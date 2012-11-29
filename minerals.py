@@ -5,7 +5,7 @@ from composition import calculate_partition_coefficient
 
 class user_mineral1 (material):
         def __init__(self):
-                material.__init__(self,method_name)
+                material.__init__(self)
                 self.params = { 'name':'test',
                         'ref_V': 6.844e-6,
                         'ref_K': 135.19,
