@@ -59,7 +59,7 @@ def plot_eos(phases, molar_abundances, geotherm):
 	p2,=plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
 	plt.title("Vs (km/s)")
 	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-	plt.ylim(6.,7.5)
+	plt.ylim(5.1,7.6)
         plt.text(40,7.3,"misfit= %3.3f" % vs_err)
 
 	# plot Vphi

@@ -2,7 +2,7 @@
 #######################
 
 #INPUT for method
-method = 'slb'					# choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005, ONLY ONE WORKING) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+method = 'mgd'					# choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005, ONLY ONE WORKING) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
 
 #INPUT for geotherm
@@ -21,7 +21,7 @@ composition_input = '2phase_fractions'		# choose 'weight_percents', '2phase_frac
 # if '2phase_fractions' or 'nphase_fractions'
 phase_names=('pv','fp')
 phases = (pv,fp)
-phase_fractions = {'pv':0.93, 'fp':0.07} 	# should add up to 1.0
+phase_fractions = {'pv':0.95, 'fp':0.05} 	# should add up to 1.0
 
 # if '2phase_fractions'
 calculate_partitioning = 'off'          	# sets if partioning coeefficients are used or calculated, 'on'/'off'/'auto', only for 2 phase fractions

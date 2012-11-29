@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 #own libs:
 from tools import *
 import mie_grueneisen_debye as mgd
-
+import birch_murnaghan as bm
 # TODO: add up weight percent and check <100 and tell them how much
 ## Based on Stixrude & Lithgow-Bertelloni (2005), all equation numbers refer to this paper. 
 
@@ -21,7 +21,6 @@ def volume(p,T,params):
       
     b_iikk= 9.*params['ref_K'] # EQ 28
     b_iikkmm= 27.*params['ref_K']*(params['K_prime']-4.) # EQ 29
-
     f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
 	
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
@@ -81,11 +80,10 @@ def bulk_modulus(p,T,V,params):
     
     delta_U = (P_th(V) - P_th_ref(V))*(V/gamma) #convert into Stixrudian units
     K = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f) \
-    		+ ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 #\
-    #		- ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
+     		+ ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 \
+    		- ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
     
     #+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.)) \
-    
     return K
 
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V

@@ -38,12 +38,14 @@ def grueneisen_parameter(x, params):
 #invert the mie-grueneisen-debye eqn of state with thermal corrections
 #for the volume
 def volume(pressure,T,params):
-	func = lambda x: bm.birch_murnaghan(x, params)*1.e9 + \
-			mgd_thermal_pressure(params['ref_V']/x, T, params) - \
-			mgd_thermal_pressure(params['ref_V']/x, 300, params) - pressure
-	ratio = opt.brentq(func, 0.8, 4.)
+	V_bm =  bm.bm_volume(pressure,params)
+	func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params)*1.e9 + \
+			mgd_thermal_pressure(V_bm, T, params) - \
+			mgd_thermal_pressure(V_bm, 300, params) - pressure
+	print "bm", bm.birch_murnaghan(params['ref_V']/V_bm, params)*1.e9, mgd_thermal_pressure(V_bm, T, params), mgd_thermal_pressure(V_bm, 300, params), pressure
+	V = opt.brentq(func, 0.09*params['ref_V'], 3.0*params['ref_V'])
 
-	V = 1./ratio * params['ref_V']
+	#V = 1./ratio * params['ref_V']
 	return V
 	
 #calculate the thermal correction for the mgd
