@@ -8,7 +8,6 @@ import mie_grueneisen_debye as mgd
 import slb_finitestrain as slb
 
 class material:
-        # method_name is the thermodynamic model that you are using, currently either slb or mgd
 	def __init__(self):
 		self.params = {	'name':'generic',
 			'ref_V': 0.,
