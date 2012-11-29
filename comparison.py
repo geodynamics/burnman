@@ -10,22 +10,27 @@ import comparison as comp
 import geotherm as gt
 import voigt_reuss_hill as vrh
 
-def compare_with_seismic_model(vs_err,vphi_err,rho_err,seis_vs,seis_vphi,seis_rho):
+def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+
+
+	rho_err_tot = madeup_misfit(mat_rho,seis_rho)
+	vphi_err_tot = madeup_misfit(mat_vphi,seis_vphi)
+	vs_err_tot = madeup_misfit(mat_vs,seis_vs)
+    	err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
+
+	print 'density misfit=',rho_err_tot, 'vphi misfit=',vphi_err_tot,'vs misfit=', vs_err_tot, 'total=',err_tot
+
+	return rho_err_tot, vphi_err_tot, vs_err_tot
+
+
+def madeup_misfit(calc,obs):
 
 	
-	for i in range(len(seis_vs)):
-		rho_err = (rho_err-seis_rho)
-		vp_err = (vp_err/1.e3- seis_vp)
-   		vs_err = (vs_err/1.e3- seis_vs)
-    		rho_err = pow(rho_err,2.)/pow(seis_rho,2.)
-    		vp_err = pow(vp_err,2.)/pow(seis_vp,2.)
-    		vs_err = pow(vs_err,2.)/pow(seis_vs,2.)
+	err = np.empty_like(calc)
+	for i in range(len(calc)):
+		err = (calc-obs)
+		err = pow(err,2.)/pow(obs,2.)
+	
+	err_tot=100.*integrate.trapz(err)
 
-	rho_err_tot = 100.*integrate.trapz(rho_err)
-	vp_err_tot = 100.*integrate.trapz(vp_err)
-	vs_err_tot = 100.*integrate.trapz(vs_err)
-    	err_tot=rho_err_tot+vp_err_tot+vs_err_tot
-
-	print 'density misfit=',rho_err_tot, 'vp misfit=',vp_err_tot,'vs misfit=', vs_err_tot, 'total=',err_tot
-
-	return rho_err_tot, vp_err_tot, vs_err_tot
+	return err_tot
