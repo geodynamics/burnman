@@ -16,6 +16,8 @@ def bm_bulk_modulus(pressure, params):
 	C= B-A
 	top=5./3.*A*pow(x,5./3.)-7./3.*B*pow(x,7./3.)+3.*C*pow(x,3.)
 	bottom=A*pow(x,5./3.)-B*pow(x,7./3.)+C*pow(x,3.)
+        if bottom == 0.0 :
+          return params['ref_K']
 	test_K=pressure*top/bottom/1e9
  	return test_K
  
