@@ -26,3 +26,9 @@ def read_table(filename):
             table.append(numbers)
     return table
 
+def cut_table(table,min, max):
+    tablen=[]
+    for i in range(min,max,1):
+        tablen.append(table[i,:])
+    return tablen
+

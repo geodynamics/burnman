@@ -1,4 +1,4 @@
-#Radius(km)	Pressure(kbar)	Density	(g/cc)	V_p (km/s)	V_s (km/s)
+#Radius(km)	Pressure(kbar)	Density	(g/cc)	V_p	V_s
 0		3638.524	13.08848	11.2622	3.6678
 100		3636.131	13.0863		11.26064	3.6667
 200		3628.956	13.07977	11.25593	3.66342
