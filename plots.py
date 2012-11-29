@@ -38,7 +38,7 @@ def plot_eos(phases, molar_abundances, geotherm):
 	mat_K = np.empty_like(seis_p)
 	mat_mu = np.empty_like(seis_p)
 
-	print "Calculating elastic properties for phase assemblage \n"
+	print "Calculating elastic properties for phase assemblag \n"
 	print "seismic p (GPa)	T (K)	density(kg/m^3)	K(Gpa) G(GPa)	Vs (km/s)	Vp(km/s)	Vphi (km/s)"
 	for i in range(len(seis_p)):
 		rho,vp,vs,vphi,K,mu = \
