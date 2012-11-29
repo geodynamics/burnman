@@ -10,19 +10,14 @@ import mie_grueneisen_debye as mgd
 def bm_bulk_modulus(pressure, params):
 	V = bm_volume(pressure, params)
 	x = params['ref_V']/V
-	
-	xi = -3./4. * (params['K_prime'] - 4.)
-##  derived by Ian
-	test_K=params['ref_K']/2. * ( (7.*pow(x, 7./3.) - 5.*pow(x, 5./3.))*(1. - xi*pow(x,2./3.)) + 2.*xi*(pow(x,3.) - pow(x,7./3.)))
-## Matas et al. equation A2
+        ## Matas et al. equation A2
 	A= -2.*(params['K_prime']-4.)+8./3.
 	B=-4.*(params['K_prime']-4.)+8./3.
 	C= B-A
 	top=5./3.*A*pow(x,5./3.)-7./3.*B*pow(x,7./3.)+3.*C*pow(x,3.)
 	bottom=A*pow(x,5./3.)-B*pow(x,7./3.)+C*pow(x,3.)
-	test_K2=pressure*top/bottom/1e9
-##
- 	return test_K2
+	test_K=pressure*top/bottom/1e9
+ 	return test_K
  
 # equation for the third order birch-murnaghan
 # equation of  state, returns pressure in the same
@@ -53,24 +48,6 @@ def bm_shear_modulus(pressure, params):
 	V = bm_volume(pressure, params)
 	x = params['ref_V']/V
 	G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
-	f=-1*1./2.*(1.-pow(x,2./3.))
-	# exact same as stixrude up to first order, no thermal correction
-    	G_slb=pow(1.+2.*f,5./2.)*(params['ref_mu']+(3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f)#+ \
-         #((6.*params['ref_K']*params['mu_prime']) - 24.*params['ref_K'] - 14.*params['ref_mu']+ 9./2.*params['ref_K']*params['K_prime'])*pow(f,2.)) 
-	return params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
+	return G 
 
 
-#if __name__ == "__main__":
-# not working 
-#        ref_rho = 3.37
-#        params = {'ref_K':130.3}
-#        params['K_prime'] = 3.9 
-#	params['ref_mu'] =  150.0
-#	params['mu_prime'] = 2.0
-#        pressures = np.arange(1.0e9, 135.0e9, 1.0e9)
-#        temperatures = np.arange(1.0e9, 135.0e9, 1.0e9)
-#        for i in range(len(pressures)):
-#		temperatures[i] = bm_shear_modulus(pressures[i], params)
-#        
-#	plt.plot(pressures, temperatures)
-#        plt.show()
