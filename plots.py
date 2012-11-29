@@ -1,7 +1,7 @@
 #standard numpy, scipy imports
 import numpy as np
 import matplotlib.pyplot as plt
-#test
+
 
 #eos imports
 import seismo_in as seis
