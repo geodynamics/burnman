@@ -52,7 +52,7 @@ def plot_eos(phases, molar_abundances, geotherm):
                 mat_K[i] = K
                 mat_mu[i] = mu
 
-	[rho_err,vp_err,vs_err]=comp.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+	[rho_err,vphi_err,vs_err]=comp.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho/1e3)
             
 	plt.subplot(2,2,1)
 	p1,=plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
@@ -70,7 +70,7 @@ def plot_eos(phases, molar_abundances, geotherm):
 	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 	plt.ylim(7,12)
 #	plt.legend([p1,p2],["Murakami (0.93 Pv, 0.07 fp)", "seismic model (PREM)"], loc=4)
-	plt.text(40,14.5,"misfit= %3.3f" % vp_err)
+	plt.text(40,11.5,"misfit= %3.3f" % vphi_err)
 
 	# plot density
 	plt.subplot(2,2,3)

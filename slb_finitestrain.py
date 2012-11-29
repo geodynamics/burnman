@@ -58,11 +58,6 @@ def shear_modulus(p,T,V,params):
     G_threeterms = pow(1.+2.*f, 5./2.) * (params['ref_mu'] + (3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f \
                                    + ((6.*params['ref_K']*params['mu_prime']) - 24.*params['ref_K'] - 14.*params['ref_mu']+ 9./2.*params['ref_K']*params['K_prime']) * pow(f,2)) \
                                    - (eta_s*(1./V)*delta_U/1.e9) # EQ 33 up to the second order
-    ## ignore, but please don't remove lines below, thanks, Sanne
-    G_sanne=pow(1.+2.*f,5./2.)*(params['ref_mu']+(3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f+ \
-	 ((6.*params['ref_K']*params['mu_prime']) - 24.*params['ref_K'] - 14.*params['ref_mu']+ 9./2.*params['ref_K']*params['K_prime'])*pow(f,2.)) \
-	 -(eta_s*(1./V)*delta_U/1.e9)
-    #G=G_sanne
 
     return G_twoterms
 
@@ -78,24 +73,19 @@ def bulk_modulus(p,T,V,params):
     Dcv = integrate.quad(func_int_cv,0.,params['ref_Debye']/T) 
     Dcv_300 = integrate.quad(func_int_cv,0.,params['ref_Debye']/300.)
     cv_300 = 9.*params['n']*gas_constant*(pow(300./params['ref_Debye'],3.))*Dcv_300[0]
-    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0])#-cv_300 #why substract this? Sanne #units of R
+    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0])-cv_300 #why substract this? Sanne #units of R
 
-    #density_0 = (params['molar_mass'] / (params['ref_V']*1e-6) )
     #Kth_0 = params['ref_K'] - (pow(params['ref_grueneisen'],2.) * density_0 * delta_U_300/params['molar_mass'])/1.e9 
     f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
     gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
     
     delta_U = (P_th(V) - P_th_ref(V))*(V/gamma) #convert into Stixrudian units
-    K = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f \
-		+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.))# \
-    #    + ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 \
-    #    - ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
-    #    - ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9	
-    Act = K
-    Mur = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f) 
-        
-	
-    perchng = (Act - Mur)/Act
+    K = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f) \
+    		+ ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 #\
+    #		- ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
+    
+    #+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.)) \
+    
     return K
 
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
