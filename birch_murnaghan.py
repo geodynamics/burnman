@@ -38,7 +38,7 @@ def bm_density(pressure, params):
 # temperature for a given pressure (Pa).  Returns
 # molar volume in m^3
 def bm_volume(pressure, params):
-	ratio = opt.brentq(lambda x: birch_murnaghan(x, params)*1e9-pressure, 0.1, 10.0)
+	ratio = opt.brentq(lambda x: birch_murnaghan(x, params)*1e9-pressure, 0.8, 5.0)
         return 1./ratio * params['ref_V']
 
 # get the birch murnaghan shear modulus at a reference temperature,

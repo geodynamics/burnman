@@ -19,18 +19,21 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     it = range(n_phase)
     
     #determine the partial molar volumes of the phases
-    V_i = [(molar_abundances[i]*phases[i].molar_volume(pressure,temperature)) for i in it]
+    for i in it:
+      phases[i].set_state(pressure,temperature)
+
+    V_i = [(molar_abundances[i]*phases[i].molar_volume()) for i in it]
     V_tot = sum(V_i)
     
     #calculate the density of the phase assemblage
-    rho = (1./V_tot) * sum( molar_abundances[i]*phases[i].molar_mass(pressure,temperature) for i in it)
+    rho = (1./V_tot) * sum( molar_abundances[i]*phases[i].molar_mass() for i in it)
 
     #calculate the voigt and reuss averages of the phase assemblage for K and mu
-    K_voigt = sum( V_i[i]/V_tot * phases[i].adiabatic_bulk_modulus(pressure,temperature) for i in it)
-    K_reuss = 1./sum( V_i[i]/V_tot / phases[i].adiabatic_bulk_modulus(pressure,temperature) for i in it)
+    K_voigt = sum( V_i[i]/V_tot * phases[i].adiabatic_bulk_modulus() for i in it)
+    K_reuss = 1./sum( V_i[i]/V_tot / phases[i].adiabatic_bulk_modulus() for i in it)
    
-    mu_voigt = sum( V_i[i]/V_tot * phases[i].shear_modulus(pressure,temperature) for i in it)
-    mu_reuss = 1./sum( V_i[i]/V_tot / phases[i].shear_modulus(pressure,temperature) for i in it)
+    mu_voigt = sum( V_i[i]/V_tot * phases[i].shear_modulus() for i in it)
+    mu_reuss = 1./sum( V_i[i]/V_tot / phases[i].shear_modulus() for i in it)
 
     #average voigt and reuss for vrh
     K_vrh = (K_voigt+K_reuss)/2.

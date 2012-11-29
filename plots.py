@@ -9,6 +9,7 @@ from  minerals import *
 import comparison as comp
 import geotherm as gt
 import composition as part
+import voigt_reuss_hill as vrh
 
 # read in userinput
 import sys

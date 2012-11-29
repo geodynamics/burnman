@@ -5,6 +5,7 @@ from composition import calculate_partition_coefficient
 
 class user_mineral1 (material):
         def __init__(self):
+                material.__init__(self,method_name)
                 self.params = { 'name':'test',
                         'ref_V': 6.844e-6,
                         'ref_K': 135.19,
@@ -227,68 +228,68 @@ class mg_fe_perovskite_pt_dependent(material):
 		self.iron_number_with_pt = iron_number_with_pt
 		self.params = {'name':'Depth dependent Mg Fe perovskite',
 				'n':5 }
-	def iron_number(self,pressure,temperature):
+	def iron_number(self):
 		return self.iron_number_with_pt(pressure,temperature)[1]
-	def molar_mass(self,pressure,temperature):
+	def molar_mass(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.molar_mass(pressure,temperature)
-	def density(self, pressure, temperature):
+		return pv.molar_mass()
+	def density(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.density(pressure, temperature)
-	def molar_volume(self,pressure, temperature):
+		return pv.density()
+	def molar_volume(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.molar_volume(pressure, temperature)
-	def bulk_modulus(self,pressure, temperature):
+		return pv.molar_volume()
+	def bulk_modulus(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.bulk_modulus(pressure, temperature)
-	def v_s(self,pressure, temperature):
+		return pv.bulk_modulus()
+	def v_s(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.v_s(pressure, temperature)
-	def v_p(self,pressure, temperature):
+		return pv.v_s()
+	def v_p(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
 		return pv.v_p(pressure, temperature)
-	def geotherm(self,pressure, temperature):
+	def geotherm(self):
 		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
 		self.params = pv.params
-		return pv.v_s(pressure, temperature)
+		return pv.v_s()
 
 class ferropericlase_pt_dependent(material):
 	def __init__(self, iron_number_with_pt):
 		self.iron_number_with_pt = iron_number_with_pt
-	def iron_number(self,pressure,temperature):
+	def iron_number(self):
 		return self.iron_number_with_pt(pressure,temperature)[0]
-	def molar_mass(self,pressure,temperature):
+	def molar_mass(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
-		return fp.molar_mass(pressure,temperature)
-	def density(self,pressure, temperature):
+		return fp.molar_mass()
+	def density(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
-		return fp.density(pressure, temperature)
-	def molar_volume(self,pressure, temperature):
+		return fp.density()
+	def molar_volume(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
-		return fp.molar_volume(pressure, temperature)
-	def bulk_modulus(self,pressure, temperature):
+		return fp.molar_volume()
+	def bulk_modulus(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
 		return fp.bulk_modulus(pressure, temperature)
-	def v_s(self,pressure, temperature):
+	def v_s(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
 		return fp.v_s(pressure, temperature)
-	def v_p(self,pressure, temperature):
+	def v_p(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
-		return fp.v_p(pressure, temperature)
-	def geotherm(self,pressure, temperature):
+		return fp.v_p()
+	def geotherm(self):
 		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
 		self.params = fp.params
-		return fp.v_s(pressure, temperature)
+		return fp.v_s()
 
