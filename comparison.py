@@ -18,8 +18,6 @@ def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rh
 	vs_err_tot = chi_factor(mat_vs,seis_vs)
     	err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
 
-	print 'density misfit=',rho_err_tot, 'vphi misfit=',vphi_err_tot,'vs misfit=', vs_err_tot, 'total=',err_tot
-
 	return rho_err_tot, vphi_err_tot, vs_err_tot
 
 
