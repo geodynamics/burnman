@@ -38,10 +38,9 @@ def grueneisen_parameter(x, params):
 #invert the mie-grueneisen-debye eqn of state with thermal corrections
 #for the volume
 def volume(pressure,T,params):
-	V_bm =  bm.bm_volume(pressure,params)
 	func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params)*1.e9 + \
-			mgd_thermal_pressure(V_bm, T, params) - \
-			mgd_thermal_pressure(V_bm, 300, params) - pressure
+			mgd_thermal_pressure(x, T, params) - \
+			mgd_thermal_pressure(x, 300, params) - pressure
 	V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
 	return V
 	
@@ -65,7 +64,8 @@ def bulk_modulus(pressure,T,V, params):
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
 # alpha is basically 1e-5
 def bulk_modulus_adiabatic(pressure,T,V,params):
-	K_T=bulk_modulus(pressure,T,V,params)
+	P_st=bm.birch_murnaghan(params['ref_V']/V,params)*1e9
+	K_T=bulk_modulus(P_st,T,V,params)
 	alpha=1./K_T*((mgd_thermal_pressure(V,T+1.,params)-mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
 	return K_T*(1.+alpha*grueneisen_parameter(params['ref_V']/V,params)*T)
 
@@ -81,9 +81,13 @@ def thermal_shear_modulus(V, T,  params):
 
 #calculate the mgd shear modulus as a function of P, V, and T
 def shear_modulus(pressure,T,V, params):
-	mu = bm.bm_shear_modulus(pressure,  params) + \
+	P_st=bm.birch_murnaghan(params['ref_V']/V,params)*1e9
+	mu = bm.bm_shear_modulus(P_st,  params) + \
 		thermal_shear_modulus(V,T, params)/1.e9 - \
 		thermal_shear_modulus(V,300, params)/1.e9 # EQ B11
+	print bm.bm_shear_modulus(pressure,  params)
+	print  thermal_shear_modulus(V,T, params)/1.e9
+	print thermal_shear_modulus(V,300, params)/1.e9 
 	return mu
 
 
