@@ -22,6 +22,12 @@ userinput=(imp.load_source("userinput",file))
 def plot_eos(phases, molar_abundances, geotherm):
         # read in seismic model
 	s=seis.seismo_in()
+	s.params['name']=userinput.name
+	s.params['attenuation_correction']=userinput.attenuation_correction
+	s.params['depth_min']=userinput.depth_min
+	s.params['depth_max']=userinput.depth_max
+	s.params['depth_step']=userinput.depth_step
+
         print "Looking up seismic model:",s.params['name']
         seis_p = np.array(s.pressure())*1.e9     
         seis_r = np.array(s.radius())/1.e3
