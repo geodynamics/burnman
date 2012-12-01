@@ -5,6 +5,8 @@ import scipy.integrate as integrate
 import math
 import matplotlib.pyplot as plt
 
+import traceback
+
 #own libs:
 from tools import *
 import mie_grueneisen_debye as mgd
@@ -15,7 +17,6 @@ import birch_murnaghan as bm
 gas_constant=8.314462175
 
 def volume(p,T,params):
- 	
     P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params) #From Stixrude 2005: delta U (T)*gamma*ro (1/V)
     P_th_ref = lambda x: mgd.mgd_thermal_pressure(x, 300., params)#From Stixrude 2005: delta U (300 K)*gamma*ro (1/V)
       
@@ -26,7 +27,9 @@ def volume(p,T,params):
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
     		+(0.5*b_iikkmm*pow(f(x),2.)))*1.e9 + P_th(x) - P_th_ref(x) - p #EQ 21 
     
-    V = opt.brentq(func, 0.09*params['ref_V'], 3.*params['ref_V']) 
+    V = opt.brentq(func, 0.5*params['ref_V'], 1.1*params['ref_V']) 
+
+    #V= params['ref_V'] #1300/2000 times
     return V
 
 def shear_modulus(p,T,V,params):
