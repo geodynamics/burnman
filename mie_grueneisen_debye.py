@@ -4,28 +4,12 @@ import scipy.integrate as integrate
 import matplotlib.pylab as plt
 import birch_murnaghan as bm
 
-import traceback
-aaa=1
 
 #Evaluate the Debye function.  Takes the parameter
 #xi = Debye_T/T
 def debye_fn(x):
-	#sol = integrate.quad( lambda xi: pow(xi,3.)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
-	#[sol,_] = integrate.fixed_quad(lambda xi: pow(xi,3.)/(np.exp(xi)-1.), 0.0, x, n=2)
-	
-	#[sol1,_] = integrate.quad( lambda xi: pow(xi,3.)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
-
-	xx = [0,x/2,x]
-	yy = [0, pow(x/2,3.)/(np.exp(x/2)-1.), pow(x,3.)/(np.exp(x)-1.)]
-
-	sol1 = integrate.trapz(yy,xx)	
-
-	global aaa
-	aaa=aaa+1
-	#traceback.print_stack()
-	#print aaa
-	#print sol,sol1
-	return 3.*sol1/pow(x,3.)
+	sol = integrate.quad( lambda xi: pow(xi,3.)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
+	return 3.*sol[0]/pow(x,3.)
 
 #calculate isotropic thermal pressure, see
 # Matas et. al. (2007) eq B4
