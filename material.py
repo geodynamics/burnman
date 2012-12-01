@@ -22,7 +22,16 @@ class material:
 			'q0': 0.}
                 self.pressure = 0.0
                 self.temperature = 300
-                self.method = slb
+                self.method = []
+
+	def set_method(self, method):
+		""" use "slb" or "mgd" """
+		if (method=="slb"):
+			self.method = slb;
+		elif (method=="mgd"):
+			self.method = mgd;
+		else:
+			raise("unsupported material method " + method)
 
         def set_state(self, pressure, temperature):
                 self.pressure = pressure

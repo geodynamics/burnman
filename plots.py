@@ -105,6 +105,7 @@ if (userinput.geotherm=='geotherm_brown_shankland'):
 	print "geotherm is from Brown & Shankland (1981)"
 else:
 	print "define geothermal gradient"
+
 # read in composition
 if (userinput.composition_input=='weight_percents'):
 	weight_percents = userinput.weight_percents 
@@ -164,6 +165,11 @@ elif (userinput.composition_input=='nphase_fractions'):
 		phases.append(phase)
 else:
 	raise("Choose method to determine composition: 'weight_percents' or 'phase_fractions'")
+
+#set method
+for ph in phases:
+	ph.set_method(userinput.method)
+
 
 print "Calculations are done for:"
 for i in range(len(phases)):
