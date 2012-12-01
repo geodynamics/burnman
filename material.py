@@ -23,10 +23,9 @@ class material:
                 self.pressure = 0.0
                 self.temperature = 300
                 self.method = slb
-        def set_state(self, pressure, temperature, method = slb):
+        def set_state(self, pressure, temperature):
                 self.pressure = pressure
                 self.temperature = temperature
-                self.method = method
 	def molar_mass(self):
 		return self.params['molar_mass']
 	def density(self):
