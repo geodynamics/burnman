@@ -42,10 +42,7 @@ def volume(pressure,T,params):
 	func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params)*1.e9 + \
 			mgd_thermal_pressure(V_bm, T, params) - \
 			mgd_thermal_pressure(V_bm, 300, params) - pressure
-	#print "bm", bm.birch_murnaghan(params['ref_V']/V_bm, params)*1.e9, mgd_thermal_pressure(V_bm, T, params), mgd_thermal_pressure(V_bm, 300, params), pressure
-	V = opt.brentq(func, 0.09*params['ref_V'], 3.0*params['ref_V'])
-
-	#V = 1./ratio * params['ref_V']
+	V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
 	return V
 	
 #calculate the thermal correction for the mgd
