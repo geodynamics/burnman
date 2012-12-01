@@ -85,9 +85,6 @@ def shear_modulus(pressure,T,V, params):
 	mu = bm.bm_shear_modulus(P_st,  params) + \
 		thermal_shear_modulus(V,T, params)/1.e9 - \
 		thermal_shear_modulus(V,300, params)/1.e9 # EQ B11
-	print bm.bm_shear_modulus(pressure,  params)
-	print  thermal_shear_modulus(V,T, params)/1.e9
-	print thermal_shear_modulus(V,300, params)/1.e9 
 	return mu
 
 
