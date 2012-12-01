@@ -23,29 +23,29 @@ class material:
                 self.pressure = 0.0
                 self.temperature = 300
                 self.method = slb
+
         def set_state(self, pressure, temperature):
                 self.pressure = pressure
                 self.temperature = temperature
+
+		self.V = bm.bm_volume(self.pressure, self.params)
+		self.K_T = self.method.bulk_modulus(self.pressure, self.temperature, self.V, self.params)
+		self.K_S = self.method.bulk_modulus_adiabatic(self.pressure, self.temperature, self.V, self.params)
+		self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
+		self.VV = self.method.volume(self.pressure, self.temperature, self.params)
+
 	def molar_mass(self):
 		return self.params['molar_mass']
 	def density(self):
-		V = bm.bm_volume(self.pressure, self.params)
-		return  self.params['molar_mass']/V
+		return  self.params['molar_mass']/self.V
         def molar_volume(self):
-                V = self.method.volume(self.pressure, self.temperature, self.params)
-                return V
+                return self.VV
 	def bulk_modulus(self):
-		V = bm.bm_volume(self.pressure, self.params)
-		K_T = self.method.bulk_modulus(self.pressure, self.temperature, V, self.params)
-		return K_T
+		return self.K_T
         def adiabatic_bulk_modulus(self):
-                V = bm.bm_volume(self.pressure,  self.params)
-                K_S = self.method.bulk_modulus_adiabatic(self.pressure, self.temperature, V, self.params)
-                return K_S
+                return self.K_S
 	def shear_modulus(self):
-		V = bm.bm_volume(self.pressure, self.params)
-		mu = self.method.shear_modulus(self.pressure, self.temperature, V, self.params)
-		return mu
+		return self.mu
 	def v_s(self):
 		return np.sqrt(self.shear_modulus()*1.e9 / \
 			self.density())/1000.
