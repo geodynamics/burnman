@@ -13,9 +13,6 @@ from code import main as main
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#INPUT for geotherm
-geotherm = 'geotherm_brown_shankland'
-
 #INPUT for seismic models
 name = 'prem'  					# choose from 'prem'(at 1 second, Dziewonski & Anderson, 1981), 'ref_fast' (Lekic et al. 2012), 'ref_slow' (Lekic et al. 2012)
 attenuation_correction= 'off'   		# correction for attuation (not required for PREM at 1s, see Matas et al. 2007, page 4) choose from 'on', 'off'
@@ -25,7 +22,7 @@ depth_step = 100.0 				# steps at which the seismic velocity and calculated velo
 
 seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
 
-temperature = main.build_geotherm(geotherm, seis_p)
+temperature = main.build_geotherm('geotherm_brown_shankland', seis_p)
 
 def material_error(amount_perovskite):
 	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
