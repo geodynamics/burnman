@@ -57,13 +57,8 @@ depth_step = 100.0 				# steps at which the seismic velocity and calculated velo
 
 seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
  
-if (geotherm=='geotherm_brown_shankland'):
-	geotherm = lambda p: gt.geotherm_brown_shankland(p)
-	print "geotherm is from Brown & Shankland (1981)"
-else:
-	print "define geothermal gradient"
         
-temperature = [geotherm(p) for p in seis_p]
+temperature = main.build_geotherm(geotherm, seis_p)
 
 
 if (composition_input=='weight_percents'):

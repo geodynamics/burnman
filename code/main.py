@@ -61,7 +61,7 @@ def chi_factor(calc,obs):
 
 	return err_tot
 
-def seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step):
+def seismo_load(name,attenuation_correction,depth_min,depth_max,depth_step):
 	s=seis.seismo_in()
 	s.params['name']=name
 	s.params['attenuation_correction']=attenuation_correction
@@ -76,5 +76,78 @@ def seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step):
 	seis_vphi = np.array(s.v_phi())/1.e3#
 	seis_vs = np.array(s.v_s())/1.e3#[seis.seis_V(y/1.e9)[1]/1.e3 for y in seis_p]
 	seis_rho = np.array(s.density())#[seis.seis_density(y/1.e9) for y in seis_p]
-
+	
 	return seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho
+
+
+def build_geotherm(name,pressure):
+	if (name=='geotherm_brown_shankland'):
+		geotherm = lambda p: gt.geotherm_brown_shankland(p)
+		print "geotherm is from Brown & Shankland (1981)"
+	else:
+		print "define geothermal gradient"
+        
+	temperature = [geotherm(p) for p in pressure]
+	
+	return temperature
+
+def phase_builder(kind,
+
+	if (composition_input=='weight_percents'):
+		weight_percents = weight_percents 
+		phase_fractions,relative_molar_percent= part.conv_inputs(weight_percents)
+		iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
+		pv_d = mg_fe_perovskite_pt_dependent(iron_content)
+		fp_d = ferropericlase_pt_dependent(iron_content)
+       		phases = (pv_d, fp_d)
+		iron_content=("(P,T) dependent","(P,T) dependent")	
+		molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
+	elif (composition_input=='2phase_fractions'):
+		if(calculate_partitioning=='auto'):
+			iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
+			pv_d = mg_fe_perovskite_pt_dependent(iron_content)
+			fp_d = ferropericlase_pt_dependent(iron_content)
+        		pv = eval(pv)(pv_d)
+        		fp = eval(fp)(fp_d)
+       		elif (calculate_partitioning=='on'):
+			pv_d=partitioning['pv']
+			fp_d=partitioning['fp']
+			iron_content=(pv_d,fp_d)
+        		pv = eval(pv)(pv_d)
+        		fp = eval(fp)(fp_d)
+		else:
+			pv = eval(pv)()
+  			fp = eval(fp)()
+			iron_content=('not used', 'not used')
+        	phases = (pv, fp)
+		molar_abundances = (phase_fractions['pv'],	phase_fractions['fp'])
+	elif (composition_input=='nphase_fractions'):
+        	list=phase_names
+        	molar_abundances=np.empty(len(list))
+        	iron_content=np.empty(len(list))
+        	phases=[]
+		for i in range(len(list)):
+			try:
+				molar_abundances[i]=float(phase_fractions[list[i]]) 
+			except:
+				molar_abundances[i]=0.
+			try:	
+				iron_content[i]=partitioning[list[i]]
+			except:
+				iron_content[i]=None
+			print iron_content[i]
+			if np.isnan(iron_content[i]):
+				try: 
+			        	phase=eval(str(phases[i]))()
+			        	print phase
+				except:
+					raise Exception("Iron partitioning needs to be defined for", userinput.phases[i])
+			else:
+				try:
+                			phase=eval(str(phases[i]))(iron_content[i])
+                		except:
+					raise Exception(phases[i], "does not handle an iron_partioning #")		
+								
+			phases.append(phase)
+	else:
+		raise("Choose method to determine composition: 'weight_percents' or 'phase_fractions'") 	
