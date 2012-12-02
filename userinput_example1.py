@@ -21,32 +21,39 @@ from code import main as main
 ### input variables ###
 #######################
 
-
 #INPUT for method
-method = 'mgd'					# choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005, ONLY ONE WORKING) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
-
+method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
 #INPUT for geotherm
 geotherm = 'geotherm_brown_shankland'
 
 
+#Example 1: simple fixed minerals
+if False:
+	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
+	amount_perovskite = 0.95
+	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 
-#INPUT for composition
-# for material constants see minerals.py
-pv = 'minerals.Murakami_perovskite'            	# choose 'mg_fe_perovskite' or 'Murakami_perovskite'
-fp = 'minerals.Murakami_fp_LS'                   	# choose 'ferropericlase', or 'Murakami_fp_LS'
+#Example 2: specify iron content
+if True:
+	phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
+	amount_perovskite = 0.95
+	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 
-# for material constants see minerals.py
-composition_input = '2phase_fractions'		# choose 'weight_percents', '2phase_fractions', or 'nphase_fractions'
+#Example 3: input weight percentages
+if False:
+	weight_percents = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.}
+	phase_fractions,relative_molar_percent = part.conv_inputs(weight_percents)
+	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
+	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+			  minerals.ferropericlase_pt_dependent(iron_content,1))
+	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
 
-# if '2phase_fractions' or 'nphase_fractions'
-phase_names=('pv','fp')
-phases = (pv,fp)
-phase_fractions = {'pv':0.95, 'fp':0.05} 	# should add up to 1.0
+#Example 4: more complicated, three materials
+if False:
+	phases = (minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite())
+	molar_abundances = ( 0.7, 0.2, 0.1)
 
-# if '2phase_fractions'
-calculate_partitioning = 'off'          	# sets if partioning coeefficients are used or calculated, 'on'/'off'/'auto', only for 2 phase fractions
-partitioning = {'pv':0.94, 'fp':0.79}   	# ignored if calculate_partioning = 'on'artitioning = {'pv':0.94, 'fp':0.79}   # ignored if calculate_partioning = 'on'
 
 #INPUT for seismic models
 name = 'prem'  					# choose from 'prem'(at 1 second, Dziewonski & Anderson, 1981), 'ref_fast' (Lekic et al. 2012), 'ref_slow' (Lekic et al. 2012)
@@ -60,83 +67,19 @@ seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, a
         
 temperature = main.build_geotherm(geotherm, seis_p)
 
-
-if (composition_input=='weight_percents'):
-	weight_percents = weight_percents 
-	phase_fractions,relative_molar_percent= part.conv_inputs(weight_percents)
-	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
-	pv_d = mg_fe_perovskite_pt_dependent(iron_content)
-	fp_d = ferropericlase_pt_dependent(iron_content)
-        phases = (pv_d, fp_d)
-	iron_content=("(P,T) dependent","(P,T) dependent")	
-	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
-elif (composition_input=='2phase_fractions'):
-	if(calculate_partitioning=='auto'):
-		iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
-		pv_d = mg_fe_perovskite_pt_dependent(iron_content)
-		fp_d = ferropericlase_pt_dependent(iron_content)
-        	pv = eval(pv)(pv_d)
-        	fp = eval(fp)(fp_d)
-        elif (calculate_partitioning=='on'):
-		pv_d=partitioning['pv']
-		fp_d=partitioning['fp']
-		iron_content=(pv_d,fp_d)
-        	pv = eval(pv)(pv_d)
-        	fp = eval(fp)(fp_d)
-	else:
-		pv = eval(pv)()
-  		fp = eval(fp)()
-		iron_content=('not used', 'not used')
-        phases = (pv, fp)
-	molar_abundances = (phase_fractions['pv'],	phase_fractions['fp'])
-elif (composition_input=='nphase_fractions'):
-        list=phase_names
-        molar_abundances=np.empty(len(list))
-        iron_content=np.empty(len(list))
-        phases=[]
-	for i in range(len(list)):
-		try:
-			molar_abundances[i]=float(phase_fractions[list[i]]) 
-		except:
-			molar_abundances[i]=0.
-		try:	
-			iron_content[i]=partitioning[list[i]]
-		except:
-			iron_content[i]=None
-		print iron_content[i]
-		if np.isnan(iron_content[i]):
-			try: 
-			        phase=eval(str(phases[i]))()
-			        print phase
-			except:
-				raise Exception("Iron partitioning needs to be defined for", userinput.phases[i])
-		else:
-			try:
-                		phase=eval(str(phases[i]))(iron_content[i])
-                	except:
-				raise Exception(phases[i], "does not handle an iron_partioning #")		
-								
-		phases.append(phase)
-else:
-	raise("Choose method to determine composition: 'weight_percents' or 'phase_fractions'")
-
-#set method
 for ph in phases:
 	ph.set_method(method)
 
-
 print "Calculations are done for:"
 for i in range(len(phases)):
-	print molar_abundances[i], " of phase", phases[i], " with partitioning fraction", iron_content[i]
+	print molar_abundances[i], " of phase", phases[i].to_string()
 
-mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-	
+mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
 
 [rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho/1e3) #check units on rho
 	
 
-
-# read in composition
+# PLOTTING
 
 
 plt.subplot(2,2,1)

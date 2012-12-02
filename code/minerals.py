@@ -6,7 +6,7 @@ from composition import calculate_partition_coefficient
 class user_mineral1 (material):
         def __init__(self):
                 material.__init__(self)
-                self.params = { 'name':'test',
+                self.params = {
                         'ref_V': 6.844e-6,
                         'ref_K': 135.19,
                         'K_prime': 6.04,
@@ -19,7 +19,7 @@ class user_mineral1 (material):
                         'q0': 0.917}
 class user_mineral2 (material):
         def __init__(self):
-                self.params = { 'name':'test',
+                self.params = {
                         'ref_V': 6.844e-6,
                         'ref_K': 135.19,
                         'K_prime': 6.04,
@@ -32,7 +32,7 @@ class user_mineral2 (material):
                         'q0': 0.917}
 class user_mineral3 (material):
         def __init__(self):
-                self.params = { 'name':'test',
+                self.params = {
                         'ref_V': 6.844e-6,
                         'ref_K': 135.19,
                         'K_prime': 6.04,
@@ -47,7 +47,7 @@ class user_mineral3 (material):
 ################ Minerals
 class test_mineral (material):
 	def __init__(self):
-		self.params = {	'name':'test',
+		self.params = {
 			'ref_V': 6.844e-6,
 			'ref_K': 135.19,
 			'K_prime': 6.04,
@@ -61,7 +61,7 @@ class test_mineral (material):
  
 class stishovite (material):
 	def __init__(self):
-		self.params = {	'name':'stishovite',
+		self.params = {
 			'ref_V': 14.02e-6,
 			'ref_K': 314.,
 			'K_prime': 4.4,
@@ -76,7 +76,7 @@ class stishovite (material):
 
 class periclase (material):
 	def __init__(self):
-		self.params = {	'name':'periclase',
+		self.params = {
 			'ref_V': 11.24e-6,
 			'ref_K': 161.,
 			'K_prime': 3.9,
@@ -90,7 +90,7 @@ class periclase (material):
 			'eta_0s': 3.0 }
 class wustite (material):
 	def __init__(self):
-		self.params = {	'name':'periclase',
+		self.params = {
 			'ref_V': 12.06e-6,
 			'ref_K': 152.,
 			'K_prime': 4.9,
@@ -111,7 +111,7 @@ class ferropericlase(material):
 		self.fe = 1.0-mg_num
 		self.pe = periclase()
 		self.wu = wustite()
-		self.params = {'name':'ferropericlase',
+		self.params = {
 			'ref_V': self.pe.params['ref_V']*self.mg + self.wu.params['ref_V']*self.fe,
 			'ref_K': self.pe.params['ref_K']*self.mg + self.wu.params['ref_K']*self.fe,
 			'K_prime': self.pe.params['K_prime']*self.mg + self.wu.params['K_prime']*self.fe,
@@ -127,7 +127,7 @@ class ferropericlase(material):
 
 class mg_perovskite(material):
 	def __init__(self):
-		self.params = {	'name':'Mg perovskite',
+		self.params = {
 			'ref_V': 24.45e-6,
 			'ref_K': 251.,
 			'K_prime': 4.1,
@@ -144,7 +144,7 @@ class mg_perovskite(material):
 
 class fe_perovskite(material):
 	def __init__(self):
-		self.params = {	'name':'Fe perovskite',
+		self.params = {
 			'ref_V': 25.48e-6,
 			'ref_K': 281.,
 			'K_prime': 4.1,
@@ -163,7 +163,7 @@ class mg_fe_perovskite(material):
 		self.fe = 1.0-mg_num
 		self.mg_pv = mg_perovskite()
 		self.fe_pv = fe_perovskite()
-		self.params = {'name':'Mg-Fe perovskite',
+		self.params = {
 			'ref_V': self.mg_pv.params['ref_V']*self.mg + self.fe_pv.params['ref_V']*self.fe,
 			'ref_K': self.mg_pv.params['ref_K']*self.mg + self.fe_pv.params['ref_K']*self.fe,
 			'K_prime': self.mg_pv.params['K_prime']*self.mg + self.fe_pv.params['K_prime']*self.fe,
@@ -178,7 +178,7 @@ class mg_fe_perovskite(material):
 
 class Murakami_perovskite(material): #From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
 	def __init__(self):
-		self.params = {	'name':'Murakami Mg-Fe perovskite',
+		self.params = {
 			'ref_V': 24.607e-6,
 			'ref_K': 251.9,
 			'K_prime': 4.01,
@@ -195,7 +195,7 @@ class Murakami_perovskite(material): #From Murakami's emails, see Cayman for det
 			
 class Murakami_fp_HS(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
 	def __init__(self):
-		self.params = {	'name':'Murakami Mg-Fe mw HS',
+		self.params = {
 			'ref_V': 11.412e-6,
 			'ref_K': 159.,
 			'K_prime': 4.11,
@@ -210,7 +210,7 @@ class Murakami_fp_HS(material): #From Murakami's emails, see Cayman for details,
 			
 class Murakami_fp_LS(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
 	def __init__(self):
-		self.params = {	'name':'Murakami Mg-Fe mw LS',
+		self.params = {
 			'ref_V': 11.171e-6,
 			'ref_K': 170.,
 			'K_prime': 4.00,
@@ -223,73 +223,51 @@ class Murakami_fp_LS(material): #From Murakami's emails, see Cayman for details,
 			'q0': 1.5, 
 			'eta_0s': 3.0}
 
-class mg_fe_perovskite_pt_dependent(material):
-	def __init__(self, iron_number_with_pt):
+class fe_dependent_helper(material):
+	def __init__(self, iron_number_with_pt, idx):
 		self.iron_number_with_pt = iron_number_with_pt
-		self.params = {'name':'Depth dependent Mg Fe perovskite',
-				'n':5 }
-	def iron_number(self):
-		return self.iron_number_with_pt(pressure,temperature)[1]
-	def molar_mass(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.molar_mass()
-	def density(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.density()
-	def molar_volume(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.molar_volume()
-	def bulk_modulus(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.bulk_modulus()
-	def v_s(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.v_s()
-	def v_p(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.v_p(pressure, temperature)
-	def geotherm(self):
-		pv = mg_fe_perovskite(1.-self.iron_number_with_pt(pressure,temperature)[1])
-		self.params = pv.params
-		return pv.v_s()
+		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
 
-class ferropericlase_pt_dependent(material):
-	def __init__(self, iron_number_with_pt):
-		self.iron_number_with_pt = iron_number_with_pt
-	def iron_number(self):
-		return self.iron_number_with_pt(pressure,temperature)[0]
-	def molar_mass(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.molar_mass()
-	def density(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.density()
-	def molar_volume(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.molar_volume()
-	def bulk_modulus(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.bulk_modulus(pressure, temperature)
-	def v_s(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.v_s(pressure, temperature)
-	def v_p(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.v_p()
-	def geotherm(self):
-		fp = ferropericlase(1.-self.iron_number_with_pt(pressure,temperature)[0])
-		self.params = fp.params
-		return fp.v_s()
+	def create_inner_material(self, iron_number):
+		return [] # needs to be overwritten in class deriving from this one
 
+        def set_state(self, pressure, temperature):
+		self.pressure = pressure
+		self.temperature = temperature
+		self.fp = self.create_inner_material(self.iron_number())
+		self.fp.method = self.method
+		self.fp.set_state(pressure, temperature)
+		self.params = self.fp.params
+		material.set_state(self, pressure, temperature)
+
+	def iron_number(self):
+		return self.iron_number_with_pt(self.pressure,self.temperature)[self.which_index]
+	def molar_mass(self):
+		return self.fp.molar_mass()
+	def density(self):
+		return self.fp.density()
+	def molar_volume(self):
+		return self.fp.molar_volume()
+	def bulk_modulus(self):
+		return self.fp.bulk_modulus()
+	def v_s(self):
+		return self.fp.v_s()
+	def v_p(self):
+		return self.fp.v_p()
+	def geotherm(self):
+		return self.fp.v_s()
+
+
+class mg_fe_perovskite_pt_dependent(fe_dependent_helper):
+	def __init__(self, iron_number_with_pt, idx):
+		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+
+	def create_inner_material(self, iron_number):
+		return mg_fe_perovskite(iron_number)
+
+class ferropericlase_pt_dependent(fe_dependent_helper):
+	def __init__(self, iron_number_with_pt, idx):
+		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+
+	def create_inner_material(self, iron_number):
+		return ferropericlase(iron_number)

@@ -42,6 +42,8 @@ class material:
 		self.K_S = self.method.bulk_modulus_adiabatic(self.pressure, self.temperature, self.V, self.params)
 		self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
 
+	def to_string(self):
+		return "'" + self.__class__.__name__ + "'"
 	def molar_mass(self):
 		return self.params['molar_mass']
 	def density(self):
