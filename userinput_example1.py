@@ -13,9 +13,6 @@ from code import main as main
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#INPUT for geotherm
-geotherm = 'geotherm_brown_shankland'
-
 
 #Example 1: simple fixed minerals
 if False:
@@ -54,7 +51,7 @@ depth_step = 100.0 				# steps at which the seismic velocity and calculated velo
 seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
  
         
-temperature = main.build_geotherm(geotherm, seis_p)
+temperature = main.build_geotherm('geotherm_brown_shankland', seis_p)
 
 for ph in phases:
 	ph.set_method(method)
