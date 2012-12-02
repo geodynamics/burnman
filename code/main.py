@@ -24,12 +24,12 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
 	mat_rho = np.empty_like(pressure)
 	mat_K = np.empty_like(pressure)
 	mat_mu = np.empty_like(pressure)
-	print "Calculating elastic properties for phase assemblage \n"
-	print "seismic p (GPa)	T (K)	density(kg/m^3)	K(Gpa) G(GPa)	Vs (km/s)	Vp(km/s)	Vphi (km/s)"
+	#print "Calculating elastic properties for phase assemblage \n"
+	#print "seismic p (GPa)	T (K)	density(kg/m^3)	K(Gpa) G(GPa)	Vs (km/s)	Vp(km/s)	Vphi (km/s)"
 	for i in range(len(pressure)):
 		rho,vp,vs,vphi,K,mu = \
 		vrh.voigt_reuss_hill(pressure[i], temperature[i], phases, molar_abundances)
-		print pressure[i]/1.e9,"	", temperature[i],"	",rho,"	", K,"	", mu,"	", vs/1.e3,"	", vp/1.e3,"	", vphi/1.e3
+		#print pressure[i]/1.e9,"	", temperature[i],"	",rho,"	", K,"	", mu,"	", vs/1.e3,"	", vp/1.e3,"	", vphi/1.e3
 		#print pressure[i]/1.e9,"	",rho,"	", mu
 		mat_rho[i] = rho/1.e3
 		mat_vs[i] = vs/1.e3
