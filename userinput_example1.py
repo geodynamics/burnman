@@ -4,18 +4,7 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('code/')
 sys.path.append(lib_path)
 
-from code import birch_murnaghan
-from code import comparison as comp
-from code import composition as part
-from code import geotherm as gt
-from code import material
-from code import mie_grueneisen_debye
 from code import minerals 
-from code import prem
-from code import seismo_in as seis
-from code import slb_finitestrain
-from code import tools
-from code import voigt_reuss_hill as vrh
 from code import main as main
 
 ### input variables ###
