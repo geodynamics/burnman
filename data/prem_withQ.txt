@@ -1,3 +1,4 @@
+#this smaller prem file is used with {s,p}wave_{fast,slow}.txt
 # radius	pressure rho	vp	vs	Qk	 Qmu
 3493636 135.09 5559.62 13713.27 7264.79 100000    355 
 3507273 134.29 5552.79 13709.94 7264.93 100000    355 
