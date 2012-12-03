@@ -1,6 +1,7 @@
 #this model will still be improved over time
 #Mean 1D P wave velocities for the fast region in the lower mantle, clustering after Lekic et al. 2012
 #Models include MIT-P08(Li et al. 2008) and P-LLNL (Simmons et al. 2012??? in press)
+#depth in m, v_p in m/s
 2795545.000000 13718.293218 
 2781909.000000 13676.263622 
 2768273.000000 13659.012872 

@@ -1,5 +1,6 @@
 #Mean 1D shear velocities in the 'slow' region of the lower mantle from Lekic et al. 2012
 #Models include S362ANI(Kustowski et al. 2008), S40RTS(Ritsema et al. 2011), SAW24B16(Megnin and Romanowicz, 2000), GyPSuM (Simmons et al. 2010), HMSL-S (Houser et al. 2008)
+#depth in m, v_p in m/s
 2795545.000000 7170.655389 
 2781909.000000 7173.180179 
 2768273.000000 7173.825632 
