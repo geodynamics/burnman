@@ -1,6 +1,6 @@
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
-
+import csv
 
 lib_path = os.path.abspath('code/')
 sys.path.append(lib_path)
@@ -16,10 +16,6 @@ from code import main as main
 
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
-
-#INPUT for geotherm
-geotherm = 'geotherm_brown_shankland'
-
 
 #Example 1: simple fixed minerals
 if False:
@@ -58,10 +54,10 @@ depth_step = 100.0 				# steps at which the seismic velocity and calculated velo
 seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
  
 #input the output filename
-output_filename = "output.txt"
- 
-        
-temperature = main.build_geotherm(geotherm, seis_p)
+output_filename = "example_woutput.txt"
+   
+geotherm = main.get_geotherm("brown_shankland")
+temperature = [geotherm(p) for p in seis_p]
 
 for ph in phases:
 	ph.set_method(method)
@@ -71,16 +67,14 @@ for i in range(len(phases)):
 	print molar_abundances[i], " of phase", phases[i].to_string()
 
 mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
-
-[rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho/1e3) #check units on rho
 	
-#write to file
+#write to file:
 
 file = open(output_filename, 'wb')
-	file.write("Pressure	Temperature	mat_rho		mat_vs		mat_vp		mat_vphi	mat_K		mat_mu\n")
-	writer = csv.writer(file, delimiter="\t")
-	data = np.array([seis_p,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu]).transpose()
-	writer.writerows(data)
+file.write("Pressure	Temperature	mat_rho		mat_vs		mat_vp		mat_vphi	mat_K		mat_mu\n")
+writer = csv.writer(file, delimiter="\t")
+data = np.array([seis_p,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu]).transpose()
+writer.writerows(data)
 	
-	print "\nYour data has been saved it: ",output_filename
+print "\nYour data has been saved as: ",output_filename
 

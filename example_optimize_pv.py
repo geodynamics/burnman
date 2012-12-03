@@ -22,7 +22,8 @@ depth_step = 100.0 				# steps at which the seismic velocity and calculated velo
 
 seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
 
-temperature = main.build_geotherm('geotherm_brown_shankland', seis_p)
+geotherm = main.get_geotherm("brown_shankland")
+temperature = [geotherm(p) for p in seis_p]
 
 def material_error(amount_perovskite):
 	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
