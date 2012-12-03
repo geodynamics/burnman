@@ -80,14 +80,11 @@ def seismo_load(name,attenuation_correction,depth_min,depth_max,depth_step):
 	return seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho
 
 
-def build_geotherm(name,pressure):
-	if (name=='geotherm_brown_shankland'):
-		geotherm = lambda p: gt.geotherm_brown_shankland(p)
-		print "geotherm is from Brown & Shankland (1981)"
+def get_geotherm(name):
+	if (name=='brown_shankland'):
+		return lambda p: gt.geotherm_brown_shankland(p)
+	elif (name=='watson_baxter'):
+		return lambda p: gt.geotherm_watson_baxter(p)
 	else:
-		print "define geothermal gradient"
-        
-	temperature = [geotherm(p) for p in pressure]
-	
-	return temperature
-
+		raise ValueError, "Error, unknown geotherm '" + name + "'"
+	return []
