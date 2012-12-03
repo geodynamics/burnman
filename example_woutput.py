@@ -17,41 +17,13 @@ from code import main as main
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#Example 1: simple fixed minerals
-if False:
-	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
-	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
-
-#Example 2: specify iron content
-if True:
-	phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
-	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
-
-#Example 3: input weight percentages
-if False:
-	weight_percents = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.}
-	phase_fractions,relative_molar_percent = part.conv_inputs(weight_percents)
-	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
-	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-			  minerals.ferropericlase_pt_dependent(iron_content,1))
-	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
-
-#Example 4: more complicated, three materials
-if False:
-	phases = (minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite())
-	molar_abundances = ( 0.7, 0.2, 0.1)
+#specify material
+phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
+amount_perovskite = 0.95
+molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 
 
-#INPUT for seismic models
-name = 'prem'  					# choose from 'prem'(at 1 second, Dziewonski & Anderson, 1981), 'ref_fast' (Lekic et al. 2012), 'ref_slow' (Lekic et al. 2012)
-attenuation_correction= 'off'   		# correction for attuation (not required for PREM at 1s, see Matas et al. 2007, page 4) choose from 'on', 'off'
-depth_min = 0.0   				# minimum depth considered in km, choose 0.0 to use the limits given by the seismic model
-depth_max = 0.0   				# maximum depth considered in km, choose 0.0 to use the limits given by the seismic model
-depth_step = 100.0 				# steps at which the seismic velocity and calculated velocity are compared (in between is interpolated)
-
-seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
+seis_p = np.arange(25e9,130e9,5e9)
  
 #input the output filename
 output_filename = "example_woutput.txt"
