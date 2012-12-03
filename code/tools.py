@@ -1,4 +1,5 @@
 import operator
+import bisect
 
 def sort_table(table, col=0):
     return sorted(table, key=operator.itemgetter(col))
@@ -32,3 +33,12 @@ def cut_table(table,min, max):
         tablen.append(table[i,:])
     return tablen
 
+def lookup_and_interpolate(table_x, table_y, x_value):	
+    idx = bisect.bisect_left(table_x, x_value) - 1
+    if (idx < 0):
+        return table_y[0]
+    elif (idx < len(table_x)-1):
+        return linear_interpol(x_value, table_x[idx], table_x[idx+1], \
+					     table_y[idx], table_y[idx+1])
+    else:
+        return table_y[idx]
