@@ -103,5 +103,5 @@ plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 	
 
 
-plt.savefig("userinput_example1.png")
+plt.savefig("example_composition.png")
 plt.show()
