@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import math
 
 class seismic_data:
+    """
+    base class for all seismic models
+    """
     def __init__(self):
-        1
-        #print "init seismic model"
-    
+        1 # how else to make an empty function?
         
     # depth in km
     def internal_depth_list(self):
@@ -166,41 +167,6 @@ class fast(radiustable):
         self.table_vs = table2[:,1] / 1e3
 
 
-class slowold(seismic_data):
-    def __init__(self):
-        seismic_data.__init__(self)
-        self.table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
-        
-        self.table = np.array(self.table)
-        #self.table[:,0] = 6371.0e3-self.table[:,0] # converts radius to depth
-        #self.table = np.array(tools.sort_table(self.table, 0))
-        #correct units to km/s:
-        self.table[:,2] = self.table[:,2] / 1e3
-        self.table[:,3] = self.table[:,3] / 1e3
-        self.table[:,4] = self.table[:,4] / 1e3
-        self.earth_radius = 6371.0
-        
-    def internal_depth_list(self):
-        return self.earth_radius - self.table[:,0]
-
-    def pressure(self, depth):
-        return self._lookup(depth, 1)
-
-    def v_p(self, depth):
-        return self._lookup(depth, 3)
-
-    def v_s(self, depth):
-        return self._lookup(depth, 4)
-
-    def v_phi(self, depth):
-        return -1 #todo
-
-    def density(self, depth):
-        return self._lookup(depth, 2)        
-
-    def _lookup(self, depth, column_idx):
-        radius = self.earth_radius - depth
-        return tools.lookup_and_interpolate(self.table[:,0], self.table[:,column_idx], radius)	
     
 
 
@@ -233,8 +199,3 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
     plt.show()
 
-
-
-
-#TODO: switch to prem.txt
-        
