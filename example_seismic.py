@@ -74,6 +74,4 @@ plt.ylim([6,8])
 plt.xlabel('pressure')
 plt.ylabel('km/s')
 
-
-
 plt.show()
