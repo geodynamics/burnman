@@ -66,7 +66,7 @@ class radiustable(seismic_data):
         self.earth_radius = 6371.0
         
     def internal_depth_list(self):
-        return self.earth_radius - self.table_radius
+        return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
 
     def pressure(self, depth):
         return self._lookup(depth, self.table_pressure)
