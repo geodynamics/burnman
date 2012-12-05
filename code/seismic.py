@@ -23,7 +23,7 @@ class seismic_data:
         v_phi = [self.v_phi(r) for r in depth_list]
         return pressures, density, v_p, v_s, v_phi
 
-    # in GPa, depth in km
+    # in Pa, depth in km
     def pressure(self, depth):
         return 0
 
@@ -100,7 +100,7 @@ class prem(radiustable):
         table = tools.read_table("data/prem_table.txt") # radius, pressure, density, vp, vs
         table = np.array(table)
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1] * 0.1 # convert kbar to GPa
+        self.table_pressure = table[:,1] * 0.1 * 1e9 # convert kbar to GPa to Pa
         self.table_density = table[:,2]
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
@@ -130,7 +130,7 @@ class slow(radiustable):
         assert(len(table) == len(table3))
 
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1]
+        self.table_pressure = table[:,1] * 1e9
         self.table_density = table[:,2]
         self.table_vp = table3[:,1] / 1e3
         self.table_vs = table2[:,1] / 1e3
@@ -161,10 +161,25 @@ class fast(radiustable):
         assert(len(table) == len(table3))
 
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1]
+        self.table_pressure = table[:,1] * 1e9
         self.table_density = table[:,2]
         self.table_vp = table3[:,1] / 1e3
         self.table_vs = table2[:,1] / 1e3
+
+
+
+# this uses prem_withQ table
+class prem_test(radiustable):
+    def __init__(self):
+        radiustable.__init__(self)
+
+        table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = np.array(table)
+        self.table_radius = table[:,0] / 1e3 #convert to km 
+        self.table_pressure = table[:,1] * 1e9
+        self.table_density = table[:,2]
+        self.table_vp = table[:,3] / 1e3
+        self.table_vs = table[:,4] / 1e3
 
 
     
@@ -173,16 +188,15 @@ class fast(radiustable):
 
 
 if __name__ == "__main__":
+    #create a seismic dataset from prem:
     s=prem()
     depths = s.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
     print depths, pressures, density, v_p, v_s, v_phi
 
-    #create a seismic dataset from prem:
-    s=prem()
 
     # specify where we want to evaluate, here we map from pressure to depth, because we can
-    p = np.arange(1.0,360.0,5)
+    p = np.arange(1e9,360e9,5e9)
     depths = map(s.depth, p) 
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35,5600,100)
@@ -199,3 +213,19 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
     plt.show()
 
+    s1=prem()
+    depths=s1.internal_depth_list()
+    pressures, density, v_p, v_s, v_phi = s1.evaluate_all_at(depths)
+    plt.plot(depths,v_p,'+-r', label='v_p')
+    plt.plot(depths,v_s,'+-b', label='v_s')
+    plt.plot(depths,v_phi,'--g', label='v_phi')
+
+    s2=prem_test()
+    depths=s2.internal_depth_list()
+    pressures, density, v_p, v_s, v_phi = s2.evaluate_all_at(depths)
+    plt.plot(depths,v_p,'x-r', label='v_p')
+    plt.plot(depths,v_s,'x-b', label='v_s')
+    plt.plot(depths,v_phi,'x-g', label='v_phi')
+    plt.show()
+    
+    print min(depths),max(depths)
