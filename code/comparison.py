@@ -1,10 +1,8 @@
-#standard numpy, scipy imports
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 
 #eos imports
-import seismo_in as seis
 import mie_grueneisen_debye as mgd
 import comparison as comp
 import geotherm as gt
