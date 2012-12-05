@@ -70,11 +70,12 @@ mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(sei
 
 
 plt.subplot(2,2,1)
-p1,=plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p2,=plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+p1,=plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
+p2,=plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
 plt.title("Vs (km/s)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.ylim(5.1,7.6)
+plt.legend(loc='lower right')
 plt.text(40,7.3,"misfit= %3.3f" % vs_err)
 
 # plot Vphi
