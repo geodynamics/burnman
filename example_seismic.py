@@ -11,7 +11,7 @@ from code import seismic as seismic
 s=seismic.prem()
 
 # specify where we want to evaluate, here we map from pressure to depth, because we can
-p = np.arange(1.0,360.0,5)
+p = np.arange(1.0e9,360.0e9,5e9)
 depths = map(s.depth, p) 
 #we could also just specify some depth levels directly like this:
 #depths = np.arange(35,5600,100)
@@ -53,9 +53,9 @@ pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
 
 
 plt.subplot(2,2,3)
-plt.plot(pressures,v_p,'-k', label='v_p prem')
-plt.plot(pressures2,v_p2,'-r', label='v_p slow')
-plt.plot(pressures3,v_p3,'-b', label='v_p fast')
+plt.plot(pressures/1e9,v_p,'-k', label='v_p prem')
+plt.plot(pressures2/1e9,v_p2,'-r', label='v_p slow')
+plt.plot(pressures3/1e9,v_p3,'-b', label='v_p fast')
 
 plt.legend(loc='upper left')
 plt.xlim([30,140])
@@ -64,9 +64,9 @@ plt.xlabel('pressure')
 plt.ylabel('km/s')
 
 plt.subplot(2,2,4)
-plt.plot(pressures,v_s,'-k', label='v_s prem')
-plt.plot(pressures2,v_s2,'-r', label='v_s slow')
-plt.plot(pressures3,v_s3,'-b', label='v_s fast')
+plt.plot(pressures/1e9,v_s,'-k', label='v_s prem')
+plt.plot(pressures2/1e9,v_s2,'-r', label='v_s slow')
+plt.plot(pressures3/1e9,v_s3,'-b', label='v_s fast')
 
 plt.legend(loc='upper left')
 plt.xlim([30,140])
