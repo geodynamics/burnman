@@ -5,7 +5,8 @@ lib_path = os.path.abspath('code/')
 sys.path.append(lib_path)
 
 from code import minerals 
-from code import main as main
+from code import main
+from code import seismic
 
 ### input variables ###
 #######################
@@ -13,14 +14,10 @@ from code import main as main
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#INPUT for seismic models
-name = 'prem'  					# choose from 'prem'(at 1 second, Dziewonski & Anderson, 1981), 'ref_fast' (Lekic et al. 2012), 'ref_slow' (Lekic et al. 2012)
-attenuation_correction= 'off'   		# correction for attuation (not required for PREM at 1s, see Matas et al. 2007, page 4) choose from 'on', 'off'
-depth_min = 0.0   				# minimum depth considered in km, choose 0.0 to use the limits given by the seismic model
-depth_max = 0.0   				# maximum depth considered in km, choose 0.0 to use the limits given by the seismic model
-depth_step = 100.0 				# steps at which the seismic velocity and calculated velocity are compared (in between is interpolated)
-
-seis_p, seis_r, seis_vp, seis_vphi, seis_vs, seis_rho = main.seismo_load(name, attenuation_correction, depth_min, depth_max,depth_step)
+seismic_model = seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+number_of_points = 20 #set on how many depth slices the computations should be done
+depths = np.linspace(700,2800, number_of_points)
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 geotherm = main.get_geotherm("brown_shankland")
 temperature = [geotherm(p) for p in seis_p]
