@@ -61,7 +61,7 @@ class seismo_in:
     def v_phi(self):
         vs=self.v_s()
         vp=self.v_p()
-        return [np.sqrt(pow(vp[i],2.0)-4/3*pow(vs[i],2.0)) for i in range(len(vp))]
+        return [np.sqrt(pow(vp[i],2.0)-4./3.*pow(vs[i],2.0)) for i in range(len(vp))]
 
 
 
