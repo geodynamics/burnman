@@ -2,12 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 
-#eos imports
-import mie_grueneisen_debye as mgd
-import comparison as comp
-import geotherm as gt
-import voigt_reuss_hill as vrh
-
 def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
 
 
