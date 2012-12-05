@@ -16,11 +16,11 @@ class seismic_data:
         return np.arange(0.,6000.0, 100.0)
         
     def evaluate_all_at(self, depth_list):
-        pressures = [self.pressure(r) for r in depth_list]
-        density = [self.density(r) for r in depth_list]
-        v_p = [self.v_p(r) for r in depth_list]
-        v_s = [self.v_s(r) for r in depth_list]
-        v_phi = [self.v_phi(r) for r in depth_list]
+        pressures = np.array([self.pressure(r) for r in depth_list])
+        density = np.array([self.density(r) for r in depth_list])
+        v_p = np.array([self.v_p(r) for r in depth_list])
+        v_s = np.array([self.v_s(r) for r in depth_list])
+        v_phi = np.array([self.v_phi(r) for r in depth_list])
         return pressures, density, v_p, v_s, v_phi
 
     # in Pa, depth in km
