@@ -25,27 +25,38 @@ class seismic_data:
 
     # in Pa, depth in km
     def pressure(self, depth):
+        raise ValueError, "not implemented"
         return 0
 
     #in km/s, depth in km
     def v_p(self, depth):
+        raise ValueError, "not implemented"
         return 0
 
     #in km/s, depth in km
     def v_s(self, depth):
+        raise ValueError, "not implemented"
         return 0
     
     #in km/s, depth in km
     def v_phi(self, depth):
+        raise ValueError, "not implemented"
         return 0
 
     #g/cc, depth in km
     def density(self, depth):
+        raise ValueError, "not implemented"
         return 0
     
-    #look up depth from given pressure
+    #look up depth from given pressure in Pa
     def depth(self, pressure):
+        raise ValueError, "not implemented"
         return -1
+
+    #todo, meaning and units? Qk, Qmu = ?
+    def attenuation(self, pressure):
+        raise ValueError, "attentuation not implemented"
+        return -1,-1
 
 class radiustable(seismic_data):
     """ 
@@ -104,6 +115,9 @@ class prem(radiustable):
         self.table_density = table[:,2]
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
+
+    def attenuation(self, pressure):
+        return 100000, 355 # todo
 
 class slow(radiustable):
     def __init__(self):
@@ -185,7 +199,9 @@ class prem_test(radiustable):
     
 
 
-
+# shared variable of prem, so that other routines do not need to create
+# prem over and over. See geotherm for example.
+prem_model = prem()
 
 if __name__ == "__main__":
     #create a seismic dataset from prem:
