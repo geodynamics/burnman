@@ -15,7 +15,7 @@ from code import seismic
 from code import slb_finitestrain
 from code import tools
 from code import voigt_reuss_hill as vrh
-
+import scipy.integrate as integrate
 
 
 def calculate_velocities (pressure, temperature, phases, molar_abundances):
@@ -43,8 +43,20 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
 
 	return mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu
 
-def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
 
+# returns the differences of the two velocity profiles sampled at the given depth
+# it computes the L2 norm of the two functions (assumed to be linear between points)
+def compare_two(depth,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+
+	rho_err_tot = l2(depth,mat_rho,seis_rho)
+	vphi_err_tot = l2(depth,mat_vphi,seis_vphi)
+	vs_err_tot = l2(depth,mat_vs,seis_vs)
+    	err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
+
+	return rho_err_tot, vphi_err_tot, vs_err_tot
+
+# weighted comparison
+def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
 
 	rho_err_tot = chi_factor(mat_rho,seis_rho)
 	vphi_err_tot = chi_factor(mat_vphi,seis_vphi)
@@ -52,6 +64,14 @@ def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rh
     	err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
 
 	return rho_err_tot, vphi_err_tot, vs_err_tot
+
+def l2(x,funca,funcb):
+	diff=np.array(funca-funcb)
+	diff=diff*diff
+	length=x[-1]-x[0]
+	assert(length>0)
+	return integrate.trapz(diff,x) / length
+	
 
 def chi_factor(calc,obs):
 	#assuming 1% a priori uncertainty on the seismic model
