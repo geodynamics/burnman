@@ -1,15 +1,14 @@
 import numpy as np
-import seismic_models as seis
-import seismo_in
-s=seismo_in.seismo_in()
+import seismic
 
 # Voigt-Reuss-Hill average
 # inputs are pressure, temperature, a list of phases, and
 # a list of the same length of molar abundances of the phases.
 # That is to say, given a mole of molecules, what fraction of them
 # are in which phase.  They should add up to 1.
+# attenuation_correction: True or False
 
-def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
+def voigt_reuss_hill(pressure, temperature, phases, molar_abundances, attenuation_correction=False):
     # from matas 2007, Appendix C
 
     n_phase = len(phases)
@@ -45,20 +44,13 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     v_phi = np.sqrt( (K_vrh*1e9) / rho)
 
     #correct velocities from Ghz to long (~100s) period seismic waves
-    if (s.params['attenuation_correction'] is 'on'):
+    if (attenuation_correction):
         v_p,v_s,v_phi=attenuation_correction(pressure,v_p,v_s,v_phi)
         
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 
 def attenuation_correction(pressure,v_p,v_s,v_phi):
-    #read in attenuation from PREM
-
-    prem_Qk = seis.prem_attenuation(pressure/1.e9)[0]
-    prem_Qm = seis.prem_attenuation(pressure/1.e9)[1]
-        
-    Qphi= prem_Qk
-    Qs  = prem_Qm
-        
+    Qphi, Qs = seismic.prem_model.attenuation(pressure)
   
     beta = 0.3 # Matas et al. (2007) page 4        
         #for i in range(len(pressure)):
