@@ -1,9 +1,8 @@
 import numpy
 import bisect
 import matplotlib.pyplot as pyplot
-import seismic_models as seis
 from tools import *
-
+import seismic
 
 # polynomial fit from Watson, Baxter, EPSL, 2007
 # pressure: in GPa
@@ -20,7 +19,7 @@ def geotherm_watson_baxter(pressure):
 
 # geotherm from Brown and Shankland 81
 def geotherm_brown_shankland(pressure):
-    depth = seis.prem_depth(pressure/1e9)/1.e3
+    depth = seismic.prem_model.depth(pressure)
     return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)	
 
 #This integrates dT/dP = gr * T / K_s
