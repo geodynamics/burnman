@@ -35,15 +35,20 @@ def material_error(amount_perovskite):
 
 	mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
 
-	[rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho/1e3) #check units on rho
+	#[rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+	[rho_err,vphi_err,vs_err]=main.compare_two(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+
 	return vs_err, vphi_err
 
-xx=np.linspace(0.0, 1.0, 20)
-yy_vs=[material_error(x)[0] for x in xx]
-yy_vphi=[material_error(x)[1] for x in xx]
+xx=np.linspace(0.0, 1.0, 40)
+errs=np.array([material_error(x) for x in xx])
+yy_vs=errs[:,0]
+yy_vphi=errs[:,1]
 plt.plot (xx,yy_vs,label=("vs error"))
 plt.plot (xx,yy_vphi,label=("vphi error"))
-plt.ylim(0,100)
+plt.yscale('log')
+
+#plt.ylim(0,100)
 plt.xlabel('% Perovskite')
 plt.ylabel('Error')
 plt.legend()
