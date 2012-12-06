@@ -15,7 +15,6 @@ from code import seismic
 from code import slb_finitestrain
 from code import tools
 from code import voigt_reuss_hill as vrh
-from code import seismo_in as seis
 
 
 
