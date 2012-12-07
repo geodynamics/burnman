@@ -1,5 +1,6 @@
 from material import *
 from composition import *
+import voigt_reuss_hill as vrh
 
 ################ User input minerals
 
@@ -103,9 +104,65 @@ class wustite (material):
 			'q0': 1.5,
 			'eta_0s': 3.0 }
 
+# combines two or more materials given a fixed molar_abundance
+# based on their volume at a certain T,p.
+class helper_volumetric_mixing(material):
+	#base_materials: list of materials
+	#molar_abundances: list of molar ratios (sum up to 1)
+	def __init__(self, base_materials, molar_abundances):
+		self.base_materials = base_materials
+		self.molar_abundances = molar_abundances
+		assert(len(base_materials)==len(molar_abundances))
+		assert(sum(molar_abundances)>0.999)
+		assert(sum(molar_abundances)<1.001)
+
+	def set_state(self, pressure, temperature):
+		for mat in self.base_materials:
+			mat.method = self.method
+			mat.set_state(pressure, temperature)
+
+		itrange = range(0,len(self.base_materials))
 
 
-class ferropericlase(material): #need to voight reuss hill these values
+		self.params = {}
+		
+		self.params['n'] = sum([self.base_materials[i].params['n'] for i in itrange ]) / len(self.base_materials)			
+		phase_volume = [self.base_materials[i].molar_volume()*self.molar_abundances[i] for i in itrange ]
+
+		# some properties need weighted averaging
+		for prop in ['ref_V', 'molar_mass','ref_Debye','ref_grueneisen','q0','eta_0s']:
+			self.params[prop] = sum( [ self.base_materials[i].params[prop]*self.molar_abundances[i] for i in itrange ] )
+
+		#print [ self.base_materials[i].params['molar_mass'] for i in itrange ], self.params['molar_mass'], self.molar_abundances
+		
+
+		# some need VRH averaging
+		for prop in ['ref_K','K_prime','ref_mu','mu_prime']:
+			
+			X=[ mat.params[prop] for mat in self.base_materials ]
+			self.params[prop] = vrh.vhr_average(phase_volume, X)
+
+		material.set_state(self,pressure, temperature)
+		
+		print [ self.base_materials[i].V for i in itrange ], self.V, self.molar_abundances
+		
+
+
+class ferropericlase(helper_volumetric_mixing):
+	def __init__(self, fe_num):
+		base_materials = [periclase(), wustite()]
+		molar_abundances = (1.-fe_num, fe_num)
+		helper_volumetric_mixing.__init__(self, base_materials, molar_abundances)
+
+
+class mg_fe_perovskite(helper_volumetric_mixing):
+	def __init__(self, fe_num):
+		base_materials = [mg_perovskite(), fe_perovskite()]
+		molar_abundances = (1.-fe_num, fe_num)
+		helper_volumetric_mixing.__init__(self, base_materials, molar_abundances)
+
+
+class ferropericlase_old_and_probably_wrong(material):
 	def __init__(self, fe_num):
 		self.mg = 1.-fe_num
 		self.fe = fe_num
@@ -113,7 +170,7 @@ class ferropericlase(material): #need to voight reuss hill these values
 		self.wu = wustite()
 		self.params = {
 			'ref_V': self.pe.params['ref_V']*self.mg + self.wu.params['ref_V']*self.fe,
-			'ref_K': (self.pe.params['ref_K']*self.mg + self.wu.params['ref_K']*self.fe,
+			'ref_K': self.pe.params['ref_K']*self.mg + self.wu.params['ref_K']*self.fe,
 			'K_prime': self.pe.params['K_prime']*self.mg + self.wu.params['K_prime']*self.fe,
 			'ref_mu': self.pe.params['ref_mu']*self.mg + self.wu.params['ref_mu']*self.fe,
 			'mu_prime': self.pe.params['mu_prime']*self.mg + self.wu.params['mu_prime']*self.fe,
@@ -124,6 +181,26 @@ class ferropericlase(material): #need to voight reuss hill these values
 			'q0': self.pe.params['q0']*self.mg + self.wu.params['q0']*self.fe ,
 			'eta_0s': self.pe.params['eta_0s']*self.mg + self.wu.params['eta_0s']*self.fe }
 
+
+
+class mg_fe_perovskite_old_and_probably_wrong(material):
+	def __init__(self, fe_num):
+		self.mg = 1.0-fe_num
+		self.fe = fe_num
+		self.mg_pv = mg_perovskite()
+		self.fe_pv = fe_perovskite()
+		self.params = {
+			'ref_V': self.mg_pv.params['ref_V']*self.mg + self.fe_pv.params['ref_V']*self.fe,
+			'ref_K': self.mg_pv.params['ref_K']*self.mg + self.fe_pv.params['ref_K']*self.fe,
+			'K_prime': self.mg_pv.params['K_prime']*self.mg + self.fe_pv.params['K_prime']*self.fe,
+			'ref_mu': self.mg_pv.params['ref_mu']*self.mg + self.fe_pv.params['ref_mu']*self.fe,
+			'mu_prime': self.mg_pv.params['mu_prime']*self.mg + self.fe_pv.params['mu_prime']*self.fe,
+			'molar_mass': self.mg_pv.params['molar_mass']*self.mg + self.fe_pv.params['molar_mass']*self.fe,
+			'n': 5,
+			'ref_Debye': self.mg_pv.params['ref_Debye']*self.mg + self.fe_pv.params['ref_Debye']*self.fe,
+			'ref_grueneisen': self.mg_pv.params['ref_grueneisen']*self.mg + self.fe_pv.params['ref_grueneisen']*self.fe,
+			'q0': self.mg_pv.params['q0']*self.mg + self.fe_pv.params['q0']*self.fe ,
+			'eta_0s': self.mg_pv.params['eta_0s']*self.mg + self.fe_pv.params['eta_0s']*self.fe}
 
 class mg_perovskite(material):
 	def __init__(self):
@@ -157,24 +234,6 @@ class fe_perovskite(material):
 			'q0': 1.4, 
 			'eta_0s': 2.4 }
 
-class mg_fe_perovskite(material):
-	def __init__(self, fe_num):
-		self.mg = 1.0-fe_num
-		self.fe = fe_num
-		self.mg_pv = mg_perovskite()
-		self.fe_pv = fe_perovskite()
-		self.params = {
-			'ref_V': self.mg_pv.params['ref_V']*self.mg + self.fe_pv.params['ref_V']*self.fe,
-			'ref_K': self.mg_pv.params['ref_K']*self.mg + self.fe_pv.params['ref_K']*self.fe,
-			'K_prime': self.mg_pv.params['K_prime']*self.mg + self.fe_pv.params['K_prime']*self.fe,
-			'ref_mu': self.mg_pv.params['ref_mu']*self.mg + self.fe_pv.params['ref_mu']*self.fe,
-			'mu_prime': self.mg_pv.params['mu_prime']*self.mg + self.fe_pv.params['mu_prime']*self.fe,
-			'molar_mass': self.mg_pv.params['molar_mass']*self.mg + self.fe_pv.params['molar_mass']*self.fe,
-			'n': 5,
-			'ref_Debye': self.mg_pv.params['ref_Debye']*self.mg + self.fe_pv.params['ref_Debye']*self.fe,
-			'ref_grueneisen': self.mg_pv.params['ref_grueneisen']*self.mg + self.fe_pv.params['ref_grueneisen']*self.fe,
-			'q0': self.mg_pv.params['q0']*self.mg + self.fe_pv.params['q0']*self.fe ,
-			'eta_0s': self.mg_pv.params['eta_0s']*self.mg + self.fe_pv.params['eta_0s']*self.fe}
 
 class Murakami_perovskite(material): #From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
 	def __init__(self):
