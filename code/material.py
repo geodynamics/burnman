@@ -48,8 +48,11 @@ class material:
 		return self.params['molar_mass']
 	def density(self):
 		return  self.params['molar_mass']/self.V
+
+	# gives volume in m^3/mol
         def molar_volume(self):
                 return self.V
+
 	def bulk_modulus(self):
 		return self.K_T
         def adiabatic_bulk_modulus(self):
