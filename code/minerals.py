@@ -223,7 +223,7 @@ class Murakami_fp_LS(material): #From Murakami's emails, see Cayman for details,
 			'q0': 1.5, 
 			'eta_0s': 3.0}
 
-class fe_dependent_helper_fp(material):
+class fe_dependent_helper(material):
 	def __init__(self, iron_number_with_pt, idx):
 		self.iron_number_with_pt = iron_number_with_pt
 		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
@@ -234,62 +234,28 @@ class fe_dependent_helper_fp(material):
         def set_state(self, pressure, temperature):
 		self.pressure = pressure
 		self.temperature = temperature
-		self.fp = self.create_inner_material(self.iron_number())
-		self.fp.method = self.method
-		self.fp.set_state(pressure, temperature)
+		self.base_material = self.create_inner_material(self.iron_number())
+		self.base_material.method = self.method
+		self.base_material.set_state(pressure, temperature)
 		self.params = self.fp.params
 		material.set_state(self, pressure, temperature)
 
 	def iron_number(self):
 		return self.iron_number_with_pt(self.pressure,self.temperature)[self.which_index]
 	def molar_mass(self):
-		return self.fp.molar_mass()
+		return self.base_material.molar_mass()
 	def density(self):
-		return self.fp.density()
+		return self.base_material.density()
 	def molar_volume(self):
-		return self.fp.molar_volume()
+		return self.base_material.molar_volume()
 	def bulk_modulus(self):
-		return self.fp.bulk_modulus()
+		return self.base_material.bulk_modulus()
 	def v_s(self):
-		return self.fp.v_s()
+		return self.base_material.v_s()
 	def v_p(self):
-		return self.fp.v_p()
+		return self.base_material.v_p()
 	def geotherm(self):
-		return self.fp.v_s()
-		
-class fe_dependent_helper_pv(material):
-	def __init__(self, iron_number_with_pt, idx):
-		self.iron_number_with_pt = iron_number_with_pt
-		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
-
-	def create_inner_material(self, iron_number):
-		return [] # needs to be overwritten in class deriving from this one
-
-        def set_state(self, pressure, temperature):
-		self.pressure = pressure
-		self.temperature = temperature
-		self.pv = self.create_inner_material(self.iron_number())
-		self.pv.method = self.method
-		self.pv.set_state(pressure, temperature)
-		self.params = self.pv.params
-		material.set_state(self, pressure, temperature)
-
-	def iron_number(self):
-		return self.iron_number_with_pt(self.pressure,self.temperature)[self.which_index]
-	def molar_mass(self):
-		return self.pv.molar_mass()
-	def density(self):
-		return self.pv.density()
-	def molar_volume(self):
-		return self.pv.molar_volume()
-	def bulk_modulus(self):
-		return self.pv.bulk_modulus()
-	def v_s(self):
-		return self.pv.v_s()
-	def v_p(self):
-		return self.pv.v_p()
-	def geotherm(self):
-		return self.pv.v_s()
+		return self.base_material.v_s()
 
 
 class mg_fe_perovskite_pt_dependent(fe_dependent_helper_pv):
