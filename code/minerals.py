@@ -1,5 +1,5 @@
 from material import *
-from composition import calculate_partition_coefficient
+from composition import *
 
 ################ User input minerals
 
@@ -105,10 +105,10 @@ class wustite (material):
 
 
 
-class ferropericlase(material):
-	def __init__(self, mg_num):
-		self.mg = mg_num
-		self.fe = 1.0-mg_num
+class ferropericlase(material): #need to voight reuss hill these values
+	def __init__(self, fe_num):
+		self.mg = 1.-fe_num
+		self.fe = fe_num
 		self.pe = periclase()
 		self.wu = wustite()
 		self.params = {
@@ -158,9 +158,9 @@ class fe_perovskite(material):
 			'eta_0s': 2.4 }
 
 class mg_fe_perovskite(material):
-	def __init__(self, mg_num):
-		self.mg = mg_num
-		self.fe = 1.0-mg_num
+	def __init__(self, fe_num):
+		self.mg = 1.0-fe_num
+		self.fe = fe_num
 		self.mg_pv = mg_perovskite()
 		self.fe_pv = fe_perovskite()
 		self.params = {
@@ -223,7 +223,7 @@ class Murakami_fp_LS(material): #From Murakami's emails, see Cayman for details,
 			'q0': 1.5, 
 			'eta_0s': 3.0}
 
-class fe_dependent_helper(material):
+class fe_dependent_helper_fp(material):
 	def __init__(self, iron_number_with_pt, idx):
 		self.iron_number_with_pt = iron_number_with_pt
 		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
@@ -256,18 +256,52 @@ class fe_dependent_helper(material):
 		return self.fp.v_p()
 	def geotherm(self):
 		return self.fp.v_s()
-
-
-class mg_fe_perovskite_pt_dependent(fe_dependent_helper):
+		
+class fe_dependent_helper_pv(material):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+		self.iron_number_with_pt = iron_number_with_pt
+		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
+
+	def create_inner_material(self, iron_number):
+		return [] # needs to be overwritten in class deriving from this one
+
+        def set_state(self, pressure, temperature):
+		self.pressure = pressure
+		self.temperature = temperature
+		self.pv = self.create_inner_material(self.iron_number())
+		self.pv.method = self.method
+		self.pv.set_state(pressure, temperature)
+		self.params = self.pv.params
+		material.set_state(self, pressure, temperature)
+
+	def iron_number(self):
+		return self.iron_number_with_pt(self.pressure,self.temperature)[self.which_index]
+	def molar_mass(self):
+		return self.pv.molar_mass()
+	def density(self):
+		return self.pv.density()
+	def molar_volume(self):
+		return self.pv.molar_volume()
+	def bulk_modulus(self):
+		return self.pv.bulk_modulus()
+	def v_s(self):
+		return self.pv.v_s()
+	def v_p(self):
+		return self.pv.v_p()
+	def geotherm(self):
+		return self.pv.v_s()
+
+
+class mg_fe_perovskite_pt_dependent(fe_dependent_helper_pv):
+	def __init__(self, iron_number_with_pt, idx):
+		fe_dependent_helper_pv.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return mg_fe_perovskite(iron_number)
 
-class ferropericlase_pt_dependent(fe_dependent_helper):
+class ferropericlase_pt_dependent(fe_dependent_helper_fp):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+		fe_dependent_helper_fp.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return ferropericlase(iron_number)

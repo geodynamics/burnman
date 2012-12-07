@@ -7,15 +7,16 @@ sys.path.append(lib_path)
 from code import minerals 
 from code import main as main
 from code import seismic
+from code import composition as part
 
 ### input variables ###
 #######################
 
 #INPUT for method
-method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+method = 'mgd' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
 #Example 1: simple fixed minerals
-if True:
+if False:
 	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
 	amount_perovskite = 0.95
 	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
@@ -28,8 +29,8 @@ if False:
 
 #Example 3: input weight percentages
 #See comments in code/composition.py for references to partition coefficent calculation
-if False:
-	weight_percents = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.}
+if True:
+	weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
 	phase_fractions,relative_molar_percent = part.conv_inputs(weight_percents)
 	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
 	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
@@ -53,6 +54,8 @@ seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(de
 geotherm = main.get_geotherm("brown_shankland")
 temperature = [geotherm(p) for p in seis_p]
 
+
+	
 for ph in phases:
 	ph.set_method(method)
 
@@ -63,8 +66,12 @@ for i in range(len(phases)):
 mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
 
 [rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-	
 
+#counter =0
+#for i in seis_p:
+#	i = counter
+#	print seis_p[i],"	", temperature[i],"	",part.calculate_partition_coefficient(seis_p[i],temperature[i],relative_molar_percent),"	",molar_abundances
+#s	counter = counter+1
 # PLOTTING
 
 plt.subplot(2,2,1)
