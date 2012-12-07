@@ -6,9 +6,8 @@ import seismic
 # a list of the same length of molar abundances of the phases.
 # That is to say, given a mole of molecules, what fraction of them
 # are in which phase.  They should add up to 1.
-# attenuation_correction: True or False
 
-def voigt_reuss_hill(pressure, temperature, phases, molar_abundances, attenuation_correction=False):
+def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     # from matas 2007, Appendix C
 
     n_phase = len(phases)
@@ -43,15 +42,10 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances, attenuatio
     v_p = np.sqrt( (K_vrh*1.e9 + 4./3.*mu_vrh*1e9) / rho)
     v_phi = np.sqrt( (K_vrh*1e9) / rho)
 
-    #correct velocities from Ghz to long (~100s) period seismic waves
-    if (attenuation_correction):
-        v_p,v_s,v_phi=attenuation_correction(pressure,v_p,v_s,v_phi)
-        
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 
-
-    #calculate the voigt and reuss averages of the phase assemblage for a certain property X
-    #from: matas 2007, appendix D
+#calculate the voigt and reuss averages of the phase assemblage for a certain property X
+#from: matas 2007, appendix D
 def vhr_average(phase_volume, X):
 
     it = range(len(phase_volume))
@@ -64,17 +58,17 @@ def vhr_average(phase_volume, X):
     X_vrh = (X_voigt+X_reuss)/2.
     return X_vrh
 
-def attenuation_correction(pressure,v_p,v_s,v_phi):
-    Qphi, Qs = seismic.prem_model.attenuation(pressure)
+def attenuation_correction(seismic_model, pressure,v_p,v_s,v_phi):
+    Qphi, Qs = seismic_model.attenuation(pressure)
   
     beta = 0.3 # Matas et al. (2007) page 4        
-        #for i in range(len(pressure)):
     Qp  = 3./4.*pow((v_p/v_s),2.)*Qs    # Matas et al. (2007) page 4
 
     cot=1./np.tan(beta*np.pi/2.)
     v_p  = v_p*(1.-1./2.*cot*1./Qp)    # Matas et al. (2007) page 1
     v_s  = v_s*(1.-1./2.*cot*1./Qs)
     v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
+
     # Kanamori and Anserson 1971, correcting from GHz to Hz
     #v_p  = v_p*(1.+1./(Qp*np.pi)*np.log(1./1.e9))    
     #v_s  = v_s*(1.+1./(Qs*np.pi)*np.log(1./1.e9))
