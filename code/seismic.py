@@ -53,7 +53,8 @@ class seismic_data:
         raise ValueError, "not implemented"
         return -1
 
-    #todo, meaning and units? Qk, Qmu = ?
+    #constants for attenuation correction
+    #returns (Qk, Qmu) with Qk: factor for v_phi, Qmu: factor for v_s
     def attenuation(self, pressure):
         raise ValueError, "attentuation not implemented"
         return -1,-1
@@ -117,7 +118,7 @@ class prem(radiustable):
         self.table_vs = table[:,4]
 
     def attenuation(self, pressure):
-        return 100000, 355 # todo
+        return 100000., 355.
 
 class slow(radiustable):
     def __init__(self):
