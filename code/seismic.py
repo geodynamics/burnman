@@ -43,7 +43,7 @@ class seismic_data:
         raise ValueError, "not implemented"
         return 0
 
-    #g/cc, depth in km
+    #in g/cc, depth in km
     def density(self, depth):
         raise ValueError, "not implemented"
         return 0
