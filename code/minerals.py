@@ -113,7 +113,7 @@ class ferropericlase(material): #need to voight reuss hill these values
 		self.wu = wustite()
 		self.params = {
 			'ref_V': self.pe.params['ref_V']*self.mg + self.wu.params['ref_V']*self.fe,
-			'ref_K': self.pe.params['ref_K']*self.mg + self.wu.params['ref_K']*self.fe,
+			'ref_K': (self.pe.params['ref_K']*self.mg + self.wu.params['ref_K']*self.fe,
 			'K_prime': self.pe.params['K_prime']*self.mg + self.wu.params['K_prime']*self.fe,
 			'ref_mu': self.pe.params['ref_mu']*self.mg + self.wu.params['ref_mu']*self.fe,
 			'mu_prime': self.pe.params['mu_prime']*self.mg + self.wu.params['mu_prime']*self.fe,
@@ -237,7 +237,7 @@ class fe_dependent_helper(material):
 		self.base_material = self.create_inner_material(self.iron_number())
 		self.base_material.method = self.method
 		self.base_material.set_state(pressure, temperature)
-		self.params = self.fp.params
+		self.params = self.base_material.params
 		material.set_state(self, pressure, temperature)
 
 	def iron_number(self):
@@ -258,16 +258,16 @@ class fe_dependent_helper(material):
 		return self.base_material.v_s()
 
 
-class mg_fe_perovskite_pt_dependent(fe_dependent_helper_pv):
+class mg_fe_perovskite_pt_dependent(fe_dependent_helper):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper_pv.__init__(self, iron_number_with_pt, idx)
+		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return mg_fe_perovskite(iron_number)
 
-class ferropericlase_pt_dependent(fe_dependent_helper_fp):
+class ferropericlase_pt_dependent(fe_dependent_helper):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper_fp.__init__(self, iron_number_with_pt, idx)
+		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return ferropericlase(iron_number)
