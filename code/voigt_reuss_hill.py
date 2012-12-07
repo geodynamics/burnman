@@ -49,6 +49,21 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances, attenuatio
         
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 
+
+    #calculate the voigt and reuss averages of the phase assemblage for a certain property X
+    #from: matas 2007, appendix D
+def vhr_average(phase_volume, X):
+
+    it = range(len(phase_volume))
+    
+    V_i = phase_volume
+    V_tot = sum(V_i)
+
+    X_voigt = sum( V_i[i]/V_tot * X[i] for i in it)
+    X_reuss = 1./sum( V_i[i]/V_tot / X[i] for i in it)
+    X_vrh = (X_voigt+X_reuss)/2.
+    return X_vrh
+
 def attenuation_correction(pressure,v_p,v_s,v_phi):
     Qphi, Qs = seismic.prem_model.attenuation(pressure)
   
