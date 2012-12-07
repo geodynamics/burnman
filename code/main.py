@@ -19,7 +19,6 @@ import scipy.integrate as integrate
 
 
 def calculate_velocities (pressure, temperature, phases, molar_abundances):
-	attenuation = False # TODO, make parameter?
 
 	mat_vs = np.empty_like(pressure)
 	mat_vp = np.empty_like(pressure)
@@ -31,7 +30,7 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
 	#print "seismic p (GPa)	T (K)	density(kg/m^3)	K(Gpa) G(GPa)	Vs (km/s)	Vp(km/s)	Vphi (km/s)"
 	for i in range(len(pressure)):
 		rho,vp,vs,vphi,K,mu = \
-		vrh.voigt_reuss_hill(pressure[i], temperature[i], phases, molar_abundances, attenuation)
+		vrh.voigt_reuss_hill(pressure[i], temperature[i], phases, molar_abundances)
 		#print pressure[i]/1.e9,"	", temperature[i],"	",rho,"	", K,"	", mu,"	", vs/1.e3,"	", vp/1.e3,"	", vphi/1.e3
 		#print pressure[i]/1.e9,"	",rho,"	", mu
 		mat_rho[i] = rho/1.e3 # convert from kg/m^3 to g/cc
