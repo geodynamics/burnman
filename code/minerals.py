@@ -133,8 +133,6 @@ class helper_volumetric_mixing(material):
 		for prop in ['ref_V', 'molar_mass','ref_Debye','ref_grueneisen','q0','eta_0s']:
 			self.params[prop] = sum( [ self.base_materials[i].params[prop]*self.molar_abundances[i] for i in itrange ] )
 
-		#print [ self.base_materials[i].params['molar_mass'] for i in itrange ], self.params['molar_mass'], self.molar_abundances
-		
 
 		# some need VRH averaging
 		for prop in ['ref_K','K_prime','ref_mu','mu_prime']:
@@ -143,8 +141,6 @@ class helper_volumetric_mixing(material):
 			self.params[prop] = vrh.vhr_average(phase_volume, X)
 
 		material.set_state(self,pressure, temperature)
-		
-		print [ self.base_materials[i].V for i in itrange ], self.V, self.molar_abundances
 		
 
 
