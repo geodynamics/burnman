@@ -6,6 +6,9 @@ Work started by a work-group of the CIDER 2012 workshop in Santa Barbara.
 
 see: http://code.google.com/p/burnman/
 
+burnman is released under the GNU GPL v2 or newer
+
+
 *** Requirements
 
 - Python 2.7 (not Python 3.x)
