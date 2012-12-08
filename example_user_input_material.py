@@ -19,7 +19,7 @@ class own_material (material):
         def __init__(self):
                 material.__init__(self)
                 self.params = {
-                        'ref_V': 6.844e-6,
+                        'ref_V': 10.844e-6,
                         'ref_K': 135.19,
                         'K_prime': 6.04,
                         'ref_mu': 175.,
