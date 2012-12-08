@@ -18,7 +18,7 @@ method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2
 
 #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
 	
-weight_percents_pyro = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.} #From Mcdonough 2003
+weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
 phase_fractions_pyro,relative_molar_percent_pyro = part.conv_inputs(weight_percents_pyro)
 iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
 phases_pyro = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
@@ -40,7 +40,7 @@ temperature_1 = [geotherm(p) for p in seis_p_1]
 
 #Input composition of model enstatite chondrites. See example_composition for potential choices.
 	
-weight_percents_enst = {'Mg':0.213, 'Fe': 0.0617, 'Si':0.214, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
+weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
 phase_fractions_enst,relative_molar_percent_enst = part.conv_inputs(weight_percents_enst)
 iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
 phases_enst = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
@@ -62,11 +62,13 @@ temperature_2 = [geotherm(p) for p in seis_p_2]
 for ph in phases_pyro:
 	ph.set_method(method)
 
+
+
+mat_rho_pyro, mat_vs_pyro, mat_vp_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = main.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
+
 print "Calculations are done for:"
 for i in range(len(phases_pyro)):
 	print molar_abundances_pyro[i], " of phase", phases_pyro[i].to_string()
-
-mat_rho_pyro, mat_vs_pyro, mat_vp_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = main.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
 
 for ph in phases_enst:
 	ph.set_method(method)
@@ -106,7 +108,9 @@ p1,=plt.plot(seis_p_1/1.e9,mat_rho_pyro,color='r',linestyle='-',marker='o',marke
 p2,=plt.plot(seis_p_2/1.e9,mat_rho_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
 p3,=plt.plot(seis_p_1/1.e9,rho_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
 plt.title("density (kg/m^3)")
-plt.legend([p1,p2,p3],["pyrolite", "enstatite","PREM"], loc=4)
+plt.legend([p1,p2,p3],["C-chondrite", "enstatite","PREM"], loc=4)
+plt.xlabel("Pressure (GPa)")
+
 
 
 #plot percent differences
@@ -125,5 +129,6 @@ p3,=plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',marke
 
 plt.title("percent difference")
 plt.legend([p1,p2,p3],["vs", "vphi","density"], loc=4)
+plt.xlabel("Pressure (GPa)")
 
 plt.show()

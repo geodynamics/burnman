@@ -7,7 +7,6 @@ sys.path.append(lib_path)
 from code import minerals 
 from code import main as main
 from code import seismic
-from code import composition as part
 
 ### input variables ###
 #######################
@@ -15,32 +14,10 @@ from code import composition as part
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#Example 1: simple fixed minerals
-if False:
-	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
-	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 
-#Example 2: specify iron content
-if False:
-	phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
-	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
-
-#Example 3: input weight percentages
-#See comments in code/composition.py for references to partition coefficent calculation
-if True:
-	weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
-	phase_fractions,relative_molar_percent = part.conv_inputs(weight_percents)
-	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
-	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-			  minerals.ferropericlase_pt_dependent(iron_content,1))
-	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
-
-#Example 4: more complicated, three materials
-if False:
-	phases = (minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite())
-	molar_abundances = ( 0.7, 0.2, 0.1)
+phases = (minerals.user_mineral1(), minerals.Murakami_fp_LS()) #disregard second mineral. See code/minerals.py for reference to user_mineral1
+amount_perovskite = 1.
+molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 
 
 #seismic model for comparison:
@@ -93,7 +70,7 @@ p1,=plt.plot(seis_p/1.e9,mat_rho,color='b',linestyle='-',marker='o',markerfaceco
 p2,=plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
 plt.title("density (kg/m^3)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-plt.text(40,4.3,"misfit= %3.3f" % rho_err)
+plt.text(40,5.3,"misfit= %3.3f" % rho_err)
 plt.xlabel("Pressure (GPa)")
 
 
@@ -107,5 +84,5 @@ plt.xlabel("Pressure (GPa)")
 	
 
 
-plt.savefig("example_composition.png")
+plt.savefig("example_user_input.png")
 plt.show()
