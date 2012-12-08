@@ -6,5 +6,6 @@ python example_woutput.py
 python example_optimize_pv.py
 python example_composition.py
 python example_seismic.py
+python example_user_input_material.py
 
 echo tests done
