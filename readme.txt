@@ -4,7 +4,7 @@ burnman is a lower mantle shear velocity generator constrained by mineral physic
 
 Work started by a work-group of the CIDER 2012 workshop in Santa Barbara.
 
-see: https://github.com/tjhei/burnman
+see: http://code.google.com/p/burnman/
 
 *** Requirements
 
