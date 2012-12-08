@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('code/')
 sys.path.append(lib_path)
 
+from code.material import material 
 from code import minerals 
 from code import main as main
 from code import seismic
@@ -14,10 +15,25 @@ from code import seismic
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
+class own_material (material):
+        def __init__(self):
+                material.__init__(self)
+                self.params = {
+                        'ref_V': 6.844e-6,
+                        'ref_K': 135.19,
+                        'K_prime': 6.04,
+                        'ref_mu': 175.,
+                        'mu_prime': 1.7,
+                        'molar_mass': .055845,
+                        'n': 1,
+                        'ref_Debye': 998.85,
+                        'ref_grueneisen': 1.368,
+                        'q0': 0.917,
+			'eta_0s': 3.0}
 
-phases = (minerals.user_mineral1(), minerals.Murakami_fp_LS()) #disregard second mineral. See code/minerals.py for reference to user_mineral1
-amount_perovskite = 1.
-molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
+
+phases = [ own_material() ]
+molar_abundances = [ 1.0 ]
 
 
 #seismic model for comparison:
