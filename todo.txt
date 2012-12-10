@@ -17,6 +17,8 @@ TODOLIST:
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?)
 - Give 2nd/3rd order approximation option as a different model so we can compare them
 - long term: setup inverse model runs, what makes sense here?
+- write burnman paper
+- write MgSi paper
 
 DONE:
 - unify importing of burnman (Timo)
