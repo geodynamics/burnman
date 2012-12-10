@@ -25,4 +25,5 @@ DONE:
 - call it burnman instead of code (Timo)
 - Timo: geotherm as burnman.geotherm.shankland() (Timo)
 - Timo: use phases = [...], instead of phases=(...) (Timo)
+- release burnman v0.2 (Timo)
 
