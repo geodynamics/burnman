@@ -32,7 +32,7 @@ seis_p_1 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature_1 = [geotherm(p) for p in seis_p_1]
 
 ##Now onto the second model parameters
@@ -42,7 +42,7 @@ temperature_1 = [geotherm(p) for p in seis_p_1]
 #Input composition of model enstatite chondrites. See example_composition for potential choices.
 	
 weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
-phase_fractions_enst,relative_molar_percent_enst = burnman.conv_inputs(weight_percents_enst)
+phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
 iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
 phases_enst = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
 	minerals.ferropericlase_pt_dependent(iron_content,1))
@@ -54,7 +54,7 @@ seis_p_2 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature_2 = [geotherm(p) for p in seis_p_2]
 
 

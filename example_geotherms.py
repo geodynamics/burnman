@@ -10,9 +10,9 @@ from burnman import minerals
 pressures = np.arange(1e9,128e9,3e9)
 
 #load two builtin geotherms and evaluate the temperatures at all pressures
-geotherm1 = burnman.get_geotherm('brown_shankland')
+geotherm1 = burnman.geotherm.brown_shankland
 temperature1 = [geotherm1(p) for p in pressures]
-geotherm2 = burnman.get_geotherm('watson_baxter')
+geotherm2 = burnman.geotherm.watson_baxter
 temperature2 = [geotherm2(p) for p in pressures]
 
 #a geotherm is actually just a function that returns a pressure given pressure in Pa

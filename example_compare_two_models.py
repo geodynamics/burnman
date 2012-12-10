@@ -24,7 +24,7 @@ seis_p_1 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature_1 = [geotherm(p) for p in seis_p_1]
 
 ##Now onto the second model parameters
@@ -45,7 +45,7 @@ seis_p_2 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature_2 = [geotherm(p) for p in seis_p_2]
 
 

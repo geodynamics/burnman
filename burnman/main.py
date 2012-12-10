@@ -1,10 +1,8 @@
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
 
-import birch_murnaghan
 import comparison as comp
 import composition as part
-import geotherm as gt
 import mie_grueneisen_debye
 import minerals 
 import seismic
@@ -92,12 +90,3 @@ def chi_factor(calc,obs):
 
 	return err_tot
 
-
-def get_geotherm(name):
-	if (name=='brown_shankland'):
-		return lambda p: gt.geotherm_brown_shankland(p)
-	elif (name=='watson_baxter'):
-		return lambda p: gt.geotherm_watson_baxter(p)
-	else:
-		raise ValueError, "Error, unknown geotherm '" + name + "'"
-	return []

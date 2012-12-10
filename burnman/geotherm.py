@@ -7,7 +7,7 @@ import seismic
 # polynomial fit from Watson, Baxter, EPSL, 2007
 # pressure: in GPa
 # return: temperature in K
-def geotherm_watson_baxter(pressure):
+def watson_baxter(pressure):
     if (pressure <= 15e9):
         return 1900-1420*pow(0.8,pressure/1e9)
     else:
@@ -18,12 +18,12 @@ def geotherm_watson_baxter(pressure):
 
 
 # geotherm from Brown and Shankland 81
-def geotherm_brown_shankland(pressure):
+def brown_shankland(pressure):
     depth = seismic.prem_model.depth(pressure)
     return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)	
 
 #This integrates dT/dP = gr * T / K_s
-def geotherm_self_consistent(pressure, T0, params):
+def self_consistent(pressure, T0, params):
         minP = 0
         #upper mantle potential temperature, in K
 	# integrate the adiabatic gradient equation

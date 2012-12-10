@@ -5,7 +5,6 @@ TODOLIST:
 - Timo: use phases = [...], instead of phases=(...)
 - document classes and functions
 - example_compare_enstpyro.py outputs negative density?!
-- Timo: geotherm as burnman.geotherm.shankland()
 - what needs to be done for spin transitions?
 - check attenuation correction and write an example (Sanne, Cayman)
 - input Ca/Al
@@ -22,3 +21,4 @@ TODOLIST:
 DONE:
 - unify importing of burnman (Timo)
 - call it burnman instead of code (Timo)
+- Timo: geotherm as burnman.geotherm.shankland() (Timo)

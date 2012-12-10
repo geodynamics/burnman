@@ -41,7 +41,7 @@ depths = np.linspace(700,2800, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
         
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature = [geotherm(p) for p in seis_p]
 
 for ph in phases:

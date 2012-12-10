@@ -23,7 +23,7 @@ molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 #define some pressure range
 pressures = np.arange(25e9,130e9,5e9)
 
-geotherm = burnman.get_geotherm("brown_shankland")
+geotherm = burnman.geotherm.brown_shankland
 temperature = [geotherm(p) for p in pressures]
 
 for ph in phases:
