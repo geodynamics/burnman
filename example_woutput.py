@@ -1,12 +1,10 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
-import csv
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import minerals 
-from code import main as main
+import burnman
+from burnman import minerals
 
 #See bottom for output tool
 
@@ -25,7 +23,7 @@ molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
 #define some pressure range
 pressures = np.arange(25e9,130e9,5e9)
 
-geotherm = main.get_geotherm("brown_shankland")
+geotherm = burnman.get_geotherm("brown_shankland")
 temperature = [geotherm(p) for p in pressures]
 
 for ph in phases:
@@ -35,7 +33,7 @@ print "Calculations are done for:"
 for i in range(len(phases)):
 	print molar_abundances[i], " of phase", phases[i].to_string()
 
-mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(pressures, temperature, phases, molar_abundances)	
+mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, phases, molar_abundances)	
 	
 #write to file:
 output_filename = "example_woutput.txt" 

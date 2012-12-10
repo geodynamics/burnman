@@ -1,12 +1,10 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import minerals 
-from code import main
-from code import seismic
+import burnman
+from burnman import minerals
 
 ### input variables ###
 #######################
@@ -14,12 +12,12 @@ from code import seismic
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-seismic_model = seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(700,2800, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
-geotherm = main.get_geotherm("brown_shankland")
+geotherm = burnman.get_geotherm("brown_shankland")
 temperature = [geotherm(p) for p in seis_p]
 
 def material_error(amount_perovskite):
@@ -33,10 +31,10 @@ def material_error(amount_perovskite):
 	for i in range(len(phases)):
 		print molar_abundances[i], " of phase", phases[i].to_string()
 
-	mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
+	mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
 
-	#[rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-	[rho_err,vphi_err,vs_err]=main.compare_two(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+	#[rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+	[rho_err,vphi_err,vs_err]=burnman.compare_two(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
 
 	return vs_err, vphi_err
 

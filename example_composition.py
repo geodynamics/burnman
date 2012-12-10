@@ -1,13 +1,10 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import minerals 
-from code import main as main
-from code import seismic
-from code import composition as part
+import burnman
+from burnman import minerals
 
 ### input variables ###
 #######################
@@ -31,8 +28,8 @@ if False:
 #See comments in code/composition.py for references to partition coefficent calculation
 if True:
 	weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
-	phase_fractions,relative_molar_percent = part.conv_inputs(weight_percents)
-	iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent)
+	phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
+	iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
 	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
 			  minerals.ferropericlase_pt_dependent(iron_content,1))
 	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
@@ -44,14 +41,14 @@ if False:
 
 
 #seismic model for comparison:
-seismic_model = seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(700,2800, number_of_points)
 #depths = seismic_model.internal_depth_list()
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
         
-geotherm = main.get_geotherm("brown_shankland")
+geotherm = burnman.get_geotherm("brown_shankland")
 temperature = [geotherm(p) for p in seis_p]
 
 for ph in phases:
@@ -61,9 +58,9 @@ print "Calculations are done for:"
 for i in range(len(phases)):
 	print molar_abundances[i], " of phase", phases[i].to_string()
 
-mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = main.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
+mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
 
-[rho_err,vphi_err,vs_err]=main.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+[rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
 	
 
 # PLOTTING

@@ -1,19 +1,16 @@
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import birch_murnaghan
-from code import comparison as comp
-from code import composition as part
-from code import geotherm as gt
-from code import mie_grueneisen_debye
-from code import minerals 
-from code import seismic
-from code import slb_finitestrain
-from code import tools
-from code import voigt_reuss_hill as vrh
+import birch_murnaghan
+import comparison as comp
+import composition as part
+import geotherm as gt
+import mie_grueneisen_debye
+import minerals 
+import seismic
+import slb_finitestrain
+import tools
+import voigt_reuss_hill as vrh
 import scipy.integrate as integrate
 
 

@@ -27,8 +27,18 @@ def weight_pct_to_mol(element, amount):
     return amount * lower_mantle_mass / molar_mass[element] * Av
 
 
-
-def conv_inputs(inp):
+def calculate_phase_percents(inp):
+    """
+    Converts given weight percentages into the requisite percent of each phase
+    in mols and also returns the fraction of perovskite versus ferropericlase, 
+    assuming all of the silcon goes into the perovskite phase
+    and with any remaining Fe or Mg going into the oxide phase.
+    Input:
+    inp={'Mg': ..., 'Fe': ..., ...} # in weight percent
+    Returns:
+    phase_per={'fp': ..., 'pv': ...} # as a fraction
+    rel_mol_per={'MgO: ..., 'FeO': ..., ...} # in mols 
+    """
     names = {'Mg':'MgO','Fe':'FeO','Si':'SiO2', 'Ca':'Ca', 'Al':'Al'}
     rel_mol_per = {}
     out = {}

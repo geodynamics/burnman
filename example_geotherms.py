@@ -1,20 +1,18 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import minerals 
-from code import main as main
-from code import tools
+import burnman
+from burnman import minerals
 
 # we want to evaluate several geotherms at these values
 pressures = np.arange(1e9,128e9,3e9)
 
 #load two builtin geotherms and evaluate the temperatures at all pressures
-geotherm1 = main.get_geotherm('brown_shankland')
+geotherm1 = burnman.get_geotherm('brown_shankland')
 temperature1 = [geotherm1(p) for p in pressures]
-geotherm2 = main.get_geotherm('watson_baxter')
+geotherm2 = burnman.get_geotherm('watson_baxter')
 temperature2 = [geotherm2(p) for p in pressures]
 
 #a geotherm is actually just a function that returns a pressure given pressure in Pa
@@ -30,7 +28,7 @@ table = [[1e9,1600],[30e9,1700],[130e9,2700]]
 table_pressure = np.array(table)[:,0]
 table_temperature = np.array(table)[:,1]
 
-my_geotherm = lambda p:  tools.lookup_and_interpolate(table_pressure, table_temperature, p)
+my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate(table_pressure, table_temperature, p)
 temperature4 = [my_geotherm(p) for p in pressures]
 
 #you can also look at code/geotherm.py to see how the geotherms are implemented

@@ -1,5 +1,6 @@
 import operator
 import bisect
+import os
 
 def sort_table(table, col=0):
     return sorted(table, key=operator.itemgetter(col))
@@ -18,10 +19,15 @@ def linear_interpol(x,x1,x2,y1,y2):
     alpha = (x - x1) / (x2-x1)
     return (1.-alpha)*y1 + alpha*y2
 
+def open_burnman_file(filename):
+    path = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
+    fullname = os.path.join(path,filename)
+    return open(fullname)
 
 def read_table(filename):
     table=[]
-    for line in open(filename).readlines():
+    
+    for line in open_burnman_file(filename).readlines():
         if (line[0]!='#'):
             numbers = map(float, line.split())
             table.append(numbers)

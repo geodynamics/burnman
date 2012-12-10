@@ -1,13 +1,14 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
-
-from code import minerals 
-from code import main as main
-from code import composition as part
-from code import seismic as seismic
+import burnman
+from burnman import minerals
+#from code import minerals 
+#from code import main as main
+#from code import composition as part
+#from code import seismic as seismic
 
 
 ###Input Model 1
@@ -19,8 +20,8 @@ method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2
 #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
 	
 weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
-phase_fractions_pyro,relative_molar_percent_pyro = part.conv_inputs(weight_percents_pyro)
-iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
+phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
+iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
 phases_pyro = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
 	minerals.ferropericlase_pt_dependent(iron_content,1))
 molar_abundances_pyro = (phase_fractions_pyro['pv'],phase_fractions_pyro['fp'])
@@ -31,7 +32,7 @@ seis_p_1 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = main.get_geotherm("brown_shankland")
+geotherm = burnman.get_geotherm("brown_shankland")
 temperature_1 = [geotherm(p) for p in seis_p_1]
 
 ##Now onto the second model parameters
@@ -41,8 +42,8 @@ temperature_1 = [geotherm(p) for p in seis_p_1]
 #Input composition of model enstatite chondrites. See example_composition for potential choices.
 	
 weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
-phase_fractions_enst,relative_molar_percent_enst = part.conv_inputs(weight_percents_enst)
-iron_content = lambda p,t: part.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
+phase_fractions_enst,relative_molar_percent_enst = burnman.conv_inputs(weight_percents_enst)
+iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
 phases_enst = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
 	minerals.ferropericlase_pt_dependent(iron_content,1))
 molar_abundances_enst = (phase_fractions_enst['pv'],phase_fractions_enst['fp'])
@@ -53,7 +54,7 @@ seis_p_2 = np.arange(25e9, 125e9, 5e9)
 
 #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
-geotherm = main.get_geotherm("brown_shankland")
+geotherm = burnman.get_geotherm("brown_shankland")
 temperature_2 = [geotherm(p) for p in seis_p_2]
 
 
@@ -64,7 +65,7 @@ for ph in phases_pyro:
 
 
 
-mat_rho_pyro, mat_vs_pyro, mat_vp_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = main.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
+mat_rho_pyro, mat_vs_pyro, mat_vp_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = burnman.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
 
 print "Calculations are done for:"
 for i in range(len(phases_pyro)):
@@ -77,11 +78,11 @@ print "Calculations are done for:"
 for i in range(len(phases_enst)):
 	print molar_abundances_enst[i], " of phase", phases_enst[i].to_string()
 
-mat_rho_enst, mat_vs_enst, mat_vp_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = main.calculate_velocities(seis_p_2, temperature_2, phases_enst, molar_abundances_enst)	
+mat_rho_enst, mat_vs_enst, mat_vp_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = burnman.calculate_velocities(seis_p_2, temperature_2, phases_enst, molar_abundances_enst)	
 
 
 ##let's create PREM for reference
-s=seismic.prem()
+s=burnman.seismic.prem()
 depths = map(s.depth, seis_p_1) 
 pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate_all_at(depths)
 

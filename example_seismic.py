@@ -1,14 +1,13 @@
-import os, sys, numpy as np
-import matplotlib.pyplot as plt
-lib_path = os.path.abspath('code/')
-sys.path.append(lib_path)
+import os, sys, numpy as np, matplotlib.pyplot as plt
+#hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
 
-from code import minerals 
-from code import main as main
-from code import seismic as seismic
+import burnman
+from burnman import minerals
 
 #create a seismic dataset from prem:
-s=seismic.prem()
+s=burnman.seismic.prem()
 
 # specify where we want to evaluate, here we map from pressure to depth, because we can
 p = np.arange(1.0e9,360.0e9,5e9)
@@ -43,11 +42,11 @@ plt.legend(loc='lower right')
 
 
 #now load a different seismic model:
-sslow = seismic.slow()
+sslow = burnman.seismic.slow()
 depths2 = sslow.internal_depth_list()
 pressures2, density2, v_p2, v_s2, v_phi2 = sslow.evaluate_all_at(depths2)
 
-sfast = seismic.fast()
+sfast = burnman.seismic.fast()
 depths3 = sfast.internal_depth_list()
 pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
 
