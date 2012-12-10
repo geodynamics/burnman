@@ -1,4 +1,4 @@
-from material import *
+from minerals import *
 from composition import calculate_partition_coefficient
 
 

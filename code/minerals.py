@@ -1,51 +1,85 @@
-from material import *
 from composition import *
 import voigt_reuss_hill as vrh
+import slb_finitestrain as slb
+import mie_grueneisen_debye as mgd
 
-################ User input minerals
+class material:
+	"""
+	This is the base class for all minerals. States of the mineral
+	can only be queried after setting the pressure and temperature
+	using set_state(). The method for computing properties of
+	the material is set using set_method(), which should be done
+	once after creating the material.
+	
+	If deriving from this class, set the properties in self.params
+	to the desired values. For more complicated materials you
+	can overwrite set_state(), change the params and then call
+	set_state() from this class.
+	"""
+	def __init__(self):
+		self.params = {	'name':'generic',
+			'ref_V': 0.,
+			'ref_K': 0.,
+			'K_prime': 0.,
+			'ref_mu': 0.,
+			'mu_prime': 0.,
+			'molar_mass': 0.,
+			'n': 0.,
+			'ref_Debye': 0.,
+			'ref_grueneisen': 0.,
+			'q0': 0.}
+                self.pressure = 0.0
+                self.temperature = 300
+                self.method = []
 
-class user_mineral1 (material):
-        def __init__(self):
-                material.__init__(self)
-                self.params = {
-                        'ref_V': 6.844e-6,
-                        'ref_K': 135.19,
-                        'K_prime': 6.04,
-                        'ref_mu': 175.,
-                        'mu_prime': 1.7,
-                        'molar_mass': .055845,
-                        'n': 1,
-                        'ref_Debye': 998.85,
-                        'ref_grueneisen': 1.368,
-                        'q0': 0.917}
-class user_mineral2 (material):
-        def __init__(self):
-                self.params = {
-                        'ref_V': 6.844e-6,
-                        'ref_K': 135.19,
-                        'K_prime': 6.04,
-                        'ref_mu': 175.,
-                        'mu_prime': 1.7,
-                        'molar_mass': .055845,
-                        'n': 1,
-                        'ref_Debye': 998.85,
-                        'ref_grueneisen': 1.368,
-                        'q0': 0.917}
-class user_mineral3 (material):
-        def __init__(self):
-                self.params = {
-                        'ref_V': 6.844e-6,
-                        'ref_K': 135.19,
-                        'K_prime': 6.04,
-                        'ref_mu': 175.,
-                        'mu_prime': 1.7,
-                        'molar_mass': .055845,
-                        'n': 1,
-                        'ref_Debye': 998.85,
-                        'ref_grueneisen': 1.368,
-                        'q0': 0.917}
+	def set_method(self, method):
+		""" use "slb" or "mgd" """
+		if (method=="slb"):
+			self.method = slb;
+		elif (method=="mgd"):
+			self.method = mgd;
+		else:
+			raise("unsupported material method " + method)
 
-################ Minerals
+	def to_string(self):
+		return "'" + self.__class__.__name__ + "'"
+
+        def set_state(self, pressure, temperature):
+                self.pressure = pressure
+                self.temperature = temperature
+
+                self.V = self.method.volume(self.pressure, self.temperature, self.params)
+		self.K_T = self.method.bulk_modulus(self.pressure, self.temperature, self.V, self.params)
+		self.K_S = self.method.bulk_modulus_adiabatic(self.pressure, self.temperature, self.V, self.params)
+		self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
+
+	def molar_mass(self):
+		return self.params['molar_mass']
+
+	def density(self):
+		return  self.params['molar_mass']/self.V
+
+	# gives volume in m^3/mol
+        def molar_volume(self):
+                return self.V
+
+	def bulk_modulus(self):
+		return self.K_T
+        def adiabatic_bulk_modulus(self):
+                return self.K_S
+	def shear_modulus(self):
+		return self.mu
+	def v_s(self):
+		return np.sqrt(self.shear_modulus()*1.e9 / \
+			self.density())/1000.
+	def v_p(self):
+		return np.sqrt((self.bulk_modulus() *1.e9 +4./3. * \
+			self.shear_modulus())/self.density())/1000.
+
+
+
+
+################ Built-in Minerals
 class test_mineral (material):
 	def __init__(self):
 		self.params = {

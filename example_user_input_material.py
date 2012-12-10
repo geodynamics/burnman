@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('code/')
 sys.path.append(lib_path)
 
-from code.material import material 
-from code import minerals 
+from code import minerals
+from code.minerals import material 
 from code import main as main
 from code import seismic
 
@@ -100,5 +100,5 @@ plt.xlabel("Pressure (GPa)")
 	
 
 
-plt.savefig("example_user_input.png")
+plt.savefig("example_user_input_material.png")
 plt.show()

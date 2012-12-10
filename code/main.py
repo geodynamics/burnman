@@ -8,7 +8,6 @@ from code import birch_murnaghan
 from code import comparison as comp
 from code import composition as part
 from code import geotherm as gt
-from code import material
 from code import mie_grueneisen_debye
 from code import minerals 
 from code import seismic
