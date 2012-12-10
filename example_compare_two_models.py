@@ -4,7 +4,6 @@ summary.
 
 requires:
 - geotherms
-- seismic models
 - creating minerals
 
 teaches:
