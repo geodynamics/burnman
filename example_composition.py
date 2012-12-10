@@ -1,3 +1,11 @@
+"""
+
+This example shows how to create different minerals,
+how to compute seismic velocities,
+and how to compare them to a seismic reference model.
+
+"""
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -5,9 +13,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-
-### input variables ###
-#######################
 
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
