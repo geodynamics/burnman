@@ -1,0 +1,24 @@
+
+TODOLIST:
+
+
+- Timo: use phases = [...], instead of phases=(...)
+- document classes and functions
+- example_compare_enstpyro.py outputs negative density?!
+- Timo: geotherm as burnman.geotherm.shankland()
+- what needs to be done for spin transitions?
+- check attenuation correction and write an example (Sanne, Cayman)
+- input Ca/Al
+- mass balance calculation, Yu?
+- write summary for each example as a comment at the top
+- document examples
+- order examples (figure out dependencies for that)
+- write a manual (what needs to go in here? Nothing but the order of the examples?)
+- isothermal/adiabatic bulk modulus, Ian. Status?
+- Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?)
+- Give 2nd/3rd order approximation option as a different model so we can compare them
+- long term: setup inverse model runs, what makes sense here?
+
+DONE:
+- unify importing of burnman (Timo)
+- call it burnman instead of code (Timo)
