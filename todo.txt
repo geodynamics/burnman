@@ -1,14 +1,16 @@
 
 TODOLIST:
 
-- document classes and functions
+- consistently order functions that return or accept v_s,v_p,v_phi
 - example_compare_enstpyro.py outputs negative density?!
 - what needs to be done for spin transitions?
 - check attenuation correction and write an example (Sanne, Cayman)
 - input Ca/Al
 - mass balance calculation, Yu?
-- write summary for each example as a comment at the top
-- document examples
+- write summary for each example as a comment at the top (see example_composition.py)
+- document examples (see example_composition.py)
+- document classes and functions in burnman better, specify units!
+- should we split up example_composition.py? Opinions?
 - order examples (figure out dependencies for that)
 - write a manual (what needs to go in here? Nothing but the order of the examples?)
 - isothermal/adiabatic bulk modulus, Ian. Status?
