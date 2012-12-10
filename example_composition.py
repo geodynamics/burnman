@@ -17,13 +17,19 @@ from burnman import minerals
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-#Example 1: simple fixed minerals
+# To compute seismic velocities and other properties, we need to supply
+# burnman with a list of minerals (phaes) and their molar abundances. Minerals
+# are classes found in burnman.minerals and are derived from
+# burnman.minerals.material.
+# Here are a few ways to define phases and molar_abundances:
+
+#Example 1: two simple fixed minerals
 if False:
 	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp_LS()]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
-#Example 2: specify iron content
+#Example 2: specify fixed iron content
 if False:
 	phases = [minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5)]
 	amount_perovskite = 0.95
@@ -39,7 +45,7 @@ if True:
 			  minerals.ferropericlase_pt_dependent(iron_content,1)]
 	molar_abundances = [phase_fractions['pv'],phase_fractions['fp']]
 
-#Example 4: more complicated, three materials
+#Example 4: three materials
 if False:
 	phases = [minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite()]
 	molar_abundances = [0.7, 0.2, 0.1]
@@ -48,7 +54,9 @@ if False:
 #seismic model for comparison:
 seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
-depths = np.linspace(700,2800, number_of_points)
+# we will do our computation and comparison at the following depth values:
+depths = np.linspace(700, 2800, number_of_points)
+#alternatively, we could use the values where prem is defined:
 #depths = seismic_model.internal_depth_list()
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
