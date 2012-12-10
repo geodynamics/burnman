@@ -16,9 +16,9 @@ from burnman import minerals
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
 #specify material
-phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
+phases = [minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5)]
 amount_perovskite = 0.95
-molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
+molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 #define some pressure range
 pressures = np.arange(25e9,130e9,5e9)

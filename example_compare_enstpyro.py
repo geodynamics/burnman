@@ -18,9 +18,9 @@ method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2
 weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
 phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
 iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
-phases_pyro = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-	minerals.ferropericlase_pt_dependent(iron_content,1))
-molar_abundances_pyro = (phase_fractions_pyro['pv'],phase_fractions_pyro['fp'])
+phases_pyro = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+	minerals.ferropericlase_pt_dependent(iron_content,1)]
+molar_abundances_pyro = [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']]
 
 #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
@@ -40,9 +40,9 @@ temperature_1 = [geotherm(p) for p in seis_p_1]
 weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
 phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
 iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
-phases_enst = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-	minerals.ferropericlase_pt_dependent(iron_content,1))
-molar_abundances_enst = (phase_fractions_enst['pv'],phase_fractions_enst['fp'])
+phases_enst = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+	minerals.ferropericlase_pt_dependent(iron_content,1)]
+molar_abundances_enst = [phase_fractions_enst['pv'], phase_fractions_enst['fp']]
 
 #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 

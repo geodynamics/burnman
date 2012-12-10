@@ -14,15 +14,15 @@ method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2
 
 #Example 1: simple fixed minerals
 if False:
-	phases = (minerals.Murakami_perovskite(), minerals.Murakami_fp_LS())
+	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp_LS()]
 	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
+	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 #Example 2: specify iron content
 if False:
-	phases = (minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5))
+	phases = [minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5)]
 	amount_perovskite = 0.95
-	molar_abundances = ( amount_perovskite, 1.0-amount_perovskite)
+	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 #Example 3: input weight percentages
 #See comments in code/composition.py for references to partition coefficent calculation
@@ -30,14 +30,14 @@ if True:
 	weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
 	phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
 	iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
-	phases = (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-			  minerals.ferropericlase_pt_dependent(iron_content,1))
-	molar_abundances = (phase_fractions['pv'],phase_fractions['fp'])
+	phases = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+			  minerals.ferropericlase_pt_dependent(iron_content,1)]
+	molar_abundances = [phase_fractions['pv'],phase_fractions['fp']]
 
 #Example 4: more complicated, three materials
 if False:
-	phases = (minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite())
-	molar_abundances = ( 0.7, 0.2, 0.1)
+	phases = [minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite()]
+	molar_abundances = [0.7, 0.2, 0.1]
 
 
 #seismic model for comparison:
