@@ -108,6 +108,16 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
   teaches:
   - how to create your own minerals
 
+* example_compare_enstpyro.py:
+  requires:
+  - geotherms
+  - seismic models
+  - compute seismic velocities
+  - creating minerals
+
+  teaches:
+  - weight percent materials
+
 * example_optimize_pv.py:
   requires:
   - creating minerals
@@ -119,13 +129,3 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
   teaches:
   - compare errors between models
   - loops over models
-
-* example_compare_enstpyro.py:
-  requires:
-  - geotherms
-  - seismic models
-  - compute seismic velocities
-  - creating minerals
-
-  teaches:
-  - weight percent materials
