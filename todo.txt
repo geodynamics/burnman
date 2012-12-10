@@ -10,7 +10,7 @@ TODOLIST:
 - write summary for each example as a comment at the top (see example_composition.py)
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
-- should we split up example_composition.py? Opinions?
+- should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately
 - order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?)
 - isothermal/adiabatic bulk modulus, Ian. Status?
