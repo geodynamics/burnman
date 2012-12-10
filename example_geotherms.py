@@ -34,13 +34,14 @@ temperature4 = [my_geotherm(p) for p in pressures]
 #you can also look at code/geotherm.py to see how the geotherms are implemented
 
 
-plt.plot(pressures,temperature1,'-r',label="Brown Shankland")
-plt.plot(pressures,temperature2,'-g',label="Watson Baxter")
-plt.plot(pressures,temperature3,'-b',label="handwritten linear")
-plt.plot(pressures,temperature4,'x-k',label="handwritten from table")
+plt.plot(pressures/1e9,temperature1,'-r',label="Brown, Shankland")
+plt.plot(pressures/1e9,temperature2,'-g',label="Watson, Baxter")
+plt.plot(pressures/1e9,temperature3,'-b',label="handwritten linear")
+plt.plot(pressures/1e9,temperature4,'x-k',label="handwritten from table")
 
 plt.legend(loc=4)
-plt.xlabel('Pressure/Pa')
+plt.xlim([0, 130])
+plt.xlabel('Pressure/GPa')
 plt.ylabel('Temperature')
 plt.show()
 
