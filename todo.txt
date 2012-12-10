@@ -11,7 +11,7 @@ TODOLIST:
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
 - should we split up example_composition.py? Opinions?
-- order examples (figure out dependencies for that)
+- order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?)
 - isothermal/adiabatic bulk modulus, Ian. Status?
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?)
