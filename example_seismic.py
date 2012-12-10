@@ -1,3 +1,14 @@
+"""
+
+summary.
+
+requires:
+
+teaches:
+- seismic models
+
+"""
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -14,6 +25,8 @@ p = np.arange(1.0e9,360.0e9,5e9)
 depths = map(s.depth, p) 
 #we could also just specify some depth levels directly like this:
 #depths = np.arange(35,5600,100)
+#we could also use the data points where the seismic model is specified:
+depths = s.internal_depth_list()
 
 #now evaluate everything at the given depths levels (using interpolation)
 pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)

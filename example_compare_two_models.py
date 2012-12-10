@@ -1,3 +1,17 @@
+"""
+
+summary.
+
+requires:
+- geotherms
+- seismic models
+- creating minerals
+
+teaches:
+- compute seismic velocities
+
+"""
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

@@ -4,6 +4,15 @@ This example shows how to create different minerals,
 how to compute seismic velocities,
 and how to compare them to a seismic reference model.
 
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+
+teaches:
+- creating minerals
+- seismic comparison
+
 """
 
 import os, sys, numpy as np, matplotlib.pyplot as plt

@@ -54,3 +54,87 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 5. Open Python Shell (IDLE Pythoon GUI)
 6. File -- Open -- find 'main.py'
 7. Run the module (or press F5)
+
+
+*** Examples
+
+* example_geotherms.py:
+
+requires:
+
+teaches:
+- geotherms
+
+* example_seismic.py
+
+requires:
+
+teaches:
+- seismic models
+
+* example_compare_two_models.py:
+
+requires:
+- geotherms
+- seismic models
+- creating minerals
+
+teaches:
+- compute seismic velocities
+
+* example_composition.py:
+
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+
+teaches:
+- creating minerals
+- seismic comparison
+
+* example_woutput.py:
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+
+teaches:
+- output computed seismic data to file 
+
+* example_user_input_material.py:
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+- seismic models
+- seismic comparison
+
+teaches:
+- how to create your own minerals
+
+* example_optimize_pv.py:
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+- seismic models
+- seismic comparison
+
+teaches:
+- compare errors between models
+- loops over models
+
+* example_compare_enstpyro.py:
+
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+- creating minerals
+
+teaches:
+- weight percent materials
