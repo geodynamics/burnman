@@ -2,7 +2,6 @@
 TODOLIST:
 
 - consistently order functions that return or accept v_s,v_p,v_phi
-- example_compare_enstpyro.py outputs negative density?!
 - what needs to be done for spin transitions?
 - check attenuation correction and write an example (Sanne, Cayman)
 - input Ca/Al
@@ -26,4 +25,5 @@ DONE:
 - Timo: geotherm as burnman.geotherm.shankland() (Timo)
 - Timo: use phases = [...], instead of phases=(...) (Timo)
 - release burnman v0.2 (Timo)
+- example_compare_enstpyro.py outputs negative density?! (not true, that is neg. difference)
 
