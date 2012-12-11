@@ -101,28 +101,26 @@ pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate_all_at(depths)
 ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
 
 plt.subplot(2,2,1)
-p1,=plt.plot(seis_p_1/1.e9,mat_vs_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_vs_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p3,=plt.plot(seis_p_1/1.e9,vs_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_vs_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+plt.plot(seis_p_2/1.e9,mat_vs_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+plt.plot(seis_p_1/1.e9,vs_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
 plt.title("Vs (km/s)")
-
 
 # plot Vphi
 plt.subplot(2,2,2)
-p1,=plt.plot(seis_p_1/1.e9,mat_vphi_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_vphi_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p3,=plt.plot(seis_p_1/1.e9,v_phi_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_vphi_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+plt.plot(seis_p_2/1.e9,mat_vphi_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+plt.plot(seis_p_1/1.e9,v_phi_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
 plt.title("Vphi (km/s)")
 
 # plot density
 plt.subplot(2,2,3)
-p1,=plt.plot(seis_p_1/1.e9,mat_rho_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_rho_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p3,=plt.plot(seis_p_1/1.e9,rho_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_rho_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4,label="C-chondrite")
+plt.plot(seis_p_2/1.e9,mat_rho_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label="enstatite")
+plt.plot(seis_p_1/1.e9,rho_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="PREM")
 plt.title("density (kg/m^3)")
-plt.legend([p1,p2,p3],["C-chondrite", "enstatite","PREM"], loc=4)
+plt.legend(loc='lower right')
 plt.xlabel("Pressure (GPa)")
-
 
 
 #plot percent differences
@@ -135,12 +133,12 @@ per_diff_vphi = 100*(mat_vphi_pyro - mat_vphi_enst_interp)/mat_rho_pyro
 per_diff_rho = 100*(mat_rho_pyro - mat_rho_enst_interp)/mat_rho_pyro
 
 plt.subplot(2,2,4)
-p1,=plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-p2,=plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',markerfacecolor='k',markersize=4)
-p3,=plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label="vs")
+plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',markerfacecolor='k',markersize=4,label="vphi")
+plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="density")
 
 plt.title("percent difference")
-plt.legend([p1,p2,p3],["vs", "vphi","density"], loc=4)
+plt.legend(loc='center right')
 plt.xlabel("Pressure (GPa)")
 
 plt.show()

@@ -86,23 +86,23 @@ mat_rho_2, mat_vs_2, mat_vp_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate
 ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
 
 plt.subplot(2,2,1)
-p1,=plt.plot(seis_p_1/1.e9,mat_vs_1,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_vs_2,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_vs_1,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+plt.plot(seis_p_2/1.e9,mat_vs_2,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
 plt.title("Vs (km/s)")
 
 
 # plot Vphi
 plt.subplot(2,2,2)
-p1,=plt.plot(seis_p_1/1.e9,mat_vphi_1,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_vphi_2,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_vphi_1,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+plt.plot(seis_p_2/1.e9,mat_vphi_2,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
 plt.title("Vphi (km/s)")
 
 # plot density
 plt.subplot(2,2,3)
-p1,=plt.plot(seis_p_1/1.e9,mat_rho_1,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-p2,=plt.plot(seis_p_2/1.e9,mat_rho_2,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,mat_rho_1,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
+plt.plot(seis_p_2/1.e9,mat_rho_2,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='model 2')
 plt.title("density (kg/m^3)")
-plt.legend([p1,p2],["model 1", "model 2"], loc=4)
+plt.legend(loc='upper left')
 
 
 #plot percent differences
@@ -115,11 +115,11 @@ per_diff_vphi = 100*(mat_vphi_1 - mat_vphi_2_interp)/mat_rho_1
 per_diff_rho = 100*(mat_rho_1 - mat_rho_2_interp)/mat_rho_1
 
 plt.subplot(2,2,4)
-p1,=plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-p2,=plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',markerfacecolor='k',markersize=4)
-p3,=plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='V_s')
+plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',markerfacecolor='k',markersize=4,label='V_phi')
+plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label='density')
 
 plt.title("percent difference")
-plt.legend([p1,p2,p3],["vs", "vphi","density"], loc=4)
+plt.legend(loc='center left')
 
 plt.show()

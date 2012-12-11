@@ -87,9 +87,10 @@ mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(
 
 # PLOTTING
 
+# plot vs
 plt.subplot(2,2,1)
-p1,=plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
-p2,=plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
+plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
+plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
 plt.title("Vs (km/s)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.ylim(5.1,7.6)
@@ -98,18 +99,17 @@ plt.text(40,7.3,"misfit= %3.3f" % vs_err)
 
 # plot Vphi
 plt.subplot(2,2,2)
-p1,=plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p2,=plt.plot(seis_p/1.e9,seis_vphi,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+plt.plot(seis_p/1.e9,seis_vphi,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
 plt.title("Vphi (km/s)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.ylim(7,12)
-#	plt.legend([p1,p2],["Murakami (0.93 Pv, 0.07 fp)", "seismic model (PREM)"], loc=4)
 plt.text(40,11.5,"misfit= %3.3f" % vphi_err)
 
 # plot density
 plt.subplot(2,2,3)
-p1,=plt.plot(seis_p/1.e9,mat_rho,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-p2,=plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+plt.plot(seis_p/1.e9,mat_rho,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
 plt.title("density (kg/m^3)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.text(40,4.3,"misfit= %3.3f" % rho_err)
@@ -118,13 +118,10 @@ plt.xlabel("Pressure (GPa)")
 
 # plot geotherm
 plt.subplot(2,2,4)
-p1,=plt.plot(seis_p/1e9,temperature,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+plt.plot(seis_p/1e9,temperature,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
 plt.title("Geotherm (K)")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.xlabel("Pressure (GPa)")
-
-	
-
 
 plt.savefig("example_composition.png")
 plt.show()
