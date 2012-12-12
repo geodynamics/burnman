@@ -1,7 +1,7 @@
 """
 
-summary.
-Shows the various ways to input geotherms: Built-in geotherms, basic linear, loaded in from a data file of your choice
+Shows the various ways to input geotherms: Built-in geotherms, basic linear,
+loaded in from a data file of your choice.
 
 requires:
 geotherm.py

@@ -1,7 +1,7 @@
 """
 
-summary.
-Shows the various ways to input seismic models (Vs, Vp, Vphi, Density as a function of depth (or P)
+Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
+function of depth (or P).
 
 requires:
 seismic.py

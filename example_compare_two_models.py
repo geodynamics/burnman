@@ -1,9 +1,7 @@
 """
 
-summary.
-Calculates and plots two models for different minerals or methods 
-and plots the results. Calculates basic percent difference statistics as well.
-
+Calculates and plots two models for different minerals or methods and plots
+the results. Calculates basic percent difference statistics as well.
 
 requires:
 - geotherms

@@ -1,9 +1,7 @@
 """
 
-summary.
-Shows user how to input a mineral of his/her choice and which physical values need to be input for BurnMan to calculate Vs, Vp, Vphi
-and density at depth 
-
+Shows user how to input a mineral of his/her choice and which physical values
+need to be input for BurnMan to calculate Vs, Vp, Vphi and density at depth.
 
 requires:
 - creating minerals

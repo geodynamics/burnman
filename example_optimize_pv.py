@@ -1,6 +1,7 @@
 """
 
-summary.
+Vary the amount perovskite vs. ferropericlase and compute the error in the
+seismic data against PREM.
 
 requires:
 - creating minerals

@@ -1,8 +1,7 @@
 """
 
-This example shows how to create different minerals,
-how to compute seismic velocities,
-and how to compare them to a seismic reference model.
+This example shows how to create different minerals, how to compute seismic
+velocities, and how to compare them to a seismic reference model.
 
 requires:
 - geotherms

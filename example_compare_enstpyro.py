@@ -1,8 +1,7 @@
 """
 
-summary. 
-This example shows you how to create two materials from wt% determines
-the optimum mixing between the two to match the seismic model of your choice
+This example shows you how to create two materials from wt% determines the
+optimum mixing between the two to match the seismic model of your choice.
 
 requires:
 - geotherms
