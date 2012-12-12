@@ -1,3 +1,7 @@
+Contact: Cayman Unterborn
+unterborn.1@osu.edu
+kmanunterborn@gmail.com
+
 *** About
 
 burnman is a lower mantle shear velocity generator constrained by mineral physics.
