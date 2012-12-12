@@ -1,8 +1,10 @@
 """
 
 summary.
+Shows the various ways to input geotherms: Built-in geotherms, basic linear, loaded in from a data file of your choice
 
 requires:
+geotherm.py
 
 teaches:
 - geotherms
@@ -26,7 +28,7 @@ temperature1 = [geotherm1(p) for p in pressures]
 geotherm2 = burnman.geotherm.watson_baxter
 temperature2 = [geotherm2(p) for p in pressures]
 
-#a geotherm is actually just a function that returns a pressure given pressure in Pa
+#a geotherm is actually just a function that returns a temperature given pressure in Pa
 #so we can just write our own function
 geotherm3 = lambda p:  1500+(2500-1500)*p/128e9
 temperature3 = [geotherm3(p) for p in pressures]

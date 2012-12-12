@@ -1,6 +1,9 @@
 """
 
 summary.
+Shows user how to input a mineral of his/her choice and which physical values need to be input for BurnMan to calculate Vs, Vp, Vphi
+and density at depth 
+
 
 requires:
 - creating minerals
@@ -32,17 +35,17 @@ class own_material (material):
         def __init__(self):
                 material.__init__(self)
                 self.params = {
-                        'ref_V': 10.844e-6,
-                        'ref_K': 135.19,
-                        'K_prime': 6.04,
-                        'ref_mu': 175.,
-                        'mu_prime': 1.7,
-                        'molar_mass': .055845,
-                        'n': 1,
-                        'ref_Debye': 998.85,
-                        'ref_grueneisen': 1.368,
-                        'q0': 0.917,
-			'eta_0s': 3.0}
+                        'ref_V': 10.844e-6, #Unit cell volume at room pressure/temperature
+                        'ref_K': 135.19, #Reference bulk modulus at room pressure/temperature
+                        'K_prime': 6.04, #pressure derivative of bulk modulus
+                        'ref_mu': 175., #reference shear modulus at room pressure/temperature
+                        'mu_prime': 1.7, #pressure derivative of shear modulus
+                        'molar_mass': .055845, #molar mass in units of kg/mol
+                        'n': 1, #number of atoms per molecule
+                        'ref_Debye': 998.85, #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
+                        'ref_grueneisen': 1.368, #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
+                        'q0': 0.917, #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
+			'eta_0s': 3.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
 
 
 phases = [ own_material() ]
