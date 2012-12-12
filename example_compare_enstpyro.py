@@ -11,8 +11,6 @@ requires:
 
 teaches:
 - weight percent materials
--mixing
--optimization
 
 """
 
