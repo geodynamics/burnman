@@ -55,8 +55,8 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
 3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
 4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
-5. Open Python Shell (IDLE Pythoon GUI)
-6. File -- Open -- find 'main.py'
+5. Open Python Shell (IDLE Python GUI)
+6. File -- Open -- find one of the example files
 7. Run the module (or press F5)
 
 
