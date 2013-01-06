@@ -23,14 +23,14 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
 	#print "Calculating elastic properties for phase assemblage \n"
 	#print "seismic p (GPa)	T (K)	density(kg/m^3)	K(Gpa) G(GPa)	Vs (km/s)	Vp(km/s)	Vphi (km/s)"
 	for i in range(len(pressure)):
-		rho,vp,vs,vphi,K,mu = \
+		rho,v_p,v_s,v_phi,K,mu = \
 		vrh.voigt_reuss_hill(pressure[i], temperature[i], phases, molar_abundances)
-		#print pressure[i]/1.e9,"	", temperature[i],"	",rho,"	", K,"	", mu,"	", vs/1.e3,"	", vp/1.e3,"	", vphi/1.e3
+		#print pressure[i]/1.e9,"	", temperature[i],"	",rho,"	", K,"	", mu,"	", v_s/1.e3,"	", v_p/1.e3,"	", v_phi/1.e3
 		#print pressure[i]/1.e9,"	",rho,"	", mu
 		mat_rho[i] = rho/1.e3 # convert from kg/m^3 to g/cc
-		mat_vp[i] = vp/1.e3
-		mat_vs[i] = vs/1.e3
-    		mat_vphi[i] = vphi/1.e3
+		mat_vp[i] = v_p/1.e3
+		mat_vs[i] = v_s/1.e3
+    		mat_vphi[i] = v_phi/1.e3
    		mat_K[i] = K
 		mat_mu[i] = mu
 
@@ -38,14 +38,14 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
 
 # apply attenuation correction to a list of v_p, v_s, v_phi
 # takes a list of pressures and the seismic model
-def apply_attenuation_correction(v_p,v_s,v_phi):
+def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
 	length = len(v_p)
 	ret_v_p = np.zeros(length)
 	ret_v_s = np.zeros(length)
 	ret_v_phi = np.zeros(length)
 	for i in range(length):
 		ret_v_p[i],ret_v_s[i],ret_v_phi[i] = \
-		    vrh.attenuation_correction(v_p[i], v_s[i], v_phi[i])
+		    vrh.attenuation_correction(v_p[i], v_s[i], v_phi[i],Qs,Qphi)
 	
 	return ret_v_p, ret_v_s, ret_v_phi
 

@@ -53,10 +53,6 @@ class seismic_data:
         raise ValueError, "not implemented"
         return -1
 
-    #constants for attenuation correction
-    #returns (Qk, Qmu) with Qk: factor for v_phi, Qmu: factor for v_s
-    def attenuation(self, pressure):
-        return 10000., 355.
 
 class radiustable(seismic_data):
     """ 

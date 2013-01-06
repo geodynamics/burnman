@@ -53,9 +53,7 @@ def vhr_average(phase_volume, X):
     X_vrh = (X_voigt+X_reuss)/2.
     return X_vrh
 
-def attenuation_correction(v_p,v_s,v_phi):
-    Qphi = 10000.
-    Qs = 355.
+def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
   
     beta = 0.3 # Matas et al. (2007) page 4        
     Qp  = 3./4.*pow((v_p/v_s),2.)*Qs    # Matas et al. (2007) page 4

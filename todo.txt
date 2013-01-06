@@ -3,14 +3,14 @@ TODOLIST:
 
 - consistently order functions that return or accept v_s,v_p,v_phi
 - what needs to be done for spin transitions?
-- check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
+x check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
 - input Ca/Al
 - mass balance calculation, Yu?
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
 - should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 - order examples (figure out dependencies for that), see bottom of readme.txt
-- write a manual (what needs to go in here? Nothing but the order of the examples?)
+- write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
 - isothermal/adiabatic bulk modulus, Ian. Status?
 -adiabatic geothermal, super adiabatic(Sanne? Do we need this?)
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
@@ -21,7 +21,7 @@ TODOLIST:
 - Convert from cc to SI in seismic files
 
 DONE:
-- Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
+x Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
 - unify importing of burnman (Timo)
 - call it burnman instead of code (Timo)
 - Timo: geotherm as burnman.geotherm.shankland() (Timo)
