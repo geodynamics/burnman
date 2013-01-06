@@ -1,9 +1,12 @@
+
 """
 
-Shows the various ways to input geotherms: Built-in geotherms, basic linear,
-loaded in from a data file of your choice.
+Shows the various ways to input geotherms: Built-in geothermsi (geotherm1 and 2), basic linear (geotherm3),
+loaded in from a data file (geotherm4) of your choice. Geotherm 1 is from Brown & Shankland (1981) and 
+geotherm2 from Watson & Baxter (2007).
 
 requires:
+- geotherm
 
 teaches:
 - geotherms

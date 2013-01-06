@@ -8,7 +8,7 @@ requires:
 - creating minerals
 
 teaches:
-- compute seismic velocities
+- compute seismic velocities and compare
 
 """
 

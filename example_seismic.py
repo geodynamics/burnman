@@ -1,9 +1,13 @@
 """
 
 Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
-function of depth (or P).
+function of depth (or P) as well as different velocity models available:
+PREM (Dziewonski & Anderson, 1981)
+reference model for fast regionsi (outside the LLSVP's) in the lower mantle (Lekic et al. 2012)
+reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
 requires:
+- burnman.seismic
 
 teaches:
 - seismic models

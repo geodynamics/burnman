@@ -85,9 +85,9 @@ class radiustable(seismic_data):
         return self._lookup(depth, self.table_vs)
 
     def v_phi(self, depth):
-        vs=self.v_s(depth)
-        vp=self.v_p(depth)
-        return math.sqrt(vp*vp-4./3.*vs*vs)
+        v_s=self.v_s(depth)
+        v_p=self.v_p(depth)
+        return math.sqrt(v_p*v_p-4./3.*v_s*v_s)
 
     def density(self, depth):
         return self._lookup(depth, self.table_density)        
@@ -104,7 +104,7 @@ class radiustable(seismic_data):
 class prem(radiustable):
     def __init__(self):
         radiustable.__init__(self)
-        table = tools.read_table("data/prem_table.txt") # radius, pressure, density, vp, vs
+        table = tools.read_table("data/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
         self.table_pressure = table[:,1] * 0.1 * 1e9 # convert kbar to GPa to Pa
