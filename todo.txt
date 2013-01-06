@@ -3,7 +3,7 @@ TODOLIST:
 
 - consistently order functions that return or accept v_s,v_p,v_phi
 - what needs to be done for spin transitions?
-- check attenuation correction and write an example (Sanne, Cayman)
+- check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
 - input Ca/Al
 - mass balance calculation, Yu?
 - document examples (see example_composition.py)
@@ -13,15 +13,15 @@ TODOLIST:
 - write a manual (what needs to go in here? Nothing but the order of the examples?)
 - isothermal/adiabatic bulk modulus, Ian. Status?
 -adiabatic geothermal, super adiabatic(Sanne? Do we need this?)
-- Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?)
-- Give 2nd/3rd order approximation option as a different model so we can compare them
+- Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
+- Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params?
 - long term: setup inverse model runs, what makes sense here?
 - write burnman paper
 - write MgSi paper
 - Convert from cc to SI in seismic files
-- Make VRH a stand alone function
 
 DONE:
+- Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
 - unify importing of burnman (Timo)
 - call it burnman instead of code (Timo)
 - Timo: geotherm as burnman.geotherm.shankland() (Timo)
