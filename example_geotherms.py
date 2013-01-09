@@ -16,12 +16,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Shows the various ways to input geotherms: Built-in geothermsi (geotherm1 and 2), basic linear (geotherm3),
+Shows the various ways to input geotherms: Built-in geotherms (geotherm1 and 2), basic linear (geotherm3),
 loaded in from a data file (geotherm4) of your choice. Geotherm 1 is from Brown & Shankland (1981) and 
 geotherm2 from Watson & Baxter (2007).
 
 requires:
-- geotherm
 
 teaches:
 - geotherms
