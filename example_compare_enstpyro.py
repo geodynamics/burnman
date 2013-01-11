@@ -93,7 +93,7 @@ for ph in phases_pyro:
 
 
 
-mat_rho_pyro, mat_vs_pyro, mat_vp_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = burnman.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
+mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = burnman.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)	
 
 print "Calculations are done for:"
 for i in range(len(phases_pyro)):
@@ -106,7 +106,7 @@ print "Calculations are done for:"
 for i in range(len(phases_enst)):
 	print molar_abundances_enst[i], " of phase", phases_enst[i].to_string()
 
-mat_rho_enst, mat_vs_enst, mat_vp_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = burnman.calculate_velocities(seis_p_2, temperature_2, phases_enst, molar_abundances_enst)	
+mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = burnman.calculate_velocities(seis_p_2, temperature_2, phases_enst, molar_abundances_enst)	
 
 
 ##let's create PREM for reference

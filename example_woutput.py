@@ -64,7 +64,7 @@ print "Calculations are done for:"
 for i in range(len(phases)):
 	print molar_abundances[i], " of phase", phases[i].to_string()
 
-mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, phases, molar_abundances)	
+mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, phases, molar_abundances)	
 	
 #write to file:
 output_filename = "example_woutput.txt" 

@@ -88,7 +88,7 @@ print "Calculations are done for:"
 for i in range(len(phases_1)):
 	print molar_abundances_1[i], " of phase", phases_1[i].to_string()
 
-mat_rho_1, mat_vs_1, mat_vp_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, phases_1, molar_abundances_1)	
+mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, phases_1, molar_abundances_1)	
 
 for ph in phases_2:
 	ph.set_method(method_2)
@@ -97,7 +97,7 @@ print "Calculations are done for:"
 for i in range(len(phases_2)):
 	print molar_abundances_2[i], " of phase", phases_2[i].to_string()
 
-mat_rho_2, mat_vs_2, mat_vp_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_2, phases_2, molar_abundances_2)	
+mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_2, phases_2, molar_abundances_2)	
 
 
 ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
