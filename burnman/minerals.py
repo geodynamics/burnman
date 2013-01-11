@@ -129,6 +129,9 @@ class stishovite (material):
 			'eta_0s': 3.0 }
 
 class periclase (material):
+	""" 
+	MgO
+	"""
 	def __init__(self):
 		self.params = {
 			'ref_V': 11.24e-6,
@@ -143,6 +146,9 @@ class periclase (material):
 			'q0': 1.5,
 			'eta_0s': 3.0 }
 class wustite (material):
+	"""
+	FeO
+	"""
 	def __init__(self):
 		self.params = {
 			'ref_V': 12.06e-6,
