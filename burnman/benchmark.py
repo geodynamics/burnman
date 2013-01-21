@@ -3,11 +3,13 @@ import birch_murnaghan as bm
 import mie_grueneisen_debye as mgd
 import slb_finitestrain as slb
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 from minerals import *
 
 
 #Attempt to recreate Stixrude and Lithgow-Bertelloni (2005) Figure 1
 def check_birch_murnaghan():
+  plt.close()
   test_mineral = material()
   test_mineral.params ={'name':'test',
 			'ref_V': 6.844e-6,
@@ -31,13 +33,18 @@ def check_birch_murnaghan():
     bulk_modulus[i] = bm.bm_bulk_modulus(pressure[i], test_mineral.params)
     shear_modulus[i] = bm.bm_shear_modulus(pressure[i], test_mineral.params)
 
-  plt.plot(pressure, bulk_modulus, pressure, shear_modulus)
-  print bulk_modulus
-  print shear_modulus
+
+  plt.plot(pressure/1.e9, bulk_modulus, pressure/1.e9, shear_modulus)
+  fig1 = mpimg.imread('../data/slb_fig1.png')
+  plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
+  plt.plot(pressure/1.e9, bulk_modulus, 'go', pressure/1.e9, shear_modulus, 'g+')
+  plt.ylim(0,800)
+  plt.xlim(0,140)
+
   plt.show()
 
 def check_mgd_shim_duffy_kenichi():
-
+  plt.close()
   #Create gold material from Table 1
   gold = material()
   gold.params = {       'name': 'gold',
@@ -72,7 +79,6 @@ def check_mgd_shim_duffy_kenichi():
   plt.show()
 
 
-#check_mgd_shim_duffy()
-check_mgd_shim_duffy_kenichi()
-#check_birch_murnaghan()
+#check_mgd_shim_duffy_kenichi()
+check_birch_murnaghan()
 

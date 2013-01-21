@@ -11,7 +11,6 @@ x check attenuation correction and write an example (Sanne, Cayman): attenuation
 - should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 - order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
-- isothermal/adiabatic bulk modulus, Ian. Status?
 -adiabatic geothermal, super adiabatic(Sanne? Do we need this?)
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
 - Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params?
@@ -24,6 +23,7 @@ DONE:
 x Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
 - unify importing of burnman (Timo)
 - call it burnman instead of code (Timo)
+- isothermal/adiabatic bulk modulus
 - Timo: geotherm as burnman.geotherm.shankland() (Timo)
 - Timo: use phases = [...], instead of phases=(...) (Timo)
 - release burnman v0.2 (Timo)
