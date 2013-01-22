@@ -71,15 +71,12 @@ def shear_modulus(p,T,V,params):
     delta_U = (P_th(V) - P_th_ref(V))*(V/gamma)
     
   
-    G_twoterms = pow(1.+2.*f, 5./2.) * (params['ref_mu'] + (3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f) \
-                                   - (eta_s*(1./V)*delta_U/1.e9) # EQ 33 up to the second order 
     G_threeterms = pow(1.+2.*f, 5./2.) * (params['ref_mu'] + (3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f \
                                    + ((6.*params['ref_K']*params['mu_prime']) - 24.*params['ref_K'] - 14.*params['ref_mu']+ 9./2.*params['ref_K']*params['K_prime']) * pow(f,2)) \
                                    - (eta_s*(1./V)*delta_U/1.e9) # EQ 33 up to the second order
 
-    return G_twoterms
+    return G_threeterms
     
-
 
 def bulk_modulus(p,T,V,params):
 

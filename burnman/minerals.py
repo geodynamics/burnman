@@ -21,6 +21,7 @@ from composition import *
 import voigt_reuss_hill as vrh
 import slb_finitestrain as slb
 import mie_grueneisen_debye as mgd
+import slb_thirdorder as slb3
 
 class material:
 	"""
@@ -52,11 +53,13 @@ class material:
                 self.method = []
 
 	def set_method(self, method):
-		""" use "slb" or "mgd" """
+		""" use "slb" or "mgd" or slb3 """
 		if (method=="slb"):
 			self.method = slb;
 		elif (method=="mgd"):
 			self.method = mgd;
+		elif (method=="slb3"):
+			self.method = slb3;
 		else:
 			raise("unsupported material method " + method)
 

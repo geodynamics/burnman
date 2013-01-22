@@ -23,7 +23,12 @@ import burnman
 from burnman import minerals
 
 #INPUT for method
-method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+""" choose 'slb' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005) 
+or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
+
+method = 'slb' 
+	
 
 # To compute seismic velocities and other properties, we need to supply
 # burnman with a list of minerals (phaes) and their molar abundances. Minerals

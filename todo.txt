@@ -13,7 +13,6 @@ x check attenuation correction and write an example (Sanne, Cayman): attenuation
 - write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
 -adiabatic geothermal, super adiabatic(Sanne? Do we need this?)
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
-- Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params?
 - long term: setup inverse model runs, what makes sense here?
 - write burnman paper
 - write MgSi paper
@@ -30,5 +29,6 @@ x Make VRH a stand alone function (finished this off, somebody had already writt
 - example_compare_enstpyro.py outputs negative density?! (not true, that is neg. difference)
 - write summary for each example as a comment at the top (see example_composition.py) Cayman: Done for the most part
 - Clean up plotting (Timo)
+- Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params? (Cayman) (Created a new method slb3 for the third order stuff)
 
 
