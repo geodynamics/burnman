@@ -62,6 +62,13 @@ def volume(pressure,T,params):
 			mgd_thermal_pressure(x, 300, params) - pressure
 	V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
 	return V
+
+#do the forward problem of the mie-grueneisen-debye equation of state, i.e.
+#get pressure from volume
+def pressure(volume, T, params):
+	return bm.birch_murnaghan(params['ref_V']/volume, params)*1.e9 + \
+			mgd_thermal_pressure(volume, T, params) - \
+			mgd_thermal_pressure(volume, 300, params)
 	
 #calculate the thermal correction for the mgd
 #bulk modulus (see matas et al, 2007)
