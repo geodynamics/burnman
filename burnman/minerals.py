@@ -71,9 +71,9 @@ class material:
                 self.temperature = temperature
 
                 self.V = self.method.volume(self.pressure, self.temperature, self.params)
-		self.K_T = self.method.bulk_modulus(self.pressure, self.temperature, self.V, self.params)
-		self.K_S = self.method.bulk_modulus_adiabatic(self.pressure, self.temperature, self.V, self.params)
-		self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
+		self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
+		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
+		self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
 
 	def molar_mass(self):
 		return self.params['molar_mass']

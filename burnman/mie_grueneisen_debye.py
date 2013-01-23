@@ -81,17 +81,16 @@ def thermal_bulk_modulus(V, T, params):
 	return K_th
 
 #calculate the mgd bulk modulus (K_T) as a function of P, T, and V
-def bulk_modulus(pressure,T,V, params):
-	K_T = bm.bm_bulk_modulus(pressure, params) + \
+def bulk_modulus(T,V, params):
+	K_T = bm.bm_bulk_modulus(V, params) + \
 		thermal_bulk_modulus(V,T, params)/1.e9 - \
 		thermal_bulk_modulus(V,300., params)/1.e9  #EQB13
 	return K_T
 
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
 # alpha is basically 1e-5
-def bulk_modulus_adiabatic(pressure,T,V,params):
-	P_st=bm.birch_murnaghan(params['ref_V']/V,params)*1e9
-	K_T=bulk_modulus(P_st,T,V,params)
+def bulk_modulus_adiabatic(T,V,params):
+	K_T=bulk_modulus(T,V,params)
 	alpha=1./K_T*((mgd_thermal_pressure(V,T+1.,params)-mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
 	return K_T*(1.+alpha*grueneisen_parameter(params['ref_V']/V,params)*T)
 
@@ -106,9 +105,8 @@ def thermal_shear_modulus(V, T,  params):
 	return mu_th
 
 #calculate the mgd shear modulus as a function of P, V, and T
-def shear_modulus(pressure,T,V, params):
-	P_st=bm.birch_murnaghan(params['ref_V']/V,params)*1e9
-	mu = bm.bm_shear_modulus(P_st,  params) + \
+def shear_modulus(T,V, params):
+	mu = bm.bm_shear_modulus(V,params) + \
 		thermal_shear_modulus(V,T, params)/1.e9 - \
 		thermal_shear_modulus(V,300, params)/1.e9 # EQ B11
 	return mu

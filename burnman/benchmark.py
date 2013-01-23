@@ -24,6 +24,7 @@ def check_birch_murnaghan():
 			'ref_Debye': 0.,
 			'ref_grueneisen': 0.,
 			'q0': 0.}
+  test_mineral.method = slb
  
   pressure = np.linspace(0., 140.e9, 100)
   volume = np.empty_like(pressure)
@@ -33,8 +34,8 @@ def check_birch_murnaghan():
   #calculate its static properties
   for i in range(len(pressure)):
     volume[i] = bm.bm_volume(pressure[i], test_mineral.params)
-    bulk_modulus[i] = bm.bm_bulk_modulus(pressure[i], test_mineral.params)
-    shear_modulus[i] = bm.bm_shear_modulus(pressure[i], test_mineral.params)
+    bulk_modulus[i] = bm.bm_bulk_modulus(volume[i], test_mineral.params)
+    shear_modulus[i] = bm.bm_shear_modulus(volume[i], test_mineral.params)
 
   #compare with figure 1
   plt.plot(pressure/1.e9, bulk_modulus, pressure/1.e9, shear_modulus)
