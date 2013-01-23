@@ -48,7 +48,7 @@ def volume(p,T,params):
     V = opt.brentq(func, 0.09*params['ref_V'], 3.*params['ref_V']) 
     return V
 
-def shear_modulus(p,T,V,params):
+def shear_modulus(T,V,params):
 
         # low T:
         # C_v = 234. * n * Av * boltzmann_constant (T/theta_D) ^ 3.  (3.43 from Poirier/EarthInterior)
@@ -78,7 +78,7 @@ def shear_modulus(p,T,V,params):
     return G_threeterms
     
 
-def bulk_modulus(p,T,V,params):
+def bulk_modulus(T,V,params):
 
     func_int = lambda t: pow(t,3.)/(math.exp(t)-1.)
     
@@ -105,8 +105,8 @@ def bulk_modulus(p,T,V,params):
 
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
 # alpha is basically 1e-5
-def bulk_modulus_adiabatic(pressure,T,V,params):
-        K_T=bulk_modulus(pressure,T,V,params)
+def bulk_modulus_adiabatic(T,V,params):
+        K_T=bulk_modulus(T,V,params)
         alpha=1./K_T*((mgd.mgd_thermal_pressure(V,T+1.,params)-mgd.mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
         gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
 	return K_T*(1.+alpha*gamma*T) # EQ A1
