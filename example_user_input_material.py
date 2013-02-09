@@ -67,7 +67,7 @@ molar_abundances = [ 1.0 ]
 
 
 #seismic model for comparison:
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(700,2800, number_of_points)
 #depths = seismic_model.internal_depth_list()

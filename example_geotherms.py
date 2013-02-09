@@ -60,7 +60,7 @@ table_temperature = np.array(table)[:,1]
 my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate(table_pressure, table_temperature, p)
 temperature4 = [my_geotherm(p) for p in pressures]
 
-#you can also look at code/geotherm.py to see how the geotherms are implemented
+#you can also look at burnman/geotherm.py to see how the geotherms are implemented
 
 
 plt.plot(pressures/1e9,temperature1,'-r',label="Brown, Shankland")

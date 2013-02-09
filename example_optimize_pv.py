@@ -46,7 +46,7 @@ from burnman import minerals
 #INPUT for method
 method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
 
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(700,2800, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)

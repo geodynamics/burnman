@@ -69,12 +69,19 @@ class material:
         def set_state(self, pressure, temperature):
                 self.pressure = pressure
                 self.temperature = temperature
-
-                self.V = self.method.volume(self.pressure, self.temperature, self.params)
-		self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
-		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
-		self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
-
+                if (hasattr(self, 'params_LS') and self.spin_transition_on):
+			if (self.params_LS['P_LS']*1.e9<pressure):
+				params=self.params_LS
+			else:
+				params=self.params
+		else:
+			params=self.params
+                self.V = self.method.volume(self.pressure, self.temperature, params)
+		self.K_T = self.method.bulk_modulus(self.temperature, self.V, params)
+		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, params)
+		self.mu = self.method.shear_modulus(self.temperature, self.V, params)
+                
+       
 	def molar_mass(self):
 		return self.params['molar_mass']
 
@@ -292,7 +299,34 @@ class fe_perovskite(material):
 			'q0': 1.4, 
 			'eta_0s': 2.4 }
 
-
+class Catalli_perovskite(material): # Catalli et al 2009
+        def __init__(self,spin_transition_on):
+	        self.spin_transition_on=spin_transition_on
+                self.params = {
+                        'ref_V': 165.78e-6,
+                        'ref_K': 237.,
+                        'K_prime': 4.5,
+                        'ref_mu': 161.,
+                        'mu_prime': 1.57,
+                        'molar_mass': .1319,
+                        'n': 5,
+                        'ref_Debye': 1021.,
+                        'ref_grueneisen': 1.48,
+                        'q0': 1.4,
+                        'eta_0s': 2.4 }
+                self.params_LS = {
+			'P_LS': 63, # in GPa
+                        'ref_V': 165.78e-6,
+                        'ref_K': 304.,
+                        'K_prime': 4.5,
+                        'ref_mu': 161.,
+                        'mu_prime': 1.57,
+                        'molar_mass': .1319,
+                        'n': 5,
+                        'ref_Debye': 1021.,
+                        'ref_grueneisen': 1.48,
+                        'q0': 1.4,
+                        'eta_0s': 2.4 }
 class Murakami_perovskite(material): #From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
 	def __init__(self):
 		self.params = {
@@ -310,8 +344,9 @@ class Murakami_perovskite(material): #From Murakami's emails, see Cayman for det
 			'q0': 1.4, 
 			'eta_0s': 2.4 }
 			
-class Murakami_fp_HS(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
-	def __init__(self):
+class Murakami_fp(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
+	def __init__(self, spin_transition_on):
+                self.spin_transition_on=spin_transition_on
 		self.params = {
 			'ref_V': 11.412e-6,
 			'ref_K': 159.,
@@ -324,13 +359,12 @@ class Murakami_fp_HS(material): #From Murakami's emails, see Cayman for details,
 			'ref_grueneisen': 1.5,
 			'q0': 1.5, 
 			'eta_0s': 3.0 }
-			
-class Murakami_fp_LS(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
-	def __init__(self):
-		self.params = {
-			'ref_V': 11.171e-6,
-			'ref_K': 170.,
-			'K_prime': 4.00,
+		# material properties for low spin state
+		self.params_LS = {
+			'P_LS': 63.,   # in GPa
+			'ref_V': 11.412e-6, #11.171e-6,modified by Sanne
+			'ref_K': 159,   #170.,
+			'K_prime': 4.11,  #4,
 			'ref_mu': 116.34,
 			'mu_prime': 1.668,
 			'molar_mass': .0494,

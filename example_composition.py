@@ -37,20 +37,20 @@ method = 'slb'
 # Here are a few ways to define phases and molar_abundances:
 
 #Example 1: two simple fixed minerals
-if False:
-	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp_LS()]
+if True:
+	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp()]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 #Example 2: specify fixed iron content
 if False:
-	phases = [minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5)]
+	phases = [minerals.mg_fe_perovskite(0.8), minerals.ferropericlase(0.8)]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 #Example 3: input weight percentages
-#See comments in code/composition.py for references to partition coefficent calculation
-if True:
+#See comments in burnman/composition.py for references to partition coefficent calculation
+if False:
 	weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
 	phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
 	iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
@@ -65,7 +65,7 @@ if False:
 
 
 #seismic model for comparison:
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 # we will do our computation and comparison at the following depth values:
 depths = np.linspace(700, 2800, number_of_points)
