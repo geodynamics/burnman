@@ -69,7 +69,8 @@ class material:
         def set_state(self, pressure, temperature):
                 self.pressure = pressure
                 self.temperature = temperature
-                if (hasattr(self, 'params_LS')):
+                if (hasattr(self, 'spin_transition')):
+			assert(hasattr(self, 'params_LS') and hasattr(self, 'params_HS'));
 			if (self.spin_transition=="low" or \
 				    (self.spin_transition=="on" \
 					     and self.params_LS['P_LS']*1.e9<pressure)):
