@@ -100,12 +100,40 @@ plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
 plt.ylim(300,800)
 plt.legend(loc='upper left')
 
-# plot geotherm
-plt.subplot(2,2,4)
-plt.plot(seis_p/1e9,temperature,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-plt.title("Geotherm (K)")
+
+
+
+# example 3:
+
+molar_abundances = [1.0]
+phases = [minerals.Murakami_fp("low")]
+phases[0].set_method('slb')
+
+mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+
+phases = [minerals.Murakami_fp("high")]
+phases[0].set_method('slb')
+mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+
+phases = [minerals.Murakami_fp("on")]
+phases[0].set_method('slb')
+mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+
+plt.subplot(2,2,3)
+plt.plot(seis_p/1.e9,mat_vs_LS,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
+plt.plot(seis_p/1.e9,mat_vs_HS,color='r',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs HS')
+plt.plot(seis_p/1.e9,mat_vs_ON,color='g',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs ON')
+plt.title("Murakami_fp")
 plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-plt.xlabel("Pressure (GPa)")
+#plt.ylim(300,800)
+plt.legend(loc='upper left')
+
+
+
+
+
+
+
 
 plt.savefig("examples_spintransition.png")
 plt.show()
