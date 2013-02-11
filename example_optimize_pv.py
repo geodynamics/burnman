@@ -55,7 +55,7 @@ geotherm = burnman.geotherm.brown_shankland
 temperature = [geotherm(p) for p in seis_p]
 
 def material_error(amount_perovskite):
-	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp_LS()]
+	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp("low")]
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
 	for ph in phases:

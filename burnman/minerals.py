@@ -69,17 +69,18 @@ class material:
         def set_state(self, pressure, temperature):
                 self.pressure = pressure
                 self.temperature = temperature
-                if (hasattr(self, 'params_LS') and self.spin_transition_on):
-			if (self.params_LS['P_LS']*1.e9<pressure):
-				params=self.params_LS
+                if (hasattr(self, 'params_LS')):
+			if (self.spin_transition=="low" or \
+				    (self.spin_transition=="on" \
+					     and self.params_LS['P_LS']*1.e9<pressure)):
+				self.params=self.params_LS
 			else:
-				params=self.params
-		else:
-			params=self.params
-                self.V = self.method.volume(self.pressure, self.temperature, params)
-		self.K_T = self.method.bulk_modulus(self.temperature, self.V, params)
-		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, params)
-		self.mu = self.method.shear_modulus(self.temperature, self.V, params)
+				self.params=self.params_HS
+
+                self.V = self.method.volume(self.pressure, self.temperature, self.params)
+		self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
+		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
+		self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
                 
        
 	def molar_mass(self):
@@ -300,9 +301,10 @@ class fe_perovskite(material):
 			'eta_0s': 2.4 }
 
 class Catalli_perovskite(material): # Catalli et al 2009
-        def __init__(self,spin_transition_on):
-	        self.spin_transition_on=spin_transition_on
-                self.params = {
+        def __init__(self,spin_transition):
+		assert(spin_transition=="on" or spin_transition=="low" or spin_transition=="high")
+	        self.spin_transition=spin_transition
+                self.params_HS = {
                         'ref_V': 165.78e-6,
                         'ref_K': 237.,
                         'K_prime': 4.5,
@@ -345,9 +347,10 @@ class Murakami_perovskite(material): #From Murakami's emails, see Cayman for det
 			'eta_0s': 2.4 }
 			
 class Murakami_fp(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
-	def __init__(self, spin_transition_on):
-                self.spin_transition_on=spin_transition_on
-		self.params = {
+	def __init__(self, spin_transition):
+		assert(spin_transition=="on" or spin_transition=="low" or spin_transition=="high")
+                self.spin_transition=spin_transition
+		self.params_HS = {
 			'ref_V': 11.412e-6,
 			'ref_K': 159.,
 			'K_prime': 4.11,

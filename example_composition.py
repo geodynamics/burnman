@@ -38,7 +38,7 @@ method = 'slb'
 
 #Example 1: two simple fixed minerals
 if True:
-	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp()]
+	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp("low")]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
