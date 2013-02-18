@@ -38,8 +38,13 @@ from burnman import minerals
 
 ###Input Model 1
 
-##input method
-method_1 = 'mgd' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+#INPUT for method_1
+""" choose 'slb' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
+or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
+or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
+
+method_1 = 'mgd' 
 
 
 #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -60,7 +65,7 @@ temperature_1 = [geotherm(p) for p in seis_p_1]
 ##Now onto the second model parameters
 
 ##input second method
-method_2 = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+method_2 = 'slb' 
 
 
 #Input composition of model 2. See example_composition for potential choices. We'll just choose something simple here

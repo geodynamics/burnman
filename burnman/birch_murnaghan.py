@@ -27,7 +27,7 @@ import mie_grueneisen_debye as mgd
 # birch-murnaghan equation of tate.  Returns bulk
 # modulus in the same units as the reference bulk
 # modulus.  Pressure must be in Pa
-def bm_bulk_modulus(volume, params):
+def bulk_modulus(volume, params):
 	x = params['ref_V']/volume
         pressure = birch_murnaghan(x, params)*1.e9
         ## Matas et al. equation A2
@@ -52,21 +52,21 @@ def birch_murnaghan(x, params):
 # get the birch-murnaghan density at a reference 
 # temperature for a given pressure.  Give pressure in
 # Pa, returns density in kg/m^3
-def bm_density(pressure, params):
+def density(pressure, params):
 	ratio = opt.brentq(lambda x: birch_murnaghan(x, params)*1e9-pressure, 0.8, 5.0)
         return ratio*params
 
 # get the birch-murnaghan density at a reference 
 # temperature for a given pressure (Pa).  Returns
 # molar volume in m^3
-def bm_volume(pressure, params):
+def volume(pressure, params):
 	ratio = opt.brentq(lambda x: birch_murnaghan(x, params)*1e9-pressure, 0.8, 5.0)
         return 1./ratio * params['ref_V']
 
 # get the birch murnaghan shear modulus at a reference temperature,
 # for a given pressure.  Returns shear modulus in GPa (the same units
 # as in params['ref_mu']
-def bm_shear_modulus(volume, params):
+def shear_modulus(volume, params):
 	x = params['ref_V']/volume
         pressure = birch_murnaghan(x, params)
 	#G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))

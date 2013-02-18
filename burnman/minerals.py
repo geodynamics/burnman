@@ -22,6 +22,7 @@ import voigt_reuss_hill as vrh
 import slb_finitestrain as slb
 import mie_grueneisen_debye as mgd
 import slb_thirdorder as slb3
+import birch_murnaghan as bm
 
 class material:
 	"""
@@ -60,6 +61,8 @@ class material:
 			self.method = mgd;
 		elif (method=="slb3"):
 			self.method = slb3;
+                elif (method=="bm"):
+			self.method = bm;
 		else:
 			raise("unsupported material method " + method)
 
@@ -77,12 +80,16 @@ class material:
 				self.params=self.params_LS
 			else:
 				self.params=self.params_HS
-
-                self.V = self.method.volume(self.pressure, self.temperature, self.params)
-		self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
-		self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
-		self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
-                
+                if (self.method==bm):
+                        self.V = self.method.volume(self.pressure, self.params)
+                        self.K_T = self.method.bulk_modulus(self.V, self.params)
+                        self.K_S = self.K_T  # since you are ignoring temperature in this method
+                        self.mu = self.method.shear_modulus(self.V, self.params)
+		else:
+                	self.V = self.method.volume(self.pressure, self.temperature, self.params)
+			self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
+			self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
+			self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
        
 	def molar_mass(self):
 		return self.params['molar_mass']

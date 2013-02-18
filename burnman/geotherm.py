@@ -47,7 +47,7 @@ def self_consistent(pressure, T0, params):
         minP = 0
         #upper mantle potential temperature, in K
 	# integrate the adiabatic gradient equation
-	lnT = integrate.quad( lambda x: (params['ref_grueneisen']/(1.e9*bm_bulk_modulus(x, params))), minP, pressure)
+	lnT = integrate.quad( lambda x: (params['ref_grueneisen']/(1.e9*bm.bulk_modulus(x, params))), minP, pressure)
 	T = T0*np.exp(lnT[0])
 	return T
     

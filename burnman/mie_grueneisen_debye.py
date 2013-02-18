@@ -82,7 +82,7 @@ def thermal_bulk_modulus(V, T, params):
 
 #calculate the mgd bulk modulus (K_T) as a function of P, T, and V
 def bulk_modulus(T,V, params):
-	K_T = bm.bm_bulk_modulus(V, params) + \
+	K_T = bm.bulk_modulus(V, params) + \
 		thermal_bulk_modulus(V,T, params)/1.e9 - \
 		thermal_bulk_modulus(V,300., params)/1.e9  #EQB13
 	return K_T
@@ -106,7 +106,7 @@ def thermal_shear_modulus(V, T,  params):
 
 #calculate the mgd shear modulus as a function of P, V, and T
 def shear_modulus(T,V, params):
-	mu = bm.bm_shear_modulus(V,params) + \
+	mu = bm.shear_modulus(V,params) + \
 		thermal_shear_modulus(V,T, params)/1.e9 - \
 		thermal_shear_modulus(V,300, params)/1.e9 # EQ B11
 	return mu
