@@ -385,7 +385,7 @@ class Murakami_fp(material): #From Murakami's emails, see Cayman for details, re
 			'q0': 1.5, 
 			'eta_0s': 3.0}
 
-class fe_dependent_helper(material):
+class helper_fe_dependent(material):
 	def __init__(self, iron_number_with_pt, idx):
 		self.iron_number_with_pt = iron_number_with_pt
 		self.which_index = idx # take input 0 or 1 from iron_number_with_pt()
@@ -420,16 +420,16 @@ class fe_dependent_helper(material):
 		return self.base_material.v_s()
 
 
-class mg_fe_perovskite_pt_dependent(fe_dependent_helper):
+class mg_fe_perovskite_pt_dependent(helper_fe_dependent):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+		helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return mg_fe_perovskite(iron_number)
 
-class ferropericlase_pt_dependent(fe_dependent_helper):
+class ferropericlase_pt_dependent(helper_fe_dependent):
 	def __init__(self, iron_number_with_pt, idx):
-		fe_dependent_helper.__init__(self, iron_number_with_pt, idx)
+		helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 
 	def create_inner_material(self, iron_number):
 		return ferropericlase(iron_number)
