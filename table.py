@@ -1,3 +1,9 @@
+# BurnMan - a lower mantle toolkit
+# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# Released under GPL v2 or later.
+
+""" Generates a text table with mineral properties. """
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

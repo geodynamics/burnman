@@ -1,5 +1,8 @@
-"""
+# BurnMan - a lower mantle toolkit
+# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# under GPL v2 or later.
 
+"""
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
