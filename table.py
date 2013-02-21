@@ -5,6 +5,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman import tools
 
 
 phases = [minerals.stishovite(), \
@@ -49,6 +50,5 @@ for p in phases:
         table.append(row)
         
 
+tools.pretty_print_table(table)
 
-for r in table:
-    print "\t".join(r)

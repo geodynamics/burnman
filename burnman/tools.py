@@ -22,6 +22,28 @@ import operator
 import bisect
 import os
 
+def pretty_print_table(table,use_tabs=False):
+    """
+    Takes a 2d table and prints it in a nice text based format. If 
+    use_tabs=True then only \t is used as a separator. This is useful for
+    importing the data into other apps (Excel, ...). The default is to pad
+    the columns with spaces to make them look neat. The first column is
+    left aligned, while the remainder is right aligned.
+    """
+    if use_tabs:
+        for r in table:
+            print "\t".join(r)
+        return        
+    
+    def col_width(table, colidx):
+        return max([len(str(row[colidx])) for row in table])
+
+    # create a format string with the first column left aligned, the others right  
+    # example:   {:<27}{:>11}{:>6}{:>8}
+    frmt = "".join([ ('{:<' if i==0 else '{:>')+str(1+col_width(table,i))+'}' for i in range(len(table[0])) ])
+    for r in table:
+        print frmt.format(*r)
+
 def sort_table(table, col=0):
     return sorted(table, key=operator.itemgetter(col))
 
@@ -31,7 +53,7 @@ def float_eq(a,b):
     return abs(a-b)<1e-10*max(1e-5,abs(a),abs(b))
 
 
-def linear_interpol(x,x1,x2,y1,y2):
+def linear_interpol(x, x1, x2, y1, y2):
     assert(x1<=x)
     assert(x2>=x)
     assert(x1<=x2)
@@ -53,7 +75,7 @@ def read_table(filename):
             table.append(numbers)
     return table
 
-def cut_table(table,min, max):
+def cut_table(table, min, max):
     tablen=[]
     for i in range(min,max,1):
         tablen.append(table[i,:])
