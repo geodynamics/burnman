@@ -39,7 +39,7 @@ method = 'slb'
 
 #Example 1: two simple fixed minerals
 if True:
-	phases = [minerals.Murakami_perovskite(), minerals.Murakami_fp("low")]
+	phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase("low")]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 
@@ -61,7 +61,7 @@ if False:
 
 #Example 4: three materials
 if False:
-	phases = [minerals.Murakami_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite()]
+	phases = [minerals.Murakami_fe_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite()]
 	molar_abundances = [0.7, 0.2, 0.1]
 
 

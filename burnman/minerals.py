@@ -307,8 +307,35 @@ class fe_perovskite(material):
 			'ref_grueneisen': 1.48,
 			'q0': 1.4, 
 			'eta_0s': 2.4 }
+class Speziale_fe_periclase(material): # Speciale et al. 2007
+        def __init__(self,spin_transition):
+                assert(spin_transition=="on" or spin_transition=="low" or spin_transition=="high")
+                self.spin_transition=spin_transition
+                self.method='mgd'
+		self.cite='Speziale et al. 2007'
+                self.params_HS = {
+                        'ref_V': 76.10,
+                        'ref_K': 157.5,
+                        'K_prime': 3.92,
+                        'molar_mass': .07610,
+                        'n': 2,
+                        'ref_Debye': 587,
+                        'ref_grueneisen': 1.46,
+                        'q0': 1.2,
+                        'eta_0s': 2.4 } # not from paper
+                self.params_LS = {
+                        'P_LS': 63, # in GPa
+                        'ref_V': 71.39-6,
+                        'ref_K': 186.,
+                        'K_prime': 4.6,
+                        'molar_mass': .07139,
+                        'n': 2,
+                        'ref_Debye': 587.,
+                        'ref_grueneisen': 1.46,
+                        'q0': 1.2,
+                        'eta_0s': 2.4 } # not from paper
 
-class Catalli_perovskite(material): # Catalli et al 2009
+class Catalli_fe_perovskite(material): # Catalli et al 2009
         def __init__(self,spin_transition):
 		assert(spin_transition=="on" or spin_transition=="low" or spin_transition=="high")
 	        self.spin_transition=spin_transition
@@ -337,7 +364,7 @@ class Catalli_perovskite(material): # Catalli et al 2009
                         'ref_grueneisen': 1.48,
                         'q0': 1.4,
                         'eta_0s': 2.4 }
-class Murakami_perovskite(material): #From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
+class Murakami_fe_perovskite(material): #From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
 	def __init__(self):
 		self.params = {
 			'ref_V': 24.607e-6,
@@ -354,7 +381,7 @@ class Murakami_perovskite(material): #From Murakami's emails, see Cayman for det
 			'q0': 1.4, 
 			'eta_0s': 2.4 }
 			
-class Murakami_fp(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
+class Murakami_fe_periclase(material): #From Murakami's emails, see Cayman for details, represents Mg# = .79
 	def __init__(self, spin_transition):
 		assert(spin_transition=="on" or spin_transition=="low" or spin_transition=="high")
                 self.spin_transition=spin_transition
