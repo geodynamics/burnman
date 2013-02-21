@@ -401,7 +401,7 @@ class Murakami_fe_periclase(material): #From Murakami's emails, see Cayman for d
 		self.params_LS = {
 			'P_LS': 63.,   # in GPa
 			'ref_V': 11.412e-6, #11.171e-6,modified by Sanne
-			'ref_K': 159,   #170.,
+			'ref_K': 159.,   #170.,
 			'K_prime': 4.11,  #4,
 			'ref_mu': 116.34,
 			'mu_prime': 1.668,
