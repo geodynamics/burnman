@@ -79,74 +79,144 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 
 *** Examples
 
-* example_geotherms.py:
-  requires:
+* example_geotherms.py
 
-  teaches:
-  - geotherms
+Shows the various ways to input geotherms: Built-in geotherms (geotherm1 and 2), basic linear (geotherm3),
+loaded in from a data file (geotherm4) of your choice. Geotherm 1 is from Brown & Shankland (1981) and 
+geotherm2 from Watson & Baxter (2007).
+
+requires:
+
+teaches:
+- geotherms
+
+
+* example_geotherms.py
+
+Shows the various ways to input geotherms: Built-in geotherms (geotherm1 and 2), basic linear (geotherm3),
+loaded in from a data file (geotherm4) of your choice. Geotherm 1 is from Brown & Shankland (1981) and 
+geotherm2 from Watson & Baxter (2007).
+
+requires:
+
+teaches:
+- geotherms
+
 
 * example_seismic.py
-  requires:
 
-  teaches:
-  - seismic models
+Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
+function of depth (or P) as well as different velocity models available:
+PREM (Dziewonski & Anderson, 1981)
+reference model for fast regionsi (outside the LLSVP's) in the lower mantle (Lekic et al. 2012)
+reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
-* example_compare_two_models.py:
-  requires:
-  - geotherms
-  - creating minerals
+requires:
 
-  teaches:
-  - compute seismic velocities
+teaches:
+- seismic models
 
-* example_composition.py:
-  requires:
-  - geotherms
-  - seismic models
-  - compute seismic velocities
 
-  teaches:
-  - creating minerals
-  - seismic comparison
+* example_compare_two_models.py
 
-* example_woutput.py:
-  requires:
-  - creating minerals
-  - compute seismic velocities
-  - geotherms
-  
-  teaches:
-  - output computed seismic data to file 
+Calculates and plots two models for different minerals or methods and plots
+the results. Calculates basic percent difference statistics as well.
 
-* example_user_input_material.py:
-  requires:
-  - creating minerals
-  - compute seismic velocities
-  - geotherms
-  - seismic models
-  - seismic comparison
+requires:
+- geotherms
+- creating minerals
 
-  teaches:
-  - how to create your own minerals
+teaches:
+- compute seismic velocities and compare
 
-* example_compare_enstpyro.py:
-  requires:
-  - geotherms
-  - seismic models
-  - compute seismic velocities
-  - creating minerals
+* example_composition.py
 
-  teaches:
-  - weight percent materials
+This example shows how to create different minerals, how to compute seismic
+velocities, and how to compare them to a seismic reference model.
 
-* example_optimize_pv.py:
-  requires:
-  - creating minerals
-  - compute seismic velocities
-  - geotherms
-  - seismic models
-  - seismic comparison
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
 
-  teaches:
-  - compare errors between models
-  - loops over models
+teaches:
+- creating minerals
+- seismic comparison
+
+
+* example_woutput.py
+
+Compute properties of minerals and creates a table of outputs in a text format
+that could be used with other programs.
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+
+teaches:
+- output computed seismic data to file 
+
+
+* example_user_input_material.py
+
+Shows user how to input a mineral of his/her choice and which physical values
+need to be input for BurnMan to calculate Vs, Vp, Vphi and density at depth.
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+- seismic models
+- seismic comparison
+
+teaches:
+- how to create your own minerals
+
+
+* example_compare_enstpyro.py
+
+This example shows you how to create two materials from wt% determines the
+optimum mixing between the two to match the seismic model of your choice.
+
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+- creating minerals
+
+teaches:
+- weight percent materials
+
+
+* example_optimize_pv.py
+
+Vary the amount perovskite vs. ferropericlase and compute the error in the
+seismic data against PREM.
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+- seismic models
+- seismic comparison
+
+teaches:
+- compare errors between models
+- loops over models
+
+
+* example_spintransition.py
+
+This example shows the different minerals that are implemented with a spin transition.
+Minerals with spin transition can be included in burnman/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in GPa. This example shows the minerals for which spin transitions are implemented. 
+
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+
+teaches:
+- spin transitions
+
+
