@@ -10,7 +10,6 @@ reference model for fast regionsi (outside the LLSVP's) in the lower mantle (Lek
 reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
 requires:
-- burnman.seismic
 
 teaches:
 - seismic models
