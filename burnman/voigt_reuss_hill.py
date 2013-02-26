@@ -26,7 +26,6 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
 
     V_i = [(molar_abundances[i]*phases[i].molar_volume()) for i in it]
     V_tot= sum(V_i)
-    
     #calculate the density of the phase assemblage
     rho = (1./V_tot) * sum( molar_abundances[i]*phases[i].molar_mass() for i in it)
 

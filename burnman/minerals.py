@@ -8,6 +8,8 @@ import slb_finitestrain as slb
 import mie_grueneisen_debye as mgd
 import slb_thirdorder as slb3
 import birch_murnaghan as bm
+import warnings
+
 
 class material:
 	"""
@@ -69,13 +71,22 @@ class material:
                         self.V = self.method.volume(self.pressure, self.params)
                         self.K_T = self.method.bulk_modulus(self.V, self.params)
                         self.K_S = self.K_T  # since you are ignoring temperature in this method
-                        self.mu = self.method.shear_modulus(self.V, self.params)
+                        if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
+                        	self.mu = self.method.shear_modulus(self.V, self.params)
+		        else:
+ 				self.mu=-1
+                                #warnings.warn(('Warning: mu and or mu_prime are undefined for', material.to_string(self)))
+
 		else:
                 	self.V = self.method.volume(self.pressure, self.temperature, self.params)
 			self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
 			self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
-			self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
-       
+                        if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
+				self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
+       			else:	
+				self.mu=-1
+                                #warnings.warn(('Warning: mu and or mu_prime are undefined for', material.to_string(self)))
+
 	def molar_mass(self):
 		return self.params['molar_mass']
 
@@ -299,21 +310,21 @@ class Speziale_fe_periclase(material): # Speciale et al. 2007
                 self.method='mgd'
 		self.cite='Speziale et al. 2007'
                 self.params_HS = {
-                        'ref_V': 76.10,
+                        'ref_V': 45.83e-5,
                         'ref_K': 157.5,
                         'K_prime': 3.92,
-                        'molar_mass': .07610,
+                        'molar_mass': .04567,
                         'n': 2,
                         'ref_Debye': 587,
                         'ref_grueneisen': 1.46,
                         'q0': 1.2,
                         'eta_0s': 2.4 } # not from paper
                 self.params_LS = {
-                        'P_LS': 63, # in GPa
-                        'ref_V': 71.39-6,
+                        'P_LS': 60, # in GPa
+                        'ref_V': 42.99e-5,
                         'ref_K': 186.,
                         'K_prime': 4.6,
-                        'molar_mass': .07139,
+                        'molar_mass': .04567,
                         'n': 2,
                         'ref_Debye': 587.,
                         'ref_grueneisen': 1.46,

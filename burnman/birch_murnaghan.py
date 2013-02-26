@@ -53,9 +53,9 @@ def volume(pressure, params):
 def shear_modulus(volume, params):
 	x = params['ref_V']/volume
         pressure = birch_murnaghan(x, params)
-	#G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
+	G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
         f = 0.5*(pow(x, 2./3.) - 1.0)
-        G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
+        #G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
 	return G 
 
 
