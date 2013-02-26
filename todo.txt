@@ -2,7 +2,6 @@
 TODOLIST:
 
 - clean up composition.py
-- fix benchmark.py
 - slb vs slb_third.py duplicate a lot, avoid that
 x consistently order functions that return or accept v_s,v_p,v_phi: order is now v_p, v_s, v_phi (Sanne)
 - what needs to be done for spin transitions?
@@ -22,6 +21,7 @@ x check attenuation correction and write an example (Sanne, Cayman): attenuation
 - Convert from cc to SI in seismic files
 
 DONE:
+- fix benchmark.py
 x Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
 - unify importing of burnman (Timo)
 x call it burnman instead of code (Timo/Sanne)
