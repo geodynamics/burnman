@@ -1,6 +1,7 @@
 
 TODOLIST:
 
+- slb vs slb_third.py duplicate a lot, avoid that
 x consistently order functions that return or accept v_s,v_p,v_phi: order is now v_p, v_s, v_phi (Sanne)
 - what needs to be done for spin transitions?
 x check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
