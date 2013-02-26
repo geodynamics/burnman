@@ -22,7 +22,7 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     
     #determine the partial molar volumes of the phases
     for i in it:
-      phases[i].set_state(pressure,temperature)
+        phases[i].set_state(pressure,temperature)
 
     V_i = [(molar_abundances[i]*phases[i].molar_volume()) for i in it]
     V_tot= sum(V_i)
@@ -67,4 +67,3 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     v_s  = v_s*(1.-1./2.*cot*1./Qs)
     v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
     return v_p, v_s, v_phi
-

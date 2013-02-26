@@ -52,7 +52,7 @@ def calculate_phase_percents(inp):
 
     norm = out['MgO']+out['FeO']
     for a in inp:
-    	rel_mol_per[names[a]] = out[names[a]]/norm
+        rel_mol_per[names[a]] = out[names[a]]/norm
 
     frac_mol_SiO2 = rel_mol_per['SiO2']
     phase_per={'fp':(1.-frac_mol_SiO2),'pv':frac_mol_SiO2}
@@ -87,7 +87,7 @@ def calculate_partition_coefficient(pressure, temperature, components):
     num_to_sqrt = (-4.*frac_mol_FeO*(K-1.)*K*frac_mol_SiO2)+(pow(1.+(frac_mol_FeO*(K-1))+((K-1.)*frac_mol_SiO2),2.))
 
     b = (-1. + frac_mol_FeO - (frac_mol_FeO*K)+frac_mol_SiO2 - (frac_mol_SiO2*K) + math.sqrt(num_to_sqrt)) \
-		 / (2.*frac_mol_SiO2*(1.-K))
+         / (2.*frac_mol_SiO2*(1.-K))
 
     a = b /(((1.-b)*K)+b)
     
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     EndP = 110.0
     deltaP = 1.
 
-    P,T,a,b,frac_mol_pv,frac_mol_mw	= part_coef_calc(inp2,StartP,EndP,deltaP)
+    P,T,a,b,frac_mol_pv,frac_mol_mw    = part_coef_calc(inp2,StartP,EndP,deltaP)
 
     gt = lambda p: geotherm.geotherm_brown_shankland(p)
     pressure = StartP
@@ -112,4 +112,3 @@ if __name__ == "__main__":
     #print inp1
     #print inp2
     #print t
-

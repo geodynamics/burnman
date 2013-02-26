@@ -25,7 +25,7 @@ def watson_baxter(pressure):
 # geotherm from Brown and Shankland 81
 def brown_shankland(pressure):
     depth = seismic.prem_model.depth(pressure)
-    return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)	
+    return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
 
 #This integrates dT/dP = gr * T / K_s
 #TODO: what is this?

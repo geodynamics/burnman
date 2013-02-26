@@ -98,11 +98,11 @@ class radiustable(seismic_data):
 
     def depth(self, pressure):
         radius = tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
-	return self.earth_radius - radius
+        return self.earth_radius - radius
 
     def _lookup(self, depth, value_table):
         radius = self.earth_radius - depth
-        return tools.lookup_and_interpolate(self.table_radius, value_table, radius)	
+        return tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
 class prem(radiustable):

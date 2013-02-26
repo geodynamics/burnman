@@ -19,16 +19,15 @@ import birch_murnaghan as bm
 gas_constant=8.314462175
 
 def volume(p,T,params):
- 	
     P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params) #From Stixrude 2005: delta U (T)*gamma*ro (1/V)
     P_th_ref = lambda x: mgd.mgd_thermal_pressure(x, 300., params)#From Stixrude 2005: delta U (300 K)*gamma*ro (1/V)
       
     b_iikk= 9.*params['ref_K'] # EQ 28
     b_iikkmm= 27.*params['ref_K']*(params['K_prime']-4.) # EQ 29
     f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
-	
+
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
-    		+(0.5*b_iikkmm*pow(f(x),2.)))*1.e9 + P_th(x) - P_th_ref(x) - p #EQ 21 
+            +(0.5*b_iikkmm*pow(f(x),2.)))*1.e9 + P_th(x) - P_th_ref(x) - p #EQ 21 
     
     V = opt.brentq(func, 0.09*params['ref_V'], 3.*params['ref_V']) 
     return V
@@ -64,7 +63,6 @@ def shear_modulus(T,V,params):
     
 
 def bulk_modulus(T,V,params):
-
     func_int = lambda t: pow(t,3.)/(math.exp(t)-1.)
     
     P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params)
@@ -82,8 +80,8 @@ def bulk_modulus(T,V,params):
     
     delta_U = (P_th(V) - P_th_ref(V))*(V/gamma) #convert into Stixrudian units
     K = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f) \
-     		+ ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 \
-    		- ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
+             + ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 \
+            - ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
     
     #+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.)) \
     return K
@@ -91,7 +89,7 @@ def bulk_modulus(T,V,params):
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
 # alpha is basically 1e-5
 def bulk_modulus_adiabatic(T,V,params):
-        K_T=bulk_modulus(T,V,params)
-        alpha=1./K_T*((mgd.mgd_thermal_pressure(V,T+1.,params)-mgd.mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
-        gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
-	return K_T*(1.+alpha*gamma*T) # EQ A1
+    K_T=bulk_modulus(T,V,params)
+    alpha=1./K_T*((mgd.mgd_thermal_pressure(V,T+1.,params)-mgd.mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
+    gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
+    return K_T*(1.+alpha*gamma*T) # EQ A1

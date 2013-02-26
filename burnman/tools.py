@@ -59,18 +59,18 @@ def read_table(filename):
             table.append(numbers)
     return table
 
-def cut_table(table, min, max):
+def cut_table(table, min_value, max_value):
     tablen=[]
-    for i in range(min,max,1):
+    for i in range(min_value,max_value,1):
         tablen.append(table[i,:])
     return tablen
 
-def lookup_and_interpolate(table_x, table_y, x_value):	
+def lookup_and_interpolate(table_x, table_y, x_value):    
     idx = bisect.bisect_left(table_x, x_value) - 1
     if (idx < 0):
         return table_y[0]
     elif (idx < len(table_x)-1):
         return linear_interpol(x_value, table_x[idx], table_x[idx+1], \
-					     table_y[idx], table_y[idx+1])
+                         table_y[idx], table_y[idx+1])
     else:
         return table_y[idx]
