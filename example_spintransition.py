@@ -25,110 +25,148 @@ import burnman
 from burnman import minerals
 
 if __name__ == "__main__":	
-print mat_rho	
-# plot example 1
-plt.subplot(2,2,1)
-plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs')
-plt.plot(seis_p/1.e9,mat_vphi,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='Vp')
-plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
-plt.title("ferropericlase (Murakami et al. 2012)")
-plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-plt.ylim(5,6.5)
-plt.legend(loc='upper left')
-
-# example 2:
-
-molar_abundances = [1.0]
-phases = [minerals.Murakami_fe_periclase("low")]
-phases[0].set_method('slb')
-
-mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-
-phases = [minerals.Murakami_fe_periclase("high")]
-phases[0].set_method('slb')
-mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-
-phases = [minerals.Murakami_fe_periclase("on")]
-phases[0].set_method('slb')
-mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-
-plt.subplot(2,2,3)
-plt.plot(seis_p/1.e9,mat_vs_LS,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
-plt.plot(seis_p/1.e9,mat_vs_HS,color='r',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs HS')
-plt.plot(seis_p/1.e9,mat_vs_ON,color='g',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs ON')
-plt.title("Murakami_fp")
-plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-#plt.ylim(300,800)
-plt.legend(loc='upper left')
-
-
-# Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-# Example 3 fe_perovskite with spin transition from Catalli et al. 2009
-if True:
-        spin_transition_on="on"
-        phases = [minerals.Catalli_fe_perovskite(spin_transition_on)]
-        amount_perovskite = 1.
-        molar_abundances = [amount_perovskite]
-
-
-for ph in phases:
-        ph.set_method(method)
-
-print "Calculations are done for:"
-for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
-
-mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-print mat_rho
-print mat_vp
-print mat_vphi
-
-# plot example 3
-plt.subplot(2,2,2)
-plt.plot(seis_p/1.e9,mat_K,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='K')
-plt.plot(seis_p/1.e9,mat_mu,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='G')
-plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
-plt.title("NOT WORKING ferrous pv (Catalli et al. 2009)")
-plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-plt.ylim(300,800)
-plt.legend(loc='upper left')
-
-# Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-# Example 4 fe_periclase with spin transition from Speziale et al. 2007
-if True:
-        spin_transition_on="on"
-        phases = [minerals.Speziale_fe_periclase(spin_transition_on)]
-        amount_periclase = 1.
-        molar_abundances = [amount_periclase]
-
-
-for ph in phases:
-        ph.set_method(method)
-
-print "Calculations are done for:"
-for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
-
-mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
-print mat_rho
-print mat_vp
-print mat_vphi
-
-# plot example 4
-plt.subplot(2,2,4)
-plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
-plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
-plt.title("ferropericlase (Speziale et al. 2007)")
-plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-plt.ylim(0,8)
-plt.legend(loc='upper left')
-
-
-
-
-
-
-
-
-plt.savefig("examples_spintransition.png")
-plt.show()
+	
+	#INPUT for method
+	""" choose 'slb' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
+	or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+	or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
+	or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
+	
+	method = 'slb' 
+	
+	#seismic model for comparison:
+	seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+	number_of_points = 40 #set on how many depth slices the computations should be done
+	# we will do our computation and comparison at the following depth values:
+	depths = np.linspace(700, 2800, number_of_points)
+	#alternatively, we could use the values where prem is defined:
+	#depths = seismic_model.internal_depth_list()
+	seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+	
+	geotherm = burnman.geotherm.brown_shankland
+	temperature = [geotherm(p) for p in seis_p]	
+	
+	
+	# Here the compositions are implemented as fixed minerals. For other options see example_composition.py
+	# Example 1 ferropericlase with spin transition from Murakami et al. 2012
+	if True:
+		spin_transition_on="on"
+		phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase(spin_transition_on)]
+		amount_perovskite = 0.
+		molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+	
+	for ph in phases:
+		ph.set_method(method)
+	
+	print "Calculations are done for:"
+	for i in range(len(phases)):
+		print molar_abundances[i], " of phase", phases[i].to_string()
+	
+	mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)	
+		
+	# plot example 1
+	plt.subplot(2,2,1)
+	plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs')
+	plt.plot(seis_p/1.e9,mat_vphi,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='Vp')
+	plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
+	plt.title("ferropericlase (Murakami et al. 2012)")
+	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+	plt.ylim(5,6.5)
+	plt.legend(loc='upper left')
+	
+	# example 2:
+	
+	molar_abundances = [1.0]
+	phases = [minerals.Murakami_fe_periclase("low")]
+	phases[0].set_method('slb')
+	
+	mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+	
+	phases = [minerals.Murakami_fe_periclase("high")]
+	phases[0].set_method('slb')
+	mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+	
+	phases = [minerals.Murakami_fe_periclase("on")]
+	phases[0].set_method('slb')
+	mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+	
+	plt.subplot(2,2,3)
+	plt.plot(seis_p/1.e9,mat_vs_LS,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
+	plt.plot(seis_p/1.e9,mat_vs_HS,color='r',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs HS')
+	plt.plot(seis_p/1.e9,mat_vs_ON,color='g',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs ON')
+	plt.title("Murakami_fp")
+	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+	#plt.ylim(300,800)
+	plt.legend(loc='upper left')
+	
+	
+	# Here the compositions are implemented as fixed minerals. For other options see example_composition.py
+	# Example 3 fe_perovskite with spin transition from Catalli et al. 2009
+	if True:
+	        spin_transition_on="on"
+	        phases = [minerals.Catalli_fe_perovskite(spin_transition_on)]
+	        amount_perovskite = 1.
+	        molar_abundances = [amount_perovskite]
+	
+	
+	for ph in phases:
+	        ph.set_method(method)
+	
+	print "Calculations are done for:"
+	for i in range(len(phases)):
+	        print molar_abundances[i], " of phase", phases[i].to_string()
+	
+	mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+	print mat_rho
+	print mat_vp
+	print mat_vphi
+	
+	# plot example 3
+	plt.subplot(2,2,2)
+	plt.plot(seis_p/1.e9,mat_K,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='K')
+	plt.plot(seis_p/1.e9,mat_mu,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='G')
+	plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
+	plt.title("NOT WORKING ferrous pv (Catalli et al. 2009)")
+	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+	plt.ylim(300,800)
+	plt.legend(loc='upper left')
+	
+	# Here the compositions are implemented as fixed minerals. For other options see example_composition.py
+	# Example 4 fe_periclase with spin transition from Speziale et al. 2007
+	if True:
+	        spin_transition_on="on"
+	        phases = [minerals.Speziale_fe_periclase(spin_transition_on)]
+	        amount_periclase = 1.
+	        molar_abundances = [amount_periclase]
+	
+	
+	for ph in phases:
+	        ph.set_method(method)
+	
+	print "Calculations are done for:"
+	for i in range(len(phases)):
+	        print molar_abundances[i], " of phase", phases[i].to_string()
+	
+	mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+	print mat_rho
+	print mat_vp
+	print mat_vphi
+	
+	# plot example 4
+	plt.subplot(2,2,4)
+	plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
+	plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
+	plt.title("ferropericlase (Speziale et al. 2007)")
+	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+	plt.ylim(0,8)
+	plt.legend(loc='upper left')
+	
+	
+	
+	
+	
+	
+	
+	
+	plt.savefig("examples_spintransition.png")
+	plt.show()
