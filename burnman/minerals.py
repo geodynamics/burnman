@@ -74,8 +74,8 @@ class material:
                         if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
                         	self.mu = self.method.shear_modulus(self.V, self.params)
 		        else:
- 				self.mu=-1
-                                #warnings.warn(('Warning: mu and or mu_prime are undefined for', material.to_string(self)))
+				self.mu=-1
+				warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 
 		else:
                 	self.V = self.method.volume(self.pressure, self.temperature, self.params)
@@ -85,7 +85,7 @@ class material:
 				self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
        			else:	
 				self.mu=-1
-                                #warnings.warn(('Warning: mu and or mu_prime are undefined for', material.to_string(self)))
+				warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 
 	def molar_mass(self):
 		return self.params['molar_mass']
