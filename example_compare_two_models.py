@@ -53,7 +53,7 @@ if __name__ == "__main__":
 	##Now onto the second model parameters
 	
 	##input second method
-	method_2 = 'slb3' 
+	method_2 = 'slb' 
 	
 	
 	#Input composition of model 2. See example_composition for potential choices. We'll just choose something simple here
