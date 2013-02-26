@@ -5,7 +5,6 @@
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
 
-import comparison as comp
 import composition as part
 import mie_grueneisen_debye
 import minerals 
