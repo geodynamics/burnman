@@ -45,7 +45,7 @@ if __name__ == "__main__":
 	
 	#Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
 		
-	phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase("low")]
+	phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
 	amount_perovskite = 0.95
 	molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
 	
