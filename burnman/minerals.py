@@ -81,6 +81,9 @@ class material:
             self.V = self.method.volume(self.pressure, self.temperature, self.params)
             self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
             self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
+            self.C_v = self.method.heat_capacity_v(self.temperature,self.V, self.params)
+            self.C_p = self.method.heat_capacity_p(self.temperature,self.V, self.params)
+            self.alpha = self.method.thermal_expansivity(self.temperature, self.V, self.params)
             if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
                 self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
             else:    
@@ -100,7 +103,13 @@ class material:
     def bulk_modulus(self):
         return self.K_T
     def adiabatic_bulk_modulus(self):
-                return self.K_S
+        return self.K_S
+    def thermal_expansivity(self):
+        return self.alpha
+    def heat_capacity_v(self):
+        return self.C_v
+    def heat_capacity_p(self):
+        return self.C_p
     def shear_modulus(self):
         return self.mu
     def v_s(self):
