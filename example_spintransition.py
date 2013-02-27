@@ -50,8 +50,7 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 1 ferropericlase with spin transition from Murakami et al. 2012
     if True:
-        spin_transition_on="on"
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase(spin_transition_on)]
+        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase()]
         amount_perovskite = 0.
         molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
     
@@ -77,16 +76,16 @@ if __name__ == "__main__":
     # example 2:
     
     molar_abundances = [1.0]
-    phases = [minerals.Murakami_fe_periclase("low")]
+    phases = [minerals.Murakami_fe_periclase_LS()]
     phases[0].set_method('slb')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
     
-    phases = [minerals.Murakami_fe_periclase("high")]
+    phases = [minerals.Murakami_fe_periclase_HS()]
     phases[0].set_method('slb')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
     
-    phases = [minerals.Murakami_fe_periclase("on")]
+    phases = [minerals.Murakami_fe_periclase()]
     phases[0].set_method('slb')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
     
@@ -103,8 +102,7 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 3 fe_perovskite with spin transition from Catalli et al. 2009
     if True:
-            spin_transition_on="on"
-            phases = [minerals.Catalli_fe_perovskite(spin_transition_on)]
+            phases = [minerals.Catalli_fe_perovskite()]
             amount_perovskite = 1.
             molar_abundances = [amount_perovskite]
     
@@ -134,8 +132,7 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 4 fe_periclase with spin transition from Speziale et al. 2007
     if True:
-            spin_transition_on="on"
-            phases = [minerals.Speziale_fe_periclase(spin_transition_on)]
+            phases = [minerals.Speziale_fe_periclase()]
             amount_periclase = 1.
             molar_abundances = [amount_periclase]
     

@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 from composition import *
+import numpy as np
 import voigt_reuss_hill as vrh
 import slb_finitestrain as slb
 import mie_grueneisen_debye as mgd
@@ -64,14 +65,6 @@ class material:
         
         self.pressure = pressure
         self.temperature = temperature
-        if (hasattr(self, 'spin_transition')):
-            assert(hasattr(self, 'params_LS') and hasattr(self, 'params_HS'));
-            if (self.spin_transition == "low" or \
-                    (self.spin_transition == "on" \
-                         and self.params_LS['P_LS'] * 1.e9 < pressure)):
-                self.params = self.params_LS
-            else:
-                self.params = self.params_HS
                 
         if (self.method == bm):
             self.V = self.method.volume(self.pressure, self.params)
@@ -124,6 +117,28 @@ class material:
         return np.sqrt((self.bulk_modulus() * 1.e9 + 4. / 3. * \
             self.shear_modulus()) / self.density()) / 1000.
 
+
+class helper_spin_transition(material):
+    """ helper class that switches between two materials (for low and high spin) 
+    based on pressure
+    """
+    
+    def __init__(self, lowspeed_pressure, ls_mat, hs_mat):
+        """ if pressure>=lowspeed_pressure [Pa], use ls_mat, else hs_mat """
+        self.lowspeed_pressure = lowspeed_pressure
+        self.ls_mat = ls_mat
+        self.hs_mat = hs_mat
+                
+    def set_state(self, pressure, temperature):
+        if (pressure >= self.lowspeed_pressure):
+            mat = self.ls_mat
+        else:
+            mat = self.hs_mat
+            
+        mat.method = self.method
+        mat.set_state(pressure, temperature)
+        self.params = mat.params
+        material.set_state(self, pressure, temperature)                
 
 
 
@@ -317,23 +332,10 @@ class fe_perovskite(material):
             'ref_grueneisen': 1.48,
             'q0': 1.4,
             'eta_0s': 2.4 }
-class Speziale_fe_periclase(material):  # Speciale et al. 2007
-    def __init__(self, spin_transition):
-        assert(spin_transition == "on" or spin_transition == "low" or spin_transition == "high")
-        self.spin_transition = spin_transition
-        self.method = 'mgd'
-        self.cite = 'Speziale et al. 2007'
-        self.params_HS = {
-                        'ref_V': 45.83e-5,
-                        'ref_K': 157.5,
-                        'K_prime': 3.92,
-                        'molar_mass': .04567,
-                        'n': 2,
-                        'ref_Debye': 587,
-                        'ref_grueneisen': 1.46,
-                        'q0': 1.2,
-                        'eta_0s': 2.4 }  # not from paper
-        self.params_LS = {
+        
+class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
+    def __init__(self):
+        self.params = {
                         'P_LS': 60,  # in GPa
                         'ref_V': 42.99e-5,
                         'ref_K': 186.,
@@ -345,24 +347,31 @@ class Speziale_fe_periclase(material):  # Speciale et al. 2007
                         'q0': 1.2,
                         'eta_0s': 2.4 }  # not from paper
 
-class Catalli_fe_perovskite(material):  # Catalli et al 2009
-    def __init__(self, spin_transition):
-        assert(spin_transition == "on" or spin_transition == "low" or spin_transition == "high")
-        self.spin_transition = spin_transition
-        self.params_HS = {
-                        'ref_V': 165.78e-6,
-                        'ref_K': 237.,
-                        'K_prime': 4.5,
-                        'ref_mu': 161.,
-                        'mu_prime': 1.57,
-                        'molar_mass': .1319,
-                        'n': 5,
-                        'ref_Debye': 1021.,
-                        'ref_grueneisen': 1.48,
-                        'q0': 1.4,
-                        'eta_0s': 2.4 }
-        self.params_LS = {
-            'P_LS': 63,  # in GPa
+    
+    
+class Speziale_fe_periclase_HS(material):  # Speciale et al. 2007
+    def __init__(self):    
+            self.params = {
+                        'ref_V': 45.83e-5,
+                        'ref_K': 157.5,
+                        'K_prime': 3.92,
+                        'molar_mass': .04567,
+                        'n': 2,
+                        'ref_Debye': 587,
+                        'ref_grueneisen': 1.46,
+                        'q0': 1.2,
+                        'eta_0s': 2.4 }  # not from paper
+    
+        
+class Speziale_fe_periclase(helper_spin_transition):  # Speciale et al. 2007
+    def __init__(self):        
+        helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
+        self.cite = 'Speziale et al. 2007'
+
+        
+class Catalli_fe_perovskite_LS(material):  # Catalli et al 2009
+    def __init__(self):        
+        self.params = {
                         'ref_V': 165.78e-6,
                         'ref_K': 304.,
                         'K_prime': 4.5,
@@ -374,6 +383,27 @@ class Catalli_fe_perovskite(material):  # Catalli et al 2009
                         'ref_grueneisen': 1.48,
                         'q0': 1.4,
                         'eta_0s': 2.4 }
+
+class Catalli_fe_perovskite_HS(material):  # Catalli et al 2009
+    def __init__(self):    
+        self.params = {
+                        'ref_V': 165.78e-6,
+                        'ref_K': 237.,
+                        'K_prime': 4.5,
+                        'ref_mu': 161.,
+                        'mu_prime': 1.57,
+                        'molar_mass': .1319,
+                        'n': 5,
+                        'ref_Debye': 1021.,
+                        'ref_grueneisen': 1.48,
+                        'q0': 1.4,
+                        'eta_0s': 2.4 }    
+        
+class Catalli_fe_perovskite(helper_spin_transition):  # Catalli et al 2009
+    def __init__(self):        
+        helper_spin_transition.__init__(self, 63.0e9, Catalli_fe_perovskite_LS(), Catalli_fe_perovskite_HS())
+
+        
 class Murakami_fe_perovskite(material):  # From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
     def __init__(self):
         self.params = {
@@ -391,11 +421,15 @@ class Murakami_fe_perovskite(material):  # From Murakami's emails, see Cayman fo
             'q0': 1.4,
             'eta_0s': 2.4 }
             
-class Murakami_fe_periclase(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
-    def __init__(self, spin_transition):
-        assert(spin_transition == "on" or spin_transition == "low" or spin_transition == "high")
-        self.spin_transition = spin_transition
-        self.params_HS = {
+            
+
+class Murakami_fe_periclase(helper_spin_transition):
+    def __init__(self):
+        helper_spin_transition.__init__(self, 63.0e9, Murakami_fe_periclase_LS(), Murakami_fe_periclase_HS())
+                
+class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+    def __init__(self):
+        self.params = {
             'ref_V': 11.412e-6,
             'ref_K': 159.,
             'K_prime': 4.11,
@@ -407,9 +441,10 @@ class Murakami_fe_periclase(material):  # From Murakami's emails, see Cayman for
             'ref_grueneisen': 1.5,
             'q0': 1.5,
             'eta_0s': 3.0 }
-        # material properties for low spin state
-        self.params_LS = {
-            'P_LS': 63.,  # in GPa
+
+class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+    def __init__(self):
+        self.params = {
             'ref_V': 11.412e-6,  # 11.171e-6,modified by Sanne
             'ref_K': 159.,  # 170.,
             'K_prime': 4.11,  # 4,
@@ -422,6 +457,9 @@ class Murakami_fe_periclase(material):  # From Murakami's emails, see Cayman for
             'q0': 1.5,
             'eta_0s': 3.0}
 
+
+
+                
 class helper_fe_dependent(material):
     def __init__(self, iron_number_with_pt, idx):
         self.iron_number_with_pt = iron_number_with_pt

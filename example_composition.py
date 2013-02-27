@@ -44,7 +44,7 @@ if __name__ == "__main__":
     
     #Example 1: two simple fixed minerals
     if True:
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase("low")]
+        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
         amount_perovskite = 0.95
         molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
     

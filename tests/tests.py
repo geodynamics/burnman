@@ -1,5 +1,6 @@
 import unittest
 from test_vrh import *
+from test_spin import *
 
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))

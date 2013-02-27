@@ -44,7 +44,7 @@ if __name__ == "__main__":
     temperature = [geotherm(p) for p in seis_p]
     
     def material_error(amount_perovskite):
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase("low")]
+        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
         molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
     
         for ph in phases:
