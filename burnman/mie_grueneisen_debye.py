@@ -72,13 +72,6 @@ def bulk_modulus(T,V, params):
         thermal_bulk_modulus(300.,V, params)/1.e9  #EQB13
     return K_T
 
-#calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
-# alpha is basically 1e-5
-def bulk_modulus_adiabatic(T,V,params):
-    K_T=bulk_modulus(T,V,params)
-    alpha=1./K_T*((mgd_thermal_pressure(T+1., V, params)-mgd_thermal_pressure(T-1.,V,params))/2.)/1.e9
-    return K_T*(1.+alpha*grueneisen_parameter(params['ref_V']/V,params)*T)
-
 
 #calculate the thermal correction to the shear modulus as a function of V, T
 def thermal_shear_modulus(T, V, params):
@@ -94,3 +87,35 @@ def shear_modulus(T,V, params):
         thermal_shear_modulus(T,V, params)/1.e9 - \
         thermal_shear_modulus(300.,V, params)/1.e9 # EQ B11
     return mu
+
+#heat capacity at constant volume
+def heat_capacity_v(T, V, params):
+    xi = debye_temperature(params['ref_V']/V, params)/T
+    deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, xi)
+    C_v = 9.*params['n']*R*deb[0]/pow(xi,3.)
+    return C_v
+
+def thermal_expansivity(T,V,params):
+    C_v = heat_capacity_v(T,V,params)
+    gr = grueneisen_parameter(params['ref_V']/V, params)
+    K = bulk_modulus(T,V,params)*1.e9
+    alpha = gr * C_v / K / V
+    return alpha
+
+#heat capacity at constant pressure
+def heat_capacity_p(T,V,params):
+    alpha = thermal_expansivity(T,V,params)
+    gr = grueneisen_parameter(params['ref_V']/V, params)
+    C_v = heat_capacity_v(T,V,params)
+    C_p = C_v*(1. + gr * alpha * T)
+    return C_p
+
+#calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
+# alpha is basically 1e-5
+def bulk_modulus_adiabatic(T,V,params):
+    K_T=bulk_modulus(T,V,params)
+    alpha = thermal_expansivity(T,V,params)
+    gr = grueneisen_parameter(params['ref_V']/V, params)
+    K_S = K_T*(1. + gr * alpha * T)
+    return K_S
+
