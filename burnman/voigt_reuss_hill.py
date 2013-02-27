@@ -5,14 +5,20 @@
 import numpy as np
 import seismic
 
-# Voigt-Reuss-Hill average
-# inputs are pressure, temperature, a list of phases, and
-# a list of the same length of molar abundances of the phases.
-# That is to say, given a mole of molecules, what fraction of them
-# are in which phase.  They should add up to 1.
-
 def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
-    # from matas 2007, Appendix C
+    
+    """ Compute Voigt-Reuss-Hill average.
+    
+    Inputs: 
+    pressure: [GPa]
+    temperature:
+    phases: list of n objects from type material
+    molar_abundances: list of n molar fractions (sums up to 1.0)
+     
+    Returns: rho, v_p, v_s, v_phi, K_vrh, mu_vrh (all scalars)    
+    """
+    
+    # This is based on Matas 2007, Appendix C
 
     n_phase = len(phases)
     assert n_phase == len(molar_abundances)
@@ -22,7 +28,7 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     
     #determine the partial molar volumes of the phases
     for i in it:
-        phases[i].set_state(pressure,temperature)
+        phases[i].set_state(pressure, temperature)
 
     V_i = [(molar_abundances[i]*phases[i].molar_volume()) for i in it]
     V_tot= sum(V_i)
@@ -42,9 +48,15 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
 
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 
-#calculate the voigt and reuss averages of the phase assemblage for a certain property X
-#from: matas 2007, appendix D
 def vhr_average(phase_volume, X):
+
+    """ calculate the voigt and reuss averages of the phase assemblage for 
+    a certain property X.
+    
+    Input: phase_volume: array of n volumes, X: array of n properties
+    Returns: mixture of property X
+    
+    Source: Matas 2007, Appendix D """
 
     it = range(len(phase_volume))
     
