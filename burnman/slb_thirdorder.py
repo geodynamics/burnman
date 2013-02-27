@@ -86,10 +86,32 @@ def bulk_modulus(T,V,params):
     #+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.)) \
     return K
 
+#heat capacity at constant volume
+def heat_capacity_v(T, V, params):
+    return mgd.heat_capacity_v(T,V,params)
+
+def thermal_expansivity(T,V,params):
+    C_v = heat_capacity_v(T,V,params)
+    gr = mgd.grueneisen_parameter(params['ref_V']/V, params)
+    K = bulk_modulus(T,V,params)*1.e9
+    alpha = gr * C_v / K / V
+    return alpha
+
+#heat capacity at constant pressure
+def heat_capacity_p(T,V,params):
+    alpha = thermal_expansivity(T,V,params)
+    gr = mgd.grueneisen_parameter(params['ref_V']/V, params)
+    C_v = heat_capacity_v(T,V,params)
+    C_p = C_v*(1. + gr * alpha * T)
+    return C_p
+
 #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
 # alpha is basically 1e-5
 def bulk_modulus_adiabatic(T,V,params):
     K_T=bulk_modulus(T,V,params)
-    alpha=1./K_T*((mgd.mgd_thermal_pressure(T+1.,V,params)-mgd.mgd_thermal_pressure(T-1.,V,params))/2.)/1.e9
-    gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
-    return K_T*(1.+alpha*gamma*T) # EQ A1
+    alpha = thermal_expansivity(T,V,params)
+    gr = mgd.grueneisen_parameter(params['ref_V']/V, params)
+    K_S = K_T*(1. + gr * alpha * T)
+    return K_S
+
+
