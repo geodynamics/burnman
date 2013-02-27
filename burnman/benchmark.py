@@ -114,7 +114,7 @@ def check_mgd_fei_mao_shu_hu():
     pressures = np.empty_like(volumes)
   
     for i in range(len(temperatures)):
-        pressures[i] = mgd.pressure(volumes[i], temperatures[i], mgfeo.params)
+        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)
  
     plt.scatter(temperatures, (pressures-ref_pressures)/ref_pressures*100)
     plt.ylim(-1,1)

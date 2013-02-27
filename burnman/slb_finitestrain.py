@@ -19,8 +19,8 @@ import birch_murnaghan as bm
 gas_constant=8.314462175
 
 def volume(p,T,params):
-    P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params) #From Stixrude 2005: delta U (T)*gamma*ro (1/V)
-    P_th_ref = lambda x: mgd.mgd_thermal_pressure(x, 300., params)#From Stixrude 2005: delta U (300 K)*gamma*ro (1/V)
+    P_th = lambda x: mgd.mgd_thermal_pressure(T,x, params) #From Stixrude 2005: delta U (T)*gamma*ro (1/V)
+    P_th_ref = lambda x: mgd.mgd_thermal_pressure(300.,x, params)#From Stixrude 2005: delta U (300 K)*gamma*ro (1/V)
       
     b_iikk= 9.*params['ref_K'] # EQ 28
     b_iikkmm= 27.*params['ref_K']*(params['K_prime']-4.) # EQ 29
@@ -40,8 +40,8 @@ def shear_modulus(T,V,params):
         # C_v = 3. * n * gas_constant
         # n = number of moles
     #C_v = 3. * n * gas_constant # in J * mol / K
-    P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params)
-    P_th_ref = lambda x: mgd.mgd_thermal_pressure(x, 300., params)
+    P_th = lambda x: mgd.mgd_thermal_pressure(T,x, params)
+    P_th_ref = lambda x: mgd.mgd_thermal_pressure(300.,x, params)
     f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
     
     a2_s = -2.*params['ref_grueneisen'] - 2.*params['eta_0s'] # EQ 47 
@@ -66,8 +66,8 @@ def shear_modulus(T,V,params):
 
 
 def bulk_modulus(T,V,params):
-    P_th = lambda x: mgd.mgd_thermal_pressure(x, T, params)
-    P_th_ref = lambda x: mgd.mgd_thermal_pressure(x, 300., params)
+    P_th = lambda x: mgd.mgd_thermal_pressure(T,x, params)
+    P_th_ref = lambda x: mgd.mgd_thermal_pressure(300.,x, params)
     
     func_int_cv = lambda t: math.exp(t)*pow(t,4.)/pow(math.exp(t)-1.,2.)
     Dcv = integrate.quad(func_int_cv,0.,params['ref_Debye']/T) 
@@ -91,6 +91,6 @@ def bulk_modulus(T,V,params):
 # alpha is basically 1e-5
 def bulk_modulus_adiabatic(T,V,params):
     K_T=bulk_modulus(T,V,params)
-    alpha=1./K_T*((mgd.mgd_thermal_pressure(V,T+1.,params)-mgd.mgd_thermal_pressure(V,T-1.,params))/2.)/1.e9
+    alpha=1./K_T*((mgd.mgd_thermal_pressure(T+1.,V,params)-mgd.mgd_thermal_pressure(T-1.,V,params))/2.)/1.e9
     gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
     return K_T*(1.+alpha*gamma*T) # EQ A1
