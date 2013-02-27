@@ -57,6 +57,11 @@ class material:
         return "'" + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
+        """ Update the material to the given pressure [GPa] and temperature.
+        
+        This updates the other properties of this class (v_s, v_p, ...).
+        """
+        
         self.pressure = pressure
         self.temperature = temperature
         if (hasattr(self, 'spin_transition')):
