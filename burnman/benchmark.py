@@ -28,7 +28,7 @@ def check_birch_murnaghan():
                           'ref_Debye': 0.,
                           'ref_grueneisen': 0.,
                           'q0': 0.}
-    test_mineral.method = slb
+    test_mineral.method = slb3
  
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
@@ -70,23 +70,22 @@ def check_mgd_shim_duffy_kenichi():
     gold.method = mgd
 
     #Total pressures, pulled from Table 2  
-    pressures = [np.array([0., 3.55, 7.55, 12.06, 17.16, 22.91, 29.42, 36.77, 45.11, 54.56, 65.29, 77.50, 91.42, 107.32, 125.51, 146.38, 170.38, 198.07])]
-    pressures.append( np.array([4.99,8.53,12.53,17.04,22.13,27.88,34.38,41.73,50.06,59.50,70.22,82.43,96.33,112.22,130.40,151.25,175.24,202.90]))
-    pressures.append( np.array([12.14,15.69,19.68,24.19,29.28,35.03,41.53,48.88,57.20,66.64,77.37,89.57,103.47,119.35,137.53,158.38,182.36,210.02]))
-    pressures.append( np.array([19.30,22.84,26.84,31.35,36.44,42.19,48.68,56.03,64.35,73.80,84.52,96.72,110.62,126.50,144.68,165.53,189.51,217.17]))
+    ref_pressures = [np.array([0., 3.55, 7.55, 12.06, 17.16, 22.91, 29.42, 36.77, 45.11, 54.56, 65.29, 77.50, 91.42, 107.32, 125.51, 146.38, 170.38, 198.07])]
+    ref_pressures.append( np.array([4.99,8.53,12.53,17.04,22.13,27.88,34.38,41.73,50.06,59.50,70.22,82.43,96.33,112.22,130.40,151.25,175.24,202.90]))
+    ref_pressures.append( np.array([12.14,15.69,19.68,24.19,29.28,35.03,41.53,48.88,57.20,66.64,77.37,89.57,103.47,119.35,137.53,158.38,182.36,210.02]))
+    ref_pressures.append( np.array([19.30,22.84,26.84,31.35,36.44,42.19,48.68,56.03,64.35,73.80,84.52,96.72,110.62,126.50,144.68,165.53,189.51,217.17]))
 
-    volumes = np.empty_like(pressures)
+    pressures = np.empty_like(ref_pressures)
     ref_dv = np.linspace(0.0, 0.34, len(pressures[0]))
     ref_volumes = (1-ref_dv)*gold.params['ref_V']
     T= np.array([300., 1000.,2000.,3000.])
     for t in range(len(pressures)):
         for i in range(len(pressures[t])):
-            gold.set_state(pressures[t][i]*1e9, T[t])
-            volumes[t][i] = gold.molar_volume()
-        plt.plot(pressures[t],(volumes[t]-ref_volumes)/ref_volumes*100)
+            pressures[t][i] = mgd.pressure(T[t],ref_volumes[i], gold.params)/1.e9
+        plt.plot(ref_dv, (pressures[t]-ref_pressures[t]))
     plt.ylim(-1,1)
-    plt.ylabel("% difference in volume")
-    plt.xlabel("Pressure (GPa)")
+    plt.ylabel("Difference in pressure (GPa)")
+    plt.xlabel("1-dV/V")
     plt.title("Comparing with Shim, Duffy, and Kenichi (2002)")
     plt.show()
 
@@ -110,17 +109,17 @@ def check_mgd_fei_mao_shu_hu():
     #change from cubic angstroms per unit cell to cubic meters per mol of molecules.
     volumes = volumes/1.e30*6.022141e23/4.0
     ref_pressures = np.array([0.0, 12.23,7.77,9.69,12.54,9.21,9.90,11.83,18.35,12.68,13.15,25.16,12.53,14.01,15.34,14.86,11.99,12.08,13.03,15.46,21.44,29.98,29.41,29.05,27.36,26.38,24.97,19.49,13.39,14.48,15.27,15.95,16.94])
-    ref_pressures = ref_pressures*1.e9
+    ref_pressures = ref_pressures
     pressures = np.empty_like(volumes)
   
     for i in range(len(temperatures)):
-        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)
+        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)/1.e9
  
-    plt.scatter(temperatures, (pressures-ref_pressures)/ref_pressures*100)
+    plt.scatter(temperatures, (pressures-ref_pressures))
     plt.ylim(-1,1)
     plt.title("Comparing with Fei, Mao, Shu, and Hu (1991)")
-    plt.xlabel("Temperature (K)")
-    plt.ylabel("% difference in total pressure")
+    plt.xlabel("Temperature (K) at various volumes")
+    plt.ylabel("Difference in total pressure (GPa)")
     plt.show()
 
 if __name__ == "__main__":
