@@ -9,6 +9,8 @@ import matplotlib.pylab as plt
 import birch_murnaghan as bm
 
 
+R = 8.314462175
+
 #Evaluate the Debye function.  Takes the parameter
 #xi = Debye_T/T
 def debye_fn(x):
@@ -18,7 +20,6 @@ def debye_fn(x):
 #calculate isotropic thermal pressure, see
 # Matas et. al. (2007) eq B4
 def mgd_thermal_pressure(T,V, params):
-    R = 8.314462175
     Debye_T = debye_temperature(params['ref_V']/V, params) 
     gr = grueneisen_parameter(params['ref_V']/V, params)
     xi = Debye_T/T
@@ -58,7 +59,6 @@ def pressure(T, V, params):
 #calculate the thermal correction for the mgd
 #bulk modulus (see matas et al, 2007)
 def thermal_bulk_modulus(T,V,params):
-    R = 8.314462175
     gr = grueneisen_parameter(params['ref_V']/V, params)
     Debye_T = debye_temperature(params['ref_V']/V, params) 
     K_th = 3.*params['n']*R*T/V * gr * \
@@ -82,7 +82,6 @@ def bulk_modulus_adiabatic(T,V,params):
 
 #calculate the thermal correction to the shear modulus as a function of V, T
 def thermal_shear_modulus(T, V, params):
-    R = 8.314462175
     gr = grueneisen_parameter(params['ref_V']/V, params)
     Debye_T = debye_temperature(params['ref_V']/V, params) 
     mu_th= 3./5. * ( thermal_bulk_modulus(T,V,params) - \
@@ -95,4 +94,3 @@ def shear_modulus(T,V, params):
         thermal_shear_modulus(T,V, params)/1.e9 - \
         thermal_shear_modulus(300.,V, params)/1.e9 # EQ B11
     return mu
-
