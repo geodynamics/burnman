@@ -74,3 +74,12 @@ def lookup_and_interpolate(table_x, table_y, x_value):
                          table_y[idx], table_y[idx+1])
     else:
         return table_y[idx]
+
+# takes unit cell volume in Angstroms, as is often reported, 
+# and the z number for the cell (number of atoms per unit cell,
+# NOT number of atoms per molecular formula), and calculates
+# the molar volume, as expected by the equations of state.
+def molar_volume_from_unit_cell_volume(unit_cell_v, z):
+    N_a = 6.0221415e23
+    return  unit_cell_v*N_a/1e30/z
+
