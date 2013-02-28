@@ -37,8 +37,8 @@ class material:
             'ref_Debye': 0.,
             'ref_grueneisen': 0.,
             'q0': 0.}
-        self.pressure = 0.0
-        self.temperature = 300
+#        self.pressure = 0.0
+#        self.temperature = 300
         self.method = []
 
     def set_method(self, method):
@@ -62,7 +62,13 @@ class material:
         
         This updates the other properties of this class (v_s, v_p, ...).
         """
-        
+        #in an effort to avoid additional work, don't do all the calculations if nothing has changed
+        try:
+            if self.pressure == pressure and self.temperature == temperature:
+                return
+        except AttributeError:
+            pass  #do nothing
+
         self.pressure = pressure
         self.temperature = temperature
                 
