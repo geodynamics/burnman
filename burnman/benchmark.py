@@ -122,6 +122,6 @@ def check_mgd_fei_mao_shu_hu():
     plt.show()
 
 if __name__ == "__main__":
-   # check_mgd_shim_duffy_kenichi()
+    check_mgd_shim_duffy_kenichi()
     check_birch_murnaghan()
-   # check_mgd_fei_mao_shu_hu()
+    check_mgd_fei_mao_shu_hu()
