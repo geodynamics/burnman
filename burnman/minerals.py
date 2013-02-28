@@ -82,6 +82,7 @@ class material:
             self.C_v = self.method.heat_capacity_v(self.temperature,self.V, self.params)
             self.C_p = self.method.heat_capacity_p(self.temperature,self.V, self.params)
             self.alpha = self.method.thermal_expansivity(self.temperature, self.V, self.params)
+            self.gr = mgd.grueneisen_parameter(self.params['ref_V']/self.V, self.params)
             if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
                 self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
             else:    
@@ -97,7 +98,8 @@ class material:
     # gives volume in m^3/mol
     def molar_volume(self):
         return self.V
-
+    def grueneisen_parameter(self):
+        return self.gr
     def bulk_modulus(self):
         return self.K_T
     def adiabatic_bulk_modulus(self):
