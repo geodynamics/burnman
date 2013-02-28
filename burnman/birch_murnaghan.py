@@ -57,16 +57,33 @@ def volume(pressure, params):
     ratio = opt.brentq(lambda x: birch_murnaghan(x, params)-pressure, 0.8, 5.0)
     return 1./ratio * params['ref_V']
 
-def shear_modulus(volume, params):
+def shear_modulus_second_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
     given volume.  Returns shear modulus in Pa (the same units as in
-    params['ref_mu'])
+    params['ref_mu']).  This uses a second order finite strain expansion
     """
 
     x = params['ref_V']/volume
-    pressure = birch_murnaghan(x, params)
     G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
-    f = 0.5*(pow(x, 2./3.) - 1.0)
-    #G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
     return G 
+
+def shear_modulus_third_order(volume, params):
+    """
+    Get the birch murnaghan shear modulus at a reference temperature, for a
+    given volume.  Returns shear modulus in Pa (the same units as in
+    params['ref_mu']).  This uses a third order finite strain expansion
+    """
+
+    x = params['ref_V']/volume
+    f = 0.5*(pow(x, 2./3.) - 1.0)
+    G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
+    return G 
+
+def shear_modulus(volume, params):
+    """
+    More mineral physics studies seem to fit their shear modulus data to
+    the second order finite strain expansion (can we confirm this more?)
+    so the default shear_modulus function wraps the second order function.
+    """
+    return shear_modulus_second_order(volume, params)
