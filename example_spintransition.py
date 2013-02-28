@@ -4,7 +4,7 @@
 
 """
 This example shows the different minerals that are implemented with a spin transition.
-Minerals with spin transition can be included in burnman/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in GPa. This example shows the minerals for which spin transitions are implemented. 
+Minerals with spin transition can be included in burnman/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in Pa. This example shows the minerals for which spin transitions are implemented. 
 
 requires:
 - geotherms

@@ -10,7 +10,7 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     """ Compute Voigt-Reuss-Hill average.
     
     Inputs: 
-    pressure: [GPa]
+    pressure: [Pa]
     temperature:
     phases: list of n objects from type material
     molar_abundances: list of n molar fractions (sums up to 1.0)

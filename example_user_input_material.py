@@ -26,6 +26,15 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman.minerals import material
 
+# A note about units: all the material parameters are expected to be in plain SI units.
+# This means that the elastic moduli should be in Pascals and NOT Gigapascals,
+# and the Debye temperature should be in K not C.  Additionally, the reference volume
+# should be in m^3/(mol molecule) and not in unit cell volume and 'n' should be
+# the number of atoms per molecule.  Frequently in the literature the reference volume
+# is given in Angstrom^3 per unit cell.  To convert this to m^3/(mol molecule) you should
+# multiply by 10^(-30) * N_a / Z, where N_a is Avogadro's number and Z is the number of
+# atoms per unit cell.  You can look up Z in many places, including www.mindat.org
+
 if __name__ == "__main__":
     
     ### input variables ###
@@ -38,7 +47,7 @@ if __name__ == "__main__":
             def __init__(self):
                     material.__init__(self)
                     self.params = {
-                            'ref_V': 10.844e-6, #Unit cell volume [m^3/mole) at room pressure/temperature
+                            'ref_V': 10.844e-6, #Molar volume [m^3/(mole molecules)] at room pressure/temperature
                             'ref_K': 135.19e9, #Reference bulk modulus [Pa] at room pressure/temperature
                             'K_prime': 6.04, #pressure derivative of bulk modulus
                             'ref_mu': 175.0e9, #reference shear modulus at room pressure/temperature

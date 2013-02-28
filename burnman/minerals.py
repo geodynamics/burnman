@@ -58,7 +58,7 @@ class material:
         return "'" + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
-        """ Update the material to the given pressure [GPa] and temperature.
+        """ Update the material to the given pressure [Pa] and temperature.
         
         This updates the other properties of this class (v_s, v_p, ...).
         """
@@ -336,7 +336,7 @@ class fe_perovskite(material):
 class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
     def __init__(self):
         self.params = {
-                        'P_LS': 60,  # in GPa
+                        'P_LS': 60.0e9,  # in Pa
                         'ref_V': 42.99e-5,
                         'ref_K': 186.0e9,
                         'K_prime': 4.6,
