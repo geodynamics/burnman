@@ -64,13 +64,14 @@ class material:
         """
         #in an effort to avoid additional work, don't do all the calculations if nothing has changed
         try:
-            if self.pressure == pressure and self.temperature == temperature:
+            if self.pressure == pressure and self.temperature == temperature and self.old_params == self.params:
                 return
         except AttributeError:
             pass  #do nothing
 
         self.pressure = pressure
         self.temperature = temperature
+        self.old_params = self.params
                 
         if (self.method == bm):
             self.V = self.method.volume(self.pressure, self.params)
