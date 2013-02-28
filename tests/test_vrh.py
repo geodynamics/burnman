@@ -33,8 +33,8 @@ class VRH(unittest.TestCase):
         self.assertAlmostEqual(10330.045, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
         self.assertAlmostEqual(7315.949, v_phi, 2)
-        self.assertAlmostEqual(202.898, K_vrh, 2)
-        self.assertAlmostEqual(151.217, mu_vrh, 2)
+        self.assertAlmostEqual(202.898, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
     def same(self, number):
         phases = [minerals.periclase()] * number
@@ -47,8 +47,8 @@ class VRH(unittest.TestCase):
         self.assertAlmostEqual(10330.045, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
         self.assertAlmostEqual(7315.949, v_phi, 2)
-        self.assertAlmostEqual(202.898, K_vrh, 2)
-        self.assertAlmostEqual(151.217, mu_vrh, 2)
+        self.assertAlmostEqual(202.898, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
     def test_same(self):
         self.same(2)
@@ -66,8 +66,8 @@ class VRH(unittest.TestCase):
         self.assertAlmostEqual(10330.045, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
         self.assertAlmostEqual(7315.949, v_phi, 2)
-        self.assertAlmostEqual(202.898, K_vrh, 2)
-        self.assertAlmostEqual(151.217, mu_vrh, 2)
+        self.assertAlmostEqual(202.898, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
 
 if __name__ == '__main__':
