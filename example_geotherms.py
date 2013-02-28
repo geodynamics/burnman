@@ -42,12 +42,24 @@ if __name__ == "__main__":
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
     #this could also be loaded from a file, just uncomment this
     #table = tools.read_table("data/example_geotherm.txt")
-    
+
     table_pressure = np.array(table)[:,0]
     table_temperature = np.array(table)[:,1]
     
     my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate(table_pressure, table_temperature, p)
     temperature4 = [my_geotherm(p) for p in pressures]
+
+
+    #finally, we can also calculate a self consistent geotherm for an assemblage of minerals
+    #based on self compression of the composite rock.  First we need to define an assemblage
+    phases = [minerals.mg_fe_perovskite(0.1), minerals.ferropericlase(0.4)]
+    for ph in phases:
+        ph.set_method("mgd")
+    molar_abundances = [0.7, 0.3]
+    #next, define an anchor temperature at which we are starting.  Perhaps 1500 K for the upper mantle
+    T0 = 1500.
+    #then generate temperature values using the self consistent function.  This takes more time than the above methods
+    temperature5 = burnman.geotherm.self_consistent(pressures, T0, phases, molar_abundances)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
     
@@ -56,6 +68,7 @@ if __name__ == "__main__":
     plt.plot(pressures/1e9,temperature2,'-g',label="Watson, Baxter")
     plt.plot(pressures/1e9,temperature3,'-b',label="handwritten linear")
     plt.plot(pressures/1e9,temperature4,'-k',label="handwritten from table")
+    plt.plot(pressures/1e9,temperature5,'-m',label="Self consistent with perovskite (70%) and ferropericlase(30%)")
     
     plt.legend(loc='lower right')
     plt.xlim([0, 130])
