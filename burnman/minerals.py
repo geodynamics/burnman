@@ -336,7 +336,6 @@ class fe_perovskite(material):
 class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
     def __init__(self):
         self.params = {
-                        'P_LS': 60.0e9,  # in Pa
                         'ref_V': 42.99e-5,
                         'ref_K': 186.0e9,
                         'K_prime': 4.6,
