@@ -28,7 +28,6 @@ def check_birch_murnaghan():
                           'ref_Debye': 0.,
                           'ref_grueneisen': 0.,
                           'q0': 0.}
-    test_mineral.method = slb3
  
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
@@ -39,7 +38,7 @@ def check_birch_murnaghan():
     for i in range(len(pressure)):
         volume[i] = bm.volume(pressure[i], test_mineral.params)
         bulk_modulus[i] = bm.bulk_modulus(volume[i], test_mineral.params)
-        shear_modulus[i] = bm.shear_modulus(volume[i], test_mineral.params)
+        shear_modulus[i] = bm.shear_modulus_third_order(volume[i], test_mineral.params) #third order is used for the plot we are comparing against
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
@@ -65,7 +64,7 @@ def check_mgd_shim_duffy_kenichi():
                    'molar_mass': .196966,
                    'n': 1.0,
                    'ref_Debye': 170.,
-                   'ref_grueneisen': 2.97,
+                   'ref_grueneisen': 2.97, #this does better with gr = 2.93.  Why?
                    'q0': 1.0}
     gold.method = mgd
 
@@ -123,6 +122,6 @@ def check_mgd_fei_mao_shu_hu():
     plt.show()
 
 if __name__ == "__main__":
-    check_mgd_shim_duffy_kenichi()
+   # check_mgd_shim_duffy_kenichi()
     check_birch_murnaghan()
-    check_mgd_fei_mao_shu_hu()
+   # check_mgd_fei_mao_shu_hu()
