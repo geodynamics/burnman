@@ -60,9 +60,8 @@ def volume(pressure, params):
 def shear_modulus(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
-    given pressure.  Returns shear modulus in Pa (the same units as in
+    given volume.  Returns shear modulus in Pa (the same units as in
     params['ref_mu'])
-    TODO: "for a given pressure"?
     """
 
     x = params['ref_V']/volume
