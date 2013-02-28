@@ -43,7 +43,7 @@ def check_birch_murnaghan():
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
-    fig1 = mpimg.imread('../data/slb_fig1.png')
+    fig1 = mpimg.imread('data/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)
@@ -59,11 +59,11 @@ def check_mgd_shim_duffy_kenichi():
     #Create gold material from Table 1
     gold = material()
     gold.params = {'name': 'gold',
-                   'ref_V': 40.86e-6,
+                   'ref_V': 10.22e-6,
                    'ref_K': 167.0e9,
                    'K_prime': 5.0,
                    'molar_mass': .196966,
-                   'n': 4.0,
+                   'n': 1.0,
                    'ref_Debye': 170.,
                    'ref_grueneisen': 2.97,
                    'q0': 1.0}
