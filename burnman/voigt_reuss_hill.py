@@ -42,9 +42,9 @@ def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
     mu_vrh = vhr_average(V_i,mu_i)
     
     #compute seismic velocities
-    v_s = np.sqrt( mu_vrh*1.e9 / rho)
-    v_p = np.sqrt( (K_vrh*1.e9 + 4./3.*mu_vrh*1e9) / rho)
-    v_phi = np.sqrt( (K_vrh*1e9) / rho)
+    v_s = np.sqrt( mu_vrh / rho)
+    v_p = np.sqrt( (K_vrh + 4./3.*mu_vrh) / rho)
+    v_phi = np.sqrt( (K_vrh) / rho)
 
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 

@@ -113,10 +113,10 @@ class material:
     def shear_modulus(self):
         return self.mu
     def v_s(self):
-        return np.sqrt(self.shear_modulus() * 1.e9 / \
+        return np.sqrt(self.shear_modulus() / \
             self.density()) / 1000.
     def v_p(self):
-        return np.sqrt((self.bulk_modulus() * 1.e9 + 4. / 3. * \
+        return np.sqrt((self.bulk_modulus() + 4. / 3. * \
             self.shear_modulus()) / self.density()) / 1000.
 
 
@@ -149,9 +149,9 @@ class test_mineral (material):
     def __init__(self):
         self.params = {
             'ref_V': 6.844e-6,
-            'ref_K': 135.19,
+            'ref_K': 135.19e9,
             'K_prime': 6.04,
-            'ref_mu': 175.,
+            'ref_mu': 175.0e9,
             'mu_prime': 1.7,
             'molar_mass': .055845,
             'n': 1,
@@ -163,9 +163,9 @@ class stishovite (material):
     def __init__(self):
         self.params = {
             'ref_V': 14.02e-6,
-            'ref_K': 314.,
+            'ref_K': 314.0e9,
             'K_prime': 4.4,
-            'ref_mu': 220.,
+            'ref_mu': 220.0e9,
             'mu_prime': 1.6,
             'molar_mass': .0601,
             'n': 3,
@@ -181,9 +181,9 @@ class periclase (material):
     def __init__(self):
         self.params = {
             'ref_V': 11.24e-6,
-            'ref_K': 161.,
+            'ref_K': 161.0e9,
             'K_prime': 3.9,
-            'ref_mu': 130.,
+            'ref_mu': 130.0e9,
             'mu_prime': 2.2,
             'molar_mass': .0403,
             'n': 2,
@@ -198,9 +198,9 @@ class wustite (material):
     def __init__(self):
         self.params = {
             'ref_V': 12.06e-6,
-            'ref_K': 152.,
+            'ref_K': 152.0e9,
             'K_prime': 4.9,
-            'ref_mu': 47.,
+            'ref_mu': 47.0e9,
             'mu_prime': 0.7,
             'molar_mass': .0718,
             'n': 2,
@@ -307,12 +307,10 @@ class mg_perovskite(material):
     def __init__(self):
         self.params = {
             'ref_V': 24.45e-6,
-            'ref_K': 251.,
+            'ref_K': 251.0e9,
             'K_prime': 4.1,
-            # 'ref_mu': 166.,
-            # 'mu_prime': 1.57,
-                        'ref_mu': 175.,  # from S & L.-B. 2005
-                        'mu_prime': 1.8,
+            'ref_mu': 175.0e9,  # from S & L.-B. 2005
+            'mu_prime': 1.8,
             'molar_mass': .1020,
             'n': 5,
             'ref_Debye': 1070.,
@@ -324,9 +322,9 @@ class fe_perovskite(material):
     def __init__(self):
         self.params = {
             'ref_V': 25.48e-6,
-            'ref_K': 281.,
+            'ref_K': 281.0e9,
             'K_prime': 4.1,
-            'ref_mu': 161.,
+            'ref_mu': 161.0e9,
             'mu_prime': 1.57,
             'molar_mass': .1319,
             'n': 5,
@@ -340,7 +338,7 @@ class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
         self.params = {
                         'P_LS': 60,  # in GPa
                         'ref_V': 42.99e-5,
-                        'ref_K': 186.,
+                        'ref_K': 186.0e9,
                         'K_prime': 4.6,
                         'molar_mass': .04567,
                         'n': 2,
@@ -355,7 +353,7 @@ class Speziale_fe_periclase_HS(material):  # Speciale et al. 2007
     def __init__(self):    
             self.params = {
                         'ref_V': 45.83e-5,
-                        'ref_K': 157.5,
+                        'ref_K': 157.5e9,
                         'K_prime': 3.92,
                         'molar_mass': .04567,
                         'n': 2,
@@ -375,9 +373,9 @@ class Catalli_fe_perovskite_LS(material):  # Catalli et al 2009
     def __init__(self):        
         self.params = {
                         'ref_V': 165.78e-6,
-                        'ref_K': 304.,
+                        'ref_K': 304.0e9,
                         'K_prime': 4.5,
-                        'ref_mu': 161.,
+                        'ref_mu': 161.0e9,
                         'mu_prime': 1.57,
                         'molar_mass': .1319,
                         'n': 5,
@@ -390,9 +388,9 @@ class Catalli_fe_perovskite_HS(material):  # Catalli et al 2009
     def __init__(self):    
         self.params = {
                         'ref_V': 165.78e-6,
-                        'ref_K': 237.,
+                        'ref_K': 237.0e9,
                         'K_prime': 4.5,
-                        'ref_mu': 161.,
+                        'ref_mu': 161.0e9,
                         'mu_prime': 1.57,
                         'molar_mass': .1319,
                         'n': 5,
@@ -410,10 +408,10 @@ class Murakami_fe_perovskite(material):  # From Murakami's emails, see Cayman fo
     def __init__(self):
         self.params = {
             'ref_V': 24.607e-6,
-            'ref_K': 251.9,
+            'ref_K': 251.9e9,
             'K_prime': 4.01,
-            'ref_mu': 164.7,
-            # 'ref_mu': 157.39,  #refitted to second order  
+            'ref_mu': 164.7e9,
+            # 'ref_mu': 157.39e9,  #refitted to second order  
                     'mu_prime': 1.58,
             # 'mu_prime': 2.08, #refitted to second order
             'molar_mass': .102165,
@@ -433,9 +431,9 @@ class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman 
     def __init__(self):
         self.params = {
             'ref_V': 11.412e-6,
-            'ref_K': 159.,
+            'ref_K': 159.0e9,
             'K_prime': 4.11,
-            'ref_mu': 105.43,
+            'ref_mu': 105.43e9,
             'mu_prime': 1.773,
             'molar_mass': .0494,
             'n': 2,
@@ -448,9 +446,9 @@ class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman 
     def __init__(self):
         self.params = {
             'ref_V': 11.412e-6,  # 11.171e-6,modified by Sanne
-            'ref_K': 159.,  # 170.,
+            'ref_K': 159.0e9,  # 170.0e9,
             'K_prime': 4.11,  # 4,
-            'ref_mu': 116.34,
+            'ref_mu': 116.34e9,
             'mu_prime': 1.668,
             'molar_mass': .0494,
             'n': 2,

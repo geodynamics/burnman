@@ -27,7 +27,7 @@ def volume(p,T,params):
     f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
 
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
-            +(0.5*b_iikkmm*pow(f(x),2.)))*1.e9 + P_th(x) - P_th_ref(x) - p #EQ 21 
+            +(0.5*b_iikkmm*pow(f(x),2.))) + P_th(x) - P_th_ref(x) - p #EQ 21 
     
     V = opt.brentq(func, 0.09*params['ref_V'], 3.*params['ref_V']) 
     return V
@@ -57,7 +57,7 @@ def shear_modulus(T,V,params):
   
     G_threeterms = pow(1.+2.*f, 5./2.) * (params['ref_mu'] + (3.*(params['ref_K']*params['mu_prime']) - 5.*params['ref_mu'])*f \
                                    + ((6.*params['ref_K']*params['mu_prime']) - 24.*params['ref_K'] - 14.*params['ref_mu']+ 9./2.*params['ref_K']*params['K_prime']) * pow(f,2)) \
-                                   - (eta_s*(1./V)*delta_U/1.e9) # EQ 33 up to the second order
+                                   - (eta_s*(1./V)*delta_U) # EQ 33 up to the second order
 
     return G_threeterms
     
@@ -74,14 +74,14 @@ def bulk_modulus(T,V,params):
     cv_300 = 9.*params['n']*gas_constant*(pow(300./params['ref_Debye'],3.))*Dcv_300[0]
     Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0])-cv_300 #why substract this? Sanne #units of R
 
-    #Kth_0 = params['ref_K'] - (pow(params['ref_grueneisen'],2.) * density_0 * delta_U_300/params['molar_mass'])/1.e9 
+    #Kth_0 = params['ref_K'] - (pow(params['ref_grueneisen'],2.) * density_0 * delta_U_300/params['molar_mass']) 
     f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
     gamma = params['ref_grueneisen'] * (pow(params['ref_V']/V,-params['q0'])) # EQ 49
     
     delta_U = (P_th(V) - P_th_ref(V))*(V/gamma) #convert into Stixrudian units
     K = pow(1.+2.*f, 5./2.) * ( params['ref_K'] + (3*params['ref_K']*params['K_prime'] -5.*params['ref_K'])*f) \
-             + ((gamma+1.-params['q0'])*(gamma/V)  *delta_U )/1.e9 \
-            - ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )/1.e9   # EQ 32 up to the second order (the third order is basically zero when K'~4
+             + ((gamma+1.-params['q0'])*(gamma/V)  *delta_U ) \
+            - ((pow(gamma,2.) / V )*(Cv*T - cv_300*300.) )   # EQ 32 up to the second order (the third order is basically zero when K'~4
     
     #+27./2.*(params['ref_K']*params['K_prime']-4.*params['ref_K'])*pow(f,2.)) \
     return K
@@ -93,7 +93,7 @@ def heat_capacity_v(T, V, params):
 def thermal_expansivity(T,V,params):
     C_v = heat_capacity_v(T,V,params)
     gr = mgd.grueneisen_parameter(params['ref_V']/V, params)
-    K = bulk_modulus(T,V,params)*1.e9
+    K = bulk_modulus(T,V,params)
     alpha = gr * C_v / K / V
     return alpha
 

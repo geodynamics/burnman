@@ -43,7 +43,7 @@ def grueneisen_parameter(x, params):
 #invert the mie-grueneisen-debye eqn of state with thermal corrections
 #for the volume
 def volume(pressure,T,params):
-    func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params)*1.e9 + \
+    func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params) + \
             mgd_thermal_pressure(T, x, params) - \
             mgd_thermal_pressure(300, x, params) - pressure
     V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
@@ -52,7 +52,7 @@ def volume(pressure,T,params):
 #do the forward problem of the mie-grueneisen-debye equation of state, i.e.
 #get pressure from volume
 def pressure(T, V, params):
-    return bm.birch_murnaghan(params['ref_V']/V, params)*1.e9 + \
+    return bm.birch_murnaghan(params['ref_V']/V, params) + \
             mgd_thermal_pressure(T,V, params) - \
             mgd_thermal_pressure(300,V, params)
     
@@ -68,8 +68,8 @@ def thermal_bulk_modulus(T,V,params):
 #calculate the mgd bulk modulus (K_T) as a function of P, T, and V
 def bulk_modulus(T,V, params):
     K_T = bm.bulk_modulus(V, params) + \
-        thermal_bulk_modulus(T,V, params)/1.e9 - \
-        thermal_bulk_modulus(300.,V, params)/1.e9  #EQB13
+        thermal_bulk_modulus(T,V, params) - \
+        thermal_bulk_modulus(300.,V, params)  #EQB13
     return K_T
 
 
@@ -84,8 +84,8 @@ def thermal_shear_modulus(T, V, params):
 #calculate the mgd shear modulus as a function of P, V, and T
 def shear_modulus(T,V, params):
     mu = bm.shear_modulus(V,params) + \
-        thermal_shear_modulus(T,V, params)/1.e9 - \
-        thermal_shear_modulus(300.,V, params)/1.e9 # EQ B11
+        thermal_shear_modulus(T,V, params) - \
+        thermal_shear_modulus(300.,V, params) # EQ B11
     return mu
 
 #heat capacity at constant volume
@@ -98,7 +98,7 @@ def heat_capacity_v(T, V, params):
 def thermal_expansivity(T,V,params):
     C_v = heat_capacity_v(T,V,params)
     gr = grueneisen_parameter(params['ref_V']/V, params)
-    K = bulk_modulus(T,V,params)*1.e9
+    K = bulk_modulus(T,V,params)
     alpha = gr * C_v / K / V
     return alpha
 

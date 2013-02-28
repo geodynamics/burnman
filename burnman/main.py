@@ -28,8 +28,6 @@ def calculate_velocities (pressure, temperature, phases, molar_abundances):
     for i in range(len(pressure)):
         rho,v_p,v_s,v_phi,K,mu = \
         vrh.voigt_reuss_hill(pressure[i], temperature[i], phases, molar_abundances)
-        #print pressure[i]/1.e9,"    ", temperature[i],"    ",rho,"    ", K,"    ", mu,"    ", v_s/1.e3,"    ", v_p/1.e3,"    ", v_phi/1.e3
-        #print pressure[i]/1.e9,"    ",rho,"    ", mu
         mat_rho[i] = rho/1.e3 # convert from kg/m^3 to g/cc
         mat_vp[i] = v_p/1.e3
         mat_vs[i] = v_s/1.e3

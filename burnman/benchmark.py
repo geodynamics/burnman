@@ -19,9 +19,9 @@ def check_birch_murnaghan():
     test_mineral = material()
     test_mineral.params ={'name':'test',
                           'ref_V': 6.844e-6,
-                          'ref_K': 259,
+                          'ref_K': 259.0e9,
                           'K_prime': 4.0,
-                          'ref_mu': 175.,
+                          'ref_mu': 175.0e9,
                           'mu_prime': 1.7,
                           'molar_mass': .0,
                           'n': 0.,
@@ -42,10 +42,10 @@ def check_birch_murnaghan():
         shear_modulus[i] = bm.shear_modulus(volume[i], test_mineral.params)
 
     #compare with figure 1
-    plt.plot(pressure/1.e9, bulk_modulus, pressure/1.e9, shear_modulus)
+    plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
     fig1 = mpimg.imread('../data/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
-    plt.plot(pressure/1.e9, bulk_modulus, 'g+', pressure/1.e9, shear_modulus, 'g+')
+    plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)
     plt.xlim(0,140)
     plt.xlabel("Pressure (GPa)")
@@ -60,7 +60,7 @@ def check_mgd_shim_duffy_kenichi():
     gold = material()
     gold.params = {'name': 'gold',
                    'ref_V': 40.86e-6,
-                   'ref_K': 167,
+                   'ref_K': 167.0e9,
                    'K_prime': 5.0,
                    'molar_mass': .196966,
                    'n': 4.0,
@@ -81,8 +81,8 @@ def check_mgd_shim_duffy_kenichi():
     T= np.array([300., 1000.,2000.,3000.])
     for t in range(len(pressures)):
         for i in range(len(pressures[t])):
-            pressures[t][i] = mgd.pressure(T[t],ref_volumes[i], gold.params)/1.e9
-        plt.plot(ref_dv, (pressures[t]-ref_pressures[t]))
+            pressures[t][i] = mgd.pressure(T[t],ref_volumes[i], gold.params)
+        plt.plot(ref_dv, (pressures[t]/1.e9-ref_pressures[t]))
     plt.ylim(-1,1)
     plt.ylabel("Difference in pressure (GPa)")
     plt.xlabel("1-dV/V")
@@ -94,7 +94,7 @@ def check_mgd_fei_mao_shu_hu():
     mgfeo = material() 
     mgfeo.params = {       'name': 'MgFeO',
                     'ref_V': 11.657e-6,
-                    'ref_K': 157.0,
+                    'ref_K': 157.0e9,
                     'K_prime': 4.0,
                     'molar_mass': .196966,
                     'n': 2.0,
@@ -113,9 +113,9 @@ def check_mgd_fei_mao_shu_hu():
     pressures = np.empty_like(volumes)
   
     for i in range(len(temperatures)):
-        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)/1.e9
+        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)
  
-    plt.scatter(temperatures, (pressures-ref_pressures))
+    plt.scatter(temperatures, (pressures/1.e9-ref_pressures))
     plt.ylim(-1,1)
     plt.title("Comparing with Fei, Mao, Shu, and Hu (1991)")
     plt.xlabel("Temperature (K) at various volumes")

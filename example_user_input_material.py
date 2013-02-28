@@ -39,9 +39,9 @@ if __name__ == "__main__":
                     material.__init__(self)
                     self.params = {
                             'ref_V': 10.844e-6, #Unit cell volume [m^3/mole) at room pressure/temperature
-                            'ref_K': 135.19, #Reference bulk modulus [GPa] at room pressure/temperature
+                            'ref_K': 135.19e9, #Reference bulk modulus [Pa] at room pressure/temperature
                             'K_prime': 6.04, #pressure derivative of bulk modulus
-                            'ref_mu': 175., #reference shear modulus at room pressure/temperature
+                            'ref_mu': 175.0e9, #reference shear modulus at room pressure/temperature
                             'mu_prime': 1.7, #pressure derivative of shear modulus
                             'molar_mass': .055845, #molar mass in units of [kg/mol]
                             'n': 1, #number of atoms per molecule

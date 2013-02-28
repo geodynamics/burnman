@@ -13,7 +13,7 @@ from minerals import *
 import mie_grueneisen_debye as mgd
 
 # polynomial fit from Watson, Baxter, EPSL, 2007
-# pressure: in GPa
+# pressure: in Pa
 # return: temperature in K
 def watson_baxter(pressure):
     if (pressure <= 15e9):
@@ -49,7 +49,7 @@ def dTdP(temperature, pressure, phases, molar_abundances):
         phases[i].set_state(pressure, temperature)
 
         gr = phases[i].grueneisen_parameter()
-        K_s = phases[i].adiabatic_bulk_modulus()*1.e9
+        K_s = phases[i].adiabatic_bulk_modulus()
         C_p = phases[i].heat_capacity_p()
 
         top += molar_abundances[i]*gr*C_p/K_s
@@ -71,9 +71,9 @@ if __name__ == "__main__":
     test_mineral = material()
     test_mineral.params ={'name':'test',
                           'ref_V': 6.844e-6,
-                          'ref_K': 256,
+                          'ref_K': 256.0e9,
                           'K_prime':0.0,
-                          'ref_mu': 175.,
+                          'ref_mu': 175.0e9,
                           'mu_prime': 1.7,
                           'molar_mass': 0.0,
                           'n': 1.,
