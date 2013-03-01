@@ -25,6 +25,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman.minerals import material
+from burnman.materials import composite
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,
@@ -60,9 +61,7 @@ if __name__ == "__main__":
                 'eta_0s': 3.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
     
     
-    phases = [ own_material() ]
-    molar_abundances = [ 1.0 ]
-    
+    rock = composite( ((own_material(), 1.0),) )
     
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
@@ -75,13 +74,12 @@ if __name__ == "__main__":
     geotherm = burnman.geotherm.brown_shankland
     temperature = [geotherm(p) for p in seis_p]
     
-    for ph in phases:
-        ph.set_method(method)
+    rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)    
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)    
     
     [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)

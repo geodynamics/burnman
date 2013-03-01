@@ -5,40 +5,32 @@
 import numpy as np
 import seismic
 
-def voigt_reuss_hill(pressure, temperature, phases, molar_abundances):
+def voigt_reuss_hill(pressure, temperature, rock):
     
     """ Compute Voigt-Reuss-Hill average.
     
     Inputs: 
     pressure: [Pa]
     temperature:
-    phases: list of n objects from type material
-    molar_abundances: list of n molar fractions (sums up to 1.0)
      
     Returns: rho, v_p, v_s, v_phi, K_vrh, mu_vrh (all scalars)    
     """
     
     # This is based on Matas 2007, Appendix C
 
-    n_phase = len(phases)
-    assert n_phase == len(molar_abundances)
-    assert sum(molar_abundances)  > 0.999
-    assert sum(molar_abundances)  < 1.001
-    it = range(n_phase)
     
     #determine the partial molar volumes of the phases
-    for i in it:
-        phases[i].set_state(pressure, temperature)
+    rock.set_state(pressure, temperature)
 
-    V_i = [(molar_abundances[i]*phases[i].molar_volume()) for i in it]
+    V_i = [(ph.fraction*ph.mineral.molar_volume()) for ph in rock.phases]
     V_tot= sum(V_i)
     #calculate the density of the phase assemblage
-    rho = (1./V_tot) * sum( molar_abundances[i]*phases[i].molar_mass() for i in it)
+    rho = (1./V_tot) * sum( ph.fraction*ph.mineral.molar_mass() for ph in rock.phases)
 
     #calculate the voigt and reuss averages of the phase assemblage for K and mu
-    K_i = [phases[i].adiabatic_bulk_modulus() for i in it]
+    K_i = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
     K_vrh = vhr_average(V_i,K_i)
-    mu_i = [phases[i].shear_modulus() for i in it]
+    mu_i = [ph.mineral.shear_modulus() for ph in rock.phases]
     mu_vrh = vhr_average(V_i,mu_i)
     
     #compute seismic velocities

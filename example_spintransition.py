@@ -23,6 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -50,18 +51,17 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 1 ferropericlase with spin transition from Murakami et al. 2012
     if True:
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase()]
         amount_perovskite = 0.
-        molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+                             (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite) ) )
     
-    for ph in phases:
-        ph.set_method(method)
+        rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)    
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)    
         
     # plot example 1
     plt.subplot(2,2,1)
@@ -75,19 +75,18 @@ if __name__ == "__main__":
     
     # example 2:
     
-    molar_abundances = [1.0]
-    phases = [minerals.Murakami_fe_periclase_LS()]
-    phases[0].set_method('slb')
+    rock = composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
+    rock.set_method('slb')
     
-    mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+    mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
-    phases = [minerals.Murakami_fe_periclase_HS()]
-    phases[0].set_method('slb')
-    mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+    rock = composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
+    rock.set_method('slb')
+    mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
-    phases = [minerals.Murakami_fe_periclase()]
-    phases[0].set_method('slb')
-    mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+    rock = composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
+    rock.set_method('slb')
+    mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
     plt.subplot(2,2,3)
     plt.plot(seis_p/1.e9,mat_vs_LS,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
@@ -102,19 +101,15 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 3 fe_perovskite with spin transition from Catalli et al. 2009
     if True:
-            phases = [minerals.Catalli_fe_perovskite()]
-            amount_perovskite = 1.
-            molar_abundances = [amount_perovskite]
+        rock = composite( ( (minerals.Catalli_fe_perovskite(), 1.0), ) )
     
-    
-    for ph in phases:
-            ph.set_method(method)
+    rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-            print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)
     print mat_rho
     print mat_vp
     print mat_vphi
@@ -132,19 +127,16 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 4 fe_periclase with spin transition from Speziale et al. 2007
     if True:
-            phases = [minerals.Speziale_fe_periclase()]
-            amount_periclase = 1.
-            molar_abundances = [amount_periclase]
+        rock = composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
     
     
-    for ph in phases:
-            ph.set_method(method)
+    rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-            print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)
     print mat_rho
     print mat_vp
     print mat_vphi

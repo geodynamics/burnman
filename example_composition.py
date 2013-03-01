@@ -24,6 +24,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -37,25 +38,26 @@ if __name__ == "__main__":
         
     
     # To compute seismic velocities and other properties, we need to supply
-    # burnman with a list of minerals (phaes) and their molar abundances. Minerals
+    # burnman with a list of minerals (phases) and their molar abundances. Minerals
     # are classes found in burnman.minerals and are derived from
     # burnman.minerals.material.
     # Here are a few ways to define phases and molar_abundances:
     
     #Example 1: two simple fixed minerals
     if True:
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
         amount_perovskite = 0.95
-        molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+                             (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
     
     #Example 2: specify fixed iron content
     if False:
-        phases = [minerals.mg_fe_perovskite(0.8), minerals.ferropericlase(0.8)]
         amount_perovskite = 0.95
-        molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+        rock = composite( ( (minerals.mg_fe_perovskite(0.8), amount_perovskite), 
+                            (minerals.ferropericlase(0.8), 1.0-amount_perovskite) ) )
     
     #Example 3: input weight percentages
     #See comments in burnman/composition.py for references to partition coefficent calculation
+
     if False:
         weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
         phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
@@ -66,8 +68,9 @@ if __name__ == "__main__":
     
     #Example 4: three materials
     if False:
-        phases = [minerals.Murakami_fe_perovskite(), minerals.ferropericlase(0.5), minerals.stishovite()]
-        molar_abundances = [0.7, 0.2, 0.1]
+        rock = composite ( ( (minerals.Murakami_fe_perovskite(), 0.7),
+                             (minerals.ferropericlase(0.5), 0.2) ,
+                             (minerals.stishovite(), 0.1 ) ) )
     
     
     #seismic model for comparison:
@@ -83,14 +86,13 @@ if __name__ == "__main__":
     geotherm = burnman.geotherm.brown_shankland
     temperature = [geotherm(p) for p in seis_p]
     
-    for ph in phases:
-        ph.set_method(method)
+    rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)    
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)    
     
     [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         

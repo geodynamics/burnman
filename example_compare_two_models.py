@@ -21,6 +21,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -37,9 +38,10 @@ if __name__ == "__main__":
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
         
-    phases_1 = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
     amount_perovskite_1 = 0.95
-    molar_abundances_1 = [amount_perovskite_1, 1.0-amount_perovskite_1]
+    rock_1 = composite ( ((minerals.Murakami_fe_perovskite(), amount_perovskite_1),
+                          (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite_1)) ) 
+    rock_1.set_method(method_1)
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -58,9 +60,10 @@ if __name__ == "__main__":
     
     #Input composition of model 2. See example_composition for potential choices. We'll just choose something simple here
         
-    phases_2 = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
     amount_perovskite_2 = 0.95
-    molar_abundances_2 = [amount_perovskite_2, 1.0-amount_perovskite_2]
+    rock_2 = composite ( ((minerals.Murakami_fe_perovskite(), amount_perovskite_2),
+                          (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite_2)) ) 
+    rock_2.set_method(method_2)
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -74,23 +77,18 @@ if __name__ == "__main__":
     
     #Now we'll calculate the models. 
     
-    for ph in phases_1:
-        ph.set_method(method_1)
     
     print "Calculations are done for:"
-    for i in range(len(phases_1)):
-        print molar_abundances_1[i], " of phase", phases_1[i].to_string()
+    for ph in rock_1.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, phases_1, molar_abundances_1)    
-    
-    for ph in phases_2:
-        ph.set_method(method_2)
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, rock_1)    
     
     print "Calculations are done for:"
-    for i in range(len(phases_2)):
-        print molar_abundances_2[i], " of phase", phases_2[i].to_string()
+    for ph in rock_2.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_2, phases_2, molar_abundances_2)    
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_2, rock_2)    
     
     
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)

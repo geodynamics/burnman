@@ -24,6 +24,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 
 if __name__ == "__main__":    
@@ -43,9 +44,8 @@ if __name__ == "__main__":
     weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
     phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
-    phases_pyro = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-        minerals.ferropericlase_pt_dependent(iron_content,1)]
-    molar_abundances_pyro = [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']]
+    pyrolite = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_pyro['pv'] ),
+                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_pyro['fp'] ) ) )
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -65,9 +65,8 @@ if __name__ == "__main__":
     weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
     phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
-    phases_enst = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
-        minerals.ferropericlase_pt_dependent(iron_content,1)]
-    molar_abundances_enst = [phase_fractions_enst['pv'], phase_fractions_enst['fp']]
+    enstatite = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_enst['pv'] ),
+                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_enst['fp'] ) ) )
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -81,25 +80,23 @@ if __name__ == "__main__":
     
     #Now we'll calculate the models. 
     
-    for ph in phases_pyro:
-        ph.set_method(method)
+    pyrolite.set_method(method)
     
     
     
-    mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = burnman.calculate_velocities(seis_p_1, temperature_1, phases_pyro, molar_abundances_pyro)    
-    
-    print "Calculations are done for:"
-    for i in range(len(phases_pyro)):
-        print molar_abundances_pyro[i], " of phase", phases_pyro[i].to_string()
-    
-    for ph in phases_enst:
-        ph.set_method(method)
+    mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = burnman.calculate_velocities(seis_p_1, temperature_1, pyrolite)    
     
     print "Calculations are done for:"
-    for i in range(len(phases_enst)):
-        print molar_abundances_enst[i], " of phase", phases_enst[i].to_string()
+    for ph in pyrolite.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = burnman.calculate_velocities(seis_p_2, temperature_2, phases_enst, molar_abundances_enst)    
+    enstatite.set_method(method)
+    
+    print "Calculations are done for:"
+    for ph in enstatite.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
+    
+    mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = burnman.calculate_velocities(seis_p_2, temperature_2, enstatite)    
     
     
     ##let's create PREM for reference

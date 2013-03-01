@@ -26,8 +26,10 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 if __name__ == "__main__":    
+
     
     ### input variables ###
     #######################
@@ -44,17 +46,16 @@ if __name__ == "__main__":
     temperature = [geotherm(p) for p in seis_p]
     
     def material_error(amount_perovskite):
-        phases = [minerals.Murakami_fe_perovskite(), minerals.Murakami_fe_periclase_LS()]
-        molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+                             (minerals.Murakami_fe_periclase_LS(), 1.0 - amount_perovskite) ) )
     
-        for ph in phases:
-            ph.set_method(method)
+        rock.set_method(method)
     
         print "Calculations are done for:"
-        for i in range(len(phases)):
-            print molar_abundances[i], " of phase", phases[i].to_string()
+        for ph in rock.phases:
+            print ph.fraction, " of phase", ph.mineral.to_string()
     
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, phases, molar_abundances)    
+        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature,  rock)    
     
         #[rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         [rho_err,vphi_err,vs_err]=burnman.compare_two(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)

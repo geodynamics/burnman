@@ -21,6 +21,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+import burnman.materials as materials
 
 if __name__ == "__main__":    
     
@@ -52,14 +53,13 @@ if __name__ == "__main__":
 
     #finally, we can also calculate a self consistent geotherm for an assemblage of minerals
     #based on self compression of the composite rock.  First we need to define an assemblage
-    phases = [minerals.mg_fe_perovskite(0.1), minerals.ferropericlase(0.4)]
-    for ph in phases:
-        ph.set_method("mgd")
-    molar_abundances = [0.7, 0.3]
+    pyrolite = burnman.materials.composite( ((minerals.mg_fe_perovskite(0.1), 0.7), 
+                                             (minerals.ferropericlase(0.4),   0.3) ))
+    pyrolite.set_method("mgd")
     #next, define an anchor temperature at which we are starting.  Perhaps 1500 K for the upper mantle
     T0 = 1500.
     #then generate temperature values using the self consistent function.  This takes more time than the above methods
-    temperature5 = burnman.geotherm.self_consistent(pressures, T0, phases, molar_abundances)
+    temperature5 = burnman.geotherm.self_consistent(pressures, T0, pyrolite)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
     

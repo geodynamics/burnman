@@ -23,6 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -36,9 +37,9 @@ if __name__ == "__main__":
     method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
     
     #specify material
-    phases = [minerals.mg_fe_perovskite(0.7), minerals.ferropericlase(0.5)]
     amount_perovskite = 0.95
-    molar_abundances = [amount_perovskite, 1.0-amount_perovskite]
+    rock = composite( ((minerals.mg_fe_perovskite(0.7), amount_perovskite), 
+                       (minerals.ferropericlase(0.5), 1.0-amount_perovskite) ) )
     
     #define some pressure range
     pressures = np.arange(25e9,130e9,5e9)
@@ -46,14 +47,13 @@ if __name__ == "__main__":
     geotherm = burnman.geotherm.brown_shankland
     temperature = [geotherm(p) for p in pressures]
     
-    for ph in phases:
-        ph.set_method(method)
+    rock.set_method(method)
     
     print "Calculations are done for:"
-    for i in range(len(phases)):
-        print molar_abundances[i], " of phase", phases[i].to_string()
+    for ph in rock.phases:
+        print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, phases, molar_abundances)    
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, rock)    
         
     #write to file:
     output_filename = "example_woutput.txt" 
