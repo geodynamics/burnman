@@ -216,17 +216,16 @@ class wustite (material):
             'q0': 1.5,
             'eta_0s': 3.0 }
 
-# combines two or more materials given a fixed molar_abundance
-# based on their volume at a certain T,p.
+# combines two or more materials given a fixed molar_fraction
 class helper_volumetric_mixing(material):
     # base_materials: list of materials
-    # molar_abundances: list of molar ratios (sum up to 1)
-    def __init__(self, base_materials, molar_abundances):
+    # molar_fraction: list of molar ratios (sum up to 1)
+    def __init__(self, base_materials, molar_fraction):
         self.base_materials = base_materials
-        self.molar_abundances = molar_abundances
-        assert(len(base_materials) == len(molar_abundances))
-        assert(sum(molar_abundances) > 0.999)
-        assert(sum(molar_abundances) < 1.001)
+        self.molar_fraction = molar_fraction
+        assert(len(base_materials) == len(molar_fraction))
+        assert(sum(molar_fraction) > 0.999)
+        assert(sum(molar_fraction) < 1.001)
 
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
@@ -239,11 +238,11 @@ class helper_volumetric_mixing(material):
         self.params = {}
         
         self.params['n'] = sum([self.base_materials[i].params['n'] for i in itrange ]) / len(self.base_materials)            
-        phase_volume = [self.base_materials[i].molar_volume() * self.molar_abundances[i] for i in itrange ]
+        phase_volume = [self.base_materials[i].molar_volume() * self.molar_fraction[i] for i in itrange ]
 
         # some properties need weighted averaging
         for prop in ['ref_V', 'molar_mass', 'ref_Debye', 'ref_grueneisen', 'q0', 'eta_0s']:
-            self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_abundances[i] for i in itrange ])
+            self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
 
 
         # some need VRH averaging
@@ -259,15 +258,15 @@ class helper_volumetric_mixing(material):
 class ferropericlase(helper_volumetric_mixing):
     def __init__(self, fe_num):
         base_materials = [periclase(), wustite()]
-        molar_abundances = (1. - fe_num, fe_num)
-        helper_volumetric_mixing.__init__(self, base_materials, molar_abundances)
+        molar_fraction = (1. - fe_num, fe_num)
+        helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
 class mg_fe_perovskite(helper_volumetric_mixing):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
-        molar_abundances = (1. - fe_num, fe_num)
-        helper_volumetric_mixing.__init__(self, base_materials, molar_abundances)
+        molar_fraction = (1. - fe_num, fe_num)
+        helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
 class ferropericlase_old_and_probably_wrong(material):
