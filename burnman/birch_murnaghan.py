@@ -17,16 +17,10 @@ def bulk_modulus(volume, params):
     """
 
     x = params['ref_V']/volume
-    pressure = birch_murnaghan(x, params)
-    ## Matas et al. equation A2
-    A= -2.*(params['K_prime']-4.)+8./3.
-    B=-4.*(params['K_prime']-4.)+8./3.
-    C= B-A
-    top=5./3.*A*pow(x,5./3.)-7./3.*B*pow(x,7./3.)+3.*C*pow(x,3.)
-    bottom=A*pow(x,5./3.)-B*pow(x,7./3.)+C*pow(x,3.)
-    if bottom == 0.0 :
-        return params['ref_K']
-    K=pressure*top/bottom
+    f = 0.5*(pow(x, 2./3.) - 1.0)
+
+    K = pow(1. + 2*f, 5./2.)* (params['ref_K'] + (3. * params['ref_K'] * params['K_prime'] -  \
+           5*params['ref_K'] ) * f + 27./2. * (params['ref_K']*params['K_prime'] - 4* params['ref_K'])*f*f)
     return K
 
 def birch_murnaghan(x, params):
