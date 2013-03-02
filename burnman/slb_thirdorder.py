@@ -72,7 +72,7 @@ def bulk_modulus(T,V,params):
     Dcv = integrate.quad(func_int_cv,0.,params['ref_Debye']/T) 
     Dcv_300 = integrate.quad(func_int_cv,0.,params['ref_Debye']/300.)
     cv_300 = 9.*params['n']*gas_constant*(pow(300./params['ref_Debye'],3.))*Dcv_300[0]
-    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0])-cv_300 #why substract this? Sanne #units of R
+    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0]) #why substract this? Sanne #units of R
 
     #Kth_0 = params['ref_K'] - (pow(params['ref_grueneisen'],2.) * density_0 * delta_U_300/params['molar_mass']) 
     f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
