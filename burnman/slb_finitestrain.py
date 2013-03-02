@@ -29,7 +29,7 @@ def volume(p,T,params):
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + P_th(x) - P_th_ref(x) - p #EQ 21 
     
-    V = opt.brentq(func, 0.09*params['ref_V'], 3.*params['ref_V']) 
+    V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V']) 
     return V
 
 def shear_modulus(T,V,params):
@@ -73,7 +73,7 @@ def bulk_modulus(T,V,params):
     Dcv = integrate.quad(func_int_cv,0.,params['ref_Debye']/T) 
     Dcv_300 = integrate.quad(func_int_cv,0.,params['ref_Debye']/300.)
     cv_300 = 9.*params['n']*gas_constant*(pow(300./params['ref_Debye'],3.))*Dcv_300[0]
-    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0])-cv_300 #why substract this? Sanne #units of R
+    Cv = (9.*params['n']*gas_constant*(pow(T/params['ref_Debye'],3.))*Dcv[0]) 
 
     #Kth_0 = params['ref_K'] - (pow(params['ref_grueneisen'],2.) * density_0 * delta_U_300/params['molar_mass']) 
     f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
