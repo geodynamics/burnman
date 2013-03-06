@@ -64,8 +64,10 @@ if __name__ == "__main__":
         iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
         phases = [minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
                   minerals.ferropericlase_pt_dependent(iron_content,1)]
-        molar_abundances = [phase_fractions['pv'],phase_fractions['fp']]
-    
+
+        rock = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions['pv'] ),
+                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions['fp'] ) ) )
+        
     #Example 4: three materials
     if False:
         rock = composite ( ( (minerals.Murakami_fe_perovskite(), 0.7),
