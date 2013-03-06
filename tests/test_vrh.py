@@ -30,10 +30,10 @@ class VRH(unittest.TestCase):
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)
-        self.assertAlmostEqual(10304.925, v_p, 2)
+        self.assertAlmostEqual(10305.374, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
-        self.assertAlmostEqual(7280.437, v_phi, 2)
-        self.assertAlmostEqual(200.933, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(7281.073, v_phi, 2)
+        self.assertAlmostEqual(200.968, K_vrh/1.e9, 2)
         self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
     def same(self, number):
@@ -43,10 +43,10 @@ class VRH(unittest.TestCase):
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)
-        self.assertAlmostEqual(10304.925, v_p, 2)
+        self.assertAlmostEqual(10305.374, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
-        self.assertAlmostEqual(7280.437, v_phi, 2)
-        self.assertAlmostEqual(200.933, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(7281.073, v_phi, 2)
+        self.assertAlmostEqual(200.968, K_vrh/1.e9, 2)
         self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
     def test_same(self):
@@ -61,10 +61,10 @@ class VRH(unittest.TestCase):
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)
-        self.assertAlmostEqual(10304.925, v_p, 2)
+        self.assertAlmostEqual(10305.374, v_p, 2)
         self.assertAlmostEqual(6315.856, v_s, 2)
-        self.assertAlmostEqual(7280.437, v_phi, 2)
-        self.assertAlmostEqual(200.933, K_vrh/1.e9, 2)
+        self.assertAlmostEqual(7281.073, v_phi, 2)
+        self.assertAlmostEqual(200.968, K_vrh/1.e9, 2)
         self.assertAlmostEqual(151.217, mu_vrh/1.e9, 2)
 
 
