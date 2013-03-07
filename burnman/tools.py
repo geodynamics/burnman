@@ -16,7 +16,7 @@ def pretty_print_table(table,use_tabs=False):
     """
     if use_tabs:
         for r in table:
-            print "\t".join(r)
+            print "\t".join(r).replace("_","\_")
         return        
     
     def col_width(table, colidx):
