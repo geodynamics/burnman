@@ -22,20 +22,24 @@ if __name__ == "__main__":
     minerals.mg_fe_perovskite(0), \
     minerals.mg_perovskite(), \
     minerals.fe_perovskite(), \
-    minerals.Catalli_fe_perovskite("on"), \
+    minerals.Speziale_fe_periclase_LS(), \
+    minerals.Speziale_fe_periclase_HS(), \
+    minerals.Catalli_fe_perovskite_LS(), \
+    minerals.Catalli_fe_perovskite_HS(), \
     minerals.Murakami_fe_perovskite(), \
-    minerals.Murakami_fe_periclase("on")]
-    #minerals.Speziale_fe_periclase("on"), \
+    minerals.Murakami_fe_periclase_LS(), \
+    minerals.Murakami_fe_periclase_HS()   ]
     #mg_fe_perovskite_pt_dependent
     #ferropericlase_pt_dependent
     
     params = ['ref_V','ref_K','K_prime','ref_mu','mu_prime','molar_mass','n','ref_Debye','ref_grueneisen','q0','eta_0s']
     
     
-    def create_list(mineral,paramname):
+    def create_list(mineral):
         row = [ p.__class__.__name__ ]
         for param in params:
-            row.append(str(getattr(p,paramname)[param]))
+            
+            row.append(str(p.params[param] if param in p.params else ""))
         return row
     
     
@@ -45,17 +49,9 @@ if __name__ == "__main__":
     for p in phases:
         p.set_method('bm')
         p.set_state(0,300)
-        if hasattr(p,'params_LS'):
-            row = create_list(p, 'params_LS')
-            row[0] += ' (LS)'
-            table.append(row)
-            row = create_list(p, 'params_HS')
-            row[0] += ' (HS)'
-            table.append(row)
-        else:
-            row = create_list(p, 'params')
-            table.append(row)
+        row = create_list(p)
+        table.append(row)
             
     
-    tools.pretty_print_table(table)
+    tools.pretty_print_table(table, False)
     
