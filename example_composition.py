@@ -24,7 +24,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -46,14 +45,14 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
+        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+                                     (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = composite( ( (minerals.mg_fe_perovskite(0.8), amount_perovskite), 
-                            (minerals.ferropericlase(0.8), 1.0-amount_perovskite) ) )
+        rock = burnman.composite( ( (minerals.mg_fe_perovskite(0.8), amount_perovskite), 
+                                    (minerals.ferropericlase(0.8), 1.0-amount_perovskite) ) )
     
     #Example 3: input weight percentages
     #See comments in burnman/composition.py for references to partition coefficent calculation
@@ -63,14 +62,14 @@ if __name__ == "__main__":
         phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
         iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
 
-        rock = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions['pv'] ),
-                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions['fp'] ) ) )
+        rock = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions['pv'] ),
+                                     (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions['fp'] ) ) )
         
     #Example 4: three materials
     if False:
-        rock = composite ( ( (minerals.Murakami_fe_perovskite(), 0.7),
-                             (minerals.ferropericlase(0.5), 0.2) ,
-                             (minerals.stishovite(), 0.1 ) ) )
+        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), 0.7),
+                                     (minerals.ferropericlase(0.5), 0.2) ,
+                                     (minerals.stishovite(), 0.1 ) ) )
     
     
     #seismic model for comparison:

@@ -24,7 +24,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 
 if __name__ == "__main__":    
@@ -44,8 +43,8 @@ if __name__ == "__main__":
     weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
     phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
-    pyrolite = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_pyro['pv'] ),
-                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_pyro['fp'] ) ) )
+    pyrolite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_pyro['pv'] ),
+                                     (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_pyro['fp'] ) ) )
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -65,8 +64,8 @@ if __name__ == "__main__":
     weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
     phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
-    enstatite = composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_enst['pv'] ),
-                              (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_enst['fp'] ) ) )
+    enstatite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_enst['pv'] ),
+                                      (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_enst['fp'] ) ) )
     
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     

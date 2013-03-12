@@ -23,7 +23,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -52,8 +51,8 @@ if __name__ == "__main__":
     # Example 1 ferropericlase with spin transition from Murakami et al. 2012
     if True:
         amount_perovskite = 0.
-        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite) ) )
+        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+                                     (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite) ) )
     
         rock.set_method(method)
     
@@ -75,16 +74,16 @@ if __name__ == "__main__":
     
     # example 2:
     
-    rock = composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
+    rock = burnman.composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
     rock.set_method('slb')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
-    rock = composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
+    rock = burnman.composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
     rock.set_method('slb')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
-    rock = composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
+    rock = burnman.composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
     rock.set_method('slb')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
@@ -101,7 +100,7 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 3 fe_perovskite with spin transition from Catalli et al. 2009
     if True:
-        rock = composite( ( (minerals.Catalli_fe_perovskite(), 1.0), ) )
+        rock = burnman.composite( ( (minerals.Catalli_fe_perovskite(), 1.0), ) )
     
     rock.set_method(method)
     
@@ -127,7 +126,7 @@ if __name__ == "__main__":
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     # Example 4 fe_periclase with spin transition from Speziale et al. 2007
     if True:
-        rock = composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
+        rock = burnman.composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
     
     
     rock.set_method(method)

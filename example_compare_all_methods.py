@@ -21,7 +21,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 if __name__ == "__main__":	
 	
@@ -47,7 +46,7 @@ if __name__ == "__main__":
 	#Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
 		
 	amount_perovskite = 0.95
-	rock = composite( ( (minerals.Murakami_fe_perovskite(), amount_perovskite), 
+	rock = burnman.composite( ( (minerals.Murakami_fe_perovskite(), amount_perovskite), 
                             (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite) ) )
 	
 	#input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array

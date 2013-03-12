@@ -25,7 +25,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman.minerals import material
-from burnman.materials import composite
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,
@@ -61,7 +60,7 @@ if __name__ == "__main__":
                 'eta_0s': 3.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
     
     
-    rock = composite( ((own_material(), 1.0),) )
+    rock = burnman.composite( ((own_material(), 1.0),) )
     
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)

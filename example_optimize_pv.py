@@ -26,7 +26,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 if __name__ == "__main__":    
 
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     temperature = [geotherm(p) for p in seis_p]
     
     def material_error(amount_perovskite):
-        rock = composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
                              (minerals.Murakami_fe_periclase_LS(), 1.0 - amount_perovskite) ) )
     
         rock.set_method(method)

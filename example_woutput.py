@@ -23,7 +23,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 
 if __name__ == "__main__":    
     
@@ -38,8 +37,8 @@ if __name__ == "__main__":
     
     #specify material
     amount_perovskite = 0.95
-    rock = composite( ((minerals.mg_fe_perovskite(0.7), amount_perovskite), 
-                       (minerals.ferropericlase(0.5), 1.0-amount_perovskite) ) )
+    rock = burnman.composite( ((minerals.mg_fe_perovskite(0.7), amount_perovskite), 
+                               (minerals.ferropericlase(0.5), 1.0-amount_perovskite) ) )
     
     #define some pressure range
     pressures = np.arange(25e9,130e9,5e9)
