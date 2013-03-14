@@ -38,9 +38,7 @@ def density(pressure, params):
     Get the birch-murnaghan density at a reference temperature for a given
     pressure (in Pa). Returns density in kg/m^3
     """
-
-    ratio = opt.brentq(lambda x: birch_murnaghan(x, params)-pressure, 0.8, 5.0)
-    return ratio*params
+    return params['molar_mass']/volume(pressure,params)
 
 def volume(pressure, params):
     """
@@ -48,8 +46,9 @@ def volume(pressure, params):
     pressure (Pa). Returns molar volume in m^3
     """
 
-    ratio = opt.brentq(lambda x: birch_murnaghan(x, params)-pressure, 0.8, 5.0)
-    return 1./ratio * params['ref_V']
+    func = lambda x: birch_murnaghan(params['ref_V']/x, params) - pressure
+    V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
+    return V
 
 def shear_modulus_second_order(volume, params):
     """
