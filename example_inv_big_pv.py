@@ -24,8 +24,7 @@ temperature = [geotherm(p) for p in seis_p]
 
 print "preparations done"
 
-
-def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime): 
+def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime):
     method = 'slb' #slb|mgd
     amount_perovskite = 0.95
     rock = burnman.composite( ( ( minerals.mg_fe_perovskite(0.1), amount_perovskite ), 
@@ -47,12 +46,16 @@ def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe
     rock.set_method(method)
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)	
+    return mat_vp, mat_vs, mat_rho
 
-    vs_err = burnman.l2(depths, mat_vs, seis_vs)
-    vp_err = burnman.l2(depths, mat_vp, seis_vp)
-    den_err = burnman.l2(depths, mat_rho, seis_rho)
+def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime): 
+	mat_vp, mat_vs, mat_rho = calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime)
+	
+	vs_err = burnman.l2(depths, mat_vs, seis_vs)
+	vp_err = burnman.l2(depths, mat_vp, seis_vp)
+	den_err = burnman.l2(depths, mat_rho, seis_rho)
 
-    return vs_err# + vp_err + den_err
+	return vs_err# + vp_err + den_err
 
 
 # Priors on unknown parameters:
@@ -77,19 +80,14 @@ def theta(p1=mg_pv_K,p2=mg_pv_K_prime,p3=mg_pv_mu,p4=mg_pv_mu_prime,p5=fe_pv_K,p
 	if (p1<0 or p2<0 or p3<0 or p4<0 or p5<0 or p6<0 or p7<0 or p8<0):
 		return 1e30
 
-    #return error(p,a,b)[1]
-	
 	try:
 		e = error(p1,p2,p3,p4,p5,p6,p7,p8)
 		if (e<minerr):
 			minerr=e
 			print "best fit", e, "values:", p1,p2,p3,p4,p5,p6,p7,p8
-		
-        #print "valid  ",p,a,b,e
 		return e
 	except ValueError:
-		#print "invalid",p1,p2,p3,p4,p5,p6,p7,p8
-		return 1e20#float("inf")#1e8
+		return 1e20#float("inf")
 
 
 sig = 1e-4
@@ -97,7 +95,6 @@ misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=
 model = [mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime,misfit]
 things = ['mg_pv_K','mg_pv_K_prime','mg_pv_mu','mg_pv_mu_prime','fe_pv_K','fe_pv_K_prime','fe_pv_mu','fe_pv_mu_prime','misfit']
 
-dbname = 'pickles/example_inv_big_pv.pickle'
 whattodo = ""
 
 if len(sys.argv)<3:
@@ -208,7 +205,33 @@ if whattodo=="test":
     plt.show()
 
 
-print "done"
+if whattodo=="show":
+	values = [float(i) for i in sys.argv[2:]]
+	mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7])
+
+	plt.subplot(2,2,1)
+	plt.plot(seis_p/1.e9,mat_vs,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.ylim([4, 8])
+	plt.title("Vs (km/s)")
+    
+    
+	# plot Vphi
+	plt.subplot(2,2,2)
+	plt.plot(seis_p/1.e9,mat_vp,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vp,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.ylim([10, 14])
+	plt.title("Vp (km/s)")
+    
+	# plot density
+	plt.subplot(2,2,3)
+	plt.plot(seis_p/1.e9,mat_rho,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
+	plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
+	plt.title("density (kg/m^3)")
+	plt.legend(loc='upper left')
+	plt.ylim([4, 8])
+	plt.show()
+
 
 if whattodo=="profile2":
 	#run with:
