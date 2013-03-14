@@ -68,7 +68,7 @@ def shear_modulus(T,V,params):
 
     f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
   
-    G_twoterms = bm.shear_modulus_second_order(V, params) - eta_s * (E_th-E_th_ref) / V
+    #G_twoterms = bm.shear_modulus_second_order(V, params) - eta_s * (E_th-E_th_ref) / V
     G_threeterms = bm.shear_modulus_third_order(V, params) - eta_s * (E_th-E_th_ref) / V
 
     return G_threeterms
