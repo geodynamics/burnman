@@ -4,6 +4,7 @@
 
 import numpy as np
 import seismic
+import warnings
 
 def voigt_reuss_hill(pressure, temperature, rock):
     
@@ -56,7 +57,11 @@ def vhr_average(phase_volume, X):
     V_tot = sum(V_i)
 
     X_voigt = sum( V_i[i]/V_tot * X[i] for i in it)
-    X_reuss = 1./sum( V_i[i]/V_tot / X[i] for i in it)
+    if (min(X)<=0.0):
+        X_reuss = 0.0
+        warnings.warn("Oops, called vhr_average with Xi<0!")
+    else:
+        X_reuss = 1./sum( V_i[i]/V_tot / X[i] for i in it)
     X_vrh = (X_voigt+X_reuss)/2.
     return X_vrh
 
