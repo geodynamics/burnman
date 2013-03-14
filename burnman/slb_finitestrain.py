@@ -22,9 +22,10 @@ import debye
 #to q0.  Takes x=ref_V/V.
 def grueneisen_parameter(x, params):
     f = 1./2. * (pow(x, 2./3.) - 1.)
-    a1_ii = 6. * params['ref_grueneisen'] # EQ 47
-    a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
-    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
+    ref_gruen = params['ref_grueneisen']
+    a1_ii = 6. * ref_gruen # EQ 47
+    a2_iikk = -12.*ref_gruen + 36.*ref_gruen*ref_gruen - 18.*params['q0']*ref_gruen # EQ 47
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
     gr = 1./6./nu_o_nu0_sq * (2*f+1.) * ( a1_ii + a2_iikk*f )
     return gr
 
@@ -54,8 +55,8 @@ def volume(p,T,params):
     f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - p #EQ 21 
-    
-    V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V']) 
+
+    V = opt.brentq(func, 0.05*params['ref_V'], 3.0*params['ref_V']) 
     return V
 
 def shear_modulus(T,V,params):
@@ -69,7 +70,7 @@ def shear_modulus(T,V,params):
     f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
   
     G_twoterms = bm.shear_modulus_second_order(V, params) - eta_s * (E_th-E_th_ref) / V
-    G_threeterms = bm.shear_modulus_third_order(V, params) - eta_s * (E_th-E_th_ref) / V
+    #G_threeterms = bm.shear_modulus_third_order(V, params) - eta_s * (E_th-E_th_ref) / V
 
     return G_twoterms
     
