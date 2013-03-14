@@ -46,16 +46,6 @@ def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe
 
     rock.set_method(method)
     
-    #try:
-    #    phases[0].set_state(29, geotherm(29))
-    #    test_v = phases[0].molar_volume()
-    #except:
-    #    test_v = -1.0
-
-    #print "molar volume at 29 gpa", test_v
-    #if (test_v<0):
-    #    return 1e5#float('inf')
-
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)	
 
     vs_err = burnman.l2(depths, mat_vs, seis_vs)
