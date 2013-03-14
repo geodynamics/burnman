@@ -66,15 +66,15 @@ def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe
 
 
 # Priors on unknown parameters:
-sigma = 10.0
+sigma = 10.0e9
 prime_sigma = 0.1
-mg_pv_K = pymc.Normal('mg_pv_K', mu=251., tau=1./(sigma**2))
+mg_pv_K = pymc.Normal('mg_pv_K', mu=251.e9, tau=1./(sigma**2))
 mg_pv_K_prime = pymc.Normal('mg_pv_K_prime', mu=4.1, tau=1./(prime_sigma**2))
-mg_pv_mu = pymc.Normal('mg_pv_mu', mu=175., tau=1./(sigma**2))
+mg_pv_mu = pymc.Normal('mg_pv_mu', mu=175.e9, tau=1./(sigma**2))
 mg_pv_mu_prime = pymc.Normal('mg_pv_mu_prime', mu=1.8, tau=1./(prime_sigma**2))
-fe_pv_K = pymc.Normal('fe_pv_K', mu=281., tau=1./(sigma**2))
+fe_pv_K = pymc.Normal('fe_pv_K', mu=281.e9, tau=1./(sigma**2))
 fe_pv_K_prime = pymc.Normal('fe_pv_K_prime', mu=4.1, tau=1./(prime_sigma**2))
-fe_pv_mu = pymc.Normal('fe_pv_mu', mu=161., tau=1./(sigma**2))
+fe_pv_mu = pymc.Normal('fe_pv_mu', mu=161.e9, tau=1./(sigma**2))
 fe_pv_mu_prime = pymc.Normal('fe_pv_mu_prime', mu=1.57, tau=1./(prime_sigma**2))
 
 
