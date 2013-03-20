@@ -11,9 +11,11 @@ from time import time
 import pymc
 import math
 import cProfile
+from scipy.stats import norm
+import matplotlib.mlab as mlab
 
 seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
-number_of_points = 20 #set on how many depth slices the computations should be done
+number_of_points = 10 #set on how many depth slices the computations should be done
 depths = np.linspace(1000,2500, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
@@ -55,7 +57,7 @@ def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe
 	vp_err = burnman.l2(depths, mat_vp, seis_vp)
 	den_err = burnman.l2(depths, mat_rho, seis_rho)
 
-	return vs_err# + vp_err + den_err
+	return vs_err + vp_err #+ den_err
 
 
 # Priors on unknown parameters:
@@ -125,7 +127,7 @@ if whattodo=="plot":
 	files=sys.argv[2:]
 	print "files:",files
 
-	b=10
+	b=10000
 	i=1
 
 	for t in things:
@@ -149,9 +151,21 @@ if whattodo=="plot":
 			print "maxlike = ", bin_edges[a], bin_edges[a+1], (bin_edges[a]+bin_edges[a+1])/2.0
 		
 
-		pymc.Matplot.histogram(np.array(trace),t,rows=2,columns=len(things)/2,num=i)
+		(mu, sigma) = norm.fit(np.array(trace))
+		print "mu, sigma: %e %e" % (mu, sigma)
+		plt.subplot(2,len(things)/2,i)
+		n, bins, patches = plt.hist(np.array(trace), 60, normed=1, facecolor='green', alpha=0.75)
+		y = mlab.normpdf( bins, mu, sigma)
+		l = plt.plot(bins, y, 'r--', linewidth=2)
+		plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
+		
+		#pymc.Matplot.histogram(np.array(trace),t,rows=2,columns=len(things)/2,num=i)
+
+		
+
 		i=i+1
 
+	plt.savefig("inv.png")
 	plt.show()
 	
 if whattodo=="test":
@@ -230,6 +244,7 @@ if whattodo=="show":
 	plt.title("density (kg/m^3)")
 	plt.legend(loc='upper left')
 	plt.ylim([4, 8])
+	plt.savefig("inv_show.png")
 	plt.show()
 
 
@@ -237,11 +252,11 @@ if whattodo=="profile2":
 	#run with:
 	#python -m cProfile -o output.pstats example_inv_big_pv.py profile2 1
 	#gprof2dot.py -f pstats output.pstats | dot -Tpng -o output.png
-	[error(235.654790318, 3.87724833477, 165.45907725, 1.61618366689, 273.888690109, 4.38543140228, 306.635371217, 1.42610871557) for i in range(0,10)]
+	[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]
 
 if whattodo=="profile":
 	#just run normally
-	cProfile.run("[error(235.654790318, 3.87724833477, 165.45907725, 1.61618366689, 273.888690109, 4.38543140228, 306.635371217, 1.42610871557) for i in range(0,10)]")
+	cProfile.run("[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]")
 
 
 
