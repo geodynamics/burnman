@@ -270,14 +270,14 @@ class helper_volumetric_mixing(material):
 class ferropericlase(helper_volumetric_mixing):
     def __init__(self, fe_num):
         base_materials = [periclase(), wustite()]
-        molar_fraction = (1. - fe_num, fe_num)
+        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
 class mg_fe_perovskite(helper_volumetric_mixing):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
-        molar_fraction = (1. - fe_num, fe_num)
+        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
