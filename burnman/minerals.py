@@ -24,19 +24,31 @@ class material:
     to the desired values. For more complicated materials you
     can overwrite set_state(), change the params and then call
     set_state() from this class.
+
+    All the material parameters are expected to be in plain SI units.  This
+    means that the elastic moduli should be in Pascals and NOT Gigapascals,
+    and the Debye temperature should be in K not C.  Additionally, the
+    reference volume should be in m^3/(mol molecule) and not in unit cell
+    volume and 'n' should be the number of atoms per molecule.  Frequently in
+    the literature the reference volume is given in Angstrom^3 per unit cell.
+    To convert this to m^3/(mol molecule) you should multiply by 10^(-30) *
+    N_a / Z, where N_a is Avogadro's number and Z is the number of atoms per
+    unit cell.  You can look up Z in many places, including www.mindat.org
     """
+
     def __init__(self):
         self.params = {    'name':'generic',
-            'ref_V': 0.,
-            'ref_K': 0.,
-            'K_prime': 0.,
-            'ref_mu': 0.,
-            'mu_prime': 0.,
-            'molar_mass': 0.,
-            'n': 0.,
-            'ref_Debye': 0.,
-            'ref_grueneisen': 0.,
-            'q0': 0.}
+            'ref_V': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
+            'ref_K': 0., #Reference bulk modulus [Pa] at room pressure/temperature
+            'K_prime': 0., #pressure derivative of bulk modulus
+            'ref_mu': 0., #reference shear modulus at room pressure/temperature
+            'mu_prime': 0., #pressure derivative of shear modulus
+            'molar_mass': 0., #molar mass in units of [kg/mol]
+            'n': 0., #number of atoms per molecule
+            'ref_Debye': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
+            'ref_grueneisen': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
+            'q0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
+            'eta_0s': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
 #        self.pressure = 0.0
 #        self.temperature = 300
         self.method = []
@@ -313,10 +325,10 @@ class mg_perovskite(material):
     def __init__(self):
         self.params = {
             'ref_V': 24.45e-6,
-            'ref_K': 251.0e9,
-            'K_prime': 4.1,
+            'ref_K': 251.0e9,   # ok
+            'K_prime': 4.1,     # ok 
             'ref_mu': 175.0e9,  # from S & L.-B. 2005
-            'mu_prime': 1.8,
+            'mu_prime': 1.8,    # 1.7 in Stixrude 2005
             'molar_mass': .1020,
             'n': 5,
             'ref_Debye': 1070.,
@@ -328,11 +340,11 @@ class fe_perovskite(material):
     def __init__(self):
         self.params = {
             'ref_V': 25.48e-6,
-            'ref_K': 281.0e9,
-            'K_prime': 4.1,
-            'ref_mu': 161.0e9,
-            'mu_prime': 1.57,
-            'molar_mass': .1319,
+            'ref_K': 281.0e9, # ok
+            'K_prime': 4.1,  # ok
+            'ref_mu': 161.0e9,  # 138 in Stixrude 2005
+            'mu_prime': 1.57,   # 1.7 in Stixrude 2005
+            'molar_mass': .1319, # where is this from?
             'n': 5,
             'ref_Debye': 1021.,
             'ref_grueneisen': 1.48,
