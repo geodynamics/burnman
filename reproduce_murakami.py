@@ -22,6 +22,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 from burnman.materials import composite
+import matplotlib.image as mpimg
 
 if __name__ == "__main__":    
     
@@ -45,7 +46,7 @@ if __name__ == "__main__":
  
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
-    seis_p_1 = np.arange(25e9, 125e9, 5e9)
+    seis_p_1 = np.arange(28e9, 130e9, 4.8e9)
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     depths = map(seismic_model.depth, seis_p_1)
@@ -66,7 +67,7 @@ if __name__ == "__main__":
 
 	#input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
-    seis_p_2 = np.arange(25e9, 125e9, 5e9)
+    seis_p_2 = np.arange(28e9, 130e9, 5e9)
     
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
     
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     rock_3.set_method(method) 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
-    seis_p_3 = np.arange(25e9, 125e9, 5e9)
+    seis_p_3 = np.arange(28e9, 130e9, 5e9)
 
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
@@ -99,7 +100,7 @@ if __name__ == "__main__":
 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
-    seis_p_4 = np.arange(25e9, 125e9, 5e9)
+    seis_p_4 = np.arange(28e9, 130e9, 5e9)
 
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
@@ -116,22 +117,16 @@ if __name__ == "__main__":
 
     temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_2)
     
-    print "Calculations are done for:"
-    
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_bs, rock_2)    
     
 
     temperature_3 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_3)
    
-    print "Calculations are done for:"
-
     mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = burnman.calculate_velocities(seis_p_3, temperature_bs, rock_3)
 
 
     temperature_4 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_4)
   
-    print "Calculations are done for:"
-
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.calculate_velocities(seis_p_4, temperature_bs, rock_4)
  
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
@@ -165,7 +160,6 @@ if __name__ == "__main__":
     plt.plot(seis_p_4/1.e9,mat_rho_4,color='g',linestyle='-')
     plt.plot(seis_p_1/1.e9,seis_rho,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Density (kg/m^3)")
-    plt.legend(loc='upper left')
     plt.xlim(29,131)    
     
     
@@ -177,4 +171,19 @@ if __name__ == "__main__":
     plt.legend(loc='upper left')
     
     plt.savefig("murakami_scgeotherm.png") 
+    #plt.show()
+
+
+    plt.subplot(1,1,1)
+    plt.ylim(5,7.6) 
+    plt.xlim(25,135)
+    fig1 = mpimg.imread('murakami_vs_cmp.png')
+    plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
+    plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='--')
+    plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='--')
+    plt.plot(seis_p_3/1.e9,mat_vs_3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_4/1.e9,mat_vs_4,color='g',linestyle='--')
+    plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.title("Vs (km/s)")
+
     plt.show()
