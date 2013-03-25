@@ -455,9 +455,9 @@ class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman 
             'molar_mass': .0494,
             'n': 2,
             'ref_Debye': 706.,
-            'ref_grueneisen': 1.5,
+            'ref_grueneisen': 1.45,
             'q0': 1.5,
-            'eta_0s': 3.0 }
+            'eta_0s': 2.54 }
 
 class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     def __init__(self):
@@ -470,9 +470,9 @@ class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman 
             'molar_mass': .0494,
             'n': 2,
             'ref_Debye': 706.,
-            'ref_grueneisen': 1.5,
+            'ref_grueneisen': 1.45,
             'q0': 1.5,
-            'eta_0s': 3.0}
+            'eta_0s': 2.54}
 
 
 
