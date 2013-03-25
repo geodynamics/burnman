@@ -177,7 +177,7 @@ if __name__ == "__main__":
     plt.subplot(1,1,1)
     plt.ylim(5,7.6) 
     plt.xlim(25,135)
-    fig1 = mpimg.imread('murakami_vs_cmp.png')
+    fig1 = mpimg.imread('data/murakami_vs_cmp.png')
     plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
     plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='--')
     plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='--')
