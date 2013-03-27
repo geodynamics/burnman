@@ -23,7 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-
+from burnman import seismic 
 if __name__ == "__main__":    
     
     #create a seismic dataset from prem:
@@ -39,7 +39,6 @@ if __name__ == "__main__":
     
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
-    
     # plot vs and vp and v_phi (note that v_phi is computed!)
     plt.subplot(2,2,1)
     plt.title('prem')
@@ -63,7 +62,7 @@ if __name__ == "__main__":
     plt.legend(loc='lower right')
     
     
-    #now load a different seismic model:
+    #now load fast and slow regionalized models (Lekic et al. 2012):
     sslow = burnman.seismic.slow()
     depths2 = sslow.internal_depth_list()
     pressures2, density2, v_p2, v_s2, v_phi2 = sslow.evaluate_all_at(depths2)
@@ -72,7 +71,8 @@ if __name__ == "__main__":
     depths3 = sfast.internal_depth_list()
     pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
     
-    
+   
+    # plotting
     plt.subplot(2,2,3)
     plt.plot(pressures/1.e9,v_p/1.e3,'-k', label='v_p prem')
     plt.plot(pressures2/1.e9,v_p2/1.e3,'-r', label='v_p slow')
@@ -95,4 +95,50 @@ if __name__ == "__main__":
     plt.xlabel('pressure')
     plt.ylabel('km/s')
     
+    plt.show()
+
+    # Loading an a seismic model from a file. In this case AK135 (Kennett et al. 1995).
+    # Note that file input is assumed to be in SI units
+    plt.close()
+    # Load data table
+
+    class ak135_table(burnman.seismic.radiustable):
+        def __init__(self):
+            burnman.seismic.radiustable.__init__(self)
+            table = burnman.tools.read_table("data/ak135_lowermantle.txt") # radius, pressure, density, v_p, v_s
+            table = np.array(table)
+            self.table_radius = table[:,0]
+            self.table_pressure = table[:,1]
+            self.table_density = table[:,2]
+            self.table_vp = table[:,3]
+            self.table_vs = table[:,4]
+
+ 
+    ak=ak135_table() 
+    # specify where we want to evaluate, here we map from pressure to depth, because we can
+    depths = np.linspace(700e3, 2800e3, 40)
+    #now evaluate everything at the given depths levels (using interpolation)
+    pressures, density, v_p, v_s, v_phi = ak.evaluate_all_at(depths)
+    # plot vs and vp and v_phi (note that v_phi is computed!)
+    plt.subplot(2,2,1)
+    plt.title('ak135')
+    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
+    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
+    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
+    plt.legend(loc='lower left')
+    plt.xlabel('depth in km')
+    plt.ylabel('km/s')
+
+    # plot pressure,density vs depth from prem:
+    plt.subplot(2,2,2)
+    plt.title('ak135')
+    plt.plot(depths/1.e3,pressures/1.e9,'-r', label='pressure')
+    plt.ylabel('GPa')
+    plt.xlabel('depth in km')
+    plt.legend(loc='upper left')
+    plt.twinx()
+    plt.ylabel('g/cc')
+    plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
+    plt.legend(loc='lower right')
+
     plt.show()
