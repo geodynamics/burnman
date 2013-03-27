@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #######################
     
     #INPUT for method
-    method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+    method = 'mgd' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
     
     #specify material
     amount_perovskite = 0.95

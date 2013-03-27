@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Here are a few ways to define phases and molar_abundances:
     
     #Example 1: two simple fixed minerals
-    if True:
+    if False:
         amount_perovskite = 0.95
         rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
                                      (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )

@@ -42,7 +42,7 @@ def check_birch_murnaghan():
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
-    fig1 = mpimg.imread('data/slb_fig1.png')
+    fig1 = mpimg.imread('../data/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)

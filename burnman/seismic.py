@@ -121,11 +121,11 @@ class slow(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        #we need to stitch together three tables. Note that prem_withQ has a wider range, so we cut
+        #we need to stitch together three tables. Note that prem_lowermantle has a wider range, so we cut
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         table[:,0] = table[:,0] / 1e3 #convert to km 
         table2 = tools.read_table("data/swave_slow.txt")
@@ -152,11 +152,11 @@ class fast(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        #we need to stitch together three tables. Note that prem_withQ has a wider range, so we cut
+        #we need to stitch together three tables. Note that prem_lowermantle has a wider range, so we cut
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         table[:,0] = table[:,0] / 1e3 #convert to km 
         table2 = tools.read_table("data/swave_fast.txt")

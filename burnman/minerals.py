@@ -210,7 +210,7 @@ class periclase (material):
             'ref_grueneisen': 1.5,
             'q0': 1.5,
             'eta_0s': 3.0 }
-class wustite (material):
+class wuestite (material):
     """
     FeO
     """
@@ -350,7 +350,73 @@ class fe_perovskite(material):
             'ref_grueneisen': 1.48,
             'q0': 1.4,
             'eta_0s': 2.4 }
-        
+
+class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
+    def __init__(self):
+        self.params = {
+            'ref_V': 24.43e-6,
+            'ref_K': 250.0e9,   
+            'K_prime': 4.0,     
+            'ref_mu': 175.0e9,  
+            'mu_prime': 1.8,    
+            'molar_mass': .1020,
+            'n': 5,
+            'ref_Debye': 1070.,
+            'ref_grueneisen': 1.48,
+            'q0': 1.4,
+            'eta_0s': 2.4 } # not in Matas?
+
+class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
+    def __init__(self):
+        self.params = {
+            'ref_V': 25.34e-6,
+            'ref_K': 250.0e9, 
+            'K_prime': 4.0,  
+            'ref_mu': 135.0e9, 
+            'mu_prime': 1.3,  
+            'molar_mass': .1319, 
+            'n': 5,
+            'ref_Debye': 841.,
+            'ref_grueneisen': 1.48,
+            'q0': 1.4,
+            'eta_0s': 2.4 } #not in Matas?
+
+class Matas_periclase (material): # Matas et al 2007 Tables 1&2
+    """
+    MgO
+    """
+    def __init__(self):
+        self.params = {
+            'ref_V': 11.25e-6,
+            'ref_K': 160.1e9,
+            'K_prime': 3.83,
+            'ref_mu': 130.0e9,
+            'mu_prime': 2.2,
+            'molar_mass': .0403,
+            'n': 2,
+            'ref_Debye': 673.,
+            'ref_grueneisen': 1.41,
+            'q0': 1.3,
+            'eta_0s': 3.0 } #not in Matas?
+
+class Matas_wustite (material): # Matas et al 2007 Tables 1&2
+    """
+    FeO
+    """
+    def __init__(self):
+        self.params = {
+            'ref_V': 12.26e-6,
+            'ref_K': 160.1e9,
+            'K_prime': 3.83,
+            'ref_mu': 46.0e9,
+            'mu_prime': 0.6,
+            'molar_mass': .0718,
+            'n': 2,
+            'ref_Debye': 673.,
+            'ref_grueneisen': 1.41,
+            'q0': 1.3,
+            'eta_0s': 3.0 } #Not in Matas? Or how to calculate?
+
 class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
     def __init__(self):
         self.params = {

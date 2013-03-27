@@ -34,7 +34,7 @@ if __name__ == "__main__":
     #######################
     
     #INPUT for method
-    method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
+    method = 'slb3' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
     
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     
     def material_error(amount_perovskite):
         rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_fe_periclase_LS(), 1.0 - amount_perovskite) ) )
+                             (minerals.Murakami_fe_periclase(), 1.0 - amount_perovskite) ) )
     
         rock.set_method(method)
     

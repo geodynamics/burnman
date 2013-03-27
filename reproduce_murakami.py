@@ -34,7 +34,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'slb' 
+    method = 'slb3' 
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     #Now we'll calculate the models. 
     
 
-    T0 = 1800.
+    T0 = 1600.
     temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_1)
     
     
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     plt.title("temperature")
     plt.legend(loc='upper left')
     
-    plt.savefig("murakami_scgeotherm.png") 
+    plt.savefig("murakami_fig4.png") 
     #plt.show()
 
 

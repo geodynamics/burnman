@@ -55,9 +55,10 @@ if __name__ == "__main__":
 	
 	#input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 	
-	geotherm = burnman.geotherm.brown_shankland
-	temperature = [geotherm(p) for p in seis_p]
-	
+#	geotherm = burnman.geotherm.brown_shankland
+#	temperature = [geotherm(p) for p in seis_p]
+    	T0 = 1500.
+   	temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)	
 	
 	#Now we'll calculate the models. 
 	

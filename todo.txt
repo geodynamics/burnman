@@ -1,37 +1,43 @@
 
 TODOLIST:
 
+- allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
+- allow for the partition coeffecient as an input (maybe an example for this?)
+- input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 - clean up composition.py
-- slb vs slb_third.py duplicate a lot, avoid that
-x consistently order functions that return or accept v_s,v_p,v_phi: order is now v_p, v_s, v_phi (Sanne)
-- what needs to be done for spin transitions?
-x check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
-- input Ca/Al
-- mass balance calculation, Yu?
+- benchmark against Matas et al. 2007 Sanne
+- what needs to be done for spin transitions?-fix example (Sanne)
+- implement option to evaluate K and G (instead of V_s, V_p, V_phi)?
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
 - should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 - order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
--adiabatic geothermal, super adiabatic(Sanne? Do we need this?)
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
 - long term: setup inverse model runs, what makes sense here?
 - write burnman paper
 - write MgSi paper
-- Convert from cc to SI in seismic files
+- Convert from cc to SI in seismic files Sanne
+
+
+Todo in far future:
+- input Ca/Al
+- mass balance calculations
 
 DONE:
-- fix benchmark.py
+x fix benchmark.py
 x Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
-- unify importing of burnman (Timo)
+x unify importing of burnman (Timo)
 x call it burnman instead of code (Timo/Sanne)
-- isothermal/adiabatic bulk modulus
-- Timo: geotherm as burnman.geotherm.shankland() (Timo)
-- Timo: use phases = [...], instead of phases=(...) (Timo)
-- release burnman v0.2 (Timo)
-- example_compare_enstpyro.py outputs negative density?! (not true, that is neg. difference)
+x isothermal/adiabatic bulk modulus
+x Timo: geotherm as burnman.geotherm.shankland() (Timo)
+x Timo: use phases = [...], instead of phases=(...) (Timo)
+x release burnman v0.2 (Timo)
+x example_compare_enstpyro.py outputs negative density?! (not true, that is neg. difference)
 x write summary for each example as a comment at the top (see example_composition.py) Cayman: Done for the most part
-- Clean up plotting (Timo)
-- Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params? (Cayman) (Created a new method slb3 for the third order stuff)
-
-
+x Clean up plotting (Timo)
+x Give 2nd/3rd order approximation option as a different method so we can compare them, Sanne: should we make the method depend on the mineral used? So the method and order used can be in the params? (Cayman) (Created a new method slb3 for the third order stuff)
+x slb vs slb_third.py duplicate a lot, avoid that
+x consistently order functions that return or accept v_s,v_p,v_phi: order is now v_p, v_s, v_phi (Sanne
+x adiabatic geotherm (Ian)
+x check attenuation correction and write an example (Sanne, Cayman): attenuation as formulated by Matas is a 0.3% correction (less for P wave velocity). Do we care about this?
