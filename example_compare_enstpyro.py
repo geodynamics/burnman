@@ -107,23 +107,23 @@ if __name__ == "__main__":
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,mat_vs_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vs_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p_1/1.e9,vs_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vs_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+    plt.plot(seis_p_2/1.e9,mat_vs_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+    plt.plot(seis_p_1/1.e9,vs_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
     plt.title("Vs (km/s)")
     
     # plot Vphi
     plt.subplot(2,2,2)
-    plt.plot(seis_p_1/1.e9,mat_vphi_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vphi_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p_1/1.e9,v_phi_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vphi_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+    plt.plot(seis_p_2/1.e9,mat_vphi_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+    plt.plot(seis_p_1/1.e9,v_phi_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
     plt.title("Vphi (km/s)")
     
     # plot density
     plt.subplot(2,2,3)
-    plt.plot(seis_p_1/1.e9,mat_rho_pyro,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4,label="C-chondrite")
-    plt.plot(seis_p_2/1.e9,mat_rho_enst,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label="enstatite")
-    plt.plot(seis_p_1/1.e9,rho_prem,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="PREM")
+    plt.plot(seis_p_1/1.e9,mat_rho_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4,label="C-chondrite")
+    plt.plot(seis_p_2/1.e9,mat_rho_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label="enstatite")
+    plt.plot(seis_p_1/1.e9,rho_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="PREM")
     plt.title("density (kg/m^3)")
     plt.legend(loc='lower right')
     plt.xlabel("Pressure (GPa)")

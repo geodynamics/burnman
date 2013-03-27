@@ -33,7 +33,7 @@ if __name__ == "__main__":
     p = np.arange(1.0e9,360.0e9,5e9)
     depths = map(s.depth, p) 
     #we could also just specify some depth levels directly like this:
-    #depths = np.arange(35,5600,100)
+    #depths = np.arange(35e3,5600e3,100e3)
     #we could also use the data points where the seismic model is specified:
     depths = s.internal_depth_list()
     
@@ -43,9 +43,9 @@ if __name__ == "__main__":
     # plot vs and vp and v_phi (note that v_phi is computed!)
     plt.subplot(2,2,1)
     plt.title('prem')
-    plt.plot(depths,v_p,'+-r', label='v_p')
-    plt.plot(depths,v_s,'+-b', label='v_s')
-    plt.plot(depths,v_phi,'--g', label='v_phi')
+    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
+    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
+    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
     plt.legend(loc='lower left')
     plt.xlabel('depth in km')
     plt.ylabel('km/s')
@@ -53,13 +53,13 @@ if __name__ == "__main__":
     # plot pressure,density vs depth from prem:
     plt.subplot(2,2,2)
     plt.title('prem')
-    plt.plot(depths,pressures/1e9,'-r', label='pressure')
+    plt.plot(depths/1.e3,pressures/1.e9,'-r', label='pressure')
     plt.ylabel('GPa')
     plt.xlabel('depth in km')
     plt.legend(loc='upper left')
     plt.twinx()
     plt.ylabel('g/cc')
-    plt.plot(depths,density,'-b', label='density')
+    plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
     plt.legend(loc='lower right')
     
     
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     
     
     plt.subplot(2,2,3)
-    plt.plot(pressures/1e9,v_p,'-k', label='v_p prem')
-    plt.plot(pressures2/1e9,v_p2,'-r', label='v_p slow')
-    plt.plot(pressures3/1e9,v_p3,'-b', label='v_p fast')
+    plt.plot(pressures/1.e9,v_p/1.e3,'-k', label='v_p prem')
+    plt.plot(pressures2/1.e9,v_p2/1.e3,'-r', label='v_p slow')
+    plt.plot(pressures3/1.e9,v_p3/1.e3,'-b', label='v_p fast')
     
     plt.legend(loc='lower right')
     plt.xlim([30,136])
@@ -85,9 +85,9 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
     
     plt.subplot(2,2,4)
-    plt.plot(pressures/1e9,v_s,'-k', label='v_s prem')
-    plt.plot(pressures2/1e9,v_s2,'-r', label='v_s slow')
-    plt.plot(pressures3/1e9,v_s3,'-b', label='v_s fast')
+    plt.plot(pressures/1.e9,v_s/1.e3,'-k', label='v_s prem')
+    plt.plot(pressures2/1.e9,v_s2/1.e3,'-r', label='v_s slow')
+    plt.plot(pressures3/1.e9,v_s3/1.e3,'-b', label='v_s fast')
     
     plt.legend(loc='upper left')
     plt.xlim([30,136])

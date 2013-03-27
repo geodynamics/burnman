@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Here are a few ways to define phases and molar_abundances:
     
     #Example 1: two simple fixed minerals
-    if False:
+    if True:
         amount_perovskite = 0.95
         rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
                                      (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:
-    depths = np.linspace(700, 2800, number_of_points)
+    depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
     #depths = seismic_model.internal_depth_list()
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -100,8 +100,8 @@ if __name__ == "__main__":
     
     # plot vs
     plt.subplot(2,2,1)
-    plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
-    plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
+    plt.plot(seis_p/1.e9,mat_vs/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
+    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
     plt.title("Vs (km/s)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.ylim(5.1,7.6)
@@ -110,8 +110,8 @@ if __name__ == "__main__":
     
     # plot Vphi
     plt.subplot(2,2,2)
-    plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,seis_vphi,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
     plt.title("Vphi (km/s)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.ylim(7,12)
@@ -119,8 +119,8 @@ if __name__ == "__main__":
     
     # plot density
     plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,mat_rho,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p/1.e9,mat_rho/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
+    plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
     plt.title("density (kg/m^3)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.text(40,4.3,"misfit= %3.3f" % rho_err)

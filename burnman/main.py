@@ -28,10 +28,10 @@ def calculate_velocities (pressure, temperature, rock):
     for i in range(len(pressure)):
         rho,v_p,v_s,v_phi,K,mu = \
         vrh.voigt_reuss_hill(pressure[i], temperature[i], rock)
-        mat_rho[i] = rho/1.e3 # convert from kg/m^3 to g/cc
-        mat_vp[i] = v_p/1.e3
-        mat_vs[i] = v_s/1.e3
-        mat_vphi[i] = v_phi/1.e3
+        mat_rho[i] = rho 
+        mat_vp[i] = v_p
+        mat_vs[i] = v_s
+        mat_vphi[i] = v_phi
         mat_K[i] = K
         mat_mu[i] = mu
 

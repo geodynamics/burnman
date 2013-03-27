@@ -38,7 +38,7 @@ if __name__ == "__main__":
     
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
-    depths = np.linspace(700,2800, number_of_points)
+    depths = np.linspace(700e3,2800e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
     
     geotherm = burnman.geotherm.brown_shankland

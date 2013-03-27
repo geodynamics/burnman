@@ -203,23 +203,23 @@ if whattodo=="show":
 	mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
 
 	plt.subplot(2,2,1)
-	plt.plot(seis_p/1.e9,mat_vs,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
 	plt.ylim([4, 8])
 	plt.title("Vs (km/s)")
     
     
 	# plot Vphi
 	plt.subplot(2,2,2)
-	plt.plot(seis_p/1.e9,mat_vp,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vp,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.plot(seis_p/1.e9,mat_vp/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
 	plt.ylim([10, 14])
 	plt.title("Vp (km/s)")
     
 	# plot density
 	plt.subplot(2,2,3)
-	plt.plot(seis_p/1.e9,mat_rho,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
-	plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
+	plt.plot(seis_p/1.e9,mat_rho/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
+	plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
 	plt.title("density (kg/m^3)")
 	plt.legend(loc='upper left')
 	plt.ylim([4, 8])

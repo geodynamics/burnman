@@ -74,7 +74,7 @@ class radiustable(seismic_data):
         self.table_density = []
         self.table_vp = []
         self.table_vs = []
-        self.earth_radius = 6371.0
+        self.earth_radius = 6371.0e3
         
     def internal_depth_list(self):
         return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
@@ -111,7 +111,7 @@ class prem(radiustable):
         table = tools.read_table("data/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1] * 0.1 * 1e9 # convert kbar to GPa to Pa
+        self.table_pressure = table[:,1] 
         self.table_density = table[:,2]
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
@@ -127,14 +127,14 @@ class slow(radiustable):
 
         table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
-        table[:,0] = table[:,0] / 1e3 #convert to km 
+        table[:,0] = table[:,0]  
         table2 = tools.read_table("data/swave_slow.txt")
         table2 = np.array(table2)
         table3 = tools.read_table("data/pwave_slow.txt")
         table3 = np.array(table3)
 
-        min_radius = self.earth_radius-max(table2[:,0])/1e3
-        max_radius = self.earth_radius-min(table2[:,0])/1e3
+        min_radius = self.earth_radius-max(table2[:,0])
+        max_radius = self.earth_radius-min(table2[:,0])
         
         table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
 
@@ -142,10 +142,10 @@ class slow(radiustable):
         assert(len(table) == len(table3))
 
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1] * 1e9
+        self.table_pressure = table[:,1] 
         self.table_density = table[:,2]
-        self.table_vp = table3[:,1] / 1e3
-        self.table_vs = table2[:,1] / 1e3
+        self.table_vp = table3[:,1] 
+        self.table_vs = table2[:,1] 
        
 
 class fast(radiustable):
@@ -158,14 +158,14 @@ class fast(radiustable):
 
         table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
-        table[:,0] = table[:,0] / 1e3 #convert to km 
+        table[:,0] = table[:,0]  
         table2 = tools.read_table("data/swave_fast.txt")
         table2 = np.array(table2)
         table3 = tools.read_table("data/pwave_fast.txt")
         table3 = np.array(table3)
 
-        min_radius = self.earth_radius-max(table2[:,0])/1e3
-        max_radius = self.earth_radius-min(table2[:,0])/1e3
+        min_radius = self.earth_radius-max(table2[:,0])
+        max_radius = self.earth_radius-min(table2[:,0])
         
         table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
 
@@ -173,10 +173,10 @@ class fast(radiustable):
         assert(len(table) == len(table3))
 
         self.table_radius = table[:,0]
-        self.table_pressure = table[:,1] * 1e9
+        self.table_pressure = table[:,1] 
         self.table_density = table[:,2]
-        self.table_vp = table3[:,1] / 1e3
-        self.table_vs = table2[:,1] / 1e3
+        self.table_vp = table3[:,1] 
+        self.table_vs = table2[:,1] 
 
 
 
@@ -187,11 +187,11 @@ class prem_test(radiustable):
 
         table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
-        self.table_radius = table[:,0] / 1e3 #convert to km 
-        self.table_pressure = table[:,1] * 1e9
+        self.table_radius = table[:,0]   
+        self.table_pressure = table[:,1] 
         self.table_density = table[:,2]
-        self.table_vp = table[:,3] / 1e3
-        self.table_vs = table[:,4] / 1e3
+        self.table_vp = table[:,3] 
+        self.table_vs = table[:,4] 
 
 
     

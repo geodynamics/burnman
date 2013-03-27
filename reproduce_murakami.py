@@ -34,7 +34,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'slb3' 
+    method = 'mgd' 
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -179,11 +179,11 @@ if __name__ == "__main__":
     plt.xlim(25,135)
     fig1 = mpimg.imread('data/murakami_vs_cmp.png')
     plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
-    plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='--')
-    plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='--')
-    plt.plot(seis_p_3/1.e9,mat_vs_3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_vs_4,color='g',linestyle='--')
-    plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='--')
+    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='--')
+    plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='--')
+    plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
 
     plt.show()
