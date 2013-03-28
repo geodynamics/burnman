@@ -39,7 +39,7 @@ if __name__ == "__main__":
     
     # Input for model M_pyrolite as defined in Matas et al. 2007 table 3. Molar proportions are converted to atomic fractions    
 
-    #weight_percents = {'Mg':0.3428, 'Fe': 0.0497, 'Si':0.1819, 'Ca':0.0229, 'Al':0.0116}
+    #weight_percents = {'Mg':0.297882, 'Fe': 0.0489699, 'Si':0.1819, 'Ca':0.0228576, 'Al':0.0116446}
     #phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
     rock = burnman.composite( ( (minerals.Matas_mg_perovskite(),.642 ),
                             (minerals.Matas_fe_perovskite(), .056 ),
