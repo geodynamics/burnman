@@ -363,8 +363,7 @@ class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
             'n': 5,
             'ref_Debye': 1070.,
             'ref_grueneisen': 1.48,
-            'q0': 1.4,
-            'eta_0s': 2.4 } # not in Matas?
+            'q0': 1.4} 
 
 class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
     def __init__(self):
@@ -378,8 +377,7 @@ class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
             'n': 5,
             'ref_Debye': 841.,
             'ref_grueneisen': 1.48,
-            'q0': 1.4,
-            'eta_0s': 2.4 } #not in Matas?
+            'q0': 1.4} 
 
 class Matas_periclase (material): # Matas et al 2007 Tables 1&2
     """
@@ -396,8 +394,7 @@ class Matas_periclase (material): # Matas et al 2007 Tables 1&2
             'n': 2,
             'ref_Debye': 673.,
             'ref_grueneisen': 1.41,
-            'q0': 1.3,
-            'eta_0s': 3.0 } #not in Matas?
+            'q0': 1.3 }
 
 class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
     """
@@ -414,8 +411,7 @@ class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
             'n': 2,
             'ref_Debye': 673.,
             'ref_grueneisen': 1.41,
-            'q0': 1.3,
-            'eta_0s': 3.0 } #Not in Matas? Or how to calculate?
+            'q0': 1.3 }
 
 class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
     def __init__(self):
