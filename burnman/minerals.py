@@ -399,7 +399,7 @@ class Matas_periclase (material): # Matas et al 2007 Tables 1&2
             'q0': 1.3,
             'eta_0s': 3.0 } #not in Matas?
 
-class Matas_wustite (material): # Matas et al 2007 Tables 1&2
+class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
     """
     FeO
     """
