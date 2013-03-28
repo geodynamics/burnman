@@ -128,9 +128,56 @@ if __name__ == "__main__":
     temperature_4 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_4)
   
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.calculate_velocities(seis_p_4, temperature_bs, rock_4)
- 
-    ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
     
+    chi_den_murk = 0.
+    for i in mat_rho_2:
+    	chi_den_murk = chi_den_murk + pow(mat_rho_2[i] - seis_rho[i],2.)/seis_rho[i]
+    	
+    chi_vs_murk = 0.
+    for i in mat_rho_2:
+    	chi_vs_murk = chi_vs_murk + pow(mat_vs_2[i] - seis_vs[i],2.)/seis_vs[i]
+    
+    chi_vp_murk = 0.
+    for i in mat_rho_2:
+    	chi_vp_murk = chi_vp_murk + pow(mat_vp_2[i] - seis_vp[i],2.)/seis_vp[i]
+    
+    chi_den_py = 0.
+    for i in mat_rho_4:
+    	chi_den_py = chi_den_py + pow(mat_rho_4[i] - seis_rho[i],2.)/seis_rho[i]
+    	
+    chi_vs_py = 0.
+    for i in mat_rho_4:
+    	chi_vs_py = chi_vs_py + pow(mat_vs_4[i] - seis_vs[i],2.)/seis_vs[i]
+    
+    chi_vp_py = 0.
+    for i in mat_rho_4:
+    	chi_vp_py = chi_vp_py + pow(mat_vp_4[i] - seis_vp[i],2.)/seis_vp[i]
+    	
+    
+ 	
+    ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
+    print "Chi squared Vs: ", chi_vs_murk
+    print "Chi squared Vs pyrolite: ", chi_vs_py
+    print "	"
+    print "Chi squared Vp: ", chi_vp_murk
+    print "Chi squared Vp pyrolite: ", chi_vp_py  
+    print "	"  
+    print "Chi squared Rho: ", chi_den_murk 
+    print "Chi squared Rho pyrolite: ", chi_den_py
+    den = chi_den_murk/chi_den_py
+    vs = chi_vs_murk/chi_vs_py
+    vp = chi_vp_murk/chi_vp_py
+    #plt.subplot(2,2,2)
+    #plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='-',label='pv + 4% Al')
+    #plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='-',label='Xpv = 0.95')
+    #plt.plot(seis_p_3/1.e9,mat_vs_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='ferropericlase Xpv = 0.8')
+    #plt.plot(seis_p_4/1.e9,mat_vs_4,color='g',linestyle='-',label='pyrolite')
+    #plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4,label='PREM')
+    #plt.title("Vs (km/s)")
+    #plt.legend(loc='upper left')
+    #plt.ylim(5,7.6) 
+    #plt.xlim(29,131)
+ 
     plt.subplot(2,2,2)
     plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='-')
     plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='-')
@@ -138,9 +185,10 @@ if __name__ == "__main__":
     plt.plot(seis_p_4/1.e9,mat_vs_4,color='g',linestyle='-')
     plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
+    plt.text(40,7.3,"chi^2 murk/py= %3.3f" % vs)
     plt.ylim(5,7.6) 
     plt.xlim(29,131)
- 
+    
     # plot Vp
     plt.subplot(2,2,3)
     plt.title("Vp (km/s)")
@@ -149,6 +197,7 @@ if __name__ == "__main__":
     plt.plot(seis_p_3/1.e9,mat_vp_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
     plt.plot(seis_p_4/1.e9,mat_vp_4,color='g',linestyle='-') 
     plt.plot(seis_p_1/1.e9,seis_vp,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.text(50,9.7,"chi^2 murk/py= %3.3f" % vp)
     plt.ylim(9.25,14.0)    
     plt.xlim(29,131)
 
@@ -159,16 +208,17 @@ if __name__ == "__main__":
     plt.plot(seis_p_3/1.e9,mat_rho_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
     plt.plot(seis_p_4/1.e9,mat_rho_4,color='g',linestyle='-')
     plt.plot(seis_p_1/1.e9,seis_rho,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.text(40,4.3,"chi^2 murk/py= %3.3f" % den)
     plt.title("Density (kg/m^3)")
     plt.xlim(29,131)    
     
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,temperature_1,color='k',linestyle='-',label='brown_shankland')
+    plt.plot(seis_p_1/1.e9,temperature_1,color='k',linestyle='-')
     plt.ylim(1600,3100)
     plt.xlim(29,131)
     plt.title("temperature")
-    plt.legend(loc='upper left')
+    #plt.legend(loc='upper left')
     
     plt.savefig("murakami_fig4.png") 
     #plt.show()

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Here are a few ways to define phases and molar_abundances:
     
     #Example 1: two simple fixed minerals
-    if True:
+    if False:
         amount_perovskite = 0.95
         rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
                                      (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     #Example 3: input weight percentages
     #See comments in burnman/composition.py for references to partition coefficent calculation
 
-    if False:
+    if True:
         weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
         phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
         iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
