@@ -180,12 +180,12 @@ class fast(radiustable):
 
 
 
-# this uses prem_withQ table
+# this uses prem_lowermantle table
 class prem_test(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("data/prem_withQ.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("data/prem_mantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         self.table_radius = table[:,0]   
         self.table_pressure = table[:,1] 
@@ -213,15 +213,15 @@ if __name__ == "__main__":
     p = np.arange(1e9,360e9,5e9)
     depths = map(s.depth, p) 
     #we could also just specify some depth levels directly like this:
-    #depths = np.arange(35,5600,100)
+    #depths = np.arange(35e3,5600e3,100e3)
 
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
 
     # plot vs and vp and v_phi (note that v_phi is computed!)
-    plt.plot(depths,v_p,'+-r', label='v_p')
-    plt.plot(depths,v_s,'+-b', label='v_s')
-    plt.plot(depths,v_phi,'--g', label='v_phi')
+    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
+    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
+    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
     plt.legend()
     plt.xlabel('depth in km')
     plt.ylabel('km/s')
@@ -230,16 +230,15 @@ if __name__ == "__main__":
     s1=prem()
     depths=s1.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s1.evaluate_all_at(depths)
-    plt.plot(depths,v_p,'+-r', label='v_p')
-    plt.plot(depths,v_s,'+-b', label='v_s')
-    plt.plot(depths,v_phi,'--g', label='v_phi')
+    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
+    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
+    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
 
     s2=prem_test()
     depths=s2.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s2.evaluate_all_at(depths)
-    plt.plot(depths,v_p,'x-r', label='v_p')
-    plt.plot(depths,v_s,'x-b', label='v_s')
-    plt.plot(depths,v_phi,'x-g', label='v_phi')
+    plt.plot(depths,v_p/1.e3,'x-r', label='v_p')
+    plt.plot(depths,v_s/1.e3,'x-b', label='v_s')
+    plt.plot(depths,v_phi/1.e3,'x-g', label='v_phi')
     plt.show()
     
-    print min(depths),max(depths)

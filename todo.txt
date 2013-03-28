@@ -17,7 +17,6 @@ TODOLIST:
 - long term: setup inverse model runs, what makes sense here?
 - write burnman paper
 - write MgSi paper
-- Convert from cc to SI in seismic files Sanne
 
 
 Todo in far future:
@@ -25,6 +24,8 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+x include ak135
+x Convert from cc to SI in seismic files Sanne
 x fix benchmark.py
 x Make VRH a stand alone function (finished this off, somebody had already written the function, Sanne)
 x unify importing of burnman (Timo)

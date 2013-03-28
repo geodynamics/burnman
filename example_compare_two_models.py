@@ -93,21 +93,21 @@ if __name__ == "__main__":
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='mgd')
+    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='slb')
     plt.title("Vs (km/s)")
     
     
     # plot Vphi
     plt.subplot(2,2,2)
-    plt.plot(seis_p_1/1.e9,mat_vphi_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vphi_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vphi_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='mgd')
+    plt.plot(seis_p_2/1.e9,mat_vphi_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='slb')
     plt.title("Vphi (km/s)")
     
     # plot density
     plt.subplot(2,2,3)
-    plt.plot(seis_p_1/1.e9,mat_rho_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
-    plt.plot(seis_p_2/1.e9,mat_rho_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='model 2')
+    plt.plot(seis_p_1/1.e9,mat_rho_1/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='mgd')
+    plt.plot(seis_p_2/1.e9,mat_rho_2/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='slb')
     plt.title("density (kg/m^3)")
     plt.legend(loc='upper left')
     
