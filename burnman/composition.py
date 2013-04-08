@@ -71,14 +71,16 @@ def part_coef_calc(inp2,StartP,EndP,deltaP):
     
     
    
-def calculate_partition_coefficient(pressure, temperature, components):
+def calculate_partition_coefficient(pressure, temperature, components, initdistcoef):
 
     frac_mol_FeO = components['FeO']
     frac_mol_MgO = components['MgO']
     frac_mol_SiO2 = components['SiO2']
- 
+    Kd_0 = initdistcoef
+ 	
     delV = 2.e-7 #in m^3/mol, taken from Nakajima et al 2012, JGR
-    Kd_0 = .29 #Fig 5 Nakajima et al 2012
+    
+    #Kd_0 = .29 #Fig 5 Nakajima et al 2012
 
     rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+math.log(Kd_0) #eq 5 Nakajima et al 2012
 
@@ -91,7 +93,7 @@ def calculate_partition_coefficient(pressure, temperature, components):
 
     a = b /(((1.-b)*K)+b)
     
-    return a,b #a is partition coefficent array with P for mw, b is pcarray for pv
+    return (a,b) #a is partition coefficent array with P for mw, b is pcarray for pv
 
 # test some composition (Javoy 2010, Table 6, PLoM)
 if __name__ == "__main__":

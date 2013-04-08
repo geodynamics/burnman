@@ -59,8 +59,10 @@ if __name__ == "__main__":
 
     if True:
         weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
+        Kd_0 = .5 #Fig 5 Nakajima et al 2012
+
         phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
-        iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent)
+        iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)
 
         rock = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions['pv'] ),
                                      (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions['fp'] ) ) )
