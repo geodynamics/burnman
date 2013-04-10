@@ -2,7 +2,6 @@
 TODOLIST:
 
 - allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
-- allow for the partition coeffecient as an input (maybe an example for this?)
 - input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 - clean up composition.py
 - benchmark against Matas et al. 2007 Sanne
@@ -24,6 +23,7 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+x allow for the partition coeffecient as an input (maybe an example for this?)
 x include ak135
 x Convert from cc to SI in seismic files Sanne
 x fix benchmark.py
