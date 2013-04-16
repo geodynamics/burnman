@@ -2,11 +2,7 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-import numpy as np
 import scipy.optimize as opt
-import scipy.integrate as integrate
-import matplotlib.pylab as plt
-import mie_grueneisen_debye as mgd
 
 def bulk_modulus(volume, params):
     """
