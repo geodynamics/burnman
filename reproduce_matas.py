@@ -41,11 +41,10 @@ if __name__ == "__main__":
 
     #weight_percents = {'Mg':0.297882, 'Fe': 0.0489699, 'Si':0.1819, 'Ca':0.0228576, 'Al':0.0116446}
     #phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
-    rock = burnman.composite( ( (minerals.Matas_mg_perovskite(),.642 ),
-                            (minerals.Matas_fe_perovskite(), .056 ),
-                            (minerals.Matas_periclase(), .246 ),
-                            (minerals.Matas_wuestite(), .056 )))
-    #                        (minerals.Murakami_fe_periclase(), phase_fractions['fp']) ) )                                  
+    rock = burnman.composite( ( (minerals.Matas_mg_perovskite(),.620 ),
+                            (minerals.Matas_fe_perovskite(), .078 ),
+                            (minerals.Matas_periclase(), .268 ),
+                            (minerals.Matas_wuestite(), .034 )))
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     rock.set_method(method) 
     seis_p_1 = np.arange(28e9, 128e9, 4.8e9)
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     #Now we'll calculate the models. 
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock)    
-    
+   
 
 
     # seismic velocities for comparison
@@ -89,9 +88,9 @@ if __name__ == "__main__":
     # plot Vp
     plt.subplot(2,2,3)
     plt.title("Vp (km/s)")
-    plt.plot(seis_p_1/1.e9,mat_vp_1/1.e3,color='b',linestyle='-')
-    plt.plot(seis_p_1/1.e9,seis_vp/1.e3,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
-    plt.ylim(9.25,14.0)    
+    plt.plot(seis_p_1/1.e9,mat_vphi_1/1.e3,color='b',linestyle='-')
+    plt.plot(seis_p_1/1.e9,seis_vphi/1.e3,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.ylim(6.25,14.0)    
     plt.xlim(29,131)
 
     # plot density
@@ -110,8 +109,8 @@ if __name__ == "__main__":
     plt.legend(loc='upper left')
     
     plt.savefig("matas.png") 
-    #plt.show()
-
+    plt.show()
+    plt.close()
 
     plt.subplot(1,1,1)
     plt.ylim(-2,5) 
