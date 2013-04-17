@@ -3,11 +3,14 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import birch_murnaghan as bm
+#import birch_murnaghan as bm
 import mie_grueneisen_debye as mgd
 import slb_finitestrain as slb
+import slb_thirdorder as slb3
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import vinet as bm
+import tools
 from minerals import *
 
 
@@ -121,7 +124,109 @@ def check_mgd_fei_mao_shu_hu():
     plt.ylabel("Difference in total pressure (GPa)")
     plt.show()
 
+
+def check_slb_fig3():
+    perovskite= material() 
+    perovskite.params = {       'name': 'perovksite',
+                    'ref_V': tools.molar_volume_from_unit_cell_volume(168.27, 4.),
+                    'ref_grueneisen': 1.63,
+                    'q0': 1.7}
+
+    volume = np.linspace(0.6, 1.0, 100)
+    grueneisen_slb = np.empty_like(volume)
+    grueneisen_mgd = np.empty_like(volume)
+
+    #calculate its thermal properties
+    for i in range(len(volume)):
+        grueneisen_slb[i] = slb3.grueneisen_parameter(1/volume[i], perovskite.params)
+        grueneisen_mgd[i] = mgd.grueneisen_parameter(1/volume[i], perovskite.params)
+
+    #compare with figure 7
+    fig1 = mpimg.imread('../data/slb_fig3.png')
+    plt.imshow(fig1, extent=[0.6, 1.0,0.35,2.0], aspect='auto')
+    plt.plot(volume, grueneisen_slb, 'g+', volume, grueneisen_mgd, 'b+')
+    plt.xlim(0.6,1.0)
+    plt.ylim(0.35,2.0)
+    plt.ylabel("Grueneisen parameter")
+    plt.xlabel("Relative Volume V/V0")
+    plt.title("Comparing with Figure 3 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.show()
+
+def check_slb_fig7():
+    forsterite = material() 
+    forsterite.params = {       'name': 'forsterite',
+                    'ref_V': 43.60e-6,
+                    'ref_K': 128.0e9,
+                    'K_prime': 4.2,
+                    'ref_mu' : 82.0e9,
+                    'mu_prime' : 1.4,
+                    'n': 7.0,
+                    'ref_Debye': 809.,
+                    'ref_grueneisen': .99,
+                    'q0': 2.1, 
+                    'eta_0s' : 2.4}
+    forsterite.method = slb3
+
+    temperature = np.linspace(0., 2000., 100)
+    volume = np.empty_like(temperature)
+    bulk_modulus = np.empty_like(temperature)
+    shear_modulus = np.empty_like(temperature)
+    heat_capacity = np.empty_like(temperature)
+
+    pressure = 1.0e5
+    #calculate its thermal properties
+    for i in range(len(temperature)):
+        forsterite.set_state(pressure, temperature[i])
+        volume[i] = forsterite.molar_volume()/forsterite.params['ref_V']
+        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/forsterite.params['ref_K']
+        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['ref_mu']
+        heat_capacity[i] = forsterite.heat_capacity_p()/forsterite.params['n']
+
+    #compare with figure 7
+    fig1 = mpimg.imread('../data/slb_fig7_vol.png')
+    plt.imshow(fig1, extent=[0,2000,0.99,1.08], aspect='auto')
+    plt.plot(temperature, volume, 'g+')
+    plt.ylim(0.99,1.08)
+    plt.xlim(0,2000)
+    plt.xlabel("Temperature (K)")
+    plt.ylabel("Relative Volume V/V0")
+    plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.show()
+
+    fig1 = mpimg.imread('../data/slb_fig7_Cp.png')
+    plt.imshow(fig1, extent=[0,2000,0.,70.], aspect='auto')
+    plt.plot(temperature, heat_capacity, 'g+')
+    plt.ylim(0,70)
+    plt.xlim(0,2000)
+    plt.xlabel("Temperature (K)")
+    plt.ylabel("Heat Capacity Cp")
+    plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.show()
+
+
+    fig1 = mpimg.imread('../data/slb_fig7_K.png')
+    plt.imshow(fig1, extent=[0,2000,0.6,1.02], aspect='auto')
+    plt.plot(temperature, bulk_modulus, 'g+')
+    plt.ylim(0.6,1.02)
+    plt.xlim(0,2000)
+    plt.xlabel("Temperature (K)")
+    plt.ylabel("Relative Bulk Modulus K/K0")
+    plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.show()
+
+    fig1 = mpimg.imread('../data/slb_fig7_G.png')
+    plt.imshow(fig1, extent=[0,2000,0.6,1.02], aspect='auto')
+    plt.plot(temperature, shear_modulus, 'g+')
+    plt.ylim(0.6,1.02)
+    plt.xlim(0,2000)
+    plt.xlabel("Temperature (K)")
+    plt.ylabel("Relative Shear Modulus G/G0")
+    plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.show()
+
 if __name__ == "__main__":
-    check_mgd_shim_duffy_kenichi()
     check_birch_murnaghan()
+    check_slb_fig7()
+    check_slb_fig3()
+    check_mgd_shim_duffy_kenichi()
     check_mgd_fei_mao_shu_hu()
