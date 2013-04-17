@@ -3,13 +3,12 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-#import birch_murnaghan as bm
+import birch_murnaghan as bm
 import mie_grueneisen_debye as mgd
 import slb_finitestrain as slb
 import slb_thirdorder as slb3
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import vinet as bm
 import tools
 from minerals import *
 
