@@ -34,7 +34,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'mgd' 
+    method = 'slb' 
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -46,14 +46,13 @@ if __name__ == "__main__":
  
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
-    seis_p_1 = np.arange(28e9, 130e9, 4.8e9)
+    seis_p_1 = np.arange(28.5e9, 133e9, 4.75e9)
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     depths = map(seismic_model.depth, seis_p_1)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)    
     geotherm = burnman.geotherm.brown_shankland
     temperature_bs = [geotherm(p) for p in seis_p_1]
- 
    ##Now onto the second model parameters
     
     
@@ -67,7 +66,7 @@ if __name__ == "__main__":
 
 	#input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
-    seis_p_2 = np.arange(28e9, 130e9, 5e9)
+    seis_p_2 = seis_p_1
     
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
     
@@ -84,7 +83,7 @@ if __name__ == "__main__":
     rock_3.set_method(method) 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
-    seis_p_3 = np.arange(28e9, 130e9, 5e9)
+    seis_p_3 = seis_p_1 
 
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
@@ -100,7 +99,7 @@ if __name__ == "__main__":
 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
-    seis_p_4 = np.arange(28e9, 130e9, 5e9)
+    seis_p_4 = seis_p_1 
 
     #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
 
@@ -130,27 +129,27 @@ if __name__ == "__main__":
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.calculate_velocities(seis_p_4, temperature_bs, rock_4)
     
     chi_den_murk = 0.
-    for i in mat_rho_2:
-    	chi_den_murk = chi_den_murk + pow(mat_rho_2[i] - seis_rho[i],2.)/seis_rho[i]
+    for i in range(len(mat_rho_2)):
+	chi_den_murk = chi_den_murk + pow(mat_rho_2[i] - seis_rho[i],2.)/seis_rho[i]
     	
     chi_vs_murk = 0.
-    for i in mat_rho_2:
+    for i in range(len(mat_rho_2)):
     	chi_vs_murk = chi_vs_murk + pow(mat_vs_2[i] - seis_vs[i],2.)/seis_vs[i]
     
     chi_vp_murk = 0.
-    for i in mat_rho_2:
+    for i in range(len(mat_rho_2)):
     	chi_vp_murk = chi_vp_murk + pow(mat_vp_2[i] - seis_vp[i],2.)/seis_vp[i]
     
     chi_den_py = 0.
-    for i in mat_rho_4:
+    for i in range(len(mat_rho_4)):
     	chi_den_py = chi_den_py + pow(mat_rho_4[i] - seis_rho[i],2.)/seis_rho[i]
     	
     chi_vs_py = 0.
-    for i in mat_rho_4:
+    for i in range(len(mat_rho_4)):
     	chi_vs_py = chi_vs_py + pow(mat_vs_4[i] - seis_vs[i],2.)/seis_vs[i]
     
     chi_vp_py = 0.
-    for i in mat_rho_4:
+    for i in range(len(mat_rho_4)):
     	chi_vp_py = chi_vp_py + pow(mat_vp_4[i] - seis_vp[i],2.)/seis_vp[i]
     	
     
@@ -179,10 +178,10 @@ if __name__ == "__main__":
     #plt.xlim(29,131)
  
     plt.subplot(2,2,2)
-    plt.plot(seis_p_1/1.e9,mat_vs_1,color='b',linestyle='-')
-    plt.plot(seis_p_2/1.e9,mat_vs_2,color='r',linestyle='-')
-    plt.plot(seis_p_3/1.e9,mat_vs_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_vs_4,color='g',linestyle='-')
+    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='-')
+    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='-')
+    plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='-')
     plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
     plt.text(40,7.3,"chi^2 murk/py= %3.3f" % vs)
@@ -192,10 +191,10 @@ if __name__ == "__main__":
     # plot Vp
     plt.subplot(2,2,3)
     plt.title("Vp (km/s)")
-    plt.plot(seis_p_1/1.e9,mat_vp_1,color='b',linestyle='-')
-    plt.plot(seis_p_2/1.e9,mat_vp_2,color='r',linestyle='-')
-    plt.plot(seis_p_3/1.e9,mat_vp_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_vp_4,color='g',linestyle='-') 
+    plt.plot(seis_p_1/1.e9,mat_vp_1/1.e3,color='b',linestyle='-')
+    plt.plot(seis_p_2/1.e9,mat_vp_2/1.e3,color='r',linestyle='-')
+    plt.plot(seis_p_3/1.e9,mat_vp_3/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_4/1.e9,mat_vp_4/1.e3,color='g',linestyle='-') 
     plt.plot(seis_p_1/1.e9,seis_vp,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.text(50,9.7,"chi^2 murk/py= %3.3f" % vp)
     plt.ylim(9.25,14.0)    
@@ -203,25 +202,26 @@ if __name__ == "__main__":
 
     # plot density
     plt.subplot(2,2,4)
-    plt.plot(seis_p_1/1.e9,mat_rho_1,color='b',linestyle='-')
-    plt.plot(seis_p_2/1.e9,mat_rho_2,color='r',linestyle='-')
-    plt.plot(seis_p_3/1.e9,mat_rho_3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_rho_4,color='g',linestyle='-')
-    plt.plot(seis_p_1/1.e9,seis_rho,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_rho_1/1.e3,color='b',linestyle='-')
+    plt.plot(seis_p_2/1.e9,mat_rho_2/1.e3,color='r',linestyle='-')
+    plt.plot(seis_p_3/1.e9,mat_rho_3/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_4/1.e9,mat_rho_4/1.e3,color='g',linestyle='-')
+    plt.plot(seis_p_1/1.e9,seis_rho/1.e3,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.text(40,4.3,"chi^2 murk/py= %3.3f" % den)
     plt.title("Density (kg/m^3)")
     plt.xlim(29,131)    
     
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,temperature_1,color='k',linestyle='-')
+    plt.plot(seis_p_1/1.e9,temperature_bs,color='k',linestyle='-',label='brown_shankland')
+    plt.plot(seis_p_1/1.e9,temperature_4,color='k',linestyle='-',label='self-consistent pyrolite')
     plt.ylim(1600,3100)
     plt.xlim(29,131)
     plt.title("temperature")
-    #plt.legend(loc='upper left')
+    plt.legend(loc='upper left')
     
-    plt.savefig("murakami_fig4.png") 
-    #plt.show()
+    #plt.savefig("murakami_fig4.png") 
+    plt.show()
 
 
     plt.subplot(1,1,1)
