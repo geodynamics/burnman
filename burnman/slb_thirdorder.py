@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 #system libs:
-import numpy
+import numpy as np
 import scipy.optimize as opt
 import scipy.integrate as integrate
 import math
@@ -38,9 +38,17 @@ def isotropic_eta_s(x, params):
     eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
     return eta_s
 
+def volume_dependent_q(x, params):
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * params['ref_grueneisen'] # EQ 47
+    a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
+    gr = 1./6./nu_o_nu0_sq * (2*f+1.) * ( a1_ii + a2_iikk*f )
+    q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
+    return q
+
 def debye_temperature(x,params):
     return params['ref_Debye']
-
 
 def volume(p,T,params):
     debye_T = lambda x : debye_temperature(params['ref_V']/x, params)
@@ -87,9 +95,11 @@ def bulk_modulus(T,V,params):
     C_v_ref = debye.heat_capacity_v(300.,debye_T, params['n']) #heat capacity at reference temperature
 
     f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
+
+    q = volume_dependent_q(params['ref_V']/V, params);
     
     K = bm.bulk_modulus(V, params) \
-             + (gr + 1.-params['q0'])* ( gr / V ) * (E_th - E_th_ref) \
+             + (gr + 1.-q)* ( gr / V ) * (E_th - E_th_ref) \
              - ( pow(gr , 2.) / V )*(C_v*T - C_v_ref*300.)   
     
     return K
