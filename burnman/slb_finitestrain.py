@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 #system libs:
-import numpy
+import numpy as np
 import scipy.optimize as opt
 import scipy.integrate as integrate
 import math
@@ -67,7 +67,7 @@ def volume(p,T,params):
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - p #EQ 21 
 
-    V = opt.brentq(func, 0.05*params['ref_V'], 3.0*params['ref_V']) 
+    V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V']) 
     return V
 
 def shear_modulus(T,V,params):
