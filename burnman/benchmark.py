@@ -134,16 +134,21 @@ def check_slb_fig3():
     volume = np.linspace(0.6, 1.0, 100)
     grueneisen_slb = np.empty_like(volume)
     grueneisen_mgd = np.empty_like(volume)
+    q_slb = np.empty_like(volume)
+    q_mgd = np.empty_like(volume)
 
     #calculate its thermal properties
     for i in range(len(volume)):
         grueneisen_slb[i] = slb3.grueneisen_parameter(1/volume[i], perovskite.params)
         grueneisen_mgd[i] = mgd.grueneisen_parameter(1/volume[i], perovskite.params)
+        q_slb[i] = slb3.volume_dependent_q(1/volume[i], perovskite.params)
+        q_mgd[i] = perovskite.params['q0']
 
     #compare with figure 7
     fig1 = mpimg.imread('../data/slb_fig3.png')
     plt.imshow(fig1, extent=[0.6, 1.0,0.35,2.0], aspect='auto')
     plt.plot(volume, grueneisen_slb, 'g+', volume, grueneisen_mgd, 'b+')
+    plt.plot(volume, q_slb, 'g+', volume, q_mgd, 'b+')
     plt.xlim(0.6,1.0)
     plt.ylim(0.35,2.0)
     plt.ylabel("Grueneisen parameter")
@@ -166,37 +171,41 @@ def check_slb_fig7():
                     'eta_0s' : 2.4}
     forsterite.method = slb3
 
-    temperature = np.linspace(0., 2000., 100)
+    temperature = np.linspace(0., 2000., 200)
     volume = np.empty_like(temperature)
     bulk_modulus = np.empty_like(temperature)
     shear_modulus = np.empty_like(temperature)
     heat_capacity = np.empty_like(temperature)
 
     pressure = 1.0e5
+    forsterite.set_state(pressure, 300.)
+    ref_Ks = forsterite.adiabatic_bulk_modulus()
+
     #calculate its thermal properties
     for i in range(len(temperature)):
         forsterite.set_state(pressure, temperature[i])
         volume[i] = forsterite.molar_volume()/forsterite.params['ref_V']
-        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/forsterite.params['ref_K']
+        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/ref_Ks
         shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['ref_mu']
         heat_capacity[i] = forsterite.heat_capacity_p()/forsterite.params['n']
+ 
 
     #compare with figure 7
     fig1 = mpimg.imread('../data/slb_fig7_vol.png')
-    plt.imshow(fig1, extent=[0,2000,0.99,1.08], aspect='auto')
+    plt.imshow(fig1, extent=[0,2200,0.99,1.08], aspect='auto')
     plt.plot(temperature, volume, 'g+')
     plt.ylim(0.99,1.08)
-    plt.xlim(0,2000)
+    plt.xlim(0,2200)
     plt.xlabel("Temperature (K)")
     plt.ylabel("Relative Volume V/V0")
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
     fig1 = mpimg.imread('../data/slb_fig7_Cp.png')
-    plt.imshow(fig1, extent=[0,2000,0.,70.], aspect='auto')
+    plt.imshow(fig1, extent=[0,2200,0.,70.], aspect='auto')
     plt.plot(temperature, heat_capacity, 'g+')
     plt.ylim(0,70)
-    plt.xlim(0,2000)
+    plt.xlim(0,2200)
     plt.xlabel("Temperature (K)")
     plt.ylabel("Heat Capacity Cp")
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
@@ -204,20 +213,20 @@ def check_slb_fig7():
 
 
     fig1 = mpimg.imread('../data/slb_fig7_K.png')
-    plt.imshow(fig1, extent=[0,2000,0.6,1.02], aspect='auto')
+    plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, bulk_modulus, 'g+')
     plt.ylim(0.6,1.02)
-    plt.xlim(0,2000)
+    plt.xlim(0,2200)
     plt.xlabel("Temperature (K)")
     plt.ylabel("Relative Bulk Modulus K/K0")
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
     fig1 = mpimg.imread('../data/slb_fig7_G.png')
-    plt.imshow(fig1, extent=[0,2000,0.6,1.02], aspect='auto')
+    plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, shear_modulus, 'g+')
     plt.ylim(0.6,1.02)
-    plt.xlim(0,2000)
+    plt.xlim(0,2200)
     plt.xlabel("Temperature (K)")
     plt.ylabel("Relative Shear Modulus G/G0")
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
