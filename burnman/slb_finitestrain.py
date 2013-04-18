@@ -40,7 +40,10 @@ def isotropic_eta_s(x, params):
     return eta_s
 
 def debye_temperature(x,params):
-    return params['ref_Debye']
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * params['ref_grueneisen'] # EQ 47
+    a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
+    return params['ref_Debye'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f) 
 
 def volume_dependent_q(x, params):
     f = 1./2. * (pow(x, 2./3.) - 1.)
