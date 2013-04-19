@@ -25,7 +25,7 @@ def grueneisen_parameter(x, params):
     a1_ii = 6. * params['ref_grueneisen'] # EQ 47
     a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
     nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
-    gr = 1./6./nu_o_nu0_sq * (2*f+1.) * ( a1_ii + a2_iikk*f )
+    gr = 1./6*pow(nu_o_nu0_sq,-1.) * (2*f+1.) * ( a1_ii + a2_iikk*f )
     return gr
 
 def isotropic_eta_s(x, params):
@@ -61,7 +61,6 @@ def volume(p,T,params):
       
     b_iikk= 9.*params['ref_K'] # EQ 28
     b_iikkmm= 27.*params['ref_K']*(params['K_prime']-4.) # EQ 29
-
     f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
     func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - p #EQ 21 
@@ -77,7 +76,7 @@ def shear_modulus(T,V,params):
     E_th = debye.thermal_energy(T,debye_T, params['n'])
     E_th_ref = debye.thermal_energy(300.,debye_T, params['n'])
 
-    f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
+    #f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
   
     #G_twoterms = bm.shear_modulus_second_order(V, params) - eta_s * (E_th-E_th_ref) / V
     G_threeterms = bm.shear_modulus_third_order(V, params) - eta_s * (E_th-E_th_ref) / V

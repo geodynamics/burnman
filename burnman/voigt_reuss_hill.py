@@ -27,13 +27,11 @@ def voigt_reuss_hill(pressure, temperature, rock):
     V_tot= sum(V_i)
     #calculate the density of the phase assemblage
     rho = (1./V_tot) * sum( ph.fraction*ph.mineral.molar_mass() for ph in rock.phases)
-
     #calculate the voigt and reuss averages of the phase assemblage for K and mu
     K_i = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
-    K_vrh = vhr_average(V_i,K_i)
+    K_vrh = vrh_average(V_i,K_i)
     mu_i = [ph.mineral.shear_modulus() for ph in rock.phases]
-    mu_vrh = vhr_average(V_i,mu_i)
-    
+    mu_vrh = vrh_average(V_i,mu_i)
     #compute seismic velocities
     v_s = np.sqrt( mu_vrh / rho)
     v_p = np.sqrt( (K_vrh + 4./3.*mu_vrh) / rho)
@@ -41,9 +39,9 @@ def voigt_reuss_hill(pressure, temperature, rock):
 
     return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
 
-def vhr_average(phase_volume, X):
+def vrh_average(phase_volume, X):
 
-    """ calculate the voigt and reuss averages of the phase assemblage for 
+    """ calculate the voigt, reuss and hill averages of the phase assemblage for 
     a certain property X.
     
     Input: phase_volume: array of n volumes, X: array of n properties
@@ -51,19 +49,26 @@ def vhr_average(phase_volume, X):
     
     Source: Matas 2007, Appendix D """
 
+    X_vrh = (voigt_average(phase_volume,X)+reuss_average(phase_volume,X))/2.
+    return X_vrh
+
+def voigt_average(phase_volume,X):
     it = range(len(phase_volume))
-    
     V_i = phase_volume
     V_tot = sum(V_i)
-
     X_voigt = sum( V_i[i]/V_tot * X[i] for i in it)
+    return X_voigt
+
+def reuss_average(phase_volume,X):
+    it = range(len(phase_volume))
+    V_i = phase_volume
+    V_tot = sum(V_i)
     if (min(X)<=0.0):
         X_reuss = 0.0
-        warnings.warn("Oops, called vhr_average with Xi<0!")
+        warnings.warn("Oops, called reuss_average with Xi<0!")
     else:
-        X_reuss = 1./sum( V_i[i]/V_tot / X[i] for i in it)
-    X_vrh = (X_voigt+X_reuss)/2.
-    return X_vrh
+        X_reuss = 1./sum(  V_i[i]/V_tot /X[i] for i in it)
+    return X_reuss
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
   

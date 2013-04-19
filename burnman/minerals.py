@@ -261,7 +261,7 @@ class helper_volumetric_mixing(material):
         for prop in ['ref_K', 'K_prime', 'ref_mu', 'mu_prime']:
             
             X = [ mat.params[prop] for mat in self.base_materials ]
-            self.params[prop] = vrh.vhr_average(phase_volume, X)
+            self.params[prop] = vrh.vrh_average(phase_volume, X)
 
         material.set_state(self, pressure, temperature)
         
@@ -406,7 +406,7 @@ class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
             'ref_K': 160.1e9,
             'K_prime': 3.83,
             'ref_mu': 46.0e9,
-            'mu_prime': 0.6,
+            'mu_prime':  0.6,
             'molar_mass': .0718,
             'n': 2,
             'ref_Debye': 673.,

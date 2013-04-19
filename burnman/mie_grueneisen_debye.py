@@ -37,7 +37,7 @@ def grueneisen_parameter(x, params):
 def volume(pressure,T,params):
     func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params) + \
             thermal_pressure(T, x, params) - \
-            thermal_pressure(300, x, params) - pressure
+            thermal_pressure(300., x, params) - pressure
     V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
     return V
 
@@ -46,7 +46,7 @@ def volume(pressure,T,params):
 def pressure(T, V, params):
     return bm.birch_murnaghan(params['ref_V']/V, params) + \
             thermal_pressure(T,V, params) - \
-            thermal_pressure(300,V, params)
+            thermal_pressure(300.,V, params)
     
 #calculate the thermal correction for the mgd
 #bulk modulus (see matas et al, 2007)
@@ -75,7 +75,7 @@ def thermal_shear_modulus(T, V, params):
 
 #calculate the mgd shear modulus as a function of P, V, and T
 def shear_modulus(T,V, params):
-    mu = bm.shear_modulus(V,params) + \
+    mu = bm.shear_modulus_second_order(V,params) + \
         thermal_shear_modulus(T,V, params) - \
         thermal_shear_modulus(300.,V, params) # EQ B11
     return mu
