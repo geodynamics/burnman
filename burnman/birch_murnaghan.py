@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 import scipy.optimize as opt
+import equation_of_state as eos
 
 def bulk_modulus(volume, params):
     """
@@ -42,7 +43,7 @@ def volume(pressure, params):
     pressure (Pa). Returns molar volume in m^3
     """
 
-    func = lambda x: birch_murnaghan(params['ref_V']/x, params) - pressure
+    func = lambda x: birch(params['ref_V']/x, params) - pressure
     V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
     return V
 
@@ -76,3 +77,40 @@ def shear_modulus(volume, params):
     so the default shear_modulus function wraps the second order function.
     """
     return shear_modulus_second_order(volume, params)
+
+
+class birch_murnaghan(eos.equation_of_state):
+    """
+    A wrapper class for the birch murnaghan functions above so that
+    it satisfies the interface requirements as specified in
+    equation_of_state.py
+    """
+
+    def volume(pressure, temperature, params):
+        return volume(pressure,params)
+
+    def density(pressure, temperature, params):
+        return density(pressure,params)
+
+    def isothermal_bulk_modulus(pressure,temperature, volume, params):
+        return bulk_modulus(pressure, params):
+
+    def adiabatic_bulk_modulus(pressure, temperature, volume, params):
+        return bulk_bulk_modulus(pressure,params):
+
+    def shear_modulus(pressure, temperature, volume, params):
+        return shear_modulus_third_order(pressure,params)
+
+    # return 0 for all the thermal stuff
+    def heat_capacity_v(pressure, temperature, volume, params):
+        return 0.
+
+    def heat_capacity_v(pressure, temperature, volume, params):
+        return 0.
+
+    def thermal_expansivity(pressure, temperature, volume, params):
+        return 0.
+
+    def grueneisen_parameter(pressure,temperature,volume,params):
+        return 0.
+
