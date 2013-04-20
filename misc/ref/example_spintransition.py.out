@@ -1,12 +1,12 @@
-burnman/minerals_base.py:104: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_HS'
+burnman/minerals_base.py:102: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_HS'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:104: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase'
+burnman/minerals_base.py:102: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 burnman/voigt_reuss_hill.py:68: UserWarning: Oops, called reuss_average with Xi<0!
   warnings.warn("Oops, called reuss_average with Xi<0!")
 burnman/voigt_reuss_hill.py:36: RuntimeWarning: invalid value encountered in sqrt
   v_s = np.sqrt( mu_vrh / rho)
-burnman/minerals_base.py:104: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_LS'
+burnman/minerals_base.py:102: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_LS'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 Calculations are done for:
 0.0  of phase 'Murakami_fe_perovskite'

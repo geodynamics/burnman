@@ -25,8 +25,12 @@ cd ..
 python burnman/composition.py || exit 1
 
 cd misc
-python gen_doc.py || exit 1
+python gen_doc.py >/dev/null || exit 1
 cd ..
+
+testit "burnman/benchmark.py"
+echo "   done"
+
 
 echo ""
 

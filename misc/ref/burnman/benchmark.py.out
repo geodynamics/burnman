@@ -1,0 +1,14 @@
+burnman/debye.py:27: RuntimeWarning: divide by zero encountered in double_scalars
+  E_th = 3.*n*R*T * debye_fn(debye_T/T)
+burnman/debye.py:32: RuntimeWarning: divide by zero encountered in double_scalars
+  deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
+burnman/debye.py:32: RuntimeWarning: overflow encountered in double_scalars
+  deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
+burnman/debye.py:32: RuntimeWarning: invalid value encountered in double_scalars
+  deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
+/usr/lib/python2.7/dist-packages/scipy/integrate/quadpack.py:288: UserWarning: The occurrence of roundoff error is detected, which prevents 
+  the requested tolerance from being achieved.  The error may be 
+  underestimated.
+  warnings.warn(msg)
+burnman/debye.py:33: RuntimeWarning: divide by zero encountered in double_scalars
+  C_v = 9.*n*R*deb[0]/pow(debye_T/T,3.)
