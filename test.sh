@@ -1,17 +1,70 @@
 #!/bin/bash
 
+function testit {
+t=$1
+echo "*** testing $t..."
+(python <<EOF
+import matplotlib as m
+m.use('Cairo')
+VERBOSE=1
+execfile('$t')
+EOF
+)  >$t.tmp 2>&1 || { echo "test $t failed"; exit 1; } 
+diff $t.tmp misc/ref/$t.out || { echo "test $t failed"; exit 1; } 
+rm $t.tmp
+}
+
+
+
+
+echo "*** running test suite..."
 cd tests
-python tests.py
+python tests.py || exit 1
 cd ..
 
 python burnman/composition.py || exit 1
 
+cd misc
+python gen_doc.py || exit 1
+cd ..
 
-tests="example_compare_enstpyro.py example_seismic.py example_compare_two_models.py example_spintransition.py example_composition.py example_user_input_material.py example_geotherms.py example_woutput.py example_optimize_pv.py table.py"
-for t in $tests; do
-    echo "*** testing '$t' ***"
-    python $t || { echo "test $t failed"; exit 1; } 
-done
+echo ""
+
+t="example_composition.py"
+testit $t
+diff example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
+echo "   done"
+
+testit "example_compare_enstpyro.py"
+echo "   done"
+
+testit "example_seismic.py"
+echo "   done"
+
+
+
+testit "example_seismic.py"
+echo "   done"
+testit "example_compare_two_models.py"
+echo "   done"
+testit "example_spintransition.py"
+echo "   done"
+testit "example_composition.py"
+echo "   done"
+testit "example_user_input_material.py"
+echo "   done"
+testit "example_geotherms.py"
+echo "   done"
+
+testit "example_woutput.py"
+echo "   done"
+
+testit "example_optimize_pv.py"
+echo "   done"
+testit "table.py"
+echo "   done"
+
+
 
 echo ""
 echo "*** tests done"
