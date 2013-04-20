@@ -43,7 +43,7 @@ def volume(pressure, params):
     pressure (Pa). Returns molar volume in m^3
     """
 
-    func = lambda x: birch(params['ref_V']/x, params) - pressure
+    func = lambda x: birch_murnaghan(params['ref_V']/x, params) - pressure
     V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
     return V
 
@@ -96,7 +96,7 @@ class birch_murnaghan_eos(eos.equation_of_state):
         return bulk_modulus(pressure, params)
 
     def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
-        return bulk_bulk_modulus(pressure,params)
+        return bulk_modulus(pressure,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
         return shear_modulus_third_order(pressure,params)
@@ -105,7 +105,7 @@ class birch_murnaghan_eos(eos.equation_of_state):
     def heat_capacity_v(self,pressure, temperature, volume, params):
         return 0.
 
-    def heat_capacity_v(self,pressure, temperature, volume, params):
+    def heat_capacity_p(self,pressure, temperature, volume, params):
         return 0.
 
     def thermal_expansivity(self,pressure, temperature, volume, params):
