@@ -19,7 +19,10 @@ ordered_examples = ['example_geotherms.py', \
                     'example_user_input_material.py', \
                     'example_compare_enstpyro.py', \
                     'example_optimize_pv.py', \
-                    'example_spintransition.py']
+                    'example_spintransition.py', \
+                    'example_partition_coef.py', \
+                    'example_compare_all_methods.py', \
+                        ]
 
 for ex in ordered_examples:
     print "*",ex
