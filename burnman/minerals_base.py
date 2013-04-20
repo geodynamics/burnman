@@ -57,9 +57,9 @@ class material:
     def set_method(self, method):
         """ use "slb" or "mgd" or slb3 """
         if( isinstance(method, basestring)):
-          if (method == "slb"):
+          if (method == "slb2"):
             self.method = slb.slb2()
-          elif (method == "mgd"):
+          elif (method == "mgd2"):
             self.method = mgd.mgd2()
           elif (method == "mgd3"):
             self.method = mgd.mgd3()

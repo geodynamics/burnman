@@ -70,7 +70,7 @@ def check_mgd_shim_duffy_kenichi():
                    'ref_Debye': 170.,
                    'ref_grueneisen': 2.97, #this does better with gr = 2.93.  Why?
                    'q0': 1.0}
-    gold.method = mgd
+    gold.set_method('mgd3')
 
     #Total pressures, pulled from Table 2  
     ref_pressures = [np.array([0., 3.55, 7.55, 12.06, 17.16, 22.91, 29.42, 36.77, 45.11, 54.56, 65.29, 77.50, 91.42, 107.32, 125.51, 146.38, 170.38, 198.07])]
@@ -106,7 +106,7 @@ def check_mgd_fei_mao_shu_hu():
                     'ref_Debye': 500.,
                     'ref_grueneisen': 1.50,
                     'q0': 1.1}
-    mgfeo.method = mgd
+    mgfeo.set_method('mgd3')
 
     #pulled from table 1
     temperatures = np.array([300,300,483,483,483,590,593,593,593,700,600,500,650,600,600,650,700,737,727,673,600,543,565,585,600,628,654,745,768,747,726,700,676])
@@ -180,7 +180,7 @@ def check_slb_fig7():
                     'ref_grueneisen': .99,
                     'q0': 2.1, 
                     'eta_0s' : 2.4}
-    forsterite.method = slb.slb3()
+    forsterite.set_method('slb3')
 
     temperature = np.linspace(0., 2000., 200)
     volume = np.empty_like(temperature)

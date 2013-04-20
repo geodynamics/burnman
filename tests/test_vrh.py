@@ -25,7 +25,7 @@ class VRH_average(unittest.TestCase):
 class VRH(unittest.TestCase):
     def test_1(self):
         rock = burnman.composite ( ( (minerals.periclase(), 1.0),) )
-        rock.set_method('slb') 
+        rock.set_method('slb2') 
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)
@@ -38,7 +38,7 @@ class VRH(unittest.TestCase):
     def same(self, number):
         rock = burnman.composite (  [(minerals.periclase(), 1.0/number)]*number  )
         
-        rock.set_method('slb')
+        rock.set_method('slb2')
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)
@@ -56,7 +56,7 @@ class VRH(unittest.TestCase):
     def test_two_different(self):
         rock = burnman.composite ( ( (minerals.periclase(), 1.0), 
                                      (minerals.fe_perovskite(), 0.0) ) )
-        rock.set_method('slb')
+        rock.set_method('slb2')
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
         self.assertAlmostEqual(3790.847, rho, 2)

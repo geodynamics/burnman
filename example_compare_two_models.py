@@ -27,12 +27,13 @@ if __name__ == "__main__":
     ###Input Model 1
     
     #INPUT for method_1
-    """ choose 'slb' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
-    or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
-    or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
-    or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
+    """ choose 'slb2' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
+    or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)
+    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, matas et al. 2007)
+    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)
+    or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))"""
     
-    method_1 = 'mgd' 
+    method_1 = 'mgd3' 
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     ##Now onto the second model parameters
     
     ##input second method
-    method_2 = 'slb' 
+    method_2 = 'slb3' 
     
     
     #Input composition of model 2. See example_composition for potential choices. We'll just choose something simple here

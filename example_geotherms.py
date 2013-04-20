@@ -55,7 +55,7 @@ if __name__ == "__main__":
     #based on self compression of the composite rock.  First we need to define an assemblage
     pyrolite = burnman.composite( ((minerals.mg_fe_perovskite(0.1), 0.7), 
                                    (minerals.ferropericlase(0.4),   0.3) ))
-    pyrolite.set_method("mgd")
+    pyrolite.set_method("mgd3")
     #next, define an anchor temperature at which we are starting.  Perhaps 1500 K for the upper mantle
     T0 = 1500.
     #then generate temperature values using the self consistent function.  This takes more time than the above methods

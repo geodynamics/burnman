@@ -14,7 +14,7 @@ class TestRock(unittest.TestCase):
         amount_perovskite = 0.3
         rock = burnman.composite( ( ( minerals.mg_fe_perovskite(0.1), amount_perovskite ), 
                                     (minerals.ferropericlase(0.2), 1.0-amount_perovskite) ) )
-        rock.set_method('slb')
+        rock.set_method('slb2')
         self.assertAlmostEqual(rock.phases[0].fraction, 0.3, 2)
         self.assertAlmostEqual(rock.phases[1].fraction, 0.7, 2)
 

@@ -12,7 +12,7 @@ class spin_transistion(unittest.TestCase):
         
         mins = [minerals.Murakami_fe_periclase(), minerals.Murakami_fe_periclase_HS(), minerals.Murakami_fe_periclase_LS()]
         for p in mins:
-            p.set_method('slb')
+            p.set_method('slb2')
         
         #print "HS regime: (on/high/low)"
         for p in mins:

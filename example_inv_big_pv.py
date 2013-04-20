@@ -27,7 +27,7 @@ temperature = [geotherm(p) for p in seis_p]
 print "preparations done"
 
 def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime):
-    method = 'slb' #slb|mgd
+    method = 'slb3' #slb3|slb2|mgd3|mgd2
     amount_perovskite = 0.95
     rock = burnman.composite( ( ( minerals.mg_fe_perovskite(0.1), amount_perovskite ), 
 				(minerals.ferropericlase(0.5), 1.0-amount_perovskite) ) )
