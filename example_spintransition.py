@@ -64,12 +64,12 @@ if __name__ == "__main__":
         
     # plot example 1
     plt.subplot(2,2,1)
-    plt.plot(seis_p/1.e9,mat_vs,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs')
-    plt.plot(seis_p/1.e9,mat_vphi,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='Vp')
-    plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
+    plt.plot(seis_p/1.e9,mat_vs/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs')
+    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='Vp')
+    plt.plot(seis_p/1.e9,mat_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
     plt.title("ferropericlase (Murakami et al. 2012)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    plt.ylim(5,6.5)
+    #plt.ylim(5,6.5)
     plt.legend(loc='upper left')
     
     # example 2:
@@ -87,44 +87,19 @@ if __name__ == "__main__":
     rock.set_method('slb')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
-    plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,mat_vs_LS,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
-    plt.plot(seis_p/1.e9,mat_vs_HS,color='r',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs HS')
-    plt.plot(seis_p/1.e9,mat_vs_ON,color='g',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs ON')
+    plt.subplot(2,2,2)
+    plt.plot(seis_p/1.e9,mat_vs_LS/1.e3,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
+    plt.plot(seis_p/1.e9,mat_vs_HS/1.e3,color='r',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs HS')
+    plt.plot(seis_p/1.e9,mat_vs_ON/1.e3,color='g',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs ON')
     plt.title("Murakami_fp")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     #plt.ylim(300,800)
     plt.legend(loc='upper left')
     
     
-    # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-    # Example 3 fe_perovskite with spin transition from Catalli et al. 2009
-    if True:
-        rock = burnman.composite( ( (minerals.Catalli_fe_perovskite(), 1.0), ) )
-    
-    rock.set_method(method)
-    
-    print "Calculations are done for:"
-    for ph in rock.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
-    
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)
-    print mat_rho
-    print mat_vp
-    print mat_vphi
-    
-    # plot example 3
-    plt.subplot(2,2,2)
-    plt.plot(seis_p/1.e9,mat_K,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='K')
-    plt.plot(seis_p/1.e9,mat_mu,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4, label='G')
-    plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
-    plt.title("NOT WORKING ferrous pv (Catalli et al. 2009)")
-    plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    plt.ylim(300,800)
-    plt.legend(loc='upper left')
     
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-    # Example 4 fe_periclase with spin transition from Speziale et al. 2007
+    # Example 3 fe_periclase with spin transition from Speziale et al. 2007
     if True:
         rock = burnman.composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
     
@@ -136,17 +111,14 @@ if __name__ == "__main__":
         print ph.fraction, " of phase", ph.mineral.to_string()
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)
-    print mat_rho
-    print mat_vp
-    print mat_vphi
     
-    # plot example 4
-    plt.subplot(2,2,4)
-    plt.plot(seis_p/1.e9,mat_vphi,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
-    plt.plot(seis_p/1.e9,mat_rho,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
+    # plot example 3
+    plt.subplot(2,2,3)
+    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
+    plt.plot(seis_p/1.e9,mat_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
     plt.title("ferropericlase (Speziale et al. 2007)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    plt.ylim(0,8)
+    #plt.ylim(0,8)
     plt.legend(loc='upper left')
     
     
