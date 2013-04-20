@@ -10,6 +10,7 @@ import mie_grueneisen_debye as mgd
 import slb_thirdorder as slb3
 import birch_murnaghan as bm
 import warnings
+import slb
 
 
 class material:
@@ -52,18 +53,18 @@ class material:
             'eta_0s': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
 #        self.pressure = 0.0
 #        self.temperature = 300
-        self.method = []
+        self.method = None
 
     def set_method(self, method):
         """ use "slb" or "mgd" or slb3 """
         if (method == "slb"):
-            self.method = slb;
+            self.method = slb.slb2()
         elif (method == "mgd"):
-            self.method = mgd;
+            self.method = mgd
         elif (method == "slb3"):
-            self.method = slb3;
+            self.method = slb.slb3()
         elif (method == "bm"):
-            self.method = bm;
+            self.method = bm.birch_murnaghan_eos()
         else:
             raise("unsupported material method " + method)
 
@@ -85,29 +86,20 @@ class material:
         self.pressure = pressure
         self.temperature = temperature
         self.old_params = self.params
-                
-        if (self.method == bm):
-            self.V = self.method.volume(self.pressure, self.params)
-            self.K_T = self.method.bulk_modulus(self.V, self.params)
-            self.K_S = self.K_T  # since you are ignoring temperature in this method
-            if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
-                self.mu = self.method.shear_modulus(self.V, self.params)
-            else:
-                self.mu = -1
-                warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
-        else:
-            self.V = self.method.volume(self.pressure, self.temperature, self.params)
-            self.K_T = self.method.bulk_modulus(self.temperature, self.V, self.params)
-            self.K_S = self.method.bulk_modulus_adiabatic(self.temperature, self.V, self.params)
-            self.C_v = self.method.heat_capacity_v(self.temperature,self.V, self.params)
-            self.C_p = self.method.heat_capacity_p(self.temperature,self.V, self.params)
-            self.alpha = self.method.thermal_expansivity(self.temperature, self.V, self.params)
-            self.gr = self.method.grueneisen_parameter(self.params['ref_V']/self.V, self.params)
-            if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
-                self.mu = self.method.shear_modulus(self.temperature, self.V, self.params)
-            else:    
-                self.mu = -1
-                warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
+        
+        self.V = self.method.volume(self.pressure, self.temperature, self.params)
+        self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)
+        self.K_T = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
+        self.K_S = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
+        self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
+        self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
+        self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
+        
+        if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
+            self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
+        else:    
+            self.mu = -1
+            warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 
     def molar_mass(self):
         return self.params['molar_mass']
