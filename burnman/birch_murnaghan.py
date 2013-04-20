@@ -86,31 +86,31 @@ class birch_murnaghan_eos(eos.equation_of_state):
     equation_of_state.py
     """
 
-    def volume(pressure, temperature, params):
+    def volume(self,pressure, temperature, params):
         return volume(pressure,params)
 
-    def density(pressure, temperature, params):
+    def density(self,pressure, temperature, params):
         return density(pressure,params)
 
-    def isothermal_bulk_modulus(pressure,temperature, volume, params):
+    def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
         return bulk_modulus(pressure, params)
 
-    def adiabatic_bulk_modulus(pressure, temperature, volume, params):
+    def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
         return bulk_bulk_modulus(pressure,params)
 
-    def shear_modulus(pressure, temperature, volume, params):
+    def shear_modulus(self,pressure, temperature, volume, params):
         return shear_modulus_third_order(pressure,params)
 
     # return 0 for all the thermal stuff
-    def heat_capacity_v(pressure, temperature, volume, params):
+    def heat_capacity_v(self,pressure, temperature, volume, params):
         return 0.
 
-    def heat_capacity_v(pressure, temperature, volume, params):
+    def heat_capacity_v(self,pressure, temperature, volume, params):
         return 0.
 
-    def thermal_expansivity(pressure, temperature, volume, params):
+    def thermal_expansivity(self,pressure, temperature, volume, params):
         return 0.
 
-    def grueneisen_parameter(pressure,temperature,volume,params):
+    def grueneisen_parameter(self,pressure,temperature,volume,params):
         return 0.
 
