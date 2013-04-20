@@ -456,14 +456,14 @@ class Murakami_mg_perovskite(material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
-            'ref_V': 24.45e-6,  # stixrud & L-B 2005
-            'ref_K': 251.9e9,
-            'K_prime': 4.01,
-            'ref_mu': 164.7e9,
-            'mu_prime': 1.58,
-            'molar_mass': .102165,
+            'ref_V': 24.45e-6,  # S & L-B 2005
+            'ref_K': 281e9,
+            'K_prime': 4.1,
+            'ref_mu': 173e9,
+            'mu_prime': 1.56,
+            'molar_mass': .1020,
             'n': 5,
-            'ref_Debye': 1054.,
+            'ref_Debye': 1070.,
             'ref_grueneisen': 1.48,
             'q0': 1.4,
             'eta_0s': 2.4 } 
@@ -489,22 +489,22 @@ class Murakami_fe_perovskite(material):
             
 class Murakami_mg_periclase(material):
     """
-    Murakami et al. (2012) supplementary table 5 and references therein
+    Murakami et al. (2012) supplementary table 5 and references therein, ref_V from Stixrude & Lithgow-Bertolloni 2005
     """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
-            'ref_V': 24.607e-6,
-            'ref_K': 251.9e9,
-            'K_prime': 4.01,
-            'ref_mu': 164.7e9,
-            'mu_prime': 1.58,
-            'molar_mass': .102165,
+            'ref_V': 11.24e-6,  # S & L-B 2005
+            'ref_K': 161e9,
+            'K_prime': 3.9,
+            'ref_mu': 131e9,
+            'mu_prime': 1.92,
+            'molar_mass': .0403,
             'n': 5,
-            'ref_Debye': 1054.,
-            'ref_grueneisen': 1.48,
-            'q0': 1.4,
-            'eta_0s': 2.4 }             
+            'ref_Debye': 773., # S& L-B 2005
+            'ref_grueneisen': 1.5,
+            'q0': 1.5, #S&L-B 2005    
+            'eta_0s': 3.0 }             
 
 class Murakami_fe_periclase(helper_spin_transition):
     def __init__(self):
