@@ -74,7 +74,7 @@ class slb_base(equation_of_state):
 
         #f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
 
-        q = self.volume_dependent_q(params['ref_V']/volume, params)
+        q = self.__volume_dependent_q(params['ref_V']/volume, params)
     
         K = bm.bulk_modulus(volume, params) \
             + (gr + 1.-q)* ( gr / volume ) * (E_th - E_th_ref) \
@@ -128,11 +128,11 @@ class slb_base(equation_of_state):
     
     
     
-class slb3:
+class slb3(slb_base):
     def __init__(self):
         self.order=3
 
-class slb2:
+class slb2(slb_base):
     def __init__(self):
         self.order=2
     
