@@ -11,7 +11,7 @@ import birch_murnaghan as bm
 import debye
 
 
-class mie_grueneisen_debye(eos.equation_of_state):
+class mgd_base(eos.equation_of_state):
     """
     """
 
@@ -39,7 +39,16 @@ class mie_grueneisen_debye(eos.equation_of_state):
         mu = bm.shear_modulus_second_order(volume,params) + \
             self.__thermal_shear_modulus(temperature,volume, params) - \
             self.__thermal_shear_modulus(300.,volume, params) # EQ B11
-        return mu
+        if self.order==2:
+            return bm.shear_modulus_second_order(volume,params) + \
+                self.__thermal_shear_modulus(temperature,volume, params) - \
+                self.__thermal_shear_modulus(300.,volume, params) # EQ B11
+        elif self.order==3:
+            return bm.shear_modulus_third_order(volume,params) + \
+                self.__thermal_shear_modulus(temperature,volume, params) - \
+                self.__thermal_shear_modulus(300.,volume, params) # EQ B11
+        else:
+            raise NotImplementedError("")
 
     #heat capacity at constant volume
     def heat_capacity_v(self, pressure, temperature, volume, params):
@@ -119,3 +128,11 @@ class mie_grueneisen_debye(eos.equation_of_state):
         return K_th
 
 
+class mgd3(mgd_base):
+    def __init__(self):
+        self.order=3
+
+class mgd2(mgd_base):
+    def __init__(self):
+        self.order=2
+    

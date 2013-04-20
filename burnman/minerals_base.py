@@ -60,7 +60,9 @@ class material:
         if (method == "slb"):
             self.method = slb.slb2()
         elif (method == "mgd"):
-            self.method = mgd.mie_grueneisen_debye()
+            self.method = mgd.mgd2()
+        elif (method == "mgd3"):
+            self.method = mgd.mgd3()
         elif (method == "slb3"):
             self.method = slb.slb3()
         elif (method == "bm"):

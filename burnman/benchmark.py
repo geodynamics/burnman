@@ -75,7 +75,7 @@ def check_mgd_shim_duffy_kenichi():
     ref_pressures.append( np.array([12.14,15.69,19.68,24.19,29.28,35.03,41.53,48.88,57.20,66.64,77.37,89.57,103.47,119.35,137.53,158.38,182.36,210.02]))
     ref_pressures.append( np.array([19.30,22.84,26.84,31.35,36.44,42.19,48.68,56.03,64.35,73.80,84.52,96.72,110.62,126.50,144.68,165.53,189.51,217.17]))
  
-    eos = mgd.mie_grueneisen_debye()
+    eos = mgd.mgd3()
  
     pressures = np.empty_like(ref_pressures)
     ref_dv = np.linspace(0.0, 0.34, len(pressures[0]))
@@ -114,7 +114,7 @@ def check_mgd_fei_mao_shu_hu():
     ref_pressures = ref_pressures
     pressures = np.empty_like(volumes)
 
-    eos = mgd.mie_grueneisen_debye()
+    eos = mgd.mgd3()
   
     for i in range(len(temperatures)):
         pressures[i] = eos.pressure(temperatures[i],volumes[i], mgfeo.params)
@@ -141,7 +141,7 @@ def check_slb_fig3():
     q_mgd = np.empty_like(volume)
 
     slb_eos = slb.slb3()
-    mgd_eos = mgd.mie_grueneisen_debye()
+    mgd_eos = mgd.mgd3()
     
 
     #calculate its thermal properties
