@@ -232,16 +232,3 @@ class helper_fe_dependent(material):
         return self.base_material.v_s()
 
 
-class mg_fe_perovskite_pt_dependent(helper_fe_dependent):
-    def __init__(self, iron_number_with_pt, idx):
-        helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return mg_fe_perovskite(iron_number)
-
-class ferropericlase_pt_dependent(helper_fe_dependent):
-    def __init__(self, iron_number_with_pt, idx):
-        helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return ferropericlase(iron_number)
