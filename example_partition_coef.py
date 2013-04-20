@@ -3,16 +3,16 @@
 # Released under GPL v2 or later.
 
 """
-This example shows how to create different minerals, how to compute seismic
-velocities, and how to compare them to a seismic reference model.
+This example shows how to vary the distribution coefficient of the perovskite/ferropericlase
+system.
 
 requires:
 - geotherms
-- seismic models
 - compute seismic velocities
+-input distribution coefficient Kd_0
 
 teaches:
-- creating minerals
+- creating varying proportions of Fe and its effect on seismic velocities
 - seismic comparison
 
 """
