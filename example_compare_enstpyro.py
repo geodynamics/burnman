@@ -42,7 +42,7 @@ if __name__ == "__main__":
         
     weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
     phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
-    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro)
+    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro, 0.5)
     pyrolite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_pyro['pv'] ),
                                      (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_pyro['fp'] ) ) )
     
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         
     weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
     phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
-    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst)
+    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst, 0.5)
     enstatite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_enst['pv'] ),
                                       (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_enst['fp'] ) ) )
     
