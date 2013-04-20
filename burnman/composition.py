@@ -110,8 +110,6 @@ if __name__ == "__main__":
     gt = lambda p: geotherm.brown_shankland(p)
     pressure = StartP
     temperature = gt(StartP)
-    print phase_per
-    print rel_mol_per
     calculate_partition_coefficient(pressure, temperature, rel_mol_per, 0.5)
     #part_coef_calc(inp2,StartP,EndP,deltaP)
     #print inp1
