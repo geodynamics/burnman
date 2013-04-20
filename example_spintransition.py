@@ -76,16 +76,16 @@ if __name__ == "__main__":
     # example 2:
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
-    rock.set_method('slb')
+    rock.set_method('slb3')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
-    rock.set_method('slb')
+    rock.set_method('slb3')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
-    rock.set_method('slb')
+    rock.set_method('slb3')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
     
     plt.subplot(2,2,2)
