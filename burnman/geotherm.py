@@ -59,7 +59,7 @@ def dTdP(temperature, pressure, rock):
     return temperature*top/bottom
 
 
-table_brown = read_table("data/brown_81.txt")
+table_brown = read_table("input_geotherm/brown_81.txt")
 table_brown_depth = np.array(table_brown)[:,0]
 table_brown_temperature = np.array(table_brown)[:,1]
 

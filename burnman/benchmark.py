@@ -43,7 +43,7 @@ def check_birch_murnaghan():
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
-    fig1 = mpimg.imread('../data/slb_fig1.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)
@@ -153,7 +153,7 @@ def check_slb_fig3():
         q_mgd[i] = perovskite.params['q0']
 
     #compare with figure 7
-    fig1 = mpimg.imread('../data/slb_fig3.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig3.png')
     plt.imshow(fig1, extent=[0.6, 1.0,0.35,2.0], aspect='auto')
     plt.plot(volume, grueneisen_slb, 'g+', volume, grueneisen_mgd, 'b+')
     plt.plot(volume, q_slb, 'g+', volume, q_mgd, 'b+')
@@ -199,7 +199,7 @@ def check_slb_fig7():
  
 
     #compare with figure 7
-    fig1 = mpimg.imread('../data/slb_fig7_vol.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig7_vol.png')
     plt.imshow(fig1, extent=[0,2200,0.99,1.08], aspect='auto')
     plt.plot(temperature, volume, 'g+')
     plt.ylim(0.99,1.08)
@@ -209,7 +209,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../data/slb_fig7_Cp.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig7_Cp.png')
     plt.imshow(fig1, extent=[0,2200,0.,70.], aspect='auto')
     plt.plot(temperature, heat_capacity, 'g+')
     plt.ylim(0,70)
@@ -220,7 +220,7 @@ def check_slb_fig7():
     plt.show()
 
 
-    fig1 = mpimg.imread('../data/slb_fig7_K.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig7_K.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, bulk_modulus, 'g+')
     plt.ylim(0.6,1.02)
@@ -230,7 +230,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../data/slb_fig7_G.png')
+    fig1 = mpimg.imread('../input_figures/slb_fig7_G.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, shear_modulus, 'g+')
     plt.ylim(0.6,1.02)

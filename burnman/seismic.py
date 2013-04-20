@@ -108,7 +108,7 @@ class radiustable(seismic_data):
 class prem(radiustable):
     def __init__(self):
         radiustable.__init__(self)
-        table = tools.read_table("data/prem_table.txt") # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
         self.table_pressure = table[:,1] 
@@ -125,12 +125,12 @@ class slow(radiustable):
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         table[:,0] = table[:,0]  
-        table2 = tools.read_table("data/swave_slow.txt")
+        table2 = tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("data/pwave_slow.txt")
+        table3 = tools.read_table("input_seismic/pwave_slow.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])
@@ -156,12 +156,12 @@ class fast(radiustable):
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("data/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         table[:,0] = table[:,0]  
-        table2 = tools.read_table("data/swave_fast.txt")
+        table2 = tools.read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("data/pwave_fast.txt")
+        table3 = tools.read_table("input_seismic/pwave_fast.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])
@@ -185,7 +185,7 @@ class prem_test(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("data/prem_mantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seimic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
         table = np.array(table)
         self.table_radius = table[:,0]   
         self.table_pressure = table[:,1] 
