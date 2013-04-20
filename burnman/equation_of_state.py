@@ -40,7 +40,7 @@ class equation_of_state:
     def heat_capacity_v(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def heat_capacity_p(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
