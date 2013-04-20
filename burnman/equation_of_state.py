@@ -23,7 +23,7 @@ class equation_of_state:
         raise NotImplementedError("")
 
     def density(self, pressure, temperature, params):
-        raise NotImplementedError("")
+        return params["molar_mass"] / self.volume(pressure, temperature, params)
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
