@@ -79,7 +79,7 @@ def shear_modulus(volume, params):
     return shear_modulus_second_order(volume, params)
 
 
-class birch_murnaghan(eos.equation_of_state):
+class birch_murnaghan_eos(eos.equation_of_state):
     """
     A wrapper class for the birch murnaghan functions above so that
     it satisfies the interface requirements as specified in
