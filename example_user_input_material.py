@@ -24,7 +24,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..')) 
 
 import burnman
-from burnman.minerals import material
+from burnman import minerals
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,
@@ -43,9 +43,9 @@ if __name__ == "__main__":
     #INPUT for method
     method = 'slb' # choose 'slb' (finite-strain, stixrude and lithgow-bertelloni, 2005) or 'mgd' (mie-gruneisen-debeye, matas et al. 2007)
     
-    class own_material (material):
+    class own_material (burnman.material):
             def __init__(self):
-                    material.__init__(self)
+                    burnman.material.__init__(self)
                     self.params = {
                             'ref_V': 10.844e-6, #Molar volume [m^3/(mole molecules)] at room pressure/temperature
                             'ref_K': 135.19e9, #Reference bulk modulus [Pa] at room pressure/temperature
