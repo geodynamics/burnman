@@ -46,11 +46,6 @@ class Speziale_fe_periclase_LS(material):
 
     
     
-        
-class Speziale_fe_periclase(helper_spin_transition): 
-    def __init__(self):        
-        helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
-        self.cite = 'Speziale et al. 2007'
 
         
 
