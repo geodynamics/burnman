@@ -17,3 +17,4 @@ from composition import calculate_partition_coefficient,calculate_phase_percents
 import minerals
 import seismic
 from materials import composite
+from minerals_base import material
