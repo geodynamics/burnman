@@ -25,7 +25,10 @@ class equation_of_state:
     def density(pressure, temperature, params):
         raise NotImplementedError("")
 
-    def isothermal_bulk_modulus(pressure,temperature, volume, params):
+    def grueneisen_parameter(pressure, temperature, volume, params):
+        raise NotImplementedError("")
+
+    def isothermal_bulk_modulus(pressure, temperature, volume, params):
         raise NotImplementedError("")
 
     def adiabatic_bulk_modulus(pressure, temperature, volume, params):
