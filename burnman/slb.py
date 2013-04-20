@@ -21,9 +21,20 @@ class slb_base:
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2*f+1.) * ( a1_ii + a2_iikk*f )
+        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
         q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
         return q
+    
+    def __isotropic_eta_s(self, x, params):
+        f = 1./2. * (pow(x, 2./3.) - 1.)
+        a2_s = -2.*params['ref_grueneisen'] - 2.*params['eta_0s'] # EQ 47 
+        a1_ii = 6. * params['ref_grueneisen'] # EQ 47
+        a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
+        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
+        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+        eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
+        return eta_s
+
 
     def volume(self, pressure, temperature, params):
         debye_T = lambda x : self.__debye_temperature(params['ref_V']/x, params)
@@ -39,9 +50,6 @@ class slb_base:
     
         V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V']) 
         return V
-
-    def density(self, pressure, temperature, params):
-        raise NotImplementedError("")
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         x = params['ref_V'] / volume
@@ -85,7 +93,7 @@ class slb_base:
     def shear_modulus(self, pressure, temperature, volume, params):
         debye_T = self.__debye_temperature(params['ref_V']/volume, params)
         #gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        eta_s = isotropic_eta_s(params['ref_V']/volume, params)
+        eta_s = self.__isotropic_eta_s(params['ref_V']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
         E_th_ref = debye.thermal_energy(300.,debye_T, params['n'])
