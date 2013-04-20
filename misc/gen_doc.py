@@ -37,4 +37,4 @@ examples = filter (lambda k: re.match("^example(.*)\.py$", k), all )
 not_listed = filter(lambda x: (not x in ordered_examples), examples)  
 
 for l in not_listed:
-    print "WARNING EXAMPLE NOT LISTED: ", l
+    sys.stderr.write("WARNING EXAMPLE NOT LISTED: "+l+"\n")
