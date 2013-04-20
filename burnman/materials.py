@@ -35,7 +35,7 @@ class composite:
 
     def set_method(self, method):
         for ph in self.phases:
-          ph.mineral.set_method(method) 
+            ph.mineral.set_method(method) 
 
     def to_string(self):
         return "'" + self.__class__.__name__ + "'"
@@ -46,7 +46,7 @@ class composite:
         self.pressure = pressure
         self.temperature = temperature
         for ph in self.phases:
-          ph.mineral.set_state(pressure, temperature) 
+            ph.mineral.set_state(pressure, temperature) 
                 
 
 

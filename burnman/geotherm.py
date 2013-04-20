@@ -11,7 +11,6 @@ import scipy.integrate as integrate
 from minerals import *
 from materials import *
 
-import mie_grueneisen_debye as mgd
 
 # polynomial fit from Watson, Baxter, EPSL, 2007
 # pressure: in Pa

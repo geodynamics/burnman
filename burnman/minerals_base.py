@@ -57,22 +57,22 @@ class material:
     def set_method(self, method):
         """ use "slb" or "mgd" or slb3 """
         if( isinstance(method, basestring)):
-          if (method == "slb2"):
-            self.method = slb.slb2()
-          elif (method == "mgd2"):
-            self.method = mgd.mgd2()
-          elif (method == "mgd3"):
-            self.method = mgd.mgd3()
-          elif (method == "slb3"):
-            self.method = slb.slb3()
-          elif (method == "bm"):
-            self.method = bm.birch_murnaghan_eos()
-          else:
-            raise Exception("unsupported material method " + method)
+            if (method == "slb2"):
+                self.method = slb.slb2()
+            elif (method == "mgd2"):
+                self.method = mgd.mgd2()
+            elif (method == "mgd3"):
+                self.method = mgd.mgd3()
+            elif (method == "slb3"):
+                self.method = slb.slb3()
+            elif (method == "bm"):
+                self.method = bm.birch_murnaghan_eos()
+            else:
+                raise Exception("unsupported material method " + method)
         elif ( isinstance(method, eos.equation_of_state) ):
-          self.method = method
+            self.method = method
         else:
-          raise Exception("unsupported material method " + method.__class__.__name__ )
+            raise Exception("unsupported material method " + method.__class__.__name__ )
 
     def to_string(self):
         return "'" + self.__class__.__name__ + "'"

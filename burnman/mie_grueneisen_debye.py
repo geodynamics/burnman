@@ -5,7 +5,6 @@
 import numpy as np
 import equation_of_state as eos
 import scipy.optimize as opt
-import scipy.integrate as integrate
 import matplotlib.pylab as plt
 import birch_murnaghan as bm
 import debye
@@ -36,9 +35,6 @@ class mgd_base(eos.equation_of_state):
 
     #calculate the mgd shear modulus as a function of P, V, and T
     def shear_modulus(self, pressure, temperature, volume, params):
-        mu = bm.shear_modulus_second_order(volume,params) + \
-            self.__thermal_shear_modulus(temperature,volume, params) - \
-            self.__thermal_shear_modulus(300.,volume, params) # EQ B11
         if self.order==2:
             return bm.shear_modulus_second_order(volume,params) + \
                 self.__thermal_shear_modulus(temperature,volume, params) - \
@@ -52,9 +48,9 @@ class mgd_base(eos.equation_of_state):
 
     #heat capacity at constant volume
     def heat_capacity_v(self, pressure, temperature, volume, params):
-         Debye_T = self.__debye_temperature(params['ref_V']/volume, params)
-         C_v = debye.heat_capacity_v(temperature, Debye_T, params['n'])
-         return C_v
+        Debye_T = self.__debye_temperature(params['ref_V']/volume, params)
+        C_v = debye.heat_capacity_v(temperature, Debye_T, params['n'])
+        return C_v
 
     def thermal_expansivity(self, pressure, temperature, volume , params):
         C_v = self.heat_capacity_v(pressure,temperature,volume,params)
