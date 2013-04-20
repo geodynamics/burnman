@@ -23,6 +23,7 @@ import burnman
 from burnman import minerals
 from burnman.materials import composite
 import matplotlib.image as mpimg
+import numpy as np
 
 if __name__ == "__main__":    
     
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'slb'
+    method = 'slb2'
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock_1)    
-    
+     
 
     temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_2)
     
@@ -127,6 +128,9 @@ if __name__ == "__main__":
   
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.calculate_velocities(seis_p_4, temperature_bs, rock_4)
     
+    ### linear averaging of the velocities
+    mat_vs_2_linear=np.sqrt((0.95*mat_mu_1+0.05*mat_mu_3)/mat_rho_2)
+    mat_vs_4_linear=np.sqrt((0.8*mat_mu_1+0.2*mat_mu_3)/mat_rho_4) 
     chi_den_murk = 0.
     for i in range(len(mat_rho_2)):
 	chi_den_murk = chi_den_murk + pow(mat_rho_2[i] - seis_rho[i],2.)/seis_rho[i]
@@ -178,9 +182,9 @@ if __name__ == "__main__":
  
     plt.subplot(2,2,2)
     plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='-')
-    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='-')
+    plt.plot(seis_p_2/1.e9,mat_vs_2_linear/1.e3,color='r',linestyle='-')
     plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='-')
+    plt.plot(seis_p_4/1.e9,mat_vs_4_linear/1.e3,color='g',linestyle='-')
     plt.plot(seis_p_1/1.e9,seis_vs,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
     plt.text(40,7.3,"chi^2 murk/py= %3.3f" % vs)
@@ -229,10 +233,9 @@ if __name__ == "__main__":
     fig1 = mpimg.imread('input_figures/murakami_vs_cmp.png')
     plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
     plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='--',marker='o',markerfacecolor='b',markersize=3)
-    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='--',marker='o',markerfacecolor='r',markersize=3)
-    #plt.plot(seis_p_1/1.e9,(0.8*mat_vs_1+0.2*mat_vs_3)/1.e3,color='m')
+    plt.plot(seis_p_2/1.e9,mat_vs_2_linear/1.e3,color='r',linestyle='--',marker='o',markerfacecolor='r',markersize=3)
     plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=3)
-    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='--',marker='o',markerfacecolor='g',markersize=3)
+    plt.plot(seis_p_4/1.e9,mat_vs_4_linear/1.e3,color='g',linestyle='--',marker='o',markerfacecolor='g',markersize=3)
     plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
     plt.savefig("output_figures/reproduce_murakami_fig4.png")
