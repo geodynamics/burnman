@@ -23,6 +23,7 @@ import burnman
 from burnman import minerals
 from burnman.materials import composite
 import matplotlib.image as mpimg
+import numpy
 
 if __name__ == "__main__":    
     
@@ -45,8 +46,18 @@ if __name__ == "__main__":
                             (minerals.Matas_fe_perovskite(), .078 ),
                             (minerals.Matas_periclase(), .268 ),
                             (minerals.Matas_wuestite(), .034 )))
+    #rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.62 ),
+    #                        (minerals.Matas_fe_perovskite(), .078/1.45 ),
+    #                        (minerals.Matas_periclase(), .268 ),
+    #                        (minerals.Matas_wuestite(), .034/1.45 ))) 
+    #KD is 2... doesn't match either
+    rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.3574 ),
+                            (minerals.Matas_fe_perovskite(), .0536 ),
+                            (minerals.Matas_periclase(), .1656 ),
+                            (minerals.Matas_wuestite(), .0124 )))
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     rock.set_method(method) 
+    rock2.set_method(method)
     seis_p_1 = np.arange(28e9, 128e9, 4.8e9)
     geotherm = burnman.geotherm.brown_shankland
     temperature_bs = [geotherm(p) for p in seis_p_1]
@@ -55,14 +66,13 @@ if __name__ == "__main__":
     #Now we'll calculate the models. 
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock)    
-   
-
-
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock2) 
+    
     # seismic velocities for comparison
     class ak135_table(burnman.seismic.radiustable):
         def __init__(self):
             burnman.seismic.radiustable.__init__(self) 
-            table = burnman.tools.read_table("data/ak135_lowermantle.txt") # radius, pressure, density, v_p, v_s
+            table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt") # radius, pressure, density, v_p, v_s
             table = np.array(table)
             self.table_radius = table[:,0]
             self.table_pressure = table[:,1]
@@ -75,28 +85,35 @@ if __name__ == "__main__":
     #seismic model for comparison:
     depths = map(ak.depth, seis_p_1)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = ak.evaluate_all_at(depths)
- 
+    prem=burnman.seismic.prem()
+    prem_p, prem_rho, prem_vp, prem_vs, prem_vphi = prem.evaluate_all_at(depths) 
+
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
-    
+
     plt.subplot(2,2,2)
-    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='-')
-    plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='g',linestyle='-',label='ak135')
+    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='-',label='rock')
+    plt.plot(seis_p_1/1.e9,mat_vs_2/1.e3,color='r',linestyle='-',label='rock2')
+    #plt.plot(depths,prem_vs/1.e3,color='r')
     plt.title("Vs (km/s)")
     plt.ylim(5,7.6) 
-    plt.xlim(29,131)
+#    plt.xlim(29,131)
+    plt.legend(loc='upper left')
  
     # plot Vp
     plt.subplot(2,2,3)
     plt.title("Vp (km/s)")
-    plt.plot(seis_p_1/1.e9,mat_vphi_1/1.e3,color='b',linestyle='-')
-    plt.plot(seis_p_1/1.e9,seis_vphi/1.e3,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.plot(seis_p_1/1.e9,seis_vp/1.e3,color='g',linestyle='-')
+    plt.plot(seis_p_1/1.e9,mat_vp_1/1.e3,color='b', linestyle='-')
+    plt.plot(seis_p_1/1.e9,mat_vp_2/1.e3,color='r', linestyle='-')
     plt.ylim(6.25,14.0)    
     plt.xlim(29,131)
 
     # plot density
     plt.subplot(2,2,4)
-    plt.plot(seis_p_1/1.e9,mat_rho_1/1.e3,color='b',linestyle='-')
-    plt.plot(seis_p_1/1.e9,seis_rho/1.e3,color='k', linestyle='',marker='o',markerfacecolor='w',markersize=4)
+    plt.plot(seis_p_1/1.e9,seis_rho/1.e3,color='b',linestyle='-')
+    plt.plot(seis_p_1/1.e9,mat_rho_1/1.e3,color='g', linestyle='-')
+    plt.plot(seis_p_1/1.e9,mat_rho_2/1.e3,color='r', linestyle='-')
     plt.title("Density (kg/m^3)")
     plt.xlim(29,131)    
     
@@ -115,10 +132,11 @@ if __name__ == "__main__":
     plt.subplot(1,1,1)
     plt.ylim(-2,5) 
     plt.xlim(800,3000)
-    fig1 = mpimg.imread('data/matas_vs_forcomparison.png')
+    fig1 = mpimg.imread('input_figures/matas_vs_forcomparison.png')
     plt.imshow(fig1, extent=[800,3000,-2,5], aspect='auto')
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vs_1-seis_vs)/seis_vs,color='b',linestyle='--')
+    plt.plot(d,100.*(mat_vs_2-seis_vs)/seis_vs,color='r',linestyle='--')
     plt.savefig("matas_cmp_vs.png")
     plt.show()
     plt.close()
@@ -126,10 +144,11 @@ if __name__ == "__main__":
     plt.subplot(1,1,1)
     plt.ylim(-2,5)
     plt.xlim(800,3000)
-    fig1 = mpimg.imread('data/matas_vp_forcomparison.png')
+    fig1 = mpimg.imread('input_figures/matas_vp_forcomparison.png')
     plt.imshow(fig1, extent=[800,3000,-2,5], aspect='auto')
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vp_1-seis_vp)/seis_vp,color='b',linestyle='--')
+    plt.plot(d,100.*(mat_vp_2-seis_vp)/seis_vp,color='r',linestyle='--')
     plt.savefig("matas_cmp_vp.png")
     plt.show()
 

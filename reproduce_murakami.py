@@ -34,7 +34,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'slb' 
+    method = 'slb'
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -63,7 +63,6 @@ if __name__ == "__main__":
     rock_2 = composite( ( (minerals.Murakami_fe_perovskite(), amount_perovskite_2),
                             (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite_2) ) )
     rock_2.set_method(method) 
-
 	#input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
     seis_p_2 = seis_p_1
@@ -117,7 +116,7 @@ if __name__ == "__main__":
     temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_2)
     
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_bs, rock_2)    
-    
+    #mat_rho_t, mat_vp_t, mat_vs_t, mat_vphi_t, mat_K_t, mat_mu_t = burnman.calculate_velocities(seis_p_2, temperature_bs, rock_2.phases[0]) 
 
     temperature_3 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_3)
    
@@ -227,13 +226,14 @@ if __name__ == "__main__":
     plt.subplot(1,1,1)
     plt.ylim(5,7.6) 
     plt.xlim(25,135)
-    fig1 = mpimg.imread('data/murakami_vs_cmp.png')
+    fig1 = mpimg.imread('input_figures/murakami_vs_cmp.png')
     plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
-    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='--')
-    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='--')
-    plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=4)
-    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='--')
+    plt.plot(seis_p_1/1.e9,mat_vs_1/1.e3,color='b',linestyle='--',marker='o',markerfacecolor='b',markersize=3)
+    plt.plot(seis_p_2/1.e9,mat_vs_2/1.e3,color='r',linestyle='--',marker='o',markerfacecolor='r',markersize=3)
+    #plt.plot(seis_p_1/1.e9,(0.8*mat_vs_1+0.2*mat_vs_3)/1.e3,color='m')
+    plt.plot(seis_p_3/1.e9,mat_vs_3/1.e3,color='k',linestyle='--',marker='o',markerfacecolor='k',markersize=3)
+    plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='--',marker='o',markerfacecolor='g',markersize=3)
     plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
-
+    plt.savefig("murakami_fig4.png")
     plt.show()

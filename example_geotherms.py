@@ -42,7 +42,7 @@ if __name__ == "__main__":
     #what about a geotherm defined from datapoints given in a file (our inline)?
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
     #this could also be loaded from a file, just uncomment this
-    #table = tools.read_table("data/example_geotherm.txt")
+    #table = tools.read_table("input_geotherm/example_geotherm.txt")
 
     table_pressure = np.array(table)[:,0]
     table_temperature = np.array(table)[:,1]
