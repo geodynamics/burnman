@@ -5,8 +5,7 @@
 import numpy as np
 import birch_murnaghan as bm
 import mie_grueneisen_debye as mgd
-import slb_finitestrain as slb
-import slb_thirdorder as slb3
+import slb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import tools
@@ -75,14 +74,16 @@ def check_mgd_shim_duffy_kenichi():
     ref_pressures.append( np.array([4.99,8.53,12.53,17.04,22.13,27.88,34.38,41.73,50.06,59.50,70.22,82.43,96.33,112.22,130.40,151.25,175.24,202.90]))
     ref_pressures.append( np.array([12.14,15.69,19.68,24.19,29.28,35.03,41.53,48.88,57.20,66.64,77.37,89.57,103.47,119.35,137.53,158.38,182.36,210.02]))
     ref_pressures.append( np.array([19.30,22.84,26.84,31.35,36.44,42.19,48.68,56.03,64.35,73.80,84.52,96.72,110.62,126.50,144.68,165.53,189.51,217.17]))
-
+ 
+    eos = mgd.mie_grueneisen_debye()
+ 
     pressures = np.empty_like(ref_pressures)
     ref_dv = np.linspace(0.0, 0.34, len(pressures[0]))
     ref_volumes = (1-ref_dv)*gold.params['ref_V']
     T= np.array([300., 1000.,2000.,3000.])
     for t in range(len(pressures)):
         for i in range(len(pressures[t])):
-            pressures[t][i] = mgd.pressure(T[t],ref_volumes[i], gold.params)
+            pressures[t][i] = eos.pressure(T[t],ref_volumes[i], gold.params)
         plt.plot(ref_dv, (pressures[t]/1.e9-ref_pressures[t]))
     plt.ylim(-1,1)
     plt.ylabel("Difference in pressure (GPa)")
@@ -112,9 +113,11 @@ def check_mgd_fei_mao_shu_hu():
     ref_pressures = np.array([0.0, 12.23,7.77,9.69,12.54,9.21,9.90,11.83,18.35,12.68,13.15,25.16,12.53,14.01,15.34,14.86,11.99,12.08,13.03,15.46,21.44,29.98,29.41,29.05,27.36,26.38,24.97,19.49,13.39,14.48,15.27,15.95,16.94])
     ref_pressures = ref_pressures
     pressures = np.empty_like(volumes)
+
+    eos = mgd.mie_grueneisen_debye()
   
     for i in range(len(temperatures)):
-        pressures[i] = mgd.pressure(temperatures[i],volumes[i], mgfeo.params)
+        pressures[i] = eos.pressure(temperatures[i],volumes[i], mgfeo.params)
  
     plt.scatter(temperatures, (pressures/1.e9-ref_pressures))
     plt.ylim(-1,1)
@@ -137,11 +140,16 @@ def check_slb_fig3():
     q_slb = np.empty_like(volume)
     q_mgd = np.empty_like(volume)
 
+    slb_eos = slb.slb3()
+    mgd_eos = mgd.mie_grueneisen_debye()
+    
+
     #calculate its thermal properties
     for i in range(len(volume)):
-        grueneisen_slb[i] = slb3.grueneisen_parameter(1/volume[i], perovskite.params)
-        grueneisen_mgd[i] = mgd.grueneisen_parameter(1/volume[i], perovskite.params)
-        q_slb[i] = slb3.volume_dependent_q(1/volume[i], perovskite.params)
+        #call with dummy pressure and temperatures, they do not change it
+        grueneisen_slb[i] = slb_eos.grueneisen_parameter(0., 0., volume[i], perovskite.params)
+        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(0., 0., volume[i], perovskite.params)
+        q_slb[i] = slb_eos.__volume_dependent_q(1/volume[i], perovskite.params)
         q_mgd[i] = perovskite.params['q0']
 
     #compare with figure 7
@@ -169,7 +177,7 @@ def check_slb_fig7():
                     'ref_grueneisen': .99,
                     'q0': 2.1, 
                     'eta_0s' : 2.4}
-    forsterite.method = slb3
+    forsterite.method = slb.slb3()
 
     temperature = np.linspace(0., 2000., 200)
     volume = np.empty_like(temperature)
@@ -235,6 +243,6 @@ def check_slb_fig7():
 if __name__ == "__main__":
     check_birch_murnaghan()
     check_slb_fig7()
-    check_slb_fig3()
+    #check_slb_fig3()
     check_mgd_shim_duffy_kenichi()
     check_mgd_fei_mao_shu_hu()
