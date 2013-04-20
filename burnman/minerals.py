@@ -38,6 +38,7 @@ class material:
 
     def __init__(self):
         self.params = {    'name':'generic',
+            'equation_of_state': 'slb3', #Equation of state used to fit the parameters
             'ref_V': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
             'ref_K': 0., #Reference bulk modulus [Pa] at room pressure/temperature
             'K_prime': 0., #pressure derivative of bulk modulus
@@ -138,6 +139,42 @@ class material:
         return np.sqrt((self.bulk_modulus() + 4. / 3. * \
             self.shear_modulus()) / self.density()) / 1000.
 
+# combines two or more materials given a fixed molar_fraction
+class helper_volumetric_mixing(material):
+    # base_materials: list of materials
+    # molar_fraction: list of molar ratios (sum up to 1)
+    def __init__(self, base_materials, molar_fraction):
+        self.base_materials = base_materials
+        self.molar_fraction = molar_fraction
+        assert(len(base_materials) == len(molar_fraction))
+        assert(sum(molar_fraction) > 0.999)
+        assert(sum(molar_fraction) < 1.001)
+
+    def set_state(self, pressure, temperature):
+        for mat in self.base_materials:
+            mat.method = self.method
+            mat.set_state(pressure, temperature)
+
+        itrange = range(0, len(self.base_materials))
+
+
+        self.params = {}
+
+        self.params['n'] = sum([self.base_materials[i].params['n'] for i in itrange ]) / len(self.base_materials)
+        phase_volume = [self.base_materials[i].molar_volume() * self.molar_fraction[i] for i in itrange ]
+
+        # some properties need weighted averaging
+        for prop in ['ref_V', 'molar_mass', 'ref_Debye', 'ref_grueneisen', 'q0', 'eta_0s']:
+            self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+
+
+        # some need VRH averaging
+        for prop in ['ref_K', 'K_prime', 'ref_mu', 'mu_prime']:
+
+            X = [ mat.params[prop] for mat in self.base_materials ]
+            self.params[prop] = vrh.vrh_average(phase_volume, X)
+
+        material.set_state(self, pressure, temperature)
 
 class helper_spin_transition(material):
     """ helper class that switches between two materials (for low and high spin) 
@@ -167,6 +204,7 @@ class helper_spin_transition(material):
 class test_mineral (material):
     def __init__(self):
         self.params = {
+            'equation_of_state': 'slb3',
             'ref_V': 6.844e-6,
             'ref_K': 135.19e9,
             'K_prime': 6.04,
@@ -179,8 +217,12 @@ class test_mineral (material):
             'q0': 0.917}
 
 class stishovite (material):
+    """
+    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state': 'slb3',
             'ref_V': 14.02e-6,
             'ref_K': 314.0e9,
             'K_prime': 4.4,
@@ -189,16 +231,17 @@ class stishovite (material):
             'molar_mass': .0601,
             'n': 3,
             'ref_Debye': 1044.,
-            'ref_grueneisen': 1.6,
+            'ref_grueneisen': 134,
             'q0': 2.4,
-            'eta_0s': 3.0 }
+            'eta_0s': 5.0 }
 
 class periclase (material):
-    """ 
-    MgO
+    """
+    Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb3',
             'ref_V': 11.24e-6,
             'ref_K': 161.0e9,
             'K_prime': 3.9,
@@ -209,13 +252,15 @@ class periclase (material):
             'ref_Debye': 773.,
             'ref_grueneisen': 1.5,
             'q0': 1.5,
-            'eta_0s': 3.0 }
+            'eta_0s': 2.3 }
+
 class wuestite (material):
     """
-    FeO
+    Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb3',
             'ref_V': 12.06e-6,
             'ref_K': 152.0e9,
             'K_prime': 4.9,
@@ -226,45 +271,8 @@ class wuestite (material):
             'ref_Debye': 455.,
             'ref_grueneisen': 1.28,
             'q0': 1.5,
-            'eta_0s': 3.0 }
+            'eta_0s': 0.8 }
 
-# combines two or more materials given a fixed molar_fraction
-class helper_volumetric_mixing(material):
-    # base_materials: list of materials
-    # molar_fraction: list of molar ratios (sum up to 1)
-    def __init__(self, base_materials, molar_fraction):
-        self.base_materials = base_materials
-        self.molar_fraction = molar_fraction
-        assert(len(base_materials) == len(molar_fraction))
-        assert(sum(molar_fraction) > 0.999)
-        assert(sum(molar_fraction) < 1.001)
-
-    def set_state(self, pressure, temperature):
-        for mat in self.base_materials:
-            mat.method = self.method
-            mat.set_state(pressure, temperature)
-
-        itrange = range(0, len(self.base_materials))
-
-
-        self.params = {}
-        
-        self.params['n'] = sum([self.base_materials[i].params['n'] for i in itrange ]) / len(self.base_materials)            
-        phase_volume = [self.base_materials[i].molar_volume() * self.molar_fraction[i] for i in itrange ]
-
-        # some properties need weighted averaging
-        for prop in ['ref_V', 'molar_mass', 'ref_Debye', 'ref_grueneisen', 'q0', 'eta_0s']:
-            self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
-
-
-        # some need VRH averaging
-        for prop in ['ref_K', 'K_prime', 'ref_mu', 'mu_prime']:
-            
-            X = [ mat.params[prop] for mat in self.base_materials ]
-            self.params[prop] = vrh.vrh_average(phase_volume, X)
-
-        material.set_state(self, pressure, temperature)
-        
 
 
 class ferropericlase(helper_volumetric_mixing):
@@ -274,6 +282,7 @@ class ferropericlase(helper_volumetric_mixing):
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
+
 class mg_fe_perovskite(helper_volumetric_mixing):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
@@ -281,79 +290,51 @@ class mg_fe_perovskite(helper_volumetric_mixing):
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
-class ferropericlase_old_and_probably_wrong(material):
-    def __init__(self, fe_num):
-        self.mg = 1. - fe_num
-        self.fe = fe_num
-        self.pe = periclase()
-        self.wu = wustite()
-        self.params = {
-            'ref_V': self.pe.params['ref_V'] * self.mg + self.wu.params['ref_V'] * self.fe,
-            'ref_K': self.pe.params['ref_K'] * self.mg + self.wu.params['ref_K'] * self.fe,
-            'K_prime': self.pe.params['K_prime'] * self.mg + self.wu.params['K_prime'] * self.fe,
-            'ref_mu': self.pe.params['ref_mu'] * self.mg + self.wu.params['ref_mu'] * self.fe,
-            'mu_prime': self.pe.params['mu_prime'] * self.mg + self.wu.params['mu_prime'] * self.fe,
-            'molar_mass': self.pe.params['molar_mass'] * self.mg + self.wu.params['molar_mass'] * self.fe,
-            'n': 5,
-            'ref_Debye': self.pe.params['ref_Debye'] * self.mg + self.wu.params['ref_Debye'] * self.fe,
-            'ref_grueneisen': self.pe.params['ref_grueneisen'] * self.mg + self.wu.params['ref_grueneisen'] * self.fe,
-            'q0': self.pe.params['q0'] * self.mg + self.wu.params['q0'] * self.fe ,
-            'eta_0s': self.pe.params['eta_0s'] * self.mg + self.wu.params['eta_0s'] * self.fe }
-
-
-
-class mg_fe_perovskite_old_and_probably_wrong(material):
-    def __init__(self, fe_num):
-        self.mg = 1.0 - fe_num
-        self.fe = fe_num
-        self.mg_pv = mg_perovskite()
-        self.fe_pv = fe_perovskite()
-        self.params = {
-            'ref_V': self.mg_pv.params['ref_V'] * self.mg + self.fe_pv.params['ref_V'] * self.fe,
-            'ref_K': self.mg_pv.params['ref_K'] * self.mg + self.fe_pv.params['ref_K'] * self.fe,
-            'K_prime': self.mg_pv.params['K_prime'] * self.mg + self.fe_pv.params['K_prime'] * self.fe,
-            'ref_mu': self.mg_pv.params['ref_mu'] * self.mg + self.fe_pv.params['ref_mu'] * self.fe,
-            'mu_prime': self.mg_pv.params['mu_prime'] * self.mg + self.fe_pv.params['mu_prime'] * self.fe,
-            'molar_mass': self.mg_pv.params['molar_mass'] * self.mg + self.fe_pv.params['molar_mass'] * self.fe,
-            'n': 5,
-            'ref_Debye': self.mg_pv.params['ref_Debye'] * self.mg + self.fe_pv.params['ref_Debye'] * self.fe,
-            'ref_grueneisen': self.mg_pv.params['ref_grueneisen'] * self.mg + self.fe_pv.params['ref_grueneisen'] * self.fe,
-            'q0': self.mg_pv.params['q0'] * self.mg + self.fe_pv.params['q0'] * self.fe ,
-            'eta_0s': self.mg_pv.params['eta_0s'] * self.mg + self.fe_pv.params['eta_0s'] * self.fe}
-
 class mg_perovskite(material):
+    """
+    Stixrude & Lithgow-Bertelloni 2005 and references therein  
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb3',
             'ref_V': 24.45e-6,
-            'ref_K': 251.0e9,   # ok
-            'K_prime': 4.1,     # ok 
-            'ref_mu': 175.0e9,  # from S & L.-B. 2005
-            'mu_prime': 1.8,    # 1.7 in Stixrude 2005
+            'ref_K': 251.0e9,   
+            'K_prime': 4.1,     
+            'ref_mu': 175.0e9,  
+            'mu_prime': 1.7,  
             'molar_mass': .1020,
             'n': 5,
             'ref_Debye': 1070.,
             'ref_grueneisen': 1.48,
             'q0': 1.4,
-            'eta_0s': 2.4 }
+            'eta_0s': 2.6 }
 
 class fe_perovskite(material):
+    """
+    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb3',
             'ref_V': 25.48e-6,
-            'ref_K': 281.0e9, # ok
-            'K_prime': 4.1,  # ok
-            'ref_mu': 161.0e9,  # 138 in Stixrude 2005
-            'mu_prime': 1.57,   # 1.7 in Stixrude 2005
-            'molar_mass': .1319, # where is this from?
+            'ref_K': 281.0e9, 
+            'K_prime': 4.1,  
+            'ref_mu': 138.0e9,
+            'mu_prime': 1.7,   
+            'molar_mass': .1319, 
             'n': 5,
-            'ref_Debye': 1021.,
+            'ref_Debye': 841.,
             'ref_grueneisen': 1.48,
             'q0': 1.4,
-            'eta_0s': 2.4 }
+            'eta_0s': 2.1 }
 
 class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
+    """
+    Matas et al. 2007 and references therein
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'mgd2',
             'ref_V': 24.43e-6,
             'ref_K': 250.0e9,   
             'K_prime': 4.0,     
@@ -366,8 +347,12 @@ class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
             'q0': 1.4} 
 
 class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
+    """
+    Matas et al. 2007 and references therein
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'mgd2',
             'ref_V': 25.34e-6,
             'ref_K': 250.0e9, 
             'K_prime': 4.0,  
@@ -381,10 +366,11 @@ class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
 
 class Matas_periclase (material): # Matas et al 2007 Tables 1&2
     """
-    MgO
+    Matas et al. 2007 and references therein
     """
     def __init__(self):
         self.params = {
+            'equation_of_state':'mgd2',
             'ref_V': 11.25e-6,
             'ref_K': 160.1e9,
             'K_prime': 3.83,
@@ -398,10 +384,11 @@ class Matas_periclase (material): # Matas et al 2007 Tables 1&2
 
 class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
     """
-    FeO
+    Matas et al. 2007 and references therein
     """
     def __init__(self):
         self.params = {
+            'equation_of_state':'mgd2',
             'ref_V': 12.26e-6,
             'ref_K': 160.1e9,
             'K_prime': 3.83,
@@ -413,102 +400,123 @@ class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
             'ref_grueneisen': 1.41,
             'q0': 1.3 }
 
-class Speziale_fe_periclase_LS(material):  # Speciale et al. 2007
-    def __init__(self):
-        self.params = {
-                        'ref_V': 107.47e-6,
-                        'ref_K': 186.0e9,
-                        'K_prime': 4.6,
-                        'molar_mass': .04567,
-                        'n': 2,
-                        'ref_Debye': 587.,
-                        'ref_grueneisen': 1.46,
-                        'q0': 1.2,
-                        'eta_0s': 2.4 }  # not from paper
 
-    
-    
-class Speziale_fe_periclase_HS(material):  # Speciale et al. 2007
-    def __init__(self):    
+class Speziale_fe_periclase(helper_spin_transition):  
+    def __init__(self):
+        helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
+        self.cite = 'Speziale et al. 2007'
+
+class Speziale_fe_periclase_HS(material):
+    """
+    Speziale et al. 2007, Mg#=83
+    """ 
+    def __init__(self):
             self.params = {
-                        'ref_V': 114.57e-6,
+                        'equation_of_state': 'mgd3',
+                        'ref_V': 22.9e-6,
                         'ref_K': 157.5e9,
                         'K_prime': 3.92,
                         'molar_mass': .04567,
                         'n': 2,
                         'ref_Debye': 587,
                         'ref_grueneisen': 1.46,
-                        'q0': 1.2,
-                        'eta_0s': 2.4 }  # not from paper
+                        'q0': 1.2 }
+
+class Speziale_fe_periclase_LS(material): 
+    """
+    Speziale et al. 2007, Mg#=83
+    """
+    def __init__(self):
+        self.params = {
+                        'equation_of_state': 'mgd3',
+                        'ref_V': 21.49e-6,
+                        'ref_K': 186.0e9,
+                        'K_prime': 4.6,
+                        'molar_mass': .04567,
+                        'n': 2,
+                        'ref_Debye': 587.,
+                        'ref_grueneisen': 1.46,
+                        'q0': 1.2  }
+
+    
     
         
-class Speziale_fe_periclase(helper_spin_transition):  # Speciale et al. 2007
+class Speziale_fe_periclase(helper_spin_transition): 
     def __init__(self):        
         helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
         self.cite = 'Speziale et al. 2007'
 
         
-class Catalli_fe_perovskite_LS(material):  # Catalli et al 2009
-    def __init__(self):        
-        self.params = {
-                        'ref_V': 165.78e-6,
-                        'ref_K': 304.0e9,
-                        'K_prime': 4.5,
-                        'ref_mu': 161.0e9,
-                        'mu_prime': 1.57,
-                        'molar_mass': .1319,
-                        'n': 5,
-                        'ref_Debye': 1021.,
-                        'ref_grueneisen': 1.48,
-                        'q0': 1.4,
-                        'eta_0s': 2.4 }
 
-class Catalli_fe_perovskite_HS(material):  # Catalli et al 2009
-    def __init__(self):    
-        self.params = {
-                        'ref_V': 165.78e-6,
-                        'ref_K': 237.0e9,
-                        'K_prime': 4.5,
-                        'ref_mu': 161.0e9,
-                        'mu_prime': 1.57,
-                        'molar_mass': .1319,
-                        'n': 5,
-                        'ref_Debye': 1021.,
-                        'ref_grueneisen': 1.48,
-                        'q0': 1.4,
-                        'eta_0s': 2.4 }    
-        
-class Catalli_fe_perovskite(helper_spin_transition):  # Catalli et al 2009
-    def __init__(self):        
-        helper_spin_transition.__init__(self, 63.0e9, Catalli_fe_perovskite_LS(), Catalli_fe_perovskite_HS())
 
-        
-class Murakami_fe_perovskite(material):  # From Murakami's emails, see Cayman for details, represents 4 wt% Al X_mg = .94
+class Murakami_mg_perovskite(material):  
+    """
+    Murakami et al. (2012) supplementary table 5 and references therein, ref_V from Stixrude & Lithgow-Bertolloni 2005
+    """
     def __init__(self):
         self.params = {
-            'ref_V': 24.607e-6,
-            'ref_K': 251.9e9, 
+            'equation_of_state':'slb2',
+            'ref_V': 24.45e-6,  # stixrud & L-B 2005
+            'ref_K': 251.9e9,
             'K_prime': 4.01,
             'ref_mu': 164.7e9,
-            # 'ref_mu': 157.39e9,  #refitted to second order  
             'mu_prime': 1.58,
-            # 'mu_prime': 2.08, #refitted to second order
             'molar_mass': .102165,
             'n': 5,
             'ref_Debye': 1054.,
             'ref_grueneisen': 1.48,
             'q0': 1.4,
-            'eta_0s': 2.4 } # Mg endmember
+            'eta_0s': 2.4 } 
+
+class Murakami_fe_perovskite(material): 
+    """
+    Murakami et al. (2012), personal communication, Mg#=94, Al=4%
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb2',
+            'ref_V': 24.607e-6,
+            'ref_K': 251.9e9, 
+            'K_prime': 4.01,
+            'ref_mu': 164.7e9,
+            'mu_prime': 1.58,
+            'molar_mass': .102165,
+            'n': 5,
+            'ref_Debye': 1054.,
+            'ref_grueneisen': 1.48,
+            'q0': 1.4,
+            'eta_0s': 1.48 } 
             
-            
+class Murakami_mg_periclase(material):
+    """
+    Murakami et al. (2012) supplementary table 5 and references therein
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb2',
+            'ref_V': 24.607e-6,
+            'ref_K': 251.9e9,
+            'K_prime': 4.01,
+            'ref_mu': 164.7e9,
+            'mu_prime': 1.58,
+            'molar_mass': .102165,
+            'n': 5,
+            'ref_Debye': 1054.,
+            'ref_grueneisen': 1.48,
+            'q0': 1.4,
+            'eta_0s': 2.4 }             
 
 class Murakami_fe_periclase(helper_spin_transition):
     def __init__(self):
         helper_spin_transition.__init__(self, 63.0e9, Murakami_fe_periclase_LS(), Murakami_fe_periclase_HS())
-                
+
 class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+    """
+    Murakami et al. (2012), personal communication, Mg#=79 
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb2',
             'ref_V': 11.412e-6,
             'ref_K': 159.1e9,
             'K_prime': 4.11,
@@ -522,8 +530,12 @@ class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman 
             'eta_0s': 2.54 }
 
 class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+    """
+    Murakami et al. (2012), personal communication, Mg#=79
+    """
     def __init__(self):
         self.params = {
+            'equation_of_state':'slb2',
             'ref_V': 11.171e-6,
             'ref_K': 170.0e9,
             'K_prime': 4,
@@ -535,6 +547,7 @@ class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman 
             'ref_grueneisen': 1.45,
             'q0': 1.5,
             'eta_0s': 2.54}
+
 
 
 
