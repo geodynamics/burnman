@@ -3,13 +3,18 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import birch_murnaghan as bm
-import mie_grueneisen_debye as mgd
-import slb
+import os, sys, numpy as np, matplotlib.pyplot as plt
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+	sys.path.insert(1,os.path.abspath('..')) 
+sys.path.insert(1,os.path.abspath('.')) 
+import burnman
+
+import burnman.birch_murnaghan as bm
+import burnman.mie_grueneisen_debye as mgd
+import burnman.slb as slb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import tools
-from minerals import *
+
 
 
 #Attempt to recreate Stixrude and Lithgow-Bertelloni (2005) Figure 1
@@ -17,7 +22,7 @@ def check_birch_murnaghan():
     plt.close()
 
     #make a test mineral
-    test_mineral = material()
+    test_mineral = burnman.material()
     test_mineral.params ={'name':'test',
                           'ref_V': 6.844e-6,
                           'ref_K': 259.0e9,
@@ -43,7 +48,7 @@ def check_birch_murnaghan():
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
-    fig1 = mpimg.imread('../input_figures/slb_fig1.png')
+    fig1 = mpimg.imread('input_figures/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)
@@ -57,7 +62,7 @@ def check_birch_murnaghan():
 def check_mgd_shim_duffy_kenichi():
     plt.close()
     #Create gold material from Table 1
-    gold = material()
+    gold = burnman.material()
     gold.params = {'name': 'gold',
                    'ref_V': 10.22e-6,
                    'ref_K': 167.0e9,
@@ -93,7 +98,7 @@ def check_mgd_shim_duffy_kenichi():
 
 
 def check_mgd_fei_mao_shu_hu():
-    mgfeo = material() 
+    mgfeo = burnman.material() 
     mgfeo.params = {       'name': 'MgFeO',
                     'ref_V': 11.657e-6,
                     'ref_K': 157.0e9,
@@ -128,9 +133,9 @@ def check_mgd_fei_mao_shu_hu():
 
 
 def check_slb_fig3():
-    perovskite= material() 
+    perovskite= burnman.material() 
     perovskite.params = {       'name': 'perovksite',
-                    'ref_V': tools.molar_volume_from_unit_cell_volume(168.27, 4.),
+                    'ref_V': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
                     'ref_grueneisen': 1.63,
                     'q0': 1.7}
 
@@ -153,7 +158,7 @@ def check_slb_fig3():
         q_mgd[i] = perovskite.params['q0']
 
     #compare with figure 7
-    fig1 = mpimg.imread('../input_figures/slb_fig3.png')
+    fig1 = mpimg.imread('input_figures/slb_fig3.png')
     plt.imshow(fig1, extent=[0.6, 1.0,0.35,2.0], aspect='auto')
     plt.plot(volume, grueneisen_slb, 'g+', volume, grueneisen_mgd, 'b+')
     plt.plot(volume, q_slb, 'g+', volume, q_mgd, 'b+')
@@ -165,7 +170,7 @@ def check_slb_fig3():
     plt.show()
 
 def check_slb_fig7():
-    forsterite = material() 
+    forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
                     'ref_V': 43.60e-6,
                     'ref_K': 128.0e9,
@@ -199,7 +204,7 @@ def check_slb_fig7():
  
 
     #compare with figure 7
-    fig1 = mpimg.imread('../input_figures/slb_fig7_vol.png')
+    fig1 = mpimg.imread('input_figures/slb_fig7_vol.png')
     plt.imshow(fig1, extent=[0,2200,0.99,1.08], aspect='auto')
     plt.plot(temperature, volume, 'g+')
     plt.ylim(0.99,1.08)
@@ -209,7 +214,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../input_figures/slb_fig7_Cp.png')
+    fig1 = mpimg.imread('input_figures/slb_fig7_Cp.png')
     plt.imshow(fig1, extent=[0,2200,0.,70.], aspect='auto')
     plt.plot(temperature, heat_capacity, 'g+')
     plt.ylim(0,70)
@@ -220,7 +225,7 @@ def check_slb_fig7():
     plt.show()
 
 
-    fig1 = mpimg.imread('../input_figures/slb_fig7_K.png')
+    fig1 = mpimg.imread('input_figures/slb_fig7_K.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, bulk_modulus, 'g+')
     plt.ylim(0.6,1.02)
@@ -230,7 +235,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../input_figures/slb_fig7_G.png')
+    fig1 = mpimg.imread('input_figures/slb_fig7_G.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, shear_modulus, 'g+')
     plt.ylim(0.6,1.02)
