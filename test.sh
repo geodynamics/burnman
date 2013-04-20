@@ -37,7 +37,7 @@ echo ""
 
 t="example_composition.py"
 testit $t
-diff example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
+diff output_figures/example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
 echo "   done"
 
 testit "example_compare_enstpyro.py"
