@@ -9,7 +9,6 @@ import composition as part
 import mie_grueneisen_debye
 import minerals 
 import seismic
-import slb_finitestrain
 import tools
 import voigt_reuss_hill as vrh
 import scipy.integrate as integrate

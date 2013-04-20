@@ -5,9 +5,7 @@
 from composition import *
 import numpy as np
 import voigt_reuss_hill as vrh
-import slb_finitestrain as slb
 import mie_grueneisen_debye as mgd
-import slb_thirdorder as slb3
 import birch_murnaghan as bm
 import warnings
 import slb
