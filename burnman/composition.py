@@ -71,13 +71,14 @@ def part_coef_calc(inp2,StartP,EndP,deltaP):
     
     
    
-def calculate_partition_coefficient(pressure, temperature, components, initdistcoef):
+def calculate_partition_coefficient(pressure, temperature, components, initial_distribution_coefficient):
+
+    """ calculate the partition coefficient given [...] initial_distribution_coefficient is known as Kd_0 """
 
     frac_mol_FeO = components['FeO']
-    frac_mol_MgO = components['MgO']
     frac_mol_SiO2 = components['SiO2']
-    Kd_0 = initdistcoef
- 	
+    Kd_0 = initial_distribution_coefficient
+
     delV = 2.e-7 #in m^3/mol, taken from Nakajima et al 2012, JGR
     
     #Kd_0 = .29 #Fig 5 Nakajima et al 2012
@@ -98,7 +99,7 @@ def calculate_partition_coefficient(pressure, temperature, components, initdistc
 # test some composition (Javoy 2010, Table 6, PLoM)
 if __name__ == "__main__":
     inp1 = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.} # wt%
-    inp2 = conv_inputs(inp1) 
+    inp2 = calculate_phase_percents(inp1) 
 
     StartP = 23.83 #in GPa
     EndP = 110.0
@@ -109,7 +110,7 @@ if __name__ == "__main__":
     gt = lambda p: geotherm.geotherm_brown_shankland(p)
     pressure = StartP
     temperature = gt(StartP)
-    calculate_partition_coefficient(pressure, temperature, inp2)
+    calculate_partition_coefficient(pressure, temperature, inp2, 0.5)
     #part_coef_calc(inp2,StartP,EndP,deltaP)
     #print inp1
     #print inp2
