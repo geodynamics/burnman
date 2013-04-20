@@ -38,9 +38,11 @@ class equation_of_state:
         raise NotImplementedError("")
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
+        """ heat capacity at constant volume """
         raise NotImplementedError("")
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
+        """ heat capacity at constant pressure """
         raise NotImplementedError("")
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
