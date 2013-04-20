@@ -2,17 +2,15 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-import numpy as np
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-	sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..')) 
 sys.path.insert(1,os.path.abspath('.')) 
 import burnman
 
 import burnman.birch_murnaghan as bm
 import burnman.mie_grueneisen_debye as mgd
 import burnman.slb as slb
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 
