@@ -17,7 +17,7 @@ class slb_base(equation_of_state):
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
         return params['ref_Debye'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f) 
 
-    def __volume_dependent_q(self, x, params):
+    def volume_dependent_q(self, x, params):
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
@@ -74,7 +74,7 @@ class slb_base(equation_of_state):
 
         #f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
 
-        q = self.__volume_dependent_q(params['ref_V']/volume, params)
+        q = self.volume_dependent_q(params['ref_V']/volume, params)
     
         K = bm.bulk_modulus(volume, params) \
             + (gr + 1.-q)* ( gr / volume ) * (E_th - E_th_ref) \

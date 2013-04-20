@@ -140,16 +140,16 @@ def check_slb_fig3():
     q_slb = np.empty_like(volume)
     q_mgd = np.empty_like(volume)
 
-    slb_eos = slb.slb3()
-    mgd_eos = mgd.mgd3()
+    slb_eos = slb.slb2()
+    mgd_eos = mgd.mgd2()
     
 
     #calculate its thermal properties
     for i in range(len(volume)):
         #call with dummy pressure and temperatures, they do not change it
-        grueneisen_slb[i] = slb_eos.grueneisen_parameter(0., 0., volume[i], perovskite.params)
-        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(0., 0., volume[i], perovskite.params)
-        q_slb[i] = slb_eos.__volume_dependent_q(1/volume[i], perovskite.params)
+        grueneisen_slb[i] = slb_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['ref_V'], perovskite.params)
+        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['ref_V'], perovskite.params)
+        q_slb[i] = slb_eos.volume_dependent_q(1./volume[i], perovskite.params)
         q_mgd[i] = perovskite.params['q0']
 
     #compare with figure 7
@@ -243,6 +243,6 @@ def check_slb_fig7():
 if __name__ == "__main__":
     check_birch_murnaghan()
     check_slb_fig7()
-    #check_slb_fig3()
+    check_slb_fig3()
     check_mgd_shim_duffy_kenichi()
     check_mgd_fei_mao_shu_hu()
