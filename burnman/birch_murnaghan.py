@@ -89,17 +89,14 @@ class birch_murnaghan_eos(eos.equation_of_state):
     def volume(self,pressure, temperature, params):
         return volume(pressure,params)
 
-    def density(self,pressure, temperature, params):
-        return density(pressure,params)
-
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
-        return bulk_modulus(pressure, params)
+        return bulk_modulus(volume, params)
 
     def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
-        return bulk_modulus(pressure,params)
+        return bulk_modulus(volume,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
-        return shear_modulus_third_order(pressure,params)
+        return shear_modulus_third_order(volume,params)
 
     # return 0 for all the thermal stuff
     def heat_capacity_v(self,pressure, temperature, volume, params):
