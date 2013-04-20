@@ -6,9 +6,10 @@ import scipy.optimize as opt
 import birch_murnaghan as bm
 import debye
 import numpy as np
+from equation_of_state import equation_of_state
 
 ## Based on Stixrude & Lithgow-Bertelloni (2005), all equation numbers refer to this paper. 
-class slb_base:
+class slb_base(equation_of_state):
     def __debye_temperature(self,x,params):
         """ x = ref_vol/vol"""
         f = 1./2. * (pow(x, 2./3.) - 1.)
