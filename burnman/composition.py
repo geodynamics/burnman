@@ -99,18 +99,20 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
 # test some composition (Javoy 2010, Table 6, PLoM)
 if __name__ == "__main__":
     inp1 = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.} # wt%
-    inp2 = calculate_phase_percents(inp1) 
+    phase_per,rel_mol_per = calculate_phase_percents(inp1) 
 
     StartP = 23.83 #in GPa
     EndP = 110.0
     deltaP = 1.
 
-    P,T,a,b,frac_mol_pv,frac_mol_mw    = part_coef_calc(inp2,StartP,EndP,deltaP)
+    #P,T,a,b,frac_mol_pv,frac_mol_mw    = part_coef_calc(inp2,StartP,EndP,deltaP)
 
-    gt = lambda p: geotherm.geotherm_brown_shankland(p)
+    gt = lambda p: geotherm.brown_shankland(p)
     pressure = StartP
     temperature = gt(StartP)
-    calculate_partition_coefficient(pressure, temperature, inp2, 0.5)
+    print phase_per
+    print rel_mol_per
+    calculate_partition_coefficient(pressure, temperature, rel_mol_per, 0.5)
     #part_coef_calc(inp2,StartP,EndP,deltaP)
     #print inp1
     #print inp2
