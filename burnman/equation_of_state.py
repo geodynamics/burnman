@@ -19,30 +19,30 @@ class equation_of_state:
     just assumed to be functions of pressure and temperature
     """
 
-    def volume(pressure, temperature, params):
+    def volume(self, pressure, temperature, params):
         raise NotImplementedError("")
 
-    def density(pressure, temperature, params):
+    def density(self, pressure, temperature, params):
         raise NotImplementedError("")
 
-    def grueneisen_parameter(pressure, temperature, volume, params):
+    def grueneisen_parameter(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def isothermal_bulk_modulus(pressure, temperature, volume, params):
+    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def adiabatic_bulk_modulus(pressure, temperature, volume, params):
+    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def shear_modulus(pressure, temperature, volume, params):
+    def shear_modulus(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def heat_capacity_v(pressure, temperature, volume, params):
+    def heat_capacity_v(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def heat_capacity_v(pressure, temperature, volume, params):
+    def heat_capacity_v(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
-    def thermal_expansivity(pressure, temperature, volume, params):
+    def thermal_expansivity(self, pressure, temperature, volume, params):
         raise NotImplementedError("")
 
