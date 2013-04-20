@@ -136,5 +136,5 @@ if __name__ == "__main__":
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.xlabel("Pressure (GPa)")
     
-    plt.savefig("example_composition.png")
+    plt.savefig("output_figures/example_composition.png")
     plt.show()

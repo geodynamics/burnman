@@ -219,7 +219,7 @@ if __name__ == "__main__":
     plt.title("temperature")
     plt.legend(loc='upper left')
     
-    #plt.savefig("murakami_fig4.png") 
+    #plt.savefig("output_figures/reproduce_murakami.png") 
     plt.show()
 
 
@@ -235,5 +235,5 @@ if __name__ == "__main__":
     plt.plot(seis_p_4/1.e9,mat_vs_4/1.e3,color='g',linestyle='--',marker='o',markerfacecolor='g',markersize=3)
     plt.plot(seis_p_1/1.e9,seis_vs/1.e3,color='k',linestyle='',marker='o',markerfacecolor='w',markersize=4)
     plt.title("Vs (km/s)")
-    plt.savefig("murakami_fig4.png")
+    plt.savefig("output_figures/reproduce_murakami_fig4.png")
     plt.show()

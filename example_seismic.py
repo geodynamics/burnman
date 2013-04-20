@@ -140,5 +140,5 @@ if __name__ == "__main__":
     plt.ylabel('g/cc')
     plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
     plt.legend(loc='lower right')
-
+    plt.savefig("output_figures/example_seismic.png")
     plt.show()

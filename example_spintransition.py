@@ -128,5 +128,5 @@ if __name__ == "__main__":
     
     
     
-    plt.savefig("examples_spintransition.png")
+    plt.savefig("output_figures/examples_spintransition.png")
     plt.show()

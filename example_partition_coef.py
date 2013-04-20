@@ -70,7 +70,7 @@ if __name__ == "__main__":
     for t in range(0,number_of_points):
     	#print t
     	part_coef_fp[t],part_coef_pv[t] = burnman.calculate_partition_coefficient(seis_p[t],temperature[t],relative_molar_percent,Kd_0)
-
+    
     rock.set_method(method)
     
     print "Calculations are done for:"
@@ -111,5 +111,5 @@ if __name__ == "__main__":
     plt.text(40,2400,"Kd_0 = %3.3f" % Kd_0)
 
 
-    plt.savefig("example_part_coef.png")
+    plt.savefig("output_figures/example_partition_coef.png")
     plt.show()

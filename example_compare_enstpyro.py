@@ -146,5 +146,5 @@ if __name__ == "__main__":
     plt.title("percent difference")
     plt.legend(loc='center right')
     plt.xlabel("Pressure (GPa)")
-    
+    plt.savefig("output_figures/example_compare_enstpyro.png") 
     plt.show()

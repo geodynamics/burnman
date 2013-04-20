@@ -165,7 +165,7 @@ if whattodo=="plot":
 
 		i=i+1
 
-	plt.savefig("inv.png")
+	plt.savefig("output_figures/example_inv_big_pv.png")
 	plt.show()
 	
 if whattodo=="test":
@@ -244,7 +244,7 @@ if whattodo=="show":
 	plt.title("density (kg/m^3)")
 	plt.legend(loc='upper left')
 	plt.ylim([4, 8])
-	plt.savefig("inv_show.png")
+	plt.savefig("output_figures/example_inv_big_pv_show.png")
 	plt.show()
 
 

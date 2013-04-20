@@ -125,7 +125,7 @@ if __name__ == "__main__":
     plt.title("temperature")
     plt.legend(loc='upper left')
     
-    plt.savefig("matas.png") 
+    plt.savefig("output_figures/reproduce_matas.png") 
     plt.show()
     plt.close()
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vs_1-seis_vs)/seis_vs,color='b',linestyle='--')
     plt.plot(d,100.*(mat_vs_2-seis_vs)/seis_vs,color='r',linestyle='--')
-    plt.savefig("matas_cmp_vs.png")
+    plt.savefig("output_figures/reproduce_matas_cmp_vs.png")
     plt.show()
     plt.close()
 
@@ -149,6 +149,6 @@ if __name__ == "__main__":
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vp_1-seis_vp)/seis_vp,color='b',linestyle='--')
     plt.plot(d,100.*(mat_vp_2-seis_vp)/seis_vp,color='r',linestyle='--')
-    plt.savefig("matas_cmp_vp.png")
+    plt.savefig("output_figures/reproduce_matas_cmp_vp.png")
     plt.show()
 

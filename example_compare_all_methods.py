@@ -122,5 +122,5 @@ if __name__ == "__main__":
 	plt.legend(loc='upper left')
 	
 	
-        plt.savefig("compare_all_methods.png")	
+        plt.savefig("output_figures/example_compare_all_methods.png")	
 	plt.show()
