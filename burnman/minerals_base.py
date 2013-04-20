@@ -9,6 +9,7 @@ import mie_grueneisen_debye as mgd
 import birch_murnaghan as bm
 import warnings
 import slb
+import equation_of_state as eos
 
 
 class material:
@@ -55,18 +56,23 @@ class material:
 
     def set_method(self, method):
         """ use "slb" or "mgd" or slb3 """
-        if (method == "slb"):
+        if( isinstance(method, basestring)):
+          if (method == "slb"):
             self.method = slb.slb2()
-        elif (method == "mgd"):
+          elif (method == "mgd"):
             self.method = mgd.mgd2()
-        elif (method == "mgd3"):
+          elif (method == "mgd3"):
             self.method = mgd.mgd3()
-        elif (method == "slb3"):
+          elif (method == "slb3"):
             self.method = slb.slb3()
-        elif (method == "bm"):
+          elif (method == "bm"):
             self.method = bm.birch_murnaghan_eos()
+          else:
+            raise Exception("unsupported material method " + method)
+        elif ( isinstance(method, eos.equation_of_state) ):
+          self.method = method
         else:
-            raise("unsupported material method " + method)
+          raise Exception("unsupported material method " + method.__class__.__name__ )
 
     def to_string(self):
         return "'" + self.__class__.__name__ + "'"
