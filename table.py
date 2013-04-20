@@ -17,15 +17,13 @@ if __name__ == "__main__":
     
     phases = [minerals.stishovite(), \
     minerals.periclase(), \
-    minerals.wustite(), \
+    minerals.wuestite(), \
     minerals.ferropericlase(0), \
     minerals.mg_fe_perovskite(0), \
     minerals.mg_perovskite(), \
     minerals.fe_perovskite(), \
     minerals.Speziale_fe_periclase_LS(), \
     minerals.Speziale_fe_periclase_HS(), \
-    minerals.Catalli_fe_perovskite_LS(), \
-    minerals.Catalli_fe_perovskite_HS(), \
     minerals.Murakami_fe_perovskite(), \
     minerals.Murakami_fe_periclase_LS(), \
     minerals.Murakami_fe_periclase_HS()   ]
