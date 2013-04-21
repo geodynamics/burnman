@@ -54,7 +54,6 @@ mu_prime = pymc.Uniform('mu_prime', lower=0., upper=3.)
 
 
 minerr = 1e100
-
 @pymc.deterministic
 def theta(p1=ref_rho,p2=ref_K,p3=K_prime,p4=ref_mu,p5=mu_prime):
     global minerr
@@ -72,98 +71,35 @@ def theta(p1=ref_rho,p2=ref_K,p3=K_prime,p4=ref_mu,p5=mu_prime):
 
 sig = 1e-4
 misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
-model = [ref_rho, ref_K, K_prime, ref_mu, mu_prime, misfit]
+model = dict(ref_rho=ref_rho, ref_K=ref_K, K_prime=K_prime, ref_mu=ref_mu, mu_prime=mu_prime, misfit=misfit)
 things = ['ref_rho', 'ref_K', 'K_prime', 'ref_mu', 'mu_prime']
 
-dbname = 'pickles/premite.pickle'
-whattodo = ""
+S = pymc.MAP(model)
+S.fit( method = 'fmin')
 
-if len(sys.argv)<3:
-    print "options:"
-    print "run <dbname>"
-    print "continue <dbname>"
-    print "plot <dbname1> <dbname2> ..."
-else:
-    whattodo = sys.argv[1]
-    dbname = sys.argv[2]
+rho, vphi, vs = calc_velocities(S.ref_rho.value, S.ref_K.value, S.K_prime.value, S.ref_mu.value, S.mu_prime.value)
+
+plt.subplot(2,2,1)
+plt.plot(seis_p/1.e9,vs/1000.,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+plt.plot(seis_p/1.e9,seis_vs/1000.,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+plt.ylim([4, 8])
+plt.title("Vs (km/s)")
+
+plt.subplot(2,2,2)
+plt.plot(seis_p/1.e9,vphi/1000.,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
+plt.plot(seis_p/1.e9,seis_vphi/1000.,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+plt.ylim([7, 12])
+plt.title("Vphi (km/s)")
    
-if whattodo=="run":
-#    S = pymc.MCMC(model, db='pickle', dbname=dbname)
-#    S.sample(iter=100, burn=0, thin=1)
-#    S.db.close()
-#    whattodo="continue"
-    print "OOGIE"
-    S = pymc.MAP(model)
-    S.fit( method = 'fmin', iterlim=1000, tol=0.001)
-    print "OOGIE"
-
-if whattodo=="continue":
-    n_runs = 100
-    for l in range(0,n_runs):
-        db = pymc.database.pickle.load(dbname)
-        print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('ref_K').stats()['n'] )
-        S = pymc.MCMC(model, db=db)
-        S.sample(iter=500, burn=0, thin=1)
-        S.db.close()
-    whattodo="plot"
-
-if whattodo=="plot":
-    files=sys.argv[2:]
-    print "files:",files
-
-    b=10
-    i=1
-
-    for t in things:
-        if t=='misfit':
-            continue
-	trace=[]
-        print "trace:",t
-        for filename in files:
-            db = pymc.database.pickle.load(filename)
-            newtrace=db.trace(t,chain=None).gettrace(burn=b,chain=None)
-            if (trace!=[]):
-                trace = np.append(trace, newtrace)
-            else:
-                trace=newtrace
-                print "   adding ", newtrace.size, "burn = ",b
-        print "  total size ", trace.size
-        print "mean = ", trace.mean()
-        for bin in [10,20,50,100]:
-            hist,bin_edges=np.histogram(trace,bins=bin)
-            a=np.argmax(hist)
-            print "maxlike = ", bin_edges[a], bin_edges[a+1], (bin_edges[a]+bin_edges[a+1])/2.0
-
-        pymc.Matplot.histogram(np.array(trace),t,rows=2,columns=(len(things)+1)/2,num=i)
-        i=i+1
-
-    plt.show()
-
-if whattodo=="show":
-	values = [float(i) for i in sys.argv[2:]]
-	rho, vphi, vs = calc_velocities(values[0], values[1]*1.e9, values[2], values[3]*1.e9, values[4])
-
-	plt.subplot(2,2,1)
-	plt.plot(seis_p/1.e9,vs,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vs,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
-	plt.ylim([4, 8])
-	plt.title("Vs (km/s)")
-
-	plt.subplot(2,2,2)
-	plt.plot(seis_p/1.e9,vphi,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vphi,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
-	plt.ylim([7, 12])
-	plt.title("Vphi (km/s)")
     
-    
-	# plot density
-	plt.subplot(2,2,3)
-	plt.plot(seis_p/1.e9,rho,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
-	plt.plot(seis_p/1.e9,seis_rho,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
-	plt.title("density (kg/m^3)")
-	plt.legend(loc='upper left')
-	plt.ylim([3, 7 ])
-	plt.show()
+# plot density
+plt.subplot(2,2,3)
+plt.plot(seis_p/1.e9,rho/1000.,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
+plt.plot(seis_p/1.e9,seis_rho/1000.,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
+plt.title("density (kg/m^3)")
+plt.legend(loc='upper left')
+plt.ylim([3, 7 ])
+plt.show()
 
 print "done"
 
