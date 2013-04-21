@@ -21,7 +21,7 @@ class Murakami_mg_perovskite(material):
             'K_prime': 4.1,
             'ref_mu': 173e9,
             'mu_prime': 1.56,
-            'molar_mass': .1020,
+            'molar_mass': .100,
             'n': 5,
             'ref_Debye': 1070.,
             'ref_grueneisen': 1.48,
