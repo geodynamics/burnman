@@ -193,7 +193,17 @@ class prem_test(radiustable):
         self.table_vp = table[:,3] 
         self.table_vs = table[:,4] 
 
+def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
 
+    beta = 0.3 # Matas et al. (2007) page 4
+    Qp  = 3./4.*pow((v_p/v_s),2.)*Qs    # Matas et al. (2007) page 4
+
+
+    cot=1./np.tan(beta*np.pi/2.)
+    v_p  = v_p*(1.-1./2.*cot*1./Qp)    # Matas et al. (2007) page 1
+    v_s  = v_s*(1.-1./2.*cot*1./Qs)
+    v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
+    return v_p, v_s, v_phi
     
 
 

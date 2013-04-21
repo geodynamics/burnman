@@ -10,7 +10,7 @@ import mie_grueneisen_debye
 import minerals 
 import seismic
 import tools
-import voigt_reuss_hill as vrh
+import averaging_schemes as ave 
 import scipy.integrate as integrate
 
 
@@ -25,14 +25,20 @@ def calculate_velocities (pressure, temperature, rock):
     #print "Calculating elastic properties for phase assemblage \n"
     #print "seismic p (GPa)    T (K)    density(kg/m^3)    K(Gpa) G(GPa)    Vs (km/s)    Vp(km/s)    Vphi (km/s)"
     for i in range(len(pressure)):
-        rho,v_p,v_s,v_phi,K,mu = \
-        vrh.voigt_reuss_hill(pressure[i], temperature[i], rock)
-        mat_rho[i] = rho 
-        mat_vp[i] = v_p
-        mat_vs[i] = v_s
-        mat_vphi[i] = v_phi
-        mat_K[i] = K
-        mat_mu[i] = mu
+        #determine the partial molar volumes of the phases
+        rock.set_state(pressure[i], temperature[i])
+        V_ph = [(ph.fraction*ph.mineral.molar_volume()) for ph in rock.phases]
+        V_tot= sum(V_ph)
+        #calculate the density of the phase assemblage
+        mat_rho[i] = (1./V_tot) * sum( ph.fraction* ph.mineral.molar_mass() for ph in rock.phases)
+        K_ph = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
+        mat_K[i] = ave.voigt_reuss_hill(V_ph,K_ph)
+        mu_ph = [ph.mineral.shear_modulus() for ph in rock.phases]
+        mat_mu[i] = ave.voigt_reuss_hill(V_ph,mu_ph)
+        #compute seismic velocities
+        mat_vs[i] = np.sqrt( mat_mu[i] / mat_rho[i])
+        mat_vp[i] = np.sqrt( (mat_K[i] + 4./3.*mat_mu[i]) / mat_rho[i])
+        mat_vphi[i] = np.sqrt( (mat_K[i]) / mat_rho[i])
 
     return mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu
 
@@ -45,7 +51,7 @@ def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     ret_v_phi = np.zeros(length)
     for i in range(length):
         ret_v_p[i],ret_v_s[i],ret_v_phi[i] = \
-            vrh.attenuation_correction(v_p[i], v_s[i], v_phi[i],Qs,Qphi)
+            seismic.attenuation_correction(v_p[i], v_s[i], v_phi[i],Qs,Qphi)
     
     return ret_v_p, ret_v_s, ret_v_phi
 
