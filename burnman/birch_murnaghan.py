@@ -98,12 +98,12 @@ class birch_murnaghan_eos(eos.equation_of_state):
     def shear_modulus(self,pressure, temperature, volume, params):
         return shear_modulus_third_order(volume,params)
 
-    # return 0 for all the thermal stuff
+    # return large for heat capacity, zero for grueneisen and expansivity
     def heat_capacity_v(self,pressure, temperature, volume, params):
-        return 0.
+        return 1.e99
 
     def heat_capacity_p(self,pressure, temperature, volume, params):
-        return 0.
+        return 1.e99
 
     def thermal_expansivity(self,pressure, temperature, volume, params):
         return 0.
