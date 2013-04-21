@@ -94,7 +94,14 @@ if __name__ == "__main__":
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)    
+    
+    moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
+    moduli = burnman.average_moduli(moduli_list, None)
+    mat_vs, mat_vp, mat_vphi = burnman.compute_velocities(moduli)
+    mat_K, mat_mu, mat_rho = moduli.K, moduli.mu, moduli.rho
+    
+    #mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature
+    #                                                                                , rock)    
     
     [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         
