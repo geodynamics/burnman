@@ -60,7 +60,7 @@ class Murakami_mg_periclase(material):
             'ref_mu': 131e9,
             'mu_prime': 1.92,
             'molar_mass': .0403,
-            'n': 5,
+            'n': 2,
             'ref_Debye': 773., # S& L-B 2005
             'ref_grueneisen': 1.5,
             'q0': 1.5, #S&L-B 2005    
