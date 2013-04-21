@@ -54,17 +54,17 @@ class wuestite (material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 12.06e-6,
-            'ref_K': 152.0e9,
+            'ref_V': 12.26e-6,
+            'ref_K': 179.0e9,
             'K_prime': 4.9,
             'ref_mu': 47.0e9,
             'mu_prime': 0.7,
             'molar_mass': .0718,
             'n': 2,
-            'ref_Debye': 455.,
-            'ref_grueneisen': 1.28,
-            'q0': 1.5,
-            'eta_0s': 0.8 }
+            'ref_Debye': 454.,
+            'ref_grueneisen': 1.53,
+            'q0': 1.7,
+            'eta_0s': -0.1 }
 
 
 
