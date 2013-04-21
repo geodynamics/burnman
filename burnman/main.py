@@ -72,6 +72,7 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         result.K[idx] = averaging_scheme.average(fractions, V_ph, K_ph)
         result.mu[idx] = averaging_scheme.average(fractions, V_ph, mu_ph)
         result.rho[idx] = sum(massfraction_ph) / result.V[idx]
+        result.fraction[idx] = 1.0
     return result
 
 def compute_velocities(moduli):
@@ -84,22 +85,22 @@ def compute_velocities(moduli):
         mat_vp[i] = np.sqrt( (moduli.K[i] + 4./3.*moduli.mu[i]) / moduli.rho[i])
         mat_vphi[i] = np.sqrt( moduli.K[i] / moduli.rho[i])
     
-    return mat_vs, mat_vp, mat_vphi
+    return mat_vp, mat_vs, mat_vphi
  
  
 def whole_darn_thing(rock, pressures, temperatures, averaging_scheme):
     
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
-    mat_vs, mat_vp, mat_vphi = compute_velocities(moduli)
-    return moduli.rho, mat_vs, mat_vp, mat_vphi
+    mat_vp, mat_vs, mat_vphi = compute_velocities(moduli)
+    return moduli.rho, mat_vp, mat_vs, mat_vphi, moduli.K, moduli.mu
 
 def whole_darn_thing_one_mat(mineral, pressures, temperatures):
 
     rock = composite( ( (mineral, 1.0) ) )
     moduli_list = calculate_moduli(rock, pressures, temperatures)
-    mat_vs, mat_vp, mat_vphi = compute_velocities(moduli_list[0])
-    return moduli_list[0].rho, mat_vs, mat_vp, mat_vphi
+    mat_vp, mat_vs, mat_vphi = compute_velocities(moduli_list[0])
+    return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].mu 
 
 
 

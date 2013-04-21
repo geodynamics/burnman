@@ -97,7 +97,7 @@ if __name__ == "__main__":
     
     moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
     moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt_reuss_hill())
-    mat_vs, mat_vp, mat_vphi = burnman.compute_velocities(moduli)
+    mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
     mat_K, mat_mu, mat_rho = moduli.K, moduli.mu, moduli.rho
     
     [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
