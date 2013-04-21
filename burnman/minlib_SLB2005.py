@@ -37,15 +37,15 @@ class periclase (material):
             'equation_of_state':'slb3',
             'ref_V': 11.24e-6,
             'ref_K': 161.0e9,
-            'K_prime': 3.9,
-            'ref_mu': 130.0e9,
-            'mu_prime': 2.2,
+            'K_prime': 3.8,
+            'ref_mu': 131.0e9,
+            'mu_prime': 2.1,
             'molar_mass': .0403,
             'n': 2,
             'ref_Debye': 773.,
             'ref_grueneisen': 1.5,
             'q0': 1.5,
-            'eta_0s': 2.3 }
+            'eta_0s': 2.8 }
 
 class wuestite (material):
     """
@@ -95,7 +95,7 @@ class mg_perovskite(material):
             'K_prime': 4.1,     
             'ref_mu': 175.0e9,  
             'mu_prime': 1.7,  
-            'molar_mass': .1020,
+            'molar_mass': .1000,
             'n': 5,
             'ref_Debye': 1070.,
             'ref_grueneisen': 1.48,
