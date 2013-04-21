@@ -10,7 +10,7 @@ import pymc
 
 seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
-depths = np.linspace(750,2890, number_of_points)
+depths = np.linspace(750.e3,2890.e3, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 print "preparations done"
@@ -18,7 +18,7 @@ print "preparations done"
 
 def calc_velocities(ref_rho, ref_K, K_prime, ref_mu, mu_prime): 
 
-    test = minerals.test_mineral()
+    test = burnman.minerals_base.material()
 
     test.params['ref_V'] = 10.e-6
     test.params['molar_mass'] = ref_rho*test.params['ref_V']
@@ -88,10 +88,14 @@ else:
     dbname = sys.argv[2]
    
 if whattodo=="run":
-    S = pymc.MCMC(model, db='pickle', dbname=dbname)
-    S.sample(iter=100, burn=0, thin=1)
-    S.db.close()
-    whattodo="continue"
+#    S = pymc.MCMC(model, db='pickle', dbname=dbname)
+#    S.sample(iter=100, burn=0, thin=1)
+#    S.db.close()
+#    whattodo="continue"
+    print "OOGIE"
+    S = pymc.MAP(model)
+    S.fit( method = 'fmin', iterlim=1000, tol=0.001)
+    print "OOGIE"
 
 if whattodo=="continue":
     n_runs = 100
