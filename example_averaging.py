@@ -34,30 +34,37 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))"""
     
     method = 'slb3'
-     
-   class olivine (material):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
-    """
-    def __init__(self):
-        self.params = {
-            'equation_of_state':'slb3',
-            'ref_V': 46.29e-6,
-            'ref_K': 135.0e9,
-            'K_prime': 4.2,
-            'ref_mu': 51.0e9,
-            'mu_prime': 1.4,
-            'molar_mass': .1406,
-            'n': 6,
-            'ref_Debye': 619.,
-            'ref_grueneisen': 1.06,
-            'q0': 3.6,
-            'eta_0s': 1.1 }     
+
+#     class olivine (burnman.material):
+#         """
+#         Stixrude & Lithgow-Bertelloni 2005 and references therein 
+#         """
+#         def __init__(self):
+#             self.params = {
+#             'equation_of_state':'slb3',
+#             'ref_V': 46.29e-6,
+#             'ref_K': 135.0e9,
+#             'K_prime': 4.2,
+#             'ref_mu': 51.0e9,
+#             'mu_prime': 1.4,
+#             'molar_mass': .1406,
+#             'n': 6,
+#             'ref_Debye': 619.,
+#             'ref_grueneisen': 1.06,
+#             'q0': 3.6,
+#             'eta_0s': 1.1 }     
     
-    amount_perovskite = 0.8
+    amount_perovskite = 0.6
+    #rock = burnman.composite( ( (minerals.mg_perovskite(), amount_perovskite), 
+    #                                (olivine(), 1.0-amount_perovskite) ) )
     rock = burnman.composite( ( (minerals.mg_perovskite(), amount_perovskite), 
                                     (minerals.periclase(), 1.0-amount_perovskite) ) )
-        
+    #rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+    #                                 (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
+   
+    #rock = burnman.composite ( ( (minerals.mg_perovskite(), amount_perovskite),
+    #                                 (minerals.Matas_periclase(), 1.0-amount_perovskite)) )
+           
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
@@ -87,13 +94,22 @@ if __name__ == "__main__":
     mat_vs2, mat_vp2, mat_vphi2 = burnman.compute_velocities(moduli)
     mat_K2, mat_mu2, mat_rho2 = moduli.K, moduli.mu, moduli.rho
 
-    moduli = moduli_list[0]
+    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt())
     mat_vs3, mat_vp3, mat_vphi3 = burnman.compute_velocities(moduli)
     mat_K3, mat_mu3, mat_rho3 = moduli.K, moduli.mu, moduli.rho
 
-    moduli = moduli_list[1]
+    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.reuss())
     mat_vs4, mat_vp4, mat_vphi4 = burnman.compute_velocities(moduli)
     mat_K4, mat_mu4, mat_rho4 = moduli.K, moduli.mu, moduli.rho
+
+
+    moduli = moduli_list[0]
+    mat_vsa, mat_vpa, mat_vphia = burnman.compute_velocities(moduli)
+    mat_Ka, mat_mua, mat_rhoa = moduli.K, moduli.mu, moduli.rho
+
+    moduli = moduli_list[1]
+    mat_vsb, mat_vpb, mat_vphib = burnman.compute_velocities(moduli)
+    mat_Kb, mat_mub, mat_rhob = moduli.K, moduli.mu, moduli.rho
     
     #[rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         
@@ -101,13 +117,15 @@ if __name__ == "__main__":
     # PLOTTING
     
     # plot vs
+    plt.plot(seis_p/1.e9,mat_vs3/1.e3,color='c',linestyle='-',marker='x',markersize=4,label='voigt')
+    plt.plot(seis_p/1.e9,mat_vs4/1.e3,color='k',linestyle='-',marker='x',markersize=4,label='reuss')
     plt.plot(seis_p/1.e9,mat_vs1/1.e3,color='b',linestyle='-',marker='x',markersize=4,label='VRH')
     plt.plot(seis_p/1.e9,mat_vs2/1.e3,color='r',linestyle='-',marker='x',markersize=4,label='linear')
-    plt.plot(seis_p/1.e9,mat_vs3/1.e3,color='y',linestyle='--',marker='x',markersize=4,label='pv')
-    plt.plot(seis_p/1.e9,mat_vs4/1.e3,color='g',linestyle='--',marker='x',markersize=4,label='fp')
-    plt.title("Vs (km/s), mix:80%pv, 20%fp")
+    plt.plot(seis_p/1.e9,mat_vsa/1.e3,color='y',linestyle='--',marker='x',markersize=4,label='mg perovskite')
+    plt.plot(seis_p/1.e9,mat_vsb/1.e3,color='g',linestyle='--',marker='x',markersize=4,label='periclase')
+    plt.title("Vs (km/s), mix: 60% mg perovskite")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    plt.ylim(6.0,7.6)
+    #plt.ylim(5.2,7.0)
     plt.legend(loc='lower right')
 
     #plt.savefig("output_figures/example_composition.png")
