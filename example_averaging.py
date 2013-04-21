@@ -33,8 +33,26 @@ if __name__ == "__main__":
     or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))"""
     
-    method = 'slb3' 
-        
+    method = 'slb3'
+     
+   class olivine (material):
+    """
+    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb3',
+            'ref_V': 46.29e-6,
+            'ref_K': 135.0e9,
+            'K_prime': 4.2,
+            'ref_mu': 51.0e9,
+            'mu_prime': 1.4,
+            'molar_mass': .1406,
+            'n': 6,
+            'ref_Debye': 619.,
+            'ref_grueneisen': 1.06,
+            'q0': 3.6,
+            'eta_0s': 1.1 }     
     
     amount_perovskite = 0.8
     rock = burnman.composite( ( (minerals.mg_perovskite(), amount_perovskite), 
