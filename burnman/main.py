@@ -10,7 +10,7 @@ import mie_grueneisen_debye
 import minerals 
 import seismic
 import tools
-import averaging_schemes as ave 
+import averaging_schemes
 import scipy.integrate as integrate
 from materials import composite
 
@@ -55,7 +55,7 @@ def calculate_moduli(rock, pressures, temperatures):
         
     return moduli
 
-def average_moduli(moduli_list, averaging_scheme):
+def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_hill):
     n_pressures = len(moduli_list[0].V)
     result = elastic_properties()
     result.set_size(n_pressures)
@@ -69,10 +69,8 @@ def average_moduli(moduli_list, averaging_scheme):
                
         result.V[idx] = sum(V_ph)
         
-        #result.K[idx] = averaging_scheme.average(fractions, V_ph, K_ph)
-        #result.mu[idx] = averaging_scheme.average(fractions, V_ph, mu_ph)
-        result.K[idx] = ave.voigt_reuss_hill(V_ph, K_ph)
-        result.mu[idx] = ave.voigt_reuss_hill(V_ph, mu_ph)
+        result.K[idx] = averaging_scheme.average(fractions, V_ph, K_ph)
+        result.mu[idx] = averaging_scheme.average(fractions, V_ph, mu_ph)
         result.rho[idx] = sum(massfraction_ph) / result.V[idx]
     return result
 
@@ -127,9 +125,9 @@ def calculate_velocities (pressure, temperature, rock):
         #calculate the density of the phase assemblage
         mat_rho[i] = (1./V_tot) * sum( ph.fraction* ph.mineral.molar_mass() for ph in rock.phases)
         K_ph = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
-        mat_K[i] = ave.voigt_reuss_hill(V_ph,K_ph)
+        mat_K[i] = averaging_schemes.voigt_reuss_hill_function(V_ph,K_ph)
         mu_ph = [ph.mineral.shear_modulus() for ph in rock.phases]
-        mat_mu[i] = ave.voigt_reuss_hill(V_ph,mu_ph)
+        mat_mu[i] = averaging_schemes.voigt_reuss_hill_function(V_ph,mu_ph)
         #compute seismic velocities
         mat_vs[i] = np.sqrt( mat_mu[i] / mat_rho[i])
         mat_vp[i] = np.sqrt( (mat_K[i] + 4./3.*mat_mu[i]) / mat_rho[i])

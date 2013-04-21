@@ -18,3 +18,4 @@ import minerals
 import seismic
 from materials import composite
 from minerals_base import material
+import averaging_schemes
