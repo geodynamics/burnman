@@ -88,7 +88,7 @@ def compute_velocities(moduli):
     return mat_vp, mat_vs, mat_vphi
  
  
-def whole_darn_thing(rock, pressures, temperatures, averaging_scheme):
+def equation_of_state(rock, pressures, temperatures, averaging_scheme):
     
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
