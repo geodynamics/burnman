@@ -4,7 +4,7 @@ burnman/minerals_base.py:108: UserWarning: Warning: mu and or mu_prime are undef
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 burnman/averaging_schemes.py:33: UserWarning: Oops, called reuss_average with Xi<0!
   warnings.warn("Oops, called reuss_average with Xi<0!")
-burnman/main.py:132: RuntimeWarning: invalid value encountered in sqrt
+burnman/main.py:133: RuntimeWarning: invalid value encountered in sqrt
   mat_vs[i] = np.sqrt( mat_mu[i] / mat_rho[i])
 burnman/minerals_base.py:108: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_LS'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))

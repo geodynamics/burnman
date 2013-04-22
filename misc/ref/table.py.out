@@ -4,11 +4,11 @@ burnman/minerals_base.py:108: UserWarning: Warning: mu and or mu_prime are undef
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 Name                           ref_V     ref_K K_prime        ref_mu mu_prime molar_mass n ref_Debye ref_grueneisen  q0 eta_0s
 stishovite                 1.402e-05  3.14e+11     4.4       2.2e+11      1.6     0.0601 3    1044.0            134 2.4    5.0
-periclase                  1.124e-05  1.61e+11     3.9       1.3e+11      2.2     0.0403 2     773.0            1.5 1.5    2.3
+periclase                  1.124e-05  1.61e+11     3.8      1.31e+11      2.1     0.0403 2     773.0            1.5 1.5    2.8
 wuestite                   1.206e-05  1.52e+11     4.9 47000000000.0      0.7     0.0718 2     455.0           1.28 1.5    0.8
-ferropericlase             1.124e-05  1.61e+11     3.9       1.3e+11      2.2     0.0403 2     773.0            1.5 1.5    2.3
-mg_fe_perovskite           2.445e-05  2.51e+11     4.1      1.75e+11      1.7      0.102 5    1070.0           1.48 1.4    2.6
-mg_perovskite              2.445e-05  2.51e+11     4.1      1.75e+11      1.7      0.102 5    1070.0           1.48 1.4    2.6
+ferropericlase             1.124e-05  1.61e+11     3.8      1.31e+11      2.1     0.0403 2     773.0            1.5 1.5    2.8
+mg_fe_perovskite           2.445e-05  2.51e+11     4.1      1.75e+11      1.7        0.1 5    1070.0           1.48 1.4    2.6
+mg_perovskite              2.445e-05  2.51e+11     4.1      1.75e+11      1.7        0.1 5    1070.0           1.48 1.4    2.6
 fe_perovskite              2.548e-05  2.81e+11     4.1      1.38e+11      1.7     0.1319 5     841.0           1.48 1.4    2.1
 Speziale_fe_periclase_LS   2.149e-05  1.86e+11     4.6                           0.04567 2     587.0           1.46 1.2       
 Speziale_fe_periclase_HS    2.29e-05 1.575e+11    3.92                           0.04567 2       587           1.46 1.2       

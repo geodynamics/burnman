@@ -66,6 +66,11 @@ echo "   done"
 
 testit "example_optimize_pv.py"
 echo "   done"
+
+testit "example_averaging.py"
+echo "   done"
+
+
 testit "table.py"
 echo "   done"
 
