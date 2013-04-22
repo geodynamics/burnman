@@ -21,7 +21,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-import burnman.materials as materials
 
 if __name__ == "__main__":    
     
