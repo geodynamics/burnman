@@ -1,4 +1,4 @@
-Pressure (GPa) Temperature (K) V_s (km/s)
+#Pressure (GPa) Temperature (K) V_s (km/s)
 42.0 	2700  	7.01
 42.9 	2700 	7.03
 46.2 	2700 	7.05
