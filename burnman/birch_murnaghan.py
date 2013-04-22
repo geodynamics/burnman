@@ -70,15 +70,6 @@ def shear_modulus_third_order(volume, params):
     G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
     return G 
 
-def shear_modulus(volume, params):
-    """
-    More mineral physics studies seem to fit their shear modulus data to
-    the second order finite strain expansion (can we confirm this more?)
-    so the default shear_modulus function wraps the second order function.
-    """
-    return shear_modulus_third_order(volume, params)
-
-
 class birch_murnaghan_base(eos.equation_of_state):
     """
     A wrapper class for the birch murnaghan functions above so that
