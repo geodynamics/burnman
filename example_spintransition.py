@@ -69,18 +69,18 @@ if __name__ == "__main__":
     rock.set_method('slb3')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
-        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
     rock.set_method('slb3')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
-            burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
     rock.set_method('slb3')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
-            burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     plt.subplot(2,2,2)
     plt.plot(seis_p/1.e9,mat_vs_LS/1.e3,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
