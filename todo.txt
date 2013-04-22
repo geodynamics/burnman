@@ -1,11 +1,10 @@
 
 TODOLIST:
 
-- allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
+- warn if used eos and mineral eos are different
 - input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 - clean up composition.py
 - benchmark against Matas et al. 2007 Sanne
-- what needs to be done for spin transitions?-fix example (Sanne)
 - implement option to evaluate K and G (instead of V_s, V_p, V_phi)?
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
@@ -23,6 +22,7 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+x allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
 x allow for the partition coeffecient as an input (maybe an example for this?)
 x include ak135
 x Convert from cc to SI in seismic files Sanne

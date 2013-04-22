@@ -34,7 +34,7 @@ def calc_velocities(a,b,c):
 
     rock.set_method(method)
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
     return mat_vp, mat_vs, mat_rho
 
 def error(a,b,c): 

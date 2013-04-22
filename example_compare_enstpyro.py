@@ -85,7 +85,7 @@ if __name__ == "__main__":
     
     
     mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = \
-        burnman.equation_of_state(pyrolite, seis_p_1, temperature_1, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, burnman.averaging_schemes.voigt_reuss_hill())
     
     print "Calculations are done for:"
     for ph in pyrolite.phases:
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         print ph.fraction, " of phase", ph.mineral.to_string()
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = \
-        burnman.equation_of_state(enstatite, seis_p_2, temperature_2, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, burnman.averaging_schemes.voigt_reuss_hill())
     
     ##let's create PREM for reference
     s=burnman.seismic.prem()

@@ -60,7 +60,7 @@ if __name__ == "__main__":
             print ph.fraction, " of phase", ph.mineral.to_string()
     
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
-            burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
         #[rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         [rho_err,vphi_err,vs_err]=burnman.compare_two(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)

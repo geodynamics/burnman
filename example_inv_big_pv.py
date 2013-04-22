@@ -47,7 +47,7 @@ def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_
 
     rock.set_method(method)
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
     return mat_vp, mat_vs, mat_rho
 
 def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime): 

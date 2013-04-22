@@ -7,6 +7,8 @@ import birch_murnaghan as bm
 import debye
 import numpy as np
 from equation_of_state import equation_of_state
+ 
+import matplotlib.pyplot as plt
 
 ## Based on Stixrude & Lithgow-Bertelloni (2005), all equation numbers refer to this paper. 
 class slb_base(equation_of_state):
@@ -49,7 +51,17 @@ class slb_base(equation_of_state):
         func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21 
     
-        V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V']) 
+        V = 0.
+        try:
+          V = opt.brentq(func, 0.5*params['ref_V'], 1.2*params['ref_V']) 
+        except ValueError:
+          vols = np.linspace(0.3*params['ref_V'], 1.5*params['ref_V'], 100)
+          press = []
+          for v in vols:
+            press.append(func(v))
+            print func(v)
+          plt.plot(vols, press)
+          plt.show()
         return V
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):

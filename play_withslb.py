@@ -59,18 +59,18 @@ if __name__ == "__main__":
     rock.set_method(method) 
     rock2.set_method(method)
     seis_p_1 = np.arange(28e9, 128e9, 4.8e9)
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_bs = [geotherm(p) for p in seis_p_1]
+    #geotherm = burnman.geotherm.brown_shankland
+    #temperature_bs = [geotherm(p) for p in seis_p_1]
  
  
     #Now we'll calculate the models. 
-    #T0 = 1800.
-    #temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock)
-    #temperature_1
+    T0 = 7333.
+    temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock)
+    temperature_1
  
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock)  
-    #temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock2)  
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock2) 
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, rock)  
+    temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock2)  
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_1, temperature_2, rock2) 
     
     # seismic velocities for comparison
     class ak135_table(burnman.seismic.radiustable):
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,temperature_bs,color='k',linestyle='-',label='brown_shankland')
+    plt.plot(seis_p_1/1.e9,temperature_1,color='k',linestyle='-',label='brown_shankland')
     plt.ylim(1600,3100)
     plt.xlim(29,131)
     plt.title("temperature")

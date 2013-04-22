@@ -43,25 +43,25 @@ if __name__ == "__main__":
         print ph.fraction, " of phase", ph.mineral.to_string()
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = \
-        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('slb2')
     temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)    
     
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = \
-        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('slb3')
     temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)    
 
     mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = \
-        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('bm')
     temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)    
 
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = \
-        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
     

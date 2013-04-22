@@ -35,7 +35,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'mgd2' 
+    method = 'mgd3' 
     
     
     # Input for model M_pyrolite as defined in Matas et al. 2007 table 3. Molar proportions are converted to atomic fractions    
@@ -46,15 +46,15 @@ if __name__ == "__main__":
                             (minerals.Matas_fe_perovskite(), .078 ),
                             (minerals.Matas_periclase(), .268 ),
                             (minerals.Matas_wuestite(), .034 )))
-    #rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.62 ),
-    #                        (minerals.Matas_fe_perovskite(), .078/1.45 ),
-    #                        (minerals.Matas_periclase(), .268 ),
-    #                        (minerals.Matas_wuestite(), .034/1.45 ))) 
+    rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.62 ),
+                            (minerals.Matas_fe_perovskite(), .078/1.5 ),
+                            (minerals.Matas_periclase(), .268 ),
+                            (minerals.Matas_wuestite(), .034/1.5 ))) 
     #KD is 2... doesn't match either
-    rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.3574 ),
-                            (minerals.Matas_fe_perovskite(), .0536 ),
-                            (minerals.Matas_periclase(), .1656 ),
-                            (minerals.Matas_wuestite(), .0124 )))
+    #rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.3574 ),
+    #                        (minerals.Matas_fe_perovskite(), .0536 ),
+    #                        (minerals.Matas_periclase(), .1656 ),
+    #                        (minerals.Matas_wuestite(), .0124 )))
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     rock.set_method(method) 
     rock2.set_method(method)
@@ -65,8 +65,8 @@ if __name__ == "__main__":
  
     #Now we'll calculate the models. 
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock)    
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_1, temperature_bs, rock2) 
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)    
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs) 
     
     # seismic velocities for comparison
     class ak135_table(burnman.seismic.radiustable):

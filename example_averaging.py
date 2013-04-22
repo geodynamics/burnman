@@ -125,7 +125,8 @@ if __name__ == "__main__":
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     #plt.ylim(5.2,7.0)
     plt.legend(loc='lower right')
-
+    plt.xlabel('pressure (GPa)')
+    plt.ylabel('Vs (km/s)')
     #plt.savefig("output_figures/example_averaging.png")
     plt.show()
 
@@ -144,6 +145,8 @@ if __name__ == "__main__":
     plt.title("Vs (km/s), mix: 60% mg perovskite")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     #plt.ylim(5.2,7.0)
+    plt.xlabel('pressure (GPa)')
+    plt.ylabel('normalized Vs')
     plt.legend(loc='lower right')
 
     #plt.savefig("output_figures/example_averaging_normalized.png")
