@@ -11,7 +11,6 @@ def calc_shear_velocities(ref_mu, mu_prime, mineral, pressures):
 
     mineral.params['ref_mu'] = ref_mu
     mineral.params['mu_prime'] = mu_prime
-    mineral.set_method('bm3')
 
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
@@ -33,6 +32,8 @@ mg_perovskite_data = np.loadtxt("input_minphys/Murakami_perovskite.txt")
 obs_pressures = mg_perovskite_data[:,0]*1.e9
 obs_vs = mg_perovskite_data[:,2]*1000.
 
+pressures = np.linspace(25.e9, 135.e9, 100)
+
 #make the mineral to fit
 guess = [200.e9, 2.0]
 mg_perovskite_test = burnman.material()
@@ -41,17 +42,32 @@ mg_perovskite_test.params['ref_K'] = 251.9e9
 mg_perovskite_test.params['K_prime'] = 4.01
 mg_perovskite_test.params['molar_mass'] = .1053
 
+#first, do the second-order fit
+mg_perovskite_test.set_method("bm2")
 func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
 sol = opt.fmin(func, guess)
+print "2nd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+model_vs_2nd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
+mg_perovskite_test.set_method("bm3")
+model_vs_2nd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
-print sol 
+#now do third-order fit
+mg_perovskite_test.set_method("bm3")
+func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
+sol = opt.fmin(func, guess)
+print "3rd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+model_vs_3rd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
+mg_perovskite_test.set_method("bm2")
+model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
-pressures = np.linspace(25.e9, 135.e9, 100)
-model_vs = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
-plt.plot(pressures/1.e9,model_vs/1000.,color='r')
+plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color='r', linestyle='-')
+plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color='r', linestyle='-.')
+plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color='b', linestyle='-')
+plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color='b', linestyle='-.')
 plt.scatter(obs_pressures/1.e9, obs_vs/1000.)
 plt.ylim([6.55, 8])
 plt.xlim([25., 135.])
-plt.title("Vs (km/s)")
+plt.ylabel("Shear velocity (km/s)")
+plt.xlabel("Pressure (GPa)")
 plt.show()
