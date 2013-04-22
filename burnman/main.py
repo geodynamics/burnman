@@ -95,46 +95,17 @@ def equation_of_state(rock, pressures, temperatures, averaging_scheme):
     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli)
     return moduli.rho, mat_vp, mat_vs, mat_vphi, moduli.K, moduli.mu
 
-def whole_darn_thing_one_mat(mineral, pressures, temperatures):
-
-    rock = composite( ( (mineral, 1.0) ) )
-    moduli_list = calculate_moduli(rock, pressures, temperatures)
-    mat_vp, mat_vs, mat_vphi = compute_velocities(moduli_list[0])
-    return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].mu 
-
-
+# def whole_darn_thing_one_mat(mineral, pressures, temperatures):
+# 
+#     rock = composite( ( (mineral, 1.0) ) )
+#     moduli_list = calculate_moduli(rock, pressures, temperatures)
+#     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli_list[0])
+#     return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].mu 
 
 
 
 
 
-def calculate_velocities (pressure, temperature, rock):
-
-    mat_vs = np.empty_like(pressure)
-    mat_vp = np.empty_like(pressure)
-    mat_vphi = np.empty_like(pressure)
-    mat_rho = np.empty_like(pressure)
-    mat_K = np.empty_like(pressure)
-    mat_mu = np.empty_like(pressure)
-    #print "Calculating elastic properties for phase assemblage \n"
-    #print "seismic p (GPa)    T (K)    density(kg/m^3)    K(Gpa) G(GPa)    Vs (km/s)    Vp(km/s)    Vphi (km/s)"
-    for i in range(len(pressure)):
-        #determine the partial molar volumes of the phases
-        rock.set_state(pressure[i], temperature[i])
-        V_ph = [(ph.fraction*ph.mineral.molar_volume()) for ph in rock.phases]
-        V_tot= sum(V_ph)
-        #calculate the density of the phase assemblage
-        mat_rho[i] = (1./V_tot) * sum( ph.fraction* ph.mineral.molar_mass() for ph in rock.phases)
-        K_ph = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
-        mat_K[i] = averaging_schemes.voigt_reuss_hill_function(V_ph,K_ph)
-        mu_ph = [ph.mineral.shear_modulus() for ph in rock.phases]
-        mat_mu[i] = averaging_schemes.voigt_reuss_hill_function(V_ph,mu_ph)
-        #compute seismic velocities
-        mat_vs[i] = np.sqrt( mat_mu[i] / mat_rho[i])
-        mat_vp[i] = np.sqrt( (mat_K[i] + 4./3.*mat_mu[i]) / mat_rho[i])
-        mat_vphi[i] = np.sqrt( (mat_K[i]) / mat_rho[i])
-
-    return mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu
 
 # apply attenuation correction to a list of v_p, v_s, v_phi
 # takes a list of pressures and the seismic model
