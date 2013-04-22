@@ -24,7 +24,7 @@ class stishovite (material):
             'molar_mass': .0601,
             'n': 3,
             'ref_Debye': 1044.,
-            'ref_grueneisen': 134,
+            'ref_grueneisen': 1.34,
             'q0': 2.4,
             'eta_0s': 5.0 }
 
