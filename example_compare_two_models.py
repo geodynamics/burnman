@@ -82,13 +82,17 @@ if __name__ == "__main__":
     for ph in rock_1.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.calculate_velocities(seis_p_1, temperature_1, rock_1)    
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = \
+        burnman.equation_of_state(rock_1, seis_p_1, temperature_1, burnman.averaging_schemes.voigt_reuss_hill())
+    
+    burnman.calculate_velocities(seis_p_1, temperature_1, rock_1)    
     
     print "Calculations are done for:"
     for ph in rock_2.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.calculate_velocities(seis_p_2, temperature_2, rock_2)    
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = \
+    burnman.equation_of_state(rock_2, seis_p_2, temperature_2, burnman.averaging_schemes.voigt_reuss_hill())    
     
     
     ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
