@@ -28,7 +28,7 @@ def calc_velocities(ref_rho, ref_K, K_prime, ref_mu, mu_prime):
     test.params['mu_prime'] = mu_prime
 
     rock = burnman.composite( ( ( test, 1.0 ), ) )
-    rock.set_method('bm')
+    rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
