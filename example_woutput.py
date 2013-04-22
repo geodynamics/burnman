@@ -57,7 +57,8 @@ if __name__ == "__main__":
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(pressures, temperature, rock)    
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
+        burnman.equation_of_state(rock, pressures, temperature, burnman.averaging_schemes.voigt_reuss_hill())
         
     #write to file:
     output_filename = "example_woutput.txt" 
