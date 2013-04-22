@@ -61,11 +61,11 @@ if __name__ == "__main__":
         
     #write to file:
     output_filename = "example_woutput.txt" 
-    file = open(output_filename, 'wb')
-    file.write("#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_mu\n")
+    f = open(output_filename, 'wb')
+    f.write("#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_mu\n")
     
     data = zip(pressures,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_mu)
-    np.savetxt(file,data,fmt='%.10e',delimiter='\t')
+    np.savetxt(f, data, fmt='%.10e', delimiter='\t')
     
         
     print "\nYour data has been saved as: ",output_filename
