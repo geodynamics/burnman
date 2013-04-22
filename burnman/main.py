@@ -88,7 +88,7 @@ def compute_velocities(moduli):
     return mat_vp, mat_vs, mat_vphi
  
  
-def velocities_from_rock(rock, pressures, temperatures, averaging_scheme):
+def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
