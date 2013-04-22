@@ -10,9 +10,7 @@ requires:
 - compute seismic velocities
 
 teaches:
-- creating minerals
 - averaging
-- seismic comparison
 
 """
 
