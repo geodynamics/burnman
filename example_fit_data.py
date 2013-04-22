@@ -11,7 +11,7 @@ def calc_shear_velocities(ref_mu, mu_prime, mineral, pressures):
 
     mineral.params['ref_mu'] = ref_mu
     mineral.params['mu_prime'] = mu_prime
-    mineral.set_method('bm')
+    mineral.set_method('bm3')
 
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
@@ -46,11 +46,12 @@ sol = opt.fmin(func, guess)
 
 print sol 
 
-pressures = np.linspace(30.e9, 130.e9, 100)
+pressures = np.linspace(25.e9, 135.e9, 100)
 model_vs = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
 plt.plot(pressures/1.e9,model_vs/1000.,color='r')
 plt.scatter(obs_pressures/1.e9, obs_vs/1000.)
-plt.ylim([4, 8])
+plt.ylim([6.55, 8])
+plt.xlim([25., 135.])
 plt.title("Vs (km/s)")
 plt.show()

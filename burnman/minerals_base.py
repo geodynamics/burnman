@@ -64,8 +64,10 @@ class material:
                 self.method = mgd.mgd3()
             elif (method == "slb3"):
                 self.method = slb.slb3()
-            elif (method == "bm"):
-                self.method = bm.birch_murnaghan_eos()
+            elif (method == "bm2"):
+                self.method = bm.bm2()
+            elif (method == "bm3"):
+                self.method = bm.bm3()
             else:
                 raise Exception("unsupported material method " + method)
         elif ( isinstance(method, eos.equation_of_state) ):

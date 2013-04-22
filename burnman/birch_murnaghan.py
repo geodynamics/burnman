@@ -76,10 +76,10 @@ def shear_modulus(volume, params):
     the second order finite strain expansion (can we confirm this more?)
     so the default shear_modulus function wraps the second order function.
     """
-    return shear_modulus_second_order(volume, params)
+    return shear_modulus_third_order(volume, params)
 
 
-class birch_murnaghan_eos(eos.equation_of_state):
+class birch_murnaghan_base(eos.equation_of_state):
     """
     A wrapper class for the birch murnaghan functions above so that
     it satisfies the interface requirements as specified in
@@ -96,7 +96,10 @@ class birch_murnaghan_eos(eos.equation_of_state):
         return bulk_modulus(volume,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
-        return shear_modulus_third_order(volume,params)
+        if(self.order == 2):
+          return shear_modulus_second_order(volume,params)
+        elif(self.order == 3):
+          return shear_modulus_third_order(volume,params)
 
     # return large for heat capacity, zero for grueneisen and expansivity
     def heat_capacity_v(self,pressure, temperature, volume, params):
@@ -111,3 +114,11 @@ class birch_murnaghan_eos(eos.equation_of_state):
     def grueneisen_parameter(self,pressure,temperature,volume,params):
         return 0.
 
+class bm3(birch_murnaghan_base):
+    def __init__(self):
+        self.order=3
+
+class bm2(birch_murnaghan_base):
+    def __init__(self):
+        self.order=2
+    
