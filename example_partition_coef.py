@@ -69,8 +69,7 @@ if __name__ == "__main__":
     part_coef_fp=[0 for x in seis_p]
     
     for t in range(0,number_of_points):
-    	#print t
-    	part_coef_fp[t],part_coef_pv[t] = burnman.calculate_partition_coefficient(seis_p[t],temperature[t],relative_molar_percent,Kd_0)
+        part_coef_fp[t],part_coef_pv[t] = burnman.calculate_partition_coefficient(seis_p[t],temperature[t],relative_molar_percent,Kd_0)
     
     rock.set_method(method)
     
