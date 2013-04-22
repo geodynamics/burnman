@@ -5,7 +5,7 @@
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
 
-import composition as part
+import partitioning as part
 import mie_grueneisen_debye
 import minerals 
 import seismic

@@ -1,6 +1,6 @@
-burnman/minerals_base.py:108: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_LS'
+burnman/minerals_base.py:107: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_LS'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:108: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_HS'
+burnman/minerals_base.py:107: UserWarning: Warning: mu and or mu_prime are undefined for 'Speziale_fe_periclase_HS'
   warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
 Name                           ref_V     ref_K K_prime        ref_mu mu_prime molar_mass n ref_Debye ref_grueneisen  q0 eta_0s
 stishovite                 1.402e-05  3.14e+11     4.4       2.2e+11      1.6     0.0601 3    1044.0            134 2.4    5.0

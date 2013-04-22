@@ -2,7 +2,6 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-from composition import *
 import numpy as np
 import voigt_reuss_hill as vrh
 import mie_grueneisen_debye as mgd

@@ -23,7 +23,7 @@ cd tests
 python tests.py || exit 1
 cd ..
 
-python burnman/composition.py || exit 1
+python burnman/partitioning.py || exit 1
 
 cd misc
 python gen_doc.py >/dev/null || exit 1
