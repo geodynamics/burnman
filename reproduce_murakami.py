@@ -35,7 +35,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'bm2'
+    method = 'slb2'
     
     
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
@@ -111,21 +111,21 @@ if __name__ == "__main__":
     temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_1)
     
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock_1,seis_p_1, temperature_bs, burnman.averaging_schemes.voigt_reuss_hill())    
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock_1,seis_p_1, temperature_bs)    
      
 
     temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_2)
     
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock_2,seis_p_2, temperature_bs, burnman.averaging_schemes.voigt_reuss_hill())    
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock_2,seis_p_2, temperature_bs)    
 
     temperature_3 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_3)
    
-    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = burnman.velocities_from_rock(rock_3,seis_p_3, temperature_bs, burnman.averaging_schemes.voigt_reuss_hill())
+    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = burnman.velocities_from_rock(rock_3,seis_p_3, temperature_bs)
 
 
     temperature_4 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_4)
   
-    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.equation_of_state(rock_4,seis_p_4, temperature_bs, burnman.averaging_schemes.voigt_reuss_hill())
+    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.velocities_from_rock(rock_4,seis_p_4, temperature_bs)
     
     ### linear averaging of the velocities
     mat_vs_2_linear=np.sqrt((0.95*mat_mu_1+0.05*mat_mu_3)/mat_rho_2)
