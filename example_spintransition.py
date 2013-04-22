@@ -26,15 +26,6 @@ from burnman import minerals
 
 if __name__ == "__main__":    
     
-    #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)
-    or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))"""
-    
-    method = 'slb3' 
-    
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 40 #set on how many depth slices the computations should be done
@@ -49,20 +40,19 @@ if __name__ == "__main__":
     
     
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-    # Example 1 ferropericlase with spin transition from Murakami et al. 2012
-    if True:
-        amount_perovskite = 0.
-        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
+    amount_perovskite = 0.
+    rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
                                      (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite) ) )
     
-        rock.set_method(method)
+    rock.set_method('slb3')
     
     print "Calculations are done for:"
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)    
-        
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
+       burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+       
     # plot example 1
     plt.subplot(2,2,1)
     plt.plot(seis_p/1.e9,mat_vs/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vs')
@@ -78,15 +68,19 @@ if __name__ == "__main__":
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
     rock.set_method('slb3')
     
-    mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
+    mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
+        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
     rock.set_method('slb3')
-    mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
+    mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
+            burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
     rock.set_method('slb3')
-    mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = burnman.calculate_velocities(seis_p, temperature, rock)
+    mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
+            burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     plt.subplot(2,2,2)
     plt.plot(seis_p/1.e9,mat_vs_LS/1.e3,color='b',linestyle='-',marker='.',markerfacecolor='b',markersize=4,label='Vs LS')
@@ -100,18 +94,17 @@ if __name__ == "__main__":
     
     
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-    # Example 3 fe_periclase with spin transition from Speziale et al. 2007
-    if True:
-        rock = burnman.composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
+    rock = burnman.composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
     
     
-    rock.set_method(method)
+    rock.set_method('slb3')
     
     print "Calculations are done for:"
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.calculate_velocities(seis_p, temperature, rock)
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
+        burnman.equation_of_state(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     # plot example 3
     plt.subplot(2,2,3)
