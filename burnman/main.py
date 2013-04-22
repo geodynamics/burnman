@@ -12,7 +12,7 @@ import seismic
 import tools
 import averaging_schemes
 import scipy.integrate as integrate
-from materials import composite
+from composite import composite
 
 #phase = namedtuple('phase', ['mineral', 'fraction'])
 

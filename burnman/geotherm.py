@@ -9,7 +9,6 @@ from tools import *
 import seismic
 import scipy.integrate as integrate
 from minerals import *
-from materials import *
 
 
 # polynomial fit from Watson, Baxter, EPSL, 2007
