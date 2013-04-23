@@ -3,6 +3,7 @@ TODOLIST:
 
 Post Texas Meeting Todos:
 
+- Talk to CIG - do they want us? -- Timo
 - Geotherm vs. Brown+Shankland for paper --Ian
 - Make brentq more robust --Ian
 - Why python? -- Timo
