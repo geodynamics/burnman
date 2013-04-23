@@ -1,4 +1,4 @@
-    BurnMan- a lower mantle toolkit
+    urnMan- a lower mantle toolkit
     Copyright (C) 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 
     This program is free software; you can redistribute it and/or modify
@@ -15,9 +15,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Contact: Cayman Unterborn
-unterborn.1@osu.edu
-kmanunterborn@gmail.com
+Contact: Ian Rose 
+ian.rose@berkeley.edu
 
 *** About
 
