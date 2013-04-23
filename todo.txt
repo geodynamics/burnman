@@ -1,6 +1,21 @@
 
 TODOLIST:
 
+Post Texas Meeting Todos:
+
+- Geotherm vs. Brown+Shankland for paper --Ian
+- Make brentq more robust --Ian
+- Why python? -- Timo
+- Make comments up-to-date -- Cayman/everybody 
+- Optimize pv example --Sanne
+- Geotherm stuff in burnman paper --Ian
+- EOS stuff in burnman paper --Ian/Cayman
+- Explain 2nd/3rd order stuff in burnman paper --Ian
+- Make figures pretty - Timo
+- Bibliography -- Sanne/Cayman
+- Write section about possibilities for extension/future plans -- Everyone
+
+
 - warn if used eos and mineral eos are different
 - input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 - clean up composition.py
