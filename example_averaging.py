@@ -22,50 +22,34 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
-if __name__ == "__main__":    
-    
-    #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order sheer modulus, stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)
-    or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))"""
+if __name__ == "__main__":
+    #Input composition.
+    """ choose 'slb2' (finite-strain 2nd order sheer modulus, 
+	stixrude and lithgow-bertelloni, 2005)
+    or 'slb3 (finite-strain 3rd order shear modulus, 
+   	stixrude and lithgow-bertelloni, 2005)
+    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, 
+    matas et al. 2007)
+    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, 
+    matas et al. 2007)
+    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature 
+    (your choice in geotherm will not matter in this case))
+    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature 
+    (your choice in geotherm will not matter in this case))"""
     
     method = 'slb3'
-
-#     class olivine (burnman.material):
-#         """
-#         Stixrude & Lithgow-Bertelloni 2005 and references therein 
-#         """
-#         def __init__(self):
-#             self.params = {
-#             'equation_of_state':'slb3',
-#             'ref_V': 46.29e-6,
-#             'ref_K': 135.0e9,
-#             'K_prime': 4.2,
-#             'ref_mu': 51.0e9,
-#             'mu_prime': 1.4,
-#             'molar_mass': .1406,
-#             'n': 6,
-#             'ref_Debye': 619.,
-#             'ref_grueneisen': 1.06,
-#             'q0': 3.6,
-#             'eta_0s': 1.1 }     
     
     amount_perovskite = 0.6
-    #rock = burnman.composite( ( (minerals.mg_perovskite(), amount_perovskite), 
-    #                                (olivine(), 1.0-amount_perovskite) ) )
+
     rock = burnman.composite( ( (minerals.mg_perovskite(), amount_perovskite), 
                                     (minerals.periclase(), 1.0-amount_perovskite) ) )
-    #rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-    #                                 (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
-   
-    #rock = burnman.composite ( ( (minerals.mg_perovskite(), amount_perovskite),
-    #                                 (minerals.Matas_periclase(), 1.0-amount_perovskite)) )
+
            
     #seismic model for comparison:
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    number_of_points = 20 #set on how many depth slices the computations should be done
+    # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    seismic_model = burnman.seismic.prem() 
+    #set on how many depth slices the computations should be done
+    number_of_points = 20
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
