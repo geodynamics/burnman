@@ -15,6 +15,7 @@ Post Texas Meeting Todos:
 - Make figures pretty - Timo
 - Bibliography -- Sanne/Cayman
 - Write section about possibilities for extension/future plans -- Everyone
+- Change "self_consistent" to adiabat everywhere
 
 
 - warn if used eos and mineral eos are different

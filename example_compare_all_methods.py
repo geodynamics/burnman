@@ -3,15 +3,17 @@
 # Released under GPL v2 or later.
 
 """
-Calculates and plots two models for different minerals or methods and plots
-the results. Calculates basic percent difference statistics as well.
+This example demonstrates how to call each of the individual calculation methodologies
+that exist within BurnMan. See below for current options. This example calculates 
+seismic velocity profiles for the same set of minerals and a plot of Vs, Vphi and density
+is produce for the user to compare each of the different methods.
 
 requires:
-- geotherms
-- creating minerals
+- geotherms (for adiabat: potential temperature)
+- mineral creation
 
 teaches:
-- compute seismic velocities and compare
+- Each method for calculating velocity profiles currently included within BurnMan
 """
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
@@ -27,13 +29,27 @@ if __name__ == "__main__":
 
     amount_perovskite = 0.95
     rock = burnman.composite( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                            (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite) ) )
+                            (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)))
 
+    #(min pressure, max pressure, pressure step)
     seis_p = np.arange(25e9, 125e9, 5e9)
 
-    T0 = 1500.0
+    #Input adiabat potential temperature
+    T0 = 1500.0 
     
     #Now we'll calculate the models. 
+	""" choose 'slb2' (finite-strain 2nd order sheer modulus, 
+	stixrude and lithgow-bertelloni, 2005)
+    or 'slb3 (finite-strain 3rd order shear modulus, 
+   	stixrude and lithgow-bertelloni, 2005)
+    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, 
+    matas et al. 2007)
+    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, 
+    matas et al. 2007)
+    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature 
+    (your choice in geotherm will not matter in this case))
+    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature 
+    (your choice in geotherm will not matter in this case))"""
     
     rock.set_method('mgd3')
     temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)    
