@@ -38,18 +38,18 @@ if __name__ == "__main__":
     T0 = 1500.0 
     
     #Now we'll calculate the models. 
-    """ choose 'slb2' (finite-strain 2nd order sheer modulus, 
-	stixrude and lithgow-bertelloni, 2005)
+    """ choose 'slb2' (finite-strain 2nd order shear modulus, 
+        stixrude and lithgow-bertelloni, 2005)
     or 'slb3 (finite-strain 3rd order shear modulus, 
    	stixrude and lithgow-bertelloni, 2005)
     or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, 
-    matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, 
-    matas et al. 2007)
+        matas et al. 2007)
+    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus, 
+        matas et al. 2007)
     or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature 
-    (your choice in geotherm will not matter in this case))
+       (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature 
-    (your choice in geotherm will not matter in this case))"""
+        (your choice in geotherm will not matter in this case))"""
     
     rock.set_method('mgd3')
     temperature = burnman.geotherm.self_consistent(seis_p, T0, rock)    

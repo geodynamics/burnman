@@ -11,24 +11,27 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 def calculate_forward_problem(frac, pressures):
     print frac
-    rock = burnman.composite( ( (minerals.SLB2011_mg_perovskite(),frac[0] ),
-                            (minerals.SLB2011_fe_perovskite(), frac[1] ),
-                            (minerals.SLB2011_periclase(), frac[2] ),
-                            (minerals.SLB2011_wuestite(), frac[3] )))
+    
+    rock = burnman.composite( ( (minerals.SLB2011_mg_perovskite(),frac[2]*frac[0] ),
+                            (minerals.SLB2011_fe_perovskite(), frac[2]*(1.0-frac[0]) ),
+                            (minerals.SLB2011_periclase(), (1.0-frac[2])) ,
+                            (minerals.SLB2011_wuestite(), 0.0*(1.0-frac[2])*(1.0-frac[0]) )))
     rock.set_method('slb3')
-    temperature = burnman.geotherm.self_consistent(pressures, frac[4], rock)
-
+    temperature = burnman.geotherm.self_consistent(pressures, frac[1], rock)
+    #geotherm1 = burnman.geotherm.brown_shankland
+    #temperature = [geotherm1(p) for p in pressures]
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,pressures, temperature)
-    return mat_vs, mat_vphi
+    return mat_rho,mat_vs, mat_vphi
    
-def error(guess, pressures, obs_vs, obs_vphi):
-    [vs,vphi] = calculate_forward_problem(guess,  pressures )
+def error(guess, pressures, obs_rho, obs_vs, obs_vphi):
+    [rho,vs,vphi] = calculate_forward_problem(guess,  pressures )
 
-    vs_l2 = [ (vs[i] - obs_vs[i])*(vs[i] - obs_vs[i]) for i in range(len(obs_vs)) ]
-    vphi_l2 = [ (vphi[i] - obs_vphi[i])*(vphi[i] - obs_vphi[i]) for i in range(len(obs_vphi)) ]
-    l2_error= sum(vs_l2)+sum(vphi_l2)
+    vs_l2 = [ (vs[i] - obs_vs[i])*(vs[i] - obs_vs[i])/(obs_vs[i]*obs_vs[i]) for i in range(len(obs_vs)) ]
+    vphi_l2 = [ (vphi[i] - obs_vphi[i])*(vphi[i] - obs_vphi[i])/(obs_vphi[i]*obs_vphi[i]) for i in range(len(obs_vphi)) ]
+    rho_l2=[(rho[i] - obs_rho[i])*(rho[i]-obs_rho[i])/(obs_rho[i]*obs_rho[i]) for i in range(len(obs_rho)) ]
+    l2_error= sum(vphi_l2)+sum(vs_l2)+ sum(rho_l2)
+    print l2_error
     return l2_error
-
 
 pressures=np.linspace(30e9,120e9,20)
 
@@ -38,11 +41,13 @@ depths = map(prem.depth,pressures)
 seis_p, prem_density, prem_vp, prem_vs, prem_vphi = prem.evaluate_all_at(depths)
 
 #make the mineral to fit
-guess = [0.62,0.078,0.36,0.022,1900]
+guess = [0.95,2100,0.65]
+lowerbounds=[0.5,0, 0,0,1800]
+upperbounds=[1.0,0.2,0.5,0.2,2100]
 
 #first, do the second-order fit
-func = lambda x : error( x, pressures, prem_vs, prem_vphi)
-sol = opt.fmin(func, guess, xtol=0.1)
+func = lambda x : error( x, pressures, prem_density, prem_vs, prem_vphi)
+sol = opt.fmin(func, guess, xtol=0.8)
 print sol 
 
 

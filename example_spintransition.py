@@ -34,22 +34,22 @@ if __name__ == "__main__":
     #alternatively, we could use the values where prem is defined:
     #depths = seismic_model.internal_depth_list()
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
-    
+
+    # here we use the Brown & Shankland geotherm    
     geotherm = burnman.geotherm.brown_shankland
     temperature = [geotherm(p) for p in seis_p]    
     
     
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
-    amount_perovskite = 0.
-    rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                                     (minerals.Murakami_fe_periclase(), 1.0-amount_perovskite) ) )
+    rock = burnman.composite ( ((minerals.Murakami_fe_periclase(), 1.0) ) )
     
-    rock.set_method('slb3')
+    # Set method, here set to 'slb2' as the shear wave moduli in Murakami et al. 2012 were fit to second order 
+    rock.set_method('slb2')
     
+    # Now we calculate the velocities
     print "Calculations are done for:"
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
-    
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
        
@@ -60,25 +60,25 @@ if __name__ == "__main__":
     plt.plot(seis_p/1.e9,mat_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
     plt.title("ferropericlase (Murakami et al. 2012)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    #plt.ylim(5,6.5)
+    plt.ylim(5,12)
     plt.legend(loc='upper left')
     
-    # example 2:
+    # example 2: Here we show the effects of using purely High Spin or Low Spin
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_LS(), 1.0), ) )
-    rock.set_method('slb3')
+    rock.set_method('slb2')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
         burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase_HS(), 1.0), ) )
-    rock.set_method('slb3')
+    rock.set_method('slb2')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
     
     rock = burnman.composite( ((minerals.Murakami_fe_periclase(), 1.0), ) )
-    rock.set_method('slb3')
+    rock.set_method('slb2')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
@@ -89,38 +89,33 @@ if __name__ == "__main__":
     plt.title("Murakami_fp")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     #plt.ylim(300,800)
-    plt.legend(loc='upper left')
+    plt.legend(loc='lower right')
     
     
-    
+    # Example 3: Periclase from Speziale et al. 2006 
     # Here the compositions are implemented as fixed minerals. For other options see example_composition.py
     rock = burnman.composite( ( (minerals.Speziale_fe_periclase(), 1.0), ) )
-    
     
     rock.set_method('slb3')
     
     print "Calculations are done for:"
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
-    
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
         burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
     # plot example 3
     plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
     plt.plot(seis_p/1.e9,mat_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4, label='rho')
     plt.title("ferropericlase (Speziale et al. 2007)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-    #plt.ylim(0,8)
     plt.legend(loc='upper left')
     
-    
-    
-    
-    
-    
-    
+    plt.subplot(2,2,4)
+    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='Vphi')
+    plt.title("ferropericlase (Speziale et al. 2007)")
+    plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+    plt.legend(loc='upper left') 
     
     plt.savefig("output_figures/examples_spintransition.png")
     plt.show()
