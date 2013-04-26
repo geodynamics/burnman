@@ -64,10 +64,10 @@ if __name__ == "__main__":
     iron_content = lambda p,t: \
     burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)
 
-    rock = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,1),\
+    rock = burnman.composite ( [ (minerals.mg_fe_perovskite_pt_dependent(iron_content,1),\
     								phase_fractions['pv'] ), 
     								(minerals.ferropericlase_pt_dependent(iron_content,0),\
-    								phase_fractions['fp'] ) ) )
+    								phase_fractions['fp'] ) ] )
             
     #seismic model for comparison:
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 

@@ -84,7 +84,7 @@ if __name__ == "__main__":
                					
     
     
-    rock = burnman.composite( ((own_material(), 1.0),))
+    rock = burnman.composite( [(own_material(), 1.0)] )
     
     #seismic model for comparison: (see burnman/seismic.py)
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 

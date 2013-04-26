@@ -57,10 +57,10 @@ if __name__ == "__main__":
     Kd_0 = .5
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_pyro, Kd_0)
-    pyrolite = burnman.composite(((minerals.mg_fe_perovskite_pt_dependent(iron_content,0),\
+    pyrolite = burnman.composite( [ (minerals.mg_fe_perovskite_pt_dependent(iron_content,0),\
      							phase_fractions_pyro['pv'] ),
                                 (minerals.ferropericlase_pt_dependent(iron_content,1), \
-                                phase_fractions_pyro['fp'] ) ) )
+                                phase_fractions_pyro['fp'] ) ] )
     
     #input pressure range for first model. 
     seis_p_1 = np.arange(25e9, 125e9, 5e9)
@@ -82,10 +82,10 @@ if __name__ == "__main__":
     calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_enst, Kd_0)
-    enstatite = burnman.composite (((minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+    enstatite = burnman.composite ( [ (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
     							phase_fractions_enst['pv'] ),
                                 (minerals.ferropericlase_pt_dependent(iron_content,1), \
-                                phase_fractions_enst['fp'] ) ) )
+                                phase_fractions_enst['fp'] ) ] )
     
     
     #input second pressure range. Same as the first for comparison
