@@ -1,4 +1,4 @@
-    urnMan- a lower mantle toolkit
+    BurnMan - a lower mantle toolkit
     Copyright (C) 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 
     This program is free software; you can redistribute it and/or modify
@@ -47,22 +47,30 @@ see burnman.org for more information
 *** Install on a MAC
 
 0. get Xcode
-1. If you don't have Python yet, download it (for free) from python.org/download . Make sure you have the latest version (I used 2.7). To check your version of python, type the following in a terminal:
-	python --version
+1. If you don't have Python yet, download it (for free) from
+   python.org/download . Make sure to use the latest version 2.x version (I
+   used 2.7). To check your version of python, type the following in a
+   terminal: 
+     python --version
 2. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
 3. Install the latest Scipy at http://sourceforge.net/projects/scipy/files/
 4. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
 5. Go to the main BurnMan directory and type:
-	python main.py
+	python example_composition.py
     Figures should show up.
 
-
 Problems you might run into:
-	- Installing numpy/scipy/matplotlib for a different python version than the one on your 	computer
-	- Having matplotlib for 32-bit instead of 64-bit (for me this got fixed by installing the very latest 	version). This will give you the error 'no matching architecture in universal wrapper'. You can 	check if your python is 32 or 64 bit with the following lines:
-		python
-		>>> import platform
-		>>> print platform.architecture()
+
+  - Installing numpy/scipy/matplotlib for a different python version than the
+    one on your computer
+
+  - Having matplotlib for 32-bit instead of 64-bit (for me this got fixed by
+    installing the very latest version). This will give you the error 'no
+    matching architecture in universal wrapper'. You can check if your python
+    is 32 or 64 bit with the following lines:
+	python 
+	>>> import platform
+	>>> print platform.architecture()
 
 
 *** Install under Windows
@@ -78,16 +86,24 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 7. Run the module (or press F5)
 
 ***Start Here
-To begin, the user may want to look at these examples to begin to understand what tools are available in BurnMan and how values are calculated. Below is a suggested order of examples that begin by introducing each of the user inputs possible as well as each of the helpers involved with each example.
 
-1. example_geotherms.py (Explains each built in geothermal and how to create your own)
-   run this example by typing 'python example_geotherms.py'
-   this should result in a plot showing various geotherms available
-2. example_seismic.py (Explains the various seismic models included in BurnMan)
-3. example_composition.py (Explains each of the possible input mineral creation schemes)
-   by changing the True/False flags, one can plot the different compositions defined in this script
-4. example_user_input_materials.py (Explains how to create user-defined minerals)
-5. example_averaging.py (Explains how moduli and density are averaged to calculate seismic velocities)
+To begin, the user may want to look at these examples to begin to understand
+what tools are available in BurnMan and how values are calculated. Below is a
+suggested order of examples that begin by introducing each of the user inputs
+possible as well as each of the helpers involved with each example.
+
+1. example_geotherms.py (Explains each built in geothermal and how to create
+   your own) run this example by typing 'python example_geotherms.py' this
+   should result in a plot showing various geotherms available
+2. example_seismic.py (Explains the various seismic models included in
+   BurnMan)
+3. example_composition.py (Explains each of the possible input mineral
+   creation schemes) by changing the True/False flags, one can plot the
+   different compositions defined in this script
+4. example_user_input_materials.py (Explains how to create user-defined
+   minerals)
+5. example_averaging.py (Explains how moduli and density are averaged to
+   calculate seismic velocities)
 
 *** Examples
 
@@ -220,8 +236,13 @@ teaches:
 
 * example_spintransition.py
 
-This example shows the different minerals that are implemented with a spin transition.
-Minerals with spin transition can be included in BurnMan/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in GPa. This example shows the minerals for which spin transitions are implemented. 
+This example shows the different minerals that are implemented with a spin
+transition.  Minerals with spin transition can be included in
+burnman/minerals.py by defining parameters for the low spin state. Regular
+parameters are by definition high spin and the second set of paramaters must
+be named 'self.params_LS'. This set of parameters should include a transition
+pressure called 'P_LS' in GPa. This example shows the minerals for which spin
+transitions are implemented.
 
 requires:
 - geotherms
