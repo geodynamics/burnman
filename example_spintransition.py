@@ -4,13 +4,10 @@
 
 """
 This example shows the different minerals that are implemented with a spin
-transition.  Minerals with spin transition can be included in
-burnman/minerals.py by defining parameters for the low spin state. Regular
-parameters are by definition high spin and the second set of paramaters must
-be named 'self.params_LS'.This set of parameters should include a transition
-pressure called 'P_LS' in Pa.  This example shows the minerals for which spin
-transitions are implemented.  To input your own values for HS and LS minerals,
-see example_user_input_minerals.py for example of how to do this
+transition.  Minerals with spin transition are implemented by defining two
+separate minerals (one for the low and one for the high spin state).  Then a
+third dynamic mineral is created that switches between the two previously
+defined minerals by comparing the current pressure to the transition pressure.
 
 requires:
 - geotherms
@@ -47,9 +44,18 @@ if __name__ == "__main__":
     temperature = [geotherm(p) for p in seis_p]    
     
     
-    # Here the compositions are implemented as fixed minerals. 
-    #For other options see example_composition.py=
+    # We create one mineral that contains spin transitions
     rock = burnman.composite ( [(minerals.Murakami_fe_periclase(), 1.0)] )
+
+    # The mineral Murakami_fe_periclase is derived from minerals.helper_spin_transition
+    # which contains the logic to switch between two other minerals based on the
+    # current pressure. The mineral is implemented similar to the following lines:
+    #
+    #   class Murakami_fe_periclase(helper_spin_transition):
+    #     def __init__(self):
+    #       helper_spin_transition.__init__(self, 63.0e9, Murakami_fe_periclase_LS(), Murakami_fe_periclase_HS())
+    #
+    # Note the reference to the low spin and high spin minerals (_LS and _HS).
     
     # Set method, here set to 'slb2' as the shear wave moduli in
     # Murakami et al. 2012 were fit to second order 
