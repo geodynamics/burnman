@@ -3,15 +3,15 @@
 # Released under GPL v2 or later.
 
 """
-This example shows the effect of different averaging schemes. Currently four averaging
-schemes are available:
+This example shows the effect of different averaging schemes. Currently four
+averaging schemes are available:
 1. Voight-Reuss-Hill (volumetric averaging)
 2. linear (mol fraction averaging)
 3. Voight averaging
 4. Reuss averaging
 
-See Watt et al., 1976 Journal of Geophysics and Space Physics
-for explanations of each averaging scheme.
+See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
+of each averaging scheme.
 
 requires:
 - geotherms

@@ -3,16 +3,17 @@
 # Released under GPL v2 or later.
 
 """
-This example shows how to vary the distribution coefficient of the 
-perovskite/ferropericlase system. The user sets Kd_0 and BurnMan scales Kd as a function
-of P and T adopting the formalism of Nakajima et al., 2012. Specifically we adopt equation
-5 of Nakajima et al., 2012 with DeltaV_0 = 0.2 cc/mol, and calculating the partition
-coefficient of Fe in each phase from stoichiometry. 
+This example shows how to vary the distribution coefficient of the
+perovskite/ferropericlase system. The user sets Kd_0 and BurnMan scales Kd as
+a function of P and T adopting the formalism of Nakajima et al.,
+2012. Specifically we adopt equation 5 of Nakajima et al., 2012 with DeltaV_0
+= 0.2 cc/mol, and calculating the partition coefficient of Fe in each phase
+from stoichiometry.
 
-This example will calculate mineral input parameters from Mg and Fe endmembers from
-Stixrude and Lithgow-bertelloni, 2005 with weighting determined by the calculated 
-partition coefficients. Finally, output plots of X_Fe pv and X_Fe fp our output as well
-as the user's choice of geotherm
+This example will calculate mineral input parameters from Mg and Fe endmembers
+from Stixrude and Lithgow-bertelloni, 2005 with weighting determined by the
+calculated partition coefficients. Finally, output plots of X_Fe pv and X_Fe
+fp our output as well as the user's choice of geotherm
 
 requires:
 - geotherms

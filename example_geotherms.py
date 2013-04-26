@@ -5,6 +5,7 @@
 """
 This example shows each of the geotherms currently possible with BurnMan.
 These are:
+
 1. Brown and Shankland, 1981
 2. Watson and Baxter, 2007
 3. linear extrapolation
@@ -16,6 +17,7 @@ requires:
 - input geotherm files
 - mineral definitions for adiabat
 - burnman/composite.py for adiabat (if necessary)
+
 teaches:
 - geotherms
 

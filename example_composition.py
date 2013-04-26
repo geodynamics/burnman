@@ -7,23 +7,27 @@ This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
 Currently BurnMan can input mineral compositions in 4 different ways: 
-1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan libraries
-	or from user defined minerals (see example_user_input_material)
-2. Two minerals mixed in simple mole fractions with user-defined Fe partitioning
-3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will calculate
-	Fe partitioning along a P, T profile (see example_partition_coef.py)
+
+1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
+   libraries or from user defined minerals (see example_user_input_material)
+2. Two minerals mixed in simple mole fractions with user-defined Fe
+   partitioning
+3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
+   calculate Fe partitioning along a P, T profile (see
+   example_partition_coef.py)
 4. A mixture of three or more  minerals. 
 
-In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral physical
-paremeters of end member minerals (pure Mg and Fe) of the user's choice using either 
-volumetric (moduli) or molar averaging (all others) at room pressure and temperature (see
-example_user_input_material.py for information on these parameters) . 
+In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral
+physical paremeters of end member minerals (pure Mg and Fe) of the user's
+choice using either volumetric (moduli) or molar averaging (all others) at
+room pressure and temperature (see example_user_input_material.py for
+information on these parameters) .
 
-To turn a method of mineral creation "on" the first if statement above the method must
-be set to True, with all others set to False. 
+To turn a method of mineral creation "on" the first if statement above the
+method must be set to True, with all others set to False.
 
-Note: These minerals can include a spin transition in (Mg,Fe)O, 
-see example_spintransition.py for explanation of how to implement this
+Note: These minerals can include a spin transition in (Mg,Fe)O, see
+example_spintransition.py for explanation of how to implement this
 
 requires:
 - geotherms

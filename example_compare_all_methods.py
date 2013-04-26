@@ -3,10 +3,11 @@
 # Released under GPL v2 or later.
 
 """
-This example demonstrates how to call each of the individual calculation methodologies
-that exist within BurnMan. See below for current options. This example calculates 
-seismic velocity profiles for the same set of minerals and a plot of Vs, Vphi and density
-is produce for the user to compare each of the different methods.
+This example demonstrates how to call each of the individual calculation
+methodologies that exist within BurnMan. See below for current options. This
+example calculates seismic velocity profiles for the same set of minerals and
+a plot of Vs, Vphi and density is produce for the user to compare each of the
+different methods.
 
 requires:
 - geotherms (for adiabat: potential temperature)

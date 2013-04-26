@@ -3,8 +3,8 @@
 # Released under GPL v2 or later.
 
 """
-The main focus of this example is to show the mineral physical input constants necessary
-for BurnMan to calculate seismic velocity profiles. Furht
+The main focus of this example is to show the mineral physical input constants
+necessary for BurnMan to calculate seismic velocity profiles. Furht
 
 Shows user how to input a mineral of his/her choice and which physical values
 need to be input for BurnMan to calculate Vs, Vp, Vphi and density at depth.

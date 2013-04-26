@@ -3,13 +3,13 @@
 # Released under GPL v2 or later.
 
 """
-This example explains how to perform the basic i/o of BurnMan. A method of calculation is
-chosen, a composite mineral/material (see example_composition.py for explanation of this 
-process) is created in the class "rock," finally a geotherm is created and seismic 
-velocities calculated. 
+This example explains how to perform the basic i/o of BurnMan. A method of
+calculation is chosen, a composite mineral/material (see
+example_composition.py for explanation of this process) is created in the
+class "rock," finally a geotherm is created and seismic velocities calculated.
 
-Post-calculation, the results are written to a simple text file to plot/manipulate
-at the user's whim. 
+Post-calculation, the results are written to a simple text file to
+plot/manipulate at the user's whim.
 
 requires:
 - creating minerals

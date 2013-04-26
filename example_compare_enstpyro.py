@@ -6,8 +6,8 @@
 This example shows you how to create two materials from wt% determines the
 optimum mixing between the two to match the seismic model of your choice.
 Currently it compares two end member meteorite groups among the chondrites:
-carbonaceous and enstatite. Velocities are calculated for each set of minerals and plotted
-for comparison. 
+carbonaceous and enstatite. Velocities are calculated for each set of minerals
+and plotted for comparison.
 
 requires:
 - geotherms
