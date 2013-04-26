@@ -49,7 +49,7 @@ if __name__ == "__main__":
     
     # Here the compositions are implemented as fixed minerals. 
     #For other options see example_composition.py=
-    rock = burnman.composite ( ((minerals.Murakami_fe_periclase(), 1.0) ) )
+    rock = burnman.composite ( [(minerals.Murakami_fe_periclase(), 1.0)] )
     
     # Set method, here set to 'slb2' as the shear wave moduli in
     # Murakami et al. 2012 were fit to second order 
