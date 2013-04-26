@@ -74,7 +74,7 @@ if __name__ == "__main__":
     
     ##input second method
     
-    #Input composition of model enstatite chondrites. See example_composition for potential choices.
+    #Input composition of model enstatite chondrites. See example_composition for ways of inputting composition.
         
     #Enstatite chondrites: Javoy 2009 Table 6 PLoM
     weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} 
