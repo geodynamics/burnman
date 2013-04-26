@@ -4,15 +4,20 @@
 
 """
 Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
-function of depth (or P) as well as different velocity models available:
-PREM (Dziewonski & Anderson, 1981)
-reference model for fast regionsi (outside the LLSVP's) in the lower mantle (Lekic et al. 2012)
-reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
+function of depth (or P) as well as different velocity model libraries available within 
+Burnman:
+1. PREM (Dziewonski & Anderson, 1981)
+2. Reference model for fast regions (outside the LLSVP's) in the lower mantle 
+	(Lekic et al. 2012)
+3. Reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
+This example will first calculate or read in a seismic model and plot the model along the
+defined pressure range
 requires:
 
 teaches:
-- seismic models
+- Input of user-defined seismic models
+- Utilization of library seismic models within BurnMan
 
 """
 
@@ -29,7 +34,8 @@ if __name__ == "__main__":
     #create a seismic dataset from prem:
     s=burnman.seismic.prem()
     
-    # specify where we want to evaluate, here we map from pressure to depth, because we can
+    # specify where we want to evaluate, here we map from pressure to depth
+    #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
     p = np.arange(1.0e9,360.0e9,5e9)
     depths = map(s.depth, p) 
     #we could also just specify some depth levels directly like this:
@@ -105,7 +111,8 @@ if __name__ == "__main__":
     class ak135_table(burnman.seismic.radiustable):
         def __init__(self):
             burnman.seismic.radiustable.__init__(self)
-            table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt") # radius, pressure, density, v_p, v_s
+            # In format: radius, pressure, density, v_p, v_s
+            table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt") 
             table = np.array(table)
             self.table_radius = table[:,0]
             self.table_pressure = table[:,1]
@@ -115,7 +122,7 @@ if __name__ == "__main__":
 
  
     ak=ak135_table() 
-    # specify where we want to evaluate, here we map from pressure to depth, because we can
+    # specify where we want to evaluate, here we map from pressure to depth
     depths = np.linspace(700e3, 2800e3, 40)
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = ak.evaluate_all_at(depths)

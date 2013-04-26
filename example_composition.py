@@ -28,18 +28,14 @@ from burnman import minerals
 if __name__ == "__main__":    
     
     #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order shear modulus,       
-        stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
-        matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
-        matas et al. 2007)
-    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
-       (your choice in geotherm will not matter in this case))
-    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
-        (your choice in geotherm will not matter in this case))""" 
+    """ choose 'slb2' (finite-strain 2nd order sheer modulus, stixrude and 
+    	lithgow-bertelloni, 2005)
+    or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)
+    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, matas et al. 2007)
+    or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)
+    or 'bm' (birch-murnaghan, if you choose to ignore temperature
+    (your choice in geotherm will not matter in this case))"""
+    
     method = 'slb3' 
         
     
@@ -66,7 +62,7 @@ if __name__ == "__main__":
 
     if True:
         weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
-        Kd_0 = .5 #Fig 5 Nakajima et al 2012
+        Kd_0 = .59 #Fig 5 Nakajima et al 2012
 
         phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
         iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)

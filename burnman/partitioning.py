@@ -79,9 +79,8 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
     frac_mol_SiO2 = components['SiO2']
     Kd_0 = initial_distribution_coefficient
 
-    delV = 2.e-7 #in m^3/mol, taken from Nakajima et al 2012, JGR
+    delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
     
-    #Kd_0 = .29 #Fig 5 Nakajima et al 2012
 
     rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+math.log(Kd_0) #eq 5 Nakajima et al 2012
 
@@ -94,7 +93,7 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
 
     a = b /(((1.-b)*K)+b)
     
-    return (a,b) #a is partition coefficent array with P for mw, b is pcarray for pv
+    return (a,b) #a is partition coefficient array with P for mw, b is pcarray for pv
 
 # test some composition (Javoy 2010, Table 6, PLoM)
 if __name__ == "__main__":

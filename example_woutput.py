@@ -3,8 +3,13 @@
 # Released under GPL v2 or later.
 
 """
-Compute properties of minerals and creates a table of outputs in a text format
-that could be used with other programs.
+This example explains how to perform the basic i/o of BurnMan. A method of calculation is
+chosen, a composite mineral/material (see example_composition.py for explanation of this 
+process) is created in the class "rock," finally a geotherm is created and seismic 
+velocities calculated. 
+
+Post-calculation, the results are written to a simple text file to plot/manipulate
+at the user's whim. 
 
 requires:
 - creating minerals
@@ -58,14 +63,16 @@ if __name__ == "__main__":
     geotherm = burnman.geotherm.brown_shankland
     temperature = [geotherm(p) for p in pressures]
     
-    rock.set_method(method)
+    rock.set_method(method) #append method of calculation to suite of minerals chosen
     
+    #Begin calculating velocities and density as depth
     print "Calculations are done for:"
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
-        burnman.velocities_from_rock(rock, pressures, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(rock, pressures, temperature, \
+        burnman.averaging_schemes.voigt_reuss_hill())
         
     #write to file:
     output_filename = "example_woutput.txt" 

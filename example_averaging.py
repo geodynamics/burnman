@@ -81,6 +81,9 @@ if __name__ == "__main__":
     moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.reuss())
     mat_vs4, mat_vp4, mat_vphi4 = burnman.compute_velocities(moduli)
     mat_K4, mat_mu4, mat_rho4 = moduli.K, moduli.mu, moduli.rho
+    
+    
+
 
 
     moduli = moduli_list[0]
