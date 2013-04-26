@@ -2,7 +2,7 @@
 
 function testit {
 t=$1
-echo "*** testing $t..."
+echo "*** testing $t ..."
 (python <<EOF
 import matplotlib as m
 m.use('Cairo')
