@@ -85,7 +85,7 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 6. File -- Open -- find one of the example files
 7. Run the module (or press F5)
 
-***Start Here
+*** Start Here
 
 To begin, the user may want to look at these examples to begin to understand
 what tools are available in BurnMan and how values are calculated. Below is a
