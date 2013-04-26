@@ -45,7 +45,7 @@ if __name__ == "__main__":
     table = [ ['Name'] + params ]
     
     for p in phases:
-        p.set_method('bm')
+        p.set_method('bm2')
         p.set_state(0,300)
         row = create_list(p)
         table.append(row)
