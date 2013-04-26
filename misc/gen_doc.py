@@ -16,11 +16,11 @@ ordered_examples = ['example_geotherms.py', \
                     'example_user_input_material.py', \
                     'example_averaging.py', \
                     'example_woutput.py', \
-                    'example_compare_enstpyro.py', \
-                    'example_optimize_pv.py', \
+                    'example_compare_all_methods.py', \
                     'example_spintransition.py', \
                     'example_partition_coef.py', \
-                    'example_compare_all_methods.py', \
+                    'example_compare_enstpyro.py', \
+                    'example_optimize_pv.py', \
                         ]
 
 for ex in ordered_examples:
