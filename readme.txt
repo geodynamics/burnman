@@ -20,13 +20,15 @@ ian.rose@berkeley.edu
 
 *** About
 
-burnman is a lower mantle shear velocity generator constrained by mineral physics.
+BurnMan is a lower mantle shear velocity generator constrained by mineral physics.
 
 Work started by a work-group of the CIDER 2012 workshop in Santa Barbara.
 
-see: http://code.google.com/p/burnman/
+see: http://code.google.com/p/BurnMan/
 
-burnman is released under the GNU GPL v2 or newer
+BurnMan is released under the GNU GPL v2 or newer
+
+see burnman.org for more information
 
 
 *** Requirements
@@ -216,7 +218,7 @@ teaches:
 * example_spintransition.py
 
 This example shows the different minerals that are implemented with a spin transition.
-Minerals with spin transition can be included in burnman/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in GPa. This example shows the minerals for which spin transitions are implemented. 
+Minerals with spin transition can be included in BurnMan/minerals.py by defining parameters for the low spin state. Regular parameters are by definition high spin and the second set of paramaters must be named 'self.params_LS'. This set of parameters should include a transition pressure called 'P_LS' in GPa. This example shows the minerals for which spin transitions are implemented. 
 
 requires:
 - geotherms
