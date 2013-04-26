@@ -71,7 +71,7 @@ class SLB2011_wuestite (material):
 
 class SLB2011_ferropericlase(helper_volumetric_mixing):
     def __init__(self, fe_num):
-        base_materials = [periclase(), wuestite()]
+        base_materials = [SLB2011_periclase(), SLB2011_wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
@@ -79,7 +79,7 @@ class SLB2011_ferropericlase(helper_volumetric_mixing):
 
 class SLB2011_mg_fe_perovskite(helper_volumetric_mixing):
     def __init__(self, fe_num):
-        base_materials = [mg_perovskite(), fe_perovskite()]
+        base_materials = [SLB2011_mg_perovskite(), SLB2011_fe_perovskite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
@@ -123,14 +123,14 @@ class SLB2011_fe_perovskite(material):
             'eta_0s': 2.3 }
 
 
-class mg_fe_perovskite_pt_dependent(helper_fe_dependent):
+class SLB2011_mg_fe_perovskite_pt_dependent(helper_fe_dependent):
     def __init__(self, iron_number_with_pt, idx):
         helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
 
-class ferropericlase_pt_dependent(helper_fe_dependent):
+class SLB2011_ferropericlase_pt_dependent(helper_fe_dependent):
     def __init__(self, iron_number_with_pt, idx):
         helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 
