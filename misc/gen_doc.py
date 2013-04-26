@@ -11,12 +11,11 @@ sys.path.insert(1,os.path.abspath('..'))
 # order the examples sensibly:
 
 ordered_examples = ['example_geotherms.py', \
-                    'example_geotherms.py', \
                     'example_seismic.py', \
-                    'example_compare_two_models.py', \
                     'example_composition.py', \
-                    'example_woutput.py', \
                     'example_user_input_material.py', \
+                    'example_averaging.py', \
+                    'example_woutput.py', \
                     'example_compare_enstpyro.py', \
                     'example_optimize_pv.py', \
                     'example_spintransition.py', \
