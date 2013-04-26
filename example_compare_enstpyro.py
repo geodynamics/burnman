@@ -5,6 +5,9 @@
 """
 This example shows you how to create two materials from wt% determines the
 optimum mixing between the two to match the seismic model of your choice.
+Currently it compares two end member meteorite groups among the chondrites:
+carbonaceous and enstatite. Velocities are calculated for each set of minerals and plotted
+for comparison. 
 
 requires:
 - geotherms
@@ -45,19 +48,24 @@ if __name__ == "__main__":
     method = 'slb3' 
     
     
-    #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
-        
-    weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} #From Mcdonough 2003
-    phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
-    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_pyro, 0.5)
-    pyrolite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_pyro['pv'] ),
-                                     (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_pyro['fp'] ) ) )
+    #Carbonaceous chondrites From Mcdonough 2003    
+    weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.} 
+    phase_fractions_pyro,relative_molar_percent_pyro = \
+    burnman.calculate_phase_percents(weight_percents_pyro)
+    #input initial distribution coefficent. See example_partition_coefficient.py 
+    #for explanation
+    Kd_0 = .5
+    iron_content = lambda p,t: burnman.calculate_partition_coefficient\
+    (p,t,relative_molar_percent_pyro, Kd_0)
+    pyrolite = burnman.composite(((minerals.mg_fe_perovskite_pt_dependent(iron_content,0),\
+     							phase_fractions_pyro['pv'] ),
+                                (minerals.ferropericlase_pt_dependent(iron_content,1), \
+                                phase_fractions_pyro['fp'] ) ) )
     
-    #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
-    
+    #input pressure range for first model. 
     seis_p_1 = np.arange(25e9, 125e9, 5e9)
     
-    #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
+    #input your geotherm. 
     
     geotherm = burnman.geotherm.brown_shankland
     temperature_1 = [geotherm(p) for p in seis_p_1]
@@ -68,17 +76,22 @@ if __name__ == "__main__":
     
     #Input composition of model enstatite chondrites. See example_composition for potential choices.
         
-    weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} #Javoy 2009 Table 6 PLoM
-    phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
-    iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent_enst, 0.5)
-    enstatite = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions_enst['pv'] ),
-                                      (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions_enst['fp'] ) ) )
+    #Enstatite chondrites: Javoy 2009 Table 6 PLoM
+    weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.} 
+    phase_fractions_enst,relative_molar_percent_enst = burnman.\
+    calculate_phase_percents(weight_percents_enst)
+    iron_content = lambda p,t: burnman.calculate_partition_coefficient\
+    (p,t,relative_molar_percent_enst, Kd_0)
+    enstatite = burnman.composite (((minerals.mg_fe_perovskite_pt_dependent(iron_content,0), \
+    							phase_fractions_enst['pv'] ),
+                                (minerals.ferropericlase_pt_dependent(iron_content,1), \
+                                phase_fractions_enst['fp'] ) ) )
     
-    #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
-    seis_p_2 = np.arange(25e9, 125e9, 5e9)
+    #input second pressure range. Same as the first for comparison
+    seis_p_2 = seis_p_1
     
-    #input your geotherm. Either choose one (See example_geotherms.py) or create one.We'll use Brown and Shankland.
+    #input your geotherm. 
     
     geotherm = burnman.geotherm.brown_shankland
     temperature_2 = [geotherm(p) for p in seis_p_2]
@@ -91,7 +104,8 @@ if __name__ == "__main__":
     
     
     mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_mu_pyro = \
-        burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, \
+        burnman.averaging_schemes.voigt_reuss_hill())
     
     print "Calculations are done for:"
     for ph in pyrolite.phases:
@@ -104,7 +118,8 @@ if __name__ == "__main__":
         print ph.fraction, " of phase", ph.mineral.to_string()
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_mu_enst = \
-        burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
+        burnman.averaging_schemes.voigt_reuss_hill())
     
     ##let's create PREM for reference
     s=burnman.seismic.prem()
@@ -112,26 +127,35 @@ if __name__ == "__main__":
     pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate_all_at(depths)
     
     
-    ##Now let's plot the comparison. You can conversely just output to a data file (see example_woutput.py)
+    ##Now let's plot the comparison.
     
     plt.subplot(2,2,1)
-    plt.plot(seis_p_1/1.e9,mat_vs_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vs_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p_1/1.e9,vs_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vs_pyro/1.e3,color='r',linestyle='-',marker='o',\
+    markerfacecolor='r',markersize=4)
+    plt.plot(seis_p_2/1.e9,mat_vs_enst/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4)
+    plt.plot(seis_p_1/1.e9,vs_prem/1.e3,color='k',linestyle='-',marker='x',\
+    markerfacecolor='k',markersize=4)
     plt.title("Vs (km/s)")
     
     # plot Vphi
     plt.subplot(2,2,2)
-    plt.plot(seis_p_1/1.e9,mat_vphi_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
-    plt.plot(seis_p_2/1.e9,mat_vphi_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p_1/1.e9,v_phi_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p_1/1.e9,mat_vphi_pyro/1.e3,color='r',linestyle='-',marker='o',\
+    markerfacecolor='r',markersize=4)
+    plt.plot(seis_p_2/1.e9,mat_vphi_enst/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4)
+    plt.plot(seis_p_1/1.e9,v_phi_prem/1.e3,color='k',linestyle='-',marker='x',\
+    markerfacecolor='k',markersize=4)
     plt.title("Vphi (km/s)")
     
     # plot density
     plt.subplot(2,2,3)
-    plt.plot(seis_p_1/1.e9,mat_rho_pyro/1.e3,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4,label="C-chondrite")
-    plt.plot(seis_p_2/1.e9,mat_rho_enst/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label="enstatite")
-    plt.plot(seis_p_1/1.e9,rho_prem/1.e3,color='k',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="PREM")
+    plt.plot(seis_p_1/1.e9,mat_rho_pyro/1.e3,color='r',linestyle='-',marker='o',\
+    markerfacecolor='r',markersize=4,label="C-chondrite")
+    plt.plot(seis_p_2/1.e9,mat_rho_enst/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4,label="enstatite")
+    plt.plot(seis_p_1/1.e9,rho_prem/1.e3,color='k',linestyle='-',marker='x',\
+    markerfacecolor='k',markersize=4,label="PREM")
     plt.title("density (kg/m^3)")
     plt.legend(loc='lower right')
     plt.xlabel("Pressure (GPa)")
@@ -147,9 +171,12 @@ if __name__ == "__main__":
     per_diff_rho = 100*(mat_rho_pyro - mat_rho_enst_interp)/mat_rho_pyro
     
     plt.subplot(2,2,4)
-    plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label="vs")
-    plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',markerfacecolor='k',markersize=4,label="vphi")
-    plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',markerfacecolor='k',markersize=4,label="density")
+    plt.plot(seis_p_1/1.e9,per_diff_vs,color='g',linestyle='-',marker='o',\
+    markerfacecolor='k',markersize=4,label="vs")
+    plt.plot(seis_p_1/1.e9,per_diff_vphi,color='c',linestyle='-',marker='+',\
+    markerfacecolor='k',markersize=4,label="vphi")
+    plt.plot(seis_p_1/1.e9,per_diff_rho,color='m',linestyle='-',marker='x',\
+    markerfacecolor='k',markersize=4,label="density")
     
     plt.title("percent difference")
     plt.legend(loc='center right')

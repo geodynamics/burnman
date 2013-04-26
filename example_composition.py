@@ -6,10 +6,30 @@
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
+Currently BurnMan can input mineral compositions in 4 different ways: 
+1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan libraries
+	or from user defined minerals (see example_user_input_material)
+2. Two minerals mixed in simple mole fractions with user-defined Fe partitioning
+3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will calculate
+	Fe partitioning along a P, T profile (see example_partition_coef.py)
+4. A mixture of three minerals. 
+
+In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral physical
+paremeters of end member minerals (pure Mg and Fe) of the user's choice using either 
+volumetric (moduli) or molar averaging (all others) at room pressure and temperature (see
+example_user_input_material.py for information on these parameters) . 
+
+To turn a method of mineral creation "on" the first if statement above the method must
+be set to True, with all others set to False. 
+
+Note: These minerals can include a spin transition in (Mg,Fe)O, 
+see example_spintransition.py for explanation of how to implement this
+
 requires:
 - geotherms
 - seismic models
 - compute seismic velocities
+- composite mineral helpers
 
 teaches:
 - creating minerals
@@ -48,27 +68,33 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite ( ( (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                                     (minerals.Murakami_fe_periclase_LS(), 1.0-amount_perovskite)) )
+        rock = burnman.composite (((minerals.Murakami_fe_perovskite(), amount_perovskite),
+                                     (minerals.Murakami_fe_periclase_LS(), \
+                                     1.0-amount_perovskite)) )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite( ( (minerals.mg_fe_perovskite(0.8), amount_perovskite), 
-                                    (minerals.ferropericlase(0.8), 1.0-amount_perovskite) ) )
+        rock = burnman.composite(((minerals.mg_fe_perovskite(0.8), amount_perovskite), \
+                                (minerals.ferropericlase(0.8), 1.0-amount_perovskite)))
     
     #Example 3: input weight percentages
-    #See comments in burnman/composition.py for references to partition coefficent calculation
+    #See comments in example_partition_coef.py for references to 
+    #partition coefficent calculation
 
     if True:
         weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
         Kd_0 = .59 #Fig 5 Nakajima et al 2012
 
-        phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
-        iron_content = lambda p,t: burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)
+        phase_fractions,relative_molar_percent = burnman.\
+        							calculate_phase_percents(weight_percents)
+        iron_content = lambda p,t: burnman.calculate_partition_coefficient\
+        							(p,t,relative_molar_percent,Kd_0)
 
-        rock = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent(iron_content,0), phase_fractions['pv'] ),
-                                     (minerals.ferropericlase_pt_dependent(iron_content,1), phase_fractions['fp'] ) ) )
+        rock = burnman.composite ( ( (minerals.mg_fe_perovskite_pt_dependent\
+        							(iron_content,0), phase_fractions['pv'] ),
+                                    (minerals.ferropericlase_pt_dependent(iron_content,1),\
+                                    phase_fractions['fp'] ) ) )
         
     #Example 4: three materials
     if False:
@@ -78,7 +104,8 @@ if __name__ == "__main__":
     
     
     #seismic model for comparison:
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    seismic_model = burnman.seismic.prem()
     number_of_points = 20 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
@@ -102,15 +129,18 @@ if __name__ == "__main__":
     mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
     mat_K, mat_mu, mat_rho = moduli.K, moduli.mu, moduli.rho
     
-    [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+    [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model\
+    	(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         
     
     # PLOTTING
     
     # plot vs
     plt.subplot(2,2,1)
-    plt.plot(seis_p/1.e9,mat_vs/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4,label='computation')
-    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='reference')
+    plt.plot(seis_p/1.e9,mat_vs/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4,label='computation')
+    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o',\
+    markerfacecolor='k',markersize=4,label='reference')
     plt.title("Vs (km/s)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.ylim(5.1,7.6)
@@ -119,8 +149,10 @@ if __name__ == "__main__":
     
     # plot Vphi
     plt.subplot(2,2,2)
-    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p/1.e9,mat_vphi/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4)
+    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-',marker='o',\
+    markerfacecolor='k',markersize=4)
     plt.title("Vphi (km/s)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.ylim(7,12)
@@ -128,8 +160,10 @@ if __name__ == "__main__":
     
     # plot density
     plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,mat_rho/1.e3,color='b',linestyle='-',marker='o',markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+    plt.plot(seis_p/1.e9,mat_rho/1.e3,color='b',linestyle='-',marker='o',\
+    markerfacecolor='b',markersize=4)
+    plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='o',\
+    markerfacecolor='k',markersize=4)
     plt.title("density (kg/m^3)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.text(40,4.3,"misfit= %3.3f" % rho_err)
@@ -138,7 +172,8 @@ if __name__ == "__main__":
     
     # plot geotherm
     plt.subplot(2,2,4)
-    plt.plot(seis_p/1e9,temperature,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=4)
+    plt.plot(seis_p/1e9,temperature,color='r',linestyle='-',marker='o',\
+    markerfacecolor='r',markersize=4)
     plt.title("Geotherm (K)")
     plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
     plt.xlabel("Pressure (GPa)")

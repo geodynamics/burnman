@@ -3,12 +3,19 @@
 # Released under GPL v2 or later.
 
 """
-Shows the various ways to input geotherms: Built-in geotherms (geotherm1 and 2), basic linear (geotherm3),
-loaded in from a data file (geotherm4) of your choice. Geotherm 1 is from Brown & Shankland (1981) and 
-geotherm2 from Watson & Baxter (2007).
+This example shows each of the geotherms currently possible with BurnMan.
+These are:
+1. Brown and Shankland, 1981
+2. Watson and Baxter, 2007
+3. linear extrapolation
+4. Read in from file from user
+5. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
 
 requires:
 
+- input geotherm files
+- mineral definitions for adiabat
+- burnman/composite.py for adiabat (if necessary)
 teaches:
 - geotherms
 
@@ -46,18 +53,23 @@ if __name__ == "__main__":
     table_pressure = np.array(table)[:,0]
     table_temperature = np.array(table)[:,1]
     
-    my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate(table_pressure, table_temperature, p)
+    my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate\
+    (table_pressure, table_temperature, p)
     temperature4 = [my_geotherm(p) for p in pressures]
 
 
-    #finally, we can also calculate a self consistent geotherm for an assemblage of minerals
-    #based on self compression of the composite rock.  First we need to define an assemblage
+    #finally, we can also calculate a self consistent 
+    #geotherm for an assemblage of minerals
+    #based on self compression of the composite rock.  
+    #First we need to define an assemblage
     pyrolite = burnman.composite( ((minerals.mg_fe_perovskite(0.1), 0.7), 
                                    (minerals.ferropericlase(0.4),   0.3) ))
     pyrolite.set_method("mgd3")
-    #next, define an anchor temperature at which we are starting.  Perhaps 1500 K for the upper mantle
+    #next, define an anchor temperature at which we are starting.  
+    #Perhaps 1500 K for the upper mantle
     T0 = 1500.
-    #then generate temperature values using the self consistent function.  This takes more time than the above methods
+    #then generate temperature values using the self consistent function. 
+    # This takes more time than the above methods
     temperature5 = burnman.geotherm.self_consistent(pressures, T0, pyrolite)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
@@ -67,7 +79,7 @@ if __name__ == "__main__":
     plt.plot(pressures/1e9,temperature2,'-g',label="Watson, Baxter")
     plt.plot(pressures/1e9,temperature3,'-b',label="handwritten linear")
     plt.plot(pressures/1e9,temperature4,'-k',label="handwritten from table")
-    plt.plot(pressures/1e9,temperature5,'-m',label="Self consistent with perovskite (70%) and ferropericlase(30%)")
+    plt.plot(pressures/1e9,temperature5,'-m',label="Adiabat with pv (70%) and fp(30%)")
     
     plt.legend(loc='lower right')
     plt.xlim([0, 130])

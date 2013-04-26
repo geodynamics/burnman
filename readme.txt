@@ -75,6 +75,14 @@ make Python 2.7.3 (for example) running under windows (do not use Python 3.x, bu
 6. File -- Open -- find one of the example files
 7. Run the module (or press F5)
 
+***Start Here
+To begin, the user may want to look at these examples to begin to understand what tools are available in BurnMan and how values are calculated. Below is a suggested order of examples that begin by introducing each of the user inputs possible as well as each of the helpers involved with each example.
+ 
+1. example_user_input_materials.py (Explains how to create user-defined minerals)
+2. example_geotherms.py (Explains each built in geothermal and how to create your own)
+3. example_seismic.py (Explains the various seismic models included in BurnMan)
+4. example_composition.py (Explains each of the possible input mineral creation schemes)
+5. example_averaging.py (Explains how moduli and density are averaged to calculate seismic velocities)
 
 *** Examples
 
