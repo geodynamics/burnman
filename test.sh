@@ -43,14 +43,11 @@ echo "   done"
 testit "example_compare_enstpyro.py"
 echo "   done"
 
-testit "example_seismic.py"
-echo "   done"
-
 
 
 testit "example_seismic.py"
 echo "   done"
-testit "example_compare_two_models.py"
+testit "example_compare_all_methods.py"
 echo "   done"
 testit "example_spintransition.py"
 echo "   done"
