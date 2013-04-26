@@ -37,8 +37,8 @@ if __name__ == "__main__":
     #Input adiabat potential temperature
     T0 = 1500.0 
     
-    #Now we'll calculate the models. 
-    """ choose 'slb2' (finite-strain 2nd order shear modulus, 
+    #Now we'll calculate the models for each method 
+    """ 'slb2' (finite-strain 2nd order shear modulus, 
         stixrude and lithgow-bertelloni, 2005)
     or 'slb3 (finite-strain 3rd order shear modulus, 
    	stixrude and lithgow-bertelloni, 2005)
