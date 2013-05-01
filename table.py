@@ -52,7 +52,7 @@ if __name__ == "__main__":
     
     
     def create_list(mineral):
-        row = [ p.__class__.__name__ ]
+        row = [ p.to_string() ]
         for param in params:
             
             row.append(str(p.params[param] if param in p.params else ""))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     table = [ ['Name'] + params ]
     
     for p in phases:
-        print p.__class__.__name__
+        print p.to_string()
         p.set_method('bm3')
         p.set_state(1e9,300)
         row = create_list(p)
