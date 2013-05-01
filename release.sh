@@ -1,12 +1,12 @@
 #!/bin/bash
 
 
-name="burnman-0.3"
+name="burnman-v0.3"
 
 rm -rf $name
 
 svn export https://burnman.googlecode.com/svn/trunk $name
-rm -rf $name/misc/ $name/todo.txt $name/release.sh $name/test.sh play_withslb.py reproduce_*.py
+rm -rf $name/misc/ $name/todo.txt $name/release.sh $name/test.sh play_withslb.py $name/reproduce_*.py $name/play_withslb.py
 
 
 
