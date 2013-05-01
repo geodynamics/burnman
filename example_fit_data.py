@@ -55,10 +55,10 @@ pressures = np.linspace(25.e9, 135.e9, 100)
 #make the mineral to fit
 guess = [200.e9, 2.0]
 mg_perovskite_test = burnman.material()
-mg_perovskite_test.params['ref_V'] = 24.607e-6
-mg_perovskite_test.params['ref_K'] = 251.9e9
-mg_perovskite_test.params['K_prime'] = 4.01
-mg_perovskite_test.params['molar_mass'] = .1053
+mg_perovskite_test.params['ref_V'] = 24.45e-6
+mg_perovskite_test.params['ref_K'] = 281.e9
+mg_perovskite_test.params['K_prime'] = 4.1
+mg_perovskite_test.params['molar_mass'] = .10
 
 #first, do the second-order fit
 mg_perovskite_test.set_method("bm2")
