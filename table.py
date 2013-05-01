@@ -10,25 +10,43 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..')) 
 
 import burnman
+import inspect
+
 from burnman import minerals
 from burnman import tools
 
 if __name__ == "__main__":    
-    
-    phases = [minerals.stishovite(), \
-    minerals.periclase(), \
-    minerals.wuestite(), \
-    minerals.ferropericlase(0), \
-    minerals.mg_fe_perovskite(0), \
-    minerals.mg_perovskite(), \
-    minerals.fe_perovskite(), \
-    minerals.Speziale_fe_periclase_LS(), \
-    minerals.Speziale_fe_periclase_HS(), \
-    minerals.Murakami_fe_perovskite(), \
-    minerals.Murakami_fe_periclase_LS(), \
-    minerals.Murakami_fe_periclase_HS()   ]
-    #mg_fe_perovskite_pt_dependent
-    #ferropericlase_pt_dependent
+
+    names = set()
+    phases = []
+
+    libs = dir(minerals)
+    for l in libs:
+        mineralgroup = getattr(minerals, l)
+        
+        if mineralgroup.__class__.__name__ == "module":
+            for m in dir(mineralgroup):
+                mineral = getattr(mineralgroup, m)
+                #print mineral
+                if inspect.isclass(mineral) and mineral!=burnman.material and issubclass(mineral, burnman.material):
+                    #print mineral.__module__ + mineral.__name__
+                    name = mineral.__module__.replace("minlib_","").replace("burnman.","minerals.") + "." + mineral.__name__
+                    if not name in names:
+                        names.add(name)
+                        try:
+                            x=mineral()
+                            phases.append(x)
+                        except:
+                            print ""
+
+        
+    for a in names:
+        print a
+
+
+    print ""
+
+
     
     params = ['ref_V','ref_K','K_prime','ref_mu','mu_prime','molar_mass','n','ref_Debye','ref_grueneisen','q0','eta_0s']
     
@@ -45,8 +63,9 @@ if __name__ == "__main__":
     table = [ ['Name'] + params ]
     
     for p in phases:
-        p.set_method('bm2')
-        p.set_state(0,300)
+        print p.__class__.__name__
+        p.set_method('bm3')
+        p.set_state(1e9,300)
         row = create_list(p)
         table.append(row)
             
