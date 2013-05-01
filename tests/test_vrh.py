@@ -73,8 +73,8 @@ class VRH(unittest.TestCase):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.composite ( ( (minerals.periclase(), 1.0), 
-                                     (minerals.fe_perovskite(), 0.0) ) )
+        rock = burnman.composite ( [ (minerals.SLB2005.periclase(), 1.0), 
+                                     (minerals.SLB2005.fe_perovskite(), 0.0) ] )
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, mu_vrh = \
             voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
