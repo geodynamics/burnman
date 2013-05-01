@@ -57,8 +57,8 @@ if __name__ == "__main__":
     temperature = [geotherm(p) for p in seis_p]
     
     def material_error(amount_perovskite):
-        rock = burnman.composite ( [ (minerals.Murakami_fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_fe_periclase(), 1.0 - amount_perovskite) ] )
+        rock = burnman.composite ( [ (minerals.Muretal2012.fe_perovskite(), amount_perovskite),
+                             (minerals.Muretal2012.fe_periclase(), 1.0 - amount_perovskite) ] )
     
         rock.set_method(method)
     

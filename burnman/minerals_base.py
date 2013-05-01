@@ -76,7 +76,7 @@ class material:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 
     def to_string(self):
-        return "'" + self.__class__.__name__ + "'"
+        return "'" + self.__class__.__module__ + "." + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
         """ Update the material to the given pressure [Pa] and temperature.

@@ -9,7 +9,7 @@ from minerals_base import *
 
 
 
-class SLB2011_stishovite (material):
+class stishovite (material):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -29,7 +29,7 @@ class SLB2011_stishovite (material):
             'eta_0s': 4.6 }
 
 
-class SLB2011_periclase (material):
+class periclase (material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
@@ -48,7 +48,7 @@ class SLB2011_periclase (material):
             'q0': 1.7,
             'eta_0s': 2.8 }
 
-class SLB2011_wuestite (material):
+class wuestite (material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
@@ -69,22 +69,22 @@ class SLB2011_wuestite (material):
 
 
 
-class SLB2011_ferropericlase(helper_volumetric_mixing):
+class ferropericlase(helper_volumetric_mixing):
     def __init__(self, fe_num):
-        base_materials = [SLB2011_periclase(), SLB2011_wuestite()]
+        base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
 
-class SLB2011_mg_fe_perovskite(helper_volumetric_mixing):
+class mg_fe_perovskite(helper_volumetric_mixing):
     def __init__(self, fe_num):
-        base_materials = [SLB2011_mg_perovskite(), SLB2011_fe_perovskite()]
+        base_materials = [mg_perovskite(), fe_perovskite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
 
 
-class SLB2011_mg_perovskite(material):
+class mg_perovskite(material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein  
     """
@@ -103,7 +103,7 @@ class SLB2011_mg_perovskite(material):
             'q0': 1.1,
             'eta_0s': 2.6 }
 
-class SLB2011_fe_perovskite(material):
+class fe_perovskite(material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
@@ -123,14 +123,14 @@ class SLB2011_fe_perovskite(material):
             'eta_0s': 2.3 }
 
 
-class SLB2011_mg_fe_perovskite_pt_dependent(helper_fe_dependent):
+class mg_fe_perovskite_pt_dependent(helper_fe_dependent):
     def __init__(self, iron_number_with_pt, idx):
         helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
 
-class SLB2011_ferropericlase_pt_dependent(helper_fe_dependent):
+class ferropericlase_pt_dependent(helper_fe_dependent):
     def __init__(self, iron_number_with_pt, idx):
         helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
 

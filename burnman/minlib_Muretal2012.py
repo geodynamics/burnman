@@ -9,7 +9,7 @@ from minerals_base import *
 
 
 
-class Murakami_mg_perovskite(material):  
+class mg_perovskite(material):  
     """
     Murakami et al. (2012) supplementary table 5 and references therein, ref_V from Stixrude & Lithgow-Bertolloni 2005
     """
@@ -28,7 +28,7 @@ class Murakami_mg_perovskite(material):
             'q0': 1.4,
             'eta_0s': 2.4 } 
 
-class Murakami_mg_perovskite_3rdorder(material):
+class mg_perovskite_3rdorder(material):
     """
     Murakami et al. (2012) third order fit to supplementary table 1, includes 4% Al 
     """
@@ -47,7 +47,7 @@ class Murakami_mg_perovskite_3rdorder(material):
             'q0': 1.4,
             'eta_0s': 2.4 }
 
-class Murakami_fe_perovskite(material): 
+class fe_perovskite(material): 
     """
     Murakami et al. (2012), personal communication, Mg#=94, Al=4%
     """
@@ -68,7 +68,7 @@ class Murakami_fe_perovskite(material):
 
 
             
-class Murakami_mg_periclase(material):
+class mg_periclase(material):
     """
     Murakami et al. (2012) supplementary table 5 and references therein, ref_V from Stixrude & Lithgow-Bertolloni 2005
     """
@@ -89,15 +89,15 @@ class Murakami_mg_periclase(material):
 
 
 
-class Murakami_fe_periclase(helper_spin_transition):
+class fe_periclase(helper_spin_transition):
     def __init__(self):
-        helper_spin_transition.__init__(self, 63.0e9, Murakami_fe_periclase_LS(), Murakami_fe_periclase_HS())
+        helper_spin_transition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
-class Murakami_fe_periclase_3rd(helper_spin_transition):
+class fe_periclase_3rd(helper_spin_transition):
     def __init__(self):
-        helper_spin_transition.__init__(self, 63.0e9, Murakami_fe_periclase_LS(), Murakami_fe_periclase_HS())
+        helper_spin_transition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
-class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+class fe_periclase_HS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     """
     Murakami et al. (2012), personal communication, Mg#=79 
     """
@@ -116,7 +116,7 @@ class Murakami_fe_periclase_HS(material):  # From Murakami's emails, see Cayman 
             'q0': 1.5,
             'eta_0s': 2.54 }
 
-class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+class fe_periclase_LS(material):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     """
     Murakami et al. (2012), personal communication, Mg#=79
     """
@@ -137,7 +137,7 @@ class Murakami_fe_periclase_LS(material):  # From Murakami's emails, see Cayman 
 
 
 
-class Murakami_fe_periclase_HS_3rd(material): 
+class fe_periclase_HS_3rd(material): 
     """
     Murakami et al. (2012), personal communication, Mg#=92
     """
@@ -156,7 +156,7 @@ class Murakami_fe_periclase_HS_3rd(material):
             'q0': 1.5,
             'eta_0s': 2.54 }
 
-class Murakami_fe_periclase_LS_3rd(material):  
+class fe_periclase_LS_3rd(material):  
     """
     Murakami et al. (2012), personal communication, Mg#=92
     """

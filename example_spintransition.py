@@ -45,7 +45,7 @@ if __name__ == "__main__":
     
     
     # We create one mineral that contains spin transitions
-    rock = burnman.composite ( [(minerals.Murakami_fe_periclase(), 1.0)] )
+    rock = burnman.composite ( [(minerals.Muretal2012.fe_periclase(), 1.0)] )
 
     # The mineral Murakami_fe_periclase is derived from minerals.helper_spin_transition
     # which contains the logic to switch between two other minerals based on the
@@ -83,21 +83,21 @@ if __name__ == "__main__":
     
     # example 2: Here we show the effects of using purely High Spin or Low Spin
     
-    rock = burnman.composite( [(minerals.Murakami_fe_periclase_LS(), 1.0)] )
+    rock = burnman.composite( [(minerals.Muretal2012.fe_periclase_LS(), 1.0)] )
     rock.set_method('slb2')
     
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
     
-    rock = burnman.composite( [(minerals.Murakami_fe_periclase_HS(), 1.0)] )
+    rock = burnman.composite( [(minerals.Muretal2012.fe_periclase_HS(), 1.0)] )
     rock.set_method('slb2')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
             burnman.velocities_from_rock(rock, seis_p, temperature, \
             burnman.averaging_schemes.voigt_reuss_hill())
 
     
-    rock = burnman.composite( [(minerals.Murakami_fe_periclase(), 1.0)] )
+    rock = burnman.composite( [(minerals.Muretal2012.fe_periclase(), 1.0)] )
     rock.set_method('slb2')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
             burnman.velocities_from_rock(rock, seis_p, temperature, \
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # Example 3: Periclase from Speziale et al. 2006 
     # Here the compositions are implemented as fixed minerals. 
     #For other options see example_composition.py
-    rock = burnman.composite( [(minerals.Speziale_fe_periclase(), 1.0)] )
+    rock = burnman.composite( [(minerals.other.Speziale_fe_periclase(), 1.0)] )
     
     rock.set_method('slb3')
     

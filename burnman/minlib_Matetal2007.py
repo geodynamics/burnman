@@ -7,7 +7,7 @@ from minerals_base import *
 
 
 
-class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
+class mg_perovskite(material): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -25,7 +25,7 @@ class Matas_mg_perovskite(material): # Matas et al 2007 Tables 1&2
             'ref_grueneisen': 1.48,
             'q0': 1.4} 
 
-class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
+class fe_perovskite(material): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -43,7 +43,7 @@ class Matas_fe_perovskite(material): # Matas et al 2007 Tables 1&2
             'ref_grueneisen': 1.48,
             'q0': 1.4} 
 
-class Matas_periclase (material): # Matas et al 2007 Tables 1&2
+class periclase (material): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -61,7 +61,7 @@ class Matas_periclase (material): # Matas et al 2007 Tables 1&2
             'ref_grueneisen': 1.41,
             'q0': 1.3 }
 
-class Matas_wuestite (material): # Matas et al 2007 Tables 1&2
+class wuestite (material): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """

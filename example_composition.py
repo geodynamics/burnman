@@ -72,15 +72,15 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.composite ( [ (minerals.SLB2011_mg_perovskite(), amount_perovskite),
-                                     (minerals.SLB2011_periclase(), \
+        rock = burnman.composite ( [ (minerals.SLB2011.mg_perovskite(), amount_perovskite),
+                                     (minerals.SLB2011.periclase(), \
                                      1.0-amount_perovskite) ] )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite( [ (minerals.SLB2011_mg_fe_perovskite(0.2), amount_perovskite), \
-                                (minerals.SLB2011_ferropericlase(0.2), 1.0-amount_perovskite) ] )
+        rock = burnman.composite( [ (minerals.SLB2011.mg_fe_perovskite(0.2), amount_perovskite), \
+                                (minerals.SLB2011.ferropericlase(0.2), 1.0-amount_perovskite) ] )
     
     #Example 3: input weight percentages
     #See comments in example_partition_coef.py for references to 
@@ -102,9 +102,9 @@ if __name__ == "__main__":
         
     #Example 4: three materials
     if False:
-        rock = burnman.composite ( [ (minerals.SLB2011_fe_perovskite(), 0.7),
-                                     (minerals.SLB2011_ferropericlase(0.5), 0.2) ,
-                                     (minerals.SLB2011_stishovite(), 0.1 ) ] )
+        rock = burnman.composite ( [ (minerals.SLB2011.fe_perovskite(), 0.7),
+                                     (minerals.SLB2011.ferropericlase(0.5), 0.2) ,
+                                     (minerals.SLB2011.stishovite(), 0.1 ) ] )
     
     
     #seismic model for comparison:
