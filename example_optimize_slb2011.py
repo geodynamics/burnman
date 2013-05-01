@@ -44,7 +44,7 @@ def error(guess, pressures, obs_rho, obs_vs, obs_vphi):
     vphi_l2 = [ (vphi[i] - obs_vphi[i])*(vphi[i] - obs_vphi[i])/(obs_vphi[i]*obs_vphi[i]) for i in range(len(obs_vphi)) ]
     rho_l2=[(rho[i] - obs_rho[i])*(rho[i]-obs_rho[i])/(obs_rho[i]*obs_rho[i]) for i in range(len(obs_rho)) ]
     l2_error= sum(vphi_l2)+sum(vs_l2)+ sum(rho_l2)
-    print l2_error
+    print "current error:", l2_error
     return l2_error
 
 pressures=np.linspace(30e9,120e9,20)
