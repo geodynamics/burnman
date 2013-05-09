@@ -43,6 +43,43 @@ class fe_perovskite(material): # Matas et al 2007 Tables 1&2
             'ref_grueneisen': 1.48,
             'q0': 1.4} 
 
+class al_perovskite(material): # Matas et al 2007 Tables 1&2
+    """
+    Matas et al. 2007 and references therein
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'mgd2',
+            'ref_V': 24.58e-6,
+            'ref_K': 249.0e9,
+            'K_prime': 4.0,
+            'ref_mu': 165.0e9,
+            'mu_prime': 1.8,
+            'molar_mass': .1005,
+            'n': 5,
+            'ref_Debye': 1021.,
+            'ref_grueneisen': 1.48,
+            'q0': 1.4}
+
+class ca_perovskite(material): # Matas et al 2007 Tables 1&2
+    """
+    Matas et al. 2007 and references therein
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'mgd2',
+            'ref_V': 27.45e-6,
+            'ref_K': 236.0e9,
+            'K_prime': 3.9,
+            'ref_mu': 165.0e9,
+            'mu_prime': 2.46,
+            'molar_mass': .11616,
+            'n': 5,
+            'ref_Debye': 984.,
+            'ref_grueneisen': 1.53,
+            'q0': 1.6}
+
+
 class periclase (material): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein

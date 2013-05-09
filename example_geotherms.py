@@ -87,5 +87,6 @@ if __name__ == "__main__":
     plt.xlim([0, 130])
     plt.xlabel('Pressure/GPa')
     plt.ylabel('Temperature')
+    plt.savefig("Output_figures/example_geotherm.png")
     plt.show()
     
