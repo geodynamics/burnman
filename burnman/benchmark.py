@@ -167,6 +167,77 @@ def check_slb_fig3():
     plt.title("Comparing with Figure 3 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
+def check_slb_fig7_txt():
+    forsterite = burnman.material() 
+    forsterite.params = {       'name': 'forsterite',
+                    'ref_V': 43.603e-6,
+                    'ref_K': 127.955e9,
+                    'K_prime': 4.232,
+                    'ref_mu' : 81.6e9,
+                    'mu_prime' : 1.4,
+                    'molar_mass': .140695,
+                    'n': 7.0,
+                    'ref_Debye': 809.183,
+                    'ref_grueneisen': .993,
+                    'q0': 2.1, 
+                    'eta_0s' : 2.364}
+    forsterite.set_method('slb3')
+
+    data = np.loadtxt("data/slb_fig7.txt", skiprows=1)
+ 
+    temperature = np.array(data[:,2])
+    pressure = np.array(data[:,0])
+    rho = np.array(data[:,3])
+    rho_comp = np.empty_like(rho)
+    Kt = np.array(data[:,4])
+    Kt_comp = np.empty_like(Kt)
+    Ks = np.array(data[:,5])
+    Ks_comp = np.empty_like(Ks)
+    G = np.array(data[:,6])
+    G_comp = np.empty_like(G)
+    VB = np.array(data[:,7])
+    VB_comp = np.empty_like(VB)
+    VS = np.array(data[:,8])
+    VS_comp = np.empty_like(VS) 
+    VP = np.array(data[:,9])
+    VP_comp = np.empty_like(VP) 
+    vol = np.array(data[:,10])
+    vol_comp = np.empty_like(vol)   
+    alpha = np.array(data[:,11])
+    alpha_comp = np.empty_like(alpha) 
+    Cp = np.array(data[:,12])
+    Cp_comp = np.empty_like(Cp)
+    
+    for  i in range(len(temperature)):
+      forsterite.set_state(pressure[i], temperature[i])
+      rho_comp[i] = 100.*(forsterite.density()/1000. - rho[i])/rho[-1]
+      Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus()/1.e9 - Kt[i])/Kt[-1]
+      Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus()/1.e9 - Ks[i])/Ks[-1]
+      G_comp[i] = 100.*(forsterite.shear_modulus()/1.e9 - G[i])/G[-1]
+      VB_comp[i] = 100.*(forsterite.v_phi()/1000. - VB[i])/VB[-1]
+      VS_comp[i] = 100.*(forsterite.v_s()/1000. - VS[i])/VS[-1]
+      VP_comp[i] = 100.*(forsterite.v_p()/1000. - VP[i])/VP[-1]
+      vol_comp[i] = 100.*(forsterite.molar_volume()*1.e6 - vol[i])/vol[-1]
+      alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/alpha[-1]
+      Cp_comp[i] = (forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/Cp[-1]
+      
+    plt.plot(temperature, rho_comp, label=r'$\rho$')
+    plt.plot(temperature, Kt_comp, label=r'$K_S$')
+    plt.plot(temperature, Ks_comp, label=r'$K_T$')
+    plt.plot(temperature, G_comp, label=r'$G$')
+    plt.plot(temperature, VS_comp, label=r'$V_S$')
+    plt.plot(temperature, VP_comp, label=r'$V_P$')
+    plt.plot(temperature, VB_comp, label = r'$V_\phi$')
+    plt.plot(temperature, vol_comp, label = r'$V$')
+    plt.plot(temperature, alpha_comp, label = r'$\alpha$')
+    plt.plot(temperature, Cp_comp, label = r'$c_P$')
+  
+    plt.xlabel("Temperature (K)")
+    plt.ylabel("% difference with Stixrude+Lithgow-Bertelloni's code")
+    plt.ylim(-1.0,1.0)
+    plt.legend()
+    plt.show()
+
 def check_slb_fig7():
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
@@ -219,7 +290,7 @@ def check_slb_fig7():
     plt.xlim(0,2200)
     plt.xlabel("Temperature (K)")
     plt.ylabel("Heat Capacity Cp")
-    plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
+    plt.title("Comparing with adiabatic_bulk_modulus7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
 
@@ -249,3 +320,4 @@ if __name__ == "__main__":
     check_slb_fig3()
     check_mgd_shim_duffy_kenichi()
     check_mgd_fei_mao_shu_hu()
+    check_slb_fig7_txt()
