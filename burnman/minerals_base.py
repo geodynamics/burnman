@@ -137,6 +137,8 @@ class material:
     def v_p(self):
         return np.sqrt((self.bulk_modulus() + 4. / 3. * \
             self.shear_modulus()) / self.density()) 
+    def v_phi(self):
+        return np.sqrt(self.bulk_modulus() / self.density())
 
 # combines two or more materials given a fixed molar_fraction
 class helper_volumetric_mixing(material):
