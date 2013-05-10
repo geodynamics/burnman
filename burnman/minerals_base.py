@@ -119,7 +119,7 @@ class material:
         return self.V
     def grueneisen_parameter(self):
         return self.gr
-    def bulk_modulus(self):
+    def isothermal_bulk_modulus(self):
         return self.K_T
     def adiabatic_bulk_modulus(self):
         return self.K_S
@@ -135,10 +135,10 @@ class material:
         return np.sqrt(self.shear_modulus() / \
             self.density()) 
     def v_p(self):
-        return np.sqrt((self.bulk_modulus() + 4. / 3. * \
+        return np.sqrt((self.adiabatic_bulk_modulus() + 4. / 3. * \
             self.shear_modulus()) / self.density()) 
     def v_phi(self):
-        return np.sqrt(self.bulk_modulus() / self.density())
+        return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
 
 # combines two or more materials given a fixed molar_fraction
 class helper_volumetric_mixing(material):
