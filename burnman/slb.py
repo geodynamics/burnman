@@ -23,7 +23,7 @@ class slb_base(equation_of_state):
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
+        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
         gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
         q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
         return q
@@ -84,8 +84,6 @@ class slb_base(equation_of_state):
         C_v = debye.heat_capacity_v(temperature, debye_T, params['n']) #heat capacity at temperature T
         C_v_ref = debye.heat_capacity_v(300.,debye_T, params['n']) #heat capacity at reference temperature
 
-        #f =.5*(pow(params['ref_V']/V,2./3.)-1) # EQ 24
-
         q = self.volume_dependent_q(params['ref_V']/volume, params)
     
         K = bm.bulk_modulus(volume, params) \
@@ -105,14 +103,11 @@ class slb_base(equation_of_state):
 
     def shear_modulus(self, pressure, temperature, volume, params):
         debye_T = self.__debye_temperature(params['ref_V']/volume, params)
-        #gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         eta_s = self.__isotropic_eta_s(params['ref_V']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
         E_th_ref = debye.thermal_energy(300.,debye_T, params['n'])
 
-        #f =.5*(pow(params['ref_V']/V,2./3.)-1.) # EQ 24
-  
         if self.order==2:
             return bm.shear_modulus_second_order(volume, params) - eta_s * (E_th-E_th_ref) / volume
         elif self.order==3:
