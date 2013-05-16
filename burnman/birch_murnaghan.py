@@ -16,8 +16,8 @@ def bulk_modulus(volume, params):
     x = params['ref_V']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
 
-    K = pow(1. + 2*f, 5./2.)* (params['ref_K'] + (3. * params['ref_K'] * params['K_prime'] -  \
-           5*params['ref_K'] ) * f + 27./2. * (params['ref_K']*params['K_prime'] - 4* params['ref_K'])*f*f)
+    K = pow(1. + 2.*f, 5./2.)* (params['ref_K'] + (3. * params['ref_K'] * params['K_prime'] -  \
+           5*params['ref_K'] ) * f + 27./2. * (params['ref_K']*params['K_prime'] - 4.* params['ref_K'])*f*f)
     return K
 
 def birch_murnaghan(x, params):
