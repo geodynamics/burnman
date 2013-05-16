@@ -179,7 +179,7 @@ def check_slb_fig7_txt():
                     'n': 7.0,
                     'ref_Debye': 809.183,
                     'ref_grueneisen': .993,
-                    'q0': 2.1, 
+                    'q0': 2.093, 
                     'eta_0s' : 2.364}
     forsterite.set_method('slb3')
 
@@ -217,29 +217,22 @@ def check_slb_fig7_txt():
     Cp = np.array(data[:,12])
     fCp = np.empty_like(Cp)
     Cp_comp = np.empty_like(Cp)
+    gr = np.array(data[:,13])
+    gr_comp = np.empty_like(gr)
     
     for  i in range(len(temperature)):
       forsterite.set_state(pressure[i], temperature[i])
-      frho[i]=forsterite.density()/1.e3
-      fKt[i]=forsterite.isothermal_bulk_modulus()/1.e9
-      fKs[i]=forsterite.adiabatic_bulk_modulus()/1.e9
-      fG[i]=forsterite.shear_modulus()/1.e9
-      fVB[i]=forsterite.v_phi()/1.e3
-      fVS[i]=forsterite.v_s()/1.e3
-      fVP[i]=forsterite.v_p()/1.e3
-      fvol[i]=forsterite.molar_volume()
-      falpha[i]=forsterite.thermal_expansivity()
-      fCp[i]=forsterite.heat_capacity_p()/forsterite.params['molar_mass']
-      rho_comp[i] = 100.*(forsterite.density()/1000. - rho[i])/rho[-1]
-      Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus()/1.e9 - Kt[i])/Kt[-1]
-      Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus()/1.e9 - Ks[i])/Ks[-1]
-      G_comp[i] = 100.*(forsterite.shear_modulus()/1.e9 - G[i])/G[-1]
-      VB_comp[i] = 100.*(forsterite.v_phi()/1000. - VB[i])/VB[-1]
-      VS_comp[i] = 100.*(forsterite.v_s()/1000. - VS[i])/VS[-1]
-      VP_comp[i] = 100.*(forsterite.v_p()/1000. - VP[i])/VP[-1]
-      vol_comp[i] = 100.*(forsterite.molar_volume()*1.e6 - vol[i])/vol[-1]
-      alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/alpha[-1]
-      Cp_comp[i] = (forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/Cp[-1]
+      rho_comp[i] = 100.*(forsterite.density()/1000. - rho[i])/rho[i]
+      Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus()/1.e9 - Kt[i])/Kt[i]
+      Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus()/1.e9 - Ks[i])/Ks[i]
+      G_comp[i] = 100.*(forsterite.shear_modulus()/1.e9 - G[i])/G[i]
+      VB_comp[i] = 100.*(forsterite.v_phi()/1000. - VB[i])/VB[i]
+      VS_comp[i] = 100.*(forsterite.v_s()/1000. - VS[i])/VS[i]
+      VP_comp[i] = 100.*(forsterite.v_p()/1000. - VP[i])/VP[i]
+      vol_comp[i] = 100.*(forsterite.molar_volume()*1.e6 - vol[i])/vol[i]
+      alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/(alpha[-1])
+      Cp_comp[i] = 100.*(forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
+      gr_comp[i] = (forsterite.grueneisen_parameter() - gr[i])/gr[i]
       
     plt.plot(temperature, rho_comp, label=r'$\rho$')
     plt.plot(temperature, Kt_comp, label=r'$K_S$')
@@ -251,66 +244,13 @@ def check_slb_fig7_txt():
     plt.plot(temperature, vol_comp, label = r'$V$')
     plt.plot(temperature, alpha_comp, label = r'$\alpha$')
     plt.plot(temperature, Cp_comp, label = r'$c_P$')
+    plt.plot(temperature, gr_comp, label = r'$\gamma$')
   
     plt.xlabel("Temperature (K)")
     plt.ylabel("% difference with Stixrude+Lithgow-Bertelloni's code")
-    plt.ylim(-1.0,1.0)
-    plt.legend()
+    plt.legend(loc="upper right")
     plt.savefig("output_figures/benchmark1.png")
     plt.show()
-    plt.close()
-
-    plt.subplot(2,2,1)
-    plt.plot(temperature,rho,'r')
-    plt.plot(temperature,frho,'k+')
-    plt.plot(temperature,VS,'r')
-    plt.plot(temperature,fVS,'k+')
-    plt.plot(temperature,VB,'r')
-    plt.plot(temperature,fVB,'k+')
-    plt.plot(temperature,VP,'r')
-    plt.plot(temperature,fVP,'k+')
-    plt.xlabel("Temperature (K)")
-    plt.ylabel("Velocity (km/s)")
-    plt.xlim(0,2200)
-    plt.text(2000,3.2,r'$\rho$')
-    plt.text(1990,4.5,r'$V_S$')
-    plt.text(1990,5.9,r'$V_\phi$')
-    plt.text(1990,7.8,r'$V_P$')
-    plt.subplot(2,2,2)
-    plt.plot(temperature,Ks,'r')
-    plt.plot(temperature,fKs,'k+')
-    plt.plot(temperature,Kt,'r')
-    plt.plot(temperature,fKt,'k+')
-    plt.plot(temperature,G,'r')
-    plt.plot(temperature,fG,'k+')
-    plt.xlabel("Temperature (K)")
-    plt.ylabel("Modulus (GPa)")
-    plt.xlim(0,2200)
-    plt.text(1980,59,r'$G$')
-    plt.text(1980,75,r'$K_T$')
-    plt.text(1980,100,r'$K_S$')
-    plt.subplot(2,2,3)
-    plt.plot(temperature,vol/1.e6,'r')
-    plt.plot(temperature,fvol,'k+')
-    plt.plot(temperature,alpha/1.e5,'r')
-    plt.plot(temperature,falpha,'k+')
-    plt.xlabel("Temperature (K)")
-    plt.ylabel(r"Thermal Expansivity/ Volume ($\frac{m^3}{mol}$)")
-    plt.xlim(0,2200)
-    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-    plt.text(1100,3.1e-5,r'$V$')
-    plt.text(1000,4.6e-5,r'$\alpha$')
-    plt.subplot(2,2,4)
-    plt.plot(temperature,Cp*1e3,'r')
-    plt.plot(temperature,fCp,'k+')
-    plt.xlabel("Temperature (K)")
-    plt.ylabel(r"Heat Capacity ($\frac{J}{m^3K}$)")
-    plt.xlim(0,2200)
-    plt.text(1980,1.42,r'$C_P$')
-    plt.savefig("output_figures/benchmark2.png")
-
-    plt.show() 
-
 
 def check_slb_fig7():
     forsterite = burnman.material() 
@@ -389,9 +329,9 @@ def check_slb_fig7():
     plt.show()
 
 if __name__ == "__main__":
-    #check_birch_murnaghan()
-    #check_slb_fig7()
-    #check_slb_fig3()
-    #check_mgd_shim_duffy_kenichi()
-    #check_mgd_fei_mao_shu_hu()
+    check_birch_murnaghan()
+    check_slb_fig7()
+    check_slb_fig3()
+    check_mgd_shim_duffy_kenichi()
+    check_mgd_fei_mao_shu_hu()
     check_slb_fig7_txt()
