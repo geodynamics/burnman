@@ -24,10 +24,15 @@ def watson_baxter(pressure):
 
 
 
-# geotherm from Brown and Shankland 81
+# geotherm from Brown and Shankland 1981
 def brown_shankland(pressure):
     depth = seismic.prem_model.depth(pressure)/1.e3
     return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
+
+# geotherm from Anderson 1982
+def anderson(pressure):
+    depth = seismic.prem_model.depth(pressure)/1.e3
+    return lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)
 
 #This integrates dT/dP = gr * T / K_s
 def self_consistent(pressures, T0, rock):
@@ -60,6 +65,10 @@ def dTdP(temperature, pressure, rock):
 table_brown = read_table("input_geotherm/brown_81.txt")
 table_brown_depth = np.array(table_brown)[:,0]
 table_brown_temperature = np.array(table_brown)[:,1]
+
+table_anderson = read_table("input_geotherm/anderson_82.txt")
+table_anderson_depth = np.array(table_anderson)[:,0]
+table_anderson_temperature = np.array(table_anderson)[:,1]
 
 # test geotherm
 if __name__ == "__main__":

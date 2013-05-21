@@ -2,7 +2,8 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-""" Generates a text table with mineral properties. """
+""" Generates a text table with mineral properties. Run 'python table.py latex' to write a tex version of the table to mytable.tex """
+
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -61,14 +62,23 @@ if __name__ == "__main__":
     
     
     table = [ ['Name'] + params ]
-    
+    tablel = []
+
     for p in phases:
         print p.to_string()
         p.set_method('bm3')
         p.set_state(1e9,300)
         row = create_list(p)
         table.append(row)
-            
+        tablel.append(row)    
     
     tools.pretty_print_table(table, False)
-    
+    if (sys.argv[1]=="latex"):
+        import table_latex as Table
+        fout = open('mytable.tex','w')
+        t = Table.Table(12, justs='lrrrrrrrrrrr', caption='Mineral parameters used', label="tab:label", rotate='True', fontsize='footnotesize')
+        t.add_header_row(['Name','ref\_V','ref\_K','K\_prime','ref\_mu','mu\_prime','molar\_mass','n','ref\_Debye','ref\_grueneisen','q0','eta\_0s'] )
+        t.add_data(map(list,zip(*tablel)), sigfigs=2)
+        t.print_table(fout)
+        fout.close() 
+        print "see mytable.tex for the latex version of the table" 

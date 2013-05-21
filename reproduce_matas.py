@@ -35,21 +35,21 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'mgd3' 
+    method = 'slb2' 
     
     
     # Input for model M_pyrolite as defined in Matas et al. 2007 table 3. Molar proportions are converted to atomic fractions    
 
     #weight_percents = {'Mg':0.297882, 'Fe': 0.0489699, 'Si':0.1819, 'Ca':0.0228576, 'Al':0.0116446}
     #phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
-    rock = burnman.composite( ( (minerals.Matas_mg_perovskite(),.620 ),
-                            (minerals.Matas_fe_perovskite(), .078 ),
-                            (minerals.Matas_periclase(), .268 ),
-                            (minerals.Matas_wuestite(), .034 )))
-    rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.62 ),
-                            (minerals.Matas_fe_perovskite(), .078/1.5 ),
-                            (minerals.Matas_periclase(), .268 ),
-                            (minerals.Matas_wuestite(), .034/1.5 ))) 
+    rock = burnman.composite( ( (minerals.Matetal2007.mg_perovskite(),.620 ),
+                            (minerals.Matetal2007.fe_perovskite(), .078 ),
+                            (minerals.Matetal2007.periclase(), .268 ),
+                            (minerals.Matetal2007.wuestite(), .034 )))
+    rock2 = burnman.composite( ( (minerals.Matetal2007.mg_perovskite(),.62 ),
+                            (minerals.Matetal2007.fe_perovskite(), .078/1.46 ),
+                            (minerals.Matetal2007.periclase(), .268 ),
+                            (minerals.Matetal2007.wuestite(), .034/1.46 ))) 
     #KD is 2... doesn't match either
     #rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.3574 ),
     #                        (minerals.Matas_fe_perovskite(), .0536 ),

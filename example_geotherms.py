@@ -7,10 +7,11 @@ This example shows each of the geotherms currently possible with BurnMan.
 These are:
 
 1. Brown and Shankland, 1981
-2. Watson and Baxter, 2007
-3. linear extrapolation
-4. Read in from file from user
-5. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
+2. Anderson, 1982
+3. Watson and Baxter, 2007
+4. linear extrapolation
+5. Read in from file from user
+6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
 
 requires:
 
@@ -39,13 +40,15 @@ if __name__ == "__main__":
     #load two builtin geotherms and evaluate the temperatures at all pressures
     geotherm1 = burnman.geotherm.brown_shankland
     temperature1 = [geotherm1(p) for p in pressures]
-    geotherm2 = burnman.geotherm.watson_baxter
+    geotherm2 = burnman.geotherm.anderson
     temperature2 = [geotherm2(p) for p in pressures]
+    geotherm3 = burnman.geotherm.watson_baxter
+    temperature3 = [geotherm3(p) for p in pressures]
     
     #a geotherm is actually just a function that returns a temperature given pressure in Pa
     #so we can just write our own function
-    geotherm3 = lambda p:  1500+(2500-1500)*p/128e9
-    temperature3 = [geotherm3(p) for p in pressures]
+    geotherm4 = lambda p:  1500+(2500-1500)*p/128e9
+    temperature4 = [geotherm4(p) for p in pressures]
     
     #what about a geotherm defined from datapoints given in a file (our inline)?
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
@@ -57,7 +60,7 @@ if __name__ == "__main__":
     
     my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate\
     (table_pressure, table_temperature, p)
-    temperature4 = [my_geotherm(p) for p in pressures]
+    temperature5 = [my_geotherm(p) for p in pressures]
 
 
     #finally, we can also calculate a self consistent 
@@ -72,16 +75,17 @@ if __name__ == "__main__":
     T0 = 1500.
     #then generate temperature values using the self consistent function. 
     # This takes more time than the above methods
-    temperature5 = burnman.geotherm.self_consistent(pressures, T0, pyrolite)
+    temperature6 = burnman.geotherm.self_consistent(pressures, T0, pyrolite)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
     
     
     plt.plot(pressures/1e9,temperature1,'-r',label="Brown, Shankland")
-    plt.plot(pressures/1e9,temperature2,'-g',label="Watson, Baxter")
-    plt.plot(pressures/1e9,temperature3,'-b',label="handwritten linear")
-    plt.plot(pressures/1e9,temperature4,'-k',label="handwritten from table")
-    plt.plot(pressures/1e9,temperature5,'-m',label="Adiabat with pv (70%) and fp(30%)")
+    plt.plot(pressures/1e9,temperature2,'-c',label="Anderson")
+    plt.plot(pressures/1e9,temperature3,'-g',label="Watson, Baxter")
+    plt.plot(pressures/1e9,temperature4,'-b',label="handwritten linear")
+    plt.plot(pressures/1e9,temperature5,'-k',label="handwritten from table")
+    plt.plot(pressures/1e9,temperature6,'-m',label="Adiabat with pv (70%) and fp(30%)")
     
     plt.legend(loc='lower right')
     plt.xlim([0, 130])
