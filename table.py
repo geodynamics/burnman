@@ -78,6 +78,10 @@ if __name__ == "__main__":
         tools.pretty_print_table(table, True)
     elif sys.argv[1]=="latex":
         import table_latex as Table
+
+        for r in tablel:
+            r[0]=r[0].replace("'","").replace("_","\_")
+
         fout = open('mytable.tex','w')
         t = Table.Table(12, justs='lrrrrrrrrrrr', caption='Mineral parameters used', label="tab:label", rotate='True', fontsize='footnotesize')
         t.add_header_row(['Name','ref\_V','ref\_K','K\_prime','ref\_mu','mu\_prime','molar\_mass','n','ref\_Debye','ref\_grueneisen','q0','eta\_0s'] )
