@@ -71,9 +71,12 @@ if __name__ == "__main__":
         row = create_list(p)
         table.append(row)
         tablel.append(row)    
-    
-    tools.pretty_print_table(table, False)
-    if (sys.argv[1]=="latex"):
+ 
+    if (len(sys.argv)==1):
+        tools.pretty_print_table(table, False)
+    elif sys.argv[1]=="tab":
+        tools.pretty_print_table(table, True)
+    elif sys.argv[1]=="latex":
         import table_latex as Table
         fout = open('mytable.tex','w')
         t = Table.Table(12, justs='lrrrrrrrrrrr', caption='Mineral parameters used', label="tab:label", rotate='True', fontsize='footnotesize')
