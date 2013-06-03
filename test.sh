@@ -26,6 +26,7 @@ cd ..
 python burnman/partitioning.py || exit 1
 
 cd misc
+echo "gen_doc..."
 python gen_doc.py >/dev/null || exit 1
 cd ..
 
@@ -40,32 +41,17 @@ testit $t
 diff output_figures/example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
 echo "   done"
 
-testit "example_compare_enstpyro.py"
-echo "   done"
+for test in `ls example*.py`
+do
+    [ $test == "example_inv_big_pv.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "example_inv_murakami.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "example_optimize_slb2011.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "example_premite_isothermal.py" ] && echo "*** skipping $test !" && continue
 
 
-
-testit "example_seismic.py"
-echo "   done"
-testit "example_compare_all_methods.py"
-echo "   done"
-testit "example_spintransition.py"
-echo "   done"
-testit "example_composition.py"
-echo "   done"
-testit "example_user_input_material.py"
-echo "   done"
-testit "example_geotherms.py"
-echo "   done"
-
-testit "example_woutput.py"
-echo "   done"
-
-testit "example_optimize_pv.py"
-echo "   done"
-
-testit "example_averaging.py"
-echo "   done"
+    testit $test
+    echo "   done"
+done
 
 
 testit "table.py"

@@ -1,0 +1,10 @@
+Optimization terminated successfully.
+         Current function value: 14212.177931
+         Iterations: 109
+         Function evaluations: 237
+2nd order fit: G =  169.498586734 GPa	G' =  1.48827806462
+Optimization terminated successfully.
+         Current function value: 16372.703008
+         Iterations: 105
+         Function evaluations: 238
+3rd order fit: G =  165.071101139 GPa	G' =  1.63332533474
