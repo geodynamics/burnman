@@ -21,7 +21,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.materials import composite
 import matplotlib.image as mpimg
 import numpy
 
