@@ -34,7 +34,7 @@ if __name__ == "__main__":
     or 'bm' (birch-murnaghan, if you choose to ignore temperature (your choice in geotherm will not matter in this case))
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)"""
     
-    method = 'mgd3' 
+    method = 'mgd2' 
     
     
     # Input for model M_pyrolite as defined in Matas et al. 2007 table 3. Molar proportions are converted to atomic fractions    
@@ -66,6 +66,14 @@ if __name__ == "__main__":
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)    
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs) 
+
+    #Next, we calculate the velocites with 3rd order Birch-Murnaghan
+    method='mgd2'
+    rock.set_method(method)
+    rock2.set_method(method)
+    mat_rho_1_3, mat_vp_1_3, mat_vs_1_3, mat_vphi_1_3, mat_K_1_3, mat_mu_1_3 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)
+    mat_rho_2_3, mat_vp_2_3, mat_vs_2_3, mat_vphi_2_3, mat_K_2_3, mat_mu_2_3 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs)
+
     
     # seismic velocities for comparison
     class ak135_table(burnman.seismic.radiustable):
@@ -125,8 +133,8 @@ if __name__ == "__main__":
     plt.legend(loc='upper left')
     
     plt.savefig("output_figures/reproduce_matas.png") 
-    plt.show()
-    plt.close()
+    #plt.show()
+    #plt.close()
 
     plt.subplot(1,1,1)
     plt.ylim(-2,5) 
@@ -136,6 +144,7 @@ if __name__ == "__main__":
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vs_1-seis_vs)/seis_vs,color='b',linestyle='--')
     plt.plot(d,100.*(mat_vs_2-seis_vs)/seis_vs,color='r',linestyle='--')
+    plt.title("Comparison M-pyrolite model Vs, 2nd order")
     plt.savefig("output_figures/reproduce_matas_cmp_vs.png")
     plt.show()
     plt.close()
@@ -148,6 +157,31 @@ if __name__ == "__main__":
     d=np.array(depths)/1.e3
     plt.plot(d,100.*(mat_vp_1-seis_vp)/seis_vp,color='b',linestyle='--')
     plt.plot(d,100.*(mat_vp_2-seis_vp)/seis_vp,color='r',linestyle='--')
+    plt.title("Comparison M-pyrolite model Vp, 2nd order")
     plt.savefig("output_figures/reproduce_matas_cmp_vp.png")
     plt.show()
 
+    plt.subplot(1,1,1)
+    plt.ylim(-2,5)
+    plt.xlim(800,3000)
+    fig1 = mpimg.imread('input_figures/matas_vs_forcomparison.png')
+    plt.imshow(fig1, extent=[800,3000,-2,5], aspect='auto')
+    d=np.array(depths)/1.e3
+    plt.plot(d,100.*(mat_vs_1_3-seis_vs)/seis_vs,color='b',linestyle='--')
+    plt.plot(d,100.*(mat_vs_2_3-seis_vs)/seis_vs,color='r',linestyle='--')
+    plt.title("Comparison M-pyrolite model Vs, 3rd order")
+    plt.savefig("output_figures/reproduce_matas_cmp_vs.png")
+    plt.show()
+    plt.close()
+
+    plt.subplot(1,1,1)
+    plt.ylim(-2,5)
+    plt.xlim(800,3000)
+    fig1 = mpimg.imread('input_figures/matas_vp_forcomparison.png')
+    plt.imshow(fig1, extent=[800,3000,-2,5], aspect='auto')
+    d=np.array(depths)/1.e3
+    plt.plot(d,100.*(mat_vp_1_3-seis_vp)/seis_vp,color='b',linestyle='--')
+    plt.plot(d,100.*(mat_vp_2_3-seis_vp)/seis_vp,color='r',linestyle='--')
+    plt.title("Comparison M-pyrolite model Vp, 3rd order")
+    plt.savefig("output_figures/reproduce_matas_cmp_vp.png")
+    plt.show()
