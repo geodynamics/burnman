@@ -245,10 +245,13 @@ def check_slb_fig7_txt():
     plt.plot(temperature, alpha_comp, label = r'$\alpha$')
     plt.plot(temperature, Cp_comp, label = r'$c_P$')
     plt.plot(temperature, gr_comp, label = r'$\gamma$')
-  
+
+    plt.xlim([0, 2750])
+    plt.ylim([-0.001, 0.001])
+    plt.xticks([0,800,1600,2200])
     plt.xlabel("Temperature (K)")
     plt.ylabel("% difference with Stixrude+Lithgow-Bertelloni's code")
-    plt.legend(loc="upper right")
+    plt.legend(loc="center right")
     plt.savefig("output_figures/benchmark1.png")
     plt.show()
 
