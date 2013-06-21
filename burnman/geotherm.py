@@ -45,7 +45,7 @@ def anderson(pressure):
     return temperature
 
 #This integrates dT/dP = gr * T / K_s
-def self_consistent(pressures, T0, rock):
+def adiabatic(pressures, T0, rock):
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
     return temperatures.ravel()
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     t1 = watson_baxter(p)
     t2 = brown_shankland(p)
-    t3 = self_consistent(p, 1600, pyrolite)
+    t3 = adiabatic(p, 1600, pyrolite)
 
     p1,=pyplot.plot(p,t1,'x--r')
     p2,=pyplot.plot(p,t2,'*-g')

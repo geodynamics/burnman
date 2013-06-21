@@ -66,10 +66,10 @@ if __name__ == "__main__":
     T0 = 0.
 
 
-    temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock)
+    temperature_1 = burnman.geotherm.adiabatic(seis_p_1, T0, rock)
  
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_1)  
-    temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock2)  
+    temperature_2 = burnman.geotherm.adiabatic(seis_p_1, T0, rock2)  
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_2) 
     
 

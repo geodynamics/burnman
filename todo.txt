@@ -15,7 +15,6 @@ Post Texas Meeting Todos:
 - Make figures pretty - Timo
 - Bibliography -- Sanne/Cayman
 - Write section about possibilities for extension/future plans -- Everyone
-- Change "self_consistent" to adiabat everywhere
 
 
 - warn if used eos and mineral eos are different
@@ -39,6 +38,7 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+x Change "self_consistent" to adiabat everywhere
 x allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
 x allow for the partition coeffecient as an input (maybe an example for this?)
 x include ak135

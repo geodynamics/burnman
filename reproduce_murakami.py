@@ -107,23 +107,23 @@ if __name__ == "__main__":
     
 
     T0 = 1600.
-    temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_1)
+    temperature_1 = burnman.geotherm.adiabatic(seis_p_1, T0, rock_1)
     
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock_1,seis_p_1, temperature_bs)    
     mat_rho_1a, mat_vp_1a, mat_vs_1a, mat_vphi_1a, mat_K_1a, mat_mu_1a = burnman.velocities_from_rock(rock_1,seis_p_1, temperature_an)     
 
-    temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_2)
+    temperature_2 = burnman.geotherm.adiabatic(seis_p_1, T0, rock_2)
     
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock_2,seis_p_2, temperature_bs)    
     mat_rho_2a, mat_vp_2a, mat_vs_2a, mat_vphi_2a, mat_K_2a, mat_mu_2a = burnman.velocities_from_rock(rock_2,seis_p_2, temperature_an)
 
-    temperature_3 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_3)
+    temperature_3 = burnman.geotherm.adiabatic(seis_p_1, T0, rock_3)
    
     mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = burnman.velocities_from_rock(rock_3,seis_p_3, temperature_bs)
 
     mat_rho_3a, mat_vp_3a, mat_vs_3a, mat_vphi_3a, mat_K_3a, mat_mu_3a = burnman.velocities_from_rock(rock_3,seis_p_3, temperature_an)
-    temperature_4 = burnman.geotherm.self_consistent(seis_p_1, T0, rock_4)
+    temperature_4 = burnman.geotherm.adiabatic(seis_p_1, T0, rock_4)
   
     mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = burnman.velocities_from_rock(rock_4,seis_p_4, temperature_bs)
     

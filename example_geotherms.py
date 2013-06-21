@@ -72,7 +72,7 @@ if __name__ == "__main__":
     T0 = 1500.
     #then generate temperature values using the self consistent function. 
     # This takes more time than the above methods
-    temperature6 = burnman.geotherm.self_consistent(pressures, T0, pyrolite)
+    temperature6 = burnman.geotherm.adiabatic(pressures, T0, pyrolite)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
     
