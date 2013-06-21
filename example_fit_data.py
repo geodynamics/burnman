@@ -9,7 +9,6 @@ must create a file with P, T and Vs. See input_minphys/ for example input
 files.
 
 requires:
-- geotherms
 - compute seismic velocities
 
 teaches:
