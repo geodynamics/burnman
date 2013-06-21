@@ -51,10 +51,8 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     depths = map(seismic_model.depth, seis_p_1)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)    
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_bs = [geotherm(p) for p in seis_p_1]
-    geotherm = burnman.geotherm.anderson
-    temperature_an = [geotherm(p) for p in seis_p_1]
+    temperature_bs = burnman.geotherm.brown_shankland(seis_p)
+    temperature_an = burnman.geotherm.anderson(seis_p)
   ##Now onto the second model parameters
     
     

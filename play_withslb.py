@@ -59,8 +59,7 @@ if __name__ == "__main__":
     rock.set_method(method) 
     rock2.set_method(method)
     seis_p_1 = np.arange(28e9, 128e9, 4.8e9)
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_bs = [geotherm(p) for p in seis_p_1]
+    temperature_bs = burnman.geotherm.brown_shankland(seis_p_1)
  
  
     #Now we'll calculate the models. 
@@ -68,7 +67,6 @@ if __name__ == "__main__":
 
 
     temperature_1 = burnman.geotherm.self_consistent(seis_p_1, T0, rock)
-    temperature_1
  
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_1)  
     temperature_2 = burnman.geotherm.self_consistent(seis_p_1, T0, rock2)  

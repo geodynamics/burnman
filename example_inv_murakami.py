@@ -20,8 +20,7 @@ depths = np.linspace(1000,2500, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 
-geotherm = burnman.geotherm.brown_shankland
-temperature = [geotherm(p) for p in seis_p]
+temperature = burnman.geotherm.brown_shankland(seis_p)
 
 
 print "preparations done"

@@ -60,8 +60,7 @@ if __name__ == "__main__":
     #define some pressure range
     pressures = np.arange(25e9,130e9,5e9)
     
-    geotherm = burnman.geotherm.brown_shankland
-    temperature = [geotherm(p) for p in pressures]
+    temperature = burnman.geotherm.brown_shankland(pressures)
     
     rock.set_method(method) #append method of calculation to suite of minerals chosen
     

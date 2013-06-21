@@ -67,8 +67,7 @@ if __name__ == "__main__":
     
     #input your geotherm. 
     
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_1 = [geotherm(p) for p in seis_p_1]
+    temperature_1 = burnman.geotherm.brown_shankland(seis_p_1)
     
     ##Now onto the second model parameters
     
@@ -93,9 +92,7 @@ if __name__ == "__main__":
     
     #input your geotherm. 
     
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_2 = [geotherm(p) for p in seis_p_2]
-    
+    temperature_2 = burnman.geotherm.brown_shankland(seis_p_2)
     
     #Now we'll calculate the models. 
     

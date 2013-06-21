@@ -58,8 +58,7 @@ if __name__ == "__main__":
     rock.set_method(method) 
     rock2.set_method(method)
     seis_p_1 = np.arange(28e9, 128e9, 4.8e9)
-    geotherm = burnman.geotherm.brown_shankland
-    temperature_bs = [geotherm(p) for p in seis_p_1]
+    temperature_bs = burnman.geotherm.brown_shankland(seis_p_1)
  
  
     #Now we'll calculate the models. 

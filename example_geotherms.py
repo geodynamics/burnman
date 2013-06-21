@@ -38,17 +38,14 @@ if __name__ == "__main__":
     pressures = np.arange(1e9,128e9,3e9)
     
     #load two builtin geotherms and evaluate the temperatures at all pressures
-    geotherm1 = burnman.geotherm.brown_shankland
-    temperature1 = [geotherm1(p) for p in pressures]
-    geotherm2 = burnman.geotherm.anderson
-    temperature2 = [geotherm2(p) for p in pressures]
-    geotherm3 = burnman.geotherm.watson_baxter
-    temperature3 = [geotherm3(p) for p in pressures]
+    temperature1 = burnman.geotherm.brown_shankland(pressures)
+    temperature2 = burnman.geotherm.anderson(pressures)
+    temperature3 = burnman.geotherm.watson_baxter(pressures)
     
-    #a geotherm is actually just a function that returns a temperature given pressure in Pa
+    #a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
     #so we can just write our own function
-    geotherm4 = lambda p:  1500+(2500-1500)*p/128e9
-    temperature4 = [geotherm4(p) for p in pressures]
+    my_geotherm_function = lambda p:  [ 1500+(2500-1500)*x/128e9 for x in p]
+    temperature4 = my_geotherm_function(pressures)
     
     #what about a geotherm defined from datapoints given in a file (our inline)?
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
@@ -58,9 +55,9 @@ if __name__ == "__main__":
     table_pressure = np.array(table)[:,0]
     table_temperature = np.array(table)[:,1]
     
-    my_geotherm = lambda p:  burnman.tools.lookup_and_interpolate\
-    (table_pressure, table_temperature, p)
-    temperature5 = [my_geotherm(p) for p in pressures]
+    my_geotherm_interpolate = lambda p:  [ burnman.tools.lookup_and_interpolate\
+                (table_pressure, table_temperature, x) for x in p]
+    temperature5 = my_geotherm_interpolate(pressures)
 
 
     #finally, we can also calculate a self consistent 

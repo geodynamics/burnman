@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     gt = lambda p: geotherm.brown_shankland(p)
     pressure = StartP
-    temperature = gt(StartP)
+    temperature = gt([StartP,])
     calculate_partition_coefficient(pressure, temperature, rel_mol_per, 0.5)
     #part_coef_calc(inp2,StartP,EndP,deltaP)
     #print inp1

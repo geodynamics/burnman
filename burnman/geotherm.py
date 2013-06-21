@@ -8,17 +8,21 @@ import matplotlib.pyplot as pyplot
 from tools import *
 import seismic
 import scipy.integrate as integrate
-from minerals import *
+import minerals
+from composite import *
 
 
 # polynomial fit from Watson, Baxter, EPSL, 2007
 # pressure: in Pa
 # return: temperature in K
 def watson_baxter(pressure):
-    if (pressure <= 15e9):
-        return 1900-1420*pow(0.8,pressure/1e9)
-    else:
-        return 1680+11.1*pressure/1e9
+    temperature = np.empty_like(pressure)
+    for i in range(len(pressure)):
+      if (pressure[i] <= 15e9):
+          temperature[i] = 1900-1420*pow(0.8,pressure[i]/1e9)
+      else:
+          temperature[i] = 1680+11.1*pressure[i]/1e9
+    return temperature
 
 
 
@@ -26,18 +30,24 @@ def watson_baxter(pressure):
 
 # geotherm from Brown and Shankland 1981
 def brown_shankland(pressure):
-    depth = seismic.prem_model.depth(pressure)/1.e3
-    return lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
+    temperature = np.empty_like(pressure)
+    for i in range(len(pressure)):
+      depth = seismic.prem_model.depth(pressure[i])/1.e3
+      temperature[i] = lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
+    return temperature
 
 # geotherm from Anderson 1982
 def anderson(pressure):
-    depth = seismic.prem_model.depth(pressure)/1.e3
-    return lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)
+    temperature = np.empty_like(pressure)
+    for i in range(len(pressure)):
+      depth = seismic.prem_model.depth(pressure[i])/1.e3
+      temperature[i] = lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
+    return temperature
 
 #This integrates dT/dP = gr * T / K_s
 def self_consistent(pressures, T0, rock):
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
-    return temperatures
+    return temperatures.ravel()
 
 #ODE to integrate temperature with depth for a composite material
 #Assumes that the minerals exist at a common pressure (Reuss bound, should be good for
@@ -73,12 +83,13 @@ table_anderson_temperature = np.array(table_anderson)[:,1]
 # test geotherm
 if __name__ == "__main__":
     p = np.arange(1.0e9,128.0e9,3e9)
-    t1 = [watson_baxter(y) for y in p]
-    t2 = [brown_shankland(y) for y in p]
   
-    pyrolite = composite( [ (mg_fe_perovskite(0.2), 0.8), (ferropericlase(0.4), 0.2) ] )
-    pyrolite.set_method('mgd')
+    pyrolite = composite( [ (minerals.SLB2011.mg_fe_perovskite(0.2), 0.8), (minerals.SLB2011.ferropericlase(0.4), 0.2) ] )
+    pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
+
+    t1 = watson_baxter(p)
+    t2 = brown_shankland(p)
     t3 = self_consistent(p, 1600, pyrolite)
 
     p1,=pyplot.plot(p,t1,'x--r')
