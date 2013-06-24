@@ -105,6 +105,20 @@ possible as well as each of the helpers involved with each example.
 5. example_averaging.py (Explains how moduli and density are averaged to
    calculate seismic velocities)
 
+
+*** About scripting in Python
+
+Burnman has the advantage of being adaptable and extendable in easy scripts. The downside might be that we do not
+provide a graphical user interface. For those of you who are not familiar  with python, we suspect it will still be 
+relatively easy to adapt the scripts for computations and plotting. 
+Here are some specific features and pitfalls on python:
+    - Python uses specific identation. A script might fail if a code block is not idented correctly. We use four spaces and no tabs, 
+      mixing these can give trouble.
+    - Indices require square brackets and function or method calls parentheses (mainly different from Matlab).
+    - The first index of an array is 0 (e.g. x[0])
+    - Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (rounded downward), while 5./3. will give 1.66666666667)
+
+
 *** Examples 
     (Note: the following text is automatically generated from misc/gen_doc.py,
     do not edit)
