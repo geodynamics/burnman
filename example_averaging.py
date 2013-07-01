@@ -77,27 +77,27 @@ if __name__ == "__main__":
 	moduli = burnman.average_moduli(moduli_list, \
 	burnman.averaging_schemes.voigt_reuss_hill())
 	mat_vs1, mat_vp1, mat_vphi1 = burnman.compute_velocities(moduli)
-	mat_K1, mat_mu1, mat_rho1 = moduli.K, moduli.mu, moduli.rho
+	mat_K1, mat_G1, mat_rho1 = moduli.K, moduli.G, moduli.rho
 
 	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.linear())
 	mat_vs2, mat_vp2, mat_vphi2 = burnman.compute_velocities(moduli)
-	mat_K2, mat_mu2, mat_rho2 = moduli.K, moduli.mu, moduli.rho
+	mat_K2, mat_G2, mat_rho2 = moduli.K, moduli.G, moduli.rho
 
 	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt())
 	mat_vs3, mat_vp3, mat_vphi3 = burnman.compute_velocities(moduli)
-	mat_K3, mat_mu3, mat_rho3 = moduli.K, moduli.mu, moduli.rho
+	mat_K3, mat_G3, mat_rho3 = moduli.K, moduli.G, moduli.rho
 
 	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.reuss())
 	mat_vs4, mat_vp4, mat_vphi4 = burnman.compute_velocities(moduli)
-	mat_K4, mat_mu4, mat_rho4 = moduli.K, moduli.mu, moduli.rho
+	mat_K4, mat_G4, mat_rho4 = moduli.K, moduli.G, moduli.rho
 	
 	moduli = moduli_list[0]
 	mat_vsa, mat_vpa, mat_vphia = burnman.compute_velocities(moduli)
-	mat_Ka, mat_mua, mat_rhoa = moduli.K, moduli.mu, moduli.rho
+	mat_Ka, mat_Ga, mat_rhoa = moduli.K, moduli.G, moduli.rho
 
 	moduli = moduli_list[1]
 	mat_vsb, mat_vpb, mat_vphib = burnman.compute_velocities(moduli)
-	mat_Kb, mat_mub, mat_rhob = moduli.K, moduli.mu, moduli.rho
+	mat_Kb, mat_Gb, mat_rhob = moduli.K, moduli.G, moduli.rho
 		
 	
 	# PLOTTING

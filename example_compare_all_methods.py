@@ -59,34 +59,34 @@ if __name__ == "__main__":
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = \
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('slb2')
     temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)    
     
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = \
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('slb3')
     temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)    
 
-    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_mu_3 = \
+    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('bm2')
     temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)    
 
-    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_mu_4 = \
+    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
 
     rock.set_method('bm3')
     temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)   
-    mat_rho_5, mat_vp_5, mat_vs_5, mat_vphi_5, mat_K_5, mat_mu_5 = \
+    mat_rho_5, mat_vp_5, mat_vs_5, mat_vphi_5, mat_K_5, mat_G_5 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
         

@@ -24,10 +24,10 @@ import burnman
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
         sys.path.insert(1,os.path.abspath('..')) 
 
-def calc_shear_velocities(ref_mu, mu_prime, mineral, pressures): 
+def calc_shear_velocities(ref_G, G_prime, mineral, pressures): 
 
-    mineral.params['ref_mu'] = ref_mu
-    mineral.params['mu_prime'] = mu_prime
+    mineral.params['ref_G'] = ref_G
+    mineral.params['G_prime'] = G_prime
 
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):

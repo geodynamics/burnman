@@ -87,9 +87,9 @@ class mgd_base(eos.equation_of_state):
     def __thermal_shear_modulus(self, T, V, params):
         gr = self.__grueneisen_parameter(params['ref_V']/V, params)
         Debye_T = self.__debye_temperature(params['ref_V']/V, params) 
-        mu_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
+        G_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
                  6*debye.R*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
-        return mu_th
+        return G_th
 
     #compute the Debye temperature in K.  Takes the
     #parameter x, which is ref_V/V (molar volumes).

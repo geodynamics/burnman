@@ -19,20 +19,20 @@ from composite import composite
 class elastic_properties:
     """
     class that contains volume V, density rho, bulk_modulus K and 
-    shear_modulus mu for a list of pressures.
+    shear_modulus G for a list of pressures.
     """
-    def __init__(self, V=None, rho=None, K=None, mu=None, fraction=None):
+    def __init__(self, V=None, rho=None, K=None, G=None, fraction=None):
         self.V = V
         self.rho = rho
         self.K = K
-        self.mu = mu
+        self.G = G
         self.fraction = fraction
 
     def set_size(self, size):
         self.V = np.ndarray(size)
         self.rho = np.ndarray(size)
         self.K = np.ndarray(size)
-        self.mu = np.ndarray(size)
+        self.G = np.ndarray(size)
         self.fraction = np.ndarray(size)
 
 
@@ -49,7 +49,7 @@ def calculate_moduli(rock, pressures, temperatures):
             ph = rock.phases[midx]
             m.V[idx] = ph.fraction * ph.mineral.molar_volume()
             m.K[idx] = ph.mineral.adiabatic_bulk_modulus()
-            m.mu[idx] = ph.mineral.shear_modulus()
+            m.G[idx] = ph.mineral.shear_modulus()
             m.rho[idx] = ph.mineral.molar_mass() / ph.mineral.molar_volume()
             m.fraction[idx] = ph.fraction
         
@@ -64,13 +64,13 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         fractions = [m.fraction[idx] for m in moduli_list]
         V_ph = [m.V[idx] for m in moduli_list]
         K_ph = [m.K[idx] for m in moduli_list]
-        mu_ph = [m.mu[idx] for m in moduli_list]
+        G_ph = [m.G[idx] for m in moduli_list]
         massfraction_ph = [m.rho[idx]*m.V[idx] for m in moduli_list]
                
         result.V[idx] = sum(V_ph)
         
         result.K[idx] = averaging_scheme.average(fractions, V_ph, K_ph)
-        result.mu[idx] = averaging_scheme.average(fractions, V_ph, mu_ph)
+        result.G[idx] = averaging_scheme.average(fractions, V_ph, G_ph)
         result.rho[idx] = sum(massfraction_ph) / result.V[idx]
         result.fraction[idx] = 1.0
     return result
@@ -81,8 +81,8 @@ def compute_velocities(moduli):
     mat_vphi = np.ndarray(len(moduli.V))
     
     for i in range(len(moduli.V)):
-        mat_vs[i] = np.sqrt( moduli.mu[i] / moduli.rho[i])
-        mat_vp[i] = np.sqrt( (moduli.K[i] + 4./3.*moduli.mu[i]) / moduli.rho[i])
+        mat_vs[i] = np.sqrt( moduli.G[i] / moduli.rho[i])
+        mat_vp[i] = np.sqrt( (moduli.K[i] + 4./3.*moduli.G[i]) / moduli.rho[i])
         mat_vphi[i] = np.sqrt( moduli.K[i] / moduli.rho[i])
     
     return mat_vp, mat_vs, mat_vphi
@@ -93,14 +93,14 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli)
-    return moduli.rho, mat_vp, mat_vs, mat_vphi, moduli.K, moduli.mu
+    return moduli.rho, mat_vp, mat_vs, mat_vphi, moduli.K, moduli.G
 
 # def whole_darn_thing_one_mat(mineral, pressures, temperatures):
 # 
 #     rock = composite( ( (mineral, 1.0) ) )
 #     moduli_list = calculate_moduli(rock, pressures, temperatures)
 #     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli_list[0])
-#     return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].mu 
+#     return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].G 
 
 
 

@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
 
     
-    params = ['ref_V','ref_K','K_prime','ref_mu','mu_prime','molar_mass','n','ref_Debye','ref_grueneisen','q0','eta_0s']
+    params = ['ref_V','ref_K','K_prime','ref_G','G_prime','molar_mass','n','ref_Debye','ref_grueneisen','q0','eta_0s']
     
     
     def create_list(mineral):
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
         fout = open('mytable.tex','w')
         t = Table.Table(12, justs='lrrrrrrrrrrr', caption='Mineral parameters used', label="tab:label", rotate='True', fontsize='footnotesize')
-        t.add_header_row(['Name','ref\_V','ref\_K','K\_prime','ref\_mu','mu\_prime','molar\_mass','n','ref\_Debye','ref\_grueneisen','q0','eta\_0s'] )
+        t.add_header_row(['Name','ref\_V','ref\_K','K\_prime','ref\_G','G\_prime','molar\_mass','n','ref\_Debye','ref\_grueneisen','q0','eta\_0s'] )
         t.add_data(map(list,zip(*tablel)), sigfigs=2)
         t.print_table(fout)
         fout.close() 

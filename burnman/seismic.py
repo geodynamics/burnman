@@ -125,7 +125,7 @@ class slow(radiustable):
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]  
         table2 = tools.read_table("input_seismic/swave_slow.txt")
@@ -156,7 +156,7 @@ class fast(radiustable):
         #away rows at the top and bottom. Interpolation is not necessary, because all tables
         #where generated with at the same depths
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]  
         table2 = tools.read_table("input_seismic/swave_fast.txt")
@@ -185,7 +185,7 @@ class prem_test(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("input_seimic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_mu
+        table = tools.read_table("input_seimic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         self.table_radius = table[:,0]   
         self.table_pressure = table[:,1] 

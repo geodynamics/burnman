@@ -33,7 +33,7 @@ def calc_velocities(a,b,c):
 
     rock.set_method(method)
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)	
     return mat_vp, mat_vs, mat_rho
 
 def error(a,b,c): 
@@ -175,11 +175,11 @@ if whattodo=="test":
     pymc.Matplot.trace(db.trace('mg_pv_K_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_K_prime',rows=2,columns=9,num=3)
     pymc.Matplot.histogram(np.array(db.trace('mg_pv_K_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_K_prime',rows=2,columns=9,num=12)
 
-    pymc.Matplot.trace(db.trace('mg_pv_mu',chain=None).gettrace(thin=t,chain=None),'mg_pv_mu',rows=2,columns=9,num=4)
-    pymc.Matplot.histogram(np.array(db.trace('mg_pv_mu',chain=None).gettrace(burn=b,chain=None)),'mg_pv_mu',rows=2,columns=9,num=13)
+    pymc.Matplot.trace(db.trace('mg_pv_G',chain=None).gettrace(thin=t,chain=None),'mg_pv_G',rows=2,columns=9,num=4)
+    pymc.Matplot.histogram(np.array(db.trace('mg_pv_G',chain=None).gettrace(burn=b,chain=None)),'mg_pv_G',rows=2,columns=9,num=13)
 
-    pymc.Matplot.trace(db.trace('mg_pv_mu_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_mu_prime',rows=2,columns=9,num=5)
-    pymc.Matplot.histogram(np.array(db.trace('mg_pv_mu_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_mu_prime',rows=2,columns=9,num=14)
+    pymc.Matplot.trace(db.trace('mg_pv_G_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_G_prime',rows=2,columns=9,num=5)
+    pymc.Matplot.histogram(np.array(db.trace('mg_pv_G_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_G_prime',rows=2,columns=9,num=14)
 
 
     pymc.Matplot.trace(db.trace('fe_pv_K',chain=None).gettrace(thin=t,chain=None),'fe_pv_K',rows=2,columns=9,num=6)
@@ -188,11 +188,11 @@ if whattodo=="test":
     pymc.Matplot.trace(db.trace('fe_pv_K_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_K_prime',rows=2,columns=9,num=7)
     pymc.Matplot.histogram(np.array(db.trace('fe_pv_K_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_K_prime',rows=2,columns=9,num=16)
 
-    pymc.Matplot.trace(db.trace('fe_pv_mu',chain=None).gettrace(thin=t,chain=None),'fe_pv_mu',rows=2,columns=9,num=8)
-    pymc.Matplot.histogram(np.array(db.trace('fe_pv_mu',chain=None).gettrace(burn=b,chain=None)),'fe_pv_mu',rows=2,columns=9,num=17)
+    pymc.Matplot.trace(db.trace('fe_pv_G',chain=None).gettrace(thin=t,chain=None),'fe_pv_G',rows=2,columns=9,num=8)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pv_G',chain=None).gettrace(burn=b,chain=None)),'fe_pv_G',rows=2,columns=9,num=17)
 
-    pymc.Matplot.trace(db.trace('fe_pv_mu_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_mu_prime',rows=2,columns=9,num=9)
-    pymc.Matplot.histogram(np.array(db.trace('fe_pv_mu_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_mu_prime',rows=2,columns=9,num=18)
+    pymc.Matplot.trace(db.trace('fe_pv_G_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_G_prime',rows=2,columns=9,num=9)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pv_G_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_G_prime',rows=2,columns=9,num=18)
 
     plt.show()
 

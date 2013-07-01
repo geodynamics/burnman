@@ -41,8 +41,8 @@ class material:
             'ref_V': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
             'ref_K': 0., #Reference bulk modulus [Pa] at room pressure/temperature
             'K_prime': 0., #pressure derivative of bulk modulus
-            'ref_mu': 0., #reference shear modulus at room pressure/temperature
-            'mu_prime': 0., #pressure derivative of shear modulus
+            'ref_G': 0., #reference shear modulus at room pressure/temperature
+            'G_prime': 0., #pressure derivative of shear modulus
             'molar_mass': 0., #molar mass in units of [kg/mol]
             'n': 0., #number of atoms per molecule
             'ref_Debye': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
@@ -102,11 +102,11 @@ class material:
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
         
-        if (self.params.has_key('ref_mu') and self.params.has_key('mu_prime')):
-            self.mu = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
+        if (self.params.has_key('ref_G') and self.params.has_key('G_prime')):
+            self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:    
-            self.mu = -1
-            warnings.warn(('Warning: mu and or mu_prime are undefined for ' + self.to_string()))
+            self.G = -1
+            warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
 
     def molar_mass(self):
         return self.params['molar_mass']
@@ -130,7 +130,7 @@ class material:
     def heat_capacity_p(self):
         return self.C_p
     def shear_modulus(self):
-        return self.mu
+        return self.G
     def v_s(self):
         return np.sqrt(self.shear_modulus() / \
             self.density()) 
@@ -170,7 +170,7 @@ class helper_volumetric_mixing(material):
 
 
         # some need VRH averaging
-        for prop in ['ref_K', 'K_prime', 'ref_mu', 'mu_prime']:
+        for prop in ['ref_K', 'K_prime', 'ref_G', 'G_prime']:
 
             X = [ mat.params[prop] for mat in self.base_materials ]
             self.params[prop] = vrh.vrh_average(phase_volume, X)

@@ -63,15 +63,15 @@ if __name__ == "__main__":
  
     #Now we'll calculate the models. 
     
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_mu_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)    
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_mu_2 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs) 
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)    
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs) 
 
     #Next, we calculate the velocites with 3rd order Birch-Murnaghan
     method='mgd2'
     rock.set_method(method)
     rock2.set_method(method)
-    mat_rho_1_3, mat_vp_1_3, mat_vs_1_3, mat_vphi_1_3, mat_K_1_3, mat_mu_1_3 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)
-    mat_rho_2_3, mat_vp_2_3, mat_vs_2_3, mat_vphi_2_3, mat_K_2_3, mat_mu_2_3 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs)
+    mat_rho_1_3, mat_vp_1_3, mat_vs_1_3, mat_vphi_1_3, mat_K_1_3, mat_G_1_3 = burnman.velocities_from_rock(rock,seis_p_1, temperature_bs)
+    mat_rho_2_3, mat_vp_2_3, mat_vs_2_3, mat_vphi_2_3, mat_K_2_3, mat_G_2_3 = burnman.velocities_from_rock(rock2,seis_p_1, temperature_bs)
 
     
     # seismic velocities for comparison

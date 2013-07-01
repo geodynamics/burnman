@@ -30,7 +30,7 @@ seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(de
 print "preparations done"
 
 
-def calc_velocities(ref_rho, ref_K, K_prime, ref_mu, mu_prime): 
+def calc_velocities(ref_rho, ref_K, K_prime, ref_G, G_prime): 
 
     test = burnman.minerals_base.material()
 
@@ -38,19 +38,19 @@ def calc_velocities(ref_rho, ref_K, K_prime, ref_mu, mu_prime):
     test.params['molar_mass'] = ref_rho*test.params['ref_V']
     test.params['ref_K'] = ref_K
     test.params['K_prime'] = K_prime
-    test.params['ref_mu'] = ref_mu
-    test.params['mu_prime'] = mu_prime
+    test.params['ref_G'] = ref_G
+    test.params['G_prime'] = G_prime
 
     rock = burnman.composite( [(test, 1.0 )] )
     rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)	
 
     return mat_rho, mat_vphi, mat_vs
 
-def error(ref_rho, ref_K, K_prime, ref_mu, mu_prime):
-    rho, vphi, vs = calc_velocities(ref_rho, ref_K, K_prime, ref_mu, mu_prime)
+def error(ref_rho, ref_K, K_prime, ref_G, G_prime):
+    rho, vphi, vs = calc_velocities(ref_rho, ref_K, K_prime, ref_G, G_prime)
 
     vphi_chi = burnman.chi_factor(vphi, seis_vphi)
     vs_chi = burnman.chi_factor(vs, seis_vs)
@@ -63,13 +63,13 @@ def error(ref_rho, ref_K, K_prime, ref_mu, mu_prime):
 ref_rho = pymc.Uniform('ref_rho', lower=3300., upper=4500.)
 ref_K = pymc.Uniform('ref_K', lower=200.e9, upper=300.e9)
 K_prime = pymc.Uniform('K_prime', lower=3., upper=6.)
-ref_mu = pymc.Uniform('ref_mu', lower=50.e9, upper=250.e9)
-mu_prime = pymc.Uniform('mu_prime', lower=0., upper=3.)
+ref_G = pymc.Uniform('ref_G', lower=50.e9, upper=250.e9)
+G_prime = pymc.Uniform('G_prime', lower=0., upper=3.)
 
 
 minerr = 1e100
 @pymc.deterministic
-def theta(p1=ref_rho,p2=ref_K,p3=K_prime,p4=ref_mu,p5=mu_prime):
+def theta(p1=ref_rho,p2=ref_K,p3=K_prime,p4=ref_G,p5=G_prime):
     global minerr
     if (p1<0 or p2<0 or p3<0 or p4<0 or p5 < 0):
         return 1e30
@@ -85,13 +85,13 @@ def theta(p1=ref_rho,p2=ref_K,p3=K_prime,p4=ref_mu,p5=mu_prime):
 
 sig = 1e-4
 misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
-model = dict(ref_rho=ref_rho, ref_K=ref_K, K_prime=K_prime, ref_mu=ref_mu, mu_prime=mu_prime, misfit=misfit)
-things = ['ref_rho', 'ref_K', 'K_prime', 'ref_mu', 'mu_prime']
+model = dict(ref_rho=ref_rho, ref_K=ref_K, K_prime=K_prime, ref_G=ref_G, G_prime=G_prime, misfit=misfit)
+things = ['ref_rho', 'ref_K', 'K_prime', 'ref_G', 'G_prime']
 
 S = pymc.MAP(model)
 S.fit( method = 'fmin')
 
-rho, vphi, vs = calc_velocities(S.ref_rho.value, S.ref_K.value, S.K_prime.value, S.ref_mu.value, S.mu_prime.value)
+rho, vphi, vs = calc_velocities(S.ref_rho.value, S.ref_K.value, S.K_prime.value, S.ref_G.value, S.G_prime.value)
 
 plt.subplot(2,2,1)
 plt.plot(seis_p/1.e9,vs/1000.,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)

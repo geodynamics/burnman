@@ -68,9 +68,9 @@ if __name__ == "__main__":
                             'ref_K': 135.19e9, #Reference bulk modulus [Pa] 
                             	#at room pressure/temperature
                             'K_prime': 6.04, #pressure derivative of bulk modulus
-                            'ref_mu': 175.0e9, #reference shear modulus 
+                            'ref_G': 175.0e9, #reference shear modulus 
                            	 	#at room pressure/temperature
-                            'mu_prime': 1.7, #pressure derivative of shear modulus
+                            'G_prime': 1.7, #pressure derivative of shear modulus
                             'molar_mass': .055845, #molar mass in units of [kg/mol]
                             'n': 1, #number of atoms per formula unit
                             'ref_Debye': 998.85, #Debye temperature for material. 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     for ph in rock.phases:
         print ph.fraction, " of phase", ph.mineral.to_string()
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = \
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())    
     

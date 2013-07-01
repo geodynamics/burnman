@@ -51,23 +51,23 @@ def shear_modulus_second_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
     given volume.  Returns shear modulus in Pa (the same units as in
-    params['ref_mu']).  This uses a second order finite strain expansion
+    params['ref_G']).  This uses a second order finite strain expansion
     """
 
     x = params['ref_V']/volume
-    G=params['ref_mu'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['mu_prime']*params['ref_K']/params['ref_mu']))
+    G=params['ref_G'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['G_prime']*params['ref_K']/params['ref_G']))
     return G 
 
 def shear_modulus_third_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
     given volume.  Returns shear modulus in Pa (the same units as in
-    params['ref_mu']).  This uses a third order finite strain expansion
+    params['ref_G']).  This uses a third order finite strain expansion
     """
 
     x = params['ref_V']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
-    G = pow((1. + 2*f), 5./2.)*(params['ref_mu']+(3.*params['ref_K']*params['mu_prime'] - 5.*params['ref_mu'])*f + (6.*params['ref_K']*params['mu_prime']-24.*params['ref_K']-14.*params['ref_mu']+9./2. * params['ref_K']*params['K_prime'])*f*f)
+    G = pow((1. + 2*f), 5./2.)*(params['ref_G']+(3.*params['ref_K']*params['G_prime'] - 5.*params['ref_G'])*f + (6.*params['ref_K']*params['G_prime']-24.*params['ref_K']-14.*params['ref_G']+9./2. * params['ref_K']*params['K_prime'])*f*f)
     return G 
 
 class birch_murnaghan_base(eos.equation_of_state):

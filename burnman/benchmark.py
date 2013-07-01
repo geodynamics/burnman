@@ -25,8 +25,8 @@ def check_birch_murnaghan():
                           'ref_V': 6.844e-6,
                           'ref_K': 259.0e9,
                           'K_prime': 4.0,
-                          'ref_mu': 175.0e9,
-                          'mu_prime': 1.7,
+                          'ref_G': 175.0e9,
+                          'G_prime': 1.7,
                           'molar_mass': .0,
                           'n': 0.,
                           'ref_Debye': 0.,
@@ -173,8 +173,8 @@ def check_slb_fig7_txt():
                     'ref_V': 43.603e-6,
                     'ref_K': 127.955e9,
                     'K_prime': 4.232,
-                    'ref_mu' : 81.6e9,
-                    'mu_prime' : 1.4,
+                    'ref_G' : 81.6e9,
+                    'G_prime' : 1.4,
                     'molar_mass': .140695,
                     'n': 7.0,
                     'ref_Debye': 809.183,
@@ -261,8 +261,8 @@ def check_slb_fig7():
                     'ref_V': 43.60e-6,
                     'ref_K': 128.0e9,
                     'K_prime': 4.2,
-                    'ref_mu' : 82.0e9,
-                    'mu_prime' : 1.4,
+                    'ref_G' : 82.0e9,
+                    'G_prime' : 1.4,
                     'n': 7.0,
                     'ref_Debye': 809.,
                     'ref_grueneisen': .99,
@@ -285,7 +285,7 @@ def check_slb_fig7():
         forsterite.set_state(pressure, temperature[i])
         volume[i] = forsterite.molar_volume()/forsterite.params['ref_V']
         bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/ref_Ks
-        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['ref_mu']
+        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['ref_G']
         heat_capacity[i] = forsterite.heat_capacity_p()/forsterite.params['n']
  
 

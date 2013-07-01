@@ -25,7 +25,7 @@ temperature = burnman.geotherm.brown_shankland(seis_p)
 
 print "preparations done"
 
-def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime):
+def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_prime,fe_pv_G,fe_pv_G_prime):
     method = 'slb3' #slb3|slb2|mgd3|mgd2
     amount_perovskite = 0.95
     rock = burnman.composite( [ ( minerals.SLB2005.mg_fe_perovskite(0.1), amount_perovskite ), 
@@ -37,26 +37,26 @@ def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_
 
     mg_pv.params['ref_K'] = mg_pv_K
     mg_pv.params['K_prime'] = mg_pv_K_prime
-    mg_pv.params['ref_mu'] = mg_pv_mu
-    mg_pv.params['mu_prime'] = mg_pv_mu_prime
+    mg_pv.params['ref_G'] = mg_pv_G
+    mg_pv.params['G_prime'] = mg_pv_G_prime
     fe_pv.params['ref_K'] = fe_pv_K
     fe_pv.params['K_prime'] = fe_pv_K_prime
-    fe_pv.params['ref_mu'] = fe_pv_mu
-    fe_pv.params['mu_prime'] = fe_pv_mu_prime
+    fe_pv.params['ref_G'] = fe_pv_G
+    fe_pv.params['G_prime'] = fe_pv_G_prime
 
     rock.set_method(method)
     
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,seis_p, temperature)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)	
     return mat_vp, mat_vs, mat_rho
 
-def error(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime): 
-	mat_vp, mat_vs, mat_rho = calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime)
+def error(mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_prime,fe_pv_G,fe_pv_G_prime): 
+	mat_vp, mat_vs, mat_rho = calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_prime,fe_pv_G,fe_pv_G_prime)
 	
 	vs_err = burnman.l2(depths, mat_vs, seis_vs)
 	vp_err = burnman.l2(depths, mat_vp, seis_vp)
 	den_err = burnman.l2(depths, mat_rho, seis_rho)
 
-	return vs_err + vp_err #+ den_err
+	return vs_err #+ vp_err #+ den_err
 
 
 # Priors on unknown parameters:
@@ -64,19 +64,19 @@ sigma = 10.0e9
 prime_sigma = 0.1
 mg_pv_K = pymc.Normal('mg_pv_K', mu=251.e9, tau=1./(sigma**2))
 mg_pv_K_prime = pymc.Normal('mg_pv_K_prime', mu=4.1, tau=1./(prime_sigma**2))
-mg_pv_mu = pymc.Normal('mg_pv_mu', mu=175.e9, tau=1./(sigma**2))
-mg_pv_mu_prime = pymc.Normal('mg_pv_mu_prime', mu=1.8, tau=1./(prime_sigma**2))
+mg_pv_G = pymc.Normal('mg_pv_G', mu=175.e9, tau=1./(sigma**2))
+mg_pv_G_prime = pymc.Normal('mg_pv_G_prime', mu=1.8, tau=1./(prime_sigma**2))
 fe_pv_K = pymc.Normal('fe_pv_K', mu=281.e9, tau=1./(sigma**2))
 fe_pv_K_prime = pymc.Normal('fe_pv_K_prime', mu=4.1, tau=1./(prime_sigma**2))
-fe_pv_mu = pymc.Normal('fe_pv_mu', mu=161.e9, tau=1./(sigma**2))
-fe_pv_mu_prime = pymc.Normal('fe_pv_mu_prime', mu=1.57, tau=1./(prime_sigma**2))
+fe_pv_G = pymc.Normal('fe_pv_G', mu=161.e9, tau=1./(sigma**2))
+fe_pv_G_prime = pymc.Normal('fe_pv_G_prime', mu=1.57, tau=1./(prime_sigma**2))
 
 
 minerr = 1e100
 
 #(plot=False)
 @pymc.deterministic
-def theta(p1=mg_pv_K,p2=mg_pv_K_prime,p3=mg_pv_mu,p4=mg_pv_mu_prime,p5=fe_pv_K,p6=fe_pv_K_prime,p7=fe_pv_mu,p8=fe_pv_mu_prime):
+def theta(p1=mg_pv_K,p2=mg_pv_K_prime,p3=mg_pv_G,p4=mg_pv_G_prime,p5=fe_pv_K,p6=fe_pv_K_prime,p7=fe_pv_G,p8=fe_pv_G_prime):
 	global minerr
 	if (p1<0 or p2<0 or p3<0 or p4<0 or p5<0 or p6<0 or p7<0 or p8<0):
 		return 1e30
@@ -93,8 +93,8 @@ def theta(p1=mg_pv_K,p2=mg_pv_K_prime,p3=mg_pv_mu,p4=mg_pv_mu_prime,p5=fe_pv_K,p
 
 sig = 1e-4
 misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
-model = [mg_pv_K,mg_pv_K_prime,mg_pv_mu,mg_pv_mu_prime,fe_pv_K,fe_pv_K_prime,fe_pv_mu,fe_pv_mu_prime,misfit]
-things = ['mg_pv_K','mg_pv_K_prime','mg_pv_mu','mg_pv_mu_prime','fe_pv_K','fe_pv_K_prime','fe_pv_mu','fe_pv_mu_prime','misfit']
+model = [mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_prime,fe_pv_G,fe_pv_G_prime,misfit]
+things = ['mg_pv_K','mg_pv_K_prime','mg_pv_G','mg_pv_G_prime','fe_pv_K','fe_pv_K_prime','fe_pv_G','fe_pv_G_prime','misfit']
 
 whattodo = ""
 
@@ -196,11 +196,11 @@ if whattodo=="test":
     pymc.Matplot.trace(db.trace('mg_pv_K_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_K_prime',rows=2,columns=9,num=3)
     pymc.Matplot.histogram(np.array(db.trace('mg_pv_K_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_K_prime',rows=2,columns=9,num=12)
 
-    pymc.Matplot.trace(db.trace('mg_pv_mu',chain=None).gettrace(thin=t,chain=None),'mg_pv_mu',rows=2,columns=9,num=4)
-    pymc.Matplot.histogram(np.array(db.trace('mg_pv_mu',chain=None).gettrace(burn=b,chain=None)),'mg_pv_mu',rows=2,columns=9,num=13)
+    pymc.Matplot.trace(db.trace('mg_pv_G',chain=None).gettrace(thin=t,chain=None),'mg_pv_G',rows=2,columns=9,num=4)
+    pymc.Matplot.histogram(np.array(db.trace('mg_pv_G',chain=None).gettrace(burn=b,chain=None)),'mg_pv_G',rows=2,columns=9,num=13)
 
-    pymc.Matplot.trace(db.trace('mg_pv_mu_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_mu_prime',rows=2,columns=9,num=5)
-    pymc.Matplot.histogram(np.array(db.trace('mg_pv_mu_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_mu_prime',rows=2,columns=9,num=14)
+    pymc.Matplot.trace(db.trace('mg_pv_G_prime',chain=None).gettrace(thin=t,chain=None),'mg_pv_G_prime',rows=2,columns=9,num=5)
+    pymc.Matplot.histogram(np.array(db.trace('mg_pv_G_prime',chain=None).gettrace(burn=b,chain=None)),'mg_pv_G_prime',rows=2,columns=9,num=14)
 
 
     pymc.Matplot.trace(db.trace('fe_pv_K',chain=None).gettrace(thin=t,chain=None),'fe_pv_K',rows=2,columns=9,num=6)
@@ -209,11 +209,11 @@ if whattodo=="test":
     pymc.Matplot.trace(db.trace('fe_pv_K_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_K_prime',rows=2,columns=9,num=7)
     pymc.Matplot.histogram(np.array(db.trace('fe_pv_K_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_K_prime',rows=2,columns=9,num=16)
 
-    pymc.Matplot.trace(db.trace('fe_pv_mu',chain=None).gettrace(thin=t,chain=None),'fe_pv_mu',rows=2,columns=9,num=8)
-    pymc.Matplot.histogram(np.array(db.trace('fe_pv_mu',chain=None).gettrace(burn=b,chain=None)),'fe_pv_mu',rows=2,columns=9,num=17)
+    pymc.Matplot.trace(db.trace('fe_pv_G',chain=None).gettrace(thin=t,chain=None),'fe_pv_G',rows=2,columns=9,num=8)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pv_G',chain=None).gettrace(burn=b,chain=None)),'fe_pv_G',rows=2,columns=9,num=17)
 
-    pymc.Matplot.trace(db.trace('fe_pv_mu_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_mu_prime',rows=2,columns=9,num=9)
-    pymc.Matplot.histogram(np.array(db.trace('fe_pv_mu_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_mu_prime',rows=2,columns=9,num=18)
+    pymc.Matplot.trace(db.trace('fe_pv_G_prime',chain=None).gettrace(thin=t,chain=None),'fe_pv_G_prime',rows=2,columns=9,num=9)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pv_G_prime',chain=None).gettrace(burn=b,chain=None)),'fe_pv_G_prime',rows=2,columns=9,num=18)
 
     plt.show()
 

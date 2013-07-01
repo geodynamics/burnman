@@ -14,7 +14,7 @@ def voigt_reuss_hill(pressure, temperature, rock):
     pressure: [Pa]
     temperature:
      
-    Returns: rho, v_p, v_s, v_phi, K_vrh, mu_vrh (all scalars)    
+    Returns: rho, v_p, v_s, v_phi, K_vrh, G_vrh (all scalars)    
     """
     
     # This is based on Matas 2007, Appendix C
@@ -27,17 +27,17 @@ def voigt_reuss_hill(pressure, temperature, rock):
     V_tot= sum(V_i)
     #calculate the density of the phase assemblage
     rho = (1./V_tot) * sum( ph.fraction*ph.mineral.molar_mass() for ph in rock.phases)
-    #calculate the voigt and reuss averages of the phase assemblage for K and mu
+    #calculate the voigt and reuss averages of the phase assemblage for K and G
     K_i = [ph.mineral.adiabatic_bulk_modulus() for ph in rock.phases]
     K_vrh = vrh_average(V_i,K_i)
-    mu_i = [ph.mineral.shear_modulus() for ph in rock.phases]
-    mu_vrh = vrh_average(V_i,mu_i)
+    G_i = [ph.mineral.shear_modulus() for ph in rock.phases]
+    G_vrh = vrh_average(V_i,G_i)
     #compute seismic velocities
-    v_s = np.sqrt( mu_vrh / rho)
-    v_p = np.sqrt( (K_vrh + 4./3.*mu_vrh) / rho)
+    v_s = np.sqrt( G_vrh / rho)
+    v_p = np.sqrt( (K_vrh + 4./3.*G_vrh) / rho)
     v_phi = np.sqrt( (K_vrh) / rho)
 
-    return rho, v_p, v_s, v_phi, K_vrh, mu_vrh
+    return rho, v_p, v_s, v_phi, K_vrh, G_vrh
 
 def vrh_average(phase_volume, X):
 
