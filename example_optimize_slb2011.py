@@ -32,7 +32,7 @@ def calculate_forward_problem(frac, pressures):
                             (minerals.SLB2011.wuestite(), 0.0*(1.0-frac[2])*(1.0-frac[0]) ) ] )
     rock.set_method('slb3')
     temperature = burnman.geotherm.self_consistent(pressures, frac[1], rock)
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_mu = burnman.velocities_from_rock(rock,pressures, temperature)
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,pressures, temperature)
     return mat_rho,mat_vs, mat_vphi
    
 def error(guess, pressures, obs_rho, obs_vs, obs_vphi):
