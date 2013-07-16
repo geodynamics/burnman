@@ -18,10 +18,10 @@ from composite import *
 def watson_baxter(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      if (pressure[i] <= 15e9):
-          temperature[i] = 1900-1420*pow(0.8,pressure[i]/1e9)
+      if (pressure[i] <= 15.e9):
+          temperature[i] = 1900.-1420.*pow(0.8,pressure[i]/1.e9)
       else:
-          temperature[i] = 1680+11.1*pressure[i]/1e9
+          temperature[i] = 1680.+11.1*pressure[i]/1.e9
     return temperature
 
 
@@ -32,7 +32,7 @@ def watson_baxter(pressure):
 def brown_shankland(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])/1.e3
+      depth = seismic.prem_model.depth(pressure[i])
       temperature[i] = lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
     return temperature
 
@@ -40,7 +40,7 @@ def brown_shankland(pressure):
 def anderson(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])/1.e3
+      depth = seismic.prem_model.depth(pressure[i])
       temperature[i] = lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
     return temperature
 
