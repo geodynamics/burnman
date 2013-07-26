@@ -70,8 +70,8 @@ class material:
                 self.method = bm.bm3()
             else:
                 raise Exception("unsupported material method " + method)
-        elif ( isinstance(method, eos.equation_of_state) ):
-            self.method = method
+        elif ( issubclass(method, eos.equation_of_state) ):
+            self.method = method()
         else:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 
