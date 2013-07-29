@@ -7,6 +7,7 @@ from minerals import *
 import warnings
 from collections import namedtuple
 
+
 phase = namedtuple('phase', ['mineral', 'fraction'])
 
 
@@ -46,7 +47,7 @@ class composite:
 
 
 if __name__ == "__main__":
-    pyrolite = composite( [ (mg_fe_perovskite(0.2), 0.8), (ferropericlase(0.4), 0.8) ] )
-    pyrolite.set_method('mgd')
+    pyrolite = composite( [ (SLB2005.mg_fe_perovskite(0.2), 0.8), (SLB2005.ferropericlase(0.4), 0.8) ] )
+    pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
 
