@@ -6,6 +6,7 @@ import numpy as np
 from minerals import *
 import warnings
 from collections import namedtuple
+import averaging_schemes as avg
 
 
 phase = namedtuple('phase', ['mineral', 'fraction'])
@@ -42,6 +43,12 @@ class composite:
         self.temperature = temperature
         for ph in self.phases:
             ph.mineral.set_state(pressure, temperature) 
+
+    def density(self):
+        densities = np.array([ph.mineral.density() for ph in self.phases])
+        volumes = np.array([ph.mineral.molar_volume() for ph in self.phases])
+        return np.sum(densities*volumes)/np.sum(volumes)
+        
                 
 
 
@@ -50,4 +57,5 @@ if __name__ == "__main__":
     pyrolite = composite( [ (SLB2005.mg_fe_perovskite(0.2), 0.8), (SLB2005.ferropericlase(0.4), 0.8) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
+    print pyrolite.phases[0].mineral.density(), pyrolite.phases[1].mineral.density(), pyrolite.density()
 
