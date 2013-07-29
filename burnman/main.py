@@ -65,13 +65,13 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         V_ph = [m.V[idx] for m in moduli_list]
         K_ph = [m.K[idx] for m in moduli_list]
         G_ph = [m.G[idx] for m in moduli_list]
-        massfraction_ph = [m.rho[idx]*m.V[idx] for m in moduli_list]
+        rho_ph = [m.rho[idx] for m in moduli_list]
                
         result.V[idx] = sum(V_ph)
         
-        result.K[idx] = averaging_scheme.average(fractions, V_ph, K_ph)
-        result.G[idx] = averaging_scheme.average(fractions, V_ph, G_ph)
-        result.rho[idx] = sum(massfraction_ph) / result.V[idx]
+        result.K[idx] = averaging_scheme.average_bulk_moduli(V_ph, K_ph, G_ph)
+        result.G[idx] = averaging_scheme.average_shear_moduli(V_ph, K_ph, G_ph)
+        result.rho[idx] = averaging_scheme.average_density(V_ph, rho_ph)
         result.fraction[idx] = 1.0
     return result
 
@@ -94,16 +94,6 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     moduli = average_moduli(moduli_list, averaging_scheme)
     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli)
     return moduli.rho, mat_vp, mat_vs, mat_vphi, moduli.K, moduli.G
-
-# def whole_darn_thing_one_mat(mineral, pressures, temperatures):
-# 
-#     rock = composite( ( (mineral, 1.0) ) )
-#     moduli_list = calculate_moduli(rock, pressures, temperatures)
-#     mat_vp, mat_vs, mat_vphi = compute_velocities(moduli_list[0])
-#     return moduli_list[0].rho, mat_vp, mat_vs, mat_vphi, moduli_list[0].K, moduli_list[0].G 
-
-
-
 
 
 

@@ -5,10 +5,10 @@
 """
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
-1. Voight-Reuss-Hill (volumetric averaging)
-2. linear (mol fraction averaging)
-3. Voight averaging
-4. Reuss averaging
+1. Voight-Reuss-Hill
+2. Voight averaging
+3. Reuss averaging
+4. Hashin-Shtrikman averaging
 
 See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
 of each averaging scheme.
@@ -49,7 +49,13 @@ if __name__ == "__main__":
 
 	rock = burnman.composite( [ (minerals.SLB2005.mg_perovskite(), amount_perovskite), 
 				    (minerals.SLB2005.periclase(), 1.0-amount_perovskite) ] )
+	rock.set_method(method)
 
+	perovskitite = burnman.composite( [ (minerals.SLB2005.mg_perovskite(), 1.0), ] )
+	perovskitite.set_method(method)
+
+	periclasite = burnman.composite( [ (minerals.SLB2005.periclase(), 1.0), ] )
+	periclasite.set_method(method)
 		   
 	#seismic model for comparison:
 	# pick from .prem() .slow() .fast() (see burnman/seismic.py)
@@ -60,93 +66,94 @@ if __name__ == "__main__":
 	depths = np.linspace(700e3, 2800e3, number_of_points)
 	#alternatively, we could use the values where prem is defined:
 	#depths = seismic_model.internal_depth_list()
-	seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+	pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
-	temperature = burnman.geotherm.brown_shankland(seis_p)
+	temperatures = burnman.geotherm.brown_shankland(pressures)
 	
-	rock.set_method(method)
 
 	print "Calculations are done for:"
 	for ph in rock.phases:
 		print ph.fraction, " of phase", ph.mineral.to_string()
-	
-	#Moduli are calculated at along a P,T profile for each mineral
-	moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
 
-	#Final moduli are then calculated for each of the averaging scheme
-	moduli = burnman.average_moduli(moduli_list, \
-	burnman.averaging_schemes.voigt_reuss_hill())
-	mat_vs1, mat_vp1, mat_vphi1 = burnman.compute_velocities(moduli)
-	mat_K1, mat_G1, mat_rho1 = moduli.K, moduli.G, moduli.rho
+        #calculate the seismic velocities of the rock using a whole battery of averaging schemes:
 
-	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.linear())
-	mat_vs2, mat_vp2, mat_vphi2 = burnman.compute_velocities(moduli)
-	mat_K2, mat_G2, mat_rho2 = moduli.K, moduli.G, moduli.rho
+        # do the end members, here averaging scheme does not matter (though it defaults to Voigt-Reuss-Hill)
+	rho_pv, vp_pv, vs_pv, vphi_pv, K_pv, G_pv = \
+            burnman.velocities_from_rock(perovskitite, pressures, temperatures)
+	rho_fp, vp_fp, vs_fp, vphi_fp, K_fp, G_fp = \
+            burnman.velocities_from_rock(periclasite, pressures, temperatures)
 
-	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt())
-	mat_vs3, mat_vp3, mat_vphi3 = burnman.compute_velocities(moduli)
-	mat_K3, mat_G3, mat_rho3 = moduli.K, moduli.G, moduli.rho
+        #Voigt Reuss Hill averaging
+	rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt_reuss_hill())
 
-	moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.reuss())
-	mat_vs4, mat_vp4, mat_vphi4 = burnman.compute_velocities(moduli)
-	mat_K4, mat_G4, mat_rho4 = moduli.K, moduli.G, moduli.rho
-	
-	moduli = moduli_list[0]
-	mat_vsa, mat_vpa, mat_vphia = burnman.compute_velocities(moduli)
-	mat_Ka, mat_Ga, mat_rhoa = moduli.K, moduli.G, moduli.rho
+        #Voigt averaging
+	rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt())
 
-	moduli = moduli_list[1]
-	mat_vsb, mat_vpb, mat_vphib = burnman.compute_velocities(moduli)
-	mat_Kb, mat_Gb, mat_rhob = moduli.K, moduli.G, moduli.rho
-		
+        #Reuss averaging
+	rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.reuss())
+
+        #Upper bound for Hashin-Shtrikman averaging
+	rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_upper())
+
+        #Lower bound for Hashin-Shtrikman averaging
+	rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_lower())
+
 	
 	# PLOTTING
 	
 	# plot vs
 	fig=plt.figure()
-	plt.plot(seis_p/1.e9,mat_vs3/1.e3,color='c',linestyle='-',marker='^',\
-	markersize=4,label='voigt')
-	plt.plot(seis_p/1.e9,mat_vs4/1.e3,color='k',linestyle='-',marker='v',\
-	markersize=4,label='reuss')
-	plt.plot(seis_p/1.e9,mat_vs1/1.e3,color='b',linestyle='-',marker='x',\
-	markersize=4,label='VRH')
-	plt.plot(seis_p/1.e9,mat_vs2/1.e3,color='r',linestyle='--',marker='x',\
-	markersize=4,label='linear')
-	plt.plot(seis_p/1.e9,mat_vsa/1.e3,color='y',linestyle='-',marker='x',\
-	markersize=4,label='mg perovskite')
-	plt.plot(seis_p/1.e9,mat_vsb/1.e3,color='g',linestyle='-',marker='x',\
-	markersize=4,label='periclase')
-	#plt.title("Vs (km/s), mix: 60% mg perovskite")
-	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
-	#plt.ylim(5.2,7.0)
+
+	plt.plot(pressures/1.e9,vs_v/1.e3,color='c',linestyle='-',marker='^',\
+	    markersize=4,label='Voigt')
+	plt.plot(pressures/1.e9,vs_r/1.e3,color='k',linestyle='-',marker='v',\
+	    markersize=4,label='Reuss')
+	plt.plot(pressures/1.e9,vs_vrh/1.e3,color='b',linestyle='-',marker='x',\
+	    markersize=4,label='Voigt-Reuss-Hill')
+	plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',marker='x',\
+	    markersize=4,label='Hashin-Shtrikman')
+	plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
+	    markersize=4)
+	plt.plot(pressures/1.e9,vs_pv/1.e3,color='y',linestyle='-',marker='x',\
+	    markersize=4,label='Mg Perovskite')
+	plt.plot(pressures/1.e9,vs_fp/1.e3,color='g',linestyle='-',marker='x',\
+	    markersize=4,label='Periclase')
+	plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
 	plt.legend(loc='upper left',prop={'size':11},frameon=False)
 	plt.xlabel('pressure (GPa)')
 	plt.ylabel('Vs (km/s)')
-	#plt.savefig("output_figures/example_averaging.png")
-	#plt.show()
 
-	mat_vsa_norm=(mat_vsa-mat_vsb)/(mat_vsa-mat_vsb)
-	mat_vsb_norm=(mat_vsb-mat_vsb)/(mat_vsa-mat_vsb)
-	mat_vs1_norm=(mat_vs1-mat_vsb)/(mat_vsa-mat_vsb)
-	mat_vs2_norm=(mat_vs2-mat_vsb)/(mat_vsa-mat_vsb)
-	mat_vs3_norm=(mat_vs3-mat_vsb)/(mat_vsa-mat_vsb)
-	mat_vs4_norm=(mat_vs4-mat_vsb)/(mat_vsa-mat_vsb)
+	vs_pv_norm=(vs_fp-vs_fp)/(vs_pv-vs_fp)
+	vs_fp_norm=(vs_fp-vs_fp)/(vs_pv-vs_fp)
+	vs_vrh_norm=(vs_vrh-vs_fp)/(vs_pv-vs_fp)
+	vs_v_norm=(vs_v-vs_fp)/(vs_pv-vs_fp)
+	vs_r_norm=(vs_r-vs_fp)/(vs_pv-vs_fp)
+	vs_hsu_norm=(vs_hsu-vs_fp)/(vs_pv-vs_fp)
+	vs_hsl_norm=(vs_hsl-vs_fp)/(vs_pv-vs_fp)
+
 	ax=fig.add_axes([0.58, 0.18, 0.3, 0.3])
-	plt.plot(seis_p/1.e9,mat_vs3_norm,color='c',linestyle='-',marker='^',\
+	plt.plot(pressures/1.e9,vs_v_norm,color='c',linestyle='-',marker='^',\
 	markersize=4,label='Voigt')
-	plt.plot(seis_p/1.e9,mat_vs4_norm,color='k',linestyle='-',marker='v',\
+	plt.plot(pressures/1.e9,vs_r_norm,color='k',linestyle='-',marker='v',\
 	markersize=4,label='Reuss')
-	plt.plot(seis_p/1.e9,mat_vs1_norm,color='b',linestyle='-',marker='x',\
-	markersize=4,label='VRH')
-	plt.plot(seis_p/1.e9,mat_vs2_norm,color='r',linestyle='--',marker='',\
-	markersize=4,label='linear')
-	plt.plot(seis_p/1.e9,mat_vsa_norm,color='y',linestyle='-',marker='x',\
-	markersize=4,label='perovskite')
-	plt.plot(seis_p/1.e9,mat_vsb_norm,color='g',linestyle='-',marker='x',\
-	markersize=4,label='periclase')
+	plt.plot(pressures/1.e9,vs_vrh_norm,color='b',linestyle='-',marker='x',\
+	markersize=4,label='Voigt-Reuss-Hill')
+	plt.plot(pressures/1.e9,vs_hsl_norm,color='r',linestyle='-',marker='x',\
+	markersize=4,label='Hashin-Shtrikman')
+	plt.plot(pressures/1.e9,vs_hsu_norm,color='r',linestyle='-',marker='x',\
+	markersize=4)
+	plt.plot(pressures/1.e9,vs_pv_norm,color='y',linestyle='-',marker='x',\
+	markersize=4,label='Mg Perovskite')
+	plt.plot(pressures/1.e9,vs_fp_norm,color='g',linestyle='-',marker='x',\
+	markersize=4,label='Periclase')
 	ax.tick_params(labelsize=10)
 	plt.title("normalized by mixture endmembers",fontsize=10)
-	plt.xlim(min(seis_p)/1.e9,max(seis_p)/1.e9)
+	plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
 	plt.ylim(-0.005,1.005)
 	plt.xlabel('pressure (GPa)',fontsize=10)
 	plt.ylabel('normalized Vs',fontsize=10)
