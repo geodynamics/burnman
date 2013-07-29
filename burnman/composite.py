@@ -3,12 +3,6 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-#import scipy.integrate as integrate
-#import voigt_reuss_hill as vrh
-#import slb_finitestrain as slb
-#import mie_grueneisen_debye as mgd
-#import slb_thirdorder as slb3
-#import birch_murnaghan as bm
 from minerals import *
 import warnings
 from collections import namedtuple
