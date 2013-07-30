@@ -69,19 +69,19 @@ class wuestite (material):
 
 
 
-class ferropericlase(helper_volumetric_mixing):
+class ferropericlase(helper_solid_solution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
+        helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
 
-class mg_fe_perovskite(helper_volumetric_mixing):
+class mg_fe_perovskite(helper_solid_solution):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helper_volumetric_mixing.__init__(self, base_materials, molar_fraction)
+        helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
 class mg_perovskite(material):

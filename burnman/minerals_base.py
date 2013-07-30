@@ -3,7 +3,6 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import voigt_reuss_hill as vrh
 import mie_grueneisen_debye as mgd
 import birch_murnaghan as bm
 import warnings
@@ -49,8 +48,6 @@ class material:
             'ref_grueneisen': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
             'q0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
             'eta_0s': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
-#        self.pressure = 0.0
-#        self.temperature = 300
         self.method = None
 
     def set_method(self, method):
@@ -141,15 +138,21 @@ class material:
         return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
 
 # combines two or more materials given a fixed molar_fraction
-class helper_volumetric_mixing(material):
+class helper_solid_solution(material):
     # base_materials: list of materials
     # molar_fraction: list of molar ratios (sum up to 1)
     def __init__(self, base_materials, molar_fraction):
         self.base_materials = base_materials
         self.molar_fraction = molar_fraction
         assert(len(base_materials) == len(molar_fraction))
-        assert(sum(molar_fraction) > 0.999)
-        assert(sum(molar_fraction) < 1.001)
+        assert(sum(molar_fraction) > 0.9999)
+        assert(sum(molar_fraction) < 1.0001)
+
+        #does not make sense to do a solid solution with different number of 
+        #atoms per formula unit, at least not simply...
+        for m in base_materials:
+            if(base_materials[0].params.has_key('n')):
+                assert(m.params['n'] == base_materials[0].params['n'])
 
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
@@ -158,23 +161,15 @@ class helper_volumetric_mixing(material):
 
         itrange = range(0, len(self.base_materials))
 
-
         self.params = {}
 
-        self.params['n'] = sum([self.base_materials[i].params['n'] for i in itrange ]) / len(self.base_materials)
-        phase_volume = [self.base_materials[i].molar_volume() * self.molar_fraction[i] for i in itrange ]
-
-        # some properties need weighted averaging
-        for prop in ['ref_V', 'molar_mass', 'ref_Debye', 'ref_grueneisen', 'q0', 'eta_0s']:
-            self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
-
-
-        # some need VRH averaging
-        for prop in ['ref_K', 'K_prime', 'ref_G', 'G_prime']:
-
-            X = [ mat.params[prop] for mat in self.base_materials ]
-            self.params[prop] = vrh.vrh_average(phase_volume, X)
-
+        # some do arithmetic averaging of the end members
+        for prop in self.base_materials[0].params:
+           try:
+               self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+           except TypeError:
+               #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
+               self.params[prop] = self.base_materials[0].params[prop]
         material.set_state(self, pressure, temperature)
 
 class helper_spin_transition(material):
@@ -200,12 +195,6 @@ class helper_spin_transition(material):
         material.set_state(self, pressure, temperature)                
 
 
-
-
-
-
-
-                
 class helper_fe_dependent(material):
     def __init__(self, iron_number_with_pt, idx):
         self.iron_number_with_pt = iron_number_with_pt
