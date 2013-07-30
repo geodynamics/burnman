@@ -51,7 +51,13 @@ class material:
         self.method = None
 
     def set_method(self, method):
-        """ use "slb" or "mgd" or slb3 """
+        """
+        Set the equation of state to be used for this mineral.
+        Takes a string corresponding to any of the predefined
+        equations of state:  'bm2', 'bm3', 'mgd2', 'mgd3', 'slb2',
+        or 'slb3'.  Alternatively, you can pass a user defined
+        class which derives from the equation_of_state base class.
+        """
         if( isinstance(method, basestring)):
             if (method == "slb2"):
                 self.method = slb.slb2()
@@ -73,13 +79,18 @@ class material:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 
     def to_string(self):
+        """
+        Returns the name of the mineral class
+        """
         return "'" + self.__class__.__module__.replace(".minlib_",".") + "." + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
-        """ Update the material to the given pressure [Pa] and temperature.
+        """
+        Update the material to the given pressure [Pa] and temperature [K].
         
         This updates the other properties of this class (v_s, v_p, ...).
         """
+
         #in an effort to avoid additional work, don't do all the calculations if nothing has changed
         try:
             if self.pressure == pressure and self.temperature == temperature and self.old_params == self.params:
@@ -102,46 +113,95 @@ class material:
         if (self.params.has_key('ref_G') and self.params.has_key('G_prime')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:    
-            self.G = float('nan')
+            self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
             warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
 
     def molar_mass(self):
+        """
+        Returns molar mass of the mineral [kg/mol]
+        """
         return self.params['molar_mass']
 
     def density(self):
+        """
+        Returns density of the mineral [kg/m^3]
+        """
         return  self.params['molar_mass'] / self.V
 
-    # gives volume in m^3/mol
     def molar_volume(self):
+        """
+        Returns molar volume of the mineral [m^3/mol]
+        """
         return self.V
     def grueneisen_parameter(self):
+        """
+        Returns grueneisen parameter of the mineral [unitless]
+        """
         return self.gr
     def isothermal_bulk_modulus(self):
+        """
+        Returns isothermal bulk modulus of the mineral [Pa]
+        """
         return self.K_T
     def adiabatic_bulk_modulus(self):
+        """
+        Returns adiabatic bulk modulus of the mineral [Pa]
+        """
         return self.K_S
+    def shear_modulus(self):
+        """
+        Returns shear modulus of the mineral [Pa]
+        """
+        return self.G
     def thermal_expansivity(self):
+        """
+        Returns thermal expansion coefficient of the mineral [1/K]
+        """
         return self.alpha
     def heat_capacity_v(self):
+        """
+        Returns heat capacity at constant volume of the mineral [J/K/mol]
+        """
         return self.C_v
     def heat_capacity_p(self):
+        """
+        Returns heat capacity at constant pressure of the mineral [J/K/mol]
+        """
         return self.C_p
-    def shear_modulus(self):
-        return self.G
     def v_s(self):
+        """
+        Returns shear wave speed of the mineral [m/s]
+        """
         return np.sqrt(self.shear_modulus() / \
             self.density()) 
     def v_p(self):
+        """
+        Returns P wave speed of the mineral [m/s]
+        """
         return np.sqrt((self.adiabatic_bulk_modulus() + 4. / 3. * \
             self.shear_modulus()) / self.density()) 
     def v_phi(self):
+        """
+        Returns bulk sound speed of the mineral [m/s]
+        """
         return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
 
 # combines two or more materials given a fixed molar_fraction
 class helper_solid_solution(material):
-    # base_materials: list of materials
-    # molar_fraction: list of molar ratios (sum up to 1)
+    """
+    Class for coming up with a new mineral based based on a solid
+    solution between two or more end member minerals.  It is not
+    completely clear how to do this, or how valid this approximation
+    is, but here we just do a weighted arithmetic average of the 
+    thermoelastic properties of the end members according to their molar fractions
+    """
     def __init__(self, base_materials, molar_fraction):
+        """
+        Takes a list of end member minerals, and a matching list of
+        molar fractions of those minerals for mixing them.  Simply
+        comes up with a new mineral by doing a weighted arithmetic
+        average of the end member minerals
+        """
         self.base_materials = base_materials
         self.molar_fraction = molar_fraction
         assert(len(base_materials) == len(molar_fraction))
@@ -173,18 +233,24 @@ class helper_solid_solution(material):
         material.set_state(self, pressure, temperature)
 
 class helper_spin_transition(material):
-    """ helper class that switches between two materials (for low and high spin) 
-    based on pressure
+    """ 
+    Helper class that makes a mineral that switches between two materials
+    (for low and high spin) based on some transition pressure [Pa]
     """
     
-    def __init__(self, lowspeed_pressure, ls_mat, hs_mat):
-        """ if pressure>=lowspeed_pressure [Pa], use ls_mat, else hs_mat """
-        self.lowspeed_pressure = lowspeed_pressure
+    def __init__(self, transition_pressure, ls_mat, hs_mat):
+        """ 
+        Takes a transition pressure, and two minerals.  Use the 
+        thermoelastic parameters for ls_mat below the transition
+        pressure, and the thermoelastic parameters for hs_mat 
+        above the transition pressure
+        """
+        self.transition_pressure = transition_pressure
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
                 
     def set_state(self, pressure, temperature):
-        if (pressure >= self.lowspeed_pressure):
+        if (pressure >= self.transition_pressure):
             mat = self.ls_mat
         else:
             mat = self.hs_mat
@@ -226,7 +292,5 @@ class helper_fe_dependent(material):
         return self.base_material.v_s()
     def v_p(self):
         return self.base_material.v_p()
-    def geotherm(self):
-        return self.base_material.v_s()
 
 

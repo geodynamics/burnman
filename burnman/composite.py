@@ -41,7 +41,8 @@ class composite:
         return "'" + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
-        """ Update the material to the given pressure [Pa] and temperature [K].
+        """
+        Update the material to the given pressure [Pa] and temperature [K].
         """
         self.pressure = pressure
         self.temperature = temperature
@@ -49,7 +50,9 @@ class composite:
             ph.mineral.set_state(pressure, temperature) 
 
     def density(self):
-        """ Compute the density of the composite based on the molar volumes and masses """
+        """
+        Compute the density of the composite based on the molar volumes and masses
+        """
         densities = np.array([ph.mineral.density() for ph in self.phases])
         volumes = np.array([ph.mineral.molar_volume() for ph in self.phases])
         return np.sum(densities*volumes)/np.sum(volumes)

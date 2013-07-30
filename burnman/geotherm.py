@@ -62,6 +62,8 @@ def adiabatic(pressures, T0, rock):
     argument is an instance or burnman.composite, which is the material
     for which we compute the adiabat.  For more info see the documentation
     on dTdP
+
+    Returns: a list of temperatures [K]  for each of the pressures [Pa]
     """
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
     return temperatures.ravel()
@@ -76,6 +78,8 @@ def dTdP(temperature, pressure, rock):
     different amounts dT[i], according to their thermoelastic parameters.  Then allow them
     to equilibrate to a constant temperature dT, conserving heat within the composite.
     This works out to the formula: dT/dP = T*sum(frac[i]*Cp[i]*gr[i]/K[i])/sum(frac[i]*Cp[i])
+
+    Returns: a single number, dT/dP [K/Pa] for the composite
     """
     top = 0
     bottom = 0

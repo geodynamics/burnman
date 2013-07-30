@@ -21,7 +21,6 @@ Post Texas Meeting Todos:
 - clean up composition.py
 - benchmark against Matas et al. 2007 Sanne
 - document examples (see example_composition.py)
-- document classes and functions in burnman better, specify units!
 - order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
@@ -35,6 +34,7 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+X document classes and functions in burnman better, specify units!
 X should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 X implement option to evaluate K and G (instead of V_s, V_p, V_phi)?
 X input different averaging schemes (Voigt and Reuss as separate options, other schemes)

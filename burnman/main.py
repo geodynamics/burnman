@@ -18,8 +18,8 @@ from composite import composite
 
 class elastic_properties:
     """
-    class that contains volume V, density rho, bulk_modulus K and 
-    shear_modulus G for a list of pressures.
+    class that contains volume V [m^3] , density rho [kg/m^3] , 
+    bulk_modulus K [Pa], and shear_modulus G [Pa].
     """
     def __init__(self, V=None, rho=None, K=None, G=None, fraction=None):
         self.V = V
@@ -94,7 +94,7 @@ def compute_velocities(moduli):
     """
     Given a list of elastic_properties, 
     compute the seismic velocities Vp, Vs, and Vphi
-    Returns a list: Vp, Vs, Vphi
+    Returns a list: Vp [m/s], Vs [m/s], Vphi [m/s]
     """
     mat_vs = np.ndarray(len(moduli.V))
     mat_vp = np.ndarray(len(moduli.V))
@@ -115,7 +115,7 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     it calculates the elastic moduli of the individual phases using calculate_moduli(), averages them using
     average_moduli(), and calculates the seismic velocities using compute_velocities().
 
-    Returns a big list: density, Vp, Vs, Vphi, K, G
+    Returns a big list: density [kg/m^3], Vp [m/s], Vs [m/s], Vphi [m/s], K [m/s], G [m/s]
     """
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)

@@ -10,16 +10,27 @@ from equation_of_state import equation_of_state
  
 import matplotlib.pyplot as plt
 
-## Based on Stixrude & Lithgow-Bertelloni (2005), all equation numbers refer to this paper. 
 class slb_base(equation_of_state):
+    """
+    Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
+    in Stixrude and Lithgow-Bertelloni (2005).  For the most part, the equations are 
+    all third order in strain, but see further the slb2 and slb3 classes
+    """
     def __debye_temperature(self,x,params):
-        """ x = ref_vol/vol"""
+        """
+        Finite strain approximation for Debye Temperature [K]
+        x = ref_vol/vol
+        """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
         return params['ref_Debye'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f) 
 
     def volume_dependent_q(self, x, params):
+        """
+        Finite strain approximation for q, the isotropic volume strain
+        derivative of the grueneisen parameter
+        """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
         a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
@@ -29,6 +40,10 @@ class slb_base(equation_of_state):
         return q
     
     def __isotropic_eta_s(self, x, params):
+        """
+        Finite strain approximation for eta_0s, the isotropic shear
+        strain derivative of the grueneisen parameter
+        """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a2_s = -2.*params['ref_grueneisen'] - 2.*params['eta_0s'] # EQ 47 
         a1_ii = 6. * params['ref_grueneisen'] # EQ 47
@@ -40,6 +55,9 @@ class slb_base(equation_of_state):
 
 
     def volume(self, pressure, temperature, params):
+        """
+        Returns molar volume at the pressure and temperature [m^3]
+        """
         debye_T = lambda x : self.__debye_temperature(params['ref_V']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
@@ -65,6 +83,9 @@ class slb_base(equation_of_state):
         return V
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
+        """
+        Returns grueneisen parameter at the pressure, temperature, and volume
+        """
         x = params['ref_V'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
         ref_gruen = params['ref_grueneisen']
@@ -74,7 +95,9 @@ class slb_base(equation_of_state):
         return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
-
+        """
+        Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
+        """
         debye_T = self.__debye_temperature(params['ref_V']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
@@ -93,8 +116,9 @@ class slb_base(equation_of_state):
         return K
     
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
-        #calculate the adiabatic bulk modulus (K_S) as a function of P, T, and V
-        # alpha is basically 1e-5
+        """
+        Returns adiabatic bulk modulus at the pressure, temperature, and volume [Pa]
+        """
         K_T=self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
@@ -102,6 +126,9 @@ class slb_base(equation_of_state):
         return K_S
 
     def shear_modulus(self, pressure, temperature, volume, params):
+        """
+        Returns shear modulus at the pressure, temperature, and volume [Pa]
+        """
         debye_T = self.__debye_temperature(params['ref_V']/volume, params)
         eta_s = self.__isotropic_eta_s(params['ref_V']/volume, params)
 
@@ -116,10 +143,16 @@ class slb_base(equation_of_state):
             raise NotImplementedError("")
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
+        """
+        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
+        """
         debye_T = self.__debye_temperature(params['ref_V']/volume, params)
         return debye.heat_capacity_v(temperature, debye_T,params['n'])
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
+        """
+        Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
+        """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         C_v = self.heat_capacity_v(pressure, temperature, volume, params)
@@ -127,6 +160,9 @@ class slb_base(equation_of_state):
         return C_p
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
+        """
+        Returns thermal expansivity at the pressure, temperature, and volume [1/K]
+        """
         C_v = self.heat_capacity_v(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
@@ -136,10 +172,21 @@ class slb_base(equation_of_state):
     
     
 class slb3(slb_base):
+    """
+    SLB equation of state with third order finite strain expansion for the
+    shear modulus (this should be preferred, as it is more thermodynamically
+    consistent.
+    """
     def __init__(self):
         self.order=3
 
 class slb2(slb_base):
+    """
+    SLB equation of state with second order finite strain expansion for the
+    shear modulus.  In general, this should not be used, but sometimes 
+    shear modulus data is fit to a second order equation of state.  In that 
+    case, you should use this.  The moral is, be careful!
+    """
     def __init__(self):
         self.order=2
     

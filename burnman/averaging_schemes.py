@@ -6,17 +6,24 @@ import numpy as np
 import warnings
 
 class averaging_scheme:
-    """  base class for different averaging schemes """
+    """ 
+    Base class for different averaging schemes
+    New averagimg schemes should define the functions
+    average_bulk_moduli and average_shear_moduli, as
+    specified here.
+    """
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the bulk moduli of an assemblage, given
         a list of volume fractions, bulk moduli, and shear moduli
+        Returns: a single modulus
         """
         raise NotImplementedError("")
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the shear moduli of an assemblage, given
         a list of volume fractions, bulk moduli, and shear moduli
+        Returns: a single modulus
         """
         raise NotImplementedError("")
     def average_density(self, volumes, densities):
@@ -24,6 +31,7 @@ class averaging_scheme:
         Average the densities of the rock.  This is the only
         one that is implemented in the base class, as it should
         not be controvsersial... :)
+        Returns: a single density
         """
         total_mass = np.sum(np.array(densities)*np.array(volumes))
         total_vol = np.sum(np.array(volumes))
@@ -70,8 +78,8 @@ class reuss(averaging_scheme):
 
 class hashin_shtrikman_upper(averaging_scheme):
     """
-    Lower of the two Hashin-Shtrikman bounds.  Formulae
-    from Watt et al (1976)
+    Lower of the two Hashin-Shtrikman bounds.  
+    Implements Formulas from Watt et al (1976)
     """
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
 
@@ -107,8 +115,8 @@ class hashin_shtrikman_upper(averaging_scheme):
 
 class hashin_shtrikman_lower(averaging_scheme):
     """
-    Lower of the two Hashin-Shtrikman bounds.  Formulae
-    from Watt et al (1976)
+    Lower of the two Hashin-Shtrikman bounds.  
+    Implements Formulas from Watt et al (1976)
     """
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
 
@@ -162,6 +170,12 @@ class hashin_shtrikman_average(averaging_scheme):
       
 
 def voigt_average_function(phase_volume,X):
+    """
+    Do Voigt (iso-strain) average.  Rather like
+    resistors in series.  Called by voigt and
+    voigt_reuss_hill classes, takes a list of
+    volumes and moduli, returns a modulus.
+    """
     it = range(len(phase_volume))
     V_i = phase_volume
     V_tot = sum(V_i)
@@ -169,6 +183,12 @@ def voigt_average_function(phase_volume,X):
     return X_voigt
 
 def reuss_average_function(phase_volume,X):
+    """
+    Do Reuss (iso-stress) average.  Rather like
+    resistors in parallel.  Called by reuss and
+    voigt_reuss_hill classes, takes a list of
+    volumes and moduli, returns a modulus.
+    """
     it = range(len(phase_volume))
     V_i = phase_volume
     V_tot = sum(V_i)
@@ -180,7 +200,12 @@ def reuss_average_function(phase_volume,X):
     return X_reuss
 
 def voigt_reuss_hill_function(phase_volume,X):
+    """
+    Do Voigt-Reuss-Hill average (arithmetic mean
+    of Voigt and Reuss bounds).  Called by
+    voigt_reuss_hill class, takes a list of
+    volumes and moduli, returns a modulus.
+    """
     X_vrh = (voigt_average_function(phase_volume,X) + reuss_average_function(phase_volume,X))/2.
     return X_vrh
-
 

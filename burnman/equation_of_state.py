@@ -20,31 +20,56 @@ class equation_of_state:
     """
 
     def volume(self, pressure, temperature, params):
+        """
+        Returns molar volume at the pressure and temperature [m^3]
+        """
         raise NotImplementedError("")
 
     def density(self, pressure, temperature, params):
+        """
+        Returns density at the pressure and temperature [kg/m^3]
+        """
         return params["molar_mass"] / self.volume(pressure, temperature, params)
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
+        """
+        Returns grueneisen parameter at the pressure, temperature, and volume
+        """
         raise NotImplementedError("")
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+        """
+        Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
+        """
         raise NotImplementedError("")
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+        """
+        Returns adiabatic bulk modulus at the pressure, temperature, and volume [Pa]
+        """
         raise NotImplementedError("")
 
     def shear_modulus(self, pressure, temperature, volume, params):
+        """
+        Returns shear modulus at the pressure, temperature, and volume [Pa]
+        """
         raise NotImplementedError("")
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
-        """ heat capacity at constant volume """
+        """
+        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
+        """
         raise NotImplementedError("")
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
-        """ heat capacity at constant pressure """
+        """
+        Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
+        """
         raise NotImplementedError("")
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
+        """
+        Returns thermal expansivity at the pressure, temperature, and volume [1/K]
+        """
         raise NotImplementedError("")
 
