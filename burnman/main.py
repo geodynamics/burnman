@@ -68,9 +68,17 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         rho_ph = [m.rho[idx] for m in moduli_list]
                
         result.V[idx] = sum(V_ph)
-        
+         
         result.K[idx] = averaging_scheme.average_bulk_moduli(V_ph, K_ph, G_ph)
-        result.G[idx] = averaging_scheme.average_shear_moduli(V_ph, K_ph, G_ph)
+
+        #if any of the shear moduli are zero, just say that the total shear
+        #modulus is zero. This avoids situations where we may not have shear 
+        #modulus data, or if we are thinking about liquids...(?) 
+        if any( [ph <= 0.0 for ph in G_ph]):
+            result.G[idx] = 0.0
+        else:
+            result.G[idx] = averaging_scheme.average_shear_moduli(V_ph, K_ph, G_ph)
+
         result.rho[idx] = averaging_scheme.average_density(V_ph, rho_ph)
         result.fraction[idx] = 1.0
     return result
