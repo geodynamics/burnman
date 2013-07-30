@@ -6,8 +6,6 @@ import numpy as np
 from minerals import *
 import warnings
 from collections import namedtuple
-import averaging_schemes as avg
-
 
 phase = namedtuple('phase', ['mineral', 'fraction'])
 

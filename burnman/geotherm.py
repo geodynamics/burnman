@@ -3,12 +3,11 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import bisect
 import matplotlib.pyplot as pyplot
-from tools import *
-import seismic
 import scipy.integrate as integrate
+import seismic
 import minerals
+from tools import *
 from composite import *
 
 
