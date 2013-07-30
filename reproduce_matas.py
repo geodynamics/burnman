@@ -41,14 +41,14 @@ if __name__ == "__main__":
 
     #weight_percents = {'Mg':0.297882, 'Fe': 0.0489699, 'Si':0.1819, 'Ca':0.0228576, 'Al':0.0116446}
     #phase_fractions,relative_molar_percent = burnman.calculate_phase_percents(weight_percents)
-    rock = burnman.composite( ( (minerals.Matetal2007.mg_perovskite(),.620 ),
-                            (minerals.Matetal2007.fe_perovskite(), .078 ),
-                            (minerals.Matetal2007.periclase(), .268 ),
-                            (minerals.Matetal2007.wuestite(), .034 )))
-    rock2 = burnman.composite( ( (minerals.Matetal2007.mg_perovskite(),.62 ),
-                            (minerals.Matetal2007.fe_perovskite(), .078/1.46 ),
-                            (minerals.Matetal2007.periclase(), .268 ),
-                            (minerals.Matetal2007.wuestite(), .034/1.46 ))) 
+    rock = burnman.composite( ( (minerals.Matas_etal_2007.mg_perovskite(),.620 ),
+                            (minerals.Matas_etal_2007.fe_perovskite(), .078 ),
+                            (minerals.Matas_etal_2007.periclase(), .268 ),
+                            (minerals.Matas_etal_2007.wuestite(), .034 )))
+    rock2 = burnman.composite( ( (minerals.Matas_etal_2007.mg_perovskite(),.62 ),
+                            (minerals.Matas_etal_2007.fe_perovskite(), .078/1.46 ),
+                            (minerals.Matas_etal_2007.periclase(), .268 ),
+                            (minerals.Matas_etal_2007.wuestite(), .034/1.46 ))) 
     #KD is 2... doesn't match either
     #rock2 = burnman.composite( ( (minerals.Matas_mg_perovskite(),.3574 ),
     #                        (minerals.Matas_fe_perovskite(), .0536 ),

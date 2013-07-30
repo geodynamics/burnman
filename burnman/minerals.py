@@ -3,8 +3,8 @@
 # Released under GPL v2 or later.
 
 
-import minlib_SLB2011 as SLB2011
-import minlib_SLB2005 as SLB2005
-import minlib_Matetal2007 as Matetal2007
-import minlib_Muretal2012 as Muretal2012
-import minlib_other as other
+import minlib.SLB_2011 as SLB_2011
+import minlib.SLB_2005 as SLB_2005
+import minlib.Matas_etal_2007 as Matas_etal_2007
+import minlib.Murakami_etal_2012 as Murakami_etal_2012
+import minlib.other as other

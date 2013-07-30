@@ -40,8 +40,8 @@ if __name__ == "__main__":
     #Input composition of model 1. See example_composition for potential choices. We'll just choose something simple here
         
     amount_perovskite_1 = 1.0
-    rock_1 = burnman.composite( ( (minerals.Muretal2012.fe_perovskite(), amount_perovskite_1),
-                            (minerals.Muretal2012.fe_periclase(), 1.0-amount_perovskite_1) ) )
+    rock_1 = burnman.composite( ( (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite_1),
+                            (minerals.Murakami_etal_2012.fe_periclase(), 1.0-amount_perovskite_1) ) )
     rock_1.set_method(method)
  
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     #Input composition of model 2. See example_composition for potential choices. We'll just choose something simple here
         
     amount_perovskite_2 = 0.95
-    rock_2 = burnman.composite( ( (minerals.Muretal2012.fe_perovskite(), amount_perovskite_2),
-                            (minerals.Muretal2012.fe_periclase(), 1.0-amount_perovskite_2) ) )
+    rock_2 = burnman.composite( ( (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite_2),
+                            (minerals.Murakami_etal_2012.fe_periclase(), 1.0-amount_perovskite_2) ) )
     rock_2.set_method(method) 
 	#input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
     
@@ -77,8 +77,8 @@ if __name__ == "__main__":
     #Input composition of model 3. See example_composition for potential choices. We'll just choose something simple here
 
     amount_perovskite_3 = 0.0
-    rock_3 = burnman.composite( ( (minerals.Muretal2012.fe_perovskite(), amount_perovskite_3),
-                            (minerals.Muretal2012.fe_periclase(), 1.0-amount_perovskite_3) ) )
+    rock_3 = burnman.composite( ( (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite_3),
+                            (minerals.Murakami_etal_2012.fe_periclase(), 1.0-amount_perovskite_3) ) )
     rock_3.set_method(method) 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array
 
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     #Input composition of model 4. See example_composition for potential choices. We'll just choose something simple here
 
     amount_perovskite_4 = 0.8
-    rock_4 = burnman.composite( ( (minerals.Muretal2012.fe_perovskite(), amount_perovskite_4),
-                            (minerals.Muretal2012.fe_periclase(), 1.0-amount_perovskite_4) ) )
+    rock_4 = burnman.composite( ( (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite_4),
+                            (minerals.Murakami_etal_2012.fe_periclase(), 1.0-amount_perovskite_4) ) )
     rock_4.set_method(method) 
 
     #input pressure range for first model. This could be from a seismic model or something you create. For this example we will create an array

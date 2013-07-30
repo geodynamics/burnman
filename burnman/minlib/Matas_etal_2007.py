@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 
-from minerals_base import *
+from burnman.minerals_base import *
 
 
 

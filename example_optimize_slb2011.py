@@ -26,10 +26,10 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 def calculate_forward_problem(frac, pressures):
     print frac
     
-    rock = burnman.composite( [ (minerals.SLB2011.mg_perovskite(),frac[2]*frac[0] ),
-                            (minerals.SLB2011.fe_perovskite(), frac[2]*(1.0-frac[0]) ),
-                            (minerals.SLB2011.periclase(), (1.0-frac[2])) ,
-                            (minerals.SLB2011.wuestite(), 0.0*(1.0-frac[2])*(1.0-frac[0]) ) ] )
+    rock = burnman.composite( [ (minerals.SLB_2011.mg_perovskite(),frac[2]*frac[0] ),
+                            (minerals.SLB_2011.fe_perovskite(), frac[2]*(1.0-frac[0]) ),
+                            (minerals.SLB_2011.periclase(), (1.0-frac[2])) ,
+                            (minerals.SLB_2011.wuestite(), 0.0*(1.0-frac[2])*(1.0-frac[0]) ) ] )
     rock.set_method('slb3')
     temperature = burnman.geotherm.self_consistent(pressures, frac[1], rock)
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,pressures, temperature)

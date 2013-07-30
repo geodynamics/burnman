@@ -62,7 +62,7 @@ class composite:
 
 
 if __name__ == "__main__":
-    pyrolite = composite( [ (SLB2005.mg_fe_perovskite(0.2), 0.8), (SLB2005.ferropericlase(0.4), 0.8) ] )
+    pyrolite = composite( [ (SLB_2005.mg_fe_perovskite(0.2), 0.8), (SLB_2005.ferropericlase(0.4), 0.8) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
     print pyrolite.phases[0].mineral.density(), pyrolite.phases[1].mineral.density(), pyrolite.density()

@@ -28,8 +28,8 @@ print "preparations done"
 def calc_velocities(a,b,c):
     method = 'slb3' #slb3|slb2|mgd3|mgd2
     amount_perovskite = a
-    rock = burnman.composite( [ ( minerals.SLB2005.mg_fe_perovskite(b), amount_perovskite ), 
-				(minerals.SLB2005.ferropericlase(c), 1.0-amount_perovskite) ] )
+    rock = burnman.composite( [ ( minerals.SLB_2005.mg_fe_perovskite(b), amount_perovskite ), 
+				(minerals.SLB_2005.ferropericlase(c), 1.0-amount_perovskite) ] )
 
     rock.set_method(method)
     

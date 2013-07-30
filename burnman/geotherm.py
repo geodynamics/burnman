@@ -108,7 +108,7 @@ table_anderson_temperature = np.array(table_anderson)[:,1]
 if __name__ == "__main__":
     p = np.arange(1.0e9,128.0e9,3e9)
   
-    pyrolite = composite( [ (minerals.SLB2011.mg_fe_perovskite(0.2), 0.8), (minerals.SLB2011.ferropericlase(0.4), 0.2) ] )
+    pyrolite = composite( [ (minerals.SLB_2011.mg_fe_perovskite(0.2), 0.8), (minerals.SLB_2011.ferropericlase(0.4), 0.2) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
 

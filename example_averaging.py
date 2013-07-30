@@ -47,14 +47,14 @@ if __name__ == "__main__":
 	amount_perovskite = 0.6
 	method = 'slb3'
 
-	rock = burnman.composite( [ (minerals.SLB2005.mg_perovskite(), amount_perovskite), 
-				    (minerals.SLB2005.periclase(), 1.0-amount_perovskite) ] )
+	rock = burnman.composite( [ (minerals.SLB_2005.mg_perovskite(), amount_perovskite), 
+				    (minerals.SLB_2005.periclase(), 1.0-amount_perovskite) ] )
 	rock.set_method(method)
 
-	perovskitite = burnman.composite( [ (minerals.SLB2005.mg_perovskite(), 1.0), ] )
+	perovskitite = burnman.composite( [ (minerals.SLB_2005.mg_perovskite(), 1.0), ] )
 	perovskitite.set_method(method)
 
-	periclasite = burnman.composite( [ (minerals.SLB2005.periclase(), 1.0), ] )
+	periclasite = burnman.composite( [ (minerals.SLB_2005.periclase(), 1.0), ] )
 	periclasite.set_method(method)
 		   
 	#seismic model for comparison:

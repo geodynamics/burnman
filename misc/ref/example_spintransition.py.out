@@ -1,14 +1,10 @@
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase_HS'
+/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minlib.other.Speziale_fe_periclase_HS'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase'
+/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minlib.other.Speziale_fe_periclase'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase_LS'
+/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minlib.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-burnman/averaging_schemes.py:33: UserWarning: Oops, called reuss_average with Xi<0!
-  warnings.warn("Oops, called reuss_average with Xi<0!")
-burnman/main.py:84: RuntimeWarning: invalid value encountered in sqrt
-  mat_vs[i] = np.sqrt( moduli.G[i] / moduli.rho[i])
 Calculations are done for:
-1.0  of phase 'burnman.Muretal2012.fe_periclase'
+1.0  of phase 'burnman.minlib.Murakami_etal_2012.fe_periclase'
 Calculations are done for:
-1.0  of phase 'burnman.other.Speziale_fe_periclase'
+1.0  of phase 'burnman.minlib.other.Speziale_fe_periclase'

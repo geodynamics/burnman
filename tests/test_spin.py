@@ -10,7 +10,7 @@ from burnman import minerals
 class spin_transistion(unittest.TestCase):
     def test_new(self):
         
-        mins = [minerals.Muretal2012.fe_periclase(), minerals.Muretal2012.fe_periclase_HS(), minerals.Muretal2012.fe_periclase_LS()]
+        mins = [minerals.Murakami_etal_2012.fe_periclase(), minerals.Murakami_etal_2012.fe_periclase_HS(), minerals.Murakami_etal_2012.fe_periclase_LS()]
         for p in mins:
             p.set_method('slb2')
         
