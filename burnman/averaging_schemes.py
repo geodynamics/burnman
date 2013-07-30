@@ -51,8 +51,7 @@ class voigt_reuss_hill(averaging_scheme):
 
 
 class voigt(averaging_scheme):
-    """ Compute Voigt average. """
-    
+    """ Compute Voigt (iso-strain) bound. """
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         return voigt_average_function(volumes, bulk_moduli)
 
@@ -61,8 +60,7 @@ class voigt(averaging_scheme):
 
 
 class reuss(averaging_scheme):
-    """ Compute Reuss average."""
-    
+    """ Compute Reuss (iso-stress) bound."""
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         return reuss_average_function(volumes, bulk_moduli)
 

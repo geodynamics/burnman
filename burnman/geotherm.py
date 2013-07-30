@@ -12,10 +12,12 @@ import minerals
 from composite import *
 
 
-# polynomial fit from Watson, Baxter, EPSL, 2007
-# pressure: in Pa
-# return: temperature in K
 def watson_baxter(pressure):
+    """
+    polynomial fit from Watson, Baxter, EPSL, 2007
+    pressure: in Pa
+    returns: temperature in K
+    """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       if (pressure[i] <= 15.e9):
@@ -28,8 +30,12 @@ def watson_baxter(pressure):
 
 
 
-# geotherm from Brown and Shankland 1981
 def brown_shankland(pressure):
+    """
+    geotherm from Brown and Shankland 1981
+    pressure: in Pa
+    returns: temperature in K
+    """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       depth = seismic.prem_model.depth(pressure[i])
@@ -38,25 +44,40 @@ def brown_shankland(pressure):
 
 # geotherm from Anderson 1982
 def anderson(pressure):
+    """
+    geotherm from Anderson 1982
+    pressure: in Pa
+    returns: temperature in K
+    """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       depth = seismic.prem_model.depth(pressure[i])
       temperature[i] = lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
     return temperature
 
-#This integrates dT/dP = gr * T / K_s
 def adiabatic(pressures, T0, rock):
+    """
+    This integrates dT/dP = gr * T / K_s  in order to get a mantle adiabat
+    at the pressures given.  Takes pressures in Pa, as well as an anchor
+    temperature corresponding to the first pressure in the list. The third
+    argument is an instance or burnman.composite, which is the material
+    for which we compute the adiabat.  For more info see the documentation
+    on dTdP
+    """
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
     return temperatures.ravel()
 
-#ODE to integrate temperature with depth for a composite material
-#Assumes that the minerals exist at a common pressure (Reuss bound, should be good for
-#slow deformations at high temperature), as well as an adiabatic process.  This
-#corresponds to conservation of enthalpy.  Is this formula correct?  It works for
-#single phases, and seems right for composites -- the tricky thing is working out
-#the heat exchange between phases as they heat up at different rates due to differing
-#grueneisen parameters and bulk moduli
 def dTdP(temperature, pressure, rock):
+    """
+    ODE to integrate temperature with depth for a composite material
+    Assumes that the minerals exist at a common pressure (Reuss bound, should be good for
+    slow deformations at high temperature), as well as an adiabatic process.  This
+    corresponds to conservation of enthalpy.  
+    First consider compression of the composite to a new pressure P+dP.  They all heat up
+    different amounts dT[i], according to their thermoelastic parameters.  Then allow them
+    to equilibrate to a constant temperature dT, conserving heat within the composite.
+    This works out to the formula: dT/dP = T*sum(frac[i]*Cp[i]*gr[i]/K[i])/sum(frac[i]*Cp[i])
+    """
     top = 0
     bottom = 0
     for ph in rock.phases:

@@ -12,13 +12,13 @@ import averaging_schemes as avg
 phase = namedtuple('phase', ['mineral', 'fraction'])
 
 
-"""
-Base class for a composite material.  The constructor takes a tuple of tuples, 
-where the inner tuple is a mineral/molar-fraction pair.  This can then be passed
-to Voigt-Reuss-Hill, the self consistent geotherm function, or anything else that
-expects a composite material
-"""
 class composite:
+    """
+    Base class for a composite material.  The constructor takes a tuple of tuples, 
+    where the inner tuple is a mineral/molar-fraction pair.  This can then be passed
+    to averaging schemes, the adiabatic geotherm function, or anything else that
+    expects a composite material
+    """
     def __init__(self, phase_tuples):
         total = 0
         self.phases = [] # make the rock composition an immutable tuple
@@ -30,14 +30,20 @@ class composite:
             self.phases.append( phase(ph[0], ph[1]/total) )
 
     def set_method(self, method):
+        """
+        set the same equation of state method for all the phases in the composite
+        """
         for ph in self.phases:
             ph.mineral.set_method(method) 
 
     def to_string(self):
+        """
+        return the name of the composite
+        """
         return "'" + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
-        """ Update the material to the given pressure [Pa] and temperature.
+        """ Update the material to the given pressure [Pa] and temperature [K].
         """
         self.pressure = pressure
         self.temperature = temperature
@@ -45,6 +51,7 @@ class composite:
             ph.mineral.set_state(pressure, temperature) 
 
     def density(self):
+        """ Compute the density of the composite based on the molar volumes and masses """
         densities = np.array([ph.mineral.density() for ph in self.phases])
         volumes = np.array([ph.mineral.molar_volume() for ph in self.phases])
         return np.sum(densities*volumes)/np.sum(volumes)

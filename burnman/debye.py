@@ -13,22 +13,29 @@ Birch-Murnaghan to get a full EOS
 
 R = 8.314462175
 
-#Evaluate the Debye function.  Takes the parameter
-#xi = Debye_T/T
 def debye_fn(x):
+    """
+    Evaluate the Debye function.  Takes the parameter
+    xi = Debye_T/T
+    """
     sol = integrate.quad( lambda xi: pow(xi,3.)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
     return 3.*sol[0]/pow(x,3.)
 
-#calculate the thermal energy of a substance.  Takes the temperature,
-#the Debye temperature, and n, the number of atoms per molecule
 def thermal_energy(T, debye_T, n):
+    """
+    calculate the thermal energy of a substance.  Takes the temperature,
+    the Debye temperature, and n, the number of atoms per molecule.
+    Returns thermal energy in J/mol
+    """
     if T == 0:
         return 0
     E_th = 3.*n*R*T * debye_fn(debye_T/T)
     return E_th
 
-#heat capacity at constant volume
 def heat_capacity_v(T, debye_T, n):
+    """
+    Heat capacity at constant volume.  In J/K/mol
+    """
     if T ==0:
         return 0
     deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
