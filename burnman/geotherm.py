@@ -7,6 +7,7 @@ import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
 import seismic
 import minerals
+import burnman
 from tools import *
 from composite import *
 

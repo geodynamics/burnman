@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 import partitioning as part
 import mie_grueneisen_debye
-import minerals 
 import seismic
 import tools
 import averaging_schemes
