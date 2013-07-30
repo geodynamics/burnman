@@ -4,13 +4,11 @@
 
 import os, sys, numpy as np
 import matplotlib.pyplot as plt
+import scipy.integrate as integrate
 
-import partitioning as part
-import mie_grueneisen_debye
 import seismic
 import tools
 import averaging_schemes
-import scipy.integrate as integrate
 from composite import composite
 
 #phase = namedtuple('phase', ['mineral', 'fraction'])
