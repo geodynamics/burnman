@@ -18,13 +18,10 @@ Post Texas Meeting Todos:
 
 
 - warn if used eos and mineral eos are different
-- input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 - clean up composition.py
 - benchmark against Matas et al. 2007 Sanne
-- implement option to evaluate K and G (instead of V_s, V_p, V_phi)?
 - document examples (see example_composition.py)
 - document classes and functions in burnman better, specify units!
-- should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 - order examples (figure out dependencies for that), see bottom of readme.txt
 - write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
 - Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
@@ -38,6 +35,9 @@ Todo in far future:
 - mass balance calculations
 
 DONE:
+X should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
+X implement option to evaluate K and G (instead of V_s, V_p, V_phi)?
+X input different averaging schemes (Voigt and Reuss as separate options, other schemes)
 x Change "self_consistent" to adiabat everywhere
 x allow for 2nd and 3rd order option in all methods (in such a way that it could be expanded to 4th order in the far future :P )
 x allow for the partition coeffecient as an input (maybe an example for this?)
