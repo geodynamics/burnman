@@ -102,7 +102,7 @@ class material:
         if (self.params.has_key('ref_G') and self.params.has_key('G_prime')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:    
-            self.G = None
+            self.G = float('nan')
             warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
 
     def molar_mass(self):

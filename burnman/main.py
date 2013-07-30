@@ -68,21 +68,11 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         rho_ph = [m.rho[idx] for m in moduli_list]
                
         result.V[idx] = sum(V_ph)
-         
         result.K[idx] = averaging_scheme.average_bulk_moduli(V_ph, K_ph, G_ph)
-
-        #if any of the shear moduli are zero, just say that the total shear
-        #modulus is zero. If any are negative, we have no good data...
-        #modul, or if we are thinking about liquids...(?) 
-        if any( [ph < 0.0 for ph in G_ph]):
-            result.G[idx] = -1.
-        if any( [ph == 0.0 for ph in G_ph]):
-            result.G[idx] = 0.
-        else:
-            result.G[idx] = averaging_scheme.average_shear_moduli(V_ph, K_ph, G_ph)
-
+        result.G[idx] = averaging_scheme.average_shear_moduli(V_ph, K_ph, G_ph)
         result.rho[idx] = averaging_scheme.average_density(V_ph, rho_ph)
         result.fraction[idx] = 1.0
+
     return result
 
 def compute_velocities(moduli):
@@ -91,14 +81,9 @@ def compute_velocities(moduli):
     mat_vphi = np.ndarray(len(moduli.V))
     
     for i in range(len(moduli.V)):
-        #if the shear modulus is negative, there is no data, so just set it to none
-        if  moduli.G[i] < 0.0 :
-             mat_vs[i] = None
-             mat_vp[i] = None
-        else:
-            mat_vs[i] = np.sqrt( moduli.G[i] / moduli.rho[i])
-            mat_vp[i] = np.sqrt( (moduli.K[i] + 4./3.*moduli.G[i]) / moduli.rho[i])
 
+        mat_vs[i] = np.sqrt( moduli.G[i] / moduli.rho[i])
+        mat_vp[i] = np.sqrt( (moduli.K[i] + 4./3.*moduli.G[i]) / moduli.rho[i])
         mat_vphi[i] = np.sqrt( moduli.K[i] / moduli.rho[i])
     
     return mat_vp, mat_vs, mat_vphi
