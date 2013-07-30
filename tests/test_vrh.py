@@ -3,7 +3,8 @@ import os, sys
 sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
-from burnman import minerals, voigt_reuss_hill
+from burnman import minerals
+import burnman.averaging_schemes as avg
 
 class mypericlase (burnman.material):
     """
@@ -26,19 +27,19 @@ class mypericlase (burnman.material):
 
 class VRH_average(unittest.TestCase):
     def test_one_object(self):
-        v = voigt_reuss_hill.vrh_average([2.0],[0.123])
+        v = avg.voigt_reuss_hill_function([2.0],[0.123])
         self.assertAlmostEqual(0.123, v)
 
     def test_two_same(self):
-        v = voigt_reuss_hill.vrh_average([2.0, 2.0],[0.456, 0.456])        
+        v = avg.voigt_reuss_hill_function([2.0, 2.0],[0.456, 0.456])        
         self.assertAlmostEqual(0.456, v)
 
     def test_one_no_volume(self):
-        v = voigt_reuss_hill.vrh_average([0.0, 2.0],[0.123, 0.456])        
+        v = avg.voigt_reuss_hill_function([0.0, 2.0],[0.123, 0.456])        
         self.assertAlmostEqual(0.456, v)
 
     def test_mix(self):
-        v = voigt_reuss_hill.vrh_average([1.0, 2.0],[0.1, 0.2])        
+        v = avg.voigt_reuss_hill_function([1.0, 2.0],[0.1, 0.2])        
         self.assertAlmostEqual(0.15833333333333, v)
 
 class VRH(unittest.TestCase):
@@ -46,7 +47,7 @@ class VRH(unittest.TestCase):
         rock = burnman.composite ( ( (mypericlase(), 1.0),) )
         rock.set_method('slb3') 
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
-            voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
+            burnman.velocities_from_rock(rock, [10e9,], [300,])
         self.assertAlmostEqual(3791.392, rho, 2)
         self.assertAlmostEqual(10285.368, v_p, 2)
         self.assertAlmostEqual(6308.811, v_s, 2)
@@ -59,7 +60,7 @@ class VRH(unittest.TestCase):
         
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
-            voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
+            burnman.velocities_from_rock(rock, [10e9,], [300,])
         self.assertAlmostEqual(3791.392, rho, 2)
         self.assertAlmostEqual(10285.368, v_p, 2)
         self.assertAlmostEqual(6308.811, v_s, 2)
@@ -77,7 +78,7 @@ class VRH(unittest.TestCase):
                                      (minerals.SLB2005.fe_perovskite(), 0.0) ] )
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
-            voigt_reuss_hill.voigt_reuss_hill(10e9, 300, rock)
+            burnman.velocities_from_rock(rock,[10e9,], [300,])
         self.assertAlmostEqual(3791.392, rho, 2)
         self.assertAlmostEqual(10285.368, v_p, 2)
         self.assertAlmostEqual(6308.811, v_s, 2)
