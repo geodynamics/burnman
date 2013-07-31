@@ -132,7 +132,7 @@ if __name__ == "__main__":
     mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
     mat_K, mat_G, mat_rho = moduli.K, moduli.G, moduli.rho
     
-    [rho_err,vphi_err,vs_err]=burnman.compare_with_seismic_model\
+    [rho_err,vphi_err,vs_err]=burnman.compare_chifactor\
     	(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         
     

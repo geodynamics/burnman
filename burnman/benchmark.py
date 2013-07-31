@@ -15,8 +15,10 @@ import matplotlib.image as mpimg
 
 
 
-#Attempt to recreate Stixrude and Lithgow-Bertelloni (2005) Figure 1
 def check_birch_murnaghan():
+    """
+    Recreates Stixrude and Lithgow-Bertelloni (2005) Figure 1, bulk and shear modulus without thermal corrections
+    """
     plt.close()
 
     #make a test mineral
@@ -58,6 +60,9 @@ def check_birch_murnaghan():
     plt.show()
 
 def check_mgd_shim_duffy_kenichi():
+    """
+    Attemmpts to recreate Shim Duffy Kenichi (2002)
+    """
     plt.close()
     #Create gold material from Table 1
     gold = burnman.material()
@@ -96,6 +101,9 @@ def check_mgd_shim_duffy_kenichi():
 
 
 def check_mgd_fei_mao_shu_hu():
+    """
+    Benchmark agains Fei Mao Shu Hu (1991)
+    """
     mgfeo = burnman.material() 
     mgfeo.params = {       'name': 'MgFeO',
                     'ref_V': 11.657e-6,
@@ -131,6 +139,9 @@ def check_mgd_fei_mao_shu_hu():
 
 
 def check_slb_fig3():
+    """
+    Benchmark grueneisen parameter against figure 3 of Stixrude and Lithgow-Bertelloni (2005b)
+    """
     perovskite= burnman.material() 
     perovskite.params = {       'name': 'perovksite',
                     'ref_V': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
@@ -168,6 +179,9 @@ def check_slb_fig3():
     plt.show()
 
 def check_slb_fig7_txt():
+    """
+    Calculates all values for forsterite and benchmarks with values from Stixrude and Lithgow-Bertelloni (personal communication)
+    """
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
                     'ref_V': 43.603e-6,
@@ -256,6 +270,9 @@ def check_slb_fig7_txt():
     plt.show()
 
 def check_slb_fig7():
+    """
+    Calculates all values for forsterite and benchmarks with figure 7 from Stixrude and Lithgow-Bertelloni (2005)
+    """
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
                     'ref_V': 43.60e-6,

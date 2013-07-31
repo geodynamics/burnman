@@ -121,9 +121,10 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
 
 
 
-# apply attenuation correction to a list of v_p, v_s, v_phi
-# takes a list of pressures and the seismic model
 def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
+    """
+    Returns lists of corrected Vp Vs and Vphi for a given Qs and Qphi
+    """
     length = len(v_p)
     ret_v_p = np.zeros(length)
     ret_v_s = np.zeros(length)
@@ -135,10 +136,11 @@ def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     return ret_v_p, ret_v_s, ret_v_phi
 
 
-# returns the differences of the two velocity profiles sampled at the given depth
-# it computes the L2 norm of the two functions (assumed to be linear between points)
-def compare_two(depth,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
-
+def compare_l2(depth,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+    """
+    It computes the L2 norm for three profiles at a time (assumed to be linear between points).
+    Input list of depths, three computed profiles, and three profiles to compare to.
+    """
     rho_err_tot = l2(depth,mat_rho,seis_rho)
     vphi_err_tot = l2(depth,mat_vphi,seis_vphi)
     vs_err_tot = l2(depth,mat_vs,seis_vs)
@@ -146,9 +148,10 @@ def compare_two(depth,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
 
     return rho_err_tot, vphi_err_tot, vs_err_tot
 
-# weighted comparison
-def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
-
+def compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+    """
+    It computes the chifactor for three profiles at a time
+    """
     rho_err_tot = chi_factor(mat_rho,seis_rho)
     vphi_err_tot = chi_factor(mat_vphi,seis_vphi)
     vs_err_tot = chi_factor(mat_vs,seis_vs)
@@ -157,6 +160,7 @@ def compare_with_seismic_model(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rh
     return rho_err_tot, vphi_err_tot, vs_err_tot
 
 def l2(x,funca,funcb):
+    """ L2 norm """
     diff=np.array(funca-funcb)
     diff=diff*diff
     length=x[-1]-x[0]

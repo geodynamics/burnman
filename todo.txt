@@ -17,6 +17,7 @@ Post Texas Meeting Todos:
 - Write section about possibilities for extension/future plans -- Everyone
 
 
+- allow for excess stishovite when molecule weight percents are defined
 - warn if used eos and mineral eos are different
 - clean up composition.py
 - benchmark against Matas et al. 2007 Sanne

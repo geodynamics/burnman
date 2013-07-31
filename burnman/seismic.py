@@ -20,6 +20,7 @@ class seismic_data:
         return np.arange(0.,6000.0, 100.0)
         
     def evaluate_all_at(self, depth_list):
+	""" returns pressure[Pa], density[kg/m^3], Vp[m/s], Vs[m/s] and Vphi[m/s] for a list of depths[m] """
         pressures = np.array([self.pressure(r) for r in depth_list])
         density = np.array([self.density(r) for r in depth_list])
         v_p = np.array([self.v_p(r) for r in depth_list])
@@ -27,32 +28,26 @@ class seismic_data:
         v_phi = np.array([self.v_phi(r) for r in depth_list])
         return pressures, density, v_p, v_s, v_phi
 
-    # in Pa, depth in km
     def pressure(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    #in km/s, depth in km
     def v_p(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    #in km/s, depth in km
     def v_s(self, depth):
         raise ValueError, "not implemented"
         return 0
     
-    #in km/s, depth in km
     def v_phi(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    #in g/cc, depth in km
     def density(self, depth):
         raise ValueError, "not implemented"
         return 0
     
-    #look up depth from given pressure in Pa
     def depth(self, pressure):
         raise ValueError, "not implemented"
         return -1
@@ -106,6 +101,9 @@ class radiustable(seismic_data):
     
 
 class prem(radiustable):
+    """ 
+    reads in the table for PREM (input_seismic/prem_table.txt) using the base class radiustable
+    """
     def __init__(self):
         radiustable.__init__(self)
         table = tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
@@ -118,12 +116,14 @@ class prem(radiustable):
 
 
 class slow(radiustable):
+    """ 
+    Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
+    We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
+    so we cut away rows at the top and bottom. Interpolation is not necessary, 
+    because all tables where generated with at the same depths 
+    """
     def __init__(self):
         radiustable.__init__(self)
-
-        #we need to stitch together three tables. Note that prem_lowermantle has a wider range, so we cut
-        #away rows at the top and bottom. Interpolation is not necessary, because all tables
-        #where generated with at the same depths
 
         table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -149,12 +149,14 @@ class slow(radiustable):
        
 
 class fast(radiustable):
+    """ 
+    Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
+    We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
+    so we cut away rows at the top and bottom. Interpolation is not necessary, 
+    because all tables where generated with at the same depths 
+    """
     def __init__(self):
         radiustable.__init__(self)
-
-        #we need to stitch together three tables. Note that prem_lowermantle has a wider range, so we cut
-        #away rows at the top and bottom. Interpolation is not necessary, because all tables
-        #where generated with at the same depths
 
         table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -185,7 +187,7 @@ class prem_test(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("input_seimic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         self.table_radius = table[:,0]   
         self.table_pressure = table[:,1] 
@@ -194,7 +196,9 @@ class prem_test(radiustable):
         self.table_vs = table[:,4] 
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
-
+    """ 
+    Applies the attenuation correction following Matas et al. (2007), page 4. This is a minor effect on the velocities 
+    """
     beta = 0.3 # Matas et al. (2007) page 4
     Qp  = 3./4.*pow((v_p/v_s),2.)*Qs    # Matas et al. (2007) page 4
 
@@ -205,8 +209,6 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
     return v_p, v_s, v_phi
     
-
-
 # shared variable of prem, so that other routines do not need to create
 # prem over and over. See geotherm for example.
 prem_model = prem()
@@ -220,13 +222,13 @@ if __name__ == "__main__":
 
 
     # specify where we want to evaluate, here we map from pressure to depth, because we can
-    p = np.arange(1e9,360e9,5e9)
-    depths = map(s.depth, p) 
+    #p = np.arange(1e9,360e9,5e9)
+    #depths = map(s.depth, p) 
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35e3,5600e3,100e3)
 
     #now evaluate everything at the given depths levels (using interpolation)
-    pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
+    #pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
 
     # plot vs and vp and v_phi (note that v_phi is computed!)
     plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
