@@ -10,6 +10,12 @@ import math
 import matplotlib.pyplot as pyplot
 
 #own libs:
+import os, sys
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+    sys.path.insert(1,os.path.abspath('..')) 
+sys.path.insert(1,os.path.abspath('.')) 
+import burnman
+
 import geotherm
 from tools import *
 

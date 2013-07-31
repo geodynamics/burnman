@@ -1,8 +1,8 @@
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase_HS'
+burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase'
+burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefined for 'burnman.other.Speziale_fe_periclase_LS'
+burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
 
 
@@ -15,103 +15,103 @@ burnman/minerals_base.py:109: UserWarning: Warning: G and or G_prime are undefin
 
 
 
-minerals.Muretal2012.fe_periclase_LS
-minerals.Muretal2012.fe_periclase_LS_3rd
-minerals.SLB2011.ferropericlase
-minerals.Matetal2007.mg_perovskite
+minerals.minerals.Matas_etal_2007.periclase
+minerals.minerals.SLB_2011.ferropericlase
+minerals.minerals.other.Speziale_fe_periclase_LS
+minerals.minerals.SLB_2011.mg_perovskite
 minerals.minerals_base.helper_spin_transition
-minerals.SLB2011.mg_fe_perovskite
-minerals.Muretal2012.fe_periclase_HS_3rd
-minerals.SLB2011.periclase
-minerals.other.Speziale_fe_periclase_HS
-minerals.SLB2005.ferropericlase
-minerals.Muretal2012.fe_perovskite
-minerals.SLB2005.mg_fe_perovskite_pt_dependent
-minerals.Matetal2007.fe_perovskite
-minerals.Matetal2007.al_perovskite
-minerals.Muretal2012.fe_periclase_3rd
-minerals.SLB2005.ferropericlase_pt_dependent
-minerals.Matetal2007.periclase
-minerals.Muretal2012.mg_perovskite
-minerals.Muretal2012.fe_periclase
-minerals.SLB2005.mg_perovskite
-minerals.SLB2005.fe_perovskite
-minerals.SLB2005.wuestite
-minerals.SLB2011.fe_perovskite
-minerals.Matetal2007.ca_perovskite
-minerals.SLB2011.ferropericlase_pt_dependent
-minerals.Matetal2007.wuestite
-minerals.Muretal2012.fe_periclase_HS
-minerals.SLB2005.periclase
-minerals.SLB2011.wuestite
-minerals.SLB2011.mg_fe_perovskite_pt_dependent
-minerals.SLB2011.mg_perovskite
-minerals.Muretal2012.mg_perovskite_3rdorder
-minerals.SLB2005.mg_fe_perovskite
-minerals.minerals_base.helper_volumetric_mixing
+minerals.minerals.SLB_2005.fe_perovskite
+minerals.minerals.SLB_2011.mg_fe_perovskite
+minerals.minerals.SLB_2011.wuestite
+minerals.minerals.Murakami_etal_2012.mg_perovskite_3rdorder
+minerals.minerals.Matas_etal_2007.ca_perovskite
+minerals.minerals.Murakami_etal_2012.fe_periclase_LS_3rd
+minerals.minerals.SLB_2005.stishovite
+minerals.minerals.Murakami_etal_2012.fe_periclase_HS_3rd
+minerals.minerals.SLB_2011.fe_perovskite
+minerals.minerals.SLB_2011.stishovite
+minerals.minerals.SLB_2011.periclase
+minerals.minerals.SLB_2005.mg_fe_perovskite
+minerals.minerals.other.Speziale_fe_periclase
+minerals.minerals.Murakami_etal_2012.fe_perovskite
+minerals.minerals.other.Speziale_fe_periclase_HS
+minerals.minerals.Matas_etal_2007.al_perovskite
+minerals.minerals.Murakami_etal_2012.fe_periclase
+minerals.minerals.SLB_2005.ferropericlase_pt_dependent
+minerals.minerals.Murakami_etal_2012.fe_periclase_3rd
+minerals.minerals.SLB_2011.mg_fe_perovskite_pt_dependent
+minerals.minerals.Murakami_etal_2012.mg_perovskite
+minerals.minerals_base.helper_solid_solution
+minerals.minerals.Murakami_etal_2012.mg_periclase
+minerals.minerals.SLB_2005.mg_perovskite
+minerals.minerals.SLB_2005.wuestite
+minerals.minerals.SLB_2005.periclase
+minerals.minerals.SLB_2005.mg_fe_perovskite_pt_dependent
+minerals.minerals.SLB_2011.ferropericlase_pt_dependent
 minerals.minerals_base.helper_fe_dependent
-minerals.SLB2005.stishovite
-minerals.SLB2011.stishovite
-minerals.Muretal2012.mg_periclase
-minerals.other.Speziale_fe_periclase
-minerals.other.Speziale_fe_periclase_LS
+minerals.minerals.Matas_etal_2007.mg_perovskite
+minerals.minerals.Murakami_etal_2012.fe_periclase_LS
+minerals.minerals.Matas_etal_2007.wuestite
+minerals.minerals.SLB_2005.ferropericlase
+minerals.minerals.Murakami_etal_2012.fe_periclase_HS
+minerals.minerals.Matas_etal_2007.fe_perovskite
 
-'burnman.Matetal2007.al_perovskite'
-'burnman.Matetal2007.ca_perovskite'
-'burnman.Matetal2007.fe_perovskite'
-'burnman.Matetal2007.mg_perovskite'
-'burnman.Matetal2007.periclase'
-'burnman.Matetal2007.wuestite'
-'burnman.Muretal2012.fe_periclase'
-'burnman.Muretal2012.fe_periclase_3rd'
-'burnman.Muretal2012.fe_periclase_HS'
-'burnman.Muretal2012.fe_periclase_HS_3rd'
-'burnman.Muretal2012.fe_periclase_LS'
-'burnman.Muretal2012.fe_periclase_LS_3rd'
-'burnman.Muretal2012.fe_perovskite'
-'burnman.Muretal2012.mg_periclase'
-'burnman.Muretal2012.mg_perovskite'
-'burnman.Muretal2012.mg_perovskite_3rdorder'
-'burnman.SLB2005.fe_perovskite'
-'burnman.SLB2005.mg_perovskite'
-'burnman.SLB2005.periclase'
-'burnman.SLB2005.stishovite'
-'burnman.SLB2005.wuestite'
-'burnman.SLB2011.fe_perovskite'
-'burnman.SLB2011.mg_perovskite'
-'burnman.SLB2011.periclase'
-'burnman.SLB2011.stishovite'
-'burnman.SLB2011.wuestite'
-'burnman.other.Speziale_fe_periclase'
-'burnman.other.Speziale_fe_periclase_HS'
-'burnman.other.Speziale_fe_periclase_LS'
-Name                                               ref_V     ref_K K_prime         ref_G G_prime molar_mass n ref_Debye ref_grueneisen  q0 eta_0s
-'burnman.Matetal2007.al_perovskite'            2.458e-05  2.49e+11     4.0      1.65e+11     1.8     0.1005 5    1021.0           1.48 1.4       
-'burnman.Matetal2007.ca_perovskite'            2.745e-05  2.36e+11     3.9      1.65e+11    2.46    0.11616 5     984.0           1.53 1.6       
-'burnman.Matetal2007.fe_perovskite'            2.534e-05   2.5e+11     4.0      1.35e+11     1.3     0.1319 5     841.0           1.48 1.4       
-'burnman.Matetal2007.mg_perovskite'            2.443e-05   2.5e+11     4.0      1.75e+11     1.8      0.102 5    1070.0           1.48 1.4       
-'burnman.Matetal2007.periclase'                1.125e-05 1.601e+11    3.83       1.3e+11     2.2     0.0403 2     673.0           1.41 1.3       
-'burnman.Matetal2007.wuestite'                 1.226e-05 1.601e+11    3.83 46000000000.0     0.6     0.0718 2     673.0           1.41 1.3       
-'burnman.Muretal2012.fe_periclase'            1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_periclase_3rd'        1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_periclase_HS'         1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_periclase_HS_3rd'     1.1412e-05 1.591e+11    4.11    1.2935e+11   1.993     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_periclase_LS'         1.1171e-05   1.7e+11       4    1.1634e+11   1.668     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_periclase_LS_3rd'     1.1171e-05   1.7e+11       4    1.5167e+11   1.754     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.Muretal2012.fe_perovskite'           2.4607e-05 2.519e+11    4.01     1.647e+11    1.58     0.1053 5    1054.0           1.48 1.4   1.48
-'burnman.Muretal2012.mg_periclase'             1.124e-05  1.61e+11     3.9      1.31e+11    1.92     0.0403 2     773.0            1.5 1.5    3.0
-'burnman.Muretal2012.mg_perovskite'            2.445e-05  2.81e+11     4.1      1.73e+11    1.56        0.1 5    1070.0           1.48 1.4    2.4
-'burnman.Muretal2012.mg_perovskite_3rdorder'   2.445e-05  2.81e+11     4.1    1.7142e+11    1.83        0.1 5    1070.0           1.48 1.4    2.4
-'burnman.SLB2005.fe_perovskite'                2.548e-05  2.81e+11     4.1      1.38e+11     1.7     0.1319 5     841.0           1.48 1.4    2.1
-'burnman.SLB2005.mg_perovskite'                2.445e-05  2.51e+11     4.1      1.75e+11     1.7        0.1 5    1070.0           1.48 1.4    2.6
-'burnman.SLB2005.periclase'                    1.124e-05  1.61e+11     3.8      1.31e+11     2.1     0.0403 2     773.0            1.5 1.5    2.8
-'burnman.SLB2005.stishovite'                   1.402e-05  3.14e+11     4.4       2.2e+11     1.6     0.0601 3    1044.0           1.34 2.4    5.0
-'burnman.SLB2005.wuestite'                     1.206e-05  1.52e+11     4.9 47000000000.0     0.7     0.0718 2     455.0           1.28 1.5    0.8
-'burnman.SLB2011.fe_perovskite'                2.549e-05  2.72e+11     4.1      1.33e+11     1.4     0.1319 5     871.0           1.57 1.1    2.3
-'burnman.SLB2011.mg_perovskite'                2.445e-05  2.51e+11     4.1      1.73e+11     1.7        0.1 5     905.0           1.57 1.1    2.6
-'burnman.SLB2011.periclase'                    1.124e-05  1.61e+11     3.8      1.31e+11     2.1     0.0403 2     767.0           1.36 1.7    2.8
-'burnman.SLB2011.stishovite'                   1.402e-05  3.14e+11     3.8       2.2e+11     1.9     0.0601 3    1108.0           1.37 2.8    4.6
-'burnman.SLB2011.wuestite'                     1.226e-05  1.79e+11     4.9 59000000000.0     1.4     0.0718 2     454.0           1.53 1.7    1.4
-'burnman.other.Speziale_fe_periclase'           2.29e-05 1.575e+11    3.92                          0.04567 2       587           1.46 1.2       
-'burnman.other.Speziale_fe_periclase_HS'        2.29e-05 1.575e+11    3.92                          0.04567 2       587           1.46 1.2       
-'burnman.other.Speziale_fe_periclase_LS'       2.149e-05  1.86e+11     4.6                          0.04567 2     587.0           1.46 1.2       
+'burnman.minerals.Matas_etal_2007.al_perovskite'
+'burnman.minerals.Matas_etal_2007.ca_perovskite'
+'burnman.minerals.Matas_etal_2007.fe_perovskite'
+'burnman.minerals.Matas_etal_2007.mg_perovskite'
+'burnman.minerals.Matas_etal_2007.periclase'
+'burnman.minerals.Matas_etal_2007.wuestite'
+'burnman.minerals.Murakami_etal_2012.fe_periclase'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_3rd'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_HS'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_HS_3rd'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS_3rd'
+'burnman.minerals.Murakami_etal_2012.fe_perovskite'
+'burnman.minerals.Murakami_etal_2012.mg_periclase'
+'burnman.minerals.Murakami_etal_2012.mg_perovskite'
+'burnman.minerals.Murakami_etal_2012.mg_perovskite_3rdorder'
+'burnman.minerals.SLB_2005.fe_perovskite'
+'burnman.minerals.SLB_2005.mg_perovskite'
+'burnman.minerals.SLB_2005.periclase'
+'burnman.minerals.SLB_2005.stishovite'
+'burnman.minerals.SLB_2005.wuestite'
+'burnman.minerals.SLB_2011.fe_perovskite'
+'burnman.minerals.SLB_2011.mg_perovskite'
+'burnman.minerals.SLB_2011.periclase'
+'burnman.minerals.SLB_2011.stishovite'
+'burnman.minerals.SLB_2011.wuestite'
+'burnman.minerals.other.Speziale_fe_periclase'
+'burnman.minerals.other.Speziale_fe_periclase_HS'
+'burnman.minerals.other.Speziale_fe_periclase_LS'
+Name                                                               ref_V     ref_K K_prime         ref_G G_prime molar_mass n ref_Debye ref_grueneisen  q0 eta_0s
+'burnman.minerals.Matas_etal_2007.al_perovskite'               2.458e-05  2.49e+11     4.0      1.65e+11     1.8     0.1005 5    1021.0           1.48 1.4       
+'burnman.minerals.Matas_etal_2007.ca_perovskite'               2.745e-05  2.36e+11     3.9      1.65e+11    2.46    0.11616 5     984.0           1.53 1.6       
+'burnman.minerals.Matas_etal_2007.fe_perovskite'               2.534e-05   2.5e+11     4.0      1.35e+11     1.3     0.1319 5     841.0           1.48 1.4       
+'burnman.minerals.Matas_etal_2007.mg_perovskite'               2.443e-05   2.5e+11     4.0      1.75e+11     1.8      0.102 5    1070.0           1.48 1.4       
+'burnman.minerals.Matas_etal_2007.periclase'                   1.125e-05 1.601e+11    3.83       1.3e+11     2.2     0.0403 2     673.0           1.41 1.3       
+'burnman.minerals.Matas_etal_2007.wuestite'                    1.226e-05 1.601e+11    3.83 46000000000.0     0.6     0.0718 2     673.0           1.41 1.3       
+'burnman.minerals.Murakami_etal_2012.fe_periclase'            1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_3rd'        1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_HS'         1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_HS_3rd'     1.1412e-05 1.591e+11    4.11    1.2935e+11   1.993     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'         1.1171e-05   1.7e+11       4    1.1634e+11   1.668     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS_3rd'     1.1171e-05   1.7e+11       4    1.5167e+11   1.754     0.0469 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_perovskite'           2.4607e-05 2.519e+11    4.01     1.647e+11    1.58     0.1053 5    1054.0           1.48 1.4   1.48
+'burnman.minerals.Murakami_etal_2012.mg_periclase'             1.124e-05  1.61e+11     3.9      1.31e+11    1.92     0.0403 2     773.0            1.5 1.5    3.0
+'burnman.minerals.Murakami_etal_2012.mg_perovskite'            2.445e-05  2.81e+11     4.1      1.73e+11    1.56        0.1 5    1070.0           1.48 1.4    2.4
+'burnman.minerals.Murakami_etal_2012.mg_perovskite_3rdorder'   2.445e-05  2.81e+11     4.1    1.7142e+11    1.83        0.1 5    1070.0           1.48 1.4    2.4
+'burnman.minerals.SLB_2005.fe_perovskite'                      2.548e-05  2.81e+11     4.1      1.38e+11     1.7     0.1319 5     841.0           1.48 1.4    2.1
+'burnman.minerals.SLB_2005.mg_perovskite'                      2.445e-05  2.51e+11     4.1      1.75e+11     1.7        0.1 5    1070.0           1.48 1.4    2.6
+'burnman.minerals.SLB_2005.periclase'                          1.124e-05  1.61e+11     3.8      1.31e+11     2.1     0.0403 2     773.0            1.5 1.5    2.8
+'burnman.minerals.SLB_2005.stishovite'                         1.402e-05  3.14e+11     4.4       2.2e+11     1.6     0.0601 3    1044.0           1.34 2.4    5.0
+'burnman.minerals.SLB_2005.wuestite'                           1.206e-05  1.52e+11     4.9 47000000000.0     0.7     0.0718 2     455.0           1.28 1.5    0.8
+'burnman.minerals.SLB_2011.fe_perovskite'                      2.549e-05  2.72e+11     4.1      1.33e+11     1.4     0.1319 5     871.0           1.57 1.1    2.3
+'burnman.minerals.SLB_2011.mg_perovskite'                      2.445e-05  2.51e+11     4.1      1.73e+11     1.7        0.1 5     905.0           1.57 1.1    2.6
+'burnman.minerals.SLB_2011.periclase'                          1.124e-05  1.61e+11     3.8      1.31e+11     2.1     0.0403 2     767.0           1.36 1.7    2.8
+'burnman.minerals.SLB_2011.stishovite'                         1.402e-05  3.14e+11     3.8       2.2e+11     1.9     0.0601 3    1108.0           1.37 2.8    4.6
+'burnman.minerals.SLB_2011.wuestite'                           1.226e-05  1.79e+11     4.9 59000000000.0     1.4     0.0718 2     454.0           1.53 1.7    1.4
+'burnman.minerals.other.Speziale_fe_periclase'                  2.29e-05 1.575e+11    3.92                          0.04567 2       587           1.46 1.2       
+'burnman.minerals.other.Speziale_fe_periclase_HS'               2.29e-05 1.575e+11    3.92                          0.04567 2       587           1.46 1.2       
+'burnman.minerals.other.Speziale_fe_periclase_LS'              2.149e-05  1.86e+11     4.6                          0.04567 2     587.0           1.46 1.2       
