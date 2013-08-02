@@ -58,6 +58,10 @@ if __name__ == "__main__":
     def eval_material(amount_perovskite):
         rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
                              (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
+#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(1.0), amount_perovskite),
+#                             (minerals.SLB_2011.ferropericlase(0.0), 1.0 - amount_perovskite) ] )
+#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
+#                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
     
         rock.set_method(method)
     
@@ -89,9 +93,13 @@ if __name__ == "__main__":
     ymax = 1e6
     plt.ylim([ymin,ymax])
 
-    plt.vlines(71,ymin,ymax,colors='c',label='A, 71% pv')
-    plt.vlines(79,ymin,ymax,colors='g',label='B, 79% pv')
-    plt.vlines(90,ymin,ymax,colors='m',label='C, 90% pv')
+    A = 0.71
+    B = 0.79
+    C = 0.91
+
+    plt.vlines(A*100.,ymin,ymax,colors='c',label='A, %d%% pv'%(A*100))
+    plt.vlines(B*100.,ymin,ymax,colors='g',label='B, %d%% pv'%(B*100))
+    plt.vlines(C*100.,ymin,ymax,colors='m',label='C, %d%% pv'%(C*100))
     
     plt.yscale('log')
     plt.xlabel('% Perovskite')
@@ -99,17 +107,17 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-    A_p, A_vs, A_vphi,_ = eval_material(0.71)
-    B_p, B_vs, B_vphi,_ = eval_material(0.79)
-    C_p, C_vs, C_vphi,_ = eval_material(0.90)
+    A_p, A_vs, A_vphi,_ = eval_material(A)
+    B_p, B_vs, B_vphi,_ = eval_material(B)
+    C_p, C_vs, C_vphi,_ = eval_material(C)
     
     plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, 71% pv')
+    markerfacecolor='c',markersize=4,label='A, %d%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, 79% pv')
+    markerfacecolor='g',markersize=4,label='B, %d%% pv'%(B*100))
     plt.plot(C_p/1.e9,C_vs/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, 90% pv')
+    markerfacecolor='m',markersize=4,label='C, %d%% pv'%(C*100))
     plt.title("Vs (km/s)")
     plt.xlabel('pressure')
     plt.ylabel('km/s')
@@ -118,11 +126,11 @@ if __name__ == "__main__":
       
     plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, 71% pv')
+    markerfacecolor='c',markersize=4,label='A, %d%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, 79% pv')
+    markerfacecolor='g',markersize=4,label='B, %d%% pv'%(B*100))
     plt.plot(C_p/1.e9,C_vphi/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, 90% pv')
+    markerfacecolor='m',markersize=4,label='C, %d%% pv'%(C*100))
     plt.title("Vphi (km/s)")
     plt.xlabel('pressure')
     plt.ylabel('km/s')
