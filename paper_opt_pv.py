@@ -50,7 +50,7 @@ if __name__ == "__main__":
     
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
-    depths = np.linspace(700e3,2800e3, number_of_points)
+    depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
     
     temperature = burnman.geotherm.brown_shankland(seis_p)
@@ -78,14 +78,14 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 80)
+    xx=np.linspace(0.0, 1.0, 50)
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
     plt.plot (xx*100,yy_vs,"r-",label=("V_s error"))
     plt.plot (xx*100,yy_vphi,"b-",label=("V_phi error"))
 
-    ymin = 500
+    ymin = 50
     ymax = 1e6
     plt.ylim([ymin,ymax])
 
