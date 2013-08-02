@@ -55,7 +55,7 @@ if __name__ == "__main__":
     
     temperature = burnman.geotherm.brown_shankland(seis_p)
     
-    def eval_material(amount_perovskite):
+    def material_error(amount_perovskite):
         rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
                              (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
     
@@ -69,62 +69,18 @@ if __name__ == "__main__":
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
     
         #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-        
-    
-        return seis_p, mat_vs, mat_vphi, mat_rho
-
-    def material_error(x):
-        _, mat_vs, mat_vphi, mat_rho = eval_material(x)
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+    
         return vs_err, vphi_err
-
-    xx=np.linspace(0.0, 1.0, 80)
+    
+    xx=np.linspace(0.0, 1.0, 40)
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
-    plt.plot (xx*100,yy_vs,"r-",label=("V_s error"))
-    plt.plot (xx*100,yy_vphi,"b-",label=("V_phi error"))
-
-    ymin = 500
-    ymax = 1e6
-    plt.ylim([ymin,ymax])
-
-    plt.vlines(71,ymin,ymax,colors='c',label='A, 71% pv')
-    plt.vlines(79,ymin,ymax,colors='g',label='B, 79% pv')
-    plt.vlines(90,ymin,ymax,colors='m',label='C, 90% pv')
-    
+    plt.plot (xx,yy_vs,"r-x",label=("vs error"))
+    plt.plot (xx,yy_vphi,"b-x",label=("vphi error"))
     plt.yscale('log')
     plt.xlabel('% Perovskite')
     plt.ylabel('Error')
     plt.legend()
-    plt.show()
-
-    A_p, A_vs, A_vphi,_ = eval_material(0.71)
-    B_p, B_vs, B_vphi,_ = eval_material(0.79)
-    C_p, C_vs, C_vphi,_ = eval_material(0.90)
-    
-    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
-    plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, 71% pv')
-    plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, 79% pv')
-    plt.plot(C_p/1.e9,C_vs/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, 90% pv')
-    plt.title("Vs (km/s)")
-    plt.xlabel('pressure')
-    plt.ylabel('km/s')
-    plt.legend(loc='lower right')
-    plt.show()
-      
-    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
-    plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, 71% pv')
-    plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, 79% pv')
-    plt.plot(C_p/1.e9,C_vphi/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, 90% pv')
-    plt.title("Vphi (km/s)")
-    plt.xlabel('pressure')
-    plt.ylabel('km/s')
-    plt.legend(loc='lower right')
     plt.show()
