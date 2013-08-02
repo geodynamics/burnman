@@ -82,7 +82,7 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 50)
+    xx=np.linspace(0.0, 1.0, 200)
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
@@ -93,13 +93,13 @@ if __name__ == "__main__":
     ymax = 1e6
     plt.ylim([ymin,ymax])
 
-    A = 0.71
-    B = 0.79
-    C = 0.91
+    A = 0.709
+    B = 0.793
+    C = 0.915
 
-    plt.vlines(A*100.,ymin,ymax,colors='c',label='A, %d%% pv'%(A*100))
-    plt.vlines(B*100.,ymin,ymax,colors='g',label='B, %d%% pv'%(B*100))
-    plt.vlines(C*100.,ymin,ymax,colors='m',label='C, %d%% pv'%(C*100))
+    plt.vlines(A*100.,ymin,ymax,colors='c',label='A, %g%% pv'%(A*100))
+    plt.vlines(B*100.,ymin,ymax,colors='g',label='B, %g%% pv'%(B*100))
+    plt.vlines(C*100.,ymin,ymax,colors='m',label='C, %g%% pv'%(C*100))
     
     plt.yscale('log')
     plt.xlabel('% Perovskite')
@@ -113,11 +113,11 @@ if __name__ == "__main__":
     
     plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, %d%% pv'%(A*100))
+    markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, %d%% pv'%(B*100))
+    markerfacecolor='g',markersize=4,label='B, %g%% pv'%(B*100))
     plt.plot(C_p/1.e9,C_vs/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, %d%% pv'%(C*100))
+    markerfacecolor='m',markersize=4,label='C, %g%% pv'%(C*100))
     plt.title("Vs (km/s)")
     plt.xlabel('pressure')
     plt.ylabel('km/s')
@@ -126,11 +126,11 @@ if __name__ == "__main__":
       
     plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, %d%% pv'%(A*100))
+    markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, %d%% pv'%(B*100))
+    markerfacecolor='g',markersize=4,label='B, %g%% pv'%(B*100))
     plt.plot(C_p/1.e9,C_vphi/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, %d%% pv'%(C*100))
+    markerfacecolor='m',markersize=4,label='C, %g%% pv'%(C*100))
     plt.title("Vphi (km/s)")
     plt.xlabel('pressure')
     plt.ylabel('km/s')
