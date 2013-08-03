@@ -82,7 +82,7 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 200)
+    xx=np.linspace(0.0, 1.0, 10) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     B_p, B_vs, B_vphi,_ = eval_material(B)
     C_p, C_vs, C_vphi,_ = eval_material(C)
     
-    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
+    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
     markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     plt.legend(loc='lower right')
     plt.show()
       
-    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='--',marker='o', markersize=4,markerfacecolor='None',label='PREM')
+    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
     markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
     plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
@@ -134,5 +134,20 @@ if __name__ == "__main__":
     plt.title("Vphi (km/s)")
     plt.xlabel('pressure')
     plt.ylabel('km/s')
+    plt.legend(loc='lower right')
+    plt.show()
+
+
+    # plot percent differences
+    plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.')
+    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color='c',label='Vs: A, %g%% pv'%(A*100))
+    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color='g',label='Vs: B, %g%% pv'%(B*100))
+    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color='m',label='Vs: C, %g%% pv'%(C*100))
+    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color='c',linestyle='--',label='Vphi: A, %g%% pv'%(A*100))
+    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color='g',linestyle='--',label='Vphi: B, %g%% pv'%(B*100))
+    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color='m',linestyle='--',label='Vphi: C, %g%% pv'%(C*100))
+    plt.xlabel('pressure')
+    plt.ylabel('% difference')
+     
     plt.legend(loc='lower right')
     plt.show()
