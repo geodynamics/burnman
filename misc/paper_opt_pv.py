@@ -46,25 +46,25 @@ if __name__ == "__main__":
        (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
-    method = 'slb2' 
+    method = 'slb2'
     
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
     
-    temperature = burnman.geotherm.brown_shankland(seis_p)
+    #temperature = burnman.geotherm.brown_shankland(seis_p)
     
     def eval_material(amount_perovskite):
         rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
                              (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(1.0), amount_perovskite),
-#                             (minerals.SLB_2011.ferropericlase(0.0), 1.0 - amount_perovskite) ] )
+#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.08), amount_perovskite),
+#                             (minerals.SLB_2011.ferropericlase(0.21), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
     
         rock.set_method(method)
-    
+        temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
         print "Calculations are done for:"
         for ph in rock.phases:
             print ph.fraction, " of phase", ph.mineral.to_string()
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 10) #200 for final image
+    xx=np.linspace(0.0, 1.0, 20) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
