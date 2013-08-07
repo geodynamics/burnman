@@ -36,7 +36,6 @@ class averaging_scheme:
         """
         total_mass = np.sum(np.array(densities)*np.array(volumes))
         total_vol = np.sum(np.array(volumes)) #should sum to one
-        assert(total_vol < 1.0001 and total_vol > 0.9999)
         density = total_mass/total_vol
         return density
          

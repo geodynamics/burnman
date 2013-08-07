@@ -76,15 +76,13 @@ def average_moduli(moduli_list, averaging_scheme=averaging_schemes.voigt_reuss_h
         fractions = [m.fraction[idx] for m in moduli_list]
 
         #come up with volume fractions of the phases
-        V_ph = [m.V[idx] for m in moduli_list]
-        V_mol = np.array(V_ph)*np.array(fractions)
-        V_frac = V_mol/sum(V_mol)
+        V_frac = [m.V[idx] for m in moduli_list]
 
         K_ph = [m.K[idx] for m in moduli_list]
         G_ph = [m.G[idx] for m in moduli_list]
         rho_ph = [m.rho[idx] for m in moduli_list]
                
-        result.V[idx] = sum(V_mol)
+        result.V[idx] = sum(V_frac)
         result.K[idx] = averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
         result.G[idx] = averaging_scheme.average_shear_moduli(V_frac, K_ph, G_ph)
         result.rho[idx] = averaging_scheme.average_density(V_frac, rho_ph)

@@ -54,8 +54,7 @@ class composite:
         Compute the density of the composite based on the molar volumes and masses
         """
         densities = np.array([ph.mineral.density() for ph in self.phases])
-        volumes = np.array([ph.mineral.molar_volume() for ph in self.phases])\
-                           *np.array([ph.fraction for ph in self.phases])
+        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.phases])
         return np.sum(densities*volumes)/np.sum(volumes)
         
                 
