@@ -59,12 +59,12 @@ class fe_perovskite(material):
             'K_prime': 4.01,
             'ref_G': 164.7e9,
             'G_prime': 1.58,
-            'molar_mass': .1053,
+            'molar_mass': .102,
             'n': 5,
             'ref_Debye': 1054.,
             'ref_grueneisen': 1.48,
             'q0': 1.4,
-            'eta_0s': 1.48 } 
+            'eta_0s': 2.4 } 
 
 
             
@@ -109,7 +109,7 @@ class fe_periclase_HS(material):  # From Murakami's emails, see Cayman for detai
             'K_prime': 4.11,
             'ref_G': 105.43e9,
             'G_prime': 1.773,
-            'molar_mass': .0469,
+            'molar_mass': .047,
             'n': 2,
             'ref_Debye': 706.,
             'ref_grueneisen': 1.45,
@@ -128,7 +128,7 @@ class fe_periclase_LS(material):  # From Murakami's emails, see Cayman for detai
             'K_prime': 4,
             'ref_G': 116.34e9,
             'G_prime': 1.668,
-            'molar_mass': .0469,
+            'molar_mass': .047,
             'n': 2,
             'ref_Debye': 706.,
             'ref_grueneisen': 1.45,
