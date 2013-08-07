@@ -28,13 +28,15 @@ class averaging_scheme:
         raise NotImplementedError("")
     def average_density(self, volumes, densities):
         """
-        Average the densities of the rock.  This is the only
+        Average the densities of the rock, given a list of volume
+        fractions and densitites.  This is the only
         one that is implemented in the base class, as it should
         not be controvsersial... :)
         Returns: a single density
         """
         total_mass = np.sum(np.array(densities)*np.array(volumes))
-        total_vol = np.sum(np.array(volumes))
+        total_vol = np.sum(np.array(volumes)) #should sum to one
+        assert(total_vol < 1.0001 and total_vol > 0.9999)
         density = total_mass/total_vol
         return density
          
