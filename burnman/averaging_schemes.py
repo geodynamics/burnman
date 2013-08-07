@@ -8,7 +8,7 @@ import warnings
 class averaging_scheme:
     """ 
     Base class for different averaging schemes
-    New averagimg schemes should define the functions
+    New averaging schemes should define the functions
     average_bulk_moduli and average_shear_moduli, as
     specified here.
     """
