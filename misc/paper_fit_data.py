@@ -26,6 +26,14 @@ import burnman
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
         sys.path.insert(1,os.path.abspath('..')) 
 
+
+figsize=(6,5)
+prop={'size':12}
+plt.rc('text', usetex=True)
+plt.rc('font', family='sanserif')
+figure=plt.figure(dpi=100,figsize=figsize)
+
+
 def calc_shear_velocities(ref_G, G_prime, mineral, pressures): 
 
     mineral.params['ref_G'] = ref_G
@@ -80,15 +88,15 @@ mg_perovskite_test.set_method("bm2")
 model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
 
-plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color='r', linestyle='-', linewidth=2, label = "Correct 2nd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color='r', linestyle='-.', linewidth=2, label = "Incorrect 2nd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color='b', linestyle='-', linewidth=2, label = "Correct 3rd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color='b', linestyle='-.', linewidth=2, label = "Incorrect 3rd order extrapolation")
-plt.scatter(obs_pressures/1.e9, obs_vs/1000.)
+plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color='r', linestyle='-', linewidth=1.5, label = "Correct 2nd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color='r', linestyle='--', linewidth=1.5, label = "Incorrect 2nd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color='b', linestyle='-', linewidth=1.5, label = "Correct 3rd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color='b', linestyle='--', linewidth=1.5, label = "Incorrect 3rd order extrapolation")
+plt.scatter(obs_pressures/1.e9, obs_vs/1000., zorder=1000, marker='o',c='w')
 plt.ylim([6.55, 8])
 plt.xlim([25., 135.])
 plt.ylabel("Shear velocity (km/s)")
 plt.xlabel("Pressure (GPa)")
-plt.legend(loc = "lower right",prop={'size':12},frameon=False)
-plt.savefig("example_fit_data.pdf")
+plt.legend(loc = "lower right",prop=prop)
+plt.savefig("example_fit_data.pdf", bbox_inches='tight')
 plt.show()
