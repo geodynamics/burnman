@@ -10,6 +10,13 @@ import burnman
 
 import burnman.slb as slb
 
+figsize=(6,5)
+prop={'size':12}
+plt.rc('text', usetex=True)
+plt.rc('font', family='sanserif')
+figure=plt.figure(dpi=100,figsize=figsize)
+
+
 def check_slb_fig7_txt():
     """
     Calculates all values for forsterite and benchmarks with values from Stixrude and Lithgow-Bertelloni (personal communication)
@@ -92,13 +99,14 @@ def check_slb_fig7_txt():
     plt.plot(temperature, Cp_comp, label = r'$c_P$')
     plt.plot(temperature, gr_comp, label = r'$\gamma$')
 
-    plt.xlim([0, 2750])
-    plt.ylim([-0.001, 0.001])
+    plt.xlim([0, 2200])
+    plt.ylim([-0.002, 0.002])
+    plt.yticks([-0.002,-0.001,0,0.001,0.002])
     plt.xticks([0,800,1600,2200])
     plt.xlabel("Temperature (K)")
-    plt.ylabel("Percent Difference from HeFESTo")
-    plt.legend(loc="center right")
-    plt.savefig("benchmark1.pdf")
+    plt.ylabel("Percent Difference")
+    plt.legend(loc="lower center",prop=prop,ncol=4)
+    plt.savefig("benchmark1.pdf", bbox_inches='tight')
     plt.show()
 
 if __name__ == "__main__":
