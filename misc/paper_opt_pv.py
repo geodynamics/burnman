@@ -29,6 +29,10 @@ from burnman import minerals
 
 if __name__ == "__main__":    
 
+    figsize=(6,5)
+    prop={'size':12}
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='sanserif')
     
     ### input variables ###
     #######################
@@ -46,7 +50,7 @@ if __name__ == "__main__":
        (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
-    method = 'slb2'
+    method = 'slb3'
     
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
@@ -56,10 +60,10 @@ if __name__ == "__main__":
     #temperature = burnman.geotherm.brown_shankland(seis_p)
     
     def eval_material(amount_perovskite):
-        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.08), amount_perovskite),
-#                             (minerals.SLB_2011.ferropericlase(0.21), 1.0 - amount_perovskite) ] )
+#        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
+#                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
+        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.08), amount_perovskite),
+                             (minerals.SLB_2011.ferropericlase(0.21), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
     
@@ -82,72 +86,84 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 20) #200 for final image
+    xx=np.linspace(0.0, 1.0, 200) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
-    plt.plot (xx*100,yy_vs,"r-",label=("V_s error"))
-    plt.plot (xx*100,yy_vphi,"b-",label=("V_phi error"))
+    plt.figure(dpi=100,figsize=figsize)
+    plt.plot (xx*100,yy_vs,"r-",label=("$V_s$ error"))
+    plt.plot (xx*100,yy_vphi,"b-",label=("$V_\phi$ error"))
+    plt.plot (xx*100,yy_vs+yy_vphi,"k--",label=("sum"))
 
     ymin = 50
     ymax = 1e6
     plt.ylim([ymin,ymax])
 
-    A = 0.709
-    B = 0.793
-    C = 0.915
+    print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_vs+yy_vphi)]
 
-    plt.vlines(A*100.,ymin,ymax,colors='c',label='A, %g%% pv'%(A*100))
-    plt.vlines(B*100.,ymin,ymax,colors='g',label='B, %g%% pv'%(B*100))
-    plt.vlines(C*100.,ymin,ymax,colors='m',label='C, %g%% pv'%(C*100))
+    B = 0.868
+    A = 0.515
+    C = 0.595
+
+    plt.vlines(A*100.,ymin,ymax,colors='c',label='A (%g\%% pv)'%(A*100))
+    plt.vlines(B*100.,ymin,ymax,colors='g',label='B (%g\%% pv)'%(B*100))
+    plt.vlines(C*100.,ymin,ymax,colors='m',label='C (%g\%% pv)'%(C*100))
     
     plt.yscale('log')
-    plt.xlabel('% Perovskite')
+    plt.xlabel('\% Perovskite')
     plt.ylabel('Error')
-    plt.legend()
+    plt.legend(loc='lower left',prop=prop)
+    plt.savefig("opt_pv_1.pdf",bbox_inches='tight')
     plt.show()
 
     A_p, A_vs, A_vphi,_ = eval_material(A)
     B_p, B_vs, B_vphi,_ = eval_material(B)
     C_p, C_vs, C_vphi,_ = eval_material(C)
     
+    plt.figure(dpi=100,figsize=figsize)
     plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
+    markerfacecolor='c',markersize=4,label='A (%g\%% pv)'%(A*100))
     plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, %g%% pv'%(B*100))
+    markerfacecolor='g',markersize=4,label='B (%g\%% pv)'%(B*100))
     plt.plot(C_p/1.e9,C_vs/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, %g%% pv'%(C*100))
-    plt.title("Vs (km/s)")
-    plt.xlabel('pressure')
+    markerfacecolor='m',markersize=4,label='C (%g\%% pv)'%(C*100))
+    plt.title("$V_s$ (km/s)")
+    plt.xlabel('pressure (GPa)')
     plt.ylabel('km/s')
-    plt.legend(loc='lower right')
+    plt.legend(loc='lower right',prop=prop)
+    plt.savefig("opt_pv_2.pdf",bbox_inches='tight')
     plt.show()
       
+    plt.figure(dpi=100,figsize=figsize)
     plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
-    markerfacecolor='c',markersize=4,label='A, %g%% pv'%(A*100))
+    markerfacecolor='c',markersize=4,label='A (%g\%% pv)'%(A*100))
     plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
-    markerfacecolor='g',markersize=4,label='B, %g%% pv'%(B*100))
+    markerfacecolor='g',markersize=4,label='B (%g\%% pv)'%(B*100))
     plt.plot(C_p/1.e9,C_vphi/1.e3,color='m',linestyle='-', \
-    markerfacecolor='m',markersize=4,label='C, %g%% pv'%(C*100))
-    plt.title("Vphi (km/s)")
-    plt.xlabel('pressure')
+    markerfacecolor='m',markersize=4,label='C (%g\%% pv)'%(C*100))
+    plt.title("$V_\phi$ (km/s)")
+    plt.xlabel('pressure (GPa)')
     plt.ylabel('km/s')
-    plt.legend(loc='lower right')
+    plt.legend(loc='lower right', prop=prop)
+    plt.savefig("opt_pv_3.pdf",bbox_inches='tight')
     plt.show()
 
 
     # plot percent differences
+    plt.figure(dpi=100,figsize=figsize)
     plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.')
-    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color='c',label='Vs: A, %g%% pv'%(A*100))
-    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color='g',label='Vs: B, %g%% pv'%(B*100))
-    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color='m',label='Vs: C, %g%% pv'%(C*100))
-    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color='c',linestyle='--',label='Vphi: A, %g%% pv'%(A*100))
-    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color='g',linestyle='--',label='Vphi: B, %g%% pv'%(B*100))
-    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color='m',linestyle='--',label='Vphi: C, %g%% pv'%(C*100))
-    plt.xlabel('pressure')
-    plt.ylabel('% difference')
+    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color='c',label='$V_s$: A (%g\%% pv)'%(A*100))
+    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color='g',label='$V_s$: B (%g\%% pv)'%(B*100))
+    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color='m',label='Vs: C (%g\%% pv)'%(C*100))
+    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color='c',linestyle='--',label='$V_\phi$: A')
+    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color='g',linestyle='--',label='Vphi: B')
+    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color='m',linestyle='--',label='Vphi: C')
+    plt.xlabel('pressure (GPa)')
+    plt.ylabel('\% difference')
+    plt.ylim([-5,4])
      
-    plt.legend(loc='lower right')
+    plt.legend(loc='lower center', ncol=2, prop=prop)
+    plt.savefig("opt_pv_4.pdf",bbox_inches='tight')
     plt.show()

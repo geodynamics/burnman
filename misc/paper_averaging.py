@@ -31,6 +31,12 @@ import burnman
 from burnman import minerals
 
 if __name__ == "__main__":
+	figsize=(6,5)
+	prop={'size':12}
+	plt.rc('text', usetex=True)
+	plt.rc('font', family='sanserif')
+	figure=plt.figure(dpi=100,figsize=figsize)
+    
 	""" choose 'slb2' (finite-strain 2nd order shear modulus, 
 		stixrude and lithgow-bertelloni, 2005)
 	or 'slb3 (finite-strain 3rd order shear modulus,
@@ -103,29 +109,44 @@ if __name__ == "__main__":
 	rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
             burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_lower())
 
+	#linear fit
+	vs_lin = vs_pv*amount_perovskite + vs_fp*(1.0-amount_perovskite)  
 	
 	# PLOTTING
 	
 	# plot vs
-	fig=plt.figure()
-
+	ax = figure.add_subplot(1,1,1)
 	plt.plot(pressures/1.e9,vs_v/1.e3,color='c',linestyle='-',marker='^',\
 	    markersize=4,label='Voigt')
 	plt.plot(pressures/1.e9,vs_r/1.e3,color='k',linestyle='-',marker='v',\
 	    markersize=4,label='Reuss')
 	plt.plot(pressures/1.e9,vs_vrh/1.e3,color='b',linestyle='-',marker='x',\
 	    markersize=4,label='Voigt-Reuss-Hill')
-	plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',marker='x',\
-	    markersize=4,label='Hashin-Shtrikman')
-	plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
-	    markersize=4)
+	plt.fill_between(pressures/1.e9, vs_hsu/1.e3, vs_hsl/1.e3, facecolor='red', lw=0, label='asdf',interpolate=False)
+
+	
+	
+
+	#plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',\
+	#    markersize=4,label='Hashin-Shtrikman')
+	#plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
+	#    markersize=4)
+	plt.plot(pressures/1.e9,vs_lin/1.e3,color='k',linestyle='--',\
+	    markersize=4,label='linear')
 	plt.plot(pressures/1.e9,vs_pv/1.e3,color='y',linestyle='-',marker='x',\
 	    markersize=4,label='Mg Perovskite')
 	plt.plot(pressures/1.e9,vs_fp/1.e3,color='g',linestyle='-',marker='x',\
 	    markersize=4,label='Wustite')
+
+	plt.ylim(2.0,7.5)
 	plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
-	plt.legend(loc='lower right',prop={'size':11},frameon=False)
+
+	simArtist = plt.Line2D((0,1),(0,0), color='r', lw=5, linestyle='-')
+	handles, labels = ax.get_legend_handles_labels()
+	plt.legend(handles[0:3]+[simArtist]+handles[3:], labels[0:3]+['Hashin-Shtrikman']+labels[3:], loc='lower right',ncol=2,prop=prop)
+
+
 	plt.xlabel('Pressure (GPa)')
 	plt.ylabel(r'$V_s$ (km/s)')
-	plt.savefig("example_averaging.pdf")
+	plt.savefig("example_averaging.pdf",bbox_inches='tight')
 	plt.show()
