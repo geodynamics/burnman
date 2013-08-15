@@ -29,6 +29,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+import colors
 
 if __name__ == "__main__":
 	figsize=(6,5)
@@ -116,12 +117,12 @@ if __name__ == "__main__":
 	
 	# plot vs
 	ax = figure.add_subplot(1,1,1)
-	plt.plot(pressures/1.e9,vs_v/1.e3,color='c',linestyle='-',marker='^',\
+	plt.plot(pressures/1.e9,vs_v/1.e3,color=colors.color(0),linewidth=2,linestyle='-',marker='^',\
 	    markersize=4,label='Voigt')
-	plt.plot(pressures/1.e9,vs_r/1.e3,color='k',linestyle='-',marker='v',\
+	plt.plot(pressures/1.e9,vs_r/1.e3,color=colors.color(5),linewidth=2,linestyle='-',marker='v',\
 	    markersize=4,label='Reuss')
-	plt.plot(pressures/1.e9,vs_vrh/1.e3,color='b',linestyle='-',marker='x',\
-	    markersize=4,label='Voigt-Reuss-Hill')
+	plt.plot(pressures/1.e9,vs_vrh/1.e3,color=colors.color(1),linestyle='-',marker='*',\
+	    markersize=6,label='Voigt-Reuss-Hill')
 	plt.fill_between(pressures/1.e9, vs_hsu/1.e3, vs_hsl/1.e3, facecolor='red', lw=0, label='asdf',interpolate=False)
 
 	
@@ -131,12 +132,12 @@ if __name__ == "__main__":
 	#    markersize=4,label='Hashin-Shtrikman')
 	#plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
 	#    markersize=4)
-	plt.plot(pressures/1.e9,vs_lin/1.e3,color='k',linestyle='--',\
+	plt.plot(pressures/1.e9,vs_lin/1.e3,color='k',linewidth=2,linestyle='--',\
 	    markersize=4,label='linear')
-	plt.plot(pressures/1.e9,vs_pv/1.e3,color='y',linestyle='-',marker='x',\
+	plt.plot(pressures/1.e9,vs_pv/1.e3,color=colors.color(2),linewidth=2,linestyle='-',marker='d',\
 	    markersize=4,label='Mg Perovskite')
-	plt.plot(pressures/1.e9,vs_fp/1.e3,color='g',linestyle='-',marker='x',\
-	    markersize=4,label='Wustite')
+	plt.plot(pressures/1.e9,vs_fp/1.e3,color=colors.color(4),linewidth=2,linestyle='-',marker='x',\
+	    markersize=6,label=r'W\"ustite')
 
 	plt.ylim(3.0,7.5)
 	plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
@@ -147,6 +148,6 @@ if __name__ == "__main__":
 
 
 	plt.xlabel('Pressure (GPa)')
-	plt.ylabel(r'$V_s$ (km/s)')
+	plt.ylabel('Shear velocity $V_s$ (km/s)')
 	plt.savefig("example_averaging.pdf",bbox_inches='tight')
 	plt.show()

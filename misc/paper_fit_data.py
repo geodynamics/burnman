@@ -21,6 +21,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import scipy.optimize as opt
 import burnman
+import colors
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -88,14 +89,14 @@ mg_perovskite_test.set_method("bm2")
 model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
 
 
-plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color='r', linestyle='-', linewidth=1.5, label = "Correct 2nd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color='r', linestyle='--', linewidth=1.5, label = "Incorrect 2nd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color='b', linestyle='-', linewidth=1.5, label = "Correct 3rd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color='b', linestyle='--', linewidth=1.5, label = "Incorrect 3rd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color=colors.color(3), linestyle='-', marker='x',markevery=7,linewidth=1.5, label = "Correct 2nd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color=colors.color(3), linestyle='--', marker='x',markevery=7, linewidth=1.5, label = "Incorrect 2nd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color=colors.color(1), linestyle='-', linewidth=1.5, label = "Correct 3rd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color=colors.color(1), linestyle='--', linewidth=1.5, label = "Incorrect 3rd order extrapolation")
 plt.scatter(obs_pressures/1.e9, obs_vs/1000., zorder=1000, marker='o',c='w')
 plt.ylim([6.7, 8])
 plt.xlim([25., 135.])
-plt.ylabel("Shear velocity (km/s)")
+plt.ylabel("Shear velocity $V_s$ (km/s)")
 plt.xlabel("Pressure (GPa)")
 plt.legend(loc = "lower right",prop=prop)
 plt.savefig("example_fit_data.pdf", bbox_inches='tight')

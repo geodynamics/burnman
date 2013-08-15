@@ -104,7 +104,7 @@ def check_slb_fig7_txt():
     plt.yticks([-0.002,-0.001,0,0.001,0.002])
     plt.xticks([0,800,1600,2200])
     plt.xlabel("Temperature (K)")
-    plt.ylabel("Percent Difference")
+    plt.ylabel("Difference (\%)")
     plt.legend(loc="lower center",prop=prop,ncol=4)
     plt.savefig("benchmark1.pdf", bbox_inches='tight')
     plt.show()
