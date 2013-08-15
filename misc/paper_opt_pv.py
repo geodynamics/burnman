@@ -90,20 +90,25 @@ if __name__ == "__main__":
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
+    vs_average_prem = sum(seis_vs)/len(seis_vs)
+    vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
+    print vs_average_prem, vphi_average_prem
+    yy_sum = 10000*(yy_vs/vs_average_prem+yy_vphi/vphi_average_prem) #we scale by a factor so it fits in the plot 
     plt.figure(dpi=100,figsize=figsize)
     plt.plot (xx*100,yy_vs,"r-",label=("$V_s$ error"),linewidth=1.5)
     plt.plot (xx*100,yy_vphi,"b-",label=("$V_\phi$ error"),linewidth=1.5)
-    plt.plot (xx*100,yy_vs+yy_vphi,"k--",label=("sum"),linewidth=1.5)
+    #plt.plot (xx*100,yy_vs+yy_vphi,"g--",label=("sum"),linewidth=1.5)
+    plt.plot (xx*100,yy_sum,"k--",label=("weighted sum"),linewidth=1.5)
 
-    ymin = .05
-    ymax = 500
+    ymin = 5
+    ymax = 1e6
     plt.ylim([ymin,ymax])
 
-    print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_vs+yy_vphi)]
+    print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)]
 
     B = np.around(xx[np.argmin(yy_vs)], decimals=3)
     A = np.around(xx[np.argmin(yy_vphi)], decimals=3)
-    C = np.around(xx[np.argmin(yy_vs+yy_vphi)], decimals=3)
+    C = np.around(xx[np.argmin(yy_sum)], decimals=3)
 
     plt.vlines(A*100.,ymin,ymax,colors='c',label='A (%g\%% pv)'%(A*100),linewidth=1.5)
     plt.vlines(B*100.,ymin,ymax,colors='g',label='B (%g\%% pv)'%(B*100),linewidth=1.5)
@@ -121,32 +126,30 @@ if __name__ == "__main__":
     C_p, C_vs, C_vphi,_ = eval_material(C)
     
     plt.figure(dpi=100,figsize=figsize)
-    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o',linewidth=1.5, markersize=4,markerfacecolor='None',label='PREM')
+    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o',linewidth=1.0, markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color='c',linestyle='-', \
     markerfacecolor='c',markersize=4,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
     plt.plot(B_p/1.e9,B_vs/1.e3,color='g',linestyle='-', \
     markerfacecolor='g',markersize=4,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
     plt.plot(C_p/1.e9,C_vs/1.e3,color='m',linestyle='-', \
     markerfacecolor='m',markersize=4,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
-    plt.title("$V_s$ (km/s)")
-    plt.xlabel('pressure (GPa)')
-    plt.ylabel('km/s')
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('$V_s$ (km/s)')
     plt.xlim([30,130])
     plt.legend(loc='lower right',prop=prop)
     plt.savefig("opt_pv_2.pdf",bbox_inches='tight')
     plt.show()
       
     plt.figure(dpi=100,figsize=figsize)
-    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.5,marker='o', markersize=4,markerfacecolor='None',label='PREM')
+    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=4,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vphi/1.e3,color='c',linestyle='-', \
     markerfacecolor='c',markersize=4,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
     plt.plot(B_p/1.e9,B_vphi/1.e3,color='g',linestyle='-', \
     markerfacecolor='g',markersize=4,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
     plt.plot(C_p/1.e9,C_vphi/1.e3,color='m',linestyle='-', \
     markerfacecolor='m',markersize=4,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
-    plt.title("$V_\phi$ (km/s)")
-    plt.xlabel('pressure (GPa)')
-    plt.ylabel('km/s')
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel("$V_\phi$ (km/s)")
     plt.xlim([30,130])
     plt.legend(loc='lower right', prop=prop)
     plt.savefig("opt_pv_3.pdf",bbox_inches='tight')
@@ -158,12 +161,12 @@ if __name__ == "__main__":
     plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.',linewidth=1.5)
     plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color='c',label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5)
     plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color='g',label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5)
-    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color='m',label='Vs: C (%g\%% pv)'%(C*100),linewidth=1.5)
+    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color='m',label='$V_s$: C (%g\%% pv)'%(C*100),linewidth=1.5)
     plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color='c',linestyle='--',label='$V_\phi$: A',linewidth=1.5)
-    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color='g',linestyle='--',label='Vphi: B',linewidth=1.5)
-    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color='m',linestyle='--',label='Vphi: C',linewidth=1.5)
-    plt.xlabel('pressure (GPa)')
-    plt.ylabel('\% difference')
+    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color='g',linestyle='--',label='$V_\phi$: B',linewidth=1.5)
+    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color='m',linestyle='--',label='$V_\phi$: C',linewidth=1.5)
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Difference (\%)')
     plt.ylim([-5,4])
     plt.xlim([30,130]) 
     plt.legend(loc='lower center', ncol=2, prop=prop)
