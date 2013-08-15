@@ -138,7 +138,7 @@ if __name__ == "__main__":
 	plt.plot(pressures/1.e9,vs_fp/1.e3,color='g',linestyle='-',marker='x',\
 	    markersize=4,label='Wustite')
 
-	plt.ylim(2.0,7.5)
+	plt.ylim(3.0,7.5)
 	plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
 
 	simArtist = plt.Line2D((0,1),(0,0), color='r', lw=5, linestyle='-')
