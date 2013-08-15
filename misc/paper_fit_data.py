@@ -93,7 +93,7 @@ plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color='r', linestyle=
 plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color='b', linestyle='-', linewidth=1.5, label = "Correct 3rd order extrapolation")
 plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color='b', linestyle='--', linewidth=1.5, label = "Incorrect 3rd order extrapolation")
 plt.scatter(obs_pressures/1.e9, obs_vs/1000., zorder=1000, marker='o',c='w')
-plt.ylim([6.55, 8])
+plt.ylim([6.7, 8])
 plt.xlim([25., 135.])
 plt.ylabel("Shear velocity (km/s)")
 plt.xlabel("Pressure (GPa)")
