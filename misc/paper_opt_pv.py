@@ -34,6 +34,7 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
+    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
     plt.rc('font', family='sanserif')
     figsize=(6,5)
 
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     plt.plot(C_p/1.e9,C_vs/1.e3,color=colors.color(4),dashes=dashstyle3, \
     label='C (%g\%% pv)'%(C*100),linewidth=1.5)
     plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Shear velocity $V_s$ (km/s)')
+    plt.ylabel('Shear velocity $V_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
     plt.xlim([30,130])
     plt.legend(loc='lower right',prop=prop)
   #  plt.tight_layout()
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     plt.plot(C_p/1.e9,C_vphi/1.e3,color=colors.color(4),dashes=dashstyle3, \
                  markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
     plt.xlabel('Pressure (GPa)')
-    plt.ylabel("Bulk sound velocity $V_\phi$ (km/s)")
+    plt.ylabel("Bulk sound velocity $V_{\mathlarger{\mathlarger{\mathlarger{\phi}}}}$ (km/s)")
     plt.xlim([30,130])
     plt.legend(loc='lower right', prop=prop)
     #plt.tight_layout()

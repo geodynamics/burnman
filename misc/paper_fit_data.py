@@ -31,6 +31,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)
+plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
 plt.rc('font', family='sanserif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
@@ -96,7 +97,7 @@ plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color=colors.color(1)
 plt.scatter(obs_pressures/1.e9, obs_vs/1000., zorder=1000, marker='o',c='w')
 plt.ylim([6.7, 8])
 plt.xlim([25., 135.])
-plt.ylabel("Shear velocity $V_s$ (km/s)")
+plt.ylabel(r'Shear velocity ${V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
 plt.xlabel("Pressure (GPa)")
 plt.legend(loc = "lower right",prop=prop)
 plt.savefig("example_fit_data.pdf", bbox_inches='tight')
