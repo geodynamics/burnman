@@ -35,12 +35,11 @@ class my_perovskite(burnman.material):
             'eta_0s': 2.6 * uncertain[7]}
 
 if __name__ == "__main__":    
-    plt.figure(dpi=100,figsize=(12,10))
+    plt.figure(dpi=100,figsize=(12,12))
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
     plt.rc('font', family='sanserif')
-    figsize=(6,5)
 
     dashstyle2=(6,3)
     dashstyle3=(10,2,2,2)
