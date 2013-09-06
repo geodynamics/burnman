@@ -56,20 +56,20 @@ if __name__ == "__main__":
         rock = burnman.composite ( [ (my_perovskite(uncertain), 1.0) ])
         rock.set_method('slb3')
 
-        temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
+        temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)
         
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
 
         return seis_p, mat_vs, mat_vphi, mat_rho
 
-    len = 8
+    len = 9
     
     p, base_vs, base_vphi, _ = eval(np.ones(len))
 
-    spread = [.1, .1, .1, .1, .1, .1, .1, .1]
+    spread = [.1, .1, .1, .1, .1, .1, .1, .1, .1]
 
-    names = ['ref\_K', 'K\_prime', 'ref\_G', 'G\_prime', 'ref\_Debye', 'ref\_grueneisen', 'q0', 'eta\_0s']
+    names = ['ref\_K', 'K\_prime', 'ref\_G', 'G\_prime', 'ref\_Debye', 'ref\_grueneisen', 'q0', 'eta\_0s','adiab\_T']
 
 
     for i in range(0,len):
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         vphimax = base_vphi
 
         #testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
-        testrange = [-1, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
+        testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
         for x in testrange:
             print i, names[i], x
             uncertain = np.ones(len)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
             vphimin = np.minimum(vphi,vphimin)
             vphimax = np.maximum(vphi,vphimax)
 
-        plt.subplot(4,4,1+i)
+        plt.subplot(4,5,1+i)
         plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
 
         plt.plot(seis_p/1.e9,base_vs/1.e3,color='k',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
 
 
-        plt.subplot(4,4,1+i+8)
+        plt.subplot(4,5,1+i+10)
 
         plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
         plt.plot(seis_p/1.e9,base_vphi/1.e3,color='b',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
