@@ -98,16 +98,17 @@ if __name__ == "__main__":
         plt.plot(seis_p/1.e9,vsmin/1.e3,color='r',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='min')
         plt.plot(seis_p/1.e9,vsmax/1.e3,color='r',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='max')
         plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
+        plt.ylim([6.2,7.6])
 
 
         plt.subplot(4,5,1+i+10)
-
         plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
         plt.plot(seis_p/1.e9,base_vphi/1.e3,color='b',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
         plt.plot(seis_p/1.e9,vphimin/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='min')
         plt.plot(seis_p/1.e9,vphimax/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='max')
 
         plt.title('Vphi %s +/- %d\\%% '%(names[i], spread[i]*100) )
+        plt.ylim([8.5,12.])
 
 
     plt.show()
