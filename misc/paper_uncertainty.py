@@ -35,7 +35,7 @@ class my_perovskite(burnman.material):
             'eta_0s': 2.6 * uncertain[7]}
 
 if __name__ == "__main__":    
-    plt.figure(dpi=100,figsize=(12,12))
+    figure=plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
@@ -68,8 +68,10 @@ if __name__ == "__main__":
 
     spread = [.1, .1, .1, .1, .1, .1, .1, .1, .1]
 
-    names = ['ref\_K', 'K\_prime', 'ref\_G', 'G\_prime', 'ref\_Debye', 'ref\_grueneisen', 'q0', 'eta\_0s','adiab\_T']
 
+    names = ['$K$', '$K\'$', '$G$', '$G\'$', 'Debye', 'grueneisen', '$q_0$', '$\eta_0s$','adiabatic T']
+
+    reorder = [0,1,3,4,5,6,7,8,2]
 
     for i in range(0,len):
 
@@ -90,27 +92,40 @@ if __name__ == "__main__":
             vphimin = np.minimum(vphi,vphimin)
             vphimax = np.maximum(vphi,vphimax)
 
-        plt.subplot(4,5,1+i)
+        ax = figure.add_subplot(3,3,reorder[i]+1)
         plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
 
-        plt.plot(seis_p/1.e9,base_vs/1.e3,color='k',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
+        plt.plot(seis_p/1.e9,base_vs/1.e3,color='r',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
 
         plt.plot(seis_p/1.e9,vsmin/1.e3,color='r',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='min')
         plt.plot(seis_p/1.e9,vsmax/1.e3,color='r',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='max')
         plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
         plt.ylim([6.2,7.6])
 
+        if (reorder[i]%3==0):
+            plt.ylabel('km/s')
 
-        plt.subplot(4,5,1+i+10)
+        if (reorder[i]>5):
+            plt.xlabel('Pressure (GPa)')
+
+        #plt.subplot(3,3,reorder[i]+1)#+10
         plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
         plt.plot(seis_p/1.e9,base_vphi/1.e3,color='b',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
         plt.plot(seis_p/1.e9,vphimin/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='min')
         plt.plot(seis_p/1.e9,vphimax/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='max')
 
-        plt.title('Vphi %s +/- %d\\%% '%(names[i], spread[i]*100) )
-        plt.ylim([8.5,12.])
+        plt.title('%s +/- %d\\%% '%(names[i], spread[i]*100) )
+        #plt.ylim([8.5,12.])
+
+        plt.ylim([6.1,11.8])
+
+        if (reorder[i]==8):
+            handles, labels = ax.get_legend_handles_labels()
+            plt.legend(handles[0:2] + handles[5:6], ['PREM','$V_S$', '$V_\phi$'], loc='center right',prop=prop)
 
 
+
+    plt.savefig("uncertain.pdf",bbox_inches='tight')
     plt.show()
 
 
