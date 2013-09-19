@@ -114,7 +114,7 @@ if __name__ == "__main__":
         plt.plot(seis_p/1.e9,vphimin/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='min')
         plt.plot(seis_p/1.e9,vphimax/1.e3,color='b',linestyle='-',linewidth=1.0,marker='x', markersize=6,markerfacecolor='None',label='max')
 
-        plt.title('%s +/- %d\\%% '%(names[i], spread[i]*100) )
+        plt.title('%s $\pm %d\\%%$ '%(names[i], spread[i]*100) )
         #plt.ylim([8.5,12.])
 
         plt.ylim([6.1,11.8])
