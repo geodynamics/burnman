@@ -70,7 +70,7 @@ if __name__ == "__main__":
     spread = [.1, .1, .1, .1, .1, .1, .1, .1, .1]
 
 
-    names = ['$K$', '$K\'$', '$G$', '$G\'$', 'Debye', 'grueneisen', '$q_0$', '$\eta_0s$','adiabatic T']
+    names = ['$K_0$', '$K\'$', '$G_0$', '$G\'$', '$\\theta_0$', '$\gamma_0$', '$q_0$', '$\eta_{s0}$','$T_0$']
 
     reorder = [0,1,3,4,5,6,7,8,2]
 
