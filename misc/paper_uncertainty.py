@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     dashstyle2=(6,3)
     dashstyle3=(10,2,2,2)
+    dashstyle4=(4,9)
 
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 10 #set on how many depth slices the computations should be done
@@ -93,39 +94,48 @@ if __name__ == "__main__":
             vphimax = np.maximum(vphi,vphimax)
 
         ax = figure.add_subplot(3,3,reorder[i]+1)
-        plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
+        #plt.subplots_adjust(left=0, bottom=None, right=0, top=None, wspace=None, hspace=None)
+        plt.subplots_adjust(wspace=0, hspace=0.2)
+        
 
-        plt.plot(seis_p/1.e9,base_vs/1.e3,color='r',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
+        plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',dashes=dashstyle4,linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
 
-        plt.plot(seis_p/1.e9,vsmin/1.e3,color='r',linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
-        plt.plot(seis_p/1.e9,vsmax/1.e3,color='r',linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
+        plt.plot(seis_p/1.e9,base_vs/1.e3,color=colors.color(3),linestyle=":",linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
+
+        plt.plot(seis_p/1.e9,vsmin/1.e3,color=colors.color(3),dashes=dashstyle2,linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
+        plt.plot(seis_p/1.e9,vsmax/1.e3,color=colors.color(3),dashes=dashstyle2,linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
         plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
         plt.ylim([6.2,7.6])
 
         if (reorder[i]%3==0):
             plt.ylabel('km/s')
+        else:
+            ax.yaxis.set_ticklabels([])
 
         if (reorder[i]>5):
             plt.xlabel('Pressure (GPa)')
+        else:
+            ax.xaxis.set_ticklabels([])
 
         #plt.subplot(3,3,reorder[i]+1)#+10
-        plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
-        plt.plot(seis_p/1.e9,base_vphi/1.e3,color='b',linestyle='--',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
-        plt.plot(seis_p/1.e9,vphimin/1.e3,color='b',linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
-        plt.plot(seis_p/1.e9,vphimax/1.e3,color='b',linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
+        plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',dashes=dashstyle4,linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
+        plt.plot(seis_p/1.e9,base_vphi/1.e3,color=colors.color(1),linestyle=':',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
+        plt.plot(seis_p/1.e9,vphimin/1.e3,color=colors.color(1),linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
+        plt.plot(seis_p/1.e9,vphimax/1.e3,color=colors.color(1),linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
 
         plt.title('%s $\pm %d\\%%$ '%(names[i], spread[i]*100) )
         #plt.ylim([8.5,12.])
 
         plt.ylim([6.1,11.8])
+        plt.xlim([30,130])
 
         if (reorder[i]==8):
             handles, labels = ax.get_legend_handles_labels()
-            plt.legend(handles[0:2] + handles[5:6], ['PREM','$V_S$', '$V_\phi$'], loc='center right',prop=prop)
+            plt.legend((handles[0],handles[6],handles[2]), ['PREM','$V_\phi$','$V_S$'], loc='center right',prop=prop)
 
 
 
     plt.savefig("uncertain.pdf",bbox_inches='tight')
-    plt.show()
+    #plt.show()
 
 
