@@ -125,7 +125,7 @@ class fe_periclase_LS(material):  # From Murakami's emails, see Cayman for detai
             'equation_of_state':'slb2',
             'ref_V': 11.171e-6,
             'ref_K': 170.0e9,
-            'K_prime': 4,
+            'K_prime': 4.00,
             'ref_G': 116.34e9,
             'G_prime': 1.668,
             'molar_mass': .047,
