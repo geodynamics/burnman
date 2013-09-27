@@ -264,9 +264,9 @@ def check_slb_fig7_txt():
     plt.ylim([-0.001, 0.001])
     plt.xticks([0,800,1600,2200])
     plt.xlabel("Temperature (K)")
-    plt.ylabel("% difference with Stixrude+Lithgow-Bertelloni's code")
+    plt.ylabel("Percent Difference from HeFESTo")
     plt.legend(loc="center right")
-    plt.savefig("output_figures/benchmark1.png")
+    plt.savefig("output_figures/benchmark1.pdf")
     plt.show()
 
 def check_slb_fig7():
@@ -348,10 +348,111 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
+def check_averaging():
+    """
+    Reproduce Figure 1a from Watt et. al. 1976 to check the Voigt, Reuss,
+    Voigt-Reuss-Hill, and Hashin-Shtrikman bounds for an elastic composite
+    """
+    voigt = burnman.averaging_schemes.voigt() 
+    reuss = burnman.averaging_schemes.reuss() 
+    voigt_reuss_hill = burnman.averaging_schemes.voigt_reuss_hill() 
+    hashin_shtrikman_upper = burnman.averaging_schemes.hashin_shtrikman_upper() 
+    hashin_shtrikman_lower = burnman.averaging_schemes.hashin_shtrikman_lower() 
+
+    #create arrays for sampling in volume fraction
+    volumes = np.linspace(0.0,1.0,100) 
+    v_bulk_modulus = np.empty_like(volumes)
+    v_shear_modulus = np.empty_like(volumes)
+    r_bulk_modulus = np.empty_like(volumes)
+    r_shear_modulus = np.empty_like(volumes)
+    vrh_bulk_modulus = np.empty_like(volumes)
+    vrh_shear_modulus = np.empty_like(volumes)
+    hsu_bulk_modulus = np.empty_like(volumes)
+    hsu_shear_modulus = np.empty_like(volumes)
+    hsl_bulk_modulus = np.empty_like(volumes)
+    hsl_shear_modulus = np.empty_like(volumes)
+
+
+    #these values are not given in the paper, so far as I can tell,
+    #so I did my best to read them off of the figure...
+    K1=0.27
+    K2=1.00
+    G1=0.07
+    G2=1.00
+
+    for i in range(len(volumes)):
+      v_bulk_modulus[i]  = voigt.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      v_shear_modulus[i] = voigt.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      r_bulk_modulus[i]  = reuss.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      r_shear_modulus[i] = reuss.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      vrh_bulk_modulus[i]  = voigt_reuss_hill.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      vrh_shear_modulus[i] = voigt_reuss_hill.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      hsu_bulk_modulus[i]  = hashin_shtrikman_upper.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      hsu_shear_modulus[i] = hashin_shtrikman_upper.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      hsl_bulk_modulus[i]  = hashin_shtrikman_lower.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      hsl_shear_modulus[i] = hashin_shtrikman_lower.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+ 
+    fig = mpimg.imread('input_figures/watt_1976_a1.png')
+    plt.imshow(fig, extent=[0,1.0,0.25,1.0], aspect='auto')
+    plt.plot(volumes, v_bulk_modulus, 'g-')
+    plt.plot(volumes, r_bulk_modulus, 'g-')
+    plt.plot(volumes, vrh_bulk_modulus, 'g-')
+    plt.plot(volumes, hsu_bulk_modulus, 'g-')
+    plt.plot(volumes, hsl_bulk_modulus, 'g-')
+    plt.ylim(0.25,1.00)
+    plt.xlim(0,1.0)
+    plt.xlabel("Volume fraction")
+    plt.ylabel("Averaged bulk modulus")
+    plt.title("Comparing with Figure 1 of Watt et al 1976")
+    plt.show()
+
+    fig = mpimg.imread('input_figures/watt_1976_a2.png')
+    plt.imshow(fig, extent=[0,1.0,0.0,1.0], aspect='auto')
+    plt.plot(volumes, v_shear_modulus, 'g-')
+    plt.plot(volumes, r_shear_modulus, 'g-')
+    plt.plot(volumes, vrh_shear_modulus, 'g-')
+    plt.plot(volumes, hsu_shear_modulus, 'g-')
+    plt.plot(volumes, hsl_shear_modulus, 'g-')
+    plt.ylim(0.0,1.00)
+    plt.xlim(0,1.0)
+    plt.xlabel("Volume fraction")
+    plt.ylabel("Averaged shear modulus")
+    plt.title("Comparing with Figure 1 of Watt et al 1976")
+    plt.show()
+
+    #also check against some numerical values given in Berryman (1995) for porous glass
+    K = 46.3
+    G = 30.5
+    #the value for porosity=0.46 in the table appears to be a typo.  Remove it here
+    porosity = np.array([ 0.0, 0.05, 0.11, 0.13, 0.25, 0.33, 0.36, 0.39, 0.44, 0.50, 0.70] )
+    berryman_bulk_modulus = np.array([46.3,41.6,36.6,35.1,27.0,22.5,21.0,19.6,17.3,14.8,7.7]) #15.5 probably a typo?
+    hsu_bulk_modulus_vals = np.empty_like(porosity)
+    for i in range(len(porosity)):
+      hsu_bulk_modulus_vals[i] = hashin_shtrikman_upper.average_bulk_moduli( [porosity[i], 1.0-porosity[i]], [0.0, K], [0.0, G])
+    for i in range(len(volumes)):
+      hsu_bulk_modulus[i] = hashin_shtrikman_upper.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [0.0, K], [0.0, G])
+    fig = mpimg.imread('input_figures/berryman_fig4.png')
+    plt.imshow(fig, extent=[0,1.0,0.0,50.0], aspect='auto')
+    plt.plot(volumes, hsu_bulk_modulus, 'g-')
+    plt.scatter(porosity, hsu_bulk_modulus_vals, c='r')
+    plt.scatter(porosity, berryman_bulk_modulus, c='y')
+    plt.ylim(0.0,50.0)
+    plt.xlim(0,1.0)
+    plt.xlabel("Porosity")
+    plt.ylabel("Averaged bulk modulus")
+    plt.title("Comparing with Figure 4 of Berryman (1995)")
+    plt.show()
+
+
 if __name__ == "__main__":
-    check_birch_murnaghan()
-    check_slb_fig7()
-    check_slb_fig3()
-    check_mgd_shim_duffy_kenichi()
-    check_mgd_fei_mao_shu_hu()
-    check_slb_fig7_txt()
+    check_averaging()
+#    check_birch_murnaghan()
+#    check_slb_fig7()
+#    check_slb_fig3()
+#    check_mgd_shim_duffy_kenichi()
+#    check_mgd_fei_mao_shu_hu()
+#    check_slb_fig7_txt()
