@@ -70,7 +70,7 @@ if __name__ == "__main__":
     spread = [.1, .1, .1, .1, .1, .1, .1, .1, .1]
 
 
-    names = ['$K_0$', '$K\'$', '$G_0$', '$G\'$', '$\\theta_0$', '$\gamma_0$', '$q_0$', '$\eta_{s0}$','$T_0$']
+    names = ['$K_0$', '$K_0\'$', '$G_0$', '$G_0\'$', '$\\theta_0$', '$\gamma_0$', '$q_0$', '$\eta_{S0}$','$T_0$']
 
     reorder = [0,1,3,4,5,6,7,8,2]
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         plt.ylim([6.2,7.6])
 
         if (reorder[i]%3==0):
-            plt.ylabel('km/s')
+            plt.ylabel('Wave speed (km/s)')
         else:
             ax.yaxis.set_ticklabels([])
 
