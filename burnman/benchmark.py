@@ -450,9 +450,9 @@ def check_averaging():
 
 if __name__ == "__main__":
     check_averaging()
-#    check_birch_murnaghan()
-#    check_slb_fig7()
-#    check_slb_fig3()
-#    check_mgd_shim_duffy_kenichi()
-#    check_mgd_fei_mao_shu_hu()
-#    check_slb_fig7_txt()
+    check_birch_murnaghan()
+    check_slb_fig7()
+    check_slb_fig3()
+    check_mgd_shim_duffy_kenichi()
+    check_mgd_fei_mao_shu_hu()
+    check_slb_fig7_txt()
