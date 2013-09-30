@@ -181,7 +181,7 @@ if __name__ == "__main__":
     plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(1),markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='$V_\phi$: B',linewidth=1.5,dashes=dashstyle2)
     plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(4),markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='$V_\phi$: C',linewidth=1.5,dashes=dashstyle3)
     plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Difference (\%)')
+    plt.ylabel('Difference from PREM (\%)')
     plt.ylim([-5,4])
     plt.xlim([30,130]) 
     plt.legend(loc='lower center', ncol=2, prop=prop)
