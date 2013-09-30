@@ -103,10 +103,10 @@ if __name__ == "__main__":
     yy_sum = 20000*(yy_vs/vs_average_prem+yy_vphi/vphi_average_prem) #we scale by a factor so it fits in the plot 
  #   plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,1)
-    plt.plot (xx*100,yy_vs,"-",color=colors.color(3),label=("$V_s$ error"),linewidth=1.5)
-    plt.plot (xx*100,yy_vphi,"-",marker='s',markevery=20,color=colors.color(1),label=("$V_\phi$ error"),linewidth=1.5)
+    plt.plot (xx*100,yy_vs,"-",color=colors.color(1),label=("$V_s$ error"),linewidth=1.5,dashes=dashstyle2)
+    plt.plot (xx*100,yy_vphi,"-",marker='s',markevery=20,color=colors.color(3),label=("$V_\phi$ error"),linewidth=1.5)
     #plt.plot (xx*100,yy_vs+yy_vphi,"g--",label=("sum"),linewidth=1.5)
-    plt.plot (xx*100,yy_sum,"d-",markevery=20,color=colors.color(5),label=("weighted sum"),linewidth=1.5)
+    plt.plot (xx*100,yy_sum,"d-",markevery=20,color=colors.color(4),label=("weighted sum"),linewidth=1.5,dashes=dashstyle3)
 
     ymin = 50
     ymax = 1e6
@@ -118,8 +118,8 @@ if __name__ == "__main__":
     A = np.around(xx[np.argmin(yy_vphi)], decimals=3)
     C = np.around(xx[np.argmin(yy_sum)], decimals=3)
 
-    plt.plot([A*100.,A*100.],[ymin,ymax],color=colors.color(0),label='A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-')
-    plt.plot([B*100.,B*100.],[ymin,ymax],color=colors.color(2),label='B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2)
+    plt.plot([A*100.,A*100.],[ymin,ymax],color=colors.color(3),label='A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-')
+    plt.plot([B*100.,B*100.],[ymin,ymax],color=colors.color(1),label='B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2)
     plt.plot([C*100.,C*100.],[ymin,ymax],color=colors.color(4),label='C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3)
     
     plt.yscale('log')
@@ -137,9 +137,9 @@ if __name__ == "__main__":
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,3)
     plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o',linewidth=1.0, markersize=6,markerfacecolor='None',label='PREM')
-    plt.plot(A_p/1.e9,A_vs/1.e3,color=colors.color(0),linestyle='-', \
+    plt.plot(A_p/1.e9,A_vs/1.e3,color=colors.color(3),linestyle='-', \
     label='A (%g\%% pv)'%(A*100),linewidth=1.5)
-    plt.plot(B_p/1.e9,B_vs/1.e3,color=colors.color(2),dashes=dashstyle2, \
+    plt.plot(B_p/1.e9,B_vs/1.e3,color=colors.color(1),dashes=dashstyle2, \
     label='B (%g\%% pv)'%(B*100),linewidth=1.5)
     plt.plot(C_p/1.e9,C_vs/1.e3,color=colors.color(4),dashes=dashstyle3, \
     label='C (%g\%% pv)'%(C*100),linewidth=1.5)
@@ -155,10 +155,10 @@ if __name__ == "__main__":
    
 #    plt.figure(dpi=100,figsize=figsize)
     plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
-    plt.plot(A_p/1.e9,A_vphi/1.e3,color=colors.color(0),linestyle='-', \
-                 markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(0),markerfacecolor='None',mew=1.5,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
-    plt.plot(B_p/1.e9,B_vphi/1.e3,color=colors.color(2),dashes=dashstyle2, \
-                 markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(2),markerfacecolor='None',mew=1.5,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
+    plt.plot(A_p/1.e9,A_vphi/1.e3,color=colors.color(3),linestyle='-', \
+                 markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
+    plt.plot(B_p/1.e9,B_vphi/1.e3,color=colors.color(1),dashes=dashstyle2, \
+                 markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
     plt.plot(C_p/1.e9,C_vphi/1.e3,color=colors.color(4),dashes=dashstyle3, \
                  markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
     plt.xlabel('Pressure (GPa)')
@@ -174,11 +174,11 @@ if __name__ == "__main__":
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,2)
     plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.',linewidth=1.5)
-    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color=colors.color(0),label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-')
-    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color=colors.color(2),label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2)
+    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color=colors.color(3),label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-')
+    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color=colors.color(1),label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2)
     plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color=colors.color(4),label='$V_s$: C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3)
-    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(0),markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(0),markerfacecolor='None',mew=1.5,label='$V_\phi$: A',linewidth=1.5,linestyle='-')
-    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(2),markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(2),markerfacecolor='None',mew=1.5,label='$V_\phi$: B',linewidth=1.5,dashes=dashstyle2)
+    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(3),markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='$V_\phi$: A',linewidth=1.5,linestyle='-')
+    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(1),markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='$V_\phi$: B',linewidth=1.5,dashes=dashstyle2)
     plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(4),markevery=2,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='$V_\phi$: C',linewidth=1.5,dashes=dashstyle3)
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Difference (\%)')
