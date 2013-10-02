@@ -93,7 +93,7 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 20) #200 for final image
+    xx=np.linspace(0.0, 1.0, 200) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
@@ -138,13 +138,13 @@ if __name__ == "__main__":
     
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-.',marker='o',linewidth=1.0, markersize=6,markerfacecolor='None',label='PREM',zorder = 10,mew=1.5)
+    plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',linewidth=2.0, markersize=6,markerfacecolor='None',label='PREM')
     plt.plot(A_p/1.e9,A_vs/1.e3,color=colors.color(3),linestyle='-', \
-    label='A (%g\%% pv)'%(A*100),linewidth=1.5,markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(3))
+    label='A (%g\%% pv)'%(A*100),linewidth=1.5,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(3))
     plt.plot(B_p/1.e9,B_vs/1.e3,color=colors.color(1),dashes=dashstyle2, \
-    label='B (%g\%% pv)'%(B*100),linewidth=1.5,markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(1))
+    label='B (%g\%% pv)'%(B*100),linewidth=1.5,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(1))
     plt.plot(C_p/1.e9,C_vs/1.e3,color=colors.color(4),dashes=dashstyle3, \
-    label='C (%g\%% pv)'%(C*100),linewidth=1.5,markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(4))
+    label='C (%g\%% pv)'%(C*100),linewidth=1.5,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(4))
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Shear velocity $V_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
     plt.xlim([30,130])
@@ -156,13 +156,13 @@ if __name__ == "__main__":
     plt.subplot(2,2,4)
    
 #    plt.figure(dpi=100,figsize=figsize)
-    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-.',linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM',zorder = 10, mew=1.5)
+    plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-',linewidth=2.0, markersize=6,markerfacecolor='None',label='PREM', mew=1.5)
     plt.plot(A_p/1.e9,A_vphi/1.e3,color=colors.color(3),linestyle='-', \
-                 markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
+                 markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='A (%g\%% pv)'%(A*100),linewidth=1.5)
     plt.plot(B_p/1.e9,B_vphi/1.e3,color=colors.color(1),dashes=dashstyle2, \
-                 markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
+                 markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='B (%g\%% pv)'%(B*100),linewidth=1.5)
     plt.plot(C_p/1.e9,C_vphi/1.e3,color=colors.color(4),dashes=dashstyle3, \
-                 markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
+                 markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='C (%g\%% pv)'%(C*100),linewidth=1.5)
     plt.xlabel('Pressure (GPa)')
     plt.ylabel("Bulk sound velocity $V_{\mathlarger{\mathlarger{\mathlarger{\phi}}}}$ (km/s)")
     plt.xlim([30,130])
@@ -176,12 +176,12 @@ if __name__ == "__main__":
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,2)
     plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.',linewidth=1.0)
-    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color=colors.color(3),label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-',markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(3))
-    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color=colors.color(1),label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2,markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(1))
-    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color=colors.color(4),label='$V_s$: C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3,markevery=3,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(4))
-    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(3),markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='$V_\phi$: A',linewidth=1.5,linestyle='-')
-    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(1),markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='$V_\phi$: B',linewidth=1.5,dashes=dashstyle2)
-    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(4),markevery=3,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='$V_\phi$: C',linewidth=1.5,dashes=dashstyle3)
+    plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color=colors.color(3),label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-',markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(3))
+    plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color=colors.color(1),label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(1))
+    plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color=colors.color(4),label='$V_s$: C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(4))
+    plt.plot(seis_p/1.e9, (A_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(3),markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(3),markerfacecolor='None',mew=1.5,label='$V_\phi$: A',linewidth=1.5,linestyle='-')
+    plt.plot(seis_p/1.e9, (B_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(1),markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(1),markerfacecolor='None',mew=1.5,label='$V_\phi$: B',linewidth=1.5,dashes=dashstyle2)
+    plt.plot(seis_p/1.e9, (C_vphi-seis_vphi)/seis_vphi*100.0,color=colors.color(4),markevery=5,marker='s',markersize=5,markeredgecolor=colors.color(4),markerfacecolor='None',mew=1.5,label='$V_\phi$: C',linewidth=1.5,dashes=dashstyle3)
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Difference from PREM (\%)')
     plt.ylim([-5,4])
