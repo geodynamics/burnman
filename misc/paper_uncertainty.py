@@ -98,12 +98,15 @@ if __name__ == "__main__":
         plt.subplots_adjust(wspace=0, hspace=0.2)
         
 
-        plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',dashes=dashstyle4,linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
+        plt.plot(seis_p/1.e9,seis_vs/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
 
-        plt.plot(seis_p/1.e9,base_vs/1.e3,color=colors.color(3),linestyle=":",linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
+        plt.plot(seis_p/1.e9,base_vs/1.e3,color=colors.color(3),dashes=dashstyle2,linewidth=1.5, markersize=6,markerfacecolor='None',label='pv')
 
-        plt.plot(seis_p/1.e9,vsmin/1.e3,color=colors.color(3),dashes=dashstyle2,linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
-        plt.plot(seis_p/1.e9,vsmax/1.e3,color=colors.color(3),dashes=dashstyle2,linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
+        plt.plot(seis_p/1.e9,vsmin/1.e3,color=colors.color(3),linestyle="-",linewidth=.5, markersize=6,markerfacecolor='None',label='min')
+        plt.plot(seis_p/1.e9,vsmax/1.e3,color=colors.color(3),linestyle="-",linewidth=.5, markersize=6,markerfacecolor='None',label='max')
+
+        plt.fill_between(seis_p/1.e9,vsmax/1.e3, vsmin/1.e3, facecolor='#ffbbbb', lw=0, label='asdf',interpolate=False)
+
         plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
         plt.ylim([6.2,7.6])
 
@@ -118,10 +121,13 @@ if __name__ == "__main__":
             ax.xaxis.set_ticklabels([])
 
         #plt.subplot(3,3,reorder[i]+1)#+10
-        plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',dashes=dashstyle4,linewidth=1.0,marker='o', markersize=6,markerfacecolor='None',label='PREM')
-        plt.plot(seis_p/1.e9,base_vphi/1.e3,color=colors.color(1),linestyle=':',linewidth=1.0, markersize=6,markerfacecolor='None',label='pv')
-        plt.plot(seis_p/1.e9,vphimin/1.e3,color=colors.color(1),linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='min')
-        plt.plot(seis_p/1.e9,vphimax/1.e3,color=colors.color(1),linestyle='-',linewidth=1.0, markersize=6,markerfacecolor='None',label='max')
+        plt.plot(seis_p/1.e9,seis_vphi/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
+        plt.plot(seis_p/1.e9,base_vphi/1.e3,color=colors.color(1),dashes=dashstyle3,linewidth=1.5, markersize=6,markerfacecolor='None',label='pv')
+        plt.plot(seis_p/1.e9,vphimin/1.e3,color=colors.color(1),linestyle="-",linewidth=.5, markersize=6,markerfacecolor='None',label='min')
+        plt.plot(seis_p/1.e9,vphimax/1.e3,color=colors.color(1),linestyle="-",linewidth=.5, markersize=6,markerfacecolor='None',label='max')
+
+        plt.fill_between(seis_p/1.e9,vphimax/1.e3, vphimin/1.e3, facecolor='#bbbbff', lw=0, label='asdf',interpolate=False)
+
 
         plt.title('%s $\pm %d\\%%$ '%(names[i], spread[i]*100) )
         #plt.ylim([8.5,12.])
@@ -131,7 +137,7 @@ if __name__ == "__main__":
 
         if (reorder[i]==8):
             handles, labels = ax.get_legend_handles_labels()
-            plt.legend((handles[0],handles[6],handles[2]), ['PREM','$V_\phi$','$V_S$'], loc='center right',prop=prop)
+            plt.legend((handles[0],handles[5],handles[1]), ['PREM','$V_\phi$','$V_S$'], loc='center right',prop=prop)
 
 
 
