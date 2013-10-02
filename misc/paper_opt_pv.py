@@ -93,14 +93,16 @@ if __name__ == "__main__":
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         return vs_err, vphi_err
 
-    xx=np.linspace(0.0, 1.0, 200) #200 for final image
+    xx=np.linspace(0.0, 1.0, 20) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
     vs_average_prem = sum(seis_vs)/len(seis_vs)
     vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
     print vs_average_prem, vphi_average_prem
-    yy_sum = 20000*(yy_vs/vs_average_prem+yy_vphi/vphi_average_prem) #we scale by a factor so it fits in the plot 
+    yy_vs=yy_vs/vs_average_prem
+    yy_vphi=yy_vphi/vphi_average_prem
+    yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot 
  #   plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,1)
     plt.plot (xx*100,yy_vs,"-",color=colors.color(1),label=("$V_s$ error"),linewidth=1.5,dashes=dashstyle2)
@@ -108,8 +110,8 @@ if __name__ == "__main__":
     #plt.plot (xx*100,yy_vs+yy_vphi,"g--",label=("sum"),linewidth=1.5)
     plt.plot (xx*100,yy_sum,"-",color=colors.color(4),label=("weighted sum"),linewidth=1.5,dashes=dashstyle3)
 
-    ymin = 50
-    ymax = 1e6
+    ymin = 1e-2
+    ymax = 1e2
     plt.ylim([ymin,ymax])
 
     print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)]
