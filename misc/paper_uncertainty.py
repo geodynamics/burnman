@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     reorder = [0,1,3,4,5,6,7,8,2]
 
-    for i in range(0,len):
+    for i in range(0,1):
 
         vsmin = base_vs
         vsmax = base_vs
@@ -97,6 +97,10 @@ if __name__ == "__main__":
         #plt.subplots_adjust(left=0, bottom=None, right=0, top=None, wspace=None, hspace=None)
         plt.subplots_adjust(wspace=0, hspace=0.2)
         
+	print np.min((vsmin-base_vs)/base_vs)
+        print np.max((vsmax-base_vs)/base_vs)
+        print np.min((vphimin-base_vphi)/base_vphi)
+        print np.max((vphimax-base_vphi)/base_vphi)
 
         plt.plot(seis_p/1.e9,seis_vs/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
 
@@ -107,7 +111,7 @@ if __name__ == "__main__":
 
         plt.fill_between(seis_p/1.e9,vsmax/1.e3, vsmin/1.e3, facecolor='#ffbbbb', lw=0, label='asdf',interpolate=False)
 
-        plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
+#        plt.title('Vs %s +/- %d\\%% '%(names[i], spread[i]*100) )
         plt.ylim([6.2,7.6])
 
         if (reorder[i]%3==0):
@@ -115,10 +119,10 @@ if __name__ == "__main__":
         else:
             ax.yaxis.set_ticklabels([])
 
-        if (reorder[i]>5):
-            plt.xlabel('Pressure (GPa)')
-        else:
-            ax.xaxis.set_ticklabels([])
+#        if (reorder[i]>5):
+#            plt.xlabel('Pressure (GPa)')
+#        else:
+#            ax.xaxis.set_ticklabels([])
 
         #plt.subplot(3,3,reorder[i]+1)#+10
         plt.plot(seis_p/1.e9,seis_vphi/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
@@ -141,7 +145,7 @@ if __name__ == "__main__":
 
 
 
-    plt.savefig("uncertain.pdf",bbox_inches='tight')
-    #plt.show()
+#    plt.savefig("uncertain.pdf",bbox_inches='tight')
+    plt.show()
 
 

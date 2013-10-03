@@ -231,6 +231,7 @@ class helper_solid_solution(material):
                #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
                self.params[prop] = self.base_materials[0].params[prop]
         material.set_state(self, pressure, temperature)
+        print self.params
 
 class helper_spin_transition(material):
     """ 
@@ -259,6 +260,25 @@ class helper_spin_transition(material):
         mat.set_state(pressure, temperature)
         self.params = mat.params
         material.set_state(self, pressure, temperature)                
+
+
+class helper_uncertainty(material):
+   """
+   incorporates uncertainties in mineral parameters
+   """
+
+   def __init__(self,perturbations):
+       self.params['ref_K']=self.params['ref_K']+self.params['err_ref_K']*(1.0+perturbations[0])
+       self.params['K_prime']=self.params['K_prime']+self.params['err_K_prime']*(1.0+perturbations[1])
+       self.params['ref_G']=self.params['ref_G']+self.params['err_ref_G']*(1.0+perturbations[2])
+       self.params['G_prime']=self.params['G_prime']+self.params['err_G_prime']*(1.0+perturbations[3])
+       self.params['ref_Debye']=self.params['ref_Debye']+self.params['err_ref_Debye']*(1.0+perturbations[4])
+       self.params['ref_grueneisen']=self.params['ref_grueneisen']+self.params['err_ref_grueneisen']*(1.0+perturbations[5])
+       self.params['q0']=self.params['q0']+self.params['err_q0']*(1.0+perturbations[6])
+       self.params['eta_0s']=self.params['eta_0s']+self.params['err_eta_0s']*(1.0+perturbations[7])
+
+   def set_state(self,pressure, temperature):
+       material.set_state(self, pressure, temperature)
 
 
 class helper_fe_dependent(material):
