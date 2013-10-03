@@ -12,7 +12,7 @@ class stishovite (helper_uncertainty):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
-    def __init__(self,peturb=[0.0,0.0,0.0,0.0]):
+    def __init__(self,peturb=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]):
         self.params = {
             'equation_of_state': 'slb3',
             'ref_V': 14.02e-6,
