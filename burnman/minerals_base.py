@@ -231,7 +231,6 @@ class helper_solid_solution(material):
                #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
                self.params[prop] = self.base_materials[0].params[prop]
         material.set_state(self, pressure, temperature)
-        print self.params
 
 class helper_spin_transition(material):
     """ 
