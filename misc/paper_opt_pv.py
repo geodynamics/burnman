@@ -175,7 +175,7 @@ if __name__ == "__main__":
     # plot percent differences
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,2)
-    plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-.',linewidth=1.0)
+    plt.plot(seis_p/1.e9, seis_vs*0.0,color='k',linestyle='-',linewidth=2.0)
     plt.plot(seis_p/1.e9, (A_vs-seis_vs)/seis_vs*100.0,color=colors.color(3),label='$V_s$: A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-',markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(3))
     plt.plot(seis_p/1.e9, (B_vs-seis_vs)/seis_vs*100.0,color=colors.color(1),label='$V_s$: B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(1))
     plt.plot(seis_p/1.e9, (C_vs-seis_vs)/seis_vs*100.0,color=colors.color(4),label='$V_s$: C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3,markevery=5,marker='v',markerfacecolor='None',mew=1.5, markeredgecolor=colors.color(4))

@@ -67,7 +67,7 @@ if __name__ == "__main__":
     
     p, base_vs, base_vphi, _ = eval(np.ones(len))
 
-    spread = [.1, .1, .1, .1, .1, .1, .1, .1, .1]
+    spread = [.1, .1, .1, .1, .1, .5, .5, .5, .1]
 
 
     names = ['$K_0$', '$K_0\'$', '$G_0$', '$G_0\'$', '$\\theta_0$', '$\gamma_0$', '$q_0$', '$\eta_{S0}$','$T_0$']
@@ -142,6 +142,6 @@ if __name__ == "__main__":
 
 
     plt.savefig("uncertain.pdf",bbox_inches='tight')
-    plt.show()
+#    plt.show()
 
 
