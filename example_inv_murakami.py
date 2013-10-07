@@ -16,7 +16,7 @@ import matplotlib.mlab as mlab
 
 seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 10 #set on how many depth slices the computations should be done
-depths = np.linspace(1000,2500, number_of_points)
+depths = np.linspace(1000e3,2500e3, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 
