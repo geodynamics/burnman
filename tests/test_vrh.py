@@ -13,17 +13,17 @@ class mypericlase (burnman.material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 11.24e-6,
-            'ref_K': 161.0e9,
-            'K_prime': 3.8,
-            'ref_G': 131.0e9,
-            'G_prime': 2.1,
+            'V_0': 11.24e-6,
+            'K_0': 161.0e9,
+            'Kprime_0': 3.8,
+            'G_0': 131.0e9,
+            'Gprime_0': 2.1,
             'molar_mass': .0403,
             'n': 2,
-            'ref_Debye': 773.,
-            'ref_grueneisen': 1.5,
-            'q0': 1.5,
-            'eta_0s': 2.8 }
+            'Debye_0': 773.,
+            'grueneisen_0': 1.5,
+            'q_0': 1.5,
+            'eta_s_0': 2.8 }
 
 class VRH_average(unittest.TestCase):
     def test_one_object(self):
