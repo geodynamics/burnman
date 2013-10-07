@@ -16,17 +16,17 @@ class stishovite (material):
     def __init__(self):
         self.params = {
             'equation_of_state': 'slb3',
-            'ref_V': 14.02e-6,
-            'ref_K': 314.0e9,
-            'K_prime': 4.4,
-            'ref_G': 220.0e9,
-            'G_prime': 1.6,
+            'V_0': 14.02e-6,
+            'K_0': 314.0e9,
+            'Kprime_0': 4.4,
+            'G_0': 220.0e9,
+            'Gprime_0': 1.6,
             'molar_mass': .0601,
             'n': 3,
-            'ref_Debye': 1044.,
-            'ref_grueneisen': 1.34,
-            'q0': 2.4,
-            'eta_0s': 5.0 }
+            'Debye_0': 1044.,
+            'grueneisen_0': 1.34,
+            'q_0': 2.4,
+            'eta_s_0': 5.0 }
 
 class periclase (material):
     """
@@ -35,17 +35,17 @@ class periclase (material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 11.24e-6,
-            'ref_K': 161.0e9,
-            'K_prime': 3.8,
-            'ref_G': 131.0e9,
-            'G_prime': 2.1,
+            'V_0': 11.24e-6,
+            'K_0': 161.0e9,
+            'Kprime_0': 3.8,
+            'G_0': 131.0e9,
+            'Gprime_0': 2.1,
             'molar_mass': .0403,
             'n': 2,
-            'ref_Debye': 773.,
-            'ref_grueneisen': 1.5,
-            'q0': 1.5,
-            'eta_0s': 2.8 }
+            'Debye_0': 773.,
+            'grueneisen_0': 1.5,
+            'q_0': 1.5,
+            'eta_s_0': 2.8 }
 
 class wuestite (material):
     """
@@ -54,17 +54,17 @@ class wuestite (material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 12.06e-6,
-            'ref_K': 152.0e9,
-            'K_prime': 4.9,
-            'ref_G': 47.0e9,
-            'G_prime': 0.7,
+            'V_0': 12.06e-6,
+            'K_0': 152.0e9,
+            'Kprime_0': 4.9,
+            'G_0': 47.0e9,
+            'Gprime_0': 0.7,
             'molar_mass': .0718,
             'n': 2,
-            'ref_Debye': 455.,
-            'ref_grueneisen': 1.28,
-            'q0': 1.5,
-            'eta_0s': 0.8 }
+            'Debye_0': 455.,
+            'grueneisen_0': 1.28,
+            'q_0': 1.5,
+            'eta_s_0': 0.8 }
 
 
 
@@ -90,17 +90,17 @@ class mg_perovskite(material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 24.45e-6,
-            'ref_K': 251.0e9,   
-            'K_prime': 4.1,     
-            'ref_G': 175.0e9,  
-            'G_prime': 1.7,  
+            'V_0': 24.45e-6,
+            'K_0': 251.0e9,   
+            'Kprime_0': 4.1,     
+            'G_0': 175.0e9,  
+            'Gprime_0': 1.7,  
             'molar_mass': .1000,
             'n': 5,
-            'ref_Debye': 1070.,
-            'ref_grueneisen': 1.48,
-            'q0': 1.4,
-            'eta_0s': 2.6 }
+            'Debye_0': 1070.,
+            'grueneisen_0': 1.48,
+            'q_0': 1.4,
+            'eta_s_0': 2.6 }
 
 class fe_perovskite(material):
     """
@@ -109,17 +109,17 @@ class fe_perovskite(material):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 25.48e-6,
-            'ref_K': 281.0e9, 
-            'K_prime': 4.1,  
-            'ref_G': 138.0e9,
-            'G_prime': 1.7,   
+            'V_0': 25.48e-6,
+            'K_0': 281.0e9, 
+            'Kprime_0': 4.1,  
+            'G_0': 138.0e9,
+            'Gprime_0': 1.7,   
             'molar_mass': .1319, 
             'n': 5,
-            'ref_Debye': 841.,
-            'ref_grueneisen': 1.48,
-            'q0': 1.4,
-            'eta_0s': 2.1 }
+            'Debye_0': 841.,
+            'grueneisen_0': 1.48,
+            'q_0': 1.4,
+            'eta_s_0': 2.1 }
 
 
 class mg_fe_perovskite_pt_dependent(helper_fe_dependent):

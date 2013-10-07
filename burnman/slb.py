@@ -22,9 +22,9 @@ class slb_base(equation_of_state):
         x = ref_vol/vol
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        a1_ii = 6. * params['ref_grueneisen'] # EQ 47
-        a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
-        return params['ref_Debye'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f) 
+        a1_ii = 6. * params['grueneisen_0'] # EQ 47
+        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
+        return params['Debye_0'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f) 
 
     def volume_dependent_q(self, x, params):
         """
@@ -32,8 +32,8 @@ class slb_base(equation_of_state):
         derivative of the grueneisen parameter
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        a1_ii = 6. * params['ref_grueneisen'] # EQ 47
-        a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
+        a1_ii = 6. * params['grueneisen_0'] # EQ 47
+        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
         gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
         q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
@@ -41,13 +41,13 @@ class slb_base(equation_of_state):
     
     def __isotropic_eta_s(self, x, params):
         """
-        Finite strain approximation for eta_0s, the isotropic shear
+        Finite strain approximation for eta_s_0, the isotropic shear
         strain derivative of the grueneisen parameter
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        a2_s = -2.*params['ref_grueneisen'] - 2.*params['eta_0s'] # EQ 47 
-        a1_ii = 6. * params['ref_grueneisen'] # EQ 47
-        a2_iikk = -12.*params['ref_grueneisen']+36.*pow(params['ref_grueneisen'],2.) - 18.*params['q0']*params['ref_grueneisen'] # EQ 47
+        a2_s = -2.*params['grueneisen_0'] - 2.*params['eta_s_0'] # EQ 47 
+        a1_ii = 6. * params['grueneisen_0'] # EQ 47
+        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
         gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
@@ -58,22 +58,22 @@ class slb_base(equation_of_state):
         """
         Returns molar volume at the pressure and temperature [m^3]
         """
-        debye_T = lambda x : self.__debye_temperature(params['ref_V']/x, params)
+        debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
         E_th_ref = lambda x : debye.thermal_energy(300., debye_T(x), params['n']) #thermal energy at reference temperature
       
-        b_iikk= 9.*params['ref_K'] # EQ 28
-        b_iikkmm= 27.*params['ref_K']*(params['K_prime']-4.) # EQ 29
-        f = lambda x: 0.5*(pow(params['ref_V']/x,2./3.)-1.) # EQ 24
+        b_iikk= 9.*params['K_0'] # EQ 28
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
+        f = lambda x: 0.5*(pow(params['V_0']/x,2./3.)-1.) # EQ 24
         func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21 
     
         V = 0.
         try:
-          V = opt.brentq(func, 0.5*params['ref_V'], 1.2*params['ref_V']) 
+          V = opt.brentq(func, 0.6*params['V_0'], 1.2*params['V_0']) 
         except ValueError:
-          vols = np.linspace(0.3*params['ref_V'], 1.5*params['ref_V'], 100)
+          vols = np.linspace(0.3*params['V_0'], 1.5*params['V_0'], 100)
           press = []
           for v in vols:
             press.append(func(v))
@@ -86,11 +86,11 @@ class slb_base(equation_of_state):
         """
         Returns grueneisen parameter at the pressure, temperature, and volume
         """
-        x = params['ref_V'] / volume
+        x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        ref_gruen = params['ref_grueneisen']
-        a1_ii = 6. * ref_gruen # EQ 47
-        a2_iikk = -12.*ref_gruen + 36.*ref_gruen*ref_gruen - 18.*params['q0']*ref_gruen # EQ 47
+        gruen_0 = params['grueneisen_0']
+        a1_ii = 6. * gruen_0 # EQ 47
+        a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*params['q_0']*gruen_0 # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
         return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
 
@@ -98,7 +98,7 @@ class slb_base(equation_of_state):
         """
         Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
         """
-        debye_T = self.__debye_temperature(params['ref_V']/volume, params)
+        debye_T = self.__debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
         E_th = debye.thermal_energy(temperature, debye_T, params['n']) #thermal energy at temperature T
@@ -107,7 +107,7 @@ class slb_base(equation_of_state):
         C_v = debye.heat_capacity_v(temperature, debye_T, params['n']) #heat capacity at temperature T
         C_v_ref = debye.heat_capacity_v(300.,debye_T, params['n']) #heat capacity at reference temperature
 
-        q = self.volume_dependent_q(params['ref_V']/volume, params)
+        q = self.volume_dependent_q(params['V_0']/volume, params)
     
         K = bm.bulk_modulus(volume, params) \
             + (gr + 1.-q)* ( gr / volume ) * (E_th - E_th_ref) \
@@ -129,8 +129,8 @@ class slb_base(equation_of_state):
         """
         Returns shear modulus at the pressure, temperature, and volume [Pa]
         """
-        debye_T = self.__debye_temperature(params['ref_V']/volume, params)
-        eta_s = self.__isotropic_eta_s(params['ref_V']/volume, params)
+        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
         E_th_ref = debye.thermal_energy(300.,debye_T, params['n'])
@@ -146,7 +146,7 @@ class slb_base(equation_of_state):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
         """
-        debye_T = self.__debye_temperature(params['ref_V']/volume, params)
+        debye_T = self.__debye_temperature(params['V_0']/volume, params)
         return debye.heat_capacity_v(temperature, debye_T,params['n'])
 
     def heat_capacity_p(self, pressure, temperature, volume, params):

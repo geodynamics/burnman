@@ -19,14 +19,14 @@ class Speziale_fe_periclase_HS(material):
     def __init__(self):
             self.params = {
                         'equation_of_state': 'mgd3',
-                        'ref_V': 22.9e-6,
-                        'ref_K': 157.5e9,
-                        'K_prime': 3.92,
+                        'V_0': 22.9e-6,
+                        'K_0': 157.5e9,
+                        'Kprime_0': 3.92,
                         'molar_mass': .04567,
                         'n': 2,
-                        'ref_Debye': 587,
-                        'ref_grueneisen': 1.46,
-                        'q0': 1.2 }
+                        'Debye_0': 587,
+                        'grueneisen_0': 1.46,
+                        'q_0': 1.2 }
 
 class Speziale_fe_periclase_LS(material): 
     """
@@ -35,14 +35,14 @@ class Speziale_fe_periclase_LS(material):
     def __init__(self):
         self.params = {
                         'equation_of_state': 'mgd3',
-                        'ref_V': 21.49e-6,
-                        'ref_K': 186.0e9,
-                        'K_prime': 4.6,
+                        'V_0': 21.49e-6,
+                        'K_0': 186.0e9,
+                        'Kprime_0': 4.6,
                         'molar_mass': .04567,
                         'n': 2,
-                        'ref_Debye': 587.,
-                        'ref_grueneisen': 1.46,
-                        'q0': 1.2  }
+                        'Debye_0': 587.,
+                        'grueneisen_0': 1.46,
+                        'q_0': 1.2  }
 
     
     

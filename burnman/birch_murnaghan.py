@@ -13,22 +13,22 @@ def bulk_modulus(volume, params):
     modulus.  Pressure must be in Pa.
     """
 
-    x = params['ref_V']/volume
+    x = params['V_0']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
 
-    K = pow(1. + 2.*f, 5./2.)* (params['ref_K'] + (3. * params['ref_K'] * params['K_prime'] -  \
-           5*params['ref_K'] ) * f + 27./2. * (params['ref_K']*params['K_prime'] - 4.* params['ref_K'])*f*f)
+    K = pow(1. + 2.*f, 5./2.)* (params['K_0'] + (3. * params['K_0'] * params['Kprime_0'] -  \
+           5*params['K_0'] ) * f + 27./2. * (params['K_0']*params['Kprime_0'] - 4.* params['K_0'])*f*f)
     return K
 
 def birch_murnaghan(x, params):
     """
     equation for the third order birch-murnaghan equation of state, returns
     pressure in the same units that are supplied for the reference bulk
-    modulus (params['ref_K'])
+    modulus (params['K_0'])
     """
 
-    return 3.*params['ref_K']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
-    * (1 - .75*(4-params['K_prime'] )*(pow(x, 2./3.) - 1))
+    return 3.*params['K_0']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
+    * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1))
 
 def density(pressure, params):
     """ 
@@ -43,31 +43,31 @@ def volume(pressure, params):
     pressure (Pa). Returns molar volume in m^3
     """
 
-    func = lambda x: birch_murnaghan(params['ref_V']/x, params) - pressure
-    V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
+    func = lambda x: birch_murnaghan(params['V_0']/x, params) - pressure
+    V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
     return V
 
 def shear_modulus_second_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
     given volume.  Returns shear modulus in Pa (the same units as in
-    params['ref_G']).  This uses a second order finite strain expansion
+    params['G_0']).  This uses a second order finite strain expansion
     """
 
-    x = params['ref_V']/volume
-    G=params['ref_G'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['G_prime']*params['ref_K']/params['ref_G']))
+    x = params['V_0']/volume
+    G=params['G_0'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['Gprime_0']*params['K_0']/params['G_0']))
     return G 
 
 def shear_modulus_third_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
     given volume.  Returns shear modulus in Pa (the same units as in
-    params['ref_G']).  This uses a third order finite strain expansion
+    params['G_0']).  This uses a third order finite strain expansion
     """
 
-    x = params['ref_V']/volume
+    x = params['V_0']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
-    G = pow((1. + 2*f), 5./2.)*(params['ref_G']+(3.*params['ref_K']*params['G_prime'] - 5.*params['ref_G'])*f + (6.*params['ref_K']*params['G_prime']-24.*params['ref_K']-14.*params['ref_G']+9./2. * params['ref_K']*params['K_prime'])*f*f)
+    G = pow((1. + 2*f), 5./2.)*(params['G_0']+(3.*params['K_0']*params['Gprime_0'] - 5.*params['G_0'])*f + (6.*params['K_0']*params['Gprime_0']-24.*params['K_0']-14.*params['G_0']+9./2. * params['K_0']*params['Kprime_0'])*f*f)
     return G 
 
 class birch_murnaghan_base(eos.equation_of_state):

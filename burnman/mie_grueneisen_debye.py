@@ -23,17 +23,17 @@ class mgd_base(eos.equation_of_state):
         Returns grueneisen parameter [unitless] as a function of pressure,
         temperature, and volume (EQ B6)
         """
-        return self.__grueneisen_parameter(params['ref_V']/volume, params)
+        return self.__grueneisen_parameter(params['V_0']/volume, params)
 
     def volume(self, pressure,temperature,params):
         """
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         EQ B7
         """
-        func = lambda x: bm.birch_murnaghan(params['ref_V']/x, params) + \
+        func = lambda x: bm.birch_murnaghan(params['V_0']/x, params) + \
             self.__thermal_pressure(temperature, x, params) - \
             self.__thermal_pressure(300., x, params) - pressure
-        V = opt.brentq(func, 0.5*params['ref_V'], 1.5*params['ref_V'])
+        V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
         return V
 
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
@@ -68,7 +68,7 @@ class mgd_base(eos.equation_of_state):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
         """
-        Debye_T = self.__debye_temperature(params['ref_V']/volume, params)
+        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
         C_v = debye.heat_capacity_v(temperature, Debye_T, params['n'])
         return C_v
 
@@ -77,7 +77,7 @@ class mgd_base(eos.equation_of_state):
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
         """
         C_v = self.heat_capacity_v(pressure,temperature,volume,params)
-        gr = self.__grueneisen_parameter(params['ref_V']/volume, params)
+        gr = self.__grueneisen_parameter(params['V_0']/volume, params)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume ,params)
         alpha = gr * C_v / K / volume
         return alpha
@@ -88,7 +88,7 @@ class mgd_base(eos.equation_of_state):
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
         alpha = self.thermal_expansivity(pressure,temperature,volume,params)
-        gr = self.__grueneisen_parameter(params['ref_V']/volume, params)
+        gr = self.__grueneisen_parameter(params['V_0']/volume, params)
         C_v = self.heat_capacity_v(pressure,temperature,volume,params)
         C_p = C_v*(1. + gr * alpha * temperature)
         return C_p
@@ -100,7 +100,7 @@ class mgd_base(eos.equation_of_state):
         """
         K_T= self.isothermal_bulk_modulus(pressure,temperature,volume,params)
         alpha = self.thermal_expansivity(pressure,temperature,volume,params)
-        gr = self.__grueneisen_parameter(params['ref_V']/volume, params)
+        gr = self.__grueneisen_parameter(params['V_0']/volume, params)
         K_S = K_T*(1. + gr * alpha * temperature)
         return K_S
 
@@ -109,37 +109,37 @@ class mgd_base(eos.equation_of_state):
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
         EQ B7
         """
-        return bm.birch_murnaghan(params['ref_V']/volume, params) + \
+        return bm.birch_murnaghan(params['V_0']/volume, params) + \
                 self.__thermal_pressure(temperature,volume, params) - \
                 self.__thermal_pressure(300.,volume, params)
 
     #calculate the thermal correction to the shear modulus as a function of V, T
     def __thermal_shear_modulus(self, T, V, params):
-        gr = self.__grueneisen_parameter(params['ref_V']/V, params)
-        Debye_T = self.__debye_temperature(params['ref_V']/V, params) 
+        gr = self.__grueneisen_parameter(params['V_0']/V, params)
+        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
         G_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
                  6*debye.R*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
         return G_th
 
     #compute the Debye temperature in K.  Takes the
-    #parameter x, which is ref_V/V (molar volumes).
+    #parameter x, which is V_0/V (molar volumes).
     #Depends on the reference grueneisen parameter,
     #the reference Debye temperature, and the factor
-    #q0, see Matas eq B6
+    #q_0, see Matas eq B6
     def __debye_temperature(self, x, params):
-        return params['ref_Debye']*np.exp((params['ref_grueneisen']- \
-            self.__grueneisen_parameter(x, params))/params['q0'])
+        return params['Debye_0']*np.exp((params['grueneisen_0']- \
+            self.__grueneisen_parameter(x, params))/params['q_0'])
 
     #compute the grueneisen parameter with depth, according
-    #to q0.  Takes x=ref_V/V. See Matas eq B6
+    #to q_0.  Takes x=V_0/V. See Matas eq B6
     def __grueneisen_parameter(self, x, params):
-        return params['ref_grueneisen']*pow(1./x, params['q0'])
+        return params['grueneisen_0']*pow(1./x, params['q_0'])
 
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
     def __thermal_pressure(self,T,V, params):
-        Debye_T = self.__debye_temperature(params['ref_V']/V, params) 
-        gr = self.__grueneisen_parameter(params['ref_V']/V, params)
+        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
+        gr = self.__grueneisen_parameter(params['V_0']/V, params)
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
 
@@ -147,10 +147,10 @@ class mgd_base(eos.equation_of_state):
     #calculate the thermal correction for the mgd
     #bulk modulus (see matas et al, 2007)
     def __thermal_bulk_modulus(self, T,V,params):
-        gr = self.__grueneisen_parameter(params['ref_V']/V, params)
-        Debye_T = self.__debye_temperature(params['ref_V']/V, params) 
+        gr = self.__grueneisen_parameter(params['V_0']/V, params)
+        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
         K_th = 3.*params['n']*debye.R*T/V * gr * \
-            ((1. - params['q0'] - 3.*gr)*debye.debye_fn(Debye_T/T)+3.*gr*(Debye_T/T)/(np.exp(Debye_T/T) - 1.)) # EQ B5
+            ((1. - params['q_0'] - 3.*gr)*debye.debye_fn(Debye_T/T)+3.*gr*(Debye_T/T)/(np.exp(Debye_T/T) - 1.)) # EQ B5
         return K_th
 
 

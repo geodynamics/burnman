@@ -24,16 +24,16 @@ def check_birch_murnaghan():
     #make a test mineral
     test_mineral = burnman.material()
     test_mineral.params ={'name':'test',
-                          'ref_V': 6.844e-6,
-                          'ref_K': 259.0e9,
-                          'K_prime': 4.0,
-                          'ref_G': 175.0e9,
-                          'G_prime': 1.7,
+                          'V_0': 6.844e-6,
+                          'K_0': 259.0e9,
+                          'Kprime_0': 4.0,
+                          'G_0': 175.0e9,
+                          'Gprime_0': 1.7,
                           'molar_mass': .0,
                           'n': 0.,
-                          'ref_Debye': 0.,
-                          'ref_grueneisen': 0.,
-                          'q0': 0.}
+                          'Debye_0': 0.,
+                          'grueneisen_0': 0.,
+                          'q_0': 0.}
  
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
@@ -67,14 +67,14 @@ def check_mgd_shim_duffy_kenichi():
     #Create gold material from Table 1
     gold = burnman.material()
     gold.params = {'name': 'gold',
-                   'ref_V': 10.22e-6,
-                   'ref_K': 167.0e9,
-                   'K_prime': 5.0,
+                   'V_0': 10.22e-6,
+                   'K_0': 167.0e9,
+                   'Kprime_0': 5.0,
                    'molar_mass': .196966,
                    'n': 1.0,
-                   'ref_Debye': 170.,
-                   'ref_grueneisen': 2.97, #this does better with gr = 2.93.  Why?
-                   'q0': 1.0}
+                   'Debye_0': 170.,
+                   'grueneisen_0': 2.97, #this does better with gr = 2.93.  Why?
+                   'q_0': 1.0}
     gold.set_method('mgd3')
 
     #Total pressures, pulled from Table 2  
@@ -87,7 +87,7 @@ def check_mgd_shim_duffy_kenichi():
  
     pressures = np.empty_like(ref_pressures)
     ref_dv = np.linspace(0.0, 0.34, len(pressures[0]))
-    ref_volumes = (1-ref_dv)*gold.params['ref_V']
+    ref_volumes = (1-ref_dv)*gold.params['V_0']
     T= np.array([300., 1000.,2000.,3000.])
     for t in range(len(pressures)):
         for i in range(len(pressures[t])):
@@ -106,14 +106,14 @@ def check_mgd_fei_mao_shu_hu():
     """
     mgfeo = burnman.material() 
     mgfeo.params = {       'name': 'MgFeO',
-                    'ref_V': 11.657e-6,
-                    'ref_K': 157.0e9,
-                    'K_prime': 4.0,
+                    'V_0': 11.657e-6,
+                    'K_0': 157.0e9,
+                    'Kprime_0': 4.0,
                     'molar_mass': .196966,
                     'n': 2.0,
-                    'ref_Debye': 500.,
-                    'ref_grueneisen': 1.50,
-                    'q0': 1.1}
+                    'Debye_0': 500.,
+                    'grueneisen_0': 1.50,
+                    'q_0': 1.1}
     mgfeo.set_method('mgd3')
 
     #pulled from table 1
@@ -144,9 +144,9 @@ def check_slb_fig3():
     """
     perovskite= burnman.material() 
     perovskite.params = {       'name': 'perovksite',
-                    'ref_V': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
-                    'ref_grueneisen': 1.63,
-                    'q0': 1.7}
+                    'V_0': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
+                    'grueneisen_0': 1.63,
+                    'q_0': 1.7}
 
     volume = np.linspace(0.6, 1.0, 100)
     grueneisen_slb = np.empty_like(volume)
@@ -161,10 +161,10 @@ def check_slb_fig3():
     #calculate its thermal properties
     for i in range(len(volume)):
         #call with dummy pressure and temperatures, they do not change it
-        grueneisen_slb[i] = slb_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['ref_V'], perovskite.params)
-        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['ref_V'], perovskite.params)
+        grueneisen_slb[i] = slb_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['V_0'], perovskite.params)
+        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(0., 0., volume[i]*perovskite.params['V_0'], perovskite.params)
         q_slb[i] = slb_eos.volume_dependent_q(1./volume[i], perovskite.params)
-        q_mgd[i] = perovskite.params['q0']
+        q_mgd[i] = perovskite.params['q_0']
 
     #compare with figure 7
     fig1 = mpimg.imread('input_figures/slb_fig3.png')
@@ -184,17 +184,17 @@ def check_slb_fig7_txt():
     """
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
-                    'ref_V': 43.603e-6,
-                    'ref_K': 127.955e9,
-                    'K_prime': 4.232,
-                    'ref_G' : 81.6e9,
-                    'G_prime' : 1.4,
+                    'V_0': 43.603e-6,
+                    'K_0': 127.955e9,
+                    'Kprime_0': 4.232,
+                    'G_0' : 81.6e9,
+                    'Gprime_0' : 1.4,
                     'molar_mass': .140695,
                     'n': 7.0,
-                    'ref_Debye': 809.183,
-                    'ref_grueneisen': .993,
-                    'q0': 2.093, 
-                    'eta_0s' : 2.364}
+                    'Debye_0': 809.183,
+                    'grueneisen_0': .993,
+                    'q_0': 2.093, 
+                    'eta_s_0' : 2.364}
     forsterite.set_method('slb3')
 
     data = np.loadtxt("data/slb_fig7.txt", skiprows=1)
@@ -275,16 +275,16 @@ def check_slb_fig7():
     """
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
-                    'ref_V': 43.60e-6,
-                    'ref_K': 128.0e9,
-                    'K_prime': 4.2,
-                    'ref_G' : 82.0e9,
-                    'G_prime' : 1.4,
+                    'V_0': 43.60e-6,
+                    'K_0': 128.0e9,
+                    'Kprime_0': 4.2,
+                    'G_0' : 82.0e9,
+                    'Gprime_0' : 1.4,
                     'n': 7.0,
-                    'ref_Debye': 809.,
-                    'ref_grueneisen': .99,
-                    'q0': 2.1, 
-                    'eta_0s' : 2.4}
+                    'Debye_0': 809.,
+                    'grueneisen_0': .99,
+                    'q_0': 2.1, 
+                    'eta_s_0' : 2.4}
     forsterite.set_method('slb3')
 
     temperature = np.linspace(0., 2000., 200)
@@ -295,14 +295,14 @@ def check_slb_fig7():
 
     pressure = 1.0e5
     forsterite.set_state(pressure, 300.)
-    ref_Ks = forsterite.adiabatic_bulk_modulus()
+    Ks_0 = forsterite.adiabatic_bulk_modulus()
 
     #calculate its thermal properties
     for i in range(len(temperature)):
         forsterite.set_state(pressure, temperature[i])
-        volume[i] = forsterite.molar_volume()/forsterite.params['ref_V']
-        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/ref_Ks
-        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['ref_G']
+        volume[i] = forsterite.molar_volume()/forsterite.params['V_0']
+        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/Ks_0
+        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['G_0']
         heat_capacity[i] = forsterite.heat_capacity_p()/forsterite.params['n']
  
 

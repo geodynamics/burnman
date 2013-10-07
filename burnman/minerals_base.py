@@ -37,17 +37,17 @@ class material:
     def __init__(self):
         self.params = {    'name':'generic',
             'equation_of_state': 'slb3', #Equation of state used to fit the parameters
-            'ref_V': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
-            'ref_K': 0., #Reference bulk modulus [Pa] at room pressure/temperature
-            'K_prime': 0., #pressure derivative of bulk modulus
-            'ref_G': 0., #reference shear modulus at room pressure/temperature
-            'G_prime': 0., #pressure derivative of shear modulus
+            'V_0': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
+            'K_0': 0., #Reference bulk modulus [Pa] at room pressure/temperature
+            'Kprime_0': 0., #pressure derivative of bulk modulus
+            'G_0': 0., #reference shear modulus at room pressure/temperature
+            'Gprime_0': 0., #pressure derivative of shear modulus
             'molar_mass': 0., #molar mass in units of [kg/mol]
             'n': 0., #number of atoms per molecule
-            'ref_Debye': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
-            'ref_grueneisen': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'q0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'eta_0s': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
+            'Debye_0': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
+            'grueneisen_0': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
+            'q_0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
+            'eta_s_0': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
         self.method = None
 
     def set_method(self, method):
@@ -110,11 +110,11 @@ class material:
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
         
-        if (self.params.has_key('ref_G') and self.params.has_key('G_prime')):
+        if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:    
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
-            warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
+            warnings.warn(('Warning: G and or Gprime_0 are undefined for ' + self.to_string()))
 
     def molar_mass(self):
         """
@@ -267,14 +267,14 @@ class helper_uncertainty(material):
    """
 
    def __init__(self,perturbations):
-       self.params['ref_K']=self.params['ref_K']+self.params['err_ref_K']*(perturbations[0])
-       self.params['K_prime']=self.params['K_prime']+self.params['err_K_prime']*(perturbations[1])
-       self.params['ref_G']=self.params['ref_G']+self.params['err_ref_G']*(perturbations[2])
-       self.params['G_prime']=self.params['G_prime']+self.params['err_G_prime']*(perturbations[3])
-       self.params['ref_Debye']=self.params['ref_Debye']+self.params['err_ref_Debye']*(perturbations[4])
-       self.params['ref_grueneisen']=self.params['ref_grueneisen']+self.params['err_ref_grueneisen']*(perturbations[5])
-       self.params['q0']=self.params['q0']+self.params['err_q0']*(perturbations[6])
-       self.params['eta_0s']=self.params['eta_0s']+self.params['err_eta_0s']*(perturbations[7])
+       self.params['K_0']=self.params['K_0']+self.params['err_K_0']*(perturbations[0])
+       self.params['Kprime_0']=self.params['Kprime_0']+self.params['err_Kprime_0']*(perturbations[1])
+       self.params['G_0']=self.params['G_0']+self.params['err_G_0']*(perturbations[2])
+       self.params['Gprime_0']=self.params['Gprime_0']+self.params['err_Gprime_0']*(perturbations[3])
+       self.params['Debye_0']=self.params['Debye_0']+self.params['err_Debye_0']*(perturbations[4])
+       self.params['grueneisen_0']=self.params['grueneisen_0']+self.params['err_grueneisen_0']*(perturbations[5])
+       self.params['q_0']=self.params['q_0']+self.params['err_q_0']*(perturbations[6])
+       self.params['eta_s_0']=self.params['eta_s_0']+self.params['err_eta_s_0']*(perturbations[7])
 
    def set_state(self,pressure, temperature):
        material.set_state(self, pressure, temperature)
