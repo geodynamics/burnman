@@ -15,6 +15,7 @@ burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefin
 
 
 
+
 minerals.minerals.Matas_etal_2007.periclase
 minerals.minerals.SLB_2011.ferropericlase
 minerals.minerals.other.Speziale_fe_periclase_LS
@@ -27,6 +28,7 @@ minerals.minerals.Murakami_etal_2012.mg_perovskite_3rdorder
 minerals.minerals.Matas_etal_2007.ca_perovskite
 minerals.minerals.Murakami_etal_2012.fe_periclase_LS_3rd
 minerals.minerals.SLB_2005.stishovite
+minerals.minerals_base.helper_uncertainty
 minerals.minerals.Murakami_etal_2012.fe_periclase_HS_3rd
 minerals.minerals.SLB_2011.fe_perovskite
 minerals.minerals.SLB_2011.stishovite
@@ -37,7 +39,7 @@ minerals.minerals.Murakami_etal_2012.fe_perovskite
 minerals.minerals.other.Speziale_fe_periclase_HS
 minerals.minerals.Matas_etal_2007.al_perovskite
 minerals.minerals.Murakami_etal_2012.fe_periclase
-minerals.minerals.SLB_2005.ferropericlase_pt_dependent
+minerals.minerals.Matas_etal_2007.fe_perovskite
 minerals.minerals.Murakami_etal_2012.fe_periclase_3rd
 minerals.minerals.SLB_2011.mg_fe_perovskite_pt_dependent
 minerals.minerals.Murakami_etal_2012.mg_perovskite
@@ -54,7 +56,7 @@ minerals.minerals.Murakami_etal_2012.fe_periclase_LS
 minerals.minerals.Matas_etal_2007.wuestite
 minerals.minerals.SLB_2005.ferropericlase
 minerals.minerals.Murakami_etal_2012.fe_periclase_HS
-minerals.minerals.Matas_etal_2007.fe_perovskite
+minerals.minerals.SLB_2005.ferropericlase_pt_dependent
 
 'burnman.minerals.Matas_etal_2007.al_perovskite'
 'burnman.minerals.Matas_etal_2007.ca_perovskite'
@@ -96,7 +98,7 @@ Name                                                               ref_V     ref
 'burnman.minerals.Murakami_etal_2012.fe_periclase_3rd'        1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773      0.047 2     706.0           1.45 1.5   2.54
 'burnman.minerals.Murakami_etal_2012.fe_periclase_HS'         1.1412e-05 1.591e+11    4.11    1.0543e+11   1.773      0.047 2     706.0           1.45 1.5   2.54
 'burnman.minerals.Murakami_etal_2012.fe_periclase_HS_3rd'     1.1412e-05 1.591e+11    4.11    1.2935e+11   1.993     0.0469 2     706.0           1.45 1.5   2.54
-'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'         1.1171e-05   1.7e+11       4    1.1634e+11   1.668      0.047 2     706.0           1.45 1.5   2.54
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'         1.1171e-05   1.7e+11     4.0    1.1634e+11   1.668      0.047 2     706.0           1.45 1.5   2.54
 'burnman.minerals.Murakami_etal_2012.fe_periclase_LS_3rd'     1.1171e-05   1.7e+11       4    1.5167e+11   1.754     0.0469 2     706.0           1.45 1.5   2.54
 'burnman.minerals.Murakami_etal_2012.fe_perovskite'           2.4607e-05 2.519e+11    4.01     1.647e+11    1.58      0.102 5    1054.0           1.48 1.4    2.4
 'burnman.minerals.Murakami_etal_2012.mg_periclase'             1.124e-05  1.61e+11     3.9      1.31e+11    1.92     0.0403 2     773.0            1.5 1.5    3.0
