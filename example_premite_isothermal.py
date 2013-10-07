@@ -37,9 +37,9 @@ def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
     test.params['V_0'] = 10.e-6
     test.params['molar_mass'] = ref_rho*test.params['V_0']
     test.params['K_0'] = K_0
-    test.params['K_prime'] = K_prime
+    test.params['Kprime_0'] = K_prime
     test.params['G_0'] = G_0
-    test.params['G_prime'] = G_prime
+    test.params['Gprime_0'] = G_prime
 
     rock = burnman.composite( [(test, 1.0 )] )
     rock.set_method('bm3')
@@ -62,9 +62,9 @@ def error(ref_rho, K_0, K_prime, G_0, G_prime):
 # Priors on unknown parameters:
 ref_rho = pymc.Uniform('ref_rho', lower=3300., upper=4500.)
 K_0 = pymc.Uniform('K_0', lower=200.e9, upper=300.e9)
-K_prime = pymc.Uniform('K_prime', lower=3., upper=6.)
+K_prime = pymc.Uniform('Kprime_0', lower=3., upper=6.)
 G_0 = pymc.Uniform('G_0', lower=50.e9, upper=250.e9)
-G_prime = pymc.Uniform('G_prime', lower=0., upper=3.)
+G_prime = pymc.Uniform('Gprime_0', lower=0., upper=3.)
 
 
 minerr = 1e100

@@ -36,13 +36,13 @@ def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_
     fe_pv = rock.phases[0].mineral.base_materials[1]
 
     mg_pv.params['K_0'] = mg_pv_K
-    mg_pv.params['K_prime'] = mg_pv_K_prime
+    mg_pv.params['Kprime_0'] = mg_pv_K_prime
     mg_pv.params['G_0'] = mg_pv_G
-    mg_pv.params['G_prime'] = mg_pv_G_prime
+    mg_pv.params['Gprime_0'] = mg_pv_G_prime
     fe_pv.params['K_0'] = fe_pv_K
-    fe_pv.params['K_prime'] = fe_pv_K_prime
+    fe_pv.params['Kprime_0'] = fe_pv_K_prime
     fe_pv.params['G_0'] = fe_pv_G
-    fe_pv.params['G_prime'] = fe_pv_G_prime
+    fe_pv.params['Gprime_0'] = fe_pv_G_prime
 
     rock.set_method(method)
     
