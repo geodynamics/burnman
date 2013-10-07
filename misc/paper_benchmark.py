@@ -23,17 +23,17 @@ def check_slb_fig7_txt():
     """
     forsterite = burnman.material() 
     forsterite.params = {       'name': 'forsterite',
-                    'ref_V': 43.603e-6,
-                    'ref_K': 127.955e9,
-                    'K_prime': 4.232,
-                    'ref_G' : 81.6e9,
-                    'G_prime' : 1.4,
+                    'V_0': 43.603e-6,
+                    'K_0': 127.955e9,
+                    'Kprime_0': 4.232,
+                    'G_0' : 81.6e9,
+                    'Gprime_0' : 1.4,
                     'molar_mass': .140695,
                     'n': 7.0,
-                    'ref_Debye': 809.183,
-                    'ref_grueneisen': .993,
-                    'q0': 2.093, 
-                    'eta_0s' : 2.364}
+                    'Debye_0': 809.183,
+                    'grueneisen_0': .993,
+                    'q_0': 2.093, 
+                    'eta_s_0' : 2.364}
     forsterite.set_method('slb3')
 
     data = np.loadtxt("slb_benchmark.txt", skiprows=1)

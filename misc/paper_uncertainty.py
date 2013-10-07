@@ -22,17 +22,17 @@ class my_perovskite(burnman.material):
     def __init__(self, uncertain):
         self.params = {
             'equation_of_state':'slb3',
-            'ref_V': 24.45e-6,
-            'ref_K': 251.0e9 * uncertain[0],   
-            'K_prime': 4.1 * uncertain[1],
-            'ref_G': 173.0e9 * uncertain[2],
-            'G_prime': 1.7 * uncertain[3],
+            'V_0': 24.45e-6,
+            'K_0': 251.0e9 * uncertain[0],   
+            'Kprime_0': 4.1 * uncertain[1],
+            'G_0': 173.0e9 * uncertain[2],
+            'Gprime_0': 1.7 * uncertain[3],
             'molar_mass': .1000,
             'n': 5,
-            'ref_Debye': 905. * uncertain[4], # less important?
-            'ref_grueneisen': 1.57 * uncertain[5],
-            'q0': 1.1 * uncertain[6],
-            'eta_0s': 2.6 * uncertain[7]}
+            'Debye_0': 905. * uncertain[4], # less important?
+            'grueneisen_0': 1.57 * uncertain[5],
+            'q_0': 1.1 * uncertain[6],
+            'eta_s_0': 2.6 * uncertain[7]}
 
 if __name__ == "__main__":    
     figure=plt.figure(dpi=100,figsize=(12,10))
