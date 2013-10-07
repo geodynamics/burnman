@@ -36,12 +36,12 @@ eps = np.finfo(np.float).eps
 sqrt_eps = np.sqrt(np.finfo(np.float).eps)
 log_eps = np.log(np.finfo(np.float).eps)
 
-def debye_fn_gsl(x):
+def debye_fn_cheb(x):
     """
     Evaluate the Debye function using a Chebyshev series expansion coupled with 
     asymptotic solutions of the function.  Shamelessly adapted from the GSL implementation
-    of the same function.  Should give the same result as debye_fn(x) to near
-    machine-precision.
+    of the same function (Itself adapted from Collected Algorithms from ACM).  
+    Should give the same result as debye_fn(x) to near machine-precision.
     """
     val_infinity = 19.4818182068004875;
     xcut = -log_eps
@@ -83,7 +83,7 @@ def thermal_energy(T, debye_T, n):
     """
     if T == 0:
         return 0
-    E_th = 3.*n*R*T * debye_fn_gsl(debye_T/T)
+    E_th = 3.*n*R*T * debye_fn_cheb(debye_T/T)
     return E_th
 
 def heat_capacity_v(T,debye_T,n):
@@ -93,7 +93,7 @@ def heat_capacity_v(T,debye_T,n):
     if T ==0:
         return 0
     x = debye_T/T
-    C_v = 3.0*n*R* ( 4.0*debye_fn_gsl(x) - 3.0*x/(np.exp(x)-1.0) )
+    C_v = 3.0*n*R* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
 
