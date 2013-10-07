@@ -114,7 +114,7 @@ class material:
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:    
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
-            warnings.warn(('Warning: G and or Gprime_0 are undefined for ' + self.to_string()))
+            warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 
     def molar_mass(self):
         """
