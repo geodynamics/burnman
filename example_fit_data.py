@@ -27,7 +27,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 def calc_shear_velocities(G_0, G_prime, mineral, pressures): 
 
     mineral.params['G_0'] = G_0
-    mineral.params['G_prime'] = G_prime
+    mineral.params['Gprime_0'] = G_prime
 
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
@@ -56,7 +56,7 @@ guess = [200.e9, 2.0]
 mg_perovskite_test = burnman.material()
 mg_perovskite_test.params['V_0'] = 24.45e-6
 mg_perovskite_test.params['K_0'] = 281.e9
-mg_perovskite_test.params['K_prime'] = 4.1
+mg_perovskite_test.params['Kprime_0'] = 4.1
 mg_perovskite_test.params['molar_mass'] = .10
 
 #first, do the second-order fit
