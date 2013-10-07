@@ -5,6 +5,7 @@
 import numpy as np
 import scipy.integrate as integrate
 import matplotlib.pyplot as plt
+import time
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye, 
@@ -100,6 +101,38 @@ def heat_capacity_v(T,debye_T,n):
 
 
 if __name__ == "__main__":
+
+
+    def old_thermal(T, debye_T, n):
+        if T == 0:
+            return 0
+        return 3.*n*R*T * debye_fn(debye_T/T)
+
+    def old_heat(T, debye_T, n):
+        if T ==0:
+            return 0
+        deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
+        return 9.*n*R*deb[0]/pow(debye_T/T,3.)
+
+    temperatures = np.linspace(100,5000, 10000)
+    Debye_T = 1000.
+    old = np.empty_like(temperatures)
+    start = time.clock()
+    for i in range(len(temperatures)):
+        old[i] = old_heat(temperatures[i], Debye_T, 1.0)
+    time_old = time.clock()-start
+
+    new = np.empty_like(temperatures)
+    start = time.clock()
+    for i in range(len(temperatures)):
+        new[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
+    time_new = time.clock()-start
+    
+    print "error %e"%np.linalg.norm((old-new)/new)
+    print "time old %g, time new %g"%(time_old,time_new)
+
+
+
     temperatures = np.linspace(0,5000, 200)
     vibrational_energy = np.empty_like(temperatures)
     heat_capacity = np.empty_like(temperatures)
