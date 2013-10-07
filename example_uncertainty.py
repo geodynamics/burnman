@@ -31,7 +31,7 @@ if __name__ == "__main__":
     
 
     def eval(uncertain):
-        rock = burnman.composite([(minerals.SLB_2011.stishovite(uncertain), 1.0)] )
+        rock = burnman.composite([(minerals.SLB_2011.stishovite_err(uncertain), 1.0)] )
         rock.set_method('slb3')
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)

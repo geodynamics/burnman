@@ -63,23 +63,23 @@ if __name__ == "__main__":
             def __init__(self):
                     burnman.material.__init__(self)
                     self.params = {
-                            'ref_V': 10.844e-6, #Molar volume [m^3/(mole molecules)] 
+                            'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)] 
                             	#at room pressure/temperature
-                            'ref_K': 135.19e9, #Reference bulk modulus [Pa] 
+                            'K_0': 135.19e9, #Reference bulk modulus [Pa] 
                             	#at room pressure/temperature
-                            'K_prime': 6.04, #pressure derivative of bulk modulus
-                            'ref_G': 175.0e9, #reference shear modulus 
+                            'Kprime_0': 6.04, #pressure derivative of bulk modulus
+                            'G_0': 175.0e9, #reference shear modulus 
                            	 	#at room pressure/temperature
-                            'G_prime': 1.7, #pressure derivative of shear modulus
+                            'Gprime_0': 1.7, #pressure derivative of shear modulus
                             'molar_mass': .055845, #molar mass in units of [kg/mol]
                             'n': 1, #number of atoms per formula unit
-                            'ref_Debye': 998.85, #Debye temperature for material. 
+                            'Debye_0': 998.85, #Debye temperature for material. 
                             	#See Stixrude & Lithgow-Bertelloni, 2005 for values 
-                            'ref_grueneisen': 1.368, #Gruneisen parameter for material. 
+                            'grueneisen_0': 1.368, #Gruneisen parameter for material. 
                             	#See Stixrude & Lithgow-Bertelloni, 2005 for values
-                            'q0': 0.917, #isotropic strain derivative of gruneisen
+                            'q_0': 0.917, #isotropic strain derivative of gruneisen
                             	#parameter. Values in Stixrude & Lithgow-Bertelloni, 2005 
-       						 'eta_0s': 3.0} #full strain derivative of gruneisen parameter
+       			    'eta_s_0': 3.0} #full strain derivative of gruneisen parameter
                					#parameter. Values in Stixrude & Lithgow-Bertelloni, 2005
                					
     

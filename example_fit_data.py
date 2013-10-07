@@ -24,9 +24,9 @@ import burnman
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
         sys.path.insert(1,os.path.abspath('..')) 
 
-def calc_shear_velocities(ref_G, G_prime, mineral, pressures): 
+def calc_shear_velocities(G_0, G_prime, mineral, pressures): 
 
-    mineral.params['ref_G'] = ref_G
+    mineral.params['G_0'] = G_0
     mineral.params['G_prime'] = G_prime
 
     shear_velocities = np.empty_like(pressures)
@@ -54,8 +54,8 @@ pressures = np.linspace(25.e9, 135.e9, 100)
 #make the mineral to fit
 guess = [200.e9, 2.0]
 mg_perovskite_test = burnman.material()
-mg_perovskite_test.params['ref_V'] = 24.45e-6
-mg_perovskite_test.params['ref_K'] = 281.e9
+mg_perovskite_test.params['V_0'] = 24.45e-6
+mg_perovskite_test.params['K_0'] = 281.e9
 mg_perovskite_test.params['K_prime'] = 4.1
 mg_perovskite_test.params['molar_mass'] = .10
 
