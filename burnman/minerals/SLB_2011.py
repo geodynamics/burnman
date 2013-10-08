@@ -10,7 +10,7 @@ from burnman.minerals_base import *
 
 class stishovite (helper_uncertainty):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
     def __init__(self,peturb=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]):
         self.params = {
