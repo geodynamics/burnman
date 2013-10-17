@@ -63,6 +63,8 @@ if __name__ == "__main__":
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+
+    print seis_p[0], seis_p[-1]
     
     #temperature = burnman.geotherm.brown_shankland(seis_p)
     
@@ -90,9 +92,10 @@ if __name__ == "__main__":
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-        return vs_err, vphi_err
+        scale = 2700e3-850e3
+        return vs_err/scale, vphi_err/scale
 
-    xx=np.linspace(0.0, 1.0, 200) #200 for final image
+    xx=np.linspace(0.0, 1.0, 10) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
