@@ -1,8 +1,8 @@
-burnman/minerals_base.py:117: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
+burnman/minerals_base.py:120: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
-burnman/minerals_base.py:117: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase'
+burnman/minerals_base.py:120: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
-burnman/minerals_base.py:117: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
+burnman/minerals_base.py:120: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 
 
