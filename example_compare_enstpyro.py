@@ -105,14 +105,12 @@ if __name__ == "__main__":
         burnman.averaging_schemes.voigt_reuss_hill())
     
     print "Calculations are done for:"
-    for ph in pyrolite.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
+    pyrolite.debug_print()
     
     enstatite.set_method(method)
     
     print "Calculations are done for:"
-    for ph in enstatite.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
+    enstatite.debug_print()
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \
         burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \

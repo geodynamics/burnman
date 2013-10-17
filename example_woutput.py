@@ -66,8 +66,7 @@ if __name__ == "__main__":
     
     #Begin calculating velocities and density as depth
     print "Calculations are done for:"
-    for ph in rock.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
+    rock.debug_print()
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, pressures, temperature, \

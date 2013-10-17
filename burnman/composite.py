@@ -4,12 +4,72 @@
 
 import numpy as np
 import warnings
-import minerals
 from collections import namedtuple
+
+class abstract_material:
+    def set_method(self, method):
+        raise NotImplementedError("need to implement this in derived class!")
+
+    def to_string(self):
+        """
+        return the name of the composite
+        """
+        return "'" + self.__class__.__name__ + "'"
+
+    def set_state(self, pressure, temperature):
+        self.pressure = pressure
+        self.temperature = temperature
+
+    def unroll(self):
+        """ return (fractions, minerals) where both are arrays. May depend on current state """
+        raise NotImplementedError("need to implement this in derived class!")
+        return ()
+
+    def density(self):
+        raise NotImplementedError("need to implement this in derived class!")
+        return inf            
+        
+
+class composite_base(abstract_material):
+    """
+    base class for writing your own composites that need to dynamically pick
+    the fractions and or minerals. The only function that needs to be implemented
+    is 
+    """
+    def set_state(self, pressure, temperature):
+        abstract_material.set_state(self, pressure, temperature)
+        #self.phases = self.unroll()
+        #check_tuple(self.phases)
+
+
+    def density(self):
+        """
+        Compute the density of the composite based on the molar volumes and masses
+        """
+        densities = np.array([ph.mineral.density() for ph in self.phases])
+        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.phases])
+        return np.sum(densities*volumes)/np.sum(volumes)
+
 
 phase = namedtuple('phase', ['mineral', 'fraction'])
 
+    
+def check_pairs(fractions, minerals):
+        if len(fractions)<1:
+            raise Exception('ERROR: we need at least one mineral')
 
+        if len(fractions) != len(minerals):
+            raise Exception('ERROR: different array lengths');
+
+        total = sum(fractions)
+        if abs(total-1.0)>1e-10:
+            raise Exception('ERROR: list of molar fractions does not add up to one')
+        for p in minerals:
+            if not isinstance(p,abstract_material):
+                raise Exception('ERROR: object is not of type abstract_material')
+
+
+# static composite of minerals/composites
 class composite:
     """
     Base class for a composite material.  The constructor takes a tuple of tuples, 
@@ -19,20 +79,31 @@ class composite:
     """
     def __init__(self, phase_tuples):
         total = 0
-        self.phases = [] # make the rock composition an immutable tuple
+        self.staticphases = [] # make the rock composition an immutable tuple
         for ph in phase_tuples:
             total += ph[1]
         if total != 1.0:
             warnings.warn('Warning: list of molar fractions does not add up to one. Normalizing')
         for ph in phase_tuples:
-            self.phases.append( phase(ph[0], ph[1]/total) )
+            self.staticphases.append( phase(ph[0], ph[1]/total) )
 
     def set_method(self, method):
         """
         set the same equation of state method for all the phases in the composite
         """
-        for ph in self.phases:
+        for ph in self.staticphases:
             ph.mineral.set_method(method) 
+
+    def unroll(self):
+        fractions = []
+        minerals = []
+
+        for p in self.staticphases:
+            p_fr,p_min = p.mineral.unroll()
+            check_pairs(p_fr, p_min)
+            fractions.extend([i*p.fraction for i in p_fr])
+            minerals.extend(p_min)
+        return (fractions, minerals)
 
     def to_string(self):
         """
@@ -40,28 +111,28 @@ class composite:
         """
         return "'" + self.__class__.__name__ + "'"
 
+    def debug_print(self):
+        (fr,mins) = self.unroll()
+        for (fr,mi) in zip(fr,mins):
+            print "%g of phase %s"%(fr,mi.to_string())
+
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
         """
         self.pressure = pressure
         self.temperature = temperature
-        for ph in self.phases:
+        for ph in self.staticphases:
             ph.mineral.set_state(pressure, temperature) 
 
-    def density(self):
-        """
-        Compute the density of the composite based on the molar volumes and masses
-        """
-        densities = np.array([ph.mineral.density() for ph in self.phases])
-        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.phases])
-        return np.sum(densities*volumes)/np.sum(volumes)
         
                 
 
 
 
 if __name__ == "__main__":
+    import minerals
+
     pyrolite = composite( [ (minerals.SLB_2005.mg_fe_perovskite(0.2), 0.8), (minerals.SLB_2005.ferropericlase(0.4), 0.8) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)

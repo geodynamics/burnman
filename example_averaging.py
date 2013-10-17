@@ -72,8 +72,7 @@ if __name__ == "__main__":
 	
 
 	print "Calculations are done for:"
-	for ph in rock.phases:
-		print ph.fraction, " of phase", ph.mineral.to_string()
+	rock.debug_print()
 
         #calculate the seismic velocities of the rock using a whole battery of averaging schemes:
 

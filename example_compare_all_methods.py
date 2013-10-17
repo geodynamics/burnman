@@ -56,8 +56,7 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)    
     
     print "Calculations are done for:"
-    for ph in rock.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
+    rock.debug_print()
     
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \

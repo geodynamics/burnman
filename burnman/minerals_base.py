@@ -8,9 +8,9 @@ import birch_murnaghan as bm
 import warnings
 import slb
 import equation_of_state as eos
+import composite
 
-
-class material:
+class material(composite.abstract_material):
     """
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature
@@ -83,6 +83,9 @@ class material:
         Returns the name of the mineral class
         """
         return "'" + self.__class__.__module__.replace(".minlib_",".") + "." + self.__class__.__name__ + "'"
+
+    def unroll(self):
+        return ([1.0],[self])
 
     def set_state(self, pressure, temperature):
         """

@@ -123,15 +123,14 @@ if __name__ == "__main__":
     rock.set_method(method)
     
     print "Calculations are done for:"
-    for ph in rock.phases:
-        print ph.fraction, " of phase", ph.mineral.to_string()
-    
+    rock.debug_print()
     
     moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
     moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt_reuss_hill())
     mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
-    mat_K, mat_G, mat_rho = moduli.K, moduli.G, moduli.rho
-    
+    mat_K = np.array([m.K for m in moduli])
+    mat_G = np.array([m.G for m in moduli])
+    mat_rho = np.array([m.rho for m in moduli])
     [rho_err,vphi_err,vs_err]=burnman.compare_chifactor\
     	(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         

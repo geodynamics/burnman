@@ -84,15 +84,15 @@ def dTdP(temperature, pressure, rock):
     """
     top = 0
     bottom = 0
-    for ph in rock.phases:
-        ph.mineral.set_state(pressure, temperature)
+    rock.set_state(pressure, temperature)
+    (fractions,minerals) = rock.unroll()
+    for (fr,mineral) in zip(fractions,minerals):
+        gr = mineral.grueneisen_parameter()
+        K_s = mineral.adiabatic_bulk_modulus()
+        C_p = mineral.heat_capacity_p()
 
-        gr = ph.mineral.grueneisen_parameter()
-        K_s = ph.mineral.adiabatic_bulk_modulus()
-        C_p = ph.mineral.heat_capacity_p()
-
-        top += ph.fraction*gr*C_p/K_s
-        bottom += ph.fraction*C_p
+        top += fr*gr*C_p/K_s
+        bottom += fr*C_p
     
     return temperature*top/bottom
 

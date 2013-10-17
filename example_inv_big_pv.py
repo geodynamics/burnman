@@ -32,8 +32,8 @@ def calc_velocities(mg_pv_K,mg_pv_K_prime,mg_pv_G,mg_pv_G_prime,fe_pv_K,fe_pv_K_
 				(minerals.SLB_2005.ferropericlase(0.5), 1.0-amount_perovskite) ] )
 
 
-    mg_pv = rock.phases[0].mineral.base_materials[0]
-    fe_pv = rock.phases[0].mineral.base_materials[1]
+    mg_pv = rock.staticphases[0].mineral.base_materials[0]
+    fe_pv = rock.staticphases[0].mineral.base_materials[1]
 
     mg_pv.params['K_0'] = mg_pv_K
     mg_pv.params['Kprime_0'] = mg_pv_K_prime
