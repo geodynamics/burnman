@@ -157,10 +157,7 @@ def l2(x,funca,funcb):
     """ L2 norm """
     diff=np.array(funca-funcb)
     diff=diff*diff
-    length=x[-1]-x[0]
-    assert(length>0)
-    return integrate.trapz(diff,x) / length
-    
+    return integrate.trapz(diff,x)
 
 def chi_factor(calc,obs):
     #assuming 1% a priori uncertainty on the seismic model
