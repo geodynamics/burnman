@@ -11,7 +11,7 @@ from time import time
 import pymc
 import math
 import cProfile
-from scipy.stats import norm
+import scipy.stats as sp
 import matplotlib.mlab as mlab
 
 seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
@@ -42,6 +42,8 @@ def error(a,b,c):
 	vs_err = burnman.l2(depths, mat_vs, seis_vs)
 	vp_err = burnman.l2(depths, mat_vp, seis_vp)
 	den_err = burnman.l2(depths, mat_rho, seis_rho)
+
+	print vs_err, vp_err, den_err
 
 	return vs_err + vp_err + den_err
 
@@ -74,7 +76,7 @@ def theta(p1=amount_pv,p2=iron_pv,p3=iron_fp):
 		return 1e20#float("inf")
 
 
-sig = 1e-4
+sig = 1000.0
 misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
 model = [amount_pv,iron_pv,iron_fp,misfit]
 things = ['amount_pv','iron_pv','iron_fp','misfit']
@@ -109,7 +111,7 @@ if whattodo=="plot":
 	files=sys.argv[2:]
 	print "files:",files
 
-	b=10
+	toburn=10000
 	plot_idx=1
 
 	for t in things:
@@ -119,12 +121,12 @@ if whattodo=="plot":
 		print "trace:",t
 		for filename in files:
 			db = pymc.database.pickle.load(filename)
-			newtrace=db.trace(t,chain=None).gettrace(burn=b,chain=None)
+			newtrace=db.trace(t,chain=None).gettrace(burn=toburn,chain=None)
 			if (trace!=[]):
 				trace = np.append(trace, newtrace)
 			else:
 				trace=newtrace
-			print "   adding ", newtrace.size, "burn = ",b
+			print "   adding ", newtrace.size, "burn = ",toburn
 		print "  total size ", trace.size
 		print "mean = ", trace.mean()
 		for bin in [10,20,50,100]:
@@ -133,13 +135,65 @@ if whattodo=="plot":
 			print "maxlike = ", bin_edges[a], bin_edges[a+1], (bin_edges[a]+bin_edges[a+1])/2.0
 		
 
-		(mu, sigma) = norm.fit(np.array(trace))
-		print "mu, sigma: %e %e" % (mu, sigma)
+
 		plt.subplot(2,len(things)/2,plot_idx)
-		n, bins, patches = plt.hist(np.array(trace), 60, normed=1, facecolor='green', alpha=0.75)
-		y = mlab.normpdf( bins, mu, sigma)
-		l = plt.plot(bins, y, 'r--', linewidth=2)
-		plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
+		if plot_idx==2:
+			n, bins, patches = plt.hist(np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
+			
+
+			X = sp.gumbel_l.fit(np.array(trace))
+			print X
+			dist = sp.gumbel_l(X[0],X[1])
+			x = np.array(bins)
+			y = dist.pdf(x)
+			print y
+			plt.plot(x, y,'k--',linewidth=2)
+
+			X = sp.norm.fit(np.array(trace))
+			print X
+			dist = sp.norm(X[0],X[1])
+			x = np.array(bins)
+			y = dist.pdf(x)
+			plt.plot(x, y,'r--',linewidth=2)
+
+			X = sp.genextreme.fit(np.array(trace))
+			print X
+			dist = sp.genextreme(X[0],X[1],X[2])
+			x = np.array(bins)
+			y = dist.pdf(x)
+			#plt.plot(x, y,'b--',linewidth=2)
+			
+
+		elif plot_idx==3:
+			n, bins, patches = plt.hist(np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
+
+			#copied = np.append(np.array(trace), -np.array(trace))
+			#(mu, sigma) = sp.norm.fit(copied)
+			#y = mlab.normpdf( bins, mu, sigma)
+			#l = plt.plot(bins, y, 'r--', linewidth=2)
+
+			X = sp.expon.fit(np.array(trace),floc=0)
+
+			print X
+
+
+			#X = sp.burr.fit(np.array(trace))
+			dist = sp.expon(X[0],X[1])
+			#print X
+			print bins
+			print dist.pdf(np.array(bins))
+			plt.plot(bins, dist.pdf(np.array(bins)),'r--', linewidth=2)
+			plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
+			
+			
+
+		else:
+			(mu, sigma) = sp.norm.fit(np.array(trace))
+			print "mu, sigma: %e %e" % (mu, sigma)
+			n, bins, patches = plt.hist(np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
+			y = mlab.normpdf( bins, mu, sigma)
+			l = plt.plot(bins, y, 'r--', linewidth=2)
+			plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
 
 		plot_idx=plot_idx+1
 
@@ -201,24 +255,27 @@ if whattodo=="show":
 	values = [float(i) for i in sys.argv[2:]]
 	mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
 
+	print "misfit: %s " % error(values[0], values[1], values[2])
+
+
 	plt.subplot(2,2,1)
-	plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='None',markersize=6)
 	plt.ylim([4, 8])
 	plt.title("Vs (km/s)")
     
     
 	# plot Vphi
 	plt.subplot(2,2,2)
-	plt.plot(seis_p/1.e9,mat_vp/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
-	plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
+	plt.plot(seis_p/1.e9,mat_vp/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
+	plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
 	plt.ylim([10, 14])
 	plt.title("Vp (km/s)")
     
 	# plot density
 	plt.subplot(2,2,3)
-	plt.plot(seis_p/1.e9,mat_rho/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')
-	plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4,label='ref')
+	plt.plot(seis_p/1.e9,mat_rho/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4,label='model 1')
+	plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='ref')
 	plt.title("density (kg/m^3)")
 	plt.legend(loc='upper left')
 	plt.ylim([4, 8])
