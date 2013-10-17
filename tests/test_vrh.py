@@ -48,12 +48,12 @@ class VRH(unittest.TestCase):
         rock.set_method('slb3') 
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock, [10e9,], [300,])
-        self.assertAlmostEqual(3791.392, rho, 2)
-        self.assertAlmostEqual(10285.368, v_p, 2)
-        self.assertAlmostEqual(6308.811, v_s, 2)
-        self.assertAlmostEqual(7260.900, v_phi, 2)
-        self.assertAlmostEqual(199.884, K_vrh/1.e9, 2)
-        self.assertAlmostEqual(150.901, G_vrh/1.e9, 2)
+        self.assertAlmostEqual(3791.392, rho[0], 2)
+        self.assertAlmostEqual(10285.368, v_p[0], 2)
+        self.assertAlmostEqual(6308.811, v_s[0], 2)
+        self.assertAlmostEqual(7260.900, v_phi[0], 2)
+        self.assertAlmostEqual(199.884, K_vrh[0]/1.e9, 2)
+        self.assertAlmostEqual(150.901, G_vrh[0]/1.e9, 2)
 
     def same(self, number):
         rock = burnman.composite (  [(mypericlase(), 1.0/number)]*number  )
@@ -61,12 +61,12 @@ class VRH(unittest.TestCase):
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock, [10e9,], [300,])
-        self.assertAlmostEqual(3791.392, rho, 2)
-        self.assertAlmostEqual(10285.368, v_p, 2)
-        self.assertAlmostEqual(6308.811, v_s, 2)
-        self.assertAlmostEqual(7260.900, v_phi, 2)
-        self.assertAlmostEqual(199.884, K_vrh/1.e9, 2)
-        self.assertAlmostEqual(150.901, G_vrh/1.e9, 2)
+        self.assertAlmostEqual(3791.392, rho[0], 2)
+        self.assertAlmostEqual(10285.368, v_p[0], 2)
+        self.assertAlmostEqual(6308.811, v_s[0], 2)
+        self.assertAlmostEqual(7260.900, v_phi[0], 2)
+        self.assertAlmostEqual(199.884, K_vrh[0]/1.e9, 2)
+        self.assertAlmostEqual(150.901, G_vrh[0]/1.e9, 2)
 
     def test_same(self):
         self.same(2)
@@ -79,12 +79,12 @@ class VRH(unittest.TestCase):
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock,[10e9,], [300,])
-        self.assertAlmostEqual(3791.392, rho, 2)
-        self.assertAlmostEqual(10285.368, v_p, 2)
-        self.assertAlmostEqual(6308.811, v_s, 2)
-        self.assertAlmostEqual(7260.900, v_phi, 2)
-        self.assertAlmostEqual(199.884, K_vrh/1.e9, 2)
-        self.assertAlmostEqual(150.901, G_vrh/1.e9, 2)
+        self.assertAlmostEqual(3791.392, rho[0], 2)
+        self.assertAlmostEqual(10285.368, v_p[0], 2)
+        self.assertAlmostEqual(6308.811, v_s[0], 2)
+        self.assertAlmostEqual(7260.900, v_phi[0], 2)
+        self.assertAlmostEqual(199.884, K_vrh[0]/1.e9, 2)
+        self.assertAlmostEqual(150.901, G_vrh[0]/1.e9, 2)
 
 
 if __name__ == '__main__':

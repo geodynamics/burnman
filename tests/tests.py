@@ -1,6 +1,7 @@
 import unittest
 from test_vrh import *
 from test_spin import *
+from test_composite import *
 
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
@@ -15,8 +16,9 @@ class TestRock(unittest.TestCase):
         rock = burnman.composite( ( ( minerals.SLB_2005.mg_fe_perovskite(0.1), amount_perovskite ), 
                                     (minerals.SLB_2005.ferropericlase(0.2), 1.0-amount_perovskite) ) )
         rock.set_method('slb2')
-        self.assertAlmostEqual(rock.phases[0].fraction, 0.3, 2)
-        self.assertAlmostEqual(rock.phases[1].fraction, 0.7, 2)
+        (fr,phases)=rock.unroll()
+        self.assertAlmostEqual(fr[0], 0.3, 2)
+        self.assertAlmostEqual(fr[1], 0.7, 2)
 
 
 #class MyTest(unittest.TestCase):
