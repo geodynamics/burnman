@@ -91,9 +91,9 @@ model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovski
 
 
 plt.plot(pressures/1.e9,model_vs_2nd_order_correct/1000.,color=colors.color(3), linestyle='-', marker='x',markevery=7,linewidth=1.5, label = "Correct 2nd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color=colors.color(3), linestyle='--', marker='x',markevery=7, linewidth=1.5, label = "Incorrect 2nd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_2nd_order_incorrect/1000.,color=colors.color(3), linestyle='--', marker='x',markevery=7, linewidth=1.5, label = "2nd order fit, 3rd order extrapolation")
 plt.plot(pressures/1.e9,model_vs_3rd_order_correct/1000.,color=colors.color(1), linestyle='-', linewidth=1.5, label = "Correct 3rd order extrapolation")
-plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color=colors.color(1), linestyle='--', linewidth=1.5, label = "Incorrect 3rd order extrapolation")
+plt.plot(pressures/1.e9,model_vs_3rd_order_incorrect/1000.,color=colors.color(1), linestyle='--', linewidth=1.5, label = "3rd order fit, 2nd order extrapolation")
 plt.scatter(obs_pressures/1.e9, obs_vs/1000., zorder=1000, marker='o',c='w')
 plt.ylim([6.7, 8])
 plt.xlim([25., 135.])
