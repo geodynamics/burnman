@@ -95,7 +95,7 @@ if __name__ == "__main__":
         scale = 2700e3-850e3
         return vs_err/scale, vphi_err/scale
 
-    xx=np.linspace(0.0, 1.0, 10) #200 for final image
+    xx=np.linspace(0.0, 1.0, 200) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
