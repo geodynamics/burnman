@@ -27,6 +27,16 @@ class stishovite (material):
             'q_0': 2.8,
             'eta_s_0': 4.6}
 
+        self.uncertainties = {
+             'err_K_0':8.e9,
+             'err_Kprime_0':0.1,
+             'err_G_0':12.e9,
+             'err_Gprime_0':0.1,
+             'err_Debye_0' : 13.,
+             'err_grueneisen_0': .17,
+             'err_q_0': 2.2,
+             'err_eta_s_0' : 1.0 
+            }
 
 
 class periclase (material):
