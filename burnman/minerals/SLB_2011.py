@@ -12,7 +12,7 @@ class stishovite (material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
-    def __init__(self:
+    def __init__(self)
         self.params = {
             'equation_of_state': 'slb3',
             'V_0': 14.02e-6,
