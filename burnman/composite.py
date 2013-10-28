@@ -34,21 +34,14 @@ class composite_base(abstract_material):
     """
     base class for writing your own composites that need to dynamically pick
     the fractions and or minerals. The only function that needs to be implemented
-    is 
+    is unroll, which returns (fractions,minerals), both arrays. unroll may depend
+    on temperature and pressure, and the fractions are molar fractions, rather 
+    than volume. 
     """
     def set_state(self, pressure, temperature):
         abstract_material.set_state(self, pressure, temperature)
-        #self.phases = self.unroll()
-        #check_tuple(self.phases)
 
 
-    def density(self):
-        """
-        Compute the density of the composite based on the molar volumes and masses
-        """
-        densities = np.array([ph.mineral.density() for ph in self.phases])
-        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.phases])
-        return np.sum(densities*volumes)/np.sum(volumes)
 
 
 phase = namedtuple('phase', ['mineral', 'fraction'])
@@ -66,6 +59,7 @@ def check_pairs(fractions, minerals):
             raise Exception('ERROR: list of molar fractions does not add up to one')
         for p in minerals:
             if not isinstance(p,abstract_material):
+                print type(p)
                 raise Exception('ERROR: object is not of type abstract_material')
 
 
@@ -125,6 +119,14 @@ class composite(composite_base):
         for ph in self.staticphases:
             ph.mineral.set_state(pressure, temperature) 
 
+    def density(self):
+        """
+        Compute the density of the composite based on the molar volumes and masses
+        """
+        densities = np.array([ph.mineral.density() for ph in self.staticphases])
+        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.staticphases])
+        return np.sum(densities*volumes)/np.sum(volumes)
+
         
                 
 
@@ -136,5 +138,5 @@ if __name__ == "__main__":
     pyrolite = composite( [ (minerals.SLB_2005.mg_fe_perovskite(0.2), 0.8), (minerals.SLB_2005.ferropericlase(0.4), 0.8) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
-    print pyrolite.phases[0].mineral.density(), pyrolite.phases[1].mineral.density(), pyrolite.density()
+    print pyrolite.staticphases[0].mineral.density(), pyrolite.staticphases[1].mineral.density(), pyrolite.density()
 

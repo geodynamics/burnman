@@ -5,11 +5,8 @@
 import numpy as np
 import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
-import seismic
-import minerals
 import burnman
 from tools import *
-from composite import *
 
 
 def watson_baxter(pressure):
@@ -38,7 +35,7 @@ def brown_shankland(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])
+      depth = burnman.seismic.prem_model.depth(pressure[i])
       temperature[i] = lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
     return temperature
 
@@ -51,7 +48,7 @@ def anderson(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])
+      depth = burnman.seismic.prem_model.depth(pressure[i])
       temperature[i] = lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
     return temperature
 
@@ -109,7 +106,7 @@ table_anderson_temperature = np.array(table_anderson)[:,1]
 if __name__ == "__main__":
     p = np.arange(1.0e9,128.0e9,3e9)
   
-    pyrolite = composite( [ (minerals.SLB_2011.mg_fe_perovskite(0.2), 0.8), (minerals.SLB_2011.ferropericlase(0.4), 0.2) ] )
+    pyrolite = burnman.composite( [ (burnman.minerals.SLB_2011.mg_fe_perovskite(0.2), 0.8), (burnman.minerals.SLB_2011.ferropericlase(0.4), 0.2) ] )
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
 
@@ -120,6 +117,6 @@ if __name__ == "__main__":
     p1,=pyplot.plot(p,t1,'x--r')
     p2,=pyplot.plot(p,t2,'*-g')
     p3,=pyplot.plot(p,t3,'*-b')
-    pyplot.legend([p1,p2,p3],[ "watson", "brown", "self consistent"], loc=4)
+    pyplot.legend([p1,p2,p3],[ "watson", "brown", "adiabatic"], loc=4)
 
     pyplot.show()
