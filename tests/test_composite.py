@@ -85,7 +85,18 @@ class composite(unittest.TestCase):
         mins=",".join([a.to_string() for a in m])
         self.assertArraysAlmostEqual(f,[0.3,0.7])
         self.assertEqual(mins,",".join([minerals.Murakami_etal_2012.fe_periclase().to_string(),minerals.SLB_2005.periclase().to_string()]))
-        
+
+    def test_nest(self):
+        min1 = minerals.Murakami_etal_2012.fe_periclase()
+        min2 = minerals.SLB_2005.periclase()
+        ca = burnman.composite( [(min1,1.0)] )
+        c = burnman.composite( [(ca,0.4),(min2, 0.6)] )
+        c.set_method("slb3")
+        c.set_state(5e9,1000)
+        (f,m) = c.unroll()
+        mins=",".join([a.to_string() for a in m])
+        self.assertArraysAlmostEqual(f,[0.4,0.6])
+        self.assertEqual(mins,",".join([min1.to_string(),min2.to_string()]))
 
 if __name__ == '__main__':
     unittest.main()
