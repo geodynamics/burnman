@@ -58,9 +58,19 @@ class periclase (material):
             'q_0': 1.7, #1.7
             'eta_s_0': 2.8 } # 2.8
 
+        self.uncertainties = {
+        'err_K_0': 3.e9,
+        'err_Kprime_0':.2,
+        'err_G_0':1.0e9,
+        'err_Gprime_0':.1,
+        'err_Debye_0':9.,
+        'err_grueneisen_0':.05,
+        'err_q_0':.2,
+        'err_eta_s_0':.2 }
+
 class wuestite (material):
     """
-    Stixrude & Lithgow-Bertelloni 2011 and references therein 
+    Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self):
         self.params = {
@@ -77,6 +87,15 @@ class wuestite (material):
             'q_0': 1.7, #1.7
             'eta_s_0': -0.1 } #
 
+        self.uncertainties = {
+            'err_K_0':1.e9,
+            'err_Kprime_0':.2,
+            'err_G_0':1.e9,
+            'err_Gprime_0':.1,
+            'err_Debye_0':21.,
+            'err_grueneisen_0':.13,
+            'err_q_0':1.0,
+            'err_eta_s_0':1.0}
 
 
 class ferropericlase(helper_solid_solution):
@@ -110,9 +129,20 @@ class mg_perovskite(material):
             'q_0': 1.1,
             'eta_s_0': 2.6 } #2.6
 
+        self.uncertainties = {
+            'err_K_0': 3.e9,
+            'err_Kprime_0': 0.1,
+            'err_G_0': 2.e9,
+            'err_Gprime_0' : 0.0,
+            'err_Debye_0': 5.,
+            'err_grueneisen_0':.05,
+            'err_q_0': .3,
+            'err_eta_s_0':.3}
+
+
 class fe_perovskite(material):
     """
-    Stixrude & Lithgow-Bertelloni 2011 and references therein 
+    Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self):
         self.params = {
@@ -129,6 +159,15 @@ class fe_perovskite(material):
             'q_0': 1.1,
             'eta_s_0': 2.3 } #2.3
 
+        self.uncertainties = {
+            'err_K_0':40e9,
+            'err_Kprime_0':1.,
+            'err_G_0':40e9,
+            'err_Gprime_0':0.0,
+            'err_Debye_0':26.,
+            'err_grueneisen_0':.3,
+            'err_q_0':1.0,
+            'err_eta_s_0':1.0}
 
 class mg_fe_perovskite_pt_dependent(helper_fe_dependent):
     def __init__(self, iron_number_with_pt, idx):
