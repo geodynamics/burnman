@@ -39,18 +39,16 @@ def calc_velocities(a,b,c):
 def error(a,b,c): 
 	mat_vp, mat_vs, mat_rho = calc_velocities(a,b,c)
 	
-	vs_err = burnman.l2(depths, mat_vs, seis_vs)
-	vp_err = burnman.l2(depths, mat_vp, seis_vp)
-	den_err = burnman.l2(depths, mat_rho, seis_rho)
+	vs_err = burnman.l2(depths, mat_vs, seis_vs) /1e9
+	vp_err = burnman.l2(depths, mat_vp, seis_vp) /1e9
+	den_err = burnman.l2(depths, mat_rho, seis_rho) /1e9
 
-	print vs_err, vp_err, den_err
+	#print vs_err, vp_err, den_err
 
 	return vs_err + vp_err + den_err
 
 
 # Priors on unknown parameters:
-sigma = 10.0e9
-prime_sigma = 0.1
 amount_pv = pymc.Uniform('amount_pv', lower= 0.0, upper=1.0, value=0.5)
 iron_pv = pymc.Uniform('iron_pv', lower= 0.0, upper=1.0, value=0.5)
 iron_fp = pymc.Uniform('iron_fp', lower= 0.0, upper=1.0, value=0.5)
@@ -76,7 +74,7 @@ def theta(p1=amount_pv,p2=iron_pv,p3=iron_fp):
 		return 1e20#float("inf")
 
 
-sig = 1000.0
+sig = 10.0
 misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
 model = [amount_pv,iron_pv,iron_fp,misfit]
 things = ['amount_pv','iron_pv','iron_fp','misfit']
@@ -111,7 +109,7 @@ if whattodo=="plot":
 	files=sys.argv[2:]
 	print "files:",files
 
-	toburn=10000
+	toburn=1000
 	plot_idx=1
 
 	for t in things:
@@ -200,6 +198,47 @@ if whattodo=="plot":
 	plt.savefig("output_figures/example_inv_murakami.png")
 	plt.show()
 	
+
+if whattodo=="misfittest":
+
+	for a in np.linspace(0.4,0.8,10):
+		for b in np.linspace(0.05,0.2,5):
+			for c in np.linspace(0,0.2,5):
+				mat_vp, mat_vs, mat_rho = calc_velocities(a,b,c)
+				misfit = error(a,b,c)
+				print "misfit: %s " % misfit
+				if misfit<25:
+					plt.subplot(2,2,1)
+					plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
+					plt.subplot(2,2,2)
+					plt.plot(seis_p/1.e9,mat_vp/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
+					plt.subplot(2,2,3)
+					plt.plot(seis_p/1.e9,mat_rho/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4,label='model 1')
+
+
+
+	plt.subplot(2,2,1)
+	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='None',markersize=6)
+	plt.ylim([4, 8])
+	plt.title("Vs (km/s)")
+    
+    
+	# plot Vphi
+	plt.subplot(2,2,2)
+	plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
+	plt.ylim([10, 14])
+	plt.title("Vp (km/s)")
+    
+	# plot density
+	plt.subplot(2,2,3)
+	plt.plot(seis_p/1.e9,seis_rho/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4,label='ref')
+	plt.title("density (kg/m^3)")
+	plt.legend(loc='upper left')
+	plt.ylim([4, 8])
+	plt.savefig("output_figures/example_inv_murakami_2.png")
+	plt.show()
+   
+
 if whattodo=="test":
     db = pymc.database.pickle.load(dbname)
     S = pymc.MCMC(model, db=db)
