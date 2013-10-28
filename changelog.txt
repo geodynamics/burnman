@@ -1,6 +1,8 @@
 Changelog
 ---------
 
+- Release v0.5 (October 28, 2013)
+
 - New example for absolute beginners (October 28, 2013)
   Added an example script for beginners to burnman, as well as people
   less familiar with python scripts.  Goes through all of the basic
