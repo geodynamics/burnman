@@ -8,33 +8,25 @@ from burnman.minerals_base import *
 
 
 
-class stishovite (helper_uncertainty):
+class stishovite (material):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
-    def __init__(self,peturb=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]):
+    def __init__(self:
         self.params = {
             'equation_of_state': 'slb3',
             'V_0': 14.02e-6,
             'K_0': 314.0e9,
-            'err_K_0':8.e9,
             'Kprime_0': 3.8,
-            'err_Kprime_0':0.1,
             'G_0': 220.0e9,
-            'err_G_0':12.e9,
             'Gprime_0': 1.9,
-            'err_Gprime_0':0.1,
             'molar_mass': .0601,
             'n': 3,
             'Debye_0': 1108.,
-            'err_Debye_0' : 13.,
             'grueneisen_0': 1.37,
-            'err_grueneisen_0': .17,
             'q_0': 2.8,
-            'err_q_0': 1.2,    # decreased so things don't crash... not the published value (which is 2.2)
-            'eta_s_0': 4.6,
-            'err_eta_s_0' : 1.0 }
-        helper_uncertainty.__init__(self,peturb)
+            'eta_s_0': 4.6}
+
 
 
 class periclase (material):
