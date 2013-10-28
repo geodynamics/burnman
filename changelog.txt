@@ -1,0 +1,10 @@
+Changelog
+---------
+
+
+
+- Nested Composites (October 17, 2013)
+  You can now nest composites and implement dynamic composites that reduce to
+  different sets of minerals depending on T,p. (no example yet)
+
+- Release v0.4 (June 3, 2013)
