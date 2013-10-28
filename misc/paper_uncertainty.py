@@ -81,8 +81,8 @@ if __name__ == "__main__":
         vphimin = base_vphi
         vphimax = base_vphi
 
-        #testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
-        testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
+        testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
+        #testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
         for x in testrange:
             print i, names[i], x
             uncertain = np.ones(len)
