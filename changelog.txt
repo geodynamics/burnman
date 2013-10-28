@@ -1,7 +1,11 @@
 Changelog
 ---------
 
-
+- New example for absolute beginners (October 28, 2013)
+  Added an example script for beginners to burnman, as well as people
+  less familiar with python scripts.  Goes through all of the basic
+  steps of creating a rock, calculating seismic properties, and plotting
+  them
 
 - Nested Composites (October 17, 2013)
   You can now nest composites and implement dynamic composites that reduce to
