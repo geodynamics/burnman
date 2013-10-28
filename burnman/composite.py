@@ -70,7 +70,7 @@ def check_pairs(fractions, minerals):
 
 
 # static composite of minerals/composites
-class composite:
+class composite(composite_base):
     """
     Base class for a composite material.  The constructor takes a tuple of tuples, 
     where the inner tuple is a mineral/molar-fraction pair.  This can then be passed
