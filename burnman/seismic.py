@@ -114,6 +114,13 @@ class prem(radiustable):
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
 
+    def grav(self,depths):
+        table = tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
+        table = np.array(table)
+        table_rad = table[:,0]
+        table_g = table[:,1]
+        return np.interp(self.earth_radius-depths, table_rad,table_g)
+
 
 class slow(radiustable):
     """ 

@@ -10,6 +10,7 @@ from composite import composite,composite_base,abstract_material
 import seismic
 import tools
 import averaging_schemes
+import geotherm
 
 #phase = namedtuple('phase', ['mineral', 'fraction'])
 
@@ -114,6 +115,46 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     mat_G = np.array([m.G for m in moduli])
     return mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G
 
+def depths_for_rock(rock,pressures, temperatures,averaging_scheme=averaging_schemes.voigt_reuss_hill()):
+    """
+        Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
+        Only simplification is using g from PREM 
+        """
+    moduli_list = calculate_moduli(rock, pressures, temperatures)
+    moduli = average_moduli(moduli_list, averaging_scheme)
+    mat_rho = np.array([m.rho for m in moduli])
+    seismic_model = seismic.prem()
+    depthsref=np.array(map(seismic_model.depth,pressures))
+    pressref=np.zeros_like(pressures)
+    g=seismic_model.grav(depthsref) # G for prem
+    depths= np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))
+    return depths
+
+def pressures_for_rock(rock, depths, temp, averaging_scheme=averaging_schemes.voigt_reuss_hill()):
+    """
+        Function computes the self-consistent pressures (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
+        Only simplification is using g from PREM
+        """
+    # use PREM pressures as inital guestimate
+    seismic_model = seismic.prem()
+    pressures,_,_,_,_ = seismic_model.evaluate_all_at(depths)
+    pressref=np.zeros_like(pressures)
+    #gets table with PREM gravities
+    g=seismic_model.grav(depths)
+    #optimize pressures for this composition
+    while nrmse(len(pressures),pressures,pressref)>1.e-6:
+        # calculate density
+        if len([temp])==1:
+            temperatures= geotherm.adiabatic(pressures,temp,rock)
+        else:
+            temperatures=temp
+        moduli_list = calculate_moduli(rock, pressures, temperatures)
+        moduli = average_moduli(moduli_list, averaging_scheme)
+        mat_rho = np.array([m.rho for m in moduli])
+        # calculate pressures
+        pressref=pressures
+        pressures=np.hstack((pressref[0], pressref[0]+integrate.cumtrapz(g*mat_rho,depths)))
+    return pressures
 
 def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """
@@ -158,6 +199,15 @@ def l2(x,funca,funcb):
     diff=np.array(funca-funcb)
     diff=diff*diff
     return integrate.trapz(diff,x)
+
+
+def nrmse(x,funca,funcb):
+    """ normalized root mean square error """
+    diff=np.array(funca-funcb)
+    diff=diff*diff
+    rmse=np.sqrt(np.sum(diff)/x)
+    nrmse=rmse/(np.max(funca)-np.min(funca))
+    return nrmse
 
 def chi_factor(calc,obs):
     #assuming 1% a priori uncertainty on the seismic model
