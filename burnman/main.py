@@ -118,7 +118,7 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
 def depths_for_rock(rock,pressures, temperatures,averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     """
         Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
-        Only simplification is using g from PREM 
+        Only simplification is using g from PREM
         """
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
@@ -130,7 +130,7 @@ def depths_for_rock(rock,pressures, temperatures,averaging_scheme=averaging_sche
     depths= np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))
     return depths
 
-def pressures_for_rock(rock, depths, temp, averaging_scheme=averaging_schemes.voigt_reuss_hill()):
+def pressures_for_rock(rock, depths, T0, averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     """
         Function computes the self-consistent pressures (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
         Only simplification is using g from PREM
@@ -144,10 +144,7 @@ def pressures_for_rock(rock, depths, temp, averaging_scheme=averaging_schemes.vo
     #optimize pressures for this composition
     while nrmse(len(pressures),pressures,pressref)>1.e-6:
         # calculate density
-        if len([temp])==1:
-            temperatures= geotherm.adiabatic(pressures,temp,rock)
-        else:
-            temperatures=temp
+        temperatures= geotherm.adiabatic(pressures,T0,rock)
         moduli_list = calculate_moduli(rock, pressures, temperatures)
         moduli = average_moduli(moduli_list, averaging_scheme)
         mat_rho = np.array([m.rho for m in moduli])
