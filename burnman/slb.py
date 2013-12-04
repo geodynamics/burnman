@@ -69,17 +69,7 @@ class slb_base(equation_of_state):
         func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21 
     
-        V = 0.
-        try:
-          V = opt.brentq(func, 0.6*params['V_0'], 1.2*params['V_0']) 
-        except ValueError:
-          vols = np.linspace(0.3*params['V_0'], 1.5*params['V_0'], 100)
-          press = []
-          for v in vols:
-            press.append(func(v))
-            print func(v)
-          plt.plot(vols, press)
-          plt.show()
+        V = opt.brentq(func, 0.6*params['V_0'], 1.2*params['V_0']) 
         return V
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
