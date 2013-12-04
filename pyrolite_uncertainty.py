@@ -91,6 +91,11 @@ for i in range(n_realizations):
   except ValueError:
     print "failed, skipping"
   
+f=open('output_pyrolite_uncertainty.txt','wb')
+f.write("#pressure\t Vs \t Vp \t rho \n")
+data=zip(pressure_list, vs_list, vp_list, density_list)
+np.savetxt(f,data,fmt='%.10e',delimiter='\t')
+
 density_hist,rho_xedge,rho_yedge = np.histogram2d(pressure_list, density_list, bins=len(pressures_sampled), normed = True)
 vs_hist,vs_xedge,vs_yedge = np.histogram2d(pressure_list, vs_list, bins=len(pressures_sampled), normed = True)
 vp_hist,vp_xedge,vp_yedge = np.histogram2d(pressure_list, vp_list, bins=len(pressures_sampled), normed = True)
