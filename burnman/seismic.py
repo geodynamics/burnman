@@ -12,7 +12,7 @@ class seismic_data:
     base class for all seismic models
     """
     def __init__(self):
-        1 # how else to make an empty function?
+        pass
         
     # depth in km
     def internal_depth_list(self):
