@@ -152,7 +152,7 @@ mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = burnman.velocities
 mat_vs_3_wr = 0.5*((0.834*mat_vs_1 + 0.166*mat_vs_2) + np.ones_like(mat_vs_1)/(0.834/mat_vs_1 + 0.166/mat_vs_2))
 mat_vs_4_wr = 0.5*((0.92*mat_vs_1 + 0.08*mat_vs_2) + np.ones_like(mat_vs_1)/(0.92/mat_vs_1 + 0.08/mat_vs_2))
 
-plt.subplot(1,2,1)
+plt.subplot(1,2,2)
 plt.ylim(4.8,7.4)
 plt.xlim(25,135)
 #fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
@@ -168,14 +168,14 @@ plt.plot(seis_p/1.e9,mat_vs_4_wr/1.e3,color=colors.color(4),dashes=dashstyle3, \
          markeredgecolor=colors.color(4),label='92\% pv')
 plt.plot(seis_p/1.e9,mat_vs_3_wr/1.e3,color='g',linestyle='-',dashes=dashstyle2, \
          linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',label='83\% pv')
+plt.legend(loc='lower right',prop={'size':12})
 
-#plt.legend(loc='lower right')
 
 plt.title("Phase average on velocities")
-plt.ylabel("Shear Velocity Vs (km/s)")
+
 plt.xlabel("Pressure (GPa)")
 
-plt.subplot(1,2,2)
+plt.subplot(1,2,1)
 plt.ylim(4.8,7.4)
 plt.xlim(25,135)
 #fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
@@ -191,9 +191,10 @@ plt.plot(seis_p/1.e9,mat_vs_4/1.e3,color=colors.color(4),dashes=dashstyle3, \
          markeredgecolor=colors.color(4),label='92\% pv')
 plt.plot(seis_p/1.e9,mat_vs_3/1.e3,color='g',linestyle='-',dashes=dashstyle2, \
          linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',label='83\% pv')
-plt.legend(loc='lower right',prop={'size':12})
+
 plt.title(" V.-R.-H. on moduli")
 plt.xlabel("Pressure (GPa)")
+plt.ylabel("Shear Velocity Vs (km/s)")
 plt.savefig("example_incorrect_averaging.pdf")
 plt.show()
 
