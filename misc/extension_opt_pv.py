@@ -71,8 +71,8 @@ if __name__ == "__main__":
     def eval_material(amount_perovskite):
 #        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
 #                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-        rock = burnman.composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.08), amount_perovskite),
-                             (minerals.SLB_2011.ferropericlase(0.21), 1.0 - amount_perovskite) ] )
+        rock = burnman.composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
+                             (minerals.SLB_2011.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
         rock.set_method(method)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         scale = 2700e3-850e3
         return vs_err/scale, vphi_err/scale
 
-    xx=np.linspace(0.0, 1.0, 100) #200 for final image
+    xx=np.linspace(0.0, 1.0, 200) #200 for final image
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]
