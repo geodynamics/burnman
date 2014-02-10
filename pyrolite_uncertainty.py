@@ -141,17 +141,43 @@ vs_list = data[:,1]
 vphi_list = data[:,2]
 infile.close()
 
+
+#get 2d histograms
 density_hist,rho_xedge,rho_yedge = np.histogram2d(pressure_list, density_list, bins=len(pressures_sampled), normed = True)
 vs_hist,vs_xedge,vs_yedge = np.histogram2d(pressure_list, vs_list, bins=len(pressures_sampled), normed = True)
 vphi_hist,vphi_xedge,vphi_yedge = np.histogram2d(pressure_list, vphi_list, bins=len(pressures_sampled), normed = True)
 
-
+#get edges of the histograms
 vs_xedge = vs_xedge/1.e9
 vphi_xedge = vphi_xedge/1.e9
 rho_xedge = rho_xedge/1.e9
 vs_yedge = vs_yedge/1.e3
 vphi_yedge = vphi_yedge/1.e3
 rho_yedge = rho_yedge/1.e3
+
+
+#calculate interquartile range at each depth slice
+from scipy.stats import scoreatpercentile
+vs_lower = np.empty_like(pressures_sampled)
+vs_upper = np.empty_like(pressures_sampled)
+vphi_lower = np.empty_like(pressures_sampled)
+vphi_upper = np.empty_like(pressures_sampled)
+rho_lower = np.empty_like(pressures_sampled)
+rho_upper = np.empty_like(pressures_sampled)
+for i in range(len(pressures_sampled)):
+  vs_dist = np.cumsum(vs_hist[i,:])/np.sum(vs_hist[i,:])
+  vphi_dist = np.cumsum(vphi_hist[i,:])/np.sum(vphi_hist[i,:])
+  rho_dist = np.cumsum(density_hist[i,:])/np.sum(density_hist[i,:])
+  vs_fun = interpolate.interp1d(vs_dist, vs_yedge[:-1])
+  vphi_fun = interpolate.interp1d(vphi_dist, vphi_yedge[:-1])
+  rho_fun = interpolate.interp1d(rho_dist, rho_yedge[:-1])
+  vs_lower[i] = vs_fun(0.25)
+  vs_upper[i] = vs_fun(0.75)
+  vphi_lower[i] = vphi_fun(0.25)
+  vphi_upper[i] = vphi_fun(0.75)
+  rho_lower[i] = rho_fun(0.25)
+  rho_upper[i] = rho_fun(0.75)
+  
 
 '''
 #do some setup for the figure
@@ -231,6 +257,8 @@ c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff')
 c.set_bad('w', alpha=1.0)
 plt.imshow(vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', alpha=.7,\
            aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]])
+plt.plot(pressures_sampled/1.e9,vs_upper,linestyle="-",color='b',linewidth=0.5)
+plt.plot(pressures_sampled/1.e9,vs_lower,linestyle="-",color='b',linewidth=0.5)
 plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
 #plot v_phi
@@ -239,6 +267,8 @@ c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff')
 c.set_bad('w', alpha=1.0)
 plt.imshow(vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7, \
            aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]])
+plt.plot(pressures_sampled/1.e9,vphi_upper,linestyle="-",color='r',linewidth=.5)
+plt.plot(pressures_sampled/1.e9,vphi_lower,linestyle="-",color='r',linewidth=.5)
 plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
 #plot density
@@ -247,6 +277,8 @@ c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff')
 c.set_bad('w', alpha=1.0)
 plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian', alpha=.7,\
            aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
+plt.plot(pressures_sampled/1.e9,rho_upper,linestyle="-",color='g',linewidth=.5)
+plt.plot(pressures_sampled/1.e9,rho_lower,linestyle="-",color='g',linewidth=.5)
 plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
 
