@@ -68,8 +68,21 @@ class slb_base(equation_of_state):
         f = lambda x: 0.5*(pow(params['V_0']/x,2./3.)-1.) # EQ 24
         func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21 
-    
-        V = opt.brentq(func, 0.6*params['V_0'], 1.2*params['V_0']) 
+
+        # we need to have a sign change in [a,b] to find a zero. Let us start with a
+        # conservative guess and increase the interval slowly (otherwise we might end up
+        # with values for a and b that we can not evaluate)
+        a = 0.6*params['V_0']
+        b = 1.2*params['V_0']
+        
+        steps = 0
+        while (func(a)*func(b) > 0 and steps<100):
+            a *= 0.9
+            b *= 1.1
+            steps += 1
+            print a, b, func(a), func(b)
+
+        V = opt.brentq(func, a, b) 
         return V
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
