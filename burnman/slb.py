@@ -80,7 +80,6 @@ class slb_base(equation_of_state):
             a *= 0.9
             b *= 1.1
             steps += 1
-            print a, b, func(a), func(b)
 
         V = opt.brentq(func, a, b) 
         return V
