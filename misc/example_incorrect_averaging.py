@@ -20,7 +20,7 @@ import numpy as np
 import colors
 
 
-plt.figure(dpi=100,figsize=(10,5))
+plt.figure(dpi=100,figsize=(12,6))
 prop={'size':12}
 plt.rc('text', usetex=True)
 plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
@@ -153,7 +153,7 @@ mat_vs_3_wr = 0.5*((0.834*mat_vs_1 + 0.166*mat_vs_2) + np.ones_like(mat_vs_1)/(0
 mat_vs_4_wr = 0.5*((0.92*mat_vs_1 + 0.08*mat_vs_2) + np.ones_like(mat_vs_1)/(0.92/mat_vs_1 + 0.08/mat_vs_2))
 
 plt.subplot(1,2,2)
-plt.ylim(4.8,7.4)
+plt.ylim(5.2,7.4)
 plt.xlim(25,135)
 #fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
 #plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
@@ -176,7 +176,7 @@ plt.title("Phase average on velocities")
 plt.xlabel("Pressure (GPa)")
 
 plt.subplot(1,2,1)
-plt.ylim(4.8,7.4)
+plt.ylim(5.2,7.4)
 plt.xlim(25,135)
 #fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
 #plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
@@ -195,7 +195,8 @@ plt.plot(seis_p/1.e9,mat_vs_3/1.e3,color='g',linestyle='-',dashes=dashstyle2, \
 plt.title(" V.-R.-H. on moduli")
 plt.xlabel("Pressure (GPa)")
 plt.ylabel("Shear Velocity Vs (km/s)")
-plt.savefig("example_incorrect_averaging.pdf")
+plt.tight_layout()
+plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
 plt.show()
 
 
