@@ -159,15 +159,15 @@ plt.xlim(25,135)
 #plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
 plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='None',markerfacecolor='w',markersize=4,label='PREM',linewidth=3.0,mew=1.5)
 plt.plot(seis_p/1.e9,mat_vs_1/1.e3,color=colors.color(3),marker='v',markerfacecolor=colors.color(3), \
-         markersize=4, markeredgecolor=colors.color(3),linewidth=1.5,label='perovskite')
+         markersize=4, markeredgecolor=colors.color(3),markevery=2,linewidth=1.5,label='perovskite')
 plt.plot(seis_p/1.e9,mat_vs_2/1.e3,color=colors.color(1),linestyle='-', \
          linewidth=1.5,marker='^',markerfacecolor=colors.color(1), markersize=4, \
-         markeredgecolor=colors.color(1),label='periclase')
+         markeredgecolor=colors.color(1),markevery=2,label='periclase')
 plt.plot(seis_p/1.e9,mat_vs_4_wr/1.e3,color=colors.color(4),dashes=dashstyle3, \
          linewidth=1.5,marker='o',markerfacecolor=colors.color(4), markersize=4,  \
-         markeredgecolor=colors.color(4),label='92\% pv')
+         markeredgecolor=colors.color(4),markevery=2,label='92\% pv')
 plt.plot(seis_p/1.e9,mat_vs_3_wr/1.e3,color='g',linestyle='-',dashes=dashstyle2, \
-         linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',label='83\% pv')
+         linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',markevery=2,label='83\% pv')
 plt.legend(loc='lower right',prop={'size':12})
 
 
@@ -182,15 +182,15 @@ plt.xlim(25,135)
 #plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
 plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='None',markerfacecolor='w',markersize=4,label='PREM',linewidth=3.0,mew=1.5)
 plt.plot(seis_p/1.e9,mat_vs_1/1.e3,color=colors.color(3),marker='v',markerfacecolor=colors.color(3), \
-         markersize=4, markeredgecolor=colors.color(3),linewidth=1.5,label='perovskite')
+         markersize=4, markeredgecolor=colors.color(3),markevery=2,linewidth=1.5,label='perovskite')
 plt.plot(seis_p/1.e9,mat_vs_2/1.e3,color=colors.color(1),linestyle='-', \
          linewidth=1.5,marker='^',markerfacecolor=colors.color(1), markersize=4, \
-         markeredgecolor=colors.color(1),label='periclase')
+         markeredgecolor=colors.color(1),markevery=2,label='periclase')
 plt.plot(seis_p/1.e9,mat_vs_4/1.e3,color=colors.color(4),dashes=dashstyle3, \
          linewidth=1.5,marker='o',markerfacecolor=colors.color(4), markersize=4,  \
-         markeredgecolor=colors.color(4),label='92\% pv')
+         markeredgecolor=colors.color(4),markevery=2,label='92\% pv')
 plt.plot(seis_p/1.e9,mat_vs_3/1.e3,color='g',linestyle='-',dashes=dashstyle2, \
-         linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',label='83\% pv')
+         linewidth=1.5,marker='o',markerfacecolor='w', markersize=4, markeredgecolor='g',markevery=2, label='83\% pv')
 
 plt.title(" V.-R.-H. on moduli")
 plt.xlabel("Pressure (GPa)")
