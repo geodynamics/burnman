@@ -193,5 +193,5 @@ if __name__ == "__main__":
 #    plt.show()
 
     plt.tight_layout()
-    plt.savefig("extension_opt_pv.pdf",bbox_inches='tight')
+    plt.savefig("paper_opt_pv.pdf",bbox_inches='tight')
     plt.show()
