@@ -3,16 +3,30 @@
 # Released under GPL v2 or later.
 
 
-import os.path
+import os.path,sys
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+    sys.path.insert(1,os.path.abspath('..')) 
 import numpy as np, matplotlib.pyplot as plt
 import numpy.ma as ma
 import numpy.random
 import burnman
+import pickle
 from burnman import minerals
 from burnman.minerals_base import helper_solid_solution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate
+from scipy.stats import norm
+import matplotlib.mlab as mlab
+import colors
+
+import signal
+import sys
+def signal_handler(signal, frame):
+    print 'You pressed Ctrl+C!'
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+
 
 def normal(loc = 0.0, scale = 1.0):
     if scale <= 0.0:
@@ -72,6 +86,42 @@ def output_rock( rock, file_handle ):
       for key in ph.mineral.params:
         file_handle.write('\t\t' + key + ': ' + str(ph.mineral.params[key]) + '\n')
     
+def realization_to_array(rock, anchor_t):
+    arr = [anchor_t]
+    names = ['anchor_T']
+    for ph in rock.staticphases:
+        if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
+            for min in ph.mineral.base_materials:
+                for key in min.params:
+                    if key != 'equation_of_state':
+                        arr.append(min.params[key])
+                        names.append(min.to_string()+'.'+key)
+        else:
+            for key in ph.mineral.params:
+                    if key != 'equation_of_state':
+                        arr.append(ph.mineral.params[key])
+                        names.append(mph.mineral.to_string()+'.'+key)
+    return arr, names
+
+def array_to_rock(arr, names):
+    rock, _ = realize_pyrolite()
+    anchor_t = arr[0]
+    idx = 1
+    for ph in rock.staticphases:
+        if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
+            for min in ph.mineral.base_materials:
+                for key in min.params:
+                    if key != 'equation_of_state':
+                        assert(names[idx]==min.to_string()+'.'+key)
+                        min.params[key] = arr[idx]
+                        idx += 1
+        else:
+            for key in ph.mineral.params:
+                    if key != 'equation_of_state':
+                        assert(names[idx]==mph.mineral.to_string()+'.'+key)
+                        ph.mineral.params[key] = arr[idx]
+                        idx += 1
+    return rock, anchor_t
 
 #set up the seismic model
 seismic_model = burnman.seismic.prem()
@@ -85,12 +135,375 @@ min_error = np.inf
 pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure)) 
 fname = 'output_pyrolite_uncertainty.txt'
 
-if os.path.isfile(fname) == False:
+
+whattodo = ""
+
+goodfits = [];
+names = [];
+
+if len(sys.argv)<3:
+    print "options:"
+    print "run <dbname>"
+    print "plot"
+    print "plotgood <dbname1> <dbname2> ..."
+    print "plotone 1"
+else:
+    whattodo = sys.argv[1]
+    dbname = sys.argv[2]
+
+if whattodo=="plotgood":
+    files=sys.argv[2:]
+    print "files:",files
+    names = pickle.load(open(files[0]+".names","rb"));
+    erridx = names.index("err")
+    print erridx
+
+    allfits=[]
+
+    for f in files:
+        a = pickle.load(open(f,"rb"))
+        allfits.extend(a)
+        b = a
+        b = [i for i in a if i[erridx]<3e-5]
+        print "adding %d out of %d"%(len(b),len(a))
+        goodfits.extend(b)
+
+    minerr = min([f[erridx] for f in allfits])
+    print "min error is %f"%minerr
+        
+
+    num = len(goodfits)
+    print "we have %d good entries" % num
+
+    i=0
+    idx=0
+    figsize=(20,15)
+    font = {'family' : 'normal',
+            'weight' : 'normal',
+            'size'   : 8}
+
+    matplotlib.rc('font', **font)
+    prop={'size':12}
+    #plt.rc('text', usetex=True)
+    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rc('font', family='sanserif')
+    figure=plt.figure(dpi=150,figsize=figsize)
+    plt.subplots_adjust(hspace=0.3)
+    for name in names:
+        if name.endswith(".n") or name.endswith(".V_0") or name.endswith(".molar_mass"):
+            i+=1
+            continue
+        plt.subplot(5,8,idx)
+        idx += 1
+        shortname = name.replace("'burnman.minerals.SLB_2011_ZSB_2013","").replace("'","").replace("perovskite","p")
+
+        trace = []
+        for entry in allfits:
+            trace.append(entry[i])
+        #n, bins, patches = plt.hist(np.array(trace), 20, normed=1, facecolor='blue', alpha=0.75)
+        hist,bins=np.histogram(np.array(trace), bins=50, density=True)
+        (mu, sigma) = norm.fit(np.array(trace))
+        y = mlab.normpdf( bins, mu, sigma)
+        if sigma>1e-10 and not shortname.startswith("err"):
+            l = plt.plot(bins, y, 'b--', linewidth=1)
+
+        trace = []
+        if shortname.startswith("err"):
+            shortname = shortname  + "(log)"
+            for entry in goodfits:
+                trace.append(np.log(entry[i])/np.log(10))
+        else:
+            for entry in goodfits:
+                trace.append(entry[i])
+        hist,bins = np.histogram(trace)
+        n, bins, patches = plt.hist(np.array(trace), 20, facecolor='green', alpha=0.75, normed=True)
+        (mu, sigma) = norm.fit(np.array(trace))
+        y = mlab.normpdf( bins, mu, sigma)
+        if sigma>1e-10 and not shortname.startswith("err"):
+            l = plt.plot(bins, y, 'r--', linewidth=1)
+ 
+        plt.title("%s\nmean %.3e sd: %.3e" % (shortname, mu, sigma),fontsize=8)
+    
+        i+=1
+    plt.savefig('good.png')
+    #plt.show()
+
+    figsize=(8,6)
+    figure=plt.figure(dpi=150,figsize=figsize)
+
+    for fit in goodfits:
+        print fit
+        print names
+
+        rock, anchor_t = array_to_rock(fit, names)
+        temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+        
+        rho, vp, vs, vphi, K, G = \
+            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+
+        print "."
+
+        plt.plot(pressure/1.e9,vs/1.e3,linestyle="-",color='r',linewidth=1.0)
+        plt.plot(pressure/1.e9,vphi/1.e3,linestyle="-",color='b',linewidth=1.0)
+        plt.plot(pressure/1.e9,rho/1.e3,linestyle="-",color='g',linewidth=1.0)
+
+    print "done!"
+
+    #plot v_s
+    plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
+
+    #plot v_phi
+    plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
+
+    #plot density
+    plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
+    
+
+    plt.savefig('goodones.png')
+    plt.show()
+
+if whattodo=="plotone":
+    figsize=(6,5)
+    figure=plt.figure(dpi=100,figsize=figsize)
+    
+    names = ['anchor_T', "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0", 'err', 'err_rho', 'err_vphi', 'err_vs']
+
+    mymapbestfitnotused = {'anchor_T':2000, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0": 1.779, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0": 2.500e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0": 1.728e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0": 1.098, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0": 3.917, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0": 1.442, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0": 2.445e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0": 9.057e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass": 0.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0": 2.104, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0": 1.401, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0": 2.637e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0": 1.329e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0": 1.084, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0": 3.428, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0": 1.568, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0": 2.549e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0": 8.707e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass": 0.1319, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0": 2.335, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0": 2.108, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0": 1.610e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0": 1.310e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0": 1.700, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0": 3.718, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0": 1.359, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0": 1.124e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0": 7.672, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass": 0.0403, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0": 2.804, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0": 1.405, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0": 1.790e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0": 5.905e10, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0": 1.681, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0": 4.884, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0": 1.532, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0": 1.226e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0": 4.543e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass": 0.0718, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0": -7.048e-2, \
+                 'err':0, \
+                 'err_rho':0, \
+                 'err_vphi':0, \
+                 'err_vs':0}
+    print "goal: 5.35427067017e-06 2.72810809096e-07 3.67937164518e-06 1.4020882159e-06"
+
+
+    mymaplit = {'anchor_T':2000, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0": 1.74,  #r:1.74 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0": 250.5e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0": 172.9e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0": 1.09, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0": 4.01,  #r:4.01 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0": 1.44, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0": 24.45e-6, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0": 9.059e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass": 0.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0": 2.13, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0": 1.4, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0": 2.72e11,  #b: 2.637e11, r:2.72e11 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0": 1.33e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0": 1.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0": 4.1,  #r: 4.1 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0": 1.57, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0": 2.549e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0": 8.71e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass": 0.1319, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0": 2.3, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0": 2.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0": 161e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0": 1.310e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0": 1.700, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0": 3.8, # b: 3.718 r:3.8 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0": 1.36, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0": 1.124e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0": 767, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass": 0.0403, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0": 2.8, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0": 1.4, #r: 1.4\
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0": 1.790e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0": 59.0e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0": 1.7, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0": 4.9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0": 1.53, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0": 1.226e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0": 4.54e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass": 0.0718, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0": -0.1, \
+                 'err':0, \
+                 'err_rho':0, \
+                 'err_vphi':0, \
+                 'err_vs':0}
+
+    mymap = {'anchor_T':2000, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0": 1.779,  #r:1.74 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0": 250.5e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0": 172.9e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0": 1.09, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0": 3.917,  #r:4.01 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0": 1.44, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0": 24.45e-6, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0": 9.059e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass": 0.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0": 2.13, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0": 1.4, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0": 2.637e11,  #b: 2.637e11, r:2.72e11 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0": 1.33e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0": 1.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0": 3.428,  #r: 4.1 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0": 1.57, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0": 2.549e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0": 8.71e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass": 0.1319, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n": 5, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0": 2.3, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0": 2.1, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0": 161e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0": 1.310e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0": 1.700, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0": 3.718, # b: 3.718 r:3.8 \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0": 1.36, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0": 1.124e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0": 767, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass": 0.0403, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0": 2.8, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0": 1.4, #r: 1.4\
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0": 1.790e11, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0": 59.0e9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0": 1.7, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0": 4.9, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0": 1.53, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0": 1.226e-05, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0": 4.54e2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass": 0.0718, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n": 2, \
+                 "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0": -0.1, \
+                 'err':0, \
+                 'err_rho':0, \
+                 'err_vphi':0, \
+                 'err_vs':0}
+
+    #make table:
+    rows = ["V_0", "K_0", "Kprime_0", "G_0", "Gprime_0", "molar_mass", "n", "Debye_0", "grueneisen_0", "q_0", "eta_s_0"]
+    for row in rows:
+        val = []
+        for n in names:
+            if "."+row in n:
+                val.append(mymap[n])
+        print row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3])
+
+    dashstyle2=(7,3)
+    dashstyle3=(3,2)
+
+    fit = []
+    lit = []
+    for n in names:
+        fit.append(mymap[n])
+        lit.append(mymaplit[n])
+
+    rock, anchor_t = array_to_rock(fit, names)
+    temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+        
+    rho, vp, vs, vphi, K, G = \
+            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+
+    err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
+        rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
+    error = np.sum([err_rho, err_vphi, err_vs])
+
+    print error, err_rho, err_vphi, err_vs
+
+    figsize=(6,5)
+    prop={'size':12}
+    plt.rc('text', usetex=True)
+    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rc('font', family='sanserif')
+    figure=plt.figure(dpi=100,figsize=figsize)
+
+
+    #plot v_s
+    plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
+
+    #plot v_phi
+    plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="-",color='k',linewidth=2.0)
+
+    #plot density
+    plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="-",color='k',linewidth=2.0)
+
+
+    plt.plot(pressure/1.e9,vphi/1.e3,linestyle="-",color=colors.color(3),linewidth=1.0,marker='s',markerfacecolor=colors.color(3), label="vphi")
+    plt.plot(pressure/1.e9,vs/1.e3,linestyle="-",color=colors.color(4),linewidth=1.0,marker='v',markerfacecolor=colors.color(4), label="vs")
+    plt.plot(pressure/1.e9,rho/1.e3,linestyle="-",color=colors.color(2),linewidth=1.0,marker='o',markerfacecolor=colors.color(2), label="rho")
+
+    rock, anchor_t = array_to_rock(lit, names)
+    temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+        
+    rho, vp, vs, vphi, K, G = \
+            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+    plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
+    plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
+    plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)
+    
+
+    plt.xlabel("Pressure (GPa)")
+    plt.ylabel("Velocities (km/s) and Density (kg/m$^3$)")
+    plt.legend(bbox_to_anchor=(1.0, 0.9),prop={'size':12})
+    plt.xlim(25,135)
+    #plt.ylim(6,11)
+    plt.savefig("onefit.pdf", bbox_inches='tight')
+    print "wrote onefit.pdf"
+    #plt.show()
+    
+
+if whattodo=="run":
   outfile = open(fname, 'w')
   outfile.write("#pressure\t Vs \t Vp \t rho \n")
   best_fit_file = open('output_pyrolite_closest_fit.txt', 'w') 
 
   for i in range(n_realizations):
+    if (i>0 and i%25==0):
+        # save good fits
+        print "saving %d fits to %s"%(len(goodfits),dbname)
+        pickle.dump(goodfits, open(dbname+".tmp", "wb"))
+        os.rename(dbname+".tmp", dbname)
+        pickle.dump(names, open(dbname+".names", "wb"))
 
     print "realization", i+1
     try:
@@ -112,6 +525,10 @@ if os.path.isfile(fname) == False:
         best_fit_file.write('Current best fit : '+str(error) + '\n' )
         output_rock(pyrolite, best_fit_file)
       
+      a,names = realization_to_array(pyrolite, anchor_temperature)
+      a.extend([error, err_rho, err_vphi, err_vs])
+      names.extend(["err","err_rho","err_vphi","err_vs"])
+      goodfits.append(a)
 
       #interpolate to a higher resolution line
       frho = interpolate.interp1d(pressure, rho) 
@@ -130,160 +547,77 @@ if os.path.isfile(fname) == False:
 
     except ValueError:
       print "failed, skipping"
+      
   outfile.close()
   best_fit_file.close()
-  
-infile=open(fname,'r')
-data = np.loadtxt(fname, skiprows=1)
-pressure_list = data[:,0]
-density_list = data[:,3]
-vs_list = data[:,1]
-vphi_list = data[:,2]
-infile.close()
+elif whattodo=="plot":  
+    infile=open(fname,'r')
+    data = np.loadtxt(fname, skiprows=1)
+    pressure_list = data[:,0]
+    density_list = data[:,3]
+    vs_list = data[:,1]
+    vphi_list = data[:,2]
+    infile.close()
+
+    density_hist,rho_xedge,rho_yedge = np.histogram2d(pressure_list, density_list, bins=len(pressures_sampled), normed = True)
+    vs_hist,vs_xedge,vs_yedge = np.histogram2d(pressure_list, vs_list, bins=len(pressures_sampled), normed = True)
+    vphi_hist,vphi_xedge,vphi_yedge = np.histogram2d(pressure_list, vphi_list, bins=len(pressures_sampled), normed = True)
 
 
-#get 2d histograms
-density_hist,rho_xedge,rho_yedge = np.histogram2d(pressure_list, density_list, bins=len(pressures_sampled), normed = True)
-vs_hist,vs_xedge,vs_yedge = np.histogram2d(pressure_list, vs_list, bins=len(pressures_sampled), normed = True)
-vphi_hist,vphi_xedge,vphi_yedge = np.histogram2d(pressure_list, vphi_list, bins=len(pressures_sampled), normed = True)
+    vs_xedge = vs_xedge/1.e9
+    vphi_xedge = vphi_xedge/1.e9
+    rho_xedge = rho_xedge/1.e9
+    vs_yedge = vs_yedge/1.e3
+    vphi_yedge = vphi_yedge/1.e3
+    rho_yedge = rho_yedge/1.e3
 
-#get edges of the histograms
-vs_xedge = vs_xedge/1.e9
-vphi_xedge = vphi_xedge/1.e9
-rho_xedge = rho_xedge/1.e9
-vs_yedge = vs_yedge/1.e3
-vphi_yedge = vphi_yedge/1.e3
-rho_yedge = rho_yedge/1.e3
+    left_edge = min(vs_xedge[0], vphi_xedge[0], rho_xedge[0])
+    right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
+    bottom_edge= 4.3
+    top_edge=11.3
+    aspect_ratio = (right_edge-left_edge)/(top_edge-bottom_edge)
+    gamma = 0.8  #Mess with this to change intensity of colormaps near the edges
+
+    #do some setup for the figure
+    plt.rc('text', usetex=True)
+    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rc('font', family='sanserif')
+    plt.subplots_adjust(wspace=0.3)
+
+    plt.subplot(111, aspect='equal')
+    plt.xlim(left_edge, right_edge)
+    plt.ylim(bottom_edge, top_edge)
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Wave Speed (km/s)')
 
 
-#calculate interquartile range at each depth slice
-from scipy.stats import scoreatpercentile
-vs_lower = np.empty_like(pressures_sampled)
-vs_upper = np.empty_like(pressures_sampled)
-vphi_lower = np.empty_like(pressures_sampled)
-vphi_upper = np.empty_like(pressures_sampled)
-rho_lower = np.empty_like(pressures_sampled)
-rho_upper = np.empty_like(pressures_sampled)
-for i in range(len(pressures_sampled)):
-  vs_dist = np.cumsum(vs_hist[i,:])/np.sum(vs_hist[i,:])
-  vphi_dist = np.cumsum(vphi_hist[i,:])/np.sum(vphi_hist[i,:])
-  rho_dist = np.cumsum(density_hist[i,:])/np.sum(density_hist[i,:])
-  vs_fun = interpolate.interp1d(vs_dist, vs_yedge[:-1])
-  vphi_fun = interpolate.interp1d(vphi_dist, vphi_yedge[:-1])
-  rho_fun = interpolate.interp1d(rho_dist, rho_yedge[:-1])
-  vs_lower[i] = vs_fun(0.25)
-  vs_upper[i] = vs_fun(0.75)
-  vphi_lower[i] = vphi_fun(0.25)
-  vphi_upper[i] = vphi_fun(0.75)
-  rho_lower[i] = rho_fun(0.25)
-  rho_upper[i] = rho_fun(0.75)
-  
-
-'''
-#do some setup for the figure
-plt.rc('text', usetex=True)
-plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-plt.rc('font', family='sanserif')
-plt.subplots_adjust(wspace=0.3)
-c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#eff3ff'), (0.4, '#bdd7e7'), (0.6, '#6baed6'), (0.8, '#3182bd'), (1.0, '#08519c') ])
-c.set_bad('w', alpha=1.0)
-
-#plot v_s
-plt.subplot(131, aspect='equal')
-plt.xlim(vs_xedge[0], vs_xedge[-1])
-plt.ylim(vs_yedge[0], vs_yedge[-1])
-aspect_ratio = (vs_xedge[-1]-vs_xedge[0])/(vs_yedge[-1]-vs_yedge[0])
-vs_hist = ma.masked_where(vs_hist <= 0.0, vs_hist)
-plt.imshow(vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', \
+    #plot v_s
+    vs_hist = ma.masked_where(vs_hist <= 0.0, vs_hist)
+    c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#eff3ff'), (0.4, '#bdd7e7'), (0.6, '#6baed6'), (0.8, '#3182bd'), (1.0, '#08519c') ] , gamma=gamma)
+    c.set_bad('w', alpha=1.0)
+    plt.imshow(vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', alpha=.7,\
            aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]])
-plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
-plt.xlabel('Pressure (GPa)')
-plt.ylabel('S Wave Speed (km/s)')
+    plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
-#plot v_phi
-plt.subplot(132)
-plt.xlim(vphi_xedge[0], vphi_xedge[-1])
-plt.ylim(vphi_yedge[0], vphi_yedge[-1])
-aspect_ratio = (vphi_xedge[-1]-vphi_xedge[0])/(vphi_yedge[-1]-vphi_yedge[0])
-vphi_hist = ma.masked_where(vphi_hist <= 0.0, vphi_hist)
-plt.imshow(vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', \
+    #plot v_phi
+    vphi_hist = ma.masked_where(vphi_hist <= 0.0, vphi_hist)
+    c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#fee5d9'), (0.4, '#fcae91'), (0.6, '#fb6a4a'), (0.8, '#de2d26'), (1.0, '#a50f15') ] , gamma=gamma)
+    c.set_bad('w', alpha=1.0)
+    plt.imshow(vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7, \
            aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]])
-plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
-plt.xlabel('Pressure (GPa)')
-plt.ylabel('Bulk Sound Speed (km/s)')
+    plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
-#plot density
-plt.subplot(133)
-plt.xlim(rho_xedge[0], rho_xedge[-1])
-plt.ylim(rho_yedge[0], rho_yedge[-1])
-aspect_ratio = (rho_xedge[-1]-rho_xedge[0])/(rho_yedge[-1]-rho_yedge[0])
-density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
-plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian',\
+    #plot density
+    density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
+    c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#edf8e9'), (0.4, '#bae4b3'), (0.6, '#74c476'), (0.8, '#31a354'), (1.0, '#006d2c') ] , gamma=gamma)
+    c.set_bad('w', alpha=1.0)
+    plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian', alpha=.7,\
            aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
-plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
-plt.xlabel('Pressure (GPa)')
-plt.ylabel('Density (kg/m$^3$)')
-
-#save and show the image
-fig = plt.gcf()
-fig.set_size_inches(12.0, 4.0)
-#fig.savefig("pyrolite_uncertainty.pdf",bbox_inches='tight', dpi=100)
-plt.show()
-'''
-
-left_edge = min(vs_xedge[0], vphi_xedge[0], rho_xedge[0])
-right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
-bottom_edge= 4.3
-top_edge=11.3
-aspect_ratio = (right_edge-left_edge)/(top_edge-bottom_edge)
-gamma = 0.8  #Mess with this to change intensity of colormaps near the edges
-
-#do some setup for the figure
-plt.rc('text', usetex=True)
-plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-plt.rc('font', family='sanserif')
-plt.subplots_adjust(wspace=0.3)
-
-plt.subplot(111, aspect='equal')
-plt.xlim(left_edge, right_edge)
-plt.ylim(bottom_edge, top_edge)
-plt.xlabel('Pressure (GPa)')
-plt.ylabel('Wave Speed (km/s)')
+    plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
 
 
-#plot v_s
-vs_hist = ma.masked_where(vs_hist <= 0.0, vs_hist)
-c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#eff3ff'), (0.4, '#bdd7e7'), (0.6, '#6baed6'), (0.8, '#3182bd'), (1.0, '#08519c') ] , gamma=gamma)
-c.set_bad('w', alpha=1.0)
-plt.imshow(vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', alpha=.7,\
-           aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]])
-plt.plot(pressures_sampled/1.e9,vs_upper,linestyle="-",color='b',linewidth=0.5)
-plt.plot(pressures_sampled/1.e9,vs_lower,linestyle="-",color='b',linewidth=0.5)
-plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
-
-#plot v_phi
-vphi_hist = ma.masked_where(vphi_hist <= 0.0, vphi_hist)
-c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#fee5d9'), (0.4, '#fcae91'), (0.6, '#fb6a4a'), (0.8, '#de2d26'), (1.0, '#a50f15') ] , gamma=gamma)
-c.set_bad('w', alpha=1.0)
-plt.imshow(vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7, \
-           aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]])
-plt.plot(pressures_sampled/1.e9,vphi_upper,linestyle="-",color='r',linewidth=.5)
-plt.plot(pressures_sampled/1.e9,vphi_lower,linestyle="-",color='r',linewidth=.5)
-plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
-
-#plot density
-density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
-c = matplotlib.colors.LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#edf8e9'), (0.4, '#bae4b3'), (0.6, '#74c476'), (0.8, '#31a354'), (1.0, '#006d2c') ] , gamma=gamma)
-c.set_bad('w', alpha=1.0)
-plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian', alpha=.7,\
-           aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
-plt.plot(pressures_sampled/1.e9,rho_upper,linestyle="-",color='g',linewidth=.5)
-plt.plot(pressures_sampled/1.e9,rho_lower,linestyle="-",color='g',linewidth=.5)
-plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
-
-
-#save and show the image
-fig = plt.gcf()
-fig.set_size_inches(6.0, 6.0)
-fig.savefig("pyrolite_uncertainty.pdf",bbox_inches='tight', dpi=100)
-plt.show()
+    #save and show the image
+    fig = plt.gcf()
+    fig.set_size_inches(6.0, 6.0)
+    fig.savefig("pyrolite_uncertainty.pdf",bbox_inches='tight', dpi=100)
+    plt.show()
