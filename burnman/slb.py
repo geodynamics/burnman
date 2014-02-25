@@ -70,19 +70,34 @@ class slb_base(equation_of_state):
             +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21 
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
-        # conservative guess and increase the interval slowly (otherwise we might end up
-        # with values for a and b that we can not evaluate)
+        # conservative guess:
         a = 0.6*params['V_0']
         b = 1.2*params['V_0']
-        
-        steps = 0
-        while (func(a)*func(b) > 0 and steps<100):
-            a *= 0.9
-            b *= 1.1
-            steps += 1
 
-        V = opt.brentq(func, a, b) 
-        return V
+        # if we have a sign change, we are done:
+        if func(a)*func(b)<0:
+            return opt.brentq(func, a, b) 
+
+        # now try to find a place with a sign change with brute force:             
+        x=np.linspace(0.3*params['V_0'],1.5*params['V_0'],100)
+        y=np.array([0.0 for xx in x])
+
+        y=np.array([func(xx) for xx in x])
+        
+        for i in range(len(x)):
+            y[i] = func(x[i])
+            if i>0 and y[i-1]*y[i] < 0:
+                return opt.brentq(func, x[i-1], x[i]) 
+
+        print "slb.volume() failed"
+        print "T,p:", temperature, pressure
+        print "tested:"
+        print x
+        print np.array(y)
+
+        raise ValueError
+
+    
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
