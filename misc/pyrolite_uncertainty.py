@@ -550,6 +550,25 @@ if whattodo=="run":
       
   outfile.close()
   best_fit_file.close()
+elif whattodo=="error":
+    values = [1957.020221991886, 1.6590112209181886, 249335164670.39246, 170883524675.03842, 0.8922515920546608, 4.083536182853109, 1.4680357687136616, 2.445e-05, 907.6618871363347, 0.1, 5, 1.4575168081960164, 1.3379195339709193, 260344929478.3809, 138077598973.27307, 0.17942226498091196, 1.3948903373340595, 1.436924855529012, 2.549e-05, 881.2532665499875, 0.1319, 5, 3.1204661890247394, 2.1411938868468483, 164407523972.7836, 131594720803.07439, 1.855224221011796, 3.867545309505681, 1.2953203656315155, 1.124e-05, 769.8199298156555, 0.0403, 2, 2.8860489779521985, 1.4263617489128713, 177341125271.45096, 59131041052.46985, 2.352310980469468, 5.1279202520952545, 1.6021924873676925, 1.226e-05, 440.13042122457716, 0.0718, 2, -1.6065263588976038, 7.5954915681374134e-05, 9.6441602176002807e-07, 4.4326026287552629e-05, 3.0664473372061482e-05]
+    names = ['anchor_T', "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0", 'err', 'err_rho', 'err_vphi', 'err_vs']
+
+    rock, anchor_t = array_to_rock(values, names)
+    temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+        
+    rho, vp, vs, vphi, K, G = \
+            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+
+    err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
+        rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
+    error = np.sum([err_rho, err_vphi, err_vs])
+
+    print error, err_rho, err_vphi, err_vs
+    
+
+
+
 elif whattodo=="plot":  
     infile=open(fname,'r')
     data = np.loadtxt(fname, skiprows=1)
