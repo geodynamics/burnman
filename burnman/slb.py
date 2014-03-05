@@ -7,6 +7,7 @@ import birch_murnaghan as bm
 import debye
 import numpy as np
 from equation_of_state import equation_of_state
+import warnings
  
 import matplotlib.pyplot as plt
 
@@ -77,25 +78,14 @@ class slb_base(equation_of_state):
         # if we have a sign change, we are done:
         if func(a)*func(b)<0:
             return opt.brentq(func, a, b) 
-
-        # now try to find a place with a sign change with brute force:             
-        x=np.linspace(0.3*params['V_0'],1.5*params['V_0'],100)
-        y=np.array([0.0 for xx in x])
-
-        y=np.array([func(xx) for xx in x])
-        
-        for i in range(len(x)):
-            y[i] = func(x[i])
-            if i>0 and y[i-1]*y[i] < 0:
-                return opt.brentq(func, x[i-1], x[i]) 
-
-        print "slb.volume() failed"
-        print "T,p:", temperature, pressure
-        print "tested:"
-        print x
-        print np.array(y)
-
-        raise ValueError
+        else:
+            tol = 0.0001
+            sol = opt.fmin(lambda x : func(x)*func(x), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
+            if sol[1] > tol*2:
+                raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
+            else:
+                warnings.warn("May be outside the range of validity for EOS")
+                return sol[0]
 
     
 
