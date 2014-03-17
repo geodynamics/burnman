@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 """
+This script reproduces Figure 6 from Cottaar, Heister, Rose and Unterborn (2014).
 Vary the amount perovskite vs. ferropericlase and compute the error in the
 seismic data against PREM.
 

@@ -2,6 +2,10 @@
 # Copyright (C) 2012, 2013, 2014, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+This script reproduces Figure 7 from Cottaar, Heister, Rose, Unterborn (2014)
+It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
+"""
 
 import os.path,sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

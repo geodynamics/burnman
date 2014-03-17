@@ -3,6 +3,8 @@
 # Released under GPL v2 or later.
 
 """
+This script reproduces Cottaar, Heister, Rose, Unterborn (2014) Figure 2.
+
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
 1. Voight-Reuss-Hill
@@ -34,7 +36,7 @@ import colors
 if __name__ == "__main__":
 	figsize=(6,5)
 	prop={'size':12}
-	plt.rc('text', usetex=True)
+	#plt.rc('text', usetex=True)
 	plt.rc('font', family='sanserif')
 	figure=plt.figure(dpi=100,figsize=figsize)
     

@@ -2,6 +2,11 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+This script reproduces the benchmark in Cottaar, Heister, Rose, Unterborn (2014), Figure 3
+"""
+
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..')) 
