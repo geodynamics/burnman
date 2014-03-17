@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 """
+This script reproduces Figure 5 from Cottaar, Heister, Rose and Unteborn (2014)
 Attempt to reproduce Figure 6.12 From chapter 6 of Physics and Chemistry of the Deep Earth, 2013
 Book chapter by Motohiko Murakami, editor Shun-ichiro Karato
 """
