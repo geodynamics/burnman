@@ -9,10 +9,9 @@ m.use('Cairo')
 VERBOSE=1
 execfile('$t')
 EOF
-)  >$t.tmp 2>&1 || { echo "test $t failed"; exit 1; } 
+)  >$t.tmp 2>&1 || { echo "test $t failed!!!!!!!!"; } #exit 1; } 
 echo "diff $t.tmp misc/ref/$t.out"
-diff $t.tmp misc/ref/$t.out || { echo "test $t failed"; exit 1; } 
-rm $t.tmp
+(diff $t.tmp misc/ref/$t.out && rm $t.tmp) || { echo "test $t failed!!!!!!!!!"; } #exit 1; } 
 }
 
 
@@ -51,7 +50,6 @@ do
 
 
     testit $test
-    echo "   done"
 done
 
 
