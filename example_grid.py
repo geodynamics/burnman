@@ -52,7 +52,11 @@ print mat_vs
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
-surf = ax.plot_surface(parray/1e9,tarray, mat_vs, rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
+
+X,Y = np.meshgrid(p/1e9, T)
+print X.shape, Y.shape, mat_vs.shape
+
+surf = ax.plot_surface(X,Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
 plt.xlabel("Pressure (GPa)")
 plt.ylabel("Temperature")
 ax.set_zlabel("Vs")
