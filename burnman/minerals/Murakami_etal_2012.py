@@ -165,7 +165,7 @@ class fe_periclase_LS_3rd(material):
             'equation_of_state':'slb3',
             'V_0': 11.171e-6,
             'K_0': 170.0e9,
-            'Kprime_0': 4,
+            'Kprime_0': 4.0,
             'G_0': 151.67e9,
             'Gprime_0': 1.754,
             'molar_mass': .0469,
