@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+- Release v0.6 (March 31, 2014)
+  Scripts to reproduce the figures from Cottaar, Heister, Rose and 
+  Unterborn (2014) can be found in misc/.
+  Mineral physical libraries from Murakami (2013) and Zhang et al. 
+  (2013) are included.
+  Pressure-depth converstion following Cammarano (2013) are included. 
+
 - Release v0.5 (October 28, 2013)
 
 - New example for absolute beginners (October 28, 2013)
