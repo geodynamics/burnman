@@ -197,7 +197,7 @@ def check_slb_fig7_txt():
                     'eta_s_0' : 2.364}
     forsterite.set_method('slb3')
 
-    data = np.loadtxt("data/slb_fig7.txt", skiprows=1)
+    data = np.loadtxt("input_minphys/slb_fig7.txt", skiprows=1)
  
     temperature = np.array(data[:,2])
     pressure = np.array(data[:,0])
