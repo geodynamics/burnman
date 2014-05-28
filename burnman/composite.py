@@ -7,7 +7,15 @@ import warnings
 from collections import namedtuple
 
 class abstract_material:
+    """
+    Base class for all materials. The main functionality is unroll() which
+    returns a list of objects of type burnman.mineral and their molar
+    fractions.
+    """
+
     def set_method(self, method):
+        """
+        """
         raise NotImplementedError("need to implement this in derived class!")
 
     def to_string(self):
@@ -17,6 +25,8 @@ class abstract_material:
         return "'" + self.__class__.__name__ + "'"
 
     def set_state(self, pressure, temperature):
+        """
+        """
         self.pressure = pressure
         self.temperature = temperature
 
