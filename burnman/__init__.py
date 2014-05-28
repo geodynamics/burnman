@@ -8,14 +8,14 @@ BurnMan
 
 BurnMan is a lower mantle shear velocity generator constrained by mineral physics.
 
-
-
 """
+
+from composite import abstract_material
+from composite import composite_base, composite
+from minerals_base import material
 
 from main import *
 from partitioning import calculate_partition_coefficient,calculate_phase_percents
 import minerals
 import seismic
-from composite import composite
-from minerals_base import material
 import averaging_schemes
