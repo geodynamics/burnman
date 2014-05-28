@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 """
-
+Mineral database
 """
 
 import Murakami_etal_2012

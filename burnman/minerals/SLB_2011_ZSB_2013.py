@@ -2,6 +2,14 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+SLB_2011_ZSB_2013
+^^^^^^^^^^^^^^^^^
+
+Minerals from Stixrude & Lithgow-Bertelloni 2011 and references therein. 
+
+"""
+
 from burnman.minerals_base import *
                 
 

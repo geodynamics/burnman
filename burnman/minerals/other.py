@@ -2,6 +2,13 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+Other minerals
+^^^^^^^^^^^^^^
+
+Other minerals in burnman.minerals.other are:
+
+"""
 
 from burnman.minerals_base import *
 

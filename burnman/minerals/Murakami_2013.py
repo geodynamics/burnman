@@ -2,6 +2,13 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+Murakami_2013
+^^^^^^^^^^^^^
+
+Minerals from Murakami 2013 and references therein
+
+"""
 from burnman.minerals_base import *
                 
 
