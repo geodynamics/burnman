@@ -1,6 +1,9 @@
 Main module
 ===========
 
+.. module:: burnman.main
+
+.. autoclass:: burnman.elastic_properties
 
 .. autofunction:: velocities_from_rock
 .. autofunction:: calculate_moduli

@@ -14,6 +14,7 @@ Welcome to BurnMan's documentation!
    main
    averaging
    geotherms
+   minerals
    seismic
 
 The functions in the :doc:`main` operate on :doc:`minerals` which can be
