@@ -6,7 +6,6 @@ import os, sys, numpy as np
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 
-from composite import composite,composite_base,abstract_material
 import seismic
 import tools
 import averaging_schemes
