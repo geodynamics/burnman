@@ -6,7 +6,24 @@
 BurnMan
 =======
 
-BurnMan is a lower mantle shear velocity generator constrained by mineral physics.
+BurnMan is an open source mineral physics toolbox written in Python to
+determine seismic velocities for the lower mantle. BurnMan calculates the
+isotropic thermoelastic moduli by solving the equations-of-state for a
+mixture of minerals defined by the user. The user may select from a list of
+minerals applicable to the lower mantle included or easily define one of
+their own.
+
+Features:
+  - form composites of arbitrary combination of :doc:`minerals`
+  - extensive :doc:`mineral_database`
+  - easy plotting and comparison of seismic profiles using matplotlib
+  - many examples highlighting different features of BurnMan
+  - different thermoelastic models, choice between second or third order accuracy
+  - different averaging schemes
+  - different geotherms
+  - extensible: all parts can be replaced by user-written modules if desired
+
+
 
 """
 
