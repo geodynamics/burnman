@@ -22,44 +22,46 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
-rock = burnman.composite ( [ (minerals.SLB_2011.mg_perovskite(), 0.80),\
-                             (minerals.SLB_2011.periclase(),     0.20) ] )
-    
-seismic_model = burnman.seismic.prem()
+if __name__ == "__main__":    
 
-depths = np.linspace(750e3, 2800e3, 10)
-p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
-    
-# Now we get an array of temperatures at which will be used for computing
-# the seismic properties of the rock.
-T = np.linspace(1900,2400,15)
+    rock = burnman.composite ( [ (minerals.SLB_2011.mg_perovskite(), 0.80),\
+                                 (minerals.SLB_2011.periclase(),     0.20) ] )
 
-print "pressures:\n", p
-print "temperatures:\n", T
+    seismic_model = burnman.seismic.prem()
 
-# turn grid into array:
-tarray=np.tile(T,len(p))
-parray=np.repeat(p,len(T))
+    depths = np.linspace(750e3, 2800e3, 10)
+    p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
-rock.set_method('slb3')
-    
-density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, parray, tarray)
+    # Now we get an array of temperatures at which will be used for computing
+    # the seismic properties of the rock.
+    T = np.linspace(1900,2400,15)
 
-mat_vs = np.reshape(vs,[len(p),len(T)]);
+    print "pressures:\n", p
+    print "temperatures:\n", T
 
-print mat_vs
+    # turn grid into array:
+    tarray=np.tile(T,len(p))
+    parray=np.repeat(p,len(T))
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+    rock.set_method('slb3')
+
+    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, parray, tarray)
+
+    mat_vs = np.reshape(vs,[len(p),len(T)]);
+
+    print mat_vs
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
 
 
-X,Y = np.meshgrid(p/1e9, T)
-print X.shape, Y.shape, mat_vs.shape
+    X,Y = np.meshgrid(p/1e9, T)
+    print X.shape, Y.shape, mat_vs.shape
 
-surf = ax.plot_surface(X,Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
-plt.xlabel("Pressure (GPa)")
-plt.ylabel("Temperature")
-ax.set_zlabel("Vs")
-ax.view_init(22, 119)
+    surf = ax.plot_surface(X,Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
+    plt.xlabel("Pressure (GPa)")
+    plt.ylabel("Temperature")
+    ax.set_zlabel("Vs")
+    ax.view_init(22, 119)
 
-plt.show()
+    plt.show()
