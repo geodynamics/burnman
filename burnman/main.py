@@ -49,7 +49,7 @@ def calculate_moduli(rock, pressures, temperatures):
                       [Pa].
 
     :type temperatures: list of float
-    :param temperatures: list of pressures you want to evaluate the rock at.
+    :param temperatures: list of temperatures you want to evaluate the rock at. In [K].
 
     :returns: 
       answer -- an array of (n_evaluation_points by n_phases) of
@@ -149,7 +149,22 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     average_moduli(), and calculates the seismic velocities using
     compute_velocities().
 
-    Returns arrays for density [kg/m^3], Vp [m/s], Vs [m/s], Vphi [m/s], K [m/s], G [m/s]
+
+    :param burnman.abstract_material rock: this is a rock
+
+    :type pressures: list of float
+    :param pressures: list of pressures you want to evaluate the rock at. In [Pa].
+
+    :type temperatures: list of float
+    :param temperatures: list of temperatures you want to evaluate the rock at. In[K].
+
+
+    :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+    :param averaging_scheme: Averaging scheme to use.
+
+    :returns: density[kg/m^3], Vp[km/s],Vs[km/s],Vphi[km/s], bulk modulus K[Pa],shear modulus G[Pa]
+    :rtype: lists of floats
+
     """
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
@@ -162,7 +177,7 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
 def depths_for_rock(rock,pressures, temperatures,averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     """
         Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
-        Only simplification is using g from PREM
+        It is simplified by taking g from PREM
         """
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
