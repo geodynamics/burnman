@@ -106,4 +106,4 @@ if __name__ == "__main__":
         burnman.averaging_schemes.voigt_reuss_hill())    
     
     [rho_err,vphi_err,vs_err]= \
-    burnman.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+    burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
