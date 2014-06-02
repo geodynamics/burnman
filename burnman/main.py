@@ -162,7 +162,7 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
     :param averaging_scheme: Averaging scheme to use.
 
-    :returns: density[kg/m^3], Vp[km/s],Vs[km/s],Vphi[km/s], bulk modulus K[Pa],shear modulus G[Pa]
+    :returns: density[kg/m^3], Vp[m/s],Vs[m/s],Vphi[m/s], bulk modulus K[Pa],shear modulus G[Pa]
     :rtype: lists of floats
 
     """
@@ -176,46 +176,89 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
 
 def depths_for_rock(rock,pressures, temperatures,averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     """
-        Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
-        It is simplified by taking g from PREM
-        """
+    Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013).
+    It is simplified by taking g from PREM.
+        
+    :param burnman.abstract_material rock: this is a rock
+        
+    :type pressures: list of float
+    :param pressures: list of pressures you want to evaluate the rock at. In [Pa].
+        
+    :type temperatures: list of float
+    :param temperatures: list of temperatures you want to evaluate the rock at. In [K].
+        
+    :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+    :param averaging_scheme: Averaging scheme to use.
+        
+    :returns: depth [m]
+    :rtype: list of floats
+    """
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
     mat_rho = np.array([m.rho for m in moduli])
     seismic_model = seismic.prem()
-    depthsref=np.array(map(seismic_model.depth,pressures))
-    pressref=np.zeros_like(pressures)
-    g=seismic_model.grav(depthsref) # G for prem
-    depths= np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))
+    depthsref = np.array(map(seismic_model.depth,pressures))
+    pressref = np.zeros_like(pressures)
+    g  = seismic_model.grav(depthsref) # G for prem
+    depths  = np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))
     return depths
 
 def pressures_for_rock(rock, depths, T0, averaging_scheme=averaging_schemes.voigt_reuss_hill()):
     """
-        Function computes the self-consistent pressures (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013)
-        Only simplification is using g from PREM
-        """
+    Function computes the self-consistent pressures (to avoid using the PREM depth pressure conversion) (Cammarano, 2013).
+    Only simplification is using g from PREM.'
+    
+    :param burnman.abstract_material rock: this is a rock
+    
+    :type depths: list of float
+    :param depths: list of depths you want to evaluate the rock at. In [m].
+    
+    :type temperatures: list of float
+    :param temperatures: list of temperatures you want to evaluate the rock at. In[K].
+    
+    :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+    :param averaging_scheme: Averaging scheme to use.
+    
+    :returns: pressures [Pa]
+    :rtype: list of floats
+    
+    """
     # use PREM pressures as inital guestimate
     seismic_model = seismic.prem()
     pressures,_,_,_,_ = seismic_model.evaluate_all_at(depths)
-    pressref=np.zeros_like(pressures)
+    pressref = np.zeros_like(pressures)
     #gets table with PREM gravities
-    g=seismic_model.grav(depths)
+    g = seismic_model.grav(depths)
     #optimize pressures for this composition
     while nrmse(len(pressures),pressures,pressref)>1.e-6:
         # calculate density
-        temperatures= geotherm.adiabatic(pressures,T0,rock)
+        temperatures = geotherm.adiabatic(pressures,T0,rock)
         moduli_list = calculate_moduli(rock, pressures, temperatures)
         moduli = average_moduli(moduli_list, averaging_scheme)
         mat_rho = np.array([m.rho for m in moduli])
         # calculate pressures
-        pressref=pressures
-        pressures=np.hstack((pressref[0], pressref[0]+integrate.cumtrapz(g*mat_rho,depths)))
+        pressref = pressures
+        pressures = np.hstack((pressref[0], pressref[0]+integrate.cumtrapz(g*mat_rho,depths)))
     return pressures
 
 def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """
-    Returns lists of corrected Vp Vs and Vphi for a given Qs and Qphi
+    Returns lists of corrected velocities  for a given Qs (/Qmu) and Qphi
+    
+
+    
+    :type Vp: list of float
+    :param Vp: list of P wave velocties. In [m/s].
+    :type Vs: list of float
+    :param Vs: list of P wave velocties. In [m/s].
+    :type Vphi: list of float
+    :param Vphi: list of P wave velocties. In [m/s].
+    
+    :returns: Vp[m/s],Vs[m/s],Vphi[m/s]
+    :rtype: list of floats
+    
     """
+    
     length = len(v_p)
     ret_v_p = np.zeros(length)
     ret_v_s = np.zeros(length)
@@ -227,38 +270,84 @@ def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     return ret_v_p, ret_v_s, ret_v_phi
 
 
-def compare_l2(depth,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+def compare_l2(depth,calc, obs):
     """
-    It computes the L2 norm for three profiles at a time (assumed to be linear between points).
-    Input list of depths, three computed profiles, and three profiles to compare to.
-    """
-    rho_err_tot = l2(depth,mat_rho,seis_rho)
-    vphi_err_tot = l2(depth,mat_vphi,seis_vphi)
-    vs_err_tot = l2(depth,mat_vs,seis_vs)
-    err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
+        
+    Computes the L2 norm for N profiles at a time (assumed to be linear between points).
 
-    return rho_err_tot, vphi_err_tot, vs_err_tot
+    .. math:: math does not work yet...
+       \sum_{i=1}^{\\infty} x_{i}
 
-def compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho):
+    :type depths: array of float
+    :param depths: depths in m.
+    :type calc: list of arrays of float
+    :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
+    :type obs: list of arrays of float
+    :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
+    
+    :returns: array of L2 norms of length N
+    :rtype: array of floats
     """
-    It computes the chifactor for three profiles at a time
-    """
-    rho_err_tot = chi_factor(mat_rho,seis_rho)
-    vphi_err_tot = chi_factor(mat_vphi,seis_vphi)
-    vs_err_tot = chi_factor(mat_vs,seis_vs)
-    err_tot=rho_err_tot+vphi_err_tot+vs_err_tot
+    err=[]
+    for l in range(len(calc)):
+        err.append(l2(depth,calc[l],obs[l]))
 
-    return rho_err_tot, vphi_err_tot, vs_err_tot
+    return err
+
+def compare_chifactor(calc, obs):
+    """
+        
+    Computes the chi factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
+        
+
+    :type calc: list of arrays of float
+    :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
+    :type obs: list of arrays of float
+    :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
+        
+    :returns: error array of length N
+    :rtype: array of floats
+    """
+    err=[]
+    for l in range(len(calc)):
+        err.append(chi_factor(calc[l],obs[l]))
+    
+    return err
 
 def l2(x,funca,funcb):
-    """ L2 norm """
+    """
+        
+    Computes the L2 norm for one profile(assumed to be linear between points).
+        
+    :type x: array of float
+    :param x: depths in m.
+    :type funca: list of arrays of float
+    :param funca: array calculated values
+    :type funcb: list of arrays of float
+    :param funcb: array of values (observed or calculated) to compare to
+        
+    :returns: L2 norm
+    :rtype: array of floats
+    """
     diff=np.array(funca-funcb)
     diff=diff*diff
     return integrate.trapz(diff,x)
 
 
 def nrmse(x,funca,funcb):
-    """ normalized root mean square error """
+    """ 
+    Normalized root mean square error for one profile
+    :type x: array of float
+    :param x: depths in m.
+    :type funca: list of arrays of float
+    :param funca: array calculated values
+    :type funcb: list of arrays of float
+    :param funcb: array of values (observed or calculated) to compare to
+    
+    :returns: RMS error
+    :rtype: array of floats
+    
+    """
     diff=np.array(funca-funcb)
     diff=diff*diff
     rmse=np.sqrt(np.sum(diff)/x)
@@ -266,7 +355,17 @@ def nrmse(x,funca,funcb):
     return nrmse
 
 def chi_factor(calc,obs):
-    #assuming 1% a priori uncertainty on the seismic model
+    """
+    Chi factor for one profile assuming 1% uncertainty on the reference model (obs)
+    :type calc: list of arrays of float
+    :param calc: array calculated values
+    :type obs: list of arrays of float
+    :param obs: array of reference values to compare to
+        
+    :returns: chi factor
+    :rtype: array of floats
+        
+    """
 
     err=np.empty_like(calc)
     for i in range(len(calc)):
