@@ -16,6 +16,7 @@ Welcome to BurnMan's documentation!
    geotherms
    minerals
    seismic
+   mineral_database
 
 The functions in the :doc:`main` operate on :doc:`minerals` which can be
 combination of different minerals from :doc:`mineral_database`.
