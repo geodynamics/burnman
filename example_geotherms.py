@@ -40,12 +40,11 @@ if __name__ == "__main__":
     #load two builtin geotherms and evaluate the temperatures at all pressures
     temperature1 = burnman.geotherm.brown_shankland(pressures)
     temperature2 = burnman.geotherm.anderson(pressures)
-    temperature3 = burnman.geotherm.watson_baxter(pressures)
     
     #a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
     #so we can just write our own function
     my_geotherm_function = lambda p:  [ 1500+(2500-1500)*x/128e9 for x in p]
-    temperature4 = my_geotherm_function(pressures)
+    temperature3 = my_geotherm_function(pressures)
     
     #what about a geotherm defined from datapoints given in a file (our inline)?
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     
     my_geotherm_interpolate = lambda p:  [ burnman.tools.lookup_and_interpolate\
                 (table_pressure, table_temperature, x) for x in p]
-    temperature5 = my_geotherm_interpolate(pressures)
+    temperature4 = my_geotherm_interpolate(pressures)
 
 
     #finally, we can also calculate a self consistent 
@@ -72,17 +71,16 @@ if __name__ == "__main__":
     T0 = 1500.
     #then generate temperature values using the self consistent function. 
     # This takes more time than the above methods
-    temperature6 = burnman.geotherm.adiabatic(pressures, T0, pyrolite)
+    temperature5 = burnman.geotherm.adiabatic(pressures, T0, pyrolite)
     
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
     
     
     plt.plot(pressures/1e9,temperature1,'-r',label="Brown, Shankland")
     plt.plot(pressures/1e9,temperature2,'-c',label="Anderson")
-    plt.plot(pressures/1e9,temperature3,'-g',label="Watson, Baxter")
-    plt.plot(pressures/1e9,temperature4,'-b',label="handwritten linear")
-    plt.plot(pressures/1e9,temperature5,'-k',label="handwritten from table")
-    plt.plot(pressures/1e9,temperature6,'-m',label="Adiabat with pv (70%) and fp(30%)")
+    plt.plot(pressures/1e9,temperature3,'-b',label="handwritten linear")
+    plt.plot(pressures/1e9,temperature4,'-k',label="handwritten from table")
+    plt.plot(pressures/1e9,temperature5,'-m',label="Adiabat with pv (70%) and fp(30%)")
     
     plt.legend(loc='lower right')
     plt.xlim([0, 130])

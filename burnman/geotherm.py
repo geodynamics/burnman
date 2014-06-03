@@ -13,24 +13,6 @@ import burnman
 from tools import *
 
 
-def watson_baxter(pressure):
-    """
-    polynomial fit from Watson, Baxter, EPSL, 2007
-    pressure: in Pa
-    returns: temperature in K
-    """
-    temperature = np.empty_like(pressure)
-    for i in range(len(pressure)):
-      if (pressure[i] <= 15.e9):
-          temperature[i] = 1900.-1420.*pow(0.8,pressure[i]/1.e9)
-      else:
-          temperature[i] = 1680.+11.1*pressure[i]/1.e9
-    return temperature
-
-
-
-
-
 def brown_shankland(pressure):
     """
     geotherm from Brown and Shankland 1981
@@ -114,13 +96,13 @@ if __name__ == "__main__":
     pyrolite.set_method('slb3')
     pyrolite.set_state(40.e9, 2000)
 
-    t1 = watson_baxter(p)
+    t1 = anderson(p)
     t2 = brown_shankland(p)
     t3 = adiabatic(p, 1600, pyrolite)
 
     p1,=pyplot.plot(p,t1,'x--r')
     p2,=pyplot.plot(p,t2,'*-g')
     p3,=pyplot.plot(p,t3,'*-b')
-    pyplot.legend([p1,p2,p3],[ "watson", "brown", "adiabatic"], loc=4)
+    pyplot.legend([p1,p2,p3],[ "anderson", "brown", "adiabatic"], loc=4)
 
     pyplot.show()
