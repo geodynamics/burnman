@@ -225,7 +225,7 @@ class reuss(averaging_scheme):
         bound, given by:
  
         .. math::
-            K_R = \\Sigma_i \\frac{V_i}{K_i} 
+            K_R = \\left(\\Sigma_i \\frac{V_i}{K_i} \\right)^{-1}
        
         Parameters
         ----------
@@ -251,7 +251,7 @@ class reuss(averaging_scheme):
         bound, given by:
  
         .. math::
-            G_R = \\Sigma_i \\frac{V_i}{G_i} 
+            G_R = \\left( \\Sigma_i \\frac{V_i}{G_i} \\right)^{-1}
        
         Parameters
         ----------
