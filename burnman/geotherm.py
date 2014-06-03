@@ -5,6 +5,10 @@
 import numpy as np
 import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
+import os, sys
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+    sys.path.insert(1,os.path.abspath('..')) 
+sys.path.insert(1,os.path.abspath('.')) 
 import burnman
 from tools import *
 
