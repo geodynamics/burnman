@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_geotherms
+-----------------
+
 This example shows each of the geotherms currently possible with BurnMan.
 These are:
 
