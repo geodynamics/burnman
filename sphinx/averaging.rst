@@ -8,6 +8,9 @@ formula for its averaged elastic properties.  Instead, we must choose from a num
 or use bounding methods to get a range of possible values.  The module :mod:`burnman.averaging_schemes` provides a number of different 
 averages and bounds for a composite.
 
+Base class
+-----------
+.. autoclass:: burnman.averaging_schemes.averaging_scheme
 
 Voigt bound
 -----------
