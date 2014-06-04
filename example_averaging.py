@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_averaging
+-----------------
+
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
 
