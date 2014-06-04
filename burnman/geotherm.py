@@ -5,12 +5,9 @@
 import numpy as np
 import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
-import os, sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
-sys.path.insert(1,os.path.abspath('.')) 
-import burnman
-from tools import *
+
+import burnman.tools
+import burnman.seismic
 
 
 def brown_shankland(pressure):
@@ -30,7 +27,7 @@ def brown_shankland(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       depth = burnman.seismic.prem_model.depth(pressure[i])
-      temperature[i] = lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
+      temperature[i] = burnman.tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
     return temperature
 
 
@@ -51,7 +48,7 @@ def anderson(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       depth = burnman.seismic.prem_model.depth(pressure[i])
-      temperature[i] = lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
+      temperature[i] = burnman.tools.lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)    
     return temperature
 
 def adiabatic(pressures, T0, rock):
@@ -136,29 +133,11 @@ def dTdP(temperature, pressure, rock):
     return temperature*top/bottom
 
 
-table_brown = read_table("input_geotherm/brown_81.txt")
+table_brown = burnman.tools.read_table("input_geotherm/brown_81.txt")
 table_brown_depth = np.array(table_brown)[:,0]
 table_brown_temperature = np.array(table_brown)[:,1]
 
-table_anderson = read_table("input_geotherm/anderson_82.txt")
+table_anderson = burnman.tools.read_table("input_geotherm/anderson_82.txt")
 table_anderson_depth = np.array(table_anderson)[:,0]
 table_anderson_temperature = np.array(table_anderson)[:,1]
 
-# test geotherm
-if __name__ == "__main__":
-    p = np.arange(1.0e9,128.0e9,3e9)
-  
-    pyrolite = burnman.composite( [ (burnman.minerals.SLB_2011.mg_fe_perovskite(0.2), 0.8), (burnman.minerals.SLB_2011.ferropericlase(0.4), 0.2) ] )
-    pyrolite.set_method('slb3')
-    pyrolite.set_state(40.e9, 2000)
-
-    t1 = anderson(p)
-    t2 = brown_shankland(p)
-    t3 = adiabatic(p, 1600, pyrolite)
-
-    p1,=pyplot.plot(p,t1,'x--r')
-    p2,=pyplot.plot(p,t2,'*-g')
-    p3,=pyplot.plot(p,t3,'*-b')
-    pyplot.legend([p1,p2,p3],[ "anderson", "brown", "adiabatic"], loc=4)
-
-    pyplot.show()

@@ -2,16 +2,15 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-import scipy.optimize as opt
-import birch_murnaghan as bm
-import debye
 import numpy as np
-from equation_of_state import equation_of_state
+import scipy.optimize as opt
 import warnings
- 
-import matplotlib.pyplot as plt
 
-class slb_base(equation_of_state):
+import burnman.birch_murnaghan as bm
+import burnman.debye as debye
+import burnman.equation_of_state as eos
+ 
+class slb_base(eos.equation_of_state):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
     in Stixrude and Lithgow-Bertelloni (2005).  For the most part, the equations are 

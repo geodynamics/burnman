@@ -3,9 +3,9 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import tools
 import matplotlib.pyplot as plt
-import math
+
+import burnman.tools
 
 class seismic_data:
     """
@@ -86,18 +86,18 @@ class radiustable(seismic_data):
     def v_phi(self, depth):
         v_s=self.v_s(depth)
         v_p=self.v_p(depth)
-        return math.sqrt(v_p*v_p-4./3.*v_s*v_s)
+        return np.sqrt(v_p*v_p-4./3.*v_s*v_s)
 
     def density(self, depth):
         return self._lookup(depth, self.table_density)        
 
     def depth(self, pressure):
-        radius = tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
+        radius = burnman.tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
         return self.earth_radius - radius
 
     def _lookup(self, depth, value_table):
         radius = self.earth_radius - depth
-        return tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
+        return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
 class prem(radiustable):
@@ -106,7 +106,7 @@ class prem(radiustable):
     """
     def __init__(self):
         radiustable.__init__(self)
-        table = tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
+        table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
         self.table_pressure = table[:,1] 
@@ -115,7 +115,7 @@ class prem(radiustable):
         self.table_vs = table[:,4]
 
     def grav(self,depths):
-        table = tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
+        table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
         table_rad = table[:,0]
         table_g = table[:,1]
@@ -132,12 +132,12 @@ class slow(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]  
-        table2 = tools.read_table("input_seismic/swave_slow.txt")
+        table2 = burnman.tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("input_seismic/pwave_slow.txt")
+        table3 = burnman.tools.read_table("input_seismic/pwave_slow.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])
@@ -165,12 +165,12 @@ class fast(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]  
-        table2 = tools.read_table("input_seismic/swave_fast.txt")
+        table2 = burnman.tools.read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("input_seismic/pwave_fast.txt")
+        table3 = burnman.tools.read_table("input_seismic/pwave_fast.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])
@@ -194,7 +194,7 @@ class prem_test(radiustable):
     def __init__(self):
         radiustable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         self.table_radius = table[:,0]   
         self.table_pressure = table[:,1] 

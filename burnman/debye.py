@@ -4,8 +4,7 @@
 
 import numpy as np
 import scipy.integrate as integrate
-import matplotlib.pyplot as plt
-import time
+from numpy.polynomial.chebyshev import Chebyshev
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye, 
@@ -27,7 +26,6 @@ def debye_fn(x):
 
 
 
-from numpy.polynomial.chebyshev import Chebyshev
 chebyshev_representation = Chebyshev( [ 2.707737068327440945/2.0, 0.340068135211091751, -0.12945150184440869e-01, \
                                      0.7963755380173816e-03, -0.546360009590824e-04, 0.39243019598805e-05, \
                                     -0.2894032823539e-06, 0.217317613962e-07, -0.16542099950e-08, \
@@ -101,7 +99,8 @@ def heat_capacity_v(T,debye_T,n):
 
 
 if __name__ == "__main__":
-
+    import matplotlib.pyplot as plt
+    import time
 
     def old_thermal(T, debye_T, n):
         if T == 0:
