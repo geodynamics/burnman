@@ -15,9 +15,17 @@ from tools import *
 
 def brown_shankland(pressure):
     """
-    geotherm from Brown and Shankland 1981
-    pressure: in Pa
-    returns: temperature in K
+    Geotherm from Brown and Shankland (1981).
+
+    Parameters
+    ----------
+    pressure : list of floats
+        The list of pressures in [Pa] at which to evaluate the geotherm.
+
+    Returns
+    -------
+    temperature : list of floats
+        The list of temperatures in [K] for each of the pressures
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
@@ -25,12 +33,20 @@ def brown_shankland(pressure):
       temperature[i] = lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)    
     return temperature
 
-# geotherm from Anderson 1982
+
 def anderson(pressure):
     """
-    geotherm from Anderson 1982
-    pressure: in Pa
-    returns: temperature in K
+    Geotherm from Anderson (1982).
+
+    Parameters
+    ----------
+    pressure : list of floats
+        The list of pressures in [Pa] at which to evaluate the geotherm.
+
+    Returns
+    -------
+    temperature : list of floats
+        The list of temperatures in [K] for each of the pressures
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
@@ -40,14 +56,36 @@ def anderson(pressure):
 
 def adiabatic(pressures, T0, rock):
     """
-    This integrates dT/dP = gr * T / K_s  in order to get a mantle adiabat
-    at the pressures given.  Takes pressures in Pa, as well as an anchor
-    temperature corresponding to the first pressure in the list. The third
-    argument is an instance or burnman.composite, which is the material
-    for which we compute the adiabat.  For more info see the documentation
-    on dTdP
+    This calculates a geotherm based on an anchor temperature and a rock, 
+    assuming that the rock's temperature follows an adiabatic gradient with 
+    pressure.  This amounts to integrating 
 
-    Returns: a list of temperatures [K]  for each of the pressures [Pa]
+    .. math:: 
+        \\frac{\partial T}{\partial P} = \\frac{ \\gamma  T}{ K_s } 
+
+    where :math:`\\gamma` is the Grueneisen parameter and :math:`K_s` is 
+    the adiabatic bulk modulus.  
+ 
+    Parameters
+    ----------
+
+    pressures : list of floats
+        The list of pressures in [Pa] at which to evaluate the geotherm.
+   
+    T0 : float
+        An anchor temperature, corresponding to the temperature of the first
+        pressure in the list.
+
+    rock : :class:`burnman.composite`
+        Material for which we compute the adiabat.  From this material we 
+        must compute average Grueneisen parameters and adiabatic bulk moduli
+        for each pressure/temperature. 
+
+    Returns
+    -------
+
+    temperature: list of floats
+        The list of temperatures in [K] for each of the pressures
     """
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
     return temperatures.ravel()
@@ -63,7 +101,25 @@ def dTdP(temperature, pressure, rock):
     to equilibrate to a constant temperature dT, conserving heat within the composite.
     This works out to the formula: dT/dP = T*sum(frac[i]*Cp[i]*gr[i]/K[i])/sum(frac[i]*Cp[i])
 
-    Returns: a single number, dT/dP [K/Pa] for the composite
+    This function is called by :func:`burnman.geotherm.adiabatic`, and in general 
+    it will not be too useful in other contexts.
+
+    Parameters
+    ----------
+
+    pressure : float
+        The pressure at which to evaluate dT/dP.
+   
+    temperature : float
+        The temperature at which to evaluate dT/dP.
+
+    rock : :class:`burnman.composite`
+        Material for which we compute dT/dP 
+
+    Returns
+    -------
+        dT/dP : float
+          Adiabatic temperature gradient [K/Pa] for the composite at temperature, pressure.
     """
     top = 0
     bottom = 0
