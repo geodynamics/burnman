@@ -7,16 +7,16 @@ class equation_of_state:
     This class defines the interface for an equation of state
     that a mineral uses to determine its properties at a 
     given P,T.  In order define a new equation of state, you
-    should define these functions"
+    should define these functions.
 
     All functions should accept and return values in SI units.
    
     In general these functions are functions of pressure,
     temperature, and volume, as well as a "params" object,
     which stores the material parameters of the stuff,
-    such as reference volume, debye temperature, etc...
+    such as reference volume, Debye temperature, etc. 
     The exceptions are volume and density, which are
-    just assumed to be functions of pressure and temperature
+    just assumed to be functions of pressure and temperature.
     """
 
     def volume(self, pressure, temperature, params):
