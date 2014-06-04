@@ -62,7 +62,7 @@ class averaging_scheme:
         """
         Average the densities of a composite, given a list of volume
         fractions and densitites.  This is the only method of
-        :class:`averaging_scheme` which is implemented in the base class,
+        :class:`burnman.averaging_schemes.averaging_scheme` which is implemented in the base class,
         as how to calculate it is not dependent on the geometry of the rock.
         The formula for density is given by
 
@@ -91,8 +91,8 @@ class averaging_scheme:
 class voigt_reuss_hill(averaging_scheme):
     """ 
     Class for computing the Voigt-Reuss-Hill average for elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -103,7 +103,7 @@ class voigt_reuss_hill(averaging_scheme):
             K_{VRH} = \\frac{K_V + K_R}{2}
 
         This is simply a shorthand for an arithmetic average of the bounds given 
-        by :class:`voigt` and :class:`reuss`.
+        by :class:`burnman.averaging_schemes.voigt` and :class:`burnman.averaging_schemes.reuss`.
        
         Parameters
         ----------
@@ -131,7 +131,7 @@ class voigt_reuss_hill(averaging_scheme):
             G_{VRH} = \\frac{G_V + G_R}{2}
 
         This is simply a shorthand for an arithmetic average of the bounds given 
-        by :class:`voigt` and :class:`reuss`.
+        by :class:`burnman.averaging_schemes.voigt` and :class:`burnman.averaging_schemes.reuss`.
        
         Parameters
         ----------
@@ -155,8 +155,8 @@ class voigt_reuss_hill(averaging_scheme):
 class voigt(averaging_scheme):
     """ 
     Class for computing the Voigt (iso-strain) bound for elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -215,8 +215,8 @@ class voigt(averaging_scheme):
 class reuss(averaging_scheme):
     """ 
     Class for computing the Reuss (iso-stress) bound for elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -275,8 +275,8 @@ class reuss(averaging_scheme):
 class hashin_shtrikman_upper(averaging_scheme):
     """
     Class for computing the upper Hashin-Shtrikman bound for elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     Implements Formulas from Watt et al (1976).  The Hashin-Shtrikman bounds
     are tighter than the Voigt and Reuss bounds because they make the 
     additional assumption that the orientation of the phases are statistically 
@@ -357,8 +357,8 @@ class hashin_shtrikman_upper(averaging_scheme):
 class hashin_shtrikman_lower(averaging_scheme):
     """
     Class for computing the lower Hashin-Shtrikman bound for elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     Implements Formulas from Watt et al (1976).  The Hashin-Shtrikman bounds
     are tighter than the Voigt and Reuss bounds because they make the 
     additional assumption that the orientation of the phases are statistically 
@@ -439,8 +439,8 @@ class hashin_shtrikman_lower(averaging_scheme):
 class hashin_shtrikman_average(averaging_scheme):
     """ 
     Class for computing arithmetic mean of the Hashin-Shtrikman bounds on elastic properties. 
-    This derives from :class:`averaging_scheme`, and implements 
-    the :func:`average_bulk_moduli` and :func:`average_shear_moduli` functions.
+    This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
     def __init__(self):
         self.upper = hashin_shtrikman_upper()
