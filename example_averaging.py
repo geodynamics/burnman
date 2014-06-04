@@ -5,6 +5,7 @@
 """
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
+
 1. Voight-Reuss-Hill
 2. Voight averaging
 3. Reuss averaging
