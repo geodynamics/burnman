@@ -29,7 +29,7 @@ echo "gen_doc..."
 python gen_doc.py >/dev/null || exit 1
 cd ..
 
-testit "burnman/benchmark.py"
+testit "tests/benchmark.py"
 echo "   done"
 
 
