@@ -12,6 +12,7 @@ Welcome to BurnMan's documentation!
    :maxdepth: 2
 
    main
+   eos
    averaging
    geotherms
    minerals
