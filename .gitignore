@@ -1,2 +1,4 @@
+/output_figures/*
+/example_woutput.txt
 /sphinx/_build/*
 *.pyc
