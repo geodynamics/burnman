@@ -3,14 +3,16 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import mie_grueneisen_debye as mgd
-import birch_murnaghan as bm
 import warnings
-import slb
-import equation_of_state as eos
-import composite
 
-class material(composite.abstract_material):
+from .composite import abstract_material
+
+import burnman.equation_of_state as eos
+import burnman.birch_murnaghan as bm
+import burnman.slb as slb
+import burnman.mie_grueneisen_debye as mgd
+
+class material(abstract_material):
     """
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature

@@ -5,9 +5,9 @@
 import numpy as np
 import equation_of_state as eos
 import scipy.optimize as opt
-import matplotlib.pylab as plt
-import birch_murnaghan as bm
-import debye
+
+import burnman.birch_murnaghan as bm
+import burnman.debye as debye
 
 
 class mgd_base(eos.equation_of_state):

@@ -27,12 +27,22 @@ Features:
 
 """
 
-from composite import abstract_material
-from composite import composite_base, composite
+
+#classes for representing rocks and minerals
+from composite import composite,composite_base,abstract_material
 from minerals_base import material
 
+#high level functions
 from main import *
-from partitioning import calculate_partition_coefficient,calculate_phase_percents
+
+#mineral library
 import minerals
+
+#central user tools
 import seismic
 import averaging_schemes
+import geotherm
+
+#miscellaneous
+import tools
+from partitioning import calculate_partition_coefficient,calculate_phase_percents

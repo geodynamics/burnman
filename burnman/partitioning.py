@@ -2,22 +2,7 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-#system libs:
-import numpy
-import scipy.optimize as opt
-import scipy.integrate as integrate
-import math
-import matplotlib.pyplot as pyplot
-
-#own libs:
-import os, sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
-sys.path.insert(1,os.path.abspath('.')) 
-import burnman
-
-import geotherm
-from tools import *
+import numpy as np
 
 # TODO: add up weight percent and check <100 and tell them how much
 
@@ -88,35 +73,16 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
     delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
     
 
-    rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+math.log(Kd_0) #eq 5 Nakajima et al 2012
+    rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012
 
-    K = math.exp(rs) #The exchange coefficent at P and T
+    K = np.exp(rs) #The exchange coefficent at P and T
 
     num_to_sqrt = (-4.*frac_mol_FeO*(K-1.)*K*frac_mol_SiO2)+(pow(1.+(frac_mol_FeO*(K-1))+((K-1.)*frac_mol_SiO2),2.))
 
-    b = (-1. + frac_mol_FeO - (frac_mol_FeO*K)+frac_mol_SiO2 - (frac_mol_SiO2*K) + math.sqrt(num_to_sqrt)) \
+    b = (-1. + frac_mol_FeO - (frac_mol_FeO*K)+frac_mol_SiO2 - (frac_mol_SiO2*K) + np.sqrt(num_to_sqrt)) \
          / (2.*frac_mol_SiO2*(1.-K))
 
     a = b /(((1.-b)*K)+b)
     
     return (a,b) #a is partition coefficient array with P for mw, b is pcarray for pv
 
-# test some composition (Javoy 2010, Table 6, PLoM)
-if __name__ == "__main__":
-    inp1 = {'Mg':0.213, 'Fe': 0.0626, 'Si':0.242, 'Ca':0., 'Al':0.} # wt%
-    phase_per,rel_mol_per = calculate_phase_percents(inp1) 
-
-    StartP = 23.83 #in GPa
-    EndP = 110.0
-    deltaP = 1.
-
-    #P,T,a,b,frac_mol_pv,frac_mol_mw    = part_coef_calc(inp2,StartP,EndP,deltaP)
-
-    gt = lambda p: geotherm.brown_shankland(p)
-    pressure = StartP
-    temperature = gt([StartP,])
-    calculate_partition_coefficient(pressure, temperature, rel_mol_per, 0.5)
-    #part_coef_calc(inp2,StartP,EndP,deltaP)
-    #print inp1
-    #print inp2
-    #print t

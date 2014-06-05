@@ -9,13 +9,13 @@ Murakami_2013
 Minerals from Murakami 2013 and references therein
 
 """
-from burnman.minerals_base import *
+import burnman.minerals_base as bmb
                 
 
 
 
 
-class periclase (material):
+class periclase (bmb.material):
     """
     Murakami 2013 and references therine
     """
@@ -34,7 +34,7 @@ class periclase (material):
             'q_0': 1.5,
             'eta_s_0': 2.3 }
 
-class wuestite (material):
+class wuestite (bmb.material):
     """
     Muarakami 2013 and references therein
     """
@@ -55,22 +55,22 @@ class wuestite (material):
 
 
 
-class ferropericlase(helper_solid_solution):
+class ferropericlase(bmb.helper_solid_solution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helper_solid_solution.__init__(self, base_materials, molar_fraction)
+        bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
 
-class mg_fe_perovskite(helper_solid_solution):
+class mg_fe_perovskite(bmb.helper_solid_solution):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helper_solid_solution.__init__(self, base_materials, molar_fraction)
+        bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
-class mg_perovskite(material):
+class mg_perovskite(bmb.material):
     """
     Murakami 2013 and references therin
     """
@@ -89,7 +89,7 @@ class mg_perovskite(material):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
-class fe_perovskite(material):
+class fe_perovskite(bmb.material):
     """
     Murakami 2013 and references therein
     """

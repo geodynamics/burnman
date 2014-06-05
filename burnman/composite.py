@@ -137,16 +137,3 @@ class composite(composite_base):
         volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.staticphases])
         return np.sum(densities*volumes)/np.sum(volumes)
 
-        
-                
-
-
-
-if __name__ == "__main__":
-    import minerals
-
-    pyrolite = composite( [ (minerals.SLB_2005.mg_fe_perovskite(0.2), 0.8), (minerals.SLB_2005.ferropericlase(0.4), 0.8) ] )
-    pyrolite.set_method('slb3')
-    pyrolite.set_state(40.e9, 2000)
-    print pyrolite.staticphases[0].mineral.density(), pyrolite.staticphases[1].mineral.density(), pyrolite.density()
-

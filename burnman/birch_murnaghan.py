@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 import scipy.optimize as opt
-import equation_of_state as eos
+import burnman.equation_of_state as eos
 
 def bulk_modulus(volume, params):
     """

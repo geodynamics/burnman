@@ -10,16 +10,16 @@ Other minerals in burnman.minerals.other are:
 
 """
 
-from burnman.minerals_base import *
+import burnman.minerals_base as bmb
 
 
 
-class Speziale_fe_periclase(helper_spin_transition):  
+class Speziale_fe_periclase(bmb.helper_spin_transition):  
     def __init__(self):
-        helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
+        bmb.helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
         self.cite = 'Speziale et al. 2007'
 
-class Speziale_fe_periclase_HS(material):
+class Speziale_fe_periclase_HS(bmb.material):
     """
     Speziale et al. 2007, Mg#=83
     """ 
@@ -35,7 +35,7 @@ class Speziale_fe_periclase_HS(material):
                         'grueneisen_0': 1.46,
                         'q_0': 1.2 }
 
-class Speziale_fe_periclase_LS(material): 
+class Speziale_fe_periclase_LS(bmb.material): 
     """
     Speziale et al. 2007, Mg#=83
     """
