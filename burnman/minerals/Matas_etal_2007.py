@@ -10,10 +10,11 @@ Minerals from Matas et al. 2007 and references therein
 """
 
 import burnman.minerals_base as bmb
+from burnman.mineral import mineral
 
 
 
-class mg_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
+class mg_perovskite(mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -31,7 +32,7 @@ class mg_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4} 
 
-class fe_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
+class fe_perovskite(mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -49,7 +50,7 @@ class fe_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4} 
 
-class al_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
+class al_perovskite(mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -67,7 +68,7 @@ class al_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
-class ca_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
+class ca_perovskite(mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -86,7 +87,7 @@ class ca_perovskite(bmb.material): # Matas et al 2007 Tables 1&2
             'q_0': 1.6}
 
 
-class periclase (bmb.material): # Matas et al 2007 Tables 1&2
+class periclase (mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """
@@ -104,7 +105,7 @@ class periclase (bmb.material): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.41,
             'q_0': 1.3 }
 
-class wuestite (bmb.material): # Matas et al 2007 Tables 1&2
+class wuestite (mineral): # Matas et al 2007 Tables 1&2
     """
     Matas et al. 2007 and references therein
     """

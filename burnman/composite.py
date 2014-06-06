@@ -6,41 +6,10 @@ import numpy as np
 import warnings
 from collections import namedtuple
 
-class abstract_material:
-    """
-    Base class for all materials. The main functionality is unroll() which
-    returns a list of objects of type burnman.mineral and their molar
-    fractions.
-    """
+from burnman.material import material   
+from burnman.mineral import mineral
 
-    def set_method(self, method):
-        """
-        """
-        raise NotImplementedError("need to implement this in derived class!")
-
-    def to_string(self):
-        """
-        return the name of the composite
-        """
-        return "'" + self.__class__.__name__ + "'"
-
-    def set_state(self, pressure, temperature):
-        """
-        """
-        self.pressure = pressure
-        self.temperature = temperature
-
-    def unroll(self):
-        """ return (fractions, minerals) where both are arrays. May depend on current state """
-        raise NotImplementedError("need to implement this in derived class!")
-        return ()
-
-    def density(self):
-        raise NotImplementedError("need to implement this in derived class!")
-        return inf            
-        
-
-class composite_base(abstract_material):
+class composite_base(material):
     """
     base class for writing your own composites that need to dynamically pick
     the fractions and or minerals. The only function that needs to be implemented
@@ -68,9 +37,8 @@ def check_pairs(fractions, minerals):
         if abs(total-1.0)>1e-10:
             raise Exception('ERROR: list of molar fractions does not add up to one')
         for p in minerals:
-            if not isinstance(p,abstract_material):
-                print type(p)
-                raise Exception('ERROR: object is not of type abstract_material')
+            if not isinstance(p,mineral):
+                raise Exception('ERROR: object of type ''%s'' is not of type material' % (type(p)))
 
 
 # static composite of minerals/composites
