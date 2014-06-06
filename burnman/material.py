@@ -24,6 +24,9 @@ class material:
         """
         return "'" + self.__class__.__name__ + "'"
 
+    def debug_print(self):
+        print self.to_string()
+
     def set_state(self, pressure, temperature):
         """
         Set the material to the given pressure and temperature
