@@ -65,7 +65,7 @@ def read_table(filename):
         if (line[0]!='#'):
             numbers = np.fromstring( line , sep =' ')
             table.append(numbers)
-    return table
+    return np.array(table)
 
 def cut_table(table, min_value, max_value):
     tablen=[]
