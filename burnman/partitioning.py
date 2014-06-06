@@ -53,12 +53,15 @@ def calculate_phase_percents(inp):
     
 def part_coef_calc(inp2,StartP,EndP,deltaP):
 
+    raise Exception("not implemented")
+
     a = [] #partition coefficent of Fe in fp
     b = [] #partition coefficent of Fe in pv
     
     Pressure= []
     Temperature=[]
     counter = 0
+
     
     
    
