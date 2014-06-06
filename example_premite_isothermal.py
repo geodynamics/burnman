@@ -32,16 +32,15 @@ print "preparations done"
 
 def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime): 
 
-    test = burnman.minerals_base.material()
+    rock = burnman.mineral()
 
-    test.params['V_0'] = 10.e-6
-    test.params['molar_mass'] = ref_rho*test.params['V_0']
-    test.params['K_0'] = K_0
-    test.params['Kprime_0'] = K_prime
-    test.params['G_0'] = G_0
-    test.params['Gprime_0'] = G_prime
+    rock.params['V_0'] = 10.e-6
+    rock.params['molar_mass'] = ref_rho*rock.params['V_0']
+    rock.params['K_0'] = K_0
+    rock.params['Kprime_0'] = K_prime
+    rock.params['G_0'] = G_0
+    rock.params['Gprime_0'] = G_prime
 
-    rock = burnman.composite( [(test, 1.0 )] )
     rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)

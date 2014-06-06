@@ -56,8 +56,9 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.brown_shankland(seis_p)
     
     def material_error(amount_perovskite):
-        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
+        rock = burnman.composite ( [amount_perovskite, 1.0-amount_perovskite], \
+                                       [minerals.Murakami_etal_2012.fe_perovskite(), \
+                                            minerals.Murakami_etal_2012.fe_periclase()] )
     
         rock.set_method(method)
     

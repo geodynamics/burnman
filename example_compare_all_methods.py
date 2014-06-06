@@ -29,8 +29,9 @@ if __name__ == "__main__":
     #Input composition. 
 
     amount_perovskite = 0.95
-    rock = burnman.composite( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
-                            (minerals.Murakami_etal_2012.fe_periclase_LS(), 1.0-amount_perovskite) ] )
+    rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+                                  [minerals.Murakami_etal_2012.fe_perovskite(), \
+                                       minerals.Murakami_etal_2012.fe_periclase_LS()] )
 
     #(min pressure, max pressure, pressure step)
     seis_p = np.arange(25e9, 125e9, 5e9)
