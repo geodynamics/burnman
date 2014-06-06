@@ -22,7 +22,7 @@ def check_birch_murnaghan():
     plt.close()
 
     #make a test mineral
-    test_mineral = burnman.material()
+    test_mineral = burnman.mineral()
     test_mineral.params ={'name':'test',
                           'V_0': 6.844e-6,
                           'K_0': 259.0e9,
@@ -65,7 +65,7 @@ def check_mgd_shim_duffy_kenichi():
     """
     plt.close()
     #Create gold material from Table 1
-    gold = burnman.material()
+    gold = burnman.mineral()
     gold.params = {'name': 'gold',
                    'V_0': 10.22e-6,
                    'K_0': 167.0e9,
@@ -104,7 +104,7 @@ def check_mgd_fei_mao_shu_hu():
     """
     Benchmark agains Fei Mao Shu Hu (1991)
     """
-    mgfeo = burnman.material() 
+    mgfeo = burnman.mineral() 
     mgfeo.params = {       'name': 'MgFeO',
                     'V_0': 11.657e-6,
                     'K_0': 157.0e9,
@@ -142,7 +142,7 @@ def check_slb_fig3():
     """
     Benchmark grueneisen parameter against figure 3 of Stixrude and Lithgow-Bertelloni (2005b)
     """
-    perovskite= burnman.material() 
+    perovskite= burnman.mineral() 
     perovskite.params = {       'name': 'perovksite',
                     'V_0': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
                     'grueneisen_0': 1.63,
@@ -182,7 +182,7 @@ def check_slb_fig7_txt():
     """
     Calculates all values for forsterite and benchmarks with values from Stixrude and Lithgow-Bertelloni (personal communication)
     """
-    forsterite = burnman.material() 
+    forsterite = burnman.mineral() 
     forsterite.params = {       'name': 'forsterite',
                     'V_0': 43.603e-6,
                     'K_0': 127.955e9,
@@ -273,7 +273,7 @@ def check_slb_fig7():
     """
     Calculates all values for forsterite and benchmarks with figure 7 from Stixrude and Lithgow-Bertelloni (2005)
     """
-    forsterite = burnman.material() 
+    forsterite = burnman.mineral() 
     forsterite.params = {       'name': 'forsterite',
                     'V_0': 43.60e-6,
                     'K_0': 128.0e9,

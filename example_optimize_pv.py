@@ -56,16 +56,17 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.brown_shankland(seis_p)
     
     def material_error(amount_perovskite):
-        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
-                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
+        rock = burnman.composite ( [amount_perovskite, 1.0-amount_perovskite], \
+                                       [minerals.Murakami_etal_2012.fe_perovskite(), \
+                                            minerals.Murakami_etal_2012.fe_periclase()] )
     
         rock.set_method(method)
     
-        print "Calculations are done for:"
-        rock.debug_print()
-    
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+    
+        print "Calculations are done for:"
+        rock.debug_print()
     
        #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
         [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,[mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])

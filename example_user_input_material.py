@@ -58,10 +58,10 @@ if __name__ == "__main__":
         (your choice in geotherm will not matter in this case))"""
     method = 'slb3'
     
-    #in form name_of_mineral (burnman.material <- creates list with parameters)
-    class own_material (burnman.material): 
+    #in form name_of_mineral (burnman.mineral <- creates list with parameters)
+    class own_material (burnman.mineral): 
             def __init__(self):
-                    burnman.material.__init__(self)
+                    burnman.mineral.__init__(self)
                     self.params = {
                             'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)] 
                             	#at room pressure/temperature
@@ -84,7 +84,7 @@ if __name__ == "__main__":
                					
     
     
-    rock = burnman.composite( [(own_material(), 1.0)] )
+    rock = own_material()
     
     #seismic model for comparison: (see burnman/seismic.py)
     seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 

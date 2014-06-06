@@ -1,10 +1,8 @@
-/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
-  warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase'
-  warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
-/home/ian/burnman/burnman/minerals_base.py:117: UserWarning: Warning: G and or G_prime are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
-  warnings.warn(('Warning: G and or G_prime are undefined for ' + self.to_string()))
+burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
+  warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
+burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
+  warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 Calculations are done for:
-1.0  of phase 'burnman.minerals.Murakami_etal_2012.fe_periclase'
+'fe_periclase'
 Calculations are done for:
-1.0  of phase 'burnman.minerals.other.Speziale_fe_periclase'
+'Speziale_fe_periclase'

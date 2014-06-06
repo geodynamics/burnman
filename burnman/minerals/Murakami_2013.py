@@ -9,13 +9,15 @@ Murakami_2013
 Minerals from Murakami 2013 and references therein
 
 """
-import burnman.minerals_base as bmb
+
+import burnman.mineral_helpers as bmb
+from burnman.mineral import mineral
                 
 
 
 
 
-class periclase (bmb.material):
+class periclase (mineral):
     """
     Murakami 2013 and references therine
     """
@@ -34,7 +36,7 @@ class periclase (bmb.material):
             'q_0': 1.5,
             'eta_s_0': 2.3 }
 
-class wuestite (bmb.material):
+class wuestite (mineral):
     """
     Muarakami 2013 and references therein
     """
@@ -70,7 +72,7 @@ class mg_fe_perovskite(bmb.helper_solid_solution):
         bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
-class mg_perovskite(bmb.material):
+class mg_perovskite(mineral):
     """
     Murakami 2013 and references therin
     """
@@ -89,7 +91,7 @@ class mg_perovskite(bmb.material):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
-class fe_perovskite(bmb.material):
+class fe_perovskite(mineral):
     """
     Murakami 2013 and references therein
     """

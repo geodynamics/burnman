@@ -49,8 +49,8 @@ if __name__ == "__main__":
     # Here "rock" has two constituent minerals: it is 80% Mg perovskite
     # and 20% periclase.  More minerals may be added by simply extending
     # the list given to burnman.composite
-    rock = burnman.composite ( [ (minerals.SLB_2011.mg_perovskite(), 0.80),\
-                                 (minerals.SLB_2011.periclase(),     0.20) ] )
+    rock = burnman.composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),\
+                                 minerals.SLB_2011.periclase()] )
 
 
     # Here we create and load the PREM seismic velocity model, which will be

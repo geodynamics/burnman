@@ -13,8 +13,8 @@ from burnman import minerals
 class TestRock(unittest.TestCase):
     def test_rock(self):
         amount_perovskite = 0.3
-        rock = burnman.composite( ( ( minerals.SLB_2005.mg_fe_perovskite(0.1), amount_perovskite ), 
-                                    (minerals.SLB_2005.ferropericlase(0.2), 1.0-amount_perovskite) ) )
+        rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+            [minerals.SLB_2005.mg_fe_perovskite(0.1), minerals.SLB_2005.ferropericlase(0.2)] )
         rock.set_method('slb2')
         (fr,phases)=rock.unroll()
         self.assertAlmostEqual(fr[0], 0.3, 2)

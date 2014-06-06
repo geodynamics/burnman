@@ -29,8 +29,10 @@ Features:
 
 
 #classes for representing rocks and minerals
-from composite import composite,composite_base,abstract_material
-from minerals_base import material
+from mineral import mineral
+from material import material
+from composite import composite
+from mineral_helpers import *
 
 #high level functions
 from main import *

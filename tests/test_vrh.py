@@ -6,7 +6,7 @@ import burnman
 from burnman import minerals
 import burnman.averaging_schemes as avg
 
-class mypericlase (burnman.material):
+class mypericlase (burnman.mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -44,7 +44,7 @@ class VRH_average(unittest.TestCase):
 
 class VRH(unittest.TestCase):
     def test_1(self):
-        rock = burnman.composite ( ( (mypericlase(), 1.0),) )
+        rock = burnman.composite ( [1.0], [mypericlase()] )
         rock.set_method('slb3') 
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock, [10e9,], [300,])
@@ -56,7 +56,7 @@ class VRH(unittest.TestCase):
         self.assertAlmostEqual(150.901, G_vrh[0]/1.e9, 2)
 
     def same(self, number):
-        rock = burnman.composite (  [(mypericlase(), 1.0/number)]*number  )
+        rock = burnman.composite ( [1.0/number] * number, [mypericlase()]*number )
         
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
@@ -74,8 +74,7 @@ class VRH(unittest.TestCase):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.composite ( [ (minerals.SLB_2005.periclase(), 1.0), 
-                                     (minerals.SLB_2005.fe_perovskite(), 0.0) ] )
+        rock = burnman.composite ( [1.0, 0.0], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock,[10e9,], [300,])

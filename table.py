@@ -29,7 +29,7 @@ if __name__ == "__main__":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
                 #print mineral
-                if inspect.isclass(mineral) and mineral!=burnman.material and issubclass(mineral, burnman.material):
+                if inspect.isclass(mineral) and mineral!=burnman.mineral and issubclass(mineral, burnman.mineral):
                     #print mineral.__module__ + mineral.__name__
                     name = mineral.__module__.replace("minlib_","").replace("burnman.","minerals.") + "." + mineral.__name__
                     if not name in names:

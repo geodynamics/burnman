@@ -57,10 +57,9 @@ if __name__ == "__main__":
     Kd_0 = .5
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_pyro, Kd_0)
-    pyrolite = burnman.composite( [ (minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0),\
-     							phase_fractions_pyro['pv'] ),
-                                (minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1), \
-                                phase_fractions_pyro['fp'] ) ] )
+    pyrolite = burnman.composite( [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']], \
+                                      [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0),\
+                                           minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     
     #input pressure range for first model. 
     seis_p_1 = np.arange(25e9, 125e9, 5e9)
@@ -81,10 +80,9 @@ if __name__ == "__main__":
     calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_enst, Kd_0)
-    enstatite = burnman.composite ( [ (minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0), \
-    							phase_fractions_enst['pv'] ),
-                                (minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1), \
-                                phase_fractions_enst['fp'] ) ] )
+    enstatite = burnman.composite ([phase_fractions_enst['pv'], phase_fractions_enst['fp']], \
+                                       [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0), \
+                                            minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     
     
     #input second pressure range. Same as the first for comparison
@@ -109,12 +107,14 @@ if __name__ == "__main__":
     
     enstatite.set_method(method)
     
-    print "Calculations are done for:"
-    enstatite.debug_print()
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \
         burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
         burnman.averaging_schemes.voigt_reuss_hill())
+
+    print "Calculations are done for:"
+    enstatite.debug_print()
+
     
     ##let's create PREM for reference
     s=burnman.seismic.prem()

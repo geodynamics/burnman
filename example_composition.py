@@ -72,15 +72,16 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.composite ( [ (minerals.SLB_2011.mg_perovskite(), amount_perovskite),
-                                     (minerals.SLB_2011.periclase(), \
-                                     1.0-amount_perovskite) ] )
+        rock = burnman.composite ( [amount_perovskite, 1.0-amount_perovskite], \
+                                       [minerals.SLB_2011.mg_perovskite(), \
+                                            minerals.SLB_2011.periclase()] )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite( [ (minerals.SLB_2011.mg_fe_perovskite(0.2), amount_perovskite), \
-                                (minerals.SLB_2011.ferropericlase(0.2), 1.0-amount_perovskite) ] )
+        rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+                                      [minerals.SLB_2011.mg_fe_perovskite(0.2), \
+                                           minerals.SLB_2011.ferropericlase(0.2)] )
     
     #Example 3: input weight percentages
     #See comments in example_partition_coef.py for references to 
