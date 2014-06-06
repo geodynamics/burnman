@@ -8,23 +8,6 @@ from collections import namedtuple
 
 from burnman.material import material   
 from burnman.mineral import mineral
-
-class composite_base(material):
-    """
-    base class for writing your own composites that need to dynamically pick
-    the fractions and or minerals. The only function that needs to be implemented
-    is unroll, which returns (fractions,minerals), both arrays. unroll may depend
-    on temperature and pressure, and the fractions are molar fractions, rather 
-    than volume. 
-    """
-    def set_state(self, pressure, temperature):
-        abstract_material.set_state(self, pressure, temperature)
-
-
-
-
-phase = namedtuple('phase', ['mineral', 'fraction'])
-
     
 def check_pairs(fractions, minerals):
         if len(fractions)<1:
@@ -42,38 +25,53 @@ def check_pairs(fractions, minerals):
 
 
 # static composite of minerals/composites
-class composite(composite_base):
+class composite(material):
     """
-    Base class for a composite material.  The constructor takes a tuple of tuples, 
-    where the inner tuple is a mineral/molar-fraction pair.  This can then be passed
-    to averaging schemes, the adiabatic geotherm function, or anything else that
-    expects a composite material
+    Base class for a static composite material with fixed molar fractions. The
+    elements can be minerals or materials, meaning composite can be nested
+    arbitrarily.
     """
-    def __init__(self, phase_tuples):
-        total = 0
-        self.staticphases = [] # make the rock composition an immutable tuple
-        for ph in phase_tuples:
-            total += ph[1]
-        if total != 1.0:
-            warnings.warn('Warning: list of molar fractions does not add up to one. Normalizing')
-        for ph in phase_tuples:
-            self.staticphases.append( phase(ph[0], ph[1]/total) )
+    def __init__(self, fractions, phases=None):
+        """
+
+        """
+
+        if phases is None:
+            # compatibility hack:
+            tmp = fractions
+            fractions = [pt[1] for pt in tmp]
+            phases = [pt[0] for pt in tmp]
+
+        assert(len(phases)==len(fractions))
+        assert(len(phases)>0)
+        for f in fractions:
+            assert(f>=0)
+        
+        self.children = zip(fractions, phases)
+
+        total = sum(fractions)
+
+        if (total-1.0)>1e-8:
+            warnings.warn('Warning: list of molar fractions does not add up to one. Normalizing.')
+            for (fraction,phase) in self.children:
+                fraction = fraction / total
+
 
     def set_method(self, method):
         """
         set the same equation of state method for all the phases in the composite
         """
-        for ph in self.staticphases:
-            ph.mineral.set_method(method) 
+        for (fraction, phase) in self.children:
+            phase.set_method(method) 
 
     def unroll(self):
         fractions = []
         minerals = []
 
-        for p in self.staticphases:
-            p_fr,p_min = p.mineral.unroll()
+        for (fraction, phase) in self.children:
+            p_fr,p_min = phase.unroll()
             check_pairs(p_fr, p_min)
-            fractions.extend([i*p.fraction for i in p_fr])
+            fractions.extend([i*fraction for i in p_fr])
             minerals.extend(p_min)
         return (fractions, minerals)
 
@@ -94,14 +92,14 @@ class composite(composite_base):
         """
         self.pressure = pressure
         self.temperature = temperature
-        for ph in self.staticphases:
-            ph.mineral.set_state(pressure, temperature) 
+        for (fraction, phase) in self.children:
+            phase.set_state(pressure, temperature) 
 
     def density(self):
         """
         Compute the density of the composite based on the molar volumes and masses
         """
-        densities = np.array([ph.mineral.density() for ph in self.staticphases])
-        volumes = np.array([ph.mineral.molar_volume()*ph.fraction for ph in self.staticphases])
+        densities = np.array([ph.density() for (_,ph) in self.children])
+        volumes = np.array([ph.molar_volume()*fraction for (fraction, ph) in self.children])
         return np.sum(densities*volumes)/np.sum(volumes)
 
