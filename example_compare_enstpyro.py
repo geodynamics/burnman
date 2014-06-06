@@ -109,12 +109,14 @@ if __name__ == "__main__":
     
     enstatite.set_method(method)
     
-    print "Calculations are done for:"
-    enstatite.debug_print()
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \
         burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
         burnman.averaging_schemes.voigt_reuss_hill())
+
+    print "Calculations are done for:"
+    enstatite.debug_print()
+
     
     ##let's create PREM for reference
     s=burnman.seismic.prem()

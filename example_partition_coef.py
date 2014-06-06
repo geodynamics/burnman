@@ -92,12 +92,12 @@ if __name__ == "__main__":
     
     rock.set_method(method)
     
-    print "Calculations are done for:"
-    rock.debug_print()
-    
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
         burnman.averaging_schemes.voigt_reuss_hill())
+    
+    print "Calculations are done for:"
+    rock.debug_print()
     
     [rho_err,vphi_err,vs_err]=burnman.compare_chifactor\
     ([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
