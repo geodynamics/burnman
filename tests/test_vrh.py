@@ -6,7 +6,7 @@ import burnman
 from burnman import minerals
 import burnman.averaging_schemes as avg
 
-class mypericlase (burnman.material):
+class mypericlase (burnman.mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """

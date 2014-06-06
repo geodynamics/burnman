@@ -7,7 +7,7 @@ from burnman import minerals
 
 
 
-class spin_transistion(unittest.TestCase):
+class spin_transition(unittest.TestCase):
     def test_new(self):
         
         mins = [minerals.Murakami_etal_2012.fe_periclase(), minerals.Murakami_etal_2012.fe_periclase_HS(), minerals.Murakami_etal_2012.fe_periclase_LS()]
@@ -19,14 +19,16 @@ class spin_transistion(unittest.TestCase):
             p.set_state(5e9, 300)
             #print p.v_s()
          
-        self.assertAlmostEqual(mins[0].v_s(), mins[1].v_s())
+        f,c = mins[0].unroll()
+        self.assertAlmostEqual(c[0].v_s(), mins[1].v_s())
         
         #print "LS regime: (on/high/low)"
         for p in mins:
             p.set_state(70e9, 300)
             #print p.v_s()
         
-        self.assertAlmostEqual(mins[0].v_s(), mins[2].v_s())
+        f,c = mins[0].unroll()
+        self.assertAlmostEqual(c[0].v_s(), mins[2].v_s())
 
 
 if __name__ == '__main__':
