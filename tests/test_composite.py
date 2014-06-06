@@ -105,5 +105,21 @@ class composite(unittest.TestCase):
         self.assertArraysAlmostEqual(f,[0.4, 0.6])
         self.assertEqual(mins,",".join([min1.to_string(),min2.to_string()]))
 
+    def test_density_composite(self):
+        pyrolite = burnman.composite( [0.95, 0.05], \
+                                  [minerals.SLB_2005.mg_fe_perovskite(0.2), \
+                                       minerals.SLB_2005.ferropericlase(0.4)] )
+        pyrolite.set_method('slb3')
+        pyrolite.set_state(40.e9, 2000)
+        
+        d1 = int(pyrolite.children[0][1].density())
+        d2 = int(pyrolite.children[1][1].density())
+        dmix = int(pyrolite.density())
+        assert(d1<dmix)
+        assert(dmix<d2)
+        assert(d1 == 4732)
+        assert(d2 == 5275)
+        assert(dmix == 4744)
+
 if __name__ == '__main__':
     unittest.main()
