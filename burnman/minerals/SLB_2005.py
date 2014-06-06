@@ -9,7 +9,7 @@ SLB_2005
 Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein 
 
 """
-import burnman.minerals_base as bmb
+import burnman.mineral_helpers as bmb
 from burnman.mineral import mineral
                 
 

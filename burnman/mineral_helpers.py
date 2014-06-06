@@ -2,6 +2,12 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+"""
+This module provides several helper minerals/materials.
+
+"""
+
+
 import numpy as np
 import warnings
 
@@ -14,7 +20,6 @@ import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 
 
-# combines two or more materials given a fixed molar_fraction
 class helper_solid_solution(mineral):
     """
     Class for coming up with a new mineral based based on a solid
@@ -103,6 +108,16 @@ class helper_spin_transition(material):
 
 
 class helper_fe_dependent(material):
+
+    """
+    Helper to implement a rock that does iron exchange (two minerals with
+    changing iron content based on p,T).
+
+    Classes deriving from this helper need to implement
+    create_inner_material() and provide a function in __init__ that computes
+    the iron exchange.
+    """
+
     def __init__(self, iron_number_with_pt, idx):
         self.iron_number_with_pt = iron_number_with_pt
         self.which_index = idx  # take input 0 or 1 from iron_number_with_pt()

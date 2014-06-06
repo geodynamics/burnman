@@ -9,7 +9,6 @@ Matas_etal_2007
 Minerals from Matas et al. 2007 and references therein
 """
 
-import burnman.minerals_base as bmb
 from burnman.mineral import mineral
 
 

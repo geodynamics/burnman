@@ -10,7 +10,7 @@ Minerals from Murakami et al. (2012) supplementary table 5 and references therei
 
 
 """
-import burnman.minerals_base as bmb
+import burnman.mineral_helpers as bmb
 from burnman.mineral import mineral
 
 

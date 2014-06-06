@@ -32,6 +32,7 @@ Features:
 from mineral import mineral
 from material import material
 from composite import composite
+from mineral_helpers import *
 
 #high level functions
 from main import *
