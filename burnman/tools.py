@@ -5,6 +5,8 @@
 import operator
 import bisect
 import os
+import pkgutil
+import numpy as np
 
 def pretty_print_table(table,use_tabs=False):
     """
@@ -54,19 +56,16 @@ def linear_interpol(x, x1, x2, y1, y2):
     alpha = (x - x1) / (x2-x1)
     return (1.-alpha)*y1 + alpha*y2
 
-def open_burnman_file(filename):
-    path = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
-    fullname = os.path.join(path,filename)
-    return open(fullname)
-
 def read_table(filename):
+    datastream = pkgutil.get_data('burnman', 'data/'+filename)
+    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
     table=[]
     
-    for line in open_burnman_file(filename).readlines():
+    for line in datalines:
         if (line[0]!='#'):
-            numbers = map(float, line.split())
+            numbers = np.fromstring( line , sep =' ')
             table.append(numbers)
-    return table
+    return np.array(table)
 
 def cut_table(table, min_value, max_value):
     tablen=[]

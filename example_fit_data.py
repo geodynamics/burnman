@@ -48,7 +48,7 @@ if __name__ == "__main__":
 	    return l2_error
 
 
-	mg_perovskite_data = np.loadtxt("input_minphys/Murakami_perovskite.txt")
+	mg_perovskite_data = burnman.tools.read_table("input_minphys/Murakami_perovskite.txt")
 	obs_pressures = mg_perovskite_data[:,0]*1.e9
 	obs_vs = mg_perovskite_data[:,2]*1000.
 
