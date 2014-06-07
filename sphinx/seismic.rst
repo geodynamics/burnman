@@ -2,7 +2,31 @@
 Seismic
 =======
 
-.. automodule:: burnman.seismic
+Base class for all seismic models
+---------------------------------
+.. autoclass:: burnman.seismic.Seismic1DModel
 
-.. autoclass:: burnman.seismic.SeismicData
-   
+
+
+Class for 1D Models
+-------------------
+.. autoclass:: burnman.seismic.RadiusTable
+
+
+
+Models currently implemented
+----------------------------
+
+.. autoclass:: burnman.seismic.PREM
+
+.. autoclass:: burnman.seismic.Slow
+
+.. autoclass:: burnman.seismic.Fast
+
+
+
+Attenuation Correction
+-----------------------
+
+.. autofunction:: burnman.seismic.attenuation_correction
+
