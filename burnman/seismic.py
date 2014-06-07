@@ -9,6 +9,7 @@ import burnman.tools
 
 class seismic_data:
     """
+    this is a test
     base class for all seismic models
     """
     def __init__(self):
