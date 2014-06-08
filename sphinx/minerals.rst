@@ -2,19 +2,18 @@
 Minerals
 ========
 
-Burnman operates on rocks (type :class:`burnman.abstract_material`), most prominently created by :class:`burnman.composite`.
+Burnman operates on rocks (type :class:`burnman.Material`) most prominentyl in form of minerals (:class:`burnman.Mineral`) and composites (:class:`burnman.Composite`).
 
 
-.. inheritance-diagram:: burnman.abstract_material burnman.composite_base burnman.composite burnman.material burnman.minerals_base.helper_solid_solution burnman.minerals_base.helper_spin_transition burnman.minerals_base.helper_fe_dependent
+.. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.mineral_helpers.helper_solid_solution burnman.mineral_helpers.helper_spin_transition burnman.mineral_helpers.helper_fe_dependent
 
 
-.. autoclass:: burnman.abstract_material
+.. autoclass:: burnman.Material
 
-.. autoclass:: burnman.composite
+.. autoclass:: burnman.Mineral
 
-.. autoclass:: burnman.composite.abstract_material
+.. autoclass:: burnman.Composite
 
-.. autoclass:: burnman.minerals_base.material
 
 
 
@@ -22,6 +21,6 @@ Burnman operates on rocks (type :class:`burnman.abstract_material`), most promin
 Mineral helpers
 ---------------
 
-.. autoclass:: burnman.minerals_base.helper_spin_transition
-.. autoclass:: burnman.minerals_base.helper_solid_solution
-.. autoclass:: burnman.minerals_base.helper_fe_dependent
+.. autoclass:: burnman.mineral_helpers.helper_spin_transition
+.. autoclass:: burnman.mineral_helpers.helper_solid_solution
+.. autoclass:: burnman.mineral_helpers.helper_fe_dependent
