@@ -34,7 +34,7 @@ from burnman import seismic
 if __name__ == "__main__":    
     
     #create a seismic dataset from prem:
-    s=burnman.seismic.prem()
+    s=burnman.seismic.PREM()
     
     # specify where we want to evaluate, here we map from pressure to depth
     #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)

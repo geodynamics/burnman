@@ -87,7 +87,7 @@ if __name__ == "__main__":
     rock = own_material()
     
     #seismic model for comparison: (see burnman/seismic.py)
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(700e3,2800e3, number_of_points)
     #depths = seismic_model.internal_depth_list()

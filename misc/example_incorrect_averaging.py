@@ -116,7 +116,7 @@ temperature_bs = burnman.geotherm.brown_shankland(pressure)
 temperature_an = burnman.geotherm.anderson(pressure)
 
 #seismic model for comparison:
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
 depths = map(seismic_model.depth, pressure)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)    
 

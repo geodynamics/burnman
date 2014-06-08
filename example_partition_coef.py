@@ -70,7 +70,7 @@ if __name__ == "__main__":
                                         minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,0)] )
             
     #seismic model for comparison:
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     #(see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:

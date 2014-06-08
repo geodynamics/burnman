@@ -59,7 +59,7 @@ if __name__ == "__main__":
         (your choice in geotherm will not matter in this case))"""
     method = 'slb3'
     
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)

@@ -96,7 +96,7 @@ def array_to_rock(arr, names):
     return rock, anchor_t
 
 #set up the seismic model
-seismic_model = burnman.seismic.prem()
+seismic_model = burnman.seismic.PREM()
 npts = 10
 depths = np.linspace(850e3,2700e3, npts)
 pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)

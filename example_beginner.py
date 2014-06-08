@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     # Here we create and load the PREM seismic velocity model, which will be
     # used for comparison with the seismic velocities of the "rock" composite
-    seismic_model = burnman.seismic.prem()
+    seismic_model = burnman.seismic.PREM()
 
     # We create an array of 20 depths at which we want to evaluate PREM, and then
     # query the seismic model for the pressure, density, P wave speed, S wave

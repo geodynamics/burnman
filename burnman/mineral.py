@@ -70,9 +70,9 @@ class Mineral(Material):
             elif (method == "slb3"):
                 self.method = slb.SLB3()
             elif (method == "bm2"):
-                self.method = bm.bm2()
+                self.method = bm.BM2()
             elif (method == "bm3"):
-                self.method = bm.bm3()
+                self.method = bm.BM3()
             else:
                 raise Exception("unsupported material method " + method)
         elif ( issubclass(method, eos.EquationOfState) ):

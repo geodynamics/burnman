@@ -100,7 +100,7 @@ class RadiusTable(SeismicData):
         return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
-class prem(RadiusTable):
+class PREM(RadiusTable):
     """ 
     reads in the table for PREM (input_seismic/prem_table.txt) using the base class radiustable
     """
@@ -219,11 +219,11 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     
 # shared variable of prem, so that other routines do not need to create
 # prem over and over. See geotherm for example.
-prem_model = prem()
+prem_model = PREM()
 
 if __name__ == "__main__":
     #create a seismic dataset from prem:
-    s=prem()
+    s=PREM()
     depths = s.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
     print depths, pressures, density, v_p, v_s, v_phi
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
     plt.show()
 
-    s1=prem()
+    s1=PREM()
     depths=s1.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s1.evaluate_all_at(depths)
     plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')

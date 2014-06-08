@@ -31,7 +31,7 @@ if __name__ == "__main__":
     
     #seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    seismic_model = burnman.seismic.prem() 
+    seismic_model = burnman.seismic.PREM()
     number_of_points = 40 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)

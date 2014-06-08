@@ -9,7 +9,7 @@ import burnman.geotherm
 import burnman.seismic
 import burnman.averaging_schemes
 
-class elastic_properties:
+class ElasticProperties:
     """
     Class that contains volume, density, and moduli. This is generated for
     different pressures and temperatures using
@@ -60,7 +60,7 @@ def calculate_moduli(rock, pressures, temperatures):
         rock.set_state(pressures[idx], temperatures[idx])
         (fractions,minerals) = rock.unroll()
         for (fraction,mineral) in zip(fractions,minerals):
-            e = elastic_properties()
+            e = ElasticProperties()
             e.V = fraction * mineral.molar_volume()
             e.K = mineral.adiabatic_bulk_modulus()
             e.G = mineral.shear_modulus()
@@ -92,7 +92,7 @@ def average_moduli(moduli_list, averaging_scheme=burnman.averaging_schemes.Voigt
     :rtype: list of :class:`burnman.elastic_properties`
     """
     n_pressures = len(moduli_list)
-    result = [elastic_properties() for i in range(n_pressures)]
+    result = [ElasticProperties() for i in range(n_pressures)]
     
     for idx in range(n_pressures):
         fractions = np.array([e.fraction for e in moduli_list[idx]])
@@ -116,7 +116,7 @@ def compute_velocities(moduli):
     and Vphi for each entry in the list.
 
     
-    :type moduli: list of :class:`elastic_properties`
+    :type moduli: list of :class:`ElasticProperties`
     :param moduli: input elastic properties.
 
     :returns: lists of Vp, Vs, Vphi (in m/s each)
@@ -192,7 +192,7 @@ def depths_for_rock(rock,pressures, temperatures,averaging_scheme=burnman.averag
     moduli_list = calculate_moduli(rock, pressures, temperatures)
     moduli = average_moduli(moduli_list, averaging_scheme)
     mat_rho = np.array([m.rho for m in moduli])
-    seismic_model = burnman.seismic.prem()
+    seismic_model = burnman.seismic.PREM()
     depthsref = np.array(map(seismic_model.depth,pressures))
     pressref = np.zeros_like(pressures)
     g  = seismic_model.grav(depthsref) # G for prem
@@ -220,7 +220,7 @@ def pressures_for_rock(rock, depths, T0, averaging_scheme=burnman.averaging_sche
     
     """
     # use PREM pressures as inital guestimate
-    seismic_model = burnman.seismic.prem()
+    seismic_model = burnman.seismic.PREM()
     pressures,_,_,_,_ = seismic_model.evaluate_all_at(depths)
     pressref = np.zeros_like(pressures)
     #gets table with PREM gravities

@@ -70,7 +70,8 @@ def shear_modulus_third_order(volume, params):
     G = pow((1. + 2*f), 5./2.)*(params['G_0']+(3.*params['K_0']*params['Gprime_0'] - 5.*params['G_0'])*f + (6.*params['K_0']*params['Gprime_0']-24.*params['K_0']-14.*params['G_0']+9./2. * params['K_0']*params['Kprime_0'])*f*f)
     return G 
 
-class birch_murnaghan_base(eos.EquationOfState):
+
+class BirchMurnaghanBase(eos.EquationOfState):
     """
     A wrapper class for the birch murnaghan functions above so that
     it satisfies the interface requirements as specified in
@@ -105,11 +106,12 @@ class birch_murnaghan_base(eos.EquationOfState):
     def grueneisen_parameter(self,pressure,temperature,volume,params):
         return 0.
 
-class bm3(birch_murnaghan_base):
+
+class BM3(BirchMurnaghanBase):
     def __init__(self):
         self.order=3
 
-class bm2(birch_murnaghan_base):
+
+class BM2(BirchMurnaghanBase):
     def __init__(self):
         self.order=2
-    
