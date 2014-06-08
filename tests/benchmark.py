@@ -22,7 +22,7 @@ def check_birch_murnaghan():
     plt.close()
 
     #make a test mineral
-    test_mineral = burnman.mineral()
+    test_mineral = burnman.Mineral()
     test_mineral.params ={'name':'test',
                           'V_0': 6.844e-6,
                           'K_0': 259.0e9,
@@ -65,7 +65,7 @@ def check_mgd_shim_duffy_kenichi():
     """
     plt.close()
     #Create gold material from Table 1
-    gold = burnman.mineral()
+    gold = burnman.Mineral()
     gold.params = {'name': 'gold',
                    'V_0': 10.22e-6,
                    'K_0': 167.0e9,
@@ -83,7 +83,7 @@ def check_mgd_shim_duffy_kenichi():
     ref_pressures.append( np.array([12.14,15.69,19.68,24.19,29.28,35.03,41.53,48.88,57.20,66.64,77.37,89.57,103.47,119.35,137.53,158.38,182.36,210.02]))
     ref_pressures.append( np.array([19.30,22.84,26.84,31.35,36.44,42.19,48.68,56.03,64.35,73.80,84.52,96.72,110.62,126.50,144.68,165.53,189.51,217.17]))
  
-    eos = mgd.mgd3()
+    eos = mgd.MGD3()
  
     pressures = np.empty_like(ref_pressures)
     ref_dv = np.linspace(0.0, 0.34, len(pressures[0]))
@@ -104,7 +104,7 @@ def check_mgd_fei_mao_shu_hu():
     """
     Benchmark agains Fei Mao Shu Hu (1991)
     """
-    mgfeo = burnman.mineral() 
+    mgfeo = burnman.Mineral()
     mgfeo.params = {       'name': 'MgFeO',
                     'V_0': 11.657e-6,
                     'K_0': 157.0e9,
@@ -125,7 +125,7 @@ def check_mgd_fei_mao_shu_hu():
     ref_pressures = ref_pressures
     pressures = np.empty_like(volumes)
 
-    eos = mgd.mgd3()
+    eos = mgd.MGD3()
   
     for i in range(len(temperatures)):
         pressures[i] = eos.pressure(temperatures[i],volumes[i], mgfeo.params)
@@ -142,7 +142,7 @@ def check_slb_fig3():
     """
     Benchmark grueneisen parameter against figure 3 of Stixrude and Lithgow-Bertelloni (2005b)
     """
-    perovskite= burnman.mineral() 
+    perovskite= burnman.Mineral()
     perovskite.params = {       'name': 'perovksite',
                     'V_0': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
                     'grueneisen_0': 1.63,
@@ -154,8 +154,8 @@ def check_slb_fig3():
     q_slb = np.empty_like(volume)
     q_mgd = np.empty_like(volume)
 
-    slb_eos = slb.slb2()
-    mgd_eos = mgd.mgd2()
+    slb_eos = slb.SLB2()
+    mgd_eos = mgd.MGD2()
     
 
     #calculate its thermal properties
@@ -182,7 +182,7 @@ def check_slb_fig7_txt():
     """
     Calculates all values for forsterite and benchmarks with values from Stixrude and Lithgow-Bertelloni (personal communication)
     """
-    forsterite = burnman.mineral() 
+    forsterite = burnman.Mineral()
     forsterite.params = {       'name': 'forsterite',
                     'V_0': 43.603e-6,
                     'K_0': 127.955e9,
@@ -273,7 +273,7 @@ def check_slb_fig7():
     """
     Calculates all values for forsterite and benchmarks with figure 7 from Stixrude and Lithgow-Bertelloni (2005)
     """
-    forsterite = burnman.mineral() 
+    forsterite = burnman.Mineral()
     forsterite.params = {       'name': 'forsterite',
                     'V_0': 43.60e-6,
                     'K_0': 128.0e9,
@@ -353,11 +353,11 @@ def check_averaging():
     Reproduce Figure 1a from Watt et. al. 1976 to check the Voigt, Reuss,
     Voigt-Reuss-Hill, and Hashin-Shtrikman bounds for an elastic composite
     """
-    voigt = burnman.averaging_schemes.voigt() 
-    reuss = burnman.averaging_schemes.reuss() 
-    voigt_reuss_hill = burnman.averaging_schemes.voigt_reuss_hill() 
-    hashin_shtrikman_upper = burnman.averaging_schemes.hashin_shtrikman_upper() 
-    hashin_shtrikman_lower = burnman.averaging_schemes.hashin_shtrikman_lower() 
+    voigt = burnman.averaging_schemes.Voigt()
+    reuss = burnman.averaging_schemes.Reuss()
+    voigt_reuss_hill = burnman.averaging_schemes.VoigtReussHill()
+    hashin_shtrikman_upper = burnman.averaging_schemes.HashinShtrikmanUpper()
+    hashin_shtrikman_lower = burnman.averaging_schemes.HashinShtrikmanLower()
 
     #create arrays for sampling in volume fraction
     volumes = np.linspace(0.0,1.0,100) 

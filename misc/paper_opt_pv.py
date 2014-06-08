@@ -60,7 +60,7 @@ if __name__ == "__main__":
         (your choice in geotherm will not matter in this case))"""
     method = 'slb3'
     
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     def eval_material(amount_perovskite):
 #        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
 #                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-        rock = burnman.composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
+        rock = burnman.Composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
                              (minerals.SLB_2011.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         rock.debug_print()
     
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
     
         #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
         

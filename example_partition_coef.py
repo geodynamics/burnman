@@ -65,12 +65,12 @@ if __name__ == "__main__":
     iron_content = lambda p,t: \
     burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)
 
-    rock = burnman.composite ( [phase_fractions['pv'], phase_fractions['fp']], \
+    rock = burnman.Composite ( [phase_fractions['pv'], phase_fractions['fp']], \
                                    [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,1),\
                                         minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,0)] )
             
     #seismic model for comparison:
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     #(see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
-        burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.averaging_schemes.VoigtReussHill())
     
     print "Calculations are done for:"
     rock.debug_print()

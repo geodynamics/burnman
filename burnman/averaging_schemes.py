@@ -5,7 +5,7 @@
 import numpy as np
 import warnings
 
-class averaging_scheme:
+class AveragingScheme:
     """ 
     Base class defining an interface for determining average 
     elastic properties of a rock.  Given a list of volume 
@@ -88,7 +88,7 @@ class averaging_scheme:
          
         
 
-class voigt_reuss_hill(averaging_scheme):
+class VoigtReussHill(AveragingScheme):
     """ 
     Class for computing the Voigt-Reuss-Hill average for elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
@@ -152,7 +152,7 @@ class voigt_reuss_hill(averaging_scheme):
         return voigt_reuss_hill_function(volumes, shear_moduli)
 
 
-class voigt(averaging_scheme):
+class Voigt(AveragingScheme):
     """ 
     Class for computing the Voigt (iso-strain) bound for elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
@@ -212,7 +212,7 @@ class voigt(averaging_scheme):
         return voigt_average_function(volumes, shear_moduli)
 
 
-class reuss(averaging_scheme):
+class Reuss(AveragingScheme):
     """ 
     Class for computing the Reuss (iso-stress) bound for elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
@@ -272,7 +272,7 @@ class reuss(averaging_scheme):
         return reuss_average_function(volumes, shear_moduli)
     
 
-class hashin_shtrikman_upper(averaging_scheme):
+class HashinShtrikmanUpper(AveragingScheme):
     """
     Class for computing the upper Hashin-Shtrikman bound for elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
@@ -354,7 +354,7 @@ class hashin_shtrikman_upper(averaging_scheme):
         G_upper = G_n + (0.5)*B_n/(1. + beta_n*B_n)
         return G_upper
 
-class hashin_shtrikman_lower(averaging_scheme):
+class HashinShtrikmanLower(AveragingScheme):
     """
     Class for computing the lower Hashin-Shtrikman bound for elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
@@ -436,15 +436,15 @@ class hashin_shtrikman_lower(averaging_scheme):
         G_lower = G_1 + (0.5)*B_1/(1. + beta_1*B_1)
         return G_lower
 
-class hashin_shtrikman_average(averaging_scheme):
+class HashinShtrikmanAverage(AveragingScheme):
     """ 
     Class for computing arithmetic mean of the Hashin-Shtrikman bounds on elastic properties. 
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements 
     the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
     def __init__(self):
-        self.upper = hashin_shtrikman_upper()
-        self.lower = hashin_shtrikman_lower()
+        self.upper = HashinShtrikmanUpper()
+        self.lower = HashinShtrikmanLower()
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """

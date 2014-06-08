@@ -11,16 +11,16 @@ This module provides several helper minerals/materials.
 import numpy as np
 import warnings
 
-from burnman.material import material
+from burnman.material import Material
 
-from burnman.mineral import mineral
+from burnman.mineral import Mineral
 import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 
 
-class helper_solid_solution(mineral):
+class HelperSolidSolution(Mineral):
     """
     Class for coming up with a new mineral based based on a solid
     solution between two or more end member minerals.  It is not
@@ -63,9 +63,9 @@ class helper_solid_solution(mineral):
            except TypeError:
                #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
                self.params[prop] = self.base_materials[0].params[prop]
-        mineral.set_state(self, pressure, temperature)
+        Mineral.set_state(self, pressure, temperature)
 
-class helper_spin_transition(material):
+class HelperSpinTransition(Material):
     """ 
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
@@ -107,7 +107,7 @@ class helper_spin_transition(material):
 
 
 
-class helper_fe_dependent(material):
+class HelperFeDependent(Material):
 
     """
     Helper to implement a rock that does iron exchange (two minerals with
@@ -133,7 +133,7 @@ class helper_fe_dependent(material):
         return self.iron_number_with_pt(self.pressure, self.temperature)[self.which_index]
 
     def set_state(self, pressure, temperature):
-        material.set_state(self, pressure, temperature)
+        Material.set_state(self, pressure, temperature)
         self.base_material = self.create_inner_material(self.iron_number())
         self.base_material.set_method(self.method)
         self.base_material.set_state(pressure, temperature)

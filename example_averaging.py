@@ -51,7 +51,7 @@ if __name__ == "__main__":
 	amount_perovskite = 0.6
 	method = 'slb3'
 
-	rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+	rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
 					  [minerals.SLB_2005.mg_perovskite(), \
 						   minerals.SLB_2005.periclase()] )
 	rock.set_method(method)
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 		   
 	#seismic model for comparison:
 	# pick from .prem() .slow() .fast() (see burnman/seismic.py)
-	seismic_model = burnman.seismic.prem() 
+	seismic_model = burnman.seismic.PREM()
 	#set on how many depth slices the computations should be done
 	number_of_points = 20
 	# we will do our computation and comparison at the following depth values:
@@ -89,23 +89,23 @@ if __name__ == "__main__":
 
         #Voigt Reuss Hill averaging
 	rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill())
 
         #Voigt averaging
 	rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Voigt())
 
         #Reuss averaging
 	rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.reuss())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Reuss())
 
         #Upper bound for Hashin-Shtrikman averaging
 	rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_upper())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanUpper())
 
         #Lower bound for Hashin-Shtrikman averaging
 	rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_lower())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanLower())
 
 	
 	# PLOTTING

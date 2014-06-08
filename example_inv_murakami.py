@@ -14,7 +14,7 @@ import cProfile
 import scipy.stats as sp
 import matplotlib.mlab as mlab
 
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 10 #set on how many depth slices the computations should be done
 depths = np.linspace(1000e3,2500e3, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -28,7 +28,7 @@ print "preparations done"
 def calc_velocities(a,b,c):
     method = 'slb3' #slb3|slb2|mgd3|mgd2
     amount_perovskite = a
-    rock = burnman.composite( [ ( minerals.SLB_2005.mg_fe_perovskite(b), amount_perovskite ), 
+    rock = burnman.Composite( [ ( minerals.SLB_2005.mg_fe_perovskite(b), amount_perovskite ),
 				(minerals.SLB_2005.ferropericlase(c), 1.0-amount_perovskite) ] )
 
     rock.set_method(method)

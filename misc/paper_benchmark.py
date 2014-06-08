@@ -26,7 +26,7 @@ def check_slb_fig7_txt():
     """
     Calculates all values for forsterite and benchmarks with values from Stixrude and Lithgow-Bertelloni (personal communication)
     """
-    forsterite = burnman.material() 
+    forsterite = burnman.Material()
     forsterite.params = {       'name': 'forsterite',
                     'V_0': 43.603e-6,
                     'K_0': 127.955e9,

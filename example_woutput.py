@@ -54,7 +54,7 @@ if __name__ == "__main__":
     
     #specify material
     amount_perovskite = 0.95
-    rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+    rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
           [minerals.SLB_2005.mg_fe_perovskite(0.7), minerals.SLB_2005.ferropericlase(0.5)] )
     
     #define some pressure range
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, pressures, temperature, \
-        burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.averaging_schemes.VoigtReussHill())
         
     #write to file:
     output_filename = "example_woutput.txt" 

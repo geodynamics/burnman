@@ -7,13 +7,7 @@ import matplotlib.pyplot as plt
 
 import burnman.tools
 
-"""
-Module for all the seismological input. Currently only 1D models are implemented:PREM (Dziewonski & Anderson 1981), Reference models for fast and slow regions in the lowermost mantle (Lekic et al. 2012).
-One example of how to include your own 1D model is included in example_seismic.py, although this does require a specific format of the input file.
-Note that everything is in SI units.
-"""
-
-class seismic_data:
+class SeismicData:
     """
     Base class for all the seismological models
     """
@@ -76,7 +70,7 @@ class seismic_data:
         return -1
 
 
-class radiustable(seismic_data):
+class RadiusTable(SeismicData):
     """ 
     This is a base class that gets the information from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
@@ -86,7 +80,7 @@ class radiustable(seismic_data):
     want to access with something else.
     """ 
     def __init__(self):
-        seismic_data.__init__(self)
+        SeismicData.__init__(self)
         self.table_radius = []
         self.table_pressure = []
         self.table_density = []
@@ -123,12 +117,12 @@ class radiustable(seismic_data):
         return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
-class prem(radiustable):
+class PREM(RadiusTable):
     """ 
     reads in the table for PREM (input_seismic/prem_table.txt) using the base class radiustable
     """
     def __init__(self):
-        radiustable.__init__(self)
+        RadiusTable.__init__(self)
         table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
@@ -145,7 +139,7 @@ class prem(radiustable):
         return np.interp(self.earth_radius-depths, table_rad,table_g)
 
 
-class slow(radiustable):
+class Slow(RadiusTable):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
     We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
@@ -153,7 +147,7 @@ class slow(radiustable):
     because all tables where generated with at the same depths 
     """
     def __init__(self):
-        radiustable.__init__(self)
+        RadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -178,7 +172,7 @@ class slow(radiustable):
         self.table_vs = table2[:,1] 
        
 
-class fast(radiustable):
+class Fast(RadiusTable):
     """ 
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
     We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
@@ -186,7 +180,7 @@ class fast(radiustable):
     because all tables where generated with at the same depths 
     """
     def __init__(self):
-        radiustable.__init__(self)
+        RadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -212,6 +206,19 @@ class fast(radiustable):
 
 
 
+# this uses prem_lowermantle table
+class PREMTest(RadiusTable):
+    def __init__(self):
+        RadiusTable.__init__(self)
+
+        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")
+        #data is: radius pressure density V_p V_s Q_K Q_G
+        table = np.array(table)
+        self.table_radius = table[:,0]   
+        self.table_pressure = table[:,1] 
+        self.table_density = table[:,2]
+        self.table_vp = table[:,3] 
+        self.table_vs = table[:,4] 
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """ 
@@ -255,11 +262,11 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     
 # shared variable of prem, so that other routines do not need to create
 # prem over and over. See geotherm for example.
-prem_model = prem()
+prem_model = PREM()
 
 if __name__ == "__main__":
     #create a seismic dataset from prem:
-    s=prem()
+    s=PREM()
     depths = s.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
 
@@ -272,7 +279,7 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
     plt.show()
 
-    s1=prem()
+    s1=PREM()
     depths=s1.internal_depth_list()
     pressures, density, v_p, v_s, v_phi = s1.evaluate_all_at(depths)
     plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')

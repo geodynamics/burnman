@@ -66,7 +66,7 @@ if __name__ == "__main__":
     #geotherm for an assemblage of minerals
     #based on self compression of the composite rock.  
     #First we need to define an assemblage
-    pyrolite = burnman.composite( [0.7, 0.3], \
+    pyrolite = burnman.Composite( [0.7, 0.3], \
                                       [minerals.SLB_2005.mg_fe_perovskite(0.1), \
                                    minerals.SLB_2005.ferropericlase(0.4)] )
     pyrolite.set_method("mgd3")
