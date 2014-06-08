@@ -21,15 +21,15 @@ teaches:
 - seismic comparison
 """
 
-# Here we import standard python modules that are required for 
+# Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
-# numerical arrays and mathematical operations on them, and 
+# numerical arrays and mathematical operations on them, and
 # matplotlib is used for generating plots of results of calculations
 import os, sys, numpy as np, matplotlib.pyplot as plt
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 
 # Here we import the relevant modules from BurnMan.  The burnman
@@ -41,7 +41,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
 
     # This is the first actual work done in this example.  We define
     # composite object and name it "rock".  A composite is made by
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     # Here "rock" has two constituent minerals: it is 80% Mg perovskite
     # and 20% periclase.  More minerals may be added by simply extending
     # the list given to burnman.composite
-    rock = burnman.Composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),\
-                                 minerals.SLB_2011.periclase()] )
+    rock = burnman.Composite([0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),
+                                          minerals.SLB_2011.periclase()])
 
 
     # Here we create and load the PREM seismic velocity model, which will be

@@ -8,7 +8,7 @@ function of depth (or P) as well as different velocity model libraries
 available within Burnman:
 
 1. PREM (Dziewonski & Anderson, 1981)
-2. Reference model for fast regions (outside the LLSVP's) in the lower mantle 
+2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
    (Lekic et al. 2012)
 3. Reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
@@ -26,25 +26,24 @@ teaches:
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
-from burnman import minerals
-from burnman import seismic 
-if __name__ == "__main__":    
-    
+
+if __name__ == "__main__":
+
     #create a seismic dataset from prem:
     s=burnman.seismic.PREM()
-    
+
     # specify where we want to evaluate, here we map from pressure to depth
     #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
     p = np.arange(1.0e9,360.0e9,5e9)
-    depths = map(s.depth, p) 
+    depths = map(s.depth, p)
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35e3,5600e3,100e3)
     #we could also use the data points where the seismic model is specified:
     depths = s.internal_depth_list()
-    
+
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
     # plot vs and vp and v_phi (note that v_phi is computed!)
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     plt.legend(loc='lower left')
     plt.xlabel('depth in km')
     plt.ylabel('km/s')
-    
+
     # plot pressure,density vs depth from prem:
     plt.subplot(2,2,2)
     plt.title('prem')
@@ -68,41 +67,41 @@ if __name__ == "__main__":
     plt.ylabel('g/cc')
     plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
     plt.legend(loc='lower right')
-    
-    
+
+
     #now load fast and slow regionalized models (Lekic et al. 2012):
     sslow = burnman.seismic.Slow()
     depths2 = sslow.internal_depth_list()
     pressures2, density2, v_p2, v_s2, v_phi2 = sslow.evaluate_all_at(depths2)
-    
+
     sfast = burnman.seismic.Fast()
     depths3 = sfast.internal_depth_list()
     pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
-    
-   
+
+
     # plotting
     plt.subplot(2,2,3)
     plt.plot(pressures/1.e9,v_p/1.e3,'-k', label='v_p prem')
     plt.plot(pressures2/1.e9,v_p2/1.e3,'-r', label='v_p slow')
     plt.plot(pressures3/1.e9,v_p3/1.e3,'-b', label='v_p fast')
-    
+
     plt.legend(loc='lower right')
     plt.xlim([30,136])
     plt.ylim([11,14])
     plt.xlabel('pressure')
     plt.ylabel('km/s')
-    
+
     plt.subplot(2,2,4)
     plt.plot(pressures/1.e9,v_s/1.e3,'-k', label='v_s prem')
     plt.plot(pressures2/1.e9,v_s2/1.e3,'-r', label='v_s slow')
     plt.plot(pressures3/1.e9,v_s3/1.e3,'-b', label='v_s fast')
-    
+
     plt.legend(loc='upper left')
     plt.xlim([30,136])
     plt.ylim([6,8])
     plt.xlabel('pressure')
     plt.ylabel('km/s')
-    
+
     plt.show()
 
     # Loading an a seismic model from a file. In this case AK135 (Kennett et al. 1995).
@@ -114,7 +113,7 @@ if __name__ == "__main__":
         def __init__(self):
             burnman.seismic.RadiusTable.__init__(self)
             # In format: radius, pressure, density, v_p, v_s
-            table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt") 
+            table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt")
             table = np.array(table)
             self.table_radius = table[:,0]
             self.table_pressure = table[:,1]
@@ -122,8 +121,8 @@ if __name__ == "__main__":
             self.table_vp = table[:,3]
             self.table_vs = table[:,4]
 
- 
-    ak=ak135_table() 
+
+    ak=ak135_table()
     # specify where we want to evaluate, here we map from pressure to depth
     depths = np.linspace(700e3, 2800e3, 40)
     #now evaluate everything at the given depths levels (using interpolation)

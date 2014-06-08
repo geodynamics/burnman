@@ -6,9 +6,9 @@
 This example shows how to evaluate seismic quantities on a p,T grid.
 """
 
-# Here we import standard python modules that are required for 
+# Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
-# numerical arrays and mathematical operations on them, and 
+# numerical arrays and mathematical operations on them, and
 # matplotlib is used for generating plots of results of calculations
 import os, sys, numpy as np, matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -17,15 +17,16 @@ from matplotlib import cm
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
 
-    rock = burnman.Composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(), \
-                                 minerals.SLB_2011.periclase()] )
+    rock = burnman.Composite([0.8, 0.2],
+                             [minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()])
 
     seismic_model = burnman.seismic.PREM()
 
