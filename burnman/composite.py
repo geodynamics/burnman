@@ -6,8 +6,8 @@ import numpy as np
 import warnings
 from collections import namedtuple
 
-from burnman.material import material   
-from burnman.mineral import mineral
+from burnman.material import Material
+from burnman.mineral import Mineral
     
 def check_pairs(fractions, minerals):
         if len(fractions)<1:
@@ -20,12 +20,12 @@ def check_pairs(fractions, minerals):
         if abs(total-1.0)>1e-10:
             raise Exception('ERROR: list of molar fractions does not add up to one')
         for p in minerals:
-            if not isinstance(p,mineral):
+            if not isinstance(p,Mineral):
                 raise Exception('ERROR: object of type ''%s'' is not of type material' % (type(p)))
 
 
 # static composite of minerals/composites
-class composite(material):
+class Composite(Material):
     """
     Base class for a static composite material with fixed molar fractions. The
     elements can be minerals or materials, meaning composite can be nested

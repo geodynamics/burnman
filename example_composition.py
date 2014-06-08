@@ -72,14 +72,14 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.composite ( [amount_perovskite, 1.0-amount_perovskite], \
+        rock = burnman.Composite ( [amount_perovskite, 1.0-amount_perovskite], \
                                        [minerals.SLB_2011.mg_perovskite(), \
                                             minerals.SLB_2011.periclase()] )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+        rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
                                       [minerals.SLB_2011.mg_fe_perovskite(0.2), \
                                            minerals.SLB_2011.ferropericlase(0.2)] )
     
@@ -96,21 +96,21 @@ if __name__ == "__main__":
         iron_content = lambda p,t: burnman.calculate_partition_coefficient\
         							(p,t,relative_molar_percent,Kd_0)
 
-        rock = burnman.composite ( [ (minerals.mg_fe_perovskite_pt_dependent\
+        rock = burnman.Composite ( [ (minerals.mg_fe_perovskite_pt_dependent\
         							(iron_content,0), phase_fractions['pv'] ),
                                     (minerals.ferropericlase_pt_dependent(iron_content,1),\
                                     phase_fractions['fp'] ) ] )
         
     #Example 4: three materials
     if False:
-        rock = burnman.composite ( [ (minerals.SLB_2011.fe_perovskite(), 0.7),
+        rock = burnman.Composite ( [ (minerals.SLB_2011.fe_perovskite(), 0.7),
                                      (minerals.SLB_2011.ferropericlase(0.5), 0.2) ,
                                      (minerals.SLB_2011.stishovite(), 0.1 ) ] )
     
     
     #seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    seismic_model = burnman.seismic.prem()
+    seismic_model = burnman.seismic.PREM()
     number_of_points = 20 #set on how many depth slices the computations should be done
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     rock.debug_print()
     
     moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
-    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.voigt_reuss_hill())
+    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.VoigtReussHill())
     mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
     mat_K = np.array([m.K for m in moduli])
     mat_G = np.array([m.G for m in moduli])

@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 
-class material:
+class Material:
     """
     Base class for all materials. The main functionality is unroll() which
     returns a list of objects of type burnman.mineral and their molar

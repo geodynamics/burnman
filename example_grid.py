@@ -24,10 +24,10 @@ from burnman import minerals
 
 if __name__ == "__main__":    
 
-    rock = burnman.composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(), \
+    rock = burnman.Composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(), \
                                  minerals.SLB_2011.periclase()] )
 
-    seismic_model = burnman.seismic.prem()
+    seismic_model = burnman.seismic.PREM()
 
     depths = np.linspace(750e3, 2800e3, 10)
     p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)

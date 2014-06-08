@@ -16,7 +16,7 @@ import burnman
 from burnman import minerals
 import colors
 
-class my_perovskite(burnman.material):
+class my_perovskite(burnman.Material):
     """
     based on Stixrude & Lithgow-Bertelloni 2011 and references therein  
     """
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     dashstyle3=(10,2,2,2)
     dashstyle4=(4,9)
 
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 10 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -54,13 +54,13 @@ if __name__ == "__main__":
     
 
     def eval(uncertain):
-        rock = burnman.composite ( [ (my_perovskite(uncertain), 1.0) ])
+        rock = burnman.Composite ( [ (my_perovskite(uncertain), 1.0) ])
         rock.set_method('slb3')
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)
         
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
 
         return seis_p, mat_vs, mat_vphi, mat_rho
 

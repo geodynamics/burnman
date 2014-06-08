@@ -36,12 +36,10 @@ Misc or work in progress
 .. broken: .. automodule:: example_optimize_slb2011
 .. automodule:: example_compare_enstpyro     
 .. automodule:: example_partition_coef
-.. automodule:: example_comparewithdepth     
 
 .. broken: .. automodule:: example_premite_isothermal
 
 .. automodule:: example_fit_data             
 .. automodule:: example_grid                 
 .. automodule:: example_woutput
-.. automodule:: example_inv_big_pv
 

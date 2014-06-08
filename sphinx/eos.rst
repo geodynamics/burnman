@@ -1,9 +1,9 @@
 Equations of state
-=================
+==================
 
 Base class
 ----------
-.. autoclass:: burnman.equation_of_state.equation_of_state
+.. autoclass:: burnman.equation_of_state.EquationOfState
 
 Birch-Murnaghan
 ---------------

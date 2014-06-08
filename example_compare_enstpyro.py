@@ -57,7 +57,7 @@ if __name__ == "__main__":
     Kd_0 = .5
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_pyro, Kd_0)
-    pyrolite = burnman.composite( [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']], \
+    pyrolite = burnman.Composite( [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']], \
                                       [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0),\
                                            minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_enst, Kd_0)
-    enstatite = burnman.composite ([phase_fractions_enst['pv'], phase_fractions_enst['fp']], \
+    enstatite = burnman.Composite ([phase_fractions_enst['pv'], phase_fractions_enst['fp']], \
                                        [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0), \
                                             minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     
     mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_G_pyro = \
         burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, \
-        burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.averaging_schemes.VoigtReussHill())
     
     print "Calculations are done for:"
     pyrolite.debug_print()
@@ -110,14 +110,14 @@ if __name__ == "__main__":
     
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \
         burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
-        burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.averaging_schemes.VoigtReussHill())
 
     print "Calculations are done for:"
     enstatite.debug_print()
 
     
     ##let's create PREM for reference
-    s=burnman.seismic.prem()
+    s=burnman.seismic.PREM()
     depths = map(s.depth, seis_p_1) 
     pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate_all_at(depths)
     

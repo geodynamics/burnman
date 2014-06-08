@@ -2,7 +2,7 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-class equation_of_state:
+class EquationOfState:
     """
     This class defines the interface for an equation of state
     that a mineral uses to determine its properties at a 

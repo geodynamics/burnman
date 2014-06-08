@@ -40,7 +40,7 @@ def make_rock():
     perovskite = helper_solid_solution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
     ferropericlase = helper_solid_solution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
 
-    pyrolite = burnman.composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
+    pyrolite = burnman.Composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
     pyrolite.set_method('slb3')
     anchor_temperature = 1935.0
 
@@ -96,7 +96,7 @@ def array_to_rock(arr, names):
     return rock, anchor_t
 
 #set up the seismic model
-seismic_model = burnman.seismic.prem()
+seismic_model = burnman.seismic.PREM()
 npts = 10
 depths = np.linspace(850e3,2700e3, npts)
 pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -229,7 +229,7 @@ rock, anchor_t = array_to_rock(fit, names)
 temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
         
 rho, vp, vs, vphi, K, G = \
-    burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+    burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
 err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
@@ -262,7 +262,7 @@ rock, anchor_t = array_to_rock(lit, names)
 temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
         
 rho, vp, vs, vphi, K, G = \
-    burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.hashin_shtrikman_average())
+    burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
 plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
 plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)

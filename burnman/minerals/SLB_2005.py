@@ -10,10 +10,10 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 import burnman.mineral_helpers as bmb
-from burnman.mineral import mineral
+from burnman.mineral import Mineral
                 
 
-class stishovite (mineral):
+class stishovite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -32,7 +32,7 @@ class stishovite (mineral):
             'q_0': 2.4,
             'eta_s_0': 5.0 }
 
-class periclase (mineral):
+class periclase (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -51,7 +51,7 @@ class periclase (mineral):
             'q_0': 1.5,
             'eta_s_0': 2.8 }
 
-class wuestite (mineral):
+class wuestite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -72,22 +72,22 @@ class wuestite (mineral):
 
 
 
-class ferropericlase(bmb.helper_solid_solution):
+class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
+        bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
 
 
 
-class mg_fe_perovskite(bmb.helper_solid_solution):
+class mg_fe_perovskite(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
+        bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
 
 
-class mg_perovskite(mineral):
+class mg_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein  
     """
@@ -106,7 +106,7 @@ class mg_perovskite(mineral):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
-class fe_perovskite(mineral):
+class fe_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -126,16 +126,16 @@ class fe_perovskite(mineral):
             'eta_s_0': 2.1 }
 
 
-class mg_fe_perovskite_pt_dependent(bmb.helper_fe_dependent):
+class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):
-        bmb.helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
+        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
 
-class ferropericlase_pt_dependent(bmb.helper_fe_dependent):
+class ferropericlase_pt_dependent(bmb.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):
-        bmb.helper_fe_dependent.__init__(self, iron_number_with_pt, idx)
+        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return ferropericlase(iron_number)

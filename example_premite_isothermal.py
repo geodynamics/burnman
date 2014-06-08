@@ -22,7 +22,7 @@ from burnman import minerals
 
 import pymc
 
-seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() (see code/seismic.py)
+seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(750.e3,2890.e3, number_of_points)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
@@ -32,7 +32,7 @@ print "preparations done"
 
 def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime): 
 
-    rock = burnman.mineral()
+    rock = burnman.Mineral()
 
     rock.params['V_0'] = 10.e-6
     rock.params['molar_mass'] = ref_rho*rock.params['V_0']

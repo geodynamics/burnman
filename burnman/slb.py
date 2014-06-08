@@ -10,7 +10,7 @@ import burnman.birch_murnaghan as bm
 import burnman.debye as debye
 import burnman.equation_of_state as eos
  
-class slb_base(eos.equation_of_state):
+class SLBBase(eos.EquationOfState):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
     in Stixrude and Lithgow-Bertelloni (2005).  For the most part, the equations are 
@@ -175,9 +175,8 @@ class slb_base(eos.equation_of_state):
         alpha = gr * C_v / K / volume
         return alpha
     
-    
-    
-class slb3(slb_base):
+
+class SLB3(SLBBase):
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
@@ -186,7 +185,8 @@ class slb3(slb_base):
     def __init__(self):
         self.order=3
 
-class slb2(slb_base):
+
+class SLB2(SLBBase):
     """
     SLB equation of state with second order finite strain expansion for the
     shear modulus.  In general, this should not be used, but sometimes 
@@ -195,4 +195,3 @@ class slb2(slb_base):
     """
     def __init__(self):
         self.order=2
-    

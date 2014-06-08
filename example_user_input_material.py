@@ -59,9 +59,9 @@ if __name__ == "__main__":
     method = 'slb3'
     
     #in form name_of_mineral (burnman.mineral <- creates list with parameters)
-    class own_material (burnman.mineral): 
+    class own_material (burnman.Mineral):
             def __init__(self):
-                    burnman.mineral.__init__(self)
+                    burnman.Mineral.__init__(self)
                     self.params = {
                             'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)] 
                             	#at room pressure/temperature
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     rock = own_material()
     
     #seismic model for comparison: (see burnman/seismic.py)
-    seismic_model = burnman.seismic.prem() # pick from .prem() .slow() .fast() 
+    seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(700e3,2800e3, number_of_points)
     #depths = seismic_model.internal_depth_list()
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
-        burnman.averaging_schemes.voigt_reuss_hill())    
+        burnman.averaging_schemes.VoigtReussHill())
     
     [rho_err,vphi_err,vs_err]= \
     burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
