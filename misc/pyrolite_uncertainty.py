@@ -5,14 +5,14 @@
 
 import os.path,sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 import numpy as np, matplotlib.pyplot as plt
 import numpy.ma as ma
 import numpy.random
 import burnman
 import pickle
 from burnman import minerals
-from burnman.minerals_base import helper_solid_solution
+from burnman.mineral_helpers import HelperSolidSolution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate
@@ -51,20 +51,20 @@ def realize_mineral( mineral ):
     return mineral
 
 def realize_pyrolite():
- 
+
     #approximate four component pyrolite model
     x_pv = 0.67
     x_fp = 0.33
     pv_fe_num = 0.07
-    fp_fe_num = 0.2 
+    fp_fe_num = 0.2
 
     mg_perovskite = minerals.SLB_2011_ZSB_2013.mg_perovskite(); realize_mineral(mg_perovskite)
     fe_perovskite = minerals.SLB_2011_ZSB_2013.fe_perovskite(); realize_mineral(fe_perovskite)
     wuestite = minerals.SLB_2011_ZSB_2013.wuestite(); realize_mineral(wuestite)
     periclase = minerals.SLB_2011_ZSB_2013.periclase(); realize_mineral(periclase)
 
-    perovskite = helper_solid_solution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
-    ferropericlase = helper_solid_solution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
+    perovskite = HelperSolidSolution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
+    ferropericlase = HelperSolidSolution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
 
     pyrolite = burnman.Composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
     pyrolite.set_method('slb3')
@@ -85,7 +85,7 @@ def output_rock( rock, file_handle ):
       file_handle.write( '\t' + ph.mineral.to_string() + '\n' )
       for key in ph.mineral.params:
         file_handle.write('\t\t' + key + ': ' + str(ph.mineral.params[key]) + '\n')
-    
+
 def realization_to_array(rock, anchor_t):
     arr = [anchor_t]
     names = ['anchor_T']
@@ -100,7 +100,7 @@ def realization_to_array(rock, anchor_t):
             for key in ph.mineral.params:
                     if key != 'equation_of_state':
                         arr.append(ph.mineral.params[key])
-                        names.append(mph.mineral.to_string()+'.'+key)
+                        names.append(ph.mineral.to_string()+'.'+key)
     return arr, names
 
 def array_to_rock(arr, names):
@@ -118,7 +118,7 @@ def array_to_rock(arr, names):
         else:
             for key in ph.mineral.params:
                     if key != 'equation_of_state':
-                        assert(names[idx]==mph.mineral.to_string()+'.'+key)
+                        assert(names[idx]==ph.mineral.to_string()+'.'+key)
                         ph.mineral.params[key] = arr[idx]
                         idx += 1
     return rock, anchor_t
@@ -132,7 +132,7 @@ pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(
 n_realizations = 10000
 min_error = np.inf
 
-pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure)) 
+pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure))
 fname = 'output_pyrolite_uncertainty.txt'
 
 
@@ -170,7 +170,7 @@ if whattodo=="plotgood":
 
     minerr = min([f[erridx] for f in allfits])
     print "min error is %f"%minerr
-        
+
 
     num = len(goodfits)
     print "we have %d good entries" % num
@@ -221,9 +221,9 @@ if whattodo=="plotgood":
         y = mlab.normpdf( bins, mu, sigma)
         if sigma>1e-10 and not shortname.startswith("err"):
             l = plt.plot(bins, y, 'r--', linewidth=1)
- 
+
         plt.title("%s\nmean %.3e sd: %.3e" % (shortname, mu, sigma),fontsize=8)
-    
+
         i+=1
     plt.savefig('good.png')
     #plt.show()
@@ -237,7 +237,7 @@ if whattodo=="plotgood":
 
         rock, anchor_t = array_to_rock(fit, names)
         temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-        
+
         rho, vp, vs, vphi, K, G = \
             burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
@@ -257,7 +257,7 @@ if whattodo=="plotgood":
 
     #plot density
     plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
-    
+
 
     plt.savefig('goodones.png')
     plt.show()
@@ -265,7 +265,7 @@ if whattodo=="plotgood":
 if whattodo=="plotone":
     figsize=(6,5)
     figure=plt.figure(dpi=100,figsize=figsize)
-    
+
     names = ['anchor_T', "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.n", "'burnman.minerals.SLB_2011_ZSB_2013.periclase'.eta_s_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Gprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.K_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.G_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.q_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Kprime_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.grueneisen_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.V_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.Debye_0", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.molar_mass", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.n", "'burnman.minerals.SLB_2011_ZSB_2013.wuestite'.eta_s_0", 'err', 'err_rho', 'err_vphi', 'err_vs']
 
     mymapbestfitnotused = {'anchor_T':2000, \
@@ -440,7 +440,7 @@ if whattodo=="plotone":
 
     rock, anchor_t = array_to_rock(fit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-        
+
     rho, vp, vs, vphi, K, G = \
             burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
@@ -474,13 +474,13 @@ if whattodo=="plotone":
 
     rock, anchor_t = array_to_rock(lit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-        
+
     rho, vp, vs, vphi, K, G = \
             burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
     plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
     plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
     plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)
-    
+
 
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Velocities (km/s) and Density (kg/m$^3$)")
@@ -490,12 +490,12 @@ if whattodo=="plotone":
     plt.savefig("onefit.pdf", bbox_inches='tight')
     print "wrote onefit.pdf"
     #plt.show()
-    
+
 
 if whattodo=="run":
   outfile = open(fname, 'w')
   outfile.write("#pressure\t Vs \t Vp \t rho \n")
-  best_fit_file = open('output_pyrolite_closest_fit.txt', 'w') 
+  best_fit_file = open('output_pyrolite_closest_fit.txt', 'w')
 
   for i in range(n_realizations):
     if (i>0 and i%25==0):
@@ -510,12 +510,12 @@ if whattodo=="run":
       #create the ith model
       pyrolite, anchor_temperature= realize_pyrolite()
       temperature = burnman.geotherm.adiabatic(pressure, anchor_temperature, pyrolite)
-     
+
       #calculate the seismic observables
       rho, vp, vs, vphi, K, G = \
         burnman.velocities_from_rock(pyrolite, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
-      #estimate the misfit with the seismic model 
+      #estimate the misfit with the seismic model
       err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
       error = np.sum([err_rho, err_vphi, err_vs])
@@ -524,30 +524,30 @@ if whattodo=="run":
         print error
         best_fit_file.write('Current best fit : '+str(error) + '\n' )
         output_rock(pyrolite, best_fit_file)
-      
+
       a,names = realization_to_array(pyrolite, anchor_temperature)
       a.extend([error, err_rho, err_vphi, err_vs])
       names.extend(["err","err_rho","err_vphi","err_vs"])
       goodfits.append(a)
 
       #interpolate to a higher resolution line
-      frho = interpolate.interp1d(pressure, rho) 
-      fs = interpolate.interp1d(pressure, vs) 
-      fphi = interpolate.interp1d(pressure, vphi) 
+      frho = interpolate.interp1d(pressure, rho)
+      fs = interpolate.interp1d(pressure, vs)
+      fphi = interpolate.interp1d(pressure, vphi)
 
       pressure_list = pressures_sampled
       density_list = frho(pressures_sampled)
       vs_list = fs(pressures_sampled)
       vphi_list = fphi(pressures_sampled)
 
-      
+
 
       data=zip(pressure_list, vs_list, vphi_list, density_list)
       np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
     except ValueError:
       print "failed, skipping"
-      
+
   outfile.close()
   best_fit_file.close()
 elif whattodo=="error":
@@ -556,7 +556,7 @@ elif whattodo=="error":
 
     rock, anchor_t = array_to_rock(values, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-        
+
     rho, vp, vs, vphi, K, G = \
             burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
@@ -565,11 +565,11 @@ elif whattodo=="error":
     error = np.sum([err_rho, err_vphi, err_vs])
 
     print error, err_rho, err_vphi, err_vs
-    
 
 
 
-elif whattodo=="plot":  
+
+elif whattodo=="plot":
     infile=open(fname,'r')
     data = np.loadtxt(fname, skiprows=1)
     pressure_list = data[:,0]
