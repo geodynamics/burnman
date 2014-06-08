@@ -20,7 +20,7 @@ import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 
 
-class helper_solid_solution(Mineral):
+class HelperSolidSolution(Mineral):
     """
     Class for coming up with a new mineral based based on a solid
     solution between two or more end member minerals.  It is not
@@ -65,7 +65,7 @@ class helper_solid_solution(Mineral):
                self.params[prop] = self.base_materials[0].params[prop]
         Mineral.set_state(self, pressure, temperature)
 
-class helper_spin_transition(Material):
+class HelperSpinTransition(Material):
     """ 
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
@@ -107,7 +107,7 @@ class helper_spin_transition(Material):
 
 
 
-class helper_fe_dependent(Material):
+class HelperFeDependent(Material):
 
     """
     Helper to implement a rock that does iron exchange (two minerals with

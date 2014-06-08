@@ -15,9 +15,9 @@ from burnman.mineral import Mineral
 
 
 
-class Speziale_fe_periclase(bmb.helper_spin_transition):  
+class Speziale_fe_periclase(bmb.HelperSpinTransition):
     def __init__(self):
-        bmb.helper_spin_transition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
+        bmb.HelperSpinTransition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
         self.cite = 'Speziale et al. 2007'
 
 class Speziale_fe_periclase_HS(Mineral):

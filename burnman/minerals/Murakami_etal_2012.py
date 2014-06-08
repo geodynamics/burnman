@@ -98,13 +98,13 @@ class mg_periclase(Mineral):
 
 
 
-class fe_periclase(bmb.helper_spin_transition):
+class fe_periclase(bmb.HelperSpinTransition):
     def __init__(self):
-        bmb.helper_spin_transition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
-class fe_periclase_3rd(bmb.helper_spin_transition):
+class fe_periclase_3rd(bmb.HelperSpinTransition):
     def __init__(self):
-        bmb.helper_spin_transition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
 class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     """
