@@ -10,10 +10,10 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 import burnman.mineral_helpers as bmb
-from burnman.mineral import mineral
+from burnman.mineral import Mineral
                 
 
-class stishovite (mineral):
+class stishovite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -32,7 +32,7 @@ class stishovite (mineral):
             'q_0': 2.4,
             'eta_s_0': 5.0 }
 
-class periclase (mineral):
+class periclase (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -51,7 +51,7 @@ class periclase (mineral):
             'q_0': 1.5,
             'eta_s_0': 2.8 }
 
-class wuestite (mineral):
+class wuestite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """
@@ -87,7 +87,7 @@ class mg_fe_perovskite(bmb.helper_solid_solution):
         bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
 
-class mg_perovskite(mineral):
+class mg_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein  
     """
@@ -106,7 +106,7 @@ class mg_perovskite(mineral):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
-class fe_perovskite(mineral):
+class fe_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
     """

@@ -32,7 +32,7 @@ dashstyle3=(3,2)
 method = 'slb2'
     
 #define the minerals from table 6.3
-mg_perovskite = burnman.material()
+mg_perovskite = burnman.Material()
 mg_perovskite.params = {       'name': 'Mg perovskite',
                     'molar_mass' : 0.1004,
                     'V_0': 24.43e-6,
@@ -47,7 +47,7 @@ mg_perovskite.params = {       'name': 'Mg perovskite',
                     'eta_s_0' : 2.6}
 mg_perovskite.set_method('slb2')
 
-fe_perovskite = burnman.material()
+fe_perovskite = burnman.Material()
 fe_perovskite.params = {       'name': 'Fe perovskite',
                     'molar_mass' : 0.1319,
                     'V_0': 25.49e-6,
@@ -62,7 +62,7 @@ fe_perovskite.params = {       'name': 'Fe perovskite',
                     'eta_s_0' : 2.1}
 fe_perovskite.set_method(method)
 
-periclase = burnman.material()
+periclase = burnman.Material()
 periclase.params = {       'name': 'periclase',
                     'molar_mass' : 0.0403,
                     'V_0': 11.24e-6,
@@ -77,7 +77,7 @@ periclase.params = {       'name': 'periclase',
                     'eta_s_0' : 2.3}
 periclase.set_method(method)
 
-wustite = burnman.material()
+wustite = burnman.Material()
 wustite.params = {       'name': 'wustite',
                     'molar_mass' : 0.07184,
                     'V_0': 12.06e-6,
@@ -121,21 +121,21 @@ depths = map(seismic_model.depth, pressure)
 seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)    
 
 #pure perovskite
-perovskitite = burnman.composite( ( (perovskite(0.06), 1.0),) )
+perovskitite = burnman.Composite( ( (perovskite(0.06), 1.0),) )
 perovskitite.set_method(method)
  
 #pure periclase
-periclasite = burnman.composite( ( (ferropericlase(0.21), 1.0),))
+periclasite = burnman.Composite( ( (ferropericlase(0.21), 1.0),))
 periclasite.set_method(method) 
 
 #pyrolite (80% perovskite)
-pyrolite = burnman.composite( ( (perovskite(0.06), 0.834),
+pyrolite = burnman.Composite( ( (perovskite(0.06), 0.834),
                               (ferropericlase(0.21), 0.166) ) )
 pyrolite.set_method(method) 
 
 #preferred mixture?
 amount_perovskite = 0.92
-preferred_mixture = burnman.composite( ( (perovskite(0.06), amount_perovskite),
+preferred_mixture = burnman.Composite( ( (perovskite(0.06), amount_perovskite),
                                          (ferropericlase(0.21), 1.0-amount_perovskite) ) )
 preferred_mixture.set_method(method) 
     

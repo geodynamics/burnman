@@ -32,7 +32,7 @@ print "preparations done"
 
 def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime): 
 
-    rock = burnman.mineral()
+    rock = burnman.Mineral()
 
     rock.params['V_0'] = 10.e-6
     rock.params['molar_mass'] = ref_rho*rock.params['V_0']

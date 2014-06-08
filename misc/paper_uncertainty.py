@@ -15,7 +15,7 @@ import burnman
 from burnman import minerals
 import colors
 
-class my_perovskite(burnman.material):
+class my_perovskite(burnman.Material):
     """
     based on Stixrude & Lithgow-Bertelloni 2011 and references therein  
     """
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     
 
     def eval(uncertain):
-        rock = burnman.composite ( [ (my_perovskite(uncertain), 1.0) ])
+        rock = burnman.Composite ( [ (my_perovskite(uncertain), 1.0) ])
         rock.set_method('slb3')
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)

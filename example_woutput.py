@@ -54,7 +54,7 @@ if __name__ == "__main__":
     
     #specify material
     amount_perovskite = 0.95
-    rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+    rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
           [minerals.SLB_2005.mg_fe_perovskite(0.7), minerals.SLB_2005.ferropericlase(0.5)] )
     
     #define some pressure range

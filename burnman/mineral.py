@@ -4,7 +4,7 @@
 
 import warnings
 
-from burnman.material import material
+from burnman.material import Material
 import burnman.slb as slb
 import numpy as np
 import burnman.equation_of_state as eos
@@ -12,7 +12,7 @@ import burnman.birch_murnaghan as bm
 import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 
-class mineral(material):
+class Mineral(Material):
     """
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature
@@ -62,20 +62,20 @@ class mineral(material):
         """
         if( isinstance(method, basestring)):
             if (method == "slb2"):
-                self.method = slb.slb2()
+                self.method = slb.SLB2()
             elif (method == "mgd2"):
-                self.method = mgd.mgd2()
+                self.method = mgd.MGD2()
             elif (method == "mgd3"):
-                self.method = mgd.mgd3()
+                self.method = mgd.MGD3()
             elif (method == "slb3"):
-                self.method = slb.slb3()
+                self.method = slb.SLB3()
             elif (method == "bm2"):
                 self.method = bm.bm2()
             elif (method == "bm3"):
                 self.method = bm.bm3()
             else:
                 raise Exception("unsupported material method " + method)
-        elif ( issubclass(method, eos.equation_of_state) ):
+        elif ( issubclass(method, eos.EquationOfState) ):
             self.method = method()
         else:
             raise Exception("unsupported material method " + method.__class__.__name__ )

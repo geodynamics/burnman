@@ -71,11 +71,11 @@ if __name__ == "__main__":
     
     
     #now load fast and slow regionalized models (Lekic et al. 2012):
-    sslow = burnman.seismic.slow()
+    sslow = burnman.seismic.Slow()
     depths2 = sslow.internal_depth_list()
     pressures2, density2, v_p2, v_s2, v_phi2 = sslow.evaluate_all_at(depths2)
     
-    sfast = burnman.seismic.fast()
+    sfast = burnman.seismic.Fast()
     depths3 = sfast.internal_depth_list()
     pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
     
@@ -110,9 +110,9 @@ if __name__ == "__main__":
     plt.close()
     # Load data table
 
-    class ak135_table(burnman.seismic.radiustable):
+    class ak135_table(burnman.seismic.RadiusTable):
         def __init__(self):
-            burnman.seismic.radiustable.__init__(self)
+            burnman.seismic.RadiusTable.__init__(self)
             # In format: radius, pressure, density, v_p, v_s
             table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt") 
             table = np.array(table)

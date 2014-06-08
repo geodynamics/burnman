@@ -57,7 +57,7 @@ if __name__ == "__main__":
     Kd_0 = .5
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_pyro, Kd_0)
-    pyrolite = burnman.composite( [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']], \
+    pyrolite = burnman.Composite( [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']], \
                                       [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0),\
                                            minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient\
     (p,t,relative_molar_percent_enst, Kd_0)
-    enstatite = burnman.composite ([phase_fractions_enst['pv'], phase_fractions_enst['fp']], \
+    enstatite = burnman.Composite ([phase_fractions_enst['pv'], phase_fractions_enst['fp']], \
                                        [minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0), \
                                             minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)] )
     

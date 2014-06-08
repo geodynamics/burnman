@@ -72,14 +72,14 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.composite ( [amount_perovskite, 1.0-amount_perovskite], \
+        rock = burnman.Composite ( [amount_perovskite, 1.0-amount_perovskite], \
                                        [minerals.SLB_2011.mg_perovskite(), \
                                             minerals.SLB_2011.periclase()] )
     
     #Example 2: specify fixed iron content
     if False:
         amount_perovskite = 0.95
-        rock = burnman.composite( [amount_perovskite, 1.0-amount_perovskite], \
+        rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
                                       [minerals.SLB_2011.mg_fe_perovskite(0.2), \
                                            minerals.SLB_2011.ferropericlase(0.2)] )
     
@@ -96,14 +96,14 @@ if __name__ == "__main__":
         iron_content = lambda p,t: burnman.calculate_partition_coefficient\
         							(p,t,relative_molar_percent,Kd_0)
 
-        rock = burnman.composite ( [ (minerals.mg_fe_perovskite_pt_dependent\
+        rock = burnman.Composite ( [ (minerals.mg_fe_perovskite_pt_dependent\
         							(iron_content,0), phase_fractions['pv'] ),
                                     (minerals.ferropericlase_pt_dependent(iron_content,1),\
                                     phase_fractions['fp'] ) ] )
         
     #Example 4: three materials
     if False:
-        rock = burnman.composite ( [ (minerals.SLB_2011.fe_perovskite(), 0.7),
+        rock = burnman.Composite ( [ (minerals.SLB_2011.fe_perovskite(), 0.7),
                                      (minerals.SLB_2011.ferropericlase(0.5), 0.2) ,
                                      (minerals.SLB_2011.stishovite(), 0.1 ) ] )
     

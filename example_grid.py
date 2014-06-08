@@ -24,7 +24,7 @@ from burnman import minerals
 
 if __name__ == "__main__":    
 
-    rock = burnman.composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(), \
+    rock = burnman.Composite ( [0.8, 0.2], [minerals.SLB_2011.mg_perovskite(), \
                                  minerals.SLB_2011.periclase()] )
 
     seismic_model = burnman.seismic.prem()

@@ -12,10 +12,10 @@ Minerals from Stixrude & Lithgow-Bertelloni 2011 and references therein
 """
 
 import burnman.mineral_helpers as bmb
-from burnman.mineral import mineral
+from burnman.mineral import Mineral
 
 
-class stishovite (mineral):
+class stishovite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
@@ -46,7 +46,7 @@ class stishovite (mineral):
             }
 
 
-class periclase (mineral):
+class periclase (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein 
     """
@@ -75,7 +75,7 @@ class periclase (mineral):
         'err_q_0':.2,
         'err_eta_s_0':.2 }
 
-class wuestite (mineral):
+class wuestite (Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
@@ -117,7 +117,7 @@ class mg_fe_perovskite(bmb.helper_solid_solution):
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         bmb.helper_solid_solution.__init__(self, base_materials, molar_fraction)
 
-class mg_perovskite(mineral):
+class mg_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein  
     """
@@ -147,7 +147,7 @@ class mg_perovskite(mineral):
             'err_eta_s_0':.3}
 
 
-class fe_perovskite(mineral):
+class fe_perovskite(Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2011 and references therein
     """

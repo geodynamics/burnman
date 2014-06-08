@@ -3,20 +3,23 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import equation_of_state as eos
 import scipy.optimize as opt
 
+import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.debye as debye
 
 
-class mgd_base(eos.equation_of_state):
+class MGDBase(eos.EquationOfState):
     """
     Base class for a generic finite-strain-mie-grueneisen-debye
     equation of state.  References for this can be found in many
     places, such as Shim, Duffym and Kenichi (2002) and Jackson and Rigedn
     (1996).  Here we mostly follow the appendices of Matas et al (2007)
     """
+
+    #def __init__(self):
+    #    pass
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
@@ -154,7 +157,7 @@ class mgd_base(eos.equation_of_state):
         return K_th
 
 
-class mgd3(mgd_base):
+class MGD3(MGDBase):
     """
     MGD equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
@@ -163,7 +166,8 @@ class mgd3(mgd_base):
     def __init__(self):
         self.order=3
 
-class mgd2(mgd_base):
+
+class MGD2(MGDBase):
     """
     MGD equation of state with second order finite strain expansion for the
     shear modulus.  In general, this should not be used, but sometimes 

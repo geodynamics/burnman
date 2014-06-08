@@ -72,7 +72,7 @@ if __name__ == "__main__":
     def eval_material(amount_perovskite):
 #        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
 #                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-        rock = burnman.composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
+        rock = burnman.Composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
                              (minerals.SLB_2011.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )

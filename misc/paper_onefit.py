@@ -40,7 +40,7 @@ def make_rock():
     perovskite = helper_solid_solution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
     ferropericlase = helper_solid_solution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
 
-    pyrolite = burnman.composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
+    pyrolite = burnman.Composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
     pyrolite.set_method('slb3')
     anchor_temperature = 1935.0
 

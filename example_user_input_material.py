@@ -59,9 +59,9 @@ if __name__ == "__main__":
     method = 'slb3'
     
     #in form name_of_mineral (burnman.mineral <- creates list with parameters)
-    class own_material (burnman.mineral): 
+    class own_material (burnman.Mineral):
             def __init__(self):
-                    burnman.mineral.__init__(self)
+                    burnman.Mineral.__init__(self)
                     self.params = {
                             'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)] 
                             	#at room pressure/temperature
