@@ -93,23 +93,23 @@ if __name__ == "__main__":
 
         #Voigt Reuss Hill averaging
 	rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill())
 
         #Voigt averaging
 	rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.voigt())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Voigt())
 
         #Reuss averaging
 	rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.reuss())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Reuss())
 
         #Upper bound for Hashin-Shtrikman averaging
 	rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_upper())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanUpper())
 
         #Lower bound for Hashin-Shtrikman averaging
 	rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.hashin_shtrikman_lower())
+            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanLower())
 
 	#linear fit
 	vs_lin = vs_pv*amount_perovskite + vs_fp*(1.0-amount_perovskite)  

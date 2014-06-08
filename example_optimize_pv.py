@@ -63,7 +63,7 @@ if __name__ == "__main__":
         rock.set_method(method)
     
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.voigt_reuss_hill())
+            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
     
         print "Calculations are done for:"
         rock.debug_print()

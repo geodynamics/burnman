@@ -70,7 +70,7 @@ if __name__ == "__main__":
     
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, pressures, temperature, \
-        burnman.averaging_schemes.voigt_reuss_hill())
+        burnman.averaging_schemes.VoigtReussHill())
         
     #write to file:
     output_filename = "example_woutput.txt" 

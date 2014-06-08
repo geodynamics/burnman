@@ -10,29 +10,29 @@ averages and bounds for a composite.
 
 Base class
 -----------
-.. autoclass:: burnman.averaging_schemes.averaging_scheme
+.. autoclass:: burnman.averaging_schemes.AveragingScheme
 
 Voigt bound
 -----------
-.. autoclass:: burnman.averaging_schemes.voigt
+.. autoclass:: burnman.averaging_schemes.Voigt
 
 Reuss bound
 -----------
-.. autoclass:: burnman.averaging_schemes.reuss
+.. autoclass:: burnman.averaging_schemes.Reuss
 
 Voigt-Reuss-Hill average
 ------------------------
-.. autoclass:: burnman.averaging_schemes.voigt_reuss_hill
+.. autoclass:: burnman.averaging_schemes.VoigtReussHill
 
 Hashin-Shtrikman upper bound
 ----------------------------
-.. autoclass:: burnman.averaging_schemes.hashin_shtrikman_upper
+.. autoclass:: burnman.averaging_schemes.HashinShtrikmanUpper
 
 Hashin-Shtrikman lower bound
 ----------------------------
-.. autoclass:: burnman.averaging_schemes.hashin_shtrikman_lower
+.. autoclass:: burnman.averaging_schemes.HashinShtrikmanLower
 
 Hashin-Shtrikman arithmetic average
 -----------------------------------
-.. autoclass:: burnman.averaging_schemes.hashin_shtrikman_average
+.. autoclass:: burnman.averaging_schemes.HashinShtrikmanAverage
 

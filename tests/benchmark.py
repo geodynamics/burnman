@@ -353,11 +353,11 @@ def check_averaging():
     Reproduce Figure 1a from Watt et. al. 1976 to check the Voigt, Reuss,
     Voigt-Reuss-Hill, and Hashin-Shtrikman bounds for an elastic composite
     """
-    voigt = burnman.averaging_schemes.voigt() 
-    reuss = burnman.averaging_schemes.reuss() 
-    voigt_reuss_hill = burnman.averaging_schemes.voigt_reuss_hill() 
-    hashin_shtrikman_upper = burnman.averaging_schemes.hashin_shtrikman_upper() 
-    hashin_shtrikman_lower = burnman.averaging_schemes.hashin_shtrikman_lower() 
+    voigt = burnman.averaging_schemes.Voigt()
+    reuss = burnman.averaging_schemes.Reuss()
+    voigt_reuss_hill = burnman.averaging_schemes.VoigtReussHill()
+    hashin_shtrikman_upper = burnman.averaging_schemes.HashinShtrikmanUpper()
+    hashin_shtrikman_lower = burnman.averaging_schemes.HashinShtrikmanLower()
 
     #create arrays for sampling in volume fraction
     volumes = np.linspace(0.0,1.0,100) 
