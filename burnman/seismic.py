@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 import burnman.tools
 
-class SeismicData:
+class SeismicModel:
     """
-    Base class for all the seismological models
+    Base class for all the seismological models.
     """
     def __init__(self):
         pass
@@ -18,7 +18,7 @@ class SeismicData:
         
     def evaluate_all_at(self, depth_list):
         """
-        Returns the lists of data for a specific model for the depths provided
+        Returns the lists of data for a SeismicModel for the depths provided
             
         Parameters
         ----------
@@ -70,7 +70,7 @@ class SeismicData:
         return -1
 
 
-class RadiusTable(SeismicData):
+class Model1D(SeismicModel):
     """ 
     This is a base class that gets the information from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
@@ -80,7 +80,7 @@ class RadiusTable(SeismicData):
     want to access with something else.
     """ 
     def __init__(self):
-        SeismicData.__init__(self)
+        SeismicModel.__init__(self)
         self.table_radius = []
         self.table_pressure = []
         self.table_density = []
@@ -89,6 +89,7 @@ class RadiusTable(SeismicData):
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self):
+        
         return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
 
     def pressure(self, depth):
@@ -117,12 +118,12 @@ class RadiusTable(SeismicData):
         return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
-class PREM(RadiusTable):
+class PREM(Model1D):
     """ 
     reads in the table for PREM (input_seismic/prem_table.txt) using the base class radiustable
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        Model1D.__init__(self)
         table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
@@ -139,7 +140,7 @@ class PREM(RadiusTable):
         return np.interp(self.earth_radius-depths, table_rad,table_g)
 
 
-class Slow(RadiusTable):
+class Slow(Model1D):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
     We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
@@ -147,7 +148,7 @@ class Slow(RadiusTable):
     because all tables where generated with at the same depths 
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        Model1D.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -172,7 +173,7 @@ class Slow(RadiusTable):
         self.table_vs = table2[:,1] 
        
 
-class Fast(RadiusTable):
+class Fast(Model1D):
     """ 
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
     We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
@@ -180,7 +181,7 @@ class Fast(RadiusTable):
     because all tables where generated with at the same depths 
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        Model1D.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -206,19 +207,6 @@ class Fast(RadiusTable):
 
 
 
-# this uses prem_lowermantle table
-class PREMTest(RadiusTable):
-    def __init__(self):
-        RadiusTable.__init__(self)
-
-        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")
-        #data is: radius pressure density V_p V_s Q_K Q_G
-        table = np.array(table)
-        self.table_radius = table[:,0]   
-        self.table_pressure = table[:,1] 
-        self.table_density = table[:,2]
-        self.table_vp = table[:,3] 
-        self.table_vs = table[:,4] 
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """ 
