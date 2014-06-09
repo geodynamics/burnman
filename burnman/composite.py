@@ -14,7 +14,7 @@ def check_pairs(fractions, minerals):
             raise Exception('ERROR: we need at least one mineral')
 
         if len(fractions) != len(minerals):
-            raise Exception('ERROR: different array lengths');
+            raise Exception('ERROR: different array lengths')
 
         total = sum(fractions)
         if abs(total-1.0)>1e-10:

@@ -5,6 +5,7 @@
 import numpy as np
 import warnings
 
+
 class AveragingScheme:
     """ 
     Base class defining an interface for determining average 
@@ -37,6 +38,7 @@ class AveragingScheme:
             The average bulk modulus in [Pa].
         """
         raise NotImplementedError("")
+
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the shear moduli of a composite.  This defines the interface 
@@ -58,11 +60,12 @@ class AveragingScheme:
             The average shear modulus in [Pa].
         """
         raise NotImplementedError("")
+
     def average_density(self, volumes, densities):
         """
         Average the densities of a composite, given a list of volume
         fractions and densitites.  This is the only method of
-        :class:`burnman.averaging_schemes.averaging_scheme` which is implemented in the base class,
+        :class:`burnman.averaging_schemes.AveragingScheme` which is implemented in the base class,
         as how to calculate it is not dependent on the geometry of the rock.
         The formula for density is given by
 
@@ -85,8 +88,7 @@ class AveragingScheme:
         total_vol = np.sum(np.array(volumes)) #should sum to one
         density = total_mass/total_vol
         return density
-         
-        
+
 
 class VoigtReussHill(AveragingScheme):
     """ 
@@ -436,6 +438,7 @@ class HashinShtrikmanLower(AveragingScheme):
         G_lower = G_1 + (0.5)*B_1/(1. + beta_1*B_1)
         return G_lower
 
+
 class HashinShtrikmanAverage(AveragingScheme):
     """ 
     Class for computing arithmetic mean of the Hashin-Shtrikman bounds on elastic properties. 
@@ -467,7 +470,7 @@ class HashinShtrikmanAverage(AveragingScheme):
         K : float
             The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus in [Pa].
         """
-        return (  self.upper.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)\
+        return (self.upper.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)
                 + self.lower.average_bulk_moduli(volumes, bulk_moduli, shear_moduli))/2.0
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -491,12 +494,11 @@ class HashinShtrikmanAverage(AveragingScheme):
         K : float
             The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus in [Pa].
         """
-        return (   self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)\
-                 + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli))/2.0
+        return (self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
+                + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli))/2.0
         
-      
 
-def voigt_average_function(phase_volume,X):
+def voigt_average_function(phase_volume, X):
     """
     Do Voigt (iso-strain) average.  Rather like
     resistors in series.  Called by voigt and
@@ -506,10 +508,11 @@ def voigt_average_function(phase_volume,X):
     it = range(len(phase_volume))
     V_i = phase_volume
     V_tot = sum(V_i)
-    X_voigt = sum( V_i[i]/V_tot * X[i] for i in it)
+    X_voigt = sum(V_i[i]/V_tot * X[i] for i in it)
     return X_voigt
 
-def reuss_average_function(phase_volume,X):
+
+def reuss_average_function(phase_volume, X):
     """
     Do Reuss (iso-stress) average.  Rather like
     resistors in parallel.  Called by reuss and
@@ -523,16 +526,17 @@ def reuss_average_function(phase_volume,X):
         X_reuss = 0.0
         warnings.warn("Oops, called reuss_average with Xi<=0!")
     else:
-        X_reuss = 1./sum(  V_i[i]/V_tot* 1./X[i] for i in it)
+        X_reuss = 1./sum(V_i[i]/V_tot* 1./X[i] for i in it)
     return X_reuss
 
-def voigt_reuss_hill_function(phase_volume,X):
+
+def voigt_reuss_hill_function(phase_volume, X):
     """
     Do Voigt-Reuss-Hill average (arithmetic mean
     of Voigt and Reuss bounds).  Called by
     voigt_reuss_hill class, takes a list of
     volumes and moduli, returns a modulus.
     """
-    X_vrh = (voigt_average_function(phase_volume,X) + reuss_average_function(phase_volume,X))/2.
+    X_vrh = (voigt_average_function(phase_volume, X) + reuss_average_function(phase_volume, X))/2.0
     return X_vrh
 
