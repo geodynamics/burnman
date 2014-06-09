@@ -72,7 +72,7 @@ class SeismicModel:
 
 class Model1D(SeismicModel):
     """ 
-    This is a base class that gets the information from a table indexed and
+    This is a base class that gets a 1D seismic model from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
     from this class.
     Note: all tables need to be sorted by increasing radius.
