@@ -12,7 +12,7 @@ Minerals from Murakami 2013 and references therein
 
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
-                
+
 
 
 
@@ -80,10 +80,10 @@ class mg_perovskite(Mineral):
         self.params = {
             'equation_of_state':'slb2',
             'V_0': 24.45e-6,
-            'K_0': 253.0e9,   
-            'Kprime_0': 4.1,     
-            'G_0': 172.9e9,  
-            'Gprime_0': 1.56,  
+            'K_0': 253.0e9,
+            'Kprime_0': 4.1,
+            'G_0': 172.9e9,
+            'Gprime_0': 1.56,
             'molar_mass': .1000,
             'n': 5,
             'Debye_0': 1100.,
@@ -99,11 +99,11 @@ class fe_perovskite(Mineral):
         self.params = {
             'equation_of_state':'slb2',
             'V_0': 25.49e-6,
-            'K_0': 281.0e9, 
-            'Kprime_0': 4.1,  
+            'K_0': 281.0e9,
+            'Kprime_0': 4.1,
             'G_0': 138.0e9,
-            'Gprime_0': 1.7,   
-            'molar_mass': .1319, 
+            'Gprime_0': 1.7,
+            'molar_mass': .1319,
             'n': 5,
             'Debye_0': 841.,
             'grueneisen_0': 1.48,

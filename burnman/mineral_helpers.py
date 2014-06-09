@@ -25,7 +25,7 @@ class HelperSolidSolution(Mineral):
     Class for coming up with a new mineral based based on a solid
     solution between two or more end member minerals.  It is not
     completely clear how to do this, or how valid this approximation
-    is, but here we just do a weighted arithmetic average of the 
+    is, but here we just do a weighted arithmetic average of the
     thermoelastic properties of the end members according to their molar fractions
     """
     def __init__(self, base_materials, molar_fraction):
@@ -41,7 +41,7 @@ class HelperSolidSolution(Mineral):
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
 
-        #does not make sense to do a solid solution with different number of 
+        #does not make sense to do a solid solution with different number of
         #atoms per formula unit, at least not simply...
         for m in base_materials:
             if(base_materials[0].params.has_key('n')):
@@ -66,23 +66,23 @@ class HelperSolidSolution(Mineral):
         Mineral.set_state(self, pressure, temperature)
 
 class HelperSpinTransition(Material):
-    """ 
+    """
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
     """
-    
+
     def __init__(self, transition_pressure, ls_mat, hs_mat):
-        """ 
-        Takes a transition pressure, and two minerals.  Use the 
+        """
+        Takes a transition pressure, and two minerals.  Use the
         thermoelastic parameters for ls_mat below the transition
-        pressure, and the thermoelastic parameters for hs_mat 
+        pressure, and the thermoelastic parameters for hs_mat
         above the transition pressure
         """
         self.transition_pressure = transition_pressure
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
-                
+
     def set_method(self, method):
         self.ls_mat.set_method(method)
         self.hs_mat.set_method(method)
@@ -92,7 +92,7 @@ class HelperSpinTransition(Material):
             self.active_mat = self.ls_mat
         else:
             self.active_mat = self.hs_mat
-            
+
         self.active_mat.set_state(pressure, temperature)
 
     def unroll(self):

@@ -23,7 +23,7 @@ class Speziale_fe_periclase(bmb.HelperSpinTransition):
 class Speziale_fe_periclase_HS(Mineral):
     """
     Speziale et al. 2007, Mg#=83
-    """ 
+    """
     def __init__(self):
             self.params = {
                         'equation_of_state': 'mgd3',
@@ -52,9 +52,9 @@ class Speziale_fe_periclase_LS(Mineral):
                         'grueneisen_0': 1.46,
                         'q_0': 1.2  }
 
-    
-    
 
-        
+
+
+
 
 

@@ -35,11 +35,11 @@ class mg_perovskite(Mineral):
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
             'q_0': 1.4,
-            'eta_s_0': 2.4 } 
+            'eta_s_0': 2.4 }
 
 class mg_perovskite_3rdorder(Mineral):
     """
-    Murakami et al. (2012) third order fit to supplementary table 1, includes 4% Al 
+    Murakami et al. (2012) third order fit to supplementary table 1, includes 4% Al
     """
     def __init__(self):
         self.params = {
@@ -64,7 +64,7 @@ class fe_perovskite(Mineral):
         self.params = {
             'equation_of_state':'slb2',
             'V_0': 24.607e-6,
-            'K_0': 251.9e9, 
+            'K_0': 251.9e9,
             'Kprime_0': 4.01,
             'G_0': 164.7e9,
             'Gprime_0': 1.58,
@@ -73,10 +73,10 @@ class fe_perovskite(Mineral):
             'Debye_0': 1054.,
             'grueneisen_0': 1.48,
             'q_0': 1.4,
-            'eta_s_0': 2.4 } 
+            'eta_s_0': 2.4 }
 
 
-            
+
 class mg_periclase(Mineral):
     """
     Murakami et al. (2012) supplementary table 5 and references therein, V_0 from Stixrude & Lithgow-Bertolloni 2005
@@ -93,8 +93,8 @@ class mg_periclase(Mineral):
             'n': 2,
             'Debye_0': 773., # S& L-B 2005
             'grueneisen_0': 1.5,
-            'q_0': 1.5, #S&L-B 2005    
-            'eta_s_0': 3.0 }             
+            'q_0': 1.5, #S&L-B 2005
+            'eta_s_0': 3.0 }
 
 
 
@@ -108,7 +108,7 @@ class fe_periclase_3rd(bmb.HelperSpinTransition):
 
 class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     """
-    Murakami et al. (2012), personal communication, Mg#=79 
+    Murakami et al. (2012), personal communication, Mg#=79
     """
     def __init__(self):
         self.params = {
@@ -183,4 +183,4 @@ class fe_periclase_LS_3rd(Mineral):
             'grueneisen_0': 1.45,
             'q_0': 1.5,
             'eta_s_0': 2.54}
-                
+

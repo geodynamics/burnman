@@ -7,7 +7,7 @@ import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
 
 """
-Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye, 
+Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
 just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
@@ -37,9 +37,9 @@ log_eps = np.log(np.finfo(np.float).eps)
 
 def debye_fn_cheb(x):
     """
-    Evaluate the Debye function using a Chebyshev series expansion coupled with 
+    Evaluate the Debye function using a Chebyshev series expansion coupled with
     asymptotic solutions of the function.  Shamelessly adapted from the GSL implementation
-    of the same function (Itself adapted from Collected Algorithms from ACM).  
+    of the same function (Itself adapted from Collected Algorithms from ACM).
     Should give the same result as debye_fn(x) to near machine-precision.
     """
     val_infinity = 19.4818182068004875;
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     for i in range(len(temperatures)):
         new[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
     time_new = time.clock()-start
-    
+
     print "error %e"%np.linalg.norm((old-new)/new)
     print "time old %g, time new %g"%(time_old,time_new)
 
@@ -147,4 +147,4 @@ if __name__ == "__main__":
     plt.show()
 
 
-    
+

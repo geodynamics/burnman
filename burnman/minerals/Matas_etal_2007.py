@@ -21,15 +21,15 @@ class mg_perovskite(Mineral): # Matas et al 2007 Tables 1&2
         self.params = {
             'equation_of_state':'mgd2',
             'V_0': 24.43e-6,
-            'K_0': 250.0e9,   
-            'Kprime_0': 4.0,     
-            'G_0': 175.0e9,  
-            'Gprime_0': 1.8,    
+            'K_0': 250.0e9,
+            'Kprime_0': 4.0,
+            'G_0': 175.0e9,
+            'Gprime_0': 1.8,
             'molar_mass': .1020,
             'n': 5,
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
-            'q_0': 1.4} 
+            'q_0': 1.4}
 
 class fe_perovskite(Mineral): # Matas et al 2007 Tables 1&2
     """
@@ -39,15 +39,15 @@ class fe_perovskite(Mineral): # Matas et al 2007 Tables 1&2
         self.params = {
             'equation_of_state':'mgd2',
             'V_0': 25.34e-6,
-            'K_0': 250.0e9, 
-            'Kprime_0': 4.0,  
-            'G_0': 135.0e9, 
-            'Gprime_0': 1.3,  
-            'molar_mass': .1319, 
+            'K_0': 250.0e9,
+            'Kprime_0': 4.0,
+            'G_0': 135.0e9,
+            'Gprime_0': 1.3,
+            'molar_mass': .1319,
             'n': 5,
             'Debye_0': 841.,
             'grueneisen_0': 1.48,
-            'q_0': 1.4} 
+            'q_0': 1.4}
 
 class al_perovskite(Mineral): # Matas et al 2007 Tables 1&2
     """

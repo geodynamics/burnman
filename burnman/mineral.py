@@ -19,7 +19,7 @@ class Mineral(Material):
     using set_state(). The method for computing properties of
     the material is set using set_method(), which should be done
     once after creating the material.
-    
+
     If deriving from this class, set the properties in self.params
     to the desired values. For more complicated materials you
     can overwrite set_state(), change the params and then call
@@ -46,7 +46,7 @@ class Mineral(Material):
             'Gprime_0': 0., #pressure derivative of shear modulus
             'molar_mass': 0., #molar mass in units of [kg/mol]
             'n': 0., #number of atoms per molecule
-            'Debye_0': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values 
+            'Debye_0': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
             'grueneisen_0': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
             'q_0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
             'eta_s_0': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
@@ -92,7 +92,7 @@ class Mineral(Material):
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
-        
+
         This updates the other properties of this class (v_s, v_p, ...).
         """
 
@@ -106,7 +106,7 @@ class Mineral(Material):
         self.pressure = pressure
         self.temperature = temperature
         self.old_params = self.params
-        
+
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)
         self.K_T = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
@@ -114,10 +114,10 @@ class Mineral(Material):
         self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
-        
+
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
-        else:    
+        else:
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
             warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 
@@ -178,13 +178,13 @@ class Mineral(Material):
         Returns shear wave speed of the mineral [m/s]
         """
         return np.sqrt(self.shear_modulus() / \
-            self.density()) 
+            self.density())
     def v_p(self):
         """
         Returns P wave speed of the mineral [m/s]
         """
         return np.sqrt((self.adiabatic_bulk_modulus() + 4. / 3. * \
-            self.shear_modulus()) / self.density()) 
+            self.shear_modulus()) / self.density())
     def v_phi(self):
         """
         Returns bulk sound speed of the mineral [m/s]

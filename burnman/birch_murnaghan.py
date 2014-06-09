@@ -31,7 +31,7 @@ def birch_murnaghan(x, params):
     * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1))
 
 def density(pressure, params):
-    """ 
+    """
     Get the birch-murnaghan density at a reference temperature for a given
     pressure (in Pa). Returns density in kg/m^3
     """
@@ -56,7 +56,7 @@ def shear_modulus_second_order(volume, params):
 
     x = params['V_0']/volume
     G=params['G_0'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['Gprime_0']*params['K_0']/params['G_0']))
-    return G 
+    return G
 
 def shear_modulus_third_order(volume, params):
     """
@@ -68,7 +68,7 @@ def shear_modulus_third_order(volume, params):
     x = params['V_0']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
     G = pow((1. + 2*f), 5./2.)*(params['G_0']+(3.*params['K_0']*params['Gprime_0'] - 5.*params['G_0'])*f + (6.*params['K_0']*params['Gprime_0']-24.*params['K_0']-14.*params['G_0']+9./2. * params['K_0']*params['Kprime_0'])*f*f)
-    return G 
+    return G
 
 
 class BirchMurnaghanBase(eos.EquationOfState):
