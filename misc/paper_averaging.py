@@ -27,7 +27,7 @@ teaches:
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-	sys.path.insert(1,os.path.abspath('..')) 
+	sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
@@ -39,20 +39,20 @@ if __name__ == "__main__":
 	#plt.rc('text', usetex=True)
 	plt.rc('font', family='sanserif')
 	figure=plt.figure(dpi=100,figsize=figsize)
-    
-	""" choose 'slb2' (finite-strain 2nd order shear modulus, 
+
+	""" choose 'slb2' (finite-strain 2nd order shear modulus,
 		stixrude and lithgow-bertelloni, 2005)
 	or 'slb3 (finite-strain 3rd order shear modulus,
 		stixrude and lithgow-bertelloni, 2005)
 	or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
 		matas et al. 2007)
-	or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus, 
+	or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
 		matas et al. 2007)
 	or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
 	   (your choice in geotherm will not matter in this case))
 	   or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
 	(your choice in geotherm will not matter in this case))"""
-	
+
 	amount_perovskite = 0.6
 	method = 'slb3'
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
 	periclasite = burnman.Composite( [ (minerals.SLB_2011.wuestite(), 1.0), ] )
 	periclasite.set_method(method)
-		   
+
 	#seismic model for comparison:
 	# pick from .prem() .slow() .fast() (see burnman/seismic.py)
 	seismic_model = burnman.seismic.PREM()
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 	pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 	temperatures = burnman.geotherm.brown_shankland(pressures)
-	
+
 
 	print "Calculations are done for:"
 	rock.debug_print()
@@ -112,10 +112,10 @@ if __name__ == "__main__":
             burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanLower())
 
 	#linear fit
-	vs_lin = vs_pv*amount_perovskite + vs_fp*(1.0-amount_perovskite)  
-	
+	vs_lin = vs_pv*amount_perovskite + vs_fp*(1.0-amount_perovskite)
+
 	# PLOTTING
-	
+
 	# plot vs
 	ax = figure.add_subplot(1,1,1)
 	plt.plot(pressures/1.e9,vs_v/1.e3,color=colors.color(0),linewidth=2,linestyle='-',marker='^',\
@@ -126,8 +126,8 @@ if __name__ == "__main__":
 	    markersize=6,label='Voigt-Reuss-Hill')
 	plt.fill_between(pressures/1.e9, vs_hsu/1.e3, vs_hsl/1.e3, facecolor='red', lw=0, label='asdf',interpolate=False)
 
-	
-	
+
+
 
 	#plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',\
 	#    markersize=4,label='Hashin-Shtrikman')

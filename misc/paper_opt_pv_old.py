@@ -22,13 +22,13 @@ teaches:
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 import colors
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
 
     #figsize=(6,5)
     plt.figure(dpi=100,figsize=(12,10))
@@ -40,12 +40,12 @@ if __name__ == "__main__":
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
-    
+
     ### input variables ###
     #######################
-    
+
     #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order shear modulus,       
+    """ choose 'slb2' (finite-strain 2nd order shear modulus,
         stixrude and lithgow-bertelloni, 2005)
     or 'slb3 (finite-strain 3rd order shear modulus,
         stixrude and lithgow-bertelloni, 2005)
@@ -58,16 +58,16 @@ if __name__ == "__main__":
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
     method = 'slb3'
-    
+
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
     print seis_p[0], seis_p[-1]
-    
+
     #temperature = burnman.geotherm.brown_shankland(seis_p)
-    
+
     def eval_material(amount_perovskite):
 #        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
 #                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
@@ -75,23 +75,25 @@ if __name__ == "__main__":
                              (minerals.SLB_2011.ferropericlase(0.21), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
 #                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
-    
+
         rock.set_method(method)
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
         print "Calculations are done for:"
         rock.debug_print()
-    
+
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
-    
+
         #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-        
-    
+
+
         return seis_p, mat_vs, mat_vphi, mat_rho
 
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
-        [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
+        [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,
+                                                     [mat_vs,mat_vphi,mat_rho],
+                                                     [seis_vs,seis_vphi,seis_rho])
         scale = 2700e3-850e3
         return vs_err/scale, vphi_err/scale
 
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     print vs_average_prem, vphi_average_prem
     yy_vs=yy_vs/vs_average_prem
     yy_vphi=yy_vphi/vphi_average_prem
-    yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot 
+    yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot
  #   plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,1)
     plt.plot (xx*100,yy_vs,"-",color=colors.color(1),label=("$V_s$ error"),linewidth=1.5,dashes=dashstyle2)
@@ -125,7 +127,7 @@ if __name__ == "__main__":
     plt.plot([A*100.,A*100.],[ymin,ymax],color=colors.color(3),label='A (%g\%% pv)'%(A*100),linewidth=1.5,linestyle='-')
     plt.plot([B*100.,B*100.],[ymin,ymax],color=colors.color(1),label='B (%g\%% pv)'%(B*100),linewidth=1.5,dashes=dashstyle2)
     plt.plot([C*100.,C*100.],[ymin,ymax],color=colors.color(4),label='C (%g\%% pv)'%(C*100),linewidth=1.5,dashes=dashstyle3)
-    
+
     plt.yscale('log')
     plt.xlabel('\% Perovskite')
     plt.ylabel('Error')
@@ -137,7 +139,7 @@ if __name__ == "__main__":
     A_p, A_vs, A_vphi,_ = eval_material(A)
     B_p, B_vs, B_vphi,_ = eval_material(B)
     C_p, C_vs, C_vphi,_ = eval_material(C)
-    
+
 #    plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,3)
     plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',linewidth=2.0, markersize=6,markerfacecolor='None',label='PREM')
@@ -154,9 +156,9 @@ if __name__ == "__main__":
   #  plt.tight_layout()
  #   plt.savefig("opt_pv_2.pdf",bbox_inches='tight')
 #    plt.show()
-   
+
     plt.subplot(2,2,4)
-   
+
 #    plt.figure(dpi=100,figsize=figsize)
     plt.plot(seis_p/1.e9,seis_vphi/1.e3,color='k',linestyle='-',linewidth=2.0, markersize=6,markerfacecolor='None',label='PREM', mew=1.5)
     plt.plot(A_p/1.e9,A_vphi/1.e3,color=colors.color(3),linestyle='-', \
@@ -187,7 +189,7 @@ if __name__ == "__main__":
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Difference from PREM (\%)')
     plt.ylim([-5,4])
-    plt.xlim([30,130]) 
+    plt.xlim([30,130])
     plt.legend(loc='lower center', ncol=2, prop=prop)
 #    plt.tight_layout()
 #    plt.savefig("opt_pv_4.pdf",bbox_inches='tight')

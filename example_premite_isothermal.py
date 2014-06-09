@@ -15,11 +15,9 @@ teaches:
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-        sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
-from burnman import minerals
-
 import pymc
 
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
@@ -30,7 +28,7 @@ seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(de
 print "preparations done"
 
 
-def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime): 
+def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
 
     rock = burnman.Mineral()
 
@@ -44,7 +42,7 @@ def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
     rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)	
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
 
     return mat_rho, mat_vphi, mat_vs
 
@@ -103,8 +101,8 @@ plt.plot(seis_p/1.e9,vphi/1000.,color='r',linestyle='-',marker='^',markerfacecol
 plt.plot(seis_p/1.e9,seis_vphi/1000.,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
 plt.ylim([7, 12])
 plt.title("Vphi (km/s)")
-   
-    
+
+
 # plot density
 plt.subplot(2,2,3)
 plt.plot(seis_p/1.e9,rho/1000.,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4,label='model 1')

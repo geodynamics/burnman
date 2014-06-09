@@ -10,7 +10,7 @@ c = ['#0A5F02', '#1c567a', '#814292', '#d7383b', '#fdae61', '#c0f8b8']
 def color(idx):
     return c[idx]
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
 
     import os, sys, numpy as np, matplotlib.pyplot as plt
 

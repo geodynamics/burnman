@@ -19,7 +19,7 @@ teaches:
 """
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-	sys.path.insert(1,os.path.abspath('..')) 
+	sys.path.insert(1,os.path.abspath('..'))
 
 import scipy.optimize as opt
 import burnman
@@ -27,7 +27,7 @@ import colors
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-        sys.path.insert(1,os.path.abspath('..')) 
+        sys.path.insert(1,os.path.abspath('..'))
 
 
 figsize=(6,5)
@@ -38,7 +38,7 @@ plt.rc('font', family='sanserif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
 
-def calc_shear_velocities(G_0, Gprime_0, mineral, pressures): 
+def calc_shear_velocities(G_0, Gprime_0, mineral, pressures):
 
     mineral.params['G_0'] = G_0
     mineral.params['Gprime_0'] = Gprime_0
@@ -67,7 +67,7 @@ pressures = np.linspace(25.e9, 135.e9, 100)
 
 #make the mineral to fit
 guess = [200.e9, 2.0]
-mg_perovskite_test = burnman.Material()
+mg_perovskite_test = burnman.Mineral()
 mg_perovskite_test.params['V_0'] = 24.45e-6
 mg_perovskite_test.params['K_0'] = 281.e9
 mg_perovskite_test.params['Kprime_0'] = 4.1

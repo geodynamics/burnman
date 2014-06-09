@@ -10,21 +10,21 @@ It shows the sensitivity of the velocities to various mineralogical parameters.
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
+    sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 import colors
 
-class my_perovskite(burnman.Material):
+class my_perovskite(burnman.Mineral):
     """
-    based on Stixrude & Lithgow-Bertelloni 2011 and references therein  
+    based on Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self, uncertain):
         self.params = {
             'equation_of_state':'slb3',
             'V_0': 24.45e-6,
-            'K_0': 251.0e9 * uncertain[0],   
+            'K_0': 251.0e9 * uncertain[0],
             'Kprime_0': 4.1 * uncertain[1],
             'G_0': 173.0e9 * uncertain[2],
             'Gprime_0': 1.7 * uncertain[3],
@@ -35,7 +35,7 @@ class my_perovskite(burnman.Material):
             'q_0': 1.1 * uncertain[6],
             'eta_s_0': 2.6 * uncertain[7]}
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     figure=plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
@@ -51,21 +51,21 @@ if __name__ == "__main__":
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
-    
+
 
     def eval(uncertain):
         rock = burnman.Composite ( [ (my_perovskite(uncertain), 1.0) ])
         rock.set_method('slb3')
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)
-        
+
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
 
         return seis_p, mat_vs, mat_vphi, mat_rho
 
     len = 9
-    
+
     p, base_vs, base_vphi, _ = eval(np.ones(len))
 
     spread = [.1, .1, .1, .1, .1, .5, .5, .5, .1]
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         ax = figure.add_subplot(3,3,reorder[i]+1)
         #plt.subplots_adjust(left=0, bottom=None, right=0, top=None, wspace=None, hspace=None)
         plt.subplots_adjust(wspace=0, hspace=0.2)
-        
+
 
         plt.plot(seis_p/1.e9,seis_vs/1.e3,linestyle="-",color='k',linewidth=2.0,label='PREM')
 
