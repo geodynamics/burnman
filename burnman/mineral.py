@@ -4,9 +4,9 @@
 
 import warnings
 
-from burnman.material import Material
-import burnman.slb as slb
 import numpy as np
+
+from burnman.material import Material
 import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.slb as slb

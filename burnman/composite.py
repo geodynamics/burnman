@@ -81,11 +81,6 @@ class Composite(Material):
         """
         return "'" + self.__class__.__name__ + "'"
 
-    def debug_print(self):
-        (fr,mins) = self.unroll()
-        for (fr,mi) in zip(fr,mins):
-            print "%g of phase %s"%(fr,mi.to_string())
-
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
