@@ -2,20 +2,20 @@
 Seismic
 =======
 
+Base class for all seismic models
+---------------------------------
+.. autoclass:: burnman.seismic.SeismicModel
+   :members: evaluate_all_at
 
 
-
-.. automodule:: burnman.seismic
-
-
-Base class
------------
-.. autoclass:: burnman.seismic.SeismicData
-   
-
-1D Models
------------
+Class for 1D Models
+-------------------
 .. autoclass:: burnman.seismic.Model1D 
+
+
+
+Models currently implemented
+----------------------------
 
 .. autoclass:: burnman.seismic.PREM
 
@@ -25,6 +25,8 @@ Base class
 
 
 
-Corrections for attenuation
+Attenuation Correction
 -----------------------
-.. autoclass:: burnman.seismic.attenuation_correction
+
+.. autofunction:: burnman.seismic.attenuation_correction
+
