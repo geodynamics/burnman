@@ -50,7 +50,13 @@ class Material:
         """
         Print a human-readable representation of this Material.
         """
-        print self.to_string()
+        (frs,mins) = self.unroll()
+        if len(mins)==1:
+            print mins[0].to_string()
+        else:
+            print "Material %s:" % self.to_string()
+            for (fr,mi) in zip(frs,mins):
+                print "  %g of phase %s" % (fr, mi.to_string())
 
     def set_state(self, pressure, temperature):
         """
