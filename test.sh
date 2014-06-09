@@ -7,9 +7,10 @@ t=$1
 import matplotlib as m
 m.use('Cairo')
 VERBOSE=1
+RUNNING_TESTS=1
 execfile('$t')
 EOF
-)  >$t.tmp 2>&1 || { echo "test $t failed!!!!!!!!"; } #exit 1; } 
+)  >$t.tmp 2>&1 || { echo "test $t failed!!!!!!!!"; cat $t.tmp; } #exit 1; } 
 #echo "diff $t.tmp misc/ref/$t.out"
 (diff $t.tmp ../misc/ref/$t.out && rm $t.tmp) || { echo "diff failed!!!!!"; echo "Check `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`"; } #exit 1; } 
 }
@@ -25,10 +26,10 @@ cd ..
 
 python burnman/partitioning.py || exit 1
 
-#cd misc
-#echo "gen_doc..."
-#python gen_doc.py >/dev/null || exit 1
-#cd ..
+cd misc
+echo "gen_doc..."
+python gen_doc.py >/dev/null || exit 1
+cd ..
 
 
 
@@ -52,7 +53,6 @@ cd misc
 for test in `ls paper*.py`
 do
     [ $test == "paper_opt_pv_old.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "paper_opt_pv.py" ] && echo "*** skipping $test !" && continue
 
     testit $test
 done

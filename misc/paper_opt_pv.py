@@ -98,6 +98,10 @@ if __name__ == "__main__":
         return vs_err/scale, vphi_err/scale
 
     xx=np.linspace(0.0, 1.0, 200) #200 for final image
+    # speed up computation for the automatic tests:
+    if "RUNNING_TESTS" in globals():
+        xx=np.linspace(0.0, 1.0, 10)
+
     errs=np.array([material_error(x) for x in xx])
     yy_vs=errs[:,0]
     yy_vphi=errs[:,1]

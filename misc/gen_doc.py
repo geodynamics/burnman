@@ -9,7 +9,8 @@ sys.path.insert(1,os.path.abspath('../examples'))
 
 # order the examples sensibly:
 
-ordered_examples = ['example_geotherms.py', \
+ordered_examples = ['example_beginner.py', \
+                    'example_geotherms.py', \
                     'example_seismic.py', \
                     'example_composition.py', \
                     'example_user_input_material.py', \
