@@ -1,0 +1,56 @@
+/usr/lib/pymodules/python2.7/matplotlib/font_manager.py:1224: UserWarning: findfont: Font family ['sanserif'] not found. Falling back to Bitstream Vera Sans
+  (prop.get_family(), self.defaultFamily[fontext]))
+/usr/lib/pymodules/python2.7/matplotlib/font_manager.py:1234: UserWarning: findfont: Could not match :family=Bitstream Vera Sans:style=normal:variant=normal:weight=normal:stretch=normal:size=medium. Returning /usr/share/matplotlib/mpl-data/fonts/ttf/cmb10.ttf
+  UserWarning)
+Optimization terminated successfully.
+         Current function value: 14212.177931
+         Iterations: 117
+         Function evaluations: 255
+2nd order fit: G =  173.346204684 GPa	G' =  1.52206197715
+Optimization terminated successfully.
+         Current function value: 16309.293866
+         Iterations: 116
+         Function evaluations: 250
+3rd order fit: G =  168.927043753 GPa	G' =  1.66680645546
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+  File "paper_fit_data.py", line 105, in <module>
+    plt.savefig("example_fit_data.pdf", bbox_inches='tight')
+  File "/usr/lib/pymodules/python2.7/matplotlib/pyplot.py", line 472, in savefig
+    return fig.savefig(*args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/figure.py", line 1370, in savefig
+    self.canvas.print_figure(*args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/backend_bases.py", line 2055, in print_figure
+    **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/backends/backend_cairo.py", line 428, in print_pdf
+    return self._save(fobj, 'pdf', *args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/backends/backend_cairo.py", line 499, in _save
+    self.figure.draw (renderer)
+  File "/usr/lib/pymodules/python2.7/matplotlib/artist.py", line 54, in draw_wrapper
+    draw(artist, renderer, *args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/figure.py", line 1006, in draw
+    func(*args)
+  File "/usr/lib/pymodules/python2.7/matplotlib/artist.py", line 54, in draw_wrapper
+    draw(artist, renderer, *args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/axes.py", line 2086, in draw
+    a.draw(renderer)
+  File "/usr/lib/pymodules/python2.7/matplotlib/artist.py", line 54, in draw_wrapper
+    draw(artist, renderer, *args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/axis.py", line 1064, in draw
+    self.label.draw(renderer)
+  File "/usr/lib/pymodules/python2.7/matplotlib/artist.py", line 54, in draw_wrapper
+    draw(artist, renderer, *args, **kwargs)
+  File "/usr/lib/pymodules/python2.7/matplotlib/text.py", line 531, in draw
+    bbox, info = self._get_layout(renderer)
+  File "/usr/lib/pymodules/python2.7/matplotlib/text.py", line 313, in _get_layout
+    ismath=ismath)
+  File "/usr/lib/pymodules/python2.7/matplotlib/backends/backend_cairo.py", line 260, in get_text_width_height_descent
+    s, self.dpi, prop)
+  File "/usr/lib/pymodules/python2.7/matplotlib/mathtext.py", line 3010, in parse
+    box = self._parser.parse(s, font_output, fontsize, dpi)
+  File "/usr/lib/pymodules/python2.7/matplotlib/mathtext.py", line 2344, in parse
+    str(err)]))
+ValueError: 
+{V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}
+     ^
+Unknown symbol: \mathlarger (at char 5), (line:1, col:6)
