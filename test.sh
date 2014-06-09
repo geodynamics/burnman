@@ -11,7 +11,7 @@ execfile('$t')
 EOF
 )  >$t.tmp 2>&1 || { echo "test $t failed!!!!!!!!"; } #exit 1; } 
 #echo "diff $t.tmp misc/ref/$t.out"
-(diff $t.tmp ../misc/ref/$t.out && rm $t.tmp) || { echo "diff $t.tmp misc/ref/$t.out failed!!!!!!!!!"; } #exit 1; } 
+(diff $t.tmp ../misc/ref/$t.out && rm $t.tmp) || { echo "diff failed!!!!!"; echo "Check `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`"; } #exit 1; } 
 }
 
 
@@ -33,11 +33,8 @@ python burnman/partitioning.py || exit 1
 
 
 
+echo "checking examples/ ..."
 cd examples
-t="example_composition.py"
-testit $t
-#diff output_figures/example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
-
 for test in `ls example*.py`
 do
     [ $test == "example_inv_murakami.py" ] && echo "*** skipping $test !" && continue

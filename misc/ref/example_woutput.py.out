@@ -1,5 +1,6 @@
 Calculations are done for:
-0.95 of phase 'burnman.minerals.SLB_2005.mg_fe_perovskite'
-0.05 of phase 'burnman.minerals.SLB_2005.ferropericlase'
+Material 'Composite':
+  0.95 of phase 'burnman.minerals.SLB_2005.mg_fe_perovskite'
+  0.05 of phase 'burnman.minerals.SLB_2005.ferropericlase'
 
 Your data has been saved as:  example_woutput.txt
