@@ -1,8 +1,8 @@
-burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
+/home/heister/Dropbox/work/burnman-git/burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
-burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
+/home/heister/Dropbox/work/burnman-git/burnman/mineral.py:122: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 Calculations are done for:
-'fe_periclase'
+'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'
 Calculations are done for:
-'Speziale_fe_periclase'
+'burnman.minerals.other.Speziale_fe_periclase_LS'

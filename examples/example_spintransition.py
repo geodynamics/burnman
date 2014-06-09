@@ -60,11 +60,11 @@ if __name__ == "__main__":
     rock.set_method('slb2')
 
     # Now we calculate the velocities
-    print "Calculations are done for:"
-    rock.debug_print()
-
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
+
+    print "Calculations are done for:"
+    rock.debug_print()
 
     # plot example 1
     plt.subplot(2,2,1)
@@ -121,12 +121,12 @@ if __name__ == "__main__":
 
     rock.set_method('slb3')
 
-    print "Calculations are done for:"
-    rock.debug_print()
-
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
                                      burnman.averaging_schemes.VoigtReussHill())
+
+    print "Calculations are done for:"
+    rock.debug_print()
 
     # plot example 3
     plt.subplot(2,2,3)
