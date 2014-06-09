@@ -5,8 +5,7 @@ import os, sys
 import os
 import re
 
-sys.path.insert(1,os.path.abspath('..'))
-
+sys.path.insert(1,os.path.abspath('../examples'))
 
 # order the examples sensibly:
 
@@ -31,7 +30,7 @@ for ex in ordered_examples:
 
 #check we do not forget an example
 
-all = os.listdir('..')
+all = os.listdir('../examples/')
 examples = filter (lambda k: re.match("^example(.*)\.py$", k), all )
 not_listed = filter(lambda x: (not x in ordered_examples), examples)
 
