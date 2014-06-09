@@ -33,7 +33,14 @@ class Composite(Material):
     """
     def __init__(self, fractions, phases=None):
         """
+        Create a composite using a list of phases and their fractions (adding to 1.0).
 
+        Parameters
+        ----------
+        fractions: list of floats
+            molar fraction for each phase.
+        phases: list of :class:`burnman.Material`
+            list of phases.
         """
 
         if phases is None:
