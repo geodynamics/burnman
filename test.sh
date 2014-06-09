@@ -33,22 +33,18 @@ testit "tests/benchmark.py"
 
 
 
-t="example_composition.py"
+t="examples/example_composition.py"
 testit $t
 #diff output_figures/example_composition.png misc/ref/example_composition.png || { echo "test $t failed"; exit 1; } 
 
-for test in `ls example*.py`
+for test in `ls examples/example*.py`
 do
-    [ $test == "example_inv_big_pv.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_inv_murakami.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_optimize_slb2011.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_premite_isothermal.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "examples/example_inv_murakami.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "examples/example_premite_isothermal.py" ] && echo "*** skipping $test !" && continue
 
     testit $test
 done
 
-
-testit "table.py"
 echo "   done"
 
 
