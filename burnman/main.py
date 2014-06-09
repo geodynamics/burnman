@@ -16,10 +16,10 @@ class ElasticProperties:
     :func:`calculate_moduli`. Several instances of elastic_properties can be
     averaged using :func:`average_moduli`.
 
-    :var float V: volume in [m^3] 
+    :var float V: volume in [m^3]
     :var float rho: density in [kg/m^3]
-    :var float K: bulk modulus K in [Pa] 
-    :var float G: shear modulus G in [Pa] 
+    :var float K: bulk modulus K in [Pa]
+    :var float G: shear modulus G in [Pa]
     """
 
     def __init__(self, V=None, rho=None, K=None, G=None, fraction=None):
@@ -47,7 +47,7 @@ def calculate_moduli(rock, pressures, temperatures):
     :type temperatures: list of float
     :param temperatures: list of temperatures you want to evaluate the rock at. In [K].
 
-    :returns: 
+    :returns:
       answer -- an array of (n_evaluation_points by n_phases) of
       elastic_properties(), so the result is of the form
       answer[pressure_idx][phase_idx].V
@@ -67,7 +67,7 @@ def calculate_moduli(rock, pressures, temperatures):
             e.rho = mineral.molar_mass() / mineral.molar_volume()
             e.fraction = fraction
             answer[idx].append(e)
-        
+
     return answer
 
 def average_moduli(moduli_list, averaging_scheme=burnman.averaging_schemes.VoigtReussHill):
@@ -87,13 +87,13 @@ def average_moduli(moduli_list, averaging_scheme=burnman.averaging_schemes.Voigt
 
     :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
     :param averaging_scheme: Averaging scheme to use.
-    
+
     :returns: A list of n_evaluation_points instances of elastic_properties.
     :rtype: list of :class:`burnman.elastic_properties`
     """
     n_pressures = len(moduli_list)
     result = [ElasticProperties() for i in range(n_pressures)]
-    
+
     for idx in range(n_pressures):
         fractions = np.array([e.fraction for e in moduli_list[idx]])
 
@@ -101,7 +101,7 @@ def average_moduli(moduli_list, averaging_scheme=burnman.averaging_schemes.Voigt
         K_ph = np.array([m.K for m in moduli_list[idx]])
         G_ph = np.array([m.G for m in moduli_list[idx]])
         rho_ph = np.array([m.rho for m in moduli_list[idx]])
-               
+
         result[idx].V = sum(V_frac)
         result[idx].K = averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
         result[idx].G = averaging_scheme.average_shear_moduli(V_frac, K_ph, G_ph)
@@ -115,7 +115,7 @@ def compute_velocities(moduli):
     Given a list of elastic_properties, compute the seismic velocities Vp, Vs,
     and Vphi for each entry in the list.
 
-    
+
     :type moduli: list of :class:`ElasticProperties`
     :param moduli: input elastic properties.
 
@@ -127,16 +127,16 @@ def compute_velocities(moduli):
     mat_vs = np.ndarray(len(moduli))
     mat_vp = np.ndarray(len(moduli))
     mat_vphi = np.ndarray(len(moduli))
-    
+
     for i in range(len(moduli)):
 
         mat_vs[i] = np.sqrt( moduli[i].G / moduli[i].rho)
         mat_vp[i] = np.sqrt( (moduli[i].K + 4./3.*moduli[i].G) / moduli[i].rho)
         mat_vphi[i] = np.sqrt( moduli[i].K / moduli[i].rho)
-    
+
     return mat_vp, mat_vs, mat_vphi
- 
- 
+
+
 def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
     """
     A function that rolls several steps into one: given a rock and a list of
@@ -174,18 +174,18 @@ def depths_for_rock(rock,pressures, temperatures,averaging_scheme=burnman.averag
     """
     Function computes the self-consistent depths (to avoid using the PREM depth-pressure conversion) (Cammarano, 2013).
     It is simplified by taking g from PREM.
-        
+
     :param burnman.abstract_material rock: this is a rock
-        
+
     :type pressures: list of float
     :param pressures: list of pressures you want to evaluate the rock at. In [Pa].
-        
+
     :type temperatures: list of float
     :param temperatures: list of temperatures you want to evaluate the rock at. In [K].
-        
+
     :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
     :param averaging_scheme: Averaging scheme to use.
-        
+
     :returns: depth [m]
     :rtype: list of floats
     """
@@ -203,21 +203,21 @@ def pressures_for_rock(rock, depths, T0, averaging_scheme=burnman.averaging_sche
     """
     Function computes the self-consistent pressures (to avoid using the PREM depth pressure conversion) (Cammarano, 2013).
     Only simplification is using g from PREM.'
-    
+
     :param burnman.abstract_material rock: this is a rock
-    
+
     :type depths: list of float
     :param depths: list of depths you want to evaluate the rock at. In [m].
-    
+
     :type temperatures: list of float
     :param temperatures: list of temperatures you want to evaluate the rock at. In[K].
-    
+
     :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
     :param averaging_scheme: Averaging scheme to use.
-    
+
     :returns: pressures [Pa]
     :rtype: list of floats
-    
+
     """
     # use PREM pressures as inital guestimate
     seismic_model = burnman.seismic.PREM()
@@ -240,21 +240,21 @@ def pressures_for_rock(rock, depths, T0, averaging_scheme=burnman.averaging_sche
 def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """
     Returns lists of corrected velocities  for a given Qs (/Qmu) and Qphi
-    
 
-    
+
+
     :type Vp: list of float
     :param Vp: list of P wave velocties. In [m/s].
     :type Vs: list of float
     :param Vs: list of P wave velocties. In [m/s].
     :type Vphi: list of float
     :param Vphi: list of P wave velocties. In [m/s].
-    
+
     :returns: Vp[m/s],Vs[m/s],Vphi[m/s]
     :rtype: list of floats
-    
+
     """
-    
+
     length = len(v_p)
     ret_v_p = np.zeros(length)
     ret_v_s = np.zeros(length)
@@ -262,13 +262,13 @@ def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     for i in range(length):
         ret_v_p[i],ret_v_s[i],ret_v_phi[i] = \
             burnman.seismic.attenuation_correction(v_p[i], v_s[i], v_phi[i],Qs,Qphi)
-    
+
     return ret_v_p, ret_v_s, ret_v_phi
 
 
 def compare_l2(depth,calc, obs):
     """
-        
+
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
 
     .. math:: math does not work yet...
@@ -280,7 +280,7 @@ def compare_l2(depth,calc, obs):
     :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
     :type obs: list of arrays of float
     :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
-    
+
     :returns: array of L2 norms of length N
     :rtype: array of floats
     """
@@ -292,36 +292,36 @@ def compare_l2(depth,calc, obs):
 
 def compare_chifactor(calc, obs):
     """
-        
+
     Computes the chi factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
-        
+
 
     :type calc: list of arrays of float
     :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
     :type obs: list of arrays of float
     :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
-        
+
     :returns: error array of length N
     :rtype: array of floats
     """
     err=[]
     for l in range(len(calc)):
         err.append(chi_factor(calc[l],obs[l]))
-    
+
     return err
 
 def l2(x,funca,funcb):
     """
-        
+
     Computes the L2 norm for one profile(assumed to be linear between points).
-        
+
     :type x: array of float
     :param x: depths in m.
     :type funca: list of arrays of float
     :param funca: array calculated values
     :type funcb: list of arrays of float
     :param funcb: array of values (observed or calculated) to compare to
-        
+
     :returns: L2 norm
     :rtype: array of floats
     """
@@ -331,7 +331,7 @@ def l2(x,funca,funcb):
 
 
 def nrmse(x,funca,funcb):
-    """ 
+    """
     Normalized root mean square error for one profile
     :type x: array of float
     :param x: depths in m.
@@ -339,10 +339,10 @@ def nrmse(x,funca,funcb):
     :param funca: array calculated values
     :type funcb: list of arrays of float
     :param funcb: array of values (observed or calculated) to compare to
-    
+
     :returns: RMS error
     :rtype: array of floats
-    
+
     """
     diff=np.array(funca-funcb)
     diff=diff*diff
@@ -357,10 +357,10 @@ def chi_factor(calc,obs):
     :param calc: array calculated values
     :type obs: list of arrays of float
     :param obs: array of reference values to compare to
-        
+
     :returns: chi factor
     :rtype: array of floats
-        
+
     """
 
     err=np.empty_like(calc)

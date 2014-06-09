@@ -10,7 +10,7 @@ import numpy as np
 
 def pretty_print_table(table,use_tabs=False):
     """
-    Takes a 2d table and prints it in a nice text based format. If 
+    Takes a 2d table and prints it in a nice text based format. If
     use_tabs=True then only \t is used as a separator. This is useful for
     importing the data into other apps (Excel, ...). The default is to pad
     the columns with spaces to make them look neat. The first column is
@@ -19,12 +19,12 @@ def pretty_print_table(table,use_tabs=False):
     if use_tabs:
         for r in table:
             print "\t".join(r).replace("_","\_")
-        return        
-    
+        return
+
     def col_width(table, colidx):
         return max([len(str(row[colidx])) for row in table])
 
-    # create a format string with the first column left aligned, the others right  
+    # create a format string with the first column left aligned, the others right
     # example:   {:<27}{:>11}{:>6}{:>8}
     frmt = "".join([ ('{:<' if i==0 else '{:>')+str(1+col_width(table,i))+'}' for i in range(len(table[0])) ])
     for r in table:
@@ -60,7 +60,7 @@ def read_table(filename):
     datastream = pkgutil.get_data('burnman', 'data/'+filename)
     datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
     table=[]
-    
+
     for line in datalines:
         if (line[0]!='#'):
             numbers = np.fromstring( line , sep =' ')
@@ -73,7 +73,7 @@ def cut_table(table, min_value, max_value):
         tablen.append(table[i,:])
     return tablen
 
-def lookup_and_interpolate(table_x, table_y, x_value):    
+def lookup_and_interpolate(table_x, table_y, x_value):
     idx = bisect.bisect_left(table_x, x_value) - 1
     if (idx < 0):
         return table_y[0]
@@ -85,7 +85,7 @@ def lookup_and_interpolate(table_x, table_y, x_value):
 
 def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     """
-    takes unit cell volume in Angstroms^3, as is often reported, 
+    takes unit cell volume in Angstroms^3, as is often reported,
     and the z number for the cell (number of atoms per unit cell,
     NOT number of atoms per molecular formula), and calculates
     the molar volume, as expected by the equations of state.

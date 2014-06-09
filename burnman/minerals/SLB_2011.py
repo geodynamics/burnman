@@ -7,7 +7,7 @@
 SLB_2011
 ^^^^^^^^
 
-Minerals from Stixrude & Lithgow-Bertelloni 2011 and references therein 
+Minerals from Stixrude & Lithgow-Bertelloni 2011 and references therein
 
 """
 
@@ -17,7 +17,7 @@ from burnman.mineral import Mineral
 
 class stishovite (Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2011 and references therein 
+    Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self):
         self.params = {
@@ -42,13 +42,13 @@ class stishovite (Mineral):
              'err_Debye_0' : 13.,
              'err_grueneisen_0': .17,
              'err_q_0': 2.2,
-             'err_eta_s_0' : 1.0 
+             'err_eta_s_0' : 1.0
             }
 
 
 class periclase (Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2011 and references therein 
+    Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self):
         self.params = {
@@ -119,16 +119,16 @@ class mg_fe_perovskite(bmb.HelperSolidSolution):
 
 class mg_perovskite(Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2011 and references therein  
+    Stixrude & Lithgow-Bertelloni 2011 and references therein
     """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
             'V_0': 24.45e-6,
-            'K_0': 251.0e9,   
-            'Kprime_0': 4.1,     
-            'G_0': 173.0e9,  
-            'Gprime_0': 1.7,  
+            'K_0': 251.0e9,
+            'Kprime_0': 4.1,
+            'G_0': 173.0e9,
+            'Gprime_0': 1.7,
             'molar_mass': .1000,
             'n': 5,
             'Debye_0': 905.,
@@ -155,11 +155,11 @@ class fe_perovskite(Mineral):
         self.params = {
             'equation_of_state':'slb3',
             'V_0': 25.49e-6,
-            'K_0': 272.0e9, 
-            'Kprime_0': 4.1,  
+            'K_0': 272.0e9,
+            'Kprime_0': 4.1,
             'G_0': 133.0e9,
-            'Gprime_0': 1.4,   
-            'molar_mass': .1319, 
+            'Gprime_0': 1.4,
+            'molar_mass': .1319,
             'n': 5,
             'Debye_0': 871.,
             'grueneisen_0': 1.57,

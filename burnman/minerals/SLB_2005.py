@@ -6,16 +6,16 @@
 SLB_2005
 ^^^^^^^^
 
-Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein 
+Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
-                
+
 
 class stishovite (Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
     def __init__(self):
         self.params = {
@@ -34,7 +34,7 @@ class stishovite (Mineral):
 
 class periclase (Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
     def __init__(self):
         self.params = {
@@ -53,7 +53,7 @@ class periclase (Mineral):
 
 class wuestite (Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
     def __init__(self):
         self.params = {
@@ -89,16 +89,16 @@ class mg_fe_perovskite(bmb.HelperSolidSolution):
 
 class mg_perovskite(Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein  
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
             'V_0': 24.45e-6,
-            'K_0': 251.0e9,   
-            'Kprime_0': 4.1,     
-            'G_0': 175.0e9,  
-            'Gprime_0': 1.7,  
+            'K_0': 251.0e9,
+            'Kprime_0': 4.1,
+            'G_0': 175.0e9,
+            'Gprime_0': 1.7,
             'molar_mass': .1000,
             'n': 5,
             'Debye_0': 1070.,
@@ -108,17 +108,17 @@ class mg_perovskite(Mineral):
 
 class fe_perovskite(Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
             'V_0': 25.48e-6,
-            'K_0': 281.0e9, 
-            'Kprime_0': 4.1,  
+            'K_0': 281.0e9,
+            'Kprime_0': 4.1,
             'G_0': 138.0e9,
-            'Gprime_0': 1.7,   
-            'molar_mass': .1319, 
+            'Gprime_0': 1.7,
+            'molar_mass': .1319,
             'n': 5,
             'Debye_0': 841.,
             'grueneisen_0': 1.48,

@@ -8,13 +8,13 @@ from collections import namedtuple
 
 from burnman.material import Material
 from burnman.mineral import Mineral
-    
+
 def check_pairs(fractions, minerals):
         if len(fractions)<1:
             raise Exception('ERROR: we need at least one mineral')
 
         if len(fractions) != len(minerals):
-            raise Exception('ERROR: different array lengths');
+            raise Exception('ERROR: different array lengths')
 
         total = sum(fractions)
         if abs(total-1.0)>1e-10:
@@ -33,7 +33,14 @@ class Composite(Material):
     """
     def __init__(self, fractions, phases=None):
         """
+        Create a composite using a list of phases and their fractions (adding to 1.0).
 
+        Parameters
+        ----------
+        fractions: list of floats
+            molar fraction for each phase.
+        phases: list of :class:`burnman.Material`
+            list of phases.
         """
 
         if phases is None:
@@ -46,7 +53,7 @@ class Composite(Material):
         assert(len(phases)>0)
         for f in fractions:
             assert(f>=0)
-        
+
         self.children = zip(fractions, phases)
 
         total = sum(fractions)
@@ -62,7 +69,7 @@ class Composite(Material):
         set the same equation of state method for all the phases in the composite
         """
         for (fraction, phase) in self.children:
-            phase.set_method(method) 
+            phase.set_method(method)
 
     def unroll(self):
         fractions = []
@@ -88,7 +95,7 @@ class Composite(Material):
         self.pressure = pressure
         self.temperature = temperature
         for (fraction, phase) in self.children:
-            phase.set_state(pressure, temperature) 
+            phase.set_state(pressure, temperature)
 
     def density(self):
         """

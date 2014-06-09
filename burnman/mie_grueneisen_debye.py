@@ -119,7 +119,7 @@ class MGDBase(eos.EquationOfState):
     #calculate the thermal correction to the shear modulus as a function of V, T
     def __thermal_shear_modulus(self, T, V, params):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
-        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
+        Debye_T = self.__debye_temperature(params['V_0']/V, params)
         G_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
                  6*debye.R*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
         return G_th
@@ -141,7 +141,7 @@ class MGDBase(eos.EquationOfState):
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
     def __thermal_pressure(self,T,V, params):
-        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
+        Debye_T = self.__debye_temperature(params['V_0']/V, params)
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
@@ -151,7 +151,7 @@ class MGDBase(eos.EquationOfState):
     #bulk modulus (see matas et al, 2007)
     def __thermal_bulk_modulus(self, T,V,params):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
-        Debye_T = self.__debye_temperature(params['V_0']/V, params) 
+        Debye_T = self.__debye_temperature(params['V_0']/V, params)
         K_th = 3.*params['n']*debye.R*T/V * gr * \
             ((1. - params['q_0'] - 3.*gr)*debye.debye_fn(Debye_T/T)+3.*gr*(Debye_T/T)/(np.exp(Debye_T/T) - 1.)) # EQ B5
         return K_th
@@ -170,10 +170,10 @@ class MGD3(MGDBase):
 class MGD2(MGDBase):
     """
     MGD equation of state with second order finite strain expansion for the
-    shear modulus.  In general, this should not be used, but sometimes 
-    shear modulus data is fit to a second order equation of state.  In that 
+    shear modulus.  In general, this should not be used, but sometimes
+    shear modulus data is fit to a second order equation of state.  In that
     case, you should use this.  The moral is, be careful!
     """
     def __init__(self):
         self.order=2
-    
+
