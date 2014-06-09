@@ -22,21 +22,21 @@ class SeismicModel:
             
         Parameters
         ----------
-            depth_list: array of floats
-                Array of depths (m) to evaluate seismic model at.
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
             
         Returns
         -------
-            pressures : array of floats
-                Pressures at given depths in [Pa].
-            density :  array of floats
-                Densities at given depths in [kg/m^3].
-            v_p : array of floats
-                P wave velocities at given depths in [m/s].
-            v_s : array of floats
-                S wave velocities at given depths in [m/s].
-            v_phi : array of floats
-                Bulk sound velocities at given depths in [m/s].
+        pressures : array of floats
+            Pressures at given depths in [Pa].
+        density :  array of floats
+            Densities at given depths in [kg/m^3].
+        v_p : array of floats
+            P wave velocities at given depths in [m/s].
+        v_s : array of floats
+            S wave velocities at given depths in [m/s].
+        v_phi : array of floats
+            Bulk sound velocities at given depths in [m/s].
         """
         pressures = np.array([self.pressure(r) for r in depth_list])
         density = np.array([self.density(r) for r in depth_list])
@@ -45,27 +45,27 @@ class SeismicModel:
         v_phi = np.array([self.v_phi(r) for r in depth_list])
         return pressures, density, v_p, v_s, v_phi
 
-    def pressure(self, depth):
+    def _pressure(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    def v_p(self, depth):
+    def _v_p(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    def v_s(self, depth):
+    def _v_s(self, depth):
         raise ValueError, "not implemented"
         return 0
     
-    def v_phi(self, depth):
+    def _v_phi(self, depth):
         raise ValueError, "not implemented"
         return 0
 
-    def density(self, depth):
+    def _density(self, depth):
         raise ValueError, "not implemented"
         return 0
     
-    def depth(self, pressure):
+    def _depth(self, pressure):
         raise ValueError, "not implemented"
         return -1
 
@@ -74,7 +74,10 @@ class Model1D(SeismicModel):
     """ 
     This is a base class that gets a 1D seismic model from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
-    from this class.
+    from this class. This class uses :class:`burnman.seismic.SeismicModel`
+    
+    Format of the input files is = Radius [m], Pressure [Pa], Density [kg/m^3], Vp [m/s], Vs [m/s]
+    
     Note: all tables need to be sorted by increasing radius.
     Alternatively, you can also overwrite the _lookup function if you
     want to access with something else.
@@ -89,27 +92,100 @@ class Model1D(SeismicModel):
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self):
+        '''
+        Returns
+        -------
+        depths : array of floats
+            Depths [m].
+        '''
         
         return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
 
     def pressure(self, depth):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        pressures : array of floats
+            Pressures at given depths in [Pa].
+        '''
         return self._lookup(depth, self.table_pressure)
 
     def v_p(self, depth):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        v_p : array of floats
+            P wave velocities at given depths in [m/s].
+        '''
         return self._lookup(depth, self.table_vp)
 
     def v_s(self, depth):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        v_s : array of floats
+            S wave velocities at given depths in [m/s].
+        '''
         return self._lookup(depth, self.table_vs)
 
     def v_phi(self, depth):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        v_phi : array of floats
+            bulk sound wave velocities at given depths in [m/s].
+            '''
+        
         v_s=self.v_s(depth)
         v_p=self.v_p(depth)
         return np.sqrt(v_p*v_p-4./3.*v_s*v_s)
 
     def density(self, depth):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+        Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        density : array of floats
+            densities at given depths in [kg/m^3].
+        '''
         return self._lookup(depth, self.table_density)        
 
     def depth(self, pressure):
+        '''
+        Parameters
+        ----------
+        pressures : array of floats
+            Pressures at given depths in [Pa].
+            
+        Returns
+        -------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+        '''
         radius = burnman.tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
         return self.earth_radius - radius
 
@@ -120,7 +196,8 @@ class Model1D(SeismicModel):
 
 class PREM(Model1D):
     """ 
-    reads in the table for PREM (input_seismic/prem_table.txt) using the base class radiustable
+    Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981). 
+    See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
         Model1D.__init__(self)
@@ -133,6 +210,18 @@ class PREM(Model1D):
         self.table_vs = table[:,4]
 
     def grav(self,depths):
+        '''
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+            
+        Returns
+        -------
+        grav : array of floats
+            Gravity for PREM model for given depths in [m/s^2]
+        '''
+        
         table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
         table_rad = table[:,0]
@@ -143,9 +232,8 @@ class PREM(Model1D):
 class Slow(Model1D):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
-    We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
-    so we cut away rows at the top and bottom. Interpolation is not necessary, 
-    because all tables where generated with at the same depths 
+    We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
+    See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
         Model1D.__init__(self)
@@ -176,9 +264,8 @@ class Slow(Model1D):
 class Fast(Model1D):
     """ 
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
-    We need to stitch together three tables. Note that prem_lowermantle has a wider range, 
-    so we cut away rows at the top and bottom. Interpolation is not necessary, 
-    because all tables where generated with at the same depths 
+    We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_fast.txt', 'input_seismic/pwave_fast.txt').
+    See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
         Model1D.__init__(self)
@@ -210,7 +297,8 @@ class Fast(Model1D):
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """ 
-    Applies the attenuation correction following Matas et al. (2007), page 4. This is a minor effect on the velocities. Called from :func:`burnman.main.apply_attenuation_correction`
+    Applies the attenuation correction following Matas et al. (2007), page 4. This is simplified, and there is also currently no 1D Q model implemented. The correction, however, only slightly reduces the velocities, and can be ignored for our current applications. Arguably, it might not be as relevant when comparing computations to PREM for periods of 1s as is implemented here.
+    Called from :func:`burnman.main.apply_attenuation_correction`
     
     Parameters
     ----------
