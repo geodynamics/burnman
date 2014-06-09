@@ -60,7 +60,7 @@ minerr = 1e100
 def theta(p1=amount_pv,p2=iron_pv,p3=iron_fp):
     global minerr
     #if (p1<0 or p2<0 or p3<0 or p4<0 or p5<0 or p6<0 or p7<0 or p8<0):
-    #	return 1e30
+    #    return 1e30
 
     try:
         e = error(p1,p2,p3)

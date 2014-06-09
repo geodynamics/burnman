@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
 #INPUT for method
     """ choose 'slb2' (finite-strain 2nd order sheer modulus, stixrude and
-    	lithgow-bertelloni, 2005)
+        lithgow-bertelloni, 2005)
     or 'slb3 (finite-strain 3rd order shear modulus, stixrude and lithgow-bertelloni, 2005)
     or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus, matas et al. 2007)
     or 'mgd2' (mie-gruneisen-debeye 2nd order shearl modulus, matas et al. 2007)

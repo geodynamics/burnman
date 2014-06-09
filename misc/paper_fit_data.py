@@ -19,7 +19,7 @@ teaches:
 """
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-	sys.path.insert(1,os.path.abspath('..'))
+    sys.path.insert(1,os.path.abspath('..'))
 
 import scipy.optimize as opt
 import burnman
@@ -27,7 +27,7 @@ import colors
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-        sys.path.insert(1,os.path.abspath('..'))
+    sys.path.insert(1,os.path.abspath('..'))
 
 
 figsize=(6,5)
