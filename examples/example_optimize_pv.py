@@ -68,8 +68,8 @@ if __name__ == "__main__":
         print "Calculations are done for:"
         rock.debug_print()
 
-        #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
-        [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,[mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
+        [vs_err, vphi_err, rho_err] = \
+            burnman.compare_l2(depths, [mat_vs,mat_vphi,mat_rho], [seis_vs,seis_vphi,seis_rho])
 
         return vs_err, vphi_err
 

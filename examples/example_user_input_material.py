@@ -105,5 +105,7 @@ if __name__ == "__main__":
         burnman.velocities_from_rock(rock, seis_p, temperature, \
                                      burnman.averaging_schemes.VoigtReussHill())
 
-    [rho_err,vphi_err,vs_err]= \
-        burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
+    [vs_err, vphi_err, rho_err]= \
+        burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho], [seis_vs,seis_vphi,seis_rho])
+
+    print vs_err, vphi_err, rho_err

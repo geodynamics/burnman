@@ -132,8 +132,9 @@ if __name__ == "__main__":
     mat_K = np.array([m.K for m in moduli])
     mat_G = np.array([m.G for m in moduli])
     mat_rho = np.array([m.rho for m in moduli])
-    [rho_err,vphi_err,vs_err]=burnman.compare_chifactor \
-            ([mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
+
+    [vs_err, vphi_err, rho_err] = burnman.compare_chifactor (
+        [mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
 
 
     # PLOTTING
