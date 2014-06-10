@@ -1,0 +1,57 @@
+/usr/lib/pymodules/python2.7/matplotlib/tight_layout.py:225: UserWarning: tight_layout : falling back to Agg renderer
+  warnings.warn("tight_layout : falling back to Agg renderer")
+31823705000.0 124629954286.0
+Calculations are done for:
+Material 'Composite':
+  0 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  1 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.111111 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.888889 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.222222 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.777778 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.333333 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.666667 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.444444 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.555556 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.555556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.444444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.666667 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.333333 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.777778 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.222222 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.888889 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.111111 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  1 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+6806.56245823 9720.08418673
+0.666666666667 0.555555555556 0.555555555556
+Calculations are done for:
+Material 'Composite':
+  0.556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.667 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.333 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Calculations are done for:
+Material 'Composite':
+  0.556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
+  0.444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
