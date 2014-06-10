@@ -30,6 +30,8 @@ class Composite(Material):
     Base class for a static composite material with fixed molar fractions. The
     elements can be minerals or materials, meaning composite can be nested
     arbitrarily.
+
+    This class is available as ``burnman.Composite``.
     """
     def __init__(self, fractions, phases=None):
         """

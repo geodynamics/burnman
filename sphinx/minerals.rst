@@ -2,20 +2,28 @@
 Minerals
 ========
 
-Burnman operates on rocks (type :class:`burnman.Material`) most prominently in form of minerals (:class:`burnman.Mineral`) and composites (:class:`burnman.Composite`).
+Burnman operates on rocks (type :class:`~burnman.material.Material`) most prominently in form of minerals (:class:`~burnman.mineral.Mineral`) and composites (:class:`~burnman.composite.Composite`).
 
 
 .. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.mineral_helpers.HelperSolidSolution burnman.mineral_helpers.HelperSpinTransition burnman.mineral_helpers.HelperFeDependent
 
 
-Base Classes
-------------
+Base Class
+----------
 
-.. autoclass:: burnman.Material
+.. autoclass:: burnman.material.Material
 
-.. autoclass:: burnman.Mineral
 
-.. autoclass:: burnman.Composite
+Base for individual Minerals
+----------------------------
+
+
+.. autoclass:: burnman.mineral.Mineral
+
+Composite
+---------
+
+.. autoclass:: burnman.composite.Composite
 
 
 
