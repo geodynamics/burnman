@@ -42,16 +42,19 @@ pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(
 # geotherm for mapping pressure to temperature
 temperature = burnman.geotherm.brown_shankland(pressure)
 
-# This is the first actual work done in this example.  We define
 
-# composite object and name it "rock".  A composite is made by
-# giving burnman.composite a list of minerals and their molar fractions.
-# Here "rock" has two constituent minerals: it is 80% Mg perovskite
-# and 20% periclase.  More minerals may be added by simply extending
-# the list given to burnman.composite
+#---------------------------------------------------------#
+#------------- MAKE MODIFICATIONS HERE -------------------#
+#---------------------------------------------------------#
+
 stishovite_fraction = 0.5
 rock = burnman.Composite([stishovite_fraction, 1.0-stishovite_fraction], 
                          [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
+
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+
 
 # At this point we want to tell the rock which equation of state to use for
 # its thermoelastic calculations. In general, we recommend the 'slb3'
