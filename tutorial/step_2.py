@@ -22,9 +22,9 @@ pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(
 temperature = burnman.geotherm.brown_shankland(pressure)
 
 def material_error(amount_perovskite):
-    rock =  ?????          '''<-------------------- Create a rock'''
+    rock =  ?????          #<-------------------- Create a rock
     rock.set_method('slb3')
-    density, vp, vs, vphi, K, G =   ???? '''<---------------- Calculate the elastic properties of hte rock'''
+    density, vp, vs, vphi, K, G =   ???? #<---------------- Calculate the elastic properties of the rock
 
     print "Calculations are done for:"
     rock.debug_print()
