@@ -31,7 +31,7 @@ import burnman
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram','sphinx.ext.viewcode']
 numpydoc_show_class_members = False
 
-autodoc_default_flags = ['members', 'undoc-members']
+autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance', 'inherited-members']
 
 
 # Add any paths that contain templates here, relative to this directory.

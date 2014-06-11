@@ -20,6 +20,8 @@ class Mineral(Material):
     the material is set using set_method(), which should be done
     once after creating the material.
 
+    This class is available as ``burnman.Mineral``.
+
     If deriving from this class, set the properties in self.params
     to the desired values. For more complicated materials you
     can overwrite set_state(), change the params and then call

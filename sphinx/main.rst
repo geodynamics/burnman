@@ -3,7 +3,7 @@ Main module
 
 .. module:: burnman.main
 
-.. autoclass:: burnman.ElasticProperties
+.. autoclass:: ElasticProperties
 
 .. autofunction:: velocities_from_rock
 .. autofunction:: calculate_moduli
