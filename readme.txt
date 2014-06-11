@@ -24,12 +24,11 @@ BurnMan is a lower mantle shear velocity generator constrained by mineral physic
 
 Work started by a work-group of the CIDER 2012 workshop in Santa Barbara.
 
-see: http://code.google.com/p/BurnMan/
-
 BurnMan is released under the GNU GPL v2 or newer
 
-see burnman.org for more information
-
+Homepage: http://burnman.org
+Documentation: http://burnman.org/current-doc
+Source code: https://github.com/burnman-project/burnman
 
 *** Requirements
 
@@ -92,6 +91,7 @@ what tools are available in BurnMan and how values are calculated. Below is a
 suggested order of examples that begin by introducing each of the user inputs
 possible as well as each of the helpers involved with each example.
 
+1. example_beginner.py (Creating a composite and computing seismic properties)
 1. example_geotherms.py (Explains each built in geothermal and how to create
    your own) run this example by typing 'python example_geotherms.py' this
    should result in a plot showing various geotherms available
@@ -123,16 +123,39 @@ Here are some specific features and pitfalls on python:
     (Note: the following text is automatically generated from misc/gen_doc.py,
     do not edit)
 
+* example_beginner.py
+
+This example script is intended for absolute beginners to BurnMan.
+We cover importing BurnMan modules, creating a composite material,
+and calculating its seismic properties at lower mantle pressures and
+temperatures.  Afterwards, we plot it against a 1D seismic model
+for visual comparison.
+
+requires:
+- geotherms
+- seismic models
+- compute seismic velocities
+- composite mineral helpers
+
+teaches:
+- creating basic composites
+- calculating thermoelastic properties
+- seismic comparison
+
 * example_geotherms.py
+
+example_geotherms
+-----------------
 
 This example shows each of the geotherms currently possible with BurnMan.
 These are:
 
 1. Brown and Shankland, 1981
-2. Watson and Baxter, 2007
-3. linear extrapolation
-4. Read in from file from user
-5. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
+2. Anderson, 1982
+3. Watson and Baxter, 2007
+4. linear extrapolation
+5. Read in from file from user
+6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
 
 requires:
 
@@ -149,9 +172,10 @@ teaches:
 Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
 function of depth (or P) as well as different velocity model libraries
 available within Burnman:
+
 1. PREM (Dziewonski & Anderson, 1981)
-2. Reference model for fast regions (outside the LLSVP's) in the lower mantle 
-	(Lekic et al. 2012)
+2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
+   (Lekic et al. 2012)
 3. Reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
 This example will first calculate or read in a seismic model and plot the
@@ -169,7 +193,7 @@ teaches:
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
-Currently BurnMan can input mineral compositions in 4 different ways: 
+Currently BurnMan can input mineral compositions in 4 different ways:
 
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
@@ -178,7 +202,7 @@ Currently BurnMan can input mineral compositions in 4 different ways:
 3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
    calculate Fe partitioning along a P, T profile (see
    example_partition_coef.py)
-4. A mixture of three or more  minerals. 
+4. A mixture of three or more  minerals.
 
 In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral
 physical paremeters of end member minerals (pure Mg and Fe) of the user's
@@ -224,12 +248,16 @@ teaches:
 
 * example_averaging.py
 
+example_averaging
+-----------------
+
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
-1. Voight-Reuss-Hill (volumetric averaging)
-2. linear (mol fraction averaging)
-3. Voight averaging
-4. Reuss averaging
+
+1. Voight-Reuss-Hill
+2. Voight averaging
+3. Reuss averaging
+4. Hashin-Shtrikman averaging
 
 See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
 of each averaging scheme.
@@ -258,7 +286,7 @@ requires:
 - geotherms
 
 teaches:
-- output computed seismic data to file 
+- output computed seismic data to file
 
 
 * example_compare_all_methods.py
