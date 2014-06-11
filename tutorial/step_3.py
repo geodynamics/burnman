@@ -16,8 +16,9 @@ from burnman.mineral_helpers import HelperSolidSolution
 
 
 def realize_mineral( mineral ):
-    K_prime_std_dev = 0.3
-    G_prime_std_dev = 0.3
+    K_prime_std_dev = 0.2  '''<----------------- One sigma uncertainty in K prime'''
+    G_prime_std_dev = 0.2  '''<----------------- One sigma uncertainty in G prime'''
+
     mineral.params['Kprime_0'] = mineral.params['Kprime_0'] + normal(scale=K_prime_std_dev)
     mineral.params['Gprime_0'] = mineral.params['Gprime_0'] + normal(scale=G_prime_std_dev)
     return mineral
@@ -25,15 +26,15 @@ def realize_mineral( mineral ):
 def realize_rock():
 
     #approximate four component pyrolite model
-    x_pv = 0.67
-    x_fp = 0.33
-    pv_fe_num = 0.07
-    fp_fe_num = 0.2
+    x_pv = 0.7    '''<---------------------------- Fraction of perovskite in preferred model'''
+    x_fp = 1.0-x_pv   
+    pv_fe_num = 0.05   '''<------------------------- Fraction of iron in perovskite'''
+    fp_fe_num = 0.3    '''<------------------------- Franction of iron in ferropericlase'''
 
-    mg_perovskite = minerals.SLB_2011_ZSB_2013.mg_perovskite(); realize_mineral(mg_perovskite)
-    fe_perovskite = minerals.SLB_2011_ZSB_2013.fe_perovskite(); realize_mineral(fe_perovskite)
-    wuestite = minerals.SLB_2011_ZSB_2013.wuestite(); realize_mineral(wuestite)
-    periclase = minerals.SLB_2011_ZSB_2013.periclase(); realize_mineral(periclase)
+    mg_perovskite = minerals.SLB_2011.mg_perovskite(); realize_mineral(mg_perovskite)
+    fe_perovskite = minerals.SLB_2011.fe_perovskite(); realize_mineral(fe_perovskite)
+    wuestite = minerals.SLB_2011.wuestite(); realize_mineral(wuestite)
+    periclase = minerals.SLB_2011.periclase(); realize_mineral(periclase)
 
     perovskite = HelperSolidSolution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
     ferropericlase = HelperSolidSolution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
@@ -45,13 +46,18 @@ def realize_rock():
 
 #set up the seismic model
 seismic_model = burnman.seismic.PREM()
+min_depth = 850.e3
+max_depth = 2800.e3
 npts = 10
-depths = np.linspace(850e3,2700e3, npts)
+depths = np.linspace(min_depth, max_depth, n_depths)
 pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
-n_realizations = 100
 pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure))
 
+
+
+n_realizations = 30
 outfile = open('uncertainty.dat', 'w')
+
 for i in range(n_realizations):
 
     print "realization", i+1
@@ -62,7 +68,7 @@ for i in range(n_realizations):
 
       #calculate the seismic observables
       rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.VoigtReussHill())
 
       #interpolate to a higher resolution line
       func_rho = interpolate.interp1d(pressure, rho)
