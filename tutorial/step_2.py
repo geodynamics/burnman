@@ -11,38 +11,37 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
 
-method = 'slb2'
 
-seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-number_of_points = 20 #set on how many depth slices the computations should be done
-depths = np.linspace(700e3,2800e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+n_depths = 20
+min_depth = 850.e3
+max_depth = 2800.e3
+depths = np.linspace(min_depth, max_depth, n_depths)
 
-temperature = burnman.geotherm.brown_shankland(seis_p)
+seismic_model = burnman.seismic.PREM()
+pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+temperature = burnman.geotherm.brown_shankland(pressure)
 
 def material_error(amount_perovskite):
-    rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                             [minerals.Murakami_etal_2012.fe_perovskite(),
-                              minerals.Murakami_etal_2012.fe_periclase()])
-    rock.set_method('slb2')
-
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
+    rock =  ?????          '''<-------------------- Create a rock'''
+    rock.set_method('slb3')
+    density, vp, vs, vphi, K, G =   ???? '''<---------------- Calculate the elastic properties of hte rock'''
 
     print "Calculations are done for:"
     rock.debug_print()
 
-    [rho_err,vphi_err,vs_err]=burnman.compare_l2(depths,[mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])
+    [vs_err, vphi_err, rho_err]=burnman.compare_l2(depths,[vs,vphi,density],[seis_vs,seis_vphi,seis_rho])
 
-    return vs_err, vphi_err
+    return vs_err, vphi_err, rho_err
 
-xx=np.linspace(0.0, 1.0, 100)
+xx=np.linspace(0.0, 1.0, 50)
 errs=np.array([material_error(x) for x in xx])
 yy_vs=errs[:,0]
 yy_vphi=errs[:,1]
+yy_rho=errs[:,2]
 
 plt.plot (xx,yy_vs,"r-x",label=("vs error"))
 plt.plot (xx,yy_vphi,"b-x",label=("vphi error"))
+plt.plot (xx,yy_rho,"g-x",label=("rho error"))
 plt.yscale('log')
 plt.xlabel('% Perovskite')
 plt.ylabel('Error')

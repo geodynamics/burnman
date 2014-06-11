@@ -21,14 +21,6 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
 
-# This is the first actual work done in this example.  We define
-# composite object and name it "rock".  A composite is made by
-# giving burnman.composite a list of minerals and their molar fractions.
-# Here "rock" has two constituent minerals: it is 80% Mg perovskite
-# and 20% periclase.  More minerals may be added by simply extending
-# the list given to burnman.composite
-rock = burnman.Composite([0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),
-                                          minerals.SLB_2011.periclase()])
 
 
 # Here we create and load the PREM seismic velocity model, which will be
@@ -38,7 +30,10 @@ seismic_model = burnman.seismic.PREM()
 # We create an array of 20 depths at which we want to evaluate PREM, and then
 # query the seismic model for the pressure, density, P wave speed, S wave
 # speed, and bulk sound velocity at those depths
-depths = np.linspace(750e3, 2800e3, 20)
+n_depths = 20
+min_depth = 850.e3
+max_depth = 2800.e3
+depths = np.linspace(min_depth, max_depth, n_depths)
 pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 
@@ -47,6 +42,16 @@ pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(
 # geotherm for mapping pressure to temperature
 temperature = burnman.geotherm.brown_shankland(pressure)
 
+# This is the first actual work done in this example.  We define
+
+# composite object and name it "rock".  A composite is made by
+# giving burnman.composite a list of minerals and their molar fractions.
+# Here "rock" has two constituent minerals: it is 80% Mg perovskite
+# and 20% periclase.  More minerals may be added by simply extending
+# the list given to burnman.composite
+stishovite_fraction = 0.5
+rock = burnman.Composite([stishovite_fraction, 1.0-stishovite_fraction], 
+                         [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
 
 # At this point we want to tell the rock which equation of state to use for
 # its thermoelastic calculations. In general, we recommend the 'slb3'
@@ -72,7 +77,7 @@ density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, tempe
 # First, we plot the s-wave speed verses the PREM s-wave speed
 plt.subplot(2,2,1)
 plt.plot(pressure/1.e9,vs/1.e3,color='b',linestyle='-',marker='o', markerfacecolor='b',markersize=4,label='computation')
-plt.plot(pressure/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o', markerfacecolor='k',markersize=4,label='reference')
+plt.plot(pressure/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='o', markerfacecolor='k',markersize=4,label='PREM')
 plt.title("S wave speed (km/s)")
 plt.xlim(min(pressure)/1.e9,max(pressure)/1.e9)
 plt.legend(loc='lower right')
