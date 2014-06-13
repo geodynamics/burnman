@@ -10,9 +10,22 @@ VERBOSE=1
 RUNNING_TESTS=1
 execfile('$t')
 EOF
-)  >$t.tmp 2>&1 || { echo "test $t failed!!!!!!!!"; cat $t.tmp; } #exit 1; } 
-#echo "diff $t.tmp misc/ref/$t.out"
-(diff $t.tmp ../misc/ref/$t.out && rm $t.tmp) || { echo "diff failed!!!!!"; echo "Check `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`"; } #exit 1; } 
+) >$t.tmp 2>&1
+ret=$?
+if [ "$ret" -ne 0 ]
+then
+  echo "$t ... FAIL"; 
+  cat $t.tmp; 
+else
+  (diff $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
+  ) || { 
+  echo "$t ... FAIL"; 
+  echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";  
+  diff $t.tmp ../misc/ref/$t.out | head
+  }
+
+fi
+
 }
 
 
