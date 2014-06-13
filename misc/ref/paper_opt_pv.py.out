@@ -1,4 +1,3 @@
-  warnings.warn("tight_layout : falling back to Agg renderer")
 31823705000.0 124629954286.0
 Calculations are done for:
 Material 'Composite':

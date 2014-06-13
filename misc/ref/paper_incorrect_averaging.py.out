@@ -1,1 +1,0 @@
-  warnings.warn("tight_layout : falling back to Agg renderer")
