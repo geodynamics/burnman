@@ -73,6 +73,8 @@ do
 
     testit $test
 done
+
+testit table.py
 cd ..
 
 echo "   done"
