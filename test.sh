@@ -22,6 +22,11 @@ else
   
   sedthing="s#$fulldir#BURNMAN#g"
   sed -i $sedthing $t.tmp #remove the absolute path from warnings
+  sed -i "s/.py:[0-9]*:/.py:/g" $t.tmp #remove line numbers
+  sed -i '/UserWarning: findfont: Could not match/d' $t.tmp #remove font warning crap
+  sed -i '/UserWarning: findfont: Font family/d' $t.tmp #remove font warning crap
+  sed -i '/UserWarning: tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
+
   (diff $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
   ) || { 
   echo "$t ... FAIL"; 

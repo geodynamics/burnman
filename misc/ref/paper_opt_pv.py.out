@@ -1,4 +1,3 @@
-/usr/lib/pymodules/python2.7/matplotlib/tight_layout.py:225: UserWarning: tight_layout : falling back to Agg renderer
   warnings.warn("tight_layout : falling back to Agg renderer")
 31823705000.0 124629954286.0
 Calculations are done for:

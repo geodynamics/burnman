@@ -1,6 +1,6 @@
-BURNMAN/burnman/mineral.py:124: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
+BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
-BURNMAN/burnman/mineral.py:124: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
+BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 Could not create 'minerals.minerals.Murakami_2013.ferropericlase'
 Could not create 'minerals.minerals.Murakami_2013.mg_fe_perovskite'

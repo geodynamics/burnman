@@ -1,6 +1,4 @@
-/usr/lib/pymodules/python2.7/matplotlib/font_manager.py:1224: UserWarning: findfont: Font family ['sanserif'] not found. Falling back to Bitstream Vera Sans
   (prop.get_family(), self.defaultFamily[fontext]))
-/usr/lib/pymodules/python2.7/matplotlib/font_manager.py:1234: UserWarning: findfont: Could not match :family=Bitstream Vera Sans:style=normal:variant=normal:weight=normal:stretch=normal:size=medium. Returning /usr/share/matplotlib/mpl-data/fonts/ttf/cmb10.ttf
   UserWarning)
 V_0 & 2.445e-05 && 2.549e-05 && 1.124e-05 && 1.226e-05 & \
 K_0 & 2.505e+11 && 2.637e+11 && 1.61e+11 && 1.79e+11 & \
