@@ -1,5 +1,7 @@
 #!/bin/bash
 
+fulldir=`pwd`
+
 function testit {
 t=$1
 #echo "*** testing $t ..."
@@ -17,6 +19,9 @@ then
   echo "$t ... FAIL"; 
   cat $t.tmp; 
 else
+  
+  sedthing="s#$fulldir#BURNMAN#g"
+  sed -i $sedthing $t.tmp #remove the absolute path from warnings
   (diff $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
   ) || { 
   echo "$t ... FAIL"; 
@@ -25,7 +30,6 @@ else
   }
 
 fi
-
 }
 
 
