@@ -63,12 +63,12 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) (m) to evaluate seismic model at.
+        Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         pressure : float or array of floats
-        Pressure at given depth(s) in [Pa].
+        Pressure(s) at given depth(s) in [Pa].
         """
         raise ValueError, "not implemented"
         return 0
@@ -78,7 +78,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-            Depth (m) to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
@@ -94,7 +94,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-        Depth (m) to evaluate seismic model at.
+        Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
@@ -109,7 +109,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth_list : float or array of floats
-        Depth (m) to evaluate seismic model at.
+        Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
@@ -126,7 +126,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-        Depth (m) to evaluate seismic model at.
+        Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
@@ -141,12 +141,12 @@ class Seismic1DModel:
         Parameters
         ----------
         pressure : float or array of floats
-            Pressure in [Pa] to evaluate depth at.
+            Pressure(s) [Pa] to evaluate depth at.
         
         Returns
         -------
         depth : float or array of floats
-            Depth (m) for given pressure (s)
+            Depth(s) [m] for given pressure(s)
         """
         raise ValueError, "not implemented"
         return -1
@@ -156,7 +156,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-        Depths (m) to evaluate gravity at.
+        Depth[s] [m] to evaluate gravity at.
         
         Returns
         -------
@@ -243,7 +243,7 @@ class Slow(RadiusTable):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
-    See also :class:`burnman.seismic.RadiusTalbe`.
+    See also :class:`burnman.seismic.RadiusTable`.
     """
     def __init__(self):
         RadiusTable.__init__(self)
@@ -275,7 +275,7 @@ class Fast(RadiusTable):
     """ 
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_fast.txt', 'input_seismic/pwave_fast.txt').
-    See also :class:`burnman.seismic.Model1D`.
+    See also :class:`burnman.seismic.SeismicModel1D`.
     """
     def __init__(self):
         RadiusTable.__init__(self)
