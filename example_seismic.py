@@ -47,6 +47,7 @@ if __name__ == "__main__":
     
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
+    
     # plot vs and vp and v_phi (note that v_phi is computed!)
     plt.subplot(2,2,1)
     plt.title('prem')

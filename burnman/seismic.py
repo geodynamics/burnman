@@ -47,6 +47,9 @@ class Seismic1DModel:
     
     def internal_depth_list(self):
         """
+        Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation.
+        
+        
         Returns
         -------
         depths : array of floats
@@ -59,13 +62,13 @@ class Seismic1DModel:
         """
         Parameters
         ----------
-        depth_list : array of floats
-        Array of depths (m) to evaluate seismic model at.
+        depth : float or array of floats
+        Depth(s) (m) to evaluate seismic model at.
         
         Returns
         -------
-        pressures : array of floats
-        Pressures at given depths in [Pa].
+        pressure : float or array of floats
+        Pressure at given depth(s) in [Pa].
         """
         raise ValueError, "not implemented"
         return 0
@@ -74,13 +77,13 @@ class Seismic1DModel:
         """
         Parameters
         ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
+        depth : float or array of floats
+            Depth (m) to evaluate seismic model at.
         
         Returns
         -------
-        v_p : array of floats
-            P wave velocities at given depths in [m/s].
+        v_p : float or array of floats
+            P wave velocity at given depth(s) in [m/s].
         """
 
         raise ValueError, "not implemented"
@@ -90,13 +93,13 @@ class Seismic1DModel:
         """
         Parameters
         ----------
-        depth_list : array of floats
-        Array of depths (m) to evaluate seismic model at.
+        depth : float or array of floats
+        Depth (m) to evaluate seismic model at.
         
         Returns
         -------
-        v_s : array of floats
-        S wave velocities at given depths in [m/s].
+        v_s : float or array of floats
+        S wave velocity at given depth(s) in [m/s].
         """
         raise ValueError, "not implemented"
         return 0
@@ -105,28 +108,30 @@ class Seismic1DModel:
         """
         Parameters
         ----------
-        depth_list : array of floats
-        Array of depths (m) to evaluate seismic model at.
+        depth_list : float or array of floats
+        Depth (m) to evaluate seismic model at.
         
         Returns
         -------
-        v_phi : array of floats
-        bulk sound wave velocities at given depths in [m/s].
+        v_phi : float or array of floats
+        bulk sound wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError, "not implemented"
-        return 0
-
+        v_s=self.v_s(depth)
+        v_p=self.v_p(depth)
+        return np.sqrt(v_p*v_p-4./3.*v_s*v_s)
+        
+        
     def density(self, depth):
         """
         Parameters
         ----------
-        depth_list : array of floats
-        Array of depths (m) to evaluate seismic model at.
+        depth : float or array of floats
+        Depth (m) to evaluate seismic model at.
         
         Returns
         -------
-        density : array of floats
-        densities at given depths in [kg/m^3].
+        density : float or array of floats
+        Density at given depth(s) in [kg/m^3].
         """
         raise ValueError, "not implemented"
         return 0
@@ -135,13 +140,28 @@ class Seismic1DModel:
         """
         Parameters
         ----------
-        pressures : array of floats
-            Pressures at given depths in [Pa].
+        pressure : float or array of floats
+            Pressure in [Pa] to evaluate depth at.
         
         Returns
         -------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
+        depth : float or array of floats
+            Depth (m) for given pressure (s)
+        """
+        raise ValueError, "not implemented"
+        return -1
+
+    def gravity (self, depth):
+        """
+        Parameters
+        ----------
+        depth : float or array of floats
+        Depths (m) to evaluate gravity at.
+        
+        Returns
+        -------
+        gravity : float or array of floats
+        Gravityfor given depths in [m/s^2]
         """
         raise ValueError, "not implemented"
         return -1
@@ -151,9 +171,7 @@ class RadiusTable(Seismic1DModel):
     """ 
     This is a base class that gets a 1D seismic model from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
-    from this class. This class uses :class:`burnman.seismic.SeismicModel`
-    
-    Format of the input files is = Radius [m], Pressure [Pa], Density [kg/m^3], Vp [m/s], Vs [m/s]
+    from this class. This class uses :class:`burnman.seismic.Seismic1DModel`
     
     Note: all tables need to be sorted by increasing radius.
     Alternatively, you can also overwrite the _lookup function if you
@@ -184,29 +202,24 @@ class RadiusTable(Seismic1DModel):
 
         return self._lookup(depth, self.table_vs)
 
-    def v_phi(self, depth):
-        v_s=self.v_s(depth)
-        v_p=self.v_p(depth)
-        return np.sqrt(v_p*v_p-4./3.*v_s*v_s)
 
     def density(self, depth):
 
         return self._lookup(depth, self.table_density)        
 
     def depth(self, pressure):
-
-        radius = burnman.tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
+        radius = np.interp(pressure, self.table_pressure[::-1], self.table_radius[::-1] )
         return self.earth_radius - radius
 
     def _lookup(self, depth, value_table):
         radius = self.earth_radius - depth
-        return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
-    
+        return np.interp(radius, self.table_radius, value_table)
+
 
 class PREM(RadiusTable):
     """ 
     Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981).
-    See also :class:`burnman.seismic.Model1D`.
+    See also :class:`burnman.seismic.RadiusTable`.
     """
     def __init__(self):
         RadiusTable.__init__(self)
@@ -218,19 +231,7 @@ class PREM(RadiusTable):
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
 
-    def grav(self,depths):
-        """
-        Parameters
-        ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        grav : array of floats
-            Gravity for PREM model for given depths in [m/s^2]
-        """
-        
+    def gravity(self,depths):
         table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
         table_rad = table[:,0]
@@ -242,7 +243,7 @@ class Slow(RadiusTable):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
-    See also :class:`burnman.seismic.Model1D`.
+    See also :class:`burnman.seismic.RadiusTalbe`.
     """
     def __init__(self):
         RadiusTable.__init__(self)

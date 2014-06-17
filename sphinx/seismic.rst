@@ -4,13 +4,13 @@ Seismic
 
 Base class for all seismic models
 ---------------------------------
-.. autoclass:: burnman.seismic.SeismicModel
-   :members: evaluate_all_at
+.. autoclass:: burnman.seismic.Seismic1DModel
+
 
 
 Class for 1D Models
 -------------------
-.. autoclass:: burnman.seismic.Model1D 
+.. autoclass:: burnman.seismic.RadiusTable
 
 
 

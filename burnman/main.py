@@ -195,7 +195,7 @@ def depths_for_rock(rock,pressures, temperatures,averaging_scheme=burnman.averag
     seismic_model = burnman.seismic.PREM()
     depthsref = np.array(map(seismic_model.depth,pressures))
     pressref = np.zeros_like(pressures)
-    g  = seismic_model.grav(depthsref) # G for prem
+    g  = seismic_model.gravity(depthsref) # G for prem
     depths  = np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))
     return depths
 
@@ -224,7 +224,7 @@ def pressures_for_rock(rock, depths, T0, averaging_scheme=burnman.averaging_sche
     pressures,_,_,_,_ = seismic_model.evaluate_all_at(depths)
     pressref = np.zeros_like(pressures)
     #gets table with PREM gravities
-    g = seismic_model.grav(depths)
+    g = seismic_model.gravity(depths)
     #optimize pressures for this composition
     while nrmse(len(pressures),pressures,pressref)>1.e-6:
         # calculate density
