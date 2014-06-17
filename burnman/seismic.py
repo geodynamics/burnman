@@ -230,13 +230,16 @@ class PREM(RadiusTable):
         self.table_density = table[:,2]
         self.table_vp = table[:,3]
         self.table_vs = table[:,4]
-
-    def gravity(self,depths):
+        
+        # read in gravity data
         table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
-        table_rad = table[:,0]
-        table_g = table[:,1]
-        return np.interp(self.earth_radius-depths, table_rad,table_g)
+        self.table_radiusgravity = table[:,0]
+        self.table_gravity = table[:,1]
+
+    def gravity(self,depths):
+
+        return np.interp(self.earth_radius-depths, self.table_radiusgravity,self.table_gravity)
 
 
 class Slow(RadiusTable):
