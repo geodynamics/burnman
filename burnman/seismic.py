@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import burnman.tools
 
-class SeismicModel:
+class Seismic1DModel:
     """
     Base class for all the seismological models.
     """
@@ -44,33 +44,110 @@ class SeismicModel:
         v_s = np.array([self.v_s(r) for r in depth_list])
         v_phi = np.array([self.v_phi(r) for r in depth_list])
         return pressures, density, v_p, v_s, v_phi
-
-    def _pressure(self, depth):
+    
+    def internal_depth_list(self):
+        """
+        Returns
+        -------
+        depths : array of floats
+        Depths [m].
+        """
         raise ValueError, "not implemented"
         return 0
 
-    def _v_p(self, depth):
+    def pressure(self, depth):
+        """
+        Parameters
+        ----------
+        depth_list : array of floats
+        Array of depths (m) to evaluate seismic model at.
+        
+        Returns
+        -------
+        pressures : array of floats
+        Pressures at given depths in [Pa].
+        """
         raise ValueError, "not implemented"
         return 0
 
-    def _v_s(self, depth):
+    def v_p(self, depth):
+        """
+        Parameters
+        ----------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+        
+        Returns
+        -------
+        v_p : array of floats
+            P wave velocities at given depths in [m/s].
+        """
+
+        raise ValueError, "not implemented"
+        return 0
+
+    def v_s(self, depth):
+        """
+        Parameters
+        ----------
+        depth_list : array of floats
+        Array of depths (m) to evaluate seismic model at.
+        
+        Returns
+        -------
+        v_s : array of floats
+        S wave velocities at given depths in [m/s].
+        """
         raise ValueError, "not implemented"
         return 0
     
-    def _v_phi(self, depth):
+    def v_phi(self, depth):
+        """
+        Parameters
+        ----------
+        depth_list : array of floats
+        Array of depths (m) to evaluate seismic model at.
+        
+        Returns
+        -------
+        v_phi : array of floats
+        bulk sound wave velocities at given depths in [m/s].
+        """
         raise ValueError, "not implemented"
         return 0
 
-    def _density(self, depth):
+    def density(self, depth):
+        """
+        Parameters
+        ----------
+        depth_list : array of floats
+        Array of depths (m) to evaluate seismic model at.
+        
+        Returns
+        -------
+        density : array of floats
+        densities at given depths in [kg/m^3].
+        """
         raise ValueError, "not implemented"
         return 0
     
-    def _depth(self, pressure):
+    def depth(self, pressure):
+        """
+        Parameters
+        ----------
+        pressures : array of floats
+            Pressures at given depths in [Pa].
+        
+        Returns
+        -------
+        depth_list : array of floats
+            Array of depths (m) to evaluate seismic model at.
+        """
         raise ValueError, "not implemented"
         return -1
 
 
-class Model1D(SeismicModel):
+class RadiusTable(Seismic1DModel):
     """ 
     This is a base class that gets a 1D seismic model from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
@@ -83,7 +160,7 @@ class Model1D(SeismicModel):
     want to access with something else.
     """ 
     def __init__(self):
-        SeismicModel.__init__(self)
+        Seismic1DModel.__init__(self)
         self.table_radius = []
         self.table_pressure = []
         self.table_density = []
@@ -92,100 +169,32 @@ class Model1D(SeismicModel):
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self):
-        '''
-        Returns
-        -------
-        depths : array of floats
-            Depths [m].
-        '''
         
         return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
 
     def pressure(self, depth):
-        '''
-        Parameters
-        ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        pressures : array of floats
-            Pressures at given depths in [Pa].
-        '''
+        
         return self._lookup(depth, self.table_pressure)
 
     def v_p(self, depth):
-        '''
-        Parameters
-        ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        v_p : array of floats
-            P wave velocities at given depths in [m/s].
-        '''
+
         return self._lookup(depth, self.table_vp)
 
     def v_s(self, depth):
-        '''
-        Parameters
-        ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        v_s : array of floats
-            S wave velocities at given depths in [m/s].
-        '''
+
         return self._lookup(depth, self.table_vs)
 
     def v_phi(self, depth):
-        '''
-        Parameters
-        ----------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        v_phi : array of floats
-            bulk sound wave velocities at given depths in [m/s].
-            '''
-        
         v_s=self.v_s(depth)
         v_p=self.v_p(depth)
         return np.sqrt(v_p*v_p-4./3.*v_s*v_s)
 
     def density(self, depth):
-        '''
-        Parameters
-        ----------
-        depth_list : array of floats
-        Array of depths (m) to evaluate seismic model at.
-            
-        Returns
-        -------
-        density : array of floats
-            densities at given depths in [kg/m^3].
-        '''
+
         return self._lookup(depth, self.table_density)        
 
     def depth(self, pressure):
-        '''
-        Parameters
-        ----------
-        pressures : array of floats
-            Pressures at given depths in [Pa].
-            
-        Returns
-        -------
-        depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
-        '''
+
         radius = burnman.tools.lookup_and_interpolate(self.table_pressure[::-1], self.table_radius[::-1], pressure)
         return self.earth_radius - radius
 
@@ -194,13 +203,13 @@ class Model1D(SeismicModel):
         return burnman.tools.lookup_and_interpolate(self.table_radius, value_table, radius)    
     
 
-class PREM(Model1D):
+class PREM(RadiusTable):
     """ 
-    Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981). 
+    Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981).
     See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
-        Model1D.__init__(self)
+        RadiusTable.__init__(self)
         table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
@@ -210,7 +219,7 @@ class PREM(Model1D):
         self.table_vs = table[:,4]
 
     def grav(self,depths):
-        '''
+        """
         Parameters
         ----------
         depth_list : array of floats
@@ -220,7 +229,7 @@ class PREM(Model1D):
         -------
         grav : array of floats
             Gravity for PREM model for given depths in [m/s^2]
-        '''
+        """
         
         table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
@@ -229,14 +238,14 @@ class PREM(Model1D):
         return np.interp(self.earth_radius-depths, table_rad,table_g)
 
 
-class Slow(Model1D):
+class Slow(RadiusTable):
     """ 
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012). 
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
     See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
-        Model1D.__init__(self)
+        RadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -261,14 +270,14 @@ class Slow(Model1D):
         self.table_vs = table2[:,1] 
        
 
-class Fast(Model1D):
+class Fast(RadiusTable):
     """ 
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012). 
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_fast.txt', 'input_seismic/pwave_fast.txt').
     See also :class:`burnman.seismic.Model1D`.
     """
     def __init__(self):
-        Model1D.__init__(self)
+        RadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
