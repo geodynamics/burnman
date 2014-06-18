@@ -28,13 +28,21 @@ This script may be run by typing
 
 """
 
+# We import a couple extra modules for this step than in the previous
+# ones.  In particular, we will use a function for a normal distribution
+# from numpy.random, as well as a class for doing linear 1D interpolation
+# from scipy.interpolate
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy.ma as ma
+
 from numpy.random import normal
 from scipy import interpolate
+
+# We also import these modules for some more advanced plotting.
+import numpy.ma as ma
 from matplotlib.colors import LinearSegmentedColormap
 
+#The BurnMan imports, however, are the same.
 import burnman
 from burnman import minerals
 
@@ -42,18 +50,23 @@ from burnman import minerals
 """
 Here we define a function realize_mineral() which takes a mineral
 as a paramter, perturbs its K' and G' parameters, then returns
-the modified mineral.  We perturb it by drawing from a normal 
-ditribution with a standard deviation given by K_prime_std_dev
-and G_prime_std_dev.  These parameters are currently set to very small
-values but you will want to put in realistic values (perhaps 0.1-0.2)
+the modified mineral.  Typical values for K' are around 4 and typical
+values for G' are around 2 (both parameters are dimensionless). 
+We perturb the mineral by drawing from a normal ditribution with a 
+standard deviation given by K_prime_std_dev and G_prime_std_dev.  
+These parameters are currently set to very small values but you will 
+want to put in realistic values (perhaps 0.1-0.2)
 """
 
 def realize_mineral( mineral ):
     K_prime_std_dev = 0.0001  #<----------------- One sigma uncertainty in K prime
     G_prime_std_dev = 0.0001  #<----------------- One sigma uncertainty in G prime
 
+    # Perturb the G' and K' values by a random number drawn from a normal distribution
     mineral.params['Kprime_0'] = mineral.params['Kprime_0'] + normal(scale=K_prime_std_dev)
     mineral.params['Gprime_0'] = mineral.params['Gprime_0'] + normal(scale=G_prime_std_dev)
+
+    # Give back the perturbed mineral
     return mineral
 
 """
@@ -69,13 +82,19 @@ def realize_rock():
     phase_1_fraction = 0.5
     phase_2_fraction = 1.0-phase_1_fraction
 
+    # Setup the minerals for the two phase composite.  This is different
+    # from how we did it in step 1 and 2.  Instead, we create the two phases
+    # then call realize_mineral() on them to perturb their properties.
     phase_1 = minerals.SLB_2011.stishovite(); realize_mineral(phase_1)
     phase_2 = minerals.SLB_2011.wuestite(); realize_mineral(phase_2)
 
+    # Set up the rock with the now-perturbed mineral phases
     mantle_rock = burnman.Composite( [phase_1_fraction, phase_2_fraction], [phase_1, phase_2] )
     mantle_rock.set_method('slb3')
 
+    # Give back the realization of the rock with the perturbed phases.
     return mantle_rock
+
 
 # Again, we set up the seismic model and ask for its properties
 # in the lower mantle.  Basically the same thing as in steps 1 and 2.
@@ -110,7 +129,7 @@ for i in range(n_realizations):
       rho, vp, vs, vphi, K, G = \
         burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.VoigtReussHill())
 
-      # This interpolates the resulting densities and wavespeeds\
+      # This block of code interpolates the resulting densities and wavespeeds
       # to a higher resolution line to make the plot look nicer.
       func_rho = interpolate.interp1d(pressure, rho)
       func_vs = interpolate.interp1d(pressure, vs)
