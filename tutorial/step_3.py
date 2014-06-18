@@ -82,8 +82,10 @@ def realize_rock():
     # Setup the minerals for the two phase composite.  This is different
     # from how we did it in step 1 and 2.  Instead, we create the two phases
     # then call realize_mineral() on them to perturb their properties.
-    phase_1 = minerals.SLB_2011.stishovite(); realize_mineral(phase_1)
-    phase_2 = minerals.SLB_2011.wuestite(); realize_mineral(phase_2)
+    phase_1 = minerals.SLB_2011.stishovite(); 
+    realize_mineral(phase_1)
+    phase_2 = minerals.SLB_2011.wuestite(); 
+    realize_mineral(phase_2)
 
     # Set up the rock with the now-perturbed mineral phases
     mantle_rock = burnman.Composite( [phase_1_fraction, phase_2_fraction], [phase_1, phase_2] )
