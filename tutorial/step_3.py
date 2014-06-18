@@ -49,8 +49,8 @@ values but you will want to put in realistic values (perhaps 0.1-0.2)
 """
 
 def realize_mineral( mineral ):
-    K_prime_std_dev = 0.3  #<----------------- One sigma uncertainty in K prime
-    G_prime_std_dev = 0.3  #<----------------- One sigma uncertainty in G prime
+    K_prime_std_dev = 0.0001  #<----------------- One sigma uncertainty in K prime
+    G_prime_std_dev = 0.0001  #<----------------- One sigma uncertainty in G prime
 
     mineral.params['Kprime_0'] = mineral.params['Kprime_0'] + normal(scale=K_prime_std_dev)
     mineral.params['Gprime_0'] = mineral.params['Gprime_0'] + normal(scale=G_prime_std_dev)
@@ -92,11 +92,11 @@ temperature = burnman.geotherm.brown_shankland(pressure)
 
 
 """
-Finally, we make 500 realizations of the rock and save the seismic profiles
+Finally, we make 1000 realizations of the rock and save the seismic profiles
 for later visualization.  
 """
 
-n_realizations = 300
+n_realizations = 1000
 outfile = open('uncertainty.dat', 'w')
 
 for i in range(n_realizations):
@@ -135,7 +135,11 @@ for i in range(n_realizations):
 """
 The rest of this script is concerned with plotting the results so that 
 you may visualize the uncertainty space that we have sampled with our
-mineral model.  In different colors we see 
+mineral model.  In different colors we see 2D histograms, where the color 
+intensity corresponds to how many of the models went through that portion of
+the velocity/density space.  The dashed lines show the PREM values.  Tighter
+histograms indicate that the perturbations to the mineral physical values 
+make less of a difference, more spread out ones show larger effects.
 
 In general, this plotting is more complex than the ones in step 1 and step 2
 and you may safely ignore it.  
@@ -165,7 +169,7 @@ rho_yedge = rho_yedge/1.e3
 
 left_edge = min(vs_xedge[0], vphi_xedge[0], rho_xedge[0])
 right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
-bottom_edge= 4.0
+bottom_edge= 4.3
 top_edge=11.3
 aspect_ratio = (right_edge-left_edge)/(top_edge-bottom_edge)
 gamma = 0.5  #Mess with this to change intensity of colormaps near the edges
@@ -175,6 +179,14 @@ plt.xlim(left_edge, right_edge)
 plt.ylim(bottom_edge, top_edge)
 plt.xlabel('Pressure (GPa)')
 plt.ylabel('Wave Speed (km/s)')
+
+#plot density
+density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
+c = LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#edf8e9'), (0.4, '#bae4b3'), (0.6, '#74c476'), (0.8, '#31a354'), (1.0, '#006d2c') ] , gamma=0.1)
+c.set_bad('w', alpha=1.0)
+plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian', alpha=.7,\
+       aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
+plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='g',linewidth=2.0,label='Density')
 
 
 #plot v_s
@@ -192,14 +204,6 @@ c.set_bad('w', alpha=1.0)
 plt.imshow(vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7, \
        aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]])
 plt.plot(pressure/1.e9,seis_vphi/1.e3,linestyle="--",color='r',linewidth=2.0,label='Vphi')
-
-#plot density
-density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
-c = LinearSegmentedColormap.from_list('vphi', [ (0, '#ffffff'), (0.2, '#edf8e9'), (0.4, '#bae4b3'), (0.6, '#74c476'), (0.8, '#31a354'), (1.0, '#006d2c') ] , gamma=0.2)
-c.set_bad('w', alpha=1.0)
-plt.imshow(density_hist.transpose(), origin='low', cmap=c, interpolation = 'gaussian', alpha=.7,\
-       aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
-plt.plot(pressure/1.e9,seis_rho/1.e3,linestyle="--",color='g',linewidth=2.0,label='Density')
 
 plt.legend(loc = 'lower right')
 
