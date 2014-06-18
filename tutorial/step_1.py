@@ -3,6 +3,32 @@
 # Released under GPL v2 or later.
 
 """
+CIDER 2014 BurnMan Tutorial --- step 1
+
+In this first part of the tutorial we will acquaint ourselves with a basic
+script for calculating the elastic properties of a mantle mineralogical
+model.  
+
+In general, there are three portions of this script:
+
+1) Define a set of pressures and temperatures at which we want to 
+calculate elastic properties
+
+2) Setup a composite of minerals (or ``rock'') and calculate its 
+elastic properties at those pressures and temperatures.
+
+3) Plot those elastic properties, and compare them to a seismic
+model, in this case PREM
+
+
+The script is basically already written, and should run as is by typing:
+
+    python step_1.py
+
+on the command line.  However, the mineral model for the rock is not
+very realistic, and you will want to change it to one that is more 
+in accordance with what we think the bulk composition of Earth's mantle is.
+
 """
 
 # Here we import standard python modules that are required for
@@ -22,6 +48,15 @@ import burnman
 from burnman import minerals
 
 
+
+"""
+Part (1) --- Defining the pressures and temperatures.
+We get the pressures from the PREM density model for a list of
+depths in Earth, and a model for the temperature profile with
+depth from Brown and Shankland (1981).  In addition, we get the
+density and elastic properties from PREM, which we will use later
+for comparison purposes
+"""
 
 # Here we create and load the PREM seismic velocity model, which will be
 # used for comparison with the seismic velocities of the "rock" composite
@@ -43,12 +78,33 @@ pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(
 temperature = burnman.geotherm.brown_shankland(pressure)
 
 
+"""
+Part (2) -- Defining the rock
+
+The object burnman.Composite expects two lists, one with the molar
+fractions of the different minerals making up the rock, and one with 
+the minerals themselves. 
+
+Here we setup a rock made from stishovite and wustite, which is 
+probably not the most realistic mineralogical model for Earth's lower
+mantle. This is the place where you will want to make changes.
+
+For our simplified mantle model, consider a three element model, with 
+Mg, Si, and O.  This will make a mantle with magnesium perovskite (MgSiO_3)
+and periclase (MgO). We can replace minerals.SLB_2011.stishovite() and 
+minerals.SLB_2011.wuestite() with minerals.SLB_2011.mg_perovskite()
+and minerals.SLB_2011.periclase() and play with the relative fraction 
+of the two phases.
+
+"""
+
 #---------------------------------------------------------#
 #------------- MAKE MODIFICATIONS HERE -------------------#
 #---------------------------------------------------------#
 
-stishovite_fraction = 0.5
-rock = burnman.Composite([stishovite_fraction, 1.0-stishovite_fraction], 
+phase_1_fraction = 0.5
+phase_2_fraction = 1.0-phase_1_fraction
+rock = burnman.Composite([phase_1_fraction, phase_2_fraction], 
                          [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
 
 #---------------------------------------------------------#
@@ -72,6 +128,23 @@ rock.set_method('slb3')
 # s-wave velocity, bulk sound speed, bulk modulus, and shear modulus.
 density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
 
+
+"""
+Part (3) --- Plotting and comparison
+
+This should not need to be changed, though of course you may if you like.  It plots the 
+resulting densities, shear wave speeds and bulk sound speeds against pressure, as 
+well as plotting the relevant values from PREM for comparison.  
+
+You can try modifying the phase_1_fraction above to try to get a closer fit, or
+a more complicated mineralogical model.
+
+You will probably have a hard time getting a close match with our simple model.  
+In particular, the densities will be too low and the wave speeds will be too fast.
+This is likely due to the fact that we have not included iron, which will make the
+rocks denser, which will in turn slow down the wave speeds.
+
+"""
 
 # All the work is done except the plotting!  Here we want to plot the seismic wave
 # speeds and the density against PREM using the matplotlib plotting tools.  We make
