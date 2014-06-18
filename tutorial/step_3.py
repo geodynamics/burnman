@@ -66,9 +66,6 @@ def realize_mineral( mineral ):
     mineral.params['Kprime_0'] = mineral.params['Kprime_0'] + normal(scale=K_prime_std_dev)
     mineral.params['Gprime_0'] = mineral.params['Gprime_0'] + normal(scale=G_prime_std_dev)
 
-    # Give back the perturbed mineral
-    return mineral
-
 """
 Here we define a function realize_rock(), which creates the realization of
 our mantle model.  First it makes a mineral, then calls realize_mineral()
