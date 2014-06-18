@@ -27,7 +27,7 @@ The script is basically already written, and should run as is by typing:
 
 on the command line.  However, the mineral model for the rock is not
 very realistic, and you will want to change it to one that is more 
-in accordance with what we think the bulk composition of Earth's mantle is.
+in accordance with what we think the bulk composition of Earth's lower mantle is.
 
 """
 
@@ -85,7 +85,7 @@ The object burnman.Composite expects two lists, one with the molar
 fractions of the different minerals making up the rock, and one with 
 the minerals themselves. 
 
-Here we setup a rock made from stishovite and wustite, which is 
+Here we setup a rock made from stishovite (SiO_2) and wustite (FeO), which is 
 probably not the most realistic mineralogical model for Earth's lower
 mantle. This is the place where you will want to make changes.
 
