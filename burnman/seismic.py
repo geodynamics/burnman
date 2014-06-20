@@ -161,7 +161,7 @@ class Seismic1DModel:
         Returns
         -------
         gravity : float or array of floats
-        Gravityfor given depths in [m/s^2]
+        Gravity for given depths in [m/s^2]
         """
         raise ValueError, "not implemented"
         return -1
