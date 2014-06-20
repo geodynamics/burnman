@@ -60,7 +60,7 @@ if __name__ == "__main__":
     phase_fractions,relative_molar_percent = \
         burnman.calculate_phase_percents(weight_percents)
 
-    Kd_0 = .5 #Fig 5 Nakajima et al 2012
+    Kd_0 = .1 #Fig 5 Nakajima et al 2012, although you can define this yourself! 
 
     iron_content = lambda p,t: \
         burnman.calculate_partition_coefficient(p,t,relative_molar_percent,Kd_0)

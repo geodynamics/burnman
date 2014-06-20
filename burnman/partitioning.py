@@ -50,21 +50,6 @@ def calculate_phase_percents(inp):
     return phase_per,rel_mol_per
 
 
-
-def part_coef_calc(inp2,StartP,EndP,deltaP):
-
-    raise Exception("not implemented")
-
-    a = [] #partition coefficent of Fe in fp
-    b = [] #partition coefficent of Fe in pv
-
-    Pressure= []
-    Temperature=[]
-    counter = 0
-
-
-
-
 def calculate_partition_coefficient(pressure, temperature, components, initial_distribution_coefficient):
 
     """ calculate the partition coefficient given [...] initial_distribution_coefficient is known as Kd_0 """
@@ -76,16 +61,20 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
     delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
 
 
-    rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012
+    rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
 
-    K = np.exp(rs) #The exchange coefficent at P and T
+    K = np.exp(rs) #The exchange coefficent at P and T. K(P,T,X) in eq 5 Nakajima et al 2012
 
-    num_to_sqrt = (-4.*frac_mol_FeO*(K-1.)*K*frac_mol_SiO2)+(pow(1.+(frac_mol_FeO*(K-1))+((K-1.)*frac_mol_SiO2),2.))
+    """
+    Solving equation 6 in Nakajima et al., 2012 for X_Fe_fp (we define as a) and X_Fe_pv (we define as b)
+    Solved using the definition of the distribution coefficient to define X_Fe_fp as a function of X_Fe_pv
+    """
+    num_to_sqrt = (-4.*frac_mol_FeO*(K-1.)*K*frac_mol_SiO2)+(pow(1.+(frac_mol_FeO*(K-1))+((K-1.)*frac_mol_SiO2),2.)) 
 
     b = (-1. + frac_mol_FeO - (frac_mol_FeO*K)+frac_mol_SiO2 - (frac_mol_SiO2*K) + np.sqrt(num_to_sqrt)) \
          / (2.*frac_mol_SiO2*(1.-K))
 
     a = b /(((1.-b)*K)+b)
 
-    return (a,b) #a is partition coefficient array with P for mw, b is pcarray for pv
+    return (a,b) #a is partition coefficient array with P for fp, b is pcarray for pv
 
