@@ -3,19 +3,26 @@
 # Released under GPL v2 or later.
 
 """
+    
+example_optimize_pv
+-------------------
+
 Vary the amount perovskite vs. ferropericlase and compute the error in the
 seismic data against PREM.
 
-requires:
-- creating minerals
-- compute seismic velocities
-- geotherms
-- seismic models
-- seismic comparison
+*Uses:*
 
-teaches:
-- compare errors between models
-- loops over models
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.main.compare_l2`
+
+*Demonstrates:*
+
+* compare errors between models
+* loops over models
 
 """
 

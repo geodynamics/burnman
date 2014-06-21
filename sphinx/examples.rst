@@ -15,8 +15,8 @@ Start Here
 
 .. automodule:: examples.example_averaging
 
-Advanced
-========
+More Advanced
+=============
 
 .. automodule:: examples.example_spintransition
 
@@ -27,9 +27,30 @@ Advanced
 .. automodule:: examples.example_compare_all_methods  
 
 
+Reproducing Cottaar, Heister, Rose and Unterborn (2014)
+=======================================================
+
+.. automodule:: misc.paper_averaging
+
+.. automodule:: misc.paper_benchmark
+   :exclude-members: check_slb_fig7_txt
+
+.. automodule:: misc.paper_fit_data
+
+.. automodule:: misc.paper_incorrect_averaging
+   :exclude-members: ferropericlase,perovskite
+
+.. automodule:: misc.paper_opt_pv
+
+
+.. automodule:: misc.paper_onefit
+   :exclude-members: array_to_rock, make_rock, output_rock, realization_to_array
+
+.. automodule:: misc.paper_uncertain
+   :exclude-members: my_perovskite
+
 Misc or work in progress
 ========================
-
 
 
 .. automodule:: examples.example_inv_murakami

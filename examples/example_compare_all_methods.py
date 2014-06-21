@@ -3,18 +3,25 @@
 # Released under GPL v2 or later.
 
 """
+    
+example_compare_all_methods
+---------------------------
+
 This example demonstrates how to call each of the individual calculation
 methodologies that exist within BurnMan. See below for current options. This
 example calculates seismic velocity profiles for the same set of minerals and
 a plot of Vs, Vphi and density is produce for the user to compare each of the
 different methods.
 
-requires:
-- geotherms (for adiabat: potential temperature)
-- mineral creation
+*Specifically uses:*
 
-teaches:
-- Each method for calculating velocity profiles currently included within BurnMan
+* :doc:`eos`
+
+
+*Demonstrates:*
+
+* Each method for calculating velocity profiles currently included within BurnMan
+
 """
 
 import os, sys, numpy as np, matplotlib.pyplot as plt

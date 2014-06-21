@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+
+example_composition
+-------------------
+    
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
@@ -29,15 +33,16 @@ method must be set to True, with all others set to False.
 Note: These minerals can include a spin transition in (Mg,Fe)O, see
 example_spintransition.py for explanation of how to implement this
 
-requires:
-- geotherms
-- seismic models
-- compute seismic velocities
-- composite mineral helpers
+*Uses:*
 
-teaches:
-- creating minerals
-- seismic comparison
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+
+
+*Demonstrates:*
+
+* Different ways to define a composite
+* Compare computations to seismic models
 
 """
 

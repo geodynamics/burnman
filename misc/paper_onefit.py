@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+    
+paper_onefit
+------------
+
 This script reproduces Figure 7 from Cottaar, Heister, Rose, Unterborn (2014)
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """

@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+    
+paper_fit_data
+--------------
+
 This script reproduces Cottaar, Heister, Rose, Unterborn (2014) Figure 4
 
 This example demonstrates BurnMan's functionality to fit thermoelastic data to
