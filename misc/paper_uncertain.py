@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+    
+paper_uncertain
+---------------
+
 This script reproduces Figure 8 from Cottaar, Heister, Rose and Unterborn (2014).
 It shows the sensitivity of the velocities to various mineralogical parameters.
 """

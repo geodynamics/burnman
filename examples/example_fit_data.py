@@ -1,8 +1,13 @@
+
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 """
+    
+example_fit_data
+----------------
+
 This example demonstrates BurnMan's functionality to fit thermoelastic data to
 both 2nd and 3rd orders using the EoS of the user's choice at 300 K. User's
 must create a file with P, T and Vs. See input_minphys/ for example input

@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_grid
+------------
+
 This example shows how to evaluate seismic quantities on a p,T grid.
 """
 

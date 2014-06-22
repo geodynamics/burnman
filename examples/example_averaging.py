@@ -17,12 +17,17 @@ averaging schemes are available:
 See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
 of each averaging scheme.
 
-requires:
-- geotherms
-- compute seismic velocities
+*Specifically uses:*
 
-teaches:
-- averaging
+* :class:`burnman.averaging_schemes.VoigtReussHill`
+* :class:`burnman.averaging_schemes.Voigt`
+* :class:`burnman.averaging_schemes.Reuss`
+* :class:`burnman.averaging_schemes.HashinShtrikmanUpper`
+* :class:`burnman.averaging_schemes.HashinShtrikmanLower`
+
+*Demonstrates:*
+
+* implemented averaging schemes
 
 """
 

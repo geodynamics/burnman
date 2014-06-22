@@ -3,7 +3,11 @@
 # Released under GPL v2 or later.
 
 """
-This script reproduces the benchmark in Cottaar, Heister, Rose, Unterborn (2014), Figure 3
+    
+paper_benchmark
+---------------
+
+This script reproduces the benchmark in Cottaar, Heister, Rose, Unterborn (2014), Figure 3.
 """
 
 

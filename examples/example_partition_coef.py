@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+
+example_parition_coef
+---------------------
+
 This example shows how to vary the distribution coefficient of the
 perovskite/ferropericlase system. The user sets Kd_0 and BurnMan scales Kd as
 a function of P and T adopting the formalism of Nakajima et al.,

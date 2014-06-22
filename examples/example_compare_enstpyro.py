@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_compare_enstpyro
+------------------------
+
 This example shows you how to create two materials from wt% determines the
 optimum mixing between the two to match the seismic model of your choice.
 Currently it compares two end member meteorite groups among the chondrites:

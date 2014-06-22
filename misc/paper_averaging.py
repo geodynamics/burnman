@@ -3,6 +3,10 @@
 # Released under GPL v2 or later.
 
 """
+    
+paper_averaging
+---------------
+
 This script reproduces Cottaar, Heister, Rose, Unterborn (2014) Figure 2.
 
 This example shows the effect of different averaging schemes. Currently four

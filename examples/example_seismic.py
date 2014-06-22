@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_seismic
+---------------
+
 Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
 function of depth (or P) as well as different velocity model libraries
 available within Burnman:
@@ -15,11 +18,17 @@ available within Burnman:
 This example will first calculate or read in a seismic model and plot the
 model along the defined pressure range.
 
-requires:
+*Uses:*
 
-teaches:
-- Input of user-defined seismic models
-- Utilization of library seismic models within BurnMan
+* :doc:`seismic`
+
+
+
+*Demonstrates:*
+
+* Utilization of library seismic models within BurnMan
+* Input of user-defined seismic models
+
 
 """
 

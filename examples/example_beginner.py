@@ -3,22 +3,29 @@
 # Released under GPL v2 or later.
 
 """
+example_beginner 
+----------------
+
 This example script is intended for absolute beginners to BurnMan.
 We cover importing BurnMan modules, creating a composite material,
 and calculating its seismic properties at lower mantle pressures and
 temperatures.  Afterwards, we plot it against a 1D seismic model
 for visual comparison.
 
-requires:
-- geotherms
-- seismic models
-- compute seismic velocities
-- composite mineral helpers
+*Uses:*
 
-teaches:
-- creating basic composites
-- calculating thermoelastic properties
-- seismic comparison
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
+
+
+*Demonstrates:*
+
+* creating basic composites
+* calculating thermoelastic properties
+* seismic comparison
 """
 
 # Here we import standard python modules that are required for

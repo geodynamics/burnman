@@ -3,20 +3,27 @@
 # Released under GPL v2 or later.
 
 """
+    
+example_spintransition
+----------------------
+
 This example shows the different minerals that are implemented with a spin
 transition.  Minerals with spin transition are implemented by defining two
 separate minerals (one for the low and one for the high spin state).  Then a
 third dynamic mineral is created that switches between the two previously
 defined minerals by comparing the current pressure to the transition pressure.
 
-requires:
-- geotherms
-- defined minerals, from library or user created (see: example_user_input_material.py)
-- seismic models
-- compute seismic velocities
+*Specifically uses:*
 
-teaches:
-- implementation of spin transition in (Mg,Fe)O at user defined pressure
+* :func:`burnman.mineral_helpers.HelperSpinTransition`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase_HS`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase_LS`
+
+
+*Demonstrates:*
+
+* implementation of spin transition in (Mg,Fe)O at user defined pressure
 """
 
 import os, sys, numpy as np, matplotlib.pyplot as plt

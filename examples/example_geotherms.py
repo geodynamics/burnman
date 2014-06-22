@@ -16,14 +16,16 @@ These are:
 5. Read in from file from user
 6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
 
-requires:
+*Uses:*
 
-- input geotherm files
-- mineral definitions for adiabat
-- burnman/composite.py for adiabat (if necessary)
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.geotherm.anderson`
+* input geotherm file *input_geotherm/example_geotherm.txt* (optional)
+* :class:`burnman.composite.Composite` for adiabat
 
-teaches:
-- geotherms
+*Demonstrates:*
+
+* the available geotherms
 
 """
 
@@ -52,13 +54,14 @@ if __name__ == "__main__":
     #what about a geotherm defined from datapoints given in a file (our inline)?
     table = [[1e9,1600],[30e9,1700],[130e9,2700]]
     #this could also be loaded from a file, just uncomment this
-    #table = tools.read_table("input_geotherm/example_geotherm.txt")
+    #table = burnman.tools.read_table("input_geotherm/example_geotherm.txt")
 
     table_pressure = np.array(table)[:,0]
     table_temperature = np.array(table)[:,1]
 
-    my_geotherm_interpolate = lambda p:  [ burnman.tools.lookup_and_interpolate \
-                                                   (table_pressure, table_temperature, x) for x in p]
+    my_geotherm_interpolate = lambda p:  [ np.interp(x, table_pressure, \
+                                                     table_temperature) for x in p]
+
     temperature4 = my_geotherm_interpolate(pressures)
 
 
