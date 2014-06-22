@@ -3,6 +3,9 @@
 # Released under GPL v2 or later.
 
 """
+example_woutput
+---------------
+
 This example explains how to perform the basic i/o of BurnMan. A method of
 calculation is chosen, a composite mineral/material (see
 example_composition.py for explanation of this process) is created in the

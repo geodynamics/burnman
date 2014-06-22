@@ -41,7 +41,7 @@ Reproducing Cottaar, Heister, Rose and Unterborn (2014)
    :exclude-members: ferropericlase,perovskite
 
 .. automodule:: misc.paper_opt_pv
-
+   :exclude-members: calc_shear_velocities,error
 
 .. automodule:: misc.paper_onefit
    :exclude-members: array_to_rock, make_rock, output_rock, realization_to_array
