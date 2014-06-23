@@ -13,8 +13,8 @@ import burnman.equation_of_state as eos
 class SLBBase(eos.EquationOfState):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
-    in Stixrude and Lithgow-Bertelloni (2005).  For the most part, the equations are
-    all third order in strain, but see further the slb2 and slb3 classes
+    in Stixrude and Lithgow-Bertelloni (2005).  For the most part the equations are
+    all third order in strain, but see further the :class:`burnman.slb.SLB2` and :class:`burnman.slb.SLB3` classes
     """
     def __debye_temperature(self,x,params):
         """

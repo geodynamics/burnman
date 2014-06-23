@@ -7,9 +7,19 @@ Base class
 
 Birch-Murnaghan
 ---------------
-.. automodule:: burnman.birch_murnaghan
+
+.. autoclass:: burnman.birch_murnaghan.BirchMurnaghanBase
+
+.. autoclass:: burnman.birch_murnaghan.BM2
+
+.. autoclass:: burnman.birch_murnaghan.BM3
 
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------
-.. automodule:: burnman.slb
+
+.. autoclass:: burnman.slb.SLBBase
+
+.. autoclass:: burnman.slb.SLB2
+
+.. autoclass:: burnman.slb.SLB3
 

@@ -73,11 +73,10 @@ def shear_modulus_third_order(volume, params):
 
 class BirchMurnaghanBase(eos.EquationOfState):
     """
-    A wrapper class for the birch murnaghan functions above so that
-    it satisfies the interface requirements as specified in
-    equation_of_state.py
+    Base class for the isothermal Birch Murnaghan equation of state.  This is third order in strain, and
+    has no temperature dependence.  However, the shear modulus is sometimes fit to a second order 
+    function, so if this is the case, you should use that.  For more see :class:`burnman.birch_murnaghan.BM2` and :class:`burnman.birch_murnaghan.BM3`.
     """
-
     def volume(self,pressure, temperature, params):
         return volume(pressure,params)
 
@@ -93,7 +92,6 @@ class BirchMurnaghanBase(eos.EquationOfState):
         elif(self.order == 3):
           return shear_modulus_third_order(volume,params)
 
-    # return large for heat capacity, zero for grueneisen and expansivity
     def heat_capacity_v(self,pressure, temperature, volume, params):
         return 1.e99
 
@@ -108,10 +106,18 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
 
 class BM3(BirchMurnaghanBase):
+    """
+    Third order Birch Murnaghan isothermal equation of state.  
+    This uses the third order expansion for shear modulus.
+    """
     def __init__(self):
         self.order=3
 
 
 class BM2(BirchMurnaghanBase):
+    """
+    Third order Birch Murnaghan isothermal equation of state.  
+    This uses the third order expansion for shear modulus.
+    """
     def __init__(self):
         self.order=2

@@ -13,63 +13,198 @@ class EquationOfState:
 
     In general these functions are functions of pressure,
     temperature, and volume, as well as a "params" object,
-    which stores the material parameters of the stuff,
-    such as reference volume, Debye temperature, etc.
-    The exceptions are volume and density, which are
-    just assumed to be functions of pressure and temperature.
+    which is a Python dictionary that stores the material 
+    parameters of the mineral, such as reference volume,
+    Debye temperature, reference moduli, etc.
+
+    The functions for volume and density are just functions 
+    of temperature, pressure, and "params"; after all, it 
+    does not make sense for them to be functions of volume/density.
     """
 
     def volume(self, pressure, temperature, params):
         """
-        Returns molar volume at the pressure and temperature [m^3]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        volume : float
+            Molar volume of the mineral. [m^3]
         """
         raise NotImplementedError("")
 
     def density(self, pressure, temperature, params):
         """
-        Returns density at the pressure and temperature [kg/m^3]
+        Calculate the density of the mineral.  
+        The params object must include a "molar_mass" field.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        density : float
+            Density of the mineral. [kg/m^3]
         """
         return params["molar_mass"] / self.volume(pressure, temperature, params)
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Returns grueneisen parameter at the pressure, temperature, and volume
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        gamma : float
+            Grueneisen parameter of the mineral. [unitless]
         """
         raise NotImplementedError("")
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """
-        Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        K_T : float
+            Isothermal bulk modulus of the mineral. [Pa]
         """
         raise NotImplementedError("")
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         """
-        Returns adiabatic bulk modulus at the pressure, temperature, and volume [Pa]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        K_S : float
+            Adiabatic bulk modulus of the mineral. [Pa]
         """
         raise NotImplementedError("")
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
-        Returns shear modulus at the pressure, temperature, and volume [Pa]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        G : float
+            Shear modulus of the mineral. [Pa]
         """
         raise NotImplementedError("")
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        C_V : float
+            Heat capacity at constant volume of the mineral. [J/K/mol]
         """
         raise NotImplementedError("")
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        C_P : float
+            Heat capacity at constant pressure of the mineral. [J/K/mol]
         """
         raise NotImplementedError("")
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Returns thermal expansivity at the pressure, temperature, and volume [1/K]
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        alpha : float
+            Thermal expansivity of the mineral. [1/K]
         """
         raise NotImplementedError("")
 
