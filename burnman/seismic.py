@@ -18,7 +18,7 @@ class Seismic1DModel:
 
     def evaluate_all_at(self, depth_list):
         """
-        Returns the lists of data for a SeismicModel for the depths provided
+        Returns the lists of data for a Seismic1DModel for the depths provided
             
         Parameters
         ----------
@@ -169,7 +169,7 @@ class Seismic1DModel:
         return -1
 
 
-class RadiusTable(Seismic1DModel):
+class SeismicRadiusTable(Seismic1DModel):
     """ 
     This is a base class that gets a 1D seismic model from a table indexed and
     sorted by radius. Fill the tables in the constructor after deriving
@@ -218,13 +218,13 @@ class RadiusTable(Seismic1DModel):
         return np.interp(radius, self.table_radius, value_table)
 
 
-class PREM(RadiusTable):
+class PREM(SeismicRadiusTable):
     """
     Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981).
-    See also :class:`burnman.seismic.RadiusTable`.
+    See also :class:`burnman.seismic.SeismicRadiusTable`.
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        SeismicRadiusTable.__init__(self)
         table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
@@ -244,14 +244,14 @@ class PREM(RadiusTable):
         return np.interp(self.earth_radius-depths, self.table_radiusgravity,self.table_gravity)
 
 
-class Slow(RadiusTable):
+class Slow(SeismicRadiusTable):
     """
     Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012).
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
-    See also :class:`burnman.seismic.RadiusTable`.
+    See also :class:`burnman.seismic.SeismicRadiusTable`.
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        SeismicRadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
@@ -276,14 +276,14 @@ class Slow(RadiusTable):
         self.table_vs = table2[:,1]
 
 
-class Fast(RadiusTable):
+class Fast(SeismicRadiusTable):
     """
     Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012).
     We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_fast.txt', 'input_seismic/pwave_fast.txt').
-    See also :class:`burnman.seismic.SeismicModel1D`.
+    See also :class:`burnman.seismic.Seismic1DModel`.
     """
     def __init__(self):
-        RadiusTable.__init__(self)
+        SeismicRadiusTable.__init__(self)
 
         table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)

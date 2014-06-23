@@ -10,7 +10,7 @@ Base class for all seismic models
 
 Class for 1D Models
 -------------------
-.. autoclass:: burnman.seismic.RadiusTable
+.. autoclass:: burnman.seismic.SeismicRadiusTable
 
 
 

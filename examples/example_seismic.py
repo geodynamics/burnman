@@ -119,9 +119,9 @@ if __name__ == "__main__":
     plt.close()
     # Load data table
 
-    class ak135_table(burnman.seismic.RadiusTable):
+    class ak135_table(burnman.seismic.SeismicRadiusTable):
         def __init__(self):
-            burnman.seismic.RadiusTable.__init__(self)
+            burnman.seismic.SeismicRadiusTable.__init__(self)
             # In format: radius, pressure, density, v_p, v_s
             table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt")
             table = np.array(table)
