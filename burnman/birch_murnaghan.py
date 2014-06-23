@@ -93,15 +93,27 @@ class BirchMurnaghanBase(eos.EquationOfState):
           return shear_modulus_third_order(volume,params)
 
     def heat_capacity_v(self,pressure, temperature, volume, params):
+        """
+        Since this equation of state does not have temperature effects, simply return a very large number.
+        """
         return 1.e99
 
     def heat_capacity_p(self,pressure, temperature, volume, params):
+        """
+        Since this equation of state does not have temperature effects, simply return a very large number.
+        """
         return 1.e99
 
     def thermal_expansivity(self,pressure, temperature, volume, params):
+        """
+        Since this equation of state does not have temperature effects, simply return zero.
+        """
         return 0.
 
     def grueneisen_parameter(self,pressure,temperature,volume,params):
+        """
+        Since this equation of state does not have temperature effects, simply return zero.
+        """
         return 0.
 
 
