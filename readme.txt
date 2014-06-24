@@ -125,24 +125,30 @@ Here are some specific features and pitfalls on python:
 
 * example_beginner.py
 
+example_beginner 
+----------------
+
 This example script is intended for absolute beginners to BurnMan.
 We cover importing BurnMan modules, creating a composite material,
 and calculating its seismic properties at lower mantle pressures and
 temperatures.  Afterwards, we plot it against a 1D seismic model
 for visual comparison.
 
-requires:
-- geotherms
-- seismic models
-- compute seismic velocities
-- composite mineral helpers
+*Uses:*
 
-teaches:
-- creating basic composites
-- calculating thermoelastic properties
-- seismic comparison
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
 
-* example_geotherms.py
+
+*Demonstrates:*
+
+* creating basic composites
+* calculating thermoelastic properties
+* seismic comparison
+
 
 example_geotherms
 -----------------
@@ -157,17 +163,21 @@ These are:
 5. Read in from file from user
 6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
 
-requires:
+*Uses:*
 
-- input geotherm files
-- mineral definitions for adiabat
-- burnman/composite.py for adiabat (if necessary)
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.geotherm.anderson`
+* input geotherm file *input_geotherm/example_geotherm.txt* (optional)
+* :class:`burnman.composite.Composite` for adiabat
 
-teaches:
-- geotherms
+*Demonstrates:*
+
+* the available geotherms
 
 
-* example_seismic.py
+
+example_seismic
+---------------
 
 Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
 function of depth (or P) as well as different velocity model libraries
@@ -181,19 +191,29 @@ available within Burnman:
 This example will first calculate or read in a seismic model and plot the
 model along the defined pressure range.
 
-requires:
+*Uses:*
 
-teaches:
-- Input of user-defined seismic models
-- Utilization of library seismic models within BurnMan
+* :doc:`seismic`
 
 
-* example_composition.py
 
+*Demonstrates:*
+
+* Utilization of library seismic models within BurnMan
+* Input of user-defined seismic models
+
+
+
+
+
+example_composition
+-------------------
+    
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
-Currently BurnMan can input mineral compositions in 4 different ways:
+There are many different ways in BurnMan to combine minerals into a
+composition. Here we present a couple of examples:
 
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
@@ -202,13 +222,13 @@ Currently BurnMan can input mineral compositions in 4 different ways:
 3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
    calculate Fe partitioning along a P, T profile (see
    example_partition_coef.py)
-4. A mixture of three or more  minerals.
+4. A mixture of three minerals.
 
-In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral
+In compositions 2, 3, and 4 of the above inputs, BurnMan will mix the mineral
 physical paremeters of end member minerals (pure Mg and Fe) of the user's
 choice using either volumetric (moduli) or molar averaging (all others) at
 room pressure and temperature (see example_user_input_material.py for
-information on these parameters) .
+information on these parameters).
 
 To turn a method of mineral creation "on" the first if statement above the
 method must be set to True, with all others set to False.
@@ -216,18 +236,22 @@ method must be set to True, with all others set to False.
 Note: These minerals can include a spin transition in (Mg,Fe)O, see
 example_spintransition.py for explanation of how to implement this
 
-requires:
-- geotherms
-- seismic models
-- compute seismic velocities
-- composite mineral helpers
+*Uses:*
 
-teaches:
-- creating minerals
-- seismic comparison
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
 
 
-* example_user_input_material.py
+*Demonstrates:*
+
+* Different ways to define a composite
+* Compare computations to seismic models
+
+
+
+    
+example_user_input_material
+---------------------------
 
 The main focus of this example is to show the mineral physical input constants
 necessary for BurnMan to calculate seismic velocity profiles. Furht
@@ -235,18 +259,16 @@ necessary for BurnMan to calculate seismic velocity profiles. Furht
 Shows user how to input a mineral of his/her choice and which physical values
 need to be input for BurnMan to calculate Vs, Vp, Vphi and density at depth.
 
-requires:
-- creating minerals
-- compute seismic velocities
-- geotherms
-- seismic models
-- seismic comparison
-
-teaches:
-- how to create your own minerals
+*Specifically uses:*
 
 
-* example_averaging.py
+* :class:`burnman.mineral.Mineral`
+
+*Demonstrates:*
+
+* how to create your own minerals
+
+
 
 example_averaging
 -----------------
@@ -262,15 +284,22 @@ averaging schemes are available:
 See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
 of each averaging scheme.
 
-requires:
-- geotherms
-- compute seismic velocities
+*Specifically uses:*
 
-teaches:
-- averaging
+* :class:`burnman.averaging_schemes.VoigtReussHill`
+* :class:`burnman.averaging_schemes.Voigt`
+* :class:`burnman.averaging_schemes.Reuss`
+* :class:`burnman.averaging_schemes.HashinShtrikmanUpper`
+* :class:`burnman.averaging_schemes.HashinShtrikmanLower`
+
+*Demonstrates:*
+
+* implemented averaging schemes
 
 
-* example_woutput.py
+
+example_woutput
+---------------
 
 This example explains how to perform the basic i/o of BurnMan. A method of
 calculation is chosen, a composite mineral/material (see
@@ -289,7 +318,10 @@ teaches:
 - output computed seismic data to file
 
 
-* example_compare_all_methods.py
+
+    
+example_compare_all_methods
+---------------------------
 
 This example demonstrates how to call each of the individual calculation
 methodologies that exist within BurnMan. See below for current options. This
@@ -297,14 +329,20 @@ example calculates seismic velocity profiles for the same set of minerals and
 a plot of Vs, Vphi and density is produce for the user to compare each of the
 different methods.
 
-requires:
-- geotherms (for adiabat: potential temperature)
-- mineral creation
+*Specifically uses:*
 
-teaches:
-- Each method for calculating velocity profiles currently included within BurnMan
+* :doc:`eos`
 
-* example_spintransition.py
+
+*Demonstrates:*
+
+* Each method for calculating velocity profiles currently included within BurnMan
+
+
+
+    
+example_spintransition
+----------------------
 
 This example shows the different minerals that are implemented with a spin
 transition.  Minerals with spin transition are implemented by defining two
@@ -312,16 +350,22 @@ separate minerals (one for the low and one for the high spin state).  Then a
 third dynamic mineral is created that switches between the two previously
 defined minerals by comparing the current pressure to the transition pressure.
 
-requires:
-- geotherms
-- defined minerals, from library or user created (see: example_user_input_material.py)
-- seismic models
-- compute seismic velocities
+*Specifically uses:*
 
-teaches:
-- implementation of spin transition in (Mg,Fe)O at user defined pressure
+* :func:`burnman.mineral_helpers.HelperSpinTransition`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase_HS`
+* :func:`burnman.minerals.Murakami_etal_2012.fe_periclase_LS`
 
-* example_partition_coef.py
+
+*Demonstrates:*
+
+* implementation of spin transition in (Mg,Fe)O at user defined pressure
+
+
+
+example_parition_coef
+---------------------
 
 This example shows how to vary the distribution coefficient of the
 perovskite/ferropericlase system. The user sets Kd_0 and BurnMan scales Kd as
@@ -344,7 +388,9 @@ teaches:
 
 
 
-* example_compare_enstpyro.py
+
+example_compare_enstpyro
+------------------------
 
 This example shows you how to create two materials from wt% determines the
 optimum mixing between the two to match the seismic model of your choice.
@@ -362,20 +408,26 @@ teaches:
 - weight percent materials
 
 
-* example_optimize_pv.py
+
+    
+example_optimize_pv
+-------------------
 
 Vary the amount perovskite vs. ferropericlase and compute the error in the
 seismic data against PREM.
 
-requires:
-- creating minerals
-- compute seismic velocities
-- geotherms
-- seismic models
-- seismic comparison
+*Uses:*
 
-teaches:
-- compare errors between models
-- loops over models
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.main.compare_l2`
+
+*Demonstrates:*
+
+* compare errors between models
+* loops over models
 
 

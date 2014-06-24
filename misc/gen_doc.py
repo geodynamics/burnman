@@ -24,7 +24,7 @@ ordered_examples = ['example_beginner.py', \
                         ]
 
 for ex in ordered_examples:
-    print "*",ex
+    #print "*",ex
     print __import__(ex.replace(".py","")).__doc__
 
 
