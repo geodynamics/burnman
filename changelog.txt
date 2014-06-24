@@ -1,14 +1,16 @@
 Changelog
 ---------
 
-- Release v0.6 (March 31, 2014)
-  Scripts to reproduce the figures from Cottaar, Heister, Rose and 
-  Unterborn (2014) can be found in misc/.
-  Mineral physical libraries from Murakami (2013) and Zhang et al. 
-  (2013) are included.
-  Pressure-depth converstion following Cammarano (2013) are included. 
+Release v0.7 (June 24, 2014)
+  - Cleanup and rewrite of the mineral/composite feature
+  - online html documentation
+  - Scripts to reproduce the figures from Cottaar, Heister, Rose and 
+    Unterborn (2014) can be found in misc/.
+  - Mineral physical libraries from Murakami (2013) and Zhang et al. 
+    (2013) are included.
+  - Pressure-depth conversion following Cammarano (2013) are included. 
 
-- Release v0.5 (October 28, 2013)
+Release v0.5 (October 28, 2013)
 
 - New example for absolute beginners (October 28, 2013)
   Added an example script for beginners to burnman, as well as people
@@ -20,4 +22,4 @@ Changelog
   You can now nest composites and implement dynamic composites that reduce to
   different sets of minerals depending on T,p. (no example yet)
 
-- Release v0.4 (June 3, 2013)
+Release v0.4 (June 3, 2013)
