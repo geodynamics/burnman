@@ -1,6 +1,7 @@
+import burnman
 
 metadata = dict( name= 'burnman',
-                 version = '0.6b3',
+                 version = burnman.__version__,
                  description='a lower mantle toolkit',
                  url='http://burnman.org',
                  author='Ian Rose',

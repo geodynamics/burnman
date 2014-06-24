@@ -27,6 +27,7 @@ Features:
 
 """
 
+from version import version as __version__
 
 #classes for representing rocks and minerals
 from mineral import Mineral
