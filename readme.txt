@@ -27,7 +27,7 @@ Work started by a work-group of the CIDER 2012 workshop in Santa Barbara.
 BurnMan is released under the GNU GPL v2 or newer
 
 Homepage: http://burnman.org
-Documentation: http://burnman.org/current-doc
+Documentation: http://burnman.org/doc-0.7
 Source code: https://github.com/burnman-project/burnman
 
 *** Requirements
