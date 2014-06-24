@@ -10,7 +10,8 @@ example_composition
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
-Currently BurnMan can input mineral compositions in 4 different ways:
+There are many different ways in BurnMan to combine minerals into a
+composition. Here we present a couple of examples:
 
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
@@ -19,13 +20,13 @@ Currently BurnMan can input mineral compositions in 4 different ways:
 3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
    calculate Fe partitioning along a P, T profile (see
    example_partition_coef.py)
-4. A mixture of three or more  minerals.
+4. A mixture of three minerals.
 
-In compositions 2,3 and 4 of the above inputs, BurnMan will mix the mineral
+In compositions 2, 3, and 4 of the above inputs, BurnMan will mix the mineral
 physical paremeters of end member minerals (pure Mg and Fe) of the user's
 choice using either volumetric (moduli) or molar averaging (all others) at
 room pressure and temperature (see example_user_input_material.py for
-information on these parameters) .
+information on these parameters).
 
 To turn a method of mineral creation "on" the first if statement above the
 method must be set to True, with all others set to False.
