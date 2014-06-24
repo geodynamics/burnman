@@ -1,7 +1,9 @@
-import burnman
+import re
+
+versionstuff = dict(re.findall("(.+) = '(.+)'\n", open('burnman/version.py').read()))
 
 metadata = dict( name= 'burnman',
-                 version = burnman.__version__,
+                 version = versionstuff['version'],
                  description='a lower mantle toolkit',
                  url='http://burnman.org',
                  author='Ian Rose',
