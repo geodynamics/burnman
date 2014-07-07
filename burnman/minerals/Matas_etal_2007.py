@@ -123,3 +123,7 @@ class wuestite (Mineral): # Matas et al 2007 Tables 1&2
             'q_0': 1.3 }
 
 
+ca_bridgmanite = ca_perovskite
+mg_bridgmanite = mg_perovskite
+fe_bridgmanite = fe_perovskite
+al_bridgmanite = al_perovskite

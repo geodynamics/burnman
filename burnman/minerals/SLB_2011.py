@@ -189,3 +189,8 @@ class ferropericlase_pt_dependent(bmb.HelperFeDependent):
 
     def create_inner_material(self, iron_number):
         return ferropericlase(iron_number)
+
+mg_bridgmanite = mg_perovskite
+fe_bridgmanite = fe_perovskite
+mg_fe_bridgmanite = mg_fe_perovskite
+mg_fe_bridgmanite_pt_dependent = mg_fe_perovskite_pt_dependent

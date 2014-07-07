@@ -111,3 +111,6 @@ class fe_perovskite(Mineral):
             'eta_s_0': 2.1 }
 
 
+mg_bridgmanite = mg_perovskite
+fe_bridgmanite = fe_perovskite
+mg_fe_bridgmanite = mg_fe_perovskite
