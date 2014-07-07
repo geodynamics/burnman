@@ -184,3 +184,6 @@ class fe_periclase_LS_3rd(Mineral):
             'q_0': 1.5,
             'eta_s_0': 2.54}
 
+mg_bridgmanite = mg_perovskite
+fe_bridgmanite = fe_perovskite
+mg_bridgmanite_3rdorder = mg_perovskite_3rdorder
