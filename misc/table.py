@@ -19,7 +19,7 @@ from burnman import tools
 if __name__ == "__main__":    
 
     names = set()
-    phases = []
+    phasenames = []
 
     libs = dir(minerals)
     for l in libs:
@@ -28,15 +28,17 @@ if __name__ == "__main__":
         if mineralgroup.__class__.__name__ == "module":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
-                #print mineral
                 if inspect.isclass(mineral) and mineral!=burnman.Mineral and issubclass(mineral, burnman.Mineral):
                     #print mineral.__module__ + mineral.__name__
-                    name = mineral.__module__.replace("minlib_","").replace("burnman.","minerals.") + "." + mineral.__name__
+                    name1 = str(mineralgroup.__name__) +"." + str(m)
+                    name = name1.replace("burnman.minerals.","")
+                    #name = mineral.__module__.replace("minlib_","").replace("burnman.","").replace("minerals.","") + "." + mineral.__name__
+                    #print mineral, name, name1
                     if not name in names:
                         names.add(name)
                         try:
                             x=mineral()
-                            phases.append(x)
+                            phasenames.append((name,x))
                         except:
                             print "Could not create '%s'" % name
 
@@ -44,8 +46,11 @@ if __name__ == "__main__":
     params = ['V_0','K_0','Kprime_0','G_0','Gprime_0','molar_mass','n','Debye_0','grueneisen_0','q_0','eta_s_0']
     
     
-    def create_list(mineral):
-        row = [ p.to_string() ]
+    def create_list(name, mineral):
+        ownname = mineral.to_string().replace("'","").replace("burnman.minerals.","")
+        if name!=ownname:
+            name=name+" ("+ownname+")"
+        row = [ name ]
         for param in params:
             
             row.append(str(p.params[param] if param in p.params else ""))
@@ -56,11 +61,13 @@ if __name__ == "__main__":
     table = [ ['Name'] + params ]
     tablel = []
 
-    for p in phases:
+    sortedlist = sorted(phasenames, key=lambda x: x[0])
+
+    for (name,p) in sortedlist:
         #print p.to_string()
         p.set_method('bm3')
         p.set_state(1e9,300)
-        row = create_list(p)
+        row = create_list(name,p)
         table.append(row)
         tablel.append(row)    
  
