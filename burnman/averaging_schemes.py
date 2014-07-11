@@ -89,6 +89,57 @@ class AveragingScheme:
         density = total_mass/total_vol
         return density
 
+    def average_thermal_expansivity(self, volumes, alphas):
+        """
+
+
+        thermal expansion coefficient of the mineral [1/K]
+
+        """
+        total_vol = np.sum(np.array(volumes))
+        return np.sum(np.array(alphas)*np.array(volumes)) / total_vol
+
+    def average_heat_capacity_v(self, fractions, c_v):
+        """
+        Averages the heat capacities at constant volume C_V by molar fractions
+        as in eqn. (16) in Ita'92.
+
+        TODO: double-check that the formula we use is appropriate here.
+
+        Parameters
+        ----------
+        fractions : list of floats
+            List of molar fractions of each phase in the composite (should sum to 1.0).
+        c_v : list of floats
+            List of heat capacities of each phase in the composite in [kg/m^3].
+
+        Returns
+        -------
+        C_v : float
+          heat capacity at constant volume of the bulk [J/K/mol]
+        """
+        return np.sum(np.array(fractions)*np.array(c_v))
+
+    def average_heat_capacity_p(self, fractions, c_p):
+        """
+        Averages the heat capacities at constant pressure C_P by molar fractions.
+
+        TODO: double-check that the formula we use is correct.
+
+        Parameters
+        ----------
+        fractions : list of floats
+            List of molar fractions of each phase in the composite (should sum to 1.0).
+        c_p : list of floats
+            List of heat capacities of each phase in the composite in [kg/m^3].
+
+        Returns
+        -------
+        C_v : float
+          heat capacity at constant pressure of the bulk [J/K/mol]
+        """
+        return np.sum(np.array(fractions)*np.array(c_p))
+
 
 class VoigtReussHill(AveragingScheme):
     """
