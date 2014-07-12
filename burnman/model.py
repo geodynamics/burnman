@@ -59,19 +59,19 @@ class Model:
     def density(self):
         if self.mat_rho is None:
             self.avg_moduli_()
-            self.mat_rho = np.array([m.rho for m in self.avgmoduli])
+            self.mat_rho = np.array([m['rho'] for m in self.avgmoduli])
         return self.mat_rho
 
     def K(self):
         if self.mat_K is None:
             self.avg_moduli_()
-            self.mat_K = np.array([m.K for m in self.avgmoduli])
+            self.mat_K = np.array([m['K'] for m in self.avgmoduli])
         return self.mat_K
 
     def G(self):
         if self.mat_G is None:
             self.avg_moduli_()
-            self.mat_G = np.array([m.G for m in self.avgmoduli])
+            self.mat_G = np.array([m['G'] for m in self.avgmoduli])
         return self.mat_G
 
     def thermal_expansivity(self):
