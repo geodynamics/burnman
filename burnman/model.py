@@ -113,6 +113,7 @@ class Model:
                         e['rho'] = mineral.molar_mass() / mineral.molar_volume()
                         e['alpha'] = mineral.thermal_expansivity()
                         e['c_v'] = mineral.heat_capacity_v()
+                        e['c_p'] = mineral.heat_capacity_p()
                         self.moduli[idx].append(e)
 
     def avg_moduli_(self):
@@ -147,12 +148,12 @@ class Model:
             self.c_v = np.zeros(len(self.p))
             self.c_p = np.zeros(len(self.p))
             for idx in range(len(self.p)):
-                fractions = np.array([m['fractions'] for m in self.moduli[idx]])
+                fractions = np.array([m['fraction'] for m in self.moduli[idx]])
                 alphas = np.array([m['alpha'] for m in self.moduli[idx]])
                 c_v = np.array([m['c_v'] for m in self.moduli[idx]])
                 c_p = np.array([m['c_p'] for m in self.moduli[idx]])
-                self.c_v[idx] = self.avgscheme.average_heat_capacity_v(self, fractions, c_v)
-                self.c_p[idx] = self.avgscheme.average_heat_capacity_p(self, fractions, c_p)
+                self.c_v[idx] = self.avgscheme.average_heat_capacity_v(fractions, c_v)
+                self.c_p[idx] = self.avgscheme.average_heat_capacity_p(fractions, c_p)
 
     def compute_velocities_(self):
         """
