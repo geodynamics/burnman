@@ -3,8 +3,8 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.main import compute_velocities
-import main
+from material import Material
+from averaging_schemes import AveragingScheme
 
 
 class Model:
@@ -21,6 +21,8 @@ class Model:
     def __init__(self, rock, p, T, avgscheme):
         assert(len(p) == len(T))
         assert(len(p) > 0)
+        assert(isinstance(rock, Material))
+        assert(isinstance(avgscheme, AveragingScheme))
 
         self.rock = rock
         self.p = p
