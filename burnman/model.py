@@ -30,7 +30,6 @@ class Model:
         self.avgscheme = avgscheme
 
         self.moduli = None
-        self.avgmoduli = None
         self.mat_rho = None
         self.mat_vs = None
         self.mat_vp = None
@@ -43,6 +42,7 @@ class Model:
         self.alpha = None
         self.c_p = None
         self.c_v = None
+        self.mat_V = None
 
     def v_s(self):
         self.compute_velocities_()
@@ -57,21 +57,15 @@ class Model:
         return self.mat_vphi
 
     def density(self):
-        if self.mat_rho is None:
-            self.avg_moduli_()
-            self.mat_rho = np.array([m['rho'] for m in self.avgmoduli])
+        self.avg_moduli_()
         return self.mat_rho
 
     def K(self):
-        if self.mat_K is None:
-            self.avg_moduli_()
-            self.mat_K = np.array([m['K'] for m in self.avgmoduli])
+        self.avg_moduli_()
         return self.mat_K
 
     def G(self):
-        if self.mat_G is None:
-            self.avg_moduli_()
-            self.mat_G = np.array([m['G'] for m in self.avgmoduli])
+        self.avg_moduli_()
         return self.mat_G
 
     def thermal_expansivity(self):
@@ -120,10 +114,13 @@ class Model:
         """
         Internal function to average moduli if necessary.
         """
-        if self.avgmoduli is None:
+        if self.mat_V is None:
             self.calc_moduli_()
             n_pressures = len(self.p)
-            self.avgmoduli = [{} for i in range(n_pressures)]
+            self.mat_V = np.zeros(len(self.p))
+            self.mat_K = np.zeros(len(self.p))
+            self.mat_G = np.zeros(len(self.p))
+            self.mat_rho = np.zeros(len(self.p))
 
             for idx in range(n_pressures):
                 mods  = self.moduli[idx]
@@ -134,10 +131,10 @@ class Model:
                 G_ph = np.array([m['G'] for m in mods])
                 rho_ph = np.array([m['rho'] for m in mods])
 
-                self.avgmoduli[idx]['V'] = sum(V_frac)
-                self.avgmoduli[idx]['K'] = self.avgscheme.average_bulk_moduli(V_frac, K_ph, G_ph)
-                self.avgmoduli[idx]['G'] = self.avgscheme.average_shear_moduli(V_frac, K_ph, G_ph)
-                self.avgmoduli[idx]['rho'] = self.avgscheme.average_density(V_frac, rho_ph)
+                self.mat_V[idx] = sum(V_frac)
+                self.mat_K[idx] = self.avgscheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+                self.mat_G[idx] = self.avgscheme.average_shear_moduli(V_frac, K_ph, G_ph)
+                self.mat_rho[idx] = self.avgscheme.average_density(V_frac, rho_ph)
 
     def calc_heat_capacities_(self):
         """
@@ -166,7 +163,6 @@ class Model:
             self.mat_vphi = np.ndarray(len(self.p))
 
             for i in range(len(self.p)):
-                mod = self.avgmoduli[i]
-                self.mat_vs[i] = np.sqrt( mod['G'] / mod['rho'])
-                self.mat_vp[i] = np.sqrt( (mod['K'] + 4./3.*mod['G']) / mod['rho'])
-                self.mat_vphi[i] = np.sqrt( mod['K'] / mod['rho'])
+                self.mat_vs[i] = np.sqrt( self.mat_G[i] / self.mat_rho[i])
+                self.mat_vp[i] = np.sqrt( (self.mat_K[i] + 4./3.*self.mat_G[i]) / self.mat_rho[i])
+                self.mat_vphi[i] = np.sqrt(self.mat_K[i] / self.mat_rho[i])
