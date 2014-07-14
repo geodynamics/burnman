@@ -123,6 +123,17 @@ class Mineral(Material):
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
             warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 
+    def perturb(self,loc=0.0, scale=1.0):
+        """
+	Computes random perturbations to the mineral paramaters given published uncertain
+	"""
+        for pert  in self.uncertainties:
+		try:
+  			self.params[pert[4:]]=self.params[pert[4:]]+np.random.normal(loc=loc,scale=scale)*self.uncertainties[pert]
+	        	print 'perturbed', pert[4:], ' to ', self.params[pert[4:]]
+		except:
+			print 'Tried to perturb ', pert, ', but failed. Possibly the uncertainty is not following the convention of \'err_?\'' 
+
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]

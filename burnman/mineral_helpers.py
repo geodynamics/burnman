@@ -47,6 +47,11 @@ class HelperSolidSolution(Mineral):
             if(base_materials[0].params.has_key('n')):
                 assert(m.params['n'] == base_materials[0].params['n'])
 
+
+    def perturb(self):
+	for min in self.base_materials:
+	    min.perturb()
+
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
             mat.method = self.method
