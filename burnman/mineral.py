@@ -130,7 +130,7 @@ class Mineral(Material):
         for pert  in self.uncertainties:
 		try:
   			self.params[pert[4:]]=self.params[pert[4:]]+np.random.normal(loc=loc,scale=scale)*self.uncertainties[pert]
-	        	print 'perturbed', pert[4:], ' to ', self.params[pert[4:]]
+	        	#print 'perturbed', pert[4:], ' to ', self.params[pert[4:]]
 		except:
 			print 'Tried to perturb ', pert, ', but failed. Possibly the uncertainty is not following the convention of \'err_?\'' 
 
