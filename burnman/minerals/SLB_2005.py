@@ -14,9 +14,6 @@ from burnman.mineral import Mineral
 
 
 class stishovite (Mineral):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state': 'slb3',
@@ -32,10 +29,8 @@ class stishovite (Mineral):
             'q_0': 2.4,
             'eta_s_0': 5.0 }
 
+
 class periclase (Mineral):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -51,10 +46,8 @@ class periclase (Mineral):
             'q_0': 1.5,
             'eta_s_0': 2.8 }
 
+
 class wuestite (Mineral):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -71,13 +64,11 @@ class wuestite (Mineral):
             'eta_s_0': 0.8 }
 
 
-
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
-
 
 
 class mg_fe_perovskite(bmb.HelperSolidSolution):
@@ -88,9 +79,6 @@ class mg_fe_perovskite(bmb.HelperSolidSolution):
 
 
 class mg_perovskite(Mineral):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -106,10 +94,8 @@ class mg_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
+
 class fe_perovskite(Mineral):
-    """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -132,6 +118,7 @@ class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
+
 
 class ferropericlase_pt_dependent(bmb.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):

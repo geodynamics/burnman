@@ -6,7 +6,8 @@
 Murakami_etal_2012
 ^^^^^^^^^^^^^^^^^^
 
-Minerals from Murakami et al. (2012) supplementary table 5 and references therein, V_0 from Stixrude & Lithgow-Bertolloni 2005
+Minerals from Murakami et al. (2012) supplementary table 5 and references therein, V_0 from
+Stixrude & Lithgow-Bertolloni 2005. Some information from personal communication with Murakami.
 
 
 """
@@ -14,14 +15,7 @@ import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
 
 
-
-
-
-
 class mg_perovskite(Mineral):
-    """
-    Murakami et al. (2012) supplementary table 5 and references therein, V_0 from Stixrude & Lithgow-Bertolloni 2005
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -37,10 +31,8 @@ class mg_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.4 }
 
+
 class mg_perovskite_3rdorder(Mineral):
-    """
-    Murakami et al. (2012) third order fit to supplementary table 1, includes 4% Al
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -56,10 +48,8 @@ class mg_perovskite_3rdorder(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.4 }
 
+
 class fe_perovskite(Mineral):
-    """
-    Murakami et al. (2012), personal communication, Mg#=94, Al=4%
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -76,11 +66,7 @@ class fe_perovskite(Mineral):
             'eta_s_0': 2.4 }
 
 
-
 class mg_periclase(Mineral):
-    """
-    Murakami et al. (2012) supplementary table 5 and references therein, V_0 from Stixrude & Lithgow-Bertolloni 2005
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -97,19 +83,17 @@ class mg_periclase(Mineral):
             'eta_s_0': 3.0 }
 
 
-
 class fe_periclase(bmb.HelperSpinTransition):
     def __init__(self):
         bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+
 
 class fe_periclase_3rd(bmb.HelperSpinTransition):
     def __init__(self):
         bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
+
 class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
-    """
-    Murakami et al. (2012), personal communication, Mg#=79
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -125,10 +109,8 @@ class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for detail
             'q_0': 1.5,
             'eta_s_0': 2.54 }
 
+
 class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
-    """
-    Murakami et al. (2012), personal communication, Mg#=79
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -145,11 +127,7 @@ class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for detail
             'eta_s_0': 2.54}
 
 
-
-class fe_periclase_HS_3rd(Mineral):
-    """
-    Murakami et al. (2012), personal communication, Mg#=92
-    """
+class fe_periclase_HS_3rd(Mineral): # personal communication, Mg#=92
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -165,10 +143,8 @@ class fe_periclase_HS_3rd(Mineral):
             'q_0': 1.5,
             'eta_s_0': 2.54 }
 
-class fe_periclase_LS_3rd(Mineral):
-    """
-    Murakami et al. (2012), personal communication, Mg#=92
-    """
+
+class fe_periclase_LS_3rd(Mineral): # personal communication, Mg#=92
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
