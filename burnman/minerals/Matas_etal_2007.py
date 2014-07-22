@@ -6,17 +6,13 @@
 Matas_etal_2007
 ^^^^^^^^^^^^^^^
 
-Minerals from Matas et al. 2007 and references therein
+Minerals from Matas et al. 2007 and references therein. See Table 1 and 2.
 """
 
 from burnman.mineral import Mineral
 
 
-
-class mg_perovskite(Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+class mg_perovskite(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -31,10 +27,8 @@ class mg_perovskite(Mineral): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
-class fe_perovskite(Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+
+class fe_perovskite(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -49,10 +43,8 @@ class fe_perovskite(Mineral): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
-class al_perovskite(Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+
+class al_perovskite(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -67,10 +59,8 @@ class al_perovskite(Mineral): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
-class ca_perovskite(Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+
+class ca_perovskite(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -86,10 +76,7 @@ class ca_perovskite(Mineral): # Matas et al 2007 Tables 1&2
             'q_0': 1.6}
 
 
-class periclase (Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+class periclase (Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -104,10 +91,8 @@ class periclase (Mineral): # Matas et al 2007 Tables 1&2
             'grueneisen_0': 1.41,
             'q_0': 1.3 }
 
-class wuestite (Mineral): # Matas et al 2007 Tables 1&2
-    """
-    Matas et al. 2007 and references therein
-    """
+
+class wuestite (Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
