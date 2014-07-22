@@ -88,6 +88,9 @@ class Mineral(Material):
         """
         return "'" + self.__class__.__module__.replace(".minlib_",".") + "." + self.__class__.__name__ + "'"
 
+    def debug_print(self, indent=""):
+        print "%s%s" % (indent, self.to_string())
+
     def unroll(self):
         return ([1.0],[self])
 
