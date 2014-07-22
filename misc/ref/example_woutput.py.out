@@ -1,6 +1,16 @@
 Calculations are done for:
-Material 'Composite':
-  0.95 of phase 'burnman.minerals.SLB_2005.mg_fe_perovskite'
-  0.05 of phase 'burnman.minerals.SLB_2005.ferropericlase'
+Composite:
+  0.95 of
+    HelperSolidSolution('burnman.minerals.SLB_2005.mg_fe_perovskite'):
+      0.3 of
+        'burnman.minerals.SLB_2005.mg_perovskite'
+      0.7 of
+        'burnman.minerals.SLB_2005.fe_perovskite'
+  0.05 of
+    HelperSolidSolution('burnman.minerals.SLB_2005.ferropericlase'):
+      0.5 of
+        'burnman.minerals.SLB_2005.periclase'
+      0.5 of
+        'burnman.minerals.SLB_2005.wuestite'
 
 Your data has been saved as:  example_woutput.txt

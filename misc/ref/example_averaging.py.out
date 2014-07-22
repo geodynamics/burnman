@@ -1,4 +1,6 @@
 Calculations are done for:
-Material 'Composite':
-  0.6 of phase 'burnman.minerals.SLB_2005.mg_perovskite'
-  0.4 of phase 'burnman.minerals.SLB_2005.periclase'
+Composite:
+  0.6 of
+    'burnman.minerals.SLB_2005.mg_perovskite'
+  0.4 of
+    'burnman.minerals.SLB_2005.periclase'
