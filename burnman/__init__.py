@@ -37,6 +37,7 @@ from mineral_helpers import *
 
 #high level functions
 from main import *
+from model import Model
 
 #mineral library
 import minerals

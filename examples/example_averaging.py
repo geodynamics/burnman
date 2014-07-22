@@ -87,30 +87,17 @@ if __name__ == "__main__":
     #calculate the seismic velocities of the rock using a whole battery of averaging schemes:
 
     # do the end members, here averaging scheme does not matter (though it defaults to Voigt-Reuss-Hill)
-    rho_pv, vp_pv, vs_pv, vphi_pv, K_pv, G_pv = \
-        burnman.velocities_from_rock(perovskitite, pressures, temperatures)
-    rho_fp, vp_fp, vs_fp, vphi_fp, K_fp, G_fp = \
-        burnman.velocities_from_rock(periclasite, pressures, temperatures)
+    model_pv = burnman.Model(perovskitite, pressures, temperatures, burnman.averaging_schemes.VoigtReussHill())
+    model_fp = burnman.Model(periclasite, pressures, temperatures, burnman.averaging_schemes.VoigtReussHill())
 
-    #Voigt Reuss Hill averaging
-    rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
-        burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill())
+    #Voigt Reuss Hill / Voigt / Reuss averaging
+    model_vrh = burnman.Model(rock, pressures, temperatures, burnman.averaging_schemes.VoigtReussHill())
+    model_v = burnman.Model(rock, pressures, temperatures, burnman.averaging_schemes.Voigt())
+    model_r = burnman.Model(rock, pressures, temperatures, burnman.averaging_schemes.Reuss())
 
-    #Voigt averaging
-    rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
-        burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Voigt())
-
-    #Reuss averaging
-    rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
-        burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Reuss())
-
-    #Upper bound for Hashin-Shtrikman averaging
-    rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
-        burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanUpper())
-
-    #Lower bound for Hashin-Shtrikman averaging
-    rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
-        burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanLower())
+    #Upper/lower bound for Hashin-Shtrikman averaging
+    model_hsu = burnman.Model(rock, pressures, temperatures, burnman.averaging_schemes.HashinShtrikmanUpper())
+    model_hsl = burnman.Model(rock, pressures, temperatures, burnman.averaging_schemes.HashinShtrikmanLower())
 
 
     # PLOTTING
@@ -118,32 +105,32 @@ if __name__ == "__main__":
     # plot vs
     fig=plt.figure()
 
-    plt.plot(pressures/1.e9,vs_v/1.e3,color='c',linestyle='-',marker='^', \
+    plt.plot(pressures/1.e9,model_v.v_s()/1.e3,color='c',linestyle='-',marker='^', \
              markersize=4,label='Voigt')
-    plt.plot(pressures/1.e9,vs_r/1.e3,color='k',linestyle='-',marker='v', \
+    plt.plot(pressures/1.e9,model_r.v_s()/1.e3,color='k',linestyle='-',marker='v', \
              markersize=4,label='Reuss')
-    plt.plot(pressures/1.e9,vs_vrh/1.e3,color='b',linestyle='-',marker='x', \
+    plt.plot(pressures/1.e9,model_vrh.v_s()/1.e3,color='b',linestyle='-',marker='x', \
              markersize=4,label='Voigt-Reuss-Hill')
-    plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',marker='x', \
+    plt.plot(pressures/1.e9,model_hsu.v_s()/1.e3,color='r',linestyle='-',marker='x', \
              markersize=4,label='Hashin-Shtrikman')
-    plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x', \
+    plt.plot(pressures/1.e9,model_hsl.v_s()/1.e3,color='r',linestyle='-',marker='x', \
              markersize=4)
-    plt.plot(pressures/1.e9,vs_pv/1.e3,color='y',linestyle='-',marker='x', \
+    plt.plot(pressures/1.e9,model_pv.v_s()/1.e3,color='y',linestyle='-',marker='x', \
              markersize=4,label='Mg Perovskite')
-    plt.plot(pressures/1.e9,vs_fp/1.e3,color='g',linestyle='-',marker='x', \
+    plt.plot(pressures/1.e9,model_fp.v_s()/1.e3,color='g',linestyle='-',marker='x', \
              markersize=4,label='Periclase')
     plt.xlim(min(pressures)/1.e9,max(pressures)/1.e9)
     plt.legend(loc='upper left',prop={'size':11},frameon=False)
     plt.xlabel('pressure (GPa)')
     plt.ylabel('Vs (km/s)')
 
-    vs_pv_norm=(vs_fp-vs_fp)/(vs_pv-vs_fp)
-    vs_fp_norm=(vs_fp-vs_fp)/(vs_pv-vs_fp)
-    vs_vrh_norm=(vs_vrh-vs_fp)/(vs_pv-vs_fp)
-    vs_v_norm=(vs_v-vs_fp)/(vs_pv-vs_fp)
-    vs_r_norm=(vs_r-vs_fp)/(vs_pv-vs_fp)
-    vs_hsu_norm=(vs_hsu-vs_fp)/(vs_pv-vs_fp)
-    vs_hsl_norm=(vs_hsl-vs_fp)/(vs_pv-vs_fp)
+    vs_pv_norm=(model_pv.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_fp_norm=(model_fp.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_vrh_norm=(model_vrh.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_v_norm=(model_v.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_r_norm=(model_r.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_hsu_norm=(model_hsu.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
+    vs_hsl_norm=(model_hsl.v_s()-model_fp.v_s())/(model_pv.v_s()-model_fp.v_s())
 
     ax=fig.add_axes([0.58, 0.18, 0.3, 0.3])
     plt.plot(pressures/1.e9,vs_v_norm,color='c',linestyle='-',marker='^', \
