@@ -47,6 +47,13 @@ class HelperSolidSolution(Mineral):
             if(base_materials[0].params.has_key('n')):
                 assert(m.params['n'] == base_materials[0].params['n'])
 
+    def debug_print(self, indent=""):
+        print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
+        indent += "  "
+        for (fraction, mat) in zip(self.molar_fraction, self.base_materials):
+            print "%s%g of" % (indent, fraction)
+            mat.debug_print(indent + "  ")
+
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
             mat.method = self.method
@@ -82,6 +89,11 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
+
+    def debug_print(self, indent=""):
+        print "%sHelperSpinTransition:" % indent
+        self.ls_mat.debug_print(indent+"  ")
+        self.hs_mat.debug_print(indent+"  ")
 
     def set_method(self, method):
         self.ls_mat.set_method(method)
@@ -121,6 +133,10 @@ class HelperFeDependent(Material):
     def __init__(self, iron_number_with_pt, idx):
         self.iron_number_with_pt = iron_number_with_pt
         self.which_index = idx  # take input 0 or 1 from iron_number_with_pt()
+
+    def debug_print(self, indent=""):
+        print "%sHelperFeDependent:" % indent
+        print "%s  %s" % (indent, self.to_string())
 
     def create_inner_material(self, iron_number):
         raise NotImplementedError("need to implement create_inner_material() in derived class!")

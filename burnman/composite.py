@@ -65,6 +65,13 @@ class Composite(Material):
             for (fraction,phase) in self.children:
                 fraction = fraction / total
 
+    def debug_print(self, indent=""):
+        print "%sComposite:" % indent
+        indent += "  "
+        for (fraction, phase) in self.children:
+            print "%s%g of" % (indent, fraction)
+            phase.debug_print(indent + "  ")
+
 
     def set_method(self, method):
         """
