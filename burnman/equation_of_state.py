@@ -208,3 +208,21 @@ class EquationOfState:
         """
         raise NotImplementedError("")
 
+    def reference_temperature( self, params ):
+        """
+        Parameters
+        ----------
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        T_0 : float
+            If params contains a "T_0" entry, return that reference temperature, otherwise
+            return 300.0 Kelvin
+        """
+        if 'T_0' in params:
+            return params['T_0']
+        else:
+            return 300.0
+

@@ -58,10 +58,11 @@ class SLBBase(eos.EquationOfState):
         """
         Returns molar volume at the pressure and temperature [m^3]
         """
+        T_0 = self.reference_temperature( params )
         debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
-        E_th_ref = lambda x : debye.thermal_energy(300., debye_T(x), params['n']) #thermal energy at reference temperature
+        E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
@@ -104,20 +105,21 @@ class SLBBase(eos.EquationOfState):
         """
         Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
         """
+        T_0 = self.reference_temperature( params )
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
         E_th = debye.thermal_energy(temperature, debye_T, params['n']) #thermal energy at temperature T
-        E_th_ref = debye.thermal_energy(300.,debye_T, params['n']) #thermal energy at reference temperature
+        E_th_ref = debye.thermal_energy(T_0,debye_T, params['n']) #thermal energy at reference temperature
 
         C_v = debye.heat_capacity_v(temperature, debye_T, params['n']) #heat capacity at temperature T
-        C_v_ref = debye.heat_capacity_v(300.,debye_T, params['n']) #heat capacity at reference temperature
+        C_v_ref = debye.heat_capacity_v(T_0,debye_T, params['n']) #heat capacity at reference temperature
 
         q = self.volume_dependent_q(params['V_0']/volume, params)
 
         K = bm.bulk_modulus(volume, params) \
             + (gr + 1.-q)* ( gr / volume ) * (E_th - E_th_ref) \
-            - ( pow(gr , 2.) / volume )*(C_v*temperature - C_v_ref*300.)
+            - ( pow(gr , 2.) / volume )*(C_v*temperature - C_v_ref*T_0)
 
         return K
 
@@ -135,11 +137,12 @@ class SLBBase(eos.EquationOfState):
         """
         Returns shear modulus at the pressure, temperature, and volume [Pa]
         """
+        T_0 = self.reference_temperature( params )
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
-        E_th_ref = debye.thermal_energy(300.,debye_T, params['n'])
+        E_th_ref = debye.thermal_energy(T_0,debye_T, params['n'])
 
         if self.order==2:
             return bm.shear_modulus_second_order(volume, params) - eta_s * (E_th-E_th_ref) / volume
