@@ -29,11 +29,11 @@ class MGDBase(eos.EquationOfState):
         return self.__grueneisen_parameter(params['V_0']/volume, params)
 
     def volume(self, pressure,temperature,params):
-        T_0 = self.reference_temperature( params )
         """
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         EQ B7
         """
+        T_0 = self.reference_temperature( params )
         func = lambda x: bm.birch_murnaghan(params['V_0']/x, params) + \
             self.__thermal_pressure(temperature, x, params) - \
             self.__thermal_pressure(T_0, x, params) - pressure
