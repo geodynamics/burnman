@@ -1,11 +1,13 @@
 import unittest
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
+import warnings
 
 import burnman
 from burnman import minerals
 
 from util import BurnManTest
+
 
 # TODO: test composite that changes number of entries
 
@@ -118,6 +120,38 @@ class composite(BurnManTest):
         assert(d1 == 4732)
         assert(d2 == 5275)
         assert(dmix == 4744)
+
+    def test_summing_bigger(self):
+        min1 = minerals.SLB_2005.periclase()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            c = burnman.Composite( [0.8, 0.4], [min1, min1])
+            assert len(w) == 1
+        c.set_method("slb3")
+        c.set_state(5e9,1000)
+        (f,m) = c.unroll()
+        self.assertArraysAlmostEqual(f, [2./3., 1./3.])
+
+    def test_summing_smaller(self):
+        min1 = minerals.SLB_2005.periclase()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            c = burnman.Composite( [0.4, 0.2], [min1, min1])
+            assert len(w) == 1
+        c.set_method("slb3")
+        c.set_state(5e9,1000)
+        (f,m) = c.unroll()
+        self.assertArraysAlmostEqual(f, [2./3., 1./3.])
+
+    def test_summing_slightly_negative(self):
+        min1 = minerals.SLB_2005.periclase()
+        c = burnman.Composite( [0.8, 0.2, 1.0-0.8-0.2], [min1, min1, min1])
+        c.set_method("slb3")
+        c.set_state(5e9,1000)
+        (f,m) = c.unroll()
+        self.assertArraysAlmostEqual(f, [0.8, 0.2, 0.0])
+        self.assertTrue(f[2]>=0.0)
+
 
 if __name__ == '__main__':
     unittest.main()

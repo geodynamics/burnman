@@ -54,16 +54,16 @@ class Composite(Material):
         assert(len(phases)==len(fractions))
         assert(len(phases)>0)
         for f in fractions:
-            assert(f>=0)
+            # we would like to check for >= 0, but this creates nasty behavior due to
+            # floating point rules: 1.0-0.8-0.1-0.1 is not 0.0 but -1e-14.
+            assert (f >= -1e-12)
+        fractions = [max(0.0, fr) for fr in fractions]  # turn -1e-14 into 0.0
+        total = sum(fractions)
+        if abs(total - 1.0) > 1e-12:
+            warnings.warn("Warning: list of molar fractions does not add up to one but %g. Normalizing." % total)
+            fractions = [fr / total for fr in fractions]
 
         self.children = zip(fractions, phases)
-
-        total = sum(fractions)
-
-        if (total-1.0)>1e-8:
-            warnings.warn('Warning: list of molar fractions does not add up to one. Normalizing.')
-            for (fraction,phase) in self.children:
-                fraction = fraction / total
 
 
     def set_method(self, method):
