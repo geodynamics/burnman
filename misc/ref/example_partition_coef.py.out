@@ -1,4 +1,8 @@
 Calculations are done for:
-Material 'Composite':
-  0.942871 of phase 'burnman.minerals.SLB_2005.mg_fe_perovskite'
-  0.0571286 of phase 'burnman.minerals.SLB_2005.ferropericlase'
+Composite:
+  0.942871 of
+    HelperFeDependent:
+      'mg_fe_perovskite_pt_dependent'
+  0.0571286 of
+    HelperFeDependent:
+      'ferropericlase_pt_dependent'

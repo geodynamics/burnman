@@ -3,6 +3,10 @@ BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefi
 BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
   warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 Calculations are done for:
-'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'
+HelperSpinTransition:
+  'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'
+  'burnman.minerals.Murakami_etal_2012.fe_periclase_HS'
 Calculations are done for:
-'burnman.minerals.other.Speziale_fe_periclase_LS'
+HelperSpinTransition:
+  'burnman.minerals.other.Speziale_fe_periclase_LS'
+  'burnman.minerals.other.Speziale_fe_periclase_HS'

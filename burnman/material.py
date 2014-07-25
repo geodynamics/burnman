@@ -46,9 +46,16 @@ class Material:
         """
         return "'" + self.__class__.__name__ + "'"
 
-    def debug_print(self):
+    def debug_print(self, indent=""):
         """
         Print a human-readable representation of this Material.
+        """
+        raise NotImplementedError("Derived classes need to implement debug_print(). This is '" + self.__class__.__name__ + "'")
+
+    def print_minerals_of_current_state(self):
+        """
+        Print a human-readable representation of this Material at the current p, T as a list of minerals.
+        This requires set_state() has been called before.
         """
         (frs,mins) = self.unroll()
         if len(mins)==1:

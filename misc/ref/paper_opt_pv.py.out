@@ -1,55 +1,185 @@
 31823705000.0 124629954286.0
 Calculations are done for:
-Material 'Composite':
-  0 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  1 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  1 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.111111 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.888889 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.111111 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.888889 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.222222 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.777778 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.222222 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.777778 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.333333 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.666667 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.333333 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.666667 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.444444 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.555556 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.444444 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.555556 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.555556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.444444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.555556 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.444444 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.666667 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.333333 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.666667 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.333333 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.777778 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.222222 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.777778 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.222222 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.888889 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.111111 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.888889 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+_2013.fe_perovskite'
+  0.111111 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  1 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  1 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 6806.56245823 9720.08418673
 0.666666666667 0.555555555556 0.555555555556
 Calculations are done for:
-Material 'Composite':
-  0.556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.556 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.444 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.667 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.333 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.667 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.333 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Material 'Composite':
-  0.556 of phase 'burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'
-  0.444 of phase 'burnman.minerals.SLB_2011.ferropericlase'
+Composite:
+  0.556 of
+    HelperSolidSolution('burnman.minerals.SLB_2011_ZSB_2013.mg_fe_perovskite'):
+      0.93 of
+        'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
+      0.07 of
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
+  0.444 of
+    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+      0.8 of
+        'burnman.minerals.SLB_2011.periclase'
+      0.2 of
+        'burnman.minerals.SLB_2011.wuestite'

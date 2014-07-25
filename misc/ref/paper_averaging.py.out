@@ -1,6 +1,8 @@
   (prop.get_family(), self.defaultFamily[fontext]))
   UserWarning)
 Calculations are done for:
-Material 'Composite':
-  0.6 of phase 'burnman.minerals.SLB_2011.mg_perovskite'
-  0.4 of phase 'burnman.minerals.SLB_2011.wuestite'
+Composite:
+  0.6 of
+    'burnman.minerals.SLB_2011.mg_perovskite'
+  0.4 of
+    'burnman.minerals.SLB_2011.wuestite'
