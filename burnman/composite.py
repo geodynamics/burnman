@@ -84,6 +84,11 @@ class Composite(Material):
             minerals.extend(p_min)
         return (fractions, minerals)
 
+    def perturb(self):
+
+	for (fraction,phase) in self.children:
+		phase.perturb()
+
     def to_string(self):
         """
         return the name of the composite
