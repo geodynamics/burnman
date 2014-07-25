@@ -6,7 +6,7 @@
 Murakami_2013
 ^^^^^^^^^^^^^
 
-Minerals from Murakami 2013 and references therein
+Minerals from Murakami 2013 and references therein.
 
 """
 
@@ -14,13 +14,7 @@ import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
 
 
-
-
-
 class periclase (Mineral):
-    """
-    Murakami 2013 and references therine
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -36,10 +30,8 @@ class periclase (Mineral):
             'q_0': 1.5,
             'eta_s_0': 2.3 }
 
+
 class wuestite (Mineral):
-    """
-    Muarakami 2013 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -56,13 +48,11 @@ class wuestite (Mineral):
             'eta_s_0': 0.8 }
 
 
-
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
-
 
 
 class mg_fe_perovskite(bmb.HelperSolidSolution):
@@ -73,9 +63,6 @@ class mg_fe_perovskite(bmb.HelperSolidSolution):
 
 
 class mg_perovskite(Mineral):
-    """
-    Murakami 2013 and references therin
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
@@ -91,10 +78,8 @@ class mg_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
+
 class fe_perovskite(Mineral):
-    """
-    Murakami 2013 and references therein
-    """
     def __init__(self):
         self.params = {
             'equation_of_state':'slb2',
