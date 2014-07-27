@@ -72,8 +72,8 @@ class Material:
         self.pressure = pressure
         self.temperature = temperature
     
-    def set_state(self, loc, scale):
-    """
+    def perturb(self, loc, scale):
+        """
         Set the material to the given pressure and temperature.
         
         Parameters
