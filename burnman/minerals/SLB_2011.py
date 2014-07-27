@@ -35,14 +35,14 @@ class stishovite (Mineral):
             'eta_s_0': 4.6}
 
         self.uncertainties = {
-             'err_K_0':8.e9,
-             'err_Kprime_0':0.1,
-             'err_G_0':12.e9,
-             'err_Gprime_0':0.1,
-             'err_Debye_0' : 13.,
-             'err_grueneisen_0': .17,
-             'err_q_0': 2.2,
-             'err_eta_s_0' : 1.0
+             'K_0':8.e9,
+             'Kprime_0':0.1,
+             'G_0':12.e9,
+             'Gprime_0':0.1,
+             'Debye_0' : 13.,
+             'grueneisen_0': .17,
+             'q_0': 2.2,
+             'eta_s_0' : 1.0
             }
 
 
@@ -66,14 +66,14 @@ class periclase (Mineral):
             'eta_s_0': 2.8 } # 2.8
 
         self.uncertainties = {
-        'err_K_0': 3.e9,
-        'err_Kprime_0':.2,
-        'err_G_0':1.0e9,
-        'err_Gprime_0':.1,
-        'err_Debye_0':9.,
-        'err_grueneisen_0':.05,
-        'err_q_0':.2,
-        'err_eta_s_0':.2 }
+        'K_0': 3.e9,
+        'Kprime_0':.2,
+        'G_0':1.0e9,
+        'Gprime_0':.1,
+        'Debye_0':9.,
+        'grueneisen_0':.05,
+        'q_0':.2,
+        'eta_s_0':.2 }
 
 class wuestite (Mineral):
     """
@@ -95,14 +95,14 @@ class wuestite (Mineral):
             'eta_s_0': -0.1 } #
 
         self.uncertainties = {
-            'err_K_0':1.e9,
-            'err_Kprime_0':.2,
-            'err_G_0':1.e9,
-            'err_Gprime_0':.1,
-            'err_Debye_0':21.,
-            'err_grueneisen_0':.13,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'K_0':1.e9,
+            'Kprime_0':.2,
+            'G_0':1.e9,
+            'Gprime_0':.1,
+            'Debye_0':21.,
+            'grueneisen_0':.13,
+            'q_0':1.0,
+            'eta_s_0':1.0}
 
 
 class ferropericlase(bmb.HelperSolidSolution):
@@ -137,14 +137,14 @@ class mg_perovskite(Mineral):
             'eta_s_0': 2.6 } #2.6
 
         self.uncertainties = {
-            'err_K_0': 3.e9,
-            'err_Kprime_0': 0.1,
-            'err_G_0': 2.e9,
-            'err_Gprime_0' : 0.0,
-            'err_Debye_0': 5.,
-            'err_grueneisen_0':.05,
-            'err_q_0': .3,
-            'err_eta_s_0':.3}
+            'K_0': 3.e9,
+            'Kprime_0': 0.1,
+            'G_0': 2.e9,
+            'Gprime_0' : 0.0,
+            'Debye_0': 5.,
+            'grueneisen_0':.05,
+            'q_0': .3,
+            'eta_s_0':.3}
 
 
 class fe_perovskite(Mineral):
@@ -167,14 +167,14 @@ class fe_perovskite(Mineral):
             'eta_s_0': 2.3 } #2.3
 
         self.uncertainties = {
-            'err_K_0':40e9,
-            'err_Kprime_0':1.,
-            'err_G_0':40e9,
-            'err_Gprime_0':0.0,
-            'err_Debye_0':26.,
-            'err_grueneisen_0':.3,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'K_0':40e9,
+            'Kprime_0':1.,
+            'G_0':40e9,
+            'Gprime_0':0.0,
+            'Debye_0':26.,
+            'grueneisen_0':.3,
+            'q_0':1.0,
+            'eta_s_0':1.0}
 
 class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):

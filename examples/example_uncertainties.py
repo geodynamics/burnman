@@ -60,15 +60,15 @@ for later visualization.
 n_realizations = 1000
 outfile = open('uncertainty.dat', 'w')
 
-
+rock=burnman.Composite([0.8,0.2],[minerals.SLB_2011.mg_fe_perovskite(.1),minerals.SLB_2011.ferropericlase(.2)])
+rock.set_method('slb3')
 
 for i in range(n_realizations):
 
     print "realization", i+1
     try:
       #setup a rock
-      rock=burnman.Composite([0.8,0.2],[minerals.SLB_2011.mg_fe_perovskite(.1),minerals.SLB_2011.ferropericlase(.2)])
-      rock.set_method('slb3')
+
       # Perturb the rock. The default treats the given error as one sigma.
       rock.perturb()
       # Calculate the wavespeed profiles, just as before.

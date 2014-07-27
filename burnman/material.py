@@ -71,6 +71,20 @@ class Material:
         """
         self.pressure = pressure
         self.temperature = temperature
+    
+    def set_state(self, loc, scale):
+    """
+        Set the material to the given pressure and temperature.
+        
+        Parameters
+        ----------
+        loc : float
+        Mean of the distribution of the random perturbation (default value= 0.0)
+        scale : float
+        Standard deviation of the distribution of the random perturbation (default value= 1.0)
+        """
+        raise NotImplementedError("need to implement perturb() in derived class!")
+        return ()
 
     def unroll(self):
         """
