@@ -6,12 +6,7 @@ import warnings
 
 import numpy as np
 
-# Kronecker delta
-def kd(x, y):
-    if x == y:
-        return 1
-    else:
-        return 0
+kd = lambda x,y : 1 if x==y else 0
 
 import burnman.symmetric_model as sym
 import burnman.asymmetric_model as asym
