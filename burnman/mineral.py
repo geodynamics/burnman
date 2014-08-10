@@ -11,6 +11,7 @@ import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
+import burnman.modified_tait as mt
 
 class Mineral(Material):
     """
@@ -59,7 +60,7 @@ class Mineral(Material):
         Set the equation of state to be used for this mineral.
         Takes a string corresponding to any of the predefined
         equations of state:  'bm2', 'bm3', 'mgd2', 'mgd3', 'slb2',
-        or 'slb3'.  Alternatively, you can pass a user defined
+        'slb3' or 'mtait'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
         if( isinstance(method, basestring)):
@@ -75,6 +76,8 @@ class Mineral(Material):
                 self.method = bm.BM2()
             elif (method == "bm3"):
                 self.method = bm.BM3()
+            elif (method == "mtait"):
+                self.method = mt.MT()
             else:
                 raise Exception("unsupported material method " + method)
         elif ( issubclass(method, eos.EquationOfState) ):
