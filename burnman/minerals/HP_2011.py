@@ -36,7 +36,7 @@ class stishovite (Mineral):
     """
     def __init__(self):
         self.params = {
-            'formula': '[Si][O]2',
+            'formula': 'SiO2',
             'equation_of_state': 'mtait',
             'H_0': -876.39e3,
             'S_0': 24.0,

@@ -45,9 +45,6 @@ class MTaitBase(eos.EquationOfState):
     and Holland and Powell (2011; followed here).
     """
 
-    #def __init__(self):
-    #    pass
-
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter [unitless] as a function of pressure,
@@ -84,7 +81,7 @@ class MTaitBase(eos.EquationOfState):
         psubpth=pressure-Pth
         return params['K_0']*(1. + b(psubpth))*(a + (1.-a)*pow((1. + b(psubpth)), c))
 
-    #calculate the mgd shear modulus as a function of P, V, and T
+    #calculate the shear modulus as a function of P, V, and T
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Not implemented. 
