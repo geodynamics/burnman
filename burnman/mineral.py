@@ -122,12 +122,18 @@ class Mineral(Material):
         self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
+        self.gibbs = self.method.gibbs(self.pressure, self.temperature, self.params)
 
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
-            warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
+            if self.params['equation_of_state'] != 'mtait':
+                warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
+
+    # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
+    def calcgibbs(self, pressure, temperature):
+        return self.method.gibbs(pressure, temperature, self.params)
 
     def molar_mass(self):
         """

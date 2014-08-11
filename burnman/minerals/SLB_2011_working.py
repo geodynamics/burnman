@@ -13,6 +13,7 @@ Minerals from Stixrude & Lithgow-Bertelloni 2011 and references therein
 
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
+from burnman.solidsolution import SolidSolution
 
 class stishovite (Mineral):
     """
@@ -104,11 +105,15 @@ class wuestite (Mineral):
             'err_eta_s_0':1.0}
 
 
-class ferropericlase(bmb.HelperSolidSolution):
+class ferropericlase(SolidSolution):
     def __init__(self, x):
-        base_materials = [periclase(), wuestite()]
+        model_type='asymmetric'
+        base_material = [periclase(), wuestite()]
         molar_fraction = [1. - x, 0. + x] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
+        site_occupancy = [['x(Mg)',1. - x],['x(Fe)',0. + x]]
+        interaction_parameter = [[4.e3,0.0,0.0]] # Wh + T*Ws + P*Wv, J/mol
+        van_laar_parameter=[1.0,1.0]
+        SolidSolution.__init__(self, base_material, molar_fraction, site_occupancy, interaction_parameter, van_laar_parameter)
 
 class mg_fe_perovskite(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
