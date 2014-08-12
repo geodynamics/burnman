@@ -8,7 +8,10 @@ import scipy.optimize as opt
 import burnman.equation_of_state as eos
 
 T_0=298.15 # Standard temperature = 25 C
+P_0=1.e5 # Standard pressure = 1.e5 Pa
+R=8.3145 # J/K/mol
 
+# see Holland and Powell, 2011
 def einst(S, n):
     """
     Einstein temperature
@@ -16,6 +19,7 @@ def einst(S, n):
     """
     return 10636./(S/n + 6.44)
 
+# see Holland and Powell, 2011
 def ksi(u):
     """
     Einstein function to describe behaviour of ak
@@ -23,12 +27,43 @@ def ksi(u):
     """
     return pow(u,2.)*np.exp(u)/pow((np.exp(u)-1.), 2.)
 
+# see Holland and Powell, 2011
 def tait_constants(params):
     a=(1.+params['Kprime_0'])/(1. + params['Kprime_0'] + params['K_0']*params['Kdprime_0'])
     b=params['Kprime_0']/params['K_0'] - params['Kdprime_0']/(1. + params['Kprime_0'])
     c=(1. + params['Kprime_0'] + params['K_0']*params['Kdprime_0'])/(params['Kprime_0']*params['Kprime_0'] + params['Kprime_0'] - params['K_0']*params['Kdprime_0'])
     return a, b, c
 
+# see derivation in thermodynamic_introduction.pdf
+def xord(n,Q):
+    return ((1.+n*Q)*(n+Q))/pow((1.+n),2.)
+
+# see derivation in thermodynamic_introduction.pdf
+def xdisord(n,Q):
+    return (pow(1.+n*Q,1./(1.+n))*pow(1.-Q,n/(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n,n)
+
+# see derivation in thermodynamic_introduction.pdf
+def xdisordminusentropy(n,Q):
+    return (pow(1.+n*Q,1./(1.+n))*pow(1.-Q,n/(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n+1.,n+1.)
+
+# see Holland and Powell, 1996
+def equilibrium_Q(Q, P, T, params):
+    n=params['BW_n']
+    W=params['BW_W'] + P*params['BW_Wv']
+    return params['BW_deltaH'] + P*params['BW_deltaV'] + R*T*np.log(xdisordminusentropy(n,Q)/xord(n,Q)) + (2.*Q - 1.)*W
+
+# see Holland and Powell, 1996
+def gibbs_disord_BW(P, T, params):
+    n=params['BW_n']
+    Q=opt.fsolve(equilibrium_Q, 0.99, args=(P, T, params))[0]
+    W=params['BW_W'] + P*params['BW_Wv']
+    ideal=(1-Q)*(params['BW_deltaH'] + P*params['BW_deltaV'] + R*T*np.log(xdisordminusentropy(n,Q))) + Q*(R*T*np.log(xord(n,Q)))
+    nonideal=(1.-Q)*Q*W
+    print '*******', P, T, Q
+    Edisord=ideal+nonideal
+    return params['BW_factor']*Edisord
+
+# see Holland and Powell, 2011
 def modified_tait(x, params):
     """
     equation for the modified Tait equation of state, returns
@@ -36,7 +71,6 @@ def modified_tait(x, params):
     modulus (params['K_0'])
     EQ 2
     """
-
     a, b, c = tait_constants(params)
 
     return (pow((x + a - 1.) / a, -1./c) - 1.)/b
@@ -187,11 +221,8 @@ class MTaitBase(eos.EquationOfState):
             Gdisord=params['landau_Tc']*params['landau_Smax']*(pow(Q_0,2) - pow(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*pow(Q,2) - params['landau_Tc']*pow(Q,6)/3.0) - temperature*(params['landau_Smax']*(pow(Q_0,2) - pow(Q,2))) + pressure*(params['landau_Vmax']*pow(Q_0,2)*Vt)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-            #Q_0=
-            #Q=
-            #Gdisord=params['BW_factor']*
-                Gdisord=0.0
-                print 'WARNING: This phase has B-W order-disorder which has not been implemented yet'
+                Gdisord=gibbs_disord_BW(pressure, temperature, params) - gibbs_disord_BW(P_0, T_0, params)
+                print 'WARNING: This phase has B-W order-disorder which has not been tested yet'
             else:
                 Gdisord=0.0
  
