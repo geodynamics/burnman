@@ -63,7 +63,7 @@ class spinel (Mineral):
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
-            'H_0': -2301.26e3,
+            'H_0': -2301.19e3,
             'S_0': 82.0,
             'V_0': 3.978e-5,
             'Cp': [222.9,6.127e-3,-1.686e6,-1551.0],
@@ -82,6 +82,65 @@ class spinel (Mineral):
 
         self.uncertainties = {
              'err_H_0':0.84e3}
+
+class hercynite (Mineral):
+    """
+    Holland and Powell, 2011 and references therein
+    """
+    def __init__(self):
+        formula='FeAl2O4'
+        self.params = {
+            'formula': formula,
+            'equation_of_state': 'mtait',
+            'H_0': -1953.03e3,
+            'S_0': 113.9,
+            'V_0': 4.0750e-5,
+            'Cp': [216.7,5.868e-3,-2.4302e6,-1178.3],
+            'a_0': 2.06e-5,
+            'K_0': 1922.e8,
+            'Kprime_0': 4.04,
+            'Kdprime_0': -0.00210e-8,
+            'n': ProcessChemistry(formula)[0],
+            'molar_mass': ProcessChemistry(formula)[1],
+            'BW_deltaH': 18.30e3,
+            'BW_deltaV': 0.00e-5,
+            'BW_W': 13.60e3,
+            'BW_Wv': 0.00e-5,
+            'BW_n': 2.0,
+            'BW_factor': 1.00}
+
+        self.uncertainties = {
+             'err_H_0':0.85e3}
+
+class sillimanite (Mineral):
+    """
+    Holland and Powell, 2011 and references therein
+    """
+    def __init__(self):
+        formula='Al2SiO5'
+        self.params = {
+            'formula': formula,
+            'equation_of_state': 'mtait',
+            'H_0': -2585.79e3,
+            'S_0': 95.4,
+            'V_0': 4.986e-5,
+            'Cp': [280.2,-6.9e-3,-1.3757e6,-2399.4],
+            'a_0': 1.12e-5,
+            'K_0': 1640.e8,
+            'Kprime_0': 5.06,
+            'Kdprime_0': -0.00310e-8,
+            'n': ProcessChemistry(formula)[0],
+            'molar_mass': ProcessChemistry(formula)[1],
+            'BW_deltaH': 4.75e3,
+            'BW_deltaV': 0.01e-5,
+            'BW_W': 4.75e3,
+            'BW_Wv': 0.01e-5,
+            'BW_n': 1.0,
+            'BW_factor': 0.25}
+
+        self.uncertainties = {
+             'err_H_0':0.68e3}
+
 
 class quartz (Mineral):
     """

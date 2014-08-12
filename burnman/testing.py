@@ -124,3 +124,70 @@ rmserror = np.sqrt(serror/((len(Gsp)-1)*(len(Gsp[0])-1)))
 print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
+
+
+
+
+# Another mineral with a phase transition described by Bragg-Williams theory: sillimanite
+sill=minerals.HP_2011.sillimanite()
+sill.set_method("mtait")
+
+Gsill=[['P \ T',25, 500, 1500],[0.001,-2614.21,-2698.95,-3039.60],[10.0,-2564.51,-2648.92,-2988.73],[100.0,-2129.23,-2211.19,-2544.71]]
+
+print 'G(sill)'
+
+Pmaxerror=0.
+Tmaxerror=0.
+maxerror=0.
+serror=0.
+for pi in range(len(Gsill)-1):
+    P=Gsill[pi+1][0]*1e8
+    for ti in range(len(Gsill[0])-1):
+        T=Gsill[0][ti+1]+273.15
+        Gburnman=sill.calcgibbs(P,T)
+        GHP=Gsill[pi+1][ti+1]*1000. # convert to J/mol
+        Gdiff=Gburnman-GHP
+        print P, T, Gburnman, GHP, Gdiff
+        serror=serror + pow(Gdiff,2)
+        if abs(Gdiff) > abs(maxerror):
+            maxerror = Gdiff
+            Tmaxerror = T
+            Pmaxerror = P
+
+rmserror = np.sqrt(serror/((len(Gsill)-1)*(len(Gsill[0])-1)))
+print 'Root mean squared error:', rmserror, 'J/mol'
+print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
+print ''
+
+"""
+# Another mineral with a phase transition described by Bragg-Williams theory: hercynite
+herc=minerals.HP_2011.hercynite()
+herc.set_method("mtait")
+
+Gherc=[['P \ T',25, 500, 1500],[0.001,-1986.97,-2079.75,-2436.29],[10.0,-1946.33,-2038.65,-2394.06],[100.0,-1589.25,-1677.93,-2024.39]]
+
+print 'G(herc)'
+
+Pmaxerror=0.
+Tmaxerror=0.
+maxerror=0.
+serror=0.
+for pi in range(len(Gherc)-1):
+    P=Gherc[pi+1][0]*1e8
+    for ti in range(len(Gherc[0])-1):
+        T=Gherc[0][ti+1]+273.15
+        Gburnman=herc.calcgibbs(P,T)
+        GHP=Gherc[pi+1][ti+1]*1000. # convert to J/mol
+        Gdiff=Gburnman-GHP
+        print P, T, Gburnman, GHP, Gdiff
+        serror=serror + pow(Gdiff,2)
+        if abs(Gdiff) > abs(maxerror):
+            maxerror = Gdiff
+            Tmaxerror = T
+            Pmaxerror = P
+
+rmserror = np.sqrt(serror/((len(Gherc)-1)*(len(Gherc[0])-1)))
+print 'Root mean squared error:', rmserror, 'J/mol'
+print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
+print ''
+"""

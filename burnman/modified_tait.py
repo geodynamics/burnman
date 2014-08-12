@@ -36,15 +36,19 @@ def tait_constants(params):
 
 # see derivation in thermodynamic_introduction.pdf
 def xord(n,Q):
-    return ((1.+n*Q)*(n+Q))/pow((1.+n),2.)
+    return ((1.+n*Q)*pow(n+Q,n))/pow(1.+n,1.+n)
 
 # see derivation in thermodynamic_introduction.pdf
 def xdisord(n,Q):
     return (pow(1.+n*Q,1./(1.+n))*pow(1.-Q,n/(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n,n)
 
 # see derivation in thermodynamic_introduction.pdf
+def entropydisorder(n,Q):
+    return R*((1.+n)*np.log(1.+n) - n*np.log(n))
+
+# merges entropy term and ideal energy of disordering
 def xdisordminusentropy(n,Q):
-    return (pow(1.+n*Q,1./(1.+n))*pow(1.-Q,n/(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n+1.,n+1.)
+    return (pow(1.+n*Q,1./(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(1.-Q,n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n+1.,n+1.)
 
 # see Holland and Powell, 1996
 def equilibrium_Q(Q, P, T, params):
@@ -57,10 +61,12 @@ def gibbs_disord_BW(P, T, params):
     n=params['BW_n']
     Q=opt.fsolve(equilibrium_Q, 0.99, args=(P, T, params))[0]
     W=params['BW_W'] + P*params['BW_Wv']
-    ideal=(1-Q)*(params['BW_deltaH'] + P*params['BW_deltaV'] + R*T*np.log(xdisordminusentropy(n,Q))) + Q*(R*T*np.log(xord(n,Q)))
+    ideal=(1-Q)*(params['BW_deltaH'] - T*entropydisorder(n,Q) + P*params['BW_deltaV'] + R*T*np.log(xdisord(n,Q))) + Q*(R*T*np.log(xord(n,Q)))
     nonideal=(1.-Q)*Q*W
-    print '*******', P, T, Q
     Edisord=ideal+nonideal
+    #print '****', P, T, Q, params['BW_factor'], (1-Q)*(params['BW_deltaH']), (1-Q)*T*entropydisorder(n,Q), (1-Q)*R*T*np.log(xdisord(n,Q)), Q*(R*T*np.log(xord(n,Q))), ideal, nonideal
+    #print '*******', P, T, Q, Edisord
+    #print '***', P, T, ideal, nonideal, (1-Q)*R*T*np.log(xdisordminusentropy(n,Q)),(1-Q)*(params['BW_deltaH']),  (1-Q)*P*params['BW_deltaV']
     return params['BW_factor']*Edisord
 
 # see Holland and Powell, 2011
