@@ -32,6 +32,7 @@ print ''
 
 
 # A mineral without phase transitions: stishovite
+print 'Stishovite: a simple phase'
 stv=minerals.HP_2011.stishovite()
 stv.set_method("mtait")
 
@@ -68,6 +69,7 @@ q.set_method("mtait")
 
 Gq=[['P \ T',25,500,1500],[0.001,-923.06,-957.10,-1088.42],[10.0,-900.62,-934.16,-1064.93],[100.0,-715.40,-746.62,-870.48]]
 
+print 'Quartz: a phase governed by a phase transition described by Landau theory'
 print 'G(q)'
 
 Pmaxerror=0.
@@ -93,8 +95,41 @@ print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
 
+# A mineral with a phase transition described by Landau theory: iron
+iron=minerals.HP_2011.iron()
+iron.set_method("mtait")
+
+Giron=[['P \ T',25,500,1500],[0.001,-8.07,-28.25,-103.64],[10.0,-1.00,-21.05,-96.09],[100.0,60.89,41.85,-30.62]]
+
+print 'Iron: a phase governed by a phase transition described by Landau theory'
+print 'G(iron)'
+
+Pmaxerror=0.
+Tmaxerror=0.
+maxerror=0.
+serror=0.
+for pi in range(len(Giron)-1):
+    P=Giron[pi+1][0]*1e8
+    for ti in range(len(Giron[0])-1):
+        T=Giron[0][ti+1]+273.15
+        Gburnman=iron.calcgibbs(P,T)
+        GHP=Giron[pi+1][ti+1]*1000. # convert to J/mol
+        Gdiff=Gburnman-GHP
+#        print P, T, Gburnman, GHP, Gdiff
+        serror=serror + pow(Gdiff,2)
+        if abs(Gdiff) > abs(maxerror):
+            maxerror = Gdiff
+            Tmaxerror = T
+            Pmaxerror = P
+
+rmserror = np.sqrt(serror/((len(Giron)-1)*(len(Giron[0])-1)))
+print 'Root mean squared error:', rmserror, 'J/mol'
+print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
+print ''
+
 
 # A mineral with a phase transition described by Bragg-Williams theory: spinel
+print 'Spinel: a phase with order-disorder described by Bragg-Williams'
 sp=minerals.HP_2011.spinel()
 sp.set_method("mtait")
 
@@ -126,9 +161,10 @@ print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
 
 
-
+"""
 
 # Another mineral with a phase transition described by Bragg-Williams theory: sillimanite
+print 'Sillimanite: a phase with order-disorder described by Bragg-Williams'
 sill=minerals.HP_2011.sillimanite()
 sill.set_method("mtait")
 
@@ -147,7 +183,7 @@ for pi in range(len(Gsill)-1):
         Gburnman=sill.calcgibbs(P,T)
         GHP=Gsill[pi+1][ti+1]*1000. # convert to J/mol
         Gdiff=Gburnman-GHP
-        print P, T, Gburnman, GHP, Gdiff
+        #print P, T, Gburnman, GHP, Gdiff
         serror=serror + pow(Gdiff,2)
         if abs(Gdiff) > abs(maxerror):
             maxerror = Gdiff
@@ -159,8 +195,9 @@ print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
 
-"""
+
 # Another mineral with a phase transition described by Bragg-Williams theory: hercynite
+print 'Hercynite: a phase with order-disorder described by Bragg-Williams'
 herc=minerals.HP_2011.hercynite()
 herc.set_method("mtait")
 
@@ -179,7 +216,7 @@ for pi in range(len(Gherc)-1):
         Gburnman=herc.calcgibbs(P,T)
         GHP=Gherc[pi+1][ti+1]*1000. # convert to J/mol
         Gdiff=Gburnman-GHP
-        print P, T, Gburnman, GHP, Gdiff
+        #print P, T, Gburnman, GHP, Gdiff
         serror=serror + pow(Gdiff,2)
         if abs(Gdiff) > abs(maxerror):
             maxerror = Gdiff
@@ -187,6 +224,40 @@ for pi in range(len(Gherc)-1):
             Pmaxerror = P
 
 rmserror = np.sqrt(serror/((len(Gherc)-1)*(len(Gherc[0])-1)))
+print 'Root mean squared error:', rmserror, 'J/mol'
+print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
+print ''
+
+
+
+# Another mineral with a phase transition described by Bragg-Williams theory: dolomite
+print 'Dolomite: a phase with order-disorder described by Bragg-Williams'
+dol=minerals.HP_2011.dolomite()
+dol.set_method("mtait")
+
+Gdol=[['P \ T',25, 500, 1500],[0.001,-2372.73,-2496.11,-2964.31],[10.0,-2308.78,-2430.98,-2895.98],[100.0,-1759.31,-1872.97,-2315.19]]
+
+print 'G(dol)'
+
+Pmaxerror=0.
+Tmaxerror=0.
+maxerror=0.
+serror=0.
+for pi in range(len(Gdol)-1):
+    P=Gdol[pi+1][0]*1e8
+    for ti in range(len(Gdol[0])-1):
+        T=Gdol[0][ti+1]+273.15
+        Gburnman=dol.calcgibbs(P,T)
+        GHP=Gdol[pi+1][ti+1]*1000. # convert to J/mol
+        Gdiff=Gburnman-GHP
+        #print P, T, Gburnman, GHP, Gdiff
+        serror=serror + pow(Gdiff,2)
+        if abs(Gdiff) > abs(maxerror):
+            maxerror = Gdiff
+            Tmaxerror = T
+            Pmaxerror = P
+
+rmserror = np.sqrt(serror/((len(Gdol)-1)*(len(Gdol[0])-1)))
 print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''

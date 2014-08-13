@@ -141,6 +141,35 @@ class sillimanite (Mineral):
         self.uncertainties = {
              'err_H_0':0.68e3}
 
+class dolomite (Mineral):
+    """
+    Holland and Powell, 2011 and references therein
+    """
+    def __init__(self):
+        formula='MgCaC2O6'
+        self.params = {
+            'formula': formula,
+            'equation_of_state': 'mtait',
+            'H_0': -2326.22e3,
+            'S_0': 156.1,
+            'V_0': 6.429e-5,
+            'Cp': [358.9,-4.905e-3,0.,-3456.2],
+            'a_0': 3.28e-5,
+            'K_0': 943.e8,
+            'Kprime_0': 3.74,
+            'Kdprime_0': -0.004e-8,
+            'n': ProcessChemistry(formula)[0],
+            'molar_mass': ProcessChemistry(formula)[1],
+            'BW_deltaH': 11.91e3,
+            'BW_deltaV': 0.016e-5,
+            'BW_W': 11.91e3,
+            'BW_Wv': 0.016e-5,
+            'BW_n': 1.0,
+            'BW_factor': 1.0}
+
+        self.uncertainties = {
+             'err_H_0':0.58e3}
+
 
 class quartz (Mineral):
     """
@@ -167,4 +196,30 @@ class quartz (Mineral):
 
         self.uncertainties = {
              'err_H_0':0.27e3}
+
+class iron (Mineral):
+    """
+    Holland and Powell, 2011 and references therein
+    """
+    def __init__(self):
+        formula='Fe'
+        self.params = {
+            'formula': formula,
+            'equation_of_state': 'mtait',
+            'H_0': 0.0e3,
+            'S_0': 27.09,
+            'V_0': 0.709e-5,
+            'Cp': [46.2,5.159e-3,7.231e5,-556.2],
+            'a_0': 3.56e-5,
+            'K_0': 1640.e8,
+            'Kprime_0': 5.16,
+            'Kdprime_0': -0.00310e-8,
+            'n': ProcessChemistry(formula)[0],
+            'molar_mass': ProcessChemistry(formula)[1],
+            'landau_Tc':1042.,
+            'landau_Smax':8.3,
+            'landau_Vmax':0.0000e-5}
+
+        self.uncertainties = {
+             'err_H_0':0.00e3}
 
