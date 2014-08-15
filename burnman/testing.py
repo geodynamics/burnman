@@ -127,7 +127,7 @@ print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
 
-
+"""
 # A mineral with a phase transition described by Bragg-Williams theory: spinel
 print 'Spinel: a phase with order-disorder described by Bragg-Williams'
 sp=minerals.HP_2011.spinel()
@@ -183,7 +183,7 @@ for pi in range(len(Gsill)-1):
         Gburnman=sill.calcgibbs(P,T)
         GHP=Gsill[pi+1][ti+1]*1000. # convert to J/mol
         Gdiff=Gburnman-GHP
-        #print P, T, Gburnman, GHP, Gdiff
+        print P, T, Gburnman, GHP, Gdiff
         serror=serror + pow(Gdiff,2)
         if abs(Gdiff) > abs(maxerror):
             maxerror = Gdiff
@@ -194,7 +194,7 @@ rmserror = np.sqrt(serror/((len(Gsill)-1)*(len(Gsill[0])-1)))
 print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
-
+"""
 
 # Another mineral with a phase transition described by Bragg-Williams theory: hercynite
 print 'Hercynite: a phase with order-disorder described by Bragg-Williams'
@@ -229,7 +229,7 @@ print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
 
 
-
+"""
 # Another mineral with a phase transition described by Bragg-Williams theory: dolomite
 print 'Dolomite: a phase with order-disorder described by Bragg-Williams'
 dol=minerals.HP_2011.dolomite()
@@ -261,4 +261,3 @@ rmserror = np.sqrt(serror/((len(Gdol)-1)*(len(Gdol[0])-1)))
 print 'Root mean squared error:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
-"""
