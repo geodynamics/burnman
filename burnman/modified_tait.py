@@ -56,19 +56,19 @@ def entropydisorder(n):
 def equilibrium_Q(Q, deltaS, P, T, params):
     n=params['BW_n']
     W=params['BW_W'] + P*params['BW_Wv']
-    return params['BW_factor']*(params['BW_deltaH'] - T*deltaS + P*params['BW_deltaV']) + R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
+    return params['BW_deltaH'] - T*deltaS + P*params['BW_deltaV'] + R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
 
 # see Holland and Powell, 1996
 def gibbs_disord_BW(P, T, params):
     n=params['BW_n']
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
-    print P, T, Q, '*** 0 =', equilibrium_Q(Q, deltaS, P, T, params)
+    #print P, T, Q, '*** 0 =', equilibrium_Q(Q, deltaS, P, T, params)
     W=params['BW_W'] + P*params['BW_Wv']
     ideal=(1.-Q)*(params['BW_deltaH'] - T*entropydisorder(n) + P*params['BW_deltaV'] + R*T*lnxdisord(n,Q)) + Q*(R*T*lnxord(n,Q))
     nonideal=(1.-Q)*Q*W
-    print '***', T, ideal/2, (1.-Q)*params['BW_deltaH']/2, (-1.+Q)*T*entropydisorder(n)/2, (1.-Q)*R*T*lnxdisord(n,Q)/2, Q*(R*T*lnxord(n,Q))/2, (1.-Q)*Q*W/2
     Edisord=ideal+nonideal
+    #print '***', T, Q, ideal*(params['BW_factor']), (1.-Q)*params['BW_deltaH']*(params['BW_factor']), (-1.+Q)*T*entropydisorder(n)*(params['BW_factor']), (1.-Q)*R*T*lnxdisord(n,Q)*(params['BW_factor']), Q*(R*T*lnxord(n,Q))*(params['BW_factor']), (1.-Q)*Q*W*(params['BW_factor']), Edisord*(params['BW_factor']), Edisord
     return Edisord
 
 # see Holland and Powell, 2011
