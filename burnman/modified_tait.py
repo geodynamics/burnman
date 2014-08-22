@@ -1,5 +1,5 @@
 # BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 import numpy as np
@@ -34,6 +34,27 @@ def tait_constants(params):
     c=(1. + params['Kprime_0'] + params['K_0']*params['Kdprime_0'])/(params['Kprime_0']*params['Kprime_0'] + params['Kprime_0'] - params['K_0']*params['Kdprime_0'])
     return a, b, c
 
+def gibbs_disord_Landau(P, T, params):
+    # From Holland and Powell, 1996, corrected using
+    # landaunote.pdf on Tim Holland's esc web page
+    Tcstar=params['landau_Tc'] + (params['landau_Vmax']/params['landau_Smax'])*P
+            # Q_0 is Q at T0, P0? 
+    Q_0=pow((params['landau_Tc']-T_0)/params['landau_Tc'],1./4.)
+    
+    # Find state of ordering
+    # Note that Q > 1 where Vmax*P > Smax*T. 
+    if Tcstar-T > 0.:
+        Q=pow((Tcstar-T)/params['landau_Tc'],1./4.)
+    else:
+        Q=0.0
+        
+    # Vt is defined as a "function shaping the excess volume of disordering" in landaunote.pdf.
+    # A sensible function to use in this case would be the expression in brackets in  EQ13 of Holland and Powell (2011) 
+    # Here we follow tc337L, where Vt=1 ("the simplest way to proceed"; Roger Powell, pers. comm. 2014/08/22). 
+    Vt=1.# EQ 13 would give: 1. - a + (a*(pow((1.-b*Pth), 1.-c) - pow((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure))
+    Gdisord=params['landau_Tc']*params['landau_Smax']*(pow(Q_0,2) - pow(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*pow(Q,2) - params['landau_Tc']*pow(Q,6)/3.0) - T*(params['landau_Smax']*(pow(Q_0,2) - pow(Q,2))) + P*(params['landau_Vmax']*pow(Q_0,2)*Vt)
+    return Gdisord
+
 # see derivation in thermodynamic_introduction.pdf
 def lnxord(n,Q):
     return np.log(1.+n*Q) + n*np.log(n+Q) - (1.+n)*np.log(1.+n)
@@ -47,28 +68,24 @@ def entropydisorder(n):
     BW_deltaS=R*((1.+n)*np.log(1.+n) - n*np.log(n))
     return BW_deltaS
 
-# merges entropy term and ideal energy of disordering
-#def xdisordminusentropy(n,Q):
-#    return (pow(1.+n*Q,1./(1.+n))*pow(n*(1.-Q),n/(1.+n))*pow(1.-Q,n/(1.+n))*pow(n+Q,n*n/(1.+n)))/pow(n+1.,n+1.)
-
 # see Holland and Powell, 1996
-# N.B. params['BW_factor'] needed somewhere in equilibrium_Q and gibbs_disord_BW
+# params['BW_factor'] is a proportional reduction of the configurational energy of mixing, so feeds into the calculation of Q.
 def equilibrium_Q(Q, deltaS, P, T, params):
     n=params['BW_n']
     W=params['BW_W'] + P*params['BW_Wv']
-    return params['BW_deltaH'] - T*deltaS + P*params['BW_deltaV'] + R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
+    if Q>1.0:
+        Q=0.9 # A simple catch to make sure the optimisation doesn't fail
+    return params['BW_deltaH'] - params['BW_factor']*T*deltaS + P*params['BW_deltaV'] + params['BW_factor']*R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
 
-# see Holland and Powell, 1996
+# Energy of disordering from Bragg-Williams symmetric model; see Holland and Powell, 1996
 def gibbs_disord_BW(P, T, params):
     n=params['BW_n']
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
-    #print P, T, Q, '*** 0 =', equilibrium_Q(Q, deltaS, P, T, params)
     W=params['BW_W'] + P*params['BW_Wv']
-    ideal=(1.-Q)*(params['BW_deltaH'] - T*entropydisorder(n) + P*params['BW_deltaV'] + R*T*lnxdisord(n,Q)) + Q*(R*T*lnxord(n,Q))
+    ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*R*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(R*T*lnxord(n,Q))
     nonideal=(1.-Q)*Q*W
     Edisord=ideal+nonideal
-    #print '***', T, Q, ideal*(params['BW_factor']), (1.-Q)*params['BW_deltaH']*(params['BW_factor']), (-1.+Q)*T*entropydisorder(n)*(params['BW_factor']), (1.-Q)*R*T*lnxdisord(n,Q)*(params['BW_factor']), Q*(R*T*lnxord(n,Q))*(params['BW_factor']), (1.-Q)*Q*W*(params['BW_factor']), Edisord*(params['BW_factor']), Edisord
     return Edisord
 
 # see Holland and Powell, 2011
@@ -206,34 +223,12 @@ class MTaitBase(eos.EquationOfState):
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
-            # From Holland and Powell, 1996, corrected using
-            # landaunote.pdf on Tim Holland's esc web page
-            Tcstar=params['landau_Tc'] + (params['landau_Vmax']/params['landau_Smax'])*pressure
-            # Q_0 is Q at T0, P0? 
-            Q_0=pow((params['landau_Tc']-T_0)/params['landau_Tc'],1./4.)
-
-            # Find state of ordering
-            # Note that Q can be > 1. This is a bit puzzling, and wasn't in the original 
-            # (apparently incorrect) expressions by Holland and Powell, 1996
-            if Tcstar-temperature > 0.:
-                Q=pow((Tcstar-temperature)/params['landau_Tc'],1./4.)
-            else:
-                Q=0.0
-
-            # Vt is cryptically defined in landaunote.pdf.
-            # R.M. imagines we would use the expression in brackets in 
-            # EQ13 of Holland and Powell (2011) but apparently Vt==1 fits
-            # the output from thermocalc version tc337L. 
-            # This is possibly a bug in thermocalc.
-            Vt=1.# EQ 13 would give: 1. - a + (a*(pow((1.-b*Pth), 1.-c) - pow((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure))
-            Gdisord=params['landau_Tc']*params['landau_Smax']*(pow(Q_0,2) - pow(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*pow(Q,2) - params['landau_Tc']*pow(Q,6)/3.0) - temperature*(params['landau_Smax']*(pow(Q_0,2) - pow(Q,2))) + pressure*(params['landau_Vmax']*pow(Q_0,2)*Vt)
+            Gdisord=gibbs_disord_Landau(pressure, temperature, params)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
                 Gdisord=gibbs_disord_BW(pressure, temperature, params) - gibbs_disord_BW(P_0, T_0, params)
-                #print 'WARNING: This phase has B-W order-disorder which has not been tested yet'
             else:
                 Gdisord=0.0
- 
 
 
         return params['H_0'] + intCpdT - temperature*(params['S_0'] + intCpoverTdT) + intVdP + Gdisord
