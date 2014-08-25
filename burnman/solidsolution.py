@@ -8,9 +8,6 @@ import numpy as np
 
 kd = lambda x,y : 1 if x==y else 0
 
-import burnman.symmetric_model as sym
-import burnman.asymmetric_model as asym
-
 class SolidSolution(Mineral):
     """
     This is the base class for all solid solutions. 
@@ -32,7 +29,8 @@ class SolidSolution(Mineral):
     and P derivatives in J/K/mol and m^3/(mol molecule).
     """
 
-    def __init__(self, base_material, molar_fraction, site_occupancy, interaction_parameter, van_laar_parameter):
+    # init sets up matrices to speed up calculations when P, T, X is defined.
+    def __init__(self, base_material, interaction_parameter):
         self.base_material = base_material
         self.molar_fraction = molar_fraction
         assert(len(base_material) == len(molar_fraction))
