@@ -2,6 +2,9 @@
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+
+#TO DO: Correct heat capacity, volume where internal order-disorder is implemented (Landau and Bragg-Williams models)
+
 import numpy as np
 import scipy.optimize as opt
 
