@@ -51,7 +51,32 @@ class Speziale_fe_periclase_LS(Mineral):
                         'grueneisen_0': 1.46,
                         'q_0': 1.2  }
 
+"""
+Katsura_2009
+^^^^^^^^^^^^^
 
+Minerals from Katsura 2009 and references therein
+
+"""
+
+class Katsura_2009_wadsleyite (Mineral):
+    """
+    Katsura 2009 and references therein
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb3',
+            'V_0': 4.0499E-05,
+            'K_0': 169.2e9,
+            'Kprime_0': 4.1,
+            'G_0': 113e9,
+            'Gprime_0': 1.5,
+            'molar_mass': .140695,
+            'n': 7,
+            'Debye_0': 814.,
+            'grueneisen_0': 1.64,
+            'q_0': 1.5,
+            'eta_s_0': 2.3 }
 
 
 
