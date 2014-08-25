@@ -104,21 +104,34 @@ class wuestite (Mineral):
             'err_q_0':1.0,
             'err_eta_s_0':1.0}
 
-
+# Stixrude and Lithgow-Bertelloni, 2011
 class ferropericlase(SolidSolution):
     def __init__(self):
         base_material = [[periclase(), '[Mg]O',       1.0], /
                          wuestite(),   '[Fe]O',       1.0], /
         
         # Interaction parameters
-        excess_enthalpy=[[11e3]]
+        excess_enthalpy=[[13e3]]
         excess_entropy=[[0.]]
         excess_volume=[[0.]]
 
         interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
+# Stixrude and Lithgow-Bertelloni, 2011
+class mg_fe_perovskite(SolidSolution):
+    def __init__(self):
+        base_materials = [[mg_perovskite(), '[Mg]SiO3', 1.0], /
+                          fe_perovskite(),  '[Fe]SiO3', 1.0]]
+        # Interaction parameters
+        excess_enthalpy=[[0e3]]
+        excess_entropy=[[0.]]
+        excess_volume=[[0.]]
 
+        interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
+        SolidSolution.__init__(self, base_material, interaction_parameter)
+
+# Mixed Holland and Powell sources (test only)
 class garnet(SolidSolution):
     def __init__(self):
         # Endmembers
@@ -135,16 +148,6 @@ class garnet(SolidSolution):
         interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
-
-
-
-
-
-class mg_fe_perovskite(bmb.HelperSolidSolution):
-    def __init__(self, fe_num):
-        base_materials = [mg_perovskite(), fe_perovskite()]
-        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
 
 class mg_perovskite(Mineral):
     """
@@ -204,20 +207,6 @@ class fe_perovskite(Mineral):
             'err_grueneisen_0':.3,
             'err_q_0':1.0,
             'err_eta_s_0':1.0}
-
-class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
-    def __init__(self, iron_number_with_pt, idx):
-        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return mg_fe_perovskite(iron_number)
-
-class ferropericlase_pt_dependent(bmb.HelperFeDependent):
-    def __init__(self, iron_number_with_pt, idx):
-        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return ferropericlase(iron_number)
 
 mg_bridgmanite = mg_perovskite
 fe_bridgmanite = fe_perovskite
