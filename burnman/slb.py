@@ -16,6 +16,7 @@ class SLBBase(eos.EquationOfState):
     in Stixrude and Lithgow-Bertelloni (2005).  For the most part the equations are
     all third order in strain, but see further the :class:`burnman.slb.SLB2` and :class:`burnman.slb.SLB3` classes
     """
+
     def __debye_temperature(self,x,params):
         """
         Finite strain approximation for Debye Temperature [K]
@@ -53,6 +54,18 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
+    def sample_pressure(self, temperature, volume, params):
+        return bm.birch_murnaghan(params['V_0']/volume, params) + \
+                self.__thermal_pressure(temperature,volume, params) - \
+                self.__thermal_pressure(300.,volume, params)
+
+    #calculate isotropic thermal pressure, see
+    # Matas et. al. (2007) eq B4
+    def __thermal_pressure(self,T,V, params):
+        Debye_T = self.__debye_temperature(params['V_0']/V, params)
+        gr = self.grueneisen_parameter(0., T, V, params) # P not important
+        P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
+        return P_th
 
     def volume(self, pressure, temperature, params):
         """
