@@ -1,0 +1,8 @@
+TO DO
+Finalise solid_solution data format
+Write solid_solution initialisation (matrix formation)
+Write solid_solution functions (to return volume, bulk modulus, gibbs etc.)
+
+
+DONE 
+Enable a V,T set_state (or similar) to allow experimental petrologists to fit their data relative to pressure. Error check by converting between V and P.
