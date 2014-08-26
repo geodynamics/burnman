@@ -97,6 +97,9 @@ class Mineral(Material):
     def unroll(self):
         return ([1.0],[self])
 
+    def sample_pressure(self, temperature, volume):
+        return self.method.sample_pressure(temperature, volume, self.params)
+
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
@@ -122,7 +125,8 @@ class Mineral(Material):
         self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
-        self.gibbs = self.method.gibbs(self.pressure, self.temperature, self.params)
+        if (self.params.has_key('H_0') and self.params.has_key('S_0')):
+            self.gibbs = self.method.gibbs(self.pressure, self.temperature, self.params)
 
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
