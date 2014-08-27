@@ -561,7 +561,7 @@ class vsv (Mineral):
             'n': ProcessChemistry(formula)[0],
             'molar_mass': ProcessChemistry(formula)[1]}
 
-class and (Mineral):
+class andalusite (Mineral):
     """
     Holland and Powell, 2011, and references therein
     """
