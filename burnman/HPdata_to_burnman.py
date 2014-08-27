@@ -56,6 +56,8 @@ formula='0'
 for i in range(int(ds[0][0])):
     mbr=ds[i*4+3][0]
     M=getmbr(ds,mbr)
+    if mbr == 'and': # change silly abbreviation
+        mbr = 'andalusite'
     if M.flag != -1 and M.flag != -2 and M.k[0] > 0:
         print 'class', mbr, '(Mineral):'
         print '    """'
