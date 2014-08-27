@@ -112,7 +112,7 @@ class MT(eos.EquationOfState):
         alpha = self.thermal_expansivity (pressure, temperature, volume, params)
         K_T = self.isothermal_bulk_modulus (pressure, temperature, volume, params)
         C_V = self.heat_capacity_v( pressure, temperature, volume, params)
-        return alpha * K_T * V / C_V
+        return alpha * K_T * volume / C_V
 
     def volume(self, pressure,temperature,params):
         """
@@ -160,7 +160,9 @@ class MT(eos.EquationOfState):
         Pth=self.__relative_thermal_pressure(temperature,params)
         psubpth=pressure-Pth
         einstein_T=einstein_temperature(params['S_0'], params['n'])
-        alpha = params['a_0']*ksi(ein/temperature)/ksi(ein/T_0)*1./((1.+b*psubpth)*(a + (1.-a)*pow((1+b*psubpth), c)))
+        C_V0 = einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+        C_V =  einstein.heat_capacity_v(temperature, einstein_T,params['n'])
+        alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*pow((1+b*psubpth), c)))
  
         return alpha
 
@@ -186,7 +188,7 @@ class MT(eos.EquationOfState):
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         C_v = self.heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v*(1. + gr * alpha * temperature)
-        return 0.
+        return C_p
 
 
     def adiabatic_bulk_modulus(self,pressure,temperature,volume,params):
@@ -196,9 +198,9 @@ class MT(eos.EquationOfState):
         """
         K_T= self.isothermal_bulk_modulus(pressure,temperature,volume,params)
         alpha = self.thermal_expansivity(pressure,temperature,volume,params)
-        gr = self.__grueneisen_parameter(params['V_0']/volume, params)
+        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         K_S = K_T*(1. + gr * alpha * temperature)
-        return 0.
+        return K_S
 
     def gibbs_free_energy(self,pressure,temperature,params):
         """
