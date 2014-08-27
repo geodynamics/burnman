@@ -97,7 +97,7 @@ def modified_tait(x, params):
     return (pow((x + a - 1.) / a, -1./c) - 1.)/b
 
 
-class MTaitBase(eos.EquationOfState):
+class MT(eos.EquationOfState):
     """
     Base class for a generic modified Tait equation of state.  
     References for this can be found in Huang and Chow (1974) 
@@ -262,12 +262,4 @@ class MTaitBase(eos.EquationOfState):
     def __relative_thermal_pressure( self, T, params):
         return self.__thermal_pressure(T, params) - \
                self.__thermal_pressure(T_0, params)
-
-
-class MT(MTaitBase):
-    """
-    Standard MT equation of state. 
-    This class currently exists for consistency with the MGD, 
-    SLB and BM class set structures.
-    """
 
