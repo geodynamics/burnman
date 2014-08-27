@@ -1,3 +1,4 @@
+
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -226,3 +227,88 @@ class EquationOfState(object):
         else:
             return 300.0
 
+
+    def gibbs_free_energy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        G : float
+            Gibbs free energy of the mineral
+        """
+        raise NotImplementedError("")
+
+    def helmholtz_free_energy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        F : float
+            Helmholtz free energy of the mineral
+        """
+        raise NotImplementedError("")
+
+
+    def enthalpy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        H : float
+            Enthalpy of the mineral
+        """
+        raise NotImplementedError("")
+
+    def internal_energy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        U : float
+            Internal energy of the mineral
+        """
+        raise NotImplementedError("")
