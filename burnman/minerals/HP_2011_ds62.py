@@ -1,3 +1,6 @@
+from burnman.processchemistry import ProcessChemistry
+from burnman.mineral import Mineral
+
 class fo (Mineral):
     """
     Holland and Powell, 2011, and references therein
