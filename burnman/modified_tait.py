@@ -9,26 +9,19 @@ import numpy as np
 import scipy.optimize as opt
 
 import burnman.equation_of_state as eos
+import burnman.einstein as einstein
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
 R=8.3145 # J/K/mol
 
 # see Holland and Powell, 2011
-def einst(S, n):
+def einstein_temperature(S, n):
     """
-    Einstein temperature
+    Empirical Einstein temperature
     base of p.346, para.1
     """
     return 10636./(S/n + 6.44)
-
-# see Holland and Powell, 2011
-def ksi(u):
-    """
-    Einstein function to describe behaviour of ak
-    EQ 11+1
-    """
-    return pow(u,2.)*np.exp(u)/pow((np.exp(u)-1.), 2.)
 
 # see Holland and Powell, 2011
 def tait_constants(params):
@@ -115,20 +108,19 @@ class MTaitBase(eos.EquationOfState):
         """
         Returns grueneisen parameter [unitless] as a function of pressure,
         temperature, and volume.
-        Not a part of the Modified Tait EoS, currently returns 0.
-        Note that this means we can't calculate Cv or Ks yet.
-        gamma = V*(dP/dE)|_V = (alpha*K_S)/(Cp*rho) = (alpha*K_T)/(Cv*rho)
         """
-        return 0.
+        alpha = self.thermal_expansivity (pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus (pressure, temperature, volume, params)
+        C_V = self.heat_capacity_v( pressure, temperature, volume, params)
+        return alpha * K_T * V / C_V
 
     def volume(self, pressure,temperature,params):
         """
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         EQ 12
         """
-
         a, b, c = tait_constants(params)
-        Pth=self.__rel_thermal_pressure(temperature,params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
         x = 1 - a*( 1. - pow(( 1. + b*(pressure-Pth)), -1.0*c))
         return x*params['V_0']
 
@@ -138,7 +130,7 @@ class MTaitBase(eos.EquationOfState):
         temperature [K], and volume [m^3].  EQ 13+2
         """
         a, b, c = tait_constants(params)
-        Pth=self.__rel_thermal_pressure(temperature,params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
         psubpth=pressure-Pth
         return params['K_0']*(1. + b*(psubpth))*(a + (1.-a)*pow((1. + b*(psubpth)), c))
 
@@ -155,9 +147,9 @@ class MTaitBase(eos.EquationOfState):
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
-        Not yet implemented, returns 0.
         """
-        return 0.
+        einstein_T=einstein_temperature(params['S_0'], params['n'])
+        return einstein.heat_capacity_v(temperature, einstein_T,params['n'])
 
     def thermal_expansivity(self, pressure, temperature, volume , params):
         """
@@ -165,15 +157,18 @@ class MTaitBase(eos.EquationOfState):
         Replace -Pth in EQ 13+1 with P-Pth for non-ambient temperature 
         """
         a, b, c = tait_constants(params)
-        Pth=self.__rel_thermal_pressure(temperature,params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
         psubpth=pressure-Pth
-        ein=einst(params['S_0'], params['n'])
+        einstein_T=einstein_temperature(params['S_0'], params['n'])
         alpha = params['a_0']*ksi(ein/temperature)/ksi(ein/T_0)*1./((1.+b*psubpth)*(a + (1.-a)*pow((1+b*psubpth), c)))
  
         return alpha
 
     # Heat capacity at ambient pressure
     # N.B. Cp=-T*(d2G/dT2)|p
+
+    # What is this?  Can't we get heat capacity at constant pressure
+    # from the equation of state and the Einstein model?  IR
     def heat_capacity_p0(self,temperature,params):
         """
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
@@ -186,12 +181,11 @@ class MTaitBase(eos.EquationOfState):
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
-        Not yet implemented. Returns 0.
         """
-        #alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        #gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        #C_v = self.heat_capacity_v(pressure, temperature, volume, params)
-        #C_p = C_v*(1. + gr * alpha * temperature)
+        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
+        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_p = C_v*(1. + gr * alpha * temperature)
         return 0.
 
 
@@ -199,12 +193,11 @@ class MTaitBase(eos.EquationOfState):
         """
         Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  
-        Not yet implemented. Returns 0.
         """
-        #K_T= self.isothermal_bulk_modulus(pressure,temperature,volume,params)
-        #alpha = self.thermal_expansivity(pressure,temperature,volume,params)
-        #gr = self.__grueneisen_parameter(params['V_0']/volume, params)
-        #K_S = K_T*(1. + gr * alpha * temperature)
+        K_T= self.isothermal_bulk_modulus(pressure,temperature,volume,params)
+        alpha = self.thermal_expansivity(pressure,temperature,volume,params)
+        gr = self.__grueneisen_parameter(params['V_0']/volume, params)
+        K_S = K_T*(1. + gr * alpha * temperature)
         return 0.
 
     def gibbs_free_energy(self,pressure,temperature,params):
@@ -212,9 +205,10 @@ class MTaitBase(eos.EquationOfState):
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
         """
-    # Calculate temperature and pressure integrals
+       # Calculate temperature and pressure integrals
         a, b, c = tait_constants(params)
-        Pth=self.__rel_thermal_pressure(temperature,params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
+
         psubpth=pressure-Pth
 
         intCpdT = (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*pow(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
@@ -243,16 +237,31 @@ class MTaitBase(eos.EquationOfState):
         EQ B7
         """
         return modified_tait(params['V_0']/volume, params) + \
-                self.__rel_thermal_pressure(temperature, params)
+               self.__relative_thermal_pressure(temperature, params)
+                  
 
+
+    #thermal pressure (relative to T_0), see EQ 12 - 1
+    def __thermal_pressure(self,T,params):
+
+        # This is basically the mie-gruneisen equation of state for thermal
+        # pressure using an Einstein model for heat capacity.  The additional
+        # assumption that they make is that alpha*K/Cv, (or gamma / V) is 
+        # constant over a wide range of compressions.
+
+        # Note that the xi function in HP2011 is just the Einstein heat capacity
+        # divided by 3nR.  I don't know why they don't use that, but anyhow...
+
+        einstein_T=einstein_temperature(params['S_0'],params['n'])
+        E_th = einstein.thermal_energy( T, einstein_T, params['n'] )
+        C_V0 = einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+        P_th = params['a_0']*params['K_0'] / C_V0 * E_th
+        return P_th
 
     #calculate relative thermal pressure (relative to T_0), see EQ 12 - 1
-    def __rel_thermal_pressure(self,T, params):
-        ein=einst(params['S_0'],params['n'])
-        u=ein/T
-        u_0=ein/T_0
-        P_th = params['a_0']*params['K_0']*ein/ksi(u_0)*((1./(np.exp(u)-1.))-(1./(np.exp(u_0)-1.)))
-        return P_th
+    def __relative_thermal_pressure( self, T, params):
+        return self.__thermal_pressure(T, params) - \
+               self.__thermal_pressure(T_0, params)
 
 
 class MT(MTaitBase):
