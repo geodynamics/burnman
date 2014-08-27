@@ -126,7 +126,7 @@ class Mineral(Material):
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
         if (self.params.has_key('H_0') and self.params.has_key('S_0')):
-            self.gibbs = self.method.gibbs(self.pressure, self.temperature, self.params)
+            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.params)
 
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
@@ -137,7 +137,7 @@ class Mineral(Material):
 
     # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
     def calcgibbs(self, pressure, temperature):
-        return self.method.gibbs(pressure, temperature, self.params)
+        return self.method.gibbs_free_energy(pressure, temperature, self.params)
 
     def molar_mass(self):
         """
@@ -208,3 +208,9 @@ class Mineral(Material):
         Returns bulk sound speed of the mineral [m/s]
         """
         return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
+
+    def gibbs_free_energy(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        """
+        return self.gibbs
