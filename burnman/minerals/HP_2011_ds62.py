@@ -1,9 +1,8 @@
 class fo (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -20,11 +19,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fa (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -41,11 +39,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class teph (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -62,11 +59,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class lrn (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -86,11 +82,10 @@ def __init__(self):
             'landau_Vmax': 5e-07 }
 
 class mont (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Mg1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -107,11 +102,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class chum (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg9.0Si4.0O18.0H2.0'
        self.params = {
             'formula': formula,
@@ -128,11 +122,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class chdr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg5.0Si2.0O10.0H2.0'
        self.params = {
             'formula': formula,
@@ -149,11 +142,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mwd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -170,11 +162,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fwd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -191,11 +182,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mrw (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -212,11 +202,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class frw (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -233,11 +222,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mpv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -254,11 +242,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fpv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -275,11 +262,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class apv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0O3.0'
        self.params = {
             'formula': formula,
@@ -296,11 +282,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cpv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -317,11 +302,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mak (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -338,11 +322,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fak (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -359,11 +342,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class maj (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg4.0Si4.0O12.0'
        self.params = {
             'formula': formula,
@@ -380,11 +362,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class py (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Al2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -401,11 +382,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class alm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe3.0Al2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -422,11 +402,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class spss (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn3.0Al2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -443,11 +422,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class gr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca3.0Al2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -464,11 +442,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class andr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca3.0Fe2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -485,11 +462,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class knor (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Cr2.0Si3.0O12.0'
        self.params = {
             'formula': formula,
@@ -506,11 +482,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class osma (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mg2.0Al5.0Si10.0O30.0'
        self.params = {
             'formula': formula,
@@ -527,11 +502,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class osmm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mg3.0Al3.0Si11.0O30.0'
        self.params = {
             'formula': formula,
@@ -548,11 +522,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class osfa (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Fe2.0Al5.0Si10.0O30.0'
        self.params = {
             'formula': formula,
@@ -569,11 +542,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class vsv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca19.0Mg2.0Al11.0Si18.0O78.0H9.0'
        self.params = {
             'formula': formula,
@@ -590,11 +562,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class and (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
             'formula': formula,
@@ -611,11 +582,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ky (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
             'formula': formula,
@@ -632,11 +602,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sill (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
             'formula': formula,
@@ -659,11 +628,10 @@ def __init__(self):
             'BW_factor': 0.25 }
 
 class smul (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
             'formula': formula,
@@ -680,11 +648,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class amul (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.5Si0.5O4.75'
        self.params = {
             'formula': formula,
@@ -701,11 +668,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class tpz (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si1.0O6.0H2.0'
        self.params = {
             'formula': formula,
@@ -722,11 +688,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mst (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
             'formula': formula,
@@ -743,11 +708,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fst (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
             'formula': formula,
@@ -764,11 +728,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mnst (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
             'formula': formula,
@@ -785,11 +748,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mctd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
             'formula': formula,
@@ -806,11 +768,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fctd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
             'formula': formula,
@@ -827,11 +788,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mnctd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
             'formula': formula,
@@ -848,11 +808,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class merw (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca3.0Mg1.0Si2.0O8.0'
        self.params = {
             'formula': formula,
@@ -869,11 +828,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class spu (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca5.0Si2.0C1.0O11.0'
        self.params = {
             'formula': formula,
@@ -890,11 +848,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class zo (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
        self.params = {
             'formula': formula,
@@ -911,11 +868,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cz (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
        self.params = {
             'formula': formula,
@@ -932,11 +888,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ep (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al2.0Fe1.0Si3.0O13.0H1.0'
        self.params = {
             'formula': formula,
@@ -953,11 +908,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fep (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al1.0Fe2.0Si3.0O13.0H1.0'
        self.params = {
             'formula': formula,
@@ -974,11 +928,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pmt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al2.0Mn1.0Si3.0O13.0H1.0'
        self.params = {
             'formula': formula,
@@ -995,11 +948,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class law (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
             'formula': formula,
@@ -1016,11 +968,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mpm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca4.0Al5.0Mg1.0Si6.0O28.0H7.0'
        self.params = {
             'formula': formula,
@@ -1037,11 +988,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fpm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca4.0Al5.0Fe1.0Si6.0O28.0H7.0'
        self.params = {
             'formula': formula,
@@ -1058,11 +1008,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class jgd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca4.0Fe6.0Si6.0O28.0H7.0'
        self.params = {
             'formula': formula,
@@ -1079,11 +1028,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class geh (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al2.0Si1.0O7.0'
        self.params = {
             'formula': formula,
@@ -1106,11 +1054,10 @@ def __init__(self):
             'BW_factor': 0.8 }
 
 class ak (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Mg1.0Si2.0O7.0'
        self.params = {
             'formula': formula,
@@ -1127,11 +1074,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class rnk (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca3.0Si2.0O7.0'
        self.params = {
             'formula': formula,
@@ -1148,11 +1094,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ty (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca5.0Si2.0C2.0O13.0'
        self.params = {
             'formula': formula,
@@ -1169,11 +1114,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class crd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Al4.0Si5.0O18.0'
        self.params = {
             'formula': formula,
@@ -1196,11 +1140,10 @@ def __init__(self):
             'BW_factor': 1.5 }
 
 class hcrd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Al4.0Si5.0O19.0H2.0'
        self.params = {
             'formula': formula,
@@ -1223,11 +1166,10 @@ def __init__(self):
             'BW_factor': 1.5 }
 
 class fcrd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Al4.0Si5.0O18.0'
        self.params = {
             'formula': formula,
@@ -1250,11 +1192,10 @@ def __init__(self):
             'BW_factor': 1.5 }
 
 class mncrd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn2.0Al4.0Si5.0O18.0'
        self.params = {
             'formula': formula,
@@ -1277,11 +1218,10 @@ def __init__(self):
             'BW_factor': 1.5 }
 
 class phA (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg7.0Si2.0O14.0H6.0'
        self.params = {
             'formula': formula,
@@ -1298,11 +1238,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sph (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Ti1.0Si1.0O5.0'
        self.params = {
             'formula': formula,
@@ -1322,11 +1261,10 @@ def __init__(self):
             'landau_Vmax': 5e-08 }
 
 class cstn (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Si2.0O5.0'
        self.params = {
             'formula': formula,
@@ -1343,11 +1281,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class zrc (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Zr1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -1364,11 +1301,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class en (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1385,11 +1321,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pren (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1406,11 +1341,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cen (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1427,11 +1361,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class hen (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1448,11 +1381,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fs (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1469,11 +1401,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mgts (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Al2.0Si1.0O6.0'
        self.params = {
             'formula': formula,
@@ -1490,11 +1421,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class di (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Mg1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1511,11 +1441,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class hed (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Fe1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1532,11 +1461,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class jd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1553,11 +1481,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class acm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Fe1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1574,11 +1501,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class kos (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Cr1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1595,11 +1521,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cats (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si1.0O6.0'
        self.params = {
             'formula': formula,
@@ -1622,11 +1547,10 @@ def __init__(self):
             'BW_factor': 0.25 }
 
 class caes (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca0.5Al1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -1643,11 +1567,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class rhod (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -1664,11 +1587,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pxmn (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -1685,11 +1607,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class wo (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -1706,11 +1627,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pswo (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -1727,11 +1647,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class wal (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -1748,11 +1667,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class tr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Mg5.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1769,11 +1687,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fact (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Fe5.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1790,11 +1707,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ts (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Mg3.0Al4.0Si6.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1811,11 +1727,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class parg (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Ca2.0Mg4.0Al3.0Si6.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1832,11 +1747,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class gl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na2.0Mg3.0Al2.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1853,11 +1767,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fgl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na2.0Al2.0Fe3.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1874,11 +1787,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class rieb (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na2.0Fe5.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1895,11 +1807,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class anth (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1916,11 +1827,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fanth (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1937,11 +1847,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cumm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1958,11 +1867,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class grun (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -1979,11 +1887,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ged (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg5.0Al4.0Si6.0O24.0H2.0'
        self.params = {
             'formula': formula,
@@ -2000,11 +1907,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class spr4 (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg4.0Al8.0Si2.0O20.0'
        self.params = {
             'formula': formula,
@@ -2021,11 +1927,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class spr5 (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Al10.0Si1.0O20.0'
        self.params = {
             'formula': formula,
@@ -2042,11 +1947,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fspr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe4.0Al8.0Si2.0O20.0'
        self.params = {
             'formula': formula,
@@ -2063,11 +1967,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mcar (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
             'formula': formula,
@@ -2084,11 +1987,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fcar (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
             'formula': formula,
@@ -2105,11 +2007,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class deer (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe18.0Si12.0O50.0H10.0'
        self.params = {
             'formula': formula,
@@ -2126,11 +2027,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mu (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al3.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2147,11 +2047,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cel (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mg1.0Al1.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2168,11 +2067,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fcel (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Fe1.0Al1.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2189,11 +2087,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pa (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al3.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2210,11 +2107,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ma (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al4.0Si2.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2231,11 +2127,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class phl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mg3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2252,11 +2147,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ann (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Fe3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2273,11 +2167,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mnbi (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mn3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2294,11 +2187,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class east (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Mg2.0Al3.0Si2.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2315,11 +2207,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class naph (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Mg3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2336,11 +2227,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class clin (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2357,11 +2247,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ames (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg4.0Al4.0Si2.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2378,11 +2267,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class afchl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg6.0Si4.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2399,11 +2287,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class daph (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2420,11 +2307,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mnchl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2441,11 +2327,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sud (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Al4.0Si3.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2462,11 +2347,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fsud (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Al4.0Si3.0O18.0H8.0'
        self.params = {
             'formula': formula,
@@ -2483,11 +2367,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class prl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2504,11 +2387,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ta (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2525,11 +2407,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fta (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2546,11 +2427,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class tats (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg2.0Al2.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2567,11 +2447,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class tap (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2588,11 +2467,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class minn (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2609,11 +2487,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class minm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2630,11 +2507,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class kao (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0Si2.0O9.0H4.0'
        self.params = {
             'formula': formula,
@@ -2651,11 +2527,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pre (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al2.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2672,11 +2547,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fpre (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca2.0Al1.0Fe1.0Si3.0O12.0H2.0'
        self.params = {
             'formula': formula,
@@ -2693,11 +2567,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class chr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
        self.params = {
             'formula': formula,
@@ -2714,11 +2587,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class liz (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
        self.params = {
             'formula': formula,
@@ -2735,11 +2607,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class glt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe3.0Si2.0O9.0H4.0'
        self.params = {
             'formula': formula,
@@ -2756,11 +2627,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fstp (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K0.5Fe5.0Si8.0Al2.0O30.5H12.5'
        self.params = {
             'formula': formula,
@@ -2777,11 +2647,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mstp (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K0.5Mg5.0Si8.0Al2.0O30.5H12.5'
        self.params = {
             'formula': formula,
@@ -2798,11 +2667,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class atg (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg48.0Si34.0O147.0H62.0'
        self.params = {
             'formula': formula,
@@ -2819,11 +2687,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ab (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
        self.params = {
             'formula': formula,
@@ -2846,11 +2713,10 @@ def __init__(self):
             'BW_factor': 0.9 }
 
 class abh (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
        self.params = {
             'formula': formula,
@@ -2867,11 +2733,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mic (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
             'formula': formula,
@@ -2888,11 +2753,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class san (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
             'formula': formula,
@@ -2915,11 +2779,10 @@ def __init__(self):
             'BW_factor': 0.8 }
 
 class an (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si2.0O8.0'
        self.params = {
             'formula': formula,
@@ -2942,11 +2805,10 @@ def __init__(self):
             'BW_factor': 2.0 }
 
 class kcm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si3.0O9.0H2.0'
        self.params = {
             'formula': formula,
@@ -2963,11 +2825,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class wa (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K2.0Si4.0O9.0'
        self.params = {
             'formula': formula,
@@ -2984,11 +2845,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class hol (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
             'formula': formula,
@@ -3005,11 +2865,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class q (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3029,11 +2888,10 @@ def __init__(self):
             'landau_Vmax': 1.188e-06 }
 
 class trd (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3050,11 +2908,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class crst (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3071,11 +2928,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class coe (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3092,11 +2948,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class stv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3113,11 +2968,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ne (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -3137,11 +2991,10 @@ def __init__(self):
             'landau_Vmax': 8e-07 }
 
 class cg (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -3158,11 +3011,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cgh (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -3179,11 +3031,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sdl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na8.0Al6.0Si6.0Cl2.0O24.0'
        self.params = {
             'formula': formula,
@@ -3200,11 +3051,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class kls (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si1.0O4.0'
        self.params = {
             'formula': formula,
@@ -3221,11 +3071,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class lc (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Al1.0Si2.0O6.0'
        self.params = {
             'formula': formula,
@@ -3248,11 +3097,10 @@ def __init__(self):
             'BW_factor': 0.7 }
 
 class me (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca4.0Al6.0Si6.0O27.0C1.0'
        self.params = {
             'formula': formula,
@@ -3269,11 +3117,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class wrk (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si4.0O14.0H4.0'
        self.params = {
             'formula': formula,
@@ -3290,11 +3137,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class lmt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si4.0O16.0H8.0'
        self.params = {
             'formula': formula,
@@ -3311,11 +3157,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class heu (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si7.0O24.0H12.0'
        self.params = {
             'formula': formula,
@@ -3332,11 +3177,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class stlb (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Al2.0Si7.0O25.0H14.0'
        self.params = {
             'formula': formula,
@@ -3353,11 +3197,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class anl (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Al1.0Si2.0O7.0H2.0'
        self.params = {
             'formula': formula,
@@ -3374,11 +3217,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class lime (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3395,11 +3237,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ru (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ti1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3416,11 +3257,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class per (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3437,11 +3277,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class fper (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3458,11 +3297,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mang (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3479,11 +3317,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cor (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al2.0O3.0'
        self.params = {
             'formula': formula,
@@ -3500,11 +3337,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mcor (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
             'formula': formula,
@@ -3521,11 +3357,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class hem (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0O3.0'
        self.params = {
             'formula': formula,
@@ -3545,11 +3380,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class esk (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Cr2.0O3.0'
        self.params = {
             'formula': formula,
@@ -3566,11 +3400,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class bix (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn2.0O3.0'
        self.params = {
             'formula': formula,
@@ -3587,11 +3420,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class NiO (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ni1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3611,11 +3443,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class pnt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0Ti1.0O3.0'
        self.params = {
             'formula': formula,
@@ -3632,11 +3463,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class geik (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Ti1.0O3.0'
        self.params = {
             'formula': formula,
@@ -3653,11 +3483,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ilm (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Ti1.0O3.0'
        self.params = {
             'formula': formula,
@@ -3677,11 +3506,10 @@ def __init__(self):
             'landau_Vmax': 2e-07 }
 
 class bdy (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Zr1.0O2.0'
        self.params = {
             'formula': formula,
@@ -3698,11 +3526,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class ten (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Cu1.0O1.0'
        self.params = {
             'formula': formula,
@@ -3719,11 +3546,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cup (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Cu2.0O1.0'
        self.params = {
             'formula': formula,
@@ -3740,11 +3566,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sp (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Al2.0O4.0'
        self.params = {
             'formula': formula,
@@ -3767,11 +3592,10 @@ def __init__(self):
             'BW_factor': 0.5 }
 
 class herc (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0Al2.0O4.0'
        self.params = {
             'formula': formula,
@@ -3794,11 +3618,10 @@ def __init__(self):
             'BW_factor': 1.0 }
 
 class mt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe3.0O4.0'
        self.params = {
             'formula': formula,
@@ -3818,11 +3641,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class mft (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Fe2.0O4.0'
        self.params = {
             'formula': formula,
@@ -3842,11 +3664,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class usp (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe2.0Ti1.0O4.0'
        self.params = {
             'formula': formula,
@@ -3863,11 +3684,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class picr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0Cr2.0O4.0'
        self.params = {
             'formula': formula,
@@ -3890,11 +3710,10 @@ def __init__(self):
             'BW_factor': 0.5 }
 
 class br (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0O2.0H2.0'
        self.params = {
             'formula': formula,
@@ -3911,11 +3730,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class dsp (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Al1.0O2.0H1.0'
        self.params = {
             'formula': formula,
@@ -3932,11 +3750,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class gth (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0O2.0H1.0'
        self.params = {
             'formula': formula,
@@ -3953,11 +3770,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class cc (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0C1.0O3.0'
        self.params = {
             'formula': formula,
@@ -3977,11 +3793,10 @@ def __init__(self):
             'landau_Vmax': 4e-07 }
 
 class arag (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0O3.0C1.0'
        self.params = {
             'formula': formula,
@@ -3998,11 +3813,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class mag (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mg1.0O3.0C1.0'
        self.params = {
             'formula': formula,
@@ -4019,11 +3833,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class sid (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0C1.0O3.0'
        self.params = {
             'formula': formula,
@@ -4040,11 +3853,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class rhc (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Mn1.0C1.0O3.0'
        self.params = {
             'formula': formula,
@@ -4061,11 +3873,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class dol (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Mg1.0O6.0C2.0'
        self.params = {
             'formula': formula,
@@ -4088,11 +3899,10 @@ def __init__(self):
             'BW_factor': 1.0 }
 
 class ank (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0Fe1.0O6.0C2.0'
        self.params = {
             'formula': formula,
@@ -4115,11 +3925,10 @@ def __init__(self):
             'BW_factor': 1.0 }
 
 class syv (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='K1.0Cl1.0'
        self.params = {
             'formula': formula,
@@ -4136,11 +3945,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class hlt (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Na1.0Cl1.0'
        self.params = {
             'formula': formula,
@@ -4157,11 +3965,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class pyr (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0S2.0'
        self.params = {
             'formula': formula,
@@ -4178,11 +3985,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class trot (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
             'formula': formula,
@@ -4202,11 +4008,10 @@ def __init__(self):
             'landau_Vmax': 4.1e-07 }
 
 class tro (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
             'formula': formula,
@@ -4226,11 +4031,10 @@ def __init__(self):
             'landau_Vmax': 4.1e-07 }
 
 class lot (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
             'formula': formula,
@@ -4250,11 +4054,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class trov (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe0.875S1.0'
        self.params = {
             'formula': formula,
@@ -4274,11 +4077,10 @@ def __init__(self):
             'landau_Vmax': 1.6e-07 }
 
 class any (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ca1.0S1.0O4.0'
        self.params = {
             'formula': formula,
@@ -4295,11 +4097,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class iron (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Fe1.0'
        self.params = {
             'formula': formula,
@@ -4319,11 +4120,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class Ni (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Ni1.0'
        self.params = {
             'formula': formula,
@@ -4343,11 +4143,10 @@ def __init__(self):
             'landau_Vmax': 0.0 }
 
 class Cu (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='Cu1.0'
        self.params = {
             'formula': formula,
@@ -4364,11 +4163,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class gph (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='C1.0'
        self.params = {
             'formula': formula,
@@ -4385,11 +4183,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class diam (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='C1.0'
        self.params = {
             'formula': formula,
@@ -4406,11 +4203,10 @@ def __init__(self):
             'molar_mass': ProcessChemistry(formula)[1]}
 
 class S (Mineral):
-"""
-Holland and Powell, 2011, and references therein
-"""
-def __init__(self):
-
+    """
+    Holland and Powell, 2011, and references therein
+    """
+    def __init__(self):
        formula='S1.0'
        self.params = {
             'formula': formula,

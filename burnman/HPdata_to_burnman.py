@@ -33,7 +33,7 @@ def read_dataset(datafile):
         ds.append(line.split())
     return ds
 
-ds=read_dataset('data/tc-ds62.txt')
+ds=read_dataset('data/raw_endmember_datasets/tc-ds62.txt')
 
 def getmbr(ds, mbr):
     mbrarray = []
@@ -58,11 +58,11 @@ for i in range(int(ds[0][0])):
     M=getmbr(ds,mbr)
     if M.flag != -1 and M.flag != -2 and M.k[0] > 0:
         print 'class', mbr, '(Mineral):'
-        print '"""'
-        print 'Holland and Powell, 2011, and references therein'
-        print '"""'
-        print 'def __init__(self):'
-        print "\n"+''.join(['       formula=\'',M.formula,'\''])
+        print '    """'
+        print '    Holland and Powell, 2011, and references therein'
+        print '    """'
+        print '    def __init__(self):'
+        print ''.join(['       formula=\'',M.formula,'\''])
         print '       self.params = {'
         print '            \'formula\': formula,'
         print '            \'equation_of_state\': \'mtait\','
