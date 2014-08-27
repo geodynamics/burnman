@@ -207,7 +207,7 @@ class MTaitBase(eos.EquationOfState):
         #K_S = K_T*(1. + gr * alpha * temperature)
         return 0.
 
-    def gibbs(self,pressure,temperature,params):
+    def gibbs_free_energy(self,pressure,temperature,params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
