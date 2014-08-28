@@ -52,6 +52,10 @@ def getmbr(ds, mbr):
             endmember=Endmember(mbr,atoms,formula, int(ds[i*4+3][1]), map(float,ds[i*4+3][2:(len(ds[i*4+3])-1)]), float(ds[i*4+4][0]), float(ds[i*4+4][1]), float(ds[i*4+4][2]), map(float,ds[i*4+5]), float(ds[i*4+6][0]), map(float,ds[i*4+6][1:4]), flag, map(float,ds[i*4+6][5:]))
             return endmember
 
+print 'from burnman.processchemistry import ProcessChemistry'
+print 'from burnman.mineral import Mineral'
+print ''
+
 formula='0'
 for i in range(int(ds[0][0])):
     mbr=ds[i*4+3][0]
