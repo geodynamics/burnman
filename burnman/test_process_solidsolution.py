@@ -42,17 +42,15 @@ base_material = [['pyrope()',    '[Mg]3[Al]2Si3O12',         1.0], \
 n_endmembers=len(base_material)
 
 # Interaction parameters
-excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
+excess_enthalpy=[[2.5e3, 30.1e3, 15e3],[10e3,18e3],[48e3]]
 excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
-excess_volume=[[0., 0., 0.],[0., 0.],[0.]]
-
+excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
 interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
 
 
-
+# INPUT PROPORTIONS
 endmember_proportions = np.array([ 0.5, 0.2, 0.1, 0.2 ])
-#endmember_proportions = np.array([ 0.0, 0.0, 0.0, 1.0 ])
-#endmember_proportions = np.array([ 1.0, 0.0, 0.0, 0.0 ])
+
 
 # "sites" is a 2D list of sites and the elements which reside on them 
 # "site_occupancies" is a 3D list describing the elemental site occupancies of each endmember 
@@ -149,6 +147,9 @@ for i in range(n_endmembers):
         Wv[i][j]=2.*excess_volume[i][j-i-1]/(alpha[i]+alpha[j])
 
 print ''
-print 'Nonideal contribution to gibbs'
-print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wh,phi))
+print 'Excess enthalpy, entropy, volume (non-configurational)'
+print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wh,phi)), 'J/mol'
 
+print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Ws,phi)), 'J/K/mol'
+
+print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wv,phi)), 'm^3/mol'
