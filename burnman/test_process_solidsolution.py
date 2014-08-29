@@ -14,10 +14,12 @@ base_material = [['pyrope()',    '[Mg]3[Al]2Si3O12',         1.0], \
                  ['grossular()', '[Ca]3[Al]2Si3O12',         2.7], \
                  ['majorite()',  '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
 
+n_endmembers=len(base_material)
+
 # Interaction parameters
-excess_enthalpy=[[2.5e3, 29.1e3, 15e3][10e3,18e3][48e3]]
-excess_entropy=[[0., 0., 0.][0., 0.][0.]]
-excess_volume=[[0., 0., 0.][0., 0.][0.]]
+excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
+excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
+excess_volume=[[0., 0., 0.],[0., 0.],[0.]]
 
 interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
 
@@ -38,7 +40,7 @@ sites=[[] for i in range(nsites)]
 site_occupancies=[]
 site_multiplicity=np.empty(shape=(nsites))
 n_elements=0
-for endmember in range(len(base_material)):
+for endmember in range(n_endmembers):
     site_occupancies.append([[0]*len(sites[site]) for site in range(nsites)])
     s=re.split(r'\[', base_material[endmember][1])[1:]
     for site in range(nsites):
@@ -69,9 +71,9 @@ for endmember in range(len(base_material)):
 
 
 
-array_occupancies=np.empty(shape=(len(base_material),n_elements))
+array_occupancies=np.empty(shape=(n_endmembers,n_elements))
 array_multiplicities=np.empty(shape=(n_elements))
-for endmember in range(len(base_material)):
+for endmember in range(n_endmembers):
     n_element=0
     for site in range(nsites):
         for element in range(len(site_occupancies[endmember][site])):
@@ -90,8 +92,8 @@ print ''
 
 
 # Ideal activities
-ideal_activity=np.empty(shape=(len(base_material)))
-for endmember in range(len(base_material)):
+ideal_activity=np.empty(shape=(n_endmembers))
+for endmember in range(n_endmembers):
     ideal_activity[endmember]=1.0
     normalisation_constant=1.0
     for element in range(n_elements):
@@ -106,4 +108,24 @@ print 'Ideal activities'
 print ideal_activity
 
 # Non ideal activities
-# STILL TO DO
+# alpha^T*p*(phi^T*W*phi)
+
+alpha=np.empty(shape=(n_endmembers))
+phi=np.empty(shape=(n_endmembers))
+for i in range(n_endmembers):
+    alpha[i]=base_material[i][2]
+    phi[i]=alpha[i]*endmember_proportions[i]
+phi=np.divide(phi, np.sum(phi))
+
+Wh=np.zeros(shape=(n_endmembers,n_endmembers))
+Ws=np.zeros(shape=(n_endmembers,n_endmembers))
+Wv=np.zeros(shape=(n_endmembers,n_endmembers))
+for i in range(n_endmembers):
+    for j in range(i+1, n_endmembers):
+        Wh[i][j]=2*excess_enthalpy[i][j-i-1]/(alpha[i]+alpha[j])
+        Ws[i][j]=2*excess_entropy[i][j-i-1]/(alpha[i]+alpha[j])
+        Wv[i][j]=2*excess_volume[i][j-i-1]/(alpha[i]+alpha[j])
+
+print ''
+print 'Nonideal contribution to gibbs'
+print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wh,phi))
