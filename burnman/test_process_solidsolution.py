@@ -110,11 +110,8 @@ print ideal_activity
 # Non ideal activities
 # alpha^T*p*(phi^T*W*phi)
 
-alpha=np.empty(shape=(n_endmembers))
-phi=np.empty(shape=(n_endmembers))
-for i in range(n_endmembers):
-    alpha[i]=base_material[i][2]
-    phi[i]=alpha[i]*endmember_proportions[i]
+alpha=np.array([base_material[i][2] for i in range(n_endmembers)])
+phi=np.array([alpha[i]*endmember_proportions[i] for i in range(n_endmembers)])
 phi=np.divide(phi, np.sum(phi))
 
 Wh=np.zeros(shape=(n_endmembers,n_endmembers))
