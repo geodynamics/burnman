@@ -141,8 +141,18 @@ class Mineral(Material):
         self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
-        if (self.params.has_key('H_0') and self.params.has_key('S_0')):
-            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.params)
+
+        # Attempt to calculate the gibbs free energy and helmholtz free energy, but don't complain if the
+        # equation of state does not calculate it, or if the mineral params do not have the requisite entries.
+        try:
+            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.V, self.params)
+        except (KeyError, NotImplementedError):
+            self.gibbs = float('nan')
+        try:
+            self.helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.V, self.params)
+        except (KeyError, NotImplementedError):
+            self.helmholtz = float('nan')
+        
 
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
@@ -230,3 +240,9 @@ class Mineral(Material):
         Returns Gibbs free energy of the mineral [J]
         """
         return self.gibbs
+
+    def helmholtz_free_energy(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        """
+        return self.helmholtz

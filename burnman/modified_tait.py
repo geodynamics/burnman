@@ -202,7 +202,7 @@ class MT(eos.EquationOfState):
         K_S = K_T*(1. + gr * alpha * temperature)
         return K_S
 
-    def gibbs_free_energy(self,pressure,temperature,params):
+    def gibbs_free_energy(self,pressure,temperature,volume,params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
