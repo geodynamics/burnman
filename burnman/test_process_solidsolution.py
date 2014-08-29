@@ -144,9 +144,9 @@ Ws=np.zeros(shape=(n_endmembers,n_endmembers))
 Wv=np.zeros(shape=(n_endmembers,n_endmembers))
 for i in range(n_endmembers):
     for j in range(i+1, n_endmembers):
-        Wh[i][j]=2*excess_enthalpy[i][j-i-1]/(alpha[i]+alpha[j])
-        Ws[i][j]=2*excess_entropy[i][j-i-1]/(alpha[i]+alpha[j])
-        Wv[i][j]=2*excess_volume[i][j-i-1]/(alpha[i]+alpha[j])
+        Wh[i][j]=2.*excess_enthalpy[i][j-i-1]/(alpha[i]+alpha[j])
+        Ws[i][j]=2.*excess_entropy[i][j-i-1]/(alpha[i]+alpha[j])
+        Wv[i][j]=2.*excess_volume[i][j-i-1]/(alpha[i]+alpha[j])
 
 print ''
 print 'Nonideal contribution to gibbs'
