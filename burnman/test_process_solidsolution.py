@@ -1,8 +1,33 @@
 # BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 # This is a test script which is the precursor to implementing a solid solution BaseClass.
+
+
+'''
+# Inputs
+Solid solution model
+Endmember proportions
+P,T
+
+# Things we can initialise without endmember proportions
+n_sites
+n_elements
+n_endmembers
+alpha
+Wh, Ws, Wv
+array_occupancies
+array_multiplicities
+
+# Endmember proportions needed
+phi
+ideal activities
+occupancies
+
+# P, T needed
+Wtotal / nonideal contribution to gibbs
+'''
 
 import re
 import numpy as np
@@ -32,18 +57,18 @@ endmember_proportions = np.array([ 0.5, 0.2, 0.1, 0.2 ])
 # "sites" is a 2D list of sites and the elements which reside on them 
 # "site_occupancies" is a 3D list describing the elemental site occupancies of each endmember 
 # "array_occupancies" is a 2D np.array of site_occupancies, concatenating the 2nd and 3rd dimension
-nsites=base_material[0][1].count('[')
-print 'Number of sites:', nsites
+n_sites=base_material[0][1].count('[')
+print 'Number of sites:', n_sites
 print ''
 
-sites=[[] for i in range(nsites)]
+sites=[[] for i in range(n_sites)]
 site_occupancies=[]
-site_multiplicity=np.empty(shape=(nsites))
+site_multiplicity=np.empty(shape=(n_sites))
 n_elements=0
 for endmember in range(n_endmembers):
-    site_occupancies.append([[0]*len(sites[site]) for site in range(nsites)])
+    site_occupancies.append([[0]*len(sites[site]) for site in range(n_sites)])
     s=re.split(r'\[', base_material[endmember][1])[1:]
-    for site in range(nsites):
+    for site in range(n_sites):
         site_occupancy=re.split(r'\]', s[site])[0]
         mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
         if mult == '':
@@ -75,7 +100,7 @@ array_occupancies=np.empty(shape=(n_endmembers,n_elements))
 array_multiplicities=np.empty(shape=(n_elements))
 for endmember in range(n_endmembers):
     n_element=0
-    for site in range(nsites):
+    for site in range(n_sites):
         for element in range(len(site_occupancies[endmember][site])):
             array_occupancies[endmember][n_element]=site_occupancies[endmember][site][element]
             array_multiplicities[n_element]=site_multiplicity[site]
@@ -126,3 +151,4 @@ for i in range(n_endmembers):
 print ''
 print 'Nonideal contribution to gibbs'
 print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wh,phi))
+
