@@ -153,3 +153,26 @@ print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wh,phi)), 'J/mol
 print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Ws,phi)), 'J/K/mol'
 
 print np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wv,phi)), 'm^3/mol'
+
+
+
+# Plot excess volumes for the pyrope-grossular join
+
+ppy= np.linspace(0, 1, 101)
+vex= np.empty(shape=(101))
+for p in range(len(ppy)):
+    a=ppy[p]
+    endmember_proportions = np.array([ a, 0.0, 1.-a, 0.0 ])
+    phi=np.array([alpha[i]*endmember_proportions[i] for i in range(n_endmembers)])
+    phi=np.divide(phi, np.sum(phi))
+
+    vex[p]=np.dot(alpha.T,endmember_proportions)*np.dot(phi.T,np.dot(Wv,phi))
+
+
+import matplotlib.pyplot as plt
+plt.plot(ppy,vex,color='r',linestyle='-',marker='o',markerfacecolor='r',markersize=0)
+plt.xlim(min(ppy),max(ppy))
+plt.xlabel("p(pyrope)")
+plt.title("V excess (m^3/mol) for pyrope-grossular garnets")
+
+plt.show()
