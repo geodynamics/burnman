@@ -2,12 +2,14 @@
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
+from burnman.mineral import Mineral
 import warnings
 
 import re
 import numpy as np
 from fractions import Fraction
 
+R = 8.3145 # J/K/mol
 kd = lambda x,y : 1 if x==y else 0
 
 class SolidSolution(Mineral):
@@ -46,9 +48,9 @@ class SolidSolution(Mineral):
         
         # Check that the interaction parameters have the correct number of variables
         for i in range(3):
-            assert(len(interaction_parameter[i]) == n_endmembers-1)
-            for j in range(n_endmembers-1):
-                assert(len(interaction_parameter[i][j]) == (n_endmembers-1)-j)
+            assert(len(interaction_parameter[i]) == self.n_endmembers-1)
+            for j in range(self.n_endmembers-1):
+                assert(len(interaction_parameter[i][j]) == (self.n_endmembers-1)-j)
 
         # Split interaction parameter into H, S, V terms
         self.excess_enthalpy=interaction_parameter[0]
@@ -59,67 +61,67 @@ class SolidSolution(Mineral):
         self.n_sites=base_material[0][1].count('[')
 
         # Check the number of sites is the same for each endmember
-        for i in range(n_endmembers):
-            assert(base_material[i][1].count('[') == n_sites)
+        for i in range(self.n_endmembers):
+            assert(base_material[i][1].count('[') == self.n_sites)
 
         # Check the chemical composition of each endmember is consistent with the dataset
         # NOT IMPLEMENTED YET
 
         # Number of unique site occupancies (e.g.. Mg on X etc.)
-        sites=[[] for i in range(n_sites)]
+        sites=[[] for i in range(self.n_sites)]
         list_occupancies=[]
-        list_multiplicity=np.empty(shape=(n_sites))
+        list_multiplicity=np.empty(shape=(self.n_sites))
         self.n_occupancies=0
-        for endmember in range(n_endmembers):
-            list_occupancies.append([[0]*len(sites[site]) for site in range(n_sites)])
+        for endmember in range(self.n_endmembers):
+            list_occupancies.append([[0]*len(sites[site]) for site in range(self.n_sites)])
             s=re.split(r'\[', base_material[endmember][1])[1:]
-            for site in range(n_sites):
+            for site in range(self.n_sites):
                 site_occupancy=re.split(r'\]', s[site])[0]
                 mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
                 if mult == '':
                     list_multiplicity[site]=1.0
                 else:
                     list_multiplicity[site]=mult
-            elements=re.findall('[A-Z][^A-Z]*',site_occupancy)
-            for i in range(len(elements)):
-                element_on_site=re.split('[0-9][^A-Z]*',elements[i])[0]
-                proportion_element_on_site=re.findall('[0-9][^A-Z]*',elements[i])
-                if len(proportion_element_on_site) == 0:
-                    proportion_element_on_site=Fraction(1.0)
-                else:
-                    proportion_element_on_site=Fraction(proportion_element_on_site[0])
+                elements=re.findall('[A-Z][^A-Z]*',site_occupancy)
+                for i in range(len(elements)):
+                    element_on_site=re.split('[0-9][^A-Z]*',elements[i])[0]
+                    proportion_element_on_site=re.findall('[0-9][^A-Z]*',elements[i])
+                    if len(proportion_element_on_site) == 0:
+                        proportion_element_on_site=Fraction(1.0)
+                    else:
+                        proportion_element_on_site=Fraction(proportion_element_on_site[0])
             
-                if element_on_site not in sites[site]:
-                    self.n_occupancies=n_occupancies+1
-                    sites[site].append(element_on_site)
-                    element_index=sites[site].index(element_on_site)
-                    for parsed_mbr in range(len(list_occupancies)):
-                        list_occupancies[parsed_mbr][site].append(0) 
-                else:
-                    element_index=sites[site].index(element_on_site)
-                list_occupancies[endmember][site][element_index]=proportion_element_on_site
+                    if element_on_site not in sites[site]:
+                        self.n_occupancies=self.n_occupancies+1
+                        sites[site].append(element_on_site)
+                        element_index=sites[site].index(element_on_site)
+                        for parsed_mbr in range(len(list_occupancies)):
+                            list_occupancies[parsed_mbr][site].append(0) 
+                    else:
+                        element_index=sites[site].index(element_on_site)
+                    list_occupancies[endmember][site][element_index]=proportion_element_on_site
 
         # Site occupancies and multiplicities
-        self.site_occupancies=np.empty(shape=(n_endmembers,n_occupancies))
-        self.site_multiplicities=np.empty(shape=(n_occupancies))
-        for endmember in range(n_endmembers):
+        self.site_occupancies=np.empty(shape=(self.n_endmembers,self.n_occupancies))
+        self.site_multiplicities=np.empty(shape=(self.n_occupancies))
+        for endmember in range(self.n_endmembers):
             n_element=0
-            for site in range(n_sites):
+            for site in range(self.n_sites):
                 for element in range(len(list_occupancies[endmember][site])):
                     self.site_occupancies[endmember][n_element]=list_occupancies[endmember][site][element]
                     self.site_multiplicities[n_element]=list_multiplicity[site]
                     n_element=n_element+1
 
-        self.alpha=np.array([base_material[i][2] for i in range(n_endmembers)])
+        self.alpha=np.array([base_material[i][2] for i in range(self.n_endmembers)])
 
-        self.Wh=np.zeros(shape=(n_endmembers,n_endmembers))
-        self.Ws=np.zeros(shape=(n_endmembers,n_endmembers))
-        self.Wv=np.zeros(shape=(n_endmembers,n_endmembers))
-        for i in range(n_endmembers):
-            for j in range(i+1, n_endmembers):
-                self.Wh[i][j]=2.*excess_enthalpy[i][j-i-1]/(alpha[i]+alpha[j])
-                self.Ws[i][j]=2.*excess_entropy[i][j-i-1]/(alpha[i]+alpha[j])
-                self.Wv[i][j]=2.*excess_volume[i][j-i-1]/(alpha[i]+alpha[j])
+        self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        for i in range(self.n_endmembers):
+            for j in range(i+1, self.n_endmembers):
+                self.Wh[i][j]=2.*self.excess_enthalpy[i][j-i-1]/(self.alpha[i]+self.alpha[j])
+                self.Ws[i][j]=2.*self.excess_entropy[i][j-i-1]/(self.alpha[i]+self.alpha[j])
+                self.Wv[i][j]=2.*self.excess_volume[i][j-i-1]/(self.alpha[i]+self.alpha[j])
 
         # END INITIALISATION
 
@@ -131,9 +133,21 @@ class SolidSolution(Mineral):
 
         self.molar_fraction=molar_fraction
 
+        # Ideal activities
+        occupancies=np.dot(self.molar_fraction, self.site_occupancies)
+        self.ideal_activity=np.empty(shape=(self.n_endmembers))
+        for endmember in range(self.n_endmembers):
+            self.ideal_activity[endmember]=1.0
+            normalisation_constant=1.0
+            for element in range(self.n_occupancies):
+                if self.site_occupancies[endmember][element] != 0:
+                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(occupancies[element],self.site_multiplicities[element])
+                    normalisation_constant=normalisation_constant/pow(self.site_occupancies[endmember][element],self.site_multiplicities[element])
+            self.ideal_activity[endmember]=normalisation_constant*self.ideal_activity[endmember]
+
+        # Nonideal contributions
         phi=np.array([self.alpha[i]*molar_fraction[i] for i in range(self.n_endmembers)])
         phi=np.divide(phi, np.sum(phi))
-
         self.H_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wh,phi))
         self.S_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Ws,phi))
         self.V_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wv,phi))
@@ -141,16 +155,28 @@ class SolidSolution(Mineral):
     def set_state(self, pressure, temperature, molar_fraction):
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
-            self.base_material[i][0].method = self.method
+            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
             self.base_material[i][0].set_state(pressure, temperature)
 
         # Find excess properties
         self.set_composition(molar_fraction)
-        self.G_excess=self.H_excess - temperature*self.S_excess + pressure*self.V_excess
 
+        # Ideal contribution (configurational entropy)
+        # Don't include endmembers with negligable molar fractions as the log term blows up
+        tol=1e-10
+        self.gibbs_excess_ideal=0
+        for i in range(self.n_endmembers):
+            if molar_fraction[i] > tol:
+                self.gibbs_excess_ideal=self.gibbs_excess_ideal + molar_fraction[i]*R*temperature*np.log(self.ideal_activity[i])
 
-        self.molar_volume= sum([ self.base_material[i][0].molar_volume() * self.molar_fraction[i] for i in n_endmembers ]) + self.V_excess
-        self.molar_gibbs= sum([ self.base_materials[i][0].molar_gibbs() * self.molar_fraction[i] for i in n_endmembers ]) + self.G_excess
+        # Non-ideal contribution
+        self.gibbs_excess_nonideal=self.H_excess - temperature*self.S_excess + pressure*self.V_excess
+
+        # Total excess Gibbs
+        self.gibbs_excess=self.gibbs_excess_ideal + self.gibbs_excess_nonideal
+
+        self.V= sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.V_excess
+        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.gibbs_excess
 
         
         '''
