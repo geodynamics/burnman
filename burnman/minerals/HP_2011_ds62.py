@@ -1,5 +1,21 @@
 from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
+from burnman.solidsolution import SolidSolution
+
+# Mixed Holland and Powell sources (test only)
+class garnet(SolidSolution):
+    def __init__(self):
+        # Endmembers
+        base_material = [[py(),  '[Mg]3[Al]2Si3O12',         1.0], [alm(), '[Fe]3[Al]2Si3O12',         1.0], [gr(),  '[Ca]3[Al]2Si3O12',         2.7], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
+
+        # Interaction parameters
+        excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
+        excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
+        excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
+        
+        interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
+        SolidSolution.__init__(self, base_material, interaction_parameter)
+
 
 class fo (Mineral):
     """
