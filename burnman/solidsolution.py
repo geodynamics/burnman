@@ -135,9 +135,8 @@ class SolidSolution(Mineral):
         phi=np.divide(phi, np.sum(phi))
 
         self.H_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wh,phi))
-        self.S_deficit=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Ws,phi))
+        self.S_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Ws,phi))
         self.V_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wv,phi))
-        self.S_excess=0.0-S_deficit
 
     def set_state(self, pressure, temperature, molar_fraction):
         # Set the state of all the endmembers
