@@ -9,7 +9,10 @@ HP_2011_ds62
 
 Minerals from Holland and Powell (2011) and references therein
 Update to dataset version 6.2
+The values in this document are all in S.I. units, 
+unlike those in the original tc-ds62.txt
 
+N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has the opposite sign to the values in Holland and Powell, 2011. This is consistent with its treatment as an excess entropy term (G=H-T*S+P*V), rather than a thermal correction to the interaction parameter (W=W+T*W_T+P*W_P).
 """
 
 from burnman.processchemistry import ProcessChemistry
