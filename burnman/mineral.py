@@ -219,13 +219,13 @@ class Mineral(Material):
         """
         return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
 
-    def gibbs_free_energy(self):
+    def molar_gibbs(self):
         """
         Returns Gibbs free energy of the mineral [J]
         """
         return self.gibbs
 
-    def helmholtz_free_energy(self):
+    def molar_helmholtz(self):
         """
         Returns Gibbs free energy of the mineral [J]
         """
