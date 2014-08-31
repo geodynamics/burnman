@@ -68,12 +68,12 @@ class SolidSolution(Mineral):
         # NOT IMPLEMENTED YET
 
         # Number of unique site occupancies (e.g.. Mg on X etc.)
-        sites=[[] for i in range(self.n_sites)]
+        self.sites=[[] for i in range(self.n_sites)]
         list_occupancies=[]
         list_multiplicity=np.empty(shape=(self.n_sites))
         self.n_occupancies=0
         for endmember in range(self.n_endmembers):
-            list_occupancies.append([[0]*len(sites[site]) for site in range(self.n_sites)])
+            list_occupancies.append([[0]*len(self.sites[site]) for site in range(self.n_sites)])
             s=re.split(r'\[', base_material[endmember][1])[1:]
             for site in range(self.n_sites):
                 site_occupancy=re.split(r'\]', s[site])[0]
@@ -91,14 +91,14 @@ class SolidSolution(Mineral):
                     else:
                         proportion_element_on_site=Fraction(proportion_element_on_site[0])
             
-                    if element_on_site not in sites[site]:
+                    if element_on_site not in self.sites[site]:
                         self.n_occupancies=self.n_occupancies+1
-                        sites[site].append(element_on_site)
-                        element_index=sites[site].index(element_on_site)
+                        self.sites[site].append(element_on_site)
+                        element_index=self.sites[site].index(element_on_site)
                         for parsed_mbr in range(len(list_occupancies)):
                             list_occupancies[parsed_mbr][site].append(0) 
                     else:
-                        element_index=sites[site].index(element_on_site)
+                        element_index=self.sites[site].index(element_on_site)
                     list_occupancies[endmember][site][element_index]=proportion_element_on_site
 
         # Site occupancies and multiplicities
@@ -134,14 +134,14 @@ class SolidSolution(Mineral):
         self.molar_fraction=molar_fraction
 
         # Ideal activities
-        occupancies=np.dot(self.molar_fraction, self.site_occupancies)
+        self.occupancies=np.dot(self.molar_fraction, self.site_occupancies)
         self.ideal_activity=np.empty(shape=(self.n_endmembers))
         for endmember in range(self.n_endmembers):
             self.ideal_activity[endmember]=1.0
             normalisation_constant=1.0
             for element in range(self.n_occupancies):
                 if self.site_occupancies[endmember][element] != 0:
-                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(occupancies[element],self.site_multiplicities[element])
+                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(self.occupancies[element],self.site_multiplicities[element])
                     normalisation_constant=normalisation_constant/pow(self.site_occupancies[endmember][element],self.site_multiplicities[element])
             self.ideal_activity[endmember]=normalisation_constant*self.ideal_activity[endmember]
 
