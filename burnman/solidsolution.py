@@ -2,12 +2,11 @@
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-from burnman.mineral import Mineral
-import warnings
-
-import re
 import numpy as np
-from fractions import Fraction
+from burnman.mineral import Mineral
+from burnman.processchemistry import ProcessSolidSolutionChemistry
+from burnman.processchemistry import CompositionEquality
+import warnings
 
 R = 8.3145 # J/K/mol
 kd = lambda x,y : 1 if x==y else 0
@@ -57,63 +56,21 @@ class SolidSolution(Mineral):
         self.excess_entropy=interaction_parameter[1]
         self.excess_volume=interaction_parameter[2]
 
-        # Number of sites 
-        self.n_sites=base_material[0][1].count('[')
-
-        # Check the number of sites is the same for each endmember
-        for i in range(self.n_endmembers):
-            assert(base_material[i][1].count('[') == self.n_sites)
-
         # Check the chemical composition of each endmember is consistent with the dataset
-        # NOT IMPLEMENTED YET
+        for i in range(self.n_endmembers):
+            endmember_formula=base_material[i][0].params['formula']
+            solution_formula=base_material[i][1]
+            if CompositionEquality(endmember_formula, solution_formula) != True:
+                print 'Formula of endmember', base_material[i][0].params['name'], 'does not agree with formula in the', self.name, 'SolidSolution model'
+                exit()
 
-        # Number of unique site occupancies (e.g.. Mg on X etc.)
-        self.sites=[[] for i in range(self.n_sites)]
-        list_occupancies=[]
-        list_multiplicity=np.empty(shape=(self.n_sites))
-        self.n_occupancies=0
-        for endmember in range(self.n_endmembers):
-            list_occupancies.append([[0]*len(self.sites[site]) for site in range(self.n_sites)])
-            s=re.split(r'\[', base_material[endmember][1])[1:]
-            for site in range(self.n_sites):
-                site_occupancy=re.split(r'\]', s[site])[0]
-                mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
-                if mult == '':
-                    list_multiplicity[site]=1.0
-                else:
-                    list_multiplicity[site]=mult
-                elements=re.findall('[A-Z][^A-Z]*',site_occupancy)
-                for i in range(len(elements)):
-                    element_on_site=re.split('[0-9][^A-Z]*',elements[i])[0]
-                    proportion_element_on_site=re.findall('[0-9][^A-Z]*',elements[i])
-                    if len(proportion_element_on_site) == 0:
-                        proportion_element_on_site=Fraction(1.0)
-                    else:
-                        proportion_element_on_site=Fraction(proportion_element_on_site[0])
-            
-                    if element_on_site not in self.sites[site]:
-                        self.n_occupancies=self.n_occupancies+1
-                        self.sites[site].append(element_on_site)
-                        element_index=self.sites[site].index(element_on_site)
-                        for parsed_mbr in range(len(list_occupancies)):
-                            list_occupancies[parsed_mbr][site].append(0) 
-                    else:
-                        element_index=self.sites[site].index(element_on_site)
-                    list_occupancies[endmember][site][element_index]=proportion_element_on_site
+        # Process solid solution chemistry
+        self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = ProcessSolidSolutionChemistry([base_material[i][1] for i in range(self.n_endmembers)])
 
-        # Site occupancies and multiplicities
-        self.site_occupancies=np.empty(shape=(self.n_endmembers,self.n_occupancies))
-        self.site_multiplicities=np.empty(shape=(self.n_occupancies))
-        for endmember in range(self.n_endmembers):
-            n_element=0
-            for site in range(self.n_sites):
-                for element in range(len(list_occupancies[endmember][site])):
-                    self.site_occupancies[endmember][n_element]=list_occupancies[endmember][site][element]
-                    self.site_multiplicities[n_element]=list_multiplicity[site]
-                    n_element=n_element+1
-
+        # Create array of van Laar parameters
         self.alpha=np.array([base_material[i][2] for i in range(self.n_endmembers)])
 
+        # Create 2D arrays of interaction parameters
         self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
         self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
         self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
@@ -127,22 +84,24 @@ class SolidSolution(Mineral):
 
 
     def set_composition(self, molar_fraction):
+        # Check that the composition declared is consistent with the solution model
         assert(len(self.base_material) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
 
+        # Make molar fraction an attribute of the solid solution
         self.molar_fraction=molar_fraction
 
         # Ideal activities
-        self.occupancies=np.dot(self.molar_fraction, self.site_occupancies)
+        self.site_occupancies=np.dot(self.molar_fraction, self.endmember_occupancies)
         self.ideal_activity=np.empty(shape=(self.n_endmembers))
         for endmember in range(self.n_endmembers):
             self.ideal_activity[endmember]=1.0
             normalisation_constant=1.0
             for element in range(self.n_occupancies):
-                if self.site_occupancies[endmember][element] != 0:
-                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(self.occupancies[element],self.site_multiplicities[element])
-                    normalisation_constant=normalisation_constant/pow(self.site_occupancies[endmember][element],self.site_multiplicities[element])
+                if self.endmember_occupancies[endmember][element] != 0:
+                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(self.site_occupancies[element],self.site_multiplicities[element])
+                    normalisation_constant=normalisation_constant/pow(self.endmember_occupancies[endmember][element],self.site_multiplicities[element])
             self.ideal_activity[endmember]=normalisation_constant*self.ideal_activity[endmember]
 
         # Nonideal contributions
@@ -188,5 +147,3 @@ class SolidSolution(Mineral):
                self.params[prop] = self.base_materials[0].params[prop]
         Mineral.set_state(self, pressure, temperature)
         '''
-
-

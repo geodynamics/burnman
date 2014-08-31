@@ -22,6 +22,9 @@ from burnman.solidsolution import SolidSolution
 # Mixed Holland and Powell sources (test only)
 class garnet(SolidSolution):
     def __init__(self):
+        # Name
+        self.name='garnet'
+
         # Endmembers
         base_material = [[py(), '[Mg]3[Al]2Si3O12', 1.0],[alm(), '[Fe]3[Al]2Si3O12', 1.0],[gr(), '[Ca]3[Al]2Si3O12', 2.7],[maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
 
@@ -34,6 +37,7 @@ class garnet(SolidSolution):
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
 
+
 class fo (Mineral):
     """
     Holland and Powell, 2011, and references therein
@@ -41,6 +45,7 @@ class fo (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
+            'name': 'fo',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2172590.0 ,
@@ -61,6 +66,7 @@ class fa (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
+            'name': 'fa',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1477720.0 ,
@@ -81,6 +87,7 @@ class teph (Mineral):
     def __init__(self):
        formula='Mn2.0Si1.0O4.0'
        self.params = {
+            'name': 'teph',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1733970.0 ,
@@ -101,6 +108,7 @@ class lrn (Mineral):
     def __init__(self):
        formula='Ca2.0Si1.0O4.0'
        self.params = {
+            'name': 'lrn',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2306920.0 ,
@@ -124,6 +132,7 @@ class mont (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0Si1.0O4.0'
        self.params = {
+            'name': 'mont',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2251260.0 ,
@@ -144,6 +153,7 @@ class chum (Mineral):
     def __init__(self):
        formula='Mg9.0Si4.0O18.0H2.0'
        self.params = {
+            'name': 'chum',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9613540.0 ,
@@ -164,6 +174,7 @@ class chdr (Mineral):
     def __init__(self):
        formula='Mg5.0Si2.0O10.0H2.0'
        self.params = {
+            'name': 'chdr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5254890.0 ,
@@ -184,6 +195,7 @@ class mwd (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
+            'name': 'mwd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2138520.0 ,
@@ -204,6 +216,7 @@ class fwd (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
+            'name': 'fwd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1467900.0 ,
@@ -224,6 +237,7 @@ class mrw (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
        self.params = {
+            'name': 'mrw',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2127680.0 ,
@@ -244,6 +258,7 @@ class frw (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
        self.params = {
+            'name': 'frw',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1471760.0 ,
@@ -264,6 +279,7 @@ class mpv (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
+            'name': 'mpv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1443030.0 ,
@@ -284,6 +300,7 @@ class fpv (Mineral):
     def __init__(self):
        formula='Fe1.0Si1.0O3.0'
        self.params = {
+            'name': 'fpv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1084640.0 ,
@@ -304,6 +321,7 @@ class apv (Mineral):
     def __init__(self):
        formula='Al2.0O3.0'
        self.params = {
+            'name': 'apv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1646630.0 ,
@@ -324,6 +342,7 @@ class cpv (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
+            'name': 'cpv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1541730.0 ,
@@ -344,6 +363,7 @@ class mak (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
+            'name': 'mak',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1490870.0 ,
@@ -364,6 +384,7 @@ class fak (Mineral):
     def __init__(self):
        formula='Fe1.0Si1.0O3.0'
        self.params = {
+            'name': 'fak',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1142140.0 ,
@@ -384,6 +405,7 @@ class maj (Mineral):
     def __init__(self):
        formula='Mg4.0Si4.0O12.0'
        self.params = {
+            'name': 'maj',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6050400.0 ,
@@ -404,6 +426,7 @@ class py (Mineral):
     def __init__(self):
        formula='Mg3.0Al2.0Si3.0O12.0'
        self.params = {
+            'name': 'py',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6281960.0 ,
@@ -424,6 +447,7 @@ class alm (Mineral):
     def __init__(self):
        formula='Fe3.0Al2.0Si3.0O12.0'
        self.params = {
+            'name': 'alm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5260700.0 ,
@@ -444,6 +468,7 @@ class spss (Mineral):
     def __init__(self):
        formula='Mn3.0Al2.0Si3.0O12.0'
        self.params = {
+            'name': 'spss',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5693490.0 ,
@@ -464,6 +489,7 @@ class gr (Mineral):
     def __init__(self):
        formula='Ca3.0Al2.0Si3.0O12.0'
        self.params = {
+            'name': 'gr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6643010.0 ,
@@ -484,6 +510,7 @@ class andr (Mineral):
     def __init__(self):
        formula='Ca3.0Fe2.0Si3.0O12.0'
        self.params = {
+            'name': 'andr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5769100.0 ,
@@ -504,6 +531,7 @@ class knor (Mineral):
     def __init__(self):
        formula='Mg3.0Cr2.0Si3.0O12.0'
        self.params = {
+            'name': 'knor',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5687710.0 ,
@@ -524,6 +552,7 @@ class osma (Mineral):
     def __init__(self):
        formula='K1.0Mg2.0Al5.0Si10.0O30.0'
        self.params = {
+            'name': 'osma',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14896310.0 ,
@@ -544,6 +573,7 @@ class osmm (Mineral):
     def __init__(self):
        formula='K1.0Mg3.0Al3.0Si11.0O30.0'
        self.params = {
+            'name': 'osmm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14786740.0 ,
@@ -564,6 +594,7 @@ class osfa (Mineral):
     def __init__(self):
        formula='K1.0Fe2.0Al5.0Si10.0O30.0'
        self.params = {
+            'name': 'osfa',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14215490.0 ,
@@ -584,6 +615,7 @@ class vsv (Mineral):
     def __init__(self):
        formula='Ca19.0Mg2.0Al11.0Si18.0O78.0H9.0'
        self.params = {
+            'name': 'vsv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -42345820.0 ,
@@ -604,6 +636,7 @@ class andalusite (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
+            'name': 'and',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2588670.0 ,
@@ -624,6 +657,7 @@ class ky (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
+            'name': 'ky',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2592970.0 ,
@@ -644,6 +678,7 @@ class sill (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
+            'name': 'sill',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2585790.0 ,
@@ -670,6 +705,7 @@ class smul (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
        self.params = {
+            'name': 'smul',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2569210.0 ,
@@ -690,6 +726,7 @@ class amul (Mineral):
     def __init__(self):
        formula='Al2.5Si0.5O4.75'
        self.params = {
+            'name': 'amul',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2485530.0 ,
@@ -710,6 +747,7 @@ class tpz (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O6.0H2.0'
        self.params = {
+            'name': 'tpz',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2900710.0 ,
@@ -730,6 +768,7 @@ class mst (Mineral):
     def __init__(self):
        formula='Mg4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
+            'name': 'mst',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -25123740.0 ,
@@ -750,6 +789,7 @@ class fst (Mineral):
     def __init__(self):
        formula='Fe4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
+            'name': 'fst',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -23754630.0 ,
@@ -770,6 +810,7 @@ class mnst (Mineral):
     def __init__(self):
        formula='Mn4.0Al18.0Si7.5O48.0H4.0'
        self.params = {
+            'name': 'mnst',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -24245850.0 ,
@@ -790,6 +831,7 @@ class mctd (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
+            'name': 'mctd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3549250.0 ,
@@ -810,6 +852,7 @@ class fctd (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
+            'name': 'fctd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3208290.0 ,
@@ -830,6 +873,7 @@ class mnctd (Mineral):
     def __init__(self):
        formula='Mn1.0Al2.0Si1.0O7.0H2.0'
        self.params = {
+            'name': 'mnctd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3336150.0 ,
@@ -850,6 +894,7 @@ class merw (Mineral):
     def __init__(self):
        formula='Ca3.0Mg1.0Si2.0O8.0'
        self.params = {
+            'name': 'merw',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4545700.0 ,
@@ -870,6 +915,7 @@ class spu (Mineral):
     def __init__(self):
        formula='Ca5.0Si2.0C1.0O11.0'
        self.params = {
+            'name': 'spu',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5846720.0 ,
@@ -890,6 +936,7 @@ class zo (Mineral):
     def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
        self.params = {
+            'name': 'zo',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6896290.0 ,
@@ -910,6 +957,7 @@ class cz (Mineral):
     def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
        self.params = {
+            'name': 'cz',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6895540.0 ,
@@ -930,6 +978,7 @@ class ep (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Fe1.0Si3.0O13.0H1.0'
        self.params = {
+            'name': 'ep',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6473830.0 ,
@@ -950,6 +999,7 @@ class fep (Mineral):
     def __init__(self):
        formula='Ca2.0Al1.0Fe2.0Si3.0O13.0H1.0'
        self.params = {
+            'name': 'fep',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6028590.0 ,
@@ -970,6 +1020,7 @@ class pmt (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Mn1.0Si3.0O13.0H1.0'
        self.params = {
+            'name': 'pmt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6543030.0 ,
@@ -990,6 +1041,7 @@ class law (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
+            'name': 'law',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4868630.0 ,
@@ -1010,6 +1062,7 @@ class mpm (Mineral):
     def __init__(self):
        formula='Ca4.0Al5.0Mg1.0Si6.0O28.0H7.0'
        self.params = {
+            'name': 'mpm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14386910.0 ,
@@ -1030,6 +1083,7 @@ class fpm (Mineral):
     def __init__(self):
        formula='Ca4.0Al5.0Fe1.0Si6.0O28.0H7.0'
        self.params = {
+            'name': 'fpm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14034040.0 ,
@@ -1050,6 +1104,7 @@ class jgd (Mineral):
     def __init__(self):
        formula='Ca4.0Fe6.0Si6.0O28.0H7.0'
        self.params = {
+            'name': 'jgd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -11808960.0 ,
@@ -1070,6 +1125,7 @@ class geh (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Si1.0O7.0'
        self.params = {
+            'name': 'geh',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3992240.0 ,
@@ -1096,6 +1152,7 @@ class ak (Mineral):
     def __init__(self):
        formula='Ca2.0Mg1.0Si2.0O7.0'
        self.params = {
+            'name': 'ak',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3865620.0 ,
@@ -1116,6 +1173,7 @@ class rnk (Mineral):
     def __init__(self):
        formula='Ca3.0Si2.0O7.0'
        self.params = {
+            'name': 'rnk',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3943820.0 ,
@@ -1136,6 +1194,7 @@ class ty (Mineral):
     def __init__(self):
        formula='Ca5.0Si2.0C2.0O13.0'
        self.params = {
+            'name': 'ty',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6368040.0 ,
@@ -1156,6 +1215,7 @@ class crd (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si5.0O18.0'
        self.params = {
+            'name': 'crd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9163430.0 ,
@@ -1182,6 +1242,7 @@ class hcrd (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si5.0O19.0H2.0'
        self.params = {
+            'name': 'hcrd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9448520.0 ,
@@ -1208,6 +1269,7 @@ class fcrd (Mineral):
     def __init__(self):
        formula='Fe2.0Al4.0Si5.0O18.0'
        self.params = {
+            'name': 'fcrd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -8444070.0 ,
@@ -1234,6 +1296,7 @@ class mncrd (Mineral):
     def __init__(self):
        formula='Mn2.0Al4.0Si5.0O18.0'
        self.params = {
+            'name': 'mncrd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -8693590.0 ,
@@ -1260,6 +1323,7 @@ class phA (Mineral):
     def __init__(self):
        formula='Mg7.0Si2.0O14.0H6.0'
        self.params = {
+            'name': 'phA',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -7129620.0 ,
@@ -1280,6 +1344,7 @@ class sph (Mineral):
     def __init__(self):
        formula='Ca1.0Ti1.0Si1.0O5.0'
        self.params = {
+            'name': 'sph',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2601660.0 ,
@@ -1303,6 +1368,7 @@ class cstn (Mineral):
     def __init__(self):
        formula='Ca1.0Si2.0O5.0'
        self.params = {
+            'name': 'cstn',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2496350.0 ,
@@ -1323,6 +1389,7 @@ class zrc (Mineral):
     def __init__(self):
        formula='Zr1.0Si1.0O4.0'
        self.params = {
+            'name': 'zrc',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2035070.0 ,
@@ -1343,6 +1410,7 @@ class en (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
+            'name': 'en',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3090220.0 ,
@@ -1363,6 +1431,7 @@ class pren (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
+            'name': 'pren',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3084560.0 ,
@@ -1383,6 +1452,7 @@ class cen (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
+            'name': 'cen',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3091110.0 ,
@@ -1403,6 +1473,7 @@ class hen (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
        self.params = {
+            'name': 'hen',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3082730.0 ,
@@ -1423,6 +1494,7 @@ class fs (Mineral):
     def __init__(self):
        formula='Fe2.0Si2.0O6.0'
        self.params = {
+            'name': 'fs',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2388710.0 ,
@@ -1443,6 +1515,7 @@ class mgts (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si1.0O6.0'
        self.params = {
+            'name': 'mgts',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3196670.0 ,
@@ -1463,6 +1536,7 @@ class di (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0Si2.0O6.0'
        self.params = {
+            'name': 'di',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3201850.0 ,
@@ -1483,6 +1557,7 @@ class hed (Mineral):
     def __init__(self):
        formula='Ca1.0Fe1.0Si2.0O6.0'
        self.params = {
+            'name': 'hed',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2842060.0 ,
@@ -1503,6 +1578,7 @@ class jd (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si2.0O6.0'
        self.params = {
+            'name': 'jd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3025270.0 ,
@@ -1523,6 +1599,7 @@ class acm (Mineral):
     def __init__(self):
        formula='Na1.0Fe1.0Si2.0O6.0'
        self.params = {
+            'name': 'acm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2583430.0 ,
@@ -1543,6 +1620,7 @@ class kos (Mineral):
     def __init__(self):
        formula='Na1.0Cr1.0Si2.0O6.0'
        self.params = {
+            'name': 'kos',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2746840.0 ,
@@ -1563,6 +1641,7 @@ class cats (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si1.0O6.0'
        self.params = {
+            'name': 'cats',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3310110.0 ,
@@ -1589,6 +1668,7 @@ class caes (Mineral):
     def __init__(self):
        formula='Ca0.5Al1.0Si2.0O6.0'
        self.params = {
+            'name': 'caes',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3002020.0 ,
@@ -1609,6 +1689,7 @@ class rhod (Mineral):
     def __init__(self):
        formula='Mn1.0Si1.0O3.0'
        self.params = {
+            'name': 'rhod',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1322380.0 ,
@@ -1629,6 +1710,7 @@ class pxmn (Mineral):
     def __init__(self):
        formula='Mn1.0Si1.0O3.0'
        self.params = {
+            'name': 'pxmn',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1323160.0 ,
@@ -1649,6 +1731,7 @@ class wo (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
+            'name': 'wo',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1633770.0 ,
@@ -1669,6 +1752,7 @@ class pswo (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
+            'name': 'pswo',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1627960.0 ,
@@ -1689,6 +1773,7 @@ class wal (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
        self.params = {
+            'name': 'wal',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1625900.0 ,
@@ -1709,6 +1794,7 @@ class tr (Mineral):
     def __init__(self):
        formula='Ca2.0Mg5.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'tr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12304870.0 ,
@@ -1729,6 +1815,7 @@ class fact (Mineral):
     def __init__(self):
        formula='Ca2.0Fe5.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'fact',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -10504120.0 ,
@@ -1749,6 +1836,7 @@ class ts (Mineral):
     def __init__(self):
        formula='Ca2.0Mg3.0Al4.0Si6.0O24.0H2.0'
        self.params = {
+            'name': 'ts',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12555270.0 ,
@@ -1769,6 +1857,7 @@ class parg (Mineral):
     def __init__(self):
        formula='Na1.0Ca2.0Mg4.0Al3.0Si6.0O24.0H2.0'
        self.params = {
+            'name': 'parg',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12664730.0 ,
@@ -1789,6 +1878,7 @@ class gl (Mineral):
     def __init__(self):
        formula='Na2.0Mg3.0Al2.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'gl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -11960240.0 ,
@@ -1809,6 +1899,7 @@ class fgl (Mineral):
     def __init__(self):
        formula='Na2.0Al2.0Fe3.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'fgl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -10880210.0 ,
@@ -1829,6 +1920,7 @@ class rieb (Mineral):
     def __init__(self):
        formula='Na2.0Fe5.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'rieb',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -10024780.0 ,
@@ -1849,6 +1941,7 @@ class anth (Mineral):
     def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'anth',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12066840.0 ,
@@ -1869,6 +1962,7 @@ class fanth (Mineral):
     def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'fanth',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9624520.0 ,
@@ -1889,6 +1983,7 @@ class cumm (Mineral):
     def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'cumm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12064690.0 ,
@@ -1909,6 +2004,7 @@ class grun (Mineral):
     def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
        self.params = {
+            'name': 'grun',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9607150.0 ,
@@ -1929,6 +2025,7 @@ class ged (Mineral):
     def __init__(self):
        formula='Mg5.0Al4.0Si6.0O24.0H2.0'
        self.params = {
+            'name': 'ged',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12329140.0 ,
@@ -1949,6 +2046,7 @@ class spr4 (Mineral):
     def __init__(self):
        formula='Mg4.0Al8.0Si2.0O20.0'
        self.params = {
+            'name': 'spr4',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -11022020.0 ,
@@ -1969,6 +2067,7 @@ class spr5 (Mineral):
     def __init__(self):
        formula='Mg3.0Al10.0Si1.0O20.0'
        self.params = {
+            'name': 'spr5',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -11135570.0 ,
@@ -1989,6 +2088,7 @@ class fspr (Mineral):
     def __init__(self):
        formula='Fe4.0Al8.0Si2.0O20.0'
        self.params = {
+            'name': 'fspr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9659530.0 ,
@@ -2009,6 +2109,7 @@ class mcar (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
+            'name': 'mcar',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4771050.0 ,
@@ -2029,6 +2130,7 @@ class fcar (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0Si2.0O10.0H4.0'
        self.params = {
+            'name': 'fcar',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4411440.0 ,
@@ -2049,6 +2151,7 @@ class deer (Mineral):
     def __init__(self):
        formula='Fe18.0Si12.0O50.0H10.0'
        self.params = {
+            'name': 'deer',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -18341400.0 ,
@@ -2069,6 +2172,7 @@ class mu (Mineral):
     def __init__(self):
        formula='K1.0Al3.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'mu',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5976510.0 ,
@@ -2089,6 +2193,7 @@ class cel (Mineral):
     def __init__(self):
        formula='K1.0Mg1.0Al1.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'cel',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5834840.0 ,
@@ -2109,6 +2214,7 @@ class fcel (Mineral):
     def __init__(self):
        formula='K1.0Fe1.0Al1.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'fcel',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5468490.0 ,
@@ -2129,6 +2235,7 @@ class pa (Mineral):
     def __init__(self):
        formula='Na1.0Al3.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'pa',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5942840.0 ,
@@ -2149,6 +2256,7 @@ class ma (Mineral):
     def __init__(self):
        formula='Ca1.0Al4.0Si2.0O12.0H2.0'
        self.params = {
+            'name': 'ma',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6242070.0 ,
@@ -2169,6 +2277,7 @@ class phl (Mineral):
     def __init__(self):
        formula='K1.0Mg3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'phl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6214880.0 ,
@@ -2189,6 +2298,7 @@ class ann (Mineral):
     def __init__(self):
        formula='K1.0Fe3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'ann',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5143720.0 ,
@@ -2209,6 +2319,7 @@ class mnbi (Mineral):
     def __init__(self):
        formula='K1.0Mn3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'mnbi',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5477520.0 ,
@@ -2229,6 +2340,7 @@ class east (Mineral):
     def __init__(self):
        formula='K1.0Mg2.0Al3.0Si2.0O12.0H2.0'
        self.params = {
+            'name': 'east',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6330380.0 ,
@@ -2249,6 +2361,7 @@ class naph (Mineral):
     def __init__(self):
        formula='Na1.0Mg3.0Al1.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'naph',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6172010.0 ,
@@ -2269,6 +2382,7 @@ class clin (Mineral):
     def __init__(self):
        formula='Mg5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
+            'name': 'clin',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -8909160.0 ,
@@ -2289,6 +2403,7 @@ class ames (Mineral):
     def __init__(self):
        formula='Mg4.0Al4.0Si2.0O18.0H8.0'
        self.params = {
+            'name': 'ames',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -9040460.0 ,
@@ -2309,6 +2424,7 @@ class afchl (Mineral):
     def __init__(self):
        formula='Mg6.0Si4.0O18.0H8.0'
        self.params = {
+            'name': 'afchl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -8727860.0 ,
@@ -2329,6 +2445,7 @@ class daph (Mineral):
     def __init__(self):
        formula='Fe5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
+            'name': 'daph',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -7116910.0 ,
@@ -2349,6 +2466,7 @@ class mnchl (Mineral):
     def __init__(self):
        formula='Mn5.0Al2.0Si3.0O18.0H8.0'
        self.params = {
+            'name': 'mnchl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -7702320.0 ,
@@ -2369,6 +2487,7 @@ class sud (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si3.0O18.0H8.0'
        self.params = {
+            'name': 'sud',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -8626540.0 ,
@@ -2389,6 +2508,7 @@ class fsud (Mineral):
     def __init__(self):
        formula='Fe2.0Al4.0Si3.0O18.0H8.0'
        self.params = {
+            'name': 'fsud',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -7899850.0 ,
@@ -2409,6 +2529,7 @@ class prl (Mineral):
     def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'prl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5640610.0 ,
@@ -2429,6 +2550,7 @@ class ta (Mineral):
     def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'ta',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5897170.0 ,
@@ -2449,6 +2571,7 @@ class fta (Mineral):
     def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'fta',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4798540.0 ,
@@ -2469,6 +2592,7 @@ class tats (Mineral):
     def __init__(self):
        formula='Mg2.0Al2.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'tats',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6001290.0 ,
@@ -2489,6 +2613,7 @@ class tap (Mineral):
     def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'tap',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5649780.0 ,
@@ -2509,6 +2634,7 @@ class minn (Mineral):
     def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'minn',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4819310.0 ,
@@ -2529,6 +2655,7 @@ class minm (Mineral):
     def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
        self.params = {
+            'name': 'minm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5866000.0 ,
@@ -2549,6 +2676,7 @@ class kao (Mineral):
     def __init__(self):
        formula='Al2.0Si2.0O9.0H4.0'
        self.params = {
+            'name': 'kao',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4122000.0 ,
@@ -2569,6 +2697,7 @@ class pre (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'pre',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6202170.0 ,
@@ -2589,6 +2718,7 @@ class fpre (Mineral):
     def __init__(self):
        formula='Ca2.0Al1.0Fe1.0Si3.0O12.0H2.0'
        self.params = {
+            'name': 'fpre',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -5766640.0 ,
@@ -2609,6 +2739,7 @@ class chr (Mineral):
     def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
        self.params = {
+            'name': 'chr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4361000.0 ,
@@ -2629,6 +2760,7 @@ class liz (Mineral):
     def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
        self.params = {
+            'name': 'liz',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4369190.0 ,
@@ -2649,6 +2781,7 @@ class glt (Mineral):
     def __init__(self):
        formula='Fe3.0Si2.0O9.0H4.0'
        self.params = {
+            'name': 'glt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3297620.0 ,
@@ -2669,6 +2802,7 @@ class fstp (Mineral):
     def __init__(self):
        formula='K0.5Fe5.0Si8.0Al2.0O30.5H12.5'
        self.params = {
+            'name': 'fstp',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -12551070.0 ,
@@ -2689,6 +2823,7 @@ class mstp (Mineral):
     def __init__(self):
        formula='K0.5Mg5.0Si8.0Al2.0O30.5H12.5'
        self.params = {
+            'name': 'mstp',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -14288380.0 ,
@@ -2709,6 +2844,7 @@ class atg (Mineral):
     def __init__(self):
        formula='Mg48.0Si34.0O147.0H62.0'
        self.params = {
+            'name': 'atg',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -71404690.0 ,
@@ -2729,6 +2865,7 @@ class ab (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
        self.params = {
+            'name': 'ab',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3935480.0 ,
@@ -2755,6 +2892,7 @@ class abh (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
        self.params = {
+            'name': 'abh',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3921480.0 ,
@@ -2775,6 +2913,7 @@ class mic (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
+            'name': 'mic',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3975350.0 ,
@@ -2795,6 +2934,7 @@ class san (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
+            'name': 'san',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3966700.0 ,
@@ -2821,6 +2961,7 @@ class an (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si2.0O8.0'
        self.params = {
+            'name': 'an',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4232690.0 ,
@@ -2847,6 +2988,7 @@ class kcm (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O9.0H2.0'
        self.params = {
+            'name': 'kcm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4232640.0 ,
@@ -2867,6 +3009,7 @@ class wa (Mineral):
     def __init__(self):
        formula='K2.0Si4.0O9.0'
        self.params = {
+            'name': 'wa',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -4271890.0 ,
@@ -2887,6 +3030,7 @@ class hol (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
        self.params = {
+            'name': 'hol',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3791960.0 ,
@@ -2907,6 +3051,7 @@ class q (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
+            'name': 'q',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -910720.0 ,
@@ -2930,6 +3075,7 @@ class trd (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
+            'name': 'trd',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -907110.0 ,
@@ -2950,6 +3096,7 @@ class crst (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
+            'name': 'crst',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -904270.0 ,
@@ -2970,6 +3117,7 @@ class coe (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
+            'name': 'coe',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -907000.0 ,
@@ -2990,6 +3138,7 @@ class stv (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
        self.params = {
+            'name': 'stv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -876390.0 ,
@@ -3010,6 +3159,7 @@ class ne (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
+            'name': 'ne',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2094560.0 ,
@@ -3033,6 +3183,7 @@ class cg (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
+            'name': 'cg',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2091720.0 ,
@@ -3053,6 +3204,7 @@ class cgh (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
        self.params = {
+            'name': 'cgh',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2078010.0 ,
@@ -3073,6 +3225,7 @@ class sdl (Mineral):
     def __init__(self):
        formula='Na8.0Al6.0Si6.0Cl2.0O24.0'
        self.params = {
+            'name': 'sdl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -13405530.0 ,
@@ -3093,6 +3246,7 @@ class kls (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si1.0O4.0'
        self.params = {
+            'name': 'kls',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2122960.0 ,
@@ -3113,6 +3267,7 @@ class lc (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si2.0O6.0'
        self.params = {
+            'name': 'lc',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3029270.0 ,
@@ -3139,6 +3294,7 @@ class me (Mineral):
     def __init__(self):
        formula='Ca4.0Al6.0Si6.0O27.0C1.0'
        self.params = {
+            'name': 'me',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -13841820.0 ,
@@ -3159,6 +3315,7 @@ class wrk (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si4.0O14.0H4.0'
        self.params = {
+            'name': 'wrk',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -6662450.0 ,
@@ -3179,6 +3336,7 @@ class lmt (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si4.0O16.0H8.0'
        self.params = {
+            'name': 'lmt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -7262700.0 ,
@@ -3199,6 +3357,7 @@ class heu (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si7.0O24.0H12.0'
        self.params = {
+            'name': 'heu',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -10545220.0 ,
@@ -3219,6 +3378,7 @@ class stlb (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si7.0O25.0H14.0'
        self.params = {
+            'name': 'stlb',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -10896760.0 ,
@@ -3239,6 +3399,7 @@ class anl (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si2.0O7.0H2.0'
        self.params = {
+            'name': 'anl',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -3307220.0 ,
@@ -3259,6 +3420,7 @@ class lime (Mineral):
     def __init__(self):
        formula='Ca1.0O1.0'
        self.params = {
+            'name': 'lime',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -634530.0 ,
@@ -3279,6 +3441,7 @@ class ru (Mineral):
     def __init__(self):
        formula='Ti1.0O2.0'
        self.params = {
+            'name': 'ru',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -944360.0 ,
@@ -3299,6 +3462,7 @@ class per (Mineral):
     def __init__(self):
        formula='Mg1.0O1.0'
        self.params = {
+            'name': 'per',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -601530.0 ,
@@ -3319,6 +3483,7 @@ class fper (Mineral):
     def __init__(self):
        formula='Fe1.0O1.0'
        self.params = {
+            'name': 'fper',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -259870.0 ,
@@ -3339,6 +3504,7 @@ class mang (Mineral):
     def __init__(self):
        formula='Mn1.0O1.0'
        self.params = {
+            'name': 'mang',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -385550.0 ,
@@ -3359,6 +3525,7 @@ class cor (Mineral):
     def __init__(self):
        formula='Al2.0O3.0'
        self.params = {
+            'name': 'cor',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1675270.0 ,
@@ -3379,6 +3546,7 @@ class mcor (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
        self.params = {
+            'name': 'mcor',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1474440.0 ,
@@ -3399,6 +3567,7 @@ class hem (Mineral):
     def __init__(self):
        formula='Fe2.0O3.0'
        self.params = {
+            'name': 'hem',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -825610.0 ,
@@ -3422,6 +3591,7 @@ class esk (Mineral):
     def __init__(self):
        formula='Cr2.0O3.0'
        self.params = {
+            'name': 'esk',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1137320.0 ,
@@ -3442,6 +3612,7 @@ class bix (Mineral):
     def __init__(self):
        formula='Mn2.0O3.0'
        self.params = {
+            'name': 'bix',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -959000.0 ,
@@ -3462,6 +3633,7 @@ class NiO (Mineral):
     def __init__(self):
        formula='Ni1.0O1.0'
        self.params = {
+            'name': 'NiO',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -239470.0 ,
@@ -3485,6 +3657,7 @@ class pnt (Mineral):
     def __init__(self):
        formula='Mn1.0Ti1.0O3.0'
        self.params = {
+            'name': 'pnt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1361950.0 ,
@@ -3505,6 +3678,7 @@ class geik (Mineral):
     def __init__(self):
        formula='Mg1.0Ti1.0O3.0'
        self.params = {
+            'name': 'geik',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1568960.0 ,
@@ -3525,6 +3699,7 @@ class ilm (Mineral):
     def __init__(self):
        formula='Fe1.0Ti1.0O3.0'
        self.params = {
+            'name': 'ilm',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1230450.0 ,
@@ -3548,6 +3723,7 @@ class bdy (Mineral):
     def __init__(self):
        formula='Zr1.0O2.0'
        self.params = {
+            'name': 'bdy',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1100340.0 ,
@@ -3568,6 +3744,7 @@ class ten (Mineral):
     def __init__(self):
        formula='Cu1.0O1.0'
        self.params = {
+            'name': 'ten',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -156100.0 ,
@@ -3588,6 +3765,7 @@ class cup (Mineral):
     def __init__(self):
        formula='Cu2.0O1.0'
        self.params = {
+            'name': 'cup',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -170600.0 ,
@@ -3608,6 +3786,7 @@ class sp (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0O4.0'
        self.params = {
+            'name': 'sp',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2301190.0 ,
@@ -3634,6 +3813,7 @@ class herc (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0O4.0'
        self.params = {
+            'name': 'herc',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1953030.0 ,
@@ -3660,6 +3840,7 @@ class mt (Mineral):
     def __init__(self):
        formula='Fe3.0O4.0'
        self.params = {
+            'name': 'mt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1114500.0 ,
@@ -3683,6 +3864,7 @@ class mft (Mineral):
     def __init__(self):
        formula='Mg1.0Fe2.0O4.0'
        self.params = {
+            'name': 'mft',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1442290.0 ,
@@ -3706,6 +3888,7 @@ class usp (Mineral):
     def __init__(self):
        formula='Fe2.0Ti1.0O4.0'
        self.params = {
+            'name': 'usp',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1491120.0 ,
@@ -3726,6 +3909,7 @@ class picr (Mineral):
     def __init__(self):
        formula='Mg1.0Cr2.0O4.0'
        self.params = {
+            'name': 'picr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1762600.0 ,
@@ -3752,6 +3936,7 @@ class br (Mineral):
     def __init__(self):
        formula='Mg1.0O2.0H2.0'
        self.params = {
+            'name': 'br',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -925560.0 ,
@@ -3772,6 +3957,7 @@ class dsp (Mineral):
     def __init__(self):
        formula='Al1.0O2.0H1.0'
        self.params = {
+            'name': 'dsp',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -999840.0 ,
@@ -3792,6 +3978,7 @@ class gth (Mineral):
     def __init__(self):
        formula='Fe1.0O2.0H1.0'
        self.params = {
+            'name': 'gth',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -561770.0 ,
@@ -3812,6 +3999,7 @@ class cc (Mineral):
     def __init__(self):
        formula='Ca1.0C1.0O3.0'
        self.params = {
+            'name': 'cc',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1207760.0 ,
@@ -3835,6 +4023,7 @@ class arag (Mineral):
     def __init__(self):
        formula='Ca1.0O3.0C1.0'
        self.params = {
+            'name': 'arag',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1207650.0 ,
@@ -3855,6 +4044,7 @@ class mag (Mineral):
     def __init__(self):
        formula='Mg1.0O3.0C1.0'
        self.params = {
+            'name': 'mag',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1110920.0 ,
@@ -3875,6 +4065,7 @@ class sid (Mineral):
     def __init__(self):
        formula='Fe1.0C1.0O3.0'
        self.params = {
+            'name': 'sid',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -762220.0 ,
@@ -3895,6 +4086,7 @@ class rhc (Mineral):
     def __init__(self):
        formula='Mn1.0C1.0O3.0'
        self.params = {
+            'name': 'rhc',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -892280.0 ,
@@ -3915,6 +4107,7 @@ class dol (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0O6.0C2.0'
        self.params = {
+            'name': 'dol',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -2326220.0 ,
@@ -3941,6 +4134,7 @@ class ank (Mineral):
     def __init__(self):
        formula='Ca1.0Fe1.0O6.0C2.0'
        self.params = {
+            'name': 'ank',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1971410.0 ,
@@ -3967,6 +4161,7 @@ class syv (Mineral):
     def __init__(self):
        formula='K1.0Cl1.0'
        self.params = {
+            'name': 'syv',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -436500.0 ,
@@ -3987,6 +4182,7 @@ class hlt (Mineral):
     def __init__(self):
        formula='Na1.0Cl1.0'
        self.params = {
+            'name': 'hlt',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -411300.0 ,
@@ -4007,6 +4203,7 @@ class pyr (Mineral):
     def __init__(self):
        formula='Fe1.0S2.0'
        self.params = {
+            'name': 'pyr',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -171640.0 ,
@@ -4027,6 +4224,7 @@ class trot (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
+            'name': 'trot',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -99030.0 ,
@@ -4050,6 +4248,7 @@ class tro (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
+            'name': 'tro',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -97760.0 ,
@@ -4073,6 +4272,7 @@ class lot (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
        self.params = {
+            'name': 'lot',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -102160.0 ,
@@ -4096,6 +4296,7 @@ class trov (Mineral):
     def __init__(self):
        formula='Fe0.875S1.0'
        self.params = {
+            'name': 'trov',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -96020.0 ,
@@ -4119,6 +4320,7 @@ class any (Mineral):
     def __init__(self):
        formula='Ca1.0S1.0O4.0'
        self.params = {
+            'name': 'any',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -1434400.0 ,
@@ -4139,6 +4341,7 @@ class iron (Mineral):
     def __init__(self):
        formula='Fe1.0'
        self.params = {
+            'name': 'iron',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -0.0 ,
@@ -4162,6 +4365,7 @@ class Ni (Mineral):
     def __init__(self):
        formula='Ni1.0'
        self.params = {
+            'name': 'Ni',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': 0.0 ,
@@ -4185,6 +4389,7 @@ class Cu (Mineral):
     def __init__(self):
        formula='Cu1.0'
        self.params = {
+            'name': 'Cu',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': -0.0 ,
@@ -4205,6 +4410,7 @@ class gph (Mineral):
     def __init__(self):
        formula='C1.0'
        self.params = {
+            'name': 'gph',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': 0.0 ,
@@ -4225,6 +4431,7 @@ class diam (Mineral):
     def __init__(self):
        formula='C1.0'
        self.params = {
+            'name': 'diam',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': 1890.0 ,
@@ -4245,6 +4452,7 @@ class S (Mineral):
     def __init__(self):
        formula='S1.0'
        self.params = {
+            'name': 'S',
             'formula': formula,
             'equation_of_state': 'mtait',
             'H_0': 0.0 ,

@@ -20,13 +20,13 @@ print garnet.molar_fraction
 print ''
 print 'Site occupancies'
 print garnet.sites
-print garnet.occupancies
+print garnet.site_occupancies
 print ''
 print 'Ideal activities'
 print garnet.ideal_activity
 print ''
 print 'Volume excess'
-print garnet.V_excess
+print garnet.V_excess, 'm^3/mol'
 print ''
 
 # Excess volumes for the pyrope-grossular join

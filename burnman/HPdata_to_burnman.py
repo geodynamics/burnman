@@ -70,6 +70,7 @@ for i in range(int(ds[0][0])):
         print '    def __init__(self):'
         print ''.join(['       formula=\'',M.formula,'\''])
         print '       self.params = {'
+        print ''.join(['            \'name\': \'', M.name, '\','])
         print '            \'formula\': formula,'
         print '            \'equation_of_state\': \'mtait\','
         print '            \'H_0\':', M.H*1e3, ','
