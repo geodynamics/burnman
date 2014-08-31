@@ -97,6 +97,66 @@ def ProcessSolidSolutionChemistry(formula):
 
         return n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities
 
-# WARNING: Currently not implemented
 def CompositionEquality(endmember_formula, solution_formula):
-    return True
+    # Parse endmember formula
+    parsed_endmember_formula=[]
+    elist=[]
+    for enamenumber in re.findall('[A-Z][^A-Z]*', endmember_formula):
+        element=filter(None, re.split(r'(\d+)', enamenumber))
+        if element[0] not in elist:
+            elist.append(element[0])
+            parsed_endmember_formula.append([element[0], float(element[1])])
+        else:
+            element_index=elist.index(element[0])
+            parsed_endmember_formula[element_index][1]=parsed_endmember_formula[element_index][1]+float(element[1])
+
+    # Parse solution formula
+    parsed_solution_formula=[]
+
+    s=re.split(r'\[', solution_formula)[1:]
+    sites=[[] for i in range(len(s))]
+    list_occupancies=[]
+    list_multiplicity=np.empty(shape=(len(s)))
+    n_occupancies=0
+
+    elist=[]
+    for site in range(len(s)):
+        site_occupancy=re.split(r'\]', s[site])[0]
+        mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
+        not_in_site=filter(None, re.split(r'\]', s[site]))[1]
+        not_in_site=not_in_site.replace(mult, '', 1)
+        if mult == '':
+            list_multiplicity[site]=1.0
+        else:
+            list_multiplicity[site]=mult
+
+        # Loop over elements on site
+        elements=re.findall('[A-Z][^A-Z]*',site_occupancy)
+        for i in range(len(elements)):
+            element_on_site=re.split('[0-9][^A-Z]*',elements[i])[0]
+            proportion_element_on_site=re.findall('[0-9][^A-Z]*',elements[i])
+            if len(proportion_element_on_site) == 0:
+                proportion_element_on_site=Fraction(1.0)
+            else:
+                proportion_element_on_site=Fraction(proportion_element_on_site[0])
+            n_element=float(mult)*proportion_element_on_site
+            if element_on_site not in elist:
+                elist.append(element_on_site)
+                parsed_solution_formula.append([element_on_site, n_element])
+            else:
+                element_index=elist.index(element_on_site)
+                parsed_solution_formula[element_index][1]=parsed_solution_formula[element_index][1] + n_element
+
+        for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
+            element=filter(None, re.split(r'(\d+)', enamenumber))
+            if element[0] not in elist:
+                elist.append(element[0])
+                parsed_solution_formula.append([element[0], float(element[1])])
+            else:
+                element_index=elist.index(element[0])
+                parsed_solution_formula[element_index][1]=parsed_solution_formula[element_index][1]+float(element[1])
+
+    parsed_endmember_formula=sorted(parsed_endmember_formula,key=lambda l:l[0])
+    parsed_solution_formula=sorted(parsed_solution_formula,key=lambda l:l[0])
+
+    return parsed_endmember_formula == parsed_solution_formula
