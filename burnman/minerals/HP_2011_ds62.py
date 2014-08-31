@@ -1,3 +1,17 @@
+# BurnMan - a lower mantle toolkit
+# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# Released under GPL v2 or later.
+
+"""
+
+HP_2011_ds62
+^^^^^^^^
+
+Minerals from Holland and Powell (2011) and references therein
+Update to dataset version 6.2
+
+"""
+
 from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
@@ -6,7 +20,7 @@ from burnman.solidsolution import SolidSolution
 class garnet(SolidSolution):
     def __init__(self):
         # Endmembers
-        base_material = [[py(),  '[Mg]3[Al]2Si3O12',         1.0], [alm(), '[Fe]3[Al]2Si3O12',         1.0], [gr(),  '[Ca]3[Al]2Si3O12',         2.7], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
+        base_material = [[py(), '[Mg]3[Al]2Si3O12', 1.0],[alm(), '[Fe]3[Al]2Si3O12', 1.0],[gr(), '[Ca]3[Al]2Si3O12', 2.7],[maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
 
         # Interaction parameters
         excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
