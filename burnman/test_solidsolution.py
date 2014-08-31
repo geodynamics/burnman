@@ -15,10 +15,18 @@ garnet=minerals.HP_2011_ds62.garnet()
 composition=np.array([ 0.5, 0.2, 0.1, 0.2 ])
 garnet.set_composition(composition)
 
+print 'Molar fraction'
 print garnet.molar_fraction
-print garnet.alpha
+print ''
+print 'Site occupancies'
+print garnet.sites
+print garnet.occupancies
+print ''
 print 'Ideal activities'
 print garnet.ideal_activity
+print ''
+print 'Volume excess'
+print garnet.V_excess
 print ''
 
 # Excess volumes for the pyrope-grossular join
