@@ -32,9 +32,6 @@ from burnman.mineral import Mineral
 #from burnman.solidsolution import SolidSolution
 
 class stishovite (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='SiO2'
         self.params = {
@@ -55,9 +52,6 @@ class stishovite (Mineral):
              'err_H_0':0.49e3}
 
 class spinel (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='MgAl2O4'
         self.params = {
@@ -84,9 +78,6 @@ class spinel (Mineral):
              'err_H_0':0.84e3}
 
 class hercynite (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='FeAl2O4'
         self.params = {
@@ -113,9 +104,6 @@ class hercynite (Mineral):
              'err_H_0':0.85e3}
 
 class sillimanite (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='Al2SiO5'
         self.params = {
@@ -142,9 +130,6 @@ class sillimanite (Mineral):
              'err_H_0':0.68e3}
 
 class dolomite (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='MgCaC2O6'
         self.params = {
@@ -172,9 +157,6 @@ class dolomite (Mineral):
 
 
 class quartz (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='SiO2'
         self.params = {
@@ -198,9 +180,6 @@ class quartz (Mineral):
              'err_H_0':0.27e3}
 
 class iron (Mineral):
-    """
-    Holland and Powell, 2011 and references therein
-    """
     def __init__(self):
         formula='Fe'
         self.params = {

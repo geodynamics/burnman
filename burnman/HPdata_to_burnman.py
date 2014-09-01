@@ -64,9 +64,6 @@ for i in range(int(ds[0][0])):
         mbr = 'andalusite'
     if M.flag != -1 and M.flag != -2 and M.k[0] > 0:
         print 'class', mbr, '(Mineral):'
-        print '    """'
-        print '    Holland and Powell, 2011, and references therein'
-        print '    """'
         print '    def __init__(self):'
         print ''.join(['       formula=\'',M.formula,'\''])
         print '       self.params = {'
