@@ -14,27 +14,22 @@ kd = lambda x,y : 1 if x==y else 0
 class SolidSolution(Mineral):
     """
     This is the base class for all solid solutions. 
+    Site occupancies, endmember activities and the constant
+    and pressure and temperature dependencies of the excess 
+    properties can be queried after using set_composition()
     States of the solid solution can only be queried after setting 
-    the pressure and temperature using set_state(). 
-    The method for computing properties of
-    the solution is set using set_method(), which should be done
-    once after creating the material.
+    the pressure, temperature and composition using set_state().
 
     This class is available as ``burnman.SolidSolution``.
 
-    If deriving from this class, set the properties in self.params
-    to the desired values. For more complicated materials you
-    can overwrite set_state(), change the params and then call
-    set_state() from this class.
-
     All the solid solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T 
-    and P derivatives in J/K/mol and m^3/(mol molecule).
+    and P derivatives in J/K/mol and m^3/mol.
     """
 
     # init sets up matrices to speed up calculations for when P, T, X is defined.
     def __init__(self, base_material, interaction_parameter):
-        # Initialise the solid soltion inputs
+        # Initialise the solid solution inputs
         self.base_material = base_material
         self.interaction_parameter = interaction_parameter
 
