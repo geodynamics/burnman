@@ -97,8 +97,8 @@ class Mineral(Material):
     def unroll(self):
         return ([1.0],[self])
 
-    def sample_pressure(self, temperature, volume):
-        return self.method.sample_pressure(temperature, volume, self.params)
+    def eos_pressure(self, temperature, volume):
+        return self.method.pressure(temperature, volume, self.params)
 
     def set_state(self, pressure, temperature):
         """

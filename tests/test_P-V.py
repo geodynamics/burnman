@@ -20,7 +20,7 @@ print ''
 # Here we take the V from the previous step and calculate the pressure. Hopefully it's the same as our original input!!
 V=wad.V
 
-P1=wad.sample_pressure(T,V)
+P1=wad.eos_pressure(T,V)
 print 'Retrieved pressure:', P1, 'Pa'
 print 'Pressure difference:', P1-P0, 'Pa'
 print 'Fractional difference:', (P1-P0)/P0
