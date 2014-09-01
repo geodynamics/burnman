@@ -16,6 +16,11 @@ from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
 
+
+'''
+SOLID SOLUTIONS
+'''
+
 class c2c_pyroxene(SolidSolution):
     def __init__(self):
         # Name
@@ -50,7 +55,7 @@ class ca_rich_perovskite(SolidSolution):
         self.name='calcium perovskite'
 
         # Endmembers (cpv is symmetric)
-        base_material = [[ca_perovskite(), '[Ca][Ca]Si2O6'],[jadeitic_perovskite(), '[Na][Al]Si2O6']]
+        base_material = [[ca_perovskite(), '[Ca][Ca]Si2O6'],[jd_perovskite(), '[Na][Al]Si2O6']]
 
         # Interaction parameters (cpv is ideal)
         interaction_parameter=[]
@@ -76,7 +81,7 @@ class garnet(SolidSolution):
         self.name='garnet'
 
         # Endmembers (garnet is symmetric)
-        base_material = [[pyrope(), '[Mg]3[Al][Al]Si3O12'],[almandine(), '[Fe]3[Al][Al]Si3O12'],[grossular(), '[Ca]3[Al][Al]Si3O12'],[mg_majorite(), '[Mg]3[Mg][Si]Si3O12'],[jadeitic_majorite(), '[Na2/3Al1/3]3[Al][Si]Si3O12']]
+        base_material = [[pyrope(), '[Mg]3[Al][Al]Si3O12'],[almandine(), '[Fe]3[Al][Al]Si3O12'],[grossular(), '[Ca]3[Al][Al]Si3O12'],[mg_majorite(), '[Mg]3[Mg][Si]Si3O12'],[jd_majorite(), '[Na2/3Al1/3]3[Al][Si]Si3O12']]
         # Interaction parameters
         interaction_parameter=[[0.0, 30.e3, 21.20278e3, 0.0],[0.0,0.0,0.0],[57.77596e3, 0.0],[0.0]]
 
@@ -209,185 +214,1692 @@ class mg_fe_wadsleyite(SolidSolution):
 
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
-class stishovite (Mineral):
+
+'''
+ENDMEMBERS
+'''
+class anorthite (Mineral):
     def __init__(self):
-        self.params = {
+       formula='CaAl2Si2O8'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'anorthite',
+            'formula': formula,
             'equation_of_state': 'slb3',
-            'V_0': 14.02e-6,
-            'K_0': 314.0e9,
-            'Kprime_0': 3.8,
-            'G_0': 220.0e9,
-            'Gprime_0': 1.9,
-            'molar_mass': .0601,
-            'n': 3,
-            'Debye_0': 1108.,
-            'grueneisen_0': 1.37,
-            'q_0': 2.8,
-            'eta_s_0': 4.6}
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -4015.e3,
+            'V_0': 100.61e-6,
+            'K_0': 84.e9,
+            'Kprime_0': 4.0,
+            'Debye_0': 752.,
+            'grueneisen_0': 0.39,
+            'q_0': 1.0,
+            'G_0': 40e9,
+            'Gprime_0': 1.1,
+            'eta_s_0': 1.6}
 
         self.uncertainties = {
-             'err_K_0':8.e9,
-             'err_Kprime_0':0.1,
-             'err_G_0':12.e9,
-             'err_Gprime_0':0.1,
-             'err_Debye_0' : 13.,
-             'err_grueneisen_0': .17,
-             'err_q_0': 2.2,
-             'err_eta_s_0' : 1.0
+            'err_F_0': 4.e3,
+            'err_V_0': 0.,
+            'err_K_0': 5.e9,
+            'err_Kprime_0': 1.0,
+            'err_Debye_0': 2.,
+            'err_grueneisen_0': 0.05,
+            'err_q_0': 1.0,
+            'err_G_0': 3.e9,
+            'err_Gprime_0': 0.5,
+            'err_eta_s_0': 0.1
             }
 
+class albite (Mineral):
+    def __init__(self):
+       formula='NaAlSi3O8'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'albite',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -3719.e3,
+            'V_0': 100.45e-6,
+            'K_0': 60.e9,
+            'Kprime_0': 4.0,
+            'Debye_0': 716.,
+            'grueneisen_0': 0.57,
+            'q_0': 1.0,
+            'G_0': 36.e9,
+            'Gprime_0': 1.4,
+            'eta_s_0': 1.0}
+
+        self.uncertainties = {
+            'err_F_0': 5.e3,
+            'err_V_0': 0.0,
+            'err_K_0': 5.e9,
+            'err_Kprime_0': 1.0,
+            'err_Debye_0': 13,
+            'err_grueneisen_0': 0.03,
+            'err_q_0': 1.0,
+            'err_G_0': 5.e9,
+            'err_Gprime_0': 0.5,
+            'err_eta_s_0': 1.0
+            }
+
+class spinel (Mineral):
+    def __init__(self):
+       formula='Mg4Al8O16'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'spinel',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -8668.0e3,
+            'V_0': 159.05e-6,
+            'K_0': 197.e9,
+            'Kprime_0': 5.7,
+            'Debye_0': 843.,
+            'grueneisen_0': 1.02,
+            'q_0': 2.7,
+            'G_0': 108.e9,
+            'Gprime_0': 0.4,
+            'eta_s_0': 2.7}
+
+        self.uncertainties = {
+            'err_F_0': 32.e3,
+            'err_V_0': 0.0,
+            'err_K_0': 1.e9,
+            'err_Kprime_0': 0.2,
+            'err_Debye_0': 33.,
+            'err_grueneisen_0': 0.04,
+            'err_q_0': 0.6,
+            'err_G_0': 10.e9,
+            'err_Gprime_0': 0.5,
+            'err_eta_s_0': 0.6
+            }
+
+class hercynite (Mineral):
+    def __init__(self):
+       formula='Fe4Al8O16'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'hercynite',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -7324.e3,
+            'V_0': 163.37e-6,
+            'K_0': 209.e9,
+            'Kprime_0': 5.7,
+            'Debye_0': 763.,
+            'grueneisen_0': 1.22,
+            'q_0': 2.7,
+            'G_0': 84.e9,
+            'Gprime_0': 0.4,
+            'eta_s_0': 2.8}
+
+        self.uncertainties = {
+            'err_F_0': 35.e3,
+            'err_V_0': 0.0,
+            'err_K_0': 2.e9,
+            'err_Kprime_0': 1.0,
+            'err_Debye_0': 32.,
+            'err_grueneisen_0': 0.07,
+            'err_q_0': 1.0,
+            'err_G_0': 13.e9,
+            'err_Gprime_0': 0.5,
+            'err_eta_s_0': 1.0
+            }
+
+class forsterite (Mineral):
+    def __init__(self):
+       formula='Mg2SiO4'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'forsterite',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -2055.e3,
+            'V_0': 43.60e-6,
+            'K_0': 128.e9,
+            'Kprime_0': 4.2,
+            'Debye_0': 809.,
+            'grueneisen_0': 0.99,
+            'q_0': 2.1,
+            'G_0': 82.e9,
+            'Gprime_0': 1.5,
+            'eta_s_0': 2.3}
+
+        self.uncertainties = {
+            'err_F_0': 2.e3,
+            'err_V_0': 0.0,
+            'err_K_0': 2.e9,
+            'err_Kprime_0': 0.2,
+            'err_Debye_0': 1.,
+            'err_grueneisen_0': 0.03,
+            'err_q_0': 0.2,
+            'err_G_0': 2.e9,
+            'err_Gprime_0': 0.1,
+            'err_eta_s_0': 0.1
+            }
+
+class fayalite (Mineral):
+    def __init__(self):
+       formula='Fe2SiO4'
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': 'fayalite',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': -1371.e3,
+            'V_0': 46.29e-6,
+            'K_0': 135.e9,
+            'Kprime_0': 4.2,
+            'Debye_0': 619.,
+            'grueneisen_0': 1.06,
+            'q_0': 3.6,
+            'G_0': 51.e9,
+            'Gprime_0': 1.5,
+            'eta_s_0': 1.0}
+
+        self.uncertainties = {
+            'err_F_0': 1.e3,
+            'err_V_0': 0.0,
+            'err_K_0': 2.e9,
+            'err_Kprime_0': 1.0,
+            'err_Debye_0': 2.,
+            'err_grueneisen_0': 0.07,
+            'err_q_0': 1.0,
+            'err_G_0': 2.e9,
+            'err_Gprime_0': 0.5,
+            'err_eta_s_0': 0.6
+            }
+
+'''
+class mg_wadsleyite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class fe_wadsleyite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_ringwoodite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class fe_ringwoodite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class enstatite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class ferrosilite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_tschermaks_molecule (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class orthodiopside (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class diopside (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class hedenbergite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class clinoenstatite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class ca_tschermaks_molecule (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class jadeite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class hp_clinoenstatite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class hp_clinoferrosilite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class ca_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_akimotoite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class fe_akimotoite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class corundum (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class pyrope (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class almandine (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class grossular (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_majorite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class jd_majorite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class quartz (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class coesite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class stishovite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class seifertite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class fe_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class al_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class mg_post_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class fe_post_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class al_post_perovskite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
 
 class periclase (Mineral):
     def __init__(self):
-        self.params = {
-            'equation_of_state':'slb3',
-            'V_0': 11.24e-6,
-            'K_0': 161.0e9,
-            'Kprime_0': 3.8,
-            'G_0': 131.0e9,
-            'Gprime_0': 2.1,
-            'molar_mass': .0403,
-            'n': 2,
-            'Debye_0': 767.,
-            'grueneisen_0': 1.36,
-            'q_0': 1.7, #1.7
-            'eta_s_0': 2.8 } # 2.8
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
 
         self.uncertainties = {
-        'err_K_0': 3.e9,
-        'err_Kprime_0':.2,
-        'err_G_0':1.0e9,
-        'err_Gprime_0':.1,
-        'err_Debye_0':9.,
-        'err_grueneisen_0':.05,
-        'err_q_0':.2,
-        'err_eta_s_0':.2 }
-
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
 
 class wuestite (Mineral):
     def __init__(self):
-        self.params = {
-            'equation_of_state':'slb3',
-            'V_0': 12.26e-6,
-            'K_0': 179.0e9,
-            'Kprime_0': 4.9,
-            'G_0': 59.0e9,
-            'Gprime_0': 1.4,
-            'molar_mass': .0718,
-            'n': 2,
-            'Debye_0': 454.,
-            'grueneisen_0': 1.53,
-            'q_0': 1.7, #1.7
-            'eta_s_0': -0.1 } #
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
 
         self.uncertainties = {
-            'err_K_0':1.e9,
-            'err_Kprime_0':.2,
-            'err_G_0':1.e9,
-            'err_Gprime_0':.1,
-            'err_Debye_0':21.,
-            'err_grueneisen_0':.13,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
 
-class mg_perovskite(Mineral):
+class mg_calcium_ferrite (Mineral):
     def __init__(self):
-        self.params = {
-            'equation_of_state':'slb3',
-            'V_0': 24.45e-6,
-            'K_0': 251.0e9,
-            'Kprime_0': 4.1,
-            'G_0': 173.0e9,
-            'Gprime_0': 1.7,
-            'molar_mass': .1000,
-            'n': 5,
-            'Debye_0': 905.,
-            'grueneisen_0': 1.57,
-            'q_0': 1.1,
-            'eta_s_0': 2.6 } #2.6
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
 
         self.uncertainties = {
-            'err_K_0': 3.e9,
-            'err_Kprime_0': 0.1,
-            'err_G_0': 2.e9,
-            'err_Gprime_0' : 0.0,
-            'err_Debye_0': 5.,
-            'err_grueneisen_0':.05,
-            'err_q_0': .3,
-            'err_eta_s_0':.3}
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
 
-
-class fe_perovskite(Mineral):
+class fe_calcium_ferrite (Mineral):
     def __init__(self):
-        self.params = {
-            'equation_of_state':'slb3',
-            'V_0': 25.49e-6,
-            'K_0': 272.0e9,
-            'Kprime_0': 4.1,
-            'G_0': 133.0e9,
-            'Gprime_0': 1.4,
-            'molar_mass': .1319,
-            'n': 5,
-            'Debye_0': 871.,
-            'grueneisen_0': 1.57,
-            'q_0': 1.1,
-            'eta_s_0': 2.3 } #2.3
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
 
         self.uncertainties = {
-            'err_K_0':40e9,
-            'err_Kprime_0':1.,
-            'err_G_0':40e9,
-            'err_Gprime_0':0.0,
-            'err_Debye_0':26.,
-            'err_grueneisen_0':.3,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class na_calcium_ferrite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class kyanite (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+class nepheline (Mineral):
+    def __init__(self):
+       formula=''
+       formula=formula_to_dictionary(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula)[0],
+            'molar_mass': molar_mass(formula, elemental_masses),
+            'F_0': ,
+            'V_0': ,
+            'K_0': ,
+            'Kprime_0': ,
+            'Debye_0': ,
+            'grueneisen_0': ,
+            'q_0': ,
+            'G_0': ,
+            'Gprime_0': ,
+            'eta_s_0': }
+
+        self.uncertainties = {
+            'err_F_0': ,
+            'err_V_0': ,
+            'err_K_0': ,
+            'err_Kprime_0': ,
+            'err_Debye_0': ,
+            'err_grueneisen_0': ,
+            'err_q_0': ,
+            'err_G_0': ,
+            'err_Gprime_0': ,
+            'err_eta_s_0': 
+            }
+
+'''
 
 # Mineral aliases
-mgc2 = hp_clinoenstatite
-fec2 = hp_clinoferrosilite
-mgcf = mg_calcium_ferrite
-fecf = fe_calcium_ferrite
-nacf = na_calcium_ferrite
-capv = calcium_perovskite
-jdpv = jadeitic_perovskite
+# Feldspars
+ab = albite
+an = anorthite
+
+# LP Spinels
+sp = spinel
+hc = hercynite
+
+# Olivine polymorphs
+fo = forsterite
+fa = fayalite
+mgwa = mg_wadsleyite
+fewa = fe_wadsleyite
+mgri = mg_ringwoodite
+feri = fe_ringwoodite
+
+# Orthopyroxenes
+en = enstatite
+fs = ferrosilite
+mgts = mg_tschermaks_molecule
+odi = orthodiopside
+
+# Clinopyroxenes
 di = diopside
 he = hedenbergite
 cen = clinoenstatite
 cats = ca_tschermaks_molecule
 jd = jadeite
-py = pyrope
-al = almandine
-gr = grossular
-mgmj = mg_majorite
-jdmj = jadeitic_majorite
-mgil = mg_akimotoite
-feil = fe_akimotoite
-co = corundum
-pe = periclase
-wu = wuestite
-fo = forsterite
-fa = fayalite
-en = enstatite
-fs = ferrosilite
-mgts = mg_tschermaks_molecule
-odi = orthodiopside
-an = anorthite
-ab = albite
-mppv = mg_post_perovskite
-fppv = fe_post_perovskite
-appv = al_post_perovskite
+mgc2 = hp_clinoenstatite
+fec2 = hp_clinoferrosilite
+hpcen = hp_clinoenstatite
+hpcfs = hp_clinoferrosilite
+
+# Perovskites
 mgpv = mg_perovskite
 mg_bridgmanite = mg_perovskite
 fepv = fe_perovskite
 fe_bridgmanite = fe_perovskite
 alpv = al_perovskite
-mgri = mg_ringwoodite
-feri = fe_ringwoodite
-sp = spinel
-hc = hercynite
-mgwa = mg_wadsleyite
-fewa = fe_wadsleyite
+capv = calcium_perovskite
+jdpv = jd_perovskite
+
+# Ilmenite group
+mgil = mg_akimotoite
+feil = fe_akimotoite
+co = corundum
+
+# Garnet group
+py = pyrope
+al = almandine
+gr = grossular
+mgmj = mg_majorite
+jdmj = jd_majorite
+
+# Quartz polymorphs
+qtz = quartz
+coes = coesite
+st = stishovite
+seif = seifertite
+
+# Post perovskites
+mppv = mg_post_perovskite
+fppv = fe_post_perovskite
+appv = al_post_perovskite
+
+# Magnesiowuestite
+pe = periclase
+wu = wuestite
+
+# Calcium ferrite structured phases
+mgcf = mg_calcium_ferrite
+fecf = fe_calcium_ferrite
+nacf = na_calcium_ferrite
+
+# Al2SiO5 polymorphs
+ky = kyanite
+
+# Nepheline group
+neph = nepheline
+
 
 
 # Solid solution aliases
