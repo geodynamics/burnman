@@ -54,7 +54,7 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
-    def sample_pressure(self, temperature, volume, params):
+    def pressure(self, temperature, volume, params):
         return bm.birch_murnaghan(params['V_0']/volume, params) + \
                 self.__thermal_pressure(temperature,volume, params) - \
                 self.__thermal_pressure(300.,volume, params)

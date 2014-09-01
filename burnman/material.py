@@ -116,3 +116,22 @@ class Material(object):
         """
         raise NotImplementedError("need to implement density() in derived class!")
         return None
+
+    def eos_pressure(self, temperature, volume):
+        """
+        Returns the pressure of this material given temperature and volume as input parameters. The return value of this function does not depend on the current
+        state (temperature, pressure).
+
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+
+        Returns
+        -------
+        eos_pressure : float
+            The pressure experienced by this material in Pa
+
+        """
+        raise NotImplementedError("need to implement eos_pressure() in derived class!")
+        return None
+
