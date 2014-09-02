@@ -99,7 +99,22 @@ class SLBBase(eos.EquationOfState):
                 warnings.warn("May be outside the range of validity for EOS")
                 return sol[0]
 
+    def pressure( self, temperature, volume, params):
+        """
+        Returns the pressure of the mineral at a given temperature and volume [Pa]
+        """
+        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        gr = self.grueneisen_parameter(0.0, temperature, volume, params) #does not depend on pressure
+        E_th = debye.thermal_energy(temperature, debye_T, params['n'])
+        E_th_ref = debye.thermal_energy(300., debye_T, params['n']) #thermal energy at reference temperature
 
+        b_iikk= 9.*params['K_0'] # EQ 28
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
+        f = 0.5*(pow(params['V_0']/volume,2./3.)-1.) # EQ 24
+        P = (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f) \
+            +(0.5*b_iikkmm*pow(f,2.))) + gr*(E_th - E_th_ref)/volume #EQ 21
+
+        return P
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """

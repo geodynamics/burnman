@@ -80,6 +80,9 @@ class BirchMurnaghanBase(eos.EquationOfState):
     def volume(self,pressure, temperature, params):
         return volume(pressure,params)
 
+    def pressure(self, temperature, volume, params):
+        return birch_murnaghan(params['V_0']/volume, params)
+
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
         return bulk_modulus(volume, params)
 

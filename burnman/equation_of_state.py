@@ -40,6 +40,24 @@ class EquationOfState:
         """
         raise NotImplementedError("")
 
+    def pressure(self, temperature, volume, params):
+        """
+        Parameters
+        ----------
+        volume : float
+            Molar volume at which to evaluate the equation of state. [m^3]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        pressure : float
+            Pressure of the mineral, including cold and thermal parts. [m^3]
+        """
+        raise NotImplementedError("")
+
     def density(self, pressure, temperature, params):
         """
         Calculate the density of the mineral.  
