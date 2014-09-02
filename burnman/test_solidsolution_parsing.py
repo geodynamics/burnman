@@ -53,7 +53,7 @@ interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
 molar_fraction = np.array([ 0.5, 0.2, 0.1, 0.2 ])
 
 
-
+print 'Garnet'
 solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities = ProcessSolidSolutionChemistry([base_material[i][1] for i in range(len(base_material))])
 
 
@@ -63,4 +63,14 @@ print n_occupancies
 print sites
 print endmember_occupancies
 print site_multiplicities 
+print ''
 
+print 'Diopside - Ca-tschermaks molecule'
+solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities = ProcessSolidSolutionChemistry(['[Ca][Mg][Si]2O6', '[Ca][Al][Si1/2Al1/2]2O6'])
+
+print solution_formulae
+print n_sites
+print n_occupancies
+print sites
+print endmember_occupancies
+print site_multiplicities 
