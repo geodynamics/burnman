@@ -141,7 +141,6 @@ def ProcessSolidSolutionChemistry(formulae):
             are repeated for each element on each site
 
     """
-
     n_sites=formulae[0].count('[')
     n_endmembers=len(formulae)
 
@@ -154,8 +153,6 @@ def ProcessSolidSolutionChemistry(formulae):
     list_occupancies=[]
     list_multiplicity=np.empty(shape=(n_sites))
     n_occupancies=0
-        
-    s=re.split(r'\[', formulae[i])[1:]
 
         # Number of unique site occupancies (e.g.. Mg on X etc.)
     for endmember in range(n_endmembers):
@@ -164,25 +161,29 @@ def ProcessSolidSolutionChemistry(formulae):
         s=re.split(r'\[', formulae[endmember])[1:]
 
         for site in range(n_sites):
-            site_occupancy=re.split(r'\]', s[site])[0]
-            mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
-            not_in_site=filter(None, re.split(r'\]', s[site]))[1]
-            not_in_site=not_in_site.replace(mult, '', 1)
+            site_split=re.split(r'\]', s[site])
+            site_occupancy=site_split[0]
+
+            mult=re.split('[A-Z][^A-Z]*',site_split[1])[0]
             if mult == '':
                 list_multiplicity[site]=1.0
             else:
-                list_multiplicity[site]=mult
+                list_multiplicity[site]=float(mult)
 
             # Loop over elements on a site
             elements=re.findall('[A-Z][^A-Z]*',site_occupancy)
+
             for i in range(len(elements)):
-                element_on_site=re.split('[0-9][^A-Z]*',elements[i])[0]
-                proportion_element_on_site=re.findall('[0-9][^A-Z]*',elements[i])
-                if len(proportion_element_on_site) == 0:
+
+                # Find the element and proportion on the site
+                element_split=re.split('([0-9][^A-Z]*)',elements[i])
+                element_on_site=element_split[0]
+                if len(element_split) == 1:
                     proportion_element_on_site=Fraction(1.0)
                 else:
-                    proportion_element_on_site=Fraction(proportion_element_on_site[0])
-                solution_formula[element_on_site]=solution_formula.get(element_on_site, 0.0) + float(mult)*proportion_element_on_site
+                    proportion_element_on_site=Fraction(element_split[1])
+
+                solution_formula[element_on_site]=solution_formula.get(element_on_site, 0.0) + list_multiplicity[site]*proportion_element_on_site
             
                 if element_on_site not in sites[site]:
                     n_occupancies=n_occupancies+1
@@ -194,10 +195,12 @@ def ProcessSolidSolutionChemistry(formulae):
                     element_index=sites[site].index(element_on_site)
                 list_occupancies[endmember][site][element_index]=proportion_element_on_site
 
-            # Loop over elements not on a site
-            for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                element=filter(None, re.split(r'(\d+)', enamenumber))
-                solution_formula[element[0]]=solution_formula.get(element[0], 0.0) + float(element[1])
+            if len(site_split) != 1:
+                not_in_site=filter(None, site_split[1])
+                not_in_site=not_in_site.replace(mult, '', 1)
+                for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
+                    element=filter(None, re.split(r'(\d+)', enamenumber))
+                    solution_formula[element[0]]=solution_formula.get(element[0], 0.0) + float(element[1])
 
         solution_formulae.append(solution_formula)
 
