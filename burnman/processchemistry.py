@@ -11,6 +11,10 @@ import numpy as np
 from fractions import Fraction
 
 def read_masses(filename): 
+    """
+    A simple function to read a file with a two column list of 
+    elements and their masses into a dictionary
+    """
     lookup=dict()
     for line in open(filename, "r"):
         data="%".join(line.split("%")[:1]).split()
@@ -19,6 +23,10 @@ def read_masses(filename):
     return lookup
 
 def dictionarize_formula(formula):
+    """
+    A function to read a chemical formula string and 
+    convert it into a dictionary
+    """
     f=dict()
     for element in re.findall('[A-Z][^A-Z]*', formula):
         list=filter(None, re.split(r'(\d+)', element))
@@ -31,12 +39,19 @@ def dictionarize_formula(formula):
     return f
 
 def formula_mass(formula, atomic_masses):
-    mass=0.
-    for element in formula:
-        mass=mass+formula[element]*atomic_masses[element]
+    """
+    A function to take chemical formula and atomic mass
+    dictionaries and 
+    """
+    mass=sum(formula[element]*atomic_masses[element] for element in formula)
     return mass
 
 def dictionarize_site_formula(formula):
+    """
+    A function to take a chemical formula with sites specified
+    by square brackets and return a standard dictionary with
+    element keys and atoms of each element per formula unit as items. 
+    """
     solution_formulae=dict()
     sites=[[] for i in range(len(s))]
     list_occupancies=[]
@@ -75,13 +90,61 @@ def dictionarize_site_formula(formula):
     return f
 
 
-def ProcessSolidSolutionChemistry(formula):
-    n_sites=formula[0].count('[')
-    n_endmembers=len(formula)
+def ProcessSolidSolutionChemistry(formulae):
+    """
+    This function parses a set of endmember formulae 
+    containing site information, e.g.
+        [ '[Mg]3[Al]2Si3O12', '[Mg]3[Mg1/2Si1/2]2Si3O12' ]
+    It outputs the bulk composition of each endmember
+    (removing the site information), and also a set of 
+    variables and arrays which contain the site information. 
+    These are output in a format that can easily be used to 
+    calculate activities and gibbs free energies, given 
+    molar fractions of the phases and pressure
+    and temperature where necessary.
+    
+    
+        Parameters
+        ----------
+        formulae : list of strings
+            List of chemical formulae with site information
+
+        Returns
+        -------
+        solution_formulae : list of dictionaries
+            List of endmember formulae is output from site formula strings
+
+        n_sites : integer
+            Number of sites in the solid solution.
+            Should be the same for all endmembers.
+    
+        sites : list of lists of strings
+            A list of elements for each site in the solid solution
+
+        n_occupancies : integer
+            Sum of the number of possible elements on each of the sites
+            in the solid solution.
+            Example: A binary solution [[A][B],[B][C1/2D1/2]] would have
+                     n_occupancies = 5, with two possible elements on 
+                     Site 1 and three on Site 2
+        
+        endmember_occupancies : 2d array of floats
+            A 1D array for each endmember in the solid solution, 
+            containing the number of atoms of each element on each site.
+        
+        site_multiplicities : array of floats
+            The number of each site per formula unit
+            To simplify computations later, the multiplicities 
+            are repeated for each element on each site
+
+    """
+
+    n_sites=formulae[0].count('[')
+    n_endmembers=len(formulae)
 
     # Check the number of sites is the same for all endmembers
     for i in range(n_endmembers):
-        assert(formula[i].count('[') == n_sites)
+        assert(formulae[i].count('[') == n_sites)
 
     solution_formulae=[]
     sites=[[] for i in range(n_sites)]
@@ -89,13 +152,13 @@ def ProcessSolidSolutionChemistry(formula):
     list_multiplicity=np.empty(shape=(n_sites))
     n_occupancies=0
         
-    s=re.split(r'\[', formula[i])[1:]
+    s=re.split(r'\[', formulae[i])[1:]
 
         # Number of unique site occupancies (e.g.. Mg on X etc.)
     for endmember in range(n_endmembers):
         solution_formula=dict()
         list_occupancies.append([[0]*len(sites[site]) for site in range(n_sites)])
-        s=re.split(r'\[', formula[endmember])[1:]
+        s=re.split(r'\[', formulae[endmember])[1:]
 
         for site in range(n_sites):
             site_occupancy=re.split(r'\]', s[site])[0]
