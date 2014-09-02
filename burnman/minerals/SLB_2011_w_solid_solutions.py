@@ -14,6 +14,7 @@ Solid solutions from inv251010 of HeFESTo
 
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
+from burnman.solutionmodel import *
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
 atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
@@ -30,10 +31,7 @@ class c2c_pyroxene(SolidSolution):
         # Endmembers (C2/c is symmetric)
         base_material = [[hp_clinoenstatite(), '[Mg]2Si2O6'],[hp_clinoferrosilite(), '[Fe]2Si2O6']]
 
-        # Interaction parameters (C2c is ideal)
-        interaction_parameter=[]
-
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, IdealSolution(base_material))
 
 
 
@@ -45,10 +43,7 @@ class ca_ferrite_structured_phase(SolidSolution):
         # Endmembers (CF is symmetric)
         base_material = [[mg_calcium_ferrite(), '[Mg]Al[Al]O4'],[fe_calcium_ferrite(), '[Fe]Al[Al]O4'],[na_calcium_ferrite(), '[Na]Al[Si]O4']]
 
-        # Interaction parameters (CF is ideal)
-        interaction_parameter=[]
-
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, IdealSolution(base_material))
 
 class ca_rich_perovskite(SolidSolution):
     def __init__(self):
@@ -58,10 +53,7 @@ class ca_rich_perovskite(SolidSolution):
         # Endmembers (cpv is symmetric)
         base_material = [[ca_perovskite(), '[Ca][Ca]Si2O6'],[jd_perovskite(), '[Na][Al]Si2O6']]
 
-        # Interaction parameters (cpv is ideal)
-        interaction_parameter=[]
-
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, IdealSolution(base_materia))
 
 class clinopyroxene(SolidSolution):
     def __init__(self):
@@ -72,9 +64,9 @@ class clinopyroxene(SolidSolution):
         base_material = [[diopside(), '[Ca][Mg][Si]2O6'],[hedenbergite(), '[Ca][Fe][Si]2O6'],[clinoenstatite(), '[Mg][Mg][Si]2O6'],[ca_tschermaks_molecule(), '[Ca][Al][Si1/2Al1/2]2O6'],[jadeite(), '[Na][Al][Si]2O6']]
 
         # Interaction parameters
-        interaction_parameter=[[0., 24.74e3, 26.e3, 24.3e3],[24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
+        enthalpy_interaction=[[0., 24.74e3, 26.e3, 24.3e3],[24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 class garnet(SolidSolution):
     def __init__(self):
@@ -84,9 +76,9 @@ class garnet(SolidSolution):
         # Endmembers (garnet is symmetric)
         base_material = [[pyrope(), '[Mg]3[Al][Al]Si3O12'],[almandine(), '[Fe]3[Al][Al]Si3O12'],[grossular(), '[Ca]3[Al][Al]Si3O12'],[mg_majorite(), '[Mg]3[Mg][Si]Si3O12'],[jd_majorite(), '[Na2/3Al1/3]3[Al][Si]Si3O12']]
         # Interaction parameters
-        interaction_parameter=[[0.0, 30.e3, 21.20278e3, 0.0],[0.0,0.0,0.0],[57.77596e3, 0.0],[0.0]]
+        enthalply_interaction=[[0.0, 30.e3, 21.20278e3, 0.0],[0.0,0.0,0.0],[57.77596e3, 0.0],[0.0]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 
 class akimotoite(SolidSolution):
@@ -97,9 +89,9 @@ class akimotoite(SolidSolution):
         # Endmembers (ilmenite/akimotoite is symmetric)
         base_material = [[mg_akimotoite(), '[Mg][Si]O3'],[fe_akimotoite(), '[Fe][Si]O3'],[corundum(), '[Al][Al]O3']]
         # Interaction parameters
-        interaction_parameter=[[0.0, 66.e3],[66.e3]]
+        enthalpy_interaction=[[0.0, 66.e3],[66.e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 class ferropericlase(SolidSolution):
     def __init__(self):
@@ -109,9 +101,9 @@ class ferropericlase(SolidSolution):
         # Endmembers (ferropericlase is symmetric)
         base_material = [[periclase(), '[Mg]O'],[wuestite(), '[Fe]O']]
         # Interaction parameters
-        interaction_parameter=[[13.e3]]
+        enthalpy_interaction=[[13.e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 class mg_fe_olivine(SolidSolution):
     def __init__(self):
@@ -121,9 +113,9 @@ class mg_fe_olivine(SolidSolution):
         # Endmembers (olivine is symmetric)
         base_material = [[forsterite(), '[Mg]2SiO4'],[fayalite(), '[Fe]2SiO4']]
         # Interaction parameters
-        interaction_parameter=[[7.81322e3]]
+        enthalpy_interaction=[[7.81322e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 class orthopyroxene(SolidSolution):
     def __init__(self):
@@ -134,9 +126,9 @@ class orthopyroxene(SolidSolution):
         base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[ferrosilite(), '[Fe][Fe][Si]SiO6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]SiO6'],[orthodiopside(), '[Ca][Mg][Si]SiO6']]
 
         # Interaction parameters
-        interaction_parameter=[[0.0, 0.0, 32.11352e3],[0.0, 0.0],[48.35316e3]]
+        enthalpy_interaction=[[0.0, 0.0, 32.11352e3],[0.0, 0.0],[48.35316e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class plagioclase(SolidSolution):
     def __init__(self):
@@ -146,9 +138,9 @@ class plagioclase(SolidSolution):
         # Endmembers (plagioclase is symmetric)
         base_material = [[anorthite(), '[Ca][Al]2Si2O8'],[albite(), '[Na][Al1/2Si1/2]2Si2O8']]
         # Interaction parameters
-        interaction_parameter=[[26.0e3]]
+        enthalpy_interaction=[[26.0e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class post_perovskite(SolidSolution):
     def __init__(self):
@@ -159,9 +151,9 @@ class post_perovskite(SolidSolution):
         base_material = [[mg_post_perovskite(), '[Mg][Si]O3'],[fe_post_perovskite(), '[Fe][Si]O3'],[al_post_perovskite(), '[Al][Al]O3']]
 
         # Interaction parameters
-        interaction_parameter=[[0.0, 60.0e3],[0.0]]
+        enthalpy_interaction=[[0.0, 60.0e3],[0.0]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class mg_fe_perovskite(SolidSolution):
     def __init__(self):
@@ -172,9 +164,9 @@ class mg_fe_perovskite(SolidSolution):
         base_material = [[mg_perovskite(), '[Mg][Si]O3'],[fe_perovskite(), '[Fe][Si]O3'],[al_perovskite(), '[Al][Al]O3']]
 
         # Interaction parameters
-        interaction_parameter=[[0.0, 116.0e3],[0.0]]
+        enthalpy_interaction=[[0.0, 116.0e3],[0.0]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class mg_fe_ringwoodite(SolidSolution):
     def __init__(self):
@@ -185,9 +177,9 @@ class mg_fe_ringwoodite(SolidSolution):
         base_material = [[mg_ringwoodite(), '[Mg]2SiO4'],[fe_ringwoodite(), '[Fe]2SiO4']]
 
         # Interaction parameters
-        interaction_parameter=[[9.34084e3]]
+        enthalpy_interaction=[[9.34084e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class mg_fe_aluminous_spinel(SolidSolution):
     def __init__(self):
@@ -198,9 +190,9 @@ class mg_fe_aluminous_spinel(SolidSolution):
         base_material = [[spinel(), '[Mg3/4Al1/4]4[Al7/8Mg1/8]8O16'],[hercynite(), '[Fe3/4Al1/4]4[Al7/8Fe1/8]8O16']]
 
         # Interaction parameters
-        interaction_parameter=[[5.87646e3]]
+        enthalpy_interaction=[[5.87646e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction))
 
 class mg_fe_wadsleyite(SolidSolution):
     def __init__(self):
@@ -211,10 +203,9 @@ class mg_fe_wadsleyite(SolidSolution):
         base_material = [[mg_wadsleyite(), '[Mg]2SiO4'],[fe_wadsleyite(), '[Fe]2SiO4']]
 
         # Interaction parameters
-        interaction_parameter=[[16.74718e3]]
+        enthalpy_interaction=[[16.74718e3]]
 
-        SolidSolution.__init__(self, base_material, interaction_parameter)
-
+        SolidSolution.__init__(self, base_material, SymmetricVanLaar(base_material, enthalpy_interaction) )
 
 '''
 ENDMEMBERS
@@ -240,7 +231,7 @@ class anorthite (Mineral):
             'Gprime_0': 1.1,
             'eta_s_0': 1.6}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 4.e3,
             'err_V_0': 0.,
             'err_K_0': 5.e9,
@@ -274,7 +265,7 @@ class albite (Mineral):
             'Gprime_0': 1.4,
             'eta_s_0': 1.0}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 5.e3,
             'err_V_0': 0.0,
             'err_K_0': 5.e9,
@@ -308,7 +299,7 @@ class spinel (Mineral):
             'Gprime_0': 0.4,
             'eta_s_0': 2.7}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 32.e3,
             'err_V_0': 0.0,
             'err_K_0': 1.e9,
@@ -342,7 +333,7 @@ class hercynite (Mineral):
             'Gprime_0': 0.4,
             'eta_s_0': 2.8}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 35.e3,
             'err_V_0': 0.0,
             'err_K_0': 2.e9,
@@ -376,7 +367,7 @@ class forsterite (Mineral):
             'Gprime_0': 1.5,
             'eta_s_0': 2.3}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 2.e3,
             'err_V_0': 0.0,
             'err_K_0': 2.e9,
@@ -410,7 +401,7 @@ class fayalite (Mineral):
             'Gprime_0': 1.5,
             'eta_s_0': 1.0}
 
-        self.uncertainties = {
+       self.uncertainties = {
             'err_F_0': 1.e3,
             'err_V_0': 0.0,
             'err_K_0': 2.e9,
@@ -423,7 +414,6 @@ class fayalite (Mineral):
             'err_eta_s_0': 0.6
             }
 
-'''
 class mg_wadsleyite (Mineral):
     def __init__(self):
        formula=''
@@ -1818,7 +1808,6 @@ class nepheline (Mineral):
             'err_eta_s_0': 
             }
 
-'''
 
 # Mineral aliases
 # Feldspars

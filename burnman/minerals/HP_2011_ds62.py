@@ -18,6 +18,7 @@ N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has t
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+from burnman.solutionmodel import *
 
 atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
 
@@ -28,15 +29,14 @@ class garnet(SolidSolution):
         self.name='garnet'
 
         # Endmembers
-        base_material = [[py(), '[Mg]3[Al]2Si3O12', 1.0],[alm(), '[Fe]3[Al]2Si3O12', 1.0],[gr(), '[Ca]3[Al]2Si3O12', 2.7],[maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12', 1.0]]
-
-        # Interaction parameters
+        endmembers = [[py(), '[Mg]3[Al]2Si3O12'], [alm(), '[Fe]3[Al]2Si3O12'], [gr(), '[Ca]3[Al]2Si3O12'], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        alphas = [1.0, 1.0, 2.7, 1.0]
         excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
         excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
         excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
         
-        interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
-        SolidSolution.__init__(self, base_material, interaction_parameter)
+        sm = AsymmetricVanLaar( endmembers, alphas, excess_enthalpy, excess_volume, excess_entropy)
+        SolidSolution.__init__(self, endmembers, sm)
 
 
 class fo (Mineral):

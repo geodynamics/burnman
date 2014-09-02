@@ -5,6 +5,7 @@
 import numpy as np
 from burnman.mineral import Mineral
 from burnman.processchemistry import ProcessSolidSolutionChemistry
+from burnman.solutionmodel import SolutionModel
 import warnings
 
 R = 8.3145 # J/K/mol
@@ -27,110 +28,32 @@ class SolidSolution(Mineral):
     """
 
     # init sets up matrices to speed up calculations for when P, T, X is defined.
-    def __init__(self, base_material, interaction_parameter):
+    def __init__(self, base_material, solution_model = SolutionModel() ):
         # Initialise the solid solution inputs
         self.base_material = base_material
-        self.interaction_parameter = interaction_parameter
+        self.solution_model = solution_model
 
         # Number of endmembers in the solid solution
         self.n_endmembers=len(base_material)
 
-        # Check that base_material and interaction parameter each have three parts
-        assert(len(map(list, zip(*base_material))) == 3) 
-        assert(len(interaction_parameter) == 3)
-        
-        # Check that the interaction parameters have the correct number of variables
-        for i in range(3):
-            assert(len(interaction_parameter[i]) == self.n_endmembers-1)
-            for j in range(self.n_endmembers-1):
-                assert(len(interaction_parameter[i][j]) == (self.n_endmembers-1)-j)
-
-        # Split interaction parameter into H, S, V terms
-        self.excess_enthalpy=interaction_parameter[0]
-        self.excess_entropy=interaction_parameter[1]
-        self.excess_volume=interaction_parameter[2]
-
-        # Process solid solution chemistry
-        self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = ProcessSolidSolutionChemistry([base_material[i][1] for i in range(self.n_endmembers)])
-
-        # Check the chemical composition of each endmember is consistent with the dataset
-        for i in range(self.n_endmembers):
-            endmember_formula=self.base_material[i][0].params['formula']
-            solution_formula=self.solution_formulae[i]
-            if endmember_formula != solution_formula:
-                print 'Formula of endmember', self.base_material[i][0].params['name'], 'does not agree with formula in the', self.name, 'SolidSolution model'
-                print endmember_formula, self.solution_formulae[i]
-                exit()
-
-        # Create array of van Laar parameters
-        self.alpha=np.array([base_material[i][2] for i in range(self.n_endmembers)])
-
-        # Create 2D arrays of interaction parameters
-        self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
-        self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
-        self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
-        for i in range(self.n_endmembers):
-            for j in range(i+1, self.n_endmembers):
-                self.Wh[i][j]=2.*self.excess_enthalpy[i][j-i-1]/(self.alpha[i]+self.alpha[j])
-                self.Ws[i][j]=2.*self.excess_entropy[i][j-i-1]/(self.alpha[i]+self.alpha[j])
-                self.Wv[i][j]=2.*self.excess_volume[i][j-i-1]/(self.alpha[i]+self.alpha[j])
-
-        # END INITIALISATION
-
-
-    def set_composition(self, molar_fraction):
-        # Check that the composition declared is consistent with the solution model
+    def set_composition( self, molar_fraction ):
         assert(len(self.base_material) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
+        self.molar_fraction = molar_fraction 
 
-        # Make molar fraction an attribute of the solid solution
-        self.molar_fraction=molar_fraction
+    def set_state(self, pressure, temperature):
 
-        # Ideal activities
-        self.site_occupancies=np.dot(self.molar_fraction, self.endmember_occupancies)
-        self.ideal_activity=np.empty(shape=(self.n_endmembers))
-        for endmember in range(self.n_endmembers):
-            self.ideal_activity[endmember]=1.0
-            normalisation_constant=1.0
-            for element in range(self.n_occupancies):
-                if self.endmember_occupancies[endmember][element] != 0:
-                    self.ideal_activity[endmember]=self.ideal_activity[endmember]*pow(self.site_occupancies[element],self.site_multiplicities[element])
-                    normalisation_constant=normalisation_constant/pow(self.endmember_occupancies[endmember][element],self.site_multiplicities[element])
-            self.ideal_activity[endmember]=normalisation_constant*self.ideal_activity[endmember]
-
-        # Nonideal contributions
-        phi=np.array([self.alpha[i]*molar_fraction[i] for i in range(self.n_endmembers)])
-        phi=np.divide(phi, np.sum(phi))
-        self.H_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wh,phi))
-        self.S_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Ws,phi))
-        self.V_excess=np.dot(self.alpha.T,molar_fraction)*np.dot(phi.T,np.dot(self.Wv,phi))
-
-    def set_state(self, pressure, temperature, molar_fraction):
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
-            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
+            self.base_material[i][0].method = self.method
             self.base_material[i][0].set_state(pressure, temperature)
 
-        # Find excess properties
-        self.set_composition(molar_fraction)
+        self.excess_gibbs = self.solution_model.excess_gibbs_free_energy( pressure, temperature, self.molar_fraction)
+        self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
 
-        # Ideal contribution (configurational entropy)
-        # Don't include endmembers with negligable molar fractions as the log term blows up
-        tol=1e-10
-        self.gibbs_excess_ideal=0
-        for i in range(self.n_endmembers):
-            if molar_fraction[i] > tol:
-                self.gibbs_excess_ideal=self.gibbs_excess_ideal + molar_fraction[i]*R*temperature*np.log(self.ideal_activity[i])
-
-        # Non-ideal contribution
-        self.gibbs_excess_nonideal=self.H_excess - temperature*self.S_excess + pressure*self.V_excess
-
-        # Total excess Gibbs
-        self.gibbs_excess=self.gibbs_excess_ideal + self.gibbs_excess_nonideal
-
-        self.V= sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.V_excess
-        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.gibbs_excess
+        self.V= sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
+        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
 
         
         '''
