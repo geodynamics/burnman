@@ -52,8 +52,10 @@ def getmbr(ds, mbr):
             endmember=Endmember(mbr,atoms,formula, int(ds[i*4+3][1]), map(float,ds[i*4+3][2:(len(ds[i*4+3])-1)]), float(ds[i*4+4][0]), float(ds[i*4+4][1]), float(ds[i*4+4][2]), map(float,ds[i*4+5]), float(ds[i*4+6][0]), map(float,ds[i*4+6][1:4]), flag, map(float,ds[i*4+6][5:]))
             return endmember
 
-print 'from burnman.processchemistry import ProcessChemistry'
 print 'from burnman.mineral import Mineral'
+print 'from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass'
+print ''
+print 'atomic_masses=read_masses(\'data/input_masses/atomic_masses.dat\')'
 print ''
 
 formula='0'
@@ -66,6 +68,7 @@ for i in range(int(ds[0][0])):
         print 'class', mbr, '(Mineral):'
         print '    def __init__(self):'
         print ''.join(['       formula=\'',M.formula,'\''])
+        print '       formula = dictionarize_formula(formula)'
         print '       self.params = {'
         print ''.join(['            \'name\': \'', M.name, '\','])
         print '            \'formula\': formula,'
@@ -78,11 +81,11 @@ for i in range(int(ds[0][0])):
         print '            \'K_0\':', M.k[0]*1e8, ','
         print '            \'Kprime_0\':', M.k[1], ','
         print '            \'Kdprime_0\':', M.k[2]*1e-8, ','
-        print '            \'n\': ProcessChemistry(formula)[0],'
+        print '            \'n\': sum(formula.values()),'
         if M.flag==0:
-            print '            \'molar_mass\': ProcessChemistry(formula)[1]}'
+            print '            \'molar_mass\': formula_mass(formula, atomic_masses)}'
         else:
-            print '            \'molar_mass\': ProcessChemistry(formula)[1],'
+            print '            \'molar_mass\': formula_mass(formula, atomic_masses),'
         if M.flag==1:
             print '            \'landau_Tc\':', M.od[0], ','
             print '            \'landau_Smax\':', M.od[1]*1e3, ','

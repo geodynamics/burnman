@@ -27,13 +27,13 @@ The values in the database itself are NOT the same as the paper. They are strict
 There are also parameters which deal with internal order-disorder and Landau transitions. NOTE: These still need to be implemented.
 """
 
-from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
-#from burnman.solidsolution import SolidSolution
+from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
 class stishovite (Mineral):
     def __init__(self):
         formula='SiO2'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -45,8 +45,8 @@ class stishovite (Mineral):
             'K_0': 3090.e8,
             'Kprime_0': 4.6,
             'Kdprime_0': -0.00150e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.uncertainties = {
              'err_H_0':0.49e3}
@@ -54,6 +54,7 @@ class stishovite (Mineral):
 class spinel (Mineral):
     def __init__(self):
         formula='MgAl2O4'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -65,8 +66,8 @@ class spinel (Mineral):
             'K_0': 1922.e8,
             'Kprime_0': 4.04,
             'Kdprime_0': -0.00210e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 8.00e3,
             'BW_deltaV': 0.00,
             'BW_W': 1.20e3,
@@ -80,6 +81,7 @@ class spinel (Mineral):
 class hercynite (Mineral):
     def __init__(self):
         formula='FeAl2O4'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -91,8 +93,8 @@ class hercynite (Mineral):
             'K_0': 1922.e8,
             'Kprime_0': 4.04,
             'Kdprime_0': -0.00210e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 18.30e3,
             'BW_deltaV': 0.00e-5,
             'BW_W': 13.60e3,
@@ -106,6 +108,7 @@ class hercynite (Mineral):
 class sillimanite (Mineral):
     def __init__(self):
         formula='Al2SiO5'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -117,8 +120,8 @@ class sillimanite (Mineral):
             'K_0': 1640.e8,
             'Kprime_0': 5.06,
             'Kdprime_0': -0.00310e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 4.75e3,
             'BW_deltaV': 0.01e-5,
             'BW_W': 4.75e3,
@@ -132,6 +135,7 @@ class sillimanite (Mineral):
 class dolomite (Mineral):
     def __init__(self):
         formula='MgCaC2O6'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -143,8 +147,8 @@ class dolomite (Mineral):
             'K_0': 943.e8,
             'Kprime_0': 3.74,
             'Kdprime_0': -0.004e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 11.91e3,
             'BW_deltaV': 0.016e-5,
             'BW_W': 11.91e3,
@@ -159,6 +163,7 @@ class dolomite (Mineral):
 class quartz (Mineral):
     def __init__(self):
         formula='SiO2'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -170,8 +175,8 @@ class quartz (Mineral):
             'K_0': 730.e8,
             'Kprime_0': 6.0,
             'Kdprime_0': -0.00820e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc':847.,
             'landau_Smax':4.95,
             'landau_Vmax':0.1188e-5}
@@ -182,6 +187,7 @@ class quartz (Mineral):
 class iron (Mineral):
     def __init__(self):
         formula='Fe'
+        formula = dictionarize_formula(formula)
         self.params = {
             'formula': formula,
             'equation_of_state': 'mtait',
@@ -193,8 +199,8 @@ class iron (Mineral):
             'K_0': 1640.e8,
             'Kprime_0': 5.16,
             'Kdprime_0': -0.00310e-8,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc':1042.,
             'landau_Smax':8.3,
             'landau_Vmax':0.0000e-5}

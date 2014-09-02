@@ -15,9 +15,9 @@ unlike those in the original tc-ds62.txt
 N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has the opposite sign to the values in Holland and Powell, 2011. This is consistent with its treatment as an excess entropy term (G=H-T*S+P*V), rather than a thermal correction to the interaction parameter (W=W+T*W_T+P*W_P).
 """
 
-from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
+from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
 # Mixed Holland and Powell sources (test only)
 class garnet(SolidSolution):
@@ -36,9 +36,13 @@ class garnet(SolidSolution):
         interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
+
+atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
+
 class fo (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fo',
             'formula': formula,
@@ -51,12 +55,13 @@ class fo (Mineral):
             'K_0': 1.285e+11 ,
             'Kprime_0': 3.84 ,
             'Kdprime_0': -3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fa (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fa',
             'formula': formula,
@@ -69,12 +74,13 @@ class fa (Mineral):
             'K_0': 1.256e+11 ,
             'Kprime_0': 4.68 ,
             'Kdprime_0': -3.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class teph (Mineral):
     def __init__(self):
        formula='Mn2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'teph',
             'formula': formula,
@@ -87,12 +93,13 @@ class teph (Mineral):
             'K_0': 1.256e+11 ,
             'Kprime_0': 4.68 ,
             'Kdprime_0': -3.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class lrn (Mineral):
     def __init__(self):
        formula='Ca2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'lrn',
             'formula': formula,
@@ -105,8 +112,8 @@ class lrn (Mineral):
             'K_0': 98500000000.0 ,
             'Kprime_0': 4.07 ,
             'Kdprime_0': -4.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 1710.0 ,
             'landau_Smax': 10.03 ,
             'landau_Vmax': 5e-07 }
@@ -114,6 +121,7 @@ class lrn (Mineral):
 class mont (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mont',
             'formula': formula,
@@ -126,12 +134,13 @@ class mont (Mineral):
             'K_0': 1.134e+11 ,
             'Kprime_0': 3.87 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class chum (Mineral):
     def __init__(self):
        formula='Mg9.0Si4.0O18.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'chum',
             'formula': formula,
@@ -144,12 +153,13 @@ class chum (Mineral):
             'K_0': 1.199e+11 ,
             'Kprime_0': 4.58 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class chdr (Mineral):
     def __init__(self):
        formula='Mg5.0Si2.0O10.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'chdr',
             'formula': formula,
@@ -162,12 +172,13 @@ class chdr (Mineral):
             'K_0': 1.161e+11 ,
             'Kprime_0': 4.8 ,
             'Kdprime_0': -4.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mwd (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mwd',
             'formula': formula,
@@ -180,12 +191,13 @@ class mwd (Mineral):
             'K_0': 1.726e+11 ,
             'Kprime_0': 3.84 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fwd (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fwd',
             'formula': formula,
@@ -198,12 +210,13 @@ class fwd (Mineral):
             'K_0': 1.69e+11 ,
             'Kprime_0': 4.35 ,
             'Kdprime_0': -2.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mrw (Mineral):
     def __init__(self):
        formula='Mg2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mrw',
             'formula': formula,
@@ -216,12 +229,13 @@ class mrw (Mineral):
             'K_0': 1.781e+11 ,
             'Kprime_0': 4.35 ,
             'Kdprime_0': -2.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class frw (Mineral):
     def __init__(self):
        formula='Fe2.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'frw',
             'formula': formula,
@@ -234,12 +248,13 @@ class frw (Mineral):
             'K_0': 1.977e+11 ,
             'Kprime_0': 4.92 ,
             'Kdprime_0': -2.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mpv (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mpv',
             'formula': formula,
@@ -252,12 +267,13 @@ class mpv (Mineral):
             'K_0': 2.51e+11 ,
             'Kprime_0': 4.14 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fpv (Mineral):
     def __init__(self):
        formula='Fe1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fpv',
             'formula': formula,
@@ -270,12 +286,13 @@ class fpv (Mineral):
             'K_0': 2.81e+11 ,
             'Kprime_0': 4.14 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class apv (Mineral):
     def __init__(self):
        formula='Al2.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'apv',
             'formula': formula,
@@ -288,12 +305,13 @@ class apv (Mineral):
             'K_0': 2.03e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cpv (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cpv',
             'formula': formula,
@@ -306,12 +324,13 @@ class cpv (Mineral):
             'K_0': 2.36e+11 ,
             'Kprime_0': 3.9 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mak (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mak',
             'formula': formula,
@@ -324,12 +343,13 @@ class mak (Mineral):
             'K_0': 2.11e+11 ,
             'Kprime_0': 4.55 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fak (Mineral):
     def __init__(self):
        formula='Fe1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fak',
             'formula': formula,
@@ -342,12 +362,13 @@ class fak (Mineral):
             'K_0': 2.18e+11 ,
             'Kprime_0': 4.55 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class maj (Mineral):
     def __init__(self):
        formula='Mg4.0Si4.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'maj',
             'formula': formula,
@@ -360,12 +381,13 @@ class maj (Mineral):
             'K_0': 1.6e+11 ,
             'Kprime_0': 4.56 ,
             'Kdprime_0': -2.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class py (Mineral):
     def __init__(self):
        formula='Mg3.0Al2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'py',
             'formula': formula,
@@ -378,12 +400,13 @@ class py (Mineral):
             'K_0': 1.743e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class alm (Mineral):
     def __init__(self):
        formula='Fe3.0Al2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'alm',
             'formula': formula,
@@ -396,12 +419,13 @@ class alm (Mineral):
             'K_0': 1.9e+11 ,
             'Kprime_0': 2.98 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class spss (Mineral):
     def __init__(self):
        formula='Mn3.0Al2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'spss',
             'formula': formula,
@@ -414,12 +438,13 @@ class spss (Mineral):
             'K_0': 1.74e+11 ,
             'Kprime_0': 6.68 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class gr (Mineral):
     def __init__(self):
        formula='Ca3.0Al2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'gr',
             'formula': formula,
@@ -432,12 +457,13 @@ class gr (Mineral):
             'K_0': 1.72e+11 ,
             'Kprime_0': 5.53 ,
             'Kdprime_0': -3.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class andr (Mineral):
     def __init__(self):
        formula='Ca3.0Fe2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'andr',
             'formula': formula,
@@ -450,12 +476,13 @@ class andr (Mineral):
             'K_0': 1.588e+11 ,
             'Kprime_0': 5.68 ,
             'Kdprime_0': -3.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class knor (Mineral):
     def __init__(self):
        formula='Mg3.0Cr2.0Si3.0O12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'knor',
             'formula': formula,
@@ -468,12 +495,13 @@ class knor (Mineral):
             'K_0': 1.743e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class osma (Mineral):
     def __init__(self):
        formula='K1.0Mg2.0Al5.0Si10.0O30.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'osma',
             'formula': formula,
@@ -486,12 +514,13 @@ class osma (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class osmm (Mineral):
     def __init__(self):
        formula='K1.0Mg3.0Al3.0Si11.0O30.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'osmm',
             'formula': formula,
@@ -504,12 +533,13 @@ class osmm (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class osfa (Mineral):
     def __init__(self):
        formula='K1.0Fe2.0Al5.0Si10.0O30.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'osfa',
             'formula': formula,
@@ -522,12 +552,13 @@ class osfa (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class vsv (Mineral):
     def __init__(self):
        formula='Ca19.0Mg2.0Al11.0Si18.0O78.0H9.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'vsv',
             'formula': formula,
@@ -540,12 +571,13 @@ class vsv (Mineral):
             'K_0': 1.255e+11 ,
             'Kprime_0': 4.8 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class andalusite (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'and',
             'formula': formula,
@@ -558,12 +590,13 @@ class andalusite (Mineral):
             'K_0': 1.442e+11 ,
             'Kprime_0': 6.89 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ky (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ky',
             'formula': formula,
@@ -576,12 +609,13 @@ class ky (Mineral):
             'K_0': 1.601e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sill (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sill',
             'formula': formula,
@@ -594,8 +628,8 @@ class sill (Mineral):
             'K_0': 1.64e+11 ,
             'Kprime_0': 5.06 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 4750.0 ,
             'BW_deltaV': 1e-07 ,
             'BW_W': 4750.0 ,
@@ -606,6 +640,7 @@ class sill (Mineral):
 class smul (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'smul',
             'formula': formula,
@@ -618,12 +653,13 @@ class smul (Mineral):
             'K_0': 1.74e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class amul (Mineral):
     def __init__(self):
        formula='Al2.5Si0.5O4.75'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'amul',
             'formula': formula,
@@ -636,12 +672,13 @@ class amul (Mineral):
             'K_0': 1.74e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class tpz (Mineral):
     def __init__(self):
        formula='Al2.0Si1.0O6.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'tpz',
             'formula': formula,
@@ -654,12 +691,13 @@ class tpz (Mineral):
             'K_0': 1.315e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mst (Mineral):
     def __init__(self):
        formula='Mg4.0Al18.0Si7.5O48.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mst',
             'formula': formula,
@@ -672,12 +710,13 @@ class mst (Mineral):
             'K_0': 1.684e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fst (Mineral):
     def __init__(self):
        formula='Fe4.0Al18.0Si7.5O48.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fst',
             'formula': formula,
@@ -690,12 +729,13 @@ class fst (Mineral):
             'K_0': 1.8e+11 ,
             'Kprime_0': 4.76 ,
             'Kdprime_0': -2.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mnst (Mineral):
     def __init__(self):
        formula='Mn4.0Al18.0Si7.5O48.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mnst',
             'formula': formula,
@@ -708,12 +748,13 @@ class mnst (Mineral):
             'K_0': 1.8e+11 ,
             'Kprime_0': 4.76 ,
             'Kdprime_0': -2.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mctd (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si1.0O7.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mctd',
             'formula': formula,
@@ -726,12 +767,13 @@ class mctd (Mineral):
             'K_0': 1.456e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -2.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fctd (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0Si1.0O7.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fctd',
             'formula': formula,
@@ -744,12 +786,13 @@ class fctd (Mineral):
             'K_0': 1.456e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -2.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mnctd (Mineral):
     def __init__(self):
        formula='Mn1.0Al2.0Si1.0O7.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mnctd',
             'formula': formula,
@@ -762,12 +805,13 @@ class mnctd (Mineral):
             'K_0': 1.456e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -2.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class merw (Mineral):
     def __init__(self):
        formula='Ca3.0Mg1.0Si2.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'merw',
             'formula': formula,
@@ -780,12 +824,13 @@ class merw (Mineral):
             'K_0': 1.2e+11 ,
             'Kprime_0': 4.07 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class spu (Mineral):
     def __init__(self):
        formula='Ca5.0Si2.0C1.0O11.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'spu',
             'formula': formula,
@@ -798,12 +843,13 @@ class spu (Mineral):
             'K_0': 95000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class zo (Mineral):
     def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'zo',
             'formula': formula,
@@ -816,12 +862,13 @@ class zo (Mineral):
             'K_0': 1.044e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cz (Mineral):
     def __init__(self):
        formula='Ca2.0Al3.0Si3.0O13.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cz',
             'formula': formula,
@@ -834,12 +881,13 @@ class cz (Mineral):
             'K_0': 1.197e+11 ,
             'Kprime_0': 4.07 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ep (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Fe1.0Si3.0O13.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ep',
             'formula': formula,
@@ -852,12 +900,13 @@ class ep (Mineral):
             'K_0': 1.34e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fep (Mineral):
     def __init__(self):
        formula='Ca2.0Al1.0Fe2.0Si3.0O13.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fep',
             'formula': formula,
@@ -870,12 +919,13 @@ class fep (Mineral):
             'K_0': 1.513e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pmt (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Mn1.0Si3.0O13.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pmt',
             'formula': formula,
@@ -888,12 +938,13 @@ class pmt (Mineral):
             'K_0': 1.197e+11 ,
             'Kprime_0': 4.07 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class law (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si2.0O10.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'law',
             'formula': formula,
@@ -906,12 +957,13 @@ class law (Mineral):
             'K_0': 1.229e+11 ,
             'Kprime_0': 5.45 ,
             'Kdprime_0': -4.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mpm (Mineral):
     def __init__(self):
        formula='Ca4.0Al5.0Mg1.0Si6.0O28.0H7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mpm',
             'formula': formula,
@@ -924,12 +976,13 @@ class mpm (Mineral):
             'K_0': 1.615e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fpm (Mineral):
     def __init__(self):
        formula='Ca4.0Al5.0Fe1.0Si6.0O28.0H7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fpm',
             'formula': formula,
@@ -942,12 +995,13 @@ class fpm (Mineral):
             'K_0': 1.615e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class jgd (Mineral):
     def __init__(self):
        formula='Ca4.0Fe6.0Si6.0O28.0H7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'jgd',
             'formula': formula,
@@ -960,12 +1014,13 @@ class jgd (Mineral):
             'K_0': 1.615e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class geh (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Si1.0O7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'geh',
             'formula': formula,
@@ -978,8 +1033,8 @@ class geh (Mineral):
             'K_0': 1.08e+11 ,
             'Kprime_0': 4.08 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 7510.0 ,
             'BW_deltaV': 9e-07 ,
             'BW_W': 7500.0 ,
@@ -990,6 +1045,7 @@ class geh (Mineral):
 class ak (Mineral):
     def __init__(self):
        formula='Ca2.0Mg1.0Si2.0O7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ak',
             'formula': formula,
@@ -1002,12 +1058,13 @@ class ak (Mineral):
             'K_0': 1.42e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -2.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class rnk (Mineral):
     def __init__(self):
        formula='Ca3.0Si2.0O7.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'rnk',
             'formula': formula,
@@ -1020,12 +1077,13 @@ class rnk (Mineral):
             'K_0': 95000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ty (Mineral):
     def __init__(self):
        formula='Ca5.0Si2.0C2.0O13.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ty',
             'formula': formula,
@@ -1038,12 +1096,13 @@ class ty (Mineral):
             'K_0': 95000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class crd (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si5.0O18.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'crd',
             'formula': formula,
@@ -1056,8 +1115,8 @@ class crd (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 36710.0 ,
             'BW_deltaV': 1e-06 ,
             'BW_W': 36700.0 ,
@@ -1068,6 +1127,7 @@ class crd (Mineral):
 class hcrd (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si5.0O19.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hcrd',
             'formula': formula,
@@ -1080,8 +1140,8 @@ class hcrd (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 36710.0 ,
             'BW_deltaV': 1e-06 ,
             'BW_W': 36700.0 ,
@@ -1092,6 +1152,7 @@ class hcrd (Mineral):
 class fcrd (Mineral):
     def __init__(self):
        formula='Fe2.0Al4.0Si5.0O18.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fcrd',
             'formula': formula,
@@ -1104,8 +1165,8 @@ class fcrd (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 36710.0 ,
             'BW_deltaV': 1e-06 ,
             'BW_W': 36700.0 ,
@@ -1116,6 +1177,7 @@ class fcrd (Mineral):
 class mncrd (Mineral):
     def __init__(self):
        formula='Mn2.0Al4.0Si5.0O18.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mncrd',
             'formula': formula,
@@ -1128,8 +1190,8 @@ class mncrd (Mineral):
             'K_0': 1.29e+11 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 36710.0 ,
             'BW_deltaV': 1e-06 ,
             'BW_W': 36700.0 ,
@@ -1140,6 +1202,7 @@ class mncrd (Mineral):
 class phA (Mineral):
     def __init__(self):
        formula='Mg7.0Si2.0O14.0H6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'phA',
             'formula': formula,
@@ -1152,12 +1215,13 @@ class phA (Mineral):
             'K_0': 1.45e+11 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -2.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sph (Mineral):
     def __init__(self):
        formula='Ca1.0Ti1.0Si1.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sph',
             'formula': formula,
@@ -1170,8 +1234,8 @@ class sph (Mineral):
             'K_0': 1.017e+11 ,
             'Kprime_0': 9.85 ,
             'Kdprime_0': -9.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 485.0 ,
             'landau_Smax': 0.4 ,
             'landau_Vmax': 5e-08 }
@@ -1179,6 +1243,7 @@ class sph (Mineral):
 class cstn (Mineral):
     def __init__(self):
        formula='Ca1.0Si2.0O5.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cstn',
             'formula': formula,
@@ -1191,12 +1256,13 @@ class cstn (Mineral):
             'K_0': 1.782e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class zrc (Mineral):
     def __init__(self):
        formula='Zr1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'zrc',
             'formula': formula,
@@ -1209,12 +1275,13 @@ class zrc (Mineral):
             'K_0': 2.301e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class en (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'en',
             'formula': formula,
@@ -1227,12 +1294,13 @@ class en (Mineral):
             'K_0': 1.059e+11 ,
             'Kprime_0': 8.65 ,
             'Kdprime_0': -8.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pren (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pren',
             'formula': formula,
@@ -1245,12 +1313,13 @@ class pren (Mineral):
             'K_0': 1.059e+11 ,
             'Kprime_0': 8.65 ,
             'Kdprime_0': -8.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cen (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cen',
             'formula': formula,
@@ -1263,12 +1332,13 @@ class cen (Mineral):
             'K_0': 1.059e+11 ,
             'Kprime_0': 8.65 ,
             'Kdprime_0': -8.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class hen (Mineral):
     def __init__(self):
        formula='Mg2.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hen',
             'formula': formula,
@@ -1281,12 +1351,13 @@ class hen (Mineral):
             'K_0': 1.5e+11 ,
             'Kprime_0': 5.5 ,
             'Kdprime_0': -3.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fs (Mineral):
     def __init__(self):
        formula='Fe2.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fs',
             'formula': formula,
@@ -1299,12 +1370,13 @@ class fs (Mineral):
             'K_0': 1.01e+11 ,
             'Kprime_0': 4.08 ,
             'Kdprime_0': -4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mgts (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si1.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mgts',
             'formula': formula,
@@ -1317,12 +1389,13 @@ class mgts (Mineral):
             'K_0': 1.028e+11 ,
             'Kprime_0': 8.55 ,
             'Kdprime_0': -8.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class di (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'di',
             'formula': formula,
@@ -1335,12 +1408,13 @@ class di (Mineral):
             'K_0': 1.192e+11 ,
             'Kprime_0': 5.19 ,
             'Kdprime_0': -4.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class hed (Mineral):
     def __init__(self):
        formula='Ca1.0Fe1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hed',
             'formula': formula,
@@ -1353,12 +1427,13 @@ class hed (Mineral):
             'K_0': 1.192e+11 ,
             'Kprime_0': 3.97 ,
             'Kdprime_0': -3.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class jd (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'jd',
             'formula': formula,
@@ -1371,12 +1446,13 @@ class jd (Mineral):
             'K_0': 1.281e+11 ,
             'Kprime_0': 3.81 ,
             'Kdprime_0': -3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class acm (Mineral):
     def __init__(self):
        formula='Na1.0Fe1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'acm',
             'formula': formula,
@@ -1389,12 +1465,13 @@ class acm (Mineral):
             'K_0': 1.06e+11 ,
             'Kprime_0': 4.08 ,
             'Kdprime_0': -3.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class kos (Mineral):
     def __init__(self):
        formula='Na1.0Cr1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'kos',
             'formula': formula,
@@ -1407,12 +1484,13 @@ class kos (Mineral):
             'K_0': 1.308e+11 ,
             'Kprime_0': 3.0 ,
             'Kdprime_0': -2.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cats (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si1.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cats',
             'formula': formula,
@@ -1425,8 +1503,8 @@ class cats (Mineral):
             'K_0': 1.192e+11 ,
             'Kprime_0': 5.19 ,
             'Kdprime_0': -4.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 3800.0 ,
             'BW_deltaV': 1e-07 ,
             'BW_W': 3800.0 ,
@@ -1437,6 +1515,7 @@ class cats (Mineral):
 class caes (Mineral):
     def __init__(self):
        formula='Ca0.5Al1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'caes',
             'formula': formula,
@@ -1449,12 +1528,13 @@ class caes (Mineral):
             'K_0': 1.192e+11 ,
             'Kprime_0': 5.19 ,
             'Kdprime_0': -4.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class rhod (Mineral):
     def __init__(self):
        formula='Mn1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'rhod',
             'formula': formula,
@@ -1467,12 +1547,13 @@ class rhod (Mineral):
             'K_0': 84000000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pxmn (Mineral):
     def __init__(self):
        formula='Mn1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pxmn',
             'formula': formula,
@@ -1485,12 +1566,13 @@ class pxmn (Mineral):
             'K_0': 84000000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class wo (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'wo',
             'formula': formula,
@@ -1503,12 +1585,13 @@ class wo (Mineral):
             'K_0': 79500000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pswo (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pswo',
             'formula': formula,
@@ -1521,12 +1604,13 @@ class pswo (Mineral):
             'K_0': 1.1e+11 ,
             'Kprime_0': 4.08 ,
             'Kdprime_0': -3.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class wal (Mineral):
     def __init__(self):
        formula='Ca1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'wal',
             'formula': formula,
@@ -1539,12 +1623,13 @@ class wal (Mineral):
             'K_0': 79500000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class tr (Mineral):
     def __init__(self):
        formula='Ca2.0Mg5.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'tr',
             'formula': formula,
@@ -1557,12 +1642,13 @@ class tr (Mineral):
             'K_0': 76200000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fact (Mineral):
     def __init__(self):
        formula='Ca2.0Fe5.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fact',
             'formula': formula,
@@ -1575,12 +1661,13 @@ class fact (Mineral):
             'K_0': 76000000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ts (Mineral):
     def __init__(self):
        formula='Ca2.0Mg3.0Al4.0Si6.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ts',
             'formula': formula,
@@ -1593,12 +1680,13 @@ class ts (Mineral):
             'K_0': 76000000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class parg (Mineral):
     def __init__(self):
        formula='Na1.0Ca2.0Mg4.0Al3.0Si6.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'parg',
             'formula': formula,
@@ -1611,12 +1699,13 @@ class parg (Mineral):
             'K_0': 91200000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class gl (Mineral):
     def __init__(self):
        formula='Na2.0Mg3.0Al2.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'gl',
             'formula': formula,
@@ -1629,12 +1718,13 @@ class gl (Mineral):
             'K_0': 88300000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fgl (Mineral):
     def __init__(self):
        formula='Na2.0Al2.0Fe3.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fgl',
             'formula': formula,
@@ -1647,12 +1737,13 @@ class fgl (Mineral):
             'K_0': 89000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class rieb (Mineral):
     def __init__(self):
        formula='Na2.0Fe5.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'rieb',
             'formula': formula,
@@ -1665,12 +1756,13 @@ class rieb (Mineral):
             'K_0': 89000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class anth (Mineral):
     def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'anth',
             'formula': formula,
@@ -1683,12 +1775,13 @@ class anth (Mineral):
             'K_0': 70000000000.0 ,
             'Kprime_0': 4.11 ,
             'Kdprime_0': -5.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fanth (Mineral):
     def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fanth',
             'formula': formula,
@@ -1701,12 +1794,13 @@ class fanth (Mineral):
             'K_0': 70000000000.0 ,
             'Kprime_0': 4.11 ,
             'Kdprime_0': -5.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cumm (Mineral):
     def __init__(self):
        formula='Mg7.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cumm',
             'formula': formula,
@@ -1719,12 +1813,13 @@ class cumm (Mineral):
             'K_0': 70000000000.0 ,
             'Kprime_0': 4.11 ,
             'Kdprime_0': -5.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class grun (Mineral):
     def __init__(self):
        formula='Fe7.0Si8.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'grun',
             'formula': formula,
@@ -1737,12 +1832,13 @@ class grun (Mineral):
             'K_0': 64800000000.0 ,
             'Kprime_0': 4.12 ,
             'Kdprime_0': -6.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ged (Mineral):
     def __init__(self):
        formula='Mg5.0Al4.0Si6.0O24.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ged',
             'formula': formula,
@@ -1755,12 +1851,13 @@ class ged (Mineral):
             'K_0': 77000000000.0 ,
             'Kprime_0': 4.1 ,
             'Kdprime_0': -5.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class spr4 (Mineral):
     def __init__(self):
        formula='Mg4.0Al8.0Si2.0O20.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'spr4',
             'formula': formula,
@@ -1773,12 +1870,13 @@ class spr4 (Mineral):
             'K_0': 2.5e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class spr5 (Mineral):
     def __init__(self):
        formula='Mg3.0Al10.0Si1.0O20.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'spr5',
             'formula': formula,
@@ -1791,12 +1889,13 @@ class spr5 (Mineral):
             'K_0': 2.5e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fspr (Mineral):
     def __init__(self):
        formula='Fe4.0Al8.0Si2.0O20.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fspr',
             'formula': formula,
@@ -1809,12 +1908,13 @@ class fspr (Mineral):
             'K_0': 2.5e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mcar (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0Si2.0O10.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mcar',
             'formula': formula,
@@ -1827,12 +1927,13 @@ class mcar (Mineral):
             'K_0': 52500000000.0 ,
             'Kprime_0': 4.14 ,
             'Kdprime_0': -7.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fcar (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0Si2.0O10.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fcar',
             'formula': formula,
@@ -1845,12 +1946,13 @@ class fcar (Mineral):
             'K_0': 52500000000.0 ,
             'Kprime_0': 4.14 ,
             'Kdprime_0': -7.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class deer (Mineral):
     def __init__(self):
        formula='Fe18.0Si12.0O50.0H10.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'deer',
             'formula': formula,
@@ -1863,12 +1965,13 @@ class deer (Mineral):
             'K_0': 63000000000.0 ,
             'Kprime_0': 4.12 ,
             'Kdprime_0': -6.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mu (Mineral):
     def __init__(self):
        formula='K1.0Al3.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mu',
             'formula': formula,
@@ -1881,12 +1984,13 @@ class mu (Mineral):
             'K_0': 49000000000.0 ,
             'Kprime_0': 4.15 ,
             'Kdprime_0': -8.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cel (Mineral):
     def __init__(self):
        formula='K1.0Mg1.0Al1.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cel',
             'formula': formula,
@@ -1899,12 +2003,13 @@ class cel (Mineral):
             'K_0': 70000000000.0 ,
             'Kprime_0': 4.11 ,
             'Kdprime_0': -5.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fcel (Mineral):
     def __init__(self):
        formula='K1.0Fe1.0Al1.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fcel',
             'formula': formula,
@@ -1917,12 +2022,13 @@ class fcel (Mineral):
             'K_0': 70000000000.0 ,
             'Kprime_0': 4.11 ,
             'Kdprime_0': -5.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pa (Mineral):
     def __init__(self):
        formula='Na1.0Al3.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pa',
             'formula': formula,
@@ -1935,12 +2041,13 @@ class pa (Mineral):
             'K_0': 51500000000.0 ,
             'Kprime_0': 6.51 ,
             'Kdprime_0': -1.26e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ma (Mineral):
     def __init__(self):
        formula='Ca1.0Al4.0Si2.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ma',
             'formula': formula,
@@ -1953,12 +2060,13 @@ class ma (Mineral):
             'K_0': 1e+11 ,
             'Kprime_0': 4.08 ,
             'Kdprime_0': -4.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class phl (Mineral):
     def __init__(self):
        formula='K1.0Mg3.0Al1.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'phl',
             'formula': formula,
@@ -1971,12 +2079,13 @@ class phl (Mineral):
             'K_0': 51300000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ann (Mineral):
     def __init__(self):
        formula='K1.0Fe3.0Al1.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ann',
             'formula': formula,
@@ -1989,12 +2098,13 @@ class ann (Mineral):
             'K_0': 51300000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mnbi (Mineral):
     def __init__(self):
        formula='K1.0Mn3.0Al1.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mnbi',
             'formula': formula,
@@ -2007,12 +2117,13 @@ class mnbi (Mineral):
             'K_0': 53000000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class east (Mineral):
     def __init__(self):
        formula='K1.0Mg2.0Al3.0Si2.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'east',
             'formula': formula,
@@ -2025,12 +2136,13 @@ class east (Mineral):
             'K_0': 53000000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class naph (Mineral):
     def __init__(self):
        formula='Na1.0Mg3.0Al1.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'naph',
             'formula': formula,
@@ -2043,12 +2155,13 @@ class naph (Mineral):
             'K_0': 51300000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class clin (Mineral):
     def __init__(self):
        formula='Mg5.0Al2.0Si3.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'clin',
             'formula': formula,
@@ -2061,12 +2174,13 @@ class clin (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ames (Mineral):
     def __init__(self):
        formula='Mg4.0Al4.0Si2.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ames',
             'formula': formula,
@@ -2079,12 +2193,13 @@ class ames (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class afchl (Mineral):
     def __init__(self):
        formula='Mg6.0Si4.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'afchl',
             'formula': formula,
@@ -2097,12 +2212,13 @@ class afchl (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class daph (Mineral):
     def __init__(self):
        formula='Fe5.0Al2.0Si3.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'daph',
             'formula': formula,
@@ -2115,12 +2231,13 @@ class daph (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mnchl (Mineral):
     def __init__(self):
        formula='Mn5.0Al2.0Si3.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mnchl',
             'formula': formula,
@@ -2133,12 +2250,13 @@ class mnchl (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sud (Mineral):
     def __init__(self):
        formula='Mg2.0Al4.0Si3.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sud',
             'formula': formula,
@@ -2151,12 +2269,13 @@ class sud (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fsud (Mineral):
     def __init__(self):
        formula='Fe2.0Al4.0Si3.0O18.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fsud',
             'formula': formula,
@@ -2169,12 +2288,13 @@ class fsud (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class prl (Mineral):
     def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'prl',
             'formula': formula,
@@ -2187,12 +2307,13 @@ class prl (Mineral):
             'K_0': 37000000000.0 ,
             'Kprime_0': 10.0 ,
             'Kdprime_0': -2.71e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ta (Mineral):
     def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ta',
             'formula': formula,
@@ -2205,12 +2326,13 @@ class ta (Mineral):
             'K_0': 43000000000.0 ,
             'Kprime_0': 6.17 ,
             'Kdprime_0': -1.44e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fta (Mineral):
     def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fta',
             'formula': formula,
@@ -2223,12 +2345,13 @@ class fta (Mineral):
             'K_0': 43000000000.0 ,
             'Kprime_0': 6.17 ,
             'Kdprime_0': -1.44e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class tats (Mineral):
     def __init__(self):
        formula='Mg2.0Al2.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'tats',
             'formula': formula,
@@ -2241,12 +2364,13 @@ class tats (Mineral):
             'K_0': 43000000000.0 ,
             'Kprime_0': 6.17 ,
             'Kdprime_0': -1.44e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class tap (Mineral):
     def __init__(self):
        formula='Al2.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'tap',
             'formula': formula,
@@ -2259,12 +2383,13 @@ class tap (Mineral):
             'K_0': 37000000000.0 ,
             'Kprime_0': 10.0 ,
             'Kdprime_0': -2.71e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class minn (Mineral):
     def __init__(self):
        formula='Fe3.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'minn',
             'formula': formula,
@@ -2277,12 +2402,13 @@ class minn (Mineral):
             'K_0': 43000000000.0 ,
             'Kprime_0': 6.17 ,
             'Kdprime_0': -1.44e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class minm (Mineral):
     def __init__(self):
        formula='Mg3.0Si4.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'minm',
             'formula': formula,
@@ -2295,12 +2421,13 @@ class minm (Mineral):
             'K_0': 43000000000.0 ,
             'Kprime_0': 6.17 ,
             'Kdprime_0': -1.44e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class kao (Mineral):
     def __init__(self):
        formula='Al2.0Si2.0O9.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'kao',
             'formula': formula,
@@ -2313,12 +2440,13 @@ class kao (Mineral):
             'K_0': 64500000000.0 ,
             'Kprime_0': 4.12 ,
             'Kdprime_0': -6.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pre (Mineral):
     def __init__(self):
        formula='Ca2.0Al2.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pre',
             'formula': formula,
@@ -2331,12 +2459,13 @@ class pre (Mineral):
             'K_0': 1.093e+11 ,
             'Kprime_0': 4.01 ,
             'Kdprime_0': -3.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fpre (Mineral):
     def __init__(self):
        formula='Ca2.0Al1.0Fe1.0Si3.0O12.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fpre',
             'formula': formula,
@@ -2349,12 +2478,13 @@ class fpre (Mineral):
             'K_0': 1.093e+11 ,
             'Kprime_0': 4.01 ,
             'Kdprime_0': -3.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class chr (Mineral):
     def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'chr',
             'formula': formula,
@@ -2367,12 +2497,13 @@ class chr (Mineral):
             'K_0': 62800000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -6.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class liz (Mineral):
     def __init__(self):
        formula='Mg3.0Si2.0O9.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'liz',
             'formula': formula,
@@ -2385,12 +2516,13 @@ class liz (Mineral):
             'K_0': 71000000000.0 ,
             'Kprime_0': 3.2 ,
             'Kdprime_0': -4.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class glt (Mineral):
     def __init__(self):
        formula='Fe3.0Si2.0O9.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'glt',
             'formula': formula,
@@ -2403,12 +2535,13 @@ class glt (Mineral):
             'K_0': 63000000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -6.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fstp (Mineral):
     def __init__(self):
        formula='K0.5Fe5.0Si8.0Al2.0O30.5H12.5'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fstp',
             'formula': formula,
@@ -2421,12 +2554,13 @@ class fstp (Mineral):
             'K_0': 51300000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mstp (Mineral):
     def __init__(self):
        formula='K0.5Mg5.0Si8.0Al2.0O30.5H12.5'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mstp',
             'formula': formula,
@@ -2439,12 +2573,13 @@ class mstp (Mineral):
             'K_0': 51300000000.0 ,
             'Kprime_0': 7.33 ,
             'Kdprime_0': -1.43e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class atg (Mineral):
     def __init__(self):
        formula='Mg48.0Si34.0O147.0H62.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'atg',
             'formula': formula,
@@ -2457,12 +2592,13 @@ class atg (Mineral):
             'K_0': 63100000000.0 ,
             'Kprime_0': 5.92 ,
             'Kdprime_0': -9.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ab (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ab',
             'formula': formula,
@@ -2475,8 +2611,8 @@ class ab (Mineral):
             'K_0': 54100000000.0 ,
             'Kprime_0': 5.91 ,
             'Kdprime_0': -1.09e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 14000.0 ,
             'BW_deltaV': 4.2e-07 ,
             'BW_W': 13000.0 ,
@@ -2487,6 +2623,7 @@ class ab (Mineral):
 class abh (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si3.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'abh',
             'formula': formula,
@@ -2499,12 +2636,13 @@ class abh (Mineral):
             'K_0': 54100000000.0 ,
             'Kprime_0': 5.91 ,
             'Kdprime_0': -1.09e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mic (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mic',
             'formula': formula,
@@ -2517,12 +2655,13 @@ class mic (Mineral):
             'K_0': 58300000000.0 ,
             'Kprime_0': 4.02 ,
             'Kdprime_0': -6.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class san (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'san',
             'formula': formula,
@@ -2535,8 +2674,8 @@ class san (Mineral):
             'K_0': 58300000000.0 ,
             'Kprime_0': 4.02 ,
             'Kdprime_0': -6.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 8650.0 ,
             'BW_deltaV': 2.4e-07 ,
             'BW_W': 8500.0 ,
@@ -2547,6 +2686,7 @@ class san (Mineral):
 class an (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si2.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'an',
             'formula': formula,
@@ -2559,8 +2699,8 @@ class an (Mineral):
             'K_0': 86000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 42010.0 ,
             'BW_deltaV': 1e-06 ,
             'BW_W': 42000.0 ,
@@ -2571,6 +2711,7 @@ class an (Mineral):
 class kcm (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O9.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'kcm',
             'formula': formula,
@@ -2583,12 +2724,13 @@ class kcm (Mineral):
             'K_0': 42500000000.0 ,
             'Kprime_0': 2.0 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class wa (Mineral):
     def __init__(self):
        formula='K2.0Si4.0O9.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'wa',
             'formula': formula,
@@ -2601,12 +2743,13 @@ class wa (Mineral):
             'K_0': 90000000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -4.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class hol (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si3.0O8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hol',
             'formula': formula,
@@ -2619,12 +2762,13 @@ class hol (Mineral):
             'K_0': 1.8e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class q (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'q',
             'formula': formula,
@@ -2637,8 +2781,8 @@ class q (Mineral):
             'K_0': 73000000000.0 ,
             'Kprime_0': 6.0 ,
             'Kdprime_0': -8.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 847.0 ,
             'landau_Smax': 4.95 ,
             'landau_Vmax': 1.188e-06 }
@@ -2646,6 +2790,7 @@ class q (Mineral):
 class trd (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'trd',
             'formula': formula,
@@ -2658,12 +2803,13 @@ class trd (Mineral):
             'K_0': 15000000000.0 ,
             'Kprime_0': 4.36 ,
             'Kdprime_0': -2.91e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class crst (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'crst',
             'formula': formula,
@@ -2676,12 +2822,13 @@ class crst (Mineral):
             'K_0': 16000000000.0 ,
             'Kprime_0': 4.35 ,
             'Kdprime_0': -2.72e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class coe (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'coe',
             'formula': formula,
@@ -2694,12 +2841,13 @@ class coe (Mineral):
             'K_0': 97900000000.0 ,
             'Kprime_0': 4.19 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class stv (Mineral):
     def __init__(self):
        formula='Si1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'stv',
             'formula': formula,
@@ -2712,12 +2860,13 @@ class stv (Mineral):
             'K_0': 3.09e+11 ,
             'Kprime_0': 4.6 ,
             'Kdprime_0': -1.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ne (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ne',
             'formula': formula,
@@ -2730,8 +2879,8 @@ class ne (Mineral):
             'K_0': 46500000000.0 ,
             'Kprime_0': 4.16 ,
             'Kdprime_0': -8.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 467.0 ,
             'landau_Smax': 10.0 ,
             'landau_Vmax': 8e-07 }
@@ -2739,6 +2888,7 @@ class ne (Mineral):
 class cg (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cg',
             'formula': formula,
@@ -2751,12 +2901,13 @@ class cg (Mineral):
             'K_0': 46500000000.0 ,
             'Kprime_0': 4.16 ,
             'Kdprime_0': -8.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cgh (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cgh',
             'formula': formula,
@@ -2769,12 +2920,13 @@ class cgh (Mineral):
             'K_0': 46500000000.0 ,
             'Kprime_0': 4.16 ,
             'Kdprime_0': -8.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sdl (Mineral):
     def __init__(self):
        formula='Na8.0Al6.0Si6.0Cl2.0O24.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sdl',
             'formula': formula,
@@ -2787,12 +2939,13 @@ class sdl (Mineral):
             'K_0': 46500000000.0 ,
             'Kprime_0': 4.16 ,
             'Kdprime_0': -8.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class kls (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'kls',
             'formula': formula,
@@ -2805,12 +2958,13 @@ class kls (Mineral):
             'K_0': 51400000000.0 ,
             'Kprime_0': 2.0 ,
             'Kdprime_0': -3.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class lc (Mineral):
     def __init__(self):
        formula='K1.0Al1.0Si2.0O6.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'lc',
             'formula': formula,
@@ -2823,8 +2977,8 @@ class lc (Mineral):
             'K_0': 45000000000.0 ,
             'Kprime_0': 5.7 ,
             'Kdprime_0': -1.27e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 11610.0 ,
             'BW_deltaV': 4e-06 ,
             'BW_W': 11600.0 ,
@@ -2835,6 +2989,7 @@ class lc (Mineral):
 class me (Mineral):
     def __init__(self):
        formula='Ca4.0Al6.0Si6.0O27.0C1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'me',
             'formula': formula,
@@ -2847,12 +3002,13 @@ class me (Mineral):
             'K_0': 87000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class wrk (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si4.0O14.0H4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'wrk',
             'formula': formula,
@@ -2865,12 +3021,13 @@ class wrk (Mineral):
             'K_0': 86000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class lmt (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si4.0O16.0H8.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'lmt',
             'formula': formula,
@@ -2883,12 +3040,13 @@ class lmt (Mineral):
             'K_0': 86000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class heu (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si7.0O24.0H12.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'heu',
             'formula': formula,
@@ -2901,12 +3059,13 @@ class heu (Mineral):
             'K_0': 27400000000.0 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -1.46e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class stlb (Mineral):
     def __init__(self):
        formula='Ca1.0Al2.0Si7.0O25.0H14.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'stlb',
             'formula': formula,
@@ -2919,12 +3078,13 @@ class stlb (Mineral):
             'K_0': 86000000000.0 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -4.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class anl (Mineral):
     def __init__(self):
        formula='Na1.0Al1.0Si2.0O7.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'anl',
             'formula': formula,
@@ -2937,12 +3097,13 @@ class anl (Mineral):
             'K_0': 40000000000.0 ,
             'Kprime_0': 4.18 ,
             'Kdprime_0': -1.04e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class lime (Mineral):
     def __init__(self):
        formula='Ca1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'lime',
             'formula': formula,
@@ -2955,12 +3116,13 @@ class lime (Mineral):
             'K_0': 1.13e+11 ,
             'Kprime_0': 3.87 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ru (Mineral):
     def __init__(self):
        formula='Ti1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ru',
             'formula': formula,
@@ -2973,12 +3135,13 @@ class ru (Mineral):
             'K_0': 2.22e+11 ,
             'Kprime_0': 4.24 ,
             'Kdprime_0': -1.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class per (Mineral):
     def __init__(self):
        formula='Mg1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'per',
             'formula': formula,
@@ -2991,12 +3154,13 @@ class per (Mineral):
             'K_0': 1.616e+11 ,
             'Kprime_0': 3.95 ,
             'Kdprime_0': -2.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class fper (Mineral):
     def __init__(self):
        formula='Fe1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'fper',
             'formula': formula,
@@ -3009,12 +3173,13 @@ class fper (Mineral):
             'K_0': 1.52e+11 ,
             'Kprime_0': 4.9 ,
             'Kdprime_0': -3.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mang (Mineral):
     def __init__(self):
        formula='Mn1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mang',
             'formula': formula,
@@ -3027,12 +3192,13 @@ class mang (Mineral):
             'K_0': 1.645e+11 ,
             'Kprime_0': 4.46 ,
             'Kdprime_0': -2.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cor (Mineral):
     def __init__(self):
        formula='Al2.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cor',
             'formula': formula,
@@ -3045,12 +3211,13 @@ class cor (Mineral):
             'K_0': 2.54e+11 ,
             'Kprime_0': 4.34 ,
             'Kdprime_0': -1.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mcor (Mineral):
     def __init__(self):
        formula='Mg1.0Si1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mcor',
             'formula': formula,
@@ -3063,12 +3230,13 @@ class mcor (Mineral):
             'K_0': 2.11e+11 ,
             'Kprime_0': 4.55 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class hem (Mineral):
     def __init__(self):
        formula='Fe2.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hem',
             'formula': formula,
@@ -3081,8 +3249,8 @@ class hem (Mineral):
             'K_0': 2.23e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 955.0 ,
             'landau_Smax': 15.6 ,
             'landau_Vmax': 0.0 }
@@ -3090,6 +3258,7 @@ class hem (Mineral):
 class esk (Mineral):
     def __init__(self):
        formula='Cr2.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'esk',
             'formula': formula,
@@ -3102,12 +3271,13 @@ class esk (Mineral):
             'K_0': 2.38e+11 ,
             'Kprime_0': 4.0 ,
             'Kdprime_0': -1.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class bix (Mineral):
     def __init__(self):
        formula='Mn2.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'bix',
             'formula': formula,
@@ -3120,12 +3290,13 @@ class bix (Mineral):
             'K_0': 2.23e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class NiO (Mineral):
     def __init__(self):
        formula='Ni1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'NiO',
             'formula': formula,
@@ -3138,8 +3309,8 @@ class NiO (Mineral):
             'K_0': 2e+11 ,
             'Kprime_0': 3.94 ,
             'Kdprime_0': -2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 520.0 ,
             'landau_Smax': 5.7 ,
             'landau_Vmax': 0.0 }
@@ -3147,6 +3318,7 @@ class NiO (Mineral):
 class pnt (Mineral):
     def __init__(self):
        formula='Mn1.0Ti1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pnt',
             'formula': formula,
@@ -3159,12 +3331,13 @@ class pnt (Mineral):
             'K_0': 1.7e+11 ,
             'Kprime_0': 8.3 ,
             'Kdprime_0': -4.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class geik (Mineral):
     def __init__(self):
        formula='Mg1.0Ti1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'geik',
             'formula': formula,
@@ -3177,12 +3350,13 @@ class geik (Mineral):
             'K_0': 1.7e+11 ,
             'Kprime_0': 8.3 ,
             'Kdprime_0': -4.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ilm (Mineral):
     def __init__(self):
        formula='Fe1.0Ti1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ilm',
             'formula': formula,
@@ -3195,8 +3369,8 @@ class ilm (Mineral):
             'K_0': 1.7e+11 ,
             'Kprime_0': 8.3 ,
             'Kdprime_0': -4.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 1900.0 ,
             'landau_Smax': 12.0 ,
             'landau_Vmax': 2e-07 }
@@ -3204,6 +3378,7 @@ class ilm (Mineral):
 class bdy (Mineral):
     def __init__(self):
        formula='Zr1.0O2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'bdy',
             'formula': formula,
@@ -3216,12 +3391,13 @@ class bdy (Mineral):
             'K_0': 95300000000.0 ,
             'Kprime_0': 3.88 ,
             'Kdprime_0': -4.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class ten (Mineral):
     def __init__(self):
        formula='Cu1.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ten',
             'formula': formula,
@@ -3234,12 +3410,13 @@ class ten (Mineral):
             'K_0': 2e+11 ,
             'Kprime_0': 3.94 ,
             'Kdprime_0': -2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cup (Mineral):
     def __init__(self):
        formula='Cu2.0O1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cup',
             'formula': formula,
@@ -3252,12 +3429,13 @@ class cup (Mineral):
             'K_0': 1.31e+11 ,
             'Kprime_0': 5.7 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sp (Mineral):
     def __init__(self):
        formula='Mg1.0Al2.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sp',
             'formula': formula,
@@ -3270,8 +3448,8 @@ class sp (Mineral):
             'K_0': 1.922e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -2.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 8000.0 ,
             'BW_deltaV': 0.0 ,
             'BW_W': 1200.0 ,
@@ -3282,6 +3460,7 @@ class sp (Mineral):
 class herc (Mineral):
     def __init__(self):
        formula='Fe1.0Al2.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'herc',
             'formula': formula,
@@ -3294,8 +3473,8 @@ class herc (Mineral):
             'K_0': 1.922e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -2.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 18300.0 ,
             'BW_deltaV': 0.0 ,
             'BW_W': 13600.0 ,
@@ -3306,6 +3485,7 @@ class herc (Mineral):
 class mt (Mineral):
     def __init__(self):
        formula='Fe3.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mt',
             'formula': formula,
@@ -3318,8 +3498,8 @@ class mt (Mineral):
             'K_0': 1.857e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 848.0 ,
             'landau_Smax': 35.0 ,
             'landau_Vmax': 0.0 }
@@ -3327,6 +3507,7 @@ class mt (Mineral):
 class mft (Mineral):
     def __init__(self):
        formula='Mg1.0Fe2.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mft',
             'formula': formula,
@@ -3339,8 +3520,8 @@ class mft (Mineral):
             'K_0': 1.857e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 665.0 ,
             'landau_Smax': 17.0 ,
             'landau_Vmax': 0.0 }
@@ -3348,6 +3529,7 @@ class mft (Mineral):
 class usp (Mineral):
     def __init__(self):
        formula='Fe2.0Ti1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'usp',
             'formula': formula,
@@ -3360,12 +3542,13 @@ class usp (Mineral):
             'K_0': 1.857e+11 ,
             'Kprime_0': 4.05 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class picr (Mineral):
     def __init__(self):
        formula='Mg1.0Cr2.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'picr',
             'formula': formula,
@@ -3378,8 +3561,8 @@ class picr (Mineral):
             'K_0': 1.922e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -2.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 8000.0 ,
             'BW_deltaV': 0.0 ,
             'BW_W': 1200.0 ,
@@ -3390,6 +3573,7 @@ class picr (Mineral):
 class br (Mineral):
     def __init__(self):
        formula='Mg1.0O2.0H2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'br',
             'formula': formula,
@@ -3402,12 +3586,13 @@ class br (Mineral):
             'K_0': 41500000000.0 ,
             'Kprime_0': 6.45 ,
             'Kdprime_0': -1.55e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class dsp (Mineral):
     def __init__(self):
        formula='Al1.0O2.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'dsp',
             'formula': formula,
@@ -3420,12 +3605,13 @@ class dsp (Mineral):
             'K_0': 2.28e+11 ,
             'Kprime_0': 4.04 ,
             'Kdprime_0': -1.8e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class gth (Mineral):
     def __init__(self):
        formula='Fe1.0O2.0H1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'gth',
             'formula': formula,
@@ -3438,12 +3624,13 @@ class gth (Mineral):
             'K_0': 2.5e+11 ,
             'Kprime_0': 4.03 ,
             'Kdprime_0': -1.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class cc (Mineral):
     def __init__(self):
        formula='Ca1.0C1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'cc',
             'formula': formula,
@@ -3456,8 +3643,8 @@ class cc (Mineral):
             'K_0': 73300000000.0 ,
             'Kprime_0': 4.06 ,
             'Kdprime_0': -5.5e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 1240.0 ,
             'landau_Smax': 10.0 ,
             'landau_Vmax': 4e-07 }
@@ -3465,6 +3652,7 @@ class cc (Mineral):
 class arag (Mineral):
     def __init__(self):
        formula='Ca1.0O3.0C1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'arag',
             'formula': formula,
@@ -3477,12 +3665,13 @@ class arag (Mineral):
             'K_0': 61400000000.0 ,
             'Kprime_0': 5.87 ,
             'Kdprime_0': -9.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class mag (Mineral):
     def __init__(self):
        formula='Mg1.0O3.0C1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'mag',
             'formula': formula,
@@ -3495,12 +3684,13 @@ class mag (Mineral):
             'K_0': 1.028e+11 ,
             'Kprime_0': 5.41 ,
             'Kdprime_0': -5.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class sid (Mineral):
     def __init__(self):
        formula='Fe1.0C1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'sid',
             'formula': formula,
@@ -3513,12 +3703,13 @@ class sid (Mineral):
             'K_0': 1.2e+11 ,
             'Kprime_0': 4.07 ,
             'Kdprime_0': -3.4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class rhc (Mineral):
     def __init__(self):
        formula='Mn1.0C1.0O3.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'rhc',
             'formula': formula,
@@ -3531,12 +3722,13 @@ class rhc (Mineral):
             'K_0': 95300000000.0 ,
             'Kprime_0': 3.88 ,
             'Kdprime_0': -4.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class dol (Mineral):
     def __init__(self):
        formula='Ca1.0Mg1.0O6.0C2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'dol',
             'formula': formula,
@@ -3549,8 +3741,8 @@ class dol (Mineral):
             'K_0': 94300000000.0 ,
             'Kprime_0': 3.74 ,
             'Kdprime_0': -4e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 11910.0 ,
             'BW_deltaV': 1.6e-07 ,
             'BW_W': 11900.0 ,
@@ -3561,6 +3753,7 @@ class dol (Mineral):
 class ank (Mineral):
     def __init__(self):
        formula='Ca1.0Fe1.0O6.0C2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'ank',
             'formula': formula,
@@ -3573,8 +3766,8 @@ class ank (Mineral):
             'K_0': 91400000000.0 ,
             'Kprime_0': 3.88 ,
             'Kdprime_0': -4.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'BW_deltaH': 11910.0 ,
             'BW_deltaV': 1.6e-07 ,
             'BW_W': 11900.0 ,
@@ -3585,6 +3778,7 @@ class ank (Mineral):
 class syv (Mineral):
     def __init__(self):
        formula='K1.0Cl1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'syv',
             'formula': formula,
@@ -3597,12 +3791,13 @@ class syv (Mineral):
             'K_0': 17000000000.0 ,
             'Kprime_0': 5.0 ,
             'Kdprime_0': -2.94e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class hlt (Mineral):
     def __init__(self):
        formula='Na1.0Cl1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'hlt',
             'formula': formula,
@@ -3615,12 +3810,13 @@ class hlt (Mineral):
             'K_0': 23800000000.0 ,
             'Kprime_0': 5.0 ,
             'Kdprime_0': -2.1e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class pyr (Mineral):
     def __init__(self):
        formula='Fe1.0S2.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'pyr',
             'formula': formula,
@@ -3633,12 +3829,13 @@ class pyr (Mineral):
             'K_0': 1.395e+11 ,
             'Kprime_0': 4.09 ,
             'Kdprime_0': -2.9e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class trot (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'trot',
             'formula': formula,
@@ -3651,8 +3848,8 @@ class trot (Mineral):
             'K_0': 65800000000.0 ,
             'Kprime_0': 4.17 ,
             'Kdprime_0': -6.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 598.0 ,
             'landau_Smax': 12.0 ,
             'landau_Vmax': 4.1e-07 }
@@ -3660,6 +3857,7 @@ class trot (Mineral):
 class tro (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'tro',
             'formula': formula,
@@ -3672,8 +3870,8 @@ class tro (Mineral):
             'K_0': 65800000000.0 ,
             'Kprime_0': 4.17 ,
             'Kdprime_0': -6.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 598.0 ,
             'landau_Smax': 12.0 ,
             'landau_Vmax': 4.1e-07 }
@@ -3681,6 +3879,7 @@ class tro (Mineral):
 class lot (Mineral):
     def __init__(self):
        formula='Fe1.0S1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'lot',
             'formula': formula,
@@ -3693,8 +3892,8 @@ class lot (Mineral):
             'K_0': 65800000000.0 ,
             'Kprime_0': 4.17 ,
             'Kdprime_0': -6.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 420.0 ,
             'landau_Smax': 10.0 ,
             'landau_Vmax': 0.0 }
@@ -3702,6 +3901,7 @@ class lot (Mineral):
 class trov (Mineral):
     def __init__(self):
        formula='Fe0.875S1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'trov',
             'formula': formula,
@@ -3714,8 +3914,8 @@ class trov (Mineral):
             'K_0': 65800000000.0 ,
             'Kprime_0': 4.17 ,
             'Kdprime_0': -6.3e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 595.0 ,
             'landau_Smax': 10.0 ,
             'landau_Vmax': 1.6e-07 }
@@ -3723,6 +3923,7 @@ class trov (Mineral):
 class any (Mineral):
     def __init__(self):
        formula='Ca1.0S1.0O4.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'any',
             'formula': formula,
@@ -3735,12 +3936,13 @@ class any (Mineral):
             'K_0': 54380000000.0 ,
             'Kprime_0': 4.19 ,
             'Kdprime_0': -7.7e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class iron (Mineral):
     def __init__(self):
        formula='Fe1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'iron',
             'formula': formula,
@@ -3753,8 +3955,8 @@ class iron (Mineral):
             'K_0': 1.64e+11 ,
             'Kprime_0': 5.16 ,
             'Kdprime_0': -3.1e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 1042.0 ,
             'landau_Smax': 8.3 ,
             'landau_Vmax': 0.0 }
@@ -3762,6 +3964,7 @@ class iron (Mineral):
 class Ni (Mineral):
     def __init__(self):
        formula='Ni1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'Ni',
             'formula': formula,
@@ -3774,8 +3977,8 @@ class Ni (Mineral):
             'K_0': 1.905e+11 ,
             'Kprime_0': 4.25 ,
             'Kdprime_0': -2.2e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1],
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'landau_Tc': 631.0 ,
             'landau_Smax': 3.0 ,
             'landau_Vmax': 0.0 }
@@ -3783,6 +3986,7 @@ class Ni (Mineral):
 class Cu (Mineral):
     def __init__(self):
        formula='Cu1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'Cu',
             'formula': formula,
@@ -3795,12 +3999,13 @@ class Cu (Mineral):
             'K_0': 1.625e+11 ,
             'Kprime_0': 4.24 ,
             'Kdprime_0': -2.6e-11 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class gph (Mineral):
     def __init__(self):
        formula='C1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'gph',
             'formula': formula,
@@ -3813,12 +4018,13 @@ class gph (Mineral):
             'K_0': 31200000000.0 ,
             'Kprime_0': 3.9 ,
             'Kdprime_0': -1.25e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class diam (Mineral):
     def __init__(self):
        formula='C1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'diam',
             'formula': formula,
@@ -3831,12 +4037,13 @@ class diam (Mineral):
             'K_0': 4.465e+11 ,
             'Kprime_0': 1.61 ,
             'Kdprime_0': -3.6e-12 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 class S (Mineral):
     def __init__(self):
        formula='S1.0'
+       formula = dictionarize_formula(formula)
        self.params = {
             'name': 'S',
             'formula': formula,
@@ -3849,7 +4056,7 @@ class S (Mineral):
             'K_0': 14500000000.0 ,
             'Kprime_0': 7.0 ,
             'Kdprime_0': -4.8e-10 ,
-            'n': ProcessChemistry(formula)[0],
-            'molar_mass': ProcessChemistry(formula)[1]}
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
 
