@@ -35,7 +35,7 @@ class garnet(SolidSolution):
         excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
         excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
         
-        sm = AsymmetricVanLaar( endmembers, alphas, excess_enthalpy, excess_volume, excess_entropy)
+        sm = AsymmetricRegularSolution( endmembers, alphas, excess_enthalpy, excess_volume, excess_entropy)
         SolidSolution.__init__(self, endmembers, sm)
 
 
