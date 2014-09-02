@@ -5,7 +5,6 @@
 import numpy as np
 from burnman.mineral import Mineral
 from burnman.processchemistry import ProcessSolidSolutionChemistry
-from burnman.processchemistry import CompositionEquality
 import warnings
 
 R = 8.3145 # J/K/mol
@@ -51,16 +50,17 @@ class SolidSolution(Mineral):
         self.excess_entropy=interaction_parameter[1]
         self.excess_volume=interaction_parameter[2]
 
+        # Process solid solution chemistry
+        self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = ProcessSolidSolutionChemistry([base_material[i][1] for i in range(self.n_endmembers)])
+
         # Check the chemical composition of each endmember is consistent with the dataset
         for i in range(self.n_endmembers):
-            endmember_formula=base_material[i][0].params['formula']
-            solution_formula=base_material[i][1]
-            if CompositionEquality(endmember_formula, solution_formula) != True:
-                print 'Formula of endmember', base_material[i][0].params['name'], 'does not agree with formula in the', self.name, 'SolidSolution model'
+            endmember_formula=self.base_material[i][0].params['formula']
+            solution_formula=self.solution_formulae[i]
+            if endmember_formula != solution_formula:
+                print 'Formula of endmember', self.base_material[i][0].params['name'], 'does not agree with formula in the', self.name, 'SolidSolution model'
+                print endmember_formula, self.solution_formulae[i]
                 exit()
-
-        # Process solid solution chemistry
-        self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = ProcessSolidSolutionChemistry([base_material[i][1] for i in range(self.n_endmembers)])
 
         # Create array of van Laar parameters
         self.alpha=np.array([base_material[i][2] for i in range(self.n_endmembers)])
