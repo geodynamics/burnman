@@ -12,10 +12,11 @@ Solid solutions from inv251010 of HeFESTo
 
 """
 
-from burnman.processchemistry import ProcessChemistry
 from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
+from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
+atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
 
 '''
 SOLID SOLUTIONS
@@ -221,13 +222,13 @@ ENDMEMBERS
 class anorthite (Mineral):
     def __init__(self):
        formula='CaAl2Si2O8'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'anorthite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -4015.e3,
             'V_0': 100.61e-6,
             'K_0': 84.e9,
@@ -255,13 +256,13 @@ class anorthite (Mineral):
 class albite (Mineral):
     def __init__(self):
        formula='NaAlSi3O8'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'albite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -3719.e3,
             'V_0': 100.45e-6,
             'K_0': 60.e9,
@@ -289,13 +290,13 @@ class albite (Mineral):
 class spinel (Mineral):
     def __init__(self):
        formula='Mg4Al8O16'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'spinel',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -8668.0e3,
             'V_0': 159.05e-6,
             'K_0': 197.e9,
@@ -323,13 +324,13 @@ class spinel (Mineral):
 class hercynite (Mineral):
     def __init__(self):
        formula='Fe4Al8O16'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'hercynite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -7324.e3,
             'V_0': 163.37e-6,
             'K_0': 209.e9,
@@ -357,13 +358,13 @@ class hercynite (Mineral):
 class forsterite (Mineral):
     def __init__(self):
        formula='Mg2SiO4'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'forsterite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -2055.e3,
             'V_0': 43.60e-6,
             'K_0': 128.e9,
@@ -391,13 +392,13 @@ class forsterite (Mineral):
 class fayalite (Mineral):
     def __init__(self):
        formula='Fe2SiO4'
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': 'fayalite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': -1371.e3,
             'V_0': 46.29e-6,
             'K_0': 135.e9,
@@ -426,13 +427,13 @@ class fayalite (Mineral):
 class mg_wadsleyite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -460,13 +461,13 @@ class mg_wadsleyite (Mineral):
 class fe_wadsleyite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -494,13 +495,13 @@ class fe_wadsleyite (Mineral):
 class mg_ringwoodite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -528,13 +529,13 @@ class mg_ringwoodite (Mineral):
 class fe_ringwoodite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -562,13 +563,13 @@ class fe_ringwoodite (Mineral):
 class enstatite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -596,13 +597,13 @@ class enstatite (Mineral):
 class ferrosilite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -630,13 +631,13 @@ class ferrosilite (Mineral):
 class mg_tschermaks_molecule (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -664,13 +665,13 @@ class mg_tschermaks_molecule (Mineral):
 class orthodiopside (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -698,13 +699,13 @@ class orthodiopside (Mineral):
 class diopside (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -732,13 +733,13 @@ class diopside (Mineral):
 class hedenbergite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -766,13 +767,13 @@ class hedenbergite (Mineral):
 class clinoenstatite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -800,13 +801,13 @@ class clinoenstatite (Mineral):
 class ca_tschermaks_molecule (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -834,13 +835,13 @@ class ca_tschermaks_molecule (Mineral):
 class jadeite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -868,13 +869,13 @@ class jadeite (Mineral):
 class hp_clinoenstatite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -902,13 +903,13 @@ class hp_clinoenstatite (Mineral):
 class hp_clinoferrosilite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -936,13 +937,13 @@ class hp_clinoferrosilite (Mineral):
 class ca_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -970,13 +971,13 @@ class ca_perovskite (Mineral):
 class mg_akimotoite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1004,13 +1005,13 @@ class mg_akimotoite (Mineral):
 class fe_akimotoite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1038,13 +1039,13 @@ class fe_akimotoite (Mineral):
 class corundum (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1072,13 +1073,13 @@ class corundum (Mineral):
 class pyrope (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1106,13 +1107,13 @@ class pyrope (Mineral):
 class almandine (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1140,13 +1141,13 @@ class almandine (Mineral):
 class grossular (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1174,13 +1175,13 @@ class grossular (Mineral):
 class mg_majorite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1208,13 +1209,13 @@ class mg_majorite (Mineral):
 class jd_majorite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1242,13 +1243,13 @@ class jd_majorite (Mineral):
 class quartz (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1276,13 +1277,13 @@ class quartz (Mineral):
 class coesite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1310,13 +1311,13 @@ class coesite (Mineral):
 class stishovite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1344,13 +1345,13 @@ class stishovite (Mineral):
 class seifertite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1378,13 +1379,13 @@ class seifertite (Mineral):
 class mg_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1412,13 +1413,13 @@ class mg_perovskite (Mineral):
 class fe_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1446,13 +1447,13 @@ class fe_perovskite (Mineral):
 class al_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1480,13 +1481,13 @@ class al_perovskite (Mineral):
 class mg_post_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1514,13 +1515,13 @@ class mg_post_perovskite (Mineral):
 class fe_post_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1548,13 +1549,13 @@ class fe_post_perovskite (Mineral):
 class al_post_perovskite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1582,13 +1583,13 @@ class al_post_perovskite (Mineral):
 class periclase (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1616,13 +1617,13 @@ class periclase (Mineral):
 class wuestite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1650,13 +1651,13 @@ class wuestite (Mineral):
 class mg_calcium_ferrite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1684,13 +1685,13 @@ class mg_calcium_ferrite (Mineral):
 class fe_calcium_ferrite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1718,13 +1719,13 @@ class fe_calcium_ferrite (Mineral):
 class na_calcium_ferrite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1752,13 +1753,13 @@ class na_calcium_ferrite (Mineral):
 class kyanite (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,
@@ -1786,13 +1787,13 @@ class kyanite (Mineral):
 class nepheline (Mineral):
     def __init__(self):
        formula=''
-       formula=formula_to_dictionary(formula)
+       formula=dictionarize_formula(formula)
        self.params = {
             'name': '',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'n': sum(formula)[0],
-            'molar_mass': molar_mass(formula, elemental_masses),
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
             'F_0': ,
             'V_0': ,
             'K_0': ,

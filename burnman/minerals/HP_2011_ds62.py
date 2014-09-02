@@ -19,6 +19,8 @@ from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
+atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
+
 # Mixed Holland and Powell sources (test only)
 class garnet(SolidSolution):
     def __init__(self):
@@ -36,8 +38,6 @@ class garnet(SolidSolution):
         interaction_parameter=[excess_enthalpy,excess_entropy,excess_volume]
         SolidSolution.__init__(self, base_material, interaction_parameter)
 
-
-atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
 
 class fo (Mineral):
     def __init__(self):

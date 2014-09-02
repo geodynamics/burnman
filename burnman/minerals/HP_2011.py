@@ -30,6 +30,8 @@ There are also parameters which deal with internal order-disorder and Landau tra
 from burnman.mineral import Mineral
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
+atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
+
 class stishovite (Mineral):
     def __init__(self):
         formula='SiO2'
