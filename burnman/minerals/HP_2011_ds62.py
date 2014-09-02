@@ -20,7 +20,7 @@ from burnman.solidsolution import SolidSolution
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 from burnman.solutionmodel import *
 
-atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
+atomic_masses=read_masses()
 
 # Mixed Holland and Powell sources (test only)
 class garnet(SolidSolution):

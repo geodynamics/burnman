@@ -9,14 +9,17 @@
 import re
 import numpy as np
 from fractions import Fraction
+import pkgutil
 
-def read_masses(filename): 
+def read_masses(): 
     """
     A simple function to read a file with a two column list of 
     elements and their masses into a dictionary
     """
+    datastream = pkgutil.get_data('burnman', 'data/input_masses/atomic_masses.dat')
+    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
     lookup=dict()
-    for line in open(filename, "r"):
+    for line in datalines:
         data="%".join(line.split("%")[:1]).split()
         if data != []:
             lookup[data[0]]=float(data[1])
