@@ -79,7 +79,7 @@ class orthopyroxene_a(burnman.SolidSolution):
         self.name='orthopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]SiO6'] ]
+        base_material = [[enstatite(), '[Mg][Mg][Si]Si1O6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]Si1O6'] ]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0]]
@@ -92,7 +92,7 @@ class orthopyroxene_b(burnman.SolidSolution):
         self.name='orthopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg]Si2O6'],[mg_tschermaks_molecule(), '[Mg][Al]AlSiO6'] ]
+        base_material = [[enstatite(), '[Mg][Mg]Si2O6'],[mg_tschermaks_molecule(), '[Mg][Al]Al1Si1O6'] ]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0]]
