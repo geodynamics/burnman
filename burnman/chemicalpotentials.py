@@ -6,28 +6,85 @@ import burnman
 from burnman import minerals
 from processchemistry import *
 import numpy as np
+from scipy.linalg import lu
 
+R=8.3145
 # This module computes chemical potentials (partial molar gibbs free energies) for an assemblage based on the Gibbs free energies and compositions of the individual phases.
 
 # It can also calculate fugacities based on the gibbs free energies of the endmembers corresponding to chemical components.
 
 # It can also calculate fugacities relative to other bulk compositions
 
-def chemicalpotentials(minerals, component_formulae):
-    mineral_gibbs=[]
-    mineral_formulae=[]
-    for mineral in minerals:
-        mineral_gibbs.append(mineral.gibbs)
-        mineral_formulae.append(mineral.params['formula'])
-        
+def chemicalpotentials(assemblage, component_formulae):
+    """
+    The compositional space of the components does not have to be a 
+    superset of the compositional space of the assemblage. Nor do they have to
+    compose an orthogonal basis. 
+
+    The components must each be described by a linear mineral combination
+
+    The mineral compositions must be linearly independent
+
+        Parameters
+        ----------
+        assemblage : list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        component_formulae : list of dictionaries
+            List of chemical component formula dictionaries
+            No restriction on length
+
+        Returns
+        -------
+        component_potentials : array of floats
+            Array of chemical potentials of components
+
+    """
+    mineral_gibbs=[mineral.gibbs for mineral in assemblage]
+    mineral_formulae=[mineral.params['formula'] for mineral in assemblage]
     mineral_compositions, elements=compositional_array(mineral_formulae)
 
-    for i in range(len(component_formulae)):
-        component_formulae[i]=dictionarize_formula(component_formulae[i])
+    pl, u = lu(mineral_compositions, permute_l=True)
+    assert(min(np.dot(np.square(u), np.ones(shape=len(elements)))) > 1e-6), \
+        'Mineral compositions do not form an independent set of basis vectors'
 
     component_compositions=ordered_compositional_array(component_formulae, elements)
-    component_proportions=np.linalg.lstsq(component_compositions.T, mineral_compositions.T)[0].T
-    component_potentials=np.linalg.solve(component_proportions,mineral_gibbs)
+
+    p=np.linalg.lstsq(mineral_compositions.T,component_compositions.T)
+    for idx, error in enumerate(p[1]):
+        assert (error < 1e-10), \
+            'Component %d not defined by prescribed assemblage' % (idx+1)
+
+    mineral_proportions=np.around(p[0],10).T
+
+    component_potentials=np.dot(mineral_proportions, mineral_gibbs)
 
     return component_potentials
 
+def fugacity(component_formula, standard_material, assemblage):
+    """
+        Parameters
+        ----------
+        component_formula : dictionary
+            Chemical formula dictionary
+
+        standard_material: class
+            Material class
+            set_method and set_state should already have been used
+
+        assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        Returns
+        -------
+        fugacity : float
+            Value of the fugacity of the component with respect to
+            the standard material
+
+    """
+    chemical_potential=chemicalpotentials(assemblage, [component_formula])[0]
+
+    fugacity=np.exp((chemical_potential - standard_material.gibbs)/(R*assemblage[0].temperature))
+    return fugacity
