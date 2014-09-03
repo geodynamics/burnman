@@ -195,11 +195,17 @@ def ProcessSolidSolutionChemistry(formulae):
                     element_index=sites[site].index(element_on_site)
                 list_occupancies[endmember][site][element_index]=proportion_element_on_site
 
+            # Loop over elements after site
             if len(site_split) != 1:
                 not_in_site=filter(None, site_split[1])
                 not_in_site=not_in_site.replace(mult, '', 1)
                 for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
                     element=filter(None, re.split(r'(\d+)', enamenumber))
+                    # Look up number of atoms of element
+                    if len(element) == 1:
+                        nel=1.
+                    else: 
+                        nel=float(float(element[1])
                     solution_formula[element[0]]=solution_formula.get(element[0], 0.0) + float(element[1])
 
         solution_formulae.append(solution_formula)
