@@ -73,26 +73,26 @@ class mg_tschermaks_molecule (burnman.Mineral):
             'Gprime_0': 1.5 ,
             'eta_s_0': 2.5 }
 
-class orthopyroxene_a(burnman.SolidSolution):
+class orthopyroxene_red(burnman.SolidSolution):
     def __init__(self):
         # Name
         self.name='orthopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]SiO6'] ]
+        base_material = [[enstatite(), 'Mg[Mg][Si]SiO6'],[mg_tschermaks_molecule(), 'Mg[Al][Al]SiO6'] ]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0]]
 
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
-class orthopyroxene_b(burnman.SolidSolution):
+class orthopyroxene_blue(burnman.SolidSolution):
     def __init__(self):
         # Name
         self.name='orthopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg]Si2O6'],[mg_tschermaks_molecule(), '[Mg][Al]AlSiO6'] ]
+        base_material = [[enstatite(), 'Mg[Mg]Si2O6'],[mg_tschermaks_molecule(), 'Mg[Al]AlSiO6'] ]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0]]
@@ -100,30 +100,30 @@ class orthopyroxene_b(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
 
-opx_a = orthopyroxene_a()
-opx_a.set_method('slb3')
-opx_b = orthopyroxene_b()
-opx_b.set_method('slb3')
+opx_red = orthopyroxene_red()
+opx_red.set_method('slb3')
+opx_blue = orthopyroxene_blue()
+opx_blue.set_method('slb3')
 
 comp = np.linspace(0, 1.0, 100)
-entropy_a = np.empty_like(comp)
-entropy_b = np.empty_like(comp)
+entropy_red = np.empty_like(comp)
+entropy_blue = np.empty_like(comp)
 
 for i,c in enumerate(comp):
-   opx_a.set_composition( np.array([1.0-c, c]) )
-   opx_a.set_state( 0.0, 0.0 )
-   entropy_a[i] = opx_a.solution_model.configurational_entropy( [1.0-c, c] )
+   opx_red.set_composition( np.array([1.0-c, c]) )
+   opx_red.set_state( 0.0, 0.0 )
+   entropy_red[i] = opx_red.solution_model.configurational_entropy( [1.0-c, c] )
 
-   opx_b.set_composition( np.array([1.0-c, c]) )
-   opx_b.set_state( 0.0, 0.0 )
-   entropy_b[i] = opx_b.solution_model.configurational_entropy( [1.0-c, c] )
+   opx_blue.set_composition( np.array([1.0-c, c]) )
+   opx_blue.set_state( 0.0, 0.0 )
+   entropy_blue[i] = opx_blue.solution_model.configurational_entropy( [1.0-c, c] )
 
 
 #fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
 #plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
 
-plt.plot( comp, entropy_a, 'b--', linewidth=3.)
-plt.plot( comp, entropy_b, 'r--', linewidth=3.)
+plt.plot( comp, entropy_red, 'r--', linewidth=3.)
+plt.plot( comp, entropy_blue, 'b--', linewidth=3.)
 plt.xlim(0.0,1.0)
 plt.ylim(0.,17.0)
 plt.ylabel("Configurational enthalpy of solution")
