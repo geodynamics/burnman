@@ -90,7 +90,7 @@ class IdealSolution ( SolutionModel ):
         self.endmember_configurational_entropies=np.zeros(shape=(self.n_endmembers))
         for idx, endmember_occupancy in enumerate(self.endmember_occupancies):
             for occ in range(self.n_occupancies):
-                if endmember_occupancy[occ] != 0.: 
+                if endmember_occupancy[occ] > 1e-10: 
                     self.endmember_configurational_entropies[idx] = \
                         self.endmember_configurational_entropies[idx] - \
                         R*self.site_multiplicities[occ]*endmember_occupancy[occ]*np.log(endmember_occupancy[occ])
