@@ -218,3 +218,52 @@ def ProcessSolidSolutionChemistry(formulae):
 
     return solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities
 
+
+def compositional_array(formulae):
+    """
+        Parameters
+        ----------
+        formulae : list of dictionaries
+            List of chemical formulae
+
+        Returns
+        -------
+        formula_array : 2D array of floats
+            Array of endmember formulae
+
+        elements : List of strings
+            List of elements
+    """
+    elements=[]
+    for formula in formulae:
+        for element in formula:
+            if element not in elements:
+                elements.append(element)
+
+    formula_array=ordered_compositional_array(formulae, elements)
+
+    return formula_array, elements
+
+
+def ordered_compositional_array(formulae, elements):
+    """
+        Parameters
+        ----------
+        formulae : list of dictionaries
+            List of chemical formulae
+
+        elements : List of strings
+            List of elements
+
+        Returns
+        -------
+        formula_array : 2D array of floats
+            Array of endmember formulae
+    """
+    formula_array=np.zeros(shape=(len(formulae), len(elements)))
+    for idx, formula in enumerate(formulae):
+        for element in formula:
+            assert(element in elements)
+            formula_array[idx][elements.index(element)]=formula[element]
+
+    return formula_array
