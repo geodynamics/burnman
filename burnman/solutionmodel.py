@@ -90,18 +90,18 @@ class IdealSolution ( SolutionModel ):
     def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
         return self.ideal_gibbs_excess( temperature, molar_fractions )
 
-    def ideal_gibbs_excess ( self, temperature, molar_fractions ): 
-
+    def configurational_entropy (self, molar_fractions):
         activities = self.ideal_activities( molar_fractions )
         gibbs_excess_ideal = 0.0
 
         tol = 1.e-10
         for i in range(self.n_endmembers):
             if molar_fractions[i] > tol:
-                gibbs_excess_ideal = gibbs_excess_ideal +  \
-                                     molar_fractions[i] * R * temperature * np.log(activities[i])
-        
-        return gibbs_excess_ideal
+                configurational_entropy = configurational_entropy -  \
+                                     molar_fractions[i] * R * np.log(activities[i])
+
+    def  ideal_gibbs_excess( self, temperature, molar_fractions ): 
+        return temperature*configurational_entropy(molar_fractions)
 
     def ideal_activities ( self, molar_fractions ):
 
@@ -122,8 +122,7 @@ class IdealSolution ( SolutionModel ):
  
 class AsymmetricRegularSolution ( IdealSolution ):
     """
-    Solution model implementing the Asymmetric Van Laar formulation
-    (best reference?).
+    Solution model implementing the asymmetric regular solution model formulation (Holland and Powell, 2003)
     """
 
     def __init__( self, endmembers, alphas, enthalpy_interaction, volume_interaction = None, entropy_interaction = None ): 
@@ -156,6 +155,9 @@ class AsymmetricRegularSolution ( IdealSolution ):
         #initialize ideal solution model
         IdealSolution.__init__(self, endmembers )
         
+    def configurational_entropy( self, molar_fractions ):
+        return IdealSolution.configurational_entropy( self, molar_fractions )
+
     def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
 
         ideal_gibbs = IdealSolution.ideal_gibbs_excess( self, temperature, molar_fractions )
@@ -185,7 +187,7 @@ class AsymmetricRegularSolution ( IdealSolution ):
 
 class SymmetricRegularSolution ( AsymmetricRegularSolution ):
     """
-    Solution model implementing the Symmetric Van Laar solution
+    Solution model implementing the symmetric regular solution model
     """
     def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_ineraction = None ):
         #symmetric case if all the alphas are equal?
