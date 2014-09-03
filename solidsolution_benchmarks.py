@@ -38,7 +38,7 @@ class o_d_spinel(burnman.SolidSolution):
         self.name='orthopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[minerals.HP_2011.spinel(), '[Mg][Al]2O4'],[minerals.HP_2011.spinel(), '[Mg1/3Al2/3][Mg1/3Al2/3]2O4'] ]
+        base_material = [[minerals.HP_2011.spinel(), '[Mg][Al]2O4'],[minerals.HP_2011.spinel(), '[Al][Mg1/2Al1/2]2O4']]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0]]
@@ -46,7 +46,7 @@ class o_d_spinel(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
 
-comp = np.linspace(0, 1.0, 100)
+comp = np.linspace(0.001, 0.999, 100)
 sp=o_d_spinel()
 sp.set_method('mtait')
 sp_entropies = np.empty_like(comp)
@@ -56,11 +56,7 @@ for i,c in enumerate(comp):
         sp.set_composition( np.array(molar_fractions) )
         sp.set_state( 1e5, 298.15 )
         sp_entropies[i] = sp.solution_model.configurational_entropy( molar_fractions )
-        x=c/1.5
-        if i > 0:
-            sp_S[i] = -8.3145*(x*np.log(x) + (1.-x)*np.log(1.-x) + x*np.log(x/2.) + (2.-x)*np.log(1.-x/2.))
-        else:
-            sp_S[i] = 0.
+        sp_S[i] = -8.3145*(c*np.log(c) + (1.-c)*np.log(1.-c) + c*np.log(c/2.) + (2.-c)*np.log(1.-c/2.))
 
 #fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
 #plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
@@ -69,7 +65,7 @@ plt.plot( comp, sp_entropies, 'r--', linewidth=3.)
 plt.xlim(0.0,1.0)
 plt.ylim(0.,17.0)
 plt.ylabel("Configurational enthalpy of solution")
-plt.xlabel("disordered spinel fraction")
+plt.xlabel("fraction inverse spinel")
 plt.show()
 
 # Configurational entropy
