@@ -189,8 +189,8 @@ class SymmetricRegularSolution ( AsymmetricRegularSolution ):
     """
     Solution model implementing the symmetric regular solution model
     """
-    def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_ineraction = None ):
+    def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_interaction = None ):
         #symmetric case if all the alphas are equal?
         alphas = np.ones( len(endmembers) )
-        AsymmetricRegularSolution.__init__(self, endmembers, alphas, enthalpy_interaction, volume_ineteraction, entropy_interaction )
+        AsymmetricRegularSolution.__init__(self, endmembers, alphas, enthalpy_interaction, volume_interaction, entropy_interaction )
 
