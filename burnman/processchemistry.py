@@ -205,8 +205,10 @@ def ProcessSolidSolutionChemistry(formulae):
                     if len(element) == 1:
                         nel=1.
                     else: 
-                        nel=float(float(element[1])
-                    solution_formula[element[0]]=solution_formula.get(element[0], 0.0) + float(element[1])
+                        nel=float(float(element[1]))
+                    solution_formula[element[0]]=solution_formula.get(element[0], 0.0) + nel
+
+
 
         solution_formulae.append(solution_formula)
 
