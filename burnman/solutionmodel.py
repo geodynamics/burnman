@@ -7,7 +7,7 @@ import warnings
 import burnman
 from burnman.processchemistry import *
 
-R = 8.3145 # J/K/mol
+R = 8.31446 # J/K/mol
 
 class SolutionModel:
     """
@@ -87,6 +87,17 @@ class IdealSolution ( SolutionModel ):
         self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
             ProcessSolidSolutionChemistry(self.formulas)
 
+        self.endmember_configurational_entropies=np.zeros(shape=(self.n_endmembers))
+        for idx, endmember_occupancy in enumerate(self.endmember_occupancies):
+            S_conf=0.
+            for occ in range(self.n_occupancies):
+                if endmember_occupancy[occ] != 0: #integer? 
+                    self.endmember_configurational_entropies[idx] = \
+                        self.endmember_configurational_entropies[idx] - \
+                        R*self.site_multiplicities[occ]*endmember_occupancy[occ]*np.log(endmember_occupancy[occ])
+
+
+
     def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
         return self.ideal_gibbs_excess( temperature, molar_fractions )
 
@@ -101,7 +112,7 @@ class IdealSolution ( SolutionModel ):
                                molar_fractions[i] * R * np.log(activities[i])
         return conf_entropy
 
-    def  ideal_gibbs_excess( self, temperature, molar_fractions ): 
+    def ideal_gibbs_excess( self, temperature, molar_fractions ): 
         return -temperature*self.configurational_entropy(molar_fractions)
 
     def ideal_activities ( self, molar_fractions ):

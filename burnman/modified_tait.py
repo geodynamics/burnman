@@ -13,7 +13,7 @@ import burnman.einstein as einstein
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
-R=8.3145 # J/K/mol
+R=8.31446 # J/K/mol
 
 # see Holland and Powell, 2011
 def einstein_temperature(S, n):
