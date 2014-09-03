@@ -101,7 +101,7 @@ class IdealSolution ( SolutionModel ):
                                      molar_fractions[i] * R * np.log(activities[i])
 
     def  ideal_gibbs_excess( self, temperature, molar_fractions ): 
-        return temperature*configurational_entropy(molar_fractions)
+        return 0.0 - temperature*configurational_entropy(molar_fractions)
 
     def ideal_activities ( self, molar_fractions ):
 
