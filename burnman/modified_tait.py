@@ -35,12 +35,12 @@ def gibbs_disord_Landau(P, T, params):
     # landaunote.pdf on Tim Holland's esc web page
     Tcstar=params['landau_Tc'] + (params['landau_Vmax']/params['landau_Smax'])*P
             # Q_0 is Q at T0, P0? 
-    Q_0=pow((params['landau_Tc']-T_0)/params['landau_Tc'],1./4.)
+    Q_0=np.power((params['landau_Tc']-T_0)/params['landau_Tc'],1./4.)
     
     # Find state of ordering
     # Note that Q > 1 where Vmax*P > Smax*T. 
     if Tcstar-T > 0.:
-        Q=pow((Tcstar-T)/params['landau_Tc'],1./4.)
+        Q=np.power((Tcstar-T)/params['landau_Tc'],1./4.)
     else:
         Q=0.0
         
@@ -48,7 +48,7 @@ def gibbs_disord_Landau(P, T, params):
     # A sensible function to use in this case would be the expression in brackets in  EQ13 of Holland and Powell (2011) 
     # Here we follow tc337L, where Vt=1 ("the simplest way to proceed"; Roger Powell, pers. comm. 2014/08/22). 
     Vt=1.# EQ 13 would give: 1. - a + (a*(pow((1.-b*Pth), 1.-c) - pow((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure))
-    Gdisord=params['landau_Tc']*params['landau_Smax']*(pow(Q_0,2) - pow(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*pow(Q,2) - params['landau_Tc']*pow(Q,6)/3.0) - T*(params['landau_Smax']*(pow(Q_0,2) - pow(Q,2))) + P*(params['landau_Vmax']*pow(Q_0,2)*Vt)
+    Gdisord=params['landau_Tc']*params['landau_Smax']*(np.power(Q_0,2) - np.power(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*np.power(Q,2) - params['landau_Tc']*np.power(Q,6)/3.0) - T*(params['landau_Smax']*(np.power(Q_0,2) - np.power(Q,2))) + P*(params['landau_Vmax']*np.power(Q_0,2)*Vt)
     return Gdisord
 
 # see derivation in thermodynamic_introduction.pdf
@@ -94,7 +94,7 @@ def modified_tait(x, params):
     """
     a, b, c = tait_constants(params)
 
-    return (pow((x + a - 1.) / a, -1./c) - 1.)/b
+    return (np.power((x + a - 1.) / a, -1./c) - 1.)/b
 
 
 class MT(eos.EquationOfState):
@@ -121,7 +121,7 @@ class MT(eos.EquationOfState):
         """
         a, b, c = tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
-        x = 1 - a*( 1. - pow(( 1. + b*(pressure-Pth)), -1.0*c))
+        x = 1 - a*( 1. - np.power(( 1. + b*(pressure-Pth)), -1.0*c))
         return x*params['V_0']
 
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
@@ -132,7 +132,7 @@ class MT(eos.EquationOfState):
         a, b, c = tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
         psubpth=pressure-Pth
-        return params['K_0']*(1. + b*(psubpth))*(a + (1.-a)*pow((1. + b*(psubpth)), c))
+        return params['K_0']*(1. + b*(psubpth))*(a + (1.-a)*np.power((1. + b*(psubpth)), c))
 
     #calculate the shear modulus as a function of P, V, and T
     def shear_modulus(self, pressure, temperature, volume, params):
@@ -162,7 +162,7 @@ class MT(eos.EquationOfState):
         einstein_T=einstein_temperature(params['S_0'], params['n'])
         C_V0 = einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
         C_V =  einstein.heat_capacity_v(temperature, einstein_T,params['n'])
-        alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*pow((1+b*psubpth), c)))
+        alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*np.power((1+b*psubpth), c)))
  
         return alpha
 
@@ -176,7 +176,7 @@ class MT(eos.EquationOfState):
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
         Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 2011
         """
-        Cp = params['Cp'][0] + params['Cp'][1]*temperature + params['Cp'][2]*pow(temperature,-2.) + params['Cp'][3]*pow(temperature,-0.5)
+        Cp = params['Cp'][0] + params['Cp'][1]*temperature + params['Cp'][2]*np.power(temperature,-2.) + params['Cp'][3]*np.power(temperature,-0.5)
         return Cp
 
 
@@ -213,12 +213,12 @@ class MT(eos.EquationOfState):
 
         psubpth=pressure-Pth
 
-        intCpdT = (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*pow(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
+        intCpdT = (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
 
-        intCpoverTdT = (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/pow(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
+        intCpoverTdT = (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
 
         # EQ 13
-        intVdP = pressure*params['V_0']*(1. - a + (a*(pow((1.-b*Pth), 1.-c) - pow((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure)))
+        intVdP = pressure*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure)))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
