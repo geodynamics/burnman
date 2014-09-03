@@ -143,8 +143,8 @@ for idx, model in enumerate(opx_models):
 
 
 
-#fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
-#plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
+fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
+plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
 plt.plot( comp, opx_entropies[0], 'r--', linewidth=3.)
 plt.plot( comp, opx_entropies[1], 'b--', linewidth=3.)
 plt.plot( comp, opx_entropies[2], 'g--', linewidth=3.)
@@ -232,8 +232,8 @@ for i,c in enumerate(comp):
    gibbs[i] = cpx.excess_gibbs
 
 
-#fig1 = mpimg.imread('dicats.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
-#plt.imshow(fig1, extent=[0.0, 1.0,-2.,8.0], aspect='auto')
+fig1 = mpimg.imread('dicats.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
+plt.imshow(fig1, extent=[0.0, 1.0,-2.,8.0], aspect='auto')
 
 plt.plot( comp, gibbs/1000., 'b--', linewidth=3.)
 plt.xlim(0.0,1.0)
