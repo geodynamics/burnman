@@ -31,6 +31,85 @@ Excess properties
 '''
 # Configurational entropy
 # Figure 3b of Stixrude and Lithgow-Bertelloni, 2011
+class enstatite (burnman.Mineral):
+    def __init__(self):
+       formula=''
+       formula=dictionarize_formula(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
+            'F_0': -2913.e3,
+            'V_0': 62.68e-6,
+            'K_0': 107.e9,
+            'Kprime_0': 7.0 ,
+            'Debye_0': 812.0,
+            'grueneisen_0': 0.78 ,
+            'q_0': 3.4,
+            'G_0': 77.e9,
+            'Gprime_0':  1.5,
+            'eta_s_0': 2.5 }
+
+class mg_tschermaks_molecule (burnman.Mineral):
+    def __init__(self):
+       formula=''
+       formula=dictionarize_formula(formula)
+       self.params = {
+            'name': '',
+            'formula': formula,
+            'equation_of_state': 'slb3',
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
+            'F_0': -3003.e3 ,
+            'V_0': 59.15e-6,
+            'K_0': 107.e9,
+            'Kprime_0': 7.0,
+            'Debye_0': 784.,
+            'grueneisen_0': 0.78 ,
+            'q_0': 3.4,
+            'G_0': 97.e9,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 2.5 }
+
+class orthopyroxene(burnman.SolidSolution):
+    def __init__(self):
+        # Name
+        self.name='orthopyroxene'
+
+        # Endmembers (cpx is symmetric)
+        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]SiO6'] ]
+
+        # Interaction parameters
+        enthalpy_interaction=[[0.0]]
+
+        burnman.SolidSolution.__init__(self, base_material, \
+                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+
+opx = orthopyroxene()
+opx.set_method('slb3')
+
+comp = np.linspace(0, 1.0, 100)
+entropy = np.empty_like(comp)
+
+for i,c in enumerate(comp):
+   opx.set_composition( np.array([1.0-c, c]) )
+   opx.set_state( 0.0, 0.0 )
+   entropy[i] = opx.solution_model.configurational_entropy( [1.0-c, c] )
+
+
+#fig1 = mpimg.imread('dicats.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
+#plt.imshow(fig1, extent=[0.0, 1.0,-2.,8.0], aspect='auto')
+
+plt.plot( comp, entropy/1000., 'b--', linewidth=3.)
+#plt.xlim(0.0,1.0)
+#plt.ylim(-2.,8.0)
+plt.ylabel("Configurational enthalpy of solution")
+plt.xlabel("cats fraction")
+plt.show()
+
+# Excess volume of solution
 
 # Excess enthalpy of solution
 # Figure 5 of Stixrude and Lithgow-Bertelloni, 2011
