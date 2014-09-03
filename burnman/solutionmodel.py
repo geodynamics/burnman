@@ -92,16 +92,17 @@ class IdealSolution ( SolutionModel ):
 
     def configurational_entropy (self, molar_fractions):
         activities = self.ideal_activities( molar_fractions )
-        gibbs_excess_ideal = 0.0
+        conf_entropy = 0.0
 
         tol = 1.e-10
         for i in range(self.n_endmembers):
             if molar_fractions[i] > tol:
-                configurational_entropy = configurational_entropy -  \
-                                     molar_fractions[i] * R * np.log(activities[i])
+                conf_entropy = conf_entropy -  \
+                               molar_fractions[i] * R * np.log(activities[i])
+        return conf_entropy
 
     def  ideal_gibbs_excess( self, temperature, molar_fractions ): 
-        return 0.0 - temperature*configurational_entropy(molar_fractions)
+        return -temperature*self.configurational_entropy(molar_fractions)
 
     def ideal_activities ( self, molar_fractions ):
 
