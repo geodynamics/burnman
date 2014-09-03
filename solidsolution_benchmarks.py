@@ -1,5 +1,6 @@
 # Benchmarks for the solid solution class
 import burnman
+from burnman import minerals
 from burnman.processchemistry import *
 
 import numpy as np
@@ -29,6 +30,49 @@ Solvus shapes (a proxy for Gibbs free energy checking
 '''
 Excess properties
 '''
+# Configurational entropy
+# Navrotsky and Kleppa, 1967
+class o_d_spinel(burnman.SolidSolution):
+    def __init__(self):
+        # Name
+        self.name='orthopyroxene'
+
+        # Endmembers (cpx is symmetric)
+        base_material = [[minerals.HP_2011.spinel(), '[Mg][Al]2O4'],[minerals.HP_2011.spinel(), '[Mg1/3Al2/3][Mg1/3Al2/3]2O4'] ]
+
+        # Interaction parameters
+        enthalpy_interaction=[[0.0]]
+
+        burnman.SolidSolution.__init__(self, base_material, \
+                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+
+comp = np.linspace(0, 1.0, 100)
+sp=o_d_spinel()
+sp.set_method('mtait')
+sp_entropies = np.empty_like(comp)
+sp_S= np.empty_like(comp)
+for i,c in enumerate(comp):
+        molar_fractions=[1.0-c, c]
+        sp.set_composition( np.array(molar_fractions) )
+        sp.set_state( 1e5, 298.15 )
+        sp_entropies[i] = sp.solution_model.configurational_entropy( molar_fractions ) + \
+            (sum(molar_fractions[mbr]*sp.solution_model.endmember_configurational_entropies[mbr] for mbr in range(sp.solution_model.n_endmembers)))
+        x=c/1.5
+        if i > 0:
+            sp_S[i] = -8.3145*(x*np.log(x) + (1.-x)*np.log(1.-x) + x*np.log(x/2.) + (2.-x)*np.log(1.-x/2.))
+        else:
+            sp_S[i] = 0.
+
+#fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
+#plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
+plt.plot( comp, sp_S, 'b-', linewidth=3.)
+plt.plot( comp, sp_entropies, 'r--', linewidth=3.)
+plt.xlim(0.0,1.0)
+plt.ylim(0.,17.0)
+plt.ylabel("Configurational enthalpy of solution")
+plt.xlabel("disordered spinel fraction")
+plt.show()
+
 # Configurational entropy
 # Figure 3b of Stixrude and Lithgow-Bertelloni, 2011
 class enstatite (burnman.Mineral):
