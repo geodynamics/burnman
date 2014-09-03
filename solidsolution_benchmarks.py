@@ -56,11 +56,11 @@ for i,c in enumerate(comp):
         sp.set_composition( np.array(molar_fractions) )
         sp.set_state( 1e5, 298.15 )
         sp_entropies[i] = sp.solution_model.configurational_entropy( molar_fractions )
-        sp_S[i] = -8.3145*(c*np.log(c) + (1.-c)*np.log(1.-c) + c*np.log(c/2.) + (2.-c)*np.log(1.-c/2.))
+        sp_entropies_NK1967[i] = -8.3145*(c*np.log(c) + (1.-c)*np.log(1.-c) + c*np.log(c/2.) + (2.-c)*np.log(1.-c/2.)) # eq. 7 in Navrotsky and Kleppa, 1967.
 
 #fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
 #plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
-plt.plot( comp, sp_S, 'b-', linewidth=3.)
+plt.plot( comp, sp_entropies_NK1967, 'b-', linewidth=3.)
 plt.plot( comp, sp_entropies, 'r--', linewidth=3.)
 plt.xlim(0.0,1.0)
 plt.ylim(0.,17.0)
