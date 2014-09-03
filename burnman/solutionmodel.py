@@ -102,21 +102,19 @@ class IdealSolution ( SolutionModel ):
         return self.ideal_gibbs_excess( temperature, molar_fractions )
 
     def configurational_entropy (self, molar_fractions):
-        activities = self.ideal_activities( molar_fractions )
-        conf_entropy = 0.0
+        site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
+        conf_entropy=0
+        for idx, occupancy in enumerate(site_occupancies):
+            if occupancy > 1e-10:
+                conf_entropy=conf_entropy-R*occupancy*self.site_multiplicities[idx]*np.log(occupancy)
 
-        tol = 1.e-10
-        for i in range(self.n_endmembers):
-            if molar_fractions[i] > tol:
-                conf_entropy = conf_entropy -  \
-                               molar_fractions[i] * R * np.log(activities[i])
         return conf_entropy
 
     def ideal_gibbs_excess( self, temperature, molar_fractions ): 
-        return -temperature*self.configurational_entropy(molar_fractions)
+        return 0.0-temperature*self.configurational_entropy(molar_fractions)
 
     def ideal_activities ( self, molar_fractions ):
-
+        # XXX Need to check this against configurational entropy!!!
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
         activities=np.empty(shape=(self.n_endmembers))
 
@@ -124,9 +122,9 @@ class IdealSolution ( SolutionModel ):
             activities[e]=1.0
             normalisation_constant=1.0
             for occ in range(self.n_occupancies):
-                if self.endmember_occupancies[e][occ] != 0: #integer?  
-                    activities[e]=activities[e]*np.power(site_occupancies[occ],self.site_multiplicities[occ])
-                    normalisation_constant=normalisation_constant/np.power(self.endmember_occupancies[e][occ],self.site_multiplicities[occ])
+                if self.endmember_occupancies[e][occ] != 0.: #integer?  
+                    activities[e]=activities[e]*np.power(site_occupancies[occ],site_occupancies[occ]*self.site_multiplicities[occ])
+                    normalisation_constant=normalisation_constant/np.power(self.endmember_occupancies[e][occ],self.endmember_occupancies[e][occ]*self.site_multiplicities[occ])
             activities[e]=normalisation_constant*activities[e]
 
         return activities
