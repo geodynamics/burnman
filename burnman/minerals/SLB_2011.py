@@ -41,19 +41,9 @@ class ca_ferrite_structured_phase(SolidSolution):
         self.name='calcium ferrite structured phase'
 
         # Endmembers (CF is symmetric)
-        base_material = [[mg_calcium_ferrite(), '[Mg]Al[Al]O4'],[fe_calcium_ferrite(), '[Fe]Al[Al]O4'],[na_calcium_ferrite(), '[Na]Al[Si]O4']]
+        base_material = [[mg_ca_ferrite(), '[Mg]Al[Al]O4'],[fe_ca_ferrite(), '[Fe]Al[Al]O4'],[na_ca_ferrite(), '[Na]Al[Si]O4']]
 
         SolidSolution.__init__(self, base_material, IdealSolution(base_material))
-
-class ca_rich_perovskite(SolidSolution):
-    def __init__(self):
-        # Name
-        self.name='calcium perovskite'
-
-        # Endmembers (cpv is symmetric)
-        base_material = [[ca_perovskite(), '[Ca][Ca]Si2O6'],[jd_perovskite(), '[Na][Al]Si2O6']]
-
-        SolidSolution.__init__(self, base_material, IdealSolution(base_materia))
 
 class clinopyroxene(SolidSolution):
     def __init__(self):
@@ -123,7 +113,7 @@ class orthopyroxene(SolidSolution):
         self.name='orthopyroxene'
 
         # Endmembers (orthopyroxene is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[ferrosilite(), '[Fe][Fe][Si]SiO6'],[mg_tschermaks(), '[Mg][Al][Al]SiO6'],[orthodiopside(), '[Ca][Mg][Si]SiO6']]
+        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[ferrosilite(), '[Fe][Fe][Si]SiO6'],[mg_tschermaks(), '[Mg][Al][Al]SiO6'],[ortho_diopside(), '[Ca][Mg][Si]SiO6']]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0, 0.0, 32.11352e3],[0.0, 0.0],[48.35316e3]]
@@ -1785,14 +1775,14 @@ feri = fe_ringwoodite
 # Orthopyroxenes
 en = enstatite
 fs = ferrosilite
-mgts = mg_tschermaks_molecule
-odi = orthodiopside
+mgts = mg_tschermaks
+odi = ortho_diopside
 
 # Clinopyroxenes
 di = diopside
 he = hedenbergite
 cen = clinoenstatite
-cats = ca_tschermaks_molecule
+cats = ca_tschermaks
 jd = jadeite
 mgc2 = hp_clinoenstatite
 fec2 = hp_clinoferrosilite
@@ -1805,8 +1795,7 @@ mg_bridgmanite = mg_perovskite
 fepv = fe_perovskite
 fe_bridgmanite = fe_perovskite
 alpv = al_perovskite
-capv = calcium_perovskite
-jdpv = jd_perovskite
+capv = ca_perovskite
 
 # Ilmenite group
 mgil = mg_akimotoite
@@ -1836,9 +1825,9 @@ pe = periclase
 wu = wuestite
 
 # Calcium ferrite structured phases
-mgcf = mg_calcium_ferrite
-fecf = fe_calcium_ferrite
-nacf = na_calcium_ferrite
+mgcf = mg_ca_ferrite
+fecf = fe_ca_ferrite
+nacf = na_ca_ferrite
 
 # Al2SiO5 polymorphs
 ky = kyanite
@@ -1850,8 +1839,7 @@ neph = nepheline
 
 # Solid solution aliases
 c2c = c2c_pyroxene
-cf = calcium_ferrite_structured_phase
-cpv = ca_rich_perovskite
+cf = ca_ferrite_structured_phase
 cpx = clinopyroxene
 gt = garnet
 il = akimotoite
