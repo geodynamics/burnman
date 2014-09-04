@@ -17,7 +17,7 @@ from burnman.solidsolution import SolidSolution
 from burnman.solutionmodel import *
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
-atomic_masses=read_masses()
+atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
 
 '''
 SOLID SOLUTIONS
@@ -61,7 +61,7 @@ class clinopyroxene(SolidSolution):
         self.name='clinopyroxene'
 
         # Endmembers (cpx is symmetric)
-        base_material = [[diopside(), '[Ca][Mg][Si]2O6'],[hedenbergite(), '[Ca][Fe][Si]2O6'],[clinoenstatite(), '[Mg][Mg][Si]2O6'],[ca_tschermaks_molecule(), '[Ca][Al][Si1/2Al1/2]2O6'],[jadeite(), '[Na][Al][Si]2O6']]
+        base_material = [[diopside(), '[Ca][Mg][Si]2O6'],[hedenbergite(), '[Ca][Fe][Si]2O6'],[clinoenstatite(), '[Mg][Mg][Si]2O6'],[ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6'],[jadeite(), '[Na][Al][Si]2O6']]
 
         # Interaction parameters
         enthalpy_interaction=[[0., 24.74e3, 26.e3, 24.3e3],[24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
@@ -123,7 +123,7 @@ class orthopyroxene(SolidSolution):
         self.name='orthopyroxene'
 
         # Endmembers (orthopyroxene is symmetric)
-        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[ferrosilite(), '[Fe][Fe][Si]SiO6'],[mg_tschermaks_molecule(), '[Mg][Al][Al]SiO6'],[orthodiopside(), '[Ca][Mg][Si]SiO6']]
+        base_material = [[enstatite(), '[Mg][Mg][Si]SiO6'],[ferrosilite(), '[Fe][Fe][Si]SiO6'],[mg_tschermaks(), '[Mg][Al][Al]SiO6'],[orthodiopside(), '[Ca][Mg][Si]SiO6']]
 
         # Interaction parameters
         enthalpy_interaction=[[0.0, 0.0, 32.11352e3],[0.0, 0.0],[48.35316e3]]
@@ -210,1606 +210,1562 @@ class mg_fe_wadsleyite(SolidSolution):
 '''
 ENDMEMBERS
 '''
+
 class anorthite (Mineral):
     def __init__(self):
        formula='CaAl2Si2O8'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'anorthite',
+            'name': 'Anorthite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -4015.0 ,
+            'V_0': 100.61 ,
+            'K_0': 84.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 752.0 ,
+            'grueneisen_0': 0.39 ,
+            'q_0': 1.0 ,
+            'G_0': 40.0 ,
+            'Gprime_0': 1.1 ,
+            'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -4015.e3,
-            'V_0': 100.61e-6,
-            'K_0': 84.e9,
-            'Kprime_0': 4.0,
-            'Debye_0': 752.,
-            'grueneisen_0': 0.39,
-            'q_0': 1.0,
-            'G_0': 40e9,
-            'Gprime_0': 1.1,
-            'eta_s_0': 1.6}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.e3,
-            'err_V_0': 0.,
-            'err_K_0': 5.e9,
-            'err_Kprime_0': 1.0,
-            'err_Debye_0': 2.,
-            'err_grueneisen_0': 0.05,
-            'err_q_0': 1.0,
-            'err_G_0': 3.e9,
-            'err_Gprime_0': 0.5,
-            'err_eta_s_0': 0.1
-            }
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 5.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 2.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 3.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class albite (Mineral):
     def __init__(self):
        formula='NaAlSi3O8'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'albite',
+            'name': 'Albite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -3719.0 ,
+            'V_0': 100.45 ,
+            'K_0': 60.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 716.0 ,
+            'grueneisen_0': 0.57 ,
+            'q_0': 1.0 ,
+            'G_0': 36.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -3719.e3,
-            'V_0': 100.45e-6,
-            'K_0': 60.e9,
-            'Kprime_0': 4.0,
-            'Debye_0': 716.,
-            'grueneisen_0': 0.57,
-            'q_0': 1.0,
-            'G_0': 36.e9,
-            'Gprime_0': 1.4,
-            'eta_s_0': 1.0}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 5.e3,
-            'err_V_0': 0.0,
-            'err_K_0': 5.e9,
-            'err_Kprime_0': 1.0,
-            'err_Debye_0': 13,
-            'err_grueneisen_0': 0.03,
-            'err_q_0': 1.0,
-            'err_G_0': 5.e9,
-            'err_Gprime_0': 0.5,
-            'err_eta_s_0': 1.0
-            }
+            'err_F_0': 5.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 5.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 13.0 ,
+            'err_grueneisen_0': 0.03 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 5.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class spinel (Mineral):
     def __init__(self):
        formula='Mg4Al8O16'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'spinel',
+            'name': 'Spinel',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -8668.0 ,
+            'V_0': 159.05 ,
+            'K_0': 197.0 ,
+            'Kprime_0': 5.7 ,
+            'Debye_0': 843.0 ,
+            'grueneisen_0': 1.02 ,
+            'q_0': 2.7 ,
+            'G_0': 108.0 ,
+            'Gprime_0': 0.4 ,
+            'eta_s_0': 2.7 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -8668.0e3,
-            'V_0': 159.05e-6,
-            'K_0': 197.e9,
-            'Kprime_0': 5.7,
-            'Debye_0': 843.,
-            'grueneisen_0': 1.02,
-            'q_0': 2.7,
-            'G_0': 108.e9,
-            'Gprime_0': 0.4,
-            'eta_s_0': 2.7}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 32.e3,
-            'err_V_0': 0.0,
-            'err_K_0': 1.e9,
-            'err_Kprime_0': 0.2,
-            'err_Debye_0': 33.,
-            'err_grueneisen_0': 0.04,
-            'err_q_0': 0.6,
-            'err_G_0': 10.e9,
-            'err_Gprime_0': 0.5,
-            'err_eta_s_0': 0.6
-            }
+            'err_F_0': 32.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 33.0 ,
+            'err_grueneisen_0': 0.04 ,
+            'err_q_0': 0.6 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 0.6 }
 
 class hercynite (Mineral):
     def __init__(self):
        formula='Fe4Al8O16'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'hercynite',
+            'name': 'Hercynite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -7324.0 ,
+            'V_0': 163.37 ,
+            'K_0': 209.0 ,
+            'Kprime_0': 5.7 ,
+            'Debye_0': 763.0 ,
+            'grueneisen_0': 1.22 ,
+            'q_0': 2.7 ,
+            'G_0': 84.0 ,
+            'Gprime_0': 0.4 ,
+            'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -7324.e3,
-            'V_0': 163.37e-6,
-            'K_0': 209.e9,
-            'Kprime_0': 5.7,
-            'Debye_0': 763.,
-            'grueneisen_0': 1.22,
-            'q_0': 2.7,
-            'G_0': 84.e9,
-            'Gprime_0': 0.4,
-            'eta_s_0': 2.8}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 35.e3,
-            'err_V_0': 0.0,
-            'err_K_0': 2.e9,
-            'err_Kprime_0': 1.0,
-            'err_Debye_0': 32.,
-            'err_grueneisen_0': 0.07,
-            'err_q_0': 1.0,
-            'err_G_0': 13.e9,
-            'err_Gprime_0': 0.5,
-            'err_eta_s_0': 1.0
-            }
+            'err_F_0': 35.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 32.0 ,
+            'err_grueneisen_0': 0.07 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 13.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class forsterite (Mineral):
     def __init__(self):
        formula='Mg2SiO4'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'forsterite',
+            'name': 'Forsterite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2055.0 ,
+            'V_0': 43.6 ,
+            'K_0': 128.0 ,
+            'Kprime_0': 4.2 ,
+            'Debye_0': 809.0 ,
+            'grueneisen_0': 0.99 ,
+            'q_0': 2.1 ,
+            'G_0': 82.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -2055.e3,
-            'V_0': 43.60e-6,
-            'K_0': 128.e9,
-            'Kprime_0': 4.2,
-            'Debye_0': 809.,
-            'grueneisen_0': 0.99,
-            'q_0': 2.1,
-            'G_0': 82.e9,
-            'Gprime_0': 1.5,
-            'eta_s_0': 2.3}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.e3,
-            'err_V_0': 0.0,
-            'err_K_0': 2.e9,
-            'err_Kprime_0': 0.2,
-            'err_Debye_0': 1.,
-            'err_grueneisen_0': 0.03,
-            'err_q_0': 0.2,
-            'err_G_0': 2.e9,
-            'err_Gprime_0': 0.1,
-            'err_eta_s_0': 0.1
-            }
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 1.0 ,
+            'err_grueneisen_0': 0.03 ,
+            'err_q_0': 0.2 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.1 }
 
 class fayalite (Mineral):
     def __init__(self):
        formula='Fe2SiO4'
-       formula=dictionarize_formula(formula)
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'fayalite',
+            'name': 'Fayalite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1371.0 ,
+            'V_0': 46.29 ,
+            'K_0': 135.0 ,
+            'Kprime_0': 4.2 ,
+            'Debye_0': 619.0 ,
+            'grueneisen_0': 1.06 ,
+            'q_0': 3.6 ,
+            'G_0': 51.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': -1371.e3,
-            'V_0': 46.29e-6,
-            'K_0': 135.e9,
-            'Kprime_0': 4.2,
-            'Debye_0': 619.,
-            'grueneisen_0': 1.06,
-            'q_0': 3.6,
-            'G_0': 51.e9,
-            'Gprime_0': 1.5,
-            'eta_s_0': 1.0}
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.e3,
-            'err_V_0': 0.0,
-            'err_K_0': 2.e9,
-            'err_Kprime_0': 1.0,
-            'err_Debye_0': 2.,
-            'err_grueneisen_0': 0.07,
-            'err_q_0': 1.0,
-            'err_G_0': 2.e9,
-            'err_Gprime_0': 0.5,
-            'err_eta_s_0': 0.6
-            }
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 2.0 ,
+            'err_grueneisen_0': 0.07 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 0.6 }
 
 class mg_wadsleyite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg2SiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Wadsleyite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2028.0 ,
+            'V_0': 40.52 ,
+            'K_0': 169.0 ,
+            'Kprime_0': 4.3 ,
+            'Debye_0': 844.0 ,
+            'grueneisen_0': 1.21 ,
+            'q_0': 2.0 ,
+            'G_0': 112.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 2.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 3.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 7.0 ,
+            'err_grueneisen_0': 0.09 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.2 ,
+            'err_eta_s_0': 0.4 }
 
 class fe_wadsleyite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Fe2SiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe_Wadsleyite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1365.0 ,
+            'V_0': 42.8 ,
+            'K_0': 169.0 ,
+            'Kprime_0': 4.3 ,
+            'Debye_0': 665.0 ,
+            'grueneisen_0': 1.21 ,
+            'q_0': 2.0 ,
+            'G_0': 72.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 7.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 13.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 21.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 12.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class mg_ringwoodite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg2SiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Ringwoodite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2017.0 ,
+            'V_0': 39.49 ,
+            'K_0': 185.0 ,
+            'Kprime_0': 4.2 ,
+            'Debye_0': 878.0 ,
+            'grueneisen_0': 1.11 ,
+            'q_0': 2.4 ,
+            'G_0': 123.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 8.0 ,
+            'err_grueneisen_0': 0.1 ,
+            'err_q_0': 0.4 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.5 }
 
 class fe_ringwoodite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Fe2SiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe_Ringwoodite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1363.0 ,
+            'V_0': 41.86 ,
+            'K_0': 213.0 ,
+            'Kprime_0': 4.2 ,
+            'Debye_0': 679.0 ,
+            'grueneisen_0': 1.27 ,
+            'q_0': 2.4 ,
+            'G_0': 92.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 7.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 8.0 ,
+            'err_grueneisen_0': 0.23 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class enstatite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg2Si2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Enstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2913.0 ,
+            'V_0': 62.68 ,
+            'K_0': 107.0 ,
+            'Kprime_0': 7.0 ,
+            'Debye_0': 812.0 ,
+            'grueneisen_0': 0.78 ,
+            'q_0': 3.4 ,
+            'G_0': 77.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.4 ,
+            'err_Debye_0': 4.0 ,
+            'err_grueneisen_0': 0.04 ,
+            'err_q_0': 0.4 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.1 }
 
 class ferrosilite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Fe2Si2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Ferrosilite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2226.0 ,
+            'V_0': 65.94 ,
+            'K_0': 101.0 ,
+            'Kprime_0': 7.0 ,
+            'Debye_0': 674.0 ,
+            'grueneisen_0': 0.72 ,
+            'q_0': 3.4 ,
+            'G_0': 52.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 1.1 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 4.0 ,
+            'err_K_prime_0': 0.5 ,
+            'err_Debye_0': 10.0 ,
+            'err_grueneisen_0': 0.08 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 5.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
-class mg_tschermaks_molecule (Mineral):
+class mg_tschermaks (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgAl2SiO6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Tschermaks',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -3003.0 ,
+            'V_0': 59.14 ,
+            'K_0': 107.0 ,
+            'Kprime_0': 7.0 ,
+            'Debye_0': 784.0 ,
+            'grueneisen_0': 0.78 ,
+            'q_0': 3.4 ,
+            'G_0': 97.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 9.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 24.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
-class orthodiopside (Mineral):
+class ortho_diopside (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='CaMgSi2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Ortho_Diopside',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -3016.0 ,
+            'V_0': 68.05 ,
+            'K_0': 107.0 ,
+            'Kprime_0': 7.0 ,
+            'Debye_0': 745.0 ,
+            'grueneisen_0': 0.78 ,
+            'q_0': 3.4 ,
+            'G_0': 60.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 1.4 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 9.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class diopside (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='CaMgSi2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Diopside',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -3030.0 ,
+            'V_0': 66.04 ,
+            'K_0': 112.0 ,
+            'Kprime_0': 5.2 ,
+            'Debye_0': 782.0 ,
+            'grueneisen_0': 0.96 ,
+            'q_0': 1.5 ,
+            'G_0': 67.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 5.0 ,
+            'err_K_prime_0': 1.8 ,
+            'err_Debye_0': 3.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 2.0 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class hedenbergite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='CaFeSi2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Hedenbergite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2677.0 ,
+            'V_0': 67.87 ,
+            'K_0': 119.0 ,
+            'Kprime_0': 5.2 ,
+            'Debye_0': 702.0 ,
+            'grueneisen_0': 0.94 ,
+            'q_0': 1.5 ,
+            'G_0': 61.0 ,
+            'Gprime_0': 1.2 ,
+            'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 45.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 4.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 2.0 ,
+            'err_grueneisen_0': 0.06 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class clinoenstatite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg2Si2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Clinoenstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2906.0 ,
+            'V_0': 62.5 ,
+            'K_0': 112.0 ,
+            'Kprime_0': 5.2 ,
+            'Debye_0': 805.0 ,
+            'grueneisen_0': 0.96 ,
+            'q_0': 1.5 ,
+            'G_0': 81.0 ,
+            'Gprime_0': 1.7 ,
+            'eta_s_0': 1.7 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 10.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
-class ca_tschermaks_molecule (Mineral):
+class ca-tschermaks (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='CaAl2SiO6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Ca-Tschermaks',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -3120.0 ,
+            'V_0': 63.57 ,
+            'K_0': 112.0 ,
+            'Kprime_0': 5.2 ,
+            'Debye_0': 804.0 ,
+            'grueneisen_0': 0.78 ,
+            'q_0': 1.5 ,
+            'G_0': 76.0 ,
+            'Gprime_0': 1.6 ,
+            'eta_s_0': 2.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 5.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 5.0 ,
+            'err_grueneisen_0': 0.0 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class jadeite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='NaAlSi2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Jadeite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2855.0 ,
+            'V_0': 60.51 ,
+            'K_0': 142.0 ,
+            'Kprime_0': 5.2 ,
+            'Debye_0': 821.0 ,
+            'grueneisen_0': 0.9 ,
+            'q_0': 0.4 ,
+            'G_0': 85.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 2.2 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 12.0 ,
+            'err_grueneisen_0': 0.08 ,
+            'err_q_0': 1.4 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class hp_clinoenstatite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg2Si2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'HP_Clinoenstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2905.0 ,
+            'V_0': 60.76 ,
+            'K_0': 116.0 ,
+            'Kprime_0': 6.2 ,
+            'Debye_0': 824.0 ,
+            'grueneisen_0': 1.12 ,
+            'q_0': 0.2 ,
+            'G_0': 88.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.3 ,
+            'err_Debye_0': 7.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 0.5 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.5 }
 
 class hp_clinoferrosilite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Fe2Si2O6'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'HP_Clinoferrosilite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2222.0 ,
+            'V_0': 63.85 ,
+            'K_0': 116.0 ,
+            'Kprime_0': 6.2 ,
+            'Debye_0': 692.0 ,
+            'grueneisen_0': 1.12 ,
+            'q_0': 0.2 ,
+            'G_0': 71.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 0.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 11.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class ca_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='CaSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Ca_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1463.0 ,
+            'V_0': 27.45 ,
+            'K_0': 236.0 ,
+            'Kprime_0': 3.9 ,
+            'Debye_0': 796.0 ,
+            'grueneisen_0': 1.89 ,
+            'q_0': 0.9 ,
+            'G_0': 157.0 ,
+            'Gprime_0': 2.2 ,
+            'eta_s_0': 1.3 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 8.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 4.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 44.0 ,
+            'err_grueneisen_0': 0.07 ,
+            'err_q_0': 1.6 ,
+            'err_G_0': 12.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class mg_akimotoite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Akimotoite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1410.0 ,
+            'V_0': 26.35 ,
+            'K_0': 211.0 ,
+            'Kprime_0': 5.6 ,
+            'Debye_0': 934.0 ,
+            'grueneisen_0': 1.19 ,
+            'q_0': 2.3 ,
+            'G_0': 132.0 ,
+            'Gprime_0': 1.6 ,
+            'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 4.0 ,
+            'err_K_prime_0': 0.8 ,
+            'err_Debye_0': 12.0 ,
+            'err_grueneisen_0': 0.13 ,
+            'err_q_0': 0.8 ,
+            'err_G_0': 8.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class fe_akimotoite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='FeSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe_Akimotoite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1068.0 ,
+            'V_0': 26.85 ,
+            'K_0': 211.0 ,
+            'Kprime_0': 5.6 ,
+            'Debye_0': 888.0 ,
+            'grueneisen_0': 1.19 ,
+            'q_0': 2.3 ,
+            'G_0': 150.0 ,
+            'Gprime_0': 1.6 ,
+            'eta_s_0': 3.5 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 21.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 120.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class corundum (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='AlAlO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Corundum',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1582.0 ,
+            'V_0': 25.58 ,
+            'K_0': 253.0 ,
+            'Kprime_0': 4.3 ,
+            'Debye_0': 933.0 ,
+            'grueneisen_0': 1.32 ,
+            'q_0': 1.3 ,
+            'G_0': 163.0 ,
+            'Gprime_0': 1.6 ,
+            'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 5.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 3.0 ,
+            'err_grueneisen_0': 0.04 ,
+            'err_q_0': 0.2 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.2 }
 
 class pyrope (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg3Al2Si3O12'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Pyrope',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -5936.0 ,
+            'V_0': 113.08 ,
+            'K_0': 170.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 823.0 ,
+            'grueneisen_0': 1.01 ,
+            'q_0': 1.4 ,
+            'G_0': 94.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 10.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.3 ,
+            'err_Debye_0': 4.0 ,
+            'err_grueneisen_0': 0.06 ,
+            'err_q_0': 0.5 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.2 ,
+            'err_eta_s_0': 0.3 }
 
 class almandine (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Fe3Al2Si3O12'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Almandine',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -4935.0 ,
+            'V_0': 115.43 ,
+            'K_0': 174.0 ,
+            'Kprime_0': 4.9 ,
+            'Debye_0': 741.0 ,
+            'grueneisen_0': 1.06 ,
+            'q_0': 1.4 ,
+            'G_0': 96.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 29.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 5.0 ,
+            'err_grueneisen_0': 0.06 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class grossular (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Ca3Al2Si3O12'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Grossular',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -6278.0 ,
+            'V_0': 125.12 ,
+            'K_0': 167.0 ,
+            'Kprime_0': 3.9 ,
+            'Debye_0': 823.0 ,
+            'grueneisen_0': 1.05 ,
+            'q_0': 1.9 ,
+            'G_0': 109.0 ,
+            'Gprime_0': 1.2 ,
+            'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 11.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 2.0 ,
+            'err_grueneisen_0': 0.06 ,
+            'err_q_0': 0.2 ,
+            'err_G_0': 4.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.1 }
 
 class mg_majorite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Mg4Si4O12'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Majorite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -5691.0 ,
+            'V_0': 114.32 ,
+            'K_0': 165.0 ,
+            'Kprime_0': 4.2 ,
+            'Debye_0': 822.0 ,
+            'grueneisen_0': 0.98 ,
+            'q_0': 1.5 ,
+            'G_0': 85.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 10.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 3.0 ,
+            'err_K_prime_0': 0.3 ,
+            'err_Debye_0': 4.0 ,
+            'err_grueneisen_0': 0.07 ,
+            'err_q_0': 0.5 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.2 ,
+            'err_eta_s_0': 0.3 }
 
 class jd_majorite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Na2Al2Si4O12'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Jd_Majorite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -5519.0 ,
+            'V_0': 110.94 ,
+            'K_0': 177.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 896.0 ,
+            'grueneisen_0': 1.01 ,
+            'q_0': 1.4 ,
+            'G_0': 125.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 3.3 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 14.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 7.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 18.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 4.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class quartz (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='SiO2'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Quartz',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -859.0 ,
+            'V_0': 23.67 ,
+            'K_0': 50.0 ,
+            'Kprime_0': 4.3 ,
+            'Debye_0': 816.0 ,
+            'grueneisen_0': 0.0 ,
+            'q_0': 1.0 ,
+            'G_0': 45.0 ,
+            'Gprime_0': 1.0 ,
+            'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 31.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class coesite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='SiO2'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Coesite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -855.0 ,
+            'V_0': 20.66 ,
+            'K_0': 114.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 857.0 ,
+            'grueneisen_0': 0.39 ,
+            'q_0': 1.0 ,
+            'G_0': 62.0 ,
+            'Gprime_0': 1.2 ,
+            'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 9.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class stishovite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='SiO2'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Stishovite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -819.0 ,
+            'V_0': 14.02 ,
+            'K_0': 314.0 ,
+            'Kprime_0': 3.8 ,
+            'Debye_0': 1108.0 ,
+            'grueneisen_0': 1.37 ,
+            'q_0': 2.8 ,
+            'G_0': 220.0 ,
+            'Gprime_0': 1.9 ,
+            'eta_s_0': 4.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 8.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 13.0 ,
+            'err_grueneisen_0': 0.17 ,
+            'err_q_0': 2.2 ,
+            'err_G_0': 12.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class seifertite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='SiO2'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Seifertite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -794.0 ,
+            'V_0': 13.67 ,
+            'K_0': 328.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 1141.0 ,
+            'grueneisen_0': 1.37 ,
+            'q_0': 2.8 ,
+            'G_0': 227.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 5.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 2.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 16.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class mg_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg-Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1368.0 ,
+            'V_0': 24.45 ,
+            'K_0': 251.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 905.0 ,
+            'grueneisen_0': 1.57 ,
+            'q_0': 1.1 ,
+            'G_0': 173.0 ,
+            'Gprime_0': 1.7 ,
+            'eta_s_0': 2.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 3.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 5.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 0.3 ,
+            'err_G_0': 2.0 ,
+            'err_Gprime_0': 0.0 ,
+            'err_eta_s_0': 0.3 }
 
 class fe_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='FeSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe-Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1041.0 ,
+            'V_0': 25.49 ,
+            'K_0': 272.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 871.0 ,
+            'grueneisen_0': 1.57 ,
+            'q_0': 1.1 ,
+            'G_0': 133.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 6.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 40.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 26.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 40.0 ,
+            'err_Gprime_0': 0.0 ,
+            'err_eta_s_0': 1.0 }
 
 class al_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='AlAlO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Al_perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1534.0 ,
+            'V_0': 24.94 ,
+            'K_0': 258.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 886.0 ,
+            'grueneisen_0': 1.57 ,
+            'q_0': 1.1 ,
+            'G_0': 171.0 ,
+            'Gprime_0': 1.5 ,
+            'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 2.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 0.5 ,
+            'err_Debye_0': 7.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.5 }
 
 class mg_post_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1348.0 ,
+            'V_0': 24.42 ,
+            'K_0': 231.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 855.0 ,
+            'grueneisen_0': 1.89 ,
+            'q_0': 1.1 ,
+            'G_0': 150.0 ,
+            'Gprime_0': 2.0 ,
+            'eta_s_0': 1.2 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 7.0 ,
+            'err_grueneisen_0': 0.03 ,
+            'err_q_0': 0.1 ,
+            'err_G_0': 4.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.2 }
 
 class fe_post_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='FeSiO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -982.0 ,
+            'V_0': 25.46 ,
+            'K_0': 231.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 782.0 ,
+            'grueneisen_0': 1.89 ,
+            'q_0': 1.1 ,
+            'G_0': 129.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': 1.4 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 21.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 52.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 5.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class al_post_perovskite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='AlAlO3'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Al_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1378.0 ,
+            'V_0': 23.85 ,
+            'K_0': 249.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 762.0 ,
+            'grueneisen_0': 1.65 ,
+            'q_0': 1.1 ,
+            'G_0': 92.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 20.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 9.0 ,
+            'err_grueneisen_0': 0.02 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.2 }
 
 class periclase (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgO'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Periclase',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -569.0 ,
+            'V_0': 11.24 ,
+            'K_0': 161.0 ,
+            'Kprime_0': 3.8 ,
+            'Debye_0': 767.0 ,
+            'grueneisen_0': 1.36 ,
+            'q_0': 1.7 ,
+            'G_0': 131.0 ,
+            'Gprime_0': 2.1 ,
+            'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 0.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 3.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 9.0 ,
+            'err_grueneisen_0': 0.05 ,
+            'err_q_0': 0.2 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 0.2 }
 
 class wuestite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='FeO'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Wuestite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -242.0 ,
+            'V_0': 12.26 ,
+            'K_0': 179.0 ,
+            'Kprime_0': 4.9 ,
+            'Debye_0': 454.0 ,
+            'grueneisen_0': 1.53 ,
+            'q_0': 1.7 ,
+            'G_0': 59.0 ,
+            'Gprime_0': 1.4 ,
+            'eta_s_0': -0.1 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 1.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.2 ,
+            'err_Debye_0': 21.0 ,
+            'err_grueneisen_0': 0.13 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class mg_calcium_ferrite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='MgAl2O4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Mg_Calcium_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2122.0 ,
+            'V_0': 36.18 ,
+            'K_0': 211.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 838.0 ,
+            'grueneisen_0': 1.31 ,
+            'q_0': 1.0 ,
+            'G_0': 130.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 16.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class fe_calcium_ferrite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='FeAl2O4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Fe_Calcium_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1790.0 ,
+            'V_0': 37.26 ,
+            'K_0': 211.0 ,
+            'Kprime_0': 4.1 ,
+            'Debye_0': 804.0 ,
+            'grueneisen_0': 1.31 ,
+            'q_0': 1.0 ,
+            'G_0': 152.0 ,
+            'Gprime_0': 1.8 ,
+            'eta_s_0': 3.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 25.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 10.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 69.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class na_calcium_ferrite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='NaAlSiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Na_Calcium_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1851.0 ,
+            'V_0': 36.27 ,
+            'K_0': 158.0 ,
+            'Kprime_0': 4.3 ,
+            'Debye_0': 812.0 ,
+            'grueneisen_0': 1.17 ,
+            'q_0': 1.0 ,
+            'G_0': 121.0 ,
+            'Gprime_0': 2.1 ,
+            'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 11.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.1 ,
+            'err_Debye_0': 51.0 ,
+            'err_grueneisen_0': 0.3 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.1 ,
+            'err_eta_s_0': 1.0 }
 
 class kyanite (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='Al2SiO5'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Kyanite',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -2446.0 ,
+            'V_0': 44.23 ,
+            'K_0': 160.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 943.0 ,
+            'grueneisen_0': 0.93 ,
+            'q_0': 1.0 ,
+            'G_0': 121.0 ,
+            'Gprime_0': 1.7 ,
+            'eta_s_0': 3.0 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 4.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 0.0 ,
+            'err_Debye_0': 8.0 ,
+            'err_grueneisen_0': 0.07 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 10.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
 class nepheline (Mineral):
     def __init__(self):
-       formula=''
-       formula=dictionarize_formula(formula)
+       formula='NaAlSiO4'
+       formula = dictionarize_formula(formula)
        self.params = {
-            'name': '',
+            'name': 'Nepheline',
             'formula': formula,
             'equation_of_state': 'slb3',
+            'F_0': -1993.0 ,
+            'V_0': 54.67 ,
+            'K_0': 53.0 ,
+            'Kprime_0': 4.0 ,
+            'Debye_0': 701.0 ,
+            'grueneisen_0': 0.69 ,
+            'q_0': 1.0 ,
+            'G_0': 31.0 ,
+            'Gprime_0': 1.3 ,
+            'eta_s_0': 0.6 ,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
-            'F_0': ,
-            'V_0': ,
-            'K_0': ,
-            'Kprime_0': ,
-            'Debye_0': ,
-            'grueneisen_0': ,
-            'q_0': ,
-            'G_0': ,
-            'Gprime_0': ,
-            'eta_s_0': }
+            'molar_mass': formula_mass(formula, atomic_masses)}
 
-        self.uncertainties = {
-            'err_F_0': ,
-            'err_V_0': ,
-            'err_K_0': ,
-            'err_Kprime_0': ,
-            'err_Debye_0': ,
-            'err_grueneisen_0': ,
-            'err_q_0': ,
-            'err_G_0': ,
-            'err_Gprime_0': ,
-            'err_eta_s_0': 
-            }
+       self.uncertainties = {
+            'err_F_0': 3.0 ,
+            'err_V_0': 0.0 ,
+            'err_K_0': 1.0 ,
+            'err_K_prime_0': 1.0 ,
+            'err_Debye_0': 13.0 ,
+            'err_grueneisen_0': 0.03 ,
+            'err_q_0': 1.0 ,
+            'err_G_0': 1.0 ,
+            'err_Gprime_0': 0.5 ,
+            'err_eta_s_0': 1.0 }
 
+'''
+Mineral aliases
+'''
 
-# Mineral aliases
 # Feldspars
 ab = albite
 an = anorthite
