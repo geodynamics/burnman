@@ -50,7 +50,7 @@ comp = np.linspace(0.001, 0.999, 100)
 sp=o_d_spinel()
 sp.set_method('mtait')
 sp_entropies = np.empty_like(comp)
-sp_S= np.empty_like(comp)
+sp_entropies_NK1967= np.empty_like(comp)
 for i,c in enumerate(comp):
         molar_fractions=[1.0-c, c]
         sp.set_composition( np.array(molar_fractions) )
