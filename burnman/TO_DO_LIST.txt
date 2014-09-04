@@ -1,8 +1,9 @@
 TO DO
-Finalise solid_solution data format
-Write solid_solution initialisation (matrix formation)
-Write solid_solution functions (to return volume, bulk modulus, gibbs etc.)
+Implement CORK equation of state for fluids
+Finish chemicalpotentials module (add relative fugacities)
+Add relative fugacity and oxygen fugacity to test script
+Add a couple of redox buffers to a new input file (Re-ReO2, for example)
+Complete Modified Tait EoS (with other variables)
+Correct averaging of solid solution properties
 
-
-DONE 
-Enable a V,T set_state (or similar) to allow experimental petrologists to fit their data relative to pressure. Error check by converting between V and P.
+Start implementing Gibbs minimisation
