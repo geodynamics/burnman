@@ -17,7 +17,7 @@ from burnman.solidsolution import SolidSolution
 from burnman.solutionmodel import *
 from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 
-atomic_masses=read_masses('data/input_masses/atomic_masses.dat')
+atomic_masses=read_masses()
 
 '''
 SOLID SOLUTIONS
@@ -219,28 +219,28 @@ class anorthite (Mineral):
             'name': 'Anorthite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -4015.0 ,
-            'V_0': 100.61 ,
-            'K_0': 84.0 ,
+            'F_0': -4015000.0 ,
+            'V_0': 0.00010061 ,
+            'K_0': 84000000000.0 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 752.0 ,
             'grueneisen_0': 0.39 ,
             'q_0': 1.0 ,
-            'G_0': 40.0 ,
+            'G_0': 40000000000.0 ,
             'Gprime_0': 1.1 ,
             'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 5.0 ,
+            'err_K_0': 5000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 2.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 3.0 ,
+            'err_G_0': 3000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -252,28 +252,28 @@ class albite (Mineral):
             'name': 'Albite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -3719.0 ,
-            'V_0': 100.45 ,
-            'K_0': 60.0 ,
+            'F_0': -3719000.0 ,
+            'V_0': 0.00010045 ,
+            'K_0': 60000000000.0 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 716.0 ,
             'grueneisen_0': 0.57 ,
             'q_0': 1.0 ,
-            'G_0': 36.0 ,
+            'G_0': 36000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 5.0 ,
+            'err_F_0': 5000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 5.0 ,
+            'err_K_0': 5000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 13.0 ,
             'err_grueneisen_0': 0.03 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 5.0 ,
+            'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -285,28 +285,28 @@ class spinel (Mineral):
             'name': 'Spinel',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -8668.0 ,
-            'V_0': 159.05 ,
-            'K_0': 197.0 ,
+            'F_0': -8668000.0 ,
+            'V_0': 0.00015905 ,
+            'K_0': 1.97e+11 ,
             'Kprime_0': 5.7 ,
             'Debye_0': 843.0 ,
             'grueneisen_0': 1.02 ,
             'q_0': 2.7 ,
-            'G_0': 108.0 ,
+            'G_0': 1.08e+11 ,
             'Gprime_0': 0.4 ,
             'eta_s_0': 2.7 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 32.0 ,
+            'err_F_0': 32000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 33.0 ,
             'err_grueneisen_0': 0.04 ,
             'err_q_0': 0.6 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 0.6 }
 
@@ -318,28 +318,28 @@ class hercynite (Mineral):
             'name': 'Hercynite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -7324.0 ,
-            'V_0': 163.37 ,
-            'K_0': 209.0 ,
+            'F_0': -7324000.0 ,
+            'V_0': 0.00016337 ,
+            'K_0': 2.09e+11 ,
             'Kprime_0': 5.7 ,
             'Debye_0': 763.0 ,
             'grueneisen_0': 1.22 ,
             'q_0': 2.7 ,
-            'G_0': 84.0 ,
+            'G_0': 84000000000.0 ,
             'Gprime_0': 0.4 ,
             'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 35.0 ,
+            'err_F_0': 35000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 32.0 ,
             'err_grueneisen_0': 0.07 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 13.0 ,
+            'err_G_0': 13000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -351,28 +351,28 @@ class forsterite (Mineral):
             'name': 'Forsterite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2055.0 ,
-            'V_0': 43.6 ,
-            'K_0': 128.0 ,
+            'F_0': -2055000.0 ,
+            'V_0': 4.36e-05 ,
+            'K_0': 1.28e+11 ,
             'Kprime_0': 4.2 ,
             'Debye_0': 809.0 ,
             'grueneisen_0': 0.99 ,
             'q_0': 2.1 ,
-            'G_0': 82.0 ,
+            'G_0': 82000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 1.0 ,
             'err_grueneisen_0': 0.03 ,
             'err_q_0': 0.2 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
 
@@ -384,28 +384,28 @@ class fayalite (Mineral):
             'name': 'Fayalite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1371.0 ,
-            'V_0': 46.29 ,
-            'K_0': 135.0 ,
+            'F_0': -1371000.0 ,
+            'V_0': 4.629e-05 ,
+            'K_0': 1.35e+11 ,
             'Kprime_0': 4.2 ,
             'Debye_0': 619.0 ,
             'grueneisen_0': 1.06 ,
             'q_0': 3.6 ,
-            'G_0': 51.0 ,
+            'G_0': 51000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 2.0 ,
             'err_grueneisen_0': 0.07 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 0.6 }
 
@@ -417,28 +417,28 @@ class mg_wadsleyite (Mineral):
             'name': 'Mg_Wadsleyite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2028.0 ,
-            'V_0': 40.52 ,
-            'K_0': 169.0 ,
+            'F_0': -2028000.0 ,
+            'V_0': 4.052e-05 ,
+            'K_0': 1.69e+11 ,
             'Kprime_0': 4.3 ,
             'Debye_0': 844.0 ,
             'grueneisen_0': 1.21 ,
             'q_0': 2.0 ,
-            'G_0': 112.0 ,
+            'G_0': 1.12e+11 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 2.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 3.0 ,
+            'err_K_0': 3000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 7.0 ,
             'err_grueneisen_0': 0.09 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.4 }
 
@@ -450,28 +450,28 @@ class fe_wadsleyite (Mineral):
             'name': 'Fe_Wadsleyite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1365.0 ,
-            'V_0': 42.8 ,
-            'K_0': 169.0 ,
+            'F_0': -1365000.0 ,
+            'V_0': 4.28e-05 ,
+            'K_0': 1.69e+11 ,
             'Kprime_0': 4.3 ,
             'Debye_0': 665.0 ,
             'grueneisen_0': 1.21 ,
             'q_0': 2.0 ,
-            'G_0': 72.0 ,
+            'G_0': 72000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 7.0 ,
+            'err_F_0': 7000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 13.0 ,
+            'err_K_0': 13000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 21.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 12.0 ,
+            'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -483,28 +483,28 @@ class mg_ringwoodite (Mineral):
             'name': 'Mg_Ringwoodite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2017.0 ,
-            'V_0': 39.49 ,
-            'K_0': 185.0 ,
+            'F_0': -2017000.0 ,
+            'V_0': 3.949e-05 ,
+            'K_0': 1.85e+11 ,
             'Kprime_0': 4.2 ,
             'Debye_0': 878.0 ,
             'grueneisen_0': 1.11 ,
             'q_0': 2.4 ,
-            'G_0': 123.0 ,
+            'G_0': 1.23e+11 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 8.0 ,
             'err_grueneisen_0': 0.1 ,
             'err_q_0': 0.4 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
 
@@ -516,28 +516,28 @@ class fe_ringwoodite (Mineral):
             'name': 'Fe_Ringwoodite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1363.0 ,
-            'V_0': 41.86 ,
-            'K_0': 213.0 ,
+            'F_0': -1363000.0 ,
+            'V_0': 4.186e-05 ,
+            'K_0': 2.13e+11 ,
             'Kprime_0': 4.2 ,
             'Debye_0': 679.0 ,
             'grueneisen_0': 1.27 ,
             'q_0': 2.4 ,
-            'G_0': 92.0 ,
+            'G_0': 92000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 7.0 ,
+            'err_K_0': 7000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 8.0 ,
             'err_grueneisen_0': 0.23 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -549,28 +549,28 @@ class enstatite (Mineral):
             'name': 'Enstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2913.0 ,
-            'V_0': 62.68 ,
-            'K_0': 107.0 ,
+            'F_0': -2913000.0 ,
+            'V_0': 6.268e-05 ,
+            'K_0': 1.07e+11 ,
             'Kprime_0': 7.0 ,
             'Debye_0': 812.0 ,
             'grueneisen_0': 0.78 ,
             'q_0': 3.4 ,
-            'G_0': 77.0 ,
+            'G_0': 77000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.4 ,
             'err_Debye_0': 4.0 ,
             'err_grueneisen_0': 0.04 ,
             'err_q_0': 0.4 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
 
@@ -582,28 +582,28 @@ class ferrosilite (Mineral):
             'name': 'Ferrosilite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2226.0 ,
-            'V_0': 65.94 ,
-            'K_0': 101.0 ,
+            'F_0': -2226000.0 ,
+            'V_0': 6.594e-05 ,
+            'K_0': 1.01e+11 ,
             'Kprime_0': 7.0 ,
             'Debye_0': 674.0 ,
             'grueneisen_0': 0.72 ,
             'q_0': 3.4 ,
-            'G_0': 52.0 ,
+            'G_0': 52000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 1.1 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 4.0 ,
+            'err_K_0': 4000000000.0 ,
             'err_K_prime_0': 0.5 ,
             'err_Debye_0': 10.0 ,
             'err_grueneisen_0': 0.08 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 5.0 ,
+            'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -615,28 +615,28 @@ class mg_tschermaks (Mineral):
             'name': 'Mg_Tschermaks',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -3003.0 ,
-            'V_0': 59.14 ,
-            'K_0': 107.0 ,
+            'F_0': -3003000.0 ,
+            'V_0': 5.914e-05 ,
+            'K_0': 1.07e+11 ,
             'Kprime_0': 7.0 ,
             'Debye_0': 784.0 ,
             'grueneisen_0': 0.78 ,
             'q_0': 3.4 ,
-            'G_0': 97.0 ,
+            'G_0': 97000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 9.0 ,
+            'err_F_0': 9000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 24.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -648,28 +648,28 @@ class ortho_diopside (Mineral):
             'name': 'Ortho_Diopside',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -3016.0 ,
-            'V_0': 68.05 ,
-            'K_0': 107.0 ,
+            'F_0': -3016000.0 ,
+            'V_0': 6.805e-05 ,
+            'K_0': 1.07e+11 ,
             'Kprime_0': 7.0 ,
             'Debye_0': 745.0 ,
             'grueneisen_0': 0.78 ,
             'q_0': 3.4 ,
-            'G_0': 60.0 ,
+            'G_0': 60000000000.0 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 1.4 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 9.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -681,28 +681,28 @@ class diopside (Mineral):
             'name': 'Diopside',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -3030.0 ,
-            'V_0': 66.04 ,
-            'K_0': 112.0 ,
+            'F_0': -3030000.0 ,
+            'V_0': 6.604e-05 ,
+            'K_0': 1.12e+11 ,
             'Kprime_0': 5.2 ,
             'Debye_0': 782.0 ,
             'grueneisen_0': 0.96 ,
             'q_0': 1.5 ,
-            'G_0': 67.0 ,
+            'G_0': 67000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 5.0 ,
+            'err_K_0': 5000000000.0 ,
             'err_K_prime_0': 1.8 ,
             'err_Debye_0': 3.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 2.0 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -714,28 +714,28 @@ class hedenbergite (Mineral):
             'name': 'Hedenbergite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2677.0 ,
-            'V_0': 67.87 ,
-            'K_0': 119.0 ,
+            'F_0': -2677000.0 ,
+            'V_0': 6.787e-05 ,
+            'K_0': 1.19e+11 ,
             'Kprime_0': 5.2 ,
             'Debye_0': 702.0 ,
             'grueneisen_0': 0.94 ,
             'q_0': 1.5 ,
-            'G_0': 61.0 ,
+            'G_0': 61000000000.0 ,
             'Gprime_0': 1.2 ,
             'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 45.0 ,
+            'err_F_0': 45000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 4.0 ,
+            'err_K_0': 4000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 2.0 ,
             'err_grueneisen_0': 0.06 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -747,61 +747,61 @@ class clinoenstatite (Mineral):
             'name': 'Clinoenstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2906.0 ,
-            'V_0': 62.5 ,
-            'K_0': 112.0 ,
+            'F_0': -2906000.0 ,
+            'V_0': 6.25e-05 ,
+            'K_0': 1.12e+11 ,
             'Kprime_0': 5.2 ,
             'Debye_0': 805.0 ,
             'grueneisen_0': 0.96 ,
             'q_0': 1.5 ,
-            'G_0': 81.0 ,
+            'G_0': 81000000000.0 ,
             'Gprime_0': 1.7 ,
             'eta_s_0': 1.7 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 10.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
-class ca-tschermaks (Mineral):
+class ca_tschermaks (Mineral):
     def __init__(self):
        formula='CaAl2SiO6'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Ca-Tschermaks',
+            'name': 'Ca_Tschermaks',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -3120.0 ,
-            'V_0': 63.57 ,
-            'K_0': 112.0 ,
+            'F_0': -3120000.0 ,
+            'V_0': 6.357e-05 ,
+            'K_0': 1.12e+11 ,
             'Kprime_0': 5.2 ,
             'Debye_0': 804.0 ,
             'grueneisen_0': 0.78 ,
             'q_0': 1.5 ,
-            'G_0': 76.0 ,
+            'G_0': 76000000000.0 ,
             'Gprime_0': 1.6 ,
             'eta_s_0': 2.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 5.0 ,
+            'err_F_0': 5000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 5.0 ,
             'err_grueneisen_0': 0.0 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -813,28 +813,28 @@ class jadeite (Mineral):
             'name': 'Jadeite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2855.0 ,
-            'V_0': 60.51 ,
-            'K_0': 142.0 ,
+            'F_0': -2855000.0 ,
+            'V_0': 6.051e-05 ,
+            'K_0': 1.42e+11 ,
             'Kprime_0': 5.2 ,
             'Debye_0': 821.0 ,
             'grueneisen_0': 0.9 ,
             'q_0': 0.4 ,
-            'G_0': 85.0 ,
+            'G_0': 85000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 2.2 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 12.0 ,
             'err_grueneisen_0': 0.08 ,
             'err_q_0': 1.4 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -846,28 +846,28 @@ class hp_clinoenstatite (Mineral):
             'name': 'HP_Clinoenstatite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2905.0 ,
-            'V_0': 60.76 ,
-            'K_0': 116.0 ,
+            'F_0': -2905000.0 ,
+            'V_0': 6.076e-05 ,
+            'K_0': 1.16e+11 ,
             'Kprime_0': 6.2 ,
             'Debye_0': 824.0 ,
             'grueneisen_0': 1.12 ,
             'q_0': 0.2 ,
-            'G_0': 88.0 ,
+            'G_0': 88000000000.0 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.3 ,
             'err_Debye_0': 7.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 0.5 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
 
@@ -879,28 +879,28 @@ class hp_clinoferrosilite (Mineral):
             'name': 'HP_Clinoferrosilite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2222.0 ,
-            'V_0': 63.85 ,
-            'K_0': 116.0 ,
+            'F_0': -2222000.0 ,
+            'V_0': 6.385e-05 ,
+            'K_0': 1.16e+11 ,
             'Kprime_0': 6.2 ,
             'Debye_0': 692.0 ,
             'grueneisen_0': 1.12 ,
             'q_0': 0.2 ,
-            'G_0': 71.0 ,
+            'G_0': 71000000000.0 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 0.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 11.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -912,28 +912,28 @@ class ca_perovskite (Mineral):
             'name': 'Ca_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1463.0 ,
-            'V_0': 27.45 ,
-            'K_0': 236.0 ,
+            'F_0': -1463000.0 ,
+            'V_0': 2.745e-05 ,
+            'K_0': 2.36e+11 ,
             'Kprime_0': 3.9 ,
             'Debye_0': 796.0 ,
             'grueneisen_0': 1.89 ,
             'q_0': 0.9 ,
-            'G_0': 157.0 ,
+            'G_0': 1.57e+11 ,
             'Gprime_0': 2.2 ,
             'eta_s_0': 1.3 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 8.0 ,
+            'err_F_0': 8000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 4.0 ,
+            'err_K_0': 4000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 44.0 ,
             'err_grueneisen_0': 0.07 ,
             'err_q_0': 1.6 ,
-            'err_G_0': 12.0 ,
+            'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -945,28 +945,28 @@ class mg_akimotoite (Mineral):
             'name': 'Mg_Akimotoite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1410.0 ,
-            'V_0': 26.35 ,
-            'K_0': 211.0 ,
+            'F_0': -1410000.0 ,
+            'V_0': 2.635e-05 ,
+            'K_0': 2.11e+11 ,
             'Kprime_0': 5.6 ,
             'Debye_0': 934.0 ,
             'grueneisen_0': 1.19 ,
             'q_0': 2.3 ,
-            'G_0': 132.0 ,
+            'G_0': 1.32e+11 ,
             'Gprime_0': 1.6 ,
             'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 4.0 ,
+            'err_K_0': 4000000000.0 ,
             'err_K_prime_0': 0.8 ,
             'err_Debye_0': 12.0 ,
             'err_grueneisen_0': 0.13 ,
             'err_q_0': 0.8 ,
-            'err_G_0': 8.0 ,
+            'err_G_0': 8000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -978,28 +978,28 @@ class fe_akimotoite (Mineral):
             'name': 'Fe_Akimotoite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1068.0 ,
-            'V_0': 26.85 ,
-            'K_0': 211.0 ,
+            'F_0': -1068000.0 ,
+            'V_0': 2.685e-05 ,
+            'K_0': 2.11e+11 ,
             'Kprime_0': 5.6 ,
             'Debye_0': 888.0 ,
             'grueneisen_0': 1.19 ,
             'q_0': 2.3 ,
-            'G_0': 150.0 ,
+            'G_0': 1.5e+11 ,
             'Gprime_0': 1.6 ,
             'eta_s_0': 3.5 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 21.0 ,
+            'err_F_0': 21000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 120.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -1011,28 +1011,28 @@ class corundum (Mineral):
             'name': 'Corundum',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1582.0 ,
-            'V_0': 25.58 ,
-            'K_0': 253.0 ,
+            'F_0': -1582000.0 ,
+            'V_0': 2.558e-05 ,
+            'K_0': 2.53e+11 ,
             'Kprime_0': 4.3 ,
             'Debye_0': 933.0 ,
             'grueneisen_0': 1.32 ,
             'q_0': 1.3 ,
-            'G_0': 163.0 ,
+            'G_0': 1.63e+11 ,
             'Gprime_0': 1.6 ,
             'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 5.0 ,
+            'err_K_0': 5000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 3.0 ,
             'err_grueneisen_0': 0.04 ,
             'err_q_0': 0.2 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
 
@@ -1044,28 +1044,28 @@ class pyrope (Mineral):
             'name': 'Pyrope',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -5936.0 ,
-            'V_0': 113.08 ,
-            'K_0': 170.0 ,
+            'F_0': -5936000.0 ,
+            'V_0': 0.00011308 ,
+            'K_0': 1.7e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 823.0 ,
             'grueneisen_0': 1.01 ,
             'q_0': 1.4 ,
-            'G_0': 94.0 ,
+            'G_0': 94000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 10.0 ,
+            'err_F_0': 10000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.3 ,
             'err_Debye_0': 4.0 ,
             'err_grueneisen_0': 0.06 ,
             'err_q_0': 0.5 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.3 }
 
@@ -1077,28 +1077,28 @@ class almandine (Mineral):
             'name': 'Almandine',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -4935.0 ,
-            'V_0': 115.43 ,
-            'K_0': 174.0 ,
+            'F_0': -4935000.0 ,
+            'V_0': 0.00011543 ,
+            'K_0': 1.74e+11 ,
             'Kprime_0': 4.9 ,
             'Debye_0': 741.0 ,
             'grueneisen_0': 1.06 ,
             'q_0': 1.4 ,
-            'G_0': 96.0 ,
+            'G_0': 96000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 29.0 ,
+            'err_F_0': 29000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 5.0 ,
             'err_grueneisen_0': 0.06 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1110,28 +1110,28 @@ class grossular (Mineral):
             'name': 'Grossular',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -6278.0 ,
-            'V_0': 125.12 ,
-            'K_0': 167.0 ,
+            'F_0': -6278000.0 ,
+            'V_0': 0.00012512 ,
+            'K_0': 1.67e+11 ,
             'Kprime_0': 3.9 ,
             'Debye_0': 823.0 ,
             'grueneisen_0': 1.05 ,
             'q_0': 1.9 ,
-            'G_0': 109.0 ,
+            'G_0': 1.09e+11 ,
             'Gprime_0': 1.2 ,
             'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 11.0 ,
+            'err_F_0': 11000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 2.0 ,
             'err_grueneisen_0': 0.06 ,
             'err_q_0': 0.2 ,
-            'err_G_0': 4.0 ,
+            'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
 
@@ -1143,28 +1143,28 @@ class mg_majorite (Mineral):
             'name': 'Mg_Majorite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -5691.0 ,
-            'V_0': 114.32 ,
-            'K_0': 165.0 ,
+            'F_0': -5691000.0 ,
+            'V_0': 0.00011432 ,
+            'K_0': 1.65e+11 ,
             'Kprime_0': 4.2 ,
             'Debye_0': 822.0 ,
             'grueneisen_0': 0.98 ,
             'q_0': 1.5 ,
-            'G_0': 85.0 ,
+            'G_0': 85000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 10.0 ,
+            'err_F_0': 10000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 3.0 ,
+            'err_K_0': 3000000000.0 ,
             'err_K_prime_0': 0.3 ,
             'err_Debye_0': 4.0 ,
             'err_grueneisen_0': 0.07 ,
             'err_q_0': 0.5 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.3 }
 
@@ -1176,28 +1176,28 @@ class jd_majorite (Mineral):
             'name': 'Jd_Majorite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -5519.0 ,
-            'V_0': 110.94 ,
-            'K_0': 177.0 ,
+            'F_0': -5519000.0 ,
+            'V_0': 0.00011094 ,
+            'K_0': 1.77e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 896.0 ,
             'grueneisen_0': 1.01 ,
             'q_0': 1.4 ,
-            'G_0': 125.0 ,
+            'G_0': 1.25e+11 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 3.3 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 14.0 ,
+            'err_F_0': 14000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 7.0 ,
+            'err_K_0': 7000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 18.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 4.0 ,
+            'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -1209,28 +1209,28 @@ class quartz (Mineral):
             'name': 'Quartz',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -859.0 ,
-            'V_0': 23.67 ,
-            'K_0': 50.0 ,
+            'F_0': -859000.0 ,
+            'V_0': 2.367e-05 ,
+            'K_0': 50000000000.0 ,
             'Kprime_0': 4.3 ,
             'Debye_0': 816.0 ,
             'grueneisen_0': 0.0 ,
             'q_0': 1.0 ,
-            'G_0': 45.0 ,
+            'G_0': 45000000000.0 ,
             'Gprime_0': 1.0 ,
             'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 31.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1242,28 +1242,28 @@ class coesite (Mineral):
             'name': 'Coesite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -855.0 ,
-            'V_0': 20.66 ,
-            'K_0': 114.0 ,
+            'F_0': -855000.0 ,
+            'V_0': 2.066e-05 ,
+            'K_0': 1.14e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 857.0 ,
             'grueneisen_0': 0.39 ,
             'q_0': 1.0 ,
-            'G_0': 62.0 ,
+            'G_0': 62000000000.0 ,
             'Gprime_0': 1.2 ,
             'eta_s_0': 2.4 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 9.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -1275,28 +1275,28 @@ class stishovite (Mineral):
             'name': 'Stishovite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -819.0 ,
-            'V_0': 14.02 ,
-            'K_0': 314.0 ,
+            'F_0': -819000.0 ,
+            'V_0': 1.402e-05 ,
+            'K_0': 3.14e+11 ,
             'Kprime_0': 3.8 ,
             'Debye_0': 1108.0 ,
             'grueneisen_0': 1.37 ,
             'q_0': 2.8 ,
-            'G_0': 220.0 ,
+            'G_0': 2.2e+11 ,
             'Gprime_0': 1.9 ,
             'eta_s_0': 4.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 8.0 ,
+            'err_K_0': 8000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 13.0 ,
             'err_grueneisen_0': 0.17 ,
             'err_q_0': 2.2 ,
-            'err_G_0': 12.0 ,
+            'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1308,28 +1308,28 @@ class seifertite (Mineral):
             'name': 'Seifertite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -794.0 ,
-            'V_0': 13.67 ,
-            'K_0': 328.0 ,
+            'F_0': -794000.0 ,
+            'V_0': 1.367e-05 ,
+            'K_0': 3.28e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 1141.0 ,
             'grueneisen_0': 1.37 ,
             'q_0': 2.8 ,
-            'G_0': 227.0 ,
+            'G_0': 2.27e+11 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 5.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 2.0 ,
+            'err_K_0': 2000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 16.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1338,31 +1338,31 @@ class mg_perovskite (Mineral):
        formula='MgSiO3'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Mg-Perovskite',
+            'name': 'Mg_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1368.0 ,
-            'V_0': 24.45 ,
-            'K_0': 251.0 ,
+            'F_0': -1368000.0 ,
+            'V_0': 2.445e-05 ,
+            'K_0': 2.51e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 905.0 ,
             'grueneisen_0': 1.57 ,
             'q_0': 1.1 ,
-            'G_0': 173.0 ,
+            'G_0': 1.73e+11 ,
             'Gprime_0': 1.7 ,
             'eta_s_0': 2.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 3.0 ,
+            'err_K_0': 3000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 5.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 0.3 ,
-            'err_G_0': 2.0 ,
+            'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.0 ,
             'err_eta_s_0': 0.3 }
 
@@ -1371,31 +1371,31 @@ class fe_perovskite (Mineral):
        formula='FeSiO3'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Fe-Perovskite',
+            'name': 'Fe_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1041.0 ,
-            'V_0': 25.49 ,
-            'K_0': 272.0 ,
+            'F_0': -1041000.0 ,
+            'V_0': 2.549e-05 ,
+            'K_0': 2.72e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 871.0 ,
             'grueneisen_0': 1.57 ,
             'q_0': 1.1 ,
-            'G_0': 133.0 ,
+            'G_0': 1.33e+11 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 2.3 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 6.0 ,
+            'err_F_0': 6000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 40.0 ,
+            'err_K_0': 40000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 26.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 40.0 ,
+            'err_G_0': 40000000000.0 ,
             'err_Gprime_0': 0.0 ,
             'err_eta_s_0': 1.0 }
 
@@ -1407,28 +1407,28 @@ class al_perovskite (Mineral):
             'name': 'Al_perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1534.0 ,
-            'V_0': 24.94 ,
-            'K_0': 258.0 ,
+            'F_0': -1534000.0 ,
+            'V_0': 2.494e-05 ,
+            'K_0': 2.58e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 886.0 ,
             'grueneisen_0': 1.57 ,
             'q_0': 1.1 ,
-            'G_0': 171.0 ,
+            'G_0': 1.71e+11 ,
             'Gprime_0': 1.5 ,
             'eta_s_0': 2.5 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 2.0 ,
+            'err_F_0': 2000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 0.5 ,
             'err_Debye_0': 7.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
 
@@ -1440,28 +1440,28 @@ class mg_post_perovskite (Mineral):
             'name': 'Mg_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1348.0 ,
-            'V_0': 24.42 ,
-            'K_0': 231.0 ,
+            'F_0': -1348000.0 ,
+            'V_0': 2.442e-05 ,
+            'K_0': 2.31e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 855.0 ,
             'grueneisen_0': 1.89 ,
             'q_0': 1.1 ,
-            'G_0': 150.0 ,
+            'G_0': 1.5e+11 ,
             'Gprime_0': 2.0 ,
             'eta_s_0': 1.2 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 7.0 ,
             'err_grueneisen_0': 0.03 ,
             'err_q_0': 0.1 ,
-            'err_G_0': 4.0 ,
+            'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
 
@@ -1473,28 +1473,28 @@ class fe_post_perovskite (Mineral):
             'name': 'Fe_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -982.0 ,
-            'V_0': 25.46 ,
-            'K_0': 231.0 ,
+            'F_0': -982000.0 ,
+            'V_0': 2.546e-05 ,
+            'K_0': 2.31e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 782.0 ,
             'grueneisen_0': 1.89 ,
             'q_0': 1.1 ,
-            'G_0': 129.0 ,
+            'G_0': 1.29e+11 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': 1.4 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 21.0 ,
+            'err_F_0': 21000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 52.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 5.0 ,
+            'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1506,28 +1506,28 @@ class al_post_perovskite (Mineral):
             'name': 'Al_Post_Perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1378.0 ,
-            'V_0': 23.85 ,
-            'K_0': 249.0 ,
+            'F_0': -1378000.0 ,
+            'V_0': 2.385e-05 ,
+            'K_0': 2.49e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 762.0 ,
             'grueneisen_0': 1.65 ,
             'q_0': 1.1 ,
-            'G_0': 92.0 ,
+            'G_0': 92000000000.0 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 20.0 ,
+            'err_K_0': 20000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 9.0 ,
             'err_grueneisen_0': 0.02 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
 
@@ -1539,14 +1539,14 @@ class periclase (Mineral):
             'name': 'Periclase',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -569.0 ,
-            'V_0': 11.24 ,
-            'K_0': 161.0 ,
+            'F_0': -569000.0 ,
+            'V_0': 1.124e-05 ,
+            'K_0': 1.61e+11 ,
             'Kprime_0': 3.8 ,
             'Debye_0': 767.0 ,
             'grueneisen_0': 1.36 ,
             'q_0': 1.7 ,
-            'G_0': 131.0 ,
+            'G_0': 1.31e+11 ,
             'Gprime_0': 2.1 ,
             'eta_s_0': 2.8 ,
             'n': sum(formula.values()),
@@ -1555,12 +1555,12 @@ class periclase (Mineral):
        self.uncertainties = {
             'err_F_0': 0.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 3.0 ,
+            'err_K_0': 3000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 9.0 ,
             'err_grueneisen_0': 0.05 ,
             'err_q_0': 0.2 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
 
@@ -1572,127 +1572,127 @@ class wuestite (Mineral):
             'name': 'Wuestite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -242.0 ,
-            'V_0': 12.26 ,
-            'K_0': 179.0 ,
+            'F_0': -242000.0 ,
+            'V_0': 1.226e-05 ,
+            'K_0': 1.79e+11 ,
             'Kprime_0': 4.9 ,
             'Debye_0': 454.0 ,
             'grueneisen_0': 1.53 ,
             'q_0': 1.7 ,
-            'G_0': 59.0 ,
+            'G_0': 59000000000.0 ,
             'Gprime_0': 1.4 ,
             'eta_s_0': -0.1 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 1.0 ,
+            'err_F_0': 1000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.2 ,
             'err_Debye_0': 21.0 ,
             'err_grueneisen_0': 0.13 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
-class mg_calcium_ferrite (Mineral):
+class mg_ca_ferrite (Mineral):
     def __init__(self):
        formula='MgAl2O4'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Mg_Calcium_Ferrite',
+            'name': 'Mg_Ca_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2122.0 ,
-            'V_0': 36.18 ,
-            'K_0': 211.0 ,
+            'F_0': -2122000.0 ,
+            'V_0': 3.618e-05 ,
+            'K_0': 2.11e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 838.0 ,
             'grueneisen_0': 1.31 ,
             'q_0': 1.0 ,
-            'G_0': 130.0 ,
+            'G_0': 1.3e+11 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 2.1 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 16.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
-class fe_calcium_ferrite (Mineral):
+class fe_ca_ferrite (Mineral):
     def __init__(self):
        formula='FeAl2O4'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Fe_Calcium_Ferrite',
+            'name': 'Fe_Ca_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1790.0 ,
-            'V_0': 37.26 ,
-            'K_0': 211.0 ,
+            'F_0': -1790000.0 ,
+            'V_0': 3.726e-05 ,
+            'K_0': 2.11e+11 ,
             'Kprime_0': 4.1 ,
             'Debye_0': 804.0 ,
             'grueneisen_0': 1.31 ,
             'q_0': 1.0 ,
-            'G_0': 152.0 ,
+            'G_0': 1.52e+11 ,
             'Gprime_0': 1.8 ,
             'eta_s_0': 3.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 25.0 ,
+            'err_F_0': 25000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 10.0 ,
+            'err_K_0': 10000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 69.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
-class na_calcium_ferrite (Mineral):
+class na_ca_ferrite (Mineral):
     def __init__(self):
        formula='NaAlSiO4'
        formula = dictionarize_formula(formula)
        self.params = {
-            'name': 'Na_Calcium_Ferrite',
+            'name': 'Na_Ca_Ferrite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1851.0 ,
-            'V_0': 36.27 ,
-            'K_0': 158.0 ,
+            'F_0': -1851000.0 ,
+            'V_0': 3.627e-05 ,
+            'K_0': 1.58e+11 ,
             'Kprime_0': 4.3 ,
             'Debye_0': 812.0 ,
             'grueneisen_0': 1.17 ,
             'q_0': 1.0 ,
-            'G_0': 121.0 ,
+            'G_0': 1.21e+11 ,
             'Gprime_0': 2.1 ,
             'eta_s_0': 1.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 11.0 ,
+            'err_F_0': 11000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.1 ,
             'err_Debye_0': 51.0 ,
             'err_grueneisen_0': 0.3 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
 
@@ -1704,28 +1704,28 @@ class kyanite (Mineral):
             'name': 'Kyanite',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -2446.0 ,
-            'V_0': 44.23 ,
-            'K_0': 160.0 ,
+            'F_0': -2446000.0 ,
+            'V_0': 4.423e-05 ,
+            'K_0': 1.6e+11 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 943.0 ,
             'grueneisen_0': 0.93 ,
             'q_0': 1.0 ,
-            'G_0': 121.0 ,
+            'G_0': 1.21e+11 ,
             'Gprime_0': 1.7 ,
             'eta_s_0': 3.0 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 4.0 ,
+            'err_F_0': 4000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 0.0 ,
             'err_Debye_0': 8.0 ,
             'err_grueneisen_0': 0.07 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 10.0 ,
+            'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
@@ -1737,135 +1737,28 @@ class nepheline (Mineral):
             'name': 'Nepheline',
             'formula': formula,
             'equation_of_state': 'slb3',
-            'F_0': -1993.0 ,
-            'V_0': 54.67 ,
-            'K_0': 53.0 ,
+            'F_0': -1993000.0 ,
+            'V_0': 5.467e-05 ,
+            'K_0': 53000000000.0 ,
             'Kprime_0': 4.0 ,
             'Debye_0': 701.0 ,
             'grueneisen_0': 0.69 ,
             'q_0': 1.0 ,
-            'G_0': 31.0 ,
+            'G_0': 31000000000.0 ,
             'Gprime_0': 1.3 ,
             'eta_s_0': 0.6 ,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
 
        self.uncertainties = {
-            'err_F_0': 3.0 ,
+            'err_F_0': 3000.0 ,
             'err_V_0': 0.0 ,
-            'err_K_0': 1.0 ,
+            'err_K_0': 1000000000.0 ,
             'err_K_prime_0': 1.0 ,
             'err_Debye_0': 13.0 ,
             'err_grueneisen_0': 0.03 ,
             'err_q_0': 1.0 ,
-            'err_G_0': 1.0 ,
+            'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
 
-'''
-Mineral aliases
-'''
-
-# Feldspars
-ab = albite
-an = anorthite
-
-# LP Spinels
-sp = spinel
-hc = hercynite
-
-# Olivine polymorphs
-fo = forsterite
-fa = fayalite
-mgwa = mg_wadsleyite
-fewa = fe_wadsleyite
-mgri = mg_ringwoodite
-feri = fe_ringwoodite
-
-# Orthopyroxenes
-en = enstatite
-fs = ferrosilite
-mgts = mg_tschermaks_molecule
-odi = orthodiopside
-
-# Clinopyroxenes
-di = diopside
-he = hedenbergite
-cen = clinoenstatite
-cats = ca_tschermaks_molecule
-jd = jadeite
-mgc2 = hp_clinoenstatite
-fec2 = hp_clinoferrosilite
-hpcen = hp_clinoenstatite
-hpcfs = hp_clinoferrosilite
-
-# Perovskites
-mgpv = mg_perovskite
-mg_bridgmanite = mg_perovskite
-fepv = fe_perovskite
-fe_bridgmanite = fe_perovskite
-alpv = al_perovskite
-capv = calcium_perovskite
-jdpv = jd_perovskite
-
-# Ilmenite group
-mgil = mg_akimotoite
-feil = fe_akimotoite
-co = corundum
-
-# Garnet group
-py = pyrope
-al = almandine
-gr = grossular
-mgmj = mg_majorite
-jdmj = jd_majorite
-
-# Quartz polymorphs
-qtz = quartz
-coes = coesite
-st = stishovite
-seif = seifertite
-
-# Post perovskites
-mppv = mg_post_perovskite
-fppv = fe_post_perovskite
-appv = al_post_perovskite
-
-# Magnesiowuestite
-pe = periclase
-wu = wuestite
-
-# Calcium ferrite structured phases
-mgcf = mg_calcium_ferrite
-fecf = fe_calcium_ferrite
-nacf = na_calcium_ferrite
-
-# Al2SiO5 polymorphs
-ky = kyanite
-
-# Nepheline group
-neph = nepheline
-
-
-
-# Solid solution aliases
-c2c = c2c_pyroxene
-cf = calcium_ferrite_structured_phase
-cpv = ca_rich_perovskite
-cpx = clinopyroxene
-gt = garnet
-il = akimotoite
-ilmenite_group = akimotoite
-mw = ferropericlase
-magnesiowuestite = ferropericlase
-ol = mg_fe_olivine
-opx = orthopyroxene
-plag = plagioclase
-ppv = post_perovskite
-pv = mg_fe_perovskite
-mg_fe_bridgmanite = mg_fe_perovskite
-mg_fe_silicate_perovskite = mg_fe_perovskite
-ri = mg_fe_ringwoodite
-spinel_group=mg_fe_aluminous_spinel
-wa = mg_fe_wadsleyite
-spinelloid_III = mg_fe_wadsleyite
