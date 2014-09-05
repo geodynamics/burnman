@@ -88,3 +88,35 @@ def fugacity(component_formula, standard_material, assemblage):
 
     fugacity=np.exp((chemical_potential - standard_material.gibbs)/(R*assemblage[0].temperature))
     return fugacity
+
+def relativefugacity(component_formula, standard_material, assemblage, reference_assemblage):
+    """
+        Parameters
+        ----------
+        component_formula : dictionary
+            Chemical formula dictionary
+
+        standard_material: class
+            Material class
+            set_method and set_state should already have been used
+
+        assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        reference_assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        Returns
+        -------
+        relative_fugacity : float
+            Value of the fugacity of the component in the assemblage
+            with respect to the reference_assemblage 
+
+    """
+    chemical_potential=chemicalpotentials(assemblage, [component_formula])[0]
+    reference_chemical_potential=chemicalpotentials(reference_assemblage, [component_formula])[0]
+
+    relative_fugacity=np.exp((chemical_potential - reference_chemical_potential)/(R*assemblage[0].temperature))
+    return relative_fugacity
