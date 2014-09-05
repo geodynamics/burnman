@@ -1,8 +1,5 @@
 TO DO
-Implement CORK equation of state for fluids
-Finish chemicalpotentials module (add relative fugacities)
 Add relative fugacity and oxygen fugacity to test script
-Add a couple of redox buffers to a new input file (Re-ReO2, for example)
 Complete Modified Tait EoS (with other variables)
 Correct averaging of solid solution properties
 
