@@ -20,6 +20,8 @@ import SLB_2011
 import SLB_2011_ZSB_2013
 import SLB_2005
 import HP_2011
+import HP_2011_fluids
 import HP_2011_ds62
 import Murakami_2013
+import Metal_Metal_oxides
 import other

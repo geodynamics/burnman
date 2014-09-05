@@ -255,3 +255,54 @@ rmserror = np.sqrt(serror/((len(Gsill)-1)*(len(Gsill[0])-1)))
 print 'RMS error on G:', rmserror, 'J/mol'
 print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
 print ''
+
+
+
+# Recreate Figure 7 from Holland and Powell, 2001
+print 'Carbon dioxide: a fluid with a CORK EoS'
+co2=minerals.HP_2011_fluids.CO2()
+co2.set_method("cork")
+temperatures = np.linspace(100., 1200., 101)
+for p in [1.e8, 2.e8, 4.e8, 6.e8, 8.e8]:
+    volumes = np.empty_like(temperatures)
+    for idx, t in enumerate(temperatures):
+        co2.set_state(p,t+273.15)
+        volumes[idx]=co2.V*1e6
+    plt.plot( volumes, temperatures, 'r', linewidth=3.)
+
+plt.xlim(20,150)
+plt.ylim(0., 1200.)
+plt.ylabel("Temperature (C)")
+plt.xlabel("Volume CO2 (cm^3/mol)")
+plt.show()
+
+# A CORK fluid: CH4
+print 'Methane: a fluid with a CORK EoS'
+methane=minerals.HP_2011_fluids.CH4()
+methane.set_method("cork")
+
+Gmethane=[['P \ T',25, 500, 1500],[0.001, -130.32, -229.83, -494.61],[10.0, -83.43, -141.90, -324.96],[100.0, 147.79, 76.97, -131.84]]
+
+
+Pmaxerror=0.
+Tmaxerror=0.
+maxerror=0.
+serror=0.
+for pi in range(len(Gmethane)-1):
+    P=Gmethane[pi+1][0]*1e8
+    for ti in range(len(Gmethane[0])-1):
+        T=Gmethane[0][ti+1]+273.15
+        Gburnman=methane.calcgibbs(P,T)
+        GHP=Gmethane[pi+1][ti+1]*1000. # convert to J/mol
+        Gdiff=Gburnman-GHP
+        #print P, T, Gburnman, GHP, Gdiff
+        serror=serror + pow(Gdiff,2)
+        if abs(Gdiff) > abs(maxerror):
+            maxerror = Gdiff
+            Tmaxerror = T
+            Pmaxerror = P
+
+rmserror = np.sqrt(serror/((len(Gmethane)-1)*(len(Gmethane[0])-1)))
+print 'RMS error on G:', rmserror, 'J/mol'
+print 'Maximum error:', maxerror, 'J/mol @', P/1.e9, 'GPa and', T, 'K'
+print ''
