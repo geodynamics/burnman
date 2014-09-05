@@ -13,6 +13,7 @@ import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 import inspect
 import burnman.modified_tait as mt
+import burnman.cork as cork
 
 class Mineral(Material):
     """
@@ -77,6 +78,8 @@ class Mineral(Material):
                     return bm.BM3()
                 elif (method == "mtait"):
                     return mt.MT()
+                elif (method == "cork"):
+                    return cork.CORK()
                 else:
                     raise Exception("unsupported material method " + method)
             elif isinstance(method, eos.EquationOfState):
@@ -145,7 +148,7 @@ class Mineral(Material):
         # Attempt to calculate the gibbs free energy and helmholtz free energy, but don't complain if the
         # equation of state does not calculate it, or if the mineral params do not have the requisite entries.
         try:
-            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.V, self.params)
+            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.params)
         except (KeyError, NotImplementedError):
             self.gibbs = float('nan')
         try:
