@@ -207,7 +207,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
-        volume=self.V
+        volume=self.volume(pressure, temperature, params)
         G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
