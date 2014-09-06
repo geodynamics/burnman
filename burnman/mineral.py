@@ -152,7 +152,7 @@ class Mineral(Material):
         except (KeyError, NotImplementedError):
             self.gibbs = float('nan')
         try:
-            self.helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.V, self.params)
+            self.helmholtz = self.method.helmholtz_free_energy(self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.helmholtz = float('nan')
         

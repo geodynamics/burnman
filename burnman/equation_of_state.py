@@ -267,12 +267,10 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def helmholtz_free_energy( self, pressure, temperature, volume, params ):
+    def helmholtz_free_energy( self, temperature, volume, params ):
         """
         Parameters
         ----------
-        pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
         temperature : float
             Temperature at which to evaluate the equation of state. [K]
         volume : float
