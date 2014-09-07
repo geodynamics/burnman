@@ -51,7 +51,7 @@ for idx, m in enumerate(ds):
             if pid > 1 and pid != 3 and pid<6:
                 print '            \''+param_names[pid]+'\':', float(param)*param_scales[pid], ','
 
-        print '            \'Cp:\'', [round(float(m[i])*param_scales[i],10) for i in [6, 7, 8, 9]], ','
+        print '            \'Cp\':', [round(float(m[i])*param_scales[i],10) for i in [6, 7, 8, 9]], ','
         for pid, param in enumerate(m):
             if pid > 9:
                 print '            \''+param_names[pid]+'\':', float(param)*param_scales[pid], ','
