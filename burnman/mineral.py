@@ -83,8 +83,12 @@ class Mineral(Material):
                 self.method = cork.CORK()
             else:
                 raise Exception("unsupported material method " + method)
+            if hasattr(self, 'base_material'):
+                for member in self.base_material:
+                    member[0].set_method(method)
         elif ( issubclass(method, eos.EquationOfState) ):
             self.method = method()
+
         else:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 

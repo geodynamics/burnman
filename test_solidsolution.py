@@ -15,7 +15,6 @@ garnet=minerals.HP_2011_ds62.garnet()
 composition=np.array([ 0.5, 0.2, 0.1, 0.2 ])
 garnet.set_method('mtait')
 garnet.set_composition(composition)
-garnet.set_state(0.0, 300.0)
 
 print 'Molar fraction'
 print garnet.molar_fraction
@@ -23,6 +22,8 @@ print ''
 print 'Site occupancies'
 print garnet.solution_model.sites
 #print garnet.solution_model.site_occupancies
+
+garnet.set_state(1.e9, 2000.)
 print ''
 print 'Volume excess'
 print garnet.excess_volume, 'm^3/mol'
@@ -36,12 +37,13 @@ for i in range(n+1):
     pyrope_proportion[i]=float(i)/n
     composition=([ pyrope_proportion[i], 0.0, 1.-pyrope_proportion[i], 0.0 ])
     garnet.set_composition(composition)
-    garnet.set_state(0.0, 300.)
+    garnet.set_state(1.e5, 300.)
     garnet_excess_volume[i]=garnet.excess_volume
 
 pressure=1.e9 # Pa
 temperature=573.15 # K
 composition=[0.9, 0.0, 0.1, 0.0]
+
 garnet.set_composition(composition)
 garnet.set_state(pressure, temperature)
 
@@ -55,7 +57,6 @@ for i in range(n+1):
     garnet.set_composition(composition)
     garnet.set_state(pressure, temperature)
     garnet_excess_gibbs[i]=garnet.excess_gibbs
-
 
 import matplotlib.pyplot as plt
 plt.subplot(1,2,1)
