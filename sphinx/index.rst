@@ -11,6 +11,7 @@ Welcome to BurnMan's documentation!
 .. toctree::
    :maxdepth: 2
 
+   overview
    examples
    main
    eos
