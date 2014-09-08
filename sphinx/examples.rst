@@ -18,29 +18,28 @@ Tutorial
 ========
 
 The tutorial for BurnMan currently consists of three separate units:
-  - :ref:`step 1 <ref-example-tut1>`,
+  - :mod:`step 1 <tutorial.step_1>`,
   - :mod:`step 2 <tutorial.step_2>`, and
   - :mod:`step 3 <tutorial.step_3>`.
 
 .. _ref-example-tut1:
 
-CIDER 2014 BurnMan Tutorial --- step 1
---------------------------------------
+.. #CIDER 2014 BurnMan Tutorial --- step 1
+.. #--------------------------------------
 
-.. literalinclude:: ../tutorial/step_1.py
-   :lines: 4-   
-
-.. :comment: automodule:: tutorial.step_1
+.. automodule:: tutorial.step_1
 
 When run, the program produces the following image:
 
 .. image:: tut-step1.png
+link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 
 
 .. automodule:: tutorial.step_2
 
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
+
 
 
 
