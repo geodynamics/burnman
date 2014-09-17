@@ -8,7 +8,7 @@ import burnman
 from burnman.processchemistry import *
 
 
-def assemble_stoichiometric_matrix ( minerals ):
+def assemble_stoichiometric_matrix ( minerals):
     """
     This takes a list of minerals and assembles a matrix where 
     the rows are elements and the columns are species (or endmembers).
@@ -51,6 +51,7 @@ def assemble_stoichiometric_matrix ( minerals ):
             stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
 
     return stoichiometric_matrix, elements, formulae
+
 
 def compute_nullspace ( stoichiometric_matrix ):
     """

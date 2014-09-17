@@ -34,6 +34,7 @@ from mineral import Mineral
 from material import Material
 from composite import Composite
 from solidsolution import SolidSolution
+from equilibriumassemblage import EquilibriumAssemblage
 from mineral_helpers import *
 
 #high level functions
