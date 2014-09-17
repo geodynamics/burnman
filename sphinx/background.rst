@@ -240,23 +240,21 @@ We adopt the formalism of :cite:`nakajima2012` choosing a reference distribution
     :label: KD2
 
 where :math:`R` is the gas constant and :math:`P_0` the reference pressure.
-As a default, we adopt the average :math:`\Delta \upsilon^{0}` of :cite:`{nakajima2012} of :math:`2\cdot10^{-7}` :math:`^3` mol:math:`^{-1}` and suggest using their :math:`{K_D}_0` value of :math:`0.5`.
+As a default, we adopt the average :math:`\Delta \upsilon^{0}` of :cite:`{nakajima2012}` of :math:`2\cdot10^{-7}` :math:`^3` mol:math:`^{-1}` and suggest using their :math:`{K_D}_0` value of :math:`0.5`.
 
 
 The multiphase mixture of these minerals can be built by the user in three ways: 
-\begin{enumerate}
-\item Molar fractions of an arbitrary number of pre-defined minerals,  for example mixing standard minerals mg\_perovskite (:math:`\mathrm{MgSiO_3}`), fe\_perovskite
+1. Molar fractions of an arbitrary number of pre-defined minerals,  for example mixing standard minerals mg\_perovskite (:math:`\mathrm{MgSiO_3}`), fe\_perovskite
 (:math:`\mathrm{FeSiO_3}`), periclase (:math:`\mathrm{MgO}`) and wüstite (:math:`\mathrm{FeO}`).
 
-\item A two-phase mixture with constant or (:math:`P,T`) varying Fe partitioning using the minerals that include Fe-dependency, for example mixing :math:`\mathrm{(Mg,Fe)SiO_3}` and :math:`\mathrm{(Mg,Fe)O}` with a pre-defined distribution coefficient.
+2. A two-phase mixture with constant or (:math:`P,T`) varying Fe partitioning using the minerals that include Fe-dependency, for example mixing :math:`\mathrm{(Mg,Fe)SiO_3}` and :math:`\mathrm{(Mg,Fe)O}` with a pre-defined distribution coefficient.
 
-\item Weight percents (wt\%) of (Mg, Si, Fe) and distribution coefficient (includes (P,T)-dependent Fe partitioning).
+3. Weight percents (wt\%) of (Mg, Si, Fe) and distribution coefficient (includes (P,T)-dependent Fe partitioning).
 This calculation assumes
 that each element is completely oxidized into its corresponding oxide mineral
 (:math:`\mathrm{MgO}`, :math:`\mathrm{FeO}`, :math:`\mathrm{SiO_2}`) and then combined to form iron-bearing perovskite and
 ferropericlase taking into account some Fe partition coefficient.
 
-\end{enumerate}
 
 
 .. label: geothermal
