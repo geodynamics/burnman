@@ -23,7 +23,14 @@ Features:
   - different geotherms
   - extensible: all parts can be replaced by user-written modules if desired
 
-
+Please citate:
+  - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A lower mantle mineral physics toolkit, Geochemistry, Geophysics, and Geosystems, 15(4), 1164-1179
+  
+Acknowledgement and Support:
+  - This project was initiated at, and follow-up research support was received through, Cooperative Institute of Deep Earth Research, CIDER (NSF FESD grant 1135452) -- see www.deep-earth.org
+  - We thank all the fellow member of the Cider Mg/Si team for their input: Valentina Magni, Yu Huang, JiaChao Liu,  Marc Hirschmann, and Barbara Romanowicz.
+  - We thank Lars Stixrude for providing benchmarking calculations.
+  - We also welcomed helpful discussions with Zack Geballe, Motohiko Murakami, Bill McDonough, Quentin Williams, Wendy Panero, and Wolfgang Bangerth.
 
 """
 

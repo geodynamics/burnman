@@ -12,6 +12,7 @@ Welcome to BurnMan's documentation!
    :maxdepth: 2
 
    overview
+   background
    examples
    main
    eos
@@ -20,10 +21,13 @@ Welcome to BurnMan's documentation!
    minerals
    seismic
    mineral_database
+   zreferences
 
 The functions in the :doc:`main` operate on :doc:`minerals` which can be
 combination of different minerals from :doc:`mineral_database`.
-      
+   
+   
+
 
 
 Indices and tables
