@@ -29,7 +29,7 @@ The tutorial for BurnMan currently consists of three separate units:
 
 .. automodule:: tutorial.step_1
 
-When run, the program produces the following image:
+When run (without putting in a more realistic composition), the program produces the following image:
 
 .. image:: tut-step1.png
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
@@ -38,9 +38,15 @@ link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 .. automodule:: tutorial.step_2
 
+Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskit content:
+
+.. image:: tut-step2.png
+
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
+After changing the standard deviations for :math:`K\prime` and :math:`G\prime` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
+.. image:: tut-step3.png
 
 
 .. automodule:: tutorial.step_3

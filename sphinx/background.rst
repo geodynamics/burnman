@@ -3,7 +3,9 @@
 Methods
 =======
 
-.. _sec:EoS:
+Here is a bit of background on the currently implemented methods in BurnMan. More detail can be found in the cited papers.
+
+.. _ref-methods-EoS:
 Calculating Thermoelastic Properties
 ------------------------------------
 
@@ -11,7 +13,7 @@ Calculating Thermoelastic Properties
 To calculate the bulk (:math:`K`) modulus, shear modulus (:math:`G`) and density (:math:`\rho`) of a material at a given pressure (:math:`P`) and temperature (:math:`T`), optionally defined by a geotherm) and determine the seismic velocities (:math:`V_S, V_P, V_\Phi`), one uses an Equation of State (EoS).
 Currently the following EoSs are supported in BurnMan: the Birch-Murnaghan formulation (excludes temperature effects) :cite:`Poirier1991`, and the Birch-Murnaghan formulation with a Mie-Grüneisen-Debye temperature correction as formulated by :cite:`Stixrude2005`.
 To calculate these thermoelastic parameters, the EoS requires the user to input three parameters: pressure, temperature, the phases and their molar fractions.
-These inputs and outputs are further discussed in Section :ref:`input`.
+These inputs and outputs are further discussed in Section :ref:`ref-methods-user-input`.
 
 
 
@@ -50,7 +52,7 @@ Here :math:`K_0` and :math:`G_0` are the reference bulk modulus and shear modulu
 
 BurnMan has the option to use the second-order expansion for shear modulus by dropping the :math:`f^2` terms in these equations (as is sometimes done for experimental fits or EoS modeling).
 
-XXX include table with parametersXXX
+
 
 
 Thermal Corrections
@@ -67,8 +69,7 @@ Here we adopt the formalism of :cite:`stixrude2005` where these corrections are 
 
 The :math:`\Delta` refers to the difference in the relevant quantity from the reference temperature (300 K).
 :math:`\gamma` is the Grüneisen parameter, :math:`q` is the logarithmic volume derivative of the Grüneisen parameter, :math:`\eta_{S}` is the shear strain derivative of the Grüneisen parameter, :math:`C_V` is the heat capacity at constant volume, and :math:`\mathcal{U}` is the internal energy at temperature :math:`T`.
- :math:`C_V` and :math:`\mathcal{U}` are calculated using the Debye model for vibrational energy of a lattice.
-These quantities are calculated as follows:
+:math:`C_V` and :math:`\mathcal{U}` are calculated using the Debye model for vibrational energy of a lattice. These quantities are calculated as follows:
 
 .. math::
     C_V &= 9nR\left (  \frac{T}{\theta}\right )^3\int_{0}^{\frac{\theta}{T}}\frac{e^{\tau}\tau^{4}}{(e^{\tau}-1)^2}d\tau, \\
@@ -104,10 +105,13 @@ There is no difference between the isothermal and adiabatic shear moduli for an 
 All together this makes an eleven parameter EoS model, which is summarized in Table~ :tab:`param`.
 For more details on the EoS, we refer readers to :cite:`stixrude2005`.
 
+XXX include table with parametersXXX
+
 Calculating multi-phase seismic velocities
 ------------------------------------------
 
-:label: ave
+.. _ref-methods-ave:
+
 Averaging schemes
 ^^^^^^^^^^^^^^^^^
 
@@ -128,7 +132,7 @@ where :math:`V_i` and :math:`n_i` are the molar volume and the molar fractions o
     :label: composite_volume
 
 
-\noindent The density of the multiphase assemblage is then
+The density of the multiphase assemblage is then
 
 
 .. math::
@@ -161,7 +165,7 @@ The Voigt-Reuss-Hill average is the arithmetic mean of Voigt and Reuss bounds:
     X_{VRH} = \frac{1}{2} \left( X_V + X_R \right).
     :label: vrh
 
-The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic, and are usually much narrower than the Voigt and Reuss bounds :cite:`{watt1976}.
+The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic, and are usually much narrower than the Voigt and Reuss bounds :cite:`{watt1976}`.
 This may be a poor assumption in regions of Earth with high anisotropy, such as the lowermost mantle, though they are rather more physically motivated than the commonly-used Voigt-Reuss-Hill average.
 In most instances, the Voigt-Reuss-Hill average and the arithmetic mean of the Hashin-Shtrikman bounds are quite close to each other with the pure arithmetic mean (linear averaging) being well outside of both Hashin-Shtrikman and Voigt-Reuss-Hill.
 
@@ -199,7 +203,8 @@ More involved models of relaxation mechanisms can be implemented, but lead to th
 While attenuation can be ignored in many applications :cite:`trampert2001`, it might play a significant role in explaining strong variations in seismic velocities in the lowermost mantle :cite:`davies2012`.
 
 
-.. _input:
+.. _ref-methods-user-input:
+
 User input
 ----------
 
@@ -240,24 +245,25 @@ We adopt the formalism of :cite:`nakajima2012` choosing a reference distribution
     :label: KD2
 
 where :math:`R` is the gas constant and :math:`P_0` the reference pressure.
-As a default, we adopt the average :math:`\Delta \upsilon^{0}` of :cite:`{nakajima2012}` of :math:`2\cdot10^{-7}` :math:`^3` mol:math:`^{-1}` and suggest using their :math:`{K_D}_0` value of :math:`0.5`.
+As a default, we adopt the average :math:`\Delta \upsilon^{0}` of :cite:`{nakajima2012}` of :math:`2\cdot10^{-7}` :math:`^3 mol^{-1}` and suggest using their :math:`{K_D}_0` value of :math:`0.5`.
 
 
 The multiphase mixture of these minerals can be built by the user in three ways: 
+
 1. Molar fractions of an arbitrary number of pre-defined minerals,  for example mixing standard minerals mg\_perovskite (:math:`\mathrm{MgSiO_3}`), fe\_perovskite
 (:math:`\mathrm{FeSiO_3}`), periclase (:math:`\mathrm{MgO}`) and wüstite (:math:`\mathrm{FeO}`).
 
-2. A two-phase mixture with constant or (:math:`P,T`) varying Fe partitioning using the minerals that include Fe-dependency, for example mixing :math:`\mathrm{(Mg,Fe)SiO_3}` and :math:`\mathrm{(Mg,Fe)O}` with a pre-defined distribution coefficient.
+2. A two-phase mixture with constant or (:math:`P,T`) varying Fe partitioning using the minerals that include Fe-dependency, 
+for example mixing :math:`\mathrm{(Mg,Fe)SiO_3}` and :math:`\mathrm{(Mg,Fe)O}` with a pre-defined distribution coefficient.
 
 3. Weight percents (wt\%) of (Mg, Si, Fe) and distribution coefficient (includes (P,T)-dependent Fe partitioning).
-This calculation assumes
-that each element is completely oxidized into its corresponding oxide mineral
-(:math:`\mathrm{MgO}`, :math:`\mathrm{FeO}`, :math:`\mathrm{SiO_2}`) and then combined to form iron-bearing perovskite and
-ferropericlase taking into account some Fe partition coefficient.
+This calculation assumes that each element is completely oxidized into its corresponding oxide mineral
+(:math:`\mathrm{MgO}`, :math:`\mathrm{FeO}`, :math:`\mathrm{SiO_2}`) and then combined to form iron-bearing perovskite and ferropericlase taking into account some Fe partition coefficient.
 
 
 
-.. label: geothermal
+.. _ref-methods-geothermal:
+
 Geotherm
 ^^^^^^^^
 
@@ -285,7 +291,8 @@ Integrating this ODE requires a choice in anchor temperature (:math:`T_0`) at th
 As the adiabatic geotherm is dependent on the thermoelastic parameters at high pressures and temperatures, it is dependent on the equation of state used.
 
 
-.. label: seis
+.. _ref-methods-seis:
+
 Seismic Models
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -296,15 +303,15 @@ Quantitative misfits between two profiles include an L2-norm and a chi-squared m
 A seismic model in BurnMan is
 an object that provides pressure, density, and seismic velocities (:math:`V_P, V_\Phi, V_S`) as a function of depth.
 
-To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`{dziewonski1981}.
+To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`{dziewonski1981}`.
 One can choose to evaluate :math:`V_P, V_\Phi, V_S, \rho, K_S` and/or :math:`G`.
 The user can input their own seismic profile, an example of which is included for AK135 :cite:`kennett1995`.
 
 Besides standardized 1D radial profiles, one can also compare to regionalized average profiles for the lower mantle.
-This option accommodates the observation that the lowermost mantle can be clustered into two regions, a `slow' region, which represents the so-called Large Low Shear Velocity Provinces, and `fast' region, the continuous surrounding region where slabs might subduct :cite:`lekic2012`.
+This option accommodates the observation that the lowermost mantle can be clustered into two regions, a 'slow' region, which represents the so-called Large Low Shear Velocity Provinces, and 'fast' region, the continuous surrounding region where slabs might subduct :cite:`lekic2012`.
 This clustering as well as the averaging of the 1D model occurs over five tomographic S wave velocity  models (SAW24B16: :cite:`megnin2000`; HMSL-S: :cite:`houser2008`; S362ANI: :cite:`kustowski2008`; GyPSuM: :cite:`simmons2010`; S40RTS: :cite:`ritsema2011`).
 The strongest deviations from PREM occur in the lowermost 1000 km.
-Using the `fast' and `slow' S wave velocity profiles is therefore most important when interpreting the lowermost mantle. Suggestion of compositional variation between these regions comes from seismology :cite:`to2005,he2012` as well as geochemistry :cite:`deschamps2012,jackson2010`.
+Using the 'fast' and 'slow' S wave velocity profiles is therefore most important when interpreting the lowermost mantle. Suggestion of compositional variation between these regions comes from seismology :cite:`to2005,he2012` as well as geochemistry :cite:`deschamps2012,jackson2010`.
 Based on thermo-chemical convection models, :cite:`styles2011` also show that averaging profiles in thermal boundary layers may cause problems for seismic interpretation.
 
 We additionally apply cluster analysis to and provide models for P wave velocity based on two tomographic models (MIT-P08: :cite:`li2008`; GyPSuM: :cite:`simmons2012`).

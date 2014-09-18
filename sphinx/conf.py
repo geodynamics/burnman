@@ -229,15 +229,14 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \end{center}
 
 %MAIN PICTURE%
-\begin{textblock*}{0in}(1.5in,0.3in)
+\begin{textblock*}{6.in}(1.5in,0.3in)
 % FILL: image height
 % e.g. height=6.5in
 \begin{center}
 \vspace{.5in}
-%\includegraphics[height=3.5in]
+\includegraphics[height=3.5in]{burnjack.png}
 % FILL: image file name
 % e.g. cover_image.png
-%{mesh-2d.png}
 \end{center}
 \end{textblock*}
 
@@ -285,7 +284,7 @@ preamble = preamble1 + r'''
 \renewcommand{\maketitle}{
 
 \definecolor{dark_grey}{gray}{0.3}
-\definecolor{aspect_blue}{rgb}{0.3125,0.6875,0.9375}
+\definecolor{aspect_blue}{rgb}{0.9,0.35,0.3}
 
 %LINE 1%
 {
@@ -326,15 +325,14 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \end{center}
 
 %MAIN PICTURE%
-\begin{textblock*}{0in}(1.5in,0.3in)
+\begin{textblock*}{0.in}(0.3in,0.3in)
 % FILL: image height
 % e.g. height=6.5in
 \begin{center}
 \vspace{.5in}
-%\includegraphics[height=3.5in]
+\includegraphics[height=5.5in]{../../burnjack.png}
 % FILL: image file name
 % e.g. cover_image.png
-%{mesh-2d.png}
 \end{center}
 \end{textblock*}
 
