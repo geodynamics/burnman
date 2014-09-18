@@ -4,7 +4,7 @@ Overview
 Overal Structure
 ----------------
 
-.. image:: structure.png
+.. image:: figures/structure.png
 
 The goal of BurnMan is to calculate seismic velocity profiles for a given mineral composition, geotherm, EoS, and averaging scheme.
 These calculated seismic velocity profiles can then be compared (either graphically or quantitatively) to profiles computed for other compositions or constrained by seismology.

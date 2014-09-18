@@ -31,7 +31,7 @@ The tutorial for BurnMan currently consists of three separate units:
 
 When run (without putting in a more realistic composition), the program produces the following image:
 
-.. image:: tut-step1.png
+.. image:: figures/tut-step1.png
 Your goal in this tutorial is to improve this awful fit....
 
 
@@ -44,7 +44,7 @@ link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
-.. image:: tut-step2.png
+.. image:: figures/tut-step2.png
 
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
@@ -54,7 +54,7 @@ link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 After changing the standard deviations for :math:`K\prime` and :math:`G\prime` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
-.. image:: tut-step3.png
+.. image:: figures/tut-step3.png
 
 
 .. _ref-example-simple:
@@ -74,7 +74,7 @@ The following is a list of simple examples:
 
 *Resulting figure:*
 
-.. image:: example_beginner.png
+.. image:: figures/example_beginner.png
 
 
 
@@ -82,27 +82,27 @@ The following is a list of simple examples:
 
 *Resulting figure:*
 
-.. image:: example_geotherm.png
+.. image:: figures/example_geotherm.png
 
 .. automodule:: examples.example_seismic
 
 *Resulting figures:*
 
-.. image:: example_seismic.png
+.. image:: figures/example_seismic.png
 
-.. image:: example_seismic2.png
+.. image:: figures/example_seismic2.png
 
 .. automodule:: examples.example_composition  
 
 *Resulting figure:*
 
-.. image:: example_composition.png
+.. image:: figures/example_composition.png
 
 .. automodule:: examples.example_averaging
 
 *Resulting figure:*
 
-.. image:: example_averaging.png
+.. image:: figures/example_averaging.png
 
 
 .. _ref-example-advanced:
@@ -121,7 +121,7 @@ Advanced examples:
 
 *Resulting figure:*
 
-.. image:: example_spintransition.png
+.. image:: figures/example_spintransition.png
 
 .. automodule:: examples.example_user_input_material
 
@@ -129,7 +129,7 @@ Advanced examples:
 
 *Resulting figure:*
 
-.. image:: example_opt_pv.png
+.. image:: figures/example_opt_pv.png
 
 
 .. automodule:: examples.example_compare_all_methods  
@@ -137,7 +137,7 @@ Advanced examples:
 
 *Resulting figure:*
 
-.. image:: example_compare_all_methods.png
+.. image:: figures/example_compare_all_methods.png
 
 
 .. _ref-example-paper:
