@@ -229,7 +229,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \end{center}
 
 %MAIN PICTURE%
-\begin{textblock*}{0.in}(0.3in,0.3in)
+\begin{textblock*}{5.in}(0.3in,0.3in)
 % FILL: image height
 % e.g. height=6.5in
 \begin{center}
