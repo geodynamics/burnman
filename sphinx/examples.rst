@@ -32,24 +32,29 @@ The tutorial for BurnMan currently consists of three separate units:
 When run (without putting in a more realistic composition), the program produces the following image:
 
 .. image:: tut-step1.png
+Your goal in this tutorial is to improve this awful fit....
+
+
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
+
 
 
 
 .. automodule:: tutorial.step_2
 
-Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskit content:
+Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
 .. image:: tut-step2.png
 
 link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
-After changing the standard deviations for :math:`K\prime` and :math:`G\prime` to 0.2, the following figure of velocities for 1000 realizations is produced:
-
-.. image:: tut-step3.png
 
 
 .. automodule:: tutorial.step_3
+
+After changing the standard deviations for :math:`K\prime` and :math:`G\prime` to 0.2, the following figure of velocities for 1000 realizations is produced:
+
+.. image:: tut-step3.png
 
 
 .. _ref-example-simple:
@@ -67,13 +72,38 @@ The following is a list of simple examples:
 
 .. automodule:: examples.example_beginner
 
+*Resulting figure:*
+
+.. image:: example_beginner.png
+
+
+
 .. automodule:: examples.example_geotherms
+
+*Resulting figure:*
+
+.. image:: example_geotherm.png
 
 .. automodule:: examples.example_seismic
 
-.. automodule:: examples.example_composition          
+*Resulting figures:*
+
+.. image:: example_seismic.png
+
+.. image:: example_seismic2.png
+
+.. automodule:: examples.example_composition  
+
+*Resulting figure:*
+
+.. image:: example_composition.png
 
 .. automodule:: examples.example_averaging
+
+*Resulting figure:*
+
+.. image:: example_averaging.png
+
 
 .. _ref-example-advanced:
 
@@ -88,11 +118,26 @@ Advanced examples:
 
 .. automodule:: examples.example_spintransition
 
+
+*Resulting figure:*
+
+.. image:: example_spintransition.png
+
 .. automodule:: examples.example_user_input_material
 
 .. automodule:: examples.example_optimize_pv
 
+*Resulting figure:*
+
+.. image:: example_opt_pv.png
+
+
 .. automodule:: examples.example_compare_all_methods  
+
+
+*Resulting figure:*
+
+.. image:: example_compare_all_methods.png
 
 
 .. _ref-example-paper:
