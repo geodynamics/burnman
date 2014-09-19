@@ -303,7 +303,7 @@ Mineralogical composition
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A number of pre-defined minerals are included in the mineral library and users can create their own.
-The library includes wrapper functions to include a transition from the high-spin mineral to the low-spin mineral :cite:`[review:][]{lin2013} or to combine minerals for a given iron number.
+The library includes wrapper functions to include a transition from the high-spin mineral to the low-spin mineral :cite:`lin2013` or to combine minerals for a given iron number.
 
 
 *Standard minerals* -- The 'standard' mineral format includes a list of parameters given in Table :tab:`param`.
