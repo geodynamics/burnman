@@ -4,6 +4,7 @@
 
 import numpy as np
 import scipy.optimize as opt
+import scipy.linalg as linalg
 import warnings
 
 import burnman
@@ -53,6 +54,12 @@ class EquilibriumAssemblage(burnman.Material):
 
         self.bulk_composition_vector = np.array([ (composition[e] if e in composition.keys() else 0.0) \
                                                    for e in self.elements] )
+ 
+        self.nullspace = gm.compute_nullspace( self.stoichiometric_matrix )
+        self.pseudoinverse = np.dot(linalg.pinv2( self.stoichiometric_matrix ) , self.bulk_composition_vector)
+
+        self.__setup_subspaces()
+        
 
     def set_method(self, method):
         for phase in self.phases:
@@ -91,11 +98,46 @@ class EquilibriumAssemblage(burnman.Material):
             else:
                 raise Exception('Unsupported mineral type, can only read burnman.Mineral or burnman.SolidSolution')
 
+        print tmp_gibbs
         return tmp_gibbs
                 
         
     def __composition_constraint (self, species_vector ):
         assert( len(species_vector) == len(self.endmember_formulae) )
         return np.dot( self.stoichiometric_matrix, species_vector) - self.bulk_composition_vector
+
+
+    def __setup_subspaces (self):
+ 
+        eps = 1.e-10
+        U, S, Vh = linalg.svd( self.stoichiometric_matrix)
+
+        right_null_mask = ( np.append(S, np.zeros(len(Vh)-len(S))) <= eps)
+        self.right_nullspace = np.transpose(np.compress(right_null_mask, Vh, axis=0))
+
+        left_null_mask = ( S <= eps)
+        self.left_nullspace = np.compress(left_null_mask, U, axis=1)
+ 
+        #It is possible to give a bag of elements that cannot be represented by the list of
+        #minerals.  This corresponds to the bulk_composition_vector having power in the left nullspace
+        #of the stoichiometric matrix.  Here we check for this, and if it is the case, project
+        #it out of the left nullspace.  For most mantle assemblages, this is probably due to the
+        #amount of oxygen given being inconsistent with the possible minerals.
+        null_power = np.dot(self.left_nullspace.T, self.bulk_composition_vector)
+        if np.any( null_power > eps ):
+            print "Composition cannot be represented by the given minerals. We are projecting the composition onto the closest we can do, but you should probably recheck the composition vector"
+            for col in range(self.left_nullspace.shape[1]):
+                self.bulk_composition_vector -= self.left_nullspace[:,col]*null_power[col]
+            self.bulk_composition_vector = self.bulk_composition_vector/sum(self.bulk_composition_vector)
+            print "New vector: ", zip(self.elements, self.bulk_composition_vector)
+        
+
+        self.baseline_assemblage = np.dot(linalg.pinv2( self.stoichiometric_matrix ) , self.bulk_composition_vector)
+        assert( np.all(np.abs(np.dot(self.stoichiometric_matrix, self.baseline_assemblage)\
+                                                     - self.bulk_composition_vector) < eps) )
+        print zip(self.endmember_formulae, self.baseline_assemblage)#/np.sum(self.baseline_assemblage))
+    
+  
+
 
 

@@ -4,9 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-minlist = [mg_fe_olivine(), wuestite(), periclase(), stishovite(), jadeite()]
-composition = {'Mg': 0.2, 'Si': 0.2, 'Fe': 0.1, 'O': 0.5}
+minlist = [mg_fe_olivine(), ferropericlase(), stishovite()]
+composition = {'Fe': 1./7., 'Mg': 1./7., 'O': 4./7., 'Si': 1./7}
 
 ea = burnman.EquilibriumAssemblage(composition, minlist)
 ea.set_method('slb3')
-ea.set_state(100.e9, 3000.)

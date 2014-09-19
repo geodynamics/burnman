@@ -65,9 +65,9 @@ def compute_nullspace ( stoichiometric_matrix ):
     """
 
     eps = 1.e-10
-    U, S, V = linalg.svd( stoichiometric_matrix)
-    S=np.append(S, [0. for i in range(len(V)-len(S))])
+    U, S, Vh = linalg.svd( stoichiometric_matrix)
+    S=np.append(S, [0. for i in range(len(Vh)-len(S))])
     null_mask = (S <= eps)
-    null_space = np.compress(null_mask, V, axis=0)
+    null_space = np.compress(null_mask, Vh, axis=0)
     return np.transpose(null_space)
     
