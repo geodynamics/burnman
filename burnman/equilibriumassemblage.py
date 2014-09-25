@@ -6,6 +6,7 @@ import numpy as np
 import scipy.optimize as opt
 import scipy.linalg as linalg
 import warnings
+import matplotlib.pyplot as plt
 
 import burnman
 import burnman.gibbsminimization as gm
@@ -59,6 +60,7 @@ class EquilibriumAssemblage(burnman.Material):
         self.pseudoinverse = np.dot(linalg.pinv2( self.stoichiometric_matrix ) , self.bulk_composition_vector)
 
         self.__setup_subspaces()
+        self.__compute_baseline_assemblage()
         
 
     def set_method(self, method):
@@ -68,14 +70,19 @@ class EquilibriumAssemblage(burnman.Material):
  
     def set_state( self, pressure, temperature):
         
+        self.__compute_baseline_assemblage()
         n = len(self.endmember_formulae)
         minimize_gibbs = lambda x : self.__compute_gibbs( pressure, temperature, x )
-        sol = opt.fmin_slsqp( minimize_gibbs, np.ones(n)/n, f_eqcons = self.__composition_constraint, bounds=[(0.0, 1.0),]*n, full_output=0)
-        self.species_vector = sol
-        print zip(self.endmember_formulae, self.species_vector)
+        non_negative_constraint = lambda x : self.__species_vector( x )
+        sol = opt.fmin( minimize_gibbs, self.reduced_species_vector, full_output=1, retall=1)
+        self.reduced_species_vector = sol[0]
+        self.gibbs = sol[1]
+        self.species_vector = self.__species_vector(self.reduced_species_vector)
+        self.print_assemblage()
 
-    def __compute_gibbs( self, pressure, temperature, species_vector ):
+    def __compute_gibbs( self, pressure, temperature, reduced_vector ):
 
+        species_vector = self.__species_vector(reduced_vector)
         assert( len(species_vector) == len(self.endmember_formulae) )
 
         tmp_gibbs = 0.0
@@ -84,28 +91,34 @@ class EquilibriumAssemblage(burnman.Material):
         for phase in self.phases:
             if isinstance (phase, burnman.SolidSolution):
                 n = len(phase.base_material)
-                total_frac = np.sum( species_vector[i:(i+n)] )
+                total_frac = np.sum( species_vector[i:(i+n)] )/np.sum(species_vector)
                 phase.set_method('slb3')
-                phase.set_composition( np.array( species_vector[i:(i+n)]/total_frac) )
+                phase.set_composition( np.array( species_vector[i:(i+n)]/np.sum(species_vector[i:(i+n)])) )
                 phase.set_state( pressure, temperature )
                 tmp_gibbs += phase.gibbs * total_frac
                 i+=n
             elif isinstance(phase, burnman.Mineral):
                 phase.set_method('slb3')
                 phase.set_state( pressure, temperature )
-                tmp_gibbs += phase.gibbs * species_vector[i]
+                tmp_gibbs += phase.gibbs * species_vector[i]/np.sum(species_vector)
                 i+=1
             else:
                 raise Exception('Unsupported mineral type, can only read burnman.Mineral or burnman.SolidSolution')
+        if np.any(species_vector < -1.e-6):
+            return 1.e30
 
-        print tmp_gibbs
         return tmp_gibbs
-                
-        
-    def __composition_constraint (self, species_vector ):
-        assert( len(species_vector) == len(self.endmember_formulae) )
-        return np.dot( self.stoichiometric_matrix, species_vector) - self.bulk_composition_vector
 
+    def __species_vector ( self, reduced_vector ):
+        return self.baseline_assemblage + np.dot( self.right_nullspace, np.transpose(reduced_vector) )
+
+    def __bulk_composition (self, species_vector):
+        return np.dot(self.stoichiometric_matrix, species_vector)
+
+    def print_assemblage(self):
+        tot = np.sum(self.species_vector)
+        for f,s in zip(self.endmember_formulae, self.species_vector):
+            print f, s/tot
 
     def __setup_subspaces (self):
  
@@ -114,10 +127,16 @@ class EquilibriumAssemblage(burnman.Material):
 
         right_null_mask = ( np.append(S, np.zeros(len(Vh)-len(S))) <= eps)
         self.right_nullspace = np.transpose(np.compress(right_null_mask, Vh, axis=0))
+        self.right_nullspace = gm.sparsify_basis(self.right_nullspace)
+        for i in range( self.right_nullspace.shape[1]):
+            print self.right_nullspace[:,i]/np.max(np.abs(self.right_nullspace[:,i]))
 
         left_null_mask = ( S <= eps)
         self.left_nullspace = np.compress(left_null_mask, U, axis=1)
- 
+
+    def __compute_baseline_assemblage(self):
+
+        eps = 1.e-10
         #It is possible to give a bag of elements that cannot be represented by the list of
         #minerals.  This corresponds to the bulk_composition_vector having power in the left nullspace
         #of the stoichiometric matrix.  Here we check for this, and if it is the case, project
@@ -132,11 +151,28 @@ class EquilibriumAssemblage(burnman.Material):
             print "New vector: ", zip(self.elements, self.bulk_composition_vector)
         
 
-        self.baseline_assemblage = np.dot(linalg.pinv2( self.stoichiometric_matrix ) , self.bulk_composition_vector)
-        assert( np.all(np.abs(np.dot(self.stoichiometric_matrix, self.baseline_assemblage)\
+        baseline_assemblage = np.dot(linalg.pinv2( self.stoichiometric_matrix ) , self.bulk_composition_vector)
+
+        i = 0
+        while i < len( baseline_assemblage) :
+            if baseline_assemblage[i] < 0.0:
+                print baseline_assemblage
+                react_id = np.argmax( self.right_nullspace[i,:])
+                reaction = self.right_nullspace[:,react_id]
+                baseline_assemblage = baseline_assemblage - reaction * baseline_assemblage[i]/reaction[i]
+                print baseline_assemblage
+                i = 0
+            elif baseline_assemblage[i] < eps:
+                baseline_assemblage[i] = 0.0
+                i = i+1
+            else: 
+                i = i+1
+
+        assert( np.all(np.abs(np.dot(self.stoichiometric_matrix, baseline_assemblage)\
                                                      - self.bulk_composition_vector) < eps) )
-        print zip(self.endmember_formulae, self.baseline_assemblage)#/np.sum(self.baseline_assemblage))
-    
+          
+        self.baseline_assemblage = baseline_assemblage
+        self.reduced_species_vector = np.zeros( self.right_nullspace.shape[1] )
   
 
 

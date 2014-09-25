@@ -4,6 +4,7 @@
 
 import numpy as np
 import scipy.linalg as linalg
+import scipy.optimize as opt
 import burnman
 from burnman.processchemistry import *
 
@@ -70,4 +71,27 @@ def compute_nullspace ( stoichiometric_matrix ):
     null_mask = (S <= eps)
     null_space = np.compress(null_mask, Vh, axis=0)
     return np.transpose(null_space)
+    
+
+def sparsify_basis ( basis ):
+    eps = 1.e-6
+    new_basis = basis.copy()
+    n_cols = new_basis.shape[1]
+    n_rows = new_basis.shape[0]
+
+    l1 = lambda x : np.sum( np.abs (x) )
+ 
+    combine = lambda B, x: np.dot( B, np.append( np.array([1.0,]), x) )
+    
+    for i in range( n_cols ):
+        sp = opt.fmin( lambda x : l1(combine( new_basis[:, i:n_cols], x )), np.ones(n_cols-i-1), disp=0, xtol = eps)
+        new_basis[:,i] = np.reshape(combine( new_basis[:, i:n_cols], sp), (n_rows,))
+        new_basis[:,i] = new_basis[:,i]/linalg.norm(new_basis[:,i])
+        for j in range (i+1, n_cols):
+            new_basis[:,j] = new_basis[:,j] - np.dot(new_basis[:,i], new_basis[:,j])*new_basis[:,i]
+            new_basis[:,j] = new_basis[:,j]/linalg.norm(new_basis[:,j])
+
+    new_basis[ np.abs(new_basis) < eps ] = 0.
+    return new_basis
+ 
     
