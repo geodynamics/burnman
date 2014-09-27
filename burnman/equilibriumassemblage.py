@@ -44,6 +44,7 @@ class EquilibriumAssemblage(burnman.Material):
         self.composition = composition
         self.phases = phases
 
+        # Calculate the stoichiometric matrix
         stoich, stoich_el, formulae = gm.assemble_stoichiometric_matrix(phases)
         #The elements in the composition object should be a subset of the
         #set of elements in the various phases
@@ -53,36 +54,72 @@ class EquilibriumAssemblage(burnman.Material):
         self.stoichiometric_matrix = stoich
         self.elements = stoich_el
 
+        #There may now be elements in the stoichiometric matrix that were not in the initial composition
+        #dictionary because they appeared in one or more of the minerals.  We need to account for this
+        #when we make the bulk composition vector
         self.bulk_composition_vector = np.array([ (composition[e] if e in composition.keys() else 0.0) \
                                                    for e in self.elements] )
  
+        #Calculate the nullspace and the baseline assemblage vector
         self.__setup_subspaces()
         self.__compute_baseline_assemblage()
 
 
     def set_method(self, method):
+        """
+        set the same equation of state method for all the phases in the assemblage
+        """
         for phase in self.phases:
             phase.set_method(method)
 
 
     def set_state( self, pressure, temperature):
-        
+        """
+        Set the state of the assemblage, as a function of pressure and temperature.  
+        The performs a minimization of the Gibbs free energy to determine the equilibrium
+        assemblage, and as such, is not a cheap operation. 
+  
+        Parameters
+        ----------
+        pressure : float
+            The pressure in [Pa] at which to set the state. 
+        temperature : float
+            The temperature in [K] at which to set the state. 
+        """
+
         n = len(self.endmember_formulae)
-        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.reduced_species_vector *0.)
+        
+        # Calculate a reference gibbs free energy at the baseline assemblage.  This is a kind of ill-conditioned
+        # minimization problem, and it seems to work better if we subtract off a reference state and normalize.
+        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.reduced_species_vector * 0.)
+ 
+        #define the function to minimize and then do it.
         minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, x ) - ref_gibbs)/np.abs(ref_gibbs)
         sol = opt.fmin_slsqp( minimize_gibbs, self.reduced_species_vector, f_ieqcons = lambda x : self.__compute_species_vector(x), full_output=1, disp=False)
+
+        #Set the solution
         self.reduced_species_vector = sol[0]
         self.species_vector = self.__compute_species_vector(self.reduced_species_vector)
         self.gibbs = sol[1]*np.abs(ref_gibbs) + ref_gibbs
 
 
     def print_assemblage(self):
+        """
+        Print the current abundance of each endmember in the assemblage, as a molar fraction.
+        """
         tot = np.sum(self.species_vector)
         for f,s in zip(self.endmember_formulae, self.species_vector):
             print f, s/tot
 
  
     def __compute_gibbs( self, pressure, temperature, reduced_vector ):
+        """
+        Given a pressure, temperature, and vector in the nullspace, 
+        calculate the gibbs free energy of the assemblage.  This 
+        is basically the function to minimize when taking the 
+        assemblage to a P-T, subject to the bulk composition contraint
+        (which is parameterized by vectors in the nullspace)
+        """
 
         species_vector = self.__compute_species_vector(reduced_vector)
         assert( len(species_vector) == len(self.endmember_formulae) )
@@ -90,18 +127,23 @@ class EquilibriumAssemblage(burnman.Material):
         tmp_gibbs = 0.0
         i = 0
 
+        #Loop over the various phases and compute the gibbs free energy
+        #of each one at P,T.  We have to treat solid solutions and
+        #single phases somewhat differently.
         for phase in self.phases:
             if isinstance (phase, burnman.SolidSolution):
+
                 n = len(phase.base_material)
-                phase.set_method('slb3')
                 frac = np.sum(species_vector[i:(i+n)])
                 molar_fractions = ( species_vector[i:(i+n)]/frac if frac > 0.0 else np.ones( n )/n )
+
                 phase.set_composition( molar_fractions )
                 phase.set_state( pressure, temperature )
+
                 tmp_gibbs += phase.gibbs
                 i+=n
+                   
             elif isinstance(phase, burnman.Mineral):
-                phase.set_method('slb3')
                 phase.set_state( pressure, temperature )
                 tmp_gibbs += phase.gibbs * species_vector[i]
                 i+=1
@@ -112,29 +154,57 @@ class EquilibriumAssemblage(burnman.Material):
 
 
     def __compute_species_vector ( self, reduced_vector ):
+        """
+        Given a vector in the nullspace, return a full species vector
+        in the endmember space.
+        """
         return self.baseline_assemblage + np.dot( self.right_nullspace, np.transpose(reduced_vector) )
 
 
     def __compute_bulk_composition (self, species_vector):
+        """
+        Given a vector in the endmember space, return the 
+        bulk composition.
+        """
         return np.dot(self.stoichiometric_matrix, species_vector)
 
 
     def __setup_subspaces (self):
- 
+        """
+        Calculate the nullspace for the bulk composition constraint, and make 
+        an attempt to sparsify it.
+        """
         self.right_nullspace = gm.compute_nullspace( self.stoichiometric_matrix )
         self.right_nullspace = gm.sparsify_basis(self.right_nullspace)
 
 
     def __compute_baseline_assemblage(self):
+        """
+        The nullspace gives us vectors that do not change the bulk composition, 
+        but we need a particular vector that satisfies our composition constraint,
+        so that general vectors may be represented with the particular vector plus
+        excursions in the nullspace.  This calculates our particular vector, called
+        the baseline assemblage.
+        """
 
+        # Initially I calculated this using the SVD and projecting onto the nullspace,
+        # but it was more complicated and less robust, and the non-negativity constraint
+        # was kind of tricky.  Non-negative least squares does the same thing, is simpler,
+        # and is more robust. [IR]
         eps = 1.e-10
         baseline_assemblage = opt.nnls( self.stoichiometric_matrix, self.bulk_composition_vector)
+
+        # It is possible, even easy, to not be able to represent a given composition by
+        # a given set of phases.  Raise an exception if this occurs.
         if  baseline_assemblage[1] > eps :
             raise Exception( "Composition cannot be represented by the given minerals." )
 
         assert( np.all(np.abs(np.dot(self.stoichiometric_matrix, baseline_assemblage[0])\
                                                      - self.bulk_composition_vector) < eps) )
           
+        #Set the baseline assemblage
         self.baseline_assemblage = baseline_assemblage[0]
+
+        #Our starting vector in the nullspace is just going to be the zero vector
         self.reduced_species_vector = np.zeros( self.right_nullspace.shape[1] )
         self.species_vector = self.__compute_species_vector( self.reduced_species_vector)
