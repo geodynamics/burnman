@@ -132,12 +132,11 @@ class EquilibriumAssemblage(burnman.Material):
 
                 n = len(phase.base_material)
                 frac = np.sum(species_vector[i:(i+n)])
-                molar_fractions = ( species_vector[i:(i+n)]/frac if frac > 0.0 else np.ones( n )/n )
-
+                molar_fractions = ( species_vector[i:(i+n)]/frac if (frac > 1.e-6)  else np.ones( n )/n )
                 phase.set_composition( molar_fractions )
                 phase.set_state( pressure, temperature )
 
-                tmp_gibbs += phase.gibbs
+                tmp_gibbs += phase.gibbs * (frac if frac > 1.e-6 else 0.0)
                 i+=n
                    
             elif isinstance(phase, burnman.Mineral):
