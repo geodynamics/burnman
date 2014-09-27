@@ -15,6 +15,27 @@ def assemble_stoichiometric_matrix ( minerals):
     the rows are elements and the columns are species (or endmembers).
     If a solid solution is passed in, then the endmembers are extracted
     from it. 
+    
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of objects of type :class:`burnman.Mineral` or `burnman.SolidSolution`.
+        Other types cannot be understood, and an exception will be thrown.
+    
+    Returns
+    -------
+    stoichiometric_matrix: 2D numpy array 
+        2D numpy array that is n_elements by n_endmembers.  The matrix entries
+        are the number of atoms of an element in that particular endmember.
+        The elements are ordered alphabetically, and the endmembers are ordered
+        in the order in which they are passed in.
+    elements: list of strings
+        List of elements that are in the stoichiometric matrix, in alphabetical
+        order.
+    formulae: list of strings
+        List of endmember formulae constructed from the minerals passed in.
+        They are ordered in the same order as they are passed in, but with 
+        The endmembers in the solid solutions also included.
     """
  
     elements = set()
@@ -57,40 +78,101 @@ def assemble_stoichiometric_matrix ( minerals):
 def compute_nullspace ( stoichiometric_matrix ):
     """
     Given a stoichiometric matrix, compute a basis for the nullspace.
-    TODO: The basis for the nullspace is nonunique, and in general there
-    is no reason to expect that the one returned by svd is in any way
-    physically meaningful.  We would really like to have the 'sparsest'
-    possible basis, which corresponds to the set of independent reactions
-    with the fewest possible reactants.  Unfortunately this is an NP
-    hard problem.  There are some ways to do it, but I have not gone for it.
+    This basis corresponds to the subspace that does not change the 
+    bulk composition.  Therefore the vectors correspond to chemical
+    reactions.  This merely identifies a set of linearly independent
+    reactions, without saying anything about which ones are likely to
+    occur.
+
+    The calculation of the nullspace is done with and SVD.
+    
+    Parameters
+    ----------
+    stoichiometric_matrix: numpy array
+        The stoichiometric matrix, presumably calculated using :func:`compute_stoichiometric_matrix`.
+    
+    Returns
+    -------
+    nullspace: numpy array
+        A 2D array correspnding to the nullspace of the stoichiometric matrix, 
+        with the columns corresponding to basis vectors.
     """
 
     eps = 1.e-10
+    # Do an SVD of the stoichiometric matrix.
     U, S, Vh = linalg.svd( stoichiometric_matrix)
+
+    # The columns of V that correspond to small singular values
+    # (or do not exist) are the left nullspace for the matrix.
+    # select them, appropriately transpose them, and return them
     S=np.append(S, [0. for i in range(len(Vh)-len(S))])
     null_mask = (S <= eps)
     null_space = np.compress(null_mask, Vh, axis=0)
+
     return np.transpose(null_space)
     
 
 def sparsify_basis ( basis ):
+    """
+    The vectors computed using :func:`compute_nullspace` are non-unique, and are
+    not likely to correspond to the most physically meaningful set of reactions.  
+    Instead we would often like to know a set of nullspace vectors that are the 
+    "sparsest", meaning that they involve a minimal set of reactions.  This is known
+    to be an NP-hard problem.  This function makes a fairly crude attempt to 
+    take a set of vectors and rotate them to the sparsest coordinate system. It does 
+    this by doing many L1 minimizations of the vectors, and as such might be 
+    pretty slow, especially for large sets of bases.
+    
+    Parameters
+    ----------
+    basis: numpy array
+        A 2D array correspnding to the basis, 
+        with the columns corresponding to basis vectors.
+   
+    Returns
+    -------
+    new_basis: numpy array
+        A 2D array correspnding to the attempt at a sparser basis, 
+        with the columns corresponding to basis vectors.
+    """
+   
     eps = 1.e-6
     new_basis = basis.copy()
     n_cols = new_basis.shape[1]
     n_rows = new_basis.shape[0]
 
+    # Okay, this is kind of ugly.  The idea is that we want to make a new basis by
+    # making linear combinations of the old basis vectors, while attempting to 
+    # minimize the L1 norm of the new basis vectors.  So we loop over each basis
+    # vector and try to make a new one of all the vectors AFTER it in the list.
+    # After this minimization is complete, we project that (now sparse) vector
+    # out of the rest of them in a standard Gram-Schmidt way, and move on to the
+    # next vector.  After all are done, we return the new basis.  
+
+    #lambda function for computing L1 norm of a vector
     l1 = lambda x : np.sum( np.abs (x) )
  
+    # Add a linear combination of all but the first column of B into
+    # the first column of B, according to x
     combine = lambda B, x: np.dot( B, np.append( np.array([1.0,]), x) )
     
+    #Loop over all the columns
     for i in range( n_cols ):
+
+        #Find a linear combination of all the columns after the ith one that minimizes
+        # the L1 norm of the ith column
         sp = opt.fmin( lambda x : l1(combine( new_basis[:, i:n_cols], x )), np.ones(n_cols-i-1), disp=0, xtol = eps)
         new_basis[:,i] = np.reshape(combine( new_basis[:, i:n_cols], sp), (n_rows,))
         new_basis[:,i] = new_basis[:,i]/linalg.norm(new_basis[:,i])
+
+        #Now project that column out of all the others.
         for j in range (i+1, n_cols):
             new_basis[:,j] = new_basis[:,j] - np.dot(new_basis[:,i], new_basis[:,j])*new_basis[:,i]
             new_basis[:,j] = new_basis[:,j]/linalg.norm(new_basis[:,j])
 
+
+    #Finally, there should now be a lot of near-zero entries in the new basis.
+    #Explicitly zero them out.
     new_basis[ np.abs(new_basis) < eps ] = 0.
     return new_basis
  
