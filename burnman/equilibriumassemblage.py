@@ -89,7 +89,9 @@ class EquilibriumAssemblage(burnman.Material):
             if isinstance (phase, burnman.SolidSolution):
                 n = len(phase.base_material)
                 phase.set_method('slb3')
-                phase.set_composition( np.array( species_vector[i:(i+n)]/np.sum(species_vector[i:(i+n)])) )
+                frac = np.sum(species_vector[i:(i+n)])
+                molar_fractions = ( species_vector[i:(i+n)]/frac if frac > 0.0 else np.ones( n )/n )
+                phase.set_composition( molar_fractions )
                 phase.set_state( pressure, temperature )
                 tmp_gibbs += phase.gibbs
                 i+=n
