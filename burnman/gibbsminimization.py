@@ -6,7 +6,6 @@ import numpy as np
 import scipy.linalg as linalg
 import scipy.optimize as opt
 import burnman
-from burnman.processchemistry import *
 
 
 def assemble_stoichiometric_matrix ( minerals):

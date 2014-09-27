@@ -4,9 +4,6 @@
 
 import numpy as np
 import scipy.optimize as opt
-import scipy.linalg as linalg
-import warnings
-import matplotlib.pyplot as plt
 
 import burnman
 import burnman.gibbsminimization as gm
