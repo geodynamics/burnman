@@ -105,8 +105,7 @@ def compute_nullspace ( stoichiometric_matrix ):
     # The columns of V that correspond to small singular values
     # (or do not exist) are the left nullspace for the matrix.
     # select them, appropriately transpose them, and return them
-    S=np.append(S, [0. for i in range(len(Vh)-len(S))])
-    null_mask = (S <= eps)
+    null_mask = ( np.append(S, np.zeros(len(Vh)-len(S))) <= eps)
     null_space = np.compress(null_mask, Vh, axis=0)
 
     return np.transpose(null_space)
