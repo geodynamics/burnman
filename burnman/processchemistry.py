@@ -38,7 +38,10 @@ def dictionarize_formula(formula):
             nel=1.
         else: 
             nel=float(list[1])
-        f[list[0]]=nel
+        if list[0] not in f:
+            f[list[0]]=nel
+        else:
+            f[list[0]]=nel+f[list[0]]
     return f
 
 def formula_mass(formula, atomic_masses):
