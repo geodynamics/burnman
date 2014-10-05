@@ -148,7 +148,7 @@ class orthopyroxene_long_dashed(burnman.SolidSolution):
         base_material = [[enstatite(), 'Mg[Mg]Si2O6'],[mg_tschermaks_molecule(), '[Mg1/2Al1/2]2AlSiO6'] ]
 
         # Interaction parameters
-        enthalpy_interaction=[[0.0]]
+        enthalpy_interaction=[[10.0e3]]
 
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
@@ -280,4 +280,23 @@ plt.ylabel("Excess enthalpy of solution (kJ/mol)")
 plt.xlabel("cats fraction")
 plt.show()
 
-# Excess volume of solution
+# Check endmember excess Gibbs goes to zero... 
+
+opx = orthopyroxene_long_dashed()
+opx.set_method('slb3')
+
+comp = np.linspace(0, 1.0, 100)
+gibbs = np.empty_like(comp)
+
+for i,c in enumerate(comp):
+   opx.set_composition( np.array([1.0-c, c]) )
+   opx.set_state( 0.0, 2000.0 )
+   gibbs[i] = opx.excess_gibbs
+
+
+plt.plot( comp, gibbs/1000., 'b--', linewidth=3.)
+plt.xlim(0.0,1.0)
+plt.ylim(-2.,8.0)
+plt.ylabel("Excess enthalpy of solution (kJ/mol)")
+plt.xlabel("mgts fraction")
+plt.show()
