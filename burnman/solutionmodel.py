@@ -8,7 +8,7 @@ import burnman
 from burnman.processchemistry import *
 
 R = 8.31446 # J/K/mol
-
+kd = lambda x,y : 1 if x==y else 0
 class SolutionModel:
     """
     This is the base class for a solution model,  intended for use
@@ -116,8 +116,26 @@ class IdealSolution ( SolutionModel ):
 
         return conf_entropy
 
+    def endmember_configurational_entropy_contribution(self, molar_fractions):
+        return np.dot(molar_fractions, self.endmember_configurational_entropies)
+
     def ideal_gibbs_excess( self, temperature, molar_fractions ): 
-        return 0.0-temperature*self.configurational_entropy(molar_fractions)
+        return 0.0-temperature*(self.configurational_entropy(molar_fractions)  - self.endmember_configurational_entropy_contribution(molar_fractions))
+
+    def ln_ideal_activities ( self, molar_fractions ):
+        site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
+        lna=np.empty(shape=(self.n_endmembers))
+
+        for e in range(self.n_endmembers):
+            lna[e]=0.0
+            for occ in range(self.n_occupancies):
+                if self.endmember_occupancies[e][occ] > 1e-10 and site_occupancies[occ] > 1e-10:
+                    lna[e]=lna[e] + self.endmember_occupancies[e][occ]*self.site_multiplicities[occ]*np.log(site_occupancies[occ])
+
+            normalisation_constant=self.endmember_configurational_entropies[e]/R
+            lna[e]=lna[e] + self.endmember_configurational_entropies[e]/R
+        return lna
+
 
     def ideal_activities ( self, molar_fractions ):
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
@@ -171,6 +189,28 @@ class AsymmetricRegularSolution ( IdealSolution ):
     def configurational_entropy( self, molar_fractions ):
         return IdealSolution.configurational_entropy( self, molar_fractions )
 
+    def non_ideal_interactions( self, molar_fractions ):
+        # -sum(sum(qi.qj.Wij*)
+        # equation (2) of Holland and Powell 2003
+        phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
+        phi=np.divide(phi, np.sum(phi))
+
+
+        q=np.zeros(len(molar_fractions))
+        Hint=np.zeros(len(molar_fractions))
+        Sint=np.zeros(len(molar_fractions))
+        Vint=np.zeros(len(molar_fractions))
+
+        for l in range(self.n_endmembers):
+            q=np.array([kd(i,l)-phi[i] for i in range(self.n_endmembers)])
+
+            Hint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wh,q))
+            Sint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Ws,q))
+            Vint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wv,q))
+     
+        return Hint, Sint, Vint
+
+
     def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
 
         ideal_gibbs = IdealSolution.ideal_gibbs_excess( self, temperature, molar_fractions )
@@ -203,7 +243,6 @@ class SymmetricRegularSolution ( AsymmetricRegularSolution ):
     Solution model implementing the symmetric regular solution model
     """
     def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_interaction = None ):
-        #symmetric case if all the alphas are equal?
         alphas = np.ones( len(endmembers) )
         AsymmetricRegularSolution.__init__(self, endmembers, alphas, enthalpy_interaction, volume_interaction, entropy_interaction )
 
