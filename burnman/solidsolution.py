@@ -36,6 +36,9 @@ class SolidSolution(Mineral):
         # Number of endmembers in the solid solution
         self.n_endmembers=len(base_material)
 
+        for i in range(self.n_endmembers):
+            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
+
     def set_composition( self, molar_fraction ):
         assert(len(self.base_material) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
@@ -69,3 +72,9 @@ class SolidSolution(Mineral):
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
         return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)
+
+    def calcpartialgibbsexcesses(self, pressure, temperature, molar_fractions):
+        Hint, Sint, Vint = self.solution_model.non_ideal_interactions(molar_fractions)
+        partialgibbsexcesses=np.empty(len(molar_fractions))
+        partialgibbsexcesses = np.array([0.+R*temperature*self.solution_model.ln_ideal_activities(molar_fractions)[i] + Hint[i] - temperature*Sint[i] + pressure*Vint[i] for i in range(self.n_endmembers)])
+        return partialgibbsexcesses
