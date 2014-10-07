@@ -1,15 +1,9 @@
-import os, sys, numpy as np, matplotlib.pyplot as plt
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
-
 import burnman
 from burnman.minerals.SLB_2011 import *
-from burnman.gibbsminimization import *
 import numpy as np
 from scipy.linalg import lstsq
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
-from burnman.equilibriumequations import *
 composition = { 'Mg': 1.8, 'Fe': 0.2, 'O': 4., 'Si': 1.}
 
 mineral_list = [mg_fe_olivine(), mg_fe_wadsleyite()]
@@ -43,8 +37,8 @@ print ol.excess_gibbs
 print 0.9*ol.calcpartialgibbsexcesses(P,T,molar_fractions)[0] + 0.1*ol.calcpartialgibbsexcesses(P,T,molar_fractions)[1]
 '''
 
-stoic=assemble_stoichiometric_matrix ( mineral_list )
-null=sparsify_basis(compute_nullspace(stoic[0]))
+stoic=burnman.assemble_stoichiometric_matrix ( mineral_list )
+null=burnman.sparsify_basis(burnman.compute_nullspace(stoic[0]))
 
 # Create a compositional vector with elements in the same order as the 
 # stoichiometric matrix
@@ -136,7 +130,7 @@ for i in np.linspace(fvars[0][1],fvars[0][2],fvars[0][3]):
             guesses[3]=1.0
         elif fvars[0][0] == 2 and fvars[1][0] == 3:
             guesses[4]=1.0
-        soln=opt.fsolve(set_eqns,guesses,args=(comp_vector, mineral_list, stoic, null, fixed_vars), full_output=1, xtol=1e-10)
+        soln=opt.fsolve(burnman.set_eqns,guesses,args=(comp_vector, mineral_list, stoic, null, fixed_vars), full_output=1, xtol=1e-10)
         if soln[2]==1:
             print " ".join(str(("%10.5f" % x)) for x in soln[0])
             guesses=soln[0]
