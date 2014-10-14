@@ -175,11 +175,11 @@ class MGDBase(eos.EquationOfState):
 
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as zeros
+        #so just add them to the dictionary as nans
         if 'G_0' not in params:
-            params['G_0'] = 0.
+            params['G_0'] = float('nan')
         if 'Gprime_0' not in params:
-            params['Gprime_0'] = 0.
+            params['Gprime_0'] = float('nan')
   
         #check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0', 'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0']
