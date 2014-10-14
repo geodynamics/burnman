@@ -253,6 +253,54 @@ class SLBBase(eos.EquationOfState):
 
         return F
 
+    def validate_parameters(self, params):
+        """
+        Check for existence and validity of the parameters
+        """
+
+        #if G and Gprime are not included this is presumably deliberate,
+        #as we can model density and bulk modulus just fine without them,
+        #so just add them to the dictionary as zeros
+        if 'G_0' not in params:
+            params['G_0'] = 0.
+        if 'Gprime_0' not in params:
+            params['Gprime_0'] = 0.
+        if 'eta_s_0' not in params:
+            params['eta_s_0'] = 0.
+  
+        #check that all the required keys are in the dictionary
+        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0', 'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
+        for k in expected_keys:
+            if k not in params:
+                raise KeyError('params object missing parameter : ' + k)
+        
+        #now check that the values are reasonable.  I mostly just
+        #made up these values from experience, and we are only 
+        #raising a warning.  Better way to do this? [IR]
+        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
+            warnings.warn( 'Unusual value for V_0' )
+        if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
+            warnings.warn( 'Unusual value for K_0' )
+        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
+            warnings.warn( 'Unusual value for Kprime_0' )
+        if params['G_0'] < 0. or params['G_0'] > 1.e13:
+            warnings.warn( 'Unusual value for G_0' )
+        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
+            warnings.warn( 'Unusual value for Gprime_0' )
+        if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
+            warnings.warn( 'Unusual value for molar_mass' )
+        if params['n'] < 1. or params['n'] > 100. or not float(params['n']).is_integer():
+            warnings.warn( 'Unusual value for n' )
+        if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
+            warnings.warn( 'Unusual value for Debye_0' )
+        if params['grueneisen_0'] < 0. or params['grueneisen_0'] > 10.:
+            warnings.warn( 'Unusual value for grueneisen_0' )
+        if params['q_0'] < -10. or params['q_0'] > 10.:
+            warnings.warn( 'Unusual value for q_0' )
+        if params['eta_s_0'] < -10. or params['eta_s_0'] > 10.:
+            warnings.warn( 'Unusual value for eta_s_0' )
+            
+
 
 class SLB3(SLBBase):
     """

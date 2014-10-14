@@ -62,6 +62,11 @@ class HelperSolidSolution(Mineral):
             print "%s%g of" % (indent, fraction)
             mat.debug_print(indent + "  ")
 
+    def set_method(self, method):
+        for mat in self.base_materials:
+            mat.set_method(method)
+        self.method = self.base_materials[0].method
+
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
             mat.set_state(pressure, temperature)
