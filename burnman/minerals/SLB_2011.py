@@ -179,7 +179,6 @@ class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
-        self.set_method('slb3')
 
 
 class ferropericlase_pt_dependent(bmb.HelperFeDependent):
