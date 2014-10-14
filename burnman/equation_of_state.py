@@ -208,3 +208,21 @@ class EquationOfState:
         """
         raise NotImplementedError("")
 
+    def validate_parameters(self, params):
+        """
+        The params object is just a dictionary associating mineral physics parameters 
+        for the equation of state.  Different equation of states can have different parameters,
+        and the parameters may have ranges of validity.  The intent of this function is 
+        twofold. First, it can check for the existence of the parameters that the 
+        equation of state needs, and second, it can check whether the parameters have reasonable
+        values.  Unreasonable values will frequently be due to unit issues (e.g., supplying 
+        bulk moduli in GPa instead of Pa). In the base class this function does nothing,
+        and an equation of state is not required to implement it.  This function will
+        not return anything, though it may raise warnings or errors.
+
+        Params
+        ------
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+        """
+        pass

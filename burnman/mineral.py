@@ -82,6 +82,12 @@ class Mineral(Material):
         else:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 
+        #Validate the params object on the requested EOS. 
+        try:
+            self.method.validate_parameters(self.params)
+        except Exception as e:
+            raise Exception('Mineral ' + self.to_string() + 'failed to validate parameters with message : \" ' + e.message + '\"' )
+
     def to_string(self):
         """
         Returns the name of the mineral class
