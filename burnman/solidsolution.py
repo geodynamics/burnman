@@ -52,11 +52,14 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.base_material[i][0].set_state(pressure, temperature)
 
+        self.excess_partial_gibbs = self.solution_model.excess_partial_gibbs_free_energies( pressure, temperature, self.molar_fraction)
         self.excess_gibbs = self.solution_model.excess_gibbs_free_energy( pressure, temperature, self.molar_fraction)
+        self.partial_gibbs = np.array([self.base_material[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
+        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
+
         self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
 
         self.V= sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
-        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
 
         
         '''
@@ -74,7 +77,4 @@ class SolidSolution(Mineral):
         return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)
 
     def calcpartialgibbsexcesses(self, pressure, temperature, molar_fractions):
-        Hint, Sint, Vint = self.solution_model.non_ideal_interactions(molar_fractions)
-        partialgibbsexcesses=np.empty(len(molar_fractions))
-        partialgibbsexcesses = np.array([0.+R*temperature*self.solution_model.ln_ideal_activities(molar_fractions)[i] + Hint[i] - temperature*Sint[i] + pressure*Vint[i] for i in range(self.n_endmembers)])
-        return partialgibbsexcesses
+        return self.solution_model.excess_partial_gibbs_free_energies( pressure, temperature, molar_fractions)

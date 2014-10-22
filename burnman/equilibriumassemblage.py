@@ -83,21 +83,52 @@ class EquilibriumAssemblage(burnman.Material):
         temperature : float
             The temperature in [K] at which to set the state. 
         """
+        self._minimize_gibbs( pressure, temperature )
+#        self._solve_equilibrium_equations (pressure, temperature )
+
+
+    def _solve_equilibrium_equations( self, pressure, temperature ): 
+        
+        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(self.reduced_species_vector * 0.))
+        print ref_gibbs
+        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self.__compute_species_vector( x ) ))
+        sol = opt.root(equilibrium, self.reduced_species_vector, method='hybr', options={'xtol':1.e-11})
+
+        self.reduced_species_vector = sol.x
+        self.species_vector = self.__compute_species_vector(self.reduced_species_vector)
+        self.gibbs = self.__compute_gibbs(pressure, temperature, self.species_vector)
+
+    def _equilibrium_equations ( self, pressure, temperature, species_vector):
+        partial_gibbs = self._compute_partial_gibbs( pressure, temperature, species_vector)
+        gibbs_inequalities = np.dot(partial_gibbs, self.right_nullspace)
+
+        if np.any(species_vector < -1.e-6):
+           gibbs_inequalitites = np.ones_like( gibbs_inequalities) * 10000000.
+
+        return gibbs_inequalities
+
+    def _minimize_gibbs( self, pressure, temperature):
 
         n = len(self.endmember_formulae)
         
         # Calculate a reference gibbs free energy at the baseline assemblage.  This is a kind of ill-conditioned
         # minimization problem, and it seems to work better if we subtract off a reference state and normalize.
-        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.reduced_species_vector * 0.)
+        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(self.reduced_species_vector * 0.))
  
         #define the function to minimize and then do it.
-        minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, x ) - ref_gibbs)/np.abs(ref_gibbs)
-        sol = opt.fmin_slsqp( minimize_gibbs, self.reduced_species_vector, f_ieqcons = lambda x : self.__compute_species_vector(x), full_output=1, disp=False)
-
+        minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(x) ) - ref_gibbs)/np.abs(ref_gibbs)
+#        minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(x) ))
+        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self.__compute_species_vector( x ) )/np.abs(ref_gibbs))
+#        equilibrium=None
+    
         #Set the solution
-        self.reduced_species_vector = sol[0]
+        constraints={'type':'ineq', 'fun':self.__compute_species_vector}
+        sol = opt.minimize( minimize_gibbs, self.reduced_species_vector, method='SLSQP', jac=equilibrium, constraints=constraints )
+        self.reduced_species_vector = sol.x
         self.species_vector = self.__compute_species_vector(self.reduced_species_vector)
-        self.gibbs = sol[1]*np.abs(ref_gibbs) + ref_gibbs
+        self.gibbs = self.__compute_gibbs(pressure, temperature, self.species_vector)
+        
+
 
 
     def print_assemblage(self):
@@ -108,25 +139,13 @@ class EquilibriumAssemblage(burnman.Material):
         for f,s in zip(self.endmember_formulae, self.species_vector):
             print f, s/tot
 
- 
-    def __compute_gibbs( self, pressure, temperature, reduced_vector ):
-        """
-        Given a pressure, temperature, and vector in the nullspace, 
-        calculate the gibbs free energy of the assemblage.  This 
-        is basically the function to minimize when taking the 
-        assemblage to a P-T, subject to the bulk composition contraint
-        (which is parameterized by vectors in the nullspace)
-        """
-
-        species_vector = self.__compute_species_vector(reduced_vector)
-        assert( len(species_vector) == len(self.endmember_formulae) )
-
-        tmp_gibbs = 0.0
-        i = 0
+    def _compute_partial_gibbs( self, pressure, temperature, species_vector):
+        partial_gibbs = np.empty_like(species_vector)
 
         #Loop over the various phases and compute the gibbs free energy
         #of each one at P,T.  We have to treat solid solutions and
         #single phases somewhat differently.
+        i = 0
         for phase in self.phases:
             if isinstance (phase, burnman.SolidSolution):
 
@@ -135,18 +154,33 @@ class EquilibriumAssemblage(burnman.Material):
                 molar_fractions = ( species_vector[i:(i+n)]/frac if (frac > 1.e-6)  else np.ones( n )/n )
                 phase.set_composition( molar_fractions )
                 phase.set_state( pressure, temperature )
-
-                tmp_gibbs += phase.gibbs * (frac if frac > 1.e-6 else 0.0)
+                
+                partial_gibbs[i:(i+n)] = phase.partial_gibbs
                 i+=n
                    
             elif isinstance(phase, burnman.Mineral):
                 phase.set_state( pressure, temperature )
-                tmp_gibbs += phase.gibbs * species_vector[i]
+                partial_gibbs[i] = phase.gibbs
                 i+=1
             else:
                 raise Exception('Unsupported mineral type, can only read burnman.Mineral or burnman.SolidSolution')
 
-        return tmp_gibbs
+        return partial_gibbs
+
+ 
+    def __compute_gibbs( self, pressure, temperature, species_vector ):
+        """
+        Given a pressure, temperature, and vector in the nullspace, 
+        calculate the gibbs free energy of the assemblage.  This 
+        is basically the function to minimize when taking the 
+        assemblage to a P-T, subject to the bulk composition contraint
+        (which is parameterized by vectors in the nullspace)
+        """
+
+        assert( len(species_vector) == len(self.endmember_formulae) )
+
+        gibbs = np.dot( species_vector, self._compute_partial_gibbs(pressure, temperature, species_vector) )
+        return gibbs
 
 
     def __compute_species_vector ( self, reduced_vector ):
@@ -154,7 +188,8 @@ class EquilibriumAssemblage(burnman.Material):
         Given a vector in the nullspace, return a full species vector
         in the endmember space.
         """
-        return self.baseline_assemblage + np.dot( self.right_nullspace, np.transpose(reduced_vector) )
+        species_vector = self.baseline_assemblage + np.dot( self.right_nullspace, np.transpose(reduced_vector) )
+        return species_vector
 
 
     def __compute_bulk_composition (self, species_vector):

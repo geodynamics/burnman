@@ -25,8 +25,9 @@ class SolutionModel:
     def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions):
         """
         Given a list of molar fractions of different phases,
-        compute the excess Gibbs free energy of the solution,
-        relative to an ideal model.
+        compute the excess Gibbs free energy of the solution.
+        The base class implementation assumes that the excess gibbs
+        free energy is zero.
  
         Parameters
         ----------
@@ -44,14 +45,38 @@ class SolutionModel:
         G_excess : float 
             The excess Gibbs free energy
         """
-        return 0.0
+        return np.dot(np.array(molar_fractions), self.excess_partial_gibbs_free_energies( pressure, temperature, molar_fractions))
+ 
+    def excess_partial_gibbs_free_energies( self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess Gibbs free energy for each endmember of the solution.
+        The base class implementation assumes that the excess gibbs
+        free energy is zero.
+ 
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+        
+        Returns
+        -------
+        partial_G_excess : numpy array
+            The excess Gibbs free energy of each endmember
+        """
+        return np.empty_like( np.array(molar_fractions) )
 
     def excess_volume( self, pressure, temperature, molar_fractions):
         """
         Given a list of molar fractions of different phases,
         compute the excess Gibbs free energy of the solution,
-        relative to an ideal model.  The base class implementation
-        assumes that the excess volume is zero.
+        The base class implementation assumes that the excess volume is zero.
  
         Parameters
         ----------
@@ -86,7 +111,13 @@ class IdealSolution ( SolutionModel ):
         # Process solid solution chemistry
         self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
             ProcessSolidSolutionChemistry(self.formulas)
+        
+        self._calculate_endmember_configurational_entropies()
 
+    def excess_partial_gibbs_free_energies( self, pressure, temperature, molar_fractions ):
+        return self._ideal_excess_partial_gibbs( temperature, molar_fractions )
+
+    def _calculate_endmember_configurational_entropies( self ):
         self.endmember_configurational_entropies=np.zeros(shape=(self.n_endmembers))
         for idx, endmember_occupancy in enumerate(self.endmember_occupancies):
             for occ in range(self.n_occupancies):
@@ -95,34 +126,23 @@ class IdealSolution ( SolutionModel ):
                         self.endmember_configurational_entropies[idx] - \
                         R*self.site_multiplicities[occ]*endmember_occupancy[occ]*np.log(endmember_occupancy[occ])
 
+    def _endmember_configurational_entropy_contribution(self, molar_fractions):
+        return np.dot(molar_fractions, self.endmember_configurational_entropies)
 
-
-    def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
-        return self.ideal_gibbs_excess( temperature, molar_fractions )
-
-    def configurational_entropy (self, molar_fractions):
+    def _configurational_entropy (self, molar_fractions):
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
         conf_entropy=0
         for idx, occupancy in enumerate(site_occupancies):
             if occupancy > 1e-10:
                 conf_entropy=conf_entropy-R*occupancy*self.site_multiplicities[idx]*np.log(occupancy)
 
-        # Alternative entropy construction
-        #activities=self.ideal_activities(molar_fractions)
-        #conf_entropy=0.
-        #for i, activity in enumerate(activities):
-        #    if activity > 1e-10:
-        #        conf_entropy=conf_entropy - R*molar_fractions[i]*np.log(activity) + molar_fractions[i]*self.endmember_configurational_entropies[i]
-
         return conf_entropy
 
-    def endmember_configurational_entropy_contribution(self, molar_fractions):
-        return np.dot(molar_fractions, self.endmember_configurational_entropies)
 
-    def ideal_gibbs_excess( self, temperature, molar_fractions ): 
-        return 0.0-temperature*(self.configurational_entropy(molar_fractions)  - self.endmember_configurational_entropy_contribution(molar_fractions))
+    def _ideal_excess_partial_gibbs( self, temperature, molar_fractions ): 
+        return  R * temperature * self._log_ideal_activities(molar_fractions)
 
-    def ln_ideal_activities ( self, molar_fractions ):
+    def _log_ideal_activities ( self, molar_fractions ):
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
         lna=np.empty(shape=(self.n_endmembers))
 
@@ -137,7 +157,7 @@ class IdealSolution ( SolutionModel ):
         return lna
 
 
-    def ideal_activities ( self, molar_fractions ):
+    def _ideal_activities ( self, molar_fractions ):
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
         activities=np.empty(shape=(self.n_endmembers))
 
@@ -186,10 +206,8 @@ class AsymmetricRegularSolution ( IdealSolution ):
         #initialize ideal solution model
         IdealSolution.__init__(self, endmembers )
         
-    def configurational_entropy( self, molar_fractions ):
-        return IdealSolution.configurational_entropy( self, molar_fractions )
 
-    def non_ideal_interactions( self, molar_fractions ):
+    def _non_ideal_interactions( self, molar_fractions ):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
         phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
@@ -210,23 +228,16 @@ class AsymmetricRegularSolution ( IdealSolution ):
      
         return Hint, Sint, Vint
 
+    def _non_ideal_excess_partial_gibbs( self, pressure, temperature, molar_fractions) :
 
-    def excess_gibbs_free_energy( self, pressure, temperature, molar_fractions ):
+        Hint, Sint, Vint = self._non_ideal_interactions( molar_fractions )
+        return Hint - temperature*Sint + pressure*Vint
 
-        ideal_gibbs = IdealSolution.ideal_gibbs_excess( self, temperature, molar_fractions )
+    def excess_partial_gibbs_free_energies( self, pressure, temperature, molar_fractions ):
 
-
-        phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
-        phi=np.divide(phi, np.sum(phi))
-
-        H_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wh,phi))
-        S_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Ws,phi))
-        V_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wv,phi))
-
-        non_ideal_gibbs = H_excess - temperature*S_excess + pressure*V_excess
-     
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions )
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs( pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
-
 
     def excess_volume ( self, pressure, temperature, molar_fractions ):
 
