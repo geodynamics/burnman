@@ -5,6 +5,7 @@
 import numpy as np
 import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
+from scipy.constants import gas_constant
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
@@ -12,7 +13,7 @@ just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
 
-R = 8.314462175
+R = gas_constant
 
 
 
