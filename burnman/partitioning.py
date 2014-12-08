@@ -3,13 +3,11 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from scipy.constants import gas_constant, Avogadro
+from burnman.constants import gas_constant, N_A
 
 # TODO: add up weight percent and check <100 and tell them how much
 
 molar_mass = {'Fe':55.845/1000., 'Mg':24.305/1000., 'O':15.999/1000., 'Al':26.982/1000., 'Ca':40.078/1000., 'Si':28.085/1000.} # kg/mol
-boltzmann_constant = 1.3806503e-23 # in m^2 kg s^-2 K^-1
-
 lower_mantle_mass = 4.043e24*.75 # in kg
 
 
@@ -18,7 +16,7 @@ lower_mantle_mass = 4.043e24*.75 # in kg
 # convert weight percentage (amount, 1.00 = 100%) of a given element to molar mass
 def weight_pct_to_mol(element, amount):
 
-    return amount * lower_mantle_mass / molar_mass[element] * Avogadro
+    return amount * lower_mantle_mass / molar_mass[element] * N_A 
 
 
 def calculate_phase_percents(inp):

@@ -5,7 +5,7 @@
 import numpy as np
 import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
-from scipy.constants import gas_constant
+from burnman.constants import gas_constant
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,

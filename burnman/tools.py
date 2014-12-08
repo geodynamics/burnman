@@ -7,7 +7,7 @@ import bisect
 import os
 import pkgutil
 import numpy as np
-from scipy.constants import Avogadro
+from burnman.constants import N_A
 
 def pretty_print_table(table,use_tabs=False):
     """
@@ -91,5 +91,5 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     NOT number of atoms per molecular formula), and calculates
     the molar volume, as expected by the equations of state.
     """
-    return  unit_cell_v*Avogadro/1e30/z
+    return  unit_cell_v*N_A/1e30/z
 
