@@ -53,14 +53,13 @@ if __name__ == "__main__":
 
     mat_vs = np.reshape(vs,[len(p),len(T)]);
 
-    print mat_vs
+    #print mat_vs
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
 
     X,Y = np.meshgrid(p/1e9, T)
-    print X.shape, Y.shape, mat_vs.shape
 
     surf = ax.plot_surface(X,Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
     plt.xlabel("Pressure (GPa)")
