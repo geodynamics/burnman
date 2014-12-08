@@ -28,11 +28,11 @@ else
   sed -i '/tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
   sed -i '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
 
-  (diff $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
+  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
   ) || { 
   echo "$t ... FAIL"; 
   echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";  
-  diff $t.tmp ../misc/ref/$t.out | head
+  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp ../misc/ref/$t.out | head
   }
 
 fi
