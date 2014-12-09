@@ -11,6 +11,8 @@ Welcome to BurnMan's documentation!
 .. toctree::
    :maxdepth: 2
 
+   overview
+   examples
    main
    eos
    averaging
@@ -18,7 +20,6 @@ Welcome to BurnMan's documentation!
    minerals
    seismic
    mineral_database
-   examples
 
 The functions in the :doc:`main` operate on :doc:`minerals` which can be
 combination of different minerals from :doc:`mineral_database`.
