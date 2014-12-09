@@ -138,6 +138,26 @@ class Seismic1DModel:
         raise ValueError, "not implemented"
         return 0
     
+    
+    def G(self, depth):
+        """
+        Parameters
+        ----------
+        depth : float or array of floats
+        Shear modulus at given for depth(s) in [Pa].
+        """
+        return np.power(self.v_s(depth),2.) * self.density(depth)
+    
+    def K(self, depth):
+        """
+        Parameters
+        ----------
+        depth : float or array of floats
+        Bulk modulus at given for depth(s) in [Pa]
+        """
+        return np.power(self.v_phi(depth),2.) * self.density(depth)
+
+    
     def depth(self, pressure):
         """
         Parameters
@@ -207,7 +227,7 @@ class SeismicRadiusTable(Seismic1DModel):
 
     def density(self, depth):
 
-        return self._lookup(depth, self.table_density)        
+        return self._lookup(depth, self.table_density)
 
     def depth(self, pressure):
         radius = np.interp(pressure, self.table_pressure[::-1], self.table_radius[::-1] )
