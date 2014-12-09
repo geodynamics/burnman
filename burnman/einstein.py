@@ -3,12 +3,13 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+from burnman.constants import gas_constant
 
 """
 Functions for the Einstein model of a solid.
 """
 
-R = 8.314462175
+R = gas_constant
 
 def thermal_energy(T, einstein_T, n):
     """

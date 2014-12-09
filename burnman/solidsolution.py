@@ -6,9 +6,10 @@ import numpy as np
 from burnman.mineral import Mineral
 from burnman.processchemistry import ProcessSolidSolutionChemistry
 from burnman.solutionmodel import SolutionModel
+from burnman.constants import gas_constant
 import warnings
 
-R = 8.3145 # J/K/mol
+R = gas_constant # J/K/mol
 kd = lambda x,y : 1 if x==y else 0
 
 class SolidSolution(Mineral):

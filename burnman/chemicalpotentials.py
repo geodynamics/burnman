@@ -7,8 +7,10 @@ from burnman import minerals
 from processchemistry import *
 import numpy as np
 from scipy.linalg import lu
+from burnman.constants import gas_constant
 
-R=8.3145
+R=gas_constant
+
 # This module computes chemical potentials (partial molar gibbs free energies) for an assemblage based on the Gibbs free energies and compositions of the individual phases.
 
 # It can also calculate fugacities based on the gibbs free energies of the endmembers corresponding to chemical components.
