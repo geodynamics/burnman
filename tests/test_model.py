@@ -55,26 +55,26 @@ class test_model(BurnManTest):
 
     def test_model1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.K()/1e11, [2.80999713])
-        self.assertArraysAlmostEqual(m.G()/1e11, [1.67031746])
+        self.assertArraysAlmostEqual(m.K()/1e11, [2.80999688])
+        self.assertArraysAlmostEqual(m.G()/1e11, [1.67031704])
 
     def test_vs1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.v_s(), [6359.44860613])
+        self.assertArraysAlmostEqual(m.v_s(), [6359.4479532])
 
     def test_vp1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.v_p(), [11043.57489092])
+        self.assertArraysAlmostEqual(m.v_p(), [11043.5742579])
 
     def test_vphi1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.v_phi(), [8248.46031729])
+        self.assertArraysAlmostEqual(m.v_phi(), [8248.46014099])
 
     def test_heatstuff1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.heat_capacity_p(), [52.32168504])
+        self.assertArraysAlmostEqual(m.heat_capacity_p(), [52.32175110])
         self.assertArraysAlmostEqual(m.thermal_expansivity(), [2.40018801e-05])
-        self.assertArraysAlmostEqual(m.heat_capacity_v(), [49.342414])
+        self.assertArraysAlmostEqual(m.heat_capacity_v(), [49.3424724])
 
         # reproduce by hand:
         min = m.rock
@@ -88,13 +88,13 @@ class test_model(BurnManTest):
         m2 = self.model2()
         m12 = self.model12()
 
-        self.assertArraysAlmostEqual(m1.heat_capacity_v(), [49.342414])
-        self.assertArraysAlmostEqual(m2.heat_capacity_v(), [49.34895224])
-        self.assertArraysAlmostEqual(m12.heat_capacity_v(), [49.34764459])
+        self.assertArraysAlmostEqual(m1.heat_capacity_v(), [49.34247236])
+        self.assertArraysAlmostEqual(m2.heat_capacity_v(), [49.3490106])
+        self.assertArraysAlmostEqual(m12.heat_capacity_v(), [49.34770297])
 
-        self.assertArraysAlmostEqual(m1.heat_capacity_p(), [52.32168504])
-        self.assertArraysAlmostEqual(m2.heat_capacity_p(), [52.7768764])
-        self.assertArraysAlmostEqual(m12.heat_capacity_p(), [52.68583813])
+        self.assertArraysAlmostEqual(m1.heat_capacity_p(), [52.32175110])
+        self.assertArraysAlmostEqual(m2.heat_capacity_p(), [52.77694375])
+        self.assertArraysAlmostEqual(m12.heat_capacity_p(), [52.68590522])
 
         self.assertArraysAlmostEqual(m1.thermal_expansivity(), [2.40018801e-5])
         self.assertArraysAlmostEqual(m2.thermal_expansivity(), [2.74743810e-5])
@@ -105,9 +105,9 @@ class test_model(BurnManTest):
         m2 = self.model2()
         m12 = self.model12()
 
-        self.assertArraysAlmostEqual(m1.density(), [4130.09554071])
-        self.assertArraysAlmostEqual(m2.density(), [4619.86457261])
-        self.assertArraysAlmostEqual(m12.density(), [4512.83334315])
+        self.assertArraysAlmostEqual(m1.density(), [4130.09535243])
+        self.assertArraysAlmostEqual(m2.density(), [4619.86433138])
+        self.assertArraysAlmostEqual(m12.density(), [4512.8331140])
 
 
 
