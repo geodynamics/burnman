@@ -29,7 +29,7 @@ import burnman.version
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram','sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram','sphinx.ext.viewcode','sphinxcontrib.bibtex']
 numpydoc_show_class_members = False
 
 autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance', 'inherited-members']
@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'BurnMan'
-copyright = u'2014, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn'
+copyright = u'2014, Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -188,7 +188,7 @@ preamble = preamble1 + r'''
 \renewcommand{\maketitle}{
 
 \definecolor{dark_grey}{gray}{0.3}
-\definecolor{aspect_blue}{rgb}{0.3125,0.6875,0.9375}
+\definecolor{aspect_blue}{rgb}{0.9,0.35,0.3}
 
 %LINE 1%
 {
@@ -229,15 +229,14 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \end{center}
 
 %MAIN PICTURE%
-\begin{textblock*}{0in}(1.5in,0.3in)
+\begin{textblock*}{5.in}(0.3in,0.3in)
 % FILL: image height
 % e.g. height=6.5in
 \begin{center}
 \vspace{.5in}
-%\includegraphics[height=3.5in]
+\includegraphics[height=4.5in]{../../burnjack-small.png}
 % FILL: image file name
 % e.g. cover_image.png
-%{mesh-2d.png}
 \end{center}
 \end{textblock*}
 
@@ -258,7 +257,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 % FILL: author list
 % e.g. Author One\\Author Two\\Author Three\\
 % be sure to have a newline (\\) after the final author
-Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\
+Sanne Cottaar\\Timo Heister\\Robert Myhill\\Ian Rose\\Cayman Unterborn\\
 }
 
 {\fontfamily{\sfdefault}\selectfont \href{http://geodynamics.org}{http://geodynamics.org}}
@@ -288,7 +287,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'BurnMan.tex', u'BurnMan Documentation',
-   u'Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn', 'manual'),
+   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -318,7 +317,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'burnman', u'BurnMan Documentation',
-     [u'Sanne Cottaar, Timo Heister, Ian rose, Cayman Unterbor'], 1)
+     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -332,7 +331,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'BurnMan', u'BurnMan Documentation',
-   u'Sanne Cottaar, Timo Heister, Ian rose, Cayman Unterbor', 'BurnMan', 'One line description of project.',
+   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
    'Miscellaneous'),
 ]
 

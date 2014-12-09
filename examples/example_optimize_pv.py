@@ -8,7 +8,7 @@ example_optimize_pv
 -------------------
 
 Vary the amount perovskite vs. ferropericlase and compute the error in the
-seismic data against PREM.
+seismic data against PREM. For more extensive comments on this setup, see tutorial/step_2.py
 
 *Uses:*
 
