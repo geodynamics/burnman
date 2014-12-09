@@ -31,17 +31,16 @@ def dictionarize_formula(formula):
     convert it into a dictionary
     """
     f=dict()
-    for element in re.findall('[A-Z][^A-Z]*', formula):
-        list=filter(None, re.split(r'(\d+)', element))
-        # Look up number of atoms of element
-        if len(list) == 1:
-            nel=1.
-        else: 
-            nel=float(list[1])
-        if list[0] not in f:
-            f[list[0]]=nel
+    elements=re.findall('[A-Z][^A-Z]*',formula)
+    for element in elements:
+        element_name=re.split('[0-9][^A-Z]*',element)[0]
+        element_atoms=re.findall('[0-9][^A-Z]*',element)
+        if len(element_atoms) == 0:
+            element_atoms=Fraction(1.0)
         else:
-            f[list[0]]=nel+f[list[0]]
+            element_atoms=Fraction(element_atoms[0])
+        f[element_name]=f.get(element_name, 0.0) + element_atoms
+
     return f
 
 def formula_mass(formula, atomic_masses):
