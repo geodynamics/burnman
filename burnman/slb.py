@@ -226,7 +226,7 @@ class SLBBase(eos.EquationOfState):
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
 
         F = params['F_0'] + \
-            0.5*volume*b_iikk*f*f + (1./6.)*volume*b_iikkmm*f*f*f +\
+            0.5*b_iikk*f*f*params['V_0'] + (1./6.)*params['V_0']*b_iikkmm*f*f*f +\
             F_quasiharmonic
 
         return F

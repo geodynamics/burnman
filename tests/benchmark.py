@@ -194,6 +194,7 @@ def check_slb_fig7_txt():
                     'Debye_0': 809.183,
                     'grueneisen_0': .993,
                     'q_0': 2.093, 
+                    'F_0': -1.1406e5,
                     'eta_s_0' : 2.364}
     forsterite.set_method('slb3')
 
@@ -233,6 +234,8 @@ def check_slb_fig7_txt():
     Cp_comp = np.empty_like(Cp)
     gr = np.array(data[:,13])
     gr_comp = np.empty_like(gr)
+    gibbs = np.array(data[:,14])
+    gibbs_comp = np.empty_like(gibbs)
     
     for  i in range(len(temperature)):
       forsterite.set_state(pressure[i], temperature[i])
@@ -247,6 +250,7 @@ def check_slb_fig7_txt():
       alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/(alpha[-1])
       Cp_comp[i] = 100.*(forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
       gr_comp[i] = (forsterite.grueneisen_parameter() - gr[i])/gr[i]
+      gibbs_comp[i] = 100.*(forsterite.molar_gibbs()/1.e6 - gibbs[i])/gibbs[i]
       
     plt.plot(temperature, rho_comp, label=r'$\rho$')
     plt.plot(temperature, Kt_comp, label=r'$K_S$')
@@ -259,6 +263,7 @@ def check_slb_fig7_txt():
     plt.plot(temperature, alpha_comp, label = r'$\alpha$')
     plt.plot(temperature, Cp_comp, label = r'$c_P$')
     plt.plot(temperature, gr_comp, label = r'$\gamma$')
+    plt.plot(temperature, gibbs_comp, label = r'Gibbs')
 
     plt.xlim([0, 2750])
     plt.ylim([-0.001, 0.001])
