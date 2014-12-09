@@ -1,5 +1,6 @@
 % Masses from NIST
-% Processed with `awk '{print substr($0,5, 4), substr($0,47,100)}' tmp  | sed 's/_//g' | awk '{print $1, $2/1000.}' | awk 'NF==2' | awk -F"(" '{print $1}' | grep -v '['`
+% Vc = vacancy. Everything else processed with `awk '{print substr($0,5, 4), substr($0,47,100)}' NIST_masses.dat  | sed 's/_//g' | awk '{print $1, $2/1000.}' | awk 'NF==2' | awk -F"(" '{print $1}' | grep -v '['`
+Vc 0.0000000
 H 0.00100794
 He 0.0040026
 Li 0.006941
