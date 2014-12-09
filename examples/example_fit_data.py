@@ -30,7 +30,24 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 
 if __name__ == "__main__":
-
+    #in form name_of_mineral (burnman.mineral <- creates list with parameters)
+    class slb2_material (burnman.Mineral):
+        def __init__(self):
+            burnman.Mineral.__init__(self)
+            self.params = {
+                'equation_of_state': 'slb2', # original method
+            'V_0': 24.45e-6,
+            'K_0': 253.0e9,
+            'Kprime_0': 4.1,
+            'G_0': 172.9e9,
+            'Gprime_0': 1.56,
+            'molar_mass': .1000,
+            'n': 5,
+            'Debye_0': 1100.,
+            'grueneisen_0': 1.4,
+            'q_0': 1.4,
+            'eta_s_0': 2.6 }
+        }
 
     def calc_shear_velocities(G_0, G_prime, mineral, pressures):
 
