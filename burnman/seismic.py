@@ -138,6 +138,24 @@ class Seismic1DModel:
         raise ValueError, "not implemented"
         return 0
     
+    def G(self, depth):
+	"""
+	Parameters
+	----------
+	depth : float or array of floats
+        Shear modulus at given depth(s) in [Pa].
+	"""
+	return (self.v_s(depth) * self.density(depth))**2.
+	
+    def K(self, depth):
+	"""
+	Parameters
+	----------
+	depth : float or array of floats
+	Bulk modulus at givin depth(s) in [Pa]
+	"""
+	return (self.v_phi(depth) * self.density(depth))**2.
+
     def depth(self, pressure):
         """
         Parameters
