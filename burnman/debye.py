@@ -5,15 +5,13 @@
 import numpy as np
 import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
-from burnman.constants import gas_constant
+from burnman.constants import R
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
 just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
-
-R = gas_constant
 
 
 
