@@ -380,10 +380,16 @@ def check_averaging():
 
     #these values are not given in the paper, so far as I can tell,
     #so I did my best to read them off of the figure...
-    K1=0.27
-    K2=1.00
-    G1=0.07
-    G2=1.00
+
+
+    # MgO bulk and shear moduli
+    K2=180. # Bulk modulus, GPa
+    G2=155. # Shear modulus, GPa
+
+    # AgCl bulk and shear moduli (estimated from plot)
+    G1=G2*0.07
+    K1=K2*0.27
+
 
     for i in range(len(volumes)):
       v_bulk_modulus[i]  = voigt.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
@@ -403,11 +409,11 @@ def check_averaging():
  
     fig = mpimg.imread('../burnman/data/input_figures/watt_1976_a1.png')
     plt.imshow(fig, extent=[0,1.0,0.25,1.0], aspect='auto')
-    plt.plot(volumes, v_bulk_modulus, 'g-')
-    plt.plot(volumes, r_bulk_modulus, 'g-')
-    plt.plot(volumes, vrh_bulk_modulus, 'g-')
-    plt.plot(volumes, hsu_bulk_modulus, 'g-')
-    plt.plot(volumes, hsl_bulk_modulus, 'g-')
+    plt.plot(volumes, v_bulk_modulus/K2, 'g-')
+    plt.plot(volumes, r_bulk_modulus/K2, 'g-')
+    plt.plot(volumes, vrh_bulk_modulus/K2, 'g-')
+    plt.plot(volumes, hsu_bulk_modulus/K2, 'g-')
+    plt.plot(volumes, hsl_bulk_modulus/K2, 'g-')
     plt.ylim(0.25,1.00)
     plt.xlim(0,1.0)
     plt.xlabel("Volume fraction")
@@ -417,11 +423,11 @@ def check_averaging():
 
     fig = mpimg.imread('../burnman/data/input_figures/watt_1976_a2.png')
     plt.imshow(fig, extent=[0,1.0,0.0,1.0], aspect='auto')
-    plt.plot(volumes, v_shear_modulus, 'g-')
-    plt.plot(volumes, r_shear_modulus, 'g-')
-    plt.plot(volumes, vrh_shear_modulus, 'g-')
-    plt.plot(volumes, hsu_shear_modulus, 'g-')
-    plt.plot(volumes, hsl_shear_modulus, 'g-')
+    plt.plot(volumes, v_shear_modulus/G2, 'g-')
+    plt.plot(volumes, r_shear_modulus/G2, 'g-')
+    plt.plot(volumes, vrh_shear_modulus/G2, 'g-')
+    plt.plot(volumes, hsu_shear_modulus/G2, 'g-')
+    plt.plot(volumes, hsl_shear_modulus/G2, 'g-')
     plt.ylim(0.0,1.00)
     plt.xlim(0,1.0)
     plt.xlabel("Volume fraction")
@@ -453,8 +459,134 @@ def check_averaging():
     plt.show()
 
 
+
+def check_averaging_2():
+    """
+    Reproduce Figure 1 from Hashin and Shtrikman (1963) to check the
+    Hashin-Shtrikman bounds for an elastic composite
+    """
+
+    hashin_shtrikman_upper = burnman.averaging_schemes.HashinShtrikmanUpper()
+    hashin_shtrikman_lower = burnman.averaging_schemes.HashinShtrikmanLower()
+
+    #create arrays for sampling in volume fraction
+    volumes = np.linspace(0.0,1.0,100) 
+    hsu_bulk_modulus = np.empty_like(volumes)
+    hsu_shear_modulus = np.empty_like(volumes)
+    hsl_bulk_modulus = np.empty_like(volumes)
+    hsl_shear_modulus = np.empty_like(volumes)
+
+
+    #These values are from the paper
+    K1=25.0
+    K2=60.7
+    G1=11.5
+    G2=41.8
+
+    for i in range(len(volumes)):
+      hsu_bulk_modulus[i]  = hashin_shtrikman_upper.average_bulk_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
+      hsu_shear_modulus[i] = hashin_shtrikman_upper.average_shear_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
+
+      hsl_bulk_modulus[i]  = hashin_shtrikman_lower.average_bulk_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
+      hsl_shear_modulus[i] = hashin_shtrikman_lower.average_shear_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
+ 
+    fig = mpimg.imread('../burnman/data/input_figures/Hashin_Shtrikman_1963_fig1_K.png')
+    plt.imshow(fig, extent=[0,1.0,1.1,K2+0.3], aspect='auto')
+    plt.plot(volumes, hsu_bulk_modulus, 'g-')
+    plt.plot(volumes, hsl_bulk_modulus, 'g-')
+    plt.ylim(K1,K2)
+    plt.xlim(0,1.0)
+    plt.xlabel("Volume fraction")
+    plt.ylabel("Averaged bulk modulus")
+    plt.title("Comparing with Figure 1 of Hashin and Shtrikman (1963)")
+    plt.show()
+
+    fig = mpimg.imread('../burnman/data/input_figures/Hashin_Shtrikman_1963_fig2_G.png')
+    plt.imshow(fig, extent=[0,1.0,0.3,G2], aspect='auto')
+    plt.plot(volumes, hsu_shear_modulus, 'g-')
+    plt.plot(volumes, hsl_shear_modulus, 'g-')
+    plt.ylim(G1,G2)
+    plt.xlim(0,1.0)
+    plt.xlabel("Volume fraction")
+    plt.ylabel("Averaged shear modulus")
+    plt.title("Comparing with Figure 2 of Hashin and Shtrikman (1963)")
+    plt.show()
+
+def check_averaging_3():
+    """
+    Reproduce Figure 3 from Avseth et al. (2010) to check the Voigt, Reuss,
+    Voigt-Reuss-Hill, and Hashin-Shtrikman bounds for an elastic composite
+    """
+    voigt = burnman.averaging_schemes.Voigt()
+    reuss = burnman.averaging_schemes.Reuss()
+    voigt_reuss_hill = burnman.averaging_schemes.VoigtReussHill()
+    hashin_shtrikman_upper = burnman.averaging_schemes.HashinShtrikmanUpper()
+    hashin_shtrikman_lower = burnman.averaging_schemes.HashinShtrikmanLower()
+
+    #create arrays for sampling in volume fraction
+    volumes = np.linspace(0.0,1.0,100) 
+    v_bulk_modulus = np.empty_like(volumes)
+    v_shear_modulus = np.empty_like(volumes)
+    r_bulk_modulus = np.empty_like(volumes)
+    r_shear_modulus = np.empty_like(volumes)
+    vrh_bulk_modulus = np.empty_like(volumes)
+    vrh_shear_modulus = np.empty_like(volumes)
+    hsu_bulk_modulus = np.empty_like(volumes)
+    hsu_shear_modulus = np.empty_like(volumes)
+    hsl_bulk_modulus = np.empty_like(volumes)
+    hsl_shear_modulus = np.empty_like(volumes)
+    hs_av_bulk_modulus = np.empty_like(volumes)
+    hs_av_shear_modulus = np.empty_like(volumes)
+
+
+    # Quartz bulk and shear moduli
+    K2=37.
+    G2=45.
+
+    # Fluid bulk and shear moduli 
+    G1=0.00001
+    K1=2.35
+
+
+    for i in range(len(volumes)):
+      v_bulk_modulus[i]  = voigt.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      v_shear_modulus[i] = voigt.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      r_bulk_modulus[i]  = reuss.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      r_shear_modulus[i] = reuss.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      vrh_bulk_modulus[i]  = voigt_reuss_hill.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      vrh_shear_modulus[i] = voigt_reuss_hill.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      hsu_bulk_modulus[i]  = hashin_shtrikman_upper.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      hsu_shear_modulus[i] = hashin_shtrikman_upper.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+
+      hsl_bulk_modulus[i]  = hashin_shtrikman_lower.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+      hsl_shear_modulus[i] = hashin_shtrikman_lower.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
+ 
+      hs_av_bulk_modulus[i]  = 0.5*hsl_bulk_modulus[i] + 0.5*hsu_bulk_modulus[i]
+      hs_av_shear_modulus[i] = 0.5*hsl_shear_modulus[i] + 0.5*hsu_shear_modulus[i]
+
+    fig = mpimg.imread('../burnman/data/input_figures/Avseth_et_al_2010_fig3_K.png')
+    plt.imshow(fig, extent=[0,1.0,0.,40.0], aspect='auto')
+    plt.plot(volumes, v_bulk_modulus, 'g-')
+    plt.plot(volumes, r_bulk_modulus, 'g-')
+    plt.plot(volumes, vrh_bulk_modulus, 'g-')
+    plt.plot(volumes, hsu_bulk_modulus, 'g-')
+    plt.plot(volumes, hsl_bulk_modulus, 'g-')
+    plt.plot(volumes, hs_av_bulk_modulus, 'g-')
+    plt.ylim(0.,40.00)
+    plt.xlim(0.,1.0)
+    plt.xlabel("Volume fraction")
+    plt.ylabel("Averaged bulk modulus")
+    plt.title("Comparing with Figure 3 of Avseth et al., 2010")
+    plt.show()
+
+
 if __name__ == "__main__":
     check_averaging()
+    check_averaging_2()
+    check_averaging_3()
     check_birch_murnaghan()
     check_slb_fig7()
     check_slb_fig3()
