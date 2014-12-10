@@ -26,13 +26,11 @@ if __name__ == "__main__":
     print "preparations done"
 
     def calc_velocities(a,b,c):
-        method = 'slb3' #slb3|slb2|mgd3|mgd2
         amount_perovskite = a
         rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
                                  [minerals.SLB_2005.mg_fe_perovskite(b),
                                   minerals.SLB_2005.ferropericlase(c)])
 
-        rock.set_method(method)
 
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
         return mat_vp, mat_vs, mat_rho

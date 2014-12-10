@@ -39,20 +39,6 @@ from burnman import minerals
 
 if __name__ == "__main__":
 
-#INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
-        matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
-        matas et al. 2007)
-    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
-       (your choice in geotherm will not matter in this case))
-    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
-        (your choice in geotherm will not matter in this case))"""
-    method = 'slb3'
 
 
 
@@ -93,7 +79,6 @@ if __name__ == "__main__":
         part_coef_fp[t],part_coef_pv[t] = burnman.calculate_partition_coefficient \
                 (seis_p[t],temperature[t],relative_molar_percent,Kd_0)
 
-    rock.set_method(method)
 
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \

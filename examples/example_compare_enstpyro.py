@@ -35,21 +35,6 @@ from burnman import minerals
 if __name__ == "__main__":
 
     ###Input Model 1
-    #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
-        matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
-        matas et al. 2007)
-    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
-       (your choice in geotherm will not matter in this case))
-    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
-        (your choice in geotherm will not matter in this case))"""
-    method = 'slb3'
-
 
     #Carbonaceous chondrites From Mcdonough 2003
     weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.}
@@ -97,7 +82,6 @@ if __name__ == "__main__":
 
     #Now we'll calculate the models.
 
-    pyrolite.set_method(method)
 
 
 
@@ -108,7 +92,6 @@ if __name__ == "__main__":
     print "Calculations are done for:"
     pyrolite.debug_print()
 
-    enstatite.set_method(method)
 
 
     mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \

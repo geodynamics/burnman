@@ -60,7 +60,6 @@ if __name__ == "__main__":
     #in form name_of_mineral (burnman.mineral <- creates list with parameters)
     class own_material (burnman.Mineral):
         def __init__(self):
-            burnman.Mineral.__init__(self)
             self.params = {
                 'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)]
                 #at room pressure/temperature
@@ -81,7 +80,7 @@ if __name__ == "__main__":
                 'eta_s_0': 3.0 #full strain derivative of gruneisen parameter
                 #parameter. Values in Stixrude & Lithgow-Bertelloni, 2005
             }
-
+	    burnman.Mineral.__init__(self)
 
 
     rock = own_material()

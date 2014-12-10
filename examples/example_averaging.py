@@ -54,18 +54,14 @@ if __name__ == "__main__":
     (your choice in geotherm will not matter in this case))"""
 
     amount_perovskite = 0.6
-    method = 'slb3'
 
     rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
                              [minerals.SLB_2005.mg_perovskite(),
                               minerals.SLB_2005.periclase()])
-    rock.set_method(method)
 
     perovskitite = minerals.SLB_2005.mg_perovskite()
-    perovskitite.set_method(method)
 
     periclasite = minerals.SLB_2005.periclase()
-    periclasite.set_method(method)
 
     #seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
