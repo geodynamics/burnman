@@ -373,7 +373,7 @@ def check_averaging():
     hsl_shear_modulus = np.empty_like(volumes)
 
 
-    # MgO bulk and shear moduli taken from Landolt-Börnstein 
+    # MgO bulk and shear moduli taken from Landolt-Boernstein 
     # - Group III Condensed Matter Volume 41B, 1999, pp 1-3
     K2=152. # Bulk modulus, GPa
     G2=155. # Shear modulus, GPa
