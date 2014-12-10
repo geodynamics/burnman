@@ -31,6 +31,7 @@ class mg_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.4 }
 
+        Mineral.__init__(self)
 
 class mg_perovskite_3rdorder(Mineral):
     def __init__(self):
@@ -48,6 +49,7 @@ class mg_perovskite_3rdorder(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.4 }
 
+        Mineral.__init__(self)
 
 class fe_perovskite(Mineral):
     def __init__(self):
@@ -65,6 +67,7 @@ class fe_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.4 }
 
+        Mineral.__init__(self)
 
 class mg_periclase(Mineral):
     def __init__(self):
@@ -82,6 +85,7 @@ class mg_periclase(Mineral):
             'q_0': 1.5, #S&L-B 2005
             'eta_s_0': 3.0 }
 
+        Mineral.__init__(self)
 
 class fe_periclase(bmb.HelperSpinTransition):
     def __init__(self):
@@ -109,6 +113,7 @@ class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for detail
             'q_0': 1.5,
             'eta_s_0': 2.54 }
 
+        Mineral.__init__(self)
 
 class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
     def __init__(self):
@@ -126,8 +131,9 @@ class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for detail
             'q_0': 1.5,
             'eta_s_0': 2.54}
 
+        Mineral.__init__(self)
 
-class fe_periclase_HS_3rd(Mineral): # personal communication, Mg#=92
+class fe_periclase_HS_3rd(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -143,8 +149,9 @@ class fe_periclase_HS_3rd(Mineral): # personal communication, Mg#=92
             'q_0': 1.5,
             'eta_s_0': 2.54 }
 
+        Mineral.__init__(self)
 
-class fe_periclase_LS_3rd(Mineral): # personal communication, Mg#=92
+class fe_periclase_LS_3rd(Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state':'slb3',
@@ -159,6 +166,9 @@ class fe_periclase_LS_3rd(Mineral): # personal communication, Mg#=92
             'grueneisen_0': 1.45,
             'q_0': 1.5,
             'eta_s_0': 2.54}
+
+        Mineral.__init__(self)
+
 
 mg_bridgmanite = mg_perovskite
 fe_bridgmanite = fe_perovskite
