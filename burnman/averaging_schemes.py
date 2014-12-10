@@ -100,14 +100,15 @@ class AveragingScheme:
         return np.sum(np.array(alphas)*np.array(volumes)) / total_vol
 
     def average_heat_capacity_v(self, fractions, c_v):
+        #TODO: double-check that the formula we use is appropriate here.
         """
         Averages the heat capacities at constant volume C_V by molar fractions
         as in eqn. (16) in Ita'92.
 
-        TODO: double-check that the formula we use is appropriate here.
 
         Parameters
         ----------
+        
         fractions : list of floats
             List of molar fractions of each phase in the composite (should sum to 1.0).
         c_v : list of floats
@@ -115,16 +116,18 @@ class AveragingScheme:
 
         Returns
         -------
+        
         C_v : float
           heat capacity at constant volume of the bulk [J/K/mol]
         """
         return np.sum(np.array(fractions)*np.array(c_v))
 
     def average_heat_capacity_p(self, fractions, c_p):
+        #TODO: double-check that the formula we use is correct.
         """
         Averages the heat capacities at constant pressure C_P by molar fractions.
 
-        TODO: double-check that the formula we use is correct.
+        
 
         Parameters
         ----------

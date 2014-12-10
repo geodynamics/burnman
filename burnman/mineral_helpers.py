@@ -123,7 +123,7 @@ class HelperFeDependent(Material):
 
     """
     Helper to implement a rock that does iron exchange (two minerals with
-    changing iron content based on p,T).
+    changing iron content based on P,T).
 
     Classes deriving from this helper need to implement
     create_inner_material() and provide a function in __init__ that computes

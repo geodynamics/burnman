@@ -78,15 +78,28 @@ class BirchMurnaghanBase(eos.EquationOfState):
     function, so if this is the case, you should use that.  For more see :class:`burnman.birch_murnaghan.BM2` and :class:`burnman.birch_murnaghan.BM3`.
     """
     def volume(self,pressure, temperature, params):
+        """
+		Returns volume [m^3] as a function of pressure [Pa]  
+        """
         return volume(pressure,params)
 
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
+        """
+        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa]
+        and volume [m^3]. 
+        """
         return bulk_modulus(volume, params)
 
     def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
+        """
+        Returns adiabatic bulk modulus of the mineral [Pa]
+        """
         return bulk_modulus(volume,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
+        """
+        Returns shear modulus of the mineral [Pa]
+        """
         if(self.order == 2):
           return shear_modulus_second_order(volume,params)
         elif(self.order == 3):
@@ -94,19 +107,19 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def heat_capacity_v(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return a very large number.
+        Since this equation of state does not have temperature effects, simply return a very large number. [J/K/mol]
         """
         return 1.e99
 
     def heat_capacity_p(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return a very large number.
+        Since this equation of state does not have temperature effects, simply return a very large number. [J/K/mol]
         """
         return 1.e99
 
     def thermal_expansivity(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return zero.
+        Since this equation of state does not have temperature effects, simply return zero. [1/K]
         """
         return 0.
 

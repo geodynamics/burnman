@@ -178,7 +178,7 @@ class Seismic1DModel:
         Parameters
         ----------
         depth : float or array of floats
-        Depth[s] [m] to evaluate gravity at.
+        Depth(s) [m] to evaluate gravity at.
         
         Returns
         -------
