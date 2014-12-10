@@ -52,7 +52,7 @@ link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 .. automodule:: tutorial.step_3
 
-After changing the standard deviations for :math:`K\prime` and :math:`G\prime` to 0.2, the following figure of velocities for 1000 realizations is produced:
+After changing the standard deviations for :math:`K'` and :math:`G'` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
 .. image:: figures/tut-step3.png
 

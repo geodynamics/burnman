@@ -71,7 +71,7 @@ def adiabatic(pressures, T0, rock):
 
     T0 : float
         An anchor temperature, corresponding to the temperature of the first
-        pressure in the list.
+        pressure in the list. [K]
 
     rock : :class:`burnman.composite`
         Material for which we compute the adiabat.  From this material we
@@ -105,10 +105,10 @@ def dTdP(temperature, pressure, rock):
     ----------
 
     pressure : float
-        The pressure at which to evaluate dT/dP.
+        The pressure at which to evaluate dT/dP. [Pa]
 
     temperature : float
-        The temperature at which to evaluate dT/dP.
+        The temperature at which to evaluate dT/dP. [K]
 
     rock : :class:`burnman.composite`
         Material for which we compute dT/dP

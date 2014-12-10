@@ -86,9 +86,9 @@ def lookup_and_interpolate(table_x, table_y, x_value):
 
 def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     """
-    takes unit cell volume in Angstroms^3, as is often reported,
-    and the z number for the cell (number of atoms per unit cell,
-    NOT number of atoms per molecular formula), and calculates
+    Takes unit cell volume in Angstroms^3 per unitcell, as is often reported,
+    and the z number for the mineral (number of formula units per unit cell,
+    NOT number of atoms per formula unit), and calculates
     the molar volume, as expected by the equations of state.
     """
     return  unit_cell_v*N_A/1e30/z

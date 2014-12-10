@@ -33,9 +33,9 @@ class Mineral(Material):
     reference volume should be in m^3/(mol molecule) and not in unit cell
     volume and 'n' should be the number of atoms per molecule.  Frequently in
     the literature the reference volume is given in Angstrom^3 per unit cell.
-    To convert this to m^3/(mol molecule) you should multiply by 10^(-30) *
-    N_a / Z, where N_a is Avogadro's number and Z is the number of atoms per
-    unit cell.  You can look up Z in many places, including www.mindat.org
+    To convert this to m^3/(mol of molecule) you should multiply by 10^(-30) *
+    N_a / Z, where N_a is Avogadro's number and Z is the number of formula units per
+    unit cell. You can look up Z in many places, including www.mindat.org
     """
 
     def __init__(self):

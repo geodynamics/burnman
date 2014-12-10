@@ -6,7 +6,7 @@ However, as soon as we have a composite material (e.g., a rock), the determinati
 The bulk and shear modulus of a rock are dependent on the specific geometry of the grains in the rock, so there is no general 
 formula for its averaged elastic properties.  Instead, we must choose from a number of averaging schemes if we want a single value, 
 or use bounding methods to get a range of possible values.  The module :mod:`burnman.averaging_schemes` provides a number of different 
-averages and bounds for a composite.
+average and bounding schemes for determining a composite rock's physical parameters.
 
 Base class
 -----------

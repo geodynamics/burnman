@@ -5,8 +5,8 @@
 """BurnMan
 =======
 
-BurnMan is an open source mineral physics toolbox written in Python to
-determine seismic velocities for the lower mantle. BurnMan calculates the
+BurnMan is an open source mineral physics toolbox written in Python which
+determines seismic velocities for the lower mantle. BurnMan calculates the
 isotropic thermoelastic moduli by solving the equations-of-state for a
 mixture of minerals defined by the user. The user may select from a list of
 minerals applicable to the lower mantle included or easily define one of
