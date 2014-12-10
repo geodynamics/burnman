@@ -58,8 +58,8 @@ class EquilibriumAssemblage(burnman.Material):
                                                    for e in self.elements] )
  
         #Calculate the nullspace and the baseline assemblage vector
-        self.__setup_subspaces()
-        self.__compute_baseline_assemblage()
+        self._setup_subspaces()
+        self._compute_baseline_assemblage()
 
 
     def set_method(self, method):
@@ -89,14 +89,14 @@ class EquilibriumAssemblage(burnman.Material):
 
     def _solve_equilibrium_equations( self, pressure, temperature ): 
         
-        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(self.reduced_species_vector * 0.))
+        ref_gibbs = self._compute_gibbs( pressure, temperature, self._compute_species_vector(self.reduced_species_vector * 0.))
         print ref_gibbs
-        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self.__compute_species_vector( x ) ))
+        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self._compute_species_vector( x ) ))
         sol = opt.root(equilibrium, self.reduced_species_vector, method='hybr', options={'xtol':1.e-11})
 
         self.reduced_species_vector = sol.x
-        self.species_vector = self.__compute_species_vector(self.reduced_species_vector)
-        self.gibbs = self.__compute_gibbs(pressure, temperature, self.species_vector)
+        self.species_vector = self._compute_species_vector(self.reduced_species_vector)
+        self.gibbs = self._compute_gibbs(pressure, temperature, self.species_vector)
 
     def _equilibrium_equations ( self, pressure, temperature, species_vector):
         partial_gibbs = self._compute_partial_gibbs( pressure, temperature, species_vector)
@@ -113,20 +113,20 @@ class EquilibriumAssemblage(burnman.Material):
         
         # Calculate a reference gibbs free energy at the baseline assemblage.  This is a kind of ill-conditioned
         # minimization problem, and it seems to work better if we subtract off a reference state and normalize.
-        ref_gibbs = self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(self.reduced_species_vector * 0.))
+        ref_gibbs = self._compute_gibbs( pressure, temperature, self._compute_species_vector(self.reduced_species_vector * 0.))
  
         #define the function to minimize and then do it.
-        minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(x) ) - ref_gibbs)/np.abs(ref_gibbs)
-#        minimize_gibbs = lambda x : (self.__compute_gibbs( pressure, temperature, self.__compute_species_vector(x) ))
-        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self.__compute_species_vector( x ) )/np.abs(ref_gibbs))
+        minimize_gibbs = lambda x : (self._compute_gibbs( pressure, temperature, self._compute_species_vector(x) ) - ref_gibbs)/np.abs(ref_gibbs)
+#        minimize_gibbs = lambda x : (self._compute_gibbs( pressure, temperature, self._compute_species_vector(x) ))
+        equilibrium = lambda x : (self._equilibrium_equations( pressure, temperature, self._compute_species_vector( x ) )/np.abs(ref_gibbs))
 #        equilibrium=None
     
         #Set the solution
-        constraints={'type':'ineq', 'fun':self.__compute_species_vector}
+        constraints={'type':'ineq', 'fun':self._compute_species_vector}
         sol = opt.minimize( minimize_gibbs, self.reduced_species_vector, method='SLSQP', jac=equilibrium, constraints=constraints )
         self.reduced_species_vector = sol.x
-        self.species_vector = self.__compute_species_vector(self.reduced_species_vector)
-        self.gibbs = self.__compute_gibbs(pressure, temperature, self.species_vector)
+        self.species_vector = self._compute_species_vector(self.reduced_species_vector)
+        self.gibbs = self._compute_gibbs(pressure, temperature, self.species_vector)
         
 
 
@@ -168,7 +168,7 @@ class EquilibriumAssemblage(burnman.Material):
         return partial_gibbs
 
  
-    def __compute_gibbs( self, pressure, temperature, species_vector ):
+    def _compute_gibbs( self, pressure, temperature, species_vector ):
         """
         Given a pressure, temperature, and vector in the nullspace, 
         calculate the gibbs free energy of the assemblage.  This 
@@ -183,7 +183,7 @@ class EquilibriumAssemblage(burnman.Material):
         return gibbs
 
 
-    def __compute_species_vector ( self, reduced_vector ):
+    def _compute_species_vector ( self, reduced_vector ):
         """
         Given a vector in the nullspace, return a full species vector
         in the endmember space.
@@ -192,7 +192,7 @@ class EquilibriumAssemblage(burnman.Material):
         return species_vector
 
 
-    def __compute_bulk_composition (self, species_vector):
+    def _compute_bulk_composition (self, species_vector):
         """
         Given a vector in the endmember space, return the 
         bulk composition.
@@ -200,7 +200,7 @@ class EquilibriumAssemblage(burnman.Material):
         return np.dot(self.stoichiometric_matrix, species_vector)
 
 
-    def __setup_subspaces (self):
+    def _setup_subspaces (self):
         """
         Calculate the nullspace for the bulk composition constraint, and make 
         an attempt to sparsify it.
@@ -209,7 +209,7 @@ class EquilibriumAssemblage(burnman.Material):
         self.right_nullspace = gm.sparsify_basis(self.right_nullspace)
 
 
-    def __compute_baseline_assemblage(self):
+    def _compute_baseline_assemblage(self):
         """
         The nullspace gives us vectors that do not change the bulk composition, 
         but we need a particular vector that satisfies our composition constraint,
@@ -238,4 +238,4 @@ class EquilibriumAssemblage(burnman.Material):
 
         #Our starting vector in the nullspace is just going to be the zero vector
         self.reduced_species_vector = np.zeros( self.right_nullspace.shape[1] )
-        self.species_vector = self.__compute_species_vector( self.reduced_species_vector)
+        self.species_vector = self._compute_species_vector( self.reduced_species_vector)
