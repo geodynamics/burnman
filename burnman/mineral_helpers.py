@@ -45,7 +45,6 @@ class HelperSolidSolution(Mineral):
 	for m in base_materials:
 		if(base_materials[0].params.has_key('n')):
 			assert(m.params['n'] == base_materials[0].params['n'])
-			assert(m.params['equation_of_state']==base_materials[0].params['equation_of_state'])
 	
 	self.method=base_materials[0].method
 
@@ -97,6 +96,7 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
+	self.method=ls_mat.method
 
     def debug_print(self, indent=""):
         print "%sHelperSpinTransition:" % indent
