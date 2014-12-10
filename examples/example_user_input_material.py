@@ -61,6 +61,8 @@ if __name__ == "__main__":
     class own_material (burnman.Mineral):
         def __init__(self):
             self.params = {
+		'name': 'myownmineral',
+		'equation_of_state': method,
                 'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)]
                 #at room pressure/temperature
                 'K_0': 135.19e9, #Reference bulk modulus [Pa]
@@ -94,7 +96,7 @@ if __name__ == "__main__":
 
 
     temperature = burnman.geotherm.brown_shankland(seis_p)
-
+    # The next line is not required here, because the method is set automatically my defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one. 
     rock.set_method(method)
 
     print "Calculations are done for:"
