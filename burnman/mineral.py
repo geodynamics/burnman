@@ -44,7 +44,6 @@ class Mineral(Material):
 	if 'equation_of_state' in self.params:
 		self.set_method(self.params['equation_of_state'])
 	else:
-	        warnings.warn(" Equation of state is not defined in the database for this mineral. However, if you call set_method later, this is fine")
 		self.method=None
 
     def set_method(self, method):
@@ -107,6 +106,9 @@ class Mineral(Material):
         self.pressure = pressure
         self.temperature = temperature
         self.old_params = self.params
+
+	if self.method==None:
+            raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
 
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)
