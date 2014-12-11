@@ -27,6 +27,7 @@ class mg_perovskite(Mineral):
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
+	Mineral.__init__(self)
 
 class fe_perovskite(Mineral):
     def __init__(self):
@@ -43,8 +44,9 @@ class fe_perovskite(Mineral):
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
+        Mineral.__init__(self)
 
-class al_perovskite(Mineral):
+class al_perovskite(Mineral): 
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -60,7 +62,9 @@ class al_perovskite(Mineral):
             'q_0': 1.4}
 
 
-class ca_perovskite(Mineral):
+        Mineral.__init__(self)
+
+class ca_perovskite(Mineral): 
     def __init__(self):
         self.params = {
             'equation_of_state':'mgd2',
@@ -75,6 +79,7 @@ class ca_perovskite(Mineral):
             'grueneisen_0': 1.53,
             'q_0': 1.6}
 
+        Mineral.__init__(self)
 
 class periclase (Mineral):
     def __init__(self):
@@ -90,7 +95,8 @@ class periclase (Mineral):
             'Debye_0': 673.,
             'grueneisen_0': 1.41,
             'q_0': 1.3 }
-
+ 
+        Mineral.__init__(self)
 
 class wuestite (Mineral):
     def __init__(self):
@@ -107,6 +113,7 @@ class wuestite (Mineral):
             'grueneisen_0': 1.41,
             'q_0': 1.3 }
 
+        Mineral.__init__(self)
 
 ca_bridgmanite = ca_perovskite
 mg_bridgmanite = mg_perovskite

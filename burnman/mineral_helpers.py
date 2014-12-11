@@ -41,11 +41,20 @@ class HelperSolidSolution(Mineral):
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
 
+        self.method = base_materials[0].method
+
         #does not make sense to do a solid solution with different number of
-        #atoms per formula unit, at least not simply...
+        #atoms per formula unit or different equations of state, at least not simply...
         for m in base_materials:
+            m.set_method(self.method)
             if(base_materials[0].params.has_key('n')):
                 assert(m.params['n'] == base_materials[0].params['n'])
+        
+        self.params = {}
+
+    def set_method(self, method):
+        for m in self.base_materials:
+            m.set_method(method)
 
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
@@ -56,21 +65,18 @@ class HelperSolidSolution(Mineral):
 
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
-            mat.method = self.method
             mat.set_state(pressure, temperature)
 
         itrange = range(0, len(self.base_materials))
-
         self.params = {}
-
-        # some do arithmetic averaging of the end members
         for prop in self.base_materials[0].params:
            try:
-               self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+                self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
            except TypeError:
-               #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
-               self.params[prop] = self.base_materials[0].params[prop]
-        Mineral.set_state(self, pressure, temperature)
+                #if there is a type error, it is probably a string. Just go with the value of the first base_material.
+                self.params[prop] = self.base_materials[0].params[prop]
+
+        Mineral.set_state(self,pressure,temperature)
 
 class HelperSpinTransition(Material):
     """
@@ -89,6 +95,7 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
+        self.method=ls_mat.method
 
     def debug_print(self, indent=""):
         print "%sHelperSpinTransition:" % indent

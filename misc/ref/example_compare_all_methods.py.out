@@ -1,3 +1,11 @@
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to MGD3
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to SLB3
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to BM2
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to BM3
+  phase.set_method(method)
 Calculations are done for:
 Composite:
   0.95 of

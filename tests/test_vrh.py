@@ -25,6 +25,7 @@ class mypericlase (burnman.Mineral):
             'grueneisen_0': 1.5,
             'q_0': 1.5,
             'eta_s_0': 2.8 }
+        burnman.Mineral.__init__(self)
 
 class VRH_average(BurnManTest):
     def test_one_object(self):

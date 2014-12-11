@@ -22,6 +22,7 @@ class min1 (burnman.Mineral):
             'grueneisen_0': 1.5,
             'q_0': 1.5,
             'eta_s_0': 2.8 }
+        burnman.Mineral.__init__(self)
 
 
 class min2 (min1):

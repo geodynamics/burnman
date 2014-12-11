@@ -60,8 +60,9 @@ if __name__ == "__main__":
     #in form name_of_mineral (burnman.mineral <- creates list with parameters)
     class own_material (burnman.Mineral):
         def __init__(self):
-            burnman.Mineral.__init__(self)
             self.params = {
+		'name': 'myownmineral',
+		'equation_of_state': method,
                 'V_0': 10.844e-6, #Molar volume [m^3/(mole molecules)]
                 #at room pressure/temperature
                 'K_0': 135.19e9, #Reference bulk modulus [Pa]
@@ -81,7 +82,7 @@ if __name__ == "__main__":
                 'eta_s_0': 3.0 #full strain derivative of gruneisen parameter
                 #parameter. Values in Stixrude & Lithgow-Bertelloni, 2005
             }
-
+	    burnman.Mineral.__init__(self)
 
 
     rock = own_material()
@@ -95,7 +96,7 @@ if __name__ == "__main__":
 
 
     temperature = burnman.geotherm.brown_shankland(seis_p)
-
+    # The next line is not required here, because the method is set automatically by defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one.
     rock.set_method(method)
 
     print "Calculations are done for:"

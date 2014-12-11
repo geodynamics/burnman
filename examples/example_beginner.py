@@ -56,6 +56,7 @@ if __name__ == "__main__":
     # Here "rock" has two constituent minerals: it is 80% Mg perovskite
     # and 20% periclase.  More minerals may be added by simply extending
     # the list given to burnman.composite
+    # For the preset minerals from the SLB_2011, the equation of state formulation from Stixrude and Lithgow-Bertolloni (2005) will be used.
     rock = burnman.Composite([0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),
                                           minerals.SLB_2011.periclase()])
 
@@ -77,11 +78,6 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.brown_shankland(pressure)
 
 
-    # At this point we want to tell the rock which equation of state to use for
-    # its thermoelastic calculations. In general, we recommend the 'slb3'
-    # equation of state as the most self-consistent model.  The parameters from
-    # the SLB_2011 mineral library are fit using this model.
-    rock.set_method('slb3')
 
     # Here is the step which does the heavy lifting.  burnman.velocities_from_rock
     # sets the state of the rock at each of the pressures and temperatures defined,

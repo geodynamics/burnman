@@ -33,6 +33,8 @@ class my_perovskite(burnman.Mineral):
             'grueneisen_0': 1.57 * uncertain[5],
             'q_0': 1.1 * uncertain[6],
             'eta_s_0': 2.6 * uncertain[7]}
+        burnman.Mineral.__init__(self)
+
 
 if __name__ == "__main__":
     figure=plt.figure(dpi=100,figsize=(12,10))

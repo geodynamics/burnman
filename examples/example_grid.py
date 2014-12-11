@@ -47,7 +47,6 @@ if __name__ == "__main__":
     tarray=np.tile(T,len(p))
     parray=np.repeat(p,len(T))
 
-    rock.set_method('slb3')
 
     density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, parray, tarray)
 

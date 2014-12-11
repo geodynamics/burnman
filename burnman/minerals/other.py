@@ -23,7 +23,7 @@ class Speziale_fe_periclase_HS(Mineral):
     Speziale et al. 2007, Mg#=83
     """
     def __init__(self):
-            self.params = {
+        self.params = {
                         'equation_of_state': 'mgd3',
                         'V_0': 22.9e-6,
                         'K_0': 157.5e9,
@@ -33,7 +33,7 @@ class Speziale_fe_periclase_HS(Mineral):
                         'Debye_0': 587,
                         'grueneisen_0': 1.46,
                         'q_0': 1.2 }
-
+        Mineral.__init__(self)
 
 class Speziale_fe_periclase_LS(Mineral):
     """
@@ -50,7 +50,7 @@ class Speziale_fe_periclase_LS(Mineral):
                         'Debye_0': 587.,
                         'grueneisen_0': 1.46,
                         'q_0': 1.2  }
-
+        Mineral.__init__(self)
 
 
 
