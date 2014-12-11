@@ -104,8 +104,8 @@ if __name__ == "__main__":
     vs_average_prem = sum(seis_vs)/len(seis_vs)
     vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
     print vs_average_prem, vphi_average_prem
-    yy_vs=yy_vs/vs_average_prem
-    yy_vphi=yy_vphi/vphi_average_prem
+    yy_vs /= vs_average_prem
+    yy_vphi /= vphi_average_prem
     yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot
  #   plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,1)

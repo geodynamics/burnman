@@ -4,13 +4,13 @@
 
 import numpy as np
 import warnings
-from collections import namedtuple
 
 from burnman.material import Material
 from burnman.mineral import Mineral
 
+
 def check_pairs(fractions, minerals):
-        if len(fractions)<1:
+        if len(fractions) < 1:
             raise Exception('ERROR: we need at least one mineral')
 
         if len(fractions) != len(minerals):
@@ -20,7 +20,7 @@ def check_pairs(fractions, minerals):
         if abs(total-1.0)>1e-10:
             raise Exception('ERROR: list of molar fractions does not add up to one')
         for p in minerals:
-            if not isinstance(p,Mineral):
+            if not isinstance(p, Mineral):
                 raise Exception('ERROR: object of type ''%s'' is not of type material' % (type(p)))
 
 

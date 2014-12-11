@@ -366,9 +366,9 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
 
 
     cot=1./np.tan(beta*np.pi/2.)
-    v_p  = v_p*(1.-1./2.*cot*1./Qp)    # Matas et al. (2007) page 1
-    v_s  = v_s*(1.-1./2.*cot*1./Qs)
-    v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
+    v_p *= 1. - 1. / 2. * cot * 1. / Qp  # Matas et al. (2007) page 1
+    v_s *= 1. - 1. / 2. * cot * 1. / Qs
+    v_phi *= 1. - 1. / 2. * cot * 1. / Qphi
     return v_p, v_s, v_phi
 
 """

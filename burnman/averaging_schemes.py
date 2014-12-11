@@ -369,8 +369,8 @@ class HashinShtrikmanUpper(AveragingScheme):
         alpha_n = -3. / (3.*K_n+4.*G_n)
         A_n = 0
         for i in range(len(vol_frac)):
-            if  bulk_moduli[i] != K_n:
-                A_n = A_n + vol_frac[i]/(1./(bulk_moduli[i] - K_n) - alpha_n)
+            if bulk_moduli[i] != K_n:
+                A_n += vol_frac[i] / (1. / (bulk_moduli[i] - K_n) - alpha_n)
 
         K_upper = K_n + A_n/(1. + alpha_n*A_n)
         return K_upper
@@ -405,7 +405,7 @@ class HashinShtrikmanUpper(AveragingScheme):
         B_n = 0
         for i in range(len(vol_frac)):
             if  shear_moduli[i] != G_n:
-                B_n = B_n + vol_frac[i]/(1./(2.*(shear_moduli[i] - G_n)) - beta_n)
+                B_n += vol_frac[i] / (1. / (2. * (shear_moduli[i] - G_n)) - beta_n)
 
         G_upper = G_n + (0.5)*B_n/(1. + beta_n*B_n)
         return G_upper
@@ -452,7 +452,7 @@ class HashinShtrikmanLower(AveragingScheme):
         A_1 = 0
         for i in range(len(vol_frac)):
             if  bulk_moduli[i] != K_1:
-                A_1 = A_1 + vol_frac[i]/(1./(bulk_moduli[i] - K_1) - alpha_1)
+                A_1 += vol_frac[i] / (1. / (bulk_moduli[i] - K_1) - alpha_1)
 
         K_lower = K_1 + A_1/(1. + alpha_1*A_1)
         return K_lower
@@ -487,7 +487,7 @@ class HashinShtrikmanLower(AveragingScheme):
         B_1 = 0
         for i in range(len(vol_frac)):
             if  shear_moduli[i] != G_1:
-                B_1 = B_1 + vol_frac[i]/(1./(2.*(shear_moduli[i] - G_1)) - beta_1)
+                B_1 += vol_frac[i] / (1. / (2. * (shear_moduli[i] - G_1)) - beta_1)
 
         G_lower = G_1 + (0.5)*B_1/(1. + beta_1*B_1)
         return G_lower

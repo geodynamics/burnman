@@ -88,7 +88,7 @@ if __name__ == "__main__":
         for x in testrange:
             print i, names[i], x
             uncertain = np.ones(len)
-            uncertain[i]=uncertain[i]+spread[i]*x
+            uncertain[i] += spread[i] * x
             _, vs, vphi, _ = eval(uncertain)
             vsmin = np.minimum(vs,vsmin)
             vsmax = np.maximum(vs,vsmax)
