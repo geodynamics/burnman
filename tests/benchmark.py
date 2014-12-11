@@ -34,7 +34,8 @@ def check_birch_murnaghan():
                           'Debye_0': 0.,
                           'grueneisen_0': 0.,
                           'q_0': 0.}
- 
+    test_mineral.set_method('mgd3')
+
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
     bulk_modulus = np.empty_like(pressure)

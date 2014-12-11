@@ -1,3 +1,5 @@
+<stdin>:76: UserWarning: Overriding database equation of state. From BM2 to BM3
+<stdin>:85: UserWarning: Overriding database equation of state. From BM3 to BM2
 Optimization terminated successfully.
          Current function value: 14212.177931
          Iterations: 109

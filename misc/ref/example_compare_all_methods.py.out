@@ -1,11 +1,11 @@
-BURNMAN/burnman/mineral.py: UserWarning: Overriding database equation of state. From slb2 to mgd3
-  warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
-BURNMAN/burnman/mineral.py: UserWarning: Overriding database equation of state. From slb2 to slb3
-  warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
-BURNMAN/burnman/mineral.py: UserWarning: Overriding database equation of state. From slb2 to bm2
-  warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
-BURNMAN/burnman/mineral.py: UserWarning: Overriding database equation of state. From slb2 to bm3
-  warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to MGD3
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to SLB3
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to BM2
+  phase.set_method(method)
+BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to BM3
+  phase.set_method(method)
 Calculations are done for:
 Composite:
   0.95 of
