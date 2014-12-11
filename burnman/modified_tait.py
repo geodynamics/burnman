@@ -10,10 +10,11 @@ import scipy.optimize as opt
 
 import burnman.equation_of_state as eos
 import burnman.einstein as einstein
+from burnman.constants import gas_constant
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
-R=8.31446 # J/K/mol
+R=gas_constant # J/K/mol
 
 # see Holland and Powell, 2011
 def einstein_temperature(S, n):
