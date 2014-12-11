@@ -371,31 +371,9 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     v_phi= v_phi*(1.-1./2.*cot*1./Qphi)
     return v_p, v_s, v_phi
 
-# shared variable of prem, so that other routines do not need to create
-# prem over and over. See geotherm for example.
+"""
+shared variable of prem, so that other routines do not need to create
+prem over and over. See geotherm for example.
+"""
 prem_model = PREM()
-
-if __name__ == "__main__":
-    #create a seismic dataset from prem:
-    s=PREM()
-    depths = s.internal_depth_list()
-    pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
-
-    # plot vs and vp and v_phi (note that v_phi is computed!)
-    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
-    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
-    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
-    plt.legend()
-    plt.xlabel('depth in km')
-    plt.ylabel('km/s')
-    plt.show()
-
-    s1=PREM()
-    depths=s1.internal_depth_list()
-    pressures, density, v_p, v_s, v_phi = s1.evaluate_all_at(depths)
-    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
-    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
-    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
-
-
 
