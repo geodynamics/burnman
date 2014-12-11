@@ -46,7 +46,7 @@ if __name__ == "__main__":
     #Input adiabat potential temperature
     T0 = 1500.0
 
-    #Now we'll calculate the models by forcing the rock to use a method. The preset eqauation of state for the Murakami_etal_2012 minerals is 'slb2'
+    #Now we'll calculate the models by forcing the rock to use a method. The preset equation of state for the Murakami_etal_2012 minerals is 'slb2'
     
     """ 'slb2' (finite-strain 2nd order shear modulus,
         stixrude and lithgow-bertelloni, 2005)

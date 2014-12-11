@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
 
     temperature = burnman.geotherm.brown_shankland(seis_p)
-    # The next line is not required here, because the method is set automatically my defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one. 
+    # The next line is not required here, because the method is set automatically by defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one.
     rock.set_method(method)
 
     print "Calculations are done for:"
