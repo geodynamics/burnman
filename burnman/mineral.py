@@ -82,6 +82,12 @@ class Mineral(Material):
         else:
             raise Exception("unsupported material method " + method.__class__.__name__ )
 
+        #Validate the params object on the requested EOS. 
+        try:
+            self.method.validate_parameters(self.params)
+        except Exception as e:
+            raise Exception('Mineral ' + self.to_string() + 'failed to validate parameters with message : \" ' + e.message + '\"' )
+
     def to_string(self):
         """
         Returns the name of the mineral class
@@ -116,15 +122,10 @@ class Mineral(Material):
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)
         self.K_T = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
         self.K_S = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
+        self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
-
-        if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
-            self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
-        else:
-            self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
-            warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 
     def molar_mass(self):
         """
