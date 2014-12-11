@@ -118,7 +118,7 @@ Composite:
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
-_2013.fe_perovskite'
+        'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.111111 of
     HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
       0.8 of
