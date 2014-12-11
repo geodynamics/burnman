@@ -13,20 +13,19 @@ from burnman import minerals
 
 garnet=minerals.HP_2011_ds62.garnet()
 composition=np.array([ 0.5, 0.2, 0.1, 0.2 ])
+garnet.set_method('mtait')
 garnet.set_composition(composition)
+garnet.set_state(0.0, 300.0)
 
 print 'Molar fraction'
 print garnet.molar_fraction
 print ''
 print 'Site occupancies'
-print garnet.sites
-print garnet.site_occupancies
-print ''
-print 'Ideal activities'
-print garnet.ideal_activity
+print garnet.solution_model.sites
+#print garnet.solution_model.site_occupancies
 print ''
 print 'Volume excess'
-print garnet.V_excess, 'm^3/mol'
+print garnet.excess_volume, 'm^3/mol'
 print ''
 
 # Excess volumes for the pyrope-grossular join
@@ -37,12 +36,14 @@ for i in range(n+1):
     pyrope_proportion[i]=float(i)/n
     composition=([ pyrope_proportion[i], 0.0, 1.-pyrope_proportion[i], 0.0 ])
     garnet.set_composition(composition)
-    garnet_excess_volume[i]=garnet.V_excess
+    garnet.set_state(0.0, 300.)
+    garnet_excess_volume[i]=garnet.excess_volume
 
 pressure=1.e9 # Pa
 temperature=573.15 # K
 composition=[0.9, 0.0, 0.1, 0.0]
-garnet.set_state(pressure, temperature, composition)
+garnet.set_composition(composition)
+garnet.set_state(pressure, temperature)
 
 # Excess gibbs for the pyrope-grossular join
 n=100
@@ -51,8 +52,9 @@ garnet_excess_gibbs= np.empty(shape=(n+1))
 for i in range(n+1):
     pyrope_proportion[i]=float(i)/n
     composition=([ pyrope_proportion[i], 0.0, 1.-pyrope_proportion[i], 0.0 ])
-    garnet.set_state(pressure, temperature, composition)
-    garnet_excess_gibbs[i]=garnet.gibbs_excess
+    garnet.set_composition(composition)
+    garnet.set_state(pressure, temperature)
+    garnet_excess_gibbs[i]=garnet.excess_gibbs
 
 
 import matplotlib.pyplot as plt
