@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman.tools
+import tools
 
 class Seismic1DModel:
     """
@@ -245,7 +245,7 @@ class PREM(SeismicRadiusTable):
     """
     def __init__(self):
         SeismicRadiusTable.__init__(self)
-        table = burnman.tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:,0]
         self.table_pressure = table[:,1]
@@ -254,7 +254,7 @@ class PREM(SeismicRadiusTable):
         self.table_vs = table[:,4]
         
         # read in gravity data
-        table = burnman.tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
+        table = tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
         table = np.array(table)
         self.table_radiusgravity = table[:,0]
         self.table_gravity = table[:,1]
@@ -273,12 +273,12 @@ class Slow(SeismicRadiusTable):
     def __init__(self):
         SeismicRadiusTable.__init__(self)
 
-        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]
-        table2 = burnman.tools.read_table("input_seismic/swave_slow.txt")
+        table2 = tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
-        table3 = burnman.tools.read_table("input_seismic/pwave_slow.txt")
+        table3 = tools.read_table("input_seismic/pwave_slow.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])
@@ -305,12 +305,12 @@ class Fast(SeismicRadiusTable):
     def __init__(self):
         SeismicRadiusTable.__init__(self)
 
-        table = burnman.tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table[:,0] = table[:,0]
-        table2 = burnman.tools.read_table("input_seismic/swave_fast.txt")
+        table2 = tools.read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
-        table3 = burnman.tools.read_table("input_seismic/pwave_fast.txt")
+        table3 = tools.read_table("input_seismic/pwave_fast.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius-max(table2[:,0])

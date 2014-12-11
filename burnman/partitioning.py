@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.constants import gas_constant, N_A
+import constants
 
 # TODO: add up weight percent and check <100 and tell them how much
 
@@ -12,11 +12,10 @@ lower_mantle_mass = 4.043e24*.75 # in kg
 
 
 
-
 # convert weight percentage (amount, 1.00 = 100%) of a given element to molar mass
 def weight_pct_to_mol(element, amount):
 
-    return amount * lower_mantle_mass / molar_mass[element] * N_A 
+    return amount * lower_mantle_mass / molar_mass[element] * constants.Avogadro
 
 
 def calculate_phase_percents(inp):
@@ -58,7 +57,7 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
     delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
 
 
-    rs = ((25.e9-pressure)*(delV)/(gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
+    rs = ((25.e9-pressure)*(delV)/(constants.gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
 
     K = np.exp(rs) #The exchange coefficent at P and T. K(P,T,X) in eq 5 Nakajima et al 2012
 

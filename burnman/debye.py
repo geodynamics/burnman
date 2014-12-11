@@ -5,15 +5,14 @@
 import numpy as np
 import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
-from burnman.constants import gas_constant
+
+import constants
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
 just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
-
-R = gas_constant
 
 
 
@@ -83,7 +82,7 @@ def thermal_energy(T, debye_T, n):
     """
     if T == 0:
         return 0
-    E_th = 3.*n*R*T * debye_fn_cheb(debye_T/T)
+    E_th = 3.*n*constants.gas_constant*T * debye_fn_cheb(debye_T/T)
     return E_th
 
 def heat_capacity_v(T,debye_T,n):
@@ -93,7 +92,7 @@ def heat_capacity_v(T,debye_T,n):
     if T ==0:
         return 0
     x = debye_T/T
-    C_v = 3.0*n*R* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
+    C_v = 3.0*n*constants.gas_constant* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
 
@@ -106,13 +105,13 @@ if __name__ == "__main__":
     def old_thermal(T, debye_T, n):
         if T == 0:
             return 0
-        return 3.*n*R*T * debye_fn(debye_T/T)
+        return 3.*n*constants.R*T * debye_fn(debye_T/T)
 
     def old_heat(T, debye_T, n):
         if T ==0:
             return 0
         deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
-        return 9.*n*R*deb[0]/pow(debye_T/T,3.)
+        return 9.*n*constants.gas_constant*deb[0]/pow(debye_T/T,3.)
 
     temperatures = np.linspace(100,5000, 10000)
     Debye_T = 1000.

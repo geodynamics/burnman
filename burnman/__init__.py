@@ -72,4 +72,3 @@ import geotherm
 #miscellaneous
 import tools
 from partitioning import calculate_partition_coefficient,calculate_phase_percents
-import constants

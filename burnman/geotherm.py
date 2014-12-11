@@ -5,10 +5,8 @@
 import numpy as np
 import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
-
-import burnman.tools
-import burnman.seismic
-
+import tools
+import seismic
 
 def brown_shankland(pressure):
     """
@@ -26,8 +24,8 @@ def brown_shankland(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = burnman.seismic.prem_model.depth(pressure[i])
-      temperature[i] = burnman.tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)
+      depth = seismic.prem_model.depth(pressure[i])
+      temperature[i] = tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)
     return temperature
 
 
@@ -47,8 +45,8 @@ def anderson(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = burnman.seismic.prem_model.depth(pressure[i])
-      temperature[i] = burnman.tools.lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)
+      depth = seismic.prem_model.depth(pressure[i])
+      temperature[i] = tools.lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)
     return temperature
 
 def adiabatic(pressures, T0, rock):
@@ -133,11 +131,11 @@ def dTdP(temperature, pressure, rock):
     return temperature*top/bottom
 
 
-table_brown = burnman.tools.read_table("input_geotherm/brown_81.txt")
+table_brown = tools.read_table("input_geotherm/brown_81.txt")
 table_brown_depth = np.array(table_brown)[:,0]
 table_brown_temperature = np.array(table_brown)[:,1]
 
-table_anderson = burnman.tools.read_table("input_geotherm/anderson_82.txt")
+table_anderson = tools.read_table("input_geotherm/anderson_82.txt")
 table_anderson_depth = np.array(table_anderson)[:,0]
 table_anderson_temperature = np.array(table_anderson)[:,1]
 
