@@ -6,7 +6,7 @@ import numpy as np
 import warnings
 
 
-class AveragingScheme:
+class AveragingScheme(object):
     """
     Base class defining an interface for determining average
     elastic properties of a rock.  Given a list of volume
