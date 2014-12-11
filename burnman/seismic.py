@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import tools
 
-class Seismic1DModel:
+class Seismic1DModel(object):
     """
     Base class for all the seismological models.
     """
