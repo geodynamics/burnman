@@ -3,9 +3,18 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+
+# Try to import the jit from numba.  If it is
+# not available, just go with the standard 
+# python interpreter
+try:
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
 import scipy.integrate as integrate
-from numpy.polynomial.chebyshev import Chebyshev
-from burnman.constants import R
+import constants
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
@@ -13,6 +22,35 @@ just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
 
+
+chebyshev_representation = np.array( [ 2.707737068327440945/2.0, 0.340068135211091751, -0.12945150184440869e-01, \
+                                     0.7963755380173816e-03, -0.546360009590824e-04, 0.39243019598805e-05, \
+                                    -0.2894032823539e-06, 0.217317613962e-07, -0.16542099950e-08, \
+                                     0.1272796189e-09, -0.987963460e-11, 0.7725074e-12, -0.607797e-13, \
+                                     0.48076e-14, -0.3820e-15, 0.305e-16, -0.24e-17] )
+@jit
+def _chebval(x, c):
+    """
+    Evaluate a Chebyshev series at points x.
+    This is just a lightly modified copy/paste job from the numpy
+    implementation of the same function, copied over here to put a
+    jit wrapper around it.
+    """
+    if len(c) == 1 :
+        c0 = c[0]
+        c1 = 0
+    elif len(c) == 2 :
+        c0 = c[0]
+        c1 = c[1]
+    else :
+        x2 = 2*x
+        c0 = c[-2]
+        c1 = c[-1]
+        for i in range(3, len(c) + 1) :
+            tmp = c0
+            c0 = c[-i] - c1
+            c1 = tmp + c1*x2
+    return c0 + c1*x
 
 
 def debye_fn(x):
@@ -25,15 +63,11 @@ def debye_fn(x):
 
 
 
-chebyshev_representation = Chebyshev( [ 2.707737068327440945/2.0, 0.340068135211091751, -0.12945150184440869e-01, \
-                                     0.7963755380173816e-03, -0.546360009590824e-04, 0.39243019598805e-05, \
-                                    -0.2894032823539e-06, 0.217317613962e-07, -0.16542099950e-08, \
-                                     0.1272796189e-09, -0.987963460e-11, 0.7725074e-12, -0.607797e-13, \
-                                     0.48076e-14, -0.3820e-15, 0.305e-16, -0.24e-17] )
 eps = np.finfo(np.float).eps
 sqrt_eps = np.sqrt(np.finfo(np.float).eps)
 log_eps = np.log(np.finfo(np.float).eps)
 
+@jit
 def debye_fn_cheb(x):
     """
     Evaluate the Debye function using a Chebyshev series expansion coupled with
@@ -50,7 +84,7 @@ def debye_fn_cheb(x):
         return 1.0 - 3.0*x/8.0 + x*x/20.0;
     elif x <= 4.0 :
         t = x*x/8.0 - 1.0;
-        c = chebyshev_representation(t)
+        c = _chebval(t, chebyshev_representation)
         return c - 0.375*x;
     elif x < -(np.log(2.0) + log_eps ):
         nexp = int(np.floor(xcut/x));
@@ -81,7 +115,7 @@ def thermal_energy(T, debye_T, n):
     """
     if T == 0:
         return 0
-    E_th = 3.*n*R*T * debye_fn_cheb(debye_T/T)
+    E_th = 3.*n*constants.gas_constant*T * debye_fn_cheb(debye_T/T)
     return E_th
 
 def heat_capacity_v(T,debye_T,n):
@@ -91,7 +125,7 @@ def heat_capacity_v(T,debye_T,n):
     if T ==0:
         return 0
     x = debye_T/T
-    C_v = 3.0*n*R* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
+    C_v = 3.0*n*constants.gas_constant* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
 def helmholtz_free_energy(T, debye_T, n):
@@ -105,57 +139,7 @@ def helmholtz_free_energy(T, debye_T, n):
     if T ==0:
         return 0
     x = debye_T/T
-    F = n * R * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
+    F = n * constants.gas_constant * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
     return F
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    import time
-
-    def old_thermal(T, debye_T, n):
-        if T == 0:
-            return 0
-        return 3.*n*R*T * debye_fn(debye_T/T)
-
-    def old_heat(T, debye_T, n):
-        if T ==0:
-            return 0
-        deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
-        return 9.*n*R*deb[0]/pow(debye_T/T,3.)
-
-    temperatures = np.linspace(100,5000, 10000)
-    Debye_T = 1000.
-    old = np.empty_like(temperatures)
-    start = time.clock()
-    for i in range(len(temperatures)):
-        old[i] = old_heat(temperatures[i], Debye_T, 1.0)
-    time_old = time.clock()-start
-
-    new = np.empty_like(temperatures)
-    start = time.clock()
-    for i in range(len(temperatures)):
-        new[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
-    time_new = time.clock()-start
-
-    print "error %e"%np.linalg.norm((old-new)/new)
-    print "time old %g, time new %g"%(time_old,time_new)
-
-
-
-    temperatures = np.linspace(0,5000, 200)
-    vibrational_energy = np.empty_like(temperatures)
-    heat_capacity = np.empty_like(temperatures)
-    Debye_T = 1000.
-    for i in range(len(temperatures)):
-      vibrational_energy[i] = thermal_energy(temperatures[i], Debye_T, 1.0)
-      heat_capacity[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
-
-    plt.subplot(121)
-    plt.plot(temperatures, vibrational_energy)
-    plt.subplot(122)
-    plt.plot(temperatures, heat_capacity)
-    plt.show()
-
 
 

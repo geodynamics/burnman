@@ -9,13 +9,10 @@ composition = { 'Mg': 1.8, 'Fe': 0.2, 'O': 4., 'Si': 1.}
 minlist = [mg_fe_olivine(), mg_fe_wadsleyite()]
 
 ol = mg_fe_olivine()
-ol.set_method('slb3')
 ol.set_composition( [0.9, 0.1])
 wa = mg_fe_wadsleyite()
-wa.set_method('slb3')
 wa.set_composition( [0.9, 0.1])
 ea = burnman.EquilibriumAssemblage(composition, minlist)
-ea.set_method('slb3')
 co = burnman.Composite( [0.5, 0.5], [ol, wa] )
 
 pressures = np.linspace( 12.e9, 14.e9, 50 )

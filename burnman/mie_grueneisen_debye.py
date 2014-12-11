@@ -8,8 +8,7 @@ import scipy.optimize as opt
 import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.debye as debye
-from burnman.constants import R
-
+import constants
 
 class MGDBase(eos.EquationOfState):
     """
@@ -34,9 +33,10 @@ class MGDBase(eos.EquationOfState):
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         EQ B7
         """
+        T_0 = self.reference_temperature( params )
         func = lambda x: bm.birch_murnaghan(params['V_0']/x, params) + \
             self.__thermal_pressure(temperature, x, params) - \
-            self.__thermal_pressure(300., x, params) - pressure
+            self.__thermal_pressure(T_0, x, params) - pressure
         V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
         return V
 
@@ -51,9 +51,10 @@ class MGDBase(eos.EquationOfState):
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ B8
         """
+        T_0 = self.reference_temperature( params )
         K_T = bm.bulk_modulus(volume, params) + \
             self.__thermal_bulk_modulus(temperature,volume, params) - \
-            self.__thermal_bulk_modulus(300.,volume, params)  #EQB13
+            self.__thermal_bulk_modulus(T_0,volume, params)  #EQB13
         return K_T
 
     #calculate the mgd shear modulus as a function of P, V, and T
@@ -62,14 +63,15 @@ class MGDBase(eos.EquationOfState):
         Returns shear modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ B11
         """
+        T_0 = self.reference_temperature( params )
         if self.order==2:
             return bm.shear_modulus_second_order(volume,params) + \
                 self.__thermal_shear_modulus(temperature,volume, params) - \
-                self.__thermal_shear_modulus(300.,volume, params) # EQ B11
+                self.__thermal_shear_modulus(T_0,volume, params) # EQ B11
         elif self.order==3:
             return bm.shear_modulus_third_order(volume,params) + \
                 self.__thermal_shear_modulus(temperature,volume, params) - \
-                self.__thermal_shear_modulus(300.,volume, params) # EQ B11
+                self.__thermal_shear_modulus(T_0,volume, params) # EQ B11
         else:
             raise NotImplementedError("")
 
@@ -119,16 +121,17 @@ class MGDBase(eos.EquationOfState):
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
         EQ B7
         """
+        T_0 = self.reference_temperature( params )
         return bm.birch_murnaghan(params['V_0']/volume, params) + \
                 self.__thermal_pressure(temperature,volume, params) - \
-                self.__thermal_pressure(300.,volume, params)
+                self.__thermal_pressure(T_0,volume, params)
 
     #calculate the thermal correction to the shear modulus as a function of V, T
     def __thermal_shear_modulus(self, T, V, params):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
         Debye_T = self.__debye_temperature(params['V_0']/V, params)
         G_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
-                 6*R*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
+                 6*constants.gas_constant*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
         return G_th
 
     #compute the Debye temperature in K.  Takes the
@@ -159,7 +162,7 @@ class MGDBase(eos.EquationOfState):
     def __thermal_bulk_modulus(self, T,V,params):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
         Debye_T = self.__debye_temperature(params['V_0']/V, params)
-        K_th = 3.*params['n']*R*T/V * gr * \
+        K_th = 3.*params['n']*constants.gas_constant*T/V * gr * \
             ((1. - params['q_0'] - 3.*gr)*debye.debye_fn(Debye_T/T)+3.*gr*(Debye_T/T)/(np.exp(Debye_T/T) - 1.)) # EQ B5
         return K_th
 

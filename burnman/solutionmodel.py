@@ -6,7 +6,9 @@ import numpy as np
 import warnings
 import burnman
 from burnman.processchemistry import *
-from burnman.constants import R
+import constants
+
+R = constants.gas_constant
 
 kd = lambda x,y : 1 if x==y else 0
 class SolutionModel:

@@ -3,7 +3,9 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.constants import R
+import constants
+
+R = constants.gas_constant
 
 """
 Functions for the Einstein model of a solid.

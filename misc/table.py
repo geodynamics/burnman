@@ -64,8 +64,6 @@ if __name__ == "__main__":
     sortedlist = sorted(phasenames, key=lambda x: x[0])
 
     for (name,p) in sortedlist:
-        #print p.to_string()
-        p.set_method('bm3')
         p.set_state(1e9,300)
         row = create_list(name,p)
         table.append(row)

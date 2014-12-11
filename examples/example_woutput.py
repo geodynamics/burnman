@@ -40,20 +40,6 @@ if __name__ == "__main__":
     ### input variables ###
     #######################
 
-    #INPUT for method
-    """ choose 'slb2' (finite-strain 2nd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'slb3 (finite-strain 3rd order shear modulus,
-        stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
-        matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
-        matas et al. 2007)
-    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
-       (your choice in geotherm will not matter in this case))
-    or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
-        (your choice in geotherm will not matter in this case))"""
-    method = 'mgd3'
 
     #specify material
     amount_perovskite = 0.95
@@ -66,7 +52,6 @@ if __name__ == "__main__":
 
     temperature = burnman.geotherm.brown_shankland(pressures)
 
-    rock.set_method(method) #append method of calculation to suite of minerals chosen
 
     #Begin calculating velocities and density as depth
     print "Calculations are done for:"

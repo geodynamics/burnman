@@ -16,7 +16,7 @@ available within Burnman:
 3. Reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
 
 This example will first calculate or read in a seismic model and plot the
-model along the defined pressure range.
+model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 (Kennett et al., 1995).
 
 *Uses:*
 

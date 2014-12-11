@@ -7,7 +7,7 @@ from material import Material
 from averaging_schemes import AveragingScheme
 
 
-class Model:
+class Model(object):
     """
     planetary model realization
 

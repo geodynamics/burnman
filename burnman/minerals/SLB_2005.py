@@ -29,6 +29,7 @@ class stishovite (Mineral):
             'q_0': 2.4,
             'eta_s_0': 5.0 }
 
+        Mineral.__init__(self)
 
 class periclase (Mineral):
     def __init__(self):
@@ -45,7 +46,7 @@ class periclase (Mineral):
             'grueneisen_0': 1.5,
             'q_0': 1.5,
             'eta_s_0': 2.8 }
-
+        Mineral.__init__(self)
 
 class wuestite (Mineral):
     def __init__(self):
@@ -63,6 +64,7 @@ class wuestite (Mineral):
             'q_0': 1.5,
             'eta_s_0': 0.8 }
 
+        Mineral.__init__(self)
 
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
@@ -94,6 +96,7 @@ class mg_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.6 }
 
+        Mineral.__init__(self)
 
 class fe_perovskite(Mineral):
     def __init__(self):
@@ -111,6 +114,7 @@ class fe_perovskite(Mineral):
             'q_0': 1.4,
             'eta_s_0': 2.1 }
 
+        Mineral.__init__(self)
 
 class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):

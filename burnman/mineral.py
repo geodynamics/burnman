@@ -13,6 +13,8 @@ import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 import burnman.modified_tait as mt
 import burnman.cork as cork
+import inspect
+
 
 class Mineral(Material):
     """
@@ -35,26 +37,17 @@ class Mineral(Material):
     reference volume should be in m^3/(mol molecule) and not in unit cell
     volume and 'n' should be the number of atoms per molecule.  Frequently in
     the literature the reference volume is given in Angstrom^3 per unit cell.
-    To convert this to m^3/(mol molecule) you should multiply by 10^(-30) *
-    N_a / Z, where N_a is Avogadro's number and Z is the number of atoms per
-    unit cell.  You can look up Z in many places, including www.mindat.org
+    To convert this to m^3/(mol of molecule) you should multiply by 10^(-30) *
+    N_a / Z, where N_a is Avogadro's number and Z is the number of formula units per
+    unit cell. You can look up Z in many places, including www.mindat.org
     """
 
     def __init__(self):
-        self.params = {    'name':'generic',
-            'equation_of_state': 'slb3', #Equation of state used to fit the parameters
-            'V_0': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
-            'K_0': 0., #Reference bulk modulus [Pa] at room pressure/temperature
-            'Kprime_0': 0., #pressure derivative of bulk modulus
-            'G_0': 0., #reference shear modulus at room pressure/temperature
-            'Gprime_0': 0., #pressure derivative of shear modulus
-            'molar_mass': 0., #molar mass in units of [kg/mol]
-            'n': 0., #number of atoms per molecule
-            'Debye_0': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'grueneisen_0': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'q_0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'eta_s_0': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
+        if 'params' not in self.__dict__:
+            self.params={}
         self.method = None
+        if 'equation_of_state' in self.params:
+            self.set_method(self.params['equation_of_state'])
 
     def set_method(self, method):
         """
@@ -64,33 +57,50 @@ class Mineral(Material):
         'slb3' or 'mtait'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
-        if( isinstance(method, basestring)):
-            if (method == "slb2"):
-                self.method = slb.SLB2()
-            elif (method == "mgd2"):
-                self.method = mgd.MGD2()
-            elif (method == "mgd3"):
-                self.method = mgd.MGD3()
-            elif (method == "slb3"):
-                self.method = slb.SLB3()
-            elif (method == "bm2"):
-                self.method = bm.BM2()
-            elif (method == "bm3"):
-                self.method = bm.BM3()
-            elif (method == "mtait"):
-                self.method = mt.MT()
-            elif (method == "cork"):
-                self.method = cork.CORK()
-            else:
-                raise Exception("unsupported material method " + method)
-            if hasattr(self, 'base_material'):
-                for member in self.base_material:
-                    member[0].set_method(method)
-        elif ( issubclass(method, eos.EquationOfState) ):
-            self.method = method()
 
-        else:
-            raise Exception("unsupported material method " + method.__class__.__name__ )
+        if method is None:
+            self.method = None
+            return
+
+        def to_method_obj(method):
+
+            if isinstance(method, basestring):
+                if (method == "slb2"):
+                    return slb.SLB2()
+                elif (method == "mgd2"):
+                    return mgd.MGD2()
+                elif (method == "mgd3"):
+                    return mgd.MGD3()
+                elif (method == "slb3"):
+                    return slb.SLB3()
+                elif (method == "bm2"):
+                    return bm.BM2()
+                elif (method == "bm3"):
+                    return bm.BM3()
+                elif (method == "mtait"):
+                    return mt.MT()
+                elif (method == "cork"):
+                    return cork.CORK()
+                else:
+                    raise Exception("unsupported material method " + method)
+            elif isinstance(method, eos.EquationOfState):
+                return method
+            elif inspect.isclass(method) and issubclass(method, eos.EquationOfState):
+                return method()
+            else:
+                raise Exception("unsupported material method " + method.__class__.__name__ )
+
+        new_method = to_method_obj(method)
+        if self.method is not None and 'equation_of_state' in self.params:
+            self.method = to_method_obj(self.params['equation_of_state'])
+
+        if type(new_method).__name__ == 'instance':
+            raise Exception("Please derive your method from object (see python old style classes)")
+
+        if self.method is not None and type(new_method) is not type(self.method):
+            warnings.warn('Overriding database equation of state. From ' + self.method.__class__.__name__ + ' to ' + new_method.__class__.__name__, stacklevel=2)
+
+        self.method = new_method
 
     def to_string(self):
         """
@@ -124,6 +134,9 @@ class Mineral(Material):
         self.pressure = pressure
         self.temperature = temperature
         self.old_params = self.params
+
+        if self.method is None:
+            raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
 
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)

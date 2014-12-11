@@ -2,7 +2,7 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-class EquationOfState:
+class EquationOfState(object):
     """
     This class defines the interface for an equation of state
     that a mineral uses to determine its properties at a
@@ -308,3 +308,17 @@ class EquationOfState:
             Internal energy of the mineral
         """
         raise NotImplementedError("")
+
+
+    def reference_temperature( self, params ):
+        """
+        Parameters
+        ----------
+        T_0 : float
+            If params contains a "T_0" entry, return that reference temperature, otherwise
+            return 300.0 Kelvin
+        """
+        if 'T_0' in params:
+            return params['T_0']
+        else:
+            return 300.0

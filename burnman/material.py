@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 
-class Material:
+class Material(object):
     """
     Base class for all materials. The main functionality is unroll() which
     returns a list of objects of type :class:`~burnman.mineral.Mineral` and their molar
@@ -15,9 +15,9 @@ class Material:
     Attributes
     ----------
     pressure : float
-        The current pressure as set by :func:`~burnman.Material.set_state`.
+        The current pressure as set by :func:`~burnman.Material.set_state`. [Pa]
     temperature : float
-        The current temperature as set by :func:`~burnman.Material.set_state`.
+        The current temperature as set by :func:`~burnman.Material.set_state`. [K]
     """
 
     def __init__(self):
@@ -54,7 +54,7 @@ class Material:
 
     def print_minerals_of_current_state(self):
         """
-        Print a human-readable representation of this Material at the current p, T as a list of minerals.
+        Print a human-readable representation of this Material at the current P, T as a list of minerals.
         This requires set_state() has been called before.
         """
         (frs,mins) = self.unroll()
@@ -72,9 +72,9 @@ class Material:
         Parameters
         ----------
         pressure : float
-            The desired pressure in Pa.
+            The desired pressure in [Pa].
         temperature : float
-            The desired temperature in K.
+            The desired temperature in [K].
         """
         self.pressure = pressure
         self.temperature = temperature
@@ -102,7 +102,7 @@ class Material:
     def density(self):
         """
         Returns the density of this material. Note that the return value of this function may depend on the current
-        state (temperature, pressure).
+        state (temperature, pressure). [kg/m^3]
 
         Notes
         -----
@@ -111,7 +111,7 @@ class Material:
         Returns
         -------
         density : float
-            The density of this material in kg/m^3
+            The density of this material in [kg/m^3]
 
         """
         raise NotImplementedError("need to implement density() in derived class!")

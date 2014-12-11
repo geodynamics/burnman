@@ -6,8 +6,10 @@ import numpy as np
 from burnman.mineral import Mineral
 from burnman.processchemistry import ProcessSolidSolutionChemistry
 from burnman.solutionmodel import SolutionModel
-from burnman.constants import R
+import constants
 import warnings
+
+R = constants.gas_constant
 
 kd = lambda x,y : 1 if x==y else 0
 
@@ -36,8 +38,8 @@ class SolidSolution(Mineral):
         # Number of endmembers in the solid solution
         self.n_endmembers=len(base_material)
 
-        for i in range(self.n_endmembers):
-            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
+#        for i in range(self.n_endmembers):
+#            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
 
     def set_composition( self, molar_fraction ):
         assert(len(self.base_material) == len(molar_fraction))

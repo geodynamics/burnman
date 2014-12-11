@@ -3,7 +3,9 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.constants import R
+import constants
+
+R = constants.gas_constant
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa

@@ -34,7 +34,8 @@ def check_birch_murnaghan():
                           'Debye_0': 0.,
                           'grueneisen_0': 0.,
                           'q_0': 0.}
- 
+    test_mineral.set_method('mgd3')
+
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
     bulk_modulus = np.empty_like(pressure)
@@ -378,12 +379,9 @@ def check_averaging():
     hsl_shear_modulus = np.empty_like(volumes)
 
 
-    #these values are not given in the paper, so far as I can tell,
-    #so I did my best to read them off of the figure...
-
-
-    # MgO bulk and shear moduli
-    K2=180. # Bulk modulus, GPa
+    # MgO bulk and shear moduli taken from Landolt-Boernstein 
+    # - Group III Condensed Matter Volume 41B, 1999, pp 1-3
+    K2=152. # Bulk modulus, GPa
     G2=155. # Shear modulus, GPa
 
     # AgCl bulk and shear moduli (estimated from plot)
@@ -477,7 +475,7 @@ def check_averaging_2():
     hsl_shear_modulus = np.empty_like(volumes)
 
 
-    #These values are from the paper
+    #These values are from Hashin and Shtrikman (1963)
     K1=25.0
     K2=60.7
     G1=11.5

@@ -9,7 +9,7 @@ import burnman.geotherm
 import burnman.seismic
 import burnman.averaging_schemes
 
-class ElasticProperties:
+class ElasticProperties(object):
     """
     Class that contains volume, density, and moduli. This is generated for
     different pressures and temperatures using

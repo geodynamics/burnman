@@ -233,6 +233,7 @@ class anorthite (Mineral):
             'err_G_0': 3000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class albite (Mineral):
     def __init__(self):
@@ -266,6 +267,7 @@ class albite (Mineral):
             'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class spinel (Mineral):
     def __init__(self):
@@ -299,6 +301,7 @@ class spinel (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 0.6 }
+       Mineral.__init__(self)
 
 class hercynite (Mineral):
     def __init__(self):
@@ -332,6 +335,7 @@ class hercynite (Mineral):
             'err_G_0': 13000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class forsterite (Mineral):
     def __init__(self):
@@ -365,6 +369,7 @@ class forsterite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
+       Mineral.__init__(self)
 
 class fayalite (Mineral):
     def __init__(self):
@@ -398,6 +403,7 @@ class fayalite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 0.6 }
+       Mineral.__init__(self)
 
 class mg_wadsleyite (Mineral):
     def __init__(self):
@@ -431,6 +437,7 @@ class mg_wadsleyite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.4 }
+       Mineral.__init__(self)
 
 class fe_wadsleyite (Mineral):
     def __init__(self):
@@ -464,6 +471,7 @@ class fe_wadsleyite (Mineral):
             'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class mg_ringwoodite (Mineral):
     def __init__(self):
@@ -497,6 +505,7 @@ class mg_ringwoodite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
+       Mineral.__init__(self)
 
 class fe_ringwoodite (Mineral):
     def __init__(self):
@@ -530,6 +539,7 @@ class fe_ringwoodite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class enstatite (Mineral):
     def __init__(self):
@@ -563,6 +573,7 @@ class enstatite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
+       Mineral.__init__(self)
 
 class ferrosilite (Mineral):
     def __init__(self):
@@ -596,6 +607,7 @@ class ferrosilite (Mineral):
             'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class mg_tschermaks (Mineral):
     def __init__(self):
@@ -629,6 +641,7 @@ class mg_tschermaks (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class ortho_diopside (Mineral):
     def __init__(self):
@@ -662,6 +675,7 @@ class ortho_diopside (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class diopside (Mineral):
     def __init__(self):
@@ -695,6 +709,7 @@ class diopside (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class hedenbergite (Mineral):
     def __init__(self):
@@ -728,6 +743,7 @@ class hedenbergite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class clinoenstatite (Mineral):
     def __init__(self):
@@ -761,6 +777,7 @@ class clinoenstatite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class ca_tschermaks (Mineral):
     def __init__(self):
@@ -794,6 +811,7 @@ class ca_tschermaks (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class jadeite (Mineral):
     def __init__(self):
@@ -827,6 +845,7 @@ class jadeite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class hp_clinoenstatite (Mineral):
     def __init__(self):
@@ -860,6 +879,7 @@ class hp_clinoenstatite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
+       Mineral.__init__(self)
 
 class hp_clinoferrosilite (Mineral):
     def __init__(self):
@@ -893,6 +913,7 @@ class hp_clinoferrosilite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class ca_perovskite (Mineral):
     def __init__(self):
@@ -926,6 +947,7 @@ class ca_perovskite (Mineral):
             'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class mg_akimotoite (Mineral):
     def __init__(self):
@@ -959,6 +981,7 @@ class mg_akimotoite (Mineral):
             'err_G_0': 8000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class fe_akimotoite (Mineral):
     def __init__(self):
@@ -992,6 +1015,7 @@ class fe_akimotoite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class corundum (Mineral):
     def __init__(self):
@@ -1025,6 +1049,7 @@ class corundum (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
+       Mineral.__init__(self)
 
 class pyrope (Mineral):
     def __init__(self):
@@ -1058,6 +1083,7 @@ class pyrope (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.3 }
+       Mineral.__init__(self)
 
 class almandine (Mineral):
     def __init__(self):
@@ -1091,6 +1117,7 @@ class almandine (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class grossular (Mineral):
     def __init__(self):
@@ -1124,6 +1151,7 @@ class grossular (Mineral):
             'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.1 }
+       Mineral.__init__(self)
 
 class mg_majorite (Mineral):
     def __init__(self):
@@ -1157,6 +1185,7 @@ class mg_majorite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.2 ,
             'err_eta_s_0': 0.3 }
+       Mineral.__init__(self)
 
 class jd_majorite (Mineral):
     def __init__(self):
@@ -1190,6 +1219,7 @@ class jd_majorite (Mineral):
             'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class quartz (Mineral):
     def __init__(self):
@@ -1223,6 +1253,7 @@ class quartz (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class coesite (Mineral):
     def __init__(self):
@@ -1256,6 +1287,7 @@ class coesite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class stishovite (Mineral):
     def __init__(self):
@@ -1289,6 +1321,7 @@ class stishovite (Mineral):
             'err_G_0': 12000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class seifertite (Mineral):
     def __init__(self):
@@ -1322,6 +1355,7 @@ class seifertite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class mg_perovskite (Mineral):
     def __init__(self):
@@ -1355,6 +1389,7 @@ class mg_perovskite (Mineral):
             'err_G_0': 2000000000.0 ,
             'err_Gprime_0': 0.0 ,
             'err_eta_s_0': 0.3 }
+       Mineral.__init__(self)
 
 class fe_perovskite (Mineral):
     def __init__(self):
@@ -1388,6 +1423,7 @@ class fe_perovskite (Mineral):
             'err_G_0': 40000000000.0 ,
             'err_Gprime_0': 0.0 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class al_perovskite (Mineral):
     def __init__(self):
@@ -1421,6 +1457,7 @@ class al_perovskite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.5 }
+       Mineral.__init__(self)
 
 class mg_post_perovskite (Mineral):
     def __init__(self):
@@ -1454,6 +1491,7 @@ class mg_post_perovskite (Mineral):
             'err_G_0': 4000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
+       Mineral.__init__(self)
 
 class fe_post_perovskite (Mineral):
     def __init__(self):
@@ -1487,6 +1525,7 @@ class fe_post_perovskite (Mineral):
             'err_G_0': 5000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class al_post_perovskite (Mineral):
     def __init__(self):
@@ -1520,6 +1559,7 @@ class al_post_perovskite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
+       Mineral.__init__(self)
 
 class periclase (Mineral):
     def __init__(self):
@@ -1553,6 +1593,7 @@ class periclase (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 0.2 }
+       Mineral.__init__(self)
 
 class wuestite (Mineral):
     def __init__(self):
@@ -1586,6 +1627,7 @@ class wuestite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class mg_ca_ferrite (Mineral):
     def __init__(self):
@@ -1619,6 +1661,7 @@ class mg_ca_ferrite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class fe_ca_ferrite (Mineral):
     def __init__(self):
@@ -1652,6 +1695,7 @@ class fe_ca_ferrite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class na_ca_ferrite (Mineral):
     def __init__(self):
@@ -1685,6 +1729,7 @@ class na_ca_ferrite (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.1 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class kyanite (Mineral):
     def __init__(self):
@@ -1718,6 +1763,7 @@ class kyanite (Mineral):
             'err_G_0': 10000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
 
 class nepheline (Mineral):
     def __init__(self):
@@ -1751,6 +1797,8 @@ class nepheline (Mineral):
             'err_G_0': 1000000000.0 ,
             'err_Gprime_0': 0.5 ,
             'err_eta_s_0': 1.0 }
+       Mineral.__init__(self)
+
 
 '''
 Mineral aliases
