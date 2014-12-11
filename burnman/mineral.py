@@ -39,20 +39,12 @@ class Mineral(Material):
     """
 
     def __init__(self):
-        self.params = {    'name':'generic',
-            'equation_of_state': 'slb3', #Equation of state used to fit the parameters
-            'V_0': 0., #Molar volume [m^3/(mole molecules)] at room pressure/temperature
-            'K_0': 0., #Reference bulk modulus [Pa] at room pressure/temperature
-            'Kprime_0': 0., #pressure derivative of bulk modulus
-            'G_0': 0., #reference shear modulus at room pressure/temperature
-            'Gprime_0': 0., #pressure derivative of shear modulus
-            'molar_mass': 0., #molar mass in units of [kg/mol]
-            'n': 0., #number of atoms per molecule
-            'Debye_0': 0., #Debye temperature for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'grueneisen_0': 0., #Gruneisen parameter for material. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'q_0': 0., #q value used in caluclations. See Stixrude & Lithgow-Bertelloni, 2005 for values
-            'eta_s_0': 0.0} #eta value used in calculations. See Stixrude & Lithgow-Bertelloni, 2005 for values
-        self.method = None
+	if 'params' not in self.__dict__:
+		self.params={}
+	if 'equation_of_state' in self.params:
+		self.set_method(self.params['equation_of_state'])
+	else:
+		self.method=None
 
     def set_method(self, method):
         """
@@ -62,6 +54,9 @@ class Mineral(Material):
         or 'slb3'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
+	if 'equation_of_state' in self.params:
+		if self.params['equation_of_state'] is not method:
+	   		warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
         if( isinstance(method, basestring)):
             if (method == "slb2"):
                 self.method = slb.SLB2()
@@ -111,6 +106,9 @@ class Mineral(Material):
         self.pressure = pressure
         self.temperature = temperature
         self.old_params = self.params
+
+	if self.method==None:
+            raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
 
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)

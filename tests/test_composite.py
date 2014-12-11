@@ -21,7 +21,6 @@ class composite(BurnManTest):
         min2 = minerals.SLB_2005.periclase()
 
         c = burnman.Composite( [1.0], [min1] )
-        c.set_method("slb2")
         c.set_state(5e9,300)
         (f,m) = c.unroll()
         mins=",".join([a.to_string() for a in m])
@@ -98,7 +97,6 @@ class composite(BurnManTest):
         min2 = minerals.SLB_2005.periclase()
         ca = burnman.Composite( [1.0], [min1] )
         c = burnman.Composite( [0.4, 0.6], [ca, min2] )
-        c.set_method("slb3")
         c.set_state(5e9,1000)
         (f,m) = c.unroll()
         mins=",".join([a.to_string() for a in m])

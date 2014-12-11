@@ -62,9 +62,6 @@ if __name__ == "__main__":
     #
     # Note the reference to the low spin and high spin minerals (_LS and _HS).
 
-    # Set method, here set to 'slb2' as the shear wave moduli in
-    # Murakami et al. 2012 were fit to second order
-    rock.set_method('slb2')
 
     # Now we calculate the velocities
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
@@ -89,21 +86,18 @@ if __name__ == "__main__":
     # example 2: Here we show the effects of using purely High Spin or Low Spin
 
     rock = minerals.Murakami_etal_2012.fe_periclase_LS()
-    rock.set_method('slb2')
 
     mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
                                      burnman.averaging_schemes.VoigtReussHill())
 
     rock = minerals.Murakami_etal_2012.fe_periclase_HS()
-    rock.set_method('slb2')
     mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
                                      burnman.averaging_schemes.VoigtReussHill())
 
 
     rock = minerals.Murakami_etal_2012.fe_periclase()
-    rock.set_method('slb2')
     mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \
                                      burnman.averaging_schemes.VoigtReussHill())
@@ -126,7 +120,6 @@ if __name__ == "__main__":
     #For other options see example_composition.py
     rock = minerals.other.Speziale_fe_periclase()
 
-    rock.set_method('slb3')
 
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
         burnman.velocities_from_rock(rock, seis_p, temperature, \

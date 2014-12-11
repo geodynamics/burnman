@@ -41,6 +41,7 @@ class stishovite (Mineral):
              'err_eta_s_0' : 1.0
             }
 
+        Mineral.__init__(self)
 
 class periclase (Mineral):
     def __init__(self):
@@ -68,6 +69,7 @@ class periclase (Mineral):
         'err_q_0':.2,
         'err_eta_s_0':.2 }
 
+        Mineral.__init__(self)
 
 class wuestite (Mineral):
     def __init__(self):
@@ -94,6 +96,8 @@ class wuestite (Mineral):
             'err_grueneisen_0':.13,
             'err_q_0':1.0,
             'err_eta_s_0':1.0}
+
+        Mineral.__init__(self)
 
 
 class ferropericlase(bmb.HelperSolidSolution):
@@ -136,6 +140,7 @@ class mg_perovskite(Mineral):
             'err_q_0': .3,
             'err_eta_s_0':.3}
 
+        Mineral.__init__(self)
 
 class fe_perovskite(Mineral):
     def __init__(self):
@@ -162,6 +167,8 @@ class fe_perovskite(Mineral):
             'err_grueneisen_0':.3,
             'err_q_0':1.0,
             'err_eta_s_0':1.0}
+
+        Mineral.__init__(self)
 
 
 class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):

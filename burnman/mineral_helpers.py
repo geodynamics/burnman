@@ -35,17 +35,22 @@ class HelperSolidSolution(Mineral):
         comes up with a new mineral by doing a weighted arithmetic
         average of the end member minerals
         """
-        self.base_materials = base_materials
-        self.molar_fraction = molar_fraction
-        assert(len(base_materials) == len(molar_fraction))
-        assert(sum(molar_fraction) > 0.9999)
-        assert(sum(molar_fraction) < 1.0001)
+ 	self.base_materials = base_materials
+	self.molar_fraction = molar_fraction
+	assert(len(base_materials) == len(molar_fraction))
+	assert(sum(molar_fraction) > 0.9999)
+	assert(sum(molar_fraction) < 1.0001)
+	#does not make sense to do a solid solution with different number of
+	#atoms per formula unit or different equations of state, at least not simply...
+	for m in base_materials:
+		if(base_materials[0].params.has_key('n')):
+			assert(m.params['n'] == base_materials[0].params['n'])
+	
+	self.method=base_materials[0].method
+	
+	self.params = {}
+	
 
-        #does not make sense to do a solid solution with different number of
-        #atoms per formula unit, at least not simply...
-        for m in base_materials:
-            if(base_materials[0].params.has_key('n')):
-                assert(m.params['n'] == base_materials[0].params['n'])
 
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
@@ -59,18 +64,16 @@ class HelperSolidSolution(Mineral):
             mat.method = self.method
             mat.set_state(pressure, temperature)
 
-        itrange = range(0, len(self.base_materials))
-
+	itrange = range(0, len(self.base_materials))
         self.params = {}
+	for prop in self.base_materials[0].params:
+	   try:
+		self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+	   except TypeError:
+		#if there is a type error, it is probably a string. Just go with the value of the first base_material.
+		self.params[prop] = self.base_materials[0].params[prop]
 
-        # some do arithmetic averaging of the end members
-        for prop in self.base_materials[0].params:
-           try:
-               self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
-           except TypeError:
-               #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
-               self.params[prop] = self.base_materials[0].params[prop]
-        Mineral.set_state(self, pressure, temperature)
+	Mineral.set_state(self,pressure,temperature)
 
 class HelperSpinTransition(Material):
     """
@@ -89,6 +92,7 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
+	self.method=ls_mat.method
 
     def debug_print(self, indent=""):
         print "%sHelperSpinTransition:" % indent

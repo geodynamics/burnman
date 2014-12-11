@@ -72,7 +72,6 @@ if __name__ == "__main__":
     pyrolite = burnman.Composite([0.7, 0.3],
                                  [minerals.SLB_2005.mg_fe_perovskite(0.1),
                                   minerals.SLB_2005.ferropericlase(0.4)])
-    pyrolite.set_method("mgd3")
     #next, define an anchor temperature at which we are starting.
     #Perhaps 1500 K for the upper mantle
     T0 = 1500.
