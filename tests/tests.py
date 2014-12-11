@@ -18,7 +18,6 @@ class TestRock(BurnManTest):
         amount_perovskite = 0.3
         rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], \
             [minerals.SLB_2005.mg_fe_perovskite(0.1), minerals.SLB_2005.ferropericlase(0.2)] )
-        rock.set_method('slb2')
         (fr,phases)=rock.unroll()
         self.assertFloatEqual(fr[0], 0.3)
         self.assertFloatEqual(fr[1], 0.7)
