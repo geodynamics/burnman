@@ -65,19 +65,14 @@ class SolidSolution(Mineral):
         self.S = sum([ self.base_material[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
         self.V = sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
         self.C_p = sum([ self.base_material[i][0].C_p * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        #self.alpha = 
-        #self.isothermal_bulk_modulus = 
-        
 
-        '''
-        for prop in self.base_materials[0].params:
-           try:
-               self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
-           except TypeError:
-               #if there is a type error, it is probably a string.  Just go with the value of the first base_material.
-               self.params[prop] = self.base_materials[0].params[prop]
-        Mineral.set_state(self, pressure, temperature)
-        '''
+        # The following are currently just simple molar sums ...
+        # ... when they are corrected, they will be moved up ...
+        self.gr = sum([ self.base_material[i][0].gr * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.K_T = sum([ self.base_material[i][0].K_T * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.K_S = sum([ self.base_material[i][0].K_S * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.C_v = sum([ self.base_material[i][0].C_v * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.alpha = sum([ self.base_material[i][0].alpha * self.molar_fraction[i] for i in range(self.n_endmembers) ])
 
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
