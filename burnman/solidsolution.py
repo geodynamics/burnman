@@ -57,11 +57,18 @@ class SolidSolution(Mineral):
         self.partial_gibbs = np.array([self.base_material[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
         self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
 
+        self.excess_enthalpy = self.solution_model.excess_enthalpy( pressure, temperature, self.molar_fraction)
+        self.excess_entropy = self.solution_model.excess_entropy( pressure, temperature, self.molar_fraction)
         self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
 
-        self.V= sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
-
+        self.H = sum([ self.base_material[i][0].H * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
+        self.S = sum([ self.base_material[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
+        self.V = sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
+        self.C_p = sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        #self.alpha = 
+        #self.isothermal_bulk_modulus = 
         
+
         '''
         for prop in self.base_materials[0].params:
            try:

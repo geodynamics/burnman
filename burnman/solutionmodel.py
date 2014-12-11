@@ -206,13 +206,16 @@ class AsymmetricRegularSolution ( IdealSolution ):
         #initialize ideal solution model
         IdealSolution.__init__(self, endmembers )
         
+    def _phi( self, molar_fractions):
+        phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
+        phi=np.divide(phi, np.sum(phi))
+        return phi
 
     def _non_ideal_interactions( self, molar_fractions ):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
-        phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
-        phi=np.divide(phi, np.sum(phi))
 
+        phi=_phi(molar_fractions)
 
         q=np.zeros(len(molar_fractions))
         Hint=np.zeros(len(molar_fractions))
@@ -240,14 +243,19 @@ class AsymmetricRegularSolution ( IdealSolution ):
         return ideal_gibbs + non_ideal_gibbs
 
     def excess_volume ( self, pressure, temperature, molar_fractions ):
-
-        phi=np.array([self.alpha[i]*molar_fractions[i] for i in range(self.n_endmembers)])
-        phi=np.divide(phi, np.sum(phi))
-
+        phi=_phi(molar_fractions)
         V_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wv,phi))
         return V_excess
 
+    def excess_entropy( self, pressure, temperature, molar_fractions ):
+        phi=_phi(molar_fractions)
+        S_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Ws,phi))
+        return IdealSolution._ideal_excess_partial_gibbs (temperature, molar_fractions ) + S_excess
 
+    def excess_enthalpy( self, pressure, temperature, molar_fractions ):
+        phi=_phi(molar_fractions)
+        H_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wh,phi))
+        return H_excess + pressure*self.excess_volume ( pressure, temperature, molar_fractions )
 
 class SymmetricRegularSolution ( AsymmetricRegularSolution ):
     """
