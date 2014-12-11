@@ -30,7 +30,7 @@ def tait_constants(params):
     c=(1. + params['Kprime_0'] + params['K_0']*params['Kdprime_0'])/(params['Kprime_0']*params['Kprime_0'] + params['Kprime_0'] - params['K_0']*params['Kdprime_0'])
     return a, b, c
 
-def gibbs_disord_Landau(P, T, params):
+def landau_ordering(P, T, params):
     # From Holland and Powell, 1996, corrected using
     # landaunote.pdf on Tim Holland's esc web page
     Tcstar=params['landau_Tc'] + (params['landau_Vmax']/params['landau_Smax'])*P
@@ -43,13 +43,45 @@ def gibbs_disord_Landau(P, T, params):
         Q=np.power((Tcstar-T)/params['landau_Tc'],1./4.)
     else:
         Q=0.0
+
+    return Tcstar, Q_0, Q
+
+def gibbs_disorder_Landau(P, T, params):
+    # From Holland and Powell, 1996, corrected using
+    # landaunote.pdf on Tim Holland's esc web page
+    Tcstar, Q_0, Q = landau_ordering(P, T, params)
         
     # Vt is defined as a "function shaping the excess volume of disordering" in landaunote.pdf.
     # A sensible function to use in this case would be the expression in brackets in  EQ13 of Holland and Powell (2011) 
     # Here we follow tc337L, where Vt=1 ("the simplest way to proceed"; Roger Powell, pers. comm. 2014/08/22). 
     Vt=1.# EQ 13 would give: 1. - a + (a*(pow((1.-b*Pth), 1.-c) - pow((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure))
     Gdisord=params['landau_Tc']*params['landau_Smax']*(np.power(Q_0,2) - np.power(Q_0,6)/3.0) - params['landau_Smax']*(Tcstar*np.power(Q,2) - params['landau_Tc']*np.power(Q,6)/3.0) - T*(params['landau_Smax']*(np.power(Q_0,2) - np.power(Q,2))) + P*(params['landau_Vmax']*np.power(Q_0,2)*Vt)
+
     return Gdisord
+
+def entropy_disorder_Landau(P, T, params):
+    # N.B. Assumes Vt==1, see above
+    Tcstar, Q_0, Q = landau_ordering(P, T, params)
+    Sdisord=params['landau_Smax']*(np.power(Q_0, 2.) - np.power(Q, 2.))
+    return Sdisord
+
+def enthalpy_disorder_Landau(P, T, params):
+    # N.B. Assumes Vt==1, see above
+    Tcstar, Q_0, Q = landau_ordering(P, T, params)
+    Hdisord=gibbs_disorder_Landau(P, T, params) + T*entropy_disorder_Landau(P, T, params)
+    return Hdisord
+
+def heat_capacity_p_disorder_Landau(P, T, params):
+    # N.B. Assumes Vt==1, see above
+    Tcstar, Q_0, Q = landau_ordering(P, T, params)
+    Hdisord=gibbs_disorder_Landau(P, T, params) + T*entropy_disorder_Landau(P, T, params)
+    if Q==0.:
+        Cp_disord=0.
+    else:
+
+        Cp_disord=params['landau_Smax']/(2.*np.sqrt((Tcstar-T)*params['landau_Tc']))
+    return Cp_disord
+
 
 # see derivation in thermodynamic_introduction.pdf
 def lnxord(n,Q):
@@ -74,7 +106,7 @@ def equilibrium_Q(Q, deltaS, P, T, params):
     return params['BW_deltaH'] - params['BW_factor']*T*deltaS + P*params['BW_deltaV'] + params['BW_factor']*R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
 
 # Energy of disordering from Bragg-Williams symmetric model; see Holland and Powell, 1996
-def gibbs_disord_BW(P, T, params):
+def gibbs_disorder_BW(P, T, params):
     n=params['BW_n']
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
@@ -83,6 +115,24 @@ def gibbs_disord_BW(P, T, params):
     nonideal=(1.-Q)*Q*W
     Edisord=ideal+nonideal
     return Edisord
+
+def entropy_disorder_BW(P, T, params):
+    n=params['BW_n']
+    deltaS=entropydisorder(n)
+    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    Sdisord=params['BW_factor']*((1.-Q)*(entropydisorder(n) - R*lnxdisord(n,Q)) - Q*(R*lnxord(n,Q)))
+    return Sdisord
+    
+def enthalpy_disorder_BW(P, T, params):
+    n=params['BW_n']
+    deltaS=entropydisorder(n)
+    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    W=params['BW_W'] + P*params['BW_Wv']
+    ideal=(1.-Q)*(params['BW_deltaH'] + P*params['BW_deltaV'])
+    nonideal=(1.-Q)*Q*W
+    Hdisord=ideal+nonideal
+    return Hdisord
+
 
 # see Holland and Powell, 2011
 def modified_tait(x, params):
@@ -148,8 +198,11 @@ class MT(eos.EquationOfState):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
         """
-        einstein_T=einstein_temperature(params['S_0'], params['n'])
-        return einstein.heat_capacity_v(temperature, einstein_T,params['n'])
+        C_p=self.heat_capacity_p(pressure, temperature, volume, params)
+        V=self.volume(pressure,temperature,params)
+        alpha=self.thermal_expansivity(pressure, temperature, volume , params)
+        K_T=self.isothermal_bulk_modulus(pressure,temperature,volume, params)
+        return C_p - V*temperature*alpha*alpha*K_T
 
     def thermal_expansivity(self, pressure, temperature, volume , params):
         """
@@ -166,11 +219,6 @@ class MT(eos.EquationOfState):
  
         return alpha
 
-    # Heat capacity at ambient pressure
-    # N.B. Cp=-T*(d2G/dT2)|p
-
-    # What is this?  Can't we get heat capacity at constant pressure
-    # from the equation of state and the Einstein model?  IR
     def heat_capacity_p0(self,temperature,params):
         """
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
@@ -180,7 +228,7 @@ class MT(eos.EquationOfState):
         return Cp
 
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def heat_capacity_p_einstein(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
@@ -213,24 +261,84 @@ class MT(eos.EquationOfState):
 
         psubpth=pressure-Pth
 
-        intCpdT = (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
-
-        intCpoverTdT = (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
-
         # EQ 13
         intVdP = pressure*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure)))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
-            Gdisord=gibbs_disord_Landau(pressure, temperature, params)
+            Gdisord=gibbs_disorder_Landau(pressure, temperature, params)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-                Gdisord=gibbs_disord_BW(pressure, temperature, params) - gibbs_disord_BW(P_0, T_0, params)
+                Gdisord=gibbs_disorder_BW(pressure, temperature, params) - gibbs_disorder_BW(P_0, T_0, params)
             else:
                 Gdisord=0.0
 
+        return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP + Gdisord
 
-        return params['H_0'] + intCpdT - temperature*(params['S_0'] + intCpoverTdT) + intVdP + Gdisord
+
+    def entropy(self,pressure,temperature,params):
+        """
+        Returns the entropy [J/K/mol] as a function of pressure [Pa]
+        and temperature [K].
+        """
+        a, b, c = tait_constants(params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
+
+        einstein_T=einstein_temperature(params['S_0'], params['n'])
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, einstein_T, params['n'] )/einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+
+        dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
+
+        # Add order-disorder terms if required
+        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+            Sdisord=entropy_disorder_Landau(pressure, temperature, params)
+        else:
+            if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
+                Sdisord=entropy_disorder_BW(pressure, temperature, params) - entropy_disorder_BW(P_0, T_0, params)
+            else:
+                Sdisord=0.0
+
+        return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdx + Sdisord
+
+    def enthalpy(self, pressure, temperature, params):
+        """
+        Returns the enthalpy [J/mol] as a function of pressure [Pa]
+        and temperature [K].
+        """
+        gibbs=self.gibbs_free_energy(pressure,temperature,params)
+        entropy=self.entropy(pressure,temperature,params)
+        
+        # Add order-disorder terms if required
+        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+            Hdisord=enthalpy_disorder_Landau(pressure, temperature, params)
+        else:
+            if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
+                Hdisord=enthalpy_disorder_BW(pressure, temperature, params) - enthalpy_disorder_BW(P_0, T_0, params)
+            else:
+                Hdisord=0.0
+
+        return gibbs + temperature*entropy + Hdisord
+
+    def heat_capacity_p(self, pressure, temperature, volume, params):
+        """
+        Returns the heat capacity [J/K/mol] as a function of pressure [Pa]
+        and temperature [K].
+        """
+        a, b, c = tait_constants(params)
+        Pth=self.__relative_thermal_pressure(temperature,params)
+
+        einstein_T=einstein_temperature(params['S_0'], params['n'])
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, einstein_T, params['n'] )/einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+
+        dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-Pth)), -1.-c) - np.power((1.-b*Pth), -1.-c))
+
+        # Add order-disorder terms if required
+        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+            Cpdisord=heat_capacity_p_disorder_Landau(pressure, temperature, params)
+        else:
+            Cpdisord=0.0
+
+        return self.heat_capacity_p0(temperature,params) + temperature*dSdT + Cpdisord
 
     # calculate P = P(T0) + Pth
     def pressure(self, temperature, volume, params):
@@ -265,3 +373,8 @@ class MT(eos.EquationOfState):
         return self.__thermal_pressure(T, params) - \
                self.__thermal_pressure(T_0, params)
 
+    def __intCpdT (self, temperature, params):
+        return (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
+
+    def __intCpoverTdT (self, temperature, params):
+        return (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
