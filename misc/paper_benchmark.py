@@ -7,7 +7,7 @@
 paper_benchmark
 ---------------
 
-This script reproduces the benchmark in Cottaar, Heister, Rose, Unterborn (2014), Figure 3.
+This script reproduces the benchmark in :cite:`Cottaar2014`, Figure 3.
 """
 
 

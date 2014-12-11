@@ -18,7 +18,7 @@ The strategy here is to make many different "realizations" of the rock
 that you determined was the closest fit to PREM, where each realization 
 has its mineral physical parameters perturbed by a small amount, hopefully 
 related to the uncertainty in that parameter.  In particular, we will
-look at how perturbations to K' and G' (the pressure derivatives of the 
+look at how perturbations to :math:`K_{0}^{'}` and :math:`G_{0}^{'}` (the pressure derivatives of the 
 bulk and shear modulus, respectively) change the calculated 1D seismic
 profiles.
 
@@ -55,9 +55,9 @@ from burnman import minerals
 if __name__=='__main__':
     """
     Here we define a function realize_mineral() which takes a mineral
-    as a paramter, perturbs its K' and G' parameters, then returns
-    the modified mineral.  Typical values for K' are around 4 and typical
-    values for G' are around 2 (both parameters are dimensionless). 
+    as a paramter, perturbs its :math:`K_{0}^{'}` and :math:`G_{0}^{'}` parameters, then returns
+    the modified mineral.  Typical values for :math:`K_{0}^{'}` are around 4 and typical
+    values for :math:`G_{0}^{'}` are around 2 (both parameters are dimensionless). 
     We perturb the mineral by drawing from a normal ditribution with a 
     standard deviation given by K_prime_std_dev and G_prime_std_dev.  
     These parameters are currently set to very small values but you will 

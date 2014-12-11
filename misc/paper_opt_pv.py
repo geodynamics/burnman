@@ -7,7 +7,7 @@
 paper_opt_pv
 ------------
 
-This script reproduces Figure 6 from Cottaar, Heister, Rose and Unterborn (2014).
+This script reproduces :cite:`Cottaar2014`, Figure 6.
 Vary the amount perovskite vs. ferropericlase and compute the error in the
 seismic data against PREM.
 

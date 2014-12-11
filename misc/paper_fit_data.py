@@ -7,11 +7,11 @@
 paper_fit_data
 --------------
 
-This script reproduces Cottaar, Heister, Rose, Unterborn (2014) Figure 4
+This script reproduces :cite:`Cottaar2014` Figure 4.
 
 This example demonstrates BurnMan's functionality to fit thermoelastic data to
 both 2nd and 3rd orders using the EoS of the user's choice at 300 K. User's
-must create a file with P, T and Vs. See input_minphys/ for example input
+must create a file with :math:`P, T` and :math:`V_s`. See input_minphys/ for example input
 files.
 
 requires:

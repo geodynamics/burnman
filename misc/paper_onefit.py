@@ -7,7 +7,7 @@
 paper_onefit
 ------------
 
-This script reproduces Figure 7 from Cottaar, Heister, Rose, Unterborn (2014)
+This script reproduces :cite:`Cottaar2014`, Figure 7.
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """
 

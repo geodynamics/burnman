@@ -16,8 +16,8 @@ density (:math:`\rho`) of a material at a given pressure (:math:`P`) and
 temperature (:math:`T`), optionally defined by a geotherm) and determine the
 seismic velocities (:math:`V_S, V_P, V_\Phi`), one uses an Equation of State
 (EoS).  Currently the following EoSs are supported in BurnMan: the
-Birch-Murnaghan formulation (excludes temperature effects)
-:cite:`Poirier1991`, and the Birch-Murnaghan formulation with a
+Birch-Murnaghan formulation (excludes temperature effects, 
+:cite:`Poirier1991`), and the Birch-Murnaghan formulation with a
 Mie-Grüneisen-Debye temperature correction as formulated by
 :cite:`Stixrude2005`.  To calculate these thermoelastic parameters, the EoS
 requires the user to input three parameters: pressure, temperature, the phases
@@ -39,9 +39,9 @@ defined as
 
 where :math:`V` is the volume at a given pressure and :math:`V_0` is the
 volume at a reference state (:math:`P = 10^5` Pa , :math:`T` = 300 K).  The
-pressure and elastic moduli are derived from a third order Taylor expansion of
+pressure and elastic moduli are derived from a third-order Taylor expansion of
 Helmholtz free energy in :math:`f` and evaluating the appropriate volume and
-strain derivatives (see, e.g., :cite:`Poirier1991`).  For an isotropic
+strain derivatives (e.g., :cite:`Poirier1991`).  For an isotropic
 material one obtains for the pressure, isothermal bulk modulus, and shear
 modulus:
 
@@ -77,13 +77,14 @@ Thermal Corrections
 
 Thermal corrections for pressure, and isothermal bulk modulus and shear
 modulus are derived from the Mie-Grüneisen-Debye EoS with the quasi-harmonic
-approximation.  Here we adopt the formalism of :cite:`stixrude2005` where
+approximation.  Here we adopt the formalism of :cite:`Stixrude2005` where
 these corrections are added to equations :eq:`V`--:eq:`G`:
 
 .. math::
     P_{th}(V,T) &={\frac{\gamma \Delta \mathcal{U}}{V}}, \\
     K_{th}(V,T) &=(\gamma +1-q)\frac{\gamma \Delta \mathcal{U}}{V} -\gamma ^{2} \frac{\Delta(C_{V}T)}{V} ,\\
     G_{th}(V,T) &=  -\frac{\eta_{S} \Delta \mathcal{U}}{V}.
+	:label: Pth
 
 The :math:`\Delta` refers to the difference in the relevant quantity from the
 reference temperature (300 K).  :math:`\gamma` is the Grüneisen parameter,
@@ -116,14 +117,14 @@ those parameters at the reference state.
 
 
 Due to the fact that a planetary mantle is rarely isothermal along a geotherm,
-It is more appropriate to use the adiabatic bulk modulus :math:`K_S` instead
+it is more appropriate to use the adiabatic bulk modulus :math:`K_S` instead
 of :math:`K_T`, which is calculated using
 
 .. math::
     K_S=K_{T}(1+\gamma \alpha T),
     :label: K_s
 
-where :math:`\alpha` is the coefficient of thermal expansion
+where :math:`\alpha` is the coefficient of thermal expansion:
 
 
 .. math::
@@ -253,9 +254,9 @@ The Voigt-Reuss-Hill average is the arithmetic mean of Voigt and Reuss bounds:
     X_{VRH} = \frac{1}{2} \left( X_V + X_R \right).
     :label: vrh
 
-The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic, and are usually much narrower than the Voigt and Reuss bounds :cite:`Watt1976`.
-This may be a poor assumption in regions of Earth with high anisotropy, such as the lowermost mantle, though they are rather more physically motivated than the commonly-used Voigt-Reuss-Hill average.
-In most instances, the Voigt-Reuss-Hill average and the arithmetic mean of the Hashin-Shtrikman bounds are quite close to each other with the pure arithmetic mean (linear averaging) being well outside of both Hashin-Shtrikman and Voigt-Reuss-Hill.
+The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic and are usually much narrower than the Voigt and Reuss bounds :cite:`Watt1976`.
+This may be a poor assumption in regions of Earth with high anisotropy, such as the lowermost mantle, however these bounds are more physically motivated than the commonly-used Voigt-Reuss-Hill average.
+In most instances, the Voigt-Reuss-Hill average and the arithmetic mean of the Hashin-Shtrikman bounds are quite similar with the pure arithmetic mean (linear averaging) being well outside of both.
 
 It is worth noting that each of the above bounding methods are derived from mechanical models of a linear elastic composite.
 It is thus only appropriate to apply them to elastic moduli, and not to other thermoelastic properties, such as wave speeds or density.
@@ -284,7 +285,7 @@ In BurnMan one can correct the calculated acoustic velocity values to those for 
     V_{S/P}=V_{S/P}^{\mathrm{uncorr.}}\left(1-\frac{1}{2}\cot(\frac{\beta\pi}{2})\frac{1}{Q_{S/P}}(\omega)\right).
 
 Similar to :cite:`Matas2007`, we use a :math:`\beta` value of 0.3, which falls in the range of values of :math:`0.2` to :math:`0.4` proposed for the lower mantle (e.g. :cite:`Karato1990`).
-The correction is implemented for Q values of PREM for the lower mantle.
+The correction is implemented for :math:`Q` values of PREM for the lower mantle.
 As :math:`Q_S` is smaller than :math:`Q_P`, the correction is more significant for S waves.
 In both cases, though, the correction is minor compared to, for example, uncertainties in the temperature (corrections) and mineral physical parameters.
 More involved models of relaxation mechanisms can be implemented, but lead to the inclusion of more poorly constrained parameters, :cite:`Matas2007a`.
@@ -392,7 +393,7 @@ Quantitative misfits between two profiles include an L2-norm and a chi-squared m
 A seismic model in BurnMan is
 an object that provides pressure, density, and seismic velocities (:math:`V_P, V_\Phi, V_S`) as a function of depth.
 
-To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`Dziewonski1981`.
+To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`dziewonski1981`.
 One can choose to evaluate :math:`V_P, V_\Phi, V_S, \rho, K_S` and/or :math:`G`.
 The user can input their own seismic profile, an example of which is included using AK135 :cite:`Kennett1995`.
 
