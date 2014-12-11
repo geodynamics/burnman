@@ -40,15 +40,21 @@ class HelperSolidSolution(Mineral):
         assert(len(base_materials) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
+
+        self.method = base_materials[0].method
+
         #does not make sense to do a solid solution with different number of
         #atoms per formula unit or different equations of state, at least not simply...
         for m in base_materials:
+            m.set_method(self.method)
             if(base_materials[0].params.has_key('n')):
                 assert(m.params['n'] == base_materials[0].params['n'])
         
-        self.method=base_materials[0].method
-        
         self.params = {}
+
+    def set_method(self, method):
+        for m in self.base_materials:
+            m.set_method(method)
 
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
@@ -59,7 +65,6 @@ class HelperSolidSolution(Mineral):
 
     def set_state(self, pressure, temperature):
         for mat in self.base_materials:
-            mat.method = self.method
             mat.set_state(pressure, temperature)
 
         itrange = range(0, len(self.base_materials))
