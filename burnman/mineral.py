@@ -143,7 +143,14 @@ class Mineral(Material):
             self.helmholtz = self.method.helmholtz_free_energy(self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.helmholtz = float('nan')
-        
+        try:
+            self.S = self.method.entropy(self.pressure, self.temperature, self.params)
+        except (KeyError, NotImplementedError):
+            self.S = float('nan')
+        try:
+            self.H = self.method.enthalpy(self.pressure, self.temperature, self.params)
+        except (KeyError, NotImplementedError):
+            self.H = float('nan')
 
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
@@ -183,6 +190,11 @@ class Mineral(Material):
         Returns isothermal bulk modulus of the mineral [Pa]
         """
         return self.K_T
+    def compressibility(self):
+        """
+        Returns isothermal bulk modulus of the mineral [Pa]
+        """
+        return 1./self.K_T
     def adiabatic_bulk_modulus(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
