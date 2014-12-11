@@ -120,7 +120,7 @@ class IdealSolution ( SolutionModel ):
         return activities
 
  
-class AsymmetricVanLaar ( IdealSolution ):
+class AsymmetricRegularSolution ( IdealSolution ):
     """
     Solution model implementing the Asymmetric Van Laar formulation
     (best reference?).
@@ -183,12 +183,12 @@ class AsymmetricVanLaar ( IdealSolution ):
 
 
 
-class SymmetricVanLaar ( AsymmetricVanLaar ):
+class SymmetricRegularSolution ( AsymmetricRegularSolution ):
     """
     Solution model implementing the Symmetric Van Laar solution
     """
     def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_ineraction = None ):
         #symmetric case if all the alphas are equal?
         alphas = np.ones( len(endmembers) )
-        AsymmetricVanLaar.__init__(self, endmembers, alphas, enthalpy_interaction, volume_ineteraction, entropy_interaction )
+        AsymmetricRegularSolution.__init__(self, endmembers, alphas, enthalpy_interaction, volume_ineteraction, entropy_interaction )
 
