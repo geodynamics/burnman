@@ -47,17 +47,9 @@ class HelperSolidSolution(Mineral):
 			assert(m.params['n'] == base_materials[0].params['n'])
 	
 	self.method=base_materials[0].method
-
-	itrange = range(0, len(self.base_materials))
-
+	
 	self.params = {}
-	for prop in self.base_materials[0].params:
-	   try:
-		self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
-	   except TypeError:
-		#if there is a type error, it is probably a string. Just go with the value of the first base_material.
-		self.params[prop] = self.base_materials[0].params[prop]
-
+	
 
 
     def debug_print(self, indent=""):
@@ -71,12 +63,16 @@ class HelperSolidSolution(Mineral):
         for mat in self.base_materials:
             mat.method = self.method
             mat.set_state(pressure, temperature)
-        Mineral.__init__(self)
 
-    def set_state(self, pressure, temperature):
-        for mat in self.base_materials:
-            mat.method = self.method
-            mat.set_state(pressure, temperature)
+	itrange = range(0, len(self.base_materials))
+        self.params = {}
+	for prop in self.base_materials[0].params:
+	   try:
+		self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+	   except TypeError:
+		#if there is a type error, it is probably a string. Just go with the value of the first base_material.
+		self.params[prop] = self.base_materials[0].params[prop]
+
 	Mineral.set_state(self,pressure,temperature)
 
 class HelperSpinTransition(Material):
