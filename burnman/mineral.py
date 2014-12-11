@@ -39,12 +39,12 @@ class Mineral(Material):
     """
 
     def __init__(self):
-	if 'params' not in self.__dict__:
-		self.params={}
-	if 'equation_of_state' in self.params:
-		self.set_method(self.params['equation_of_state'])
-	else:
-		self.method=None
+        if 'params' not in self.__dict__:
+            self.params={}
+        if 'equation_of_state' in self.params:
+            self.set_method(self.params['equation_of_state'])
+        else:
+            self.method=None
 
     def set_method(self, method):
         """
@@ -54,9 +54,9 @@ class Mineral(Material):
         or 'slb3'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
-	if 'equation_of_state' in self.params:
-		if self.params['equation_of_state'] is not method:
-	   		warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
+        if 'equation_of_state' in self.params:
+            if self.params['equation_of_state'] is not method:
+                warnings.warn('Overriding database equation of state. From '+self.params['equation_of_state'] +' to ' + method)
         if( isinstance(method, basestring)):
             if (method == "slb2"):
                 self.method = slb.SLB2()
@@ -107,7 +107,7 @@ class Mineral(Material):
         self.temperature = temperature
         self.old_params = self.params
 
-	if self.method==None:
+        if self.method==None:
             raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
 
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
