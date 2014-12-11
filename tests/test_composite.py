@@ -27,7 +27,6 @@ class composite(BurnManTest):
         self.assertEqual(f,[1.0])
         self.assertEqual(mins,min_hs.to_string())
         c = burnman.Composite( [0.4, 0.6], [min1, min2] )
-        c.set_method("slb2")
         c.set_state(5e9,300)
         (f,m) = c.unroll()
         self.assertEqual(f,[0.4,0.6])
