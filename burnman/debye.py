@@ -5,15 +5,14 @@
 import numpy as np
 import scipy.integrate as integrate
 from numpy.polynomial.chebyshev import Chebyshev
-from burnman.constants import gas_constant
+
+import constants
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,
 just Debye, so is pretty limited.  Combine this with Mie-Grueneisen and
 Birch-Murnaghan to get a full EOS
 """
-
-R = gas_constant
 
 
 
@@ -83,7 +82,7 @@ def thermal_energy(T, debye_T, n):
     """
     if T == 0:
         return 0
-    E_th = 3.*n*R*T * debye_fn_cheb(debye_T/T)
+    E_th = 3.*n*constants.gas_constant*T * debye_fn_cheb(debye_T/T)
     return E_th
 
 def heat_capacity_v(T,debye_T,n):
@@ -93,59 +92,9 @@ def heat_capacity_v(T,debye_T,n):
     if T ==0:
         return 0
     x = debye_T/T
-    C_v = 3.0*n*R* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
+    C_v = 3.0*n*constants.gas_constant* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
-
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    import time
-
-    def old_thermal(T, debye_T, n):
-        if T == 0:
-            return 0
-        return 3.*n*R*T * debye_fn(debye_T/T)
-
-    def old_heat(T, debye_T, n):
-        if T ==0:
-            return 0
-        deb = integrate.quad( lambda x : pow(x,4.)*np.exp(x)/pow((np.exp(x)-1.),2.), 0.0, debye_T/T)
-        return 9.*n*R*deb[0]/pow(debye_T/T,3.)
-
-    temperatures = np.linspace(100,5000, 10000)
-    Debye_T = 1000.
-    old = np.empty_like(temperatures)
-    start = time.clock()
-    for i in range(len(temperatures)):
-        old[i] = old_heat(temperatures[i], Debye_T, 1.0)
-    time_old = time.clock()-start
-
-    new = np.empty_like(temperatures)
-    start = time.clock()
-    for i in range(len(temperatures)):
-        new[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
-    time_new = time.clock()-start
-
-    print "error %e"%np.linalg.norm((old-new)/new)
-    print "time old %g, time new %g"%(time_old,time_new)
-
-
-
-    temperatures = np.linspace(0,5000, 200)
-    vibrational_energy = np.empty_like(temperatures)
-    heat_capacity = np.empty_like(temperatures)
-    Debye_T = 1000.
-    for i in range(len(temperatures)):
-      vibrational_energy[i] = thermal_energy(temperatures[i], Debye_T, 1.0)
-      heat_capacity[i] = heat_capacity_v(temperatures[i], Debye_T, 1.0)
-
-    plt.subplot(121)
-    plt.plot(temperatures, vibrational_energy)
-    plt.subplot(122)
-    plt.plot(temperatures, heat_capacity)
-    plt.show()
 
 
 

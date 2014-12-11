@@ -27,6 +27,7 @@ else
   sed -i '/UserWarning: findfont: Font family/d' $t.tmp #remove font warning crap
   sed -i '/tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
   sed -i '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
+  sed -i '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
   (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
   ) || { 
@@ -45,9 +46,8 @@ echo "*** running test suite..."
 cd tests
 python tests.py || exit 1
 testit "benchmark.py"
+testit "debye.py"
 cd ..
-
-python burnman/partitioning.py || exit 1
 
 cd misc
 echo "gen_doc..."

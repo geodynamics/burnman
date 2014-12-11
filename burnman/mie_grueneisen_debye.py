@@ -8,7 +8,7 @@ import scipy.optimize as opt
 import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.debye as debye
-
+import constants
 
 class MGDBase(eos.EquationOfState):
     """
@@ -121,7 +121,7 @@ class MGDBase(eos.EquationOfState):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
         Debye_T = self.__debye_temperature(params['V_0']/V, params)
         G_th= 3./5. * ( self.__thermal_bulk_modulus(T,V,params) - \
-                 6*debye.R*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
+                 6*constants.gas_constant*T*params['n']/V * gr * debye.debye_fn(Debye_T/T) ) # EQ B10
         return G_th
 
     #compute the Debye temperature in K.  Takes the
@@ -152,7 +152,7 @@ class MGDBase(eos.EquationOfState):
     def __thermal_bulk_modulus(self, T,V,params):
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
         Debye_T = self.__debye_temperature(params['V_0']/V, params)
-        K_th = 3.*params['n']*debye.R*T/V * gr * \
+        K_th = 3.*params['n']*constants.gas_constant*T/V * gr * \
             ((1. - params['q_0'] - 3.*gr)*debye.debye_fn(Debye_T/T)+3.*gr*(Debye_T/T)/(np.exp(Debye_T/T) - 1.)) # EQ B5
         return K_th
 
