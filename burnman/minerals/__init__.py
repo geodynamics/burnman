@@ -1,5 +1,5 @@
 # BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
+# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 """
@@ -19,5 +19,10 @@ import Matas_etal_2007
 import SLB_2011
 import SLB_2011_ZSB_2013
 import SLB_2005
+import HP_2011
+import HP_2011_fluids
+import HP_2011_ds62
+import HHPH_2013
 import Murakami_2013
+import Metal_Metal_oxides
 import other

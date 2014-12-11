@@ -83,6 +83,9 @@ class BirchMurnaghanBase(eos.EquationOfState):
         """
         return volume(pressure,params)
 
+    def pressure(self, temperature, volume, params):
+        return birch_murnaghan(params['V_0']/volume, params)
+
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
         """
         Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],

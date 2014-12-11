@@ -40,6 +40,24 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
+    def pressure(self, temperature, volume, params):
+        """
+        Parameters
+        ----------
+        volume : float
+            Molar volume at which to evaluate the equation of state. [m^3]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        pressure : float
+            Pressure of the mineral, including cold and thermal parts. [m^3]
+        """
+        raise NotImplementedError("")
+
     def density(self, pressure, temperature, params):
         """
         Calculate the density of the mineral.  
@@ -208,15 +226,94 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def reference_temperature( self, params ):
+    def gibbs_free_energy( self, pressure, temperature, volume, params ):
         """
         Parameters
         ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
+        G : float
+            Gibbs free energy of the mineral
+        """
+        raise NotImplementedError("")
+
+    def helmholtz_free_energy( self, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        F : float
+            Helmholtz free energy of the mineral
+        """
+        raise NotImplementedError("")
+
+
+    def enthalpy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        H : float
+            Enthalpy of the mineral
+        """
+        raise NotImplementedError("")
+
+    def internal_energy( self, pressure, temperature, volume, params ):
+        """
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the equation of state. [Pa]
+        temperature : float
+            Temperature at which to evaluate the equation of state. [K]
+        volume : float
+            Molar volume of the mineral.  For consistency this should be calculated
+            using :func:`volume`. [m^3]
+        params : dictionary
+            Dictionary containing material parameters required by the equation of state.
+
+        Returns
+        -------
+        U : float
+            Internal energy of the mineral
+        """
+        raise NotImplementedError("")
+
+
+    def reference_temperature( self, params ):
+        """
+        Parameters
+        ----------
         T_0 : float
             If params contains a "T_0" entry, return that reference temperature, otherwise
             return 300.0 Kelvin
@@ -225,4 +322,3 @@ class EquationOfState(object):
             return params['T_0']
         else:
             return 300.0
-

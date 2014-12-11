@@ -1,0 +1,6 @@
+TO DO
+Add relative fugacity and oxygen fugacity to test script
+Complete Modified Tait EoS (with other variables)
+Correct averaging of solid solution properties
+
+Start implementing Gibbs minimisation

@@ -55,11 +55,14 @@ from version import version as __version__
 from mineral import Mineral
 from material import Material
 from composite import Composite
+from solidsolution import SolidSolution
+from equilibriumassemblage import EquilibriumAssemblage
 from mineral_helpers import *
 
 #high level functions
 from main import *
 from model import Model
+from gibbsminimization import *
 
 #mineral library
 import minerals
@@ -67,6 +70,7 @@ import minerals
 #central user tools
 import seismic
 import averaging_schemes
+import solutionmodel
 import geotherm
 
 #miscellaneous
