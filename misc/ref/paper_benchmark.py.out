@@ -1,2 +1,0 @@
-  (prop.get_family(), self.defaultFamily[fontext]))
-  UserWarning)

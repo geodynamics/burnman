@@ -7,7 +7,7 @@ t=$1
 #echo "*** testing $t ..."
 (python <<EOF
 import matplotlib as m
-m.use('Cairo')
+m.use('Template')
 VERBOSE=1
 RUNNING_TESTS=1
 execfile('$t')
