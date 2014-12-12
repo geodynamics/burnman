@@ -206,29 +206,34 @@ class SLBBase(eos.EquationOfState):
         alpha = gr * C_v / K / volume
         return alpha
 
-    def gibbs_free_energy( self, pressure, temperature, params):
+    def gibbs_free_energy( self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         volume=self.volume(pressure, temperature, params)
-        G = self.helmholtz_free_energy( temperature, volume, params) + pressure * volume
+        G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
-    def entropy( self, pressure, temperature, params):
+    def entropy( self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        
-        return float('nan')
+        volume=self.volume(pressure, temperature, params)
+        x = params['V_0'] / volume
+        f = 1./2. * (pow(x, 2./3.) - 1.)
+        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        S = debye.entropy( temperature, Debye_T, params['n'] )
+        return S 
 
-    def enthalpy( self, pressure, temperature, params):
+    def enthalpy( self, pressure, temperature, volume, params):
         """
         Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
         """
         
-        return float('nan')
+        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
+               temperature * self.entropy( pressure, temperature, volume, params)
 
-    def helmholtz_free_energy( self, temperature, volume, params):
+    def helmholtz_free_energy( self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
