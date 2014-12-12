@@ -5,6 +5,7 @@ from test_spin import *
 from test_composite import *
 from test_model import *
 from test_partitioning import *
+from test_eos import *
 
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
