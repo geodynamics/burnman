@@ -143,3 +143,13 @@ def helmholtz_free_energy(T, debye_T, n):
     F = n * constants.gas_constant * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
     return F
 
+def entropy( T, debye_T, n):
+    """
+    Entropy due to lattice vibrations in the Debye model [J/K]
+    """
+    if T <= eps:
+        return 0.
+    x = debye_T/T
+    S = n * constants.gas_constant * ( 4. * debye_fn_cheb(x) - 3. * np.log( 1.0 - np.exp(-x) ) ) 
+    return S
+
