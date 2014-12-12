@@ -1,0 +1,105 @@
+'''
+Mineral aliases
+'''
+
+# Feldspars
+ab = albite
+an = anorthite
+
+# LP Spinels
+sp = spinel
+hc = hercynite
+
+# Olivine polymorphs
+fo = forsterite
+fa = fayalite
+mgwa = mg_wadsleyite
+fewa = fe_wadsleyite
+mgri = mg_ringwoodite
+feri = fe_ringwoodite
+
+# Orthopyroxenes
+en = enstatite
+fs = ferrosilite
+mgts = mg_tschermaks
+odi = ortho_diopside
+
+# Clinopyroxenes
+di = diopside
+he = hedenbergite
+cen = clinoenstatite
+cats = ca_tschermaks
+jd = jadeite
+mgc2 = hp_clinoenstatite
+fec2 = hp_clinoferrosilite
+hpcen = hp_clinoenstatite
+hpcfs = hp_clinoferrosilite
+
+# Perovskites
+mgpv = mg_perovskite
+mg_bridgmanite = mg_perovskite
+fepv = fe_perovskite
+fe_bridgmanite = fe_perovskite
+alpv = al_perovskite
+capv = ca_perovskite
+
+# Ilmenite group
+mgil = mg_akimotoite
+feil = fe_akimotoite
+co = corundum
+
+# Garnet group
+py = pyrope
+al = almandine
+gr = grossular
+mgmj = mg_majorite
+jdmj = jd_majorite
+
+# Quartz polymorphs
+qtz = quartz
+coes = coesite
+st = stishovite
+seif = seifertite
+
+# Post perovskites
+mppv = mg_post_perovskite
+fppv = fe_post_perovskite
+appv = al_post_perovskite
+
+# Magnesiowuestite
+pe = periclase
+wu = wuestite
+
+# Calcium ferrite structured phases
+mgcf = mg_ca_ferrite
+fecf = fe_ca_ferrite
+nacf = na_ca_ferrite
+
+# Al2SiO5 polymorphs
+ky = kyanite
+
+# Nepheline group
+neph = nepheline
+
+
+
+# Solid solution aliases
+c2c = c2c_pyroxene
+cf = ca_ferrite_structured_phase
+cpx = clinopyroxene
+gt = garnet
+il = akimotoite
+ilmenite_group = akimotoite
+mw = ferropericlase
+magnesiowuestite = ferropericlase
+ol = mg_fe_olivine
+opx = orthopyroxene
+plag = plagioclase
+ppv = post_perovskite
+pv = mg_fe_perovskite
+mg_fe_bridgmanite = mg_fe_perovskite
+mg_fe_silicate_perovskite = mg_fe_perovskite
+ri = mg_fe_ringwoodite
+spinel_group=mg_fe_aluminous_spinel
+wa = mg_fe_wadsleyite
+spinelloid_III = mg_fe_wadsleyite
