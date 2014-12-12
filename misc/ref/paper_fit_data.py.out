@@ -1,7 +1,5 @@
 <stdin>:88: UserWarning: Overriding database equation of state. From BM2 to BM3
 <stdin>:97: UserWarning: Overriding database equation of state. From BM3 to BM2
-  (prop.get_family(), self.defaultFamily[fontext]))
-  UserWarning)
 Optimization terminated successfully.
          Current function value: 14212.177931
          Iterations: 117

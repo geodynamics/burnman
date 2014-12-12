@@ -1,5 +1,3 @@
-  (prop.get_family(), self.defaultFamily[fontext]))
-  UserWarning)
 V_0 & 2.445e-05 && 2.549e-05 && 1.124e-05 && 1.226e-05 & \
 K_0 & 2.505e+11 && 2.637e+11 && 1.61e+11 && 1.79e+11 & \
 Kprime_0 & 3.917 && 3.428 && 3.718 && 4.9 & \
