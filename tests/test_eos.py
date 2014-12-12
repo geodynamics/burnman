@@ -31,7 +31,7 @@ class mypericlase (burnman.Mineral):
 
 class eos(BurnManTest):
 
-    def test_volume_fail(self):
+    def test_reference_values(self):
 		rock = mypericlase()
 		pressure = 0.
 		temperature = 300
