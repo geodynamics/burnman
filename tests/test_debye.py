@@ -32,16 +32,32 @@ class mypericlase(burnman.Mineral):
 
 
 class Debye(BurnManTest):
-    def test_temperature(self):
-        #rock = mypericlase()
-        pressure = 0.
-        temperature = 300.
-        eoses = [burnman.slb.SLB2(), burnman.slb.SLB3(), burnman.birch_murnaghan.BM2(), burnman.birch_murnaghan.BM3()]
 
-        test_debye = burnman.debye.debye_fn(temperature)
-        test_debye_cheb = burnman.debye.debye_fn_cheb(temperature)
+    def test_same_debye(self):
+        x = 300.
+        test_debye = burnman.debye.debye_fn(x)
+        test_debye_cheb = burnman.debye.debye_fn_cheb(x)
         self.assertFloatEqual(test_debye, test_debye_cheb)
 
+    def test_return_zero(self):
+        rock = mypericlase()
+        x = 0.
+        test_helmholtz = burnman.debye.helmholtz_free_energy(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_helmholtz,0.)
+        test_heat_capacity_v = burnman.debye.heat_capacity_v(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_heat_capacity_v,0.)
+        test_thermal_energy = burnman.debye.thermal_energy(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_thermal_energy,0.)
+
+    def test_small(self):
+        rock = mypericlase()
+        x = 1e-16
+        test_helmholtz = burnman.debye.helmholtz_free_energy(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_helmholtz,0.)
+        test_heat_capacity_v = burnman.debye.heat_capacity_v(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_heat_capacity_v,0.)
+        test_thermal_energy = burnman.debye.thermal_energy(x,rock.params['Debye_0'],rock.params['n'])
+        self.assertFloatEqual(test_thermal_energy,0.)
 
 if __name__ == '__main__':
     unittest.main()
