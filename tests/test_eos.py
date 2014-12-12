@@ -9,7 +9,6 @@ from burnman import minerals
 from util import BurnManTest
 
 
-# TODO: test composite that changes number of entries
 class mypericlase (burnman.Mineral):
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein 
