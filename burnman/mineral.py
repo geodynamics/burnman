@@ -115,19 +115,19 @@ class Mineral(Material):
         # Attempt to calculate the gibbs free energy and helmholtz free energy, but don't complain if the
         # equation of state does not calculate it, or if the mineral params do not have the requisite entries.
         try:
-            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.params)
+            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.gibbs = float('nan')
         try:
-            self.helmholtz = self.method.helmholtz_free_energy(self.temperature, self.V, self.params)
+            self.helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.helmholtz = float('nan')
         try:
-            self.S = self.method.entropy(self.pressure, self.temperature, self.params)
+            self.S = self.method.entropy(self.pressure, self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.S = float('nan')
         try:
-            self.H = self.method.enthalpy(self.pressure, self.temperature, self.params)
+            self.H = self.method.enthalpy(self.pressure, self.temperature, self.V, self.params)
         except (KeyError, NotImplementedError):
             self.H = float('nan')
 

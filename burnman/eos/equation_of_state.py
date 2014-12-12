@@ -246,7 +246,7 @@ class EquationOfState(object):
             return 300.0
 
 
-    def gibbs_free_energy( self, pressure, temperature, params ):
+    def gibbs_free_energy( self, pressure, temperature, volume, params ):
         """
         Parameters
         ----------
@@ -267,7 +267,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def helmholtz_free_energy( self, temperature, volume, params ):
+    def helmholtz_free_energy( self, pressure, temperature, volume, params ):
         """
         Parameters
         ----------
@@ -286,14 +286,14 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def entropy( self, pressure, temperature, params):
+    def entropy( self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
 
         raise NotImplementedError("")
 
-    def enthalpy( self, pressure, temperature, params ):
+    def enthalpy( self, pressure, temperature, volume, params ):
         """
         Parameters
         ----------

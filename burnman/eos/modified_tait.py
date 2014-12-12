@@ -117,7 +117,7 @@ class MT(eos.EquationOfState):
         K_S = K_T*C_p/C_v
         return K_S
 
-    def gibbs_free_energy(self,pressure,temperature,params):
+    def gibbs_free_energy(self,pressure,temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
@@ -143,7 +143,7 @@ class MT(eos.EquationOfState):
         return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP + Gdisord
 
 
-    def entropy(self,pressure,temperature,params):
+    def entropy(self,pressure,temperature, volume, params):
         """
         Returns the entropy [J/K/mol] as a function of pressure [Pa]
         and temperature [K].
@@ -167,13 +167,13 @@ class MT(eos.EquationOfState):
 
         return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdx + Sdisord
 
-    def enthalpy(self, pressure, temperature, params):
+    def enthalpy(self, pressure, temperature, volume, params):
         """
         Returns the enthalpy [J/mol] as a function of pressure [Pa]
         and temperature [K].
         """
-        gibbs=self.gibbs_free_energy(pressure,temperature,params)
-        entropy=self.entropy(pressure,temperature,params)
+        gibbs=self.gibbs_free_energy(pressure,temperature,volume, params)
+        entropy=self.entropy(pressure,temperature,volume, params)
         
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
