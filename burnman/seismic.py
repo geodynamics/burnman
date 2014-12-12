@@ -3,8 +3,6 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 import tools
 
 class Seismic1DModel(object):

@@ -188,7 +188,7 @@ def ProcessSolidSolutionChemistry(formulae):
                 solution_formula[element_on_site]=solution_formula.get(element_on_site, 0.0) + list_multiplicity[site]*proportion_element_on_site
             
                 if element_on_site not in sites[site]:
-                    n_occupancies=n_occupancies+1
+                    n_occupancies += 1
                     sites[site].append(element_on_site)
                     element_index=sites[site].index(element_on_site)
                     for parsed_mbr in range(len(list_occupancies)):
@@ -223,7 +223,7 @@ def ProcessSolidSolutionChemistry(formulae):
             for element in range(len(list_occupancies[endmember][site])):
                 endmember_occupancies[endmember][n_element]=list_occupancies[endmember][site][element]
                 site_multiplicities[n_element]=list_multiplicity[site]
-                n_element=n_element+1
+                n_element += 1
     
 
     return solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities

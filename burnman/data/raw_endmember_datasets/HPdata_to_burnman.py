@@ -42,7 +42,7 @@ def getmbr(ds, mbr):
             atoms = 0.0
             formula=''
             for j in range(3,len(ds[i*4+3])-1,2):
-                atoms = atoms + float(ds[i*4+3][j])
+                atoms += float(ds[i * 4 + 3][j])
                 formula=formula+components[int(ds[i*4+3][j-1])-1]+str(round(float(ds[i*4+3][j]),10))
             if mbr.endswith('L'):
                 flag=-2
