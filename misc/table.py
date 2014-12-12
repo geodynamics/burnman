@@ -29,6 +29,8 @@ if __name__ == "__main__":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
                 if inspect.isclass(mineral) and mineral!=burnman.Mineral and issubclass(mineral, burnman.Mineral):
+                    if issubclass(mineral,burnman.SolidSolution):
+                        continue
                     #print mineral.__module__ + mineral.__name__
                     name1 = str(mineralgroup.__name__) +"." + str(m)
                     name = name1.replace("burnman.minerals.","")
@@ -64,6 +66,7 @@ if __name__ == "__main__":
     sortedlist = sorted(phasenames, key=lambda x: x[0])
 
     for (name,p) in sortedlist:
+        print name
         p.set_state(1e9,300)
         row = create_list(name,p)
         table.append(row)
