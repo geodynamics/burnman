@@ -16,10 +16,10 @@ EOF
 ret=$?
 if [ "$ret" -ne 0 ]
 then
-  echo "$t ... FAIL"; 
-  cat $t.tmp; 
+  echo "$t ... FAIL";
+  cat $t.tmp;
 else
-  
+
   sedthing="s#$fulldir#BURNMAN#g"
   sed -i'' $sedthing $t.tmp #remove the absolute path from warnings
   sed -i'' "s/.py:[0-9]*:/.py:/g" $t.tmp #remove line numbers
@@ -30,9 +30,9 @@ else
   sed -i'' '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
   (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
-  ) || { 
-  echo "$t ... FAIL"; 
-  echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";  
+  ) || {
+  echo "$t ... FAIL";
+  echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";
   numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp ../misc/ref/$t.out | head
   }
 
