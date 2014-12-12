@@ -124,7 +124,7 @@ class IdealSolution ( SolutionModel ):
                 if endmember_occupancy[occ] > 1e-10: 
                     self.endmember_configurational_entropies[idx] = \
                         self.endmember_configurational_entropies[idx] - \
-                        R*self.site_multiplicities[occ]*endmember_occupancy[occ]*np.log(endmember_occupancy[occ])
+                        constants.gas_constant*self.site_multiplicities[occ]*endmember_occupancy[occ]*np.log(endmember_occupancy[occ])
 
     def _endmember_configurational_entropy_contribution(self, molar_fractions):
         return np.dot(molar_fractions, self.endmember_configurational_entropies)
@@ -134,13 +134,13 @@ class IdealSolution ( SolutionModel ):
         conf_entropy=0
         for idx, occupancy in enumerate(site_occupancies):
             if occupancy > 1e-10:
-                conf_entropy=conf_entropy-R*occupancy*self.site_multiplicities[idx]*np.log(occupancy)
+                conf_entropy=conf_entropy-constants.gas_constant*occupancy*self.site_multiplicities[idx]*np.log(occupancy)
 
         return conf_entropy
 
 
     def _ideal_excess_partial_gibbs( self, temperature, molar_fractions ): 
-        return  R * temperature * self._log_ideal_activities(molar_fractions)
+        return  constants.gas_constant*temperature * self._log_ideal_activities(molar_fractions)
 
     def _log_ideal_activities ( self, molar_fractions ):
         site_occupancies=np.dot(molar_fractions, self.endmember_occupancies)
@@ -152,8 +152,8 @@ class IdealSolution ( SolutionModel ):
                 if self.endmember_occupancies[e][occ] > 1e-10 and site_occupancies[occ] > 1e-10:
                     lna[e]=lna[e] + self.endmember_occupancies[e][occ]*self.site_multiplicities[occ]*np.log(site_occupancies[occ])
 
-            normalisation_constant=self.endmember_configurational_entropies[e]/R
-            lna[e]=lna[e] + self.endmember_configurational_entropies[e]/R
+            normalisation_constant=self.endmember_configurational_entropies[e]/constants.gas_constant
+            lna[e]=lna[e] + self.endmember_configurational_entropies[e]/constants.gas_constant
         return lna
 
 
@@ -249,8 +249,9 @@ class AsymmetricRegularSolution ( IdealSolution ):
 
     def excess_entropy( self, pressure, temperature, molar_fractions ):
         phi=self._phi(molar_fractions)
+        S_conf=np.dot(IdealSolution._ideal_excess_partial_gibbs(self, temperature, molar_fractions),molar_fractions)
         S_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Ws,phi))
-        return IdealSolution._ideal_excess_partial_gibbs (self,temperature, molar_fractions ) + S_excess
+        return S_conf + S_excess
 
     def excess_enthalpy( self, pressure, temperature, molar_fractions ):
         phi=self._phi(molar_fractions)

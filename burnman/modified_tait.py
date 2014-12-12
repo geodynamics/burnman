@@ -113,8 +113,9 @@ class MT(eos.EquationOfState):
         """
         K_T= self.isothermal_bulk_modulus(pressure,temperature,volume,params)
         alpha = self.thermal_expansivity(pressure,temperature,volume,params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K_S = K_T*(1. + gr * alpha * temperature)
+        C_p = self.heat_capacity_p(pressure, temperature, volume, params)
+        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        K_S = K_T*C_p/C_v
         return K_S
 
     def gibbs_free_energy(self,pressure,temperature,params):
