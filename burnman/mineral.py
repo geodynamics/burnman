@@ -12,7 +12,8 @@ import burnman.birch_murnaghan as bm
 import burnman.slb as slb
 import burnman.mie_grueneisen_debye as mgd
 import inspect
-
+import burnman.modified_tait as mt
+import burnman.cork as cork
 
 class Mineral(Material):
     """
@@ -52,7 +53,7 @@ class Mineral(Material):
         Set the equation of state to be used for this mineral.
         Takes a string corresponding to any of the predefined
         equations of state:  'bm2', 'bm3', 'mgd2', 'mgd3', 'slb2',
-        or 'slb3'.  Alternatively, you can pass a user defined
+        'slb3' or 'mtait'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
 
@@ -75,6 +76,10 @@ class Mineral(Material):
                     return bm.BM2()
                 elif (method == "bm3"):
                     return bm.BM3()
+                elif (method == "mtait"):
+                    return mt.MT()
+                elif (method == "cork"):
+                    return cork.CORK()
                 else:
                     raise Exception("unsupported material method " + method)
             elif isinstance(method, eos.EquationOfState):
@@ -108,6 +113,9 @@ class Mineral(Material):
     def unroll(self):
         return ([1.0],[self])
 
+    def eos_pressure(self, temperature, volume):
+        return self.method.pressure(temperature, volume, self.params)
+
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
@@ -137,11 +145,35 @@ class Mineral(Material):
         self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
         self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
 
+        # Attempt to calculate the gibbs free energy and helmholtz free energy, but don't complain if the
+        # equation of state does not calculate it, or if the mineral params do not have the requisite entries.
+        try:
+            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.params)
+        except (KeyError, NotImplementedError):
+            self.gibbs = float('nan')
+        try:
+            self.helmholtz = self.method.helmholtz_free_energy(self.temperature, self.V, self.params)
+        except (KeyError, NotImplementedError):
+            self.helmholtz = float('nan')
+        try:
+            self.S = self.method.entropy(self.pressure, self.temperature, self.params)
+        except (KeyError, NotImplementedError):
+            self.S = float('nan')
+        try:
+            self.H = self.method.enthalpy(self.pressure, self.temperature, self.params)
+        except (KeyError, NotImplementedError):
+            self.H = float('nan')
+
         if (self.params.has_key('G_0') and self.params.has_key('Gprime_0')):
             self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
         else:
             self.G = float('nan') #nan if there is no G, this should propagate through calculations to the end
-            warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
+            if self.params['equation_of_state'] != 'mtait':
+                warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
+
+    # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
+    def calcgibbs(self, pressure, temperature):
+        return self.method.gibbs_free_energy(pressure, temperature, self.params)
 
     def molar_mass(self):
         """
@@ -170,6 +202,11 @@ class Mineral(Material):
         Returns isothermal bulk modulus of the mineral [Pa]
         """
         return self.K_T
+    def compressibility(self):
+        """
+        Returns isothermal bulk modulus of the mineral [Pa]
+        """
+        return 1./self.K_T
     def adiabatic_bulk_modulus(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
@@ -212,3 +249,15 @@ class Mineral(Material):
         Returns bulk sound speed of the mineral [m/s]
         """
         return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
+
+    def molar_gibbs(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        """
+        return self.gibbs
+
+    def molar_helmholtz(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        """
+        return self.helmholtz
