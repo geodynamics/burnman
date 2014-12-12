@@ -29,18 +29,17 @@ class mypericlase(burnman.Mineral):
             'grueneisen_0': 1.5,
             'q_0': 1.5,
             'eta_s_0': 2.8}
+        burnman.Mineral.__init__(self)
 
 
 class geotherm(BurnManTest):
     def test_adiabat(self):
         rock = mypericlase()
-        rock.params['K_0'] = 0.
-        pressure = [10e9]
-        T0 = 300.
-        test_K_adiabat = burnman.geotherm.adiabatic(pressure,T0,rock.params)
-        self.assertFloatEqual(test_K_adiabat,T0)
-
-
+        pressure = [100.e9,150.e9]
+        rock.set_method('slb3')
+        T0 = 1500.
+        test_K_adiabat = burnman.geotherm.adiabatic(pressure,T0,rock)
+        self.assertArraysAlmostEqual(test_K_adiabat,[1500,1650.22034002])
 
 
 if __name__ == '__main__':
