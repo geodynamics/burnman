@@ -1,5 +1,5 @@
 import unittest
-from util import BurnManTest
+from util import *
 from test_vrh import *
 from test_spin import *
 from test_composite import *
@@ -8,6 +8,7 @@ from test_partitioning import *
 from test_eos import *
 from test_debye import *
 from test_solidsolution import *
+
 
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
