@@ -81,7 +81,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
     """
     def volume(self,pressure, temperature, params):
         """
-		Returns volume [m^3] as a function of pressure [Pa]  
+        Returns volume [m^3] as a function of pressure [Pa]  
         """
         return volume(pressure,params)
 
