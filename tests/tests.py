@@ -6,6 +6,7 @@ from test_composite import *
 from test_model import *
 from test_partitioning import *
 from test_eos import *
+from test_debye import *
 from test_solidsolution import *
 
 import os, sys
