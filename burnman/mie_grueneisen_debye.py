@@ -40,6 +40,12 @@ class MGDBase(eos.EquationOfState):
         V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
         return V
 
+    def pressure(self, temperature, volume, params):
+        P = bm.birch_murnaghan(params['V_0']/volume, params) + \
+            self.__thermal_pressure(temperature, volume, params) - \
+            self.__thermal_pressure(300., volume, params)
+        return P
+
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],

@@ -129,6 +129,18 @@ def heat_capacity_v(T,debye_T,n):
     C_v = 3.0*n*constants.gas_constant* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
-
+def helmholtz_free_energy(T, debye_T, n):
+    """
+    Helmholtz free energy of lattice vibrations in the Debye model.
+    It is important to note that this does NOT include the zero 
+    point energy of vibration for the lattice.  As long as you are 
+    calculating relative differences in F, this should cancel anyways.
+    In Joules.
+    """
+    if T ==0:
+        return 0
+    x = debye_T/T
+    F = n * constants.gas_constant * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
+    return F
 
 

@@ -16,6 +16,7 @@ class SLBBase(eos.EquationOfState):
     in Stixrude and Lithgow-Bertelloni (2005).  For the most part the equations are
     all third order in strain, but see further the :class:`burnman.slb.SLB2` and :class:`burnman.slb.SLB3` classes
     """
+
     def __debye_temperature(self,x,params):
         """
         Finite strain approximation for Debye Temperature [K]
@@ -53,6 +54,18 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
+    def pressure(self, temperature, volume, params):
+        return bm.birch_murnaghan(params['V_0']/volume, params) + \
+                self.__thermal_pressure(temperature,volume, params) - \
+                self.__thermal_pressure(300.,volume, params)
+
+    #calculate isotropic thermal pressure, see
+    # Matas et. al. (2007) eq B4
+    def __thermal_pressure(self,T,V, params):
+        Debye_T = self.__debye_temperature(params['V_0']/V, params)
+        gr = self.grueneisen_parameter(0., T, V, params) # P not important
+        P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
+        return P_th
 
     def volume(self, pressure, temperature, params):
         """
@@ -87,7 +100,22 @@ class SLBBase(eos.EquationOfState):
                 warnings.warn("May be outside the range of validity for EOS")
                 return sol[0]
 
+    def pressure( self, temperature, volume, params):
+        """
+        Returns the pressure of the mineral at a given temperature and volume [Pa]
+        """
+        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        gr = self.grueneisen_parameter(0.0, temperature, volume, params) #does not depend on pressure
+        E_th = debye.thermal_energy(temperature, debye_T, params['n'])
+        E_th_ref = debye.thermal_energy(300., debye_T, params['n']) #thermal energy at reference temperature
 
+        b_iikk= 9.*params['K_0'] # EQ 28
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
+        f = 0.5*(pow(params['V_0']/volume,2./3.)-1.) # EQ 24
+        P = (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f) \
+            +(0.5*b_iikkmm*pow(f,2.))) + gr*(E_th - E_th_ref)/volume #EQ 21
+
+        return P
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
@@ -177,6 +205,48 @@ class SLBBase(eos.EquationOfState):
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
+
+    def gibbs_free_energy( self, pressure, temperature, params):
+        """
+        Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
+        """
+        volume=self.volume(pressure, temperature, params)
+        G = self.helmholtz_free_energy( temperature, volume, params) + pressure * volume
+        return G
+
+    def entropy( self, pressure, temperature, params):
+        """
+        Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
+        """
+        
+        return float('nan')
+
+    def enthalpy( self, pressure, temperature, params):
+        """
+        Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
+        """
+        
+        return float('nan')
+
+    def helmholtz_free_energy( self, temperature, volume, params):
+        """
+        Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
+        """
+        x = params['V_0'] / volume
+        f = 1./2. * (pow(x, 2./3.) - 1.)
+        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+
+        F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
+                          debye.helmholtz_free_energy( 300., Debye_T, params['n'] )
+
+        b_iikk= 9.*params['K_0'] # EQ 28
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
+
+        F = params['F_0'] + \
+            0.5*b_iikk*f*f*params['V_0'] + (1./6.)*params['V_0']*b_iikkmm*f*f*f +\
+            F_quasiharmonic
+
+        return F
 
 
 class SLB3(SLBBase):
