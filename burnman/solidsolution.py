@@ -65,14 +65,14 @@ class SolidSolution(Mineral):
         self.S = sum([ self.base_material[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
         self.V = sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
         self.C_p = sum([ self.base_material[i][0].C_p * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.alpha = (1./self.V) * sum([ self.base_material[i][0].alpha * self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.K_T = self.V * 1./(sum([ (0.0-self.base_material[i][0].V) / (self.base_material[i][0].K_T)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
 
-        # The following are currently just simple molar sums ...
-        # ... when they are corrected, they will be moved up ...
-        self.gr = sum([ self.base_material[i][0].gr * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.K_T = sum([ self.base_material[i][0].K_T * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.K_S = sum([ self.base_material[i][0].K_S * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.C_v = sum([ self.base_material[i][0].C_v * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.alpha = sum([ self.base_material[i][0].alpha * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        # Derived properties
+        self.C_v = self.C_p - self.V*temperature*np.power(self.alpha, 2.)*self.K_T
+        self.K_S = self.K_T*self.C_p/self.C_v
+        self.gr = self.alpha*self.K_T*self.V/self.C_v
+
 
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
