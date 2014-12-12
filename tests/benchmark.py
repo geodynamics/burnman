@@ -8,9 +8,9 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 sys.path.insert(1,os.path.abspath('.')) 
 import burnman
 
-import burnman.birch_murnaghan as bm
-import burnman.mie_grueneisen_debye as mgd
-import burnman.slb as slb
+import burnman.eos.birch_murnaghan as bm
+import burnman.eos.mie_grueneisen_debye as mgd
+import burnman.eos.slb as slb
 import matplotlib.image as mpimg
 
 

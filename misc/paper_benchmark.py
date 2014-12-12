@@ -17,8 +17,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 sys.path.insert(1,os.path.abspath('.'))
 import burnman
 
-import burnman.slb as slb
-
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)

@@ -6,7 +6,7 @@ import numpy as np
 import scipy.optimize as opt
 import warnings
 
-import burnman.birch_murnaghan as bm
+import birch_murnaghan as bm
 import burnman.debye as debye
 import equation_of_state as eos
 
