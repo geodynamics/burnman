@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.constants import R
+import constants
 
 """
 Functions for the Einstein model of a solid.
@@ -17,9 +17,9 @@ def thermal_energy(T, einstein_T, n):
     Returns thermal energy in J/mol
     """
     if T == 0:
-        return 3.*n*R*einstein_T*0.5 # zero point energy
+        return 3.*n*constants.gas_constant*einstein_T*0.5 # zero point energy
     x = einstein_T/T
-    E_th = 3.*n*R*einstein_T*( 0.5 + 1. / (np.exp( x ) - 1.0) ) # include the zero point energy
+    E_th = 3.*n*constants.gas_constant*einstein_T*( 0.5 + 1. / (np.exp( x ) - 1.0) ) # include the zero point energy
     return E_th
 
 def heat_capacity_v(T,einstein_T,n):
@@ -29,7 +29,7 @@ def heat_capacity_v(T,einstein_T,n):
     if T ==0:
         return 0
     x = einstein_T/T
-    C_v = 3.0*n*R* ( x * x * np.exp( x ) / np.power( np.exp( x ) - 1.0, 2.0 ) ) 
+    C_v = 3.0*n*constants.gas_constant* ( x * x * np.exp( x ) / np.power( np.exp( x ) - 1.0, 2.0 ) )
     return C_v
 
 

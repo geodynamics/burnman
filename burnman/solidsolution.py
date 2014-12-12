@@ -6,7 +6,7 @@ import numpy as np
 from burnman.mineral import Mineral
 from burnman.processchemistry import ProcessSolidSolutionChemistry
 from burnman.solutionmodel import SolutionModel
-from burnman.constants import R
+import constants
 import warnings
 
 kd = lambda x,y : 1 if x==y else 0

@@ -3,7 +3,7 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.constants import R
+import constants
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
@@ -119,7 +119,7 @@ def equilibrium_Q(Q, deltaS, P, T, params):
     W=params['BW_W'] + P*params['BW_Wv']
     if Q>1.0:
         Q=0.9 # A simple catch to make sure the optimisation doesn't fail
-    return params['BW_deltaH'] - params['BW_factor']*T*deltaS + P*params['BW_deltaV'] + params['BW_factor']*R*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
+    return params['BW_deltaH'] - params['BW_factor']*T*deltaS + P*params['BW_deltaV'] + params['BW_factor']*constants.gas_constant*T*(lnxdisord(n,Q) - lnxord(n,Q)) + (2.*Q - 1.)*W
 
 # Energy of disordering from Bragg-Williams symmetric model; see Holland and Powell, 1996
 def gibbs_disorder_BW(P, T, params):
@@ -127,7 +127,7 @@ def gibbs_disorder_BW(P, T, params):
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
     W=params['BW_W'] + P*params['BW_Wv']
-    ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*R*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(R*T*lnxord(n,Q))
+    ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*constants.gas_constant*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(R*T*lnxord(n,Q))
     nonideal=(1.-Q)*Q*W
     Edisord=ideal+nonideal
     return Edisord

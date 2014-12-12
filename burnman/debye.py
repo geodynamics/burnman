@@ -140,7 +140,7 @@ def helmholtz_free_energy(T, debye_T, n):
     if T ==0:
         return 0
     x = debye_T/T
-    F = n * R * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
+    F = n * constants.gas_constant * T * ( 3.0 * np.log( 1.0 - np.exp(-x)) - debye_fn_cheb(x) )
     return F
 
 
