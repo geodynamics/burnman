@@ -225,6 +225,18 @@ class Mineral(Material):
 
     def molar_helmholtz(self):
         """
-        Returns Gibbs free energy of the mineral [J]
+        Returns Helmholtz free energy of the mineral [J]
         """
         return self.helmholtz
+
+    def molar_enthalpy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        """
+        return self.H
+
+    def molar_entropy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        """
+        return self.S
