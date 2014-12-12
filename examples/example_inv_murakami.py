@@ -192,7 +192,7 @@ if __name__ == "__main__":
                 l = plt.plot(bins, y, 'r--', linewidth=2)
                 plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
 
-            plot_idx=plot_idx+1
+            plot_idx += 1
 
         plt.savefig("output_figures/example_inv_murakami.png")
         plt.show()

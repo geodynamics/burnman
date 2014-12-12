@@ -1218,40 +1218,6 @@ class jd_majorite (Mineral):
             'err_eta_s_0': 1.0 }
         Mineral.__init__(self)
 
-class quartz (Mineral):
-    def __init__(self):
-        formula='SiO2'
-        formula = dictionarize_formula(formula)
-        self.params = {
-            'name': 'Quartz',
-            'formula': formula,
-            'equation_of_state': 'slb3',
-            'F_0': -859000.0 ,
-            'V_0': 2.367e-05 ,
-            'K_0': 50000000000.0 ,
-            'Kprime_0': 4.3 ,
-            'Debye_0': 816.0 ,
-            'grueneisen_0': 0.0 ,
-            'q_0': 1.0 ,
-            'G_0': 45000000000.0 ,
-            'Gprime_0': 1.0 ,
-            'eta_s_0': 2.4 ,
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
-
-        self.uncertainties = {
-            'err_F_0': 1000.0 ,
-            'err_V_0': 0.0 ,
-            'err_K_0': 1000000000.0 ,
-            'err_K_prime_0': 0.1 ,
-            'err_Debye_0': 31.0 ,
-            'err_grueneisen_0': 0.05 ,
-            'err_q_0': 1.0 ,
-            'err_G_0': 1000000000.0 ,
-            'err_Gprime_0': 0.1 ,
-            'err_eta_s_0': 1.0 }
-        Mineral.__init__(self)
-
 class coesite (Mineral):
     def __init__(self):
         formula='SiO2'
@@ -1854,7 +1820,6 @@ mgmj = mg_majorite
 jdmj = jd_majorite
 
 # Quartz polymorphs
-qtz = quartz
 coes = coesite
 st = stishovite
 seif = seifertite

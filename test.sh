@@ -16,7 +16,7 @@ EOF
 ret=$?
 if [ "$ret" -ne 0 ]
 then
-  echo "$t ... FAIL";
+  echo "!  $t ... FAIL";
   cat $t.tmp;
 else
 
@@ -29,9 +29,9 @@ else
   sed -i'' '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
+  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
-  echo "$t ... FAIL";
+  echo "!  $t ... FAIL";
   echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";
   numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp ../misc/ref/$t.out | head
   }
@@ -61,23 +61,21 @@ echo "checking examples/ ..."
 cd examples
 for test in `ls example*.py`
 do
-    [ $test == "example_inv_murakami.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_premite_isothermal.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_compare_enstpyro.py" ] && echo "*** skipping $test !" && continue
-    [ $test == "example_partition_coef.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "example_inv_murakami.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "example_premite_isothermal.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "example_compare_enstpyro.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "example_partition_coef.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test
 done
 cd ..
-
-echo "   done"
 
 
 echo "checking misc/ ..."
 cd misc
 for test in `ls paper*.py`
 do
-    [ $test == "paper_opt_pv_old.py" ] && echo "*** skipping $test !" && continue
+    [ $test == "paper_opt_pv_old.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test
 done

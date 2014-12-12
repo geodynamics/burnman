@@ -97,7 +97,7 @@ class Material(object):
             List of minerals.
         """
         raise NotImplementedError("need to implement unroll() in derived class!")
-        return ()
+        return ([], [])
 
     def density(self):
         """

@@ -3,7 +3,8 @@
 # Released under GPL v2 or later.
 
 import scipy.optimize as opt
-import burnman.equation_of_state as eos
+import equation_of_state as eos
+
 
 def bulk_modulus(volume, params):
     """
@@ -19,6 +20,7 @@ def bulk_modulus(volume, params):
     K = pow(1. + 2.*f, 5./2.)* (params['K_0'] + (3. * params['K_0'] * params['Kprime_0'] -  \
            5*params['K_0'] ) * f + 27./2. * (params['K_0']*params['Kprime_0'] - 4.* params['K_0'])*f*f)
     return K
+
 
 def birch_murnaghan(x, params):
     """
@@ -79,7 +81,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
     """
     def volume(self,pressure, temperature, params):
         """
-		Returns volume [m^3] as a function of pressure [Pa]  
+        Returns volume [m^3] as a function of pressure [Pa]  
         """
         return volume(pressure,params)
 

@@ -36,7 +36,7 @@ class eos(BurnManTest):
         rock = mypericlase()
         pressure = 0.
         temperature = 300.
-        eoses = [burnman.slb.SLB2(), burnman.slb.SLB3(), burnman.birch_murnaghan.BM2(), burnman.birch_murnaghan.BM3()]
+        eoses = [burnman.eos.SLB2(), burnman.eos.SLB3(), burnman.eos.BM2(), burnman.eos.BM3()]
 
         for i in eoses:
             Volume_test = i.volume(pressure, temperature, rock.params)
@@ -56,7 +56,7 @@ class eos(BurnManTest):
             Cv_test = i.heat_capacity_v(pressure, temperature, rock.params['V_0'], rock.params)
             Grun_test = i.grueneisen_parameter(pressure, temperature, rock.params['V_0'], rock.params)
 
-        eoses_thermal = [burnman.slb.SLB2(), burnman.slb.SLB3()]
+        eoses_thermal = [burnman.eos.SLB2(), burnman.eos.SLB3()]
         for i in eoses_thermal:
             Cp_test = i.heat_capacity_p(pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(Cp_test, 37.076768469502042)

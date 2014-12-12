@@ -51,26 +51,28 @@ Acknowledgement and Support:
 
 from version import version as __version__
 
-#classes for representing rocks and minerals
+# classes for representing rocks and minerals:
 from mineral import Mineral
 from material import Material
 from composite import Composite
 from solidsolution import SolidSolution
 from mineral_helpers import *
 
-#high level functions
+# high level functions
 from main import *
 from model import Model
 
-#mineral library
+# mineral library
 import minerals
 
-#central user tools
+# central user tools
 import seismic
 import averaging_schemes
-import solutionmodel
+import eos
+
+from solutionmodel import SolutionModel
 import geotherm
 
-#miscellaneous
+# miscellaneous
 import tools
 from partitioning import calculate_partition_coefficient,calculate_phase_percents

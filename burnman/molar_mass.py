@@ -38,10 +38,10 @@ for element in re.findall('[A-Z][^A-Z]*', formula):
     else: 
         nel=float(list[1])
     # Increment size of compound
-    n=n+nel
+    n += nel
 
     # Find atomic mass of element
-    molar_mass=molar_mass+nel*el_mass[el_name.index(list[0])]
+    molar_mass += nel * el_mass[el_name.index(list[0])]
 
 print 'number of atoms per formula unit:', n
 print 'molar mass of formula unit:', molar_mass, 'kg'

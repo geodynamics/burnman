@@ -209,7 +209,7 @@ if whattodo=="plotgood":
 
         trace = []
         if shortname.startswith("err"):
-            shortname = shortname  + "(log)"
+            shortname += "(log)"
             for entry in goodfits:
                 trace.append(np.log(entry[i])/np.log(10))
         else:
@@ -582,13 +582,12 @@ elif whattodo=="plot":
     vs_hist,vs_xedge,vs_yedge = np.histogram2d(pressure_list, vs_list, bins=len(pressures_sampled), normed = True)
     vphi_hist,vphi_xedge,vphi_yedge = np.histogram2d(pressure_list, vphi_list, bins=len(pressures_sampled), normed = True)
 
-
-    vs_xedge = vs_xedge/1.e9
-    vphi_xedge = vphi_xedge/1.e9
-    rho_xedge = rho_xedge/1.e9
-    vs_yedge = vs_yedge/1.e3
-    vphi_yedge = vphi_yedge/1.e3
-    rho_yedge = rho_yedge/1.e3
+    vs_xedge /= 1.e9
+    vphi_xedge /= 1.e9
+    rho_xedge /= 1.e9
+    vs_yedge /= 1.e3
+    vphi_yedge /= 1.e3
+    rho_yedge /= 1.e3
 
     left_edge = min(vs_xedge[0], vphi_xedge[0], rho_xedge[0])
     right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])

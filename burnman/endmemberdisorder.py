@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+import scipy.optimize as opt
 import constants
 
 T_0=298.15 # Standard temperature = 25 C
@@ -109,7 +110,7 @@ def lnxdisord(n,Q):
 
 # see derivation in thermodynamic_introduction.pdf
 def entropydisorder(n):
-    BW_deltaS=R*((1.+n)*np.log(1.+n) - n*np.log(n))
+    BW_deltaS=constants.gas_constant*((1.+n)*np.log(1.+n) - n*np.log(n))
     return BW_deltaS
 
 # see Holland and Powell, 1996
@@ -127,7 +128,7 @@ def gibbs_disorder_BW(P, T, params):
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
     W=params['BW_W'] + P*params['BW_Wv']
-    ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*constants.gas_constant*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(R*T*lnxord(n,Q))
+    ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*constants.gas_constant*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(constants.gas_constant*T*lnxord(n,Q))
     nonideal=(1.-Q)*Q*W
     Edisord=ideal+nonideal
     return Edisord
@@ -136,9 +137,9 @@ def entropy_disorder_BW(P, T, params):
     n=params['BW_n']
     deltaS=entropydisorder(n)
     Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
-    Sdisord=params['BW_factor']*((1.-Q)*(entropydisorder(n) - R*lnxdisord(n,Q)) - Q*(R*lnxord(n,Q)))
+    Sdisord=params['BW_factor']*((1.-Q)*(entropydisorder(n) - constants.gas_constant*lnxdisord(n,Q)) - Q*(constants.gas_constant*lnxord(n,Q)))
     return Sdisord
-    
+
 def enthalpy_disorder_BW(P, T, params):
     n=params['BW_n']
     deltaS=entropydisorder(n)

@@ -11,7 +11,6 @@ Mineral database
   - :mod:`~burnman.minerals.Murakami_etal_2012`
   - :mod:`~burnman.minerals.Murakami_2013`
   - :mod:`~burnman.minerals.Matas_etal_2007`
-  - :mod:`~burnman.minerals.HP_2011_fluids`
   - :mod:`~burnman.minerals.HP_2011_ds62`
   - :mod:`~burnman.minerals.HHPH_2013`
   - :mod:`~burnman.minerals.other`

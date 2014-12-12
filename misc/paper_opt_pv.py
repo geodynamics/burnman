@@ -77,9 +77,9 @@ if __name__ == "__main__":
 #        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
 #                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
         rock = burnman.Composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
-                             (minerals.SLB_2011.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
+                             (minerals.other.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
 #        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
-#                             (minerals.SLB_2011.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
+#                             (minerals.other.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
         rock.set_method(method)
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
         print "Calculations are done for:"
@@ -112,8 +112,8 @@ if __name__ == "__main__":
     vs_average_prem = sum(seis_vs)/len(seis_vs)
     vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
     print vs_average_prem, vphi_average_prem
-    yy_vs=yy_vs/vs_average_prem
-    yy_vphi=yy_vphi/vphi_average_prem
+    yy_vs /= vs_average_prem
+    yy_vphi /= vphi_average_prem
     yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot
  #   plt.figure(dpi=100,figsize=figsize)
     plt.subplot(2,2,1)

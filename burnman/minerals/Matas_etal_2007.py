@@ -26,8 +26,8 @@ class mg_perovskite(Mineral):
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
             'q_0': 1.4}
-
-	Mineral.__init__(self)
+        
+        Mineral.__init__(self)
 
 class fe_perovskite(Mineral):
     def __init__(self):
