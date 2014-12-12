@@ -29,7 +29,7 @@ else
   sed -i'' '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "$t ... ok"
+  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "$t ... FAIL";
   echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";
@@ -69,8 +69,6 @@ do
     testit $test
 done
 cd ..
-
-echo "   done"
 
 
 echo "checking misc/ ..."

@@ -8,7 +8,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   1 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -22,7 +22,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.888889 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -36,7 +36,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.777778 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -50,7 +50,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.666667 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -64,7 +64,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.555556 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -78,7 +78,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444444 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -92,7 +92,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.333333 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -106,7 +106,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.222222 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -119,8 +119,8 @@ Composite:
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
-  0.111111 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+.111111 of
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -134,7 +134,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -150,7 +150,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -164,7 +164,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.333 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -178,7 +178,7 @@ Composite:
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444 of
-    HelperSolidSolution('burnman.minerals.SLB_2011.ferropericlase'):
+    HelperSolidSolution('burnman.minerals.other.ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
