@@ -30,7 +30,6 @@ import Murakami_2013
 import Matas_etal_2007
 
 # Holland, Powell and coworkers
-import HP_2011_fluids
 import HP_2011_ds62
 import HHPH_2013
 
