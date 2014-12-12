@@ -36,24 +36,3 @@ def heat_capacity_v(T,einstein_T,n):
 
 
 
-
-if __name__ == "__main__":
-
-    import matplotlib.pyplot as plt
-
-    temperatures = np.linspace(0,5000, 200)
-    vibrational_energy = np.empty_like(temperatures)
-    heat_capacity = np.empty_like(temperatures)
-    Einstein_T = 1000.
-    for i in range(len(temperatures)):
-      vibrational_energy[i] = thermal_energy(temperatures[i], Einstein_T, 1.0)
-      heat_capacity[i] = heat_capacity_v(temperatures[i], Einstein_T, 1.0)
-
-    plt.subplot(121)
-    plt.plot(temperatures, vibrational_energy)
-    plt.subplot(122)
-    plt.plot(temperatures, heat_capacity)
-    plt.show()
-
-
-
