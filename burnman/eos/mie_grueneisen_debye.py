@@ -8,7 +8,7 @@ import scipy.optimize as opt
 import burnman.equation_of_state as eos
 import burnman.birch_murnaghan as bm
 import burnman.debye as debye
-import constants
+import burnman.constants as constants
 
 class MGDBase(eos.EquationOfState):
     """

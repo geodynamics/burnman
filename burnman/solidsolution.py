@@ -3,13 +3,11 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-from burnman.mineral import Mineral
-from burnman.processchemistry import ProcessSolidSolutionChemistry
-from burnman.solutionmodel import SolutionModel
-import constants
-import warnings
 
-kd = lambda x,y : 1 if x==y else 0
+from burnman import Mineral
+from solutionmodel import SolutionModel
+from solutionmodel import kd
+
 
 class SolidSolution(Mineral):
     """
@@ -27,19 +25,40 @@ class SolidSolution(Mineral):
     and P derivatives in J/K/mol and m^3/mol.
     """
 
-    # init sets up matrices to speed up calculations for when P, T, X is defined.
-    def __init__(self, base_material, solution_model = SolutionModel() ):
+    def __init__(self, endmembers, solution_model=SolutionModel()):
+        """
+        Set up matrices to speed up calculations for when P, T, X is defined.
+
+        Parameters
+        ----------
+        endmembers: list of :class:`burnman.Mineral`
+            List of endmembers in this solid solution.
+        solution_model: :class:`burnman.SolutionModel`
+            SolutionModel to use.
+        """
+
         # Initialise the solid solution inputs
-        self.base_material = base_material
+        self.base_material = endmembers
         self.solution_model = solution_model
 
         # Number of endmembers in the solid solution
-        self.n_endmembers=len(base_material)
+        self.n_endmembers = len(endmembers)
 
         for i in range(self.n_endmembers):
             self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
 
-    def set_composition( self, molar_fraction ):
+    def get_endmembers(self):
+        return self.base_material
+
+    def set_composition(self, molar_fraction ):
+        """
+        Set the composition for this solid solution.
+
+        Parameters
+        ----------
+        molar_fraction: list of float
+            molar abundance for each endmember, needs to sum to one.
+        """
         assert(len(self.base_material) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)

@@ -8,7 +8,7 @@ import warnings
 
 import burnman.birch_murnaghan as bm
 import burnman.debye as debye
-import burnman.equation_of_state as eos
+import equation_of_state as eos
 
 class SLBBase(eos.EquationOfState):
     """

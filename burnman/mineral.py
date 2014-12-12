@@ -7,13 +7,8 @@ import warnings
 import numpy as np
 
 from burnman.material import Material
-import burnman.equation_of_state as eos
-import burnman.birch_murnaghan as bm
-import burnman.slb as slb
-import burnman.mie_grueneisen_debye as mgd
-import inspect
-import burnman.modified_tait as mt
-import burnman.cork as cork
+import burnman.eos as eos
+
 
 class Mineral(Material):
     """
@@ -43,12 +38,12 @@ class Mineral(Material):
 
     def __init__(self):
         if 'params' not in self.__dict__:
-            self.params={}
+            self.params = {}
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
 
-    def set_method(self, method):
+    def set_method(self, equation_of_state):
         """
         Set the equation of state to be used for this mineral.
         Takes a string corresponding to any of the predefined
@@ -57,41 +52,13 @@ class Mineral(Material):
         class which derives from the equation_of_state base class.
         """
 
-        if method is None:
+        if equation_of_state is None:
             self.method = None
             return
 
-        def to_method_obj(method):
-
-            if isinstance(method, basestring):
-                if (method == "slb2"):
-                    return slb.SLB2()
-                elif (method == "mgd2"):
-                    return mgd.MGD2()
-                elif (method == "mgd3"):
-                    return mgd.MGD3()
-                elif (method == "slb3"):
-                    return slb.SLB3()
-                elif (method == "bm2"):
-                    return bm.BM2()
-                elif (method == "bm3"):
-                    return bm.BM3()
-                elif (method == "mtait"):
-                    return mt.MT()
-                elif (method == "cork"):
-                    return cork.CORK()
-                else:
-                    raise Exception("unsupported material method " + method)
-            elif isinstance(method, eos.EquationOfState):
-                return method
-            elif inspect.isclass(method) and issubclass(method, eos.EquationOfState):
-                return method()
-            else:
-                raise Exception("unsupported material method " + method.__class__.__name__ )
-
-        new_method = to_method_obj(method)
+        new_method = eos.create(equation_of_state)
         if self.method is not None and 'equation_of_state' in self.params:
-            self.method = to_method_obj(self.params['equation_of_state'])
+            self.method = eos.create(self.params['equation_of_state'])
 
         if type(new_method).__name__ == 'instance':
             raise Exception("Please derive your method from object (see python old style classes)")

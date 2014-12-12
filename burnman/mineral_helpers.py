@@ -11,13 +11,12 @@ This module provides several helper minerals/materials.
 import numpy as np
 import warnings
 
-from burnman.material import Material
+from burnman import Material, Mineral
 
-from burnman.mineral import Mineral
-import burnman.equation_of_state as eos
-import burnman.birch_murnaghan as bm
-import burnman.slb as slb
-import burnman.mie_grueneisen_debye as mgd
+#import burnman.equation_of_state as eos
+#import burnman.birch_murnaghan as bm
+#import burnman.slb as slb
+#import burnman.mie_grueneisen_debye as mgd
 
 
 class HelperSolidSolution(Mineral):
@@ -52,9 +51,9 @@ class HelperSolidSolution(Mineral):
         
         self.params = {}
 
-    def set_method(self, method):
+    def set_method(self, equation_of_state):
         for m in self.base_materials:
-            m.set_method(method)
+            m.set_method(equation_of_state)
 
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())

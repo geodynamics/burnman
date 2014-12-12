@@ -5,9 +5,8 @@
 import numpy as np
 import warnings
 
-from burnman.material import Material
-from burnman.mineral import Mineral
-
+from burnman import Material
+from burnman import Mineral
 
 def check_pairs(fractions, minerals):
         if len(fractions) < 1:

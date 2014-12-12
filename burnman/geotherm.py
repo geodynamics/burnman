@@ -3,10 +3,10 @@
 # Released under GPL v2 or later.
 
 import numpy as np
-import matplotlib.pyplot as pyplot
 import scipy.integrate as integrate
 import tools
 import seismic
+
 
 def brown_shankland(pressure):
     """
