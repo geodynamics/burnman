@@ -246,7 +246,7 @@ class EquationOfState(object):
             return 300.0
 
 
-    def gibbs_free_energy( self, pressure, temperature, volume, params ):
+    def gibbs_free_energy( self, pressure, temperature, params ):
         """
         Parameters
         ----------
@@ -286,8 +286,14 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
+    def entropy( self, pressure, temperature, params):
+        """
+        Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
+        """
 
-    def enthalpy( self, pressure, temperature, volume, params ):
+        raise NotImplementedError("")
+
+    def enthalpy( self, pressure, temperature, params ):
         """
         Parameters
         ----------
@@ -295,9 +301,6 @@ class EquationOfState(object):
             Pressure at which to evaluate the equation of state. [Pa]
         temperature : float
             Temperature at which to evaluate the equation of state. [K]
-        volume : float
-            Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
