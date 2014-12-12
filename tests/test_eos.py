@@ -35,20 +35,22 @@ class eos(BurnManTest):
     def test_reference_values(self):
         rock = mypericlase()
         pressure = 0.
-        temperature = 300
+        temperature = 300.
         eoses = [burnman.slb.SLB2(), burnman.slb.SLB3(), burnman.birch_murnaghan.BM2(), burnman.birch_murnaghan.BM3()]
 
         for i in eoses:
             Volume_test = i.volume(pressure, temperature, rock.params)
             self.assertFloatEqual(Volume_test, rock.params['V_0'])
-            K_test = i.adiabatic_bulk_modulus(pressure, temperature, rock.params['V_0'], rock.params)
-            self.assertFloatEqual(K_test, rock.params['K_0'])
+            Kt_test = i.isothermal_bulk_modulus(pressure, 300., rock.params['V_0'], rock.params)
+            self.assertFloatEqual(Kt_test, rock.params['K_0'])
+            # K_S is based on 0 reference temperature:
+            Kt_test = i.isothermal_bulk_modulus(pressure, 0., rock.params['V_0'], rock.params)
+            K_test = i.adiabatic_bulk_modulus(pressure, 0., rock.params['V_0'], rock.params)
+            self.assertFloatEqual(K_test, Kt_test)
             G_test = i.shear_modulus(pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(G_test, rock.params['G_0'])
             Density_test = i.density(pressure, temperature, rock.params)
             self.assertFloatEqual(Density_test, rock.params['molar_mass'] / rock.params['V_0'])
-            Kt_test = i.isothermal_bulk_modulus(pressure, temperature, rock.params['V_0'], rock.params)
-            self.assertFloatEqual(Kt_test, rock.params['K_0'])
             alpha_test = i.thermal_expansivity(pressure, temperature, rock.params['V_0'], rock.params)
             Cp_test = i.heat_capacity_p(pressure, temperature, rock.params['V_0'], rock.params)
             Cv_test = i.heat_capacity_v(pressure, temperature, rock.params['V_0'], rock.params)
