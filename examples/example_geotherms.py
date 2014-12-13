@@ -40,7 +40,7 @@ from burnman import minerals
 if __name__ == "__main__":
 
 # we want to evaluate several geotherms at these values
-    pressures = np.arange(1e9,128e9,3e9)
+    pressures = np.arange(8.5e9,128e9,3e9)
 
     #load two builtin geotherms and evaluate the temperatures at all pressures
     temperature1 = burnman.geotherm.brown_shankland(pressures)
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     plt.plot(pressures/1e9,temperature5,'-m',label="Adiabat with pv (70%) and fp(30%)")
 
     plt.legend(loc='lower right')
-    plt.xlim([0, 130])
+    plt.xlim([8.5, 130])
     plt.xlabel('Pressure/GPa')
     plt.ylabel('Temperature')
     plt.savefig("output_figures/example_geotherm.png")
