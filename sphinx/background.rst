@@ -82,7 +82,6 @@ these corrections are added to equations :eq:`V`--:eq:`G`:
 
 .. math::
     P_{th}(V,T) &={\frac{\gamma \Delta \mathcal{U}}{V}}, \\
-    :label: Pth
     K_{th}(V,T) &=(\gamma +1-q)\frac{\gamma \Delta \mathcal{U}}{V} -\gamma ^{2} \frac{\Delta(C_{V}T)}{V} ,\\
     G_{th}(V,T) &=  -\frac{\eta_{S} \Delta \mathcal{U}}{V}.
 
