@@ -83,8 +83,8 @@ fe_pc= pymc.Uniform('fe_pc', 0.0, 0.5)
 
 def calc_all_velocities(fraction_pv, fe_pv, fe_pc):
         method = 'slb3' #slb3|slb2|mgd3|mgd2
-        pv=minerals.SLB_2011.mg_fe_perovskite(fe_pv)
-        pc=minerals.SLB_2011.ferropericlase(fe_pc)
+        pv=minerals.other.mg_fe_perovskite(fe_pv)
+        pc=minerals.other.ferropericlase(fe_pc)
         rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
         
         
@@ -110,15 +110,13 @@ def nrmse(funca,funcb):
     rmse=np.sqrt(np.sum(diff)/len(diff))
     nrmse=rmse/(np.max(funcb)-np.min(funcb))
     return nrmse
-# rewrite as function of f_pv and fe_content
-@pymc.deterministic
-def calc_misfit(fraction_pv=fraction_pv, fe_pv=fe_pv, fe_pc=fe_pc):
-    try:
-        print fraction_pv,fe_pv,fe_pc
+
+def error(fraction_pv, fe_pv, fe_pc):
+    if True:
         if fraction_pv>0. and fraction_pv<1.0 and fe_pv>0. and fe_pv<1.0 and fe_pc>0. and fe_pc<1.0:
             method = 'slb3' #slb3|slb2|mgd3|mgd2
-            pv=minerals.SLB_2011.mg_fe_perovskite(fe_pv)
-            pc=minerals.SLB_2011.ferropericlase(fe_pc)
+            pv=minerals.other.mg_fe_perovskite(fe_pv)
+            pc=minerals.other.ferropericlase(fe_pc)
             rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
 
 
@@ -128,12 +126,17 @@ def calc_misfit(fraction_pv=fraction_pv, fe_pv=fe_pv, fe_pc=fe_pc):
             #return mat_vp, mat_vs, mat_rho, mat_vphi
 
             misfit = nrmse(mat_rho,seis_rho)+nrmse(mat_K,seis_K)+nrmse(mat_G,seis_G)
-            print 'misfit',nrmse(mat_rho,seis_rho),nrmse(mat_K,seis_K),nrmse(mat_G,seis_G)
+            #print 'misfit',nrmse(mat_rho,seis_rho),nrmse(mat_K,seis_K),nrmse(mat_G,seis_G)
             return misfit
         else:
             return 1e30
-    except:
-        return 1e30
+    #except:
+    #    return 1e30
+
+# rewrite as function of f_pv and fe_content
+@pymc.deterministic
+def calc_misfit(fraction_pv=fraction_pv, fe_pv=fe_pv, fe_pc=fe_pc):
+    return error(fraction_pv,fe_pv,fe_pc)
 
 
 #sig = 1e-2
@@ -169,7 +172,7 @@ if whattodo=="continue":
         print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
         S = pymc.MCMC(model, db=db)
         #S.sample(iter=100, burn=10, thin=1)
-        S.sample(iter=10000, burn=1000, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+        S.sample(iter=10000, burn=0, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
         S.db.close()
 
 if whattodo=="plot":
@@ -288,11 +291,12 @@ if whattodo=="profile2":
 	#run with:
 	#python -m cProfile -o output.pstats example_inv_big_pv.py profile2 1
 	#gprof2dot.py -f pstats output.pstats | dot -Tpng -o output.png
-	[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]
+	[error(0.5,0.1,0.2) for i in range(0,100)]
 
 if whattodo=="profile":
 	#just run normally
-	cProfile.run("[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]")
+        print error(0.5,0.1,0.2)
+	cProfile.run("[error(0.5,0.1,0.2) for i in range(0,100)]")
 
 
 
