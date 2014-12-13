@@ -343,7 +343,5 @@ class MT(eos.EquationOfState):
 
         if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n', stacklevel=2 )
-            print params['name'], params['n']
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
-            print params['name'], params['molar_mass']
