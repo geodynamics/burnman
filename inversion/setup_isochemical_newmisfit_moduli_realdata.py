@@ -281,12 +281,12 @@ if whattodo=="profile2":
 	#run with:
 	#python -m cProfile -o output.pstats example_inv_big_pv.py profile2 1
 	#gprof2dot.py -f pstats output.pstats | dot -Tpng -o output.png
-	[error(0.5,0.1,0.2) for i in range(0,100)]
+	[error(0.5,0.1,0.2) for i in range(0,1000)]
 
 if whattodo=="profile":
 	#just run normally
         print error(0.5,0.1,0.2)
-	cProfile.run("[error(0.5,0.1,0.2) for i in range(0,100)]")
+	cProfile.run("[error(0.5,0.1,0.2) for i in range(0,1000)]")
 
 
 
