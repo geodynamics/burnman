@@ -13,14 +13,14 @@ from burnman.mineral import Mineral
 
 from SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
-# This is ferropericlase with the depricated solid solution setup, although it is still used in some of the /misc/paper* scripts
+# This is ferropericlase with the deprecated solid solution setup, although it is still used in some of the /misc/paper* scripts
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
 
-# this is mg_fe_perovskite iwth the depricated solid solution setup. Better not use...
+# this is mg_fe_perovskite with the depricated solid solution setup. Better not use...
 class mg_fe_perovskite(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [mg_perovskite(), fe_perovskite()]
