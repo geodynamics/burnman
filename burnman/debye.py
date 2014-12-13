@@ -107,7 +107,7 @@ def debye_fn_cheb(x):
     else:
         return ((val_infinity/x)/x)/x;
 
-
+@jit
 def thermal_energy(T, debye_T, n):
     """
     calculate the thermal energy of a substance.  Takes the temperature,
