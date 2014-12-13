@@ -91,7 +91,7 @@ def calc_all_velocities(fraction_pv, fe_pv, fe_pc):
         rock.set_method(method)
         
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
-        return mat_vp, mat_vs, mat_rho, mat_vphi
+        return mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G
 
 def nrmse(funca,funcb):
     """
@@ -114,19 +114,9 @@ def nrmse(funca,funcb):
 def error(fraction_pv, fe_pv, fe_pc):
     if True:
         if fraction_pv>0. and fraction_pv<1.0 and fe_pv>0. and fe_pv<1.0 and fe_pc>0. and fe_pc<1.0:
-            method = 'slb3' #slb3|slb2|mgd3|mgd2
-            pv=minerals.other.mg_fe_perovskite(fe_pv)
-            pc=minerals.other.ferropericlase(fe_pc)
-            rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
-
-
-            rock.set_method(method)
-
-            mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
-            #return mat_vp, mat_vs, mat_rho, mat_vphi
+            mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G = calc_all_velocities(fraction_pv, fe_pv, fe_pc)
 
             misfit = nrmse(mat_rho,seis_rho)+nrmse(mat_K,seis_K)+nrmse(mat_G,seis_G)
-            #print 'misfit',nrmse(mat_rho,seis_rho),nrmse(mat_K,seis_K),nrmse(mat_G,seis_G)
             return misfit
         else:
             return 1e30
