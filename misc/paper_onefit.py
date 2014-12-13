@@ -234,7 +234,7 @@ if __name__ == "__main__":
     rho, vp, vs, vphi, K, G = \
         burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
-    err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths),
+    err_vs, err_vphi, err_rho = burnman.compare_l2(depths/np.mean(depths),
                                                    [vs/np.mean(seis_vs),
                                                     vphi/np.mean(seis_vphi),
                                                     rho/np.mean(seis_rho)],
