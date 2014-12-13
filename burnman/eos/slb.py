@@ -278,27 +278,27 @@ class SLBBase(eos.EquationOfState):
         #made up these values from experience, and we are only 
         #raising a warning.  Better way to do this? [IR]
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
-            warnings.warn( 'Unusual value for V_0' )
+            warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0' )
+            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
         if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0' )
+            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         if params['G_0'] < 0. or params['G_0'] > 1.e13:
-            warnings.warn( 'Unusual value for G_0' )
+            warnings.warn( 'Unusual value for G_0', stacklevel=2 )
         if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Gprime_0' )
+            warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
-            warnings.warn( 'Unusual value for molar_mass' )
+            warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
         if params['n'] < 1. or params['n'] > 100. or not float(params['n']).is_integer():
-            warnings.warn( 'Unusual value for n' )
+            warnings.warn( 'Unusual value for n', stacklevel=2 )
         if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
-            warnings.warn( 'Unusual value for Debye_0' )
+            warnings.warn( 'Unusual value for Debye_0', stacklevel=2 )
         if params['grueneisen_0'] < 0. or params['grueneisen_0'] > 10.:
-            warnings.warn( 'Unusual value for grueneisen_0' )
+            warnings.warn( 'Unusual value for grueneisen_0' , stacklevel=2)
         if params['q_0'] < -10. or params['q_0'] > 10.:
-            warnings.warn( 'Unusual value for q_0' )
+            warnings.warn( 'Unusual value for q_0' , stacklevel=2)
         if params['eta_s_0'] < -10. or params['eta_s_0'] > 10.:
-            warnings.warn( 'Unusual value for eta_s_0' )
+            warnings.warn( 'Unusual value for eta_s_0' , stacklevel=2)
             
 
 
