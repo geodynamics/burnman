@@ -156,20 +156,20 @@ if whattodo=="run":
     whattodo="continue"
 
 if whattodo=="continue":
-    n_runs = 2 # results in 1000 new points
+    n_runs = 100
     for l in range(0,n_runs):
         db = pymc.database.pickle.load(dbname)
         print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
         S = pymc.MCMC(model, db=db)
         #S.sample(iter=100, burn=10, thin=1)
-        S.sample(iter=10000, burn=0, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+        S.sample(iter=1000, burn=0, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
         S.db.close()
 
 if whattodo=="plot":
 	files=sys.argv[2:]
 	print "files:",files
         
-        b=0#10000 # burn number
+        b=100#10000 # burn number
         i=1
 
         for t in things:
