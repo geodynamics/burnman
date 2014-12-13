@@ -1,7 +1,3 @@
-BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_HS'
-  warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
-BURNMAN/burnman/mineral.py: UserWarning: Warning: G_0 and or Gprime_0 are undefined for 'burnman.minerals.other.Speziale_fe_periclase_LS'
-  warnings.warn(('Warning: G_0 and or Gprime_0 are undefined for ' + self.to_string()))
 Could not create 'Murakami_2013.ferropericlase'
 Could not create 'Murakami_2013.mg_fe_bridgmanite'
 Could not create 'Murakami_2013.mg_fe_perovskite'
@@ -397,7 +393,7 @@ SLB_2011_ZSB_2013.mg_perovskite                                                 
 SLB_2011_ZSB_2013.periclase                                                              1.124e-05      1.61e+11      3.8      1.31e+11      2.1      0.0403     2   767.0         1.36  1.7     2.8
 SLB_2011_ZSB_2013.stishovite                                                             1.402e-05      3.14e+11      3.8       2.2e+11      1.9      0.0601     3  1108.0         1.37  2.8     4.6
 SLB_2011_ZSB_2013.wuestite                                                               1.226e-05      1.79e+11      4.9 59000000000.0      1.4      0.0718     2   454.0         1.53  1.7    -0.1
-other.Speziale_fe_periclase_HS                                                            2.29e-05     1.575e+11     3.92                            0.04567     2     587         1.46  1.2        
-other.Speziale_fe_periclase_LS                                                           2.149e-05      1.86e+11      4.6                            0.04567     2   587.0         1.46  1.2        
+other.Speziale_fe_periclase_HS                                                            2.29e-05     1.575e+11     3.92           nan      nan     0.04567     2     587         1.46  1.2        
+other.Speziale_fe_periclase_LS                                                           2.149e-05      1.86e+11      4.6           nan      nan     0.04567     2   587.0         1.46  1.2        
 other.periclase (SLB_2011.periclase)                                                     1.124e-05      1.61e+11      3.8      1.31e+11      2.1   0.0403044   2.0   767.0         1.36  1.7     2.8
 other.wuestite (SLB_2011.wuestite)                                                       1.226e-05      1.79e+11      4.9 59000000000.0      1.4   0.0718444   2.0   454.0         1.53  1.7    -0.1

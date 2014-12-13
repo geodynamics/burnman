@@ -30,11 +30,8 @@ def check_birch_murnaghan():
                           'G_0': 175.0e9,
                           'Gprime_0': 1.7,
                           'molar_mass': .0,
-                          'n': 0.,
-                          'Debye_0': 0.,
-                          'grueneisen_0': 0.,
-                          'q_0': 0.}
-    test_mineral.set_method('mgd3')
+                          }
+    test_mineral.set_method('bm3')
 
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
@@ -71,6 +68,8 @@ def check_mgd_shim_duffy_kenichi():
                    'V_0': 10.22e-6,
                    'K_0': 167.0e9,
                    'Kprime_0': 5.0,
+                   'G_0': 0.0e9,
+                   'Gprime_0': 0.0,
                    'molar_mass': .196966,
                    'n': 1.0,
                    'Debye_0': 170.,
@@ -110,6 +109,8 @@ def check_mgd_fei_mao_shu_hu():
                     'V_0': 11.657e-6,
                     'K_0': 157.0e9,
                     'Kprime_0': 4.0,
+                    'G_0': 0.0e9,
+                    'Gprime_0': 0.0,
                     'molar_mass': .196966,
                     'n': 2.0,
                     'Debye_0': 500.,
@@ -295,6 +296,7 @@ def check_slb_fig7():
                     'G_0' : 82.0e9,
                     'Gprime_0' : 1.4,
                     'n': 7.0,
+                    'molar_mass': .140695,
                     'Debye_0': 809.,
                     'grueneisen_0': .99,
                     'q_0': 2.1, 
