@@ -66,32 +66,50 @@ class SLBBase(eos.EquationOfState):
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         return params['Debye_0'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
 
-    def volume_dependent_q(self, x, params):
+    def _volume_dependent_q(self, mineral):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
         derivative of the grueneisen parameter.
         """
-        f = 1./2. * (pow(x, 2./3.) - 1.)
-        a1_ii = 6. * params['grueneisen_0'] # EQ 47
-        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
-        return q
+        if 'q' not in mineral.eos_data:
+            x = mineral.params['V_0'] / mineral.molar_volume()
+            grueneisen_0 = mineral.params['grueneisen_0']
+            q_0 = mineral.params['q_0']
+            f = 1./2. * (pow(x, 2./3.) - 1.)
+            a1_ii = 6. * grueneisen_0 # EQ 47
+            a2_iikk = -12.*grueneisen_0+36.*pow(grueneisen_0, 2.) - 18.*q_0*grueneisen_0 # EQ 47
+            nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+            gr = mineral.grueneisen_parameter()
+            mineral.eos_data['q'] = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
+        return mineral.eos_data['q']
 
-    def __isotropic_eta_s(self, x, params):
+
+    def _debye_T(self, mineral):
+        if 'debye_T' not in mineral.eos_data:
+            grueneisen_0 = mineral.params['grueneisen_0']
+            q_0 = mineral.params['q_0']
+            Debye_0 = mineral.params['Debye_0']
+            mineral.eos_data['debye_T'] = _debye_temperature_fast(mineral.params['V_0']/mineral.molar_volume(),
+                                                                  grueneisen_0, Debye_0, q_0)
+        return mineral.eos_data['debye_T']
+
+    def _isotropic_eta_s(self, mineral):
         """
         Finite strain approximation for :math:`eta_{s0}`, the isotropic shear
         strain derivative of the grueneisen parameter.
         """
-        f = 1./2. * (pow(x, 2./3.) - 1.)
-        a2_s = -2.*params['grueneisen_0'] - 2.*params['eta_s_0'] # EQ 47
-        a1_ii = 6. * params['grueneisen_0'] # EQ 47
-        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
-        return eta_s
+        if 'eta_s' not in mineral.eos_data:
+            x = mineral.params['V_0']/mineral.molar_volume()
+            f = 1./2. * (pow(x, 2./3.) - 1.)
+            grueneisen_0 = mineral.params['grueneisen_0']
+            q_0 = mineral.params['q_0']
+            a2_s = -2.*grueneisen_0 - 2.*mineral.params['eta_s_0'] # EQ 47
+            a1_ii = 6. * grueneisen_0 # EQ 47
+            a2_iikk = -12.*grueneisen_0+36.*pow(grueneisen_0, 2.) - 18.*q_0*grueneisen_0 # EQ 47
+            nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * pow(f,2.) # EQ 41
+            gr = mineral.grueneisen_parameter()
+            mineral.eos_data['eta_s'] = - gr - (1./2. * pow(nu_o_nu0_sq, -1.) * pow((2.*f)+1., 2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
+        return mineral.eos_data['eta_s']
 
     def pressure(self, temperature, volume, params):
         return bm.birch_murnaghan(params['V_0']/volume, params) + \
@@ -125,10 +143,10 @@ class SLBBase(eos.EquationOfState):
         Returns molar volume. :math:`[m^3]`
         """
         T_0 = self.reference_temperature( params )
-        debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
-        gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
-        E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
-        E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
+        #debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
+        #gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
+        #E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
+        #E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
@@ -179,24 +197,28 @@ class SLBBase(eos.EquationOfState):
 
         return P
 
+    def grueneisen_parameter(self, mineral):
+        gruen_0 = mineral.params['grueneisen_0']
+        V_0 = mineral.params['V_0']
+        q_0 = mineral.params['q_0']
+        return _grueneisen_parameter_fast(V_0, mineral.V, gruen_0, q_0)
 
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter :math:`[unitless]` 
-        """
-        gruen_0 = params['grueneisen_0']
-        V_0 = params['V_0']
-        q_0 = params['q_0']
-        return _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0)
-
-    def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
+    def isothermal_bulk_modulus(self, mineral):
         """
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
+        temperature = mineral.temperature
+        params = mineral.params
+        volume = mineral.molar_volume()
         T_0 = self.reference_temperature( params )
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        gruen_0 = mineral.params['grueneisen_0']
+        V_0 = mineral.params['V_0']
+        q_0 = mineral.params['q_0']
+        Debye_0 = params['Debye_0']
+
+        debye_T = self._debye_T(mineral)
+        gr = mineral.grueneisen_parameter()
 
         E_th = debye.thermal_energy(temperature, debye_T, params['n']) #thermal energy at temperature T
         E_th_ref = debye.thermal_energy(T_0,debye_T, params['n']) #thermal energy at reference temperature
@@ -204,7 +226,7 @@ class SLBBase(eos.EquationOfState):
         C_v = debye.heat_capacity_v(temperature, debye_T, params['n']) #heat capacity at temperature T
         C_v_ref = debye.heat_capacity_v(T_0,debye_T, params['n']) #heat capacity at reference temperature
 
-        q = self.volume_dependent_q(params['V_0']/volume, params)
+        q = self._volume_dependent_q(mineral)
 
         K = bm.bulk_modulus(volume, params) \
             + (gr + 1.-q)* ( gr / volume ) * (E_th - E_th_ref) \
@@ -212,26 +234,29 @@ class SLBBase(eos.EquationOfState):
 
         return K
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def adiabatic_bulk_modulus(self, mineral):
         """
         Returns adiabatic bulk modulus. :math:`[Pa]` 
         """
-        K_T=self.isothermal_bulk_modulus(pressure, temperature, volume, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K_S = K_T*(1. + gr * alpha * temperature)
+        K_T = mineral.isothermal_bulk_modulus()
+        alpha = mineral.thermal_expansivity()
+        gr = mineral.grueneisen_parameter()
+        K_S = K_T*(1. + gr * alpha * mineral.temperature)
         return K_S
 
-    def shear_modulus(self, pressure, temperature, volume, params):
+    def shear_modulus(self, mineral):
         """
         Returns shear modulus. :math:`[Pa]` 
         """
+        params = mineral.params
+        volume = mineral.molar_volume()
         T_0 = self.reference_temperature( params )
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
+        debye_T = self._debye_T(mineral)
 
-        E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
-        E_th_ref = debye.thermal_energy(T_0,debye_T, params['n'])
+        eta_s = self._isotropic_eta_s(mineral) # TODO
+
+        E_th = debye.thermal_energy(mineral.temperature, debye_T, params['n'])
+        E_th_ref = debye.thermal_energy(T_0, debye_T, params['n'])
 
         if self.order==2:
             return bm.shear_modulus_second_order(volume, params) - eta_s * (E_th-E_th_ref) / volume
@@ -240,74 +265,73 @@ class SLBBase(eos.EquationOfState):
         else:
             raise NotImplementedError("")
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def heat_capacity_v(self, mineral):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        return debye.heat_capacity_v(temperature, debye_T,params['n'])
+        debye_T = self._debye_T(mineral)
+        return debye.heat_capacity_v(mineral.temperature, debye_T, mineral.params['n'])
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def heat_capacity_p(self, mineral):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
         """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
-        C_p = C_v*(1. + gr * alpha * temperature)
+        alpha = mineral.thermal_expansivity()
+        gr = mineral.grueneisen_parameter()
+        C_v = mineral.heat_capacity_v()
+        C_p = C_v*(1. + gr * alpha * mineral.temperature)
         return C_p
 
-    def thermal_expansivity(self, pressure, temperature, volume, params):
+    def thermal_expansivity(self, mineral):
         """
         Returns thermal expansivity. :math:`[1/K]` 
         """
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
-        alpha = gr * C_v / K / volume
+        C_v = mineral.heat_capacity_v()
+        gr = mineral.grueneisen_parameter()
+        K = mineral.isothermal_bulk_modulus()
+        alpha = gr * C_v / K / mineral.molar_volume()
         return alpha
 
-    def gibbs_free_energy( self, pressure, temperature, volume, params):
+    def gibbs_free_energy(self, mineral):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
-        G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
+        F = mineral.molar_helmholtz(mineral)
+        G = F + mineral.pressure * mineral.molar_volume()
         return G
 
-    def entropy( self, pressure, temperature, volume, params):
+    def entropy( self, mineral):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        x = params['V_0'] / volume
-        f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        S = debye.entropy( temperature, Debye_T, params['n'] )
+        Debye_T = self._debye_T(mineral)
+        S = debye.entropy(mineral.temperature, Debye_T, mineral.params['n'] )
         return S 
 
-    def enthalpy( self, pressure, temperature, volume, params):
+    def enthalpy(self, mineral):
         """
         Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
         """
-        
-        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
-               temperature * self.entropy( pressure, temperature, volume, params)
+        F = mineral.molar_helmholtz(mineral)
+        entropy = mineral.molar_entropy()
+        return F + mineral.temperature * entropy
 
-    def helmholtz_free_energy( self, pressure, temperature, volume, params):
+    def helmholtz_free_energy(self, mineral):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
-        x = params['V_0'] / volume
+        x = mineral.params['V_0'] / mineral.molar_volume()
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        Debye_T = self._debye_T(mineral)
 
-        F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
-                          debye.helmholtz_free_energy( 300., Debye_T, params['n'] )
+        F_quasiharmonic = debye.helmholtz_free_energy(mineral.temperature, Debye_T, mineral.params['n'] ) - \
+                          debye.helmholtz_free_energy( 300., Debye_T, mineral.params['n'] )
 
-        b_iikk= 9.*params['K_0'] # EQ 28
-        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
+        b_iikk= 9.*mineral.params['K_0'] # EQ 28
+        b_iikkmm= 27.*mineral.params['K_0']*(mineral.params['Kprime_0']-4.) # EQ 29
 
-        F = params['F_0'] + \
-            0.5*b_iikk*f*f*params['V_0'] + (1./6.)*params['V_0']*b_iikkmm*f*f*f +\
+        F = mineral.params['F_0'] + \
+            0.5*b_iikk*f*f*mineral.params['V_0'] + (1./6.)*mineral.params['V_0']*b_iikkmm*f*f*f +\
             F_quasiharmonic
 
         return F
