@@ -11,6 +11,8 @@ import scipy.optimize as opt
 import equation_of_state as eos
 import burnman.constants as constants
 
+#import warnings
+
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
 
