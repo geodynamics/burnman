@@ -30,11 +30,8 @@ def check_birch_murnaghan():
                           'G_0': 175.0e9,
                           'Gprime_0': 1.7,
                           'molar_mass': .0,
-                          'n': 0.,
-                          'Debye_0': 0.,
-                          'grueneisen_0': 0.,
-                          'q_0': 0.}
-    test_mineral.set_method('mgd3')
+                          }
+    test_mineral.set_method('bm3')
 
     pressure = np.linspace(0., 140.e9, 100)
     volume = np.empty_like(pressure)
