@@ -47,7 +47,7 @@ class CO2 (Mineral):
             'H_0': -393.51e3,
             'S_0': 213.7,
             'Cp': [87.8, -2.644e-3, 706.4e3, -998.9]}
-
+        Mineral.__init__(self)
 
 class CH4 (Mineral):
     def __init__(self):
@@ -63,7 +63,7 @@ class CH4 (Mineral):
             'H_0': -74.81e3,
             'S_0': 186.26,
             'Cp': [150.1, 0.002063, 3427700., -2650.4]}
-
+        Mineral.__init__(self)
 
 class O2 (Mineral):
     def __init__(self):
@@ -79,7 +79,7 @@ class O2 (Mineral):
             'H_0': 0.,
             'S_0': 205.2,
             'Cp': [48.3, -0.000691, 499200., -420.7]}
-
+        Mineral.__init__(self)
 
 class H2 (Mineral):
     def __init__(self):
@@ -95,7 +95,7 @@ class H2 (Mineral):
             'H_0': 0.,
             'S_0': 130.7,
             'Cp': [23.3, 0.004627, 0.0, 76.3]}
-
+        Mineral.__init__(self)
 
 class S2 (Mineral):
     def __init__(self):
@@ -111,7 +111,7 @@ class S2 (Mineral):
             'H_0': 128.54e3,
             'S_0': 231.0,
             'Cp': [37.1, 0.002398, -161000.0, -65.0]}
-
+        Mineral.__init__(self)
 
 class H2S (Mineral):
     def __init__(self):
@@ -127,4 +127,4 @@ class H2S (Mineral):
             'H_0': 128.54e3,
             'S_0': 231.0,
             'Cp': [47.4, 0.010240, 615900., -397.8]}
-
+        Mineral.__init__(self)
