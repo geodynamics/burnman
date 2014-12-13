@@ -4,6 +4,7 @@ fulldir=`pwd`
 
 function testit {
 t=$1
+fulldir=$2
 #echo "*** testing $t ..."
 (python <<EOF
 import matplotlib as m
@@ -29,11 +30,11 @@ else
   sed -i'' '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp ../misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
+  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "!  $t ... FAIL";
-  echo "Check: `readlink -f $t.tmp` `readlink -f ../misc/ref/$t.out`";
-  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp ../misc/ref/$t.out | head
+  echo "Check: `readlink -f $t.tmp` `readlink -f $fulldir/misc/ref/$t.out`";
+  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp $fulldir/misc/ref/$t.out | head
   }
 
 fi
@@ -43,15 +44,28 @@ fi
 
 
 echo "*** running test suite..."
+
+# check for tabs in code:
+for f in `find . -name \*.py`
+do
+    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 1
+done
+
 cd tests
 python tests.py || exit 1
-testit "benchmark.py"
-testit "debye.py"
 cd ..
+
 
 cd misc
 echo "gen_doc..."
 python gen_doc.py >/dev/null || exit 1
+
+cd benchmarks
+for test in `ls *.py`
+do
+    testit $test $fulldir
+done
+cd ..
 cd ..
 
 
@@ -66,7 +80,7 @@ do
     [ $test == "example_compare_enstpyro.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_partition_coef.py" ] && echo "  *** skipping $test !" && continue
 
-    testit $test
+    testit $test $fulldir
 done
 cd ..
 
@@ -77,10 +91,10 @@ for test in `ls paper*.py`
 do
     [ $test == "paper_opt_pv_old.py" ] && echo "  *** skipping $test !" && continue
 
-    testit $test
+    testit $test $fulldir
 done
 
-testit table.py
+testit table.py $fulldir
 cd ..
 
 echo "   done"
