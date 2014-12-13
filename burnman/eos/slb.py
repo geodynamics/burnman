@@ -211,7 +211,6 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
-        volume=self.volume(pressure, temperature, params)
         G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
@@ -219,7 +218,6 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        volume=self.volume(pressure, temperature, params)
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
         Debye_T = self.__debye_temperature(params['V_0']/volume, params)
