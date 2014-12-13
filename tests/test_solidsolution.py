@@ -91,6 +91,20 @@ class olivine_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
 
+# Orthopyroxene solid solution
+class orthopyroxene(burnman.SolidSolution):
+    def __init__(self):
+        # Name
+        self.name='orthopyroxene'
+
+        base_material = [[forsterite(), 'Mg[Mg]Si2O6'], [forsterite(), '[Mg1/2Al1/2]2AlSiO6']]
+
+        # Interaction parameters
+        enthalpy_interaction=[[10.0e3]]
+
+        burnman.SolidSolution.__init__(self, base_material, \
+                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+
 
 
 
@@ -154,6 +168,12 @@ class test_solidsolution(BurnManTest):
         H_excess=ol_ss.solution_model.excess_enthalpy(1.e5, 1000., [0.5,0.5])
         Wh=ol_ss.solution_model.Wh[0][1]
         self.assertArraysAlmostEqual([Wh/4.0], [H_excess])
+
+    def test_order_disorder(self):
+        opx = orthopyroxene()
+        opx.set_composition( np.array([0.0, 1.0]) )
+        self.assertArraysAlmostEqual([opx.excess_gibbs], [0.])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -89,10 +89,14 @@ class SolidSolution(Mineral):
 
         # Derived properties
         self.C_v = self.C_p - self.V*temperature*self.alpha*self.alpha*self.K_T
-        self.K_S = self.K_T*self.C_p/self.C_v
-        self.gr = self.alpha*self.K_T*self.V/self.C_v
 
-
+        # C_v and C_p -> 0 as T -> 0
+        if temperature<1e-10:
+            self.K_S = self.K_T
+            self.gr = float('nan')
+        else:
+            self.K_S = self.K_T*self.C_p/self.C_v
+            self.gr = self.alpha*self.K_T*self.V/self.C_v     
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
         return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)

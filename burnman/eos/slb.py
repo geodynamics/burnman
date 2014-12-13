@@ -3,12 +3,50 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+# Try to import the jit from numba.  If it is
+# not available, just go with the standard 
+# python interpreter
+try:
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
 import scipy.optimize as opt
 import warnings
 
 import birch_murnaghan as bm
 import burnman.debye as debye
 import equation_of_state as eos
+
+@jit
+def _debye_temperature_fast(x,gruen_0,debye_0, q_0):
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * gruen_0 # EQ 47
+    a2_iikk = -12.*gruen_0+36.* gruen_0 * gruen_0 - 18.*q_0*gruen_0 # EQ 47
+    return debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+
+@jit
+def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
+    x = V_0 / volume
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * gruen_0 # EQ 47
+    a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*q_0*gruen_0 # EQ 47
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+    return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+
+@jit#(nopython=True)
+def _volume_opt_func(x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0):
+    debye_T = _debye_temperature_fast(V_0/x,gruen_0,debye_0, q_0)
+    gr = _grueneisen_parameter_fast(V_0, x, gruen_0, q_0)
+    
+    E_th =  debye.thermal_energy(temperature, debye_T, n) #thermal energy at temperature T
+    E_th_ref = debye.thermal_energy(T_0, debye_T, n) #thermal energy at reference temperature
+        
+    fx = 0.5*(pow(V_0/x,2./3.)-1.) # EQ 24
+    ret = (1./3.)*(pow(1.+2.*fx,5./2.))*((b_iikk*fx) \
+                                             +(0.5*b_iikkmm*fx*fx)) + gr*(E_th - E_th_ref)/x - pressure #EQ 21
+    return ret
 
 class SLBBase(eos.EquationOfState):
     """
@@ -68,6 +106,20 @@ class SLBBase(eos.EquationOfState):
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
 
+
+    
+    def _volume_opt_func2(self, x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0):
+        debye_T = self.__debye_temperature_fast(V_0/x,gruen_0,debye_0, q_0)
+        gr = self._grueneisen_parameter_fast(V_0, x, gruen_0, q_0)
+
+        E_th =  debye.thermal_energy(temperature, debye_T, n) #thermal energy at temperature T
+        E_th_ref = debye.thermal_energy(T_0, debye_T, n) #thermal energy at reference temperature
+        
+        fx = 0.5*(pow(V_0/x,2./3.)-1.) # EQ 24
+        ret = (1./3.)*(pow(1.+2.*fx,5./2.))*((b_iikk*fx) \
+                                             +(0.5*b_iikkmm*fx*fx)) + gr*(E_th - E_th_ref)/x - pressure #EQ 21
+        return ret*ret
+
     def volume(self, pressure, temperature, params):
         """
         Returns molar volume. :math:`[m^3]`
@@ -81,8 +133,17 @@ class SLBBase(eos.EquationOfState):
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
         f = lambda x: 0.5*(pow(params['V_0']/x,2./3.)-1.) # EQ 24
-        func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
-            +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
+        #func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
+        #    +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
+
+        n = params['n']
+        gruen_0 = params['grueneisen_0']
+        V_0 = params['V_0']
+        q_0 = params['q_0']
+        debye_0 = params['Debye_0']
+
+        func = lambda x: _volume_opt_func(x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0)
+        func2 = lambda x: pow(self._volume_opt_func2(x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0),2.)
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
@@ -94,7 +155,7 @@ class SLBBase(eos.EquationOfState):
             return opt.brentq(func, a, b)
         else:
             tol = 0.0001
-            sol = opt.fmin(lambda x : func(x)*func(x), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
+            sol = opt.fmin(func2, 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
             if sol[1] > tol*2:
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
@@ -118,17 +179,16 @@ class SLBBase(eos.EquationOfState):
 
         return P
 
+
+
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter :math:`[unitless]` 
         """
-        x = params['V_0'] / volume
-        f = 1./2. * (pow(x, 2./3.) - 1.)
         gruen_0 = params['grueneisen_0']
-        a1_ii = 6. * gruen_0 # EQ 47
-        a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*params['q_0']*gruen_0 # EQ 47
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+        V_0 = params['V_0']
+        q_0 = params['q_0']
+        return _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0)
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
@@ -211,7 +271,6 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
-        volume=self.volume(pressure, temperature, params)
         G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
@@ -219,7 +278,6 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        volume=self.volume(pressure, temperature, params)
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
         Debye_T = self.__debye_temperature(params['V_0']/volume, params)
