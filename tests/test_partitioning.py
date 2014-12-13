@@ -21,12 +21,12 @@ class test(BurnManTest):
 
         #P,T,a,b,frac_mol_pv,frac_mol_mw    = part_coef_calc(inp2,StartP,EndP,deltaP)
  
-        gt = lambda p: burnman.geotherm.brown_shankland(p)
+        gt = lambda p: burnman.geotherm.anderson(p)
         pressure = StartP
         temperature = gt([StartP])[0]
         (a,b) = burnman.calculate_partition_coefficient(pressure, temperature, rel_mol_per, 0.5)
-        self.assertFloatEqual(a, 0.14347274523)
-        self.assertFloatEqual(b, 0.108980503625)
+        self.assertFloatEqual(a, 0.0319126180713)
+        self.assertFloatEqual(b, 0.125395826369)
         
 
 
