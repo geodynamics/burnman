@@ -25,6 +25,8 @@ def brown_shankland(pressure):
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
       depth = seismic.prem_model.depth(pressure[i])
+      if depth < min(table_brown_depth):
+        raise ValueError, "depth smaller than range Brown & Shankland, 1981"
       temperature[i] = tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)
     return temperature
 
