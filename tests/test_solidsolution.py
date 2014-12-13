@@ -105,7 +105,18 @@ class orthopyroxene(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, base_material, \
                           burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
 
+# Three-endmember, two site solid solution
+class two_site_ss(burnman.SolidSolution):
+    def __init__(self):
+        # Name
+        self.name='two_site_ss'
 
+        # Endmembers (symmetric)
+        base_material = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        # Interaction parameters
+        enthalpy_interaction=[[0.0, 0.0],[0.0]]
+
+        burnman.SolidSolution.__init__(self, base_material, burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
 
 
 class test_solidsolution(BurnManTest):
@@ -172,8 +183,23 @@ class test_solidsolution(BurnManTest):
     def test_order_disorder(self):
         opx = orthopyroxene()
         opx.set_composition( np.array([0.0, 1.0]) )
+        opx.set_state(1.e5,300.)
         self.assertArraysAlmostEqual([opx.excess_gibbs], [0.])
 
+    def test_site_totals(self):
+        ss=two_site_ss()
+        ss.set_composition([0.3,0.3,0.4])
+        ss.set_state(1.e5,300.)
+
+        site_fractions=np.dot(ss.molar_fraction, ss.solution_model.endmember_occupancies)
+        i=0
+        site_fill=[]
+        ones=[1.] * ss.solution_model.n_sites
+        for site in ss.solution_model.sites:
+            site_fill.append(sum(site_fractions[i:i+len(site)]))
+            i += len(site)
+
+        self.assertArraysAlmostEqual(site_fill, ones)
 
 if __name__ == '__main__':
     unittest.main()

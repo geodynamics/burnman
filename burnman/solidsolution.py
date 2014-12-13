@@ -98,8 +98,8 @@ class SolidSolution(Mineral):
             self.K_S = self.K_T*self.C_p/self.C_v
             self.gr = self.alpha*self.K_T*self.V/self.C_v     
 
-    def calcgibbs(self, pressure, temperature, molar_fractions): 
-        return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)
+    def calcgibbs(self, pressure, temperature, molar_fraction): 
+        return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fraction[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fraction)
 
-    def calcpartialgibbsexcesses(self, pressure, temperature, molar_fractions):
-        return self.solution_model.excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions)
+    def calcpartialgibbsexcesses(self, pressure, temperature, molar_fraction):
+        return self.solution_model.excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fraction)
