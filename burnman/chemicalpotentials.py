@@ -16,7 +16,7 @@ import burnman.constants as constants
 
 # It can also calculate fugacities relative to other bulk compositions
 
-def chemicalpotentials(assemblage, component_formulae):
+def chemical_potentials(assemblage, component_formulae):
     """
     The compositional space of the components does not have to be a 
     superset of the compositional space of the assemblage. Nor do they have to
@@ -102,12 +102,12 @@ def fugacity(component_formula, standard_material, assemblage):
             the standard material
 
     """
-    chemical_potential=chemicalpotentials(assemblage, [component_formula])[0]
+    chemical_potential=chemical_potentials(assemblage, [component_formula])[0]
 
     fugacity=np.exp((chemical_potential - standard_material.gibbs)/(constants.gas_constant*assemblage[0].temperature))
     return fugacity
 
-def relativefugacity(component_formula, standard_material, assemblage, reference_assemblage):
+def relative_fugacity(component_formula, standard_material, assemblage, reference_assemblage):
     """
         Parameters
         ----------
@@ -133,8 +133,8 @@ def relativefugacity(component_formula, standard_material, assemblage, reference
             with respect to the reference_assemblage 
 
     """
-    chemical_potential=chemicalpotentials(assemblage, [component_formula])[0]
-    reference_chemical_potential=chemicalpotentials(reference_assemblage, [component_formula])[0]
+    chemical_potential=chemical_potentials(assemblage, [component_formula])[0]
+    reference_chemical_potential=chemical_potentials(reference_assemblage, [component_formula])[0]
 
     relative_fugacity=np.exp((chemical_potential - reference_chemical_potential)/(constants.gas_constant*assemblage[0].temperature))
     return relative_fugacity
