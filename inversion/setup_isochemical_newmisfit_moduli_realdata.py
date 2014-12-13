@@ -20,31 +20,14 @@ from burnman import minerals
 
 
 
-number_of_points = 10 #set on how many depth slices the computations should be done
+number_of_points = 5 #set on how many depth slices the computations should be done
 
 
 
 # velocity constraints from seismology
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
-
-
-seismic_model2 = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
-depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p2, seis_rho2, seis_vp2, seis_vs2, seis_vphi2 = seismic_model2.evaluate_all_at(depths)
-
-'''
-print seis_vs-seis_vs2
-plt.plot(depths,seis_vs,'r')
-plt.plot(depths,seis_vs2,'k')
-plt.plot(depths,seis_vp,'r')
-plt.plot(depths,seis_vp2,'k')
-#plt.plot(depths,seis_rho)
-#plt.plot(depths,seis_rho2)
-plt.show()
-stophere
-'''
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths
 
 seis_G= seis_vs**2.*seis_rho
 seis_K= seis_vphi**2*seis_rho
