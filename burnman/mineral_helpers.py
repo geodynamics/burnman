@@ -51,10 +51,6 @@ class HelperSolidSolution(Mineral):
         
         self.params = {}
 
-    def set_method(self, equation_of_state):
-        for m in self.base_materials:
-            m.set_method(equation_of_state)
-
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
         indent += "  "
