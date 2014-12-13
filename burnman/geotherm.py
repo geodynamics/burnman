@@ -99,7 +99,7 @@ def dTdP(temperature, pressure, rock):
     This works out to the formula: 
     
     .. math::
-    	dT/dP = T*\\frac{\Sigma_i(X[i]*C_{p}[i]*\gamma[i]/K[i])}{\Sigma(X[i]*C_{p}[i])}
+        dT/dP = T*\\frac{\Sigma_i(X[i]*C_{p}[i]*\gamma[i]/K[i])}{\Sigma(X[i]*C_{p}[i])}
 
     Where :math:`X[i]` is the molar fraction of phase :math:`i`, :math:`C_p` is the specific heat at constant pressure,
     :math:`\gamma` is the Gruneisen parameter and :math:`K` is the bulk modulus.
