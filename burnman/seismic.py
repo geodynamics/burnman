@@ -21,7 +21,7 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth_list : array of floats
-            Array of depths (m) to evaluate seismic model at.
+            Array of depths [m] to evaluate seismic model at.
             
         Returns
         -------
@@ -239,7 +239,7 @@ class SeismicRadiusTable(Seismic1DModel):
 
 class PREM(SeismicRadiusTable):
     """
-    Reads  PREM (1s) (input_seismic/prem_table.txt, Dziewonski & Anderson 1981).
+    Reads  PREM (1s) (input_seismic/prem_table.txt, :cite:`dziewonski1981`).
     See also :class:`burnman.seismic.SeismicRadiusTable`.
     """
     def __init__(self):

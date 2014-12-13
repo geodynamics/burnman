@@ -27,21 +27,21 @@ Please cite:
 
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
-    Geosystems, 15(4), 1164-1179
+    Geosystems, 15(4), 1164-1179 `(link) <http://dx.doi.org/10.1002/2013GC005122>`_
   
 Acknowledgement and Support:
 
   - This project was initiated at, and follow-up research support was received
     through, Cooperative Institute of Deep Earth Research, CIDER (NSF FESD
-    grant 1135452) -- see www.deep-earth.org
+    grant 1135452) -- see `www.deep-earth.org <http://www.deep-earth.org>`_
 
-  - We thank all the fellow members of the Cider Mg/Si team for their input:
+  - We thank all the fellow members of the CIDER Mg/Si team for their input:
     Valentina Magni, Yu Huang, JiaChao Liu, Marc Hirschmann, and Barbara
     Romanowicz.
 
   - We thank Lars Stixrude for providing benchmarking calculations.
 
-  - We thank CIG (www.geodynamics.org) for support and accepting our donation
+  - We thank CIG (`www.geodynamics.org <http://www.geodynamics.org>`_) for support and accepting our donation
     of BurnMan as an official project.
 
   - We also welcomed helpful discussions with Zack Geballe, Motohiko Murakami,

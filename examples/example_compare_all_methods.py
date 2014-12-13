@@ -10,7 +10,7 @@ example_compare_all_methods
 This example demonstrates how to call each of the individual calculation
 methodologies that exist within BurnMan. See below for current options. This
 example calculates seismic velocity profiles for the same set of minerals and
-a plot of Vs, Vphi and density is produce for the user to compare each of the
+a plot of :math:`V_s, V_\phi` and :math:`\\rho` is produce for the user to compare each of the
 different methods.
 
 *Specifically uses:*

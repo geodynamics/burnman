@@ -13,8 +13,9 @@ import equation_of_state as eos
 class SLBBase(eos.EquationOfState):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
-    in Stixrude and Lithgow-Bertelloni (2005).  For the most part the equations are
-    all third order in strain, but see further the :class:`burnman.slb.SLB2` and :class:`burnman.slb.SLB3` classes
+    in :cite:`Stixrude2005`.  For the most part the equations are
+    all third order in strain, but see further the :class:`burnman.slb.SLB2` and 
+    :class:`burnman.slb.SLB3` classes.
     """
 
     def __debye_temperature(self,x,params):
@@ -29,8 +30,8 @@ class SLBBase(eos.EquationOfState):
 
     def volume_dependent_q(self, x, params):
         """
-        Finite strain approximation for q, the isotropic volume strain
-        derivative of the grueneisen parameter
+        Finite strain approximation for :math:`q`, the isotropic volume strain
+        derivative of the grueneisen parameter.
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['grueneisen_0'] # EQ 47
@@ -42,8 +43,8 @@ class SLBBase(eos.EquationOfState):
 
     def __isotropic_eta_s(self, x, params):
         """
-        Finite strain approximation for eta_s_0, the isotropic shear
-        strain derivative of the grueneisen parameter
+        Finite strain approximation for :math:`eta_{s0}`, the isotropic shear
+        strain derivative of the grueneisen parameter.
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a2_s = -2.*params['grueneisen_0'] - 2.*params['eta_s_0'] # EQ 47
@@ -69,7 +70,7 @@ class SLBBase(eos.EquationOfState):
 
     def volume(self, pressure, temperature, params):
         """
-        Returns molar volume at the pressure and temperature [m^3]
+        Returns molar volume. :math:`[m^3]`
         """
         T_0 = self.reference_temperature( params )
         debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
@@ -119,7 +120,7 @@ class SLBBase(eos.EquationOfState):
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Returns grueneisen parameter at the pressure, temperature, and volume
+        Returns grueneisen parameter :math:`[unitless]` 
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
@@ -131,7 +132,7 @@ class SLBBase(eos.EquationOfState):
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
-        Returns isothermal bulk modulus at the pressure, temperature, and volume [Pa]
+        Returns isothermal bulk modulus :math:`[Pa]` 
         """
         T_0 = self.reference_temperature( params )
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
@@ -153,7 +154,7 @@ class SLBBase(eos.EquationOfState):
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         """
-        Returns adiabatic bulk modulus at the pressure, temperature, and volume [Pa]
+        Returns adiabatic bulk modulus. :math:`[Pa]` 
         """
         K_T=self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
@@ -163,7 +164,7 @@ class SLBBase(eos.EquationOfState):
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
-        Returns shear modulus at the pressure, temperature, and volume [Pa]
+        Returns shear modulus. :math:`[Pa]` 
         """
         T_0 = self.reference_temperature( params )
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
@@ -181,14 +182,14 @@ class SLBBase(eos.EquationOfState):
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
+        Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         return debye.heat_capacity_v(temperature, debye_T,params['n'])
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
+        Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
@@ -198,7 +199,7 @@ class SLBBase(eos.EquationOfState):
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Returns thermal expansivity at the pressure, temperature, and volume [1/K]
+        Returns thermal expansivity. :math:`[1/K]` 
         """
         C_v = self.heat_capacity_v(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)

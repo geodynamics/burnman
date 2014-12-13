@@ -14,7 +14,7 @@ averaging schemes are available:
 3. Reuss averaging
 4. Hashin-Shtrikman averaging
 
-See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
+See :cite:`Watt1976` Journal of Geophysics and Space Physics for explanations
 of each averaging scheme.
 
 *Specifically uses:*

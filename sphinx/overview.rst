@@ -2,7 +2,7 @@ Overview
 ========
 
 Overall Structure
-----------------
+-----------------
 
 .. image:: figures/structure.png
 
@@ -12,8 +12,8 @@ seismic velocity profiles can then be compared (either graphically or
 quantitatively) to profiles computed for other compositions or constrained by
 seismology.  It is written in the Python language and is run from the command
 line.  This allows the library to be incorporated into other projects.
-BurnMan makes extensive use of SciPy and NumPy, which are widely used Python
-libraries for scientific computation.  Matplotlib is used to display results
+BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_ and `NumPy <http://www.numpy.org/>`_, which are widely used Python
+libraries for scientific computation.  `Matplotlib <http://matplotlib.org/>`_ is used to display results
 and produce publication quality figures.  The computations are consistently
 done in SI units, although for this paper we convert units for plotting
 purposes.  A large collection of annotated examples on the usage of BurnMan

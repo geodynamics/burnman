@@ -17,7 +17,7 @@ import colors
 
 class my_perovskite(burnman.Mineral):
     """
-    based on Stixrude & Lithgow-Bertelloni 2011 and references therein
+    based on :cite:`Stixrude2011` and references therein
     """
     def __init__(self, uncertain):
         self.params = {

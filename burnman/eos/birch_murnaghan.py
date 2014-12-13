@@ -11,7 +11,7 @@ def bulk_modulus(volume, params):
     compute the bulk modulus as per the third order
     birch-murnaghan equation of state.  Returns bulk
     modulus in the same units as the reference bulk
-    modulus.  Pressure must be in Pa.
+    modulus.  Pressure must be in :math:`[Pa]`.
     """
 
     x = params['V_0']/volume
@@ -35,14 +35,14 @@ def birch_murnaghan(x, params):
 def density(pressure, params):
     """
     Get the birch-murnaghan density at a reference temperature for a given
-    pressure (in Pa). Returns density in kg/m^3
+    pressure :math:`[Pa]`. Returns density in :math:`[kg/m^3]'
     """
     return params['molar_mass']/volume(pressure,params)
 
 def volume(pressure, params):
     """
     Get the birch-murnaghan volume at a reference temperature for a given
-    pressure (Pa). Returns molar volume in m^3
+    pressure :math:`[Pa]`. Returns molar volume in :math:`[m^3]`
     """
 
     func = lambda x: birch_murnaghan(params['V_0']/x, params) - pressure
@@ -52,7 +52,7 @@ def volume(pressure, params):
 def shear_modulus_second_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in Pa (the same units as in
+    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
     params['G_0']).  This uses a second order finite strain expansion
     """
 
@@ -63,7 +63,7 @@ def shear_modulus_second_order(volume, params):
 def shear_modulus_third_order(volume, params):
     """
     Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in Pa (the same units as in
+    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
     params['G_0']).  This uses a third order finite strain expansion
     """
 
@@ -81,7 +81,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
     """
     def volume(self,pressure, temperature, params):
         """
-        Returns volume [m^3] as a function of pressure [Pa]  
+        Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
         return volume(pressure,params)
 
@@ -90,20 +90,20 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
         """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K] and volume [m^3]. 
+        Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
+        temperature :math:`[K]` and volume :math:`[m^3]`. 
         """
         return bulk_modulus(volume, params)
 
     def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
         """
-        Returns adiabatic bulk modulus of the mineral [Pa]
+        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
         """
         return bulk_modulus(volume,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
         """
-        Returns shear modulus of the mineral [Pa]
+        Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
         """
         if(self.order == 2):
           return shear_modulus_second_order(volume,params)
@@ -112,25 +112,25 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def heat_capacity_v(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return a very large number. [J/K/mol]
+        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
     def heat_capacity_p(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return a very large number. [J/K/mol]
+        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
     def thermal_expansivity(self,pressure, temperature, volume, params):
         """
-        Since this equation of state does not have temperature effects, simply return zero. [1/K]
+        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
         """
         return 0.
 
     def grueneisen_parameter(self,pressure,temperature,volume,params):
         """
-        Since this equation of state does not have temperature effects, simply return zero.
+        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
         """
         return 0.
 

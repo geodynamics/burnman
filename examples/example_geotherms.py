@@ -9,9 +9,9 @@ example_geotherms
 This example shows each of the geotherms currently possible with BurnMan.
 These are:
 
-1. Brown and Shankland, 1981
-2. Anderson, 1982
-3. Watson and Baxter, 2007
+1. Brown and Shankland, 1981 :cite:`Brown1981`
+2. Anderson, 1982 :cite:`anderson1982earth`
+3. Watson and Baxter, 2007 :cite:`Watson2007`
 4. linear extrapolation
 5. Read in from file from user
 6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)

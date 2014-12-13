@@ -10,17 +10,17 @@ import seismic
 
 def brown_shankland(pressure):
     """
-    Geotherm from Brown and Shankland (1981).
+    Geotherm from :cite:`Brown1981`. NOTE: Valid only above 270 km
 
     Parameters
     ----------
     pressure : list of floats
-        The list of pressures in [Pa] at which to evaluate the geotherm.
+        The list of pressures at which to evaluate the geotherm. :math:`[Pa]`
 
     Returns
     -------
     temperature : list of floats
-        The list of temperatures in [K] for each of the pressures
+        The list of temperatures for each of the pressures. :math:`[K]`
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
@@ -33,17 +33,17 @@ def brown_shankland(pressure):
 
 def anderson(pressure):
     """
-    Geotherm from Anderson (1982).
+    Geotherm from :cite:`anderson1982earth`.
 
     Parameters
     ----------
     pressure : list of floats
-        The list of pressures in [Pa] at which to evaluate the geotherm.
+        The list of pressures at which to evaluate the geotherm. :math:`[Pa]`
 
     Returns
     -------
     temperature : list of floats
-        The list of temperatures in [K] for each of the pressures
+        The list of temperatures for each of the pressures. :math:`[K]`
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
@@ -55,7 +55,7 @@ def adiabatic(pressures, T0, rock):
     """
     This calculates a geotherm based on an anchor temperature and a rock,
     assuming that the rock's temperature follows an adiabatic gradient with
-    pressure.  This amounts to integrating
+    pressure. This amounts to integrating:
 
     .. math::
         \\frac{\partial T}{\partial P} = \\frac{ \\gamma  T}{ K_s }
@@ -67,11 +67,11 @@ def adiabatic(pressures, T0, rock):
     ----------
 
     pressures : list of floats
-        The list of pressures in [Pa] at which to evaluate the geotherm.
+        The list of pressures in :math:`[Pa]` at which to evaluate the geotherm.
 
     T0 : float
         An anchor temperature, corresponding to the temperature of the first
-        pressure in the list. [K]
+        pressure in the list. :math:`[K]`
 
     rock : :class:`burnman.composite`
         Material for which we compute the adiabat.  From this material we
@@ -82,7 +82,7 @@ def adiabatic(pressures, T0, rock):
     -------
 
     temperature: list of floats
-        The list of temperatures in [K] for each of the pressures
+        The list of temperatures for each pressure. :math:`[K]`
     """
     temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
     return temperatures.ravel()
@@ -96,8 +96,13 @@ def dTdP(temperature, pressure, rock):
     First consider compression of the composite to a new pressure P+dP.  They all heat up
     different amounts dT[i], according to their thermoelastic parameters.  Then allow them
     to equilibrate to a constant temperature dT, conserving heat within the composite.
-    This works out to the formula: dT/dP = T*sum(frac[i]*Cp[i]*gr[i]/K[i])/sum(frac[i]*Cp[i])
+    This works out to the formula: 
+    
+    .. math::
+    	dT/dP = T*\\frac{\Sigma_i(X[i]*C_{p}[i]*\gamma[i]/K[i])}{\Sigma(X[i]*C_{p}[i])}
 
+    Where :math:`X[i]` is the molar fraction of phase :math:`i`, :math:`C_p` is the specific heat at constant pressure,
+    :math:`\gamma` is the Gruneisen parameter and :math:`K` is the bulk modulus.
     This function is called by :func:`burnman.geotherm.adiabatic`, and in general
     it will not be too useful in other contexts.
 
@@ -105,18 +110,18 @@ def dTdP(temperature, pressure, rock):
     ----------
 
     pressure : float
-        The pressure at which to evaluate dT/dP. [Pa]
+        The pressure at which to evaluate dT/dP. :math:`[Pa]`
 
     temperature : float
-        The temperature at which to evaluate dT/dP. [K]
+        The temperature at which to evaluate dT/dP. :math:`[K]`
 
     rock : :class:`burnman.composite`
-        Material for which we compute dT/dP
+        Material for which we compute dT/dP.
 
     Returns
     -------
         dT/dP : float
-          Adiabatic temperature gradient [K/Pa] for the composite at temperature, pressure.
+          Adiabatic temperature gradient for the composite at a given temperature and pressure. :math:`[K/Pa]` 
     """
     top = 0
     bottom = 0
