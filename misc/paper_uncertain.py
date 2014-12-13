@@ -7,7 +7,7 @@
 paper_uncertain
 ---------------
 
-This script reproduces Figure 8 from Cottaar, Heister, Rose and Unterborn (2014).
+This script reproduces :cite:`Cottaar2014`, Figure 8.
 It shows the sensitivity of the velocities to various mineralogical parameters.
 """
 

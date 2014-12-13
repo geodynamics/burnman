@@ -3,23 +3,31 @@ Equations of state
 
 Base class
 ----------
-.. autoclass:: burnman.equation_of_state.EquationOfState
+.. autoclass:: burnman.eos.EquationOfState
 
 Birch-Murnaghan
 ---------------
 
-.. autoclass:: burnman.birch_murnaghan.BirchMurnaghanBase
+.. autoclass:: burnman.eos.BirchMurnaghanBase
 
-.. autoclass:: burnman.birch_murnaghan.BM2
+.. autoclass:: burnman.eos.BM2
 
-.. autoclass:: burnman.birch_murnaghan.BM3
+.. autoclass:: burnman.eos.BM3
 
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------
 
-.. autoclass:: burnman.slb.SLBBase
+.. autoclass:: burnman.eos.SLBBase
 
-.. autoclass:: burnman.slb.SLB2
+.. autoclass:: burnman.eos.SLB2
 
-.. autoclass:: burnman.slb.SLB3
+.. autoclass:: burnman.eos.SLB3
+
+Modified Tait
+-------------
+.. autoclass:: burnman.eos.MT
+
+Cork
+----
+.. autoclass:: burnman.eos.CORK
 

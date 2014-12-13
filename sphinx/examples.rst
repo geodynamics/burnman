@@ -35,7 +35,7 @@ When run (without putting in a more realistic composition), the program produces
 Your goal in this tutorial is to improve this awful fit....
 
 
-link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
+link to source code: `tutorial/step1.py <../../../tutorial/step_2.py>`_
 
 
 
@@ -52,7 +52,7 @@ link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 .. automodule:: tutorial.step_3
 
-After changing the standard deviations for :math:`K'` and :math:`G'` to 0.2, the following figure of velocities for 1000 realizations is produced:
+After changing the standard deviations for :math:`K_{0}^{'}` and :math:`G_{0}^{'}` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
 .. image:: figures/tut-step3.png
 
@@ -144,6 +144,8 @@ Advanced examples:
 
 Reproducing Cottaar, Heister, Rose and Unterborn (2014)
 =======================================================
+In this section we include the scripts that were used for all computations and
+figures in the 2014 BurnMan paper: Cottaar, Heister, Rose & Unterborn (2014) :cite:`Cottaar2014`
 
 .. automodule:: misc.paper_averaging
 
@@ -164,9 +166,9 @@ Reproducing Cottaar, Heister, Rose and Unterborn (2014)
 .. automodule:: misc.paper_uncertain
    :exclude-members: my_perovskite
 
+
 Misc or work in progress
 ========================
-
 
 .. automodule:: examples.example_inv_murakami
 .. broken: .. automodule:: example_optimize_slb2011

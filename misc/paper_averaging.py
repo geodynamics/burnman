@@ -7,7 +7,7 @@
 paper_averaging
 ---------------
 
-This script reproduces Cottaar, Heister, Rose, Unterborn (2014) Figure 2.
+This script reproduces :cite:`Cottaar2014`, Figure 2.
 
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
@@ -16,7 +16,7 @@ averaging schemes are available:
 3. Reuss averaging
 4. Hashin-Shtrikman averaging
 
-See Watt et al., 1976 Journal of Geophysics and Space Physics for explanations
+See :cite:`Watt1976` for explanations
 of each averaging scheme.
 
 requires:

@@ -6,17 +6,17 @@
 example_seismic
 ---------------
 
-Shows the various ways to input seismic models (Vs, Vp, Vphi, Density) as a
-function of depth (or P) as well as different velocity model libraries
+Shows the various ways to input seismic models (:math:`V_s, V_p, V_{\phi}, \\rho`) as a
+function of depth (or pressure) as well as different velocity model libraries
 available within Burnman:
 
-1. PREM (Dziewonski & Anderson, 1981)
+1. PREM :cite:`dziewonski1981`
 2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
-   (Lekic et al. 2012)
-3. Reference model for slow regions (LLSVP's) in the lower mantle (Lekic et la. 2012)
+   :cite:`Lekic2012`
+3. Reference model for slow regions (LLSVP's) in the lower mantle :cite:`Lekic2012`
 
 This example will first calculate or read in a seismic model and plot the
-model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 (Kennett et al., 1995).
+model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`Kennett1995`.
 
 *Uses:*
 

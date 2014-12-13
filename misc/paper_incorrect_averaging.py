@@ -8,9 +8,8 @@ paper_incorrect_averaging
 -------------------------
 
 
-This script reproduces Figure 5 from Cottaar, Heister, Rose and Unteborn (2014)
-Attempt to reproduce Figure 6.12 From chapter 6 of Physics and Chemistry of the Deep Earth, 2013
-Book chapter by Motohiko Murakami, editor Shun-ichiro Karato
+This script reproduces :cite:`Cottaar2014`, Figure 5. 
+Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
 
 import os, sys, numpy as np, matplotlib.pyplot as plt

@@ -18,7 +18,7 @@ composition. Here we present a couple of examples:
 2. Two minerals mixed in simple mole fractions with user-defined Fe
    partitioning
 3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
-   calculate Fe partitioning along a P, T profile (see
+   calculate Fe partitioning along a :math:`P, T` profile (see
    example_partition_coef.py)
 4. A mixture of three minerals.
 

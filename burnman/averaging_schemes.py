@@ -19,52 +19,52 @@ class AveragingScheme(object):
     """
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the bulk moduli of a composite.  This defines the interface
+        Average the bulk moduli :math:`K` for a composite. This defines the interface
         for this method, and is not implemented in the base class.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli of each phase in the composite. :math:`[Pa]` 
 
         Returns
         -------
 
         K : float
-            The average bulk modulus in [Pa].
+            The average bulk modulus :math:`K`. :math:`[Pa]`
         """
         raise NotImplementedError("")
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the shear moduli of a composite.  This defines the interface
+        Average the shear moduli :math:`G` for a composite.  This defines the interface
         for this method, and is not implemented in the base class.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The average shear modulus in [Pa].
+            The average shear modulus :math:`G`. :math:`[Pa]`
         """
         raise NotImplementedError("")
 
     def average_density(self, volumes, densities):
         """
         Average the densities of a composite, given a list of volume
-        fractions and densitites.  This is the only method of
+        fractions and densitites. This is the only method of
         :class:`burnman.averaging_schemes.AveragingScheme` which is implemented in the base class,
         as how to calculate it is not dependent on the geometry of the rock.
         The formula for density is given by
@@ -75,14 +75,14 @@ class AveragingScheme(object):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         densities : list of floats
-            List of densities of each phase in the composite in [kg/m^3].
+            List of densities of each phase in the composite. :math:`[kg/m^3]`
 
         Returns
         -------
         rho : float
-           Density in [kg/m^3].
+           Density :math:`\\rho`. :math:`[kg/m^3]`
         """
         total_mass = np.sum(np.array(densities)*np.array(volumes))
         total_vol = np.sum(np.array(volumes)) #should sum to one
@@ -91,10 +91,7 @@ class AveragingScheme(object):
 
     def average_thermal_expansivity(self, volumes, alphas):
         """
-
-
-        thermal expansion coefficient of the mineral [1/K]
-
+        thermal expansion coefficient of the mineral :math:`\\alpha`. :math:`[1/K]`
         """
         total_vol = np.sum(np.array(volumes))
         return np.sum(np.array(alphas)*np.array(volumes)) / total_vol
@@ -102,9 +99,8 @@ class AveragingScheme(object):
     def average_heat_capacity_v(self, fractions, c_v):
         #TODO: double-check that the formula we use is appropriate here.
         """
-        Averages the heat capacities at constant volume C_V by molar fractions
-        as in eqn. (16) in Ita'92.
-
+        Averages the heat capacities at constant volume :math:`C_V` by molar fractions
+        as in eqn. (16) in :cite:`Ita1992`.
 
         Parameters
         ----------
@@ -112,34 +108,32 @@ class AveragingScheme(object):
         fractions : list of floats
             List of molar fractions of each phase in the composite (should sum to 1.0).
         c_v : list of floats
-            List of heat capacities of each phase in the composite in [kg/m^3].
+            List of heat capacities at constant volume :math:`C_V` of each phase in the composite. :math:`[J/K/mol]`
 
         Returns
         -------
         
-        C_v : float
-          heat capacity at constant volume of the bulk [J/K/mol]
+        c_v : float
+          heat capacity at constant volume of the composite :math:`C_V`. :math:`[J/K/mol]`
         """
         return np.sum(np.array(fractions)*np.array(c_v))
 
     def average_heat_capacity_p(self, fractions, c_p):
         #TODO: double-check that the formula we use is correct.
         """
-        Averages the heat capacities at constant pressure C_P by molar fractions.
-
-        
+        Averages the heat capacities at constant pressure :math:`C_P` by molar fractions.
 
         Parameters
         ----------
         fractions : list of floats
             List of molar fractions of each phase in the composite (should sum to 1.0).
         c_p : list of floats
-            List of heat capacities of each phase in the composite in [kg/m^3].
+            List of heat capacities at constant pressure :math:`C_P` of each phase in the composite. :math:`[J/K/mol]`
 
         Returns
         -------
-        C_v : float
-          heat capacity at constant pressure of the bulk [J/K/mol]
+        c_p : float
+          heat capacity at constant pressure :math:`C_P` of the composite. :math:`[J/K/mol]`
         """
         return np.sum(np.array(fractions)*np.array(c_p))
 
@@ -164,24 +158,24 @@ class VoigtReussHill(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of shear moduli :math:`G` of each phase in the composite. 
+            Not used in this average. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The Voigt-Reuss-Hill average bulk modulus in [Pa].
+            The Voigt-Reuss-Hill average bulk modulus :math:`K_{VRH}`. :math:`[Pa]`
         """
         return voigt_reuss_hill_function(volumes, bulk_moduli)
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the shear moduli of a composite with the Voigt-Reuss-Hill average, given by:
+        Average the shear moduli :math:`G` of a composite with the Voigt-Reuss-Hill average, given by:
 
         .. math::
             G_{VRH} = \\frac{G_V + G_R}{2}
@@ -192,18 +186,18 @@ class VoigtReussHill(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of bulk moduli :math:`K` of each phase in the composite 
+            Not used in this average. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The Voigt-Reuss-Hill average shear modulus in [Pa].
+            The Voigt-Reuss-Hill average shear modulus :math:`G_{VRH}`. :math:`[Pa]`
         """
         return voigt_reuss_hill_function(volumes, shear_moduli)
 
@@ -212,12 +206,13 @@ class Voigt(AveragingScheme):
     """
     Class for computing the Voigt (iso-strain) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and 
+    :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the bulk moduli of a composite with the Voigt (iso-strain)
+        Average the bulk moduli of a composite :math:`K` with the Voigt (iso-strain)
         bound, given by:
 
         .. math::
@@ -226,18 +221,18 @@ class Voigt(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of shear moduli :math:`G` of each phase in the composite.
+            Not used in this average. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The Voigt average bulk modulus in [Pa]
+            The Voigt average bulk modulus :math:`K_V`. :math:`[Pa]`
         """
         return voigt_average_function(volumes, bulk_moduli)
 
@@ -252,18 +247,18 @@ class Voigt(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of bulk moduli :math:`K` of each phase in the composite.
+            Not used in this average. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The Voigt average shear modulus in [Pa]
+            The Voigt average shear modulus :math:`G_V`. :math:`[Pa]`
         """
         return voigt_average_function(volumes, shear_moduli)
 
@@ -272,7 +267,8 @@ class Reuss(AveragingScheme):
     """
     Class for computing the Reuss (iso-stress) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and
+     :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -286,18 +282,18 @@ class Reuss(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of shear moduli :math:`G` of each phase in the composite. 
+            Not used in this average. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The Reuss average bulk modulus in [Pa].
+            The Reuss average bulk modulus :math:`K_R`. :math:`[Pa]`
         """
         return reuss_average_function(volumes, bulk_moduli)
 
@@ -312,18 +308,18 @@ class Reuss(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of bulk moduli :math:`K` of each phase in the composite. 
+            Not used in this average. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The Reuss average shear modulus in [Pa].
+            The Reuss average shear modulus :math:`G_R`. :math:`[Pa]`
         """
         return reuss_average_function(volumes, shear_moduli)
 
@@ -332,8 +328,9 @@ class HashinShtrikmanUpper(AveragingScheme):
     """
     Class for computing the upper Hashin-Shtrikman bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
-    Implements Formulas from Watt et al (1976).  The Hashin-Shtrikman bounds
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` 
+    and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    Implements formulas from :cite:`Watt1976`.  The Hashin-Shtrikman bounds
     are tighter than the Voigt and Reuss bounds because they make the
     additional assumption that the orientation of the phases are statistically
     isotropic.  In some cases this may be a good assumption, and in others it
@@ -343,22 +340,22 @@ class HashinShtrikmanUpper(AveragingScheme):
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the bulk moduli of a composite with the upper Hashin-Shtrikman bound.
-        Implements Formulas from Watt et al (1976), which are too lengthy to reproduce here.
+        Implements Formulas from :cite:`Watt1976`, which are too lengthy to reproduce here.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The upper Hashin-Shtrikman average bulk modulus in [Pa].
+            The upper Hashin-Shtrikman average bulk modulus :math:`K`. :math:`[Pa]`
         """
 
         K_n = max(bulk_moduli)
@@ -378,22 +375,22 @@ class HashinShtrikmanUpper(AveragingScheme):
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the shear moduli of a composite with the upper Hashin-Shtrikman bound.
-        Implements Formulas from Watt et al (1976), which are too lengthy to reproduce here.
+        Implements Formulas from :cite:`Watt1976`, which are too lengthy to reproduce here.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The upper Hashin-Shtrikman average shear modulus in [Pa].
+            The upper Hashin-Shtrikman average shear modulus :math:`G`. :math:`[Pa]`
         """
 
         K_n = max(bulk_moduli)
@@ -414,8 +411,9 @@ class HashinShtrikmanLower(AveragingScheme):
     """
     Class for computing the lower Hashin-Shtrikman bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
-    Implements Formulas from Watt et al (1976).  The Hashin-Shtrikman bounds
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` 
+    and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    Implements Formulas from :cite:`Watt1976`.  The Hashin-Shtrikman bounds
     are tighter than the Voigt and Reuss bounds because they make the
     additional assumption that the orientation of the phases are statistically
     isotropic.  In some cases this may be a good assumption, and in others it
@@ -425,22 +423,22 @@ class HashinShtrikmanLower(AveragingScheme):
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the bulk moduli of a composite with the lower Hashin-Shtrikman bound.
-        Implements Formulas from Watt et al (1976), which are too lengthy to reproduce here.
+        Implements Formulas from :cite:`Watt1976`, which are too lengthy to reproduce here.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volume of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The lower Hashin-Shtrikman average bulk modulus in [Pa].
+            The lower Hashin-Shtrikman average bulk modulus :math:`K`. :math:`[Pa]`
         """
 
         K_1 = min(bulk_moduli)
@@ -460,22 +458,22 @@ class HashinShtrikmanLower(AveragingScheme):
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
         Average the shear moduli of a composite with the lower Hashin-Shtrikman bound.
-        Implements Formulas from Watt et al (1976), which are too lengthy to reproduce here.
+        Implements Formulas from :cite:`Watt1976`, which are too lengthy to reproduce here.
 
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of volumes of each phase in the composite. :math:`[m^3]`.
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`.
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
         G : float
-            The lower Hashin-Shtrikman average shear modulus in [Pa].
+            The lower Hashin-Shtrikman average shear modulus :math:`G`. :math:`[Pa]`
         """
 
         K_1 = min(bulk_moduli)
@@ -497,7 +495,8 @@ class HashinShtrikmanAverage(AveragingScheme):
     """
     Class for computing arithmetic mean of the Hashin-Shtrikman bounds on elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` 
+    and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
     def __init__(self):
         self.upper = HashinShtrikmanUpper()
@@ -511,18 +510,18 @@ class HashinShtrikmanAverage(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volumes of each phase in the composite. :math:`[m^3]`
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
+            List of bulk moduli :math:`K` of each phase in the composite. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of shear moduli :math:`G` of each phase in the composite. 
+            Not used in this average. :math:`[Pa]`
 
         Returns
         -------
 
         K : float
-            The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus in [Pa].
+            The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus :math:`K`. :math:`[Pa]`
         """
         return (self.upper.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)
                 + self.lower.average_bulk_moduli(volumes, bulk_moduli, shear_moduli))/2.0
@@ -535,18 +534,18 @@ class HashinShtrikmanAverage(AveragingScheme):
         Parameters
         ----------
         volumes : list of floats
-            List of volume fractions of each phase in the composite in [m^3].
+            List of the volumes of each phase in the composite. [m^3].
         bulk_moduli : list of floats
-            List of bulk moduli of each phase in the composite in [Pa].
-            Not used in this average.
+            List of bulk moduli :math:`K` of each phase in the composite. 
+            Not used in this average. :math:`[Pa]`
         shear_moduli : list of floats
-            List of shear moduli of each phase in the composite in [Pa].
+            List of shear moduli :math:`G` of each phase in the composite. :math:`[Pa]`
 
         Returns
         -------
 
-        K : float
-            The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus in [Pa].
+        G : float
+            The arithmetic mean of the Hashin-Shtrikman bounds on shear modulus :math:`G`. :math:`[Pa]`
         """
         return (self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
                 + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli))/2.0

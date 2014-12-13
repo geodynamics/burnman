@@ -6,7 +6,7 @@
 example_grid
 ------------
 
-This example shows how to evaluate seismic quantities on a p,T grid.
+This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
 """
 
 # Here we import standard python modules that are required for

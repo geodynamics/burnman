@@ -41,7 +41,7 @@ class CORK(eos.EquationOfState):
         Eq. 7 in Holland and Powell, 1991
         """
         cork=cork_variables(params['cork_params'], params['cork_P'], params['cork_T'], temperature)
-        V = R*temperature/pressure + (cork[1] - cork[0]*R*np.sqrt(temperature)/((R*temperature + cork[1]*pressure)*(R*temperature + 2.*cork[1]*pressure)) + cork[2]*np.sqrt(pressure) + cork[3]*pressure)
+        V = constants.gas_constant*temperature/pressure + (cork[1] - cork[0]*constants.gas_constant*np.sqrt(temperature)/((constants.gas_constant*temperature + cork[1]*pressure)*(constants.gas_constant*temperature + 2.*cork[1]*pressure)) + cork[2]*np.sqrt(pressure) + cork[3]*pressure)
         return V
 
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
@@ -113,7 +113,7 @@ class CORK(eos.EquationOfState):
         else:
             cork=cork_variables(params['cork_params'], params['cork_P'], params['cork_T'], temperature)
         
-            RTlnf = R*temperature*np.log(1e-5*pressure) + cork[1]*pressure + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(R*temperature + cork[1]*pressure) - np.log(R*temperature + 2.*cork[1]*pressure)) + 2./3.*cork[2]*pressure*np.sqrt(pressure) + cork[3]/2.*pressure*pressure  # Eq. 8 in Holland and Powell, 1991
+            RTlnf = constants.gas_constant*temperature*np.log(1e-5*pressure) + cork[1]*pressure + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(constants.gas_constant*temperature + cork[1]*pressure) - np.log(constants.gas_constant*temperature + 2.*cork[1]*pressure)) + 2./3.*cork[2]*pressure*np.sqrt(pressure) + cork[3]/2.*pressure*pressure  # Eq. 8 in Holland and Powell, 1991
 
         return params['H_0'] + intCpdT - temperature*(params['S_0'] + intCpoverTdT) + RTlnf
 
@@ -124,3 +124,40 @@ class CORK(eos.EquationOfState):
         """
         return 0.
                   
+    def validate_parameters(self, params):
+        """
+        Check for existence and validity of the parameters
+        """
+
+        #if G and Gprime are not included this is presumably deliberate,
+        #as we can model density and bulk modulus just fine without them,
+        #so just add them to the dictionary as nans
+        if 'H_0' not in params:
+            params['H_0'] = float('nan')
+        if 'S_0' not in params:
+            params['S_0'] = float('nan')
+  
+        #check that all the required keys are in the dictionary
+        expected_keys = ['cork_params', 'cork_T', 'cork_P', 'Cp']
+        for k in expected_keys:
+            if k not in params:
+                raise KeyError('params object missing parameter : ' + k)
+        
+        #now check that the values are reasonable.  I mostly just
+        #made up these values from experience, and we are only 
+        #raising a warning.  Better way to do this? [IR]
+
+        # no test for H_0
+        if params['S_0'] is not float('nan') and params['S_0'] < 0.:
+            warnings.warn( 'Unusual value for S_0', stacklevel=2 )
+
+        if params['cork_T'] < 0.:
+            warnings.warn( 'Unusual value for cork_T', stacklevel=2 )
+        if params['cork_P'] < 1.e6 or params['cork_P'] > 1.e8:
+            warnings.warn( 'Unusual value for cork_P', stacklevel=2 )
+
+        if self.heat_capacity_p0(T_0,params) < 0.:
+            warnings.warn( 'Negative heat capacity at T_0', stacklevel=2 )
+        if self.heat_capacity_p0(2000.,params) < 0.:
+            warnings.warn( 'Negative heat capacity at 2000K', stacklevel=2 )
+ 

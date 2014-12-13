@@ -7,7 +7,7 @@ class EquationOfState(object):
     """
     This class defines the interface for an equation of state
     that a mineral uses to determine its properties at a
-    given P,T.  In order define a new equation of state, you
+    given :math:`P, T`.  In order define a new equation of state, you
     should define these functions.
 
     All functions should accept and return values in SI units.
@@ -20,7 +20,7 @@ class EquationOfState(object):
 
     The functions for volume and density are just functions 
     of temperature, pressure, and "params"; after all, it 
-    does not make sense for them to be functions of volume/density.
+    does not make sense for them to be functions of volume or density.
     """
 
     def volume(self, pressure, temperature, params):
@@ -28,16 +28,16 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         volume : float
-            Molar volume of the mineral. [m^3]
+            Molar volume of the mineral. :math:`[m^3]`
         """
         raise NotImplementedError("")
 
@@ -61,22 +61,22 @@ class EquationOfState(object):
 
     def density(self, pressure, temperature, params):
         """
-        Calculate the density of the mineral.  
+        Calculate the density of the mineral :math:`[kg/m^3]`.  
         The params object must include a "molar_mass" field.
 
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         density : float
-            Density of the mineral. [kg/m^3]
+            Density of the mineral. :math:`[kg/m^3]`
         """
         return params["molar_mass"] / self.volume(pressure, temperature, params)
 
@@ -85,19 +85,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         gamma : float
-            Grueneisen parameter of the mineral. [unitless]
+            Grueneisen parameter of the mineral. :math:`[unitless]`
         """
         raise NotImplementedError("")
 
@@ -106,19 +106,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         K_T : float
-            Isothermal bulk modulus of the mineral. [Pa]
+            Isothermal bulk modulus of the mineral. :math:`[Pa]`
         """
         raise NotImplementedError("")
 
@@ -127,19 +127,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         K_S : float
-            Adiabatic bulk modulus of the mineral. [Pa]
+            Adiabatic bulk modulus of the mineral. :math:`[Pa]`
         """
         raise NotImplementedError("")
 
@@ -148,19 +148,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         G : float
-            Shear modulus of the mineral. [Pa]
+            Shear modulus of the mineral. :math:`[Pa]`
         """
         raise NotImplementedError("")
 
@@ -169,19 +169,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         C_V : float
-            Heat capacity at constant volume of the mineral. [J/K/mol]
+            Heat capacity at constant volume of the mineral. :math:`[J/K/mol]`
         """
         raise NotImplementedError("")
 
@@ -190,19 +190,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         C_P : float
-            Heat capacity at constant pressure of the mineral. [J/K/mol]
+            Heat capacity at constant pressure of the mineral. :math:`[J/K/mol]`
         """
         raise NotImplementedError("")
 
@@ -211,19 +211,19 @@ class EquationOfState(object):
         Parameters
         ----------
         pressure : float
-            Pressure at which to evaluate the equation of state. [Pa]
+            Pressure at which to evaluate the equation of state. :math:`[Pa]`
         temperature : float
-            Temperature at which to evaluate the equation of state. [K]
+            Temperature at which to evaluate the equation of state. :math:`[K]`
         volume : float
             Molar volume of the mineral.  For consistency this should be calculated
-            using :func:`volume`. [m^3]
+            using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
         Returns
         -------
         alpha : float
-            Thermal expansivity of the mineral. [1/K]
+            Thermal expansivity of the mineral. :math:`[1/K]`
         """
         raise NotImplementedError("")
 
