@@ -1,7 +1,6 @@
-import os, sys, numpy as np, matplotlib.pyplot as plt
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
-sys.path.insert(1,os.path.abspath('.')) 
+import os.path, sys
+sys.path.insert(1,os.path.abspath('../..'))
+import numpy as np, matplotlib.pyplot as plt
 import burnman
 
 import scipy.integrate

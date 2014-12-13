@@ -1,4 +1,7 @@
 # Benchmarks for the solid solution class
+import os.path, sys
+sys.path.insert(1,os.path.abspath('../..'))
+
 import burnman
 from burnman import minerals
 from burnman.processchemistry import *

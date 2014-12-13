@@ -52,13 +52,19 @@ done
 
 cd tests
 python tests.py || exit 1
-testit "benchmark.py"
-testit "debye.py"
 cd ..
+
 
 cd misc
 echo "gen_doc..."
 python gen_doc.py >/dev/null || exit 1
+
+cd benchmarks
+for test in `ls *.py`
+do
+    testit $test
+done
+cd ..
 cd ..
 
 

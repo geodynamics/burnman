@@ -2,10 +2,10 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-import os, sys, numpy as np, matplotlib.pyplot as plt
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..')) 
-sys.path.insert(1,os.path.abspath('.')) 
+import os.path, sys
+sys.path.insert(1,os.path.abspath('../..')) 
+import numpy as np, matplotlib.pyplot as plt
+
 import burnman
 
 import burnman.eos.birch_murnaghan as bm
@@ -49,7 +49,7 @@ def check_birch_murnaghan():
 
     #compare with figure 1
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, pressure/1.e9, shear_modulus/1.e9)
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig1.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig1.png')
     plt.imshow(fig1, extent=[0,140,0,800], aspect='auto')
     plt.plot(pressure/1.e9, bulk_modulus/1.e9, 'g+', pressure/1.e9, shear_modulus/1.e9, 'g+')
     plt.ylim(0,800)
@@ -168,7 +168,7 @@ def check_slb_fig3():
         q_mgd[i] = perovskite.params['q_0']
 
     #compare with figure 7
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig3.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig3.png')
     plt.imshow(fig1, extent=[0.6, 1.0,0.35,2.0], aspect='auto')
     plt.plot(volume, grueneisen_slb, 'g+', volume, grueneisen_mgd, 'b+')
     plt.plot(volume, q_slb, 'g+', volume, q_mgd, 'b+')
@@ -199,7 +199,7 @@ def check_slb_fig7_txt():
                     'eta_s_0' : 2.364}
     forsterite.set_method('slb3')
 
-    data = np.loadtxt("../burnman/data/input_minphys/slb_fig7.txt", skiprows=2)
+    data = np.loadtxt("../../burnman/data/input_minphys/slb_fig7.txt", skiprows=2)
  
     temperature = np.array(data[:,2])
     pressure = np.array(data[:,0])
@@ -321,7 +321,7 @@ def check_slb_fig7():
  
 
     #compare with figure 7
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig7_vol.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig7_vol.png')
     plt.imshow(fig1, extent=[0,2200,0.99,1.08], aspect='auto')
     plt.plot(temperature, volume, 'g+')
     plt.ylim(0.99,1.08)
@@ -331,7 +331,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig7_Cp.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig7_Cp.png')
     plt.imshow(fig1, extent=[0,2200,0.,70.], aspect='auto')
     plt.plot(temperature, heat_capacity, 'g+')
     plt.ylim(0,70)
@@ -342,7 +342,7 @@ def check_slb_fig7():
     plt.show()
 
 
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig7_K.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig7_K.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, bulk_modulus, 'g+')
     plt.ylim(0.6,1.02)
@@ -352,7 +352,7 @@ def check_slb_fig7():
     plt.title("Comparing with Figure 7 of Stixrude and Lithgow-Bertelloni (2005)")
     plt.show()
 
-    fig1 = mpimg.imread('../burnman/data/input_figures/slb_fig7_G.png')
+    fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig7_G.png')
     plt.imshow(fig1, extent=[0,2200,0.6,1.02], aspect='auto')
     plt.plot(temperature, shear_modulus, 'g+')
     plt.ylim(0.6,1.02)
@@ -413,7 +413,7 @@ def check_averaging():
       hsl_bulk_modulus[i]  = hashin_shtrikman_lower.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
       hsl_shear_modulus[i] = hashin_shtrikman_lower.average_shear_moduli( [volumes[i], 1.0-volumes[i]], [K1,K2], [G1,G2] )
  
-    fig = mpimg.imread('../burnman/data/input_figures/watt_1976_a1.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/watt_1976_a1.png')
     plt.imshow(fig, extent=[0,1.0,0.25,1.0], aspect='auto')
     plt.plot(volumes, v_bulk_modulus/K2, 'g-')
     plt.plot(volumes, r_bulk_modulus/K2, 'g-')
@@ -427,7 +427,7 @@ def check_averaging():
     plt.title("Comparing with Figure 1 of Watt et al 1976")
     plt.show()
 
-    fig = mpimg.imread('../burnman/data/input_figures/watt_1976_a2.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/watt_1976_a2.png')
     plt.imshow(fig, extent=[0,1.0,0.0,1.0], aspect='auto')
     plt.plot(volumes, v_shear_modulus/G2, 'g-')
     plt.plot(volumes, r_shear_modulus/G2, 'g-')
@@ -452,7 +452,7 @@ def check_averaging():
       hsu_bulk_modulus_vals[i] = hashin_shtrikman_upper.average_bulk_moduli( [porosity[i], 1.0-porosity[i]], [0.0, K], [0.0, G])
     for i in range(len(volumes)):
       hsu_bulk_modulus[i] = hashin_shtrikman_upper.average_bulk_moduli( [volumes[i], 1.0-volumes[i]], [0.0, K], [0.0, G])
-    fig = mpimg.imread('../burnman/data/input_figures/berryman_fig4.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/berryman_fig4.png')
     plt.imshow(fig, extent=[0,1.0,0.0,50.0], aspect='auto')
     plt.plot(volumes, hsu_bulk_modulus, 'g-')
     plt.scatter(porosity, hsu_bulk_modulus_vals, c='r')
@@ -496,7 +496,7 @@ def check_averaging_2():
       hsl_bulk_modulus[i]  = hashin_shtrikman_lower.average_bulk_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
       hsl_shear_modulus[i] = hashin_shtrikman_lower.average_shear_moduli( [1.0-volumes[i], volumes[i]], [K1,K2], [G1,G2] )
  
-    fig = mpimg.imread('../burnman/data/input_figures/Hashin_Shtrikman_1963_fig1_K.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/Hashin_Shtrikman_1963_fig1_K.png')
     plt.imshow(fig, extent=[0,1.0,1.1,K2+0.3], aspect='auto')
     plt.plot(volumes, hsu_bulk_modulus, 'g-')
     plt.plot(volumes, hsl_bulk_modulus, 'g-')
@@ -507,7 +507,7 @@ def check_averaging_2():
     plt.title("Comparing with Figure 1 of Hashin and Shtrikman (1963)")
     plt.show()
 
-    fig = mpimg.imread('../burnman/data/input_figures/Hashin_Shtrikman_1963_fig2_G.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/Hashin_Shtrikman_1963_fig2_G.png')
     plt.imshow(fig, extent=[0,1.0,0.3,G2], aspect='auto')
     plt.plot(volumes, hsu_shear_modulus, 'g-')
     plt.plot(volumes, hsl_shear_modulus, 'g-')
@@ -573,7 +573,7 @@ def check_averaging_3():
       hs_av_bulk_modulus[i]  = 0.5*hsl_bulk_modulus[i] + 0.5*hsu_bulk_modulus[i]
       hs_av_shear_modulus[i] = 0.5*hsl_shear_modulus[i] + 0.5*hsu_shear_modulus[i]
 
-    fig = mpimg.imread('../burnman/data/input_figures/Avseth_et_al_2010_fig3_K.png')
+    fig = mpimg.imread('../../burnman/data/input_figures/Avseth_et_al_2010_fig3_K.png')
     plt.imshow(fig, extent=[0,1.0,0.,40.0], aspect='auto')
     plt.plot(volumes, v_bulk_modulus, 'g-')
     plt.plot(volumes, r_bulk_modulus, 'g-')
