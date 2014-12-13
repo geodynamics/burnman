@@ -256,6 +256,12 @@ HP_2011_ds62.wo                                                                 
 HP_2011_ds62.wrk                                                                         0.0001904 86000000000.0     4.09                         0.43440636  25.0                                  
 HP_2011_ds62.zo                                                                         0.00013575     1.044e+11      4.0                         0.45435714  22.0                                  
 HP_2011_ds62.zrc                                                                         3.926e-05     2.301e+11     4.04                          0.1833071   6.0                                  
+HP_2011_fluids.CH4                                                                                                                                                                                  
+HP_2011_fluids.CO2                                                                                                                                                                                  
+HP_2011_fluids.H2                                                                                                                                                                                   
+HP_2011_fluids.H2S                                                                                                                                                                                  
+HP_2011_fluids.O2                                                                                                                                                                                   
+HP_2011_fluids.S2                                                                                                                                                                                   
 Matas_etal_2007.al_bridgmanite (Matas_etal_2007.al_perovskite)                           2.458e-05      2.49e+11      4.0      1.65e+11      1.8      0.1005     5  1021.0         1.48  1.4        
 Matas_etal_2007.al_perovskite                                                            2.458e-05      2.49e+11      4.0      1.65e+11      1.8      0.1005     5  1021.0         1.48  1.4        
 Matas_etal_2007.ca_bridgmanite (Matas_etal_2007.ca_perovskite)                           2.745e-05      2.36e+11      3.9      1.65e+11     2.46     0.11616     5   984.0         1.53  1.6        
