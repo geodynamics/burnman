@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # specify where we want to evaluate, here we map from pressure to depth
     #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
     p = np.arange(1.0e9,360.0e9,5e9)
-    depths = map(s.depth, p)
+    depths = np.array([s.depth(pr) for pr in p])
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35e3,5600e3,100e3)
     #we could also use the data points where the seismic model is specified:
