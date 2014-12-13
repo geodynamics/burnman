@@ -13,13 +13,76 @@ from burnman.mineral import Mineral
 
 from SLB_2011 import periclase, wuestite
 
-
+# This is ferropericlase with the depricated solid solution setup, although it is still used in some of the /misc/paper* scripts
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         base_materials = [periclase(), wuestite()]
         molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
 
+# similar to ferropericlase, using the old solid solution setup. These values are based on Zhang, Stixrude and Brodholt 2013
+class ZSB_2013_mg_fe_perovskite(bmb.HelperSolidSolution):
+    def __init__(self, fe_num):
+        base_materials = [mg_perovskite(), fe_perovskite()]
+        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+        bmb.HelperSolidSolution.__init__(self, base_materials, molar_fraction)
+
+
+class mg_perovskite(Mineral):
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb3',
+            'V_0': 24.45e-6,
+            'K_0': 250.5e9,
+            'Kprime_0': 4.01,
+            'G_0': 172.9e9,
+            'Gprime_0': 1.74,
+            'molar_mass': .1000,
+            'n': 5,
+            'Debye_0': 905.9,
+            'grueneisen_0': 1.44,
+            'q_0': 1.09,
+            'eta_s_0': 2.13 } #2.6
+
+        self.uncertainties = {
+            'err_K_0': 3.e9,
+            'err_Kprime_0': 0.1,
+            'err_G_0': 2.e9,
+            'err_Gprime_0' : 0.0,
+            'err_Debye_0': 5.,
+            'err_grueneisen_0':.05,
+            'err_q_0': .3,
+            'err_eta_s_0':.3}
+
+        Mineral.__init__(self)
+
+class fe_perovskite(Mineral):
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb3',
+            'V_0': 25.49e-6,
+            'K_0': 272.0e9,
+            'Kprime_0': 4.1,
+            'G_0': 133.0e9,
+            'Gprime_0': 1.4,
+            'molar_mass': .1319,
+            'n': 5,
+            'Debye_0': 871.,
+            'grueneisen_0': 1.57,
+            'q_0': 1.1,
+            'eta_s_0': 2.3 } #2.3
+
+        self.uncertainties = {
+            'err_K_0':40e9,
+            'err_Kprime_0':1.,
+            'err_G_0':40e9,
+            'err_Gprime_0':0.0,
+            'err_Debye_0':26.,
+            'err_grueneisen_0':.3,
+            'err_q_0':1.0,
+            'err_eta_s_0':1.0}
+
+        Mineral.__init__(self)
 
 class Speziale_fe_periclase(bmb.HelperSpinTransition):
     def __init__(self):
@@ -60,7 +123,6 @@ class Speziale_fe_periclase_LS(Mineral):
                         'grueneisen_0': 1.46,
                         'q_0': 1.2  }
         Mineral.__init__(self)
-
 
 
 
