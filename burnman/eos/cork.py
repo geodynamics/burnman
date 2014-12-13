@@ -124,3 +124,42 @@ class CORK(eos.EquationOfState):
         """
         return 0.
                   
+    def validate_parameters(self, params):
+        """
+        Check for existence and validity of the parameters
+        """
+
+        #if G and Gprime are not included this is presumably deliberate,
+        #as we can model density and bulk modulus just fine without them,
+        #so just add them to the dictionary as nans
+        if 'H_0' not in params:
+            params['H_0'] = float('nan')
+        if 'S_0' not in params:
+            params['S_0'] = float('nan')
+  
+        #check that all the required keys are in the dictionary
+        expected_keys = ['cork_params', 'cork_T', 'cork_P', 'Cp']
+        for k in expected_keys:
+            if k not in params:
+                raise KeyError('params object missing parameter : ' + k)
+        
+        #now check that the values are reasonable.  I mostly just
+        #made up these values from experience, and we are only 
+        #raising a warning.  Better way to do this? [IR]
+
+        # no test for H_0
+        if params['S_0'] is not float('nan') and params['S_0'] < 0.:
+            warnings.warn( 'Unusual value for S_0', stacklevel=2 )
+
+
+        if params['cork_T'] < 0.:
+            warnings.warn( 'Unusual value for cork_T', stacklevel=2 )
+        if params['cork_P'] < 1.e6 or params['cork_P'] > 1.e8:
+            warnings.warn( 'Unusual value for cork_P', stacklevel=2 )
+
+
+        if self.heat_capacity_p0(T_0,params) < 0.:
+            warnings.warn( 'Negative heat capacity at T_0', stacklevel=2 )
+        if self.heat_capacity_p0(2000.,params) < 0.:
+            warnings.warn( 'Negative heat capacity at 2000K', stacklevel=2 )
+ 
