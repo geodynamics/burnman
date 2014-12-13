@@ -230,7 +230,8 @@ class SLBBase(eos.EquationOfState):
         """
         
         return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
-               temperature * self.entropy( pressure, temperature, volume, params)
+               temperature * self.entropy( pressure, temperature, volume, params) + \
+               pressure * self.volume( pressure, temperature, params)
 
     def helmholtz_free_energy( self, pressure, temperature, volume, params):
         """
