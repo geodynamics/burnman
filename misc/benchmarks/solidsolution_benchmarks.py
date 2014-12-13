@@ -136,7 +136,7 @@ for idx, model in enumerate(opx_models):
     for i,c in enumerate(comp):
         molar_fractions=[1.0-c, c]
         model.set_composition( np.array(molar_fractions) )
-        model.set_state( 1.e5, 300. )
+        model.set_state( 0., 0. )
         opx_entropies[idx][i] = model.solution_model._configurational_entropy( molar_fractions )
 
 
@@ -180,7 +180,7 @@ gibbs = np.empty_like(comp)
 
 for i,c in enumerate(comp):
    cpx.set_composition( np.array([1.0-c, c]) )
-   cpx.set_state( 1.e5, 300. )
+   cpx.set_state( 0., 0. )
    gibbs[i] = cpx.excess_gibbs
 
 
