@@ -70,6 +70,7 @@ import seismic
 import averaging_schemes
 import eos
 
+import processchemistry
 from solutionmodel import SolutionModel
 import geotherm
 
