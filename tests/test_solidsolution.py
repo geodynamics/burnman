@@ -172,6 +172,7 @@ class test_solidsolution(BurnManTest):
     def test_order_disorder(self):
         opx = orthopyroxene()
         opx.set_composition( np.array([0.0, 1.0]) )
+        opx.set_state(1.e5,300.)
         self.assertArraysAlmostEqual([opx.excess_gibbs], [0.])
 
 
