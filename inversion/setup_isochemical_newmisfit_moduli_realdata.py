@@ -27,7 +27,7 @@ number_of_points = 5 #set on how many depth slices the computations should be do
 # velocity constraints from seismology
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 seis_G= seis_vs**2.*seis_rho
 seis_K= seis_vphi**2*seis_rho
