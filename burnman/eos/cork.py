@@ -41,7 +41,7 @@ class CORK(eos.EquationOfState):
         Eq. 7 in Holland and Powell, 1991
         """
         cork=cork_variables(params['cork_params'], params['cork_P'], params['cork_T'], temperature)
-        V = R*temperature/pressure + (cork[1] - cork[0]*R*np.sqrt(temperature)/((R*temperature + cork[1]*pressure)*(R*temperature + 2.*cork[1]*pressure)) + cork[2]*np.sqrt(pressure) + cork[3]*pressure)
+        V = constants.gas_constant*temperature/pressure + (cork[1] - cork[0]*constants.gas_constant*np.sqrt(temperature)/((constants.gas_constant*temperature + cork[1]*pressure)*(constants.gas_constant*temperature + 2.*cork[1]*pressure)) + cork[2]*np.sqrt(pressure) + cork[3]*pressure)
         return V
 
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
@@ -113,7 +113,7 @@ class CORK(eos.EquationOfState):
         else:
             cork=cork_variables(params['cork_params'], params['cork_P'], params['cork_T'], temperature)
         
-            RTlnf = R*temperature*np.log(1e-5*pressure) + cork[1]*pressure + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(R*temperature + cork[1]*pressure) - np.log(R*temperature + 2.*cork[1]*pressure)) + 2./3.*cork[2]*pressure*np.sqrt(pressure) + cork[3]/2.*pressure*pressure  # Eq. 8 in Holland and Powell, 1991
+            RTlnf = constants.gas_constant*temperature*np.log(1e-5*pressure) + cork[1]*pressure + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(constants.gas_constant*temperature + cork[1]*pressure) - np.log(constants.gas_constant*temperature + 2.*cork[1]*pressure)) + 2./3.*cork[2]*pressure*np.sqrt(pressure) + cork[3]/2.*pressure*pressure  # Eq. 8 in Holland and Powell, 1991
 
         return params['H_0'] + intCpdT - temperature*(params['S_0'] + intCpoverTdT) + RTlnf
 
