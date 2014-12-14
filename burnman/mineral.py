@@ -72,7 +72,8 @@ class Mineral(Material):
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
-            raise Exception('Mineral ' + self.to_string() + 'failed to validate parameters with message : \" ' + e.message + '\"' )
+            print 'Mineral ' + self.to_string() + ' failed to validate parameters with message : \" ' + e.message + '\"'
+            raise
 
     def to_string(self):
         """

@@ -8,6 +8,7 @@ import equation_of_state as eos
 import einstein
 from burnman.endmemberdisorder import *
 import burnman.constants as constants
+import warnings
 
 T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
@@ -323,7 +324,7 @@ class MT(eos.EquationOfState):
         # no test for H_0
         if params['S_0'] is not float('nan') and params['S_0'] < 0.:
             warnings.warn( 'Unusual value for S_0', stacklevel=2 )
-        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
+        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-2:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
 
             
@@ -340,8 +341,7 @@ class MT(eos.EquationOfState):
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         # no test for Kdprime_0
 
-        if params['n'] < 1. or params['n'] > 100. or not float(params['n']).is_integer():
+        if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n', stacklevel=2 )
-        if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
+        if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
-
