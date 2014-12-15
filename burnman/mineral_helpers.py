@@ -95,7 +95,6 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
-        self.method=ls_mat.method
 
     def debug_print(self, indent=""):
         print "%sHelperSpinTransition:" % indent
@@ -111,12 +110,12 @@ class HelperSpinTransition(Material):
             self.active_mat = self.ls_mat
         else:
             self.active_mat = self.hs_mat
-
+        Material.set_state(self, pressure, temperature)
         self.active_mat.set_state(pressure, temperature)
 
     def unroll(self):
         """ return (fractions, minerals) where both are arrays. May depend on current state """
-        return ([1.0],[self.active_mat])
+        return ([1.0], [self.active_mat])
 
     def density(self):
         return self.active_mat.density()
@@ -140,6 +139,7 @@ class HelperFeDependent(Material):
     def __init__(self, iron_number_with_pt, idx):
         self.iron_number_with_pt = iron_number_with_pt
         self.which_index = idx  # take input 0 or 1 from iron_number_with_pt()
+        self.method = None
 
     def debug_print(self, indent=""):
         print "%sHelperFeDependent:" % indent
@@ -158,7 +158,8 @@ class HelperFeDependent(Material):
     def set_state(self, pressure, temperature):
         Material.set_state(self, pressure, temperature)
         self.base_material = self.create_inner_material(self.iron_number())
-        self.base_material.set_method(self.method)
+        if self.method:
+            self.base_material.set_method(self.method)
         self.base_material.set_state(pressure, temperature)
 
     def unroll(self):
