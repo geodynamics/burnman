@@ -283,9 +283,9 @@ class SLBBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for K_0', stacklevel=2 )
         if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        if params['G_0'] < 0. or params['G_0'] > 1.e13:
+        if params['G_0'] is not float('nan') and (params['G_0'] < 0. or params['G_0'] > 1.e13):
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
-        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
+        if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
             warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
