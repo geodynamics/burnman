@@ -18,7 +18,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
-number_of_points = 5 #set on how many depth slices the computations should be done
+number_of_points = 10 #set on how many depth slices the computations should be done
 
 
 
@@ -27,6 +27,10 @@ Kd_0 = .5
 
 weight_percents_enst = {'Mg':0.213, 'Fe': 0.0721, 'Si':0.242, 'Ca':0., 'Al':0.}
 weight_percents_pyro = {'Mg':0.228, 'Fe': 0.0626, 'Si':0.21, 'Ca':0., 'Al':0.}
+
+minerals.SLB_2005.mg_fe_perovskite_pt_dependent.method = ('slb3')
+minerals.SLB_2005.ferropericlase_pt_dependent.method = ('slb3')
+
 
 phase_fractions_pyro,relative_molar_percent_pyro = burnman.calculate_phase_percents(weight_percents_pyro)
 phase_fractions_enst,relative_molar_percent_enst = burnman.calculate_phase_percents(weight_percents_enst)
@@ -91,8 +95,7 @@ print "preparations done"
 
 
 # Priors on unknown parameters:
-fraction_pyro = pymc.Uniform('fraction_pv', 0.0, 1.0)
-T0 = pymc.Normal('T0',mu=1500.,tau=1./500.)
+fraction_pyro = pymc.Uniform('fraction_pyro', 0.0, 1.0)
 def calc_all_velocities(fraction_pyro):
         method = 'slb3' #slb3|slb2|mgd3|mgd2
         rock = burnman.Composite( [fraction_pyro, 1.0-fraction_pyro],[ pyrolite,enstatite ] )
@@ -119,7 +122,7 @@ def nrmse(funca,funcb):
 
 def error(fraction_pyro):
     if True:
-        if fraction_pyro>0. and fraction_pyro<1.0:
+        if fraction_pyro>=0. and fraction_pyro<=1.0:
             mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G = calc_all_velocities(fraction_pyro)
 
             misfit = nrmse(mat_rho,seis_rho)+nrmse(mat_K,seis_K)+nrmse(mat_G,seis_G)
@@ -141,7 +144,7 @@ def calc_misfit(fraction_pyro=fraction_pyro):
 #sig = pymc.Uniform('sig', 0.0, 100.0, value=1.)
 sig=1.e-2 # Some sorts of error
 obs = pymc.Normal('d',mu=calc_misfit,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
-model = [fraction_pv, fe_pv, fe_pc, T0,obs]
+model = [fraction_pyro,obs]
 things = ['fraction_pyro']
 
 whattodo = ""
@@ -163,20 +166,20 @@ if whattodo=="run":
     whattodo="continue"
 
 if whattodo=="continue":
-    n_runs = 100
+    n_runs = 1000
     for l in range(0,n_runs):
         db = pymc.database.pickle.load(dbname)
-        print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
+        print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pyro').stats()['n'] )
         S = pymc.MCMC(model, db=db)
         #S.sample(iter=100, burn=10, thin=1)
-        S.sample(iter=10, burn=0, thin=1) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+        S.sample(iter=1000, burn=100, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
         S.db.close()
 
 if whattodo=="plot":
 	files=sys.argv[2:]
 	print "files:",files
 
-        b=0#10000 # burn number
+        b=50#10000 # burn number
         i=1
 
         for t in things:
@@ -216,7 +219,7 @@ if whattodo=="plot":
 
             i=i+1
 
-        plt.savefig("example_inv_big_pyro.png")
+        plt.savefig("example_inv_big_pv.png")
         plt.show()
 
 if whattodo=="test":
@@ -243,7 +246,15 @@ if whattodo=="test":
 
 
     pymc.Matplot.trace(db.trace('fraction_pyro',chain=None).gettrace(thin=t,chain=None),'fraction_pyro',rows=2,columns=4,num=2)
-    pymc.Matplot.histogram(np.array(db.trace('fraction_pyro',chain=None).gettrace(burn=b,chain=None)),'fraction_pv',rows=2,columns=4,num=6)
+    pymc.Matplot.histogram(np.array(db.trace('fraction_pyro',chain=None).gettrace(burn=b,chain=None)),'fraction_pyro',rows=2,columns=4,num=6)
+
+    pymc.Matplot.trace(db.trace('fe_pv',chain=None).gettrace(thin=t,chain=None),'fe_pv',rows=2,columns=4,num=3)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pv',chain=None).gettrace(burn=b,chain=None)),'fe_pv',rows=2,columns=4,num=7)
+
+    pymc.Matplot.trace(db.trace('fe_pc',chain=None).gettrace(thin=t,chain=None),'fe_pc',rows=2,columns=4,num=4)
+    pymc.Matplot.histogram(np.array(db.trace('fe_pc',chain=None).gettrace(burn=b,chain=None)),'fe_pc',rows=2,columns=4,num=8)
+
+
 
     plt.show()
 
