@@ -12,7 +12,7 @@ def p(v1, v2):
     return (v2-v1)/v1
 
 ###
-filemin=[['SLB2011', '../../burnman/data/input_minphys/perplex_output/fo_SLB2011_params.dat', SLB_2011.fo()],['HP2011', '../../burnman/data/input_minphys/perplex_output/fo_HP2011_params.dat', HP_2011_ds62.fo()]]
+filemin=[['SLB2011', '../../burnman/data/input_perplex/fo_SLB2011_params.dat', SLB_2011.fo()],['HP2011', '../../burnman/data/input_perplex/fo_HP2011_params.dat', HP_2011_ds62.fo()]]
 
 for database, f, mineral in filemin:
     f = open(f, 'r')
