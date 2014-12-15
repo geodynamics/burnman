@@ -51,10 +51,12 @@ class Mineral(Material):
         'slb3' or 'mtait'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
-
         if equation_of_state is None:
             self.method = None
             return
+
+        if hasattr(self, 'method') == False:
+            self.method = None
 
         new_method = eos.create(equation_of_state)
         if self.method is not None and 'equation_of_state' in self.params:
