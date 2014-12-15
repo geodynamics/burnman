@@ -68,5 +68,122 @@ class eos(BurnManTest):
             self.assertFloatEqual(Grun_test, rock.params['grueneisen_0'])
 
 
+    
+
+
+
+class test_eos_validation(BurnManTest):
+    def test_no_shear_error(self):
+        #The validation should place nans in for the shear parameters
+        #If any exceptions or warnings are raised, fail.
+        class mymineralwithoutshear(burnman.Mineral):
+            def __init__(self):
+                self.params = {
+                    'equation_of_state': 'slb3',
+                    'V_0': 11.24e-6,
+                    'K_0': 161.0e9,
+                    'Kprime_0': 3.8,
+                    'molar_mass': .0403,
+                    'n': 2,
+                    'Debye_0': 773.,
+                    'grueneisen_0': 1.5,
+                    'q_0': 1.5,
+                    'eta_s_0': 2.8}
+                burnman.Mineral.__init__(self)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            #Trigger warning
+            shearless = mymineralwithoutshear()
+            if len(w) != 0:
+                self.fail("Caught unexpected warning: "+str(w[-1]))
+            try:
+                x = shearless.params['G_0']
+                y = shearless.params['Gprime_0']
+                z = shearless.params['F_0']
+                z = shearless.params['eta_s_0']
+            except KeyError:
+                self.fail('Parameter padding failed in validation')
+                pass
+
+    def test_dumb_parameter_values(self):
+
+        class mymineralwithnegativekprime(burnman.Mineral):
+            def __init__(self):
+                self.params = {
+                    'equation_of_state': 'slb3',
+                    'V_0': 11.24e-6,
+                    'K_0': 161.0e9,
+                    'Kprime_0': -4.,
+                    'molar_mass': .0403,
+                    'n': 2,
+                    'Debye_0': 773.,
+                    'grueneisen_0': 1.5,
+                    'q_0': 1.5,
+                    'eta_s_0': 2.8}
+                burnman.Mineral.__init__(self)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            #Trigger warning
+            negative_Kprime = mymineralwithnegativekprime()
+            if len(w) == 0:
+                print negative_Kprime.params
+                self.fail("Did not catch expected warning for negative K prime")
+     
+        class mymineralwithkingigapascals(burnman.Mineral):
+            def __init__(self):
+                self.params = {
+                    'equation_of_state': 'slb3',
+                    'V_0': 11.24e-6,
+                    'K_0': 161.0,
+                    'Kprime_0': 3.8,
+                    'molar_mass': .0403,
+                    'n': 3.14159,
+                    'Debye_0': 773.,
+                    'grueneisen_0': 1.5,
+                    'q_0': 1.5,
+                    'eta_s_0': 2.8}
+                burnman.Mineral.__init__(self)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            #Trigger warning
+            low_K = mymineralwithkingigapascals()
+            if len(w) == 0:
+                self.fail("Did not catch expected warning K in Gpa")
+
+        class mymineralwithfractionalatoms(burnman.Mineral):
+            def __init__(self):
+                self.params = {
+                    'equation_of_state': 'slb3',
+                    'V_0': 11.24e-6,
+                    'K_0': 161.0e9,
+                    'Kprime_0': 3.8,
+                    'molar_mass': .0403,
+                    'n': 3.14159,
+                    'Debye_0': 773.,
+                    'grueneisen_0': 1.5,
+                    'q_0': 1.5,
+                    'eta_s_0': 2.8}
+                burnman.Mineral.__init__(self)
+
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            #Trigger warning
+            fractional_atoms = mymineralwithfractionalatoms()
+            if len(w) == 0:
+                self.fail("Did not catch expected warning for fractional atoms")
+     
+     
+
+
+     
+
+
 if __name__ == '__main__':
     unittest.main()
