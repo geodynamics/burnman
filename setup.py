@@ -10,7 +10,7 @@ metadata = dict( name= 'burnman',
                  author_email='ian.rose@berkeley.edu',
                  license='GPL',
                  long_description='BurnMan calculates elastic properties of lower mantle assemblages constrained by mineral physics.',
-                 packages = ['burnman', 'burnman.minerals'],
+                 packages = ['burnman', 'burnman.minerals', 'burnman.eos'],
                  package_data = { 'burnman' : ['data/input_*/*'] },
                )
 
