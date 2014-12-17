@@ -158,14 +158,14 @@ class test_solidsolution(BurnManTest):
 
     def test_1_gibbs(self):
         fo, fo_ss = self.setup_1min_ss()
-        endmember_properties=[fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr]
-        ss_properties=[fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr]
+        endmember_properties=[fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
+        ss_properties=[fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_2_gibbs(self):
         fo, fo_ss = self.setup_2min_ss()
-        endmember_properties=[fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr]
-        ss_properties=[fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr]
+        endmember_properties=[fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
+        ss_properties=[fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_ol_gibbs(self):
