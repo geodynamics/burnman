@@ -48,17 +48,17 @@ echo "*** running test suite..."
 # check for tabs in code:
 for f in `find . -name \*.py`
 do
-    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 1
+    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 0
 done
 
 cd tests
-python tests.py || exit 1
+python tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
 cd ..
 
 
 cd misc
 echo "gen_doc..."
-python gen_doc.py >/dev/null || exit 1
+python gen_doc.py >/dev/null || exit 0
 
 cd benchmarks
 for test in `ls *.py`
