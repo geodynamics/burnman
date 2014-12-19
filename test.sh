@@ -30,11 +30,11 @@ else
   sed -i'' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
+  (numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "!  $t ... FAIL";
   echo "Check: `readlink -f $t.tmp` `readlink -f $fulldir/misc/ref/$t.out`";
-  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp $fulldir/misc/ref/$t.out | head
+  numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 $t.tmp $fulldir/misc/ref/$t.out | head
   }
 
 fi
