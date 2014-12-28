@@ -202,7 +202,7 @@ class MGDBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
             warnings.warn( 'Unusual value for molar_mass' , stacklevel=2)
-        if params['n'] < 1. or params['n'] > 1000. or float(params['n']).is_integer()==False:
+        if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n' , stacklevel=2)
         if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
             warnings.warn( 'Unusual value for Debye_0' , stacklevel=2)

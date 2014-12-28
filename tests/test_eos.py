@@ -156,34 +156,6 @@ class test_eos_validation(BurnManTest):
             if len(w) == 0:
                 self.fail("Did not catch expected warning K in Gpa")
 
-        class mymineralwithfractionalatoms(burnman.Mineral):
-            def __init__(self):
-                self.params = {
-                    'equation_of_state': 'slb3',
-                    'V_0': 11.24e-6,
-                    'K_0': 161.0e9,
-                    'Kprime_0': 3.8,
-                    'molar_mass': .0403,
-                    'n': 3.14159,
-                    'Debye_0': 773.,
-                    'grueneisen_0': 1.5,
-                    'q_0': 1.5,
-                    'eta_s_0': 2.8}
-                burnman.Mineral.__init__(self)
-
-        with warnings.catch_warnings(record=True) as w:
-            # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
-            #Trigger warning
-            fractional_atoms = mymineralwithfractionalatoms()
-            if len(w) == 0:
-                self.fail("Did not catch expected warning for fractional atoms")
-     
-     
-
-
-     
-
 
 if __name__ == '__main__':
     unittest.main()
