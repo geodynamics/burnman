@@ -35,7 +35,7 @@ for database, f, mineral in filemin:
         gibbs=H-T*S
         PT.append([P/1.e4,T])
         diff=[p(fo.gibbs, gibbs), p(fo.H, H), p(fo.S, S), p(fo.V, V/1.e5), p(fo.C_p, C_p), p(fo.alpha, alpha), p(fo.K_T, 1.e5/beta), p(fo.density(), rho)]
-        print ["{0:0.4f}".format(i) for i in diff]
+        print diff
         percentage_diff.append(diff)
 
     percentage_diff=np.array(percentage_diff)

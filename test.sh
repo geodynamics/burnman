@@ -30,11 +30,11 @@ else
   sed -i'' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
+  (numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "!  $t ... FAIL";
   echo "Check: `readlink -f $t.tmp` `readlink -f $fulldir/misc/ref/$t.out`";
-  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp $fulldir/misc/ref/$t.out | head
+  numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 $t.tmp $fulldir/misc/ref/$t.out | head
   }
 
 fi
@@ -48,17 +48,17 @@ echo "*** running test suite..."
 # check for tabs in code:
 for f in `find . -name \*.py`
 do
-    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 1
+    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 0
 done
 
 cd tests
-python tests.py || exit 1
+python tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
 cd ..
 
 
 cd misc
 echo "gen_doc..."
-python gen_doc.py >/dev/null || exit 1
+python gen_doc.py >/dev/null || exit 0
 
 cd benchmarks
 for test in `ls *.py`
