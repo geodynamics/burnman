@@ -71,6 +71,11 @@ class SolidSolution(Mineral):
 	molar_mass = sum([ self.base_material[i][0].params['molar_mass'] * self.molar_fraction[i] for i in range(self.n_endmembers) ])
         return molar_mass
 
+    def set_method(self, method):
+        for i in range(self.n_endmembers):
+            self.base_material[i][0].set_method(method)
+        self.method = self.base_material[0][0].method
+
     def set_state(self, pressure, temperature):
         self.pressure=pressure
         self.temperature=temperature
