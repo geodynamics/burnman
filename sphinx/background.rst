@@ -398,7 +398,7 @@ One can choose to evaluate :math:`V_P, V_\Phi, V_S, \rho, K_S` and/or :math:`G`.
 The user can input their own seismic profile, an example of which is included using AK135 :cite:`Kennett1995`.
 
 Besides standardized 1D radial profiles, one can also compare to regionalized average profiles for the lower mantle.
-This option accommodates the observation that the lowermost mantle can be clustered into two regions, a 'slow' region, which represents the so-called Large Low Shear Velocity Provinces, and 'fast' region, the continuous surrounding region where slabs might subduct :cite:`lekic2012`.
+This option accommodates the observation that the lowermost mantle can be clustered into two regions, a 'slow' region, which represents the so-called Large Low Shear Velocity Provinces, and 'fast' region, the continuous surrounding region where slabs might subduct :cite:`Lekic2012`.
 This clustering as well as the averaging of the 1D model occurs over five tomographic S wave velocity  models (SAW24B16: :cite:`megnin2000`; HMSL-S: :cite:`houser2008`; S362ANI: :cite:`Kustowski2008`; GyPSuM: :cite:`Simmons2010`; S40RTS: :cite:`Ritsema2011`).
 The strongest deviations from PREM occur in the lowermost 1000 km.
 Using the 'fast' and 'slow' S wave velocity profiles is therefore most important when interpreting the lowermost mantle. Suggestion of compositional variation between these regions comes from seismology :cite:`to2005,He2012` as well as geochemistry :cite:`Deschamps2012,jackson2010`.

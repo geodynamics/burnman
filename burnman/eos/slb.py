@@ -306,7 +306,7 @@ class SLB3(SLBBase):
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
-    consistent.
+    consistent.)
     """
     def __init__(self):
         self.order=3

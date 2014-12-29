@@ -18,7 +18,9 @@ class SolutionModel(object):
     """
     This is the base class for a solution model,  intended for use
     in defining solid solutions and performing thermodynamic calculations
-    on them.
+    on them.  All minerals of type :class:`burnman.SolidSolution` use 
+    a solution model for defining how the endmembers in the solid solution 
+    interact.
 
     A user wanting a new solution model should define the functions for
     excess_gibbs_free_energy and excess_volume.  In the base class these
