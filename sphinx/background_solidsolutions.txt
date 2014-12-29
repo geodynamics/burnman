@@ -1,3 +1,5 @@
+.. _ref-methods-solid-solutions:
+
 Calculating Solid Solution Properties
 -------------------------------------
 Many minerals exist across a continuous compositional space. These compositional domains are called solid solutions if the mineral structure is not altered. 
