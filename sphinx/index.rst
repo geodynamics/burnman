@@ -18,7 +18,6 @@ Welcome to BurnMan's documentation!
    materials
    eos
    averaging
-   thermodynamics
    geotherms
    seismic
    mineral_database
