@@ -17,8 +17,8 @@ Section :ref:`ref-methods-user-input`.
 
 
 
-Isothermal calculations: Birch-Murnaghan
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Birch-Murnaghan (isothermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Birch-Murnaghan equation is an isothermal Eulerian finite-strain EoS
 relating pressure and volume.  The negative finite-strain (or compression) is
@@ -60,11 +60,39 @@ BurnMan has the option to use the second-order expansion for shear modulus by
 dropping the :math:`f^2` terms in these equations (as is sometimes done for
 experimental fits or EoS modeling).
 
+Modified Tait (isothermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Modified Tait equation of state was developed by :cite:`HC1974`
+
+.. math::
+    \frac{V_{P, T}}{V_{1 bar, 298 K}} &= 1 - a(1-(1+bP)^{-c}), \\
+    a &= \frac{1 + K_0'}{1 + K_0' + K_0K_0''}, \\
+    b &= \frac{K_0'}{K_0} - \frac{K_0''}{1 + K_0'}, \\
+    c &= \frac{1 + K_0' + K_0K_0''}{K_0'^2 + K_0' - K_0K_0''}
+    :label: mtait
 
 
+Mie-Grüneisen-Debye (thermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Thermal Corrections
-^^^^^^^^^^^^^^^^^^^
+HP2011 (thermal correction to Modified Tait)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-P_{\textrm{thermal}}` in Equation :eq:`mtait` :cite:`HP2011` 
+
+.. math::
+    P_{\textrm{thermal}} &= d \int_{T0}^T \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2} dT, \\
+    d &= \alpha_0K_0 \frac{(\exp(\frac{\Theta}{T})-1)^2}{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}
+
+:math:`\Theta` is the Einstein temperature of the crystal in Kelvin, approximated for a substance :math:`i` with :math:`n_i` atoms in the unit formula and a molar entropy :math:`S_i` using the empirical formula 
+
+.. math::
+    \Theta_i=\frac{10636}{S_i/n_i + 6.44}
+
+
+SLB2005 (for solids, thermal)
+^^^^^^^^^^^^^^^^^
 
 Thermal corrections for pressure, and isothermal bulk modulus and shear
 modulus are derived from the Mie-Grüneisen-Debye EoS with the quasi-harmonic
@@ -75,7 +103,7 @@ these corrections are added to equations :eq:`V`--:eq:`G`:
     P_{th}(V,T) &={\frac{\gamma \Delta \mathcal{U}}{V}}, \\
     K_{th}(V,T) &=(\gamma +1-q)\frac{\gamma \Delta \mathcal{U}}{V} -\gamma ^{2} \frac{\Delta(C_{V}T)}{V} ,\\
     G_{th}(V,T) &=  -\frac{\eta_{S} \Delta \mathcal{U}}{V}.
-	:label: Pth
+    :label: Pth
 
 The :math:`\Delta` refers to the difference in the relevant quantity from the
 reference temperature (300 K).  :math:`\gamma` is the Grüneisen parameter,
@@ -186,3 +214,14 @@ EoS, we refer readers to :cite:`Stixrude2005`.
 |              |                  |                                   |                         |
 +--------------+------------------+-----------------------------------+-------------------------+
 
+CORK (for fluids, thermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+A Murnaghan EoS is used to approximate the change in volume with pressure and temperature
+
+.. math::
+    V_{P, T} = V_{1 bar, T} \left( 1- \frac{K_0'P}{K_0'P + K_0(1-\frac{dK_0}{dT}(T-298)} \right)^{\frac{1}{K_0'}}
+
+.. math::
+    V_{1 bar, T} = (1+\alpha(T-298))
