@@ -1,0 +1,28 @@
+Calculating Thermodynamic Properties
+------------------------------------
+
+At any given pressure and temperature, the equilibrium assemblage of minerals is that which minimises the Gibbs Free Energy of the system. The Gibbs free energy is the maximum amount of non-expansion work that can be extracted from a closed system. For each phase, the Gibbs free energy is equal to 
+
+.. math::
+    \mathcal{G}= \mathcal{U} - T\mathcal{S} + PV = \mathcal{H} - TS = \mathcal{F} + PV
+    :label: gibbs
+
+where :math:`P` is the pressure, :math:`T` is the temperature and :math:`\mathcal{U}`, :math:`\mathcal{F}`, :math:`\mathcal{H}`, :math:`\mathcal{S}` and :math:`V` are the molar internal energy, Helmholtz Free Energy, enthalpy, entropy and volume respectively. The total energy of the system is then
+
+.. math::
+    \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i
+    :label: gibbstotal
+
+HP2011
+^^^^^^
+
+.. math::
+    \mathcal{G}(P,T) = \mathcal{H}_{\textrm{1 bar, T}} - T\mathcal{S}_{\textrm{1 bar, T}} + \int_{\textrm{1 bar}}^P V(P,T)~dP
+    :label: gibbs_hp2011  
+
+.. math::
+    \mathcal{G}(P,T) = \left( \Delta_f\mathcal{H}_{\textrm{1 bar, 298 K}} + \int_{298}^T C_P~dT \right) - T\left(\mathcal{S}_{\textrm{1 bar, 298 K}} + \int_{298}^T \frac{C_P}{T}~dT \right) + \int_{\textrm{1 bar}}^P V(P,T)~dP
+    :label: gibbs_hp2011_2   
+
+SLB2005
+^^^^^^^
