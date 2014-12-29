@@ -201,5 +201,9 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(site_fill, ones)
 
+    def test_set_method(self):
+       ss = olivine_ss()
+       ss.set_method('mtait')
+
 if __name__ == '__main__':
     unittest.main()
