@@ -65,7 +65,7 @@ experimental fits or EoS modeling).
 Modified Tait (isothermal)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Modified Tait equation of state was developed by :cite:`HC1974`
+The Modified Tait equation of state was developed by :cite:`HC1974`. It has the considerable benefit of allowing volume to be expressed as a function of pressure. It performs very well to pressures and temperatures relevant to the deep Earth :cite:`HP2011`.
 
 .. math::
     \frac{V_{P, T}}{V_{1 bar, 298 K}} &= 1 - a(1-(1+bP)^{-c}), \\
@@ -75,8 +75,40 @@ The Modified Tait equation of state was developed by :cite:`HC1974`
     :label: mtait
 
 
-Mie-Grüneisen-Debye (thermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mie-Grüneisen-Debye (thermal correction to Birch-Murnaghan)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Debye model for the Helmholtz free energy can be written as follows :cite:`Matas2007`
+
+.. math::
+    \mathcal{F} &= \frac{9nRT}{V}\frac{1}{x^3} \int_{0}^{x} \xi^2 \ln (1-e^{-\xi}) d\xi, \\
+    x &= \theta / T, \\
+    \theta &= \theta_0 \exp \left( \frac{\gamma_0-\gamma}{q_0} \right), \\
+    \gamma &= \gamma_0 \left( \frac{V}{V_0} \right)^{q_0}
+
+where :math:`\theta` is the Debye temperature and :math:`\gamma` is the Grüneisen parameter. 
+
+Using thermodynamic relations we can derive equations for the thermal pressure and bulk modulus
+
+.. math::
+    P_{th}(V,T) &= - \frac{\partial \mathcal{F(V, T)}}{\partial V}, \\
+    &= \frac{3 n \gamma R T}{V} D(x), \\
+    K_{th}(V,T) &= -V \frac{\partial P(V, T)}{\partial V}, \\
+    &= \frac{3 n \gamma R T}{V} \gamma \left[ (1-q_0 - 3 \gamma) D(x) + 3\gamma \frac{x}{e^x - 1} \right], \\
+    D(x) &= \frac{3}{x^3} \int_{0}^{x} \frac{\xi^3}{e^{\xi} - 1} d\xi
+
+The thermal shear correction used in BurnMan was developed by :cite:`HS1998`
+
+.. math::
+    G_{th}(V,T) &= \frac{3}{5} \left[ K_{th} (V, T) - 2\frac{3nRT}{V}\gamma D(x) \right]
+
+
+The total pressure, bulk and shear moduli can be calculated from the following sums
+
+.. math::
+    P(V, T) &= P_{\textrm{ref}}(V, T_0) + P_{th}(V, T) - P_{th}(V, T_0), \\
+    K(V, T) &= K_{\textrm{ref}}(V, T_0) + K_{th}(V, T) - K_{th}(V, T_0), \\
+    G(V, T) &= G_{\textrm{ref}}(V, T_0) + G_{th}(V, T) - G_{th}(V, T_0) 
 
 HP2011 (thermal correction to Modified Tait)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -84,7 +116,7 @@ HP2011 (thermal correction to Modified Tait)
 The thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-P_{\textrm{thermal}}` in Equation :eq:`mtait` :cite:`HP2011`. Thermal pressure here is calculated using a Mie-Grüneisen equation of state and an Einstein model for heat capacity, even though the Einstein model is not actually used for the heat capacity when calculating the enthalpy and entropy (see following section).
 
 .. math::
-    P_{\textrm{thermal}} &= \frac{\alpha_0 K_0 E_{\textrm{th}}}{C_{V0}}, \\
+    P_{\textrm{th}} &= \frac{\alpha_0 K_0 E_{\textrm{th}}}{C_{V0}}, \\
     C_{V0} &= 3 n R \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2}, \\
     E_{\textrm{th}} &= \int_{T0}^T \frac{1}{C_{V0}} dT
 
@@ -217,14 +249,15 @@ EoS, we refer readers to :cite:`Stixrude2005`.
 |              |                  |                                   |                         |
 +--------------+------------------+-----------------------------------+-------------------------+
 
-CORK (for fluids, thermal)
+Compensated-Redlich-Kwong (for fluids, thermal)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-A Murnaghan EoS is used to approximate the change in volume with pressure and temperature
-
-.. math::
-    V_{P, T} = V_{1 bar, T} \left( 1- \frac{K_0'P}{K_0'P + K_0(1-\frac{dK_0}{dT}(T-298)} \right)^{\frac{1}{K_0'}}
+The CORK equation of state :cite:`HP1991` is a simple virial-type extension to the modified Redlich-Kwong (MRK) equation of state. It was designed to compensate for the tendency of the MRK equation of state to overestimate volumes at high pressures and accommodate the volume behaviour of coexisting gas and liquid phases along the saturation curve.
 
 .. math::
-    V_{1 bar, T} = (1+\alpha(T-298))
+    V &= \frac{RT}{P} + c_1 - \frac{c_0 R T^{0.5}}{(RT + c_1 P)(RT + 2 c_1 P)} + c_2 P^{0.5} + c_3 P, \\
+    c_0 &= c_{0,0} T_c^{2.5}/P_c + c_{0,1} T_c^{1.5}/P_c T, \\
+    c_1 &= c_{1,0} T_c/P_c, \\
+    c_2 &= c_{2,0} T_c/P_c^{1.5} + c_{2,1}/P_c^{1.5} T, \\
+    c_3 &= c_{3,0} T_c/P_c^2 + c_{3,1}/P_c^2 T
+    
