@@ -95,7 +95,7 @@ The thermal pressure can be incorporated into the Modified Tait equation of stat
 
 
 SLB2005 (for solids, thermal)
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Thermal corrections for pressure, and isothermal bulk modulus and shear
 modulus are derived from the Mie-Grüneisen-Debye EoS with the quasi-harmonic

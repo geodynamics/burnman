@@ -19,6 +19,7 @@ Welcome to BurnMan's documentation!
    eos
    averaging
    geotherms
+   thermodynamics
    seismic
    mineral_database
    zreferences
