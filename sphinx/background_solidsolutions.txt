@@ -2,16 +2,13 @@
 
 Calculating Solid Solution Properties
 -------------------------------------
-Many minerals exist across a continuous compositional space. These compositional domains are called solid solutions if the mineral structure is not altered. 
-
-A solid solution is not simply a mechanical mixture of its constituent endmembers. Many of the properties of even simple solid solutions deviate from the properties expected of a mechanical mixture. These deviations result from differences in ionic radius and charge, the changes in length and strength of atomic bonds, and the consequent distortions in the crystal lattice.
-
-Solid solutions can be described in terms of the occupancies of elements in different sites in the crystal lattices. For example, low pressure silicate garnets have two distinct sites on which mixing takes place; a dodecahedral site (3 per unit cell) and octahedral site (2 per unit cell). The chemical formula can be written as follows:
+Many minerals can exist over a range of compositions. The compositional domains of minerals with a common crystal structure are called solid solutions. Different elements substitute for one another within distinct crystallographic sites in the structure. For example, low pressure silicate garnets have two distinct sites on which mixing takes place; a dodecahedral site (3 per unit cell) and octahedral site (2 per unit cell). The chemical formula of many low pressure garnets exist within the solid solution:
 
 .. math::
     \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
 
-The mixing of different elements on sites results in an excess configurational entropy
+
+A solid solution is not simply a mechanical mixture of its constituent endmembers. Most fundamentally, the mixing of different elements on sites results in an excess configurational entropy
 
 .. math::	
     \mathcal{S}_{\textrm{conf}} = R \ln \prod_s (X_c^s)^{\nu}
@@ -19,7 +16,7 @@ The mixing of different elements on sites results in an excess configurational e
 
 where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
 
-Many solid solutions exhibit deviations from ideality. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
+Many solid solutions exhibit further deviations from ideality, which arise as a result of interactions between ions with different physical and chemical characteristics. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
 
 .. math::
     \alpha^T p (\phi^T W \phi)
