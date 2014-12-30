@@ -122,7 +122,7 @@ class IdealSolution (SolutionModel):
 
         # Process solid solution chemistry
         self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
-            ProcessSolidSolutionChemistry(self.formulas)
+            process_solution_chemistry(self.formulas)
 
         self._calculate_endmember_configurational_entropies()
 

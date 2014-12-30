@@ -4,7 +4,7 @@
 
 # This module provides the functions required to process the standard burnman formula compositions
 # ProcessChemistry returns the number of atoms and molar mass of a compound given its unit formula as an argument.
-# ProcessSolidSolutionChemistry returns information required to calculate solid solution properties from a set of endmember formulae
+# process_solution_chemistry returns information required to calculate solid solution properties from a set of endmember formulae
 
 import re
 import numpy as np
@@ -95,7 +95,7 @@ def dictionarize_site_formula(formula):
     return f
 
 
-def ProcessSolidSolutionChemistry(formulae):
+def process_solution_chemistry(formulae):
     """
     This function parses a set of endmember formulae 
     containing site information, e.g.
