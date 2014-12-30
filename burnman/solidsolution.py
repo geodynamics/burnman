@@ -64,6 +64,13 @@ class SolidSolution(Mineral):
         assert(sum(molar_fraction) < 1.0001)
         self.molar_fraction = molar_fraction 
 
+    def molar_mass(self):
+        """
+        Returns molar mass of the mineral [kg/mol]
+        """
+	molar_mass = sum([ self.base_material[i][0].params['molar_mass'] * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        return molar_mass
+
     def set_state(self, pressure, temperature):
         self.pressure=pressure
         self.temperature=temperature
