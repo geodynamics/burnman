@@ -60,6 +60,7 @@ from version import version as __version__
 from mineral import Mineral
 from material import Material
 from composite import Composite
+from solutionmodel import SolutionModel
 from solidsolution import SolidSolution
 from mineral_helpers import *
 
