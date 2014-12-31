@@ -20,11 +20,11 @@ class SolutionModel(object):
     in defining solid solutions and performing thermodynamic calculations
     on them.
 
-    A user wanting a new solution model should define the functions for
-    excess_gibbs_free_energy and excess_volume.  In the base class these
-    return zero, so if this class is used then the Gibbs free energy and molar
-    volume of a solution are just the weighted arithmetic averages of the
-    different endmember values.
+    A user wanting a new solution model should define the functions below.
+    In the base class all of these return zero, so if the solution model 
+    does not implement them, they essentially have no effect, and 
+    then the Gibbs free energy and molar volume of a solid solution are 
+    just the weighted arithmetic averages of the different endmember values.
     """
 
     def __init__(self):
@@ -86,7 +86,7 @@ class SolutionModel(object):
     def excess_volume( self, pressure, temperature, molar_fraction):
         """
         Given a list of molar fractions of different phases,
-        compute the excess Gibbs free energy of the solution,
+        compute the excess volume of the solution.
         The base class implementation assumes that the excess volume is zero.
 
         Parameters
@@ -104,6 +104,54 @@ class SolutionModel(object):
         -------
         V_excess : float
             The excess volume of the solution
+        """
+        return 0.0
+
+    def excess_enthalpy( self, pressure, temperature, molar_fraction):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess enthalpy of the solution.
+        The base class implementation assumes that the excess enthalpy is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fraction : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        H_excess : float
+            The excess enthalpy of the solution
+        """
+        return 0.0
+
+    def excess_entropy( self, pressure, temperature, molar_fraction):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess entropy of the solution.
+        The base class implementation assumes that the excess entropy is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fraction : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        S_excess : float
+            The excess entropy of the solution
         """
         return 0.0
 
