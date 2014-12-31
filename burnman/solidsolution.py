@@ -81,9 +81,14 @@ class SolidSolution(Mineral):
         self.partial_gibbs = np.array([self.base_material[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
         self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
 
-        self.excess_enthalpy = self.solution_model.excess_enthalpy( pressure, temperature, self.molar_fraction)
-        self.excess_entropy = self.solution_model.excess_entropy( pressure, temperature, self.molar_fraction)
-        self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
+        if self.solution_model.__class__.__name__ == 'IdealSolution':
+            self.excess_enthalpy = 0.
+            self.excess_entropy = 0.
+            self.excess_volume = 0.
+        else:
+            self.excess_enthalpy = self.solution_model.excess_enthalpy( pressure, temperature, self.molar_fraction)
+            self.excess_entropy = self.solution_model.excess_entropy( pressure, temperature, self.molar_fraction)
+            self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
 
         self.H = sum([ self.base_material[i][0].H * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
         self.S = sum([ self.base_material[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
