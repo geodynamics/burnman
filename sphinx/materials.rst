@@ -8,9 +8,6 @@ Burnman operates on materials (type :class:`~burnman.material.Material`) most pr
 .. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.solidsolution.SolidSolution burnman.mineral_helpers.HelperSpinTransition
 
 
-.. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.solutionmodel.SolutionModel burnman.solidsolution.SolidSolution burnman.mineral_helpers.HelperSpinTransition
-
-
 Material Base Class
 -------------------
 
