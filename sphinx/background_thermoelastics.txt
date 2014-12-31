@@ -250,7 +250,7 @@ EoS, we refer readers to :cite:`Stixrude2005`.
 +--------------+------------------+-----------------------------------+-------------------------+
 
 Compensated-Redlich-Kwong (for fluids, thermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The CORK equation of state :cite:`HP1991` is a simple virial-type extension to the modified Redlich-Kwong (MRK) equation of state. It was designed to compensate for the tendency of the MRK equation of state to overestimate volumes at high pressures and accommodate the volume behaviour of coexisting gas and liquid phases along the saturation curve.
 
