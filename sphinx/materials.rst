@@ -11,18 +11,10 @@ Burnman operates on materials (type :class:`~burnman.material.Material`) most pr
 .. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.solutionmodel.SolutionModel burnman.solidsolution.SolidSolution burnman.mineral_helpers.HelperSpinTransition
 
 
-Base Classes
-------------
-
-Materials
-^^^^^^^^^
+Material Base Class
+-------------------
 
 .. autoclass:: burnman.material.Material
-
-Solution models
-^^^^^^^^^^^^^^^
-
-.. autoclass:: burnman.solutionmodel.SolutionModel
 
 
 Minerals
@@ -38,8 +30,8 @@ Solid solutions
 
 .. autoclass:: burnman.solidsolution.SolidSolution
 
-Solid solution helpers (deprecated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mineral helpers
+^^^^^^^^^^^^^^^
 
 .. autoclass:: burnman.mineral_helpers.HelperSpinTransition
 

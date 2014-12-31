@@ -2,11 +2,16 @@
 Thermodynamics
 ==============
 
-Burnman has a number of functions which deal with the thermodynamics of single phases and aggregates.
+Burnman has a number of functions and classes which deal with the thermodynamics of single phases and aggregates.
+
+Solution models
+---------------
+
+.. autoclass:: burnman.solutionmodel.SolutionModel
 
 
-Chemistry processing
---------------------
+Chemistry parsing
+-----------------
 
 .. autofunction:: burnman.processchemistry.read_masses
 .. autofunction:: burnman.processchemistry.dictionarize_formula
@@ -17,11 +22,8 @@ Chemistry processing
 .. autofunction:: burnman.processchemistry.ordered_compositional_array
 
 
-Thermodynamics
---------------
-
 Chemical potentials
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 .. autofunction:: burnman.chemicalpotentials.chemical_potentials
 .. autofunction:: burnman.chemicalpotentials.fugacity
