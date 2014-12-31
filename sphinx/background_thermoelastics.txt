@@ -8,14 +8,19 @@ To calculate the bulk (:math:`K`) modulus, shear modulus (:math:`G`) and
 density (:math:`\rho`) of a material at a given pressure (:math:`P`) and
 temperature (:math:`T`), optionally defined by a geotherm) and determine the
 seismic velocities (:math:`V_S, V_P, V_\Phi`), one uses an Equation of State
-(EoS).  Currently the following EoSs are supported in BurnMan: the
-Birch-Murnaghan formulation (excludes temperature effects, 
-:cite:`Poirier1991`), and the Birch-Murnaghan formulation with a
-Mie-Grüneisen-Debye temperature correction as formulated by
-:cite:`Stixrude2005`.  To calculate these thermoelastic parameters, the EoS
-requires the user to input three parameters: pressure, temperature, the phases
+(EoS).  Currently the following EoSs are supported in BurnMan:
+
+* Birch-Murnaghan finite-strain EoS (excludes temperature effects, :cite:`Poirier1991`), 
+* Birch-Murnaghan finite-strain EoS with a Mie-Grüneisen-Debye thermal correction, as formulated by :cite:`Stixrude2005`.
+* Birch-Murnaghan finite-strain EoS with a Mie-Grüneisen-Debye thermal correction, as formulated by :cite:`Matas2007`.
+* Modified Tait EoS with a pseudo-Einstein model for thermal corrections, as formulated by :cite:`HP2011`.
+* Compensated-Redlich-Kwong for fluids, as formulated by :cite:`HP2011`.
+
+
+To calculate these thermoelastic parameters, the EoS
+requires the user to input the pressure, temperature, and the phases
 and their molar fractions.  These inputs and outputs are further discussed in
-Section :ref:`ref-methods-user-input`.
+:ref:`ref-methods-user-input`.
 
 
 

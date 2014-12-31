@@ -25,7 +25,7 @@ These minerals are "wrapped," so as to switch from the high spin to high spin mi
 While not realistic, for the sake of simplicity, the spin transitions are considered to be sharp at a given pressure.
 
 *Minerals depending on Fe partitioning* -- The wrapper function can partition iron, for example between ferropericlase, fp, and perovskite, pv.
-It requires the input of the iron mol fraction with regards to Mg, :math:`X_\mathrm{fp}` and :math:`X_\mathrm{pv}`, which then defines the chemistry of an Mg-Fe solid solution according to (:math:`\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{fp}}}$,$\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{fp}}}$)$\mathrm{O}$ or ($\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{pv}}}$,$\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{pv}}}$)$\mathrm{SiO_3}`.
+It requires the input of the iron mol fraction with regards to Mg, :math:`X_\mathrm{fp}` and :math:`X_\mathrm{pv}`, which then defines the chemistry of an Mg-Fe solid solution according to (:math:`\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{fp}}},\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{fp}}})\mathrm{O}` or :math:`(\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{pv}}},\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{pv}}})\mathrm{SiO_3}`.
 The iron mol fractions can be set to be constant or varying with P and T as needed.
 Alternatively one can calculate the iron mol fraction from the distribution coefficient :math:`K_D` defined as
 
