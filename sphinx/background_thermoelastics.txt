@@ -127,7 +127,7 @@ The thermal pressure can be incorporated into the Modified Tait equation of stat
 .. math::
     P_{\textrm{th}} &= \frac{\alpha_0 K_0 E_{\textrm{th}}}{C_{V0}}, \\
     C_{V0} &= 3 n R \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2}, \\
-    E_{\textrm{th}} &= \int_{T0}^T \frac{1}{C_{V0}} dT
+    E_{\textrm{th}} &= 3 n R \Theta \left(0.5 + \frac{1}{ \exp(\frac{\Theta}{T}) - 1 }\right)
 
 :math:`\Theta` is the Einstein temperature of the crystal in Kelvin, approximated for a substance :math:`i` with :math:`n_i` atoms in the unit formula and a molar entropy :math:`S_i` using the empirical formula 
 
