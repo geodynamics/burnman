@@ -105,8 +105,8 @@ if __name__ == "__main__":
 
 
     # Plot the FMQ log10(fO2) values
-    plt.plot(temperatures, log10fO2_FMQ_ONeill1987, 'k', linewidth=3., label='FMQ (O\'Neill (1987)')
-    plt.plot(temperatures, log10fO2_FMQ, 'b--', linewidth=3., label='FMQ (HP 2011 ds62)')
+    plt.plot(temperatures, log10fO2_FMQ_ONeill1987, 'k', linewidth=1., label='FMQ (O\'Neill (1987)')
+    plt.plot(temperatures, log10fO2_FMQ, 'b--', linewidth=2., label='FMQ (HP 2011 ds62)')
 
 
     # Do the same for Re-ReO2
@@ -187,8 +187,8 @@ if __name__ == "__main__":
         log10fO2_ReReO2buffer[i] = np.log10(fugacity(oxygen, ReReO2buffer))
 
     # Plot the Re-ReO2 log10(fO2) values
-    plt.plot(temperatures, log10fO2_Re_PO1994, 'k', linewidth=3., label='Re-ReO2 (Pownceby and O\'Neill (1994)')
-    plt.plot(temperatures, log10fO2_ReReO2buffer, 'r--', linewidth=3., label='Re-ReO2 (HP 2011 ds62)')
+    plt.plot(temperatures, log10fO2_Re_PO1994, 'k', linewidth=1., label='Re-ReO2 (Pownceby and O\'Neill (1994)')
+    plt.plot(temperatures, log10fO2_ReReO2buffer, 'r--', linewidth=2., label='Re-ReO2 (HP 2011 ds62)')
     plt.ylabel("log_10 (fO2)")
     plt.xlabel("T (K)")
     plt.legend(loc='lower right')
