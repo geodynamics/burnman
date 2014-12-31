@@ -129,8 +129,8 @@ class MT(eos.EquationOfState):
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0' , stacklevel=2)
-        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
+            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
+        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         if params['G_0'] < 0.0 or params['G_0'] > 1.e13:
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
