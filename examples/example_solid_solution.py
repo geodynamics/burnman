@@ -18,9 +18,10 @@ BurnMan:
 3. Asymmetric solid solutions
 
 These solid solutions can potentially deal with:
-- Disordered endmembers (more than one element on a crystallographic site)
-- Site vacancies
-- More than one valence/spin state of the same element on a site
+
+* Disordered endmembers (more than one element on a crystallographic site)
+* Site vacancies
+* More than one valence/spin state of the same element on a site
 
 *Uses:*
 
