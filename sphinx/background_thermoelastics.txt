@@ -122,12 +122,13 @@ The primary differences are in the thermal correction to the shear modulus and i
 HP2011 (thermal correction to Modified Tait)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-P_{\textrm{thermal}}` in Equation :eq:`mtait` :cite:`HP2011`. Thermal pressure here is calculated using a Mie-Grüneisen equation of state and an Einstein model for heat capacity, even though the Einstein model is not actually used for the heat capacity when calculating the enthalpy and entropy (see following section).
+The thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-\left(P_{\textrm{th}} - P_{\textrm{th0}}\right)` in Equation :eq:`mtait` :cite:`HP2011`. Thermal pressure is calculated using a Mie-Grüneisen equation of state and an Einstein model for heat capacity, even though the Einstein model is not actually used for the heat capacity when calculating the enthalpy and entropy (see following section).
 
 .. math::
-    P_{\textrm{th}} &= \frac{\alpha_0 K_0 E_{\textrm{th}}}{C_{V0}}, \\
-    C_{V0} &= 3 n R \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2}, \\
-    E_{\textrm{th}} &= 3 n R \Theta \left(0.5 + \frac{1}{ \exp(\frac{\Theta}{T}) - 1 }\right)
+    P_{\textrm{th}} &= \frac{\alpha_0 K_0 E_{\textrm{th}} }{C_{V0}}, \\
+    E_{\textrm{th}} &= 3 n R \Theta \left(0.5 + \frac{1}{ \exp(\frac{\Theta}{T}) - 1 }\right), \\
+    C_{V} &= 3 n R \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2}
+
 
 :math:`\Theta` is the Einstein temperature of the crystal in Kelvin, approximated for a substance :math:`i` with :math:`n_i` atoms in the unit formula and a molar entropy :math:`S_i` using the empirical formula 
 
