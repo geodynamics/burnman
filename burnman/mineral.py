@@ -173,7 +173,7 @@ class Mineral(Material):
         return self.K_T
     def compressibility(self):
         """
-        Returns isothermal bulk modulus of the mineral [Pa]
+        Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
         """
         return 1./self.K_T
     def adiabatic_bulk_modulus(self):
