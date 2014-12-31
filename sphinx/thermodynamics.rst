@@ -4,10 +4,21 @@ Thermodynamics
 
 Burnman has a number of functions and classes which deal with the thermodynamics of single phases and aggregates.
 
+Lattice Vibrations
+------------------
+
+Debye model
+^^^^^^^^^^^
+.. automodule:: burnman.debye
+
+Einstein model
+^^^^^^^^^^^^^^
+.. automodule:: burnman.eos.einstein
+
 Solution models
 ---------------
 
-.. autoclass:: burnman.solutionmodel.SolutionModel
+.. automodule:: burnman.solutionmodel
 
 
 Chemistry parsing
