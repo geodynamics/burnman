@@ -14,6 +14,7 @@ from birch_murnaghan import BM2, BM3
 from mie_grueneisen_debye import MGD2, MGD3
 from slb import SLB2, SLB3
 from modified_tait import MT
+from hp import HPMT
 from cork import CORK
 
 from helper import create

@@ -7,6 +7,7 @@ import slb
 import mie_grueneisen_debye as mgd
 import birch_murnaghan as bm
 import modified_tait as mt
+import hp 
 import cork
 from equation_of_state import EquationOfState
 
@@ -29,8 +30,10 @@ def create(method):
             return bm.BM2()
         elif method == "bm3":
             return bm.BM3()
-        elif method == "mtait":
+        elif method == "isomt":
             return mt.MT()
+        elif method == "mtait":
+            return hp.HPMT()
         elif method == "cork":
             return cork.CORK()
         else:
