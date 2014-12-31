@@ -80,16 +80,14 @@ def chemical_potentials(assemblage, component_formulae):
     component_potentials=np.dot(endmember_proportions, endmember_potentials)
     return component_potentials
 
-def fugacity(component_formula, standard_material, assemblage):
+def fugacity(standard_material, assemblage):
     """
         Parameters
         ----------
-        component_formula : dictionary
-            Chemical formula dictionary
-
         standard_material: class
             Material class
             set_method and set_state should already have been used
+            material must have a formula as a dictionary parameter
 
         assemblage: list of classes
             List of material classes
@@ -102,21 +100,20 @@ def fugacity(component_formula, standard_material, assemblage):
             the standard material
 
     """
+    component_formula = standard_material.params['formula']
     chemical_potential=chemical_potentials(assemblage, [component_formula])[0]
 
     fugacity=np.exp((chemical_potential - standard_material.gibbs)/(constants.gas_constant*assemblage[0].temperature))
     return fugacity
 
-def relative_fugacity(component_formula, standard_material, assemblage, reference_assemblage):
+def relative_fugacity(standard_material, assemblage, reference_assemblage):
     """
         Parameters
         ----------
-        component_formula : dictionary
-            Chemical formula dictionary
-
         standard_material: class
             Material class
             set_method and set_state should already have been used
+            material must have a formula as a dictionary parameter
 
         assemblage: list of classes
             List of material classes
@@ -133,6 +130,7 @@ def relative_fugacity(component_formula, standard_material, assemblage, referenc
             with respect to the reference_assemblage 
 
     """
+    component_formula = standard_material.params['formula']
     chemical_potential=chemical_potentials(assemblage, [component_formula])[0]
     reference_chemical_potential=chemical_potentials(reference_assemblage, [component_formula])[0]
 
