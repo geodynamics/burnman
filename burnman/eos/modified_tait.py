@@ -92,6 +92,12 @@ class MT(eos.EquationOfState):
         """
         return 1.e99
 
+    def heat_capacity_p(self, pressure, temperature, volume, params):
+        """
+        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
+        """
+        return 1.e99
+
     def thermal_expansivity(self,pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
