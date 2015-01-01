@@ -71,6 +71,7 @@ import averaging_schemes
 import eos
 
 import processchemistry
+import chemicalpotentials
 from solutionmodel import SolutionModel
 import geotherm
 
