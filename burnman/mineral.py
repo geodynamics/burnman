@@ -15,8 +15,9 @@ class Mineral(Material):
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature
     using set_state(). The method for computing properties of
-    the material is set using set_method(), which should be done
-    once after creating the material.
+    the material is set using set_method(). This is done during 
+    initialisation if the param 'equation_of_state' has been defined.
+    The method can be overridden later by the user.
 
     This class is available as ``burnman.Mineral``.
 
@@ -64,6 +65,7 @@ class Mineral(Material):
             raise Exception("Please derive your method from object (see python old style classes)")
 
         if self.method is not None and type(new_method) is not type(self.method):
+            self.params['equation_of_state']=equation_of_state
             warnings.warn('Overriding database equation of state. From ' + self.method.__class__.__name__ + ' to ' + new_method.__class__.__name__, stacklevel=2)
 
         self.method = new_method
