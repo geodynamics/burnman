@@ -207,8 +207,8 @@ class test_solidsolution(BurnManTest):
 
     def test_molar_mass(self):
         ss=olivine_ss()
-	ss.set_composition( np.array( [0.5, 0.5]))
-	self.assertArraysAlmostEqual([ss.molar_mass()], [0.1722331])
+        ss.set_composition( np.array( [0.5, 0.5]))
+        self.assertArraysAlmostEqual([ss.molar_mass()], [0.5*forsterite().params['molar_mass']+0.5*fayalite().params['molar_mass']])
 
 if __name__ == '__main__':
     unittest.main()
