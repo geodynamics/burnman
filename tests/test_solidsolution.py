@@ -202,8 +202,13 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual(site_fill, ones)
 
     def test_set_method(self):
-       ss = olivine_ss()
-       ss.set_method('mtait')
+        ss = olivine_ss()
+        ss.set_method('mtait')
+
+    def test_molar_mass(self):
+        ss=olivine_ss()
+	ss.set_composition( np.array( [0.5, 0.5]))
+	self.assertArraysAlmostEqual([ss.molar_mass()], [0.1722331])
 
 if __name__ == '__main__':
     unittest.main()

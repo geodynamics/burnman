@@ -68,7 +68,7 @@ class SolidSolution(Mineral):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-	molar_mass = sum([ self.base_material[i][0].params['molar_mass'] * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+	molar_mass = sum([ self.base_material[i][0].molar_mass() * self.molar_fraction[i] for i in range(self.n_endmembers) ])
         return molar_mass
 
     def set_method(self, method):
