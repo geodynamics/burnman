@@ -52,7 +52,7 @@ for database, f, mineral in filemin:
 variables=['V','beta','rho']
     
 fo = HP_2011_ds62.fo()
-fo.set_method('isomt')
+fo.set_method('mtait')
 percentage_diff=[]
 PT=[]
 

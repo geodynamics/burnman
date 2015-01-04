@@ -49,7 +49,7 @@ class Mineral(Material):
         Set the equation of state to be used for this mineral.
         Takes a string corresponding to any of the predefined
         equations of state:  'bm2', 'bm3', 'mgd2', 'mgd3', 'slb2',
-        'slb3' or 'mtait'.  Alternatively, you can pass a user defined
+        'slb3' or 'hp_tmt'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
 

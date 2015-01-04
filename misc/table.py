@@ -56,7 +56,7 @@ if __name__ == "__main__":
                             print "Could not create '%s'" % name
 
             eos=phasenames[0][1].params['equation_of_state']
-            if eos == 'mtait':
+            if eos == 'hp_tmt':
                 params = ['V_0','K_0','Kprime_0','Kdprime_0','molar_mass','n','Cp']
             elif eos == 'slb2' or eos== 'slb3' or eos == 'mgd2' or eos== 'mgd3':
                 params = ['V_0','K_0','Kprime_0','G_0','Gprime_0','molar_mass','n','Debye_0','grueneisen_0','q_0','eta_s_0']

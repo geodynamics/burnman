@@ -28,7 +28,7 @@ class fo (Mineral):
         self.params = {
             'name': 'fo',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2172450.0 ,
             'S_0': 95.1 ,
             'V_0': 4.366e-05 ,
@@ -51,7 +51,7 @@ class fa (Mineral):
         self.params = {
             'name': 'fa',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1477740.0 ,
             'S_0': 151.0 ,
             'V_0': 4.631e-05 ,
@@ -74,7 +74,7 @@ class mwd (Mineral):
         self.params = {
             'name': 'mwd',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2138080.0 ,
             'S_0': 93.9 ,
             'V_0': 4.051e-05 ,
@@ -97,7 +97,7 @@ class fwd (Mineral):
         self.params = {
             'name': 'fwd',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1467920.0 ,
             'S_0': 146.0 ,
             'V_0': 4.321e-05 ,
@@ -120,7 +120,7 @@ class mrw (Mineral):
         self.params = {
             'name': 'mrw',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2126840.0 ,
             'S_0': 90.0 ,
             'V_0': 3.949e-05 ,
@@ -143,7 +143,7 @@ class frw (Mineral):
         self.params = {
             'name': 'frw',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1471760.0 ,
             'S_0': 140.0 ,
             'V_0': 4.203e-05 ,
@@ -166,7 +166,7 @@ class mpv (Mineral):
         self.params = {
             'name': 'mpv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1442310.0 ,
             'S_0': 62.6 ,
             'V_0': 2.445e-05 ,
@@ -189,7 +189,7 @@ class fpv (Mineral):
         self.params = {
             'name': 'fpv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1082910.0 ,
             'S_0': 95.0 ,
             'V_0': 2.534e-05 ,
@@ -212,7 +212,7 @@ class apv (Mineral):
         self.params = {
             'name': 'apv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1619990.0 ,
             'S_0': 51.8 ,
             'V_0': 2.54e-05 ,
@@ -235,7 +235,7 @@ class npv (Mineral):
         self.params = {
             'name': 'npv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1365000.0 ,
             'S_0': 63.0 ,
             'V_0': 2.334e-05 ,
@@ -258,7 +258,7 @@ class cpv (Mineral):
         self.params = {
             'name': 'cpv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1533590.0 ,
             'S_0': 74.5 ,
             'V_0': 2.745e-05 ,
@@ -281,7 +281,7 @@ class mak (Mineral):
         self.params = {
             'name': 'mak',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1489610.0 ,
             'S_0': 59.3 ,
             'V_0': 2.635e-05 ,
@@ -304,7 +304,7 @@ class fak (Mineral):
         self.params = {
             'name': 'fak',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1142130.0 ,
             'S_0': 91.5 ,
             'V_0': 2.76e-05 ,
@@ -327,7 +327,7 @@ class maj (Mineral):
         self.params = {
             'name': 'maj',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6041550.0 ,
             'S_0': 260.2 ,
             'V_0': 0.00011457 ,
@@ -350,7 +350,7 @@ class nagt (Mineral):
         self.params = {
             'name': 'nagt',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -5985000.0 ,
             'S_0': 260.6 ,
             'V_0': 0.0001109 ,
@@ -373,7 +373,7 @@ class py (Mineral):
         self.params = {
             'name': 'py',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6281770.0 ,
             'S_0': 269.5 ,
             'V_0': 0.00011313 ,
@@ -396,7 +396,7 @@ class alm (Mineral):
         self.params = {
             'name': 'alm',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -5260750.0 ,
             'S_0': 342.0 ,
             'V_0': 0.00011525 ,
@@ -419,7 +419,7 @@ class gr (Mineral):
         self.params = {
             'name': 'gr',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6643050.0 ,
             'S_0': 255.0 ,
             'V_0': 0.00012535 ,
@@ -442,7 +442,7 @@ class en (Mineral):
         self.params = {
             'name': 'en',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3090100.0 ,
             'S_0': 132.5 ,
             'V_0': 6.262e-05 ,
@@ -465,7 +465,7 @@ class cen (Mineral):
         self.params = {
             'name': 'cen',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3090990.0 ,
             'S_0': 132.0 ,
             'V_0': 6.264e-05 ,
@@ -488,7 +488,7 @@ class hen (Mineral):
         self.params = {
             'name': 'hen',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3082610.0 ,
             'S_0': 131.7 ,
             'V_0': 6.099e-05 ,
@@ -511,7 +511,7 @@ class hfs (Mineral):
         self.params = {
             'name': 'hfs',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2380810.0 ,
             'S_0': 189.0 ,
             'V_0': 6.405e-05 ,
@@ -534,7 +534,7 @@ class fs (Mineral):
         self.params = {
             'name': 'fs',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2388760.0 ,
             'S_0': 189.9 ,
             'V_0': 6.592e-05 ,
@@ -557,7 +557,7 @@ class mgts (Mineral):
         self.params = {
             'name': 'mgts',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3196600.0 ,
             'S_0': 131.0 ,
             'V_0': 6.05e-05 ,
@@ -580,7 +580,7 @@ class di (Mineral):
         self.params = {
             'name': 'di',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3201820.0 ,
             'S_0': 142.9 ,
             'V_0': 6.619e-05 ,
@@ -603,7 +603,7 @@ class hed (Mineral):
         self.params = {
             'name': 'hed',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2842120.0 ,
             'S_0': 175.0 ,
             'V_0': 6.795e-05 ,
@@ -626,7 +626,7 @@ class jd (Mineral):
         self.params = {
             'name': 'jd',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3025290.0 ,
             'S_0': 133.5 ,
             'V_0': 6.04e-05 ,
@@ -649,7 +649,7 @@ class cats (Mineral):
         self.params = {
             'name': 'cats',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -3310110.0 ,
             'S_0': 135.0 ,
             'V_0': 6.356e-05 ,
@@ -672,7 +672,7 @@ class stv (Mineral):
         self.params = {
             'name': 'stv',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -876820.0 ,
             'S_0': 24.0 ,
             'V_0': 1.401e-05 ,
@@ -695,7 +695,7 @@ class macf (Mineral):
         self.params = {
             'name': 'macf',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2246420.0 ,
             'S_0': 80.0 ,
             'V_0': 3.614e-05 ,
@@ -718,7 +718,7 @@ class mscf (Mineral):
         self.params = {
             'name': 'mscf',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2061130.0 ,
             'S_0': 87.5 ,
             'V_0': 3.649e-05 ,
@@ -741,7 +741,7 @@ class fscf (Mineral):
         self.params = {
             'name': 'fscf',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1405500.0 ,
             'S_0': 143.4 ,
             'V_0': 3.914e-05 ,
@@ -764,7 +764,7 @@ class nacf (Mineral):
         self.params = {
             'name': 'nacf',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1965550.0 ,
             'S_0': 110.0 ,
             'V_0': 3.631e-05 ,
@@ -787,7 +787,7 @@ class cacf (Mineral):
         self.params = {
             'name': 'cacf',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -2325600.0 ,
             'S_0': 87.6 ,
             'V_0': 3.976e-05 ,
@@ -810,7 +810,7 @@ class manal (Mineral):
         self.params = {
             'name': 'manal',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6796630.0 ,
             'S_0': 250.0 ,
             'V_0': 0.00011166 ,
@@ -833,7 +833,7 @@ class nanal (Mineral):
         self.params = {
             'name': 'nanal',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6610270.0 ,
             'S_0': 280.0 ,
             'V_0': 0.00011322 ,
@@ -856,7 +856,7 @@ class msnal (Mineral):
         self.params = {
             'name': 'msnal',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6172380.0 ,
             'S_0': 272.5 ,
             'V_0': 0.00011061 ,
@@ -879,7 +879,7 @@ class fsnal (Mineral):
         self.params = {
             'name': 'fsnal',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -4146000.0 ,
             'S_0': 440.2 ,
             'V_0': 0.00011856 ,
@@ -902,7 +902,7 @@ class canal (Mineral):
         self.params = {
             'name': 'canal',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -6840000.0 ,
             'S_0': 257.6 ,
             'V_0': 0.00011159 ,
@@ -925,7 +925,7 @@ class per (Mineral):
         self.params = {
             'name': 'per',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -601570.0 ,
             'S_0': 26.5 ,
             'V_0': 1.125e-05 ,
@@ -948,7 +948,7 @@ class fper (Mineral):
         self.params = {
             'name': 'fper',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -262240.0 ,
             'S_0': 58.6 ,
             'V_0': 1.206e-05 ,
@@ -971,7 +971,7 @@ class cor (Mineral):
         self.params = {
             'name': 'cor',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1675250.0 ,
             'S_0': 50.9 ,
             'V_0': 2.558e-05 ,
@@ -994,7 +994,7 @@ class mcor (Mineral):
         self.params = {
             'name': 'mcor',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1468000.0 ,
             'S_0': 59.3 ,
             'V_0': 2.635e-05 ,
