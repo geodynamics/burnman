@@ -19,9 +19,8 @@ P_0=1.e5 # Standard pressure = 1.e5 Pa
 
 class HP_TMT(eos.EquationOfState):
     """
-    Base class for a generic modified Tait equation of state.  
-    References for this can be found in Huang and Chow (1974) 
-    and Holland and Powell (2011; followed here).
+    Base class for the Holland and Powell (2011) correction to
+    the generic modified Tait equation of state (class MT).
     """
 
     def volume(self, pressure,temperature,params):
