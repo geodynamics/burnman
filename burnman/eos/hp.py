@@ -21,6 +21,12 @@ class HP_TMT(eos.EquationOfState):
     """
     Base class for the Holland and Powell (2011) correction to
     the generic modified Tait equation of state (class MT).
+
+
+    An instance "m" of a Mineral can be assigned this 
+    equation of state with the command m.set_method('hp_tmt')
+    (or by initialising the class with the param 
+    equation_of_state = 'hp_tmt'
     """
 
     def volume(self, pressure,temperature,params):
