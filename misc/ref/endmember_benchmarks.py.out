@@ -1,4 +1,4 @@
-<stdin>:55: UserWarning: Overriding database equation of state. From HPMT to MT
+<stdin>:55: UserWarning: Overriding database equation of state. From HP_TMT to MT
 Benchmarks for SLB2011 database with method slb3
 ['H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
 [0.00017156026591432655, 0.0002055800239183733, -6.4391026211448567e-05, 0.00014642709264959587, 0.00027680790069709911, 0.0043841690680523288, -0.0013546021287755491, -0.00014635661915870913]
@@ -21,7 +21,7 @@ Benchmarks for HP2011 database with method hp_tmt
 Maximum error in HP2011 database:
 alpha : 2.82198466083e-05 % at 0.0001 GPa and 1000.0 K
 
-Benchmarks for HP2011 database with method mtait
+Benchmarks for HP2011 database with method mt
 ['V', 'beta', 'rho']
 [7.7820925661860693e-07, 3.5713065344384812e-05, -2.292568834341453e-05]
 [4.0270311222739116e-06, 3.7028365245184261e-08, -2.2393157908795917e-05]

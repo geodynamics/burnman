@@ -17,7 +17,7 @@ T_0=298.15 # Standard temperature = 25 C
 P_0=1.e5 # Standard pressure = 1.e5 Pa
 
 
-class HPMT(eos.EquationOfState):
+class HP_TMT(eos.EquationOfState):
     """
     Base class for a generic modified Tait equation of state.  
     References for this can be found in Huang and Chow (1974) 

@@ -30,10 +30,10 @@ def create(method):
             return bm.BM2()
         elif method == "bm3":
             return bm.BM3()
-        elif method == "mtait":
+        elif method == "mt":
             return mt.MT()
         elif method == "hp_tmt":
-            return hp.HPMT()
+            return hp.HP_TMT()
         elif method == "cork":
             return cork.CORK()
         else:
