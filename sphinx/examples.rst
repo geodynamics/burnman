@@ -32,10 +32,11 @@ The tutorial for BurnMan currently consists of three separate units:
 When run (without putting in a more realistic composition), the program produces the following image:
 
 .. image:: figures/tut-step1.png
-Your goal in this tutorial is to improve this awful fit....
+
+Your goal in this tutorial is to improve this awful fit...
 
 
-link to source code: `tutorial/step1.py <../../../tutorial/step_2.py>`_
+link to source code: `tutorial/step1.py <../../../tutorial/step_1.py>`_
 
 
 
