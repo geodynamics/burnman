@@ -1,40 +1,61 @@
+TO DO LIST
 
-TODOLIST:
+======
+TO DO DOCUMENT v.3 (Post pre-AGU 2014 Meeting)
+======
 
-Post Texas Meeting Todos:
+- Thoroughly document new features / add to manual -- everyone
+- Add details of thermodynamic treatment to manual -- Bob/Ian
+- Optimize EoS processing to avoid repeated calls to expensive functions -- Timo/Ian
+- Split set_state to allow computation of thermoelastic-only and thermodynamic-only (or both) properties -- Ian/Timo
+- table.py update, separate html page with all minerals and all solid solutions -- Cayman/Bob
+- reference P and T in minerals -- Bob/Ian
+- inversion for seismic properties -- Sanne
+- Gibbs minimization -- Ian/Timo/Bob
+- diagram to show what happens when you incorrectly mix PVT EoSs (2nd/3rd order) -- Sanne
+- investigate state of art for solid solution properties (especially volume, bulk modulus, shear modulus) and the effect of using different averaging schemes from endmember properties on seismic velocities in the mantle -- Bob/Ian/Sanne 
+- investigate use in high school/university teaching -- Cayman/everyone
+- write MgSi paper -- everyone
+- write gibbs paper -- everyone
 
-- Talk to CIG - do they want us? -- Timo
-- Geotherm vs. Brown+Shankland for paper --Ian
-- Make brentq more robust --Ian
-- Why python? -- Timo
-- Make comments up-to-date -- Cayman/everybody 
-- Optimize pv example --Sanne
-- Geotherm stuff in burnman paper --Ian
-- EOS stuff in burnman paper --Ian/Cayman
-- Explain 2nd/3rd order stuff in burnman paper --Ian
-- Make figures pretty - Timo
-- Bibliography -- Sanne/Cayman
-- Write section about possibilities for extension/future plans -- Everyone
+
+======
+TO DO DOCUMENT v.2 (post Texas)
+======
+
+X Talk to CIG - do they want us? -- Timo
+X Geotherm vs. Brown+Shankland for paper --Ian
+X Make brentq more robust --Ian
+X Why python? -- Timo
+X Make comments up-to-date -- Cayman/everybody 
+X Optimize pv example --Sanne
+X Geotherm stuff in burnman paper --Ian
+X EOS stuff in burnman paper --Ian/Cayman
+X Explain 2nd/3rd order stuff in burnman paper --Ian
+X Make figures pretty - Timo
+X Bibliography -- Sanne/Cayman
+X Write section about possibilities for extension/future plans -- Everyone
+
+X clean up composition.py
+X document examples (see example_composition.py)
+X order examples (figure out dependencies for that), see bottom of readme.txt
+X write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
+X write burnman paper
 
 
+To do list items not required with new thermodynamics/solid solution scheme (December 2014)
 - allow for excess stishovite when molecule weight percents are defined
 - warn if used eos and mineral eos are different
-- clean up composition.py
-- benchmark against Matas et al. 2007 Sanne
-- document examples (see example_composition.py)
-- order examples (figure out dependencies for that), see bottom of readme.txt
-- write a manual (what needs to go in here? Nothing but the order of the examples?) Sanne: in the matlab package MSAT, I noticed their manual on the examples was made up out of blocks of text at the top of the examples. I'm not 100% sure yet how they did this. It seems usefull, when we update examples, that the manual changes consistently. 
-- Test the forward problem further, make sure we don't make a mistake with Murakamis results (V_phi?, Sanne: V_phi is alarming different between slb and mgd)
-- long term: setup inverse model runs, what makes sense here?
-- write burnman paper
-- write MgSi paper
-
-
-Todo in far future:
 - input Ca/Al
 - mass balance calculations
 
-DONE:
+Still to do (see December 2014 update above)
+- write MgSi paper
+
+
+======
+TO DO DOCUMENT v.1
+======
 X document classes and functions in burnman better, specify units!
 X should we split up example_composition.py? Opinions? Timo: yes, try to teach creating of minerals separately. Cayman: I agree. Let's just do this Timo.
 X implement option to evaluate K and G (instead of V_s, V_p, V_phi)?

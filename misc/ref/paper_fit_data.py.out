@@ -1,5 +1,5 @@
-<stdin>:88: UserWarning: Overriding database equation of state. From BM2 to BM3
-<stdin>:97: UserWarning: Overriding database equation of state. From BM3 to BM2
+<stdin>:88: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+<stdin>:97: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
 Optimization terminated successfully.
          Current function value: 14212.177931
          Iterations: 117

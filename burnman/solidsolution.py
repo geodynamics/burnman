@@ -66,6 +66,11 @@ class SolidSolution(Mineral):
         assert(sum(molar_fraction) < 1.0001)
         self.molar_fraction = molar_fraction 
 
+    def set_method(self, method):
+        for i in range(self.n_endmembers):
+            self.base_material[i][0].set_method(method)
+        self.method = self.base_material[0][0].method
+
     def set_state(self, pressure, temperature):
         self.pressure=pressure
         self.temperature=temperature
@@ -88,6 +93,12 @@ class SolidSolution(Mineral):
         self.C_p = sum([ self.base_material[i][0].C_p * self.molar_fraction[i] for i in range(self.n_endmembers) ])
         self.alpha = (1./self.V) * sum([ self.base_material[i][0].alpha * self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ])
         self.K_T = self.V * 1./(sum([ self.base_material[i][0].V / (self.base_material[i][0].K_T)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
+ 
+        G_list = [ self.base_material[i][0].G for i in range(self.n_endmembers) ]
+        if 0.0 in G_list:
+            self.G = 0.0
+        else:
+            self.G = self.V * 1./(sum([ self.base_material[i][0].V / (self.base_material[i][0].G)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
 
         # Derived properties
         self.C_v = self.C_p - self.V*temperature*self.alpha*self.alpha*self.K_T

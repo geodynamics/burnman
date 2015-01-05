@@ -65,11 +65,12 @@ Simple Examples
 
 The following is a list of simple examples:
   - :mod:`~examples.example_beginner`,
+  - :mod:`~examples.example_solid_solution`,
   - :mod:`~examples.example_geotherms`,
   - :mod:`~examples.example_seismic`,
-  - :mod:`~examples.example_composition`, and
-  - :mod:`~examples.example_averaging`.
-
+  - :mod:`~examples.example_composition`,
+  - :mod:`~examples.example_averaging`, and
+  - :mod:`~examples.example_chemical_potentials`.
 
 .. automodule:: examples.example_beginner
 
@@ -78,6 +79,17 @@ The following is a list of simple examples:
 .. image:: figures/example_beginner.png
 
 
+.. automodule:: examples.example_solid_solution
+
+*Resulting figures:*
+
+.. image:: figures/example_solid_solution_1.png
+
+.. image:: figures/example_solid_solution_2.png
+
+.. image:: figures/example_solid_solution_3.png
+
+.. image:: figures/example_solid_solution_4.png
 
 .. automodule:: examples.example_geotherms
 
@@ -105,6 +117,11 @@ The following is a list of simple examples:
 
 .. image:: figures/example_averaging.png
 
+.. automodule:: examples.example_chemical_potentials
+
+*Resulting figure:*
+
+.. image:: figures/example_fO2.png
 
 .. _ref-example-advanced:
 

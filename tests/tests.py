@@ -9,6 +9,7 @@ from test_partitioning import *
 from test_eos import *
 from test_debye import *
 from test_geotherm import *
+from test_endmembers import *
 from test_solidsolution import *
 
 

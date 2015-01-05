@@ -17,7 +17,7 @@ class Re (burnman.Mineral):
        self.params = {
             'name': 'Re',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': 0.0 ,
             'S_0': 36.53 ,
             'V_0': 8.862e-06 ,
@@ -37,7 +37,7 @@ class ReO2 (burnman.Mineral):
         self.params = {
             'name': 'ReO2',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -445140.0 ,
             'S_0': 47.82 ,
             'V_0': 1.8779e-05 ,
@@ -63,15 +63,13 @@ mt=burnman.minerals.HP_2011_ds62.mt()
 qtz=burnman.minerals.HP_2011_ds62.q()
 FMQ=[fa, mt, qtz]
 
-O2_gas=burnman.minerals.HP_2011_fluids.O2()
-O2_gas.set_method('cork')
+oxygen=burnman.minerals.HP_2011_fluids.O2()
 
 rhenium=Re()
 rheniumIVoxide=ReO2()
 ReReO2buffer=[rhenium, rheniumIVoxide]
 
 Pr=1.e5
-O2=dictionarize_formula('O2')
 
 temperatures = np.linspace(900., 1420., 100)
 log10fO2_FMQ_ONeill1987 = np.empty_like(temperatures)
@@ -80,7 +78,7 @@ invT = np.empty_like(temperatures)
 
 P=1.e5
 for i, T in enumerate(temperatures):
-    O2_gas.set_state(Pr, T)
+    oxygen.set_state(Pr, T)
     for mineral in FMQ:
         mineral.set_state(P, T)
     for mineral in ReReO2buffer:
@@ -90,7 +88,7 @@ for i, T in enumerate(temperatures):
     log10fO2_FMQ_ONeill1987[i] = np.log10(np.exp((muO2_FMQ_ONeill1987)/(constants.gas_constant*T)))
 
     invT[i] = 10000./(T)
-    log10fO2_FMQ[i] = np.log10(fugacity(O2, O2_gas, FMQ))
+    log10fO2_FMQ[i] = np.log10(fugacity(oxygen, FMQ))
 
 plt.plot(temperatures, log10fO2_FMQ_ONeill1987, 'k', linewidth=3., label='FMQ (O\'Neill (1987)')
 plt.plot(temperatures, log10fO2_FMQ, 'b--', linewidth=3., label='FMQ (HP 2011 ds62)')
@@ -102,7 +100,7 @@ log10fO2_ReReO2buffer = np.empty_like(temperatures)
 
 for i, T in enumerate(temperatures):
 
-    O2_gas.set_state(Pr, T)
+    oxygen.set_state(Pr, T)
     for mineral in FMQ:
         mineral.set_state(P, T)
     for mineral in ReReO2buffer:
@@ -112,7 +110,7 @@ for i, T in enumerate(temperatures):
     log10fO2_Re_PO1994[i] = np.log10(np.exp((muO2_Re_PO1994)/(constants.gas_constant*T)))
 
     invT[i] = 10000./(T)
-    log10fO2_ReReO2buffer[i] = np.log10(fugacity(O2, O2_gas, ReReO2buffer))
+    log10fO2_ReReO2buffer[i] = np.log10(fugacity(oxygen, ReReO2buffer))
 
 plt.plot(temperatures, log10fO2_Re_PO1994, 'k', linewidth=3., label='Re-ReO2 (Pownceby and O\'Neill (1994)')
 plt.plot(temperatures, log10fO2_ReReO2buffer, 'r--', linewidth=3., label='Re-ReO2 (HP 2011 ds62)')
