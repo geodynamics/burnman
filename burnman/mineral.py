@@ -65,16 +65,14 @@ class Mineral(Material):
             raise Exception("Please derive your method from object (see python old style classes)")
 
         if self.method is not None and type(new_method) is not type(self.method):
-            # Reset everything but params
-            for key, elem in self.__dict__.items():
-                if key != 'params':
-                    elem = float('nan')
-
-            # Set new EoS
-            self.params['equation_of_state']=equation_of_state
 
             # Warn user that they are changing the EoS
-            warnings.warn('Overriding database equation of state. From ' + self.method.__class__.__name__ + ' to ' + new_method.__class__.__name__, stacklevel=2)
+            warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ + ' even though the material is designed to be used with the method ' + self.method.__class__.__name__ + '.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).', stacklevel=2)
+
+            try:
+                self.pressure=self.temperature=float('nan')
+            except AttributeError:
+                pass
 
         self.method = new_method
 

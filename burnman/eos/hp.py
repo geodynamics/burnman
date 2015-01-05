@@ -135,7 +135,7 @@ class HP_TMT(eos.EquationOfState):
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
         """
-       # Calculate temperature and pressure integrals
+        # Calculate temperature and pressure integrals
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 

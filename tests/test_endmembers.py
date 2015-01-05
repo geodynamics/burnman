@@ -1,6 +1,7 @@
 import unittest
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
+import warnings
 
 import burnman
 from burnman.mineral import Mineral
@@ -36,7 +37,10 @@ class test_endmembers(BurnManTest):
         fo=forsterite()
         fo.set_state(1.e5, 298.15)
         volume1=fo.V
-        fo.set_method('mt')
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            fo.set_method('mt')
+            assert len(w) == 1
         fo.set_state(1.e5, 298.15)
         volume2=fo.V
         self.assertArraysAlmostEqual([volume1], [volume2])
@@ -45,7 +49,10 @@ class test_endmembers(BurnManTest):
         fo=forsterite()
         fo.set_state(1.e9, 298.15)
         volume1=fo.V
-        fo.set_method('mt')
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            fo.set_method('mt')
+            assert len(w) == 1
         fo.set_state(1.e9, 298.15)
         volume2=fo.V
         self.assertArraysAlmostEqual([volume1], [volume2])
@@ -54,7 +61,10 @@ class test_endmembers(BurnManTest):
         fo=forsterite()
         fo.set_state(1.e9, 298.15)
         K1=fo.K_T
-        fo.set_method('mt')
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            fo.set_method('mt')
+            assert len(w) == 1
         fo.set_state(1.e9, 298.15)
         K2=fo.K_T
         self.assertArraysAlmostEqual([K1], [K2])

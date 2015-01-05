@@ -1,12 +1,10 @@
-BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to MGD3
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to MGD3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From MGD3 to SLB2
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to SLB3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB2 to SLB3
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From SLB3 to BM2
-  phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Overriding database equation of state. From BM2 to BM3
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
   phase.set_method(method)
 Calculations are done for:
 Composite:

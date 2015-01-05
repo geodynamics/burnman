@@ -56,7 +56,7 @@ class MT(eos.EquationOfState):
     An instance "m" of a Mineral can be assigned this 
     equation of state with the command m.set_method('mt')
     (or by initialising the class with the param 
-    equation_of_state = 'mt'
+    equation_of_state = 'mt').
     """
 
     def volume(self, pressure,temperature,params):
