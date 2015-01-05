@@ -2,7 +2,8 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-"""BurnMan
+"""
+BurnMan
 =======
 
 BurnMan is an open source mineral physics toolbox written in Python which
@@ -20,7 +21,7 @@ Features:
   - a range of thermoelastic models, choice between second or third order accuracy
   - a range of thermodynamic models for mineral endmembers
   - consistent, comprehensive treatment of minerals with solid solutions
-  - form composites of arbitrary combination of :doc:`minerals`
+  - form composites of arbitrary combination of :doc:`materials`
   - extensive :doc:`mineral_database`
   - easy plotting and comparison of seismic profiles using matplotlib
   - many examples highlighting different features of BurnMan
