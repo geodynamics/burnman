@@ -225,7 +225,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \hspace{0.1in}\burnman{}\hspace{0.1in}
 }}}
 \\[12pt]
-{\Large a lower mantle mineral physics toolkit}
+{\Large a thermodynamics and thermoelasticity toolkit}
 \end{center}
 
 %MAIN PICTURE%

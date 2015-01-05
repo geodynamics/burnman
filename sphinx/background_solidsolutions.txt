@@ -1,0 +1,62 @@
+.. _ref-methods-solid-solutions:
+
+Calculating Solid Solution Properties
+-------------------------------------
+Many minerals can exist over a range of compositions. The compositional domains of minerals with a common crystal structure are called solid solutions. Different elements substitute for one another within distinct crystallographic sites in the structure. For example, low pressure silicate garnets have two distinct sites on which mixing takes place; a dodecahedral site (3 per unit cell) and octahedral site (2 per unit cell). The chemical formula of many low pressure garnets exist within the solid solution:
+
+.. math::
+    \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
+
+
+A solid solution is not simply a mechanical mixture of its constituent endmembers. Most fundamentally, the mixing of different elements on sites results in an excess configurational entropy
+
+.. math::	
+    \mathcal{S}_{\textrm{conf}} = R \ln \prod_s (X_c^s)^{\nu}
+
+
+where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
+
+Many solid solutions exhibit further deviations from ideality, which arise as a result of interactions between ions with different physical and chemical characteristics. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
+
+.. math::
+    \alpha^T p (\phi^T W \phi)
+
+where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers, :math:`\alpha` is a vector of "van  Laar parameters" governing asymmetry in the excess properties, and 
+
+.. math::
+    \phi_i &= \frac{\alpha_i p_i}{\sum_{k=1}^{n} \alpha_k p_k}, \\
+    W_{ij} &= \frac{2 w_{ij}}{\alpha_i + \alpha_j} \textrm{for i<j}
+
+The :math:`w_{ij}` terms are a set of interaction terms between endmembers :math:`i` and :math:`j`. If all the :math:`\alpha` terms are equal to unity, a non-zero :math:`w` yields an excess with a quadratic form and a maximum of :math:`w/4` half-way between the two endmembers. 
+
+From the preceeding equations, we can define the thermodynamic potentials of solid solutions:
+ 
+.. math::	
+    \mathcal{H}_{\textrm{SS}} &= \sum_in_i\mathcal{H}_i + \mathcal{H}_{\textrm{excess}} + PV_{\textrm{excess}}\\
+    \mathcal{S}_{\textrm{SS}} &= \sum_in_i\mathcal{S}_i + \mathcal{S}_{\textrm{conf}} + \mathcal{S}_{\textrm{excess}} \\
+    \mathcal{G}_{\textrm{SS}} &= \mathcal{H}_{\textrm{SS}} - T\mathcal{S}_{\textrm{SS}}\\
+    V_{\textrm{SS}} &= \sum_in_iV_i + V_{\textrm{excess}} 
+
+We can also define the derivatives of volume with respect to pressure and temperature
+
+.. math::
+    \alpha_{P,\textrm{SS}} &= \frac{1}{V}\left(\frac{\partial V}{\partial T}\right)_P = \left( \frac{1}{V_{\textrm{SS}}}\right)\left( \sum_i\left(n_i\,\alpha_i\,V_i \right) \right) \\
+    K_{T,\textrm{SS}} &= V\left( \frac{\partial P}{\partial V} \right)_T = V_{\textrm{SS}} \left( \frac{1}{\sum_i\left(n_i \frac{V_{i}}{K_{Ti}} \right)} + \frac{\partial P}{\partial V_{\textrm{excess}}} \right) 
+
+Making the approximation that the excess entropy has no temperature dependence
+
+.. math::
+    C_{P,\textrm{SS}} &= \sum_in_iC_{Pi}\\
+    C_{V, \textrm{SS}} &= C_{P,\textrm{SS}} - V_{\textrm{SS}}\,T\,\alpha_{\textrm{SS}}^{2}\,K_{T,\textrm{SS}} \\
+    K_{S,\textrm{SS}} &= K_{T,\textrm{SS}} \,\frac{C_{P,\textrm{SS}}}{C_{V,\textrm{SS}}}\\
+    \gamma_{\textrm{SS}} &= \frac{\alpha_{\textrm{SS}}\,K_{T,\textrm{SS}}\,V_{\textrm{SS}}}{C_{V, \textrm{SS}}}
+
+Including order-disorder
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Order-disorder can be treated trivially with solid solutions. The only difference between mixing between ordered and disordered endmembers is that disordered endmembers have a non-zero configurational entropy, which must be accounted for when calculating the excess entropy within a solid solution.  
+
+Including spin transitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The regular solid solution formalism should provide an elegant way to model spin transitions in phases such as periclase and bridgmanite. High and low spin iron can be treated as different elements, providing distinct endmembers and an excess configurational entropy. Further excess terms can be added as necessary.

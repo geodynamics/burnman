@@ -18,7 +18,9 @@ class SolidSolution(Mineral):
     States of the solid solution can only be queried after setting 
     the pressure, temperature and composition using set_state().
 
-    This class is available as ``burnman.SolidSolution``.
+    This class is available as :class:`burnman.SolidSolution`.
+    It uses an instance of :class:`burnman.SolutionModel` to 
+    calculate interaction terms between endmembers.
 
     All the solid solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T 

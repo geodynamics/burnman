@@ -142,7 +142,8 @@ class VoigtReussHill(AveragingScheme):
     """
     Class for computing the Voigt-Reuss-Hill average for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and
+    :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -268,7 +269,7 @@ class Reuss(AveragingScheme):
     Class for computing the Reuss (iso-stress) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
     the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and
-     :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):

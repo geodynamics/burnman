@@ -2,25 +2,31 @@
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
-"""BurnMan
+"""
+BurnMan
 =======
 
 BurnMan is an open source mineral physics toolbox written in Python which
-determines seismic velocities for the lower mantle. BurnMan calculates the
-isotropic thermoelastic moduli by solving the equations-of-state for a
-mixture of minerals defined by the user. The user may select from a list of
-minerals applicable to the lower mantle included or easily define one of
-their own.
+determines the velocities of seismic waves in mineral assemblages at 
+high pressure and temperature. It was designed to calculate seismic 
+velocities in the lower mantle, but is equally suited to any part 
+of the solid Earth (or indeed any of the terrestrial planets). 
+BurnMan calculates the isotropic thermoelastic moduli by solving the 
+equations-of-state for a mixture of minerals defined by the user. The user 
+may select from an extensive list of minerals obtained from published 
+databases. Alternatively, they can easily define their own minerals.
 
 Features:
 
-  - form composites of arbitrary combination of :doc:`minerals`
+  - a range of thermoelastic models, choice between second or third order accuracy
+  - a range of thermodynamic models for mineral endmembers
+  - consistent, comprehensive treatment of minerals with solid solutions
+  - form composites of arbitrary combination of :doc:`materials`
   - extensive :doc:`mineral_database`
   - easy plotting and comparison of seismic profiles using matplotlib
   - many examples highlighting different features of BurnMan
-  - different thermoelastic models, choice between second or third order accuracy
-  - different averaging schemes
-  - different geotherms
+  - different averaging schemes for seismic velocities in composite materials
+  - a catalogue of published geotherms
   - extensible: all parts can be replaced by user-written modules if desired
 
 Please cite:
@@ -55,6 +61,7 @@ from version import version as __version__
 from mineral import Mineral
 from material import Material
 from composite import Composite
+from solutionmodel import SolutionModel
 from solidsolution import SolidSolution
 from mineral_helpers import *
 

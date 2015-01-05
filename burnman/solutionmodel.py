@@ -18,7 +18,9 @@ class SolutionModel(object):
     """
     This is the base class for a solution model,  intended for use
     in defining solid solutions and performing thermodynamic calculations
-    on them.
+    on them.  All minerals of type :class:`burnman.SolidSolution` use 
+    a solution model for defining how the endmembers in the solid solution 
+    interact.
 
     A user wanting a new solution model should define the functions below.
     In the base class all of these return zero, so if the solution model 
@@ -168,7 +170,7 @@ class IdealSolution (SolutionModel):
 
         # Process solid solution chemistry
         self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
-            ProcessSolidSolutionChemistry(self.formulas)
+            process_solution_chemistry(self.formulas)
 
         self._calculate_endmember_configurational_entropies()
 
