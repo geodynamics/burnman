@@ -5,7 +5,7 @@
 """
 
 example_chemical_potentials
--------------------
+---------------------------
     
 This example shows how to use the chemical potentials library of functions.
 
