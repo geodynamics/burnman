@@ -15,8 +15,9 @@ class Mineral(Material):
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature
     using set_state(). The method for computing properties of
-    the material is set using set_method(), which should be done
-    once after creating the material.
+    the material is set using set_method(). This is done during 
+    initialisation if the param 'equation_of_state' has been defined.
+    The method can be overridden later by the user.
 
     This class is available as ``burnman.Mineral``.
 
@@ -48,7 +49,7 @@ class Mineral(Material):
         Set the equation of state to be used for this mineral.
         Takes a string corresponding to any of the predefined
         equations of state:  'bm2', 'bm3', 'mgd2', 'mgd3', 'slb2',
-        'slb3' or 'mtait'.  Alternatively, you can pass a user defined
+        'slb3' or 'hp_tmt'.  Alternatively, you can pass a user defined
         class which derives from the equation_of_state base class.
         """
 
@@ -64,7 +65,14 @@ class Mineral(Material):
             raise Exception("Please derive your method from object (see python old style classes)")
 
         if self.method is not None and type(new_method) is not type(self.method):
-            warnings.warn('Overriding database equation of state. From ' + self.method.__class__.__name__ + ' to ' + new_method.__class__.__name__, stacklevel=2)
+
+            # Warn user that they are changing the EoS
+            warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ + ' even though the material is designed to be used with the method ' + self.method.__class__.__name__ + '.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).', stacklevel=2)
+
+            try:
+                self.pressure=self.temperature=float('nan')
+            except AttributeError:
+                pass
 
         self.method = new_method
 

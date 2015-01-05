@@ -65,7 +65,7 @@ for idx, m in enumerate(ds):
         print '        self.params = {'
         print ''.join(['            \'name\': \'', m[0], '\','])
         print '            \'formula\': formula,'
-        print '            \'equation_of_state\': \'mtait\','
+        print '            \'equation_of_state\': \'hp_tmt\','
         for pid, param in enumerate(m):
             if pid > 1 and pid != 3 and pid<6:
                 print '            \''+param_names[pid]+'\':', float(param)*param_scales[pid], ','
