@@ -85,7 +85,6 @@ class Seismic1DModel(object):
         v_p : float or array of floats
             P wave velocity at given depth(s) in [m/s].
         """
-
         raise ValueError, "not implemented"
         return 0
 
@@ -155,6 +154,53 @@ class Seismic1DModel(object):
         """
         return np.power(self.v_phi(depth),2.) * self.density(depth)
 
+
+    def QK(self, depth):
+        """
+        Parameters
+        ----------
+        depth : float or array of floats
+        Depth(s) [m] to evaluate seismic model at.
+
+        Returns
+        -------
+        Qk : float or array of floats
+        Quality factor for bulk modulus at given depth(s).
+        """
+        raise ValueError, "not implemented"
+        return 0
+
+    def QG(self, depth):
+        """
+        Parameters
+        ----------
+        depth : float or array of floats
+        Depth(s) [m] to evaluate seismic model at.
+        
+        Returns
+        -------
+        QG : float or array of floats
+        Quality factor for shear modulus at given depth(s).
+        """
+        raise ValueError, "not implemented"
+        return 0
+
+
+
+    def depth(self, pressure):
+        """
+        Parameters
+        ----------
+        pressure : float or array of floats
+            Pressure(s) [Pa] to evaluate depth at.
+
+        Returns
+        -------
+        depth : float or array of floats
+            Depth(s) [m] for given pressure(s)
+        """
+        raise ValueError, "not implemented"
+        return -1
     
     def depth(self, pressure):
         """
@@ -193,26 +239,37 @@ class SeismicRadiusTable(Seismic1DModel):
     sorted by radius. Fill the tables in the constructor after deriving
     from this class. This class uses :class:`burnman.seismic.Seismic1DModel`
     
-    Note: all tables need to be sorted by increasing radius.
+    Note: all tables need to be sorted by increasing depth or radius.
     Alternatively, you can also overwrite the _lookup function if you
     want to access with something else.
     """ 
     def __init__(self):
         Seismic1DModel.__init__(self)
+        self.table_depth = []
         self.table_radius = []
         self.table_pressure = []
+        self.table_gravity = []
         self.table_density = []
         self.table_vp = []
         self.table_vs = []
+        self.table_QG = []
+        self.table_QK = []
+
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self):
-        
-        return (self.earth_radius - self.table_radius)[::-1] #radius is sorted in increasing order, so we need to reverse the depth list
+        if self.table_depth[0]: 
+            return self.table_depth 
+        else:
+            return self.earth_radius - self.table_radius[::-1]
 
     def pressure(self, depth):
         
         return self._lookup(depth, self.table_pressure)
+
+    def gravity(self, depth):
+
+        return self._lookup(depth,self.table_gravity)
 
     def v_p(self, depth):
 
@@ -222,45 +279,59 @@ class SeismicRadiusTable(Seismic1DModel):
 
         return self._lookup(depth, self.table_vs)
 
+    def QK(self, depth):
+
+        return self._lookup(depth, self.table_Qk)
+
+    def QG(self, depth):
+
+        return self._lookup(depth, self.table_Qmu)
+
 
     def density(self, depth):
 
         return self._lookup(depth, self.table_density)
 
     def depth(self, pressure):
-        if pressure > max(self.table_pressure) or pressure < min(self.table_pressure)  :
-           raise ValueError, "Pressure outside range of PREM"
-        radius = np.interp(pressure, self.table_pressure[::-1], self.table_radius[::-1] )
-        return self.earth_radius - radius
+        if self.table_depth[0]:
+            depth = np.interp(pressure, self.table_pressure, self.table_depth )
+        else:
+            depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_radius[::-1])
+        return self.depth
+
+    def radius(self, pressure):
+        if self.table_radius[0]:
+            depth = np.interp(pressure, self.table_pressure, self.table_radius )
+        else:
+            depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_depth[::-1])
+        return self.depth
+
 
     def _lookup(self, depth, value_table):
-        radius = self.earth_radius - depth
-        return np.interp(radius, self.table_radius, value_table)
+        if not len(self.table_depth)==0:
+            return np.interp(depth, self.table_depth, value_table)
+        else:
+            return np.interp(depth, self.earth_radius-self.table_radius[::-1],value_table[::-1])
+
 
 class PREM(SeismicRadiusTable):
     """
-    Reads  PREM (1s) (input_seismic/prem_table.txt, :cite:`dziewonski1981`).
+    Reads  PREM (1s) (input_seismic/prem.txt, :cite:`dziewonski1981`).
     See also :class:`burnman.seismic.SeismicRadiusTable`.
     """
     def __init__(self):
         SeismicRadiusTable.__init__(self)
-        table = tools.read_table("input_seismic/prem_table.txt") # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/prem.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
-        self.table_radius = table[:,0]
-        self.table_pressure = table[:,1]
-        self.table_density = table[:,2]
-        self.table_vp = table[:,3]
-        self.table_vs = table[:,4]
-        
-        # read in gravity data
-        table = tools.read_table("input_seismic/grav_for_PREM.txt") # radius, g
-        table = np.array(table)
-        self.table_radiusgravity = table[:,0]
-        self.table_gravity = table[:,1]
-
-    def gravity(self,depths):
-
-        return np.interp(self.earth_radius-depths, self.table_radiusgravity,self.table_gravity)
+        self.table_depth = table[:,0]
+        self.table_radius = table[:,1]
+        self.table_pressure = table[:,2]
+        self.table_gravity = table[:,3]
+        self.table_density = table[:,4]
+        self.table_vp = table[:,5]
+        self.table_vs = table[:,6]
+        self.table_Qk = table[:,7]
+        self.table_Qmu = table[:,8]
 
 
 class Slow(SeismicRadiusTable):
@@ -272,9 +343,8 @@ class Slow(SeismicRadiusTable):
     def __init__(self):
         SeismicRadiusTable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
-        table[:,0] = table[:,0]
         table2 = tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
         table3 = tools.read_table("input_seismic/pwave_slow.txt")
@@ -283,17 +353,15 @@ class Slow(SeismicRadiusTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
+        table=np.array(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table))
 
-        assert(len(table) == len(table2))
-        assert(len(table) == len(table3))
 
-        self.table_radius = table[:,0]
-        self.table_pressure = table[:,1]
-        self.table_density = table[:,2]
-        self.table_vp = table3[:,1]
-        self.table_vs = table2[:,1]
-
+        self.table_depth = table[:,0]
+        self.table_radius = table[:,1]
+        self.table_pressure = table[:,2]
+        self.table_density = table[:,4]
+        self.table_vp = np.interp(self.table_depth,table3[:,0][::-1],table3[:,1][::-1])
+        self.table_vs = np.interp(self.table_depth,table2[:,0][::-1],table2[:,1][::-1])
 
 class Fast(SeismicRadiusTable):
     """
@@ -304,9 +372,8 @@ class Fast(SeismicRadiusTable):
     def __init__(self):
         SeismicRadiusTable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem_lowermantle.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem.txt")#data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
-        table[:,0] = table[:,0]
         table2 = tools.read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
         table3 = tools.read_table("input_seismic/pwave_fast.txt")
@@ -315,18 +382,15 @@ class Fast(SeismicRadiusTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
-
-        assert(len(table) == len(table2))
-        assert(len(table) == len(table3))
-
-        self.table_radius = table[:,0]
-        self.table_pressure = table[:,1]
-        self.table_density = table[:,2]
-        self.table_vp = table3[:,1]
-        self.table_vs = table2[:,1]
+        table=np.array(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table))
 
 
+        self.table_depth = table[:,0]
+        self.table_radius = table[:,1]
+        self.table_pressure = table[:,2]
+        self.table_density = table[:,4]
+        self.table_vp = np.interp(self.table_depth,table3[:,0][::-1],table3[:,1][::-1])
+        self.table_vs = np.interp(self.table_depth,table2[:,0][::-1],table2[:,1][::-1])
 
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):

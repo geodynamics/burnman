@@ -46,13 +46,12 @@ if __name__ == "__main__":
 
     # specify where we want to evaluate, here we map from pressure to depth
     #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
-    p = np.arange(1.0e9,360.0e9,5e9)
+    p = np.arange(1.0e9,360.0e9,1.e9)
     depths = np.array([s.depth(pr) for pr in p])
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35e3,5600e3,100e3)
     #we could also use the data points where the seismic model is specified:
     depths = s.internal_depth_list()
-
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
     
@@ -78,6 +77,27 @@ if __name__ == "__main__":
     plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
     plt.legend(loc='lower right')
 
+    plt.subplot(2,2,3)
+    plt.plot(depths/1.e3,s.gravity(depths),'+-g', label='gravity')
+    plt.legend(loc='lower left')
+    plt.xlabel('depth in km')
+    plt.ylabel('m/s^2')
+
+
+    plt.subplot(2,2,4)
+    plt.plot(depths/1.e3,s.QK(depths),'+-r', label='Quality bulk QK')
+    plt.xlabel('depth in km')
+    plt.ylabel('QK')
+    plt.legend(loc='upper left')
+    plt.twinx()
+    plt.plot(depths/1.e3,s.QG(depths),'+-b', label='Quality shear QG')
+    plt.legend(loc='lower left')
+    plt.xlabel('depth in km')
+    plt.ylabel('QG')
+    
+    plt.show()
+
+
 
     #now load fast and slow regionalized models (Lekic et al. 2012):
     sslow = burnman.seismic.Slow()
@@ -90,7 +110,7 @@ if __name__ == "__main__":
 
 
     # plotting
-    plt.subplot(2,2,3)
+    plt.subplot(2,2,1)
     plt.plot(pressures/1.e9,v_p/1.e3,'-k', label='v_p prem')
     plt.plot(pressures2/1.e9,v_p2/1.e3,'-r', label='v_p slow')
     plt.plot(pressures3/1.e9,v_p3/1.e3,'-b', label='v_p fast')
@@ -101,7 +121,7 @@ if __name__ == "__main__":
     plt.xlabel('pressure')
     plt.ylabel('km/s')
 
-    plt.subplot(2,2,4)
+    plt.subplot(2,2,2)
     plt.plot(pressures/1.e9,v_s/1.e3,'-k', label='v_s prem')
     plt.plot(pressures2/1.e9,v_s2/1.e3,'-r', label='v_s slow')
     plt.plot(pressures3/1.e9,v_s3/1.e3,'-b', label='v_s fast')
@@ -113,7 +133,7 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
 
     plt.show()
-
+    
     # Loading an a seismic model from a file. In this case AK135 (Kennett et al. 1995).
     # Note that file input is assumed to be in SI units
     plt.close()
@@ -158,5 +178,4 @@ if __name__ == "__main__":
     plt.ylabel('g/cc')
     plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
     plt.legend(loc='lower right')
-    plt.savefig("output_figures/example_seismic.png")
     plt.show()
