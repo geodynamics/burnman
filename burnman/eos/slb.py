@@ -267,6 +267,8 @@ class SLBBase(eos.EquationOfState):
             params['Gprime_0'] = float('nan')
         if 'eta_s_0' not in params:
             params['eta_s_0'] = float('nan')
+        if 'F_0' not in params:
+            params['F_0'] = float('nan')
   
         #check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0', 'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
@@ -281,7 +283,7 @@ class SLBBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
             warnings.warn( 'Unusual value for K_0', stacklevel=2 )
-        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
+        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         if params['G_0'] < 0. or params['G_0'] > 1.e13:
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
@@ -299,14 +301,14 @@ class SLBBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for q_0' , stacklevel=2)
         if params['eta_s_0'] < -10. or params['eta_s_0'] > 10.:
             warnings.warn( 'Unusual value for eta_s_0' , stacklevel=2)
-            
+
 
 
 class SLB3(SLBBase):
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
-    consistent.
+    consistent.)
     """
     def __init__(self):
         self.order=3

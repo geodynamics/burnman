@@ -5,7 +5,7 @@
 """
 
 example_solid_solution
--------------------
+----------------------
     
 This example shows how to create different solid solution models and output
 thermodynamic and thermoelastic quantities.

@@ -1,0 +1,54 @@
+.. _ref-methods-thermodynamics:
+
+Calculating Thermodynamic Properties
+------------------------------------
+
+At any given pressure and temperature, the equilibrium assemblage of minerals is that which minimises the Gibbs Free Energy of the system. The Gibbs free energy is the maximum amount of non-expansion work that can be extracted from a closed system. For each phase, the Gibbs free energy is equal to 
+
+.. math::
+    \mathcal{G}= \mathcal{U} - T\mathcal{S} + PV = \mathcal{H} - TS = \mathcal{F} + PV
+    :label: gibbs
+
+where :math:`P` is the pressure, :math:`T` is the temperature and :math:`\mathcal{U}`, :math:`\mathcal{F}`, :math:`\mathcal{H}`, :math:`\mathcal{S}` and :math:`V` are the molar internal energy, Helmholtz Free Energy, enthalpy, entropy and volume respectively. The total energy of the system is then
+
+.. math::
+    \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i
+    :label: gibbstotal
+
+HP2011
+^^^^^^
+
+.. math::
+    \mathcal{G}(P,T) &= \mathcal{H}_{\textrm{1 bar, T}} - T\mathcal{S}_{\textrm{1 bar, T}} + \int_{\textrm{1 bar}}^P V(P,T)~dP, \\
+    \mathcal{H}_{\textrm{1 bar, T}} &= \Delta_f\mathcal{H}_{\textrm{1 bar, 298 K}} + \int_{298}^T C_P~dT, \\
+    \mathcal{S}_{\textrm{1 bar, T}} &= \mathcal{S}_{\textrm{1 bar, 298 K}} + \int_{298}^T \frac{C_P}{T}~dT, \\
+    \int_{\textrm{1 bar}}^P V(P,T)~dP &= P V_0 \left( 1 - a + \left( a \frac{(1-b P_{th})^{1-c} - (1 + b(P-P_{th}))^{1-c}}{b (c-1) P} \right) \right)
+    :label: gibbs_hp2011  
+
+
+The heat capacity at one bar is given by an empirical polynomial fit to experimental data
+
+.. math::
+    C_p = a + bT + cT^{-2} + dT^{-0.5}
+
+The entropy at high pressure and temperature can be calculated by differentiating the expression for :math:`\mathcal{G}` with respect to temperature
+
+.. math::
+    \mathcal{S}(P,T) &= S_{\textrm{1 bar, T}} + \frac{\partial  \int V dP }{\partial T}, \\
+    \frac{\partial  \int V dP }{\partial T} &= V_0 \alpha_0 K_0 a \frac{C_{V0}(T)}{C_{V0}(T_\textrm{{ref}})} ((1+b(P-P_{th}))^{-c} - (1-bP_{th})^{-c} )
+
+Finally, the enthalpy at high pressure and temperature can be calculated
+
+.. math::
+    \mathcal{H}(P,T) = \mathcal{G}(P,T) + T\mathcal{S}(P,T) 
+
+SLB2005
+^^^^^^^
+
+The Debye model yields the Helmholtz free energy and entropy due to lattice vibrations
+
+.. math::
+    \mathcal{G} &= \mathcal{F} + PV, \\
+    \mathcal{F} &= nRT \left(3 \ln( 1 - e^{-\frac{\theta}{T}}) - \int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau \right), \\	
+    \mathcal{S} &= nR \left(4 \int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau - 3 \ln(1-e^{-\frac{\theta}{T}}) \right), \\
+    \mathcal{H} &= \mathcal{G} + T\mathcal{S}

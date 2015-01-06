@@ -13,10 +13,12 @@ import burnman.constants as constants
 
 class MGDBase(eos.EquationOfState):
     """
-    Base class for a generic finite-strain-mie-grueneisen-debye
+    Base class for a generic finite-strain Mie-Grueneisen-Debye
     equation of state.  References for this can be found in many
-    places, such as Shim, Duffym and Kenichi (2002) and Jackson and Rigedn
-    (1996).  Here we mostly follow the appendices of Matas et al (2007)
+    places, such as Shim, Duffym and Kenichi (2002) and Jackson and Rigden
+    (1996).  Here we mostly follow the appendices of Matas et al (2007).
+    Of particular note is the thermal correction to the shear modulus, which
+    was developed by Hama and Suito (1998).
     """
 
     #def __init__(self):
@@ -197,12 +199,12 @@ class MGDBase(eos.EquationOfState):
         if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         if params['G_0'] < 0. or params['G_0'] > 1.e13:
-            warnings.warn( 'Unusual value for G_0' , stacklevel=2)
+            warnings.warn( 'Unusual value for G_0', stacklevel=2 )
         if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Gprime_0',stacklevel=2 )
+            warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
             warnings.warn( 'Unusual value for molar_mass' , stacklevel=2)
-        if params['n'] < 1. or params['n'] > 100. or not float(params['n']).is_integer():
+        if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n' , stacklevel=2)
         if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
             warnings.warn( 'Unusual value for Debye_0' , stacklevel=2)

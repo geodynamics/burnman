@@ -21,6 +21,8 @@ from burnman import Material, Mineral
 
 class HelperSolidSolution(Mineral):
     """
+    This material is deprecated!
+
     Class for coming up with a new mineral based based on a solid
     solution between two or more end member minerals.  It is not
     completely clear how to do this, or how valid this approximation
@@ -128,6 +130,8 @@ class HelperSpinTransition(Material):
 class HelperFeDependent(Material):
 
     """
+    This material is deprecated!
+
     Helper to implement a rock that does iron exchange (two minerals with
     changing iron content based on P,T).
 

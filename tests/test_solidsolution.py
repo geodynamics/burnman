@@ -16,7 +16,7 @@ class forsterite (Mineral):
        self.params = {
            'name': 'fo',
            'formula': formula,
-           'equation_of_state': 'mtait',
+           'equation_of_state': 'hp_tmt',
            'H_0': -2172590.0 ,
            'S_0': 95.1 ,
            'V_0': 4.366e-05 ,
@@ -36,7 +36,7 @@ class fayalite (Mineral):
        self.params = {
             'name': 'fa',
             'formula': formula,
-            'equation_of_state': 'mtait',
+            'equation_of_state': 'hp_tmt',
             'H_0': -1477720.0 ,
             'S_0': 151.0 ,
             'V_0': 4.631e-05 ,

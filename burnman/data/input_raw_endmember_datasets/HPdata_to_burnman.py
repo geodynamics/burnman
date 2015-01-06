@@ -96,7 +96,7 @@ for i in range(int(ds[0][0])):
         print '        self.params = {'
         print ''.join(['            \'name\': \'', M.name, '\','])
         print '            \'formula\': formula,'
-        print '            \'equation_of_state\': \'mtait\','
+        print '            \'equation_of_state\': \'hp_tmt\','
         print '            \'H_0\':', M.H*1e3, ','
         print '            \'S_0\':', M.S*1e3, ','
         print '            \'V_0\':', M.V*1e-5, ','

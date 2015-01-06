@@ -5,7 +5,7 @@
 """
 
 example_chemical_potentials
--------------------
+---------------------------
     
 This example shows how to use the chemical potentials library of functions.
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             self.params = {
                 'name': 'Re',
                 'formula': formula,
-                'equation_of_state': 'mtait',
+                'equation_of_state': 'hp_tmt',
                 'H_0': 0.0 ,
                 'S_0': 36.53 ,
                 'V_0': 8.862e-06 ,
@@ -141,7 +141,7 @@ if __name__ == "__main__":
             self.params = {
                 'name': 'ReO2',
                 'formula': formula,
-                'equation_of_state': 'mtait',
+                'equation_of_state': 'hp_tmt',
                 'H_0': -445140.0 ,
                 'S_0': 47.82 ,
                 'V_0': 1.8779e-05 ,
