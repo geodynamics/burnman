@@ -15,18 +15,10 @@ composition. Here we present a couple of examples:
 
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
-2. Two minerals mixed in simple mole fractions with user-defined Fe
-   partitioning
-3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
-   calculate Fe partitioning along a :math:`P, T` profile (see
-   example_partition_coef.py)
-4. A mixture of three minerals.
+2. Example with three minerals
+3. Using preset solid solutions
+4. Defining your own solid solution
 
-In compositions 2, 3, and 4 of the above inputs, BurnMan will mix the mineral
-physical paremeters of end member minerals (pure Mg and Fe) of the user's
-choice using either volumetric (moduli) or molar averaging (all others) at
-room pressure and temperature (see example_user_input_material.py for
-information on these parameters).
 
 To turn a method of mineral creation "on" the first if statement above the
 method must be set to True, with all others set to False.
@@ -38,11 +30,13 @@ example_spintransition.py for explanation of how to implement this
 
 * :doc:`mineral_database`
 * :class:`burnman.composite.Composite`
-
+* :class:`burnman.minerals.Mineral`
+* :class:`burnman.solidsolution.SolidSolution`
 
 *Demonstrates:*
 
 * Different ways to define a composite
+* Using minerals and solid solutions
 * Compare computations to seismic models
 
 """
@@ -72,36 +66,36 @@ if __name__ == "__main__":
                                  [minerals.SLB_2011.mg_perovskite(),
                                   minerals.SLB_2011.periclase()])
 
-    #Example 2: specify fixed iron content
-    if False:
-        amount_perovskite = 0.95
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.SLB_2011.mg_fe_perovskite(0.2),
-                                  minerals.SLB_2011.ferropericlase(0.2)])
 
-    #Example 3: input weight percentages
-    #See comments in example_partition_coef.py for references to
-    #partition coefficent calculation
-
-    if False:
-        weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
-        Kd_0 = .59 #Fig 5 Nakajima et al 2012
-
-        phase_fractions,relative_molar_percent = burnman. \
-            calculate_phase_percents(weight_percents)
-        iron_content = lambda p,t: burnman.calculate_partition_coefficient \
-                (p,t,relative_molar_percent,Kd_0)
-
-        rock = burnman.Composite([phase_fractions['pv'], phase_fractions['fp']],
-                                 [minerals.mg_fe_perovskite_pt_dependent(iron_content,0),
-                                  minerals.ferropericlase_pt_dependent(iron_content,1)])
-
-    #Example 4: three materials
+    #Example 2: three materials
     if False:
         rock = burnman.Composite([0.7, 0.2, 0.1],
                                  [minerals.SLB_2011.fe_perovskite(),
                                   minerals.SLB_2011.ferropericlase(0.5),
                                   minerals.SLB_2011.stishovite()])
+
+
+    #Example 3: Mixing solid solutions
+    if False:
+        # Defining a rock using a predefined solid solution from the mineral library database.
+        preset_solidsolution=minerals.SLB_2011.mg_fe_perovskite()
+        # The line below is optional to see which endmembers (and in which order) are in the solid solution
+        #print preset_solidsolution.endmembers
+        #Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
+        preset_solidsolution.set_composition([0.9,0.1,0.]) # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
+        rock = burnman.Composite([0.8, 0.2], phases=[preset_solidsolution, minerals.SLB_2011.periclase()])
+
+
+    #Example 4: Defining your own solid solution
+    if False:
+        # Define a new SolidSolution with mg and fe perovskite endmembers
+        new_solidsolution = burnman.SolidSolution([[minerals.SLB_2011.mg_perovskite()],
+                                          [minerals.SLB_2011.fe_perovskite()]])
+        # Set molar fraction of endmembers
+        new_solidsolution.set_composition([0.9,0.1])
+        rock=burnman.Composite([0.8, 0.2], [new_solidsolution, minerals.SLB_2011.periclase()])
+
+
 
 
     #seismic model for comparison:
