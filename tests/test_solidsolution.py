@@ -55,13 +55,13 @@ class forsterite_ss(burnman.SolidSolution):
         # Name
         self.name='Dummy solid solution'
 
-        base_material = [[forsterite(), '[Mg]2SiO4']]
+        endmembers = [[forsterite(), '[Mg]2SiO4']]
 
         # Interaction parameters
         enthalpy_interaction=[]
 
-        burnman.SolidSolution.__init__(self, base_material, \
-                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self, endmembers, \
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 
 # Two-mineral solid solution
 class forsterite_forsterite_ss(burnman.SolidSolution):
@@ -69,13 +69,13 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
         # Name
         self.name='Fo-Fo solid solution'
 
-        base_material = [[forsterite(), '[Mg]2SiO4'], [forsterite(), '[Mg]2SiO4']]
+        endmembers = [[forsterite(), '[Mg]2SiO4'], [forsterite(), '[Mg]2SiO4']]
 
         # Interaction parameters
         enthalpy_interaction=[[0.]]
 
-        burnman.SolidSolution.__init__(self, base_material, \
-                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self, endmembers, \
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 
 # Olivine solid solution
 class olivine_ss(burnman.SolidSolution):
@@ -83,13 +83,13 @@ class olivine_ss(burnman.SolidSolution):
         # Name
         self.name='Olivine'
 
-        base_material = [[forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
+        endmembers = [[forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
 
         # Interaction parameters
         enthalpy_interaction=[[8.4e3]]
 
-        burnman.SolidSolution.__init__(self, base_material, \
-                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self, endmembers, \
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 
 # Orthopyroxene solid solution
 class orthopyroxene(burnman.SolidSolution):
@@ -97,13 +97,13 @@ class orthopyroxene(burnman.SolidSolution):
         # Name
         self.name='orthopyroxene'
 
-        base_material = [[forsterite(), 'Mg[Mg]Si2O6'], [forsterite(), '[Mg1/2Al1/2]2AlSiO6']]
+        endmembers = [[forsterite(), 'Mg[Mg]Si2O6'], [forsterite(), '[Mg1/2Al1/2]2AlSiO6']]
 
         # Interaction parameters
         enthalpy_interaction=[[10.0e3]]
 
-        burnman.SolidSolution.__init__(self, base_material, \
-                          burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self, endmembers, \
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 
 # Three-endmember, two site solid solution
 class two_site_ss(burnman.SolidSolution):
@@ -112,11 +112,11 @@ class two_site_ss(burnman.SolidSolution):
         self.name='two_site_ss'
 
         # Endmembers (symmetric)
-        base_material = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         # Interaction parameters
         enthalpy_interaction=[[0.0, 0.0],[0.0]]
 
-        burnman.SolidSolution.__init__(self, base_material, burnman.solutionmodel.SymmetricRegularSolution(base_material, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self, endmembers, burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 
 
 class test_solidsolution(BurnManTest):
