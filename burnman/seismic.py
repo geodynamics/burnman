@@ -45,7 +45,7 @@ class Seismic1DModel(object):
     
 
 
-    def internal_depth_list(self):
+    def internal_depth_list(self,mindepth=0.,maxdepth=6371.e3):
         """
         Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation.
         
@@ -257,11 +257,12 @@ class SeismicRadiusTable(Seismic1DModel):
 
         self.earth_radius = 6371.0e3
         
-    def internal_depth_list(self):
+    def internal_depth_list(self,mindepth=0., maxdepth=6371.):
         if self.table_depth[0]: 
-            return self.table_depth 
+            return np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth]) 
         else:
-            return self.earth_radius - self.table_radius[::-1]
+            depth = self.earth_radius - self.table_radius[::-1]
+            return np.array([depth[x] for x in range(len(depth)) if depth[x]>mindepth and depth[x]<maxdepth])
 
     def pressure(self, depth):
         

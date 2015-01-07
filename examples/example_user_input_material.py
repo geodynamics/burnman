@@ -91,7 +91,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(700e3,2800e3, number_of_points)
-    #depths = seismic_model.internal_depth_list()
+    #depths = seismic_model.internal_depth_list(mindepth=700.e3, maxdepth=2800.e3)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
 

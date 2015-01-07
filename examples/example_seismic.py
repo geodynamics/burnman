@@ -46,12 +46,13 @@ if __name__ == "__main__":
 
     # specify where we want to evaluate, here we map from pressure to depth
     #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
-    p = np.arange(1.0e9,360.0e9,1.e9)
-    depths = np.array([s.depth(pr) for pr in p])
+    #p = np.arange(1.0e9,360.0e9,1.e9)
+    #depths = np.array([s.depth(pr) for pr in p])
     #we could also just specify some depth levels directly like this:
     #depths = np.arange(35e3,5600e3,100e3)
-    #we could also use the data points where the seismic model is specified:
-    depths = s.internal_depth_list()
+    #we could also use the data points where the seismic model is specified over a depth range:
+    #this is the preferred way to plot seismic discontinuities correctly
+    depths = s.internal_depth_list(mindepth=100.e3, maxdepth=6371.e3)
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
     
