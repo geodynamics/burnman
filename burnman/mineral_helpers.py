@@ -29,54 +29,54 @@ class HelperSolidSolution(Mineral):
     is, but here we just do a weighted arithmetic average of the
     thermoelastic properties of the end members according to their molar fractions
     """
-    def __init__(self, base_materials, molar_fraction):
+    def __init__(self, endmembers, molar_fraction):
         """
         Takes a list of end member minerals, and a matching list of
         molar fractions of those minerals for mixing them.  Simply
         comes up with a new mineral by doing a weighted arithmetic
         average of the end member minerals
         """
-        self.base_materials = base_materials
+        self.endmembers = endmembers
         self.molar_fraction = molar_fraction
-        assert(len(base_materials) == len(molar_fraction))
+        assert(len(endmembers) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
 
-        self.method = base_materials[0].method
+        self.method = endmembers[0].method
 
         #does not make sense to do a solid solution with different number of
         #atoms per formula unit or different equations of state, at least not simply...
-        for m in base_materials:
+        for m in endmembers:
             m.set_method(self.method)
-            if(base_materials[0].params.has_key('n')):
-                assert(m.params['n'] == base_materials[0].params['n'])
+            if(endmembers[0].params.has_key('n')):
+                assert(m.params['n'] == endmembers[0].params['n'])
         
         self.params = {}
 
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
         indent += "  "
-        for (fraction, mat) in zip(self.molar_fraction, self.base_materials):
+        for (fraction, mat) in zip(self.molar_fraction, self.endmembers):
             print "%s%g of" % (indent, fraction)
             mat.debug_print(indent + "  ")
 
     def set_method(self, method):
-        for mat in self.base_materials:
+        for mat in self.endmembers:
             mat.set_method(method)
-        self.method = self.base_materials[0].method
+        self.method = self.endmembers[0].method
 
     def set_state(self, pressure, temperature):
-        for mat in self.base_materials:
+        for mat in self.endmembers:
             mat.set_state(pressure, temperature)
 
-        itrange = range(0, len(self.base_materials))
+        itrange = range(0, len(self.endmembers))
         self.params = {}
-        for prop in self.base_materials[0].params:
+        for prop in self.endmembers[0].params:
            try:
-                self.params[prop] = sum([ self.base_materials[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+                self.params[prop] = sum([ self.endmembers[i].params[prop] * self.molar_fraction[i] for i in itrange ])
            except TypeError:
-                #if there is a type error, it is probably a string. Just go with the value of the first base_material.
-                self.params[prop] = self.base_materials[0].params[prop]
+                #if there is a type error, it is probably a string. Just go with the value of the first endmembers.
+                self.params[prop] = self.endmembers[0].params[prop]
 
         Mineral.set_state(self,pressure,temperature)
 
@@ -161,16 +161,16 @@ class HelperFeDependent(Material):
 
     def set_state(self, pressure, temperature):
         Material.set_state(self, pressure, temperature)
-        self.base_material = self.create_inner_material(self.iron_number())
+        self.endmembers = self.create_inner_material(self.iron_number())
         if self.method:
-            self.base_material.set_method(self.method)
-        self.base_material.set_state(pressure, temperature)
+            self.endmembers.set_method(self.method)
+        self.endmembers.set_state(pressure, temperature)
 
     def unroll(self):
         """ return (fractions, minerals) where both are arrays. May depend on current state """
-        return ([1.0],[self.base_material])
+        return ([1.0],[self.endmembers])
 
     def density(self):
-        return self.base_material.density()
+        return self.endmembers.density()
 
 

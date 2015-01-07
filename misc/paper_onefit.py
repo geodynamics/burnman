@@ -53,7 +53,7 @@ def make_rock():
 def output_rock( rock, file_handle ):
   for ph in rock.staticphases:
     if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-      for min in ph.mineral.base_materials:
+      for min in ph.mineral.endmembers:
         file_handle.write( '\t' + min.to_string() + '\n')
         for key in min.params:
           file_handle.write('\t\t' + key + ': ' + str(min.params[key]) + '\n')
@@ -67,7 +67,7 @@ def realization_to_array(rock, anchor_t):
     names = ['anchor_T']
     for ph in rock.staticphases:
         if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-            for min in ph.mineral.base_materials:
+            for min in ph.mineral.endmembers:
                 for key in min.params:
                     if key != 'equation_of_state':
                         arr.append(min.params[key])
@@ -85,7 +85,7 @@ def array_to_rock(arr, names):
     idx = 1
     for (fraction,phase) in rock.children:
         if isinstance(phase, HelperSolidSolution):
-            for min in phase.base_materials:
+            for min in phase.endmembers:
                 for key in min.params:
                     if key != 'equation_of_state' and key != 'F_0':
                         assert(names[idx]==min.to_string()+'.'+key)

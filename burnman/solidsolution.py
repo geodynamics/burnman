@@ -40,17 +40,17 @@ class SolidSolution(Mineral):
         """
 
         # Initialise the solid solution inputs
-        self.base_material = endmembers
+        self.endmembers = endmembers
         self.solution_model = solution_model
 
         # Number of endmembers in the solid solution
         self.n_endmembers = len(endmembers)
 
         for i in range(self.n_endmembers):
-            self.base_material[i][0].set_method(self.base_material[i][0].params['equation_of_state'])
+            self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])
 
     def get_endmembers(self):
-        return self.base_material
+        return self.endmembers
 
     def set_composition(self, molar_fraction ):
         """
@@ -61,21 +61,21 @@ class SolidSolution(Mineral):
         molar_fraction: list of float
             molar abundance for each endmember, needs to sum to one.
         """
-        assert(len(self.base_material) == len(molar_fraction))
+        assert(len(self.endmembers) == len(molar_fraction))
         assert(sum(molar_fraction) > 0.9999)
         assert(sum(molar_fraction) < 1.0001)
         self.molar_fraction = molar_fraction 
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
-            self.base_material[i][0].set_method(method)
-        self.method = self.base_material[0][0].method
+            self.endmembers[i][0].set_method(method)
+        self.method = self.endmembers[0][0].method
 
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-        molar_mass = sum([ self.base_material[i][0].molar_mass()*self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        molar_mass = sum([ self.endmembers[i][0].molar_mass()*self.molar_fraction[i] for i in range(self.n_endmembers) ])
         return molar_mass
 
     def set_state(self, pressure, temperature):
@@ -83,29 +83,29 @@ class SolidSolution(Mineral):
         self.temperature=temperature
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
-            self.base_material[i][0].set_state(pressure, temperature)
+            self.endmembers[i][0].set_state(pressure, temperature)
 
         self.excess_partial_gibbs = self.solution_model.excess_partial_gibbs_free_energies( pressure, temperature, self.molar_fraction)
         self.excess_gibbs = self.solution_model.excess_gibbs_free_energy( pressure, temperature, self.molar_fraction)
-        self.partial_gibbs = np.array([self.base_material[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
-        self.gibbs= sum([ self.base_material[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
+        self.partial_gibbs = np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
+        self.gibbs= sum([ self.endmembers[i][0].gibbs * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
 
         self.excess_enthalpy = self.solution_model.excess_enthalpy( pressure, temperature, self.molar_fraction)
         self.excess_entropy = self.solution_model.excess_entropy( pressure, temperature, self.molar_fraction)
         self.excess_volume = self.solution_model.excess_volume( pressure, temperature, self.molar_fraction)
 
-        self.H = sum([ self.base_material[i][0].H * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
-        self.S = sum([ self.base_material[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
-        self.V = sum([ self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
-        self.C_p = sum([ self.base_material[i][0].C_p * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.alpha = (1./self.V) * sum([ self.base_material[i][0].alpha * self.base_material[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ])
-        self.K_T = self.V * 1./(sum([ self.base_material[i][0].V / (self.base_material[i][0].K_T)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
+        self.H = sum([ self.endmembers[i][0].H * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
+        self.S = sum([ self.endmembers[i][0].S * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
+        self.V = sum([ self.endmembers[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ]) + self.excess_volume
+        self.C_p = sum([ self.endmembers[i][0].C_p * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.alpha = (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fraction[i] for i in range(self.n_endmembers) ])
+        self.K_T = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].K_T)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
  
-        G_list = [ self.base_material[i][0].G for i in range(self.n_endmembers) ]
+        G_list = [ self.endmembers[i][0].G for i in range(self.n_endmembers) ]
         if 0.0 in G_list:
             self.G = 0.0
         else:
-            self.G = self.V * 1./(sum([ self.base_material[i][0].V / (self.base_material[i][0].G)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
+            self.G = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fraction[i] for i in range(self.n_endmembers) ]))
 
         # Derived properties
         self.C_v = self.C_p - self.V*temperature*self.alpha*self.alpha*self.K_T
@@ -119,7 +119,7 @@ class SolidSolution(Mineral):
             self.gr = self.alpha*self.K_T*self.V/self.C_v     
 
     def calcgibbs(self, pressure, temperature, molar_fraction): 
-        return sum([ self.base_material[i][0].calcgibbs(pressure, temperature) * molar_fraction[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fraction)
+        return sum([ self.endmembers[i][0].calcgibbs(pressure, temperature) * molar_fraction[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fraction)
 
     def calcpartialgibbsexcesses(self, pressure, temperature, molar_fraction):
         return self.solution_model.excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fraction)

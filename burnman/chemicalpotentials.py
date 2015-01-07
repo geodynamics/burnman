@@ -49,7 +49,7 @@ def chemical_potentials(assemblage, component_formulae):
     endmember_potentials=[]
     for mineral in assemblage:
         if isinstance(mineral, burnman.SolidSolution):
-            for member in mineral.base_material:
+            for member in mineral.endmembers:
                 endmember_list.append(member[0])
             for potential in mineral.partial_gibbs:
                 endmember_potentials.append(potential)
