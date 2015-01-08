@@ -203,9 +203,16 @@ if __name__ == "__main__":
     # the total mass of the planet and
     # the moment of inertia factor,
     # or C/MR^2
-    print "Total mass of the planet: ", merc.mass
-    print "Moment of inertia factor of the planet: ", merc.moment_of_inertia_factor
+    observed_mass = 3.02e23
+    observed_moment = 0.346  #From Margot. et al, 2012
 
+    print ("Total mass of the planet: %.2e, or %.0f%% of the observed mass" % (merc.mass, merc.mass/observed_mass*100. ) )
+    print ("Moment of inertia factor of the planet: %.3g, or %0.f%% of the observed factor" % (merc.moment_of_inertia_factor, merc.moment_of_inertia_factor/observed_moment*100.))
+
+    # As we can see by running this, the calculated mass of the planet is much too large. 
+    # One could do a better job of fitting this by using a more complicated interior model,
+    # with a liquid outer core, light alloying elements in the core, and a more realistic 
+    # temperature profile.  That, however, is outside of the scope of this example. 
 
 
     import matplotlib.gridspec as gridspec
