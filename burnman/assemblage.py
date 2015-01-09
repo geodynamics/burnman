@@ -5,8 +5,10 @@
 import numpy as np
 import warnings
 
+import burnman
 from burnman import Material
 from burnman import Mineral
+import burnman.averaging_schemes
 
 def check_pairs(fractions, minerals):
         if len(fractions) < 1:
@@ -68,7 +70,7 @@ class Assemblage(Material):
 
     def set_composition(self, phase_compositions):
         assert(len(self.phases)==len(phase_compositions))
-        for idx, composition in phase_compositions:
+        for idx, composition in enumerate(phase_compositions):
             if composition != []:
                 self.phases[idx].set_composition(composition)
 
@@ -109,14 +111,14 @@ class Assemblage(Material):
 	if set_type=="none":
             pass
 	elif set_type=="gibbs_only":
-            self.gibbs=assemblage_gibbs()
+            self.gibbs=self.assemblage_gibbs()
 	elif set_type=="elastic":
-            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = assemblage_elastic_properties(averaging_scheme)
+            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = self.assemblage_elastic_properties(averaging_scheme)
 	elif set_type=="thermodynamic":
-            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = assemblage_thermodynamic_properties()
+            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = self.assemblage_thermodynamic_properties()
 	elif set_type=="all":
-            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = assemblage_thermodynamic_properties()
-            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = assemblage_elastic_properties(averaging_scheme)
+            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = self.assemblage_thermodynamic_properties()
+            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = self.assemblage_elastic_properties(averaging_scheme)
 
     def density(self):
         """
@@ -137,9 +139,9 @@ class Assemblage(Material):
         :rtype: list of list of :class:`burnman.elastic_properties`
         """
         elastic_properties_of_phases = []
-        (fractions,minerals) = rock.unroll()
+        (fractions,minerals) = self.unroll()
         for (fraction,mineral) in zip(fractions,minerals):
-            e = ElasticProperties()
+            e = burnman.ElasticProperties()
             e.V = fraction * mineral.molar_volume()
             e.K = mineral.adiabatic_bulk_modulus()
             e.G = mineral.shear_modulus()
@@ -156,15 +158,16 @@ class Assemblage(Material):
         :rtype: lists of floats
         """
         thermodynamic_properties_of_phases = []
-        (fractions,minerals) = rock.unroll()
-        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(minerals) ])
-        H = sum([ minerals[i].H * fractions[i] for i in range(minerals) ])
-        S = sum([ minerals[i].S * fractions[i] for i in range(minerals) ])
-        V = sum([ minerals[i].V * fractions[i] for i in range(minerals) ])
-        C_p = 0. #sum([ minerals[i].C_p * fractions[i] for i in range(minerals) ])
-        C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(minerals) ])
-        alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(minerals) ])
-        gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(minerals) ])
+        (fractions,minerals) = self.unroll()
+	n_minerals=len(minerals)
+        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
+        H = sum([ minerals[i].H * fractions[i] for i in range(n_minerals) ])
+        S = sum([ minerals[i].S * fractions[i] for i in range(n_minerals) ])
+        V = sum([ minerals[i].V * fractions[i] for i in range(n_minerals) ])
+        C_p = 0. #sum([ minerals[i].C_p * fractions[i] for i in range(n_minerals) ])
+        C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(n_minerals) ])
+        alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(n_minerals) ])
+        gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(n_minerals) ])
         return gibbs, H, S, V, C_p, C_v, alpha, gr
 
     def assemblage_gibbs(self):
@@ -173,8 +176,9 @@ class Assemblage(Material):
         :returns: :math:`\mathcal{G}` :math:`[J/mol]`
         """
         thermodynamic_properties_of_phases = []
-        (fractions,minerals) = rock.unroll()
-        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(minerals) ])
+        (fractions,minerals) = self.unroll()
+	n_minerals=len(minerals)
+        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
 	return gibbs
 
 
@@ -190,9 +194,9 @@ class Assemblage(Material):
         :rtype: lists of floats
 
         """
-        moduli_list = self.calculate_moduli()
-        moduli = average_moduli(moduli_list, averaging_scheme)
-        mat_vp, mat_vs, mat_vphi = compute_velocities(moduli)
+        moduli_list = [self.calculate_moduli()]
+        moduli = burnman.average_moduli(moduli_list, averaging_scheme)
+        mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
         mat_rho = np.array([m.rho for m in moduli])
         mat_K = np.array([m.K for m in moduli])
         mat_G = np.array([m.G for m in moduli])
