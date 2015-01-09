@@ -97,7 +97,7 @@ class Assemblage(Material):
         """
         return "'" + self.__class__.__name__ + "'"
 
-    def set_state(self, pressure, temperature):
+    def set_state(self, pressure, temperature, set_type="none", averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
         """
         Update the material to the given pressure [Pa] and temperature [K].
         """
@@ -105,6 +105,18 @@ class Assemblage(Material):
         self.temperature = temperature
         for phase in self.phases:
             phase.set_state(pressure, temperature)
+
+	if set_type=="none":
+            pass
+	elif set_type=="gibbs_only":
+            self.gibbs=assemblage_gibbs()
+	elif set_type=="elastic":
+            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = assemblage_elastic_properties(averaging_scheme)
+	elif set_type=="thermodynamic":
+            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = assemblage_thermodynamic_properties()
+	elif set_type=="all":
+            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = assemblage_thermodynamic_properties()
+            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = assemblage_elastic_properties(averaging_scheme)
 
     def density(self):
         """
@@ -149,11 +161,22 @@ class Assemblage(Material):
         H = sum([ minerals[i].H * fractions[i] for i in range(minerals) ])
         S = sum([ minerals[i].S * fractions[i] for i in range(minerals) ])
         V = sum([ minerals[i].V * fractions[i] for i in range(minerals) ])
-        #C_p = sum([ minerals[i].C_p * fractions[i] for i in range(minerals) ])
-        #C_v = sum([ minerals[i].C_v * fractions[i] for i in range(minerals) ])
-        #alpha = sum([ minerals[i].alpha * fractions[i] for i in range(minerals) ])
-        #gr = sum([ minerals[i].gr * fractions[i] for i in range(minerals) ])
-        return gibbs, H, S, V #, C_p, C_v, alpha, gr
+        C_p = 0. #sum([ minerals[i].C_p * fractions[i] for i in range(minerals) ])
+        C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(minerals) ])
+        alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(minerals) ])
+        gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(minerals) ])
+        return gibbs, H, S, V, C_p, C_v, alpha, gr
+
+    def assemblage_gibbs(self):
+        """
+        Calculates the molar gibbs free energy of the assemblage
+        :returns: :math:`\mathcal{G}` :math:`[J/mol]`
+        """
+        thermodynamic_properties_of_phases = []
+        (fractions,minerals) = rock.unroll()
+        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(minerals) ])
+	return gibbs
+
 
     def assemblage_elastic_properties(self, averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
         """
