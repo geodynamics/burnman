@@ -100,7 +100,7 @@ class Assemblage(Material):
         """
         return "'" + self.__class__.__name__ + "'"
 
-    def set_state(self, pressure, temperature, set_type="none", averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
+    def set_state(self, pressure, temperature, set_type="all", averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
         """
         Update the material to the given pressure [Pa] and temperature [K].
         """
@@ -120,7 +120,8 @@ class Assemblage(Material):
         elif set_type=="all":
             self.assemblage_thermodynamic_properties()
             self.assemblage_elastic_properties(averaging_scheme)
-
+	else:
+            raise Exception("Type for set_state not recognised.")
     def density(self):
         """
         Compute the density of the composite based on the molar volumes and masses
