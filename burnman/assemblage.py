@@ -200,4 +200,4 @@ class Assemblage(Material):
         mat_rho = np.array([m.rho for m in moduli])
         mat_K = np.array([m.K for m in moduli])
         mat_G = np.array([m.G for m in moduli])
-        return mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G
+        return mat_rho[0], mat_vp[0], mat_vs[0], mat_vphi[0], mat_K[0], mat_G[0]
