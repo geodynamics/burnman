@@ -71,3 +71,20 @@ if __name__ == "__main__":
     assemblage.set_composition([[], []])
     assemblage.set_state(P, T, "all")
     print assemblage.G
+
+
+    olivine=minerals.SLB_2011.mg_fe_olivine()
+    orthopyroxene=minerals.SLB_2011.orthopyroxene()
+
+    class mantle_with_solid_solutions(burnman.Assemblage):
+        def __init__(self):
+            self.name='Mantle with solid solutions'
+            phases = [olivine, orthopyroxene]
+            burnman.Assemblage.__init__(self, phases)
+
+    assemblage=mantle_with_solid_solutions()
+
+    assemblage.set_phase_fractions([0.8, 0.2])
+    assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
+    assemblage.set_state(P, T, "all")
+    print assemblage.G
