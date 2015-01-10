@@ -55,7 +55,7 @@ class Assemblage(Material):
         indent += "  "
         for (fraction, phase) in self.children:
             print "%s%g of" % (indent, fraction)
-            phase.debug_print(indent + "  ")	
+            phase.debug_print(indent + "  ")    
 
     def set_phase_fractions(self, fractions):
         assert(len(self.phases)==len(fractions))
@@ -109,15 +109,15 @@ class Assemblage(Material):
         for phase in self.phases:
             phase.set_state(pressure, temperature)
 
-	if set_type=="none":
+        if set_type=="none":
             pass
-	elif set_type=="gibbs_only":
+        elif set_type=="gibbs_only":
             self.assemblage_gibbs()
-	elif set_type=="elastic":
+        elif set_type=="elastic":
             self.assemblage_elastic_properties(averaging_scheme)
-	elif set_type=="thermodynamic":
+        elif set_type=="thermodynamic":
             self.assemblage_thermodynamic_properties()
-	elif set_type=="all":
+        elif set_type=="all":
             self.assemblage_thermodynamic_properties()
             self.assemblage_elastic_properties(averaging_scheme)
 
@@ -160,7 +160,7 @@ class Assemblage(Material):
         """
         thermodynamic_properties_of_phases = []
         (fractions,minerals) = self.unroll()
-	n_minerals=len(minerals)
+        n_minerals=len(minerals)
         self.gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
         self.H = sum([ minerals[i].H * fractions[i] for i in range(n_minerals) ])
         self.S = sum([ minerals[i].S * fractions[i] for i in range(n_minerals) ])
@@ -169,7 +169,7 @@ class Assemblage(Material):
         self.C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(n_minerals) ])
         self.alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(n_minerals) ])
         self.gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(n_minerals) ])
-	return self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr
+        return self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr
 
     def assemblage_gibbs(self):
         """
@@ -178,9 +178,9 @@ class Assemblage(Material):
         """
         thermodynamic_properties_of_phases = []
         (fractions,minerals) = self.unroll()
-	n_minerals=len(minerals)
+        n_minerals=len(minerals)
         self.gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
-	return self.gibbs
+        return self.gibbs
 
 
     def assemblage_elastic_properties(self, averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
@@ -200,7 +200,7 @@ class Assemblage(Material):
         self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
         self.rho = moduli.rho
         self.K = moduli.K
-	self.G = moduli.G
+        self.G = moduli.G
 
         return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
 

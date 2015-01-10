@@ -4,36 +4,22 @@
 
 """
 
-example_solid_solution
+example_assemblage
 ----------------------
     
-This example shows how to create different solid solution models and output
+This example shows how to create assemblages and output
 thermodynamic and thermoelastic quantities.
-
-There are three main types of solid solution currently implemented in 
-BurnMan:
-
-1. Ideal solid solutions
-2. Symmmetric solid solutions
-3. Asymmetric solid solutions
-
-These solid solutions can potentially deal with:
-
-* Disordered endmembers (more than one element on a crystallographic site)
-* Site vacancies
-* More than one valence/spin state of the same element on a site
 
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.solidsolution.SolidSolution`
-* :class:`burnman.solutionmodel.SolutionModel`
+* :class:`burnman.assemblage.Assemblage`
 
 
 *Demonstrates:*
 
-* Different ways to define a solid solution
-* How to set composition and state
+* Different ways to define an instance of the Assemblage class
+* How to set phase fractions, composition and state
 * How to output thermodynamic and thermoelastic properties
 
 """
@@ -90,7 +76,7 @@ if __name__ == "__main__":
     print assemblage.G
 
     """
-    Here's a simpler way of doing the same thing
+    Here's a briefer way of doing the same thing
     """
     assemblage=burnman.Assemblage([olivine, orthopyroxene])
     assemblage.set_phase_fractions([0.8, 0.2])
