@@ -97,3 +97,17 @@ if __name__ == "__main__":
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
     print assemblage.G
+
+    """
+    An assemblage can also be queried for chemical potential information
+    """
+    fayalite=minerals.HP_2011_ds62.fa()
+    magnetite=minerals.HP_2011_ds62.mt()
+    quartz=minerals.HP_2011_ds62.q()
+    O2=minerals.HP_2011_fluids.O2()
+    O2.set_state(1.e5, T)
+
+    FMQ=burnman.Assemblage([fayalite, magnetite, quartz])
+    FMQ.set_state(P, T, "none")
+    print FMQ.chemical_potentials(['FeO', 'SiO2', 'O2'])
+    print np.log10(FMQ.fugacity(O2))
