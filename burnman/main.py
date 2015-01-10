@@ -124,12 +124,12 @@ def compute_velocities(moduli):
 
 
     """
-    mat_vs = np.ndarray(len(moduli))
     mat_vp = np.ndarray(len(moduli))
+    mat_vs = np.ndarray(len(moduli))
     mat_vphi = np.ndarray(len(moduli))
 
     for i in range(len(moduli)):
-        mat_vs[i], mat_vp[i], mat_vphi[i] = compute_velocity(moduli[i])
+        mat_vp[i], mat_vs[i], mat_vphi[i] = compute_velocity(moduli[i])
 
     return mat_vp, mat_vs, mat_vphi
 
