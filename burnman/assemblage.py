@@ -112,14 +112,14 @@ class Assemblage(Material):
 	if set_type=="none":
             pass
 	elif set_type=="gibbs_only":
-            self.gibbs=self.assemblage_gibbs()
+            self.assemblage_gibbs()
 	elif set_type=="elastic":
-            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = self.assemblage_elastic_properties(averaging_scheme)
+            self.assemblage_elastic_properties(averaging_scheme)
 	elif set_type=="thermodynamic":
-            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = self.assemblage_thermodynamic_properties()
+            self.assemblage_thermodynamic_properties()
 	elif set_type=="all":
-            self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr = self.assemblage_thermodynamic_properties()
-            self.rho, self.vp, self.vs, self.vphi, self.K, self.G = self.assemblage_elastic_properties(averaging_scheme)
+            self.assemblage_thermodynamic_properties()
+            self.assemblage_elastic_properties(averaging_scheme)
 
     def density(self):
         """
@@ -161,15 +161,15 @@ class Assemblage(Material):
         thermodynamic_properties_of_phases = []
         (fractions,minerals) = self.unroll()
 	n_minerals=len(minerals)
-        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
-        H = sum([ minerals[i].H * fractions[i] for i in range(n_minerals) ])
-        S = sum([ minerals[i].S * fractions[i] for i in range(n_minerals) ])
-        V = sum([ minerals[i].V * fractions[i] for i in range(n_minerals) ])
-        C_p = 0. #sum([ minerals[i].C_p * fractions[i] for i in range(n_minerals) ])
-        C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(n_minerals) ])
-        alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(n_minerals) ])
-        gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(n_minerals) ])
-        return gibbs, H, S, V, C_p, C_v, alpha, gr
+        self.gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
+        self.H = sum([ minerals[i].H * fractions[i] for i in range(n_minerals) ])
+        self.S = sum([ minerals[i].S * fractions[i] for i in range(n_minerals) ])
+        self.V = sum([ minerals[i].V * fractions[i] for i in range(n_minerals) ])
+        self.C_p = 0. #sum([ minerals[i].C_p * fractions[i] for i in range(n_minerals) ])
+        self.C_v = 0. #sum([ minerals[i].C_v * fractions[i] for i in range(n_minerals) ])
+        self.alpha = 0. #sum([ minerals[i].alpha * fractions[i] for i in range(n_minerals) ])
+        self.gr = 0. #sum([ minerals[i].gr * fractions[i] for i in range(n_minerals) ])
+	return self.gibbs, self.H, self.S, self.V, self.C_p, self.C_v, self.alpha, self.gr
 
     def assemblage_gibbs(self):
         """
@@ -179,8 +179,8 @@ class Assemblage(Material):
         thermodynamic_properties_of_phases = []
         (fractions,minerals) = self.unroll()
 	n_minerals=len(minerals)
-        gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
-	return gibbs
+        self.gibbs = sum([ minerals[i].gibbs * fractions[i] for i in range(n_minerals) ])
+	return self.gibbs
 
 
     def assemblage_elastic_properties(self, averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
@@ -195,10 +195,11 @@ class Assemblage(Material):
         :rtype: lists of floats
 
         """
-        moduli_list = [self.calculate_moduli()]
-        moduli = burnman.average_moduli(moduli_list, averaging_scheme)
-        mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
-        mat_rho = np.array([m.rho for m in moduli])
-        mat_K = np.array([m.K for m in moduli])
-        mat_G = np.array([m.G for m in moduli])
-        return mat_rho[0], mat_vp[0], mat_vs[0], mat_vphi[0], mat_K[0], mat_G[0]
+        moduli = [self.calculate_moduli()]
+        moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
+        self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
+        self.rho = moduli.rho
+        self.K = moduli.K
+	self.G = moduli.G
+
+        return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
