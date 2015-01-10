@@ -203,3 +203,10 @@ class Assemblage(Material):
 	self.G = moduli.G
 
         return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
+
+    def chemical_potentials(self, component_formulae):
+        component_formulae_dict=[burnman.chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
+        return burnman.chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
+
+    def fugacity(self, standard_material):
+        return burnman.chemicalpotentials.fugacity(standard_material, self.phases)
