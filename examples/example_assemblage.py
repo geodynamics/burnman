@@ -88,3 +88,12 @@ if __name__ == "__main__":
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
     print assemblage.G
+
+    """
+    Here's a simpler way of doing the same thing
+    """
+    assemblage=burnman.Assemblage([olivine, orthopyroxene])
+    assemblage.set_phase_fractions([0.8, 0.2])
+    assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
+    assemblage.set_state(P, T, "all")
+    print assemblage.G
