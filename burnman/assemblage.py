@@ -45,7 +45,8 @@ class Assemblage(Material):
         phases: list of :class:`burnman.Material`
             list of phases.
         """
-        assert(len(phases)>0)
+        if len(phases)==0:
+            warnings.warn("Assemblage must be populated with phases before you can do anything with it!", stacklevel=2)
         self.phases=phases
 
 
@@ -54,7 +55,7 @@ class Assemblage(Material):
         indent += "  "
         for (fraction, phase) in self.children:
             print "%s%g of" % (indent, fraction)
-            phase.debug_print(indent + "  ")
+            phase.debug_print(indent + "  ")	
 
     def set_phase_fractions(self, fractions):
         assert(len(self.phases)==len(fractions))
@@ -65,7 +66,7 @@ class Assemblage(Material):
         self.fractions = [max(0.0, fr) for fr in fractions]  # turn -1e-14 into 0.0
         total = sum(self.fractions)
         if abs(total - 1.0) > 1e-12:
-            warnings.warn("Warning: list of molar fractions sums to %g. Normalizing." % total)
+            warnings.warn("List of molar fractions sums to %g. Normalizing." % total, stacklevel=2)
             self.fractions = [fr / total for fr in self.fractions]
 
     def set_composition(self, phase_compositions):
