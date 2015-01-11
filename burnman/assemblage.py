@@ -71,9 +71,19 @@ class Assemblage(Material):
 
     def set_composition(self, phase_compositions):
         assert(len(self.phases)==len(phase_compositions))
-        for idx, composition in enumerate(phase_compositions):
+        for i, composition in enumerate(phase_compositions):
             if composition != []:
-                self.phases[idx].set_composition(composition)
+                self.phases[i].set_composition(composition)
+
+	if hasattr(self, 'fractions'):
+            self.phase_compositions=[self.phases[i].composition for i in range(len(self.phases))]
+	    self.composition=dict()
+	    for i, composition in enumerate(self.phase_compositions):
+                for element in composition:
+                    if element not in self.composition:
+                        self.composition[element] = self.fractions[i]*composition[element]
+                    else:
+                        self.composition[element] += self.fractions[i]*composition[element]
 
     def set_method(self, method):
         """

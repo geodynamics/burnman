@@ -83,6 +83,7 @@ if __name__ == "__main__":
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
     print assemblage.G
+    print assemblage.composition
 
     """
     An assemblage can also be queried for chemical potential information
