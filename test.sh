@@ -2,6 +2,16 @@
 
 fulldir=`pwd`
 
+# use numdiff but fall back to diff if not found:
+which numdiff >/dev/null
+if [ $? -eq 0 ]
+then
+  diffcmd="numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5"
+else
+  diffcmd="diff"
+  echo "WARNING: numdiff not found, please install! Falling back to diff."
+fi
+
 function testit {
 t=$1
 fulldir=$2
@@ -30,11 +40,11 @@ else
   sed -i'' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
+  (eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "!  $t ... FAIL";
-  echo "Check: `readlink -f $t.tmp` `readlink -f $fulldir/misc/ref/$t.out`";
-  numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5 $t.tmp $fulldir/misc/ref/$t.out | head
+  echo "Check: `pwd`/$t.tmp $fulldir/misc/ref/$t.out";
+  eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out | head
   }
 
 fi
