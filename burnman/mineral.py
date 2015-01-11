@@ -43,6 +43,8 @@ class Mineral(Material):
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
+        if 'formula' in self.params:
+            self.composition=self.params['formula']
 
     def set_method(self, equation_of_state):
         """

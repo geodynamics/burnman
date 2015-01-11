@@ -66,6 +66,18 @@ class SolidSolution(Mineral):
         assert(sum(molar_fraction) < 1.0001)
         self.molar_fraction = molar_fraction 
 
+
+        self.endmember_compositions=[self.endmembers[i][0].composition for i in range(self.n_endmembers)]
+        self.composition=dict()
+        for i, composition in enumerate(self.endmember_compositions):
+            for element in composition:
+                if element not in self.composition:
+                    self.composition[element] = molar_fraction[i]*composition[element]
+                else:
+                    self.composition[element] += molar_fraction[i]*composition[element]
+                
+        
+
     def set_method(self, method):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)
@@ -81,6 +93,7 @@ class SolidSolution(Mineral):
     def set_state(self, pressure, temperature):
         self.pressure=pressure
         self.temperature=temperature
+        
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
