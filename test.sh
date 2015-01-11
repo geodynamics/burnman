@@ -58,7 +58,9 @@ echo "*** running test suite..."
 # check for tabs in code:
 for f in `find . -name \*.py`
 do
-    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 0
+    grep $'\t' -q $f && \
+	echo "ERROR: tabs found in '$f':" && \
+	grep -n $'\t' $f && exit 0
 done
 
 cd tests
