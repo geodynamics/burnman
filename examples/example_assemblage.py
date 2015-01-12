@@ -57,6 +57,7 @@ if __name__ == "__main__":
     assemblage.set_composition([[], []])
     assemblage.set_state(P, T, "all")
     print 'Assemblage 1 (endmembers only)'
+    print assemblage.phase_names
     print 'G:', assemblage.G/1.e9, "GPa" 
     print ''
 
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
     print 'Assemblage 2 (with solid solutions), method 1'
+    print assemblage.phase_names
     print 'G:', assemblage.G/1.e9, "GPa" 
     print ''
 
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     assemblage.set_phase_fractions([0.8, 0.2])
     assemblage.set_state(P, T, "all")
     print 'Assemblage 2 (with solid solutions), method 2'
+    print assemblage.phase_names
     print 'G:', assemblage.G/1.e9, "GPa" 
     print ''
     '''
@@ -124,8 +127,8 @@ if __name__ == "__main__":
 
     FMQ=burnman.Assemblage([fayalite, magnetite, quartz])
     FMQ.set_state(P, T, "none")
-    print 'Chemical potentials for the FMQ buffer'
-    print 'P:', P, "; T:", T
+    print 'Chemical potentials for the FMQ buffer at', P/1.e9, "GPa and", T, "K"
+    print FMQ.phase_names
     components=['FeO', 'SiO2', 'O2']
 
     for i, component in enumerate(components):

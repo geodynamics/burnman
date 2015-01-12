@@ -49,6 +49,13 @@ class Assemblage(Material):
             warnings.warn("Assemblage must be populated with phases before you can do anything with it!", stacklevel=2)
         self.phases=phases
 
+        self.phase_names = []
+        for i in range(len(self.phases)):
+            try:
+                self.phase_names.append(self.phases[i].name)
+            except AttributeError:
+                self.phase_names.append('')
+
 
     def debug_print(self, indent=""):
         print "%sComposite:" % indent

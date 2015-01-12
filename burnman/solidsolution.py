@@ -46,8 +46,13 @@ class SolidSolution(Mineral):
         # Number of endmembers in the solid solution
         self.n_endmembers = len(endmembers)
 
+        self.endmember_names = []
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])
+            try:
+                self.endmember_names.append(self.endmembers[i][0].params['name'])
+            except AttributeError:
+                self.endmember_names.append('')
 
     def get_endmembers(self):
         return self.endmembers
