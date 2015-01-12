@@ -57,17 +57,52 @@ class Assemblage(Material):
             print "%s%g of" % (indent, fraction)
             phase.debug_print(indent + "  ")    
 
-    def set_phase_fractions(self, fractions):
+    def set_phase_fractions(self, fractions, fraction_type='molar'):
         assert(len(self.phases)==len(fractions))
+
         for f in fractions:
             # we would like to check for >= 0, but this creates nasty behavior due to
             # floating point rules: 1.0-0.8-0.1-0.1 is not 0.0 but -1e-14.
             assert (f >= -1e-12)
-        self.fractions = [max(0.0, fr) for fr in fractions]  # turn -1e-14 into 0.0
-        total = sum(self.fractions)
-        if abs(total - 1.0) > 1e-12:
-            warnings.warn("List of molar fractions sums to %g. Normalizing." % total, stacklevel=2)
-            self.fractions = [fr / total for fr in self.fractions]
+
+        if fraction_type == 'molar':
+            self.molar_fractions=fractions
+            total = sum(fractions)
+            if abs(total - 1.0) > 1e-12:
+                warnings.warn("List of molar fractions sums to %g. Normalizing." % total, stacklevel=2)
+                self.molar_fractions = [fr / total for fr in fractions]
+            try:
+                del self.mass_fractions
+            except AttributeError:
+                pass
+            try:
+                del self.volume_fractions
+            except AttributeError:
+                pass
+        elif fraction_type == 'mass': # only if set_composition has been called
+            self.mass_fractions=fractions
+            self.molar_fractions = self.mass_to_molar_fractions(fractions, self.phases)
+            try:
+                del self.volume_fractions
+            except AttributeError:
+                pass
+        elif fraction_type == 'volume': # only if set_composition and set_state have been called
+            self.volume_fractions=fractions
+            self.molar_fractions = self.volume_to_molar_fractions(fractions, self.phases)
+            try:
+                del self.mass_fractions
+            except AttributeError:
+                pass
+        else:
+            raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
+
+        # Make sure all fractions >= 0.0
+        self.molar_fractions = [max(0.0, fr) for fr in self.molar_fractions]
+
+        try:
+            self.composition=self.assemblage_composition() # if set_composition has been called
+        except AttributeError:
+            pass
 
     def set_composition(self, phase_compositions):
         assert(len(self.phases)==len(phase_compositions))
@@ -75,15 +110,19 @@ class Assemblage(Material):
             if composition != []:
                 self.phases[i].set_composition(composition)
 
-	if hasattr(self, 'fractions'):
-            self.phase_compositions=[self.phases[i].composition for i in range(len(self.phases))]
-	    self.composition=dict()
-	    for i, composition in enumerate(self.phase_compositions):
-                for element in composition:
-                    if element not in self.composition:
-                        self.composition[element] = self.fractions[i]*composition[element]
-                    else:
-                        self.composition[element] += self.fractions[i]*composition[element]
+	if hasattr(self, 'molar_fractions'):
+            self.composition=self.assemblage_composition()
+
+    def assemblage_composition(self):
+        self.phase_compositions=[self.phases[i].composition for i in range(len(self.phases))]
+        self.composition=dict()
+        for i, composition in enumerate(self.phase_compositions):
+            for element in composition:
+                if element not in self.composition:
+                    self.composition[element] = self.molar_fractions[i]*composition[element]
+                else:
+                    self.composition[element] += self.molar_fractions[i]*composition[element]
+        return self.composition
 
     def set_method(self, method):
         """
@@ -97,7 +136,7 @@ class Assemblage(Material):
         minerals = []
 
         for idx, phase in enumerate(self.phases):
-            fraction=self.fractions[idx]
+            fraction=self.molar_fractions[idx]
             p_fr,p_min = phase.unroll()
             check_pairs(p_fr,p_min)
             fractions.extend([i*fraction for i in p_fr])
@@ -151,17 +190,47 @@ class Assemblage(Material):
         :rtype: list of list of :class:`burnman.elastic_properties`
         """
         elastic_properties_of_phases = []
-        (fractions,minerals) = self.unroll()
-        for (fraction,mineral) in zip(fractions,minerals):
+        (molar_fractions,minerals) = self.unroll()
+        volume_fractions = self.molar_to_volume_fractions(molar_fractions, minerals)
+
+        for (volume_fraction,mineral) in zip(volume_fractions,minerals):
+
             e = burnman.ElasticProperties()
-            e.V = fraction * mineral.molar_volume()
+            e.V = volume_fraction * mineral.molar_volume()
             e.K = mineral.adiabatic_bulk_modulus()
             e.G = mineral.shear_modulus()
             e.rho = mineral.molar_mass() / mineral.molar_volume()
-            e.fraction = fraction
+            e.fraction = volume_fraction
             elastic_properties_of_phases.append(e)
 
         return elastic_properties_of_phases
+
+    def molar_to_volume_fractions(self, molar_fractions, minerals):
+        total_volume=0.
+        for i, mineral in enumerate(minerals):
+            total_volume+=molar_fractions[i]*mineral.V
+        volume_fractions=[]
+        for i, mineral in enumerate(minerals):
+            volume_fractions.append(molar_fractions[i]*mineral.V/total_volume)
+        return volume_fractions
+
+    def volume_to_molar_fractions(self, volume_fractions, minerals):
+        total_moles=0.
+        for i, mineral in enumerate(minerals):
+            total_moles+=volume_fractions[i]/mineral.V
+        molar_fractions=[]
+        for i, mineral in enumerate(minerals):
+            molar_fractions.append(volume_fractions[i]/(mineral.V*total_moles))
+        return molar_fractions
+
+    def mass_to_molar_fractions(self, mass_fractions, minerals):
+        total_moles=0.
+        for i, mineral in enumerate(minerals):
+            total_moles+=mass_fractions[i]/mineral.molar_mass()
+        molar_fractions=[]
+        for i, mineral in enumerate(minerals):
+            molar_fractions.append(mass_fractions[i]/(mineral.molar_mass()*total_moles))
+        return molar_fractions
 
     def assemblage_thermodynamic_properties(self):
         """
@@ -221,3 +290,10 @@ class Assemblage(Material):
 
     def fugacity(self, standard_material):
         return burnman.chemicalpotentials.fugacity(standard_material, self.phases)
+
+    def molar_mass(self):
+        """
+        Returns molar mass of the assemblage [kg/mol]
+        """
+        molar_mass = sum([ self.phases[i][0].molar_mass()*self.molar_fractions[i] for i in range(self.n_endmembers) ])
+        return molar_mass
