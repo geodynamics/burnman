@@ -56,8 +56,9 @@ if __name__ == "__main__":
     assemblage.set_phase_fractions([0.8, 0.2])
     assemblage.set_composition([[], []])
     assemblage.set_state(P, T, "all")
-    print assemblage.G
-
+    print 'Assemblage 1 (endmembers only)'
+    print 'G:', assemblage.G/1.e9, "GPa" 
+    print ''
 
     olivine=minerals.SLB_2011.mg_fe_olivine()
     orthopyroxene=minerals.SLB_2011.orthopyroxene()
@@ -73,17 +74,39 @@ if __name__ == "__main__":
     assemblage.set_phase_fractions([0.8, 0.2])
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
-    print assemblage.G
+    print 'Assemblage 2 (with solid solutions), method 1'
+    print 'G:', assemblage.G/1.e9, "GPa" 
+    print ''
 
     """
     Here's a briefer way of doing the same thing
     """
     assemblage=burnman.Assemblage([olivine, orthopyroxene])
+    assemblage.set_composition([[0.9,0.1], [0.90, 0.1, 0.0, 0.0]])
     assemblage.set_phase_fractions([0.8, 0.2])
-    assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T, "all")
-    print assemblage.G
+    print 'Assemblage 2 (with solid solutions), method 2'
+    print 'G:', assemblage.G/1.e9, "GPa" 
+    print ''
+    '''
+    Allow fractions to be set as molar (default), volume or mass
+    Volume and mass fractions only possible *after* phase compositions have been set
+    The fractions stored and used by burnman are *always* molar fractions - volume and mass fractions are converted before use. Note that mass fractions will change with set_composition, and volume fractions will change with set_state...
+    '''
+    assemblage.set_phase_fractions([0.8, 0.2], 'molar')
+    print assemblage.molar_fractions
+
+    assemblage.set_phase_fractions([0.8, 0.2], 'mass')
+    print assemblage.mass_fractions
+    print assemblage.molar_fractions
+
+    assemblage.set_phase_fractions([0.8, 0.2], 'volume')
+    print assemblage.volume_fractions
+    print assemblage.molar_fractions
+
+    print 'Assemblage composition'
     print assemblage.composition
+    print ''
 
     """
     An assemblage can also be queried for chemical potential information
@@ -96,5 +119,11 @@ if __name__ == "__main__":
 
     FMQ=burnman.Assemblage([fayalite, magnetite, quartz])
     FMQ.set_state(P, T, "none")
-    print FMQ.chemical_potentials(['FeO', 'SiO2', 'O2'])
-    print np.log10(FMQ.fugacity(O2))
+    print 'Chemical potentials for the FMQ buffer'
+    print 'P:', P, "; T:", T
+    components=['FeO', 'SiO2', 'O2']
+
+    for i, component in enumerate(components):
+        print component + ':', FMQ.chemical_potentials(components)[i]/1.e3, 'kJ/mol'
+
+    print 'log10(fO2):', np.log10(FMQ.fugacity(O2))
