@@ -81,8 +81,10 @@ if __name__ == "__main__":
     """
     Here's a briefer way of doing the same thing
     """
+    olivine=minerals.SLB_2011.mg_fe_olivine()
+    orthopyroxene=minerals.SLB_2011.orthopyroxene()
     assemblage=burnman.Assemblage([olivine, orthopyroxene])
-    assemblage.set_composition([[0.9,0.1], [0.90, 0.1, 0.0, 0.0]])
+    assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_phase_fractions([0.8, 0.2])
     assemblage.set_state(P, T, "all")
     print 'Assemblage 2 (with solid solutions), method 2'
@@ -91,22 +93,25 @@ if __name__ == "__main__":
     '''
     Allow fractions to be set as molar (default), volume or mass
     Volume and mass fractions only possible *after* phase compositions have been set
+    Volume fractions also require state to have been set
     The fractions stored and used by burnman are *always* molar fractions - volume and mass fractions are converted before use. Note that mass fractions will change with set_composition, and volume fractions will change with set_state...
     '''
     assemblage.set_phase_fractions([0.8, 0.2], 'molar')
-    print assemblage.molar_fractions
-
-    assemblage.set_phase_fractions([0.8, 0.2], 'mass')
-    print assemblage.mass_fractions
-    print assemblage.molar_fractions
-
-    assemblage.set_phase_fractions([0.8, 0.2], 'volume')
-    print assemblage.volume_fractions
-    print assemblage.molar_fractions
-
-    print 'Assemblage composition'
+    print 'Assemblage composition when molar phase fractions are', assemblage.molar_fractions
     print assemblage.composition
     print ''
+
+    print 'Converting between fraction types'
+    assemblage.set_phase_fractions([0.8, 0.2], 'mass')
+    print 'Mass fractions:', assemblage.mass_fractions
+    print 'Molar fractions:', assemblage.molar_fractions
+    print ''
+
+    assemblage.set_phase_fractions([0.8, 0.2], 'volume')
+    print 'Volume fractions:', assemblage.volume_fractions
+    print 'Molar fractions:', assemblage.molar_fractions
+    print ''
+
 
     """
     An assemblage can also be queried for chemical potential information

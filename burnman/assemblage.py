@@ -80,19 +80,25 @@ class Assemblage(Material):
             except AttributeError:
                 pass
         elif fraction_type == 'mass': # only if set_composition has been called
-            self.mass_fractions=fractions
-            self.molar_fractions = self.mass_to_molar_fractions(fractions, self.phases)
             try:
-                del self.volume_fractions
+                self.mass_fractions=fractions
+                self.molar_fractions = self.mass_to_molar_fractions(fractions, self.phases)
+                try:
+                    del self.volume_fractions
+                except AttributeError:
+                    pass
             except AttributeError:
-                pass
+                raise Exception("Mass fractions cannot be set before set_composition for all the phases in the assemblage.")
         elif fraction_type == 'volume': # only if set_composition and set_state have been called
-            self.volume_fractions=fractions
-            self.molar_fractions = self.volume_to_molar_fractions(fractions, self.phases)
             try:
-                del self.mass_fractions
+                self.volume_fractions=fractions
+                self.molar_fractions = self.volume_to_molar_fractions(fractions, self.phases)
+                try:
+                    del self.mass_fractions
+                except AttributeError:
+                    pass
             except AttributeError:
-                pass
+                raise Exception("Volume fractions cannot be set before set_state.") 
         else:
             raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
 
