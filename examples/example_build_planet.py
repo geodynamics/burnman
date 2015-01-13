@@ -95,10 +95,10 @@ if __name__ == "__main__":
 
             #The planet will be represented by a two layer model, mantle and core.  
             #The top layer will be a composite of 80% perovskite and 20% periclase.
-            amount_perovskite = 0.8
-            self.mantle = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite],
-                                             [minerals.SLB_2011.mg_perovskite(),
-                                              minerals.SLB_2011.periclase()] )
+            amount_olivine = 0.8
+            self.mantle = burnman.Composite( [amount_olivine, 1.0-amount_olivine],
+                                             [minerals.SLB_2011.forsterite(),
+                                              minerals.SLB_2011.enstatite()] )
              #The core will be represented by solid iron.
             self.core = iron() 
 
