@@ -58,22 +58,29 @@ if __name__ == "__main__":
     Further endmembers can be added simply by adding more endmember lists.
     """ 
     class mg_fe_garnet(burnman.SolidSolution):
-        def __init__(self):
+        def __init__(self, molar_fractions=None):
             self.name='Ideal pyrope-almandine garnet'
             endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
-            burnman.SolidSolution.__init__(self, endmembers, burnman.solutionmodel.IdealSolution(endmembers) )
+            burnman.SolidSolution.__init__(self, endmembers, burnman.solutionmodel.IdealSolution(endmembers), molar_fractions)
 
     g1=mg_fe_garnet()
 
-    comp = np.linspace(0.001, 0.999, 100)
-
-    g1.set_composition([0.0, 1.0])
+    """
+    Initialisation can optionally include setting the composition of the solid solution, i.e.
+    """
+    g1=mg_fe_garnet([0.0, 1.0])
     g1.set_state(P,T)
     alm_gibbs = g1.gibbs
+
+    """
+    Alternatively, the composition can be set after initialisation
+    """
     g1.set_composition([1.0, 0.0])
     g1.set_state(P,T)
     py_gibbs = g1.gibbs
 
+
+    comp = np.linspace(0.001, 0.999, 100)
     g1_gibbs = np.empty_like(comp)
     g1_excess_gibbs = np.empty_like(comp)
     for i,c in enumerate(comp):
@@ -109,12 +116,12 @@ if __name__ == "__main__":
     It can be well-approximated with a symmetric regular solid solution model
     '''
     class mg_fe_garnet_2(burnman.SolidSolution):
-        def __init__(self):
+        def __init__(self, molar_fractions=None):
             self.name='Symmetric pyrope-almandine garnet'
             endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
             enthalpy_interaction=[[2.5e3]]
             burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
     g2=mg_fe_garnet_2()
     g2_excess_gibbs = np.empty_like(comp)
@@ -151,7 +158,7 @@ if __name__ == "__main__":
     DQF[2] = V_excess
     '''
     class hp_mg_fe_garnet(burnman.SolidSolution):
-        def __init__(self):
+        def __init__(self, molar_fractions=None):
             self.name='Symmetric pyrope-almandine-majorite garnet'
             endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'],[minerals.HP_2011_ds62.maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
             enthalpy_interaction=[[2.5e3,0.0e3],[10.0e3]]
@@ -159,7 +166,7 @@ if __name__ == "__main__":
             volume_interaction=[[0.0e3,0.0e3],[0.0e3]]
 
             burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction, volume_interaction, entropy_interaction) )
+                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction, volume_interaction, entropy_interaction), molar_fractions)
 
     g3=hp_mg_fe_garnet()
     g3_configurational_entropy = np.empty_like(comp)
@@ -183,14 +190,14 @@ if __name__ == "__main__":
     The addition of grossular garnet (Ca-Al garnet) illustrates the use of asymmetric solution models
     '''
     class mg_fe_ca_garnet(burnman.SolidSolution):
-        def __init__(self):
+        def __init__(self, molar_fractions=None):
             self.name='Asymmetric pyrope-almandine-grossular garnet'
             endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'],[minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12']]
             alphas=[1.0, 1.0, 2.7]
             enthalpy_interaction=[[2.5e3,30.1e3],[1.0e3]]
             volume_interaction=[[0.,0.169e-5],[0.122e-5]]
             burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.AsymmetricRegularSolution(endmembers, alphas, enthalpy_interaction, volume_interaction) )
+                          burnman.solutionmodel.AsymmetricRegularSolution(endmembers, alphas, enthalpy_interaction, volume_interaction), molar_fractions)
 
 
     g4=mg_fe_ca_garnet()
