@@ -150,6 +150,13 @@ Advanced examples:
 .. image:: figures/example_opt_pv.png
 
 
+.. automodule:: examples.example_build_planet
+
+*Resulting figure:*
+
+.. image:: figures/example_build_planet.png
+
+
 .. automodule:: examples.example_compare_all_methods  
 
 
