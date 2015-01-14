@@ -27,7 +27,7 @@ class SolidSolution(Mineral):
     and P derivatives in J/K/mol and m^3/mol.
     """
 
-    def __init__(self, endmembers, solution_model=SolutionModel()):
+    def __init__(self, endmembers, solution_model=SolutionModel(), molar_fraction=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
 
@@ -48,6 +48,10 @@ class SolidSolution(Mineral):
 
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])
+
+        if molar_fraction is not None:
+            self.molar_fraction = molar_fraction
+            self.set_composition(molar_fraction)
 
     def get_endmembers(self):
         return self.endmembers
