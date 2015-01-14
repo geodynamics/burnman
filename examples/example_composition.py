@@ -71,7 +71,7 @@ if __name__ == "__main__":
     if False:
         rock = burnman.Composite([0.7, 0.2, 0.1],
                                  [minerals.SLB_2011.fe_perovskite(),
-                                  minerals.SLB_2011.ferropericlase(0.5),
+                                  minerals.SLB_2011.periclase(),
                                   minerals.SLB_2011.stishovite()])
 
 
