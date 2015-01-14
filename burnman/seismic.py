@@ -296,18 +296,18 @@ class SeismicRadiusTable(Seismic1DModel):
     def depth(self, pressure):
         if pressure > max(self.table_pressure) or pressure < min(self.table_pressure)  :
             raise ValueError, "Pressure outside range of SeismicRadiusTable"
-        if self.table_depth[0]:
+        if not len(self.table_depth)==0:
             depth = np.interp(pressure, self.table_pressure, self.table_depth )
         else:
             depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_radius[::-1])
-        return self.depth
+        return depth
 
     def radius(self, pressure):
-        if self.table_radius[0]:
+        if not len(self.table_depth)==0:
             depth = np.interp(pressure, self.table_pressure, self.table_radius )
         else:
             depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_depth[::-1])
-        return self.depth
+        return depth
 
 
     def _lookup(self, depth, value_table):
