@@ -1,16 +1,8 @@
 Calculations are done for:
 Composite:
   0.95 of
-    HelperSolidSolution('burnman.minerals.SLB_2005.mg_fe_perovskite'):
-      0.3 of
-        'burnman.minerals.SLB_2005.mg_perovskite'
-      0.7 of
-        'burnman.minerals.SLB_2005.fe_perovskite'
+    'burnman.minerals.SLB_2011.mg_fe_perovskite'
   0.05 of
-    HelperSolidSolution('burnman.minerals.SLB_2005.ferropericlase'):
-      0.5 of
-        'burnman.minerals.SLB_2005.periclase'
-      0.5 of
-        'burnman.minerals.SLB_2005.wuestite'
+    'burnman.minerals.SLB_2011.ferropericlase'
 
 Your data has been saved as:  example_woutput.txt
