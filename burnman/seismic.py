@@ -257,7 +257,7 @@ class SeismicRadiusTable(Seismic1DModel):
 
         self.earth_radius = 6371.0e3
         
-    def internal_depth_list(self,mindepth=0., maxdepth=6371.):
+    def internal_depth_list(self,mindepth=0., maxdepth=6371.e3):
         if self.table_depth[0]: 
             return np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth]) 
         else:
