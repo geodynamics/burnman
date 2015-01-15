@@ -165,7 +165,7 @@ class Seismic1DModel(object):
         Returns
         -------
         Qk : float or array of floats
-        Quality factor for bulk modulus at given depth(s).
+        Quality factor (dimensionless) for bulk modulus at given depth(s).
         """
         raise ValueError, "not implemented"
         return 0
@@ -180,7 +180,7 @@ class Seismic1DModel(object):
         Returns
         -------
         QG : float or array of floats
-        Quality factor for shear modulus at given depth(s).
+        Quality factor (dimensionless) for shear modulus at given depth(s).
         """
         raise ValueError, "not implemented"
         return 0
@@ -248,8 +248,7 @@ class SeismicRadiusTable(Seismic1DModel):
         if not len(self.table_depth) == 0:
             return np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth]) 
         else:
-            depth = self.earth_radius - self.table_radius[::-1]
-            return np.array([depth[x] for x in range(len(depth)) if depth[x]>mindepth and depth[x]<maxdepth])
+            return self.earth_radius - np.array([self.table_radius[x] for x in range(len(self.table_radius)) if self.table_radius[x]>(self.earth_radius-maxdepth) and self.table_radius[x]<(self.earth_radius-mindepth)])[::-1]
 
     def pressure(self, depth):
         
