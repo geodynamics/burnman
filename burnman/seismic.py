@@ -192,30 +192,17 @@ class Seismic1DModel(object):
         Parameters
         ----------
         pressure : float or array of floats
-            Pressure(s) [Pa] to evaluate depth at.
+        Pressure(s) [Pa] to evaluate depth at.
 
         Returns
         -------
         depth : float or array of floats
-            Depth(s) [m] for given pressure(s)
+        Depth(s) [m] for given pressure(s)
         """
         raise ValueError, "not implemented"
         return -1
     
-    def depth(self, pressure):
-        """
-        Parameters
-        ----------
-        pressure : float or array of floats
-            Pressure(s) [Pa] to evaluate depth at.
-        
-        Returns
-        -------
-        depth : float or array of floats
-            Depth(s) [m] for given pressure(s)
-        """
-        raise ValueError, "not implemented"
-        return -1
+
 
     def gravity (self, depth):
         """
@@ -258,7 +245,7 @@ class SeismicRadiusTable(Seismic1DModel):
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self,mindepth=0., maxdepth=6371.e3):
-        if self.table_depth[0]: 
+        if not len(self.table_depth) == 0:
             return np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth]) 
         else:
             depth = self.earth_radius - self.table_radius[::-1]
@@ -296,22 +283,22 @@ class SeismicRadiusTable(Seismic1DModel):
     def depth(self, pressure):
         if pressure > max(self.table_pressure) or pressure < min(self.table_pressure)  :
             raise ValueError, "Pressure outside range of SeismicRadiusTable"
-        if not len(self.table_depth)==0:
+        if not len(self.table_depth) == 0:
             depth = np.interp(pressure, self.table_pressure, self.table_depth )
         else:
             depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_radius[::-1])
         return depth
 
     def radius(self, pressure):
-        if not len(self.table_depth)==0:
-            depth = np.interp(pressure, self.table_pressure, self.table_radius )
+        if not len(self.table_radius) == 0:
+            radius = np.interp(pressure, self.table_pressure, self.table_radius )
         else:
-            depth = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_depth[::-1])
-        return depth
+            radius = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_depth[::-1])
+        return radius
 
 
     def _lookup(self, depth, value_table):
-        if not len(self.table_depth)==0:
+        if not len(self.table_depth) == 0:
             return np.interp(depth, self.table_depth, value_table)
         else:
             return np.interp(depth, self.earth_radius-self.table_radius[::-1],value_table[::-1])
