@@ -103,15 +103,15 @@ class wuestite (Mineral):
 class ferropericlase(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [periclase(), wuestite()]
-        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fraction)
+        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
 class mg_fe_perovskite(bmb.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [mg_perovskite(), fe_perovskite()]
-        molar_fraction = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fraction)
+        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
 class mg_perovskite(Mineral):

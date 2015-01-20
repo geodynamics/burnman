@@ -84,8 +84,8 @@ if __name__ == "__main__":
     g1_gibbs = np.empty_like(comp)
     g1_excess_gibbs = np.empty_like(comp)
     for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, c]
-        g1.set_composition(molar_fraction)
+        molar_fractions=[1.0-c, c]
+        g1.set_composition(molar_fractions)
         g1.set_state(P,T)
         g1_gibbs[i] = g1.gibbs
         g1_excess_gibbs[i] = g1.excess_gibbs
@@ -126,8 +126,8 @@ if __name__ == "__main__":
     g2=mg_fe_garnet_2()
     g2_excess_gibbs = np.empty_like(comp)
     for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, c]
-        g2.set_composition(molar_fraction)
+        molar_fractions=[1.0-c, c]
+        g2.set_composition(molar_fractions)
         g2.set_state(P,T)
         g2_excess_gibbs[i] = g2.excess_gibbs
 
@@ -172,11 +172,11 @@ if __name__ == "__main__":
     g3_configurational_entropy = np.empty_like(comp)
     g3_excess_entropy = np.empty_like(comp)
     for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, 0., c]
-        g3.set_composition(molar_fraction)
+        molar_fractions=[1.0-c, 0., c]
+        g3.set_composition(molar_fractions)
         g3.set_state(P,T)
-        g3_configurational_entropy[i] = g3.solution_model._configurational_entropy( molar_fraction )
-        g3_excess_entropy[i]= -np.dot(molar_fraction,g3.solution_model._ideal_excess_partial_gibbs(T, molar_fraction))/T
+        g3_configurational_entropy[i] = g3.solution_model._configurational_entropy( molar_fractions )
+        g3_excess_entropy[i]= -np.dot(molar_fractions,g3.solution_model._ideal_excess_partial_gibbs(T, molar_fractions))/T
 
     plt.plot( comp, g3_configurational_entropy, 'g-', linewidth=1., label='Configurational entropy')
     plt.plot( comp, g3_excess_entropy, 'r-', linewidth=1., label='Excess entropy')
@@ -206,8 +206,8 @@ if __name__ == "__main__":
     g4_excess_gibbs_1200 = np.empty_like(comp)
 
     for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, 0., c]
-        g4.set_composition(molar_fraction)
+        molar_fractions=[1.0-c, 0., c]
+        g4.set_composition(molar_fractions)
         g4.set_state(P,400.)
         g4_excess_gibbs_400[i] = g4.excess_gibbs
         g4.set_state(P,800.)

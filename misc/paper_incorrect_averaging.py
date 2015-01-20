@@ -101,16 +101,16 @@ if __name__ == "__main__":
     class ferropericlase(HelperSolidSolution):
         def __init__(self, fe_num):
             endmembers = [periclase, wustite]
-            molar_fraction = [1. - fe_num, 0.0 + fe_num]
-            HelperSolidSolution.__init__(self, endmembers, molar_fraction)
+            molar_fractions = [1. - fe_num, 0.0 + fe_num]
+            HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
 
     class perovskite(HelperSolidSolution):
         def __init__(self, fe_num):
             endmembers = [mg_perovskite, fe_perovskite]
-            molar_fraction = [1. - fe_num, 0.0 + fe_num]
-            HelperSolidSolution.__init__(self, endmembers, molar_fraction)
+            molar_fractions = [1. - fe_num, 0.0 + fe_num]
+            HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
     #define the P-T path
