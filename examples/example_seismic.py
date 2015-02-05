@@ -42,115 +42,59 @@ import burnman
 if __name__ == "__main__":
 
     #create a seismic dataset from prem:
-    s=burnman.seismic.PREM()
-
-    # specify where we want to evaluate, here we map from pressure to depth
-    #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
-    #p = np.arange(1.0e9,360.0e9,1.e9)
-    #depths = np.array([s.depth(pr) for pr in p])
-    #we could also just specify some depth levels directly like this:
-    #depths = np.arange(35e3,5600e3,100e3)
-    #we could also use the data points where the seismic model is specified over a depth range:
-    #this is the preferred way to plot seismic discontinuities correctly
-    depths = s.internal_depth_list(mindepth=100.e3, maxdepth=6371.e3)
-    #now evaluate everything at the given depths levels (using interpolation)
-    pressures, density, v_p, v_s, v_phi = s.evaluate_all_at(depths)
+    models=[burnman.seismic.PREM(), burnman.seismic.REF()]#,burnman.seismic.IASP91()]
+    vars=['v_p','v_s','v_phi','density','pressure','gravity']
+    units=['m/s','m/s','m/s','kg/m^3','Pa','m/s^2']
+    #vars=['gravity']
+    #units=['m/s^2','quality factor','quality factor']
+    labels = ['PREM', 'REF','IASP91']
+    colors = ['r','b','g']
+    figure = plt.figure( figsize = (12,8) )
     
-    # plot vs and vp and v_phi (note that v_phi is computed!)
-    plt.subplot(2,2,1)
-    plt.title('prem')
-    plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
-    plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
-    plt.plot(depths/1.e3,v_phi/1.e3,'--g', label='v_phi')
-    plt.legend(loc='lower left')
-    plt.xlabel('depth in km')
-    plt.ylabel('km/s')
+    for a in range(len(vars)):
+        for m in range(len(models)):
+            #try:
+                # specify where we want to evaluate, here we map from pressure to depth
+                #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
+                #p = np.arange(1.0e9,360.0e9,1.e9)
+                #depths = np.array([s.depth(pr) for pr in p])
+                #we could also just specify some depth levels directly like this:
+                #depths = np.arange(35e3,5600e3,100e3)
+                #we could also use the data points where the seismic model is specified over a depth range:
+                #this is the preferred way to plot seismic discontinuities correctly
+                depths = models[m].internal_depth_list(mindepth=100.e3, maxdepth=6371.e3)
+     
+                #now evaluate everything at the given depths levels (using interpolation)
 
-    # plot pressure,density vs depth from prem:
-    plt.subplot(2,2,2)
-    plt.title('prem')
-    plt.plot(depths/1.e3,pressures/1.e9,'-r', label='pressure')
-    plt.ylabel('GPa')
-    plt.xlabel('depth in km')
-    plt.legend(loc='upper left')
-    plt.twinx()
-    plt.ylabel('g/cc')
-    plt.plot(depths/1.e3,density/1.e3,'-b', label='density')
-    plt.legend(loc='lower right')
-
-    plt.subplot(2,2,3)
-    plt.plot(depths/1.e3,s.gravity(depths),'+-g', label='gravity')
-    plt.legend(loc='lower left')
-    plt.xlabel('depth in km')
-    plt.ylabel('m/s^2')
+                plt.title(vars[a])
+                plt.plot(depths/1.e3,getattr(models[m],vars[a])(depths),color=colors[m],linestyle='-',label=labels[m])
+                plt.legend(loc='lower right')
+                plt.xlabel('depth in km')
+                plt.ylabel(units[a])
+                    #except:
+                    #print vars[a], 'is not defined for ', models[m]
 
 
-    plt.subplot(2,2,4)
-    plt.plot(depths/1.e3,s.QK(depths),'+-r', label='Quality bulk QK')
-    plt.xlabel('depth in km')
-    plt.ylabel('QK')
-    plt.legend(loc='upper left')
-    plt.twinx()
-    plt.plot(depths/1.e3,s.QG(depths),'+-b', label='Quality shear QG')
-    plt.legend(loc='lower left')
-    plt.xlabel('depth in km')
-    plt.ylabel('QG')
+        plt.show()
     
-    plt.show()
 
 
-
-    #now load fast and slow regionalized models (Lekic et al. 2012):
-    sslow = burnman.seismic.Slow()
-    depths2 = sslow.internal_depth_list()
-    pressures2, density2, v_p2, v_s2, v_phi2 = sslow.evaluate_all_at(depths2)
-
-    sfast = burnman.seismic.Fast()
-    depths3 = sfast.internal_depth_list()
-    pressures3, density3, v_p3, v_s3, v_phi3 = sfast.evaluate_all_at(depths3)
-
-
-    # plotting
-    plt.subplot(2,2,1)
-    plt.plot(pressures/1.e9,v_p/1.e3,'-k', label='v_p prem')
-    plt.plot(pressures2/1.e9,v_p2/1.e3,'-r', label='v_p slow')
-    plt.plot(pressures3/1.e9,v_p3/1.e3,'-b', label='v_p fast')
-
-    plt.legend(loc='lower right')
-    plt.xlim([30,136])
-    plt.ylim([11,14])
-    plt.xlabel('pressure')
-    plt.ylabel('km/s')
-
-    plt.subplot(2,2,2)
-    plt.plot(pressures/1.e9,v_s/1.e3,'-k', label='v_s prem')
-    plt.plot(pressures2/1.e9,v_s2/1.e3,'-r', label='v_s slow')
-    plt.plot(pressures3/1.e9,v_s3/1.e3,'-b', label='v_s fast')
-
-    plt.legend(loc='upper left')
-    plt.xlim([30,136])
-    plt.ylim([6,8])
-    plt.xlabel('pressure')
-    plt.ylabel('km/s')
-
-    plt.show()
-    
-    # Loading an a seismic model from a file. In this case AK135 (Kennett et al. 1995).
-    # Note that file input is assumed to be in SI units
-    plt.close()
-    # Load data table
-
-    class ak135_table(burnman.seismic.SeismicRadiusTable):
+    ## The following shows how to read in your own model from a file
+    ## Model needs to be defined with increasing depth and decreasing radius. In this case the table is switched.
+    class ak135_table(burnman.seismic.SeismicTable):
         def __init__(self):
-            burnman.seismic.SeismicRadiusTable.__init__(self)
+            burnman.seismic.SeismicTable.__init__(self)
             # In format: radius, pressure, density, v_p, v_s
             table = burnman.tools.read_table("input_seismic/ak135_lowermantle.txt")
             table = np.array(table)
-            self.table_radius = table[:,0]
-            self.table_pressure = table[:,1]
-            self.table_density = table[:,2]
-            self.table_vp = table[:,3]
-            self.table_vs = table[:,4]
+            self.table_radius = table[:,0][::-1]
+            self.table_pressure = table[:,1][::-1]
+            self.table_density = table[:,2][::-1]
+            self.table_vp = table[:,3][::-1]
+            self.table_vs = table[:,4][::-1]
+
+            #self.table_depth needs to be defined and needs to be increasing
+            self.table_depth=self.earth_radius-self.table_radius
 
 
     ak=ak135_table()
