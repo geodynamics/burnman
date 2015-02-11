@@ -300,11 +300,10 @@ class SeismicTable(Seismic1DModel):
     
     def shift_discontinuities(self):
         #Shifting depths of discontinuities by 1 m, so they have unique depth values and interpolations work well....
-        for i in range(1,len(self.table_depth)):
-            if self.table_depth[i]==self.table_depth[i-1]:
-                self.table_depth[i]=self.table_depth[i]+1.
-                if not len(self.table_radius) == 0:
-                    self.table_radius[i]=self.table_radius[i]-1.
+        discontinuities=np.where(self.table_depth[1:]-self.table_depth[:-1]==0)[0]
+        self.table_depth[discontinuities+1]=self.table_depth[discontinuities+1]+1.
+        if not len(self.table_radius) == 0:
+            self.table_radius[discontinuities+1]=self.table_radius[discontinuities+1]-1.
 
 
     def _lookup(self, depth, value_table):
@@ -322,18 +321,20 @@ class SeismicTable(Seismic1DModel):
         rhofunc = scipy.interpolate.UnivariateSpline(radii, density)
  
         G = 6.67e-11
-        #Numerically integrate Poisson's equation  --- can't get this part to work
+        #Numerically integrate Poisson's equation  --- can't get this part to work!!!!
         poisson = lambda p,x : 4.0 * np.pi * G * rhofunc(x) * x * x
         grav = np.ravel(scipy.integrate.odeint( poisson, 0.0, radii, full_output=0, printmessg=1))
         grav[1:] = grav[1:]/radii[1:]/radii[1:]
         grav[0] = 0.0 #Set it to zero a the center, since radius = 0 there we cannot divide by r^2
+        
+        
         #simple integration
         g=[]
         for i in range(len(radii)):
             g_tmp=scipy.integrate.trapz(G*4.*np.pi*density[0:i]*radii[0:i]*radii[0:i]/(radii[i])/(radii[i]),radii[0:i])
             g.append(g_tmp)
         self.table_gravity=g[::-1]
-        print grav, g
+
 
     def _compute_pressure(self):
         #Calculate the pressure profile based on density and gravity.  This integrates
@@ -341,23 +342,24 @@ class SeismicTable(Seismic1DModel):
         radii=self.table_radius
         density=self.table_density
         gravity=self.gravity(self.earth_radius-radii)
-        print radii, density, gravity
         #convert radii to depths
         depth = self.earth_radius-radii
         
+        
+        #### This isn't working and I'm not sure why...
         #Make a spline fit of density as a function of depth
         rhofunc = scipy.interpolate.UnivariateSpline( depth, density )
         #Make a spline fit of gravity as a function of depth
         gfunc = scipy.interpolate.UnivariateSpline( depth, gravity )
-        
         #integrate the hydrostatic equation
         pressure = np.ravel(scipy.integrate.odeint( (lambda p, x : gfunc(x)* rhofunc(x)), 0.0,depth))
+        
+        
         p=[]
         for i in range(len(depth)):
             p_tmp=scipy.integrate.trapz(gravity[0:i]*density[0:i],depth[0:i])
             p.append(p_tmp)
 
-        print pressure,p
         self.table_pressure=p
 
 
@@ -472,7 +474,7 @@ class REF(SeismicTable):
 
 class IASP91(SeismicTable):
     """
-        Reads  REF or STW05 (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
+        Reads  REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
         See also :class:`burnman.seismic.SeismicTable`.
         """
     def __init__(self):
@@ -486,6 +488,26 @@ class IASP91(SeismicTable):
         
         
         self.shift_discontinuities()
+
+class AK135(SeismicTable):
+    """
+        Reads  AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
+        See also :class:`burnman.seismic.SeismicTable`.
+        """
+    def __init__(self):
+        SeismicTable.__init__(self)
+        table = tools.read_table("input_seismic/ak135.txt") # radius, pressure, density, v_p, v_s
+        table = np.array(table)
+        self.table_depth = table[:,0]
+        self.table_radius = table[:,1]
+        self.table_density=table[:,2]
+        self.table_vp = table[:,3]
+        self.table_vs = table[:,4]
+        self.table_QG = table[:,5]
+        self.table_QK = table[:,6]
+        
+        self.shift_discontinuities()
+
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """

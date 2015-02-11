@@ -41,40 +41,43 @@ import burnman
 
 if __name__ == "__main__":
 
-    #create a seismic dataset from prem:
-    models=[burnman.seismic.PREM(), burnman.seismic.REF()]#,burnman.seismic.IASP91()]
+    #List of seismic data sets
+    models=[burnman.seismic.PREM(), burnman.seismic.REF(),burnman.seismic.AK135(),burnman.seismic.IASP91()]
+    labels = ['PREM', 'REF','AK135','IASP91']
+    colors = ['r','b','g','k']
+    # Variables to plot
     vars=['v_p','v_s','v_phi','density','pressure','gravity']
     units=['m/s','m/s','m/s','kg/m^3','Pa','m/s^2']
-    #vars=['gravity']
-    #units=['m/s^2','quality factor','quality factor']
-    labels = ['PREM', 'REF','IASP91']
-    colors = ['r','b','g']
-    figure = plt.figure( figsize = (12,8) )
-    
+
+    # Run through models and variables
     for a in range(len(vars)):
         for m in range(len(models)):
-            #try:
+            try:
                 # specify where we want to evaluate, here we map from pressure to depth
-                #format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
+                #1. format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
                 #p = np.arange(1.0e9,360.0e9,1.e9)
-                #depths = np.array([s.depth(pr) for pr in p])
-                #we could also just specify some depth levels directly like this:
+                #depths = np.array([models[m].depth(pr) for pr in p])
+                #2. we could also just specify some depth levels directly like this:
                 #depths = np.arange(35e3,5600e3,100e3)
-                #we could also use the data points where the seismic model is specified over a depth range:
+                #3. we could also use the data points where the seismic model is specified over a depth range:
                 #this is the preferred way to plot seismic discontinuities correctly
                 depths = models[m].internal_depth_list(mindepth=100.e3, maxdepth=6371.e3)
      
                 #now evaluate everything at the given depths levels (using interpolation)
+                values=getattr(models[m],vars[a])(depths)
+                
+                #Plot
+                plt.plot(depths/1.e3,values,color=colors[m],linestyle='-',label=labels[m])
 
-                plt.title(vars[a])
-                plt.plot(depths/1.e3,getattr(models[m],vars[a])(depths),color=colors[m],linestyle='-',label=labels[m])
-                plt.legend(loc='lower right')
-                plt.xlabel('depth in km')
-                plt.ylabel(units[a])
-                    #except:
-                    #print vars[a], 'is not defined for ', models[m]
+            except:
+                # Some of the models do not have density and thus no gravity/pressure either. 
+                print vars[a], 'is not defined for ', models[m]
 
 
+        plt.title(vars[a])
+        plt.legend(loc='lower right')
+        plt.xlabel('depth in km')
+        plt.ylabel(units[a])
         plt.show()
     
 
@@ -103,7 +106,8 @@ if __name__ == "__main__":
     #now evaluate everything at the given depths levels (using interpolation)
     pressures, density, v_p, v_s, v_phi = ak.evaluate_all_at(depths)
     # plot vs and vp and v_phi (note that v_phi is computed!)
-    plt.subplot(2,2,1)
+    plt.figure(figsize=(10,5))
+    plt.subplot(1,2,1)
     plt.title('ak135')
     plt.plot(depths/1.e3,v_p/1.e3,'+-r', label='v_p')
     plt.plot(depths/1.e3,v_s/1.e3,'+-b', label='v_s')
@@ -113,7 +117,7 @@ if __name__ == "__main__":
     plt.ylabel('km/s')
 
     # plot pressure,density vs depth from prem:
-    plt.subplot(2,2,2)
+    plt.subplot(1,2,2)
     plt.title('ak135')
     plt.plot(depths/1.e3,pressures/1.e9,'-r', label='pressure')
     plt.ylabel('GPa')
