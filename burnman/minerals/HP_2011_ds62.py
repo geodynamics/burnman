@@ -25,7 +25,7 @@ N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has t
 """
 
 class garnet(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='garnet'
 
@@ -37,7 +37,7 @@ class garnet(SolidSolution):
         excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
         
         sm = AsymmetricRegularSolution( endmembers, alphas, excess_enthalpy, excess_volume, excess_entropy)
-        SolidSolution.__init__(self, endmembers, sm)
+        SolidSolution.__init__(self, endmembers, sm, molar_fractions)
 
 """
 ENDMEMBERS

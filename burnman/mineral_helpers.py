@@ -29,7 +29,7 @@ class HelperSolidSolution(Mineral):
     is, but here we just do a weighted arithmetic average of the
     thermoelastic properties of the end members according to their molar fractions
     """
-    def __init__(self, endmembers, molar_fraction):
+    def __init__(self, endmembers, molar_fractions):
         """
         Takes a list of end member minerals, and a matching list of
         molar fractions of those minerals for mixing them.  Simply
@@ -37,10 +37,10 @@ class HelperSolidSolution(Mineral):
         average of the end member minerals
         """
         self.endmembers = endmembers
-        self.molar_fraction = molar_fraction
-        assert(len(endmembers) == len(molar_fraction))
-        assert(sum(molar_fraction) > 0.9999)
-        assert(sum(molar_fraction) < 1.0001)
+        self.molar_fractions = molar_fractions
+        assert(len(endmembers) == len(molar_fractions))
+        assert(sum(molar_fractions) > 0.9999)
+        assert(sum(molar_fractions) < 1.0001)
 
         self.method = endmembers[0].method
 
@@ -56,7 +56,7 @@ class HelperSolidSolution(Mineral):
     def debug_print(self, indent=""):
         print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
         indent += "  "
-        for (fraction, mat) in zip(self.molar_fraction, self.endmembers):
+        for (fraction, mat) in zip(self.molar_fractions, self.endmembers):
             print "%s%g of" % (indent, fraction)
             mat.debug_print(indent + "  ")
 
@@ -73,7 +73,7 @@ class HelperSolidSolution(Mineral):
         self.params = {}
         for prop in self.endmembers[0].params:
            try:
-                self.params[prop] = sum([ self.endmembers[i].params[prop] * self.molar_fraction[i] for i in itrange ])
+                self.params[prop] = sum([ self.endmembers[i].params[prop] * self.molar_fractions[i] for i in itrange ])
            except TypeError:
                 #if there is a type error, it is probably a string. Just go with the value of the first endmembers.
                 self.params[prop] = self.endmembers[0].params[prop]

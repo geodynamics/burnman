@@ -4,29 +4,29 @@ from inv251010 of HeFESTo
 '''
 
 class c2c_pyroxene(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='C2/c pyroxene'
 
         # Endmembers (C2/c is symmetric)
         endmembers = [[hp_clinoenstatite(), '[Mg]2Si2O6'],[hp_clinoferrosilite(), '[Fe]2Si2O6']]
 
-        SolidSolution.__init__(self, endmembers, IdealSolution(endmembers))
+        SolidSolution.__init__(self, endmembers, IdealSolution(endmembers), molar_fractions)
 
 
 
 class ca_ferrite_structured_phase(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='calcium ferrite structured phase'
 
         # Endmembers (CF is symmetric)
         endmembers = [[mg_ca_ferrite(), '[Mg]Al[Al]O4'],[fe_ca_ferrite(), '[Fe]Al[Al]O4'],[na_ca_ferrite(), '[Na]Al[Si]O4']]
 
-        SolidSolution.__init__(self, endmembers, IdealSolution(endmembers))
+        SolidSolution.__init__(self, endmembers, IdealSolution(endmembers), molar_fractions)
 
 class clinopyroxene(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='clinopyroxene'
 
@@ -36,10 +36,10 @@ class clinopyroxene(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[0., 24.74e3, 26.e3, 24.3e3],[24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class garnet(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='garnet'
 
@@ -48,11 +48,11 @@ class garnet(SolidSolution):
         # Interaction parameters
         enthalply_interaction=[[0.0, 30.e3, 21.20278e3, 0.0],[0.0,0.0,0.0],[57.77596e3, 0.0],[0.0]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 
 class akimotoite(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='akimotoite/ilmenite'
 
@@ -61,10 +61,10 @@ class akimotoite(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[0.0, 66.e3],[66.e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class ferropericlase(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='magnesiowustite/ferropericlase'
 
@@ -73,10 +73,10 @@ class ferropericlase(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[13.e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class mg_fe_olivine(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='olivine'
 
@@ -85,10 +85,10 @@ class mg_fe_olivine(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[7.81322e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class orthopyroxene(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='orthopyroxene'
 
@@ -98,10 +98,10 @@ class orthopyroxene(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[0.0, 0.0, 32.11352e3],[0.0, 0.0],[48.35316e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class plagioclase(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='plagioclase'
 
@@ -110,10 +110,10 @@ class plagioclase(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[26.0e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class post_perovskite(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='post-perovskite/bridgmanite'
 
@@ -123,10 +123,10 @@ class post_perovskite(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[0.0, 60.0e3],[0.0]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class mg_fe_perovskite(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='magnesium silicate perovskite/bridgmanite'
 
@@ -136,10 +136,10 @@ class mg_fe_perovskite(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[0.0, 116.0e3],[0.0]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class mg_fe_ringwoodite(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='ringwoodite'
 
@@ -149,10 +149,10 @@ class mg_fe_ringwoodite(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[9.34084e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class mg_fe_aluminous_spinel(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='spinel-hercynite binary, fixed order'
 
@@ -162,10 +162,10 @@ class mg_fe_aluminous_spinel(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[5.87646e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction))
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 
 class mg_fe_wadsleyite(SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='wadsleyite'
 
@@ -175,5 +175,5 @@ class mg_fe_wadsleyite(SolidSolution):
         # Interaction parameters
         enthalpy_interaction=[[16.74718e3]]
 
-        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        SolidSolution.__init__(self, endmembers, SymmetricRegularSolution(endmembers, enthalpy_interaction), molar_fractions)
 

@@ -191,7 +191,7 @@ class test_solidsolution(BurnManTest):
         ss.set_composition([0.3,0.3,0.4])
         ss.set_state(1.e5,300.)
 
-        site_fractions=np.dot(ss.molar_fraction, ss.solution_model.endmember_occupancies)
+        site_fractions=np.dot(ss.molar_fractions, ss.solution_model.endmember_occupancies)
         i=0
         site_fill=[]
         ones=[1.] * ss.solution_model.n_sites

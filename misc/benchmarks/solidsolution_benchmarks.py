@@ -52,10 +52,10 @@ sp=o_d_spinel()
 sp_entropies = np.empty_like(comp)
 sp_entropies_NK1967= np.empty_like(comp)
 for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, c]
-        sp.set_composition( np.array(molar_fraction) )
+        molar_fractions=[1.0-c, c]
+        sp.set_composition( np.array(molar_fractions) )
         sp.set_state( 1e5, 298.15 )
-        sp_entropies[i] = sp.solution_model._configurational_entropy( molar_fraction )
+        sp_entropies[i] = sp.solution_model._configurational_entropy( molar_fractions )
         sp_entropies_NK1967[i] = -8.3145*(c*np.log(c) + (1.-c)*np.log(1.-c) + c*np.log(c/2.) + (2.-c)*np.log(1.-c/2.)) # eq. 7 in Navrotsky and Kleppa, 1967.
 
 #fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
@@ -132,10 +132,10 @@ opx_models=[orthopyroxene_red(), orthopyroxene_blue(), orthopyroxene_long_dashed
 opx_entropies = [ np.empty_like(comp) for model in opx_models ]
 for idx, model in enumerate(opx_models):
     for i,c in enumerate(comp):
-        molar_fraction=[1.0-c, c]
-        model.set_composition(np.array(molar_fraction))
+        molar_fractions=[1.0-c, c]
+        model.set_composition(np.array(molar_fractions))
         model.set_state(0., 0.)
-        opx_entropies[idx][i] = model.solution_model._configurational_entropy(molar_fraction)
+        opx_entropies[idx][i] = model.solution_model._configurational_entropy(molar_fractions)
 
 fig1 = mpimg.imread('configurational_entropy.png')  # Uncomment these two lines if you want to overlay the plot on a screengrab from SLB2011
 plt.imshow(fig1, extent=[0.0, 1.0,0.,17.0], aspect='auto')
