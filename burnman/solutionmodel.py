@@ -308,7 +308,7 @@ class AsymmetricRegularSolution (IdealSolution):
 
     def excess_entropy( self, pressure, temperature, molar_fractions ):
         phi=self._phi(molar_fractions)
-        S_conf=np.dot(IdealSolution._ideal_excess_partial_gibbs(self, temperature, molar_fractions),molar_fractions)
+        S_conf=-constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, molar_fractions), molar_fractions)
         S_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Ws,phi))
         return S_conf + S_excess
 
