@@ -326,3 +326,85 @@ class SymmetricRegularSolution (AsymmetricRegularSolution):
         alphas = np.ones( len(endmembers) )
         AsymmetricRegularSolution.__init__(self, endmembers, alphas, enthalpy_interaction, volume_interaction, entropy_interaction )
 
+class SubregularSolution (IdealSolution):
+    """
+    Solution model implementing the subregular solution model formulation (Helffrich and Wood, 1989)
+    """
+
+    def __init__( self, endmembers, enthalpy_interaction, volume_interaction = None, entropy_interaction = None ): 
+
+        self.n_endmembers = len(endmembers)
+
+        # Create 2D arrays of interaction parameters
+        self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+
+        #setup excess enthalpy interaction matrix
+        for i in range(self.n_endmembers):
+            for j in range(i+1, self.n_endmembers):
+                self.Wh[i][j]=enthalpy_interaction[i][j-i-1][0]
+                self.Wh[j][i]=enthalpy_interaction[i][j-i-1][1]
+
+        if entropy_interaction is not None:
+            for i in range(self.n_endmembers):
+                for j in range(i+1, self.n_endmembers):
+                    self.Ws[i][j]=entropy_interaction[i][j-i-1][0]
+                    self.Ws[j][i]=entropy_interaction[i][j-i-1][1]
+
+        if volume_interaction is not None:
+            for i in range(self.n_endmembers):
+                for j in range(i+1, self.n_endmembers):
+                    self.Wv[i][j]=volume_interaction[i][j-i-1][0]
+                    self.Wv[j][i]=volume_interaction[i][j-i-1][1]
+
+        #initialize ideal solution model
+        IdealSolution.__init__(self, endmembers )
+
+
+    def _non_ideal_interactions( self, molar_fractions ):
+        # -sum(sum(qi.qj.Wij*)
+        # equation (2) of Holland and Powell 2003
+
+        phi=self._phi(molar_fractions)
+
+        q=np.zeros(len(molar_fractions))
+        Hint=np.zeros(len(molar_fractions))
+        Sint=np.zeros(len(molar_fractions))
+        Vint=np.zeros(len(molar_fractions))
+
+        for l in range(self.n_endmembers):
+            q=np.array([kd(i,l)-phi[i] for i in range(self.n_endmembers)])
+
+            Hint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wh,q))
+            Sint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Ws,q))
+            Vint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wv,q))
+     
+        return Hint, Sint, Vint
+
+    def _non_ideal_excess_partial_gibbs( self, pressure, temperature, molar_fractions) :
+
+        Hint, Sint, Vint = self._non_ideal_interactions( molar_fractions )
+        return Hint - temperature*Sint + pressure*Vint
+
+    def excess_partial_gibbs_free_energies( self, pressure, temperature, molar_fractions ):
+
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions )
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)
+        return ideal_gibbs + non_ideal_gibbs
+
+    def excess_volume ( self, pressure, temperature, molar_fractions ):
+        phi=self._phi(molar_fractions)
+        V_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wv,phi))
+        return V_excess
+
+    def excess_entropy( self, pressure, temperature, molar_fractions ):
+        phi=self._phi(molar_fractions)
+        S_conf=-constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, molar_fractions), molar_fractions)
+        S_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Ws,phi))
+        return S_conf + S_excess
+
+    def excess_enthalpy( self, pressure, temperature, molar_fractions ):
+        phi=self._phi(molar_fractions)
+        H_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wh,phi))
+        return H_excess + pressure*self.excess_volume ( pressure, temperature, molar_fractions )
