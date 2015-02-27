@@ -361,24 +361,27 @@ class SubregularSolution (IdealSolution):
         #initialize ideal solution model
         IdealSolution.__init__(self, endmembers )
 
+    def _non_ideal_function(W, molar_fractions):
+        # equation (6') of Helffrich and Wood, 1989
+        n=len(molar_fractions)
+        RTlny=np.zeros(n)
+        for l in range(n):
+            val=0.
+            for i in range(0,n):
+                if i != l:
+                    val+=0.5*molar_fractions[i]*(W[l][i]*(1-molar_fractions[l] + molar_fractions[i] + 2.*molar_fractions[l]*(molar_fractions[l] - molar_fractions[i] - 1)) + W[i][l]*(1.-molar_fractions[l] - molar_fractions[i] - 2.*molar_fractions[l]*(molar_fractions[l] - molar_fractions[i] - 1)))
+                    for j in range(i+1,n):
+                        if j != l:
+                            val+=molar_fractions[i]*molar_fractions[j]*(W[i][j]*(molar_fractions[i] - molar_fractions[j] - 0.5) + W[j][i]*(molar_fractions[j] - molar_fractions[i] - 0.5))
+            RTlny[l] = val
+        return RTlny
+
 
     def _non_ideal_interactions( self, molar_fractions ):
-        # -sum(sum(qi.qj.Wij*)
-        # equation (2) of Holland and Powell 2003
-
-        phi=self._phi(molar_fractions)
-
-        q=np.zeros(len(molar_fractions))
-        Hint=np.zeros(len(molar_fractions))
-        Sint=np.zeros(len(molar_fractions))
-        Vint=np.zeros(len(molar_fractions))
-
-        for l in range(self.n_endmembers):
-            q=np.array([kd(i,l)-phi[i] for i in range(self.n_endmembers)])
-
-            Hint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wh,q))
-            Sint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Ws,q))
-            Vint[l]=0.-self.alpha[l]*np.dot(q,np.dot(self.Wv,q))
+        # equation (6') of Helffrich and Wood, 1989
+        Hint=self._non_ideal_function(Wh, molar_fractions)
+        Sint=self._non_ideal_function(Ws, molar_fractions)
+        Vint=self._non_ideal_function(Wv, molar_fractions)
      
         return Hint, Sint, Vint
 
@@ -387,6 +390,7 @@ class SubregularSolution (IdealSolution):
         Hint, Sint, Vint = self._non_ideal_interactions( molar_fractions )
         return Hint - temperature*Sint + pressure*Vint
 
+'''
     def excess_partial_gibbs_free_energies( self, pressure, temperature, molar_fractions ):
 
         ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions )
@@ -408,3 +412,4 @@ class SubregularSolution (IdealSolution):
         phi=self._phi(molar_fractions)
         H_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wh,phi))
         return H_excess + pressure*self.excess_volume ( pressure, temperature, molar_fractions )
+'''
