@@ -8,7 +8,7 @@ from burnman.minerals import HP_2011_ds62
 from burnman.minerals import Sundman_1991
 from burnman import constants
 import numpy as np
-from scipy import optimize
+
 
 def p(v1, v2):
     return (v2-v1)/v1

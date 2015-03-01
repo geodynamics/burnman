@@ -29,7 +29,7 @@ class bcc_iron (Mineral):
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'BCC iron',
-            'formula': formula,Pressure
+            'formula': formula,
             'equation_of_state': 'hp_tmt',
             'H_0': 9149.0 ,
             'S_0': 36.868 ,
