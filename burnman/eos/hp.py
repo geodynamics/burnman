@@ -282,10 +282,11 @@ class HP_TMT(eos.EquationOfState):
         Returns the magnetic contribution to the Gibbs free energy
         """
 
-        structural_parameter=params.magnetic_structural_parameter
+        structural_parameter=params['magnetic_structural_parameter']
+        tau=temperature/(params['curie_temperature'][0] + pressure*params['curie_temperature'][1])
+        magnetic_moment=params['magnetic_moment'][0] + pressure*params['magnetic_moment'][1]
+
         A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
-        tau=temperature/(params.curie_temperature[0] + pressure*params.curie_temperature[1])
-        magnetic_moment=params.magnetic_moment[0] + pressure*params.magnetic_moment[1]
         if tau < 1: 
             f=1.-(1./A)*(79./(140.*structural_parameter*tau) + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
         else:
