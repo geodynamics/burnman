@@ -358,7 +358,7 @@ class SubregularSolution (IdealSolution):
         #initialize ideal solution model
         IdealSolution.__init__(self, endmembers)
 
-    def _non_ideal_function(W, molar_fractions):
+    def _non_ideal_function(self, W, molar_fractions):
         # equation (6') of Helffrich and Wood, 1989
         n=len(molar_fractions)
         RTlny=np.zeros(n)
@@ -375,9 +375,9 @@ class SubregularSolution (IdealSolution):
 
     def _non_ideal_interactions(self, molar_fractions):
         # equation (6') of Helffrich and Wood, 1989
-        Hint=self._non_ideal_function(Wh, molar_fractions)
-        Sint=self._non_ideal_function(Ws, molar_fractions)
-        Vint=self._non_ideal_function(Wv, molar_fractions)
+        Hint=self._non_ideal_function(self.Wh, molar_fractions)
+        Sint=self._non_ideal_function(self.Ws, molar_fractions)
+        Vint=self._non_ideal_function(self.Wv, molar_fractions)
         return Hint, Sint, Vint
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions) :
@@ -385,19 +385,19 @@ class SubregularSolution (IdealSolution):
         return Hint - temperature*Sint + pressure*Vint
 
     def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
-        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (temperature, molar_fractions)
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions)
         non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
 
-    def excess_volume (self, pressure, temperature, molar_fractions)
+    def excess_volume (self, pressure, temperature, molar_fractions):
         V_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wv, molar_fractions))
         return V_excess
 
-    def excess_entropy(self, pressure, temperature, molar_fractions)
-        S_conf=-constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(molar_fractions), molar_fractions)
+    def excess_entropy(self, pressure, temperature, molar_fractions):
+        S_conf=-constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, molar_fractions), molar_fractions)
         S_excess=np.dot(molar_fractions, self._non_ideal_function(self.Ws, molar_fractions))
         return S_conf + S_excess
 
-    def excess_enthalpy(self, pressure, temperature, molar_fractions)
+    def excess_enthalpy(self, pressure, temperature, molar_fractions):
         H_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wh, molar_fractions))
         return H_excess + pressure*self.excess_volume (pressure, temperature, molar_fractions)
