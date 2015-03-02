@@ -279,7 +279,9 @@ class HP_TMT(eos.EquationOfState):
 
     def _magnetic_gibbs(self, pressure, temperature, params):
         """
-        Returns the magnetic contribution to the Gibbs free energy
+        Returns the magnetic contribution to the Gibbs free energy [J/mol]
+        Expressions are those used by Chin, Hertzman and Sundman (1987)
+        as reported in Sundman in the Journal of Phase Equilibria (1991)
         """
 
         structural_parameter=params['magnetic_structural_parameter']
