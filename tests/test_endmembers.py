@@ -30,6 +30,28 @@ class forsterite (Mineral):
            'molar_mass': formula_mass(formula, atomic_masses)}
        Mineral.__init__(self)
 
+class bcc_iron (Mineral):
+    def __init__(self):
+        formula='Fe1.0'
+        formula = dictionarize_formula(formula)
+        self.params = {
+            'name': 'BCC iron',
+            'formula': formula,
+            'equation_of_state': 'hp_tmt',
+            'H_0': 9149.0 ,
+            'S_0': 36.868 ,
+            'V_0': 7.09e-06 ,
+            'Cp': [21.09, 0.0101455, -221508., 47.1947] ,
+            'a_0': 3.56e-05 ,
+            'K_0': 1.64e+11 ,
+            'Kprime_0': 5.16 ,
+            'Kdprime_0': -3.1e-11 ,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses),
+            'curie_temperature': [1043., 0.0] ,
+            'magnetic_moment': [2.22, 0.0] ,
+            'magnetic_structural_parameter': 0.4 }
+        Mineral.__init__(self)
 
 class test_endmembers(BurnManTest):
 
@@ -68,6 +90,19 @@ class test_endmembers(BurnManTest):
         fo.set_state(1.e9, 298.15)
         K2=fo.K_T
         self.assertArraysAlmostEqual([K1], [K2])
+
+    def test4_bcc_iron_hp_tmt(self):
+        bcc=bcc_iron()
+        bcc.set_state(1.e5, 298.15)
+        gibbs_mag=bcc.method._magnetic_gibbs(1.e5, 298.15, bcc.params)
+        gibbs1=bcc.gibbs
+        del bcc.params['curie_temperature']
+        del bcc.params['magnetic_moment']
+        del bcc.params['magnetic_structural_parameter']
+        bcc.set_state(1.e5, 100.) # reset with different PT
+        bcc.set_state(1.e5, 298.15)
+        gibbs2=bcc.gibbs
+        self.assertArraysAlmostEqual([gibbs1-gibbs_mag], [gibbs2])
 
 if __name__ == '__main__':
     unittest.main()
