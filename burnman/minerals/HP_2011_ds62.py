@@ -26,18 +26,15 @@ N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has t
 
 class garnet(SolidSolution):
     def __init__(self, molar_fractions=None):
-        # Name
         self.name='garnet'
+        self.endmembers = [[py(), '[Mg]3[Al]2Si3O12'], [alm(), '[Fe]3[Al]2Si3O12'], [gr(), '[Ca]3[Al]2Si3O12'], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.type='asymmetric'
+        self.alphas = [1.0, 1.0, 2.7, 1.0]
+        self.excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
+        self.excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
+        self.excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]] 
 
-        # Endmembers
-        endmembers = [[py(), '[Mg]3[Al]2Si3O12'], [alm(), '[Fe]3[Al]2Si3O12'], [gr(), '[Ca]3[Al]2Si3O12'], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
-        alphas = [1.0, 1.0, 2.7, 1.0]
-        excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
-        excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
-        excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]]
-        
-        sm = AsymmetricRegularSolution( endmembers, alphas, excess_enthalpy, excess_volume, excess_entropy)
-        SolidSolution.__init__(self, endmembers, sm, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions)
 
 """
 ENDMEMBERS
