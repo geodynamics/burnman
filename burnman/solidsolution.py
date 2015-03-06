@@ -3,6 +3,7 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+import warnings
 
 from burnman import Mineral
 from solutionmodel import *
@@ -37,11 +38,13 @@ class SolidSolution(Mineral):
         solution_model: :class:`burnman.SolutionModel`
             SolutionModel to use.
         """
+        if hasattr(self, 'endmembers') == False:
+            raise Exception("'endmembers' attribute missing from solid solution")
 
         # Set default solution model type 
         if hasattr(self, 'type'):
             if self.type == 'ideal':
-                self.solution_model=solutionmodel.IdealSolution(endmembers)
+                self.solution_model=solutionmodel.IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'enthalpy_interaction') == False:
                     self.enthalpy_interaction = None
@@ -53,12 +56,16 @@ class SolidSolution(Mineral):
                 if self.type == 'symmetric':
                     self.solution_model=SymmetricRegularSolution(self.endmembers, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.type == 'asymmetric':
-                    self.solution_model=AsymmetricRegularSolution(self.endmembers, self.alphas, self.enthalpy_interaction, self.volume_interaction, entropy_interaction)
+                    try:
+                        self.solution_model=AsymmetricRegularSolution(self.endmembers, self.alphas, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
+                    except: 
+                        raise Exception("'alphas' attribute missing from solid solution")
                 elif self.type == 'subregular':
                     self.solution_model=SubregularSolution(self.endmembers, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
                 else:
                     raise Exception("Solution model type "+self.params['type']+"not recognised.")
         else:
+            warnings.warn("Warning, you have not set a solution model 'type' attribute for this solid solution.", stacklevel=2)
             self.solution_model=SolutionModel()
 
         # Number of endmembers in the solid solution
