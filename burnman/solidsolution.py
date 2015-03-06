@@ -38,13 +38,14 @@ class SolidSolution(Mineral):
         solution_model: :class:`burnman.SolutionModel`
             SolutionModel to use.
         """
+
         if hasattr(self, 'endmembers') == False:
             raise Exception("'endmembers' attribute missing from solid solution")
 
         # Set default solution model type 
         if hasattr(self, 'type'):
             if self.type == 'ideal':
-                self.solution_model=solutionmodel.IdealSolution(self.endmembers)
+                self.solution_model=IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'enthalpy_interaction') == False:
                     self.enthalpy_interaction = None
