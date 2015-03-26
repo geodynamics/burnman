@@ -153,7 +153,12 @@ class HP_TMT(eos.EquationOfState):
             else:
                 Gdisord=0.0
 
-        return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP + Gdisord
+        if params.has_key('magnetic_moment'):
+            Gmagnetic=self._magnetic_gibbs(pressure, temperature, params)
+        else:
+            Gmagnetic=0.0
+
+        return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP + Gdisord + Gmagnetic
 
 
     def entropy(self,pressure,temperature, volume, params):
@@ -272,7 +277,24 @@ class HP_TMT(eos.EquationOfState):
         """
         return (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
 
+    def _magnetic_gibbs(self, pressure, temperature, params):
+        """
+        Returns the magnetic contribution to the Gibbs free energy [J/mol]
+        Expressions are those used by Chin, Hertzman and Sundman (1987)
+        as reported in Sundman in the Journal of Phase Equilibria (1991)
+        """
 
+        structural_parameter=params['magnetic_structural_parameter']
+        tau=temperature/(params['curie_temperature'][0] + pressure*params['curie_temperature'][1])
+        magnetic_moment=params['magnetic_moment'][0] + pressure*params['magnetic_moment'][1]
+
+        A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
+        if tau < 1: 
+            f=1.-(1./A)*(79./(140.*structural_parameter*tau) + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
+        else:
+            f=-(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
+        return constants.gas_constant*temperature*np.log(magnetic_moment + 1.)*f
+        
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters
