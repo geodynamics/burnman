@@ -7,7 +7,7 @@ gas_constant = scipy.constants.gas_constant
 
 
 """
-Avogradro constant (N_A) in mol ^ -1
+Avogadro constant (N_A) in mol ^ -1
 """
 Avogadro = scipy.constants.Avogadro
 
