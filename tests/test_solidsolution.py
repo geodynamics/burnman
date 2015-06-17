@@ -96,13 +96,13 @@ class two_site_ss(burnman.SolidSolution):
         self.name='two_site_ss'
         self.type='symmetric'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
-        self.enthalpy_interaction=[[0.0, 0.0],[0.0]]
+        self.enthalpy_interaction=[[10.0e3, 5.0e3],[-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site solid solution
 class two_site_ss_subregular(burnman.SolidSolution):
-    def __init__(self):
+    def __init__(self, molar_fractions=None):
         # Name
         self.name='two_site_ss (subregular symmetric)'
         self.type='subregular'

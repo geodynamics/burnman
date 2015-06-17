@@ -364,7 +364,7 @@ class SubregularSolution (IdealSolution):
         RTlny=np.zeros(n)
         for l in range(n):
             val=0.
-            for i in range(0,n):
+            for i in range(n):
                 if i != l:
                     val+=0.5*molar_fractions[i]*(W[l][i]*(1-molar_fractions[l] + molar_fractions[i] + 2.*molar_fractions[l]*(molar_fractions[l] - molar_fractions[i] - 1)) + W[i][l]*(1.-molar_fractions[l] - molar_fractions[i] - 2.*molar_fractions[l]*(molar_fractions[l] - molar_fractions[i] - 1)))
                     for j in range(i+1,n):
