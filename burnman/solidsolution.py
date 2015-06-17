@@ -3,10 +3,10 @@
 # Released under GPL v2 or later.
 
 import numpy as np
+import warnings
 
 from burnman import Mineral
-from solutionmodel import SolutionModel
-from solutionmodel import kd
+from solutionmodel import *
 
 
 class SolidSolution(Mineral):
@@ -27,7 +27,7 @@ class SolidSolution(Mineral):
     and P derivatives in J/K/mol and m^3/mol.
     """
 
-    def __init__(self, endmembers, solution_model=SolutionModel(), molar_fractions=None):
+    def __init__(self, molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
 
@@ -39,12 +39,38 @@ class SolidSolution(Mineral):
             SolutionModel to use.
         """
 
-        # Initialise the solid solution inputs
-        self.endmembers = endmembers
-        self.solution_model = solution_model
+        if hasattr(self, 'endmembers') == False:
+            raise Exception("'endmembers' attribute missing from solid solution")
+
+        # Set default solution model type 
+        if hasattr(self, 'type'):
+            if self.type == 'ideal':
+                self.solution_model=IdealSolution(self.endmembers)
+            else:
+                if hasattr(self, 'enthalpy_interaction') == False:
+                    self.enthalpy_interaction = None
+                if hasattr(self, 'volume_interaction') == False:
+                    self.volume_interaction = None
+                if hasattr(self, 'entropy_interaction') == False:
+                    self.entropy_interaction = None
+
+                if self.type == 'symmetric':
+                    self.solution_model=SymmetricRegularSolution(self.endmembers, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
+                elif self.type == 'asymmetric':
+                    try:
+                        self.solution_model=AsymmetricRegularSolution(self.endmembers, self.alphas, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
+                    except: 
+                        raise Exception("'alphas' attribute missing from solid solution")
+                elif self.type == 'subregular':
+                    self.solution_model=SubregularSolution(self.endmembers, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
+                else:
+                    raise Exception("Solution model type "+self.params['type']+"not recognised.")
+        else:
+            warnings.warn("Warning, you have not set a solution model 'type' attribute for this solid solution.", stacklevel=2)
+            self.solution_model=SolutionModel()
 
         # Number of endmembers in the solid solution
-        self.n_endmembers = len(endmembers)
+        self.n_endmembers = len(self.endmembers)
 
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])

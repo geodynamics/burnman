@@ -35,17 +35,12 @@ Excess properties
 # Navrotsky and Kleppa, 1967
 class o_d_spinel(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='orthopyroxene'
+        self.type='symmetric'
+        self.endmembers = [[minerals.HP_2011_ds62.sp(), '[Mg][Al]2O4'],[minerals.HP_2011_ds62.sp(), '[Al][Mg1/2Al1/2]2O4']]
+        self.enthalpy_interaction=[[0.0]]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.HP_2011_ds62.sp(), '[Mg][Al]2O4'],[minerals.HP_2011_ds62.sp(), '[Al][Mg1/2Al1/2]2O4']]
-
-        # Interaction parameters
-        enthalpy_interaction=[[0.0]]
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self)
 
 comp = np.linspace(0.001, 0.999, 100)
 sp=o_d_spinel()
@@ -71,61 +66,41 @@ plt.show()
 # Configurational entropy
 # Figure 3b of Stixrude and Lithgow-Bertelloni, 2011
 
-
 class orthopyroxene_red(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='orthopyroxene'
+        self.type='symmetric'
+        self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]SiO6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al]SiO6'] ]
+        self.enthalpy_interaction=[[0.0]]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]SiO6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al]SiO6'] ]
+        burnman.SolidSolution.__init__(self)
 
-        # Interaction parameters
-        enthalpy_interaction=[[0.0]]
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
 class orthopyroxene_blue(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='orthopyroxene'
+        self.type='symmetric'
+        self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al]AlSiO6'] ]
+        self.enthalpy_interaction=[[0.0]]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al]AlSiO6'] ]
-
-        # Interaction parameters
-        enthalpy_interaction=[[0.0]]
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self)
 
 class orthopyroxene_long_dashed(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='orthopyroxene'
+        self.type='symmetric'
+        self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'],[minerals.SLB_2011.mg_tschermaks(), '[Mg1/2Al1/2]2AlSiO6'] ]
+        self.enthalpy_interaction=[[10.0e3]]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'],[minerals.SLB_2011.mg_tschermaks(), '[Mg1/2Al1/2]2AlSiO6'] ]
-
-        # Interaction parameters
-        enthalpy_interaction=[[10.0e3]]
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self)
 
 class orthopyroxene_short_dashed(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='orthopyroxene'
+        self.type='symmetric'
+        self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]2O6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al1/2Si1/2]2O6'] ]
+        self.enthalpy_interaction=[[0.0]]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]2O6'],[minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al1/2Si1/2]2O6'] ]
-
-        # Interaction parameters
-        enthalpy_interaction=[[0.0]]
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.SymmetricRegularSolution(endmembers, enthalpy_interaction) )
+        burnman.SolidSolution.__init__(self)
 
 comp = np.linspace(0, 1.0, 100)
 opx_models=[orthopyroxene_red(), orthopyroxene_blue(), orthopyroxene_long_dashed(), orthopyroxene_short_dashed()]
@@ -155,20 +130,13 @@ plt.show()
 # Figure 5 of Stixrude and Lithgow-Bertelloni, 2011
 class clinopyroxene(burnman.SolidSolution):
     def __init__(self):
-        # Name
         self.name='clinopyroxene'
+        self.type='asymmetric'
+        self.endmembers = [[minerals.SLB_2011.diopside(), '[Ca][Mg][Si]2O6'],[minerals.SLB_2011.ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6'] ]
+        self.enthalpy_interaction=[[26.e3]]
+        self.alphas = [1.0, 3.5]
 
-        # Endmembers (cpx is symmetric)
-        endmembers = [[minerals.SLB_2011.diopside(), '[Ca][Mg][Si]2O6'],[minerals.SLB_2011.ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6'] ]
-
-        # Interaction parameters
-        enthalpy_interaction=[[26.e3]]
-        alphas = np.array( [1.0, 3.5] ) 
-
-        burnman.SolidSolution.__init__(self, endmembers, \
-                          burnman.solutionmodel.AsymmetricRegularSolution(endmembers, alphas, enthalpy_interaction) )
-
-
+        burnman.SolidSolution.__init__(self)
 
 cpx = clinopyroxene()
 
