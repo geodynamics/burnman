@@ -15,7 +15,7 @@ class MGDBase(eos.EquationOfState):
     """
     Base class for a generic finite-strain Mie-Grueneisen-Debye
     equation of state.  References for this can be found in many
-    places, such as Shim, Duffym and Kenichi (2002) and Jackson and Rigden
+    places, such as Shim, Duffy and Kenichi (2002) and Jackson and Rigden
     (1996).  Here we mostly follow the appendices of Matas et al (2007).
     Of particular note is the thermal correction to the shear modulus, which
     was developed by Hama and Suito (1998).
