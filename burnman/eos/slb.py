@@ -99,7 +99,7 @@ class SLBBase(eos.EquationOfState):
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
                 warnings.warn("May be outside the range of validity for EOS")
-                return sol[0]
+                return sol[0][0]
 
     def pressure( self, temperature, volume, params):
         """
