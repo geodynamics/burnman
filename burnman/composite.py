@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import zip
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -63,7 +64,7 @@ class Composite(Material):
             warnings.warn("Warning: list of molar fractions does not add up to one but %g. Normalizing." % total)
             fractions = [fr / total for fr in fractions]
 
-        self.children = zip(fractions, phases)
+        self.children = list(zip(fractions, phases))
 
     def debug_print(self, indent=""):
         print("%sComposite:" % indent)

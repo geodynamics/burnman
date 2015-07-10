@@ -1,3 +1,7 @@
+from builtins import zip
+from builtins import map
+from builtins import range
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -193,7 +197,7 @@ def depths_for_rock(rock,pressures, temperatures,averaging_scheme=burnman.averag
     moduli = average_moduli(moduli_list, averaging_scheme)
     mat_rho = np.array([m.rho for m in moduli])
     seismic_model = burnman.seismic.PREM()
-    depthsref = np.array(map(seismic_model.depth,pressures))
+    depthsref = np.array(list(map(seismic_model.depth,pressures)))
     pressref = np.zeros_like(pressures)
     g  = seismic_model.gravity(depthsref) # G for prem
     depths  = np.hstack((depthsref[0],depthsref[0]+integrate.cumtrapz(1./(g*mat_rho),pressures)))

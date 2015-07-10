@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -284,7 +285,7 @@ class Slow(SeismicRadiusTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
+        table=np.array([x for x in table if (x[0]>=min_radius and x[0]<=max_radius)])
 
         assert(len(table) == len(table2))
         assert(len(table) == len(table3))
@@ -316,7 +317,7 @@ class Fast(SeismicRadiusTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[0]>=min_radius and x[0]<=max_radius), table))
+        table=np.array([x for x in table if (x[0]>=min_radius and x[0]<=max_radius)])
 
         assert(len(table) == len(table2))
         assert(len(table) == len(table3))

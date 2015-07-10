@@ -1,4 +1,7 @@
 from __future__ import absolute_import
+from builtins import zip
+from builtins import range
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.

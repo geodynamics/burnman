@@ -12,6 +12,7 @@ This script reproduces :cite:`Cottaar2014`, Figure 5.
 Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
 from __future__ import absolute_import
+from builtins import map
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -121,7 +122,7 @@ if __name__ == "__main__":
 
     #seismic model for comparison:
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    depths = map(seismic_model.depth, pressure)
+    depths = list(map(seismic_model.depth, pressure))
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
     #pure perovskite

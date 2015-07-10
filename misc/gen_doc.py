@@ -33,8 +33,8 @@ for ex in ordered_examples:
 #check we do not forget an example
 
 all = os.listdir('../examples/')
-examples = filter (lambda k: re.match("^example(.*)\.py$", k), all )
-not_listed = filter(lambda x: (not x in ordered_examples), examples)
+examples = [k for k in all if re.match("^example(.*)\.py$", k)]
+not_listed = [x for x in examples if (not x in ordered_examples)]
 
 for l in not_listed:
     sys.stderr.write("WARNING EXAMPLE NOT LISTED: "+l+"\n")

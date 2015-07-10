@@ -7,6 +7,8 @@ This module provides several helper minerals/materials.
 
 """
 from __future__ import print_function
+from builtins import zip
+from builtins import range
 
 
 import numpy as np
@@ -70,7 +72,7 @@ class HelperSolidSolution(Mineral):
         for mat in self.endmembers:
             mat.set_state(pressure, temperature)
 
-        itrange = range(0, len(self.endmembers))
+        itrange = list(range(0, len(self.endmembers)))
         self.params = {}
         for prop in self.endmembers[0].params:
            try:

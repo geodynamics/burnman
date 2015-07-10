@@ -21,6 +21,7 @@ teaches:
 
 """
 from __future__ import print_function
+from builtins import range
 import os, sys, numpy as np, matplotlib.pyplot as plt
 import scipy.optimize as opt
 

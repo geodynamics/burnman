@@ -28,6 +28,8 @@ This script may be run by typing
 
 """
 from __future__ import print_function
+from builtins import zip
+from builtins import range
 
 # We import a couple extra modules for this step than in the previous
 # ones.  In particular, we will use a function for a normal distribution
@@ -147,7 +149,7 @@ if __name__=='__main__':
           vphi_list = func_vphi(pressures_sampled)
 
           # Save the output to a file
-          data = zip(pressure_list, vs_list, vphi_list, density_list)
+          data = list(zip(pressure_list, vs_list, vphi_list, density_list))
           np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
         # It is possible for the Birch-Murnaghan equation of state to go unstable for

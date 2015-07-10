@@ -12,6 +12,7 @@ It shows the sensitivity of the velocities to various mineralogical parameters.
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import range
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:

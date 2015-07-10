@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -559,7 +561,7 @@ def voigt_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    it = range(len(phase_volume))
+    it = list(range(len(phase_volume)))
     V_i = phase_volume
     V_tot = sum(V_i)
     X_voigt = sum(V_i[i]/V_tot * X[i] for i in it)
@@ -573,7 +575,7 @@ def reuss_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    it = range(len(phase_volume))
+    it = list(range(len(phase_volume)))
     V_i = phase_volume
     V_tot = sum(V_i)
     if (min(X)<=0.0):

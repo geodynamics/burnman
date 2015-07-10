@@ -12,6 +12,7 @@ It shows an example for a  best fit for a pyrolitic model within mineralogical e
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import str
 
 import os.path,sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

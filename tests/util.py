@@ -1,3 +1,4 @@
+from builtins import zip
 import unittest
 
 class BurnManTest(unittest.TestCase):

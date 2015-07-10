@@ -24,6 +24,7 @@ teaches:
 
 """
 from __future__ import print_function
+from builtins import zip
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     f = open(output_filename, 'wb')
     f.write("#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_G\n")
 
-    data = zip(pressures,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_G)
+    data = list(zip(pressures,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_G))
     np.savetxt(f, data, fmt='%.10e', delimiter='\t')
 
 

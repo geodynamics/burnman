@@ -1,5 +1,8 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import zip
+from builtins import str
+from builtins import range
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, 2014, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -544,7 +547,7 @@ if whattodo=="run":
 
 
 
-      data=zip(pressure_list, vs_list, vphi_list, density_list)
+      data=list(zip(pressure_list, vs_list, vphi_list, density_list))
       np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
     except ValueError:

@@ -23,6 +23,7 @@ teaches:
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import range
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..'))

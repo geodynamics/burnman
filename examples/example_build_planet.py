@@ -33,6 +33,8 @@ Here we show an example that does this, using the planet Mercury as motivation.
 * :func:`burnman.main.velocities_from_rock`
 '''
 from __future__ import print_function
+from builtins import range
+from builtins import object
 
 import os, sys
 #hack to allow scripts to be placed in subdirectories next to burnman:
