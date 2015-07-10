@@ -60,7 +60,7 @@ def linear_interpol(x, x1, x2, y1, y2):
 
 def read_table(filename):
     datastream = pkgutil.get_data('burnman', 'data/'+filename)
-    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
+    datalines = [ line.strip() for line in datastream.decode('ascii').split('\n') if line.strip() ]
     table=[]
 
     for line in datalines:

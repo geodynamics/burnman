@@ -17,7 +17,7 @@ def read_masses():
     elements and their masses into a dictionary
     """
     datastream = pkgutil.get_data('burnman', 'data/input_masses/atomic_masses.dat')
-    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
+    datalines = [ line.strip() for line in datastream.decode('ascii').split('\n') if line.strip() ]
     lookup=dict()
     for line in datalines:
         data="%".join(line.split("%")[:1]).split()
