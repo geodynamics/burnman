@@ -7,11 +7,12 @@ Other minerals
 ^^^^^^^^^^^^^^
 
 """
+from __future__ import absolute_import
 
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
 
-from SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
+from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
 # This is ferropericlase with the deprecated solid solution setup, although it is still used in some of the /misc/paper* scripts
 class ferropericlase(bmb.HelperSolidSolution):
