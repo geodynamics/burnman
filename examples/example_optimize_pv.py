@@ -25,6 +25,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * loops over models
 
 """
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
             burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
 
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
         [vs_err, vphi_err, rho_err] = \

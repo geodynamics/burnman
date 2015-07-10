@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 import numpy as np
-import constants
+from . import constants
 
 # TODO: add up weight percent and check <100 and tell them how much
 

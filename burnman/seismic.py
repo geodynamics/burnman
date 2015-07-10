@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 import numpy as np
-import tools
+from . import tools
 
 class Seismic1DModel(object):
     """
@@ -55,7 +56,7 @@ class Seismic1DModel(object):
         depths : array of floats
         Depths [m].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def pressure(self, depth):
@@ -70,7 +71,7 @@ class Seismic1DModel(object):
         pressure : float or array of floats
         Pressure(s) at given depth(s) in [Pa].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def v_p(self, depth):
@@ -86,7 +87,7 @@ class Seismic1DModel(object):
             P wave velocity at given depth(s) in [m/s].
         """
 
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def v_s(self, depth):
@@ -101,7 +102,7 @@ class Seismic1DModel(object):
         v_s : float or array of floats
         S wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
     
     def v_phi(self, depth):
@@ -133,7 +134,7 @@ class Seismic1DModel(object):
         density : float or array of floats
         Density at given depth(s) in [kg/m^3].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
     
     
@@ -168,7 +169,7 @@ class Seismic1DModel(object):
         depth : float or array of floats
             Depth(s) [m] for given pressure(s)
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return -1
 
     def gravity (self, depth):
@@ -183,7 +184,7 @@ class Seismic1DModel(object):
         gravity : float or array of floats
         Gravity for given depths in [m/s^2]
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return -1
 
 
@@ -229,7 +230,7 @@ class SeismicRadiusTable(Seismic1DModel):
 
     def depth(self, pressure):
         if pressure > max(self.table_pressure) or pressure < min(self.table_pressure)  :
-           raise ValueError, "Pressure outside range of PREM"
+           raise ValueError("Pressure outside range of PREM")
         radius = np.interp(pressure, self.table_pressure[::-1], self.table_radius[::-1] )
         return self.earth_radius - radius
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -7,7 +8,7 @@ from scipy.linalg import lu
 
 import burnman
 from burnman import minerals
-from processchemistry import *
+from .processchemistry import *
 import burnman.constants as constants
 
 # This module computes chemical potentials (partial molar gibbs free energies) for an assemblage based on the Gibbs free energies and compositions of the individual phases.

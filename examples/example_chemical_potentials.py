@@ -15,6 +15,7 @@ This example shows how to use the chemical potentials library of functions.
 * How to compute fugacities and relative fugacities
 
 """
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -63,10 +64,10 @@ if __name__ == "__main__":
     for mineral in MH:
         mineral.set_state(P, T)
 
-    print 'log10(fO2) at the FMQ buffer:', np.log10(fugacity(oxygen, FMQ))
-    print 'log10(fO2) at the mt-hem buffer:', np.log10(fugacity(oxygen, MH))
+    print('log10(fO2) at the FMQ buffer:', np.log10(fugacity(oxygen, FMQ)))
+    print('log10(fO2) at the mt-hem buffer:', np.log10(fugacity(oxygen, MH)))
 
-    print 'Relative log10(fO2):', np.log10(relative_fugacity(oxygen, FMQ, MH))
+    print('Relative log10(fO2):', np.log10(relative_fugacity(oxygen, FMQ, MH)))
 
 
     '''

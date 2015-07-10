@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import os, sys
 
@@ -130,7 +131,7 @@ class test_eos_validation(BurnManTest):
             #Trigger warning
             negative_Kprime = mymineralwithnegativekprime()
             if len(w) == 0:
-                print negative_Kprime.params
+                print(negative_Kprime.params)
                 self.fail("Did not catch expected warning for negative K prime")
      
         class mymineralwithkingigapascals(burnman.Mineral):

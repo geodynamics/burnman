@@ -1,3 +1,4 @@
+from __future__ import print_function
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -65,10 +66,10 @@ class Composite(Material):
         self.children = zip(fractions, phases)
 
     def debug_print(self, indent=""):
-        print "%sComposite:" % indent
+        print("%sComposite:" % indent)
         indent += "  "
         for (fraction, phase) in self.children:
-            print "%s%g of" % (indent, fraction)
+            print("%s%g of" % (indent, fraction))
             phase.debug_print(indent + "  ")
 
 

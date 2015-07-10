@@ -1,5 +1,6 @@
 
 """ generates a list with the examples """
+from __future__ import print_function
 
 import os, sys
 import os
@@ -25,7 +26,7 @@ ordered_examples = ['example_beginner.py', \
 
 for ex in ordered_examples:
     #print "*",ex
-    print __import__(ex.replace(".py","")).__doc__
+    print(__import__(ex.replace(".py","")).__doc__)
 
 
 

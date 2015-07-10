@@ -11,6 +11,7 @@ paper_incorrect_averaging
 This script reproduces :cite:`Cottaar2014`, Figure 5. 
 Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:

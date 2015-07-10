@@ -10,6 +10,8 @@ paper_uncertain
 This script reproduces :cite:`Cottaar2014`, Figure 8.
 It shows the sensitivity of the velocities to various mineralogical parameters.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -90,7 +92,7 @@ if __name__ == "__main__":
         testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
         #testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
         for x in testrange:
-            print i, names[i], x
+            print(i, names[i], x)
             uncertain = np.ones(len)
             uncertain[i] += spread[i] * x
             _, vs, vphi, _ = eval(uncertain)

@@ -27,6 +27,7 @@ This script may be run by typing
     python step_3.py
 
 """
+from __future__ import print_function
 
 # We import a couple extra modules for this step than in the previous
 # ones.  In particular, we will use a function for a normal distribution
@@ -125,7 +126,7 @@ if __name__=='__main__':
 
     for i in range(n_realizations):
 
-        print "realization", i+1
+        print("realization", i+1)
         try:
           # We call the realize_rock() to create the ith model
           rock = realize_rock()
@@ -153,7 +154,7 @@ if __name__=='__main__':
         # some values of the parameters, which can make it fail.  If that happens, we
         # simply disregard this realization of the rock.
         except ValueError:
-          print "failed, skipping"
+          print("failed, skipping")
 
 
     """

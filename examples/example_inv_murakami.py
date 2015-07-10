@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -23,7 +24,7 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.brown_shankland(seis_p)
 
 
-    print "preparations done"
+    print("preparations done")
 
     def calc_velocities(a,b,c):
         amount_perovskite = a
@@ -67,7 +68,7 @@ if __name__ == "__main__":
             e = error(p1,p2,p3)
             if (e<minerr):
                 minerr=e
-                print "best fit", e, "values:", p1,p2,p3
+                print("best fit", e, "values:", p1,p2,p3)
             return e
         except ValueError:
             return 1e20#float("inf")
@@ -81,10 +82,10 @@ if __name__ == "__main__":
     whattodo = ""
 
     if len(sys.argv)<3:
-        print "options:"
-        print "run <dbname>"
-        print "continue <dbname>"
-        print "plot <dbname1> <dbname2> ..."
+        print("options:")
+        print("run <dbname>")
+        print("continue <dbname>")
+        print("plot <dbname1> <dbname2> ...")
     else:
         whattodo = sys.argv[1]
         dbname = sys.argv[2]
@@ -99,14 +100,14 @@ if __name__ == "__main__":
         n_runs = 1000
         for l in range(0,n_runs):
             db = pymc.database.pickle.load(dbname)
-            print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('amount_pv').stats()['n'] )
+            print("*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('amount_pv').stats()['n'] ))
             S = pymc.MCMC(model, db=db)
             S.sample(iter=500, burn=0, thin=1)
             S.db.close()
 
     if whattodo=="plot":
         files=sys.argv[2:]
-        print "files:",files
+        print("files:",files)
 
         toburn=1000
         plot_idx=1
@@ -115,7 +116,7 @@ if __name__ == "__main__":
             if t=='misfit':
                 continue
             trace=[]
-            print "trace:",t
+            print("trace:",t)
             for filename in files:
                 db = pymc.database.pickle.load(filename)
                 newtrace=db.trace(t,chain=None).gettrace(burn=toburn,chain=None)
@@ -123,13 +124,13 @@ if __name__ == "__main__":
                     trace = np.append(trace, newtrace)
                 else:
                     trace=newtrace
-                print "   adding ", newtrace.size, "burn = ",toburn
-            print "  total size ", trace.size
-            print "mean = ", trace.mean()
+                print("   adding ", newtrace.size, "burn = ",toburn)
+            print("  total size ", trace.size)
+            print("mean = ", trace.mean())
             for bin in [10,20,50,100]:
                 hist,bin_edges=np.histogram(trace,bins=bin)
                 a=np.argmax(hist)
-                print "maxlike = ", bin_edges[a], bin_edges[a+1], (bin_edges[a]+bin_edges[a+1])/2.0
+                print("maxlike = ", bin_edges[a], bin_edges[a+1], (bin_edges[a]+bin_edges[a+1])/2.0)
 
 
 
@@ -139,22 +140,22 @@ if __name__ == "__main__":
 
 
                 X = sp.gumbel_l.fit(np.array(trace))
-                print X
+                print(X)
                 dist = sp.gumbel_l(X[0],X[1])
                 x = np.array(bins)
                 y = dist.pdf(x)
-                print y
+                print(y)
                 plt.plot(x, y,'k--',linewidth=2)
 
                 X = sp.norm.fit(np.array(trace))
-                print X
+                print(X)
                 dist = sp.norm(X[0],X[1])
                 x = np.array(bins)
                 y = dist.pdf(x)
                 plt.plot(x, y,'r--',linewidth=2)
 
                 X = sp.genextreme.fit(np.array(trace))
-                print X
+                print(X)
                 dist = sp.genextreme(X[0],X[1],X[2])
                 x = np.array(bins)
                 y = dist.pdf(x)
@@ -171,14 +172,14 @@ if __name__ == "__main__":
 
                 X = sp.expon.fit(np.array(trace),floc=0)
 
-                print X
+                print(X)
 
 
                 #X = sp.burr.fit(np.array(trace))
                 dist = sp.expon(X[0],X[1])
                 #print X
-                print bins
-                print dist.pdf(np.array(bins))
+                print(bins)
+                print(dist.pdf(np.array(bins)))
                 plt.plot(bins, dist.pdf(np.array(bins)),'r--', linewidth=2)
                 plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
 
@@ -186,7 +187,7 @@ if __name__ == "__main__":
 
             else:
                 (mu, sigma) = sp.norm.fit(np.array(trace))
-                print "mu, sigma: %e %e" % (mu, sigma)
+                print("mu, sigma: %e %e" % (mu, sigma))
                 n, bins, patches = plt.hist(np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
                 y = mlab.normpdf( bins, mu, sigma)
                 l = plt.plot(bins, y, 'r--', linewidth=2)
@@ -205,7 +206,7 @@ if __name__ == "__main__":
                 for c in np.linspace(0,0.2,5):
                     mat_vp, mat_vs, mat_rho = calc_velocities(a,b,c)
                     misfit = error(a,b,c)
-                    print "misfit: %s " % misfit
+                    print("misfit: %s " % misfit)
                     if misfit<25:
                         plt.subplot(2,2,1)
                         plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
@@ -243,13 +244,13 @@ if __name__ == "__main__":
         S = pymc.MCMC(model, db=db)
 
         for t in things:
-            print db.trace(t).stats()
+            print(db.trace(t).stats())
 
-        print "means:"
+        print("means:")
         for t in things:
-            print t,"\t",db.trace(t).stats()['mean']
+            print(t,"\t",db.trace(t).stats()['mean'])
 
-        print "#samples: %d" % db.trace('mg_pv_K').stats()['n']
+        print("#samples: %d" % db.trace('mg_pv_K').stats()['n'])
 
         pymc.raftery_lewis(S, q=0.025, r=0.01)
 
@@ -293,7 +294,7 @@ if __name__ == "__main__":
         values = [float(i) for i in sys.argv[2:]]
         mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
 
-        print "misfit: %s " % error(values[0], values[1], values[2])
+        print("misfit: %s " % error(values[0], values[1], values[2]))
 
 
         plt.subplot(2,2,1)

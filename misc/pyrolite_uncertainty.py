@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, 2014, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -23,7 +25,7 @@ import colors
 import signal
 import sys
 def signal_handler(signal, frame):
-    print 'You pressed Ctrl+C!'
+    print('You pressed Ctrl+C!')
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -142,21 +144,21 @@ goodfits = [];
 names = [];
 
 if len(sys.argv)<3:
-    print "options:"
-    print "run <dbname>"
-    print "plot"
-    print "plotgood <dbname1> <dbname2> ..."
-    print "plotone 1"
+    print("options:")
+    print("run <dbname>")
+    print("plot")
+    print("plotgood <dbname1> <dbname2> ...")
+    print("plotone 1")
 else:
     whattodo = sys.argv[1]
     dbname = sys.argv[2]
 
 if whattodo=="plotgood":
     files=sys.argv[2:]
-    print "files:",files
+    print("files:",files)
     names = pickle.load(open(files[0]+".names","rb"));
     erridx = names.index("err")
-    print erridx
+    print(erridx)
 
     allfits=[]
 
@@ -165,15 +167,15 @@ if whattodo=="plotgood":
         allfits.extend(a)
         b = a
         b = [i for i in a if i[erridx]<3e-5]
-        print "adding %d out of %d"%(len(b),len(a))
+        print("adding %d out of %d"%(len(b),len(a)))
         goodfits.extend(b)
 
     minerr = min([f[erridx] for f in allfits])
-    print "min error is %f"%minerr
+    print("min error is %f"%minerr)
 
 
     num = len(goodfits)
-    print "we have %d good entries" % num
+    print("we have %d good entries" % num)
 
     i=0
     idx=0
@@ -232,8 +234,8 @@ if whattodo=="plotgood":
     figure=plt.figure(dpi=150,figsize=figsize)
 
     for fit in goodfits:
-        print fit
-        print names
+        print(fit)
+        print(names)
 
         rock, anchor_t = array_to_rock(fit, names)
         temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
@@ -241,13 +243,13 @@ if whattodo=="plotgood":
         rho, vp, vs, vphi, K, G = \
             burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
 
-        print "."
+        print(".")
 
         plt.plot(pressure/1.e9,vs/1.e3,linestyle="-",color='r',linewidth=1.0)
         plt.plot(pressure/1.e9,vphi/1.e3,linestyle="-",color='b',linewidth=1.0)
         plt.plot(pressure/1.e9,rho/1.e3,linestyle="-",color='g',linewidth=1.0)
 
-    print "done!"
+    print("done!")
 
     #plot v_s
     plt.plot(pressure/1.e9,seis_vs/1.e3,linestyle="--",color='k',linewidth=2.0,label='PREM')
@@ -317,7 +319,7 @@ if whattodo=="plotone":
                  'err_rho':0, \
                  'err_vphi':0, \
                  'err_vs':0}
-    print "goal: 5.35427067017e-06 2.72810809096e-07 3.67937164518e-06 1.4020882159e-06"
+    print("goal: 5.35427067017e-06 2.72810809096e-07 3.67937164518e-06 1.4020882159e-06")
 
 
     mymaplit = {'anchor_T':2000, \
@@ -427,7 +429,7 @@ if whattodo=="plotone":
         for n in names:
             if "."+row in n:
                 val.append(mymap[n])
-        print row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3])
+        print(row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3]))
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
@@ -448,7 +450,7 @@ if whattodo=="plotone":
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
     error = np.sum([err_rho, err_vphi, err_vs])
 
-    print error, err_rho, err_vphi, err_vs
+    print(error, err_rho, err_vphi, err_vs)
 
     figsize=(6,5)
     prop={'size':12}
@@ -488,7 +490,7 @@ if whattodo=="plotone":
     plt.xlim(25,135)
     #plt.ylim(6,11)
     plt.savefig("onefit.pdf", bbox_inches='tight')
-    print "wrote onefit.pdf"
+    print("wrote onefit.pdf")
     #plt.show()
 
 
@@ -500,12 +502,12 @@ if whattodo=="run":
   for i in range(n_realizations):
     if (i>0 and i%25==0):
         # save good fits
-        print "saving %d fits to %s"%(len(goodfits),dbname)
+        print("saving %d fits to %s"%(len(goodfits),dbname))
         pickle.dump(goodfits, open(dbname+".tmp", "wb"))
         os.rename(dbname+".tmp", dbname)
         pickle.dump(names, open(dbname+".names", "wb"))
 
-    print "realization", i+1
+    print("realization", i+1)
     try:
       #create the ith model
       pyrolite, anchor_temperature= realize_pyrolite()
@@ -521,7 +523,7 @@ if whattodo=="run":
       error = np.sum([err_rho, err_vphi, err_vs])
       if error < min_error:
         min_error = error
-        print error
+        print(error)
         best_fit_file.write('Current best fit : '+str(error) + '\n' )
         output_rock(pyrolite, best_fit_file)
 
@@ -546,7 +548,7 @@ if whattodo=="run":
       np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
     except ValueError:
-      print "failed, skipping"
+      print("failed, skipping")
 
   outfile.close()
   best_fit_file.close()
@@ -564,7 +566,7 @@ elif whattodo=="error":
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
     error = np.sum([err_rho, err_vphi, err_vs])
 
-    print error, err_rho, err_vphi, err_vs
+    print(error, err_rho, err_vphi, err_vs)
 
 
 

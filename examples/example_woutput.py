@@ -23,6 +23,7 @@ teaches:
 - output computed seismic data to file
 
 """
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -58,7 +59,7 @@ if __name__ == "__main__":
 
 
     #Begin calculating velocities and density as depth
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
@@ -74,5 +75,5 @@ if __name__ == "__main__":
     np.savetxt(f, data, fmt='%.10e', delimiter='\t')
 
 
-    print "\nYour data has been saved as: ",output_filename
+    print("\nYour data has been saved as: ",output_filename)
 
