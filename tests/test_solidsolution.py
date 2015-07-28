@@ -96,9 +96,21 @@ class two_site_ss(burnman.SolidSolution):
         self.name='two_site_ss'
         self.type='symmetric'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
-        self.enthalpy_interaction=[[0.0, 0.0],[0.0]]
+        self.enthalpy_interaction=[[10.0e3, 5.0e3],[-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
+
+# Three-endmember, two site solid solution
+class two_site_ss_subregular(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        # Name
+        self.name='two_site_ss (subregular symmetric)'
+        self.type='subregular'
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],[forsterite(), '[Fe]3[Al]2Si3O12'],[forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        # Interaction parameters
+        self.enthalpy_interaction=[[[10.e3, 10.e3],[5.e3, 5.e3]],[[-10.e3, -10.e3]]]
+
+        burnman.SolidSolution.__init__(self, molar_fractions )
 
 
 class test_solidsolution(BurnManTest):
@@ -191,6 +203,18 @@ class test_solidsolution(BurnManTest):
         ss = olivine_ss()
         ss.set_composition( np.array([0.5, 0.5]) )
         self.assertArraysAlmostEqual([ss.molar_mass()], [0.5*forsterite().params['molar_mass']+0.5*fayalite().params['molar_mass']])    
+
+    def test_subregular(self):
+        ss0=two_site_ss()
+        ss1=two_site_ss_subregular()
+
+        ss0.set_composition([0.3,0.3,0.4])
+        ss0.set_state(1.e5,300.)
+
+        ss1.set_composition([0.3,0.3,0.4])
+        ss1.set_state(1.e5,300.)
+
+        self.assertArraysAlmostEqual(ss0.excess_partial_gibbs, ss1.excess_partial_gibbs)
 
 if __name__ == '__main__':
     unittest.main()

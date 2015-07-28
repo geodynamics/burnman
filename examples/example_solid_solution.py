@@ -10,12 +10,13 @@ example_solid_solution
 This example shows how to create different solid solution models and output
 thermodynamic and thermoelastic quantities.
 
-There are three main types of solid solution currently implemented in 
+There are four main types of solid solution currently implemented in 
 BurnMan:
 
 1. Ideal solid solutions
 2. Symmmetric solid solutions
 3. Asymmetric solid solutions
+4. Subregular solid solutions
 
 These solid solutions can potentially deal with:
 
@@ -227,3 +228,42 @@ if __name__ == "__main__":
     plt.legend(loc='lower left')
     plt.show()
 
+
+    '''
+    The subregular solution model (Helffrich and Wood, 1989)
+    provides a more flexible way of constructing an asymmetric
+    model
+    '''
+    class mg_fe_ca_garnet_Ganguly(burnman.SolidSolution):
+        def __init__(self, molar_fractions=None):
+            self.name='Subregular pyrope-almandine-grossular garnet'
+            self.type='subregular'
+            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'],[minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12'], [minerals.HP_2011_ds62.spss(), '[Mn]3[Al]2Si3O12']]
+            self.enthalpy_interaction=[[[2117., 695.], [9834., 21627.], [12083., 12083.]],[[6773., 873.],[539., 539.]],[[0., 0.]]]
+            self.volume_interaction=[[[0.07e-5, 0.], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],[[0.03e-5, 0.],[0.04e-5, 0.01e-5]],[[0., 0.]]]
+            self.entropy_interaction=[[[0., 0.], [5.78, 5.78], [7.67, 7.67]],[[1.69, 1.69],[0., 0.]],[[0., 0.]]]
+            
+            # Published values are on a 4-oxygen (1-cation) basis
+            for interaction in [self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction]:
+                for i in range(len(interaction)):
+                    for j in range(len(interaction[i])):
+                        for k in range(len(interaction[i][j])):
+                            interaction[i][j][k]*=3.
+
+            burnman.SolidSolution.__init__(self, molar_fractions)
+
+    g5=mg_fe_ca_garnet_Ganguly()
+    g5_excess_enthalpy = np.empty_like(comp)
+
+    for i,c in enumerate(comp):
+        molar_fractions=[1.0-c, 0., c, 0.]
+        g5.set_composition(molar_fractions)
+        g5.set_state(1.e5,298.15)
+        g5_excess_enthalpy[i] = g5.excess_enthalpy
+
+    plt.plot( comp, g5_excess_enthalpy/3., 'r-', linewidth=1., label='Py-Gr excess enthalpy (J/cation-mole)')
+    plt.title("Asymmetric py-gr join (Ganguly et al., 1996; Figure 5)")
+    plt.ylabel("Excess enthalpy of solution (J/cation-mol)")
+    plt.xlabel("Pyrope fraction")
+    plt.legend(loc='lower left')
+    plt.show()
