@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 import numpy as np
-import equation_of_state as eos
+from . import equation_of_state as eos
 import warnings
 
 P_0=1.e5 # Standard pressure = 1.e5 Pa

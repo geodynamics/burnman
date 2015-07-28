@@ -9,6 +9,7 @@ paper_benchmark
 
 This script reproduces the benchmark in :cite:`Cottaar2014`, Figure 3.
 """
+from builtins import range
 
 
 import os, sys, numpy as np, matplotlib.pyplot as plt

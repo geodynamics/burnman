@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -6,7 +9,7 @@ import numpy as np
 import warnings
 import burnman
 from burnman.processchemistry import *
-import constants
+from . import constants
 
 """
 kronecker delta function for integers

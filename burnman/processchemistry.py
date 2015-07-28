@@ -1,3 +1,5 @@
+from builtins import filter
+from builtins import range
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -17,7 +19,7 @@ def read_masses():
     elements and their masses into a dictionary
     """
     datastream = pkgutil.get_data('burnman', 'data/input_masses/atomic_masses.dat')
-    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
+    datalines = [ line.strip() for line in datastream.decode('ascii').split('\n') if line.strip() ]
     lookup=dict()
     for line in datalines:
         data="%".join(line.split("%")[:1]).split()
@@ -89,7 +91,7 @@ def dictionarize_site_formula(formula):
 
         # Loop over elements not on a site
         for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-            element=filter(None, re.split(r'(\d+)', enamenumber))
+            element=[_f for _f in re.split(r'(\d+)', enamenumber) if _f]
             f[element[0]]=f.get(element[0], 0.0) + float(element[1])
 
     return f
@@ -200,10 +202,10 @@ def process_solution_chemistry(formulae):
 
             # Loop over elements after site
             if len(site_split) != 1:
-                not_in_site=filter(None, site_split[1])
+                not_in_site=str([_f for _f in site_split[1] if _f])
                 not_in_site=not_in_site.replace(mult, '', 1)
                 for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                    element=filter(None, re.split(r'(\d+)', enamenumber))
+                    element=[_f for _f in re.split(r'(\d+)', enamenumber) if _f]
                     # Look up number of atoms of element
                     if len(element) == 1:
                         nel=1.

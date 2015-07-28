@@ -1,11 +1,14 @@
+from __future__ import absolute_import
+from builtins import zip
+from builtins import range
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
 
 import numpy as np
 import scipy.integrate as integrate
-import tools
-import seismic
+from . import tools
+from . import seismic
 
 
 def brown_shankland(pressure):
@@ -26,7 +29,7 @@ def brown_shankland(pressure):
     for i in range(len(pressure)):
       depth = seismic.prem_model.depth(pressure[i])
       if depth < min(table_brown_depth):
-        raise ValueError, "depth smaller than range Brown & Shankland, 1981"
+        raise ValueError("depth smaller than range Brown & Shankland, 1981")
       temperature[i] = tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)
     return temperature
 

@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import zip
+from builtins import object
 # BurnMan - a lower mantle toolkit
 # Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
 # Released under GPL v2 or later.
@@ -59,11 +62,11 @@ class Material(object):
         """
         (frs,mins) = self.unroll()
         if len(mins)==1:
-            print mins[0].to_string()
+            print(mins[0].to_string())
         else:
-            print "Material %s:" % self.to_string()
+            print("Material %s:" % self.to_string())
             for (fr,mi) in zip(frs,mins):
-                print "  %g of phase %s" % (fr, mi.to_string())
+                print("  %g of phase %s" % (fr, mi.to_string()))
 
     def set_state(self, pressure, temperature):
         """

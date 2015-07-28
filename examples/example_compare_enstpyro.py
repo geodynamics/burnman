@@ -22,6 +22,8 @@ teaches:
 - weight percent materials
 
 """
+from __future__ import print_function
+from builtins import map
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -89,7 +91,7 @@ if __name__ == "__main__":
         burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, \
                                      burnman.averaging_schemes.VoigtReussHill())
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     pyrolite.debug_print()
 
 
@@ -98,13 +100,13 @@ if __name__ == "__main__":
         burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
                                      burnman.averaging_schemes.VoigtReussHill())
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     enstatite.debug_print()
 
 
     ##let's create PREM for reference
     s=burnman.seismic.PREM()
-    depths = map(s.depth, seis_p_1)
+    depths = list(map(s.depth, seis_p_1))
     pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate_all_at(depths)
 
 
