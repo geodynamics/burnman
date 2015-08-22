@@ -259,9 +259,14 @@ class SeismicTable(Seismic1DModel):
             return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
-        try:
+        #try:
+        #return self._lookup(depth,self.table_gravity)
+        #except:
+        print len(self.table_gravity)
+        if len(self.table_gravity)>0:
             return self._lookup(depth,self.table_gravity)
-        except:
+        else:
+            print 'ok, I will compute'
             self._compute_gravity()
             return self._lookup(depth,self.table_gravity)
 
@@ -320,6 +325,19 @@ class SeismicTable(Seismic1DModel):
         radii=self.table_radius[::-1]
         rhofunc = scipy.interpolate.UnivariateSpline(radii, density)
  
+        depth = self.earth_radius-radii
+        jumps=np.diff(depth)
+        disc = [ x for x in range(len(jumps)) if jumps[x]<2.] # define discontinuities defined over less than 2 m.
+        disc.insert(0,0.)
+        disc.append[-1] # include center of the earth
+        pressure=[0.]
+        grav=[0.]
+        for i in range(len(disc)-1):
+            #Numerically integrate Poisson's equation  --- can't get this part to work!!!!
+            poisson = lambda p,x : 4.0 * np.pi * G * rhofunc(x) * x * x
+            grav = np.ravel(scipy.integrate.odeint( poisson, 0.0, radii[disc[i]:disc[i+1]], full_output=0, printmessg=1))
+            print grav[-1]
+ 
         G = 6.67e-11
         #Numerically integrate Poisson's equation  --- can't get this part to work!!!!
         poisson = lambda p,x : 4.0 * np.pi * G * rhofunc(x) * x * x
@@ -344,21 +362,28 @@ class SeismicTable(Seismic1DModel):
         gravity=self.gravity(self.earth_radius-radii)
         #convert radii to depths
         depth = self.earth_radius-radii
-        
-        
-        #### This isn't working and I'm not sure why...
-        #Make a spline fit of density as a function of depth
-        rhofunc = scipy.interpolate.UnivariateSpline( depth, density )
-        #Make a spline fit of gravity as a function of depth
-        gfunc = scipy.interpolate.UnivariateSpline( depth, gravity )
-        #integrate the hydrostatic equation
-        pressure = np.ravel(scipy.integrate.odeint( (lambda p, x : gfunc(x)* rhofunc(x)), 0.0,depth))
-        
+        jumps=np.diff(depth)
+        disc = [ x for x in range(len(jumps)) if jumps[x]<2.] # define discontinuities defined over less than 2 m.
+        disc.insert(0,0.)
+        disc.append[-1] # include center of the earth
+        pressure=[0.]
+        for i in range(len(disc)-1):
+            #Make a spline fit of density as a function of depth
+            rhofunc = scipy.interpolate.UnivariateSpline( depth[disc[i]:disc[i+1]], density[disc[i]:disc[i+1]] )
+            #Make a spline fit of gravity as a function of depth
+            gfunc = scipy.interpolate.UnivariateSpline( depth[disc[i]:disc[i+1]], gravity[disc[i]:disc[i+1]] )
+            #integrate the hydrostatic equation
+            pressure.append(np.ravel(scipy.integrate.odeint( (lambda p, x : gfunc(x)* rhofunc(x)),pressure[-1] ,depth[disc[i]:disc[i+1]])))
+            print pressure[-1]
         
         p=[]
         for i in range(len(depth)):
             p_tmp=scipy.integrate.trapz(gravity[0:i]*density[0:i],depth[0:i])
             p.append(p_tmp)
+        plt.figure()
+        plt.plot(depth, p_tmp)
+        plt.plot(depth,pressure)
+        plt.show()
 
         self.table_pressure=p
 
