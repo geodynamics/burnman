@@ -14,7 +14,6 @@ from burnman.endmemberdisorder import *
 
 
 T_0=298.15 # Standard temperature = 25 C
-P_0=1.e5 # Standard pressure = 1.e5 Pa
 
 
 class HP_TMT(eos.EquationOfState):
@@ -90,10 +89,10 @@ class HP_TMT(eos.EquationOfState):
         """
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
-        psubpth=pressure-Pth
-        einstein_T=self.__einstein_temperature(params['S_0'], params['n'])
-        C_V0 = einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
-        C_V =  einstein.heat_capacity_v(temperature, einstein_T,params['n'])
+        psubpth=pressure-params['P_0']-Pth
+
+        C_V0 = einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
+        C_V =  einstein.heat_capacity_v(temperature, params['einstein_T'],params['n'])
         alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*np.power((1+b*psubpth), c)))
  
         return alpha
@@ -139,17 +138,17 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 
-        psubpth=pressure-Pth
+        psubpth=pressure-params['P_0']-Pth
 
         # EQ 13
-        intVdP = pressure*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(pressure-Pth)), 1.-c))/(b*(c-1.)*pressure)))
+        intVdP = (pressure-params['P_0'])*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(psubpth)), 1.-c))/(b*(c-1.)*(pressure-params['P_0']))))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
             Gdisord=gibbs_disorder_Landau(pressure, temperature, params)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-                Gdisord=gibbs_disorder_BW(pressure, temperature, params) - gibbs_disorder_BW(P_0, T_0, params)
+                Gdisord=gibbs_disorder_BW(pressure, temperature, params) - gibbs_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Gdisord=0.0
 
@@ -169,17 +168,16 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 
-        einstein_T=self.__einstein_temperature(params['S_0'], params['n'])
-        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, einstein_T, params['n'] )/einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['einstein_T'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
 
-        dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
+        dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
             Sdisord=entropy_disorder_Landau(pressure, temperature, params)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-                Sdisord=entropy_disorder_BW(pressure, temperature, params) - entropy_disorder_BW(P_0, T_0, params)
+                Sdisord=entropy_disorder_BW(pressure, temperature, params) - entropy_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Sdisord=0.0
 
@@ -198,7 +196,7 @@ class HP_TMT(eos.EquationOfState):
             Hdisord=enthalpy_disorder_Landau(pressure, temperature, params)
         else:
             if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-                Hdisord=enthalpy_disorder_BW(pressure, temperature, params) - enthalpy_disorder_BW(P_0, T_0, params)
+                Hdisord=enthalpy_disorder_BW(pressure, temperature, params) - enthalpy_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Hdisord=0.0
 
@@ -212,10 +210,9 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 
-        einstein_T=self.__einstein_temperature(params['S_0'], params['n'])
-        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, einstein_T, params['n'] )/einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['einstein_T'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
 
-        dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-Pth)), -1.-c) - np.power((1.-b*Pth), -1.-c))
+        dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.-b*Pth), -1.-c))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
@@ -224,16 +221,6 @@ class HP_TMT(eos.EquationOfState):
             Cpdisord=0.0
 
         return self.heat_capacity_p0(temperature,params) + temperature*dSdT + Cpdisord
-
-
-    def __einstein_temperature(self, S, n):
-        """
-        Empirical Einstein temperature
-        Holland and Powell, 2011; base of p.346, para.1
-        """
-        return 10636./(S/n + 6.44)
-    
-
     
     def __thermal_pressure(self,T,params):
         """
@@ -249,33 +236,32 @@ class HP_TMT(eos.EquationOfState):
         # Note that the xi function in HP2011 is just the Einstein heat capacity
         # divided by 3nR.  I don't know why they don't use that, but anyhow...
 
-        einstein_T=self.__einstein_temperature(params['S_0'],params['n'])
-        E_th = einstein.thermal_energy( T, einstein_T, params['n'] )
-        C_V0 = einstein.heat_capacity_v( T_0, einstein_T, params['n'] )
+        E_th = einstein.thermal_energy( T, params['einstein_T'], params['n'] )
+        C_V0 = einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
         P_th = params['a_0']*params['K_0'] / C_V0 * E_th
         return P_th
 
     def __relative_thermal_pressure( self, T, params):
         """
-        Returns relative thermal pressure [Pa] as a function of T-T_0 [K] 
+        Returns relative thermal pressure [Pa] as a function of T-params['T_0'] [K] 
         EQ 12 - 1 of Holland and Powell, 2011 
         """
         return self.__thermal_pressure(T, params) - \
-               self.__thermal_pressure(T_0, params)
+               self.__thermal_pressure(params['T_0'], params)
 
     def __intCpdT (self, temperature, params):
         """
         Returns the thermal addition to the standard state enthalpy [J/mol]
         at ambient pressure [Pa]
         """
-        return (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
+        return (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*params['T_0'] + 0.5*params['Cp'][1]*params['T_0']*params['T_0'] - params['Cp'][2]/params['T_0'] + 2.0*params['Cp'][3]*np.sqrt(params['T_0']))
 
     def __intCpoverTdT (self, temperature, params):
         """
         Returns the thermal addition to the standard state entropy [J/K/mol]
         at ambient pressure [Pa]
         """
-        return (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
+        return (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(params['T_0']) + params['Cp'][1]*params['T_0'] - 0.5*params['Cp'][2]/(params['T_0']*params['T_0']) - 2.0*params['Cp'][3]/np.sqrt(params['T_0']))
 
     def _magnetic_gibbs(self, pressure, temperature, params):
         """
@@ -300,6 +286,11 @@ class HP_TMT(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
 
+        if 'T_0' not in params:
+            params['T_0'] = 298.15
+        if 'P_0' not in params:
+            params['P_0'] = 0.9999999e5
+
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,
         #so just add them to the dictionary as nans
@@ -318,6 +309,12 @@ class HP_TMT(eos.EquationOfState):
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
+        # Empirical Einstein temperature
+        # Holland and Powell, 2011; base of p.346, para.1
+        if 'einstein_T' not in params:
+            params['einstein_T'] = 10636./(params['S_0']/params['n'] + 6.44)
+
+
         #now check that the values are reasonable.  I mostly just
         #made up these values from experience, and we are only 
         #raising a warning.  Better way to do this? [IR]
@@ -326,6 +323,11 @@ class HP_TMT(eos.EquationOfState):
         if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
             warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
 
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
+        if params['P_0'] < 0.:
+            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
+
         # no test for H_0
         if params['S_0'] is not float('nan') and params['S_0'] < 0.:
             warnings.warn( 'Unusual value for S_0', stacklevel=2 )
@@ -333,7 +335,7 @@ class HP_TMT(eos.EquationOfState):
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
 
             
-        if self.heat_capacity_p0(T_0,params) < 0.:
+        if self.heat_capacity_p0(params['T_0'],params) < 0.:
             warnings.warn( 'Negative heat capacity at T_0', stacklevel=2 )
         if self.heat_capacity_p0(2000.,params) < 0.:
             warnings.warn( 'Negative heat capacity at 2000K', stacklevel=2 )

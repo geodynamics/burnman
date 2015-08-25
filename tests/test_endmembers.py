@@ -38,6 +38,7 @@ class bcc_iron (Mineral):
             'name': 'BCC iron',
             'formula': formula,
             'equation_of_state': 'hp_tmt',
+            'P_0': 0.,
             'H_0': 9149.0 ,
             'S_0': 36.868 ,
             'V_0': 7.09e-06 ,
@@ -54,6 +55,26 @@ class bcc_iron (Mineral):
         Mineral.__init__(self)
 
 class test_endmembers(BurnManTest):
+
+    def test0_T_ref(self):
+        fo=forsterite()
+        fo.params['P_0'] = 0.99999999999e5
+
+        fo.set_state(1.e5, 500.)
+        data = [fo.H, fo.S]
+        T_0 = 2000.
+        fo.set_state(1.e5, T_0)
+        fo.params['T_0'] = T_0
+        fo.params['H_0'] = fo.H
+        fo.params['S_0'] = fo.S
+        fo.params['V_0'] = fo.V
+        fo.params['K_0'] = fo.K_T 
+        fo.params['Kdprime_0'] = -fo.params['Kprime_0']/fo.params['K_0']
+        fo.params['a_0'] = fo.alpha
+
+        fo.set_state(1.e5, 500.)
+        data2 = [fo.H, fo.S]
+        self.assertArraysAlmostEqual(data, data2)
 
     def test1_mt_hp_tmt(self):
         fo=forsterite()
@@ -103,6 +124,7 @@ class test_endmembers(BurnManTest):
         bcc.set_state(1.e5, 298.15)
         gibbs2=bcc.gibbs
         self.assertArraysAlmostEqual([gibbs1-gibbs_mag], [gibbs2])
+
 
 if __name__ == '__main__':
     unittest.main()
