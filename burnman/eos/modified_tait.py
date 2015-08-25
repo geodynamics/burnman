@@ -6,8 +6,6 @@ import numpy as np
 import equation_of_state as eos
 import warnings
 
-P_0=1.e5 # Standard pressure = 1.e5 Pa
-
 def tait_constants(params):
     """
     returns parameters for the modified Tait equation of state
@@ -27,7 +25,7 @@ def modified_tait(x, params):
     EQ 2 from Holland and Powell, 2011
     """
     a, b, c = tait_constants(params)
-    return (np.power((x + a - 1.) / a, -1./c) - 1.)/b
+    return (np.power((x + a - 1.) / a, -1./c) - 1.)/b + params['P_0']
 
 def volume(pressure,params):
     """
@@ -35,7 +33,7 @@ def volume(pressure,params):
     EQ 12
     """
     a, b, c = tait_constants(params)
-    x = 1 - a*( 1. - np.power(( 1. + b*(pressure)), -1.0*c))
+    x = 1 - a*( 1. - np.power(( 1. + b*(pressure-params['P_0'])), -1.0*c))
     return x*params['V_0']
 
 def bulk_modulus(pressure, params):
@@ -44,7 +42,7 @@ def bulk_modulus(pressure, params):
     EQ 13+2
     """
     a, b, c = tait_constants(params)
-    return params['K_0']*(1. + b*(pressure))*(a + (1.-a)*np.power((1. + b*(pressure)), c))
+    return params['K_0']*(1. + b*(pressure-params['P_0']))*(a + (1.-a)*np.power((1. + b*(pressure-params['P_0'])), c))
 
 
 class MT(eos.EquationOfState):
@@ -119,6 +117,9 @@ class MT(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+
+        if 'P_0' not in params:
+            params['P_0'] = 1.e5
      
         # G and Gprime are not defined in this equation of state,
         # We can model density and bulk modulus just fine without them,
