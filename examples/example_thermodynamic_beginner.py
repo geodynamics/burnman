@@ -32,11 +32,16 @@ import burnman
 from burnman import minerals
 import matplotlib.pyplot as plt
 
-T_ref = 1273.
-P_ref = 49.9999999e9
+T_min_Cp = 500.
+T_max_Cp = 2000.
 
-T_obs = 1273.
-P_obs = 100.e9
+T_max = 6000.
+
+T_ref = 1273.
+P_ref = 50.e9
+
+T_obs = 1873.
+P_obs = 50.e9
 
 
 fo=minerals.HP_2011_ds62.fo()
@@ -48,7 +53,7 @@ def Cp(T, a, b, c, d):
 fo.set_state(P_ref, T_ref)
 
 Cps = []
-temperatures = np.linspace(300., 5000., 100)
+temperatures = np.linspace(T_min_Cp, T_max_Cp, 100)
 for T in temperatures:
     fo.set_state(P_obs, T)
     Cps.append(fo.C_p)
@@ -63,13 +68,13 @@ print fo.gibbs, fo.S, fo.C_p
 
 
 Cp0 = []
-temperatures = np.linspace(300., 5000., 100)
+temperatures = np.linspace(300., T_max, 100)
 for T in temperatures:
     fo.set_state(P_obs, T)
     Cp0.append(fo.C_p)
 
 
-temperatures = np.linspace(300., 5000., 100)
+temperatures = np.linspace(300., T_max, 100)
 alphas_0 = []
 volumes_0 = []
 gibbs_0 = []
@@ -106,7 +111,7 @@ fo.params['P_0'] = P_ref
 fo.params['H_0'] = fo.H
 fo.params['S_0'] = fo.S
 fo.params['V_0'] = fo.V
-#fo.params['Cp'] = [a, b, c, d]
+fo.params['Cp'] = [a, b, c, d]
 fo.params['K_0'] = fo.K_T 
 fo.params['a_0'] = fo.alpha
 fo.params['Kprime_0'] = (K2 - K0)/(2.*dP)
@@ -117,13 +122,15 @@ fo.set_state(P_obs, T_obs)
 print fo.gibbs, fo.S, fo.C_p
 
 Cp1 = []
-temperatures = np.linspace(300., 5000., 100)
+temperatures = np.linspace(300., T_max, 100)
 for T in temperatures:
     fo.set_state(P_obs, T)
     Cp1.append(fo.C_p)
 
 
-plt.plot(temperatures, np.array(Cp1) - np.array(Cp0))
+plt.plot(temperatures, np.array(Cp0), label='pre')
+plt.plot(temperatures, np.array(Cp1), label='post')
+plt.legend(loc='lower right')
 plt.show()
 
 
