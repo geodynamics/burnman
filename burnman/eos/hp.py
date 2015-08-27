@@ -141,7 +141,10 @@ class HP_TMT(eos.EquationOfState):
         psubpth=pressure-params['P_0']-Pth
 
         # EQ 13
-        intVdP = (pressure-params['P_0'])*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(psubpth)), 1.-c))/(b*(c-1.)*(pressure-params['P_0']))))
+        if pressure != params['P_0']:
+            intVdP = (pressure-params['P_0'])*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(psubpth)), 1.-c))/(b*(c-1.)*(pressure-params['P_0']))))
+        else:
+            intVdP = 0.
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
@@ -212,7 +215,7 @@ class HP_TMT(eos.EquationOfState):
 
         ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['einstein_T'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
 
-        dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.-b*Pth), -1.-c))
+        dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.+b*(-Pth)), -1.-c))
 
         # Add order-disorder terms if required
         if params.has_key('landau_Tc'): # For a phase transition described by Landau term
