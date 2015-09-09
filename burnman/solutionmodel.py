@@ -401,3 +401,81 @@ class SubregularSolution (IdealSolution):
     def excess_enthalpy(self, pressure, temperature, molar_fractions):
         H_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wh, molar_fractions))
         return H_excess + pressure*self.excess_volume (pressure, temperature, molar_fractions)
+
+class FullSubregularSolution (SubregularSolution):
+    """
+    Solution model implementing the subregular solution model formulation (Helffrich and Wood, 1989)
+    Intermediates are defined to describe each of the interaction terms as a function of P and T
+    """
+
+    def __init__( self, endmembers, intermediates): 
+        self.endmembers = endmembers
+        self.intermediates = intermediates
+        #initialize ideal solution model
+        IdealSolution.__init__(self, endmembers)
+
+    def set_interaction_terms(self, pressure, temperature):
+        for i in range(self.n_endmembers-1):
+            for j in range(self.n_endmembers-i-1):
+                self.intermediates[i][j][0].set_state(pressure, temperature)
+                self.intermediates[i][j][1].set_state(pressure, temperature)
+
+
+        # Create 2D arrays of interaction parameters
+        self.enthalpy_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+        self.entropy_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+        self.volume_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+
+        self.Wg=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+
+        #setup excess enthalpy interaction matrix
+        for i in range(self.n_endmembers):
+            for j in range(i+1, self.n_endmembers):
+                fractions = []
+                for mbr in range(self.n_endmembers):
+                    if mbr == i or mbr == j:
+                        fractions.append(0.5)
+                    else:
+                        fractions.append(0.0)
+                Sconf = -constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, fractions), fractions)
+
+
+                self.Wg[i][j]=4.*(self.intermediates[i][j-i-1][0].gibbs - 0.5*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) \
+                                      + temperature*Sconf) 
+                self.Wg[j][i]=4.*(self.intermediates[i][j-i-1][1].gibbs - 0.5*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) \
+                                      + temperature*Sconf) 
+
+                self.Ws[i][j]=4.*(self.intermediates[i][j-i-1][0].S - 0.5*(self.endmembers[i][0].S + self.endmembers[j][0].S) - Sconf)
+                self.Ws[j][i]=4.*(self.intermediates[i][j-i-1][1].S - 0.5*(self.endmembers[i][0].S + self.endmembers[j][0].S) - Sconf)
+                self.entropy_interaction[i][j-i-1][0] = self.Ws[i][j]
+                self.entropy_interaction[i][j-i-1][1] = self.Ws[j][i]
+
+                self.Wv[i][j]=4.*(self.intermediates[i][j-i-1][0].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
+                self.Wv[j][i]=4.*(self.intermediates[i][j-i-1][0].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
+                self.volume_interaction[i][j-i-1][0] = self.Wv[i][j]
+                self.volume_interaction[i][j-i-1][1] = self.Wv[j][i]
+
+
+    def _non_ideal_function(self, W, molar_fractions):
+        return SubregularSolution._non_ideal_function(self, W, molar_fractions )
+
+    def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions) :
+        return self._non_ideal_function(self.Wg, molar_fractions)
+
+    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions)
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)
+        return ideal_gibbs + non_ideal_gibbs
+
+    def excess_volume (self, pressure, temperature, molar_fractions):
+        return SubregularSolution.excess_volume(self, pressure, temperature, molar_fractions )
+
+    def excess_entropy(self, pressure, temperature, molar_fractions):
+        return SubregularSolution.excess_entropy(self, pressure, temperature, molar_fractions )
+
+    def excess_enthalpy(self, pressure, temperature, molar_fractions):
+        return self.excess_gibbs_free_energy(pressure, temperature, molar_fractions) \
+            + temperature*self.excess_entropy(pressure, temperature, molar_fractions)

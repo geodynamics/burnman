@@ -267,3 +267,138 @@ if __name__ == "__main__":
     plt.xlabel("Pyrope fraction")
     plt.legend(loc='lower left')
     plt.show()
+
+
+    '''
+    Finally, the full subregular model is supercool
+    '''
+
+    # First let's define a simple symmetric garnet
+    H_ex = 15000.*3. # J/mol
+    S_ex = 5.78*3. # m^3/mol
+    V_ex = 0.0405e-5*3. # m^3/mol
+
+    class symmetric_garnet(burnman.SolidSolution):
+        def __init__(self, molar_fractions=None):
+            self.name='Symmetric pyrope-grossular garnet'
+            self.type='symmetric'
+            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12']]
+            self.enthalpy_interaction=[[H_ex]]
+            self.entropy_interaction=[[S_ex]]
+            self.volume_interaction=[[V_ex]]
+
+            burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+    # Now let's define an intermediate
+    py = minerals.HP_2011_ds62.py()
+    gr = minerals.HP_2011_ds62.gr()
+
+    from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+    atomic_masses=read_masses()
+
+    class pygr (burnman.Mineral):
+        def __init__(self):
+            formula='Mg1.5Ca1.5Al2.0Si3.0O12.0'
+            formula = dictionarize_formula(formula)
+            V_0 = (py.params['V_0'] + gr.params['V_0'])*0.5 + V_ex/4.
+
+            KV_py = py.params['K_0']*py.params['V_0']
+            KV_gr = gr.params['K_0']*gr.params['V_0']
+            KV_pygr = 0.5*(KV_py + KV_gr)
+            K_0 = KV_pygr / V_0
+            Kprime_0 = (py.params['Kprime_0'] + gr.params['Kprime_0'])*0.5
+
+            Sconf = 2.*burnman.constants.gas_constant*0.5*3.*np.log(0.5)
+            self.params = {
+                'name': 'py-gr intermediate',
+                'formula': formula,
+                'equation_of_state': 'hp_tmt',
+                'H_0': (py.params['H_0'] + gr.params['H_0'])*0.5 + H_ex/4.,
+                'S_0': (py.params['S_0'] + gr.params['S_0'])*0.5 - Sconf + S_ex/4. ,
+                'V_0': V_0,
+                'Cp': [(py.params['Cp'][0] + gr.params['Cp'][0])*0.5,
+                       (py.params['Cp'][1] + gr.params['Cp'][1])*0.5,
+                       (py.params['Cp'][2] + gr.params['Cp'][2])*0.5,
+                       (py.params['Cp'][3] + gr.params['Cp'][3])*0.5] ,
+                'a_0': (py.params['a_0'] + gr.params['a_0'])*0.5 ,
+                'K_0': K_0 ,
+                'Kprime_0': Kprime_0 ,
+                'Kdprime_0': -Kprime_0/K_0 ,
+                'n': sum(formula.values()),
+                'molar_mass': formula_mass(formula, atomic_masses)}
+            burnman.Mineral.__init__(self)
+
+    # Finally, here's the class
+    class full_garnet(burnman.SolidSolution):
+        def __init__(self, molar_fractions=None):
+            self.name='Subregular pyrope-almandine-grossular garnet'
+            self.type='full_subregular'
+            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12']]
+            self.intermediates=[[[pygr(), pygr()]]]
+
+            burnman.SolidSolution.__init__(self, molar_fractions)
+
+    g6=full_garnet()
+    g7=symmetric_garnet()
+
+    pressures = np.linspace(1.e5, 25.e9, 26)
+    py_volumes = np.empty_like(pressures)
+    gr_volumes = np.empty_like(pressures)
+    g6_volumes = np.empty_like(pressures)
+    g7_volumes = np.empty_like(pressures)
+    g6_excess_volumes = np.empty_like(pressures)
+    g7_excess_volumes = np.empty_like(pressures)
+
+    g6_excess_gibbs = np.empty_like(pressures)
+    g7_excess_gibbs = np.empty_like(pressures)
+
+    T = 298.15
+    molar_fractions=[0.5, 0.5]
+    for i,P in enumerate(pressures):
+        py.set_state(P,T)
+        py_volumes[i] = py.V
+        gr.set_state(P,T)
+        gr_volumes[i] = gr.V
+
+        g6.set_composition(molar_fractions)
+        g6.set_state(P,T)
+        g6_volumes[i] = g6.V
+        g6_excess_volumes[i] = g6.excess_volume
+        g6_excess_gibbs[i] = g6.excess_gibbs
+
+        g7.set_composition(molar_fractions)
+        g7.set_state(P,T)
+        g7_volumes[i] = g7.V
+        g7_excess_volumes[i] = g7.excess_volume
+        g7_excess_gibbs[i] = g7.excess_gibbs
+
+
+    plt.plot( pressures/1.e9, py_volumes*1.e6/3., 'r-', linewidth=1., label='Py volume')
+    plt.plot( pressures/1.e9, gr_volumes*1.e6/3., 'r-', linewidth=1., label='Gr volume')
+    plt.plot( pressures/1.e9, g6_volumes*1.e6/3., 'g-', linewidth=1., label='Py50Gr50 (full)')
+    plt.plot( pressures/1.e9, g7_volumes*1.e6/3., 'b-', linewidth=1., label='Py50Gr50 (simple)')
+    plt.title("Room temperature py-gr equations of state")
+    plt.ylabel("Volume (cm^3/cation-mole)")
+    plt.xlabel("Pressure (GPa)")
+    plt.legend(loc='lower left')
+    plt.show()
+
+    plt.plot( pressures/1.e9, g6_excess_volumes*1.e6/3., 'g-', linewidth=1., label='Py50Gr50 (full)')
+    plt.plot( pressures/1.e9, g7_excess_volumes*1.e6/3., 'b-', linewidth=1., label='Py50Gr50 (simple)')
+    plt.title("Py-gr volume excesses")
+    plt.ylabel("Excess volume (cm^3/cation-mole)")
+    plt.xlabel("Pressure (GPa)")
+    plt.legend(loc='lower left')
+    plt.show()
+
+
+    plt.plot( pressures/1.e9, g6_excess_gibbs*1.e-3, 'g-', linewidth=1., label='Py50Gr50 (full)')
+    plt.plot( pressures/1.e9, g7_excess_gibbs*1.e-3, 'b-', linewidth=1., label='Py50Gr50 (simple)')
+    plt.title("Py-gr gibbs excesses")
+    plt.ylabel("Excess gibbs (kJ/mole)")
+    plt.xlabel("Pressure (GPa)")
+    plt.legend(loc='lower left')
+    plt.show()

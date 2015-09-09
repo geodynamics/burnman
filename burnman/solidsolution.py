@@ -63,6 +63,8 @@ class SolidSolution(Mineral):
                         raise Exception("'alphas' attribute missing from solid solution")
                 elif self.type == 'subregular':
                     self.solution_model=SubregularSolution(self.endmembers, self.enthalpy_interaction, self.volume_interaction, self.entropy_interaction)
+                elif self.type == 'full_subregular':
+                    self.solution_model=FullSubregularSolution(self.endmembers, self.intermediates)
                 else:
                     raise Exception("Solution model type "+self.params['type']+"not recognised.")
         else:
@@ -115,6 +117,9 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
+        if self.type == 'full_subregular':
+            self.solution_model.set_interaction_terms(pressure, temperature)
+
         self.excess_partial_gibbs = self.solution_model.excess_partial_gibbs_free_energies( pressure, temperature, self.molar_fractions)
         self.excess_gibbs = self.solution_model.excess_gibbs_free_energy( pressure, temperature, self.molar_fractions)
         self.partial_gibbs = np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
@@ -127,29 +132,42 @@ class SolidSolution(Mineral):
         self.H = sum([ self.endmembers[i][0].H * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
         self.S = sum([ self.endmembers[i][0].S * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
         self.V = sum([ self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_volume
-        self.C_p = sum([ self.endmembers[i][0].C_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        self.alpha = (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        self.K_T = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].K_T)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
- 
-        G_list = [ self.endmembers[i][0].G for i in range(self.n_endmembers) ]
-        if 0.0 in G_list:
-            self.G = 0.0
-        else:
-            self.G = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
 
-        # Derived properties
-        self.C_v = self.C_p - self.V*temperature*self.alpha*self.alpha*self.K_T
-
-        # C_v and C_p -> 0 as T -> 0
-        if temperature<1e-10:
-            self.K_S = self.K_T
-            self.gr = float('nan')
+        if self.type != 'full_subregular':
+            self.C_p = sum([ self.endmembers[i][0].C_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+            self.alpha = (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+            self.K_T = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].K_T)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
+            
+            G_list = [ self.endmembers[i][0].G for i in range(self.n_endmembers) ]
+            if 0.0 in G_list:
+                self.G = 0.0
+            else:
+                self.G = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
         else:
-            self.K_S = self.K_T*self.C_p/self.C_v
-            self.gr = self.alpha*self.K_T*self.V/self.C_v     
+            self.C_p = float('nan')
+            self.alpha = float('nan')
+            self.K_T = float('nan')
+            self.G = float('nan')
+
+            # Derived properties
+            self.C_v = self.C_p - self.V*temperature*self.alpha*self.alpha*self.K_T
+
+            # C_v and C_p -> 0 as T -> 0
+            if temperature<1e-10:
+                self.K_S = self.K_T
+                self.gr = float('nan')
+            else:
+                self.K_S = self.K_T*self.C_p/self.C_v
+                self.gr = self.alpha*self.K_T*self.V/self.C_v     
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
+        if self.type == 'full_subregular':
+            self.solution_model.set_interaction_terms(pressure, temperature)
+
         return sum([ self.endmembers[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)
 
     def calcpartialgibbsexcesses(self, pressure, temperature, molar_fractions):
+        if self.type == 'full_subregular':
+            self.solution_model.set_interaction_terms(pressure, temperature)
+
         return self.solution_model.excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions)
