@@ -157,6 +157,77 @@ class SolutionModel(object):
         """
         return 0.0
 
+    def excess_dVdP(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(volume)/d(pressure) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dVdP_excess : float
+            The pressure gradient of the volume excess of the solution
+        """
+        return 0.0
+
+    def excess_dVdT(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(volume)/d(temperature) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dVdT_excess : float
+            The temperature gradient of the volume excess of the solution
+        """
+        return 0.0
+
+    def excess_dSdT(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(entropy)/d(temperature) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dSdT_excess : float
+            The temperature gradient of the entropy excess of the solution
+        """
+        return 0.0
 
 class IdealSolution (SolutionModel):
     """
@@ -431,6 +502,10 @@ class FullSubregularSolution (SubregularSolution):
         self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
         self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
 
+        self.Wdvdp=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wdvdt=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wdsdt=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+
         #setup excess enthalpy interaction matrix
         for i in range(self.n_endmembers):
             for j in range(i+1, self.n_endmembers):
@@ -454,10 +529,27 @@ class FullSubregularSolution (SubregularSolution):
                 self.entropy_interaction[i][j-i-1][1] = self.Ws[j][i]
 
                 self.Wv[i][j]=4.*(self.intermediates[i][j-i-1][0].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
-                self.Wv[j][i]=4.*(self.intermediates[i][j-i-1][0].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
+                self.Wv[j][i]=4.*(self.intermediates[i][j-i-1][1].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
                 self.volume_interaction[i][j-i-1][0] = self.Wv[i][j]
                 self.volume_interaction[i][j-i-1][1] = self.Wv[j][i]
 
+                self.Wdvdp[i][j] = -4.*(self.intermediates[i][j-i-1][0].V/self.intermediates[i][j-i-1][0].K_T \
+                                            - 0.5*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                                                       + self.endmembers[j][0].V/self.endmembers[j][0].K_T))
+                self.Wdvdp[j][i] = -4.*(self.intermediates[i][j-i-1][1].V/self.intermediates[i][j-i-1][1].K_T \
+                                            - 0.5*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                                                       + self.endmembers[j][0].V/self.endmembers[j][0].K_T))
+
+                self.Wdvdt[i][j] = 4.*(self.intermediates[i][j-i-1][0].alpha*self.intermediates[i][j-i-1][0].V \
+                                           - 0.5*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                                                      + self.endmembers[j][0].alpha*self.endmembers[j][0].V))           
+                self.Wdvdt[j][i] = 4.*(self.intermediates[i][j-i-1][1].alpha*self.intermediates[i][j-i-1][1].V \
+                                           - 0.5*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                                                      + self.endmembers[j][0].alpha*self.endmembers[j][0].V))    
+
+                self.Wdsdt[i][j] = 4./temperature*(self.intermediates[i][j-i-1][0].C_p - 0.5*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))    
+                self.Wdsdt[j][i] = 4./temperature*(self.intermediates[i][j-i-1][1].C_p - 0.5*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p)) 
+                
 
     def _non_ideal_function(self, W, molar_fractions):
         return SubregularSolution._non_ideal_function(self, W, molar_fractions )
@@ -479,3 +571,15 @@ class FullSubregularSolution (SubregularSolution):
     def excess_enthalpy(self, pressure, temperature, molar_fractions):
         return self.excess_gibbs_free_energy(pressure, temperature, molar_fractions) \
             + temperature*self.excess_entropy(pressure, temperature, molar_fractions)
+
+    def excess_dVdP (self, pressure, temperature, molar_fractions):
+        dVdP_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdvdp, molar_fractions))
+        return dVdP_excess
+
+    def excess_dVdT (self, pressure, temperature, molar_fractions):
+        dVdT_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdvdt, molar_fractions))
+        return dVdT_excess
+
+    def excess_dSdT (self, pressure, temperature, molar_fractions):
+        dSdT_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdsdt, molar_fractions))
+        return dSdT_excess
