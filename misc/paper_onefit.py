@@ -102,7 +102,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()
     npts = 10
     depths = np.linspace(850e3,2700e3, npts)
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure))
 

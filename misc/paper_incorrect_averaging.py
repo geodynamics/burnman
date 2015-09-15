@@ -121,7 +121,7 @@ if __name__ == "__main__":
     #seismic model for comparison:
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     depths = map(seismic_model.depth, pressure)
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     #pure perovskite
     perovskitite = burnman.Composite( ( (perovskite(0.06), 1.0),) )

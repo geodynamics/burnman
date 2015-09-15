@@ -69,7 +69,7 @@ if __name__ == "__main__":
     # query the seismic model for the pressure, density, P wave speed, S wave
     # speed, and bulk sound velocity at those depths
     depths = np.linspace(750e3, 2800e3, 20)
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 
     # Now we get an array of temperatures at which will be used for computing

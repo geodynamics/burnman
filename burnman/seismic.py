@@ -4,9 +4,13 @@
 
 import numpy as np
 import tools
+import constants
+import warnings
 import scipy.interpolate
 import scipy.integrate
 import matplotlib.pyplot as plt
+
+
 
 class Seismic1DModel(object):
     """
@@ -17,35 +21,27 @@ class Seismic1DModel(object):
 
 
 
-    def evaluate_all_at(self, depth_list):
+    
+    def evaluate(self, vars_list, depth_list):
         """
         Returns the lists of data for a Seismic1DModel for the depths provided
-            
+        
         Parameters
         ----------
+        vars_list : array of variables (in str format) to be evaluated
         depth_list : array of floats
-            Array of depths [m] to evaluate seismic model at.
-            
+        Array of depths [m] to evaluate seismic model at.
+        
         Returns
         -------
-        pressures : array of floats
-            Pressures at given depths in [Pa].
-        density :  array of floats
-            Densities at given depths in [kg/m^3].
-        v_p : array of floats
-            P wave velocities at given depths in [m/s].
-        v_s : array of floats
-            S wave velocities at given depths in [m/s].
-        v_phi : array of floats
-            Bulk sound velocities at given depths in [m/s].
+        Array of values shapes as (len(vars_list),len(depth_list)). 
+
         """
-        pressures = np.array([self.pressure(r) for r in depth_list])
-        density = np.array([self.density(r) for r in depth_list])
-        v_p = np.array([self.v_p(r) for r in depth_list])
-        v_s = np.array([self.v_s(r) for r in depth_list])
-        v_phi = np.array([self.v_phi(r) for r in depth_list])
-        return pressures, density, v_p, v_s, v_phi
-    
+        
+        values=np.empty((len(vars_list),len(depth_list)))
+        for a in range(len(vars_list)):
+            values[a,:]=getattr(self,vars_list[a])(depth_list)
+        return values
 
 
     def internal_depth_list(self,mindepth=0.,maxdepth=6371.e3):
@@ -235,40 +231,46 @@ class SeismicTable(Seismic1DModel):
     """ 
     def __init__(self):
         Seismic1DModel.__init__(self)
+        
         self.table_depth = []
         self.table_radius = []
         self.table_pressure = []
-        #self.table_gravity = []
+        self.table_gravity = []
         self.table_density = []
         self.table_vp = []
         self.table_vs = []
         self.table_QG = []
         self.table_QK = []
-
+        
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self,mindepth=0., maxdepth=6371.e3):
-        return np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth])
+        depths= np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth])
+        discontinuities=np.where(depths[1:]-depths[:-1]==0)[0]
+        #Shift values at discontinities by 1 m to simplify evaluating values around these.
+        depths[discontinuities]=depths[discontinuities]-1.
+        depths[discontinuities+1]=depths[discontinuities+1]+1.
+        return depths
 
 
     def pressure(self, depth):
-        try:
+        if len(self.table_pressure)>0:
             return self._lookup(depth, self.table_pressure)
-        except:
-            self._compute_pressure()
-            return self._lookup(depth, self.table_pressure)
+        else:
+            if len(self.table_density)>0:
+                warnings.warn("Pressure is not given in "+ self.__class__.__name__ +" and is now being computed. Potentially this might not be very realistic if "+ self.__class__.__name__ +" is not a global model. Potentially it might be better to use the depth/pressure conversion given by the PREM model.")
+
+                self._compute_pressure()
+                return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
-        #try:
-        #return self._lookup(depth,self.table_gravity)
-        #except:
-        print len(self.table_gravity)
         if len(self.table_gravity)>0:
             return self._lookup(depth,self.table_gravity)
         else:
-            print 'ok, I will compute'
-            self._compute_gravity()
-            return self._lookup(depth,self.table_gravity)
+            if len(self.table_density)>0:
+                warnings.warn("Gravity is not given in "+ self.__class__.__name__ +" and is now being computed. Potentially this might not be very realistic if "+ self.__class__.__name__ +" is not a global model.")
+                self._compute_gravity()
+                return self._lookup(depth,self.table_gravity)
 
     def v_p(self, depth):
 
@@ -302,13 +304,6 @@ class SeismicTable(Seismic1DModel):
 
         radius = np.interp(pressure, self.table_pressure[::-1], self.earth_radius - self.table_depth[::-1])
         return radius
-    
-    def shift_discontinuities(self):
-        #Shifting depths of discontinuities by 1 m, so they have unique depth values and interpolations work well....
-        discontinuities=np.where(self.table_depth[1:]-self.table_depth[:-1]==0)[0]
-        self.table_depth[discontinuities+1]=self.table_depth[discontinuities+1]+1.
-        if not len(self.table_radius) == 0:
-            self.table_radius[discontinuities+1]=self.table_radius[discontinuities+1]-1.
 
 
     def _lookup(self, depth, value_table):
@@ -317,41 +312,18 @@ class SeismicTable(Seismic1DModel):
 
 
     def _compute_gravity(self):
-        #Calculate the gravity of the planet, based on a density profile.  This integrates
-        #Poisson's equation in radius, under the assumption that the planet is laterally
-        #homogeneous.
-        #Create a spline fit of density as a function of radius
+        # Calculate the gravity of the planet, based on a density profile.
+        # There is a check of the surface value is within reason for this model, otherwise values for PREM are used.
+        
+        
         density=self.table_density[::-1]
         radii=self.table_radius[::-1]
-        rhofunc = scipy.interpolate.UnivariateSpline(radii, density)
- 
-        depth = self.earth_radius-radii
-        jumps=np.diff(depth)
-        disc = [ x for x in range(len(jumps)) if jumps[x]<2.] # define discontinuities defined over less than 2 m.
-        disc.insert(0,0.)
-        disc.append[-1] # include center of the earth
-        pressure=[0.]
-        grav=[0.]
-        for i in range(len(disc)-1):
-            #Numerically integrate Poisson's equation  --- can't get this part to work!!!!
-            poisson = lambda p,x : 4.0 * np.pi * G * rhofunc(x) * x * x
-            grav = np.ravel(scipy.integrate.odeint( poisson, 0.0, radii[disc[i]:disc[i+1]], full_output=0, printmessg=1))
-            print grav[-1]
- 
-        G = 6.67e-11
-        #Numerically integrate Poisson's equation  --- can't get this part to work!!!!
-        poisson = lambda p,x : 4.0 * np.pi * G * rhofunc(x) * x * x
-        grav = np.ravel(scipy.integrate.odeint( poisson, 0.0, radii, full_output=0, printmessg=1))
-        grav[1:] = grav[1:]/radii[1:]/radii[1:]
-        grav[0] = 0.0 #Set it to zero a the center, since radius = 0 there we cannot divide by r^2
-        
-        
-        #simple integration
-        g=[]
-        for i in range(len(radii)):
-            g_tmp=scipy.integrate.trapz(G*4.*np.pi*density[0:i]*radii[0:i]*radii[0:i]/(radii[i])/(radii[i]),radii[0:i])
-            g.append(g_tmp)
+        g=scipy.integrate.cumtrapz(constants.gravitational*4.*np.pi*density*radii*radii, x=radii,initial=0)
+        g[1:]=g[1:]/radii[1:]/radii[1:]
+
+
         self.table_gravity=g[::-1]
+
 
 
     def _compute_pressure(self):
@@ -360,32 +332,12 @@ class SeismicTable(Seismic1DModel):
         radii=self.table_radius
         density=self.table_density
         gravity=self.gravity(self.earth_radius-radii)
+        
         #convert radii to depths
         depth = self.earth_radius-radii
-        jumps=np.diff(depth)
-        disc = [ x for x in range(len(jumps)) if jumps[x]<2.] # define discontinuities defined over less than 2 m.
-        disc.insert(0,0.)
-        disc.append[-1] # include center of the earth
-        pressure=[0.]
-        for i in range(len(disc)-1):
-            #Make a spline fit of density as a function of depth
-            rhofunc = scipy.interpolate.UnivariateSpline( depth[disc[i]:disc[i+1]], density[disc[i]:disc[i+1]] )
-            #Make a spline fit of gravity as a function of depth
-            gfunc = scipy.interpolate.UnivariateSpline( depth[disc[i]:disc[i+1]], gravity[disc[i]:disc[i+1]] )
-            #integrate the hydrostatic equation
-            pressure.append(np.ravel(scipy.integrate.odeint( (lambda p, x : gfunc(x)* rhofunc(x)),pressure[-1] ,depth[disc[i]:disc[i+1]])))
-            print pressure[-1]
-        
-        p=[]
-        for i in range(len(depth)):
-            p_tmp=scipy.integrate.trapz(gravity[0:i]*density[0:i],depth[0:i])
-            p.append(p_tmp)
-        plt.figure()
-        plt.plot(depth, p_tmp)
-        plt.plot(depth,pressure)
-        plt.show()
+        pressure=scipy.integrate.cumtrapz(gravity*density, x=depth,initial=0.)
 
-        self.table_pressure=p
+        self.table_pressure=pressure
 
 
 class PREM(SeismicTable):
@@ -407,7 +359,7 @@ class PREM(SeismicTable):
         self.table_QK = table[:,7]
         self.table_QG = table[:,8]
 
-        self.shift_discontinuities()
+
 
 
 
@@ -470,9 +422,9 @@ class Fast(SeismicTable):
         self.table_vs = np.interp(self.table_depth,table2[:,0][::-1],table2[:,1][::-1])
 
 
-class REF(SeismicTable):
+class STW105(SeismicTable):
     """
-        Reads  REF or STW05 (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
+        Reads  STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
         See also :class:`burnman.seismic.SeismicTable`.
         """
     def __init__(self):
@@ -494,7 +446,7 @@ class REF(SeismicTable):
         self.table_vs=np.sqrt((2.*self.table_vsv*self.table_vsv+self.table_vsh*self.table_vsh)/3.)
         self.table_vp=np.sqrt((self.table_vpv*self.table_vpv+4.*self.table_vph*self.table_vph)/5.)
 
-        self.shift_discontinuities()
+
 
 
 class IASP91(SeismicTable):
@@ -504,15 +456,13 @@ class IASP91(SeismicTable):
         """
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table("input_seismic/IASP91.txt") # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/iasp91.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:,0]
         self.table_radius = table[:,1]
         self.table_vp = table[:,2]
         self.table_vs = table[:,3]
-        
-        
-        self.shift_discontinuities()
+
 
 class AK135(SeismicTable):
     """
@@ -531,7 +481,7 @@ class AK135(SeismicTable):
         self.table_QG = table[:,5]
         self.table_QK = table[:,6]
         
-        self.shift_discontinuities()
+
 
 
 def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):

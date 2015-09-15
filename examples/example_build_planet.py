@@ -1,4 +1,4 @@
-# BurnMan - a lower mantle toolkit
+    # BurnMan - a lower mantle toolkit
 # Copyright (C) 2015, Heister, T., Unterborn, C., Rose, I. Cottaar, S., and Myhill, R.
 # Released under GPL v2 or later.
 
