@@ -518,38 +518,47 @@ class FullSubregularSolution (SubregularSolution):
                 Sconf = -constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, fractions), fractions)
 
 
-                self.Wg[i][j]=4.*(self.intermediates[i][j-i-1][0].gibbs - 0.5*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) \
-                                      + temperature*Sconf) 
-                self.Wg[j][i]=4.*(self.intermediates[i][j-i-1][1].gibbs - 0.5*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) \
-                                      + temperature*Sconf) 
+                self.Wg[i][j]=4.*(self.intermediates[i][j-i-1][0].gibbs + temperature*Sconf) \
+                               - 2.*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs)
+                self.Wg[j][i]=4.*(self.intermediates[i][j-i-1][1].gibbs + temperature*Sconf) \
+                               - 2.*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) 
 
-                self.Ws[i][j]=4.*(self.intermediates[i][j-i-1][0].S - 0.5*(self.endmembers[i][0].S + self.endmembers[j][0].S) - Sconf)
-                self.Ws[j][i]=4.*(self.intermediates[i][j-i-1][1].S - 0.5*(self.endmembers[i][0].S + self.endmembers[j][0].S) - Sconf)
+                self.Ws[i][j] = 4.*(self.intermediates[i][j-i-1][0].S - Sconf) \
+                               - 2.*(self.endmembers[i][0].S + self.endmembers[j][0].S) 
+                self.Ws[j][i] = 4.*(self.intermediates[i][j-i-1][1].S - Sconf) \
+                                - 2.*(self.endmembers[i][0].S + self.endmembers[j][0].S)
                 self.entropy_interaction[i][j-i-1][0] = self.Ws[i][j]
                 self.entropy_interaction[i][j-i-1][1] = self.Ws[j][i]
 
-                self.Wv[i][j]=4.*(self.intermediates[i][j-i-1][0].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
-                self.Wv[j][i]=4.*(self.intermediates[i][j-i-1][1].V - 0.5*(self.endmembers[i][0].V + self.endmembers[j][0].V))
+                self.Wv[i][j] = 4.*(self.intermediates[i][j-i-1][0].V) \
+                                - 2.*(self.endmembers[i][0].V + self.endmembers[j][0].V)
+                self.Wv[j][i] = 4.*(self.intermediates[i][j-i-1][1].V) \
+                                - 2.*(self.endmembers[i][0].V + self.endmembers[j][0].V)
                 self.volume_interaction[i][j-i-1][0] = self.Wv[i][j]
                 self.volume_interaction[i][j-i-1][1] = self.Wv[j][i]
 
-                self.Wdvdp[i][j] = -4.*(self.intermediates[i][j-i-1][0].V/self.intermediates[i][j-i-1][0].K_T \
-                                            - 0.5*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
-                                                       + self.endmembers[j][0].V/self.endmembers[j][0].K_T))
-                self.Wdvdp[j][i] = -4.*(self.intermediates[i][j-i-1][1].V/self.intermediates[i][j-i-1][1].K_T \
-                                            - 0.5*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
-                                                       + self.endmembers[j][0].V/self.endmembers[j][0].K_T))
-
-                self.Wdvdt[i][j] = 4.*(self.intermediates[i][j-i-1][0].alpha*self.intermediates[i][j-i-1][0].V \
-                                           - 0.5*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
-                                                      + self.endmembers[j][0].alpha*self.endmembers[j][0].V))           
-                self.Wdvdt[j][i] = 4.*(self.intermediates[i][j-i-1][1].alpha*self.intermediates[i][j-i-1][1].V \
-                                           - 0.5*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
-                                                      + self.endmembers[j][0].alpha*self.endmembers[j][0].V))    
-
-                self.Wdsdt[i][j] = 4./temperature*(self.intermediates[i][j-i-1][0].C_p - 0.5*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))    
-                self.Wdsdt[j][i] = 4./temperature*(self.intermediates[i][j-i-1][1].C_p - 0.5*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p)) 
+                self.Wdvdp[i][j] = -4.*(self.intermediates[i][j-i-1][0].V \
+                                        / self.intermediates[i][j-i-1][0].K_T) \
+                    + 2.*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                          + self.endmembers[j][0].V/self.endmembers[j][0].K_T)
+                self.Wdvdp[j][i] = -4.*(self.intermediates[i][j-i-1][1].V \
+                                        / self.intermediates[i][j-i-1][1].K_T) \
+                    + 2.*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                          + self.endmembers[j][0].V/self.endmembers[j][0].K_T)
                 
+                self.Wdvdt[i][j] = 4.*(self.intermediates[i][j-i-1][0].alpha \
+                                       * self.intermediates[i][j-i-1][0].V) \
+                    - 2.*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                          + self.endmembers[j][0].alpha*self.endmembers[j][0].V)        
+                self.Wdvdt[j][i] = 4.*(self.intermediates[i][j-i-1][1].alpha \
+                                       * self.intermediates[i][j-i-1][1].V) \
+                    - 2.*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                          + self.endmembers[j][0].alpha*self.endmembers[j][0].V)
+
+                self.Wdsdt[i][j] = (1./temperature)*(4.*(self.intermediates[i][j-i-1][0].C_p)
+                                    - 2.*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))
+                self.Wdsdt[j][i] = (1./temperature)*(4.*(self.intermediates[i][j-i-1][1].C_p)
+                                    - 2.*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))
 
     def _non_ideal_function(self, W, molar_fractions):
         return SubregularSolution._non_ideal_function(self, W, molar_fractions )

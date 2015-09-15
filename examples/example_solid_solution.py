@@ -326,10 +326,10 @@ if __name__ == "__main__":
     Kprime_0 = V_pygr*2./(py.params['V_0']/(py.params['Kprime_0'] + 1.) \
                            + py.params['V_0']/(py.params['Kprime_0'] + 1.))
     
-    Sconf = 2.*burnman.constants.gas_constant*0.5*3.*np.log(0.5)
-    S_pygr = (py.params['S_0'] + gr.params['S_0'])*0.5 - Sconf + S_ex/4.
+    Sconf = -2.*burnman.constants.gas_constant*0.5*3.*np.log(0.5)
+    S_pygr = (py.params['S_0'] + gr.params['S_0'])*0.5 + Sconf + S_ex/4.
     H_pygr = (py.params['H_0'] + gr.params['H_0'])*0.5 + H_ex/4.
-
+    
     # Cp_scaling = ((py.params['S_0'] + gr.params['S_0'])*0.5 + S_ex/4)/((py.params['S_0'] + gr.params['S_0'])*0.5)
     # Haselton and Westrum (1980) show that the excess entropy is primarily a result of a low temperature spike in Cp
     # Therefore, at >=298.15 K, Cp is well approximated by a linear combination of pyrope and grossular 
