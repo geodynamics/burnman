@@ -6,7 +6,6 @@ import numpy as np
 import tools
 import constants
 import warnings
-import scipy.interpolate
 import scipy.integrate
 import matplotlib.pyplot as plt
 
