@@ -25,4 +25,4 @@ Boltzmann = 1.3806488e-23
 Newtonian constant of gravitation (G) in m^3 kg^-1 s^-2
 """
 
-gravitational = scipy.constants.G
+G = scipy.constants.G

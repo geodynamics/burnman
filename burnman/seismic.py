@@ -28,9 +28,10 @@ class Seismic1DModel(object):
         
         Parameters
         ----------
-        vars_list : array of variables (in str format) to be evaluated
+        vars_list : array of str
+	    Variables to be evaluated. Options are depending on the model 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
         depth_list : array of floats
-        Array of depths [m] to evaluate seismic model at.
+            Array of depths [m] to evaluate seismic model at.
         
         Returns
         -------
@@ -52,7 +53,7 @@ class Seismic1DModel(object):
         Returns
         -------
         depths : array of floats
-        Depths [m].
+            Depths [m].
         """
         raise ValueError, "not implemented"
         return 0
@@ -62,12 +63,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         pressure : float or array of floats
-        Pressure(s) at given depth(s) in [Pa].
+            Pressure(s) at given depth(s) in [Pa].
         """
         raise ValueError, "not implemented"
         return 0
@@ -92,12 +93,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         v_s : float or array of floats
-        S wave velocity at given depth(s) in [m/s].
+            S wave velocity at given depth(s) in [m/s].
         """
         raise ValueError, "not implemented"
         return 0
@@ -107,12 +108,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth_list : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         v_phi : float or array of floats
-        bulk sound wave velocity at given depth(s) in [m/s].
+            bulk sound wave velocity at given depth(s) in [m/s].
         """
         v_s=self.v_s(depth)
         v_p=self.v_p(depth)
@@ -124,12 +125,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         density : float or array of floats
-        Density at given depth(s) in [kg/m^3].
+            Density at given depth(s) in [kg/m^3].
         """
         raise ValueError, "not implemented"
         return 0
@@ -140,7 +141,7 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Shear modulus at given for depth(s) in [Pa].
+            Shear modulus at given for depth(s) in [Pa].
         """
         return np.power(self.v_s(depth),2.) * self.density(depth)
     
@@ -149,7 +150,7 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Bulk modulus at given for depth(s) in [Pa]
+            Bulk modulus at given for depth(s) in [Pa]
         """
         return np.power(self.v_phi(depth),2.) * self.density(depth)
 
@@ -159,12 +160,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
 
         Returns
         -------
         Qk : float or array of floats
-        Quality factor (dimensionless) for bulk modulus at given depth(s).
+            Quality factor (dimensionless) for bulk modulus at given depth(s).
         """
         raise ValueError, "not implemented"
         return 0
@@ -174,12 +175,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate seismic model at.
+            Depth(s) [m] to evaluate seismic model at.
         
         Returns
         -------
         QG : float or array of floats
-        Quality factor (dimensionless) for shear modulus at given depth(s).
+            Quality factor (dimensionless) for shear modulus at given depth(s).
         """
         raise ValueError, "not implemented"
         return 0
@@ -191,12 +192,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         pressure : float or array of floats
-        Pressure(s) [Pa] to evaluate depth at.
+            Pressure(s) [Pa] to evaluate depth at.
 
         Returns
         -------
         depth : float or array of floats
-        Depth(s) [m] for given pressure(s)
+            Depth(s) [m] for given pressure(s)
         """
         raise ValueError, "not implemented"
         return -1
@@ -208,12 +209,12 @@ class Seismic1DModel(object):
         Parameters
         ----------
         depth : float or array of floats
-        Depth(s) [m] to evaluate gravity at.
+            Depth(s) [m] to evaluate gravity at.
         
         Returns
         -------
         gravity : float or array of floats
-        Gravity for given depths in [m/s^2]
+            Gravity for given depths in [m/s^2]
         """
         raise ValueError, "not implemented"
         return -1
@@ -318,7 +319,7 @@ class SeismicTable(Seismic1DModel):
         
         density=self.table_density[::-1]
         radii=self.table_radius[::-1]
-        g=scipy.integrate.cumtrapz(constants.gravitational*4.*np.pi*density*radii*radii, x=radii,initial=0)
+        g=scipy.integrate.cumtrapz(constants.G*4.*np.pi*density*radii*radii, x=radii,initial=0)
         g[1:]=g[1:]/radii[1:]/radii[1:]
 
 
@@ -426,7 +427,7 @@ class STW105(SeismicTable):
     """
         Reads  STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
         See also :class:`burnman.seismic.SeismicTable`.
-        """
+    """
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table("input_seismic/STW105.txt") # radius, pressure, density, v_p, v_s
@@ -453,7 +454,7 @@ class IASP91(SeismicTable):
     """
         Reads  REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
         See also :class:`burnman.seismic.SeismicTable`.
-        """
+    """
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table("input_seismic/iasp91.txt") # radius, pressure, density, v_p, v_s
@@ -468,7 +469,7 @@ class AK135(SeismicTable):
     """
         Reads  AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
         See also :class:`burnman.seismic.SeismicTable`.
-        """
+    """
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table("input_seismic/ak135.txt") # radius, pressure, density, v_p, v_s
@@ -506,11 +507,11 @@ def attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     Returns
     -------
     v_p : float
-    corrected P wave velocity in [m/s].
+        corrected P wave velocity in [m/s].
     v_s : float
-    corrected S wave velocitiy in [m/s].
+        corrected S wave velocitiy in [m/s].
     v_phi : float
-    corrected Bulk sound velocity in [m/s].
+        corrected Bulk sound velocity in [m/s].
 
 
 
