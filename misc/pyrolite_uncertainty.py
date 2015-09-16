@@ -186,7 +186,7 @@ if whattodo=="plotgood":
     prop={'size':12}
     #plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=150,figsize=figsize)
     plt.subplots_adjust(hspace=0.3)
     for name in names:
@@ -454,7 +454,7 @@ if whattodo=="plotone":
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
 
@@ -599,7 +599,7 @@ elif whattodo=="plot":
     #do some setup for the figure
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     plt.subplots_adjust(wspace=0.3)
 
     plt.subplot(111, aspect='equal')
