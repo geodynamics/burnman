@@ -150,5 +150,6 @@ if __name__ == "__main__":
 
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Shear velocity $V_s$ (km/s)')
-    plt.savefig("example_averaging.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_averaging.pdf",bbox_inches='tight')
     plt.show()

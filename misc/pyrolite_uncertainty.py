@@ -637,5 +637,6 @@ elif whattodo=="plot":
     #save and show the image
     fig = plt.gcf()
     fig.set_size_inches(6.0, 6.0)
-    fig.savefig("pyrolite_uncertainty.pdf",bbox_inches='tight', dpi=100)
+    if "RUNNING_TESTS" not in globals():
+        fig.savefig("pyrolite_uncertainty.pdf",bbox_inches='tight', dpi=100)
     plt.show()
