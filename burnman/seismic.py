@@ -28,7 +28,7 @@ class Seismic1DModel(object):
         Parameters
         ----------
         vars_list : array of str
-	    Variables to be evaluated. Options are depending on the model 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
+        Available variables depend on the seismic model, and can be chosen from 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
         depth_list : array of floats
             Array of depths [m] to evaluate seismic model at.
         
@@ -245,7 +245,7 @@ class SeismicTable(Seismic1DModel):
         self.earth_radius = 6371.0e3
         
     def internal_depth_list(self,mindepth=0., maxdepth=6371.e3):
-        depths= np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>mindepth and self.table_depth[x]<maxdepth])
+        depths= np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>=mindepth and self.table_depth[x]<=maxdepth])
         discontinuities=np.where(depths[1:]-depths[:-1]==0)[0]
         #Shift values at discontinities by 1 m to simplify evaluating values around these.
         depths[discontinuities]=depths[discontinuities]-1.
@@ -254,23 +254,16 @@ class SeismicTable(Seismic1DModel):
 
 
     def pressure(self, depth):
-        if len(self.table_pressure)>0:
-            return self._lookup(depth, self.table_pressure)
-        else:
-            if len(self.table_density)>0:
+        if len(self.table_pressure)==0:
                 warnings.warn("Pressure is not given in "+ self.__class__.__name__ +" and is now being computed. Potentially this might not be very realistic if "+ self.__class__.__name__ +" is not a global model. Potentially it might be better to use the depth/pressure conversion given by the PREM model.")
-
                 self._compute_pressure()
-                return self._lookup(depth, self.table_pressure)
+        return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
-        if len(self.table_gravity)>0:
-            return self._lookup(depth,self.table_gravity)
-        else:
-            if len(self.table_density)>0:
+        if len(self.table_gravity)==0:
                 warnings.warn("Gravity is not given in "+ self.__class__.__name__ +" and is now being computed. Potentially this might not be very realistic if "+ self.__class__.__name__ +" is not a global model.")
                 self._compute_gravity()
-                return self._lookup(depth,self.table_gravity)
+        return self._lookup(depth,self.table_gravity)
 
     def v_p(self, depth):
 

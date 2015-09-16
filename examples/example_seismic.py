@@ -45,13 +45,15 @@ if __name__ == "__main__":
     models=[burnman.seismic.PREM(), burnman.seismic.STW105(),burnman.seismic.AK135(),burnman.seismic.IASP91()]
     colors = ['r','b','m','k']
     # Variables to plot
-    vars=['pressure','gravity','v_p','v_s','v_phi','density']#,
+    var=['pressure','gravity','v_p','v_s','v_phi','density']
     units=['Pa','m/s^2','m/s','m/s','m/s','kg/m^3','Pa','m/s^2']
+    
+    
     plt.figure(figsize=(14,8))
     
 
     # Run through models and variables
-    for a in range(len(vars)):
+    for a in range(len(var)):
         for m in range(len(models)):
 
                 # specify where we want to evaluate, here we map from pressure to depth
@@ -62,16 +64,17 @@ if __name__ == "__main__":
                 #depths = np.arange(700e3,2800e3,100e3)
                 #3. we could also use the data points where the seismic model is specified over a depth range, this will bring out any discontinuities
                 #this is the preferred way to plot seismic discontinuities correctly
-                depths = models[m].internal_depth_list(mindepth=-1.e3, maxdepth=6372.1e3)
-                #now evaluate everything at the given depths levels (using interpolation)
+                depths = models[m].internal_depth_list(mindepth=0, maxdepth=6371e3)
+                #now evaluate everything at the given depths levels (using linear interpolation)
+                # try to get and plot values for given model, if this fails the variable is likely not defined for that model
                 try:
-                    values=getattr(models[m],vars[a])(depths)
-                    #Plot
+                    values=getattr(models[m],var[a])(depths)
                     plt.plot(depths/1.e3,values,color=colors[m],linestyle='-',label=models[m].__class__.__name__)
                 except:
-                    print vars[a] + ' is not defined for ' + models[m].__class__.__name__
+                    # write out warning that the variable failed for given model
+                    print var[a] + ' is not defined for ' + models[m].__class__.__name__
 
-        plt.title(vars[a])
+        plt.title(var[a])
         plt.legend(loc='center right')
         plt.xlabel('depth in km')
         plt.ylabel(units[a])
@@ -80,7 +83,6 @@ if __name__ == "__main__":
 
     
     ## Alternatively one is able to evaluate all the variables for a model in a single line
-    #  values = model.evaluate(vars_list,depth_list)
     pressure, gravity, v_p, v_s, v_phi, density = models[0].evaluate(['pressure','gravity','v_p','v_s','v_phi','density'],models[0].internal_depth_list(mindepth=-1.e3, maxdepth=6372.1e3))
 
 
