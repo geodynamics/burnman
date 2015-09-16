@@ -244,7 +244,7 @@ class SeismicTable(Seismic1DModel):
         
         self.earth_radius = 6371.0e3
         
-    def internal_depth_list(self,mindepth=0., maxdepth=6371.e3):
+    def internal_depth_list(self,mindepth=0., maxdepth=1.e10):
         depths= np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x]>=mindepth and self.table_depth[x]<=maxdepth])
         discontinuities=np.where(depths[1:]-depths[:-1]==0)[0]
         #Shift values at discontinities by 1 m to simplify evaluating values around these.
