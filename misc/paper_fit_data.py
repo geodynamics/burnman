@@ -109,5 +109,6 @@ if __name__ == "__main__":
         plt.ylabel(r'Shear velocity ${V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc = "lower right",prop=prop)
-    plt.savefig("example_fit_data.pdf", bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_fit_data.pdf", bbox_inches='tight')
     plt.show()

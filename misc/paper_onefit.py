@@ -280,6 +280,7 @@ if __name__ == "__main__":
     plt.legend(bbox_to_anchor=(1.0, 0.9),prop={'size':12})
     plt.xlim(25,135)
     #plt.ylim(6,11)
-    plt.savefig("onefit.pdf", bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("onefit.pdf", bbox_inches='tight')
     print "wrote onefit.pdf"
     #plt.show()

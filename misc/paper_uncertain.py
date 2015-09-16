@@ -147,7 +147,8 @@ if __name__ == "__main__":
 
 
 
-    plt.savefig("uncertain.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("uncertain.pdf",bbox_inches='tight')
 #    plt.show()
 
 
