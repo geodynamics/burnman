@@ -20,7 +20,7 @@ import burnman
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)
-plt.rc('font', family='sanserif')
+plt.rc('font', family='sans-serif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
 

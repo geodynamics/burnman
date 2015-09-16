@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
 
     #Come up with axes for the final plot
     figure = plt.figure( figsize = (12,10) )

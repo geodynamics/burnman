@@ -249,7 +249,7 @@ if __name__ == "__main__":
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
     #plot v_s
