@@ -345,12 +345,11 @@ class PREM(SeismicTable):
         self.table_depth = table[:,0]
         self.table_radius = table[:,1]
         self.table_pressure = table[:,2]
-        self.table_gravity = table[:,3]
-        self.table_density = table[:,4]
-        self.table_vp = table[:,5]
-        self.table_vs = table[:,6]
-        self.table_QK = table[:,7]
-        self.table_QG = table[:,8]
+        self.table_density = table[:,3]
+        self.table_vp = table[:,4]
+        self.table_vs = table[:,5]
+        self.table_QK = table[:,6]
+        self.table_QG = table[:,7]
 
 
 
