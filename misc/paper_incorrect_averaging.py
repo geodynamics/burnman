@@ -200,7 +200,8 @@ if __name__ == "__main__":
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Shear Velocity Vs (km/s)")
     plt.tight_layout()
-    plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
     plt.show()
 
 

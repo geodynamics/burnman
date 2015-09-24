@@ -41,7 +41,7 @@ if __name__ == "__main__":
     figsize=(6,5)
     prop={'size':12}
     #plt.rc('text', usetex=True)
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
     """ choose 'slb2' (finite-strain 2nd order shear modulus,
@@ -150,5 +150,6 @@ if __name__ == "__main__":
 
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Shear velocity $V_s$ (km/s)')
-    plt.savefig("example_averaging.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_averaging.pdf",bbox_inches='tight')
     plt.show()

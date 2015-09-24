@@ -45,7 +45,7 @@ if __name__ == "__main__":
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
 
     dashstyle2=(6,3)
     dashstyle3=(10,2,2,2)
@@ -147,7 +147,8 @@ if __name__ == "__main__":
 
 
 
-    plt.savefig("uncertain.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("uncertain.pdf",bbox_inches='tight')
 #    plt.show()
 
 

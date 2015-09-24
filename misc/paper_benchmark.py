@@ -20,7 +20,7 @@ import burnman
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)
-plt.rc('font', family='sanserif')
+plt.rc('font', family='sans-serif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
 
@@ -113,7 +113,8 @@ def check_slb_fig7_txt():
     plt.xlabel("Temperature (K)")
     plt.ylabel("Difference (\%)")
     plt.legend(loc="lower center",prop=prop,ncol=4)
-    plt.savefig("benchmark1.pdf", bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("benchmark1.pdf", bbox_inches='tight')
     plt.show()
 
 if __name__ == "__main__":

@@ -249,7 +249,7 @@ if __name__ == "__main__":
     prop={'size':12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
     #plot v_s
@@ -280,6 +280,7 @@ if __name__ == "__main__":
     plt.legend(bbox_to_anchor=(1.0, 0.9),prop={'size':12})
     plt.xlim(25,135)
     #plt.ylim(6,11)
-    plt.savefig("onefit.pdf", bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("onefit.pdf", bbox_inches='tight')
     print "wrote onefit.pdf"
     #plt.show()
