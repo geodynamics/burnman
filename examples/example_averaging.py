@@ -71,8 +71,8 @@ if __name__ == "__main__":
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
-    #depths = seismic_model.internal_depth_list()
-    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    #depths = seismic_model.internal_depth_list(mindepth=700.e3, maxdepth=2800.e3)
+    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     temperatures = burnman.geotherm.brown_shankland(pressures)
 
