@@ -44,7 +44,7 @@ class Seismic1DModel(object):
         return values
 
 
-    def internal_depth_list(self,mindepth=0.,maxdepth=6371.e3):
+    def internal_depth_list(self,mindepth=0.,maxdepth=1.e99):
         """
         Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation.
         
