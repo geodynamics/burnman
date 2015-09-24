@@ -28,7 +28,7 @@ class Seismic1DModel(object):
         Parameters
         ----------
         vars_list : array of str
-        Available variables depend on the seismic model, and can be chosen from 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
+            Available variables depend on the seismic model, and can be chosen from 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
         depth_list : array of floats
             Array of depths [m] to evaluate seismic model at.
         
@@ -46,8 +46,14 @@ class Seismic1DModel(object):
 
     def internal_depth_list(self,mindepth=0.,maxdepth=1.e99):
         """
-        Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation.
+        Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation. The depths can be bounded by the mindepth and maxdepth parameters.
         
+        Parameters
+        ----------
+        mindepth  :  float
+            Minimum depth value to be returned [m]
+        maxdepth
+            Maximum depth value to be returned [m]
         
         Returns
         -------
