@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 # This is a standalone program that converts a tabulated version of the Stixrude and Lithgow-Bertelloni data format into the standard burnman format (printed to stdout)
 
@@ -16,9 +16,9 @@ def read_dataset(datafile):
 
 ds=read_dataset('slb_2011.txt')
 
-print '# BurnMan - a lower mantle toolkit'
-print '# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.'
-print '# Released under GPL v2 or later.'
+print '# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences'
+print '# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.'
+print ''
 print ''
 print '"""'
 print 'SLB_2011'
