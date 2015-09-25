@@ -1,3 +1,6 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

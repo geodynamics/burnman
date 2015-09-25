@@ -1,6 +1,5 @@
-    BurnMan - a lower mantle toolkit
-    Copyright (C) 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-
+    This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences.
+    Copyright (C) 2012 - 2015 by the BurnMan team
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -29,6 +28,13 @@ BurnMan is released under the GNU GPL v2 or newer
 Homepage: http://burnman.org
 Documentation: http://burnman.org/current-doc
 Source code: https://github.com/geodynamics/burnman
+
+Authors (as of 2015, listed alphabetically by first name):
+	Bob Myhill
+	Cayman Unterborn
+	Ian Rose
+	Sanne Cottaar
+	Timo Heister
 
 *** Requirements
 

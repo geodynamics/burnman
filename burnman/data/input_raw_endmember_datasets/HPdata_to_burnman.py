@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012-2014, Myhill, R., Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 # This is a standalone program that converts the Holland and Powell data format into the standard burnman format (printed to stdout)
 # It only outputs properties of solid endmembers - other endmembers are currently ignored.
@@ -52,9 +52,9 @@ def getmbr(ds, mbr):
             endmember=Endmember(mbr,atoms,formula, int(ds[i*4+3][1]), map(float,ds[i*4+3][2:(len(ds[i*4+3])-1)]), float(ds[i*4+4][0]), float(ds[i*4+4][1]), float(ds[i*4+4][2]), map(float,ds[i*4+5]), float(ds[i*4+6][0]), map(float,ds[i*4+6][1:4]), flag, map(float,ds[i*4+6][5:]))
             return endmember
 
-print '# BurnMan - a lower mantle toolkit'
-print '# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.'
-print '# Released under GPL v2 or later.'
+print '# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences'
+print '# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.'
+print ''
 print ''
 print '"""'
 print 'HP_2011 (ds-62)'
