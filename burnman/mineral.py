@@ -96,7 +96,7 @@ class Mineral(Material):
         print "%s%s" % (indent, self.to_string())
 
     def unroll(self):
-        return ([1.0],[self])
+        return ([self], [1.0])
 
     def eos_pressure(self, temperature, volume):
         return self.method.pressure(temperature, volume, self.params)

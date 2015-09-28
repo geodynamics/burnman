@@ -57,8 +57,9 @@ if __name__ == "__main__":
     # and 20% periclase.  More minerals may be added by simply extending
     # the list given to burnman.composite
     # For the preset minerals from the SLB_2011, the equation of state formulation from Stixrude and Lithgow-Bertolloni (2005) will be used.
-    rock = burnman.Composite([0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),
-                                          minerals.SLB_2011.periclase()])
+    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()], \
+                             [0.8, 0.2])
 
 
     # Here we create and load the PREM seismic velocity model, which will be

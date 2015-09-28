@@ -51,9 +51,9 @@ if __name__ == "__main__":
     def material_error(amount_perovskite):
         #Define composition using the values from Murakami et al. 2012 (Note: fe_perovskite and fe_periclase do not represent pure iron
         #endmembers here, but contain 6% and 20% Fe respectively. 
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.Murakami_etal_2012.fe_perovskite(),
-                                  minerals.Murakami_etal_2012.fe_periclase()])
+        rock = burnman.Composite([minerals.Murakami_etal_2012.fe_perovskite(),
+                                  minerals.Murakami_etal_2012.fe_periclase()], \
+                                 [amount_perovskite, 1.0-amount_perovskite])
 
 
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \

@@ -126,14 +126,14 @@ def dTdP(temperature, pressure, rock):
     top = 0
     bottom = 0
     rock.set_state(pressure, temperature)
-    (fractions,minerals) = rock.unroll()
-    for (fr,mineral) in zip(fractions,minerals):
+    (minerals, fractions) = rock.unroll()
+    for (mineral, fraction) in zip(minerals, fractions):
         gr = mineral.grueneisen_parameter()
         K_s = mineral.adiabatic_bulk_modulus()
         C_p = mineral.heat_capacity_p()
 
-        top += fr*gr*C_p/K_s
-        bottom += fr*C_p
+        top += fraction*gr*C_p/K_s
+        bottom += fraction*C_p
 
     return temperature*top/bottom
 
