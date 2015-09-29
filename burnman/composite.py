@@ -5,9 +5,11 @@
 import numpy as np
 import warnings
 
-from burnman import averaging_schemes
 from burnman import Material
 from burnman import Mineral
+
+from burnman import averaging_schemes
+from burnman import chemicalpotentials
 
 def check_pairs(phases, fractions):
         if len(fractions) < 1:
@@ -49,40 +51,66 @@ class Composite(Material):
         assert(len(phases)>0)
 
         self.phases = phases
+
+        self.phase_names = []
+        for i in range(len(self.phases)):
+            try:
+                self.phase_names.append(self.phases[i].name)
+            except AttributeError:
+                self.phase_names.append('')
         
         if fractions is not None:
-            assert(len(phases)==len(fractions))
-
-            try:
-                total = sum(fractions)
-            except TypeError:
-                raise Exception("Since v0.8, burnman.Composite takes an array of Materials, then an array of fractions")
-
-            for f in fractions:
-                assert (f >= -1e-12)
-
-            if abs(total - 1.0) > 1e-12:
-                warnings.warn("Warning: list of fractions does not add up to one but %g. Normalizing." % total)
-                corrected_fractions = [fr / total for fr in fractions]
-                fractions = corrected_fractions
-
-
-            if fraction_type == 'molar':
-                molar_fractions = fractions
-            elif fraction_type == 'mass':
-                molar_fractions = self._mass_to_molar_fractions(self.phases, fractions)
-            elif fraction_type == 'volume':
-                molar_fractions = self._volume_to_molar_fractions(self.phases, fractions)
-            else:
-                raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
-
-            # Set minimum value of a molar fraction at 0.0 (rather than -1.e-12)
-            self.molar_fractions = [max(0.0, fraction) for fraction in molar_fractions]  
-                
+            self.set_phase_fractions(fractions, fraction_type)
         else:
-                self.molar_fractions=None
+            self.molar_fractions=None
+
+    def set_phase_fractions(self, fractions, fraction_type='molar'):
+        assert(len(self.phases)==len(fractions))
+
+        try:
+            total = sum(fractions)
+        except TypeError:
+            raise Exception("Since v0.8, burnman.Composite takes an array of Materials, then an array of fractions")
+
+        for f in fractions:
+            assert (f >= -1e-12)
+
+        if abs(total - 1.0) > 1e-12:
+            warnings.warn("Warning: list of fractions does not add up to one but %g. Normalizing." % total)
+            corrected_fractions = [fr / total for fr in fractions]
+            fractions = corrected_fractions
 
 
+        if fraction_type == 'molar':
+            molar_fractions = fractions
+        elif fraction_type == 'mass':
+            molar_fractions = self._mass_to_molar_fractions(self.phases, fractions)
+        elif fraction_type == 'volume':
+            molar_fractions = self._volume_to_molar_fractions(self.phases, fractions)
+        else:
+            raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
+
+           
+        # Set minimum value of a molar fraction at 0.0 (rather than -1.e-12)
+        self.molar_fractions = [max(0.0, fraction) for fraction in molar_fractions]  
+
+    def set_composition(self, phase_compositions):
+        assert(len(self.phases)==len(phase_compositions))
+        for i, composition in enumerate(phase_compositions):
+            if composition != []:
+                self.phases[i].set_composition(composition)
+            
+    def composition(self):
+        self.phase_compositions=[self.phases[i].composition() for i in range(len(self.phases))]
+        bulk_composition=dict()
+        for i, composition in enumerate(self.phase_compositions):
+            for element in composition:
+                if element not in bulk_composition:
+                    bulk_composition[element] = self.molar_fractions[i]*composition[element]
+                else:
+                    bulk_composition[element] += self.molar_fractions[i]*composition[element]
+        return bulk_composition
+            
     def debug_print(self, indent=""):
         print "%sComposite:" % indent
         indent += "  "
@@ -224,11 +252,11 @@ class Composite(Material):
         return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
 
     def chemical_potentials(self, component_formulae):
-        component_formulae_dict=[burnman.chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
-        return burnman.chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
+        component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
+        return chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
 
     def fugacity(self, standard_material):
-        return burnman.chemicalpotentials.fugacity(standard_material, self.phases)
+        return chemicalpotentials.fugacity(standard_material, self.phases)
 
     def molar_mass(self):
         """
