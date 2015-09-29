@@ -83,7 +83,7 @@ def array_to_rock(arr, names):
     rock, _ = make_rock()
     anchor_t = arr[0]
     idx = 1
-    for (phase, fraction) in rock.children:
+    for phase in rock.phases:
         if isinstance(phase, HelperSolidSolution):
             for min in phase.endmembers:
                 for key in min.params:
