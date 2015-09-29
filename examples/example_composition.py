@@ -66,9 +66,8 @@ if __name__ == "__main__":
         amount_perovskite = 0.95
         rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
                                   minerals.SLB_2011.periclase()],\
-                                 [amount_perovskite, 1.0-amount_perovskite])
-
-
+                                 [amount_perovskite, 1-amount_perovskite])
+        
     #Example 2: three materials
     if False:
         rock = burnman.Composite([minerals.SLB_2011.fe_perovskite(),

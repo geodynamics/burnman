@@ -110,8 +110,8 @@ class composite(BurnManTest):
         pyrolite.set_method('slb3')
         pyrolite.set_state(40.e9, 2000)
         
-        d1 = int(pyrolite.children[0][0].density())
-        d2 = int(pyrolite.children[1][0].density())
+        d1 = int(pyrolite.phases[0].density())
+        d2 = int(pyrolite.phases[1].density())
         dmix = int(pyrolite.density())
         assert(d1<dmix)
         assert(dmix<d2)
