@@ -45,8 +45,6 @@ class Mineral(Material):
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
-        if 'formula' in self.params:
-            self.composition=self.params['formula']
         if 'name' in self.params:
             self.name=self.params['name']
 
@@ -163,6 +161,9 @@ class Mineral(Material):
     def calcgibbs(self, pressure, temperature):
         return self.method.gibbs_free_energy(pressure, temperature, self.params)
 
+    def composition(self):
+        return self.params['formula']
+    
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
