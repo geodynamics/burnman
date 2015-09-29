@@ -117,9 +117,9 @@ class SolidSolution(Mineral):
         for i, composition in enumerate(self.endmember_compositions):
             for element in composition:
                 if element not in self.composition:
-                    self.composition[element] = molar_fraction[i]*composition[element]
+                    self.composition[element] = molar_fractions[i]*composition[element]
                 else:
-                    self.composition[element] += molar_fraction[i]*composition[element]
+                    self.composition[element] += molar_fractions[i]*composition[element]
 
         
     def set_method(self, method):
