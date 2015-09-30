@@ -49,11 +49,11 @@ class Composite(Material):
         
         assert(len(phases)>0)
         if fractions is not None:
-            self.set_phase_fractions(fractions, fraction_type)
+            self.set_fractions(fractions, fraction_type)
         else:
             self.molar_fractions=None
 
-    def set_phase_fractions(self, fractions, fraction_type='molar'):
+    def set_fractions(self, fractions, fraction_type='molar'):
         assert(len(self.phases)==len(fractions))
 
         try:
