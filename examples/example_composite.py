@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     assemblage=simple_mantle()
 
-    assemblage.set_phase_fractions([0.8, 0.2])
+    assemblage.set_fractions([0.8, 0.2])
     print assemblage.composition()
     assemblage.set_state(P, T)
     print 'Assemblage 1 (endmembers only)'
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     assemblage=mantle_with_solid_solutions()
 
-    assemblage.set_phase_fractions([0.8, 0.2])
+    assemblage.set_fractions([0.8, 0.2])
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T)
     print 'Assemblage 2 (with solid solutions), method 1'
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     orthopyroxene=minerals.SLB_2011.orthopyroxene()
     assemblage=burnman.Composite([olivine, orthopyroxene])
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
-    assemblage.set_phase_fractions([0.8, 0.2])
+    assemblage.set_fractions([0.8, 0.2])
     assemblage.set_state(P, T)
     print 'Assemblage 2 (with solid solutions), method 2'
     print assemblage.phase_names
@@ -96,16 +96,16 @@ if __name__ == "__main__":
     Volume fractions also require state to have been set
     The fractions stored and used by burnman are *always* molar fractions - volume and mass fractions are converted before use. Note that mass fractions will change with set_composition, and volume fractions will change with set_state...
     '''
-    assemblage.set_phase_fractions([0.8, 0.2], 'molar')
+    assemblage.set_fractions([0.8, 0.2], 'molar')
     print 'Assemblage composition when molar phase fractions are', assemblage.molar_fractions
     print assemblage.composition()
     print ''
 
     print 'Converting between fraction types'
-    assemblage.set_phase_fractions([0.8, 0.2], 'mass')
+    assemblage.set_fractions([0.8, 0.2], 'mass')
     print 'Molar fractions from mass fractions:', assemblage.molar_fractions
 
-    assemblage.set_phase_fractions([0.8, 0.2], 'volume')
+    assemblage.set_fractions([0.8, 0.2], 'volume')
     print 'Molar fractions from volume fractions:', assemblage.molar_fractions
     print ''
 
@@ -129,3 +129,17 @@ if __name__ == "__main__":
         print component + ':', FMQ.chemical_potentials(components)[i]/1.e3, 'kJ/mol'
 
     print 'log10(fO2):', np.log10(FMQ.fugacity(O2))
+
+
+
+    """
+    Now we deal with elastic and thermodynamic properties of composites
+    where the individual phases are treated as isotropic. 
+
+    Averaging is conducted over phases (endmembers and solid solutions)
+    which have unique isotropic bulk and shear moduli derived in a 
+    different way to composites.
+
+    """
+
+    
