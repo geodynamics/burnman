@@ -57,13 +57,13 @@ class Material(object):
         Print a human-readable representation of this Material at the current P, T as a list of minerals.
         This requires set_state() has been called before.
         """
-        (frs,mins) = self.unroll()
-        if len(mins)==1:
-            print mins[0].to_string()
+        (minerals, fractions) = self.unroll()
+        if len(minerals)==1:
+            print minerals[0].to_string()
         else:
             print "Material %s:" % self.to_string()
-            for (fr,mi) in zip(frs,mins):
-                print "  %g of phase %s" % (fr, mi.to_string())
+            for (mineral, fraction) in zip(minerals, fractions):
+                print "  %g of phase %s" % (fraction, mineral.to_string())
 
     def set_state(self, pressure, temperature):
         """

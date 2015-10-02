@@ -8,19 +8,22 @@ import warnings
 from burnman import Material
 from burnman import Mineral
 
-def check_pairs(fractions, minerals):
-        if len(fractions) < 1:
-            raise Exception('ERROR: we need at least one mineral')
+from burnman import averaging_schemes
+from burnman import chemicalpotentials
 
-        if len(fractions) != len(minerals):
-            raise Exception('ERROR: different array lengths')
+def check_pairs(phases, fractions):
+        if len(fractions) < 1:
+            raise Exception('ERROR: we need at least one phase')
+
+        if len(phases) != len(fractions):
+            raise Exception('ERROR: different array lengths for phases and fractions')
 
         total = sum(fractions)
         if abs(total-1.0)>1e-10:
             raise Exception('ERROR: list of molar fractions does not add up to one')
-        for p in minerals:
+        for p in phases:
             if not isinstance(p, Mineral):
-                raise Exception('ERROR: object of type ''%s'' is not of type material' % (type(p)))
+                raise Exception('ERROR: object of type ''%s'' is not of type Mineral' % (type(p)))
 
 
 # static composite of minerals/composites
@@ -32,63 +35,112 @@ class Composite(Material):
 
     This class is available as ``burnman.Composite``.
     """
-    def __init__(self, fractions, phases=None):
+    def __init__(self, phases, fractions=None, fraction_type='molar'):
         """
         Create a composite using a list of phases and their fractions (adding to 1.0).
 
         Parameters
         ----------
-        fractions: list of floats
-            molar fraction for each phase.
         phases: list of :class:`burnman.Material`
             list of phases.
+        fractions: list of floats
+            molar fraction for each phase.
         """
 
-        if phases is None:
-            # compatibility hack:
-            tmp = fractions
-            fractions = [pt[1] for pt in tmp]
-            phases = [pt[0] for pt in tmp]
-
-        assert(len(phases)==len(fractions))
+        
         assert(len(phases)>0)
+
+        self.phases = phases
+
+        self.phase_names = []
+        for i in range(len(self.phases)):
+            try:
+                self.phase_names.append(self.phases[i].name)
+            except AttributeError:
+                self.phase_names.append('')
+        
+        if fractions is not None:
+            self.set_fractions(fractions, fraction_type)
+        else:
+            self.molar_fractions=None
+
+    def set_fractions(self, fractions, fraction_type='molar'):
+        assert(len(self.phases)==len(fractions))
+
+        try:
+            total = sum(fractions)
+        except TypeError:
+            raise Exception("Since v0.8, burnman.Composite takes an array of Materials, then an array of fractions")
+
         for f in fractions:
-            # we would like to check for >= 0, but this creates nasty behavior due to
-            # floating point rules: 1.0-0.8-0.1-0.1 is not 0.0 but -1e-14.
             assert (f >= -1e-12)
-        fractions = [max(0.0, fr) for fr in fractions]  # turn -1e-14 into 0.0
-        total = sum(fractions)
+
         if abs(total - 1.0) > 1e-12:
-            warnings.warn("Warning: list of molar fractions does not add up to one but %g. Normalizing." % total)
-            fractions = [fr / total for fr in fractions]
+            warnings.warn("Warning: list of fractions does not add up to one but %g. Normalizing." % total)
+            corrected_fractions = [fr / total for fr in fractions]
+            fractions = corrected_fractions
 
-        self.children = zip(fractions, phases)
 
+        if fraction_type == 'molar':
+            molar_fractions = fractions
+        elif fraction_type == 'mass':
+            molar_fractions = self._mass_to_molar_fractions(self.phases, fractions)
+        elif fraction_type == 'volume':
+            molar_fractions = self._volume_to_molar_fractions(self.phases, fractions)
+        else:
+            raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
+
+           
+        # Set minimum value of a molar fraction at 0.0 (rather than -1.e-12)
+        self.molar_fractions = [max(0.0, fraction) for fraction in molar_fractions]  
+
+    def set_composition(self, phase_compositions):
+        assert(len(self.phases)==len(phase_compositions))
+        for i, composition in enumerate(phase_compositions):
+            if composition != []:
+                self.phases[i].set_composition(composition)
+            
+    def composition(self):
+        self.phase_compositions=[self.phases[i].composition() for i in range(len(self.phases))]
+        bulk_composition=dict()
+        for i, composition in enumerate(self.phase_compositions):
+            for element in composition:
+                if element not in bulk_composition:
+                    bulk_composition[element] = self.molar_fractions[i]*composition[element]
+                else:
+                    bulk_composition[element] += self.molar_fractions[i]*composition[element]
+        return bulk_composition
+            
     def debug_print(self, indent=""):
         print "%sComposite:" % indent
         indent += "  "
-        for (fraction, phase) in self.children:
-            print "%s%g of" % (indent, fraction)
-            phase.debug_print(indent + "  ")
-
+        try: # if fractions have been defined
+            for i, phase in enumerate(self.phases):
+                print "%s%g of" % (indent, self.molar_fractions[i])
+                phase.debug_print(indent + "  ")
+        except:
+            for i, phase in enumerate(self.phases):
+                phase.debug_print(indent + "  ")
 
     def set_method(self, method):
         """
         set the same equation of state method for all the phases in the composite
         """
-        for (fraction, phase) in self.children:
+        for phase in self.phases:
             phase.set_method(method)
 
     def unroll(self):
+        phases = []
         fractions = []
-        minerals = []
-
-        for (fraction, phase) in self.children:
-            p_fr,p_min = phase.unroll()
-            check_pairs(p_fr, p_min)
-            fractions.extend([i*fraction for i in p_fr])
-            minerals.extend(p_min)
-        return (fractions, minerals)
+        try:
+            for i, phase in enumerate(self.phases):
+                p_mineral, p_fraction = phase.unroll()
+                check_pairs(p_mineral, p_fraction)
+                fractions.extend([f*self.molar_fractions[i] for f in p_fraction])
+                phases.extend(p_mineral)
+        except:
+            raise Exception("Unroll only works if the composite has defined fractions.")
+        return (phases, fractions)
 
     def to_string(self):
         """
@@ -102,14 +154,113 @@ class Composite(Material):
         """
         self.pressure = pressure
         self.temperature = temperature
-        for (fraction, phase) in self.children:
+        for phase in self.phases:
             phase.set_state(pressure, temperature)
 
     def density(self):
         """
         Compute the density of the composite based on the molar volumes and masses
         """
-        densities = np.array([ph.density() for (_,ph) in self.children])
-        volumes = np.array([ph.molar_volume()*fraction for (fraction, ph) in self.children])
+        try:
+            densities = np.array([phase.density() for phase in self.phases])
+            volumes = np.array([phase.molar_volume()*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        except:
+            raise Exception("Density cannot be computed without phase fractions being defined.")
         return np.sum(densities*volumes)/np.sum(volumes)
 
+    def calculate_moduli(self):
+        """
+        Calculate the elastic moduli and densities of the individual phases in the assemblage.
+
+        :returns:
+        answer -- an array of (n_evaluation_points by n_phases) of
+        elastic_properties(), so the result is of the form
+        answer[pressure_idx][phase_idx].V
+        :rtype: list of list of :class:`burnman.elastic_properties`
+        """
+        elastic_properties_of_phases = []
+        (minerals, molar_fractions) = self.unroll()
+        volume_fractions = self._molar_to_volume_fractions(minerals, molar_fractions)
+
+        for (mineral, volume_fraction) in zip(minerals, volume_fractions):
+
+            e = burnman.ElasticProperties()
+            e.V = volume_fraction * mineral.molar_volume()
+            e.K = mineral.adiabatic_bulk_modulus()
+            e.G = mineral.shear_modulus()
+            e.rho = mineral.molar_mass() / mineral.molar_volume()
+            e.fraction = volume_fraction
+            elastic_properties_of_phases.append(e)
+
+        return elastic_properties_of_phases
+
+    def _molar_to_volume_fractions(self, minerals, molar_fractions):
+        total_volume=0.
+        try:
+            for i, mineral in enumerate(minerals):
+                total_volume+=molar_fractions[i]*mineral.V
+            volume_fractions=[]
+            for i, mineral in enumerate(minerals):
+                volume_fractions.append(molar_fractions[i]*mineral.V/total_volume)
+        except AttributeError:
+            raise Exception("Volume fractions cannot be set before set_state.")
+    
+        return volume_fractions
+
+    def _volume_to_molar_fractions(self, minerals, volume_fractions):
+        total_moles=0.
+        for i, mineral in enumerate(minerals):
+            total_moles+=volume_fractions[i]/mineral.V
+        molar_fractions=[]
+        for i, mineral in enumerate(minerals):
+            molar_fractions.append(volume_fractions[i]/(mineral.V*total_moles))
+            
+        return molar_fractions
+
+    def _mass_to_molar_fractions(self, minerals, mass_fractions):
+        total_moles=0.
+        try:
+            for i, mineral in enumerate(minerals):
+                total_moles+=mass_fractions[i]/mineral.molar_mass()
+            molar_fractions=[]
+            for i, mineral in enumerate(minerals):
+                molar_fractions.append(mass_fractions[i]/(mineral.molar_mass()*total_moles))
+        except AttributeError:
+            raise Exception("Mass fractions cannot be set before composition has been set for all the phases in the composite.")
+    
+        return molar_fractions
+
+    def elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
+        """
+        Calculates the seismic velocities of the Assemblage, using
+        an averaging scheme for the velocities of individual phases
+
+        :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+        :param averaging_scheme: Averaging scheme to use.
+
+        :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
+        :rtype: lists of floats
+
+        """
+        moduli = [self.calculate_moduli()]
+        moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
+        self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
+        self.rho = moduli.rho
+        self.K = moduli.K
+        self.G = moduli.G
+
+        return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
+
+    def chemical_potentials(self, component_formulae):
+        component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
+        return chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
+
+    def fugacity(self, standard_material):
+        return chemicalpotentials.fugacity(standard_material, self.phases)
+
+    def molar_mass(self):
+        """
+        Returns molar mass of the composite [kg/mol]
+        """
+        molar_mass = sum([ self.phases[i][0].molar_mass()*self.molar_fractions[i] for i in range(self.n_endmembers) ])
+        return molar_mass

@@ -48,7 +48,7 @@ class test_model(BurnManTest):
         return burnman.Model(rock, p, T, burnman.averaging_schemes.VoigtReussHill())
 
     def model12(self):
-        rock = burnman.Composite([0.2, 0.8], [min1(), min2()])
+        rock = burnman.Composite([min1(), min2()], [0.2, 0.8])
         rock.set_method('slb3')
         p = [40e9]
         T = [2000]

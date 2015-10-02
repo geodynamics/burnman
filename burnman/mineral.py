@@ -43,7 +43,10 @@ class Mineral(Material):
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
+        if 'name' in self.params:
+            self.name=self.params['name']
 
+            
     def set_method(self, equation_of_state):
         """
         Set the equation of state to be used for this mineral.
@@ -96,7 +99,7 @@ class Mineral(Material):
         print "%s%s" % (indent, self.to_string())
 
     def unroll(self):
-        return ([1.0],[self])
+        return ([self], [1.0])
 
     def eos_pressure(self, temperature, volume):
         return self.method.pressure(temperature, volume, self.params)
@@ -155,6 +158,9 @@ class Mineral(Material):
     def calcgibbs(self, pressure, temperature):
         return self.method.gibbs_free_energy(pressure, temperature, self.params)
 
+    def composition(self):
+        return self.params['formula']
+    
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]

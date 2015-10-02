@@ -97,8 +97,8 @@ class Model(object):
 
                 for idx in range(len(self.p)):
                     self.rock.set_state(self.p[idx], self.T[idx])
-                    (fractions, minerals) = self.rock.unroll()
-                    for (fraction, mineral) in zip(fractions, minerals):
+                    (minerals, fractions) = self.rock.unroll()
+                    for (mineral, fraction) in zip(minerals, fractions):
                         e = {}
                         e['fraction'] = fraction
                         e['V'] = fraction * mineral.molar_volume()

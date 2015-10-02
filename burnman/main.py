@@ -58,8 +58,8 @@ def calculate_moduli(rock, pressures, temperatures):
 
     for idx in range(len(pressures)):
         rock.set_state(pressures[idx], temperatures[idx])
-        (fractions,minerals) = rock.unroll()
-        for (fraction,mineral) in zip(fractions,minerals):
+        (minerals,fractions) = rock.unroll()
+        for (mineral,fraction) in zip(minerals,fractions):
             e = ElasticProperties()
             e.V = fraction * mineral.molar_volume()
             e.K = mineral.adiabatic_bulk_modulus()
@@ -124,17 +124,30 @@ def compute_velocities(moduli):
 
 
     """
-    mat_vs = np.ndarray(len(moduli))
     mat_vp = np.ndarray(len(moduli))
+    mat_vs = np.ndarray(len(moduli))
     mat_vphi = np.ndarray(len(moduli))
 
     for i in range(len(moduli)):
-
-        mat_vs[i] = np.sqrt( moduli[i].G / moduli[i].rho)
-        mat_vp[i] = np.sqrt( (moduli[i].K + 4./3.*moduli[i].G) / moduli[i].rho)
-        mat_vphi[i] = np.sqrt( moduli[i].K / moduli[i].rho)
+        mat_vp[i], mat_vs[i], mat_vphi[i] = compute_velocity(moduli[i])
 
     return mat_vp, mat_vs, mat_vphi
+
+def compute_velocity(moduli):
+    """
+    Given an instance of elastic_properties, compute the seismic velocities :math:`V_p, V_s,` 
+    and :math:`V_{\phi}` :math:`[m/s]`.
+    :type moduli: :class:`ElasticProperties`
+    :param moduli: input elastic properties.
+    :returns: :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`
+    :rtype: float, float, float
+    """
+
+    vs = np.sqrt( moduli.G / moduli.rho)
+    vp = np.sqrt( (moduli.K + 4./3.*moduli.G) / moduli.rho)
+    vphi = np.sqrt( moduli.K / moduli.rho)
+
+    return vp, vs, vphi
 
 
 def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill()):
