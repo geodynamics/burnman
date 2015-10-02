@@ -84,7 +84,7 @@ if __name__ == "__main__":
         #print preset_solidsolution.endmembers
         #Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
         preset_solidsolution.set_composition([0.9,0.1,0.]) # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
-        rock = burnman.Composite([0.8, 0.2], phases=[preset_solidsolution, minerals.SLB_2011.periclase()])
+        rock = burnman.Composite([preset_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
 
 
     #Example 4: Defining your own solid solution
