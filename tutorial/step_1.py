@@ -77,7 +77,7 @@ if __name__=='__main__':
     min_depth = 850.e3
     max_depth = 2800.e3
     depths = np.linspace(min_depth, max_depth, n_depths)
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vp, seis_vs = seismic_model.evaluate(['pressure', 'density', 'v_p', 'v_s'], depths)
 
 
     # Now we get an array of temperatures at which will be used for computing
