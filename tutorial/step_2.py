@@ -45,7 +45,7 @@ if __name__=='__main__':
     depths = np.linspace(min_depth, max_depth, n_depths)
 
     seismic_model = burnman.seismic.PREM()
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(['pressure', 'density', 'v_phi', 'v_s'], depths)
     temperature = burnman.geotherm.brown_shankland(pressure)
 
 
