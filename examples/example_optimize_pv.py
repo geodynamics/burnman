@@ -36,10 +36,6 @@ from burnman import minerals
 
 if __name__ == "__main__":
 
-
-### input variables ###
-    #######################
-
     # Define reference model and depth to evaluate
     seismic_model = burnman.seismic.PREM()
     number_of_points = 20
@@ -54,7 +50,7 @@ if __name__ == "__main__":
     perovskite=minerals.SLB_2011.mg_fe_perovskite()
     perovskite.set_composition([0.94,0.06,0.]) # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
     ferropericlase=minerals.SLB_2011.ferropericlase()
-    ferropericlase.set_composition([0.8,0.2]) # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
+    ferropericlase.set_composition([0.8,0.2]) # Set molar_fraction of MgO and FeO
 
     def material_error(amount_perovskite):
         #Define composite using the values
