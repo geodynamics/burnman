@@ -146,6 +146,7 @@ class Composite(Material):
         self.temperature = temperature
         for phase in self.phases:
             phase.set_state(pressure, temperature)
+        self.rho = self.Vp = self.Vs = self.Vphi = self.K = self.G = None
 
     def density(self):
         """
@@ -158,7 +159,7 @@ class Composite(Material):
             raise Exception("Density cannot be computed without phase fractions being defined.")
         return np.sum(densities*volumes)/np.sum(volumes)
 
-    def calculate_moduli(self):
+    def _calculate_moduli(self):
         """
         Calculate the elastic moduli and densities of the individual phases in the assemblage.
 
@@ -220,7 +221,7 @@ class Composite(Material):
     
         return molar_fractions
 
-    def elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
+    def calculate_elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
         """
         Calculates the seismic velocities of the Assemblage, using
         an averaging scheme for the velocities of individual phases
@@ -232,14 +233,12 @@ class Composite(Material):
         :rtype: lists of floats
 
         """
-        moduli = [self.calculate_moduli()]
+        moduli = [self._calculate_moduli()]
         moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
         self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
         self.rho = moduli.rho
         self.K = moduli.K
         self.G = moduli.G
-
-        return self.rho, self.Vp, self.Vs, self.Vphi, self.K, self.G
 
     def chemical_potentials(self, component_formulae):
         component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
@@ -254,3 +253,4 @@ class Composite(Material):
         """
         molar_mass = sum([ self.phases[i][0].molar_mass()*self.molar_fractions[i] for i in range(self.n_endmembers) ])
         return molar_mass
+
