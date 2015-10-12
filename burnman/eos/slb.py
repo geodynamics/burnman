@@ -280,6 +280,8 @@ class SLBBase(eos.EquationOfState):
                 raise KeyError('params object missing parameter : ' + k)
         
         # Finally, check that the values are reasonable.
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
         if params['n'] < 1. or params['n'] > 1000.:

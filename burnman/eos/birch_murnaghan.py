@@ -156,7 +156,9 @@ class BirchMurnaghanBase(eos.EquationOfState):
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.
+        # Finally, check that the values are reasonable.
+        if params['P_0'] < 0.:
+            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:

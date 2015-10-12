@@ -316,15 +316,12 @@ class HP_TMT(eos.EquationOfState):
             params['T_einstein'] = 10636./(params['S_0']/params['n'] + 6.44)
 
         # Finally, check that the values are reasonable.
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
         if params['G_0'] is not float('nan') and (params['G_0'] < 0. or params['G_0'] > 1.e13):
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
         if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
             warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
-
-        if params['T_0'] < 0.:
-            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
-        if params['P_0'] < 0.:
-            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
 
         # no test for H_0
         if params['S_0'] is not float('nan') and params['S_0'] < 0.:
