@@ -163,7 +163,7 @@ class CORK(eos.EquationOfState):
         if params['cork_P'] < 1.e4 or params['cork_P'] > 1.e8:
             warnings.warn( 'Unusual value for cork_P', stacklevel=2 )
 
-        if self.heat_capacity_p0(T_0,params) < 0.:
+        if self.heat_capacity_p0(params['T_0'],params) < 0.:
             warnings.warn( 'Negative heat capacity at T_0', stacklevel=2 )
         if self.heat_capacity_p0(2000.,params) < 0.:
             warnings.warn( 'Negative heat capacity at 2000K', stacklevel=2 )
