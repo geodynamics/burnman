@@ -72,7 +72,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns molar volume. :math:`[m^3]`
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
@@ -134,7 +134,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0'] 
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
@@ -166,7 +166,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0'] 
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
 
@@ -257,6 +257,10 @@ class SLBBase(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+        if 'T_0' not in params:
+            params['T_0'] = 300.
+        if 'P_0' not in params:
+            params['P_0'] = 0.
 
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,

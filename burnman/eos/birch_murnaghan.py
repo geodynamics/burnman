@@ -30,7 +30,7 @@ def birch_murnaghan(x, params):
     """
 
     return 3.*params['K_0']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
-    * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1))
+    * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1)) + params['P_0']
 
 def density(pressure, params):
     """
@@ -139,6 +139,9 @@ class BirchMurnaghanBase(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
      
+        if 'P_0' not in params:
+            params['P_0'] = 0.
+
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,
         #so just add them to the dictionary as nans

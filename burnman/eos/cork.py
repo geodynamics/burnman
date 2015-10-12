@@ -13,9 +13,6 @@ import burnman.constants as constants
 
 import warnings
 
-T_0=298.15 # Standard temperature = 25 C
-P_0=1.e5 # Standard pressure = 1.e5 Pa
-
 def cork_variables(cork, cork_P, cork_T, temperature):
     a=cork[0][0]*cork_T**(2.5)/cork_P + cork[0][1]*cork_T**(1.5)/cork_P*temperature
     b=cork[1][0]*cork_T/cork_P
@@ -105,7 +102,10 @@ class CORK(eos.EquationOfState):
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
         """
-       # Calculate temperature and pressure integrals
+        T_0 = params['T_0']
+        P_relative = pressure - params['P_0']
+
+        # Calculate temperature and pressure integrals
         intCpdT = (params['Cp'][0]*temperature + 0.5*params['Cp'][1]*np.power(temperature,2.) - params['Cp'][2]/temperature + 2.*params['Cp'][3]*np.sqrt(temperature)) - (params['Cp'][0]*T_0 + 0.5*params['Cp'][1]*T_0*T_0 - params['Cp'][2]/T_0 + 2.0*params['Cp'][3]*np.sqrt(T_0))
 
         intCpoverTdT = (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(T_0) + params['Cp'][1]*T_0 - 0.5*params['Cp'][2]/(T_0*T_0) - 2.0*params['Cp'][3]/np.sqrt(T_0))
@@ -115,7 +115,7 @@ class CORK(eos.EquationOfState):
         else:
             cork=cork_variables(params['cork_params'], params['cork_P'], params['cork_T'], temperature)
         
-            RTlnf = constants.gas_constant*temperature*np.log(1e-5*pressure) + cork[1]*pressure + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(constants.gas_constant*temperature + cork[1]*pressure) - np.log(constants.gas_constant*temperature + 2.*cork[1]*pressure)) + 2./3.*cork[2]*pressure*np.sqrt(pressure) + cork[3]/2.*pressure*pressure  # Eq. 8 in Holland and Powell, 1991
+            RTlnf = constants.gas_constant*temperature*np.log(1e-5*P_relative) + cork[1]*P_relative + cork[0]/(cork[1]*np.sqrt(temperature))*(np.log(constants.gas_constant*temperature + cork[1]*P_relative) - np.log(constants.gas_constant*temperature + 2.*cork[1]*P_relative)) + 2./3.*cork[2]*P_relative*np.sqrt(P_relative) + cork[3]/2.*P_relative*P_relative  # Eq. 8 in Holland and Powell, 1991
 
         return params['H_0'] + intCpdT - temperature*(params['S_0'] + intCpoverTdT) + RTlnf
 
@@ -130,6 +130,11 @@ class CORK(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+
+        if 'T_0' not in params:
+            params['T_0'] = 298.15
+        if 'P_0' not in params:
+            params['P_0'] = 0.
 
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,

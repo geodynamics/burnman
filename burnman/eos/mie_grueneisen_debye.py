@@ -36,7 +36,7 @@ class MGDBase(eos.EquationOfState):
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         EQ B7
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         func = lambda x: bm.birch_murnaghan(params['V_0']/x, params) + \
             self.__thermal_pressure(temperature, x, params) - \
             self.__thermal_pressure(T_0, x, params) - pressure
@@ -54,7 +54,7 @@ class MGDBase(eos.EquationOfState):
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ B8
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         K_T = bm.bulk_modulus(volume, params) + \
             self.__thermal_bulk_modulus(temperature,volume, params) - \
             self.__thermal_bulk_modulus(T_0,volume, params)  #EQB13
@@ -66,7 +66,7 @@ class MGDBase(eos.EquationOfState):
         Returns shear modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ B11
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         if self.order==2:
             return bm.shear_modulus_second_order(volume,params) + \
                 self.__thermal_shear_modulus(temperature,volume, params) - \
@@ -124,7 +124,7 @@ class MGDBase(eos.EquationOfState):
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
         EQ B7
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         return bm.birch_murnaghan(params['V_0']/volume, params) + \
                 self.__thermal_pressure(temperature,volume, params) - \
                 self.__thermal_pressure(T_0,volume, params)
@@ -156,7 +156,7 @@ class MGDBase(eos.EquationOfState):
     def __thermal_pressure(self,T,V, params):
         Debye_T = self.__debye_temperature(params['V_0']/V, params)
         gr = self.__grueneisen_parameter(params['V_0']/V, params)
-        P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
+        P_th = gr * debye.thermal_energy(T, Debye_T, params['n'])/V
         return P_th
 
 
@@ -174,6 +174,10 @@ class MGDBase(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+        if 'T_0' not in params:
+            params['T_0'] = 300.
+        if 'P_0' not in params:
+            params['P_0'] = 0.
 
         #if G and Gprime are not included this is presumably deliberate,
         #as we can model density and bulk modulus just fine without them,
