@@ -6,7 +6,7 @@ fulldir=`pwd`
 which numdiff >/dev/null
 if [ $? -eq 0 ]
 then
-  diffcmd="numdiff -r 1e-5 -s ' \t\n[],' -a 1e-5"
+  diffcmd="numdiff -r 1e-5 -s ' \t\n[],'"
 else
   diffcmd="diff"
   echo "WARNING: numdiff not found, please install! Falling back to diff."
