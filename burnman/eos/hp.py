@@ -289,36 +289,33 @@ class HP_TMT(eos.EquationOfState):
 
         if 'T_0' not in params:
             params['T_0'] = 298.15
-        if 'P_0' not in params:
-            params['P_0'] = 1.e5
 
-        #if G and Gprime are not included this is presumably deliberate,
-        #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as nans
+        # If standard state enthalpy and entropy are not included 
+        # this is presumably deliberate, as we can model density 
+        # and bulk modulus just fine without them.
+        # Just add them to the dictionary as nans.
         if 'H_0' not in params:
             params['H_0'] = float('nan')
         if 'S_0' not in params:
             params['S_0'] = float('nan')
-        if 'G_0' not in params:
-            params['G_0'] = float('nan')
-        if 'Gprime_0' not in params:
-            params['Gprime_0'] = float('nan')
   
-        #check that all the required keys are in the dictionary
-        expected_keys = ['H_0', 'S_0', 'V_0', 'Cp', 'a_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'n', 'molar_mass']
+        # First, let's check the EoS parameters for Tref
+        mt.MT.validate_parameters(mt.MT(), params)
+
+        # Now check all the required keys for the 
+        # thermal part of the EoS are in the dictionary
+        expected_keys = ['H_0', 'S_0', 'V_0', 'Cp', 'a_0', 'n', 'molar_mass']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        # Empirical Einstein temperature
+        # The following line estimates the Einstein temperature
+        # according to the empirical equation of 
         # Holland and Powell, 2011; base of p.346, para.1
         if 'T_einstein' not in params:
             params['T_einstein'] = 10636./(params['S_0']/params['n'] + 6.44)
 
-
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
+        # Finally, check that the values are reasonable.
         if params['G_0'] is not float('nan') and (params['G_0'] < 0. or params['G_0'] > 1.e13):
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
         if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
@@ -343,11 +340,7 @@ class HP_TMT(eos.EquationOfState):
  
         if params['a_0'] < 0. or params['a_0'] > 1.e-3:
             warnings.warn( 'Unusual value for a_0', stacklevel=2 )
-        if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
-        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        # no test for Kdprime_0
+
 
         if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n', stacklevel=2 )

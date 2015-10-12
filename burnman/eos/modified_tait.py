@@ -129,15 +129,13 @@ class MT(eos.EquationOfState):
         if 'Gprime_0' not in params:
             params['Gprime_0'] = float('nan')
   
-        #check that all the required keys are in the dictionary
+        # Check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'G_0', 'Gprime_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
+        # Finally,  check that the values are reasonable. 
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
