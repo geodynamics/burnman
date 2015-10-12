@@ -6,8 +6,6 @@ import numpy as np
 import equation_of_state as eos
 import warnings
 
-P_0=1.e5 # Standard pressure = 1.e5 Pa
-
 def tait_constants(params):
     """
     returns parameters for the modified Tait equation of state
@@ -27,7 +25,7 @@ def modified_tait(x, params):
     EQ 2 from Holland and Powell, 2011
     """
     a, b, c = tait_constants(params)
-    return (np.power((x + a - 1.) / a, -1./c) - 1.)/b
+    return (np.power((x + a - 1.) / a, -1./c) - 1.)/b + params['P_0']
 
 def volume(pressure,params):
     """
@@ -35,7 +33,7 @@ def volume(pressure,params):
     EQ 12
     """
     a, b, c = tait_constants(params)
-    x = 1 - a*( 1. - np.power(( 1. + b*(pressure)), -1.0*c))
+    x = 1 - a*( 1. - np.power(( 1. + b*(pressure-params['P_0'])), -1.0*c))
     return x*params['V_0']
 
 def bulk_modulus(pressure, params):
@@ -44,7 +42,7 @@ def bulk_modulus(pressure, params):
     EQ 13+2
     """
     a, b, c = tait_constants(params)
-    return params['K_0']*(1. + b*(pressure))*(a + (1.-a)*np.power((1. + b*(pressure)), c))
+    return params['K_0']*(1. + b*(pressure-params['P_0']))*(a + (1.-a)*np.power((1. + b*(pressure-params['P_0'])), c))
 
 
 class MT(eos.EquationOfState):
@@ -119,6 +117,9 @@ class MT(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+
+        if 'P_0' not in params:
+            params['P_0'] = 1.e5
      
         # G and Gprime are not defined in this equation of state,
         # We can model density and bulk modulus just fine without them,
@@ -128,16 +129,16 @@ class MT(eos.EquationOfState):
         if 'Gprime_0' not in params:
             params['Gprime_0'] = float('nan')
   
-        #check that all the required keys are in the dictionary
+        # Check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'G_0', 'Gprime_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
-        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
+        # Finally, check that the values are reasonable. 
+        if params['P_0'] < 0.:
+            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
+        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-2:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
             warnings.warn( 'Unusual value for K_0', stacklevel=2 )

@@ -18,6 +18,8 @@ class mypericlase(burnman.Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state': 'slb3',
+            'T_0': 300.,
+            'P_0': 0.,
             'V_0': 11.24e-6,
             'K_0': 161.0e9,
             'Kprime_0': 3.8,
