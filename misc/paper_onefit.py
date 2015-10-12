@@ -69,12 +69,12 @@ def realization_to_array(rock, anchor_t):
         if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
             for min in ph.mineral.endmembers:
                 for key in min.params:
-                    if key != 'equation_of_state':
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
                         arr.append(min.params[key])
                         names.append(min.to_string()+'.'+key)
         else:
             for key in ph.mineral.params:
-                    if key != 'equation_of_state':
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
                         arr.append(ph.mineral.params[key])
                         names.append(mph.mineral.to_string()+'.'+key)
     return arr, names
@@ -87,7 +87,7 @@ def array_to_rock(arr, names):
         if isinstance(phase, HelperSolidSolution):
             for min in phase.endmembers:
                 for key in min.params:
-                    if key != 'equation_of_state' and key != 'F_0':
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
                         assert(names[idx]==min.to_string()+'.'+key)
                         min.params[key] = arr[idx]
                         idx += 1

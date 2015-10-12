@@ -30,7 +30,7 @@ def birch_murnaghan(x, params):
     """
 
     return 3.*params['K_0']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
-    * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1))
+    * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1)) + params['P_0']
 
 def density(pressure, params):
     """
@@ -139,28 +139,31 @@ class BirchMurnaghanBase(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
      
-        #if G and Gprime are not included this is presumably deliberate,
-        #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as nans
+        if 'P_0' not in params:
+            params['P_0'] = 0.
+
+        # If G and Gprime are not included this is presumably deliberate,
+        # as we can model density and bulk modulus just fine without them,
+        # so just add them to the dictionary as nans
         if 'G_0' not in params:
             params['G_0'] = float('nan')
         if 'Gprime_0' not in params:
             params['Gprime_0'] = float('nan')
   
-        #check that all the required keys are in the dictionary
+        # Check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
+        # Finally, check that the values are reasonable.
+        if params['P_0'] < 0.:
+            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
             warnings.warn( 'Unusual value for V_0', stacklevel=2 )
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
             warnings.warn( 'Unusual value for K_0' , stacklevel=2)
-        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
+        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
         if params['G_0'] < 0.0 or params['G_0'] > 1.e13:
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )

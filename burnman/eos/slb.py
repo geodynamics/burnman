@@ -72,7 +72,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns molar volume. :math:`[m^3]`
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0']
         debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
@@ -134,7 +134,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0'] 
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
@@ -166,7 +166,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
+        T_0 = params['T_0'] 
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
 
@@ -257,38 +257,31 @@ class SLBBase(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+        if 'T_0' not in params:
+            params['T_0'] = 300.
 
-        #if G and Gprime are not included this is presumably deliberate,
-        #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as nans
-        if 'G_0' not in params:
-            params['G_0'] = float('nan')
-        if 'Gprime_0' not in params:
-            params['Gprime_0'] = float('nan')
+        # If eta_s_0 is not included this is presumably deliberate,
+        # as we can model density and bulk modulus just fine without it,
+        # so just add it to the dictionary as nan
+        # The same goes for the standard state Helmholtz free energy
         if 'eta_s_0' not in params:
             params['eta_s_0'] = float('nan')
         if 'F_0' not in params:
             params['F_0'] = float('nan')
-  
-        #check that all the required keys are in the dictionary
-        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0', 'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
+
+        # First, let's check the EoS parameters for Tref
+        bm.BirchMurnaghanBase.validate_parameters(bm.BirchMurnaghanBase(),params)
+
+        # Now check all the required keys for the 
+        # thermal part of the EoS are in the dictionary
+        expected_keys = ['molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
-        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
-            warnings.warn( 'Unusual value for V_0', stacklevel=2 )
-        if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
-        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        if params['G_0'] < 0. or params['G_0'] > 1.e13:
-            warnings.warn( 'Unusual value for G_0', stacklevel=2 )
-        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
+        # Finally, check that the values are reasonable.
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
         if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
         if params['n'] < 1. or params['n'] > 1000.:

@@ -13,9 +13,6 @@ import einstein
 from burnman.endmemberdisorder import *
 
 
-T_0=298.15 # Standard temperature = 25 C
-
-
 class HP_TMT(eos.EquationOfState):
     """
     Base class for the Holland and Powell (2011) correction to
@@ -91,8 +88,8 @@ class HP_TMT(eos.EquationOfState):
         Pth=self.__relative_thermal_pressure(temperature,params)
         psubpth=pressure-params['P_0']-Pth
 
-        C_V0 = einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
-        C_V =  einstein.heat_capacity_v(temperature, params['einstein_T'],params['n'])
+        C_V0 = einstein.heat_capacity_v(params['T_0'], params['T_einstein'], params['n'] )
+        C_V =  einstein.heat_capacity_v(temperature, params['T_einstein'],params['n'])
         alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*np.power((1+b*psubpth), c)))
  
         return alpha
@@ -171,7 +168,7 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 
-        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['einstein_T'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['T_einstein'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['T_einstein'], params['n'] )
 
         dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
 
@@ -213,7 +210,7 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth=self.__relative_thermal_pressure(temperature,params)
 
-        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['einstein_T'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
+        ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['T_einstein'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['T_einstein'], params['n'] )
 
         dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.+b*(-Pth)), -1.-c))
 
@@ -237,10 +234,12 @@ class HP_TMT(eos.EquationOfState):
         # constant over a wide range of compressions.
 
         # Note that the xi function in HP2011 is just the Einstein heat capacity
-        # divided by 3nR.  I don't know why they don't use that, but anyhow...
+        # divided by 3nR. This function is *not* used to calculate the
+        # heat capacity - Holland and Powell (2011) prefer the additional 
+        # freedom provided by their polynomial expression.
 
-        E_th = einstein.thermal_energy( T, params['einstein_T'], params['n'] )
-        C_V0 = einstein.heat_capacity_v( params['T_0'], params['einstein_T'], params['n'] )
+        E_th = einstein.thermal_energy( T, params['T_einstein'], params['n'] )
+        C_V0 = einstein.heat_capacity_v( params['T_0'], params['T_einstein'], params['n'] )
         P_th = params['a_0']*params['K_0'] / C_V0 * E_th
         return P_th
 
@@ -291,45 +290,39 @@ class HP_TMT(eos.EquationOfState):
 
         if 'T_0' not in params:
             params['T_0'] = 298.15
-        if 'P_0' not in params:
-            params['P_0'] = 0.9999999e5
 
-        #if G and Gprime are not included this is presumably deliberate,
-        #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as nans
+        # If standard state enthalpy and entropy are not included 
+        # this is presumably deliberate, as we can model density 
+        # and bulk modulus just fine without them.
+        # Just add them to the dictionary as nans.
         if 'H_0' not in params:
             params['H_0'] = float('nan')
         if 'S_0' not in params:
             params['S_0'] = float('nan')
-        if 'G_0' not in params:
-            params['G_0'] = float('nan')
-        if 'Gprime_0' not in params:
-            params['Gprime_0'] = float('nan')
   
-        #check that all the required keys are in the dictionary
-        expected_keys = ['H_0', 'S_0', 'V_0', 'Cp', 'a_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'n', 'molar_mass']
+        # First, let's check the EoS parameters for Tref
+        mt.MT.validate_parameters(mt.MT(), params)
+
+        # Now check all the required keys for the 
+        # thermal part of the EoS are in the dictionary
+        expected_keys = ['H_0', 'S_0', 'V_0', 'Cp', 'a_0', 'n', 'molar_mass']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        # Empirical Einstein temperature
+        # The following line estimates the Einstein temperature
+        # according to the empirical equation of 
         # Holland and Powell, 2011; base of p.346, para.1
-        if 'einstein_T' not in params:
-            params['einstein_T'] = 10636./(params['S_0']/params['n'] + 6.44)
+        if 'T_einstein' not in params:
+            params['T_einstein'] = 10636./(params['S_0']/params['n'] + 6.44)
 
-
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
+        # Finally, check that the values are reasonable.
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
         if params['G_0'] is not float('nan') and (params['G_0'] < 0. or params['G_0'] > 1.e13):
             warnings.warn( 'Unusual value for G_0', stacklevel=2 )
         if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
             warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
-
-        if params['T_0'] < 0.:
-            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
-        if params['P_0'] < 0.:
-            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
 
         # no test for H_0
         if params['S_0'] is not float('nan') and params['S_0'] < 0.:
@@ -345,11 +338,7 @@ class HP_TMT(eos.EquationOfState):
  
         if params['a_0'] < 0. or params['a_0'] > 1.e-3:
             warnings.warn( 'Unusual value for a_0', stacklevel=2 )
-        if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
-        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        # no test for Kdprime_0
+
 
         if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n', stacklevel=2 )
