@@ -24,16 +24,18 @@ SOLID SOLUTIONS
 N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has the opposite sign to the values in Holland and Powell, 2011. This is consistent with its treatment as an excess entropy term (G=H-T*S+P*V), rather than a thermal correction to the interaction parameter (W=W+T*W_T+P*W_P).
 """
 
-class garnet(SolidSolution):
+class CFMASO_garnet(SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name='garnet'
-        self.endmembers = [[py(), '[Mg]3[Al]2Si3O12'], [alm(), '[Fe]3[Al]2Si3O12'], [gr(), '[Ca]3[Al]2Si3O12'], [maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.endmembers = [[py(), '[Mg]3[Al]2Si3O12'],
+                           [alm(), '[Fe]3[Al]2Si3O12'],
+                           [gr(), '[Ca]3[Al]2Si3O12'],
+                           [andr(), '[Ca]3[Fe]2Si3O12']]
         self.type='asymmetric'
-        self.alphas = [1.0, 1.0, 2.7, 1.0]
-        self.excess_enthalpy=[[2.5e3, 29.1e3, 15e3],[10e3,18e3],[48e3]]
-        self.excess_entropy=[[0., 0., 0.],[0., 0.],[0.]]
-        self.excess_volume=[[0., 0.164e-5, 0.],[0., 0.],[0.]] 
-
+        self.alphas = [1.0, 1.0, 2.7, 2.7]
+        self.enthalpy_interaction=[[2.5e3, 31.e3, 53.2e3],
+                                   [5.e3, 37.24e3],
+                                   [2.e3]]
         SolidSolution.__init__(self, molar_fractions)
 
 """

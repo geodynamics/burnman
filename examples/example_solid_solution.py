@@ -192,25 +192,31 @@ if __name__ == "__main__":
 
     '''
     The addition of grossular garnet (Ca-Al garnet) illustrates the use of asymmetric solution models
+    This model is also found in the HP_2011_ds62 database
     '''
-    class mg_fe_ca_garnet(burnman.SolidSolution):
+
+    class CFMASO_garnet(burnman.SolidSolution):
         def __init__(self, molar_fractions=None):
-            self.name='Asymmetric pyrope-almandine-grossular garnet'
+            self.name='garnet'
+            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.andr(), '[Ca]3[Fe]2Si3O12']]
             self.type='asymmetric'
-            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'],[minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'],[minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12']]
-            self.alphas=[1.0, 1.0, 2.7]
-            self.enthalpy_interaction=[[2.5e3,30.1e3],[1.0e3]]
-            self.volume_interaction=[[0.,0.169e-5],[0.122e-5]]
+            self.alphas = [1.0, 1.0, 2.7, 2.7]
+            self.enthalpy_interaction=[[2.5e3, 31.e3, 53.2e3],
+                                       [5.e3, 37.24e3],
+                                       [2.e3]]
             burnman.SolidSolution.__init__(self, molar_fractions)
 
 
-    g4=mg_fe_ca_garnet()
+    g4=burnman.minerals.HP_2011_ds62.CFMASO_garnet()
     g4_excess_gibbs_400 = np.empty_like(comp)
     g4_excess_gibbs_800 = np.empty_like(comp)
     g4_excess_gibbs_1200 = np.empty_like(comp)
 
     for i,c in enumerate(comp):
-        molar_fractions=[1.0-c, 0., c]
+        molar_fractions=[1.0-c, 0., c, 0.]
         g4.set_composition(molar_fractions)
         g4.set_state(P,400.)
         g4_excess_gibbs_400[i] = g4.excess_gibbs
