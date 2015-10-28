@@ -87,18 +87,38 @@ if __name__ == "__main__":
     comp = np.linspace(0.001, 0.999, 100)
     g1_gibbs = np.empty_like(comp)
     g1_excess_gibbs = np.empty_like(comp)
+    g1_pyrope_activity = np.empty_like(comp)
+    g1_almandine_activity = np.empty_like(comp)
+    g1_pyrope_gamma = np.empty_like(comp)
+    g1_almandine_gamma = np.empty_like(comp)
     for i,c in enumerate(comp):
         molar_fractions=[1.0-c, c]
         g1.set_composition(molar_fractions)
         g1.set_state(P,T)
         g1_gibbs[i] = g1.gibbs
         g1_excess_gibbs[i] = g1.excess_gibbs
+        g1_pyrope_activity[i] = g1.activities[0]
+        g1_almandine_activity[i] = g1.activities[1]
+        g1_pyrope_gamma[i] = g1.activity_coefficients[0]
+        g1_almandine_gamma[i] = g1.activity_coefficients[1]
 
     plt.plot( [0., 1.], [py_gibbs/1000., alm_gibbs/1000.], 'b-', linewidth=1., label='Mechanical mixing')
     plt.plot( comp, g1_gibbs/1000., 'r-', linewidth=1., label='Ideal solid solution')
-    plt.title("Pyrope-almandine join")
+    plt.title("Ideal pyrope-almandine join")
     plt.ylabel("Gibbs free energy of solution (kJ/mol)")
-    plt.xlabel("Pyrope fraction")
+    plt.xlabel("Almandine fraction")
+    plt.legend(loc='lower right')
+    plt.show()
+
+    plt.plot( comp, g1_pyrope_activity, 'r-', linewidth=1., label='Pyrope activity')
+    plt.plot( comp, g1_almandine_activity, 'b-', linewidth=1., label='Almandine activity')
+
+    plt.plot( comp, g1_pyrope_gamma, 'r-.', linewidth=1., label='Pyrope activity coefficient')
+    plt.plot( comp, g1_almandine_gamma, 'b--', linewidth=1., label='Almandine activity coefficient')
+    plt.title("Ideal pyrope-almandine join")
+    plt.ylim(0.0, 1.01)
+    plt.ylabel("Activities")
+    plt.xlabel("Almandine fraction")
     plt.legend(loc='lower right')
     plt.show()
 
@@ -128,21 +148,43 @@ if __name__ == "__main__":
 
             burnman.SolidSolution.__init__(self, molar_fractions)
 
+
     g2=mg_fe_garnet_2()
     g2_excess_gibbs = np.empty_like(comp)
+    g2_pyrope_activity = np.empty_like(comp)
+    g2_almandine_activity = np.empty_like(comp)
+    g2_pyrope_gamma = np.empty_like(comp)
+    g2_almandine_gamma = np.empty_like(comp)
     for i,c in enumerate(comp):
-        molar_fractions=[1.0-c, c]
+        molar_fractions=[1.-c, c]
         g2.set_composition(molar_fractions)
         g2.set_state(P,T)
         g2_excess_gibbs[i] = g2.excess_gibbs
+        g2_pyrope_activity[i] = g2.activities[0]
+        g2_almandine_activity[i] = g2.activities[1]
+        g2_pyrope_gamma[i] = g2.activity_coefficients[0]
+        g2_almandine_gamma[i] = g2.activity_coefficients[1]
 
     plt.plot( comp, g1_excess_gibbs, 'r-', linewidth=1., label='Ideal solution')
     plt.plot( comp, g2_excess_gibbs, 'g-', linewidth=1., label='Symmetric solution, 2.5 kJ/mol')
     plt.title("Pyrope-almandine join (model comparison)")
     plt.ylabel("Excess gibbs free energy of solution (J/mol)")
-    plt.xlabel("Pyrope fraction")
+    plt.xlabel("Almandine fraction")
     plt.legend(loc='upper left')
     plt.show()
+
+
+    plt.plot( comp, g2_pyrope_activity, 'r-', linewidth=1., label='Pyrope activity')
+    plt.plot( comp, g2_almandine_activity, 'b-', linewidth=1., label='Almandine activity')
+
+    plt.plot( comp, g2_pyrope_gamma, 'r-.', linewidth=1., label='Pyrope activity coefficient')
+    plt.plot( comp, g2_almandine_gamma, 'b--', linewidth=1., label='Almandine activity coefficient')
+    plt.title("Ideal pyrope-almandine join")
+    plt.ylabel("Activities")
+    plt.xlabel("Almandine fraction")
+    plt.legend(loc='lower right')
+    plt.show()
+
 
     '''
     Adding more endmembers is very straightforward.
@@ -187,7 +229,7 @@ if __name__ == "__main__":
     plt.plot( comp, g3_excess_entropy, 'r-', linewidth=1., label='Excess entropy')
     plt.title("Pyrope-majorite join")
     plt.ylabel("Entropy (J/K/mol)")
-    plt.xlabel("Pyrope fraction")
+    plt.xlabel("Majorite fraction")
     plt.legend(loc='upper left')
     plt.show()
 
@@ -231,7 +273,7 @@ if __name__ == "__main__":
     plt.plot( comp, g4_excess_gibbs_1200, 'b-', linewidth=1., label='1200 K')
     plt.title("Pyrope-grossular join (asymmetric model)")
     plt.ylabel("Excess gibbs free energy of solution (J/mol)")
-    plt.xlabel("Pyrope fraction")
+    plt.xlabel("Grossular fraction")
     plt.legend(loc='lower left')
     plt.show()
 
@@ -260,17 +302,19 @@ if __name__ == "__main__":
             burnman.SolidSolution.__init__(self, molar_fractions)
 
     g5=mg_fe_ca_garnet_Ganguly()
-    g5_excess_enthalpy = np.empty_like(comp)
-
+    g5_excess_gibbs = np.empty_like(comp)
     for i,c in enumerate(comp):
-        molar_fractions=[1.0-c, 0., c, 0.]
+        molar_fractions=[1.-c, 0., c, 0.]
         g5.set_composition(molar_fractions)
         g5.set_state(1.e5,298.15)
-        g5_excess_enthalpy[i] = g5.excess_enthalpy
+        g5_excess_gibbs[i] = g5.excess_gibbs
 
-    plt.plot( comp, g5_excess_enthalpy/3., 'r-', linewidth=1., label='Py-Gr excess enthalpy (J/cation-mole)')
+    plt.plot( comp, g5_excess_gibbs/3., 'r-', linewidth=1., label='Py-Gr excess enthalpy (J/cation-mole)')
+
     plt.title("Asymmetric py-gr join (Ganguly et al., 1996; Figure 5)")
     plt.ylabel("Excess enthalpy of solution (J/cation-mol)")
-    plt.xlabel("Pyrope fraction")
+    plt.xlabel("XCa")
     plt.legend(loc='lower left')
     plt.show()
+
+

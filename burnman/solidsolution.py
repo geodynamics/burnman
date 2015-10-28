@@ -10,8 +10,7 @@ import warnings
 from .mineral import Mineral, material_property
 from .solutionmodel import *
 from .averaging_schemes import reuss_average_function
-
-
+from . import constants
 
 class SolidSolution(Mineral):
     """
@@ -122,9 +121,30 @@ class SolidSolution(Mineral):
         Mineral.set_state(self, pressure, temperature)
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
+            
 
+    @material_property
+    def activities(self):
+        """
+        Returns a list of endmember activities
+        """
+        if self.temperature > 1.e-10:
+            return np.exp(self.excess_partial_gibbs/(constants.gas_constant*self.temperature))
+        else:
+            return None
 
+    @material_property
+    def activity_coefficients(self):
+        """
+        Returns a list of endmember activity coefficients (the non-ideal part of the activities
+        """
+        if self.temperature > 1.e-10:
+            return np.exp(self.excess_partial_gibbs/(constants.gas_constant*self.temperature)
+                          - IdealSolution._log_ideal_activities(self.solution_model, self.molar_fractions))
+        else:
+            return None
 
+            
     @material_property
     def internal_energy(self):
         """
@@ -152,8 +172,7 @@ class SolidSolution(Mineral):
         """
         return np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
 
-
- 
+    
     @material_property
     def excess_gibbs(self):
         """
@@ -273,7 +292,7 @@ class SolidSolution(Mineral):
             return  self.isothermal_bulk_modulus
         else:
             return  self.isothermal_bulk_modulus*self.heat_capacity_p/self.heat_capacity_v
-
+        
     
     @material_property
     def isothermal_compressibility(self):
@@ -368,3 +387,4 @@ class SolidSolution(Mineral):
         Aliased with self.C_p
         """
         return sum([ self.endmembers[i][0].heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+
