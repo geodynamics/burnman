@@ -20,6 +20,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
+round_to_n = lambda x, xerr, n: round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
 if __name__ == "__main__":
 
@@ -35,6 +36,16 @@ if __name__ == "__main__":
     pressures_wd_rw = np.empty_like(temperatures)
     pressures_rw_perpv = np.empty_like(temperatures)
 
+
+    # Here's one example where we find the equilibrium temperature:
+    P = 14.e9
+    T = burnman.tools.equilibrium_temperature([forsterite, mg_wadsleyite],
+                                              [1.0, -1.0], P)
+    print 'Endmember equilibrium calculations'
+    print 'fo -> wad equilibrium at', P/1.e9, "GPa is reached at", round_to_n(T, T, 4), "K"
+    print ''
+
+    # Now let's make the whole diagram using equilibrium_pressure
     for i, T in enumerate(temperatures):
         P = burnman.tools.equilibrium_pressure([forsterite, mg_wadsleyite],
                                                [1.0, -1.0],
@@ -58,6 +69,7 @@ if __name__ == "__main__":
     plt.xlabel("Temperature (K)")
     plt.ylabel("Pressure (GPa)")
     plt.legend(loc="lower right")
+    plt.title("Mg2SiO4 phase diagram")
     plt.ylim(0., 30.)
     plt.show()
 
@@ -102,10 +114,12 @@ if __name__ == "__main__":
     popt, pcov = burnman.tools.fit_PVT_data(stv, params, guesses, PT, V)
 
     # Print the optimized parameters
+    print 'Equation of state calculations'
     print 'Optimized equation of state for stishovite:'
     for i, p in enumerate(params):
-        print p+':', popt[i], '+/-', np.sqrt(pcov[i][i])
-    
+        print p+':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),\
+            '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
+        
     # Finally, let's plot our equation of state
     pressures = np.linspace(1.e5, 60.e9, 101)
     volumes = np.empty_like(pressures)
@@ -113,10 +127,11 @@ if __name__ == "__main__":
         stv.set_state(P, 298.15)
         volumes[i] = stv.V
 
-    plt.plot(pressures/1.e9, volumes, label='Optimized fit for stishovite')
-    plt.errorbar(PT[0]/1.e9, V, yerr=sigma, linestyle='None', marker='o', label='Andrault et al. (2003)')
+    plt.plot(pressures/1.e9, volumes*1.e6, label='Optimized fit for stishovite')
+    plt.errorbar(PT[0]/1.e9, V*1.e6, yerr=sigma*1.e6, linestyle='None', marker='o', label='Andrault et al. (2003)')
     
-    plt.ylabel("Volume (m^3/mol)")
+    plt.ylabel("Volume (cm^3/mol)")
     plt.xlabel("Pressure (GPa)")
-    plt.legend(loc="lower right")
+    plt.legend(loc="upper right")
+    plt.title("Stishovite EoS (room temperature)")
     plt.show()
