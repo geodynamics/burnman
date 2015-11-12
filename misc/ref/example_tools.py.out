@@ -1,0 +1,8 @@
+Endmember equilibrium calculations
+fo -> wad equilibrium at 14.0 GPa is reached at 1650.0 K
+
+Equation of state calculations
+Optimized equation of state for stishovite:
+V_0: 1.4006e-05 +/- 9e-09
+K_0: 3.12e+11 +/- 10000000000.0
+Kprime_0: 4.4 +/- 0.5
