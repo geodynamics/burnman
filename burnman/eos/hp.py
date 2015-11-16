@@ -31,7 +31,17 @@ class HP_TMT(eos.EquationOfState):
         EQ 12
         """
         Pth=self.__relative_thermal_pressure(temperature,params)
-        return mt.volume(pressure-Pth, params)
+
+        # Add order-disorder terms if required
+        if params.has_key('landau_Vmax'): # For a phase transition described by Landau term
+            Vdisord=volume_disorder_Landau(pressure, temperature, params)
+        else:
+            if params.has_key('BW_deltaV'): # Add Bragg-Williams disordering
+                Vdisord=volume_disorder_BW(pressure, temperature, params) - volume_disorder_BW(params['P_0'], params['T_0'], params)
+            else:
+                Vdisord=0.0
+
+        return mt.volume(pressure-Pth, params) + Vdisord
 
     def pressure(self, temperature, volume, params):
         """
@@ -190,17 +200,8 @@ class HP_TMT(eos.EquationOfState):
         """
         gibbs=self.gibbs_free_energy(pressure,temperature,volume, params)
         entropy=self.entropy(pressure,temperature,volume, params)
-        
-        # Add order-disorder terms if required
-        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
-            Hdisord=enthalpy_disorder_Landau(pressure, temperature, params)
-        else:
-            if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
-                Hdisord=enthalpy_disorder_BW(pressure, temperature, params) - enthalpy_disorder_BW(params['P_0'], params['T_0'], params)
-            else:
-                Hdisord=0.0
 
-        return gibbs + temperature*entropy + Hdisord
+        return gibbs + temperature*entropy
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """

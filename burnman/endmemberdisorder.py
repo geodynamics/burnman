@@ -75,10 +75,22 @@ def enthalpy_disorder_Landau(P, T, params):
     from Holland and Powell, 1996, corrected using
     landaunote.pdf on Tim Holland's esc web page
     """
-    # N.B. Assumes Vt==1, see above
-    Tcstar, Q_0, Q = landau_ordering(P, T, params)
     Hdisord=gibbs_disorder_Landau(P, T, params) + T*entropy_disorder_Landau(P, T, params)
     return Hdisord
+
+def volume_disorder_Landau(P, T, params):
+    """
+    Returns the volume of disordering [m^3/mol] relative 
+    to the equilibrium state of disorder (Q [unitless]) 
+    based on the landau model
+
+    from Holland and Powell, 1996, corrected using
+    landaunote.pdf on Tim Holland's esc web page
+    """
+    Tcstar, Q_0, Q = landau_ordering(P, T, params) 
+    Vt=1.
+    Vdisord=params['landau_Vmax']*(Q_0*Q_0-Q*Q)*Vt
+    return Vdisord
 
 def heat_capacity_p_disorder_Landau(P, T, params):
     """
@@ -149,3 +161,13 @@ def enthalpy_disorder_BW(P, T, params):
     nonideal=(1.-Q)*Q*W
     Hdisord=ideal+nonideal
     return Hdisord
+
+def volume_disorder_BW(P, T, params):
+    n=params['BW_n']
+    deltaS=entropydisorder(n)
+    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    W=params['BW_Wv']
+    ideal=(1.-Q)*(params['BW_deltaV'])
+    nonideal=(1.-Q)*Q*W
+    Vdisord=ideal+nonideal
+    return Vdisord
