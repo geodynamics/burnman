@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     def material_error(amount_perovskite):
         #Define composite using the values
-        rock = burnman.Composite([perovskite, ferropericlase] \
+        rock = burnman.Composite([perovskite, ferropericlase], \
                                  [amount_perovskite, 1.0-amount_perovskite])
 
         # Compute velocities
