@@ -61,6 +61,16 @@ class test_solidsolution(BurnManTest):
         
         self.assertArraysAlmostEqual(pcov[0], zeros)
 
+
+    def test_hugoniot(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+        T_ref = 298.15
+        P_ref = 1.e5
+        pressures = np.array([P_ref])
+        temperatures, volumes = hugoniot(fo, P_ref, T_ref, pressures)
+
+        self.assertArraysAlmostEqual(temperatures, np.array([T_ref]))
+
         
 if __name__ == '__main__':
     unittest.main()

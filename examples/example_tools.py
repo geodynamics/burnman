@@ -10,7 +10,7 @@ example_tools
 This example demonstrates BurnMan's tools, which are currently
 - equation of state fitting
 - equilibrium temperature and pressure calculations
-
+- Hugoniot calculation
 
 """
 import os, sys, numpy as np, matplotlib.pyplot as plt
@@ -134,3 +134,23 @@ if __name__ == "__main__":
     plt.legend(loc="upper right")
     plt.title("Stishovite EoS (room temperature)")
     plt.show()
+
+
+    # Here's a calculation of the Hugoniot of periclase up to 120 GPa
+    print ''
+    print 'Hugoniot calculations'
+    pressures = np.linspace(1.e5, 120.e9, 101)
+    temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 298.15, pressures)
+    plt.plot(pressures/1.e9, temperatures, label='298.15 K')
+    print 'Room temperature Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K'
+    
+    temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 1000., pressures)
+    plt.plot(pressures/1.e9, temperatures, label='1000 K')
+    print '1000 K Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K'
+    
+    plt.legend(loc="upper left")
+    plt.ylabel("Temperature (K)")
+    plt.xlabel("Pressure (GPa)")
+    plt.title("Periclase Hugoniot")
+    plt.show()
+    

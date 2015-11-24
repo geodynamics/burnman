@@ -222,3 +222,57 @@ def equilibrium_temperature(minerals, stoichiometry, pressure, temperature_initi
     temperature = fsolve(eqm, [temperature_initial_guess], args=(pressure))[0]
     
     return temperature
+
+
+def hugoniot(mineral, P_ref, T_ref, pressures):
+    """
+    Calculates the temperatures (and volumes) along a Hugoniot
+    as a function of pressure according to the Hugoniot equation
+    U2-U1 = 0.5*(p2 - p1)(V1 - V2) where U and V are the 
+    internal energies and volumes (mass or molar) and U = F + TS
+
+
+    Parameters
+    ----------
+    mineral : mineral
+        Mineral for which the Hugoniot is to be calculated.
+    
+    P_ref : float
+        Reference pressure [Pa]
+    
+    T_ref : float
+        Reference temperature [K]
+
+    pressures : numpy array of floats
+        Set of pressures [Pa] for which the Hugoniot temperature
+        and volume should be calculated
+    
+    Returns
+    -------
+    temperatures : numpy array of floats
+        The Hugoniot temperatures at pressure
+
+    volumes : numpy array of floats
+        The Hugoniot volumes at pressure
+    """
+
+    def Ediff(T, mineral, P, P_ref, U_ref, V_ref):
+        mineral.set_state(P, T[0])
+        U = mineral.helmholtz + T[0]*mineral.S
+        V = mineral.V
+        
+        return (U - U_ref) - 0.5*(P - P_ref)*(V_ref - V)
+
+
+    mineral.set_state(P_ref, T_ref)
+    U_ref = mineral.helmholtz + T_ref*mineral.S
+    V_ref = mineral.V
+
+    temperatures = np.empty_like(pressures)
+    volumes = np.empty_like(pressures)
+    
+    for i, P in enumerate(pressures):
+        temperatures[i] = fsolve(Ediff, [T_ref], args = (mineral, P, P_ref, U_ref, V_ref))[0]
+        volumes[i] = mineral.V
+
+    return temperatures, volumes
