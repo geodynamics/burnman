@@ -110,8 +110,7 @@ if __name__ == "__main__":
     # The mineral parameters are automatically updated during fitting
     stv = burnman.minerals.HP_2011_ds62.stv()
     params = ['V_0', 'K_0', 'Kprime_0']
-    guesses = [1.2e-5, 300.e9, 4.]
-    popt, pcov = burnman.tools.fit_PVT_data(stv, params, guesses, PT, V)
+    popt, pcov = burnman.tools.fit_PVT_data(stv, params, PT, V)
 
     # Print the optimized parameters
     print 'Equation of state calculations'
