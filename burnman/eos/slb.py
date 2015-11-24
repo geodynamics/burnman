@@ -58,7 +58,7 @@ class SLBBase(eos.EquationOfState):
     def pressure(self, temperature, volume, params):
         return bm.birch_murnaghan(params['V_0']/volume, params) + \
                 self.__thermal_pressure(temperature,volume, params) - \
-                self.__thermal_pressure(300.,volume, params)
+                self.__thermal_pressure(params['T_0'],volume, params)
 
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
@@ -108,7 +108,7 @@ class SLBBase(eos.EquationOfState):
         debye_T = self.__debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(0.0, temperature, volume, params) #does not depend on pressure
         E_th = debye.thermal_energy(temperature, debye_T, params['n'])
-        E_th_ref = debye.thermal_energy(300., debye_T, params['n']) #thermal energy at reference temperature
+        E_th_ref = debye.thermal_energy(params['T_0'], debye_T, params['n']) #thermal energy at reference temperature
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
@@ -242,7 +242,7 @@ class SLBBase(eos.EquationOfState):
         Debye_T = self.__debye_temperature(params['V_0']/volume, params)
 
         F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
-                          debye.helmholtz_free_energy( 300., Debye_T, params['n'] )
+                          debye.helmholtz_free_energy(params['T_0'], Debye_T, params['n'] )
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
