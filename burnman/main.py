@@ -58,8 +58,8 @@ def calculate_moduli(rock, pressures, temperatures):
 
     for idx in range(len(pressures)):
         rock.set_state(pressures[idx], temperatures[idx])
-        (fractions,minerals) = rock.unroll()
-        for (fraction,mineral) in zip(fractions,minerals):
+        (minerals,fractions) = rock.unroll()
+        for (mineral,fraction) in zip(minerals,fractions):
             e = ElasticProperties()
             e.V = fraction * mineral.molar_volume()
             e.K = mineral.adiabatic_bulk_modulus()

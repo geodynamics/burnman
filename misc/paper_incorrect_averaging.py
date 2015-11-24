@@ -125,22 +125,22 @@ if __name__ == "__main__":
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     #pure perovskite
-    perovskitite = burnman.Composite( ( (perovskite(0.06), 1.0),) )
+    perovskitite = burnman.Composite( [perovskite(0.06)], [1.0] )
     perovskitite.set_method(method)
 
     #pure periclase
-    periclasite = burnman.Composite( ( (ferropericlase(0.21), 1.0),))
+    periclasite = burnman.Composite( [ferropericlase(0.21)], [1.0])
     periclasite.set_method(method)
 
     #pyrolite (80% perovskite)
-    pyrolite = burnman.Composite( ( (perovskite(0.06), 0.834),
-                                    (ferropericlase(0.21), 0.166) ) )
+    pyrolite = burnman.Composite( [perovskite(0.06), ferropericlase(0.21)],\
+                                  [0.834, 0.166] )
     pyrolite.set_method(method)
 
     #preferred mixture?
     amount_perovskite = 0.92
-    preferred_mixture = burnman.Composite( ( (perovskite(0.06), amount_perovskite),
-                                             (ferropericlase(0.21), 1.0-amount_perovskite) ) )
+    preferred_mixture = burnman.Composite( [perovskite(0.06), ferropericlase(0.21)],\
+                                           [amount_perovskite, 1.0-amount_perovskite] )
     preferred_mixture.set_method(method)
 
 
@@ -204,7 +204,4 @@ if __name__ == "__main__":
     if "RUNNING_TESTS" not in globals():
         plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
     plt.show()
-
-
-
 

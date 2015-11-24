@@ -77,7 +77,7 @@ if __name__ == "__main__":
     pc=minerals.SLB_2011.ferropericlase()
     pv.set_composition([1.-fe_pv,fe_pv,0.])
     pc.set_composition([1.-fe_pc,fe_pc])
-    example_rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], [pv,pc] )
+    example_rock = burnman.Composite( [pv,pc], [amount_perovskite, 1.0-amount_perovskite] )
     
     #next, define an anchor temperature at which we are starting.
     #Perhaps 1500 K for the upper mantle

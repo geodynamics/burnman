@@ -64,17 +64,17 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.SLB_2011.mg_perovskite(),
-                                  minerals.SLB_2011.periclase()])
+        rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                                  minerals.SLB_2011.periclase()],\
+                                 [amount_perovskite, 1.0-amount_perovskite])
 
 
     #Example 2: three materials
     if False:
-        rock = burnman.Composite([0.7, 0.2, 0.1],
-                                 [minerals.SLB_2011.fe_perovskite(),
+        rock = burnman.Composite([minerals.SLB_2011.fe_perovskite(),
                                   minerals.SLB_2011.periclase(),
-                                  minerals.SLB_2011.stishovite()])
+                                  minerals.SLB_2011.stishovite()],\
+                                 [0.7, 0.2, 0.1])
 
 
     #Example 3: Mixing solid solutions
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
         # Set molar fraction of endmembers
         new_solidsolution.set_composition([0.9,0.1])
-        rock=burnman.Composite([0.8, 0.2], [new_solidsolution, minerals.SLB_2011.periclase()])
+        rock=burnman.Composite([new_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
 
 
 

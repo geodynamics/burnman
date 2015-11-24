@@ -51,7 +51,7 @@ if __name__ == "__main__":
     pc=minerals.SLB_2011.ferropericlase()
     pv.set_composition([1.-fe_pv,fe_pv,0.])
     pc.set_composition([1.-fe_pc,fe_pc])
-    rock = burnman.Composite( [amount_perovskite, 1.0-amount_perovskite], [pv,pc] )
+    rock = burnman.Composite( [pv,pc], [amount_perovskite, 1.0-amount_perovskite] )
     
     #define some pressure range
     pressures = np.arange(25e9,130e9,5e9)

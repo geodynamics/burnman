@@ -32,9 +32,9 @@ if __name__ == "__main__":
 
     def calc_velocities(a,b,c):
         amount_perovskite = a
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.SLB_2005.mg_fe_perovskite(b),
-                                  minerals.SLB_2005.ferropericlase(c)])
+        rock = burnman.Composite([minerals.SLB_2005.mg_fe_perovskite(b),
+                                  minerals.SLB_2005.ferropericlase(c)],\
+                                 [amount_perovskite, 1.0-amount_perovskite])
 
 
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
