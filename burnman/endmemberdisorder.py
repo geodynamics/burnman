@@ -6,12 +6,14 @@ import numpy as np
 import scipy.optimize as opt
 import constants
 
-T_0=298.15 # Standard temperature = 25 C
-P_0=1.e5 # Standard pressure = 1.e5 Pa
 
 """
 Functions for order-disorder thermodynamic properties of endmembers
 """
+
+#####################################
+# TRICRITICAL LANDAU ORDER-DISORDER #
+#####################################
 
 def landau_ordering(P, T, params):
     """
@@ -23,7 +25,7 @@ def landau_ordering(P, T, params):
     """
     Tcstar=params['landau_Tc'] + (params['landau_Vmax']/params['landau_Smax'])*P
             # Q_0 is Q at T0, P0? 
-    Q_0=np.power((params['landau_Tc']-T_0)/params['landau_Tc'],1./4.)
+    Q_0=np.power((params['landau_Tc']-params['T_0'])/params['landau_Tc'],1./4.)
     
     # Find state of ordering
     # Note that Q > 1 where Vmax*P > Smax*T. 
@@ -112,6 +114,12 @@ def heat_capacity_p_disorder_Landau(P, T, params):
     return Cp_disord
 
 
+#################################
+# BRAGG-WILLIAMS ORDER-DISORDER #
+#################################
+
+
+
 # see derivation in thermodynamic_introduction.pdf
 def lnxord(n,Q):
     return np.log(1.+n*Q) + n*np.log(n+Q) - (1.+n)*np.log(1.+n)
@@ -127,7 +135,14 @@ def entropydisorder(n):
 
 # see Holland and Powell, 1996
 # params['BW_factor'] is a proportional reduction of the configurational energy of mixing, so feeds into the calculation of Q.
-def equilibrium_Q(Q, deltaS, P, T, params):
+def _equilibrium_Q_BW(Q, deltaS, P, T, params):
+    """
+    Function for input into an optimization routine to obtain 
+    equilibrium state of order [unitless] at 
+    pressure [Pa], and temperature (K)
+
+    from Holland and Powell, 1996 (two papers in Am. Min.)
+    """
     n=params['BW_n']
     W=params['BW_W'] + P*params['BW_Wv']
     if Q>1.0:
@@ -136,9 +151,15 @@ def equilibrium_Q(Q, deltaS, P, T, params):
 
 # Energy of disordering from Bragg-Williams symmetric model; see Holland and Powell, 1996
 def gibbs_disorder_BW(P, T, params):
+    """
+    Returns gibbs energy of disordering [J/mol] at pressure [Pa], 
+    and temperature (K)
+
+    from Holland and Powell, 1996 (two papers in Am. Min.)
+    """
     n=params['BW_n']
     deltaS=entropydisorder(n)
-    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    Q=opt.fsolve(_equilibrium_Q_BW, 0.999995, args=(deltaS, P, T, params))[0]
     W=params['BW_W'] + P*params['BW_Wv']
     ideal=(1.-Q)*(params['BW_deltaH'] - params['BW_factor']*T*entropydisorder(n) + P*params['BW_deltaV'] + params['BW_factor']*constants.gas_constant*T*lnxdisord(n,Q)) + params['BW_factor']*Q*(constants.gas_constant*T*lnxord(n,Q))
     nonideal=(1.-Q)*Q*W
@@ -146,16 +167,28 @@ def gibbs_disorder_BW(P, T, params):
     return Edisord
 
 def entropy_disorder_BW(P, T, params):
+    """
+    Returns entropy of disordering [J/K/mol] at pressure [Pa], 
+    and temperature (K)
+
+    from Holland and Powell, 1996 (two papers in Am. Min.)
+    """
     n=params['BW_n']
     deltaS=entropydisorder(n)
-    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    Q=opt.fsolve(_equilibrium_Q_BW, 0.999995, args=(deltaS, P, T, params))[0]
     Sdisord=params['BW_factor']*((1.-Q)*(entropydisorder(n) - constants.gas_constant*lnxdisord(n,Q)) - Q*(constants.gas_constant*lnxord(n,Q)))
     return Sdisord
 
 def enthalpy_disorder_BW(P, T, params):
+    """
+    Returns enthalpy of disordering [J/mol] at pressure [Pa], 
+    and temperature (K)
+
+    from Holland and Powell, 1996 (two papers in Am. Min.)
+    """
     n=params['BW_n']
     deltaS=entropydisorder(n)
-    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    Q=opt.fsolve(_equilibrium_Q_BW, 0.999995, args=(deltaS, P, T, params))[0]
     W=params['BW_W'] + P*params['BW_Wv']
     ideal=(1.-Q)*(params['BW_deltaH'] + P*params['BW_deltaV'])
     nonideal=(1.-Q)*Q*W
@@ -163,9 +196,15 @@ def enthalpy_disorder_BW(P, T, params):
     return Hdisord
 
 def volume_disorder_BW(P, T, params):
+    """
+    Returns volume of disordering [m^3/mol] at pressure [Pa], 
+    and temperature (K)
+
+    from Holland and Powell, 1996 (two papers in Am. Min.)
+    """
     n=params['BW_n']
     deltaS=entropydisorder(n)
-    Q=opt.fsolve(equilibrium_Q, 0.999995, args=(deltaS, P, T, params))[0]
+    Q=opt.fsolve(_equilibrium_Q_BW, 0.999995, args=(deltaS, P, T, params))[0]
     W=params['BW_Wv']
     ideal=(1.-Q)*(params['BW_deltaV'])
     nonideal=(1.-Q)*Q*W
