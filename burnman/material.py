@@ -101,20 +101,280 @@ class Material(object):
         raise NotImplementedError("need to implement unroll() in derived class!")
         return ([], [])
 
-    def density(self):
-        """
-        Returns the density of this material. Note that the return value of this function may depend on the current
-        state (temperature, pressure). [kg/m^3]
 
+
+    def molar_mass(self):
+        """
+        Returns molar mass of the mineral [kg/mol]
+        
         Notes
         -----
         Needs to be implemented in derived classes.
-
+        
         Returns
         -------
-        density : float
-            The density of this material in [kg/m^3]
-
+        molar_mass : array of floats
+        
         """
         raise NotImplementedError("need to implement density() in derived class!")
         return None
+
+
+def density(self):
+    """
+        Returns the density of this material.
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        density : float
+        The density of this material in [kg/m^3]
+        
+        """
+            raise NotImplementedError("need to implement density() in derived class!")
+                return None
+
+    def molar_volume(self):
+        """
+        Returns molar volume of the mineral [m^3/mol]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        V : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+        
+    def grueneisen_parameter(self):
+        """
+        Returns grueneisen parameter of the mineral [unitless]
+                
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        gr : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def isothermal_bulk_modulus(self):
+        """
+        Returns isothermal bulk modulus of the mineral [Pa]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        K_T : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def compressibility(self):
+        """
+        Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        (K_T)^-1 : array of floats
+        
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def adiabatic_bulk_modulus(self):
+        """
+        Returns adiabatic bulk modulus of the mineral [Pa]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        K_S : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def shear_modulus(self):
+        """
+        Returns shear modulus of the mineral [Pa]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        G : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def thermal_expansivity(self):
+        """
+        Returns thermal expansion coefficient of the mineral [1/K]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        alpha : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def heat_capacity_v(self):
+        """
+        Returns heat capacity at constant volume of the mineral [J/K/mol]
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        C_v : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def heat_capacity_p(self):
+        """
+        Returns heat capacity at constant pressure of the mineral [J/K/mol]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        C_p : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def v_s(self):
+        """
+        Returns shear wave speed of the mineral [m/s]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        v_s : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def v_p(self):
+        """
+        Returns P wave speed of the mineral [m/s]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        v_p : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
+    def v_phi(self):
+        """
+        Returns bulk sound speed of the mineral [m/s]
+            
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        v_phi: array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+    
+    def molar_gibbs(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        Gibbs free energies : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+    
+    def molar_helmholtz(self):
+        """
+        Returns Helmholtz free energy of the mineral [J]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        Helmholtz free energies : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+    
+    def molar_enthalpy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        enthalpies : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+    
+    def molar_entropy(self):
+        """
+        Returns entropy of the mineral [J]
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        entropies : array of floats
+        """
+        raise NotImplementedError("need to implement density() in derived class!")
+        return None
+
