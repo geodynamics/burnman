@@ -81,9 +81,9 @@ class test_model(BurnManTest):
         # reproduce by hand:
         min = m.rock
         min.set_state(m.p[0], m.T[0])
-        self.assertArraysAlmostEqual(m.thermal_expansivity(), [min.thermal_expansivity()])
-        self.assertArraysAlmostEqual(m.heat_capacity_v(), [min.heat_capacity_v()])
-        self.assertArraysAlmostEqual(m.heat_capacity_p(), [min.heat_capacity_p()])
+        self.assertArraysAlmostEqual(m.thermal_expansivity(), [min.thermal_expansivity])
+        self.assertArraysAlmostEqual(m.heat_capacity_v(), [min.heat_capacity_v])
+        self.assertArraysAlmostEqual(m.heat_capacity_p(), [min.heat_capacity_p])
 
     def test_heat2(self):
         m1 = self.model1()

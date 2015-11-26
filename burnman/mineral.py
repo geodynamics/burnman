@@ -114,7 +114,7 @@ class Mineral(Material):
         This updates the other properties of this class (v_s, v_p, ...).
         """
 
-        #in an effort to avoid additional work, don't do all the calculations if nothing has changed
+        #in an effort to avoid additional work, don't do all the calculations if nothing has changed REDUNDANT!
         try:
             if self.pressure == pressure and self.temperature == temperature and self.old_params == self.params:
                 return
@@ -128,33 +128,8 @@ class Mineral(Material):
         if self.method is None:
             raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
-        self.V = self.method.volume(self.pressure, self.temperature, self.params)
-        self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)
-        self.K_T = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
-        self.K_S = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.V, self.params)
-        self.G = self.method.shear_modulus(self.pressure, self.temperature, self.V, self.params)
-        self.C_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.V, self.params)
-        self.C_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.V, self.params)
-        self.alpha = self.method.thermal_expansivity(self.pressure, self.temperature, self.V, self.params)
+        #self.V = self.method.volume(self.pressure, self.temperature, self.params)
 
-        # Attempt to calculate the gibbs free energy and helmholtz free energy, but don't complain if the
-        # equation of state does not calculate it, or if the mineral params do not have the requisite entries.
-        try:
-            self.gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.V, self.params)
-        except (KeyError, NotImplementedError):
-            self.gibbs = float('nan')
-        try:
-            self.helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.V, self.params)
-        except (KeyError, NotImplementedError):
-            self.helmholtz = float('nan')
-        try:
-            self.S = self.method.entropy(self.pressure, self.temperature, self.V, self.params)
-        except (KeyError, NotImplementedError):
-            self.S = float('nan')
-        try:
-            self.H = self.method.enthalpy(self.pressure, self.temperature, self.V, self.params)
-        except (KeyError, NotImplementedError):
-            self.H = float('nan')
 
 
     # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
@@ -164,115 +139,159 @@ class Mineral(Material):
     def composition(self):
         return self.params['formula']
     
-
+    @property
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-        return self.params['molar_mass']
+        self._molar_mass = self.params['molar_mass']
+        return self._molar_mass
 
+    @property
     def density(self):
         """
         Returns density of the mineral [kg/m^3]
         """
-        return  self.params['molar_mass'] / self.molar_volume
+        self._density = self.molar_mass/self.molar_volume
+        return self._density
 
+    @property
     def molar_volume(self):
         """
         Returns molar volume of the mineral [m^3/mol]
         """
-        return self.method.volume(self.pressure, self.temperature, self.params)
-    
+        self._molar_volume=self.method.volume(self.pressure, self.temperature, self.params)
+        return self._molar_volume
+
+    @property
     def grueneisen_parameter(self):
         """
         Returns grueneisen parameter of the mineral [unitless]
         """
-        return self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
-    
+        self._grueneisen_parameter = self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._grueneisen_parameter
+
+    @property
     def isothermal_bulk_modulus(self):
         """
         Returns isothermal bulk modulus of the mineral [Pa]
         """
-        return self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume, self.params)
-    
+        self._isothermal_bulk_modulus = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._isothermal_bulk_modulus
+
+    @property
     def compressibility(self):
         """
         Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
         """
-        return 1./self.isothermal_bulk_modulus()
-    
+        self._compressibility = 1./self.isothermal_bulk_modulus
+        return self._compressibily
+
+    @property
     def adiabatic_bulk_modulus(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
         """
-        return self.K_S
-    
+        self._adiabatic_bulk_modulus = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._adiabatic_bulk_modulus
+
+    @property
     def shear_modulus(self):
         """
         Returns shear modulus of the mineral [Pa]
         """
-        return self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume, self.params)
-    
+        self._shear_modulus = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._shear_modulus
+
+    @property
     def thermal_expansivity(self):
         """
-        Returns thermal expansion coefficient of the mineral [1/K]
+        Returns thermal expansion coefficient (alpha) of the mineral [1/K]
         """
-        return self.alpha
-    
+        self._thermal_expansivity = self.method.thermal_expansivity(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._thermal_expansivity
+
+    @property
     def heat_capacity_v(self):
         """
         Returns heat capacity at constant volume of the mineral [J/K/mol]
         """
-        return self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume, self.params)
-    
+        self._heat_capacity_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._heat_capacity_v
+
+    @property
     def heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
         """
-        return self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume, self.params)
-    
+        self._heat_capacity_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume , self.params)
+        return self._heat_capacity_p
+
+    @property
     def v_s(self):
         """
         Returns shear wave speed of the mineral [m/s]
         """
-        return np.sqrt(self.shear_modulus() / \
-            self.density())
-    
+        self._v_s = np.sqrt(self.shear_modulus / self.density)
+        return self._v_s
+
+    @property
     def v_p(self):
         """
         Returns P wave speed of the mineral [m/s]
         """
-        return np.sqrt((self.adiabatic_bulk_modulus() + 4. / 3. * \
-            self.shear_modulus()) / self.density())
-    
+        self._v_p = np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+                             self.shear_modulus) / self.density)
+        return self._v_p
+
+    @property
     def v_phi(self):
         """
         Returns bulk sound speed of the mineral [m/s]
         """
-        return np.sqrt(self.adiabatic_bulk_modulus() / self.density())
+        self._v_phi = np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return self._v_phi
     
-
+    @property
     def molar_gibbs(self):
         """
         Returns Gibbs free energy of the mineral [J]
         """
-        return self.method.gibbs_free_energy(self.pressure, self.temperature, self.V, self.params)
+        self._gibbs_free_energy = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._gibbs_free_energy
 
+    @property
     def molar_helmholtz(self):
         """
         Returns Helmholtz free energy of the mineral [J]
         """
-        return self.method.helmholtz_free_energy(self.pressure, self.temperature, self.V, self.params)
+        self._helmholtz_free_energy = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._helmholtz_free_energy
 
+    @property
     def molar_enthalpy(self):
         """
         Returns enthalpy of the mineral [J]
         """
-        return self.method.enthalpy(self.pressure, self.temperature, self.V, self.params)
+        self._molar_enthalpy = self.method.enthalpy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._molar_enthalpy
 
+    @property
     def molar_entropy(self):
         """
         Returns enthalpy of the mineral [J]
         """
-        return self.method.entropy(self.pressure, self.temperature, self.V, self.params)
+        self._molar_entropy = self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._molar_entropy
 
+    gibbs = molar_gibbs
+    V = molar_volume
+    H = molar_enthalpy
+    S  = molar_entropy
+    C_p = heat_capacity_p
+    C_v = heat_capacity_v
+    alpha = thermal_expansivity
+    K_T = isothermal_bulk_modulus
+    K_S = adiabatic_bulk_modulus
+    gr = grueneisen_parameter
+    G = shear_modulus

@@ -53,6 +53,9 @@ class Composite(Material):
         else:
             self.molar_fractions=None
 
+        self.set_averaging_scheme('VoigtReussHill')
+        self.set_state(1.e5,300.)
+
     def set_fractions(self, fractions, fraction_type='molar'):
         assert(len(self.phases)==len(fractions))
 
@@ -89,6 +92,36 @@ class Composite(Material):
             if composition != []:
                 self.phases[i].set_composition(composition)
             
+
+    def set_method(self, method):
+        """
+        set the same equation of state method for all the phases in the composite
+        """
+        for phase in self.phases:
+            
+            phase.set_method(method)
+
+    def set_averaging_scheme(self,averaging_scheme):
+        """
+        Set the averaging scheme for the moduli in the composite.
+        Default is set to VoigtReussHill, when Composite is initialized.
+        """
+        
+        if type(averaging_scheme)==str:
+            self.averaging_scheme = getattr(averaging_schemes,averaging_scheme)()
+        else:
+            self.averaging_scheme = averaging_scheme
+
+    def set_state(self, pressure, temperature):
+        """
+        Update the material to the given pressure [Pa] and temperature [K].
+        """
+        self.pressure = pressure
+        self.temperature = temperature
+        for phase in self.phases:
+                phase.set_state(pressure, temperature)
+        #self.rho = self.Vp = self.Vs = self.Vphi = self.K = self.G = None #Do we need this?
+            
     def composition(self):
         self.phase_compositions=[self.phases[i].composition() for i in range(len(self.phases))]
         bulk_composition=dict()
@@ -112,12 +145,6 @@ class Composite(Material):
             for i, phase in enumerate(self.phases):
                 phase.debug_print(indent + "  ")
 
-    def set_method(self, method):
-        """
-        set the same equation of state method for all the phases in the composite
-        """
-        for phase in self.phases:
-            phase.set_method(method)
 
     def unroll(self):
         phases = []
@@ -138,26 +165,209 @@ class Composite(Material):
         """
         return "'" + self.__class__.__name__ + "'"
 
-    def set_state(self, pressure, temperature):
-        """
-        Update the material to the given pressure [Pa] and temperature [K].
-        """
-        self.pressure = pressure
-        self.temperature = temperature
-        for phase in self.phases:
-            phase.set_state(pressure, temperature)
-        self.rho = self.Vp = self.Vs = self.Vphi = self.K = self.G = None
+    def evaluate_phase_properties(self,vars_list):
+        values = np.empty((len(vars_list),len(self.phases)))
+        for v,var in enumerate(vars_list):
+            for p,phase in enumerate(self.phases):
+                values[v,p] = getattr(phase.var)()
 
+
+
+    def calculate_elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
+        """
+        Calculates the seismic velocities of the Assemblage, using
+        an averaging scheme for the velocities of individual phases
+
+        :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+        :param averaging_scheme: Averaging scheme to use.
+
+        :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
+        :rtype: lists of floats
+
+        """
+        moduli = [self._calculate_moduli()]
+        moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
+        self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
+        self.rho = moduli.rho
+        self.K = moduli.K
+        self.G = moduli.G
+
+    def chemical_potentials(self, component_formulae):
+        component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
+        return chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
+
+    def fugacity(self, standard_material):
+        return chemicalpotentials.fugacity(standard_material, self.phases)
+
+    @property
+    def molar_mass(self):
+        """
+        Returns molar mass of the composite [kg/mol]
+        """
+        self._molar_mass = sum([ phase.molar_mass*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        return self._molar_mass
+
+    @property
     def density(self):
         """
         Compute the density of the composite based on the molar volumes and masses
         """
-        try:
-            densities = np.array([phase.density() for phase in self.phases])
-            volumes = np.array([phase.molar_volume()*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
-        except:
-            raise Exception("Density cannot be computed without phase fractions being defined.")
-        return np.sum(densities*volumes)/np.sum(volumes)
+        densities = np.array([phase.density for phase in self.phases])
+        volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        self._density = self.averaging_scheme.average_density(volumes,densities)
+        return self._density
+
+    @property
+    def molar_volume(self):
+        """
+        Returns molar volume of the composite [m^3/mol]
+        """
+        volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        self._molar_volume = np.sum(volumes)
+        return self._molar_volume
+
+    @property
+    def grueneisen_parameter(self):
+        """
+        Returns grueneisen parameter of the composite [unitless]
+        """
+        raise NotImplementedError("need to implement grueneisen_parameter() for composite!")
+        return None
+
+    @property
+    def isothermal_bulk_modulus(self):
+        """
+        Returns isothermal bulk modulus of the composite [Pa]
+        """
+        V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        K_ph = np.array([phase.isothermal_bulk_modulus for phase in self.phases])
+        G_ph = np.array([phase.shear_modulus for phase in self.phases])
+   
+        self._isothermal_bulk_modulus = self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+        return self._isothermal_bulk_modulus
+
+    @property
+    def compressibility(self):
+        """
+        Returns compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
+        """
+        self._compressibility = 1./self.isothermal_bulk_modulus()
+        return self._compressibility
+
+    @property
+    def adiabatic_bulk_modulus(self):
+        """
+        Returns adiabatic bulk modulus of the mineral [Pa]
+        """
+        V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        K_ph = np.array([phase.adiabatic_bulk_modulus for phase in self.phases])
+        G_ph = np.array([phase.shear_modulus for phase in self.phases])
+        
+        self._adiabatic_bulk_modulus = self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+        
+        return self._adiabatic_bulk_modulus
+
+    @property
+    def shear_modulus(self):
+        """
+        Returns shear modulus of the mineral [Pa]
+        """
+        V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        K_ph = np.array([phase.adiabatic_bulk_modulus for phase in self.phases])
+        G_ph = np.array([phase.shear_modulus for phase in self.phases])
+        
+        self._shear_modulus = self.averaging_scheme.average_shear_moduli(V_frac, K_ph, G_ph)
+                                                        
+        return self._shear_modulus
+
+    @property
+    def thermal_expansivity(self):
+        """
+        Returns thermal expansion coefficient of the composite [1/K]
+        """
+        V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        alphas = np.array([phase.thermal_expansivity for phase in self.phases])
+        
+        self._thermal_expansivity = self.averaging_scheme.average_thermal_expansivity(volumes,alphas)
+        return self._thermal_expansivity
+
+    @property
+    def heat_capacity_v(self):
+        """
+        Returns heat capacity at constant volume of the composite [J/K/mol]
+        """
+        c_v = np.array([phase.heat_capacity_v for phase in self.phases])
+        self._heat_capacity_v = self.averaging_scheme.averaging_heat_capacity_v(self.molar_fractions,c_v)
+        return self._heat_capacity_v
+
+    @property
+    def heat_capacity_p(self):
+        """
+        Returns heat capacity at constant pressure of the composite [J/K/mol]
+        """
+        c_p = np.array([phase.heat_capacity_v for phase in self.phases])
+        self._heat_capacity_p = self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
+        return self._heat_capacity_p
+
+    @property
+    def v_s(self):
+        """
+        Returns shear wave speed of the composite [m/s]
+        """
+        self._v_s = np.sqrt(self.shear_modulus / self.density)
+        return self._v_s
+
+    @property
+    def v_p(self):
+        """
+        Returns P wave speed of the composite [m/s]
+        """
+        self._v_p =  np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+                            self.shear_modulus) / self.density)
+        return self._v_p
+
+    @property
+    def v_phi(self):
+        """
+        Returns bulk sound speed of the composite [m/s]
+        """
+        self._v_phi =  np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return self._v_phi
+
+    @property
+    def molar_gibbs(self):
+        """
+        Returns Gibbs free energy of the composite [J]
+        """
+        raise NotImplementedError("need to implement molar_gibbs() for Composite()!")
+        return None
+
+    @property
+    def molar_helmholtz(self):
+        """
+        Returns Helmholtz free energy of the mineral [J]
+        """
+        raise NotImplementedError("need to implement molar_helmholtz() for Composite()!")
+        return None
+
+    @property
+    def molar_enthalpy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        """
+        raise NotImplementedError("need to implement molar_enthalpy() for Composite!")
+        return None
+
+    @property
+    def molar_entropy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        """
+        raise NotImplementedError("need to implement molar_entropy() in derived class!")
+        return None
+
+
+
 
     def _calculate_moduli(self):
         """
@@ -176,10 +386,10 @@ class Composite(Material):
         for (mineral, volume_fraction) in zip(minerals, volume_fractions):
 
             e = burnman.ElasticProperties()
-            e.V = volume_fraction * mineral.molar_volume()
+            e.V = volume_fraction * mineral.molar_volume
             e.K = mineral.adiabatic_bulk_modulus()
             e.G = mineral.shear_modulus()
-            e.rho = mineral.molar_mass() / mineral.molar_volume()
+            e.rho = mineral.molar_mass / mineral.molar_volume
             e.fraction = volume_fraction
             elastic_properties_of_phases.append(e)
 
@@ -212,45 +422,13 @@ class Composite(Material):
         total_moles=0.
         try:
             for i, mineral in enumerate(minerals):
-                total_moles+=mass_fractions[i]/mineral.molar_mass()
+                total_moles+=mass_fractions[i]/mineral.molar_mass
             molar_fractions=[]
             for i, mineral in enumerate(minerals):
-                molar_fractions.append(mass_fractions[i]/(mineral.molar_mass()*total_moles))
+                molar_fractions.append(mass_fractions[i]/(mineral.molar_mass*total_moles))
         except AttributeError:
             raise Exception("Mass fractions cannot be set before composition has been set for all the phases in the composite.")
     
         return molar_fractions
 
-    def calculate_elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
-        """
-        Calculates the seismic velocities of the Assemblage, using
-        an averaging scheme for the velocities of individual phases
-
-        :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
-        :param averaging_scheme: Averaging scheme to use.
-
-        :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
-        :rtype: lists of floats
-
-        """
-        moduli = [self._calculate_moduli()]
-        moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
-        self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
-        self.rho = moduli.rho
-        self.K = moduli.K
-        self.G = moduli.G
-
-    def chemical_potentials(self, component_formulae):
-        component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
-        return chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
-
-    def fugacity(self, standard_material):
-        return chemicalpotentials.fugacity(standard_material, self.phases)
-
-    def molar_mass(self):
-        """
-        Returns molar mass of the composite [kg/mol]
-        """
-        molar_mass = sum([ self.phases[i][0].molar_mass()*self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        return molar_mass
 

@@ -128,9 +128,9 @@ def dTdP(temperature, pressure, rock):
     rock.set_state(pressure, temperature)
     (minerals, fractions) = rock.unroll()
     for (mineral, fraction) in zip(minerals, fractions):
-        gr = mineral.grueneisen_parameter()
-        K_s = mineral.adiabatic_bulk_modulus()
-        C_p = mineral.heat_capacity_p()
+        gr = mineral.grueneisen_parameter
+        K_s = mineral.adiabatic_bulk_modulus
+        C_p = mineral.heat_capacity_p
 
         top += fraction*gr*C_p/K_s
         bottom += fraction*C_p

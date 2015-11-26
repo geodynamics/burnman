@@ -22,7 +22,7 @@ class spin_transition(BurnManTest):
             #print p.v_s()
          
         c,f = mins[0].unroll()
-        self.assertFloatEqual(c[0].v_s(), mins[1].v_s())
+        self.assertFloatEqual(c[0].v_s, mins[1].v_s)
         
         #print "LS regime: (on/high/low)"
         for p in mins:
@@ -30,7 +30,7 @@ class spin_transition(BurnManTest):
             #print p.v_s()
         
         c,f = mins[0].unroll()
-        self.assertFloatEqual(c[0].v_s(), mins[2].v_s())
+        self.assertFloatEqual(c[0].v_s, mins[2].v_s)
 
     def test_no_set_state(self):
         m = minerals.Murakami_etal_2012.fe_periclase()
@@ -44,10 +44,10 @@ class TestHelperSolidSolution(BurnManTest):
     def test1(self):
         m = minerals.other.ferropericlase(0.1)
         m.set_state(5e9, 300)
-        self.assertFloatEqual(m.v_s(), 5821.42007777)
+        self.assertFloatEqual(m.v_s, 5821.42007777)
         m = minerals.other.ferropericlase(0.7)
         m.set_state(5e9, 300)
-        self.assertFloatEqual(m.v_s(), 4061.92139873)
+        self.assertFloatEqual(m.v_s, 4061.92139873)
 
 
 class TestHelperFEdep(BurnManTest):
@@ -68,11 +68,11 @@ class TestHelperFEdep(BurnManTest):
         self.assertArraysAlmostEqual(fractions, [0.9428714062806316, 0.057128593719368403])
         self.assertIsInstance(mins[0], minerals.SLB_2005.mg_fe_perovskite)
         self.assertIsInstance(mins[1], minerals.SLB_2005.ferropericlase)
-        self.assertFloatEqual(mins[0].molar_mass(), 0.101752790682)
+        self.assertFloatEqual(mins[0].molar_mass, 0.101752790682)
 
         rock.set_state(7e9, 700)
         mins, fractions = rock.unroll()
-        self.assertFloatEqual(mins[0].molar_mass(), 0.104161162508)
+        self.assertFloatEqual(mins[0].molar_mass, 0.104161162508)
 
 
 

@@ -57,7 +57,6 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
 
     delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
 
-
     rs = ((25.e9-pressure)*(delV)/(constants.gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
 
     K = np.exp(rs) #The exchange coefficent at P and T. K(P,T,X) in eq 5 Nakajima et al 2012
