@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))

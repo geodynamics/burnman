@@ -20,6 +20,8 @@ need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density a
 * how to create your own minerals
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -99,7 +101,7 @@ if __name__ == "__main__":
     # The next line is not required here, because the method is set automatically by defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one.
     rock.set_method(method)
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
@@ -109,4 +111,4 @@ if __name__ == "__main__":
     [vs_err, vphi_err, rho_err]= \
         burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho], [seis_vs,seis_vphi,seis_rho])
 
-    print vs_err, vphi_err, rho_err
+    print(vs_err, vphi_err, rho_err)

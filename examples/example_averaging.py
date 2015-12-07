@@ -30,6 +30,8 @@ of each averaging scheme.
 * implemented averaging schemes
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -77,7 +79,7 @@ if __name__ == "__main__":
     temperatures = burnman.geotherm.brown_shankland(pressures)
 
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
     #calculate the seismic velocities of the rock using a whole battery of averaging schemes:

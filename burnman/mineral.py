@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -83,7 +85,7 @@ class Mineral(Material):
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
-            print 'Mineral ' + self.to_string() + ' failed to validate parameters with message : \" ' + e.message + '\"'
+            print('Mineral ' + self.to_string() + ' failed to validate parameters with message : \" ' + e.message + '\"')
             raise
 
     def to_string(self):
@@ -93,7 +95,7 @@ class Mineral(Material):
         return "'" + self.__class__.__module__.replace(".minlib_",".") + "." + self.__class__.__name__ + "'"
 
     def debug_print(self, indent=""):
-        print "%s%s" % (indent, self.to_string())
+        print("%s%s" % (indent, self.to_string()))
 
     def unroll(self):
         return ([1.0],[self])
@@ -120,7 +122,7 @@ class Mineral(Material):
         self.old_params = self.params
 
         if self.method is None:
-            raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
+            raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
         self.V = self.method.volume(self.pressure, self.temperature, self.params)
         self.gr = self.method.grueneisen_parameter(self.pressure, self.temperature, self.V, self.params)

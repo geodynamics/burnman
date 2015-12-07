@@ -6,6 +6,8 @@
 This module provides several helper minerals/materials.
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 
 import numpy as np
@@ -48,16 +50,16 @@ class HelperSolidSolution(Mineral):
         #atoms per formula unit or different equations of state, at least not simply...
         for m in endmembers:
             m.set_method(self.method)
-            if(endmembers[0].params.has_key('n')):
+            if('n' in endmembers[0].params):
                 assert(m.params['n'] == endmembers[0].params['n'])
         
         self.params = {}
 
     def debug_print(self, indent=""):
-        print "%sHelperSolidSolution(%s):" % (indent, self.to_string())
+        print("%sHelperSolidSolution(%s):" % (indent, self.to_string()))
         indent += "  "
         for (fraction, mat) in zip(self.molar_fractions, self.endmembers):
-            print "%s%g of" % (indent, fraction)
+            print("%s%g of" % (indent, fraction))
             mat.debug_print(indent + "  ")
 
     def set_method(self, method):
@@ -99,7 +101,7 @@ class HelperSpinTransition(Material):
         self.active_mat = None
 
     def debug_print(self, indent=""):
-        print "%sHelperSpinTransition:" % indent
+        print("%sHelperSpinTransition:" % indent)
         self.ls_mat.debug_print(indent+"  ")
         self.hs_mat.debug_print(indent+"  ")
 
@@ -146,8 +148,8 @@ class HelperFeDependent(Material):
         self.method = None
 
     def debug_print(self, indent=""):
-        print "%sHelperFeDependent:" % indent
-        print "%s  %s" % (indent, self.to_string())
+        print("%sHelperFeDependent:" % indent)
+        print("%s  %s" % (indent, self.to_string()))
 
     def create_inner_material(self, iron_number):
         raise NotImplementedError("need to implement create_inner_material() in derived class!")

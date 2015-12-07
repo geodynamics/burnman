@@ -8,6 +8,7 @@ Matas_etal_2007
 
 Minerals from Matas et al. 2007 and references therein. See Table 1 and 2.
 """
+from __future__ import absolute_import
 
 from burnman.mineral import Mineral
 

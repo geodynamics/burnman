@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import os.path, sys
 sys.path.insert(1,os.path.abspath('../..'))
 import numpy as np, matplotlib.pyplot as plt
@@ -31,8 +33,8 @@ for i in range(len(temperatures)):
     new[i] = burnman.debye.heat_capacity_v(temperatures[i], Debye_T, 1.0)
 time_new = time.clock()-start
 
-print "error %e"%np.linalg.norm((old-new)/new)
-print "time old %g, time new %g"%(time_old,time_new)
+print("error %e"%np.linalg.norm((old-new)/new))
+print("time old %g, time new %g"%(time_old,time_new))
 
 
 

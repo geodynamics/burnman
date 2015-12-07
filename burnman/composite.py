@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -65,10 +67,10 @@ class Composite(Material):
         self.children = list(zip(fractions, phases))
 
     def debug_print(self, indent=""):
-        print "%sComposite:" % indent
+        print("%sComposite:" % indent)
         indent += "  "
         for (fraction, phase) in self.children:
-            print "%s%g of" % (indent, fraction)
+            print("%s%g of" % (indent, fraction))
             phase.debug_print(indent + "  ")
 
 

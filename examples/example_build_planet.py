@@ -32,6 +32,8 @@ Here we show an example that does this, using the planet Mercury as motivation.
 * :class:`burnman.composite.Composite`
 * :func:`burnman.main.velocities_from_rock`
 '''
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -206,8 +208,8 @@ if __name__ == "__main__":
     observed_mass = 3.02e23
     observed_moment = 0.346  #From Margot. et al, 2012
 
-    print ("Total mass of the planet: %.2e, or %.0f%% of the observed mass" % (merc.mass, merc.mass/observed_mass*100. ) )
-    print ("Moment of inertia factor of the planet: %.3g, or %0.f%% of the observed factor" % (merc.moment_of_inertia_factor, merc.moment_of_inertia_factor/observed_moment*100.))
+    print(("Total mass of the planet: %.2e, or %.0f%% of the observed mass" % (merc.mass, merc.mass/observed_mass*100. ) ))
+    print(("Moment of inertia factor of the planet: %.3g, or %0.f%% of the observed factor" % (merc.moment_of_inertia_factor, merc.moment_of_inertia_factor/observed_moment*100.)))
 
     # As we can see by running this, the calculated mass of the planet is much too large. 
     # One could do a better job of fitting this by using a more complicated interior model,

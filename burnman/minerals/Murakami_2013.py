@@ -9,6 +9,7 @@ Murakami_2013
 Minerals from Murakami 2013 and references therein.
 
 """
+from __future__ import absolute_import
 
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral

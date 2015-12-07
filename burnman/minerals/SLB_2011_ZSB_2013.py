@@ -9,6 +9,7 @@ SLB_2011_ZSB_2013
 Minerals from Stixrude & Lithgow-Bertelloni 2011, Zhang, Stixrude & Brodholt 2013, and references therein.
 
 """
+from __future__ import absolute_import
 
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral

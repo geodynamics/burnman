@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
 
 import numpy as np
-import tools
-import constants
+from . import tools
+from . import constants
 import warnings
 import scipy.integrate
 import matplotlib.pyplot as plt
@@ -60,7 +61,7 @@ class Seismic1DModel(object):
         depths : array of floats
             Depths [m].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def pressure(self, depth):
@@ -75,7 +76,7 @@ class Seismic1DModel(object):
         pressure : float or array of floats
             Pressure(s) at given depth(s) in [Pa].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def v_p(self, depth):
@@ -90,7 +91,7 @@ class Seismic1DModel(object):
         v_p : float or array of floats
             P wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def v_s(self, depth):
@@ -105,7 +106,7 @@ class Seismic1DModel(object):
         v_s : float or array of floats
             S wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
     
     def v_phi(self, depth):
@@ -137,7 +138,7 @@ class Seismic1DModel(object):
         density : float or array of floats
             Density at given depth(s) in [kg/m^3].
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
     
     
@@ -172,7 +173,7 @@ class Seismic1DModel(object):
         Qk : float or array of floats
             Quality factor (dimensionless) for bulk modulus at given depth(s).
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
     def QG(self, depth):
@@ -187,7 +188,7 @@ class Seismic1DModel(object):
         QG : float or array of floats
             Quality factor (dimensionless) for shear modulus at given depth(s).
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return 0
 
 
@@ -204,7 +205,7 @@ class Seismic1DModel(object):
         depth : float or array of floats
             Depth(s) [m] for given pressure(s)
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return -1
     
 
@@ -221,7 +222,7 @@ class Seismic1DModel(object):
         gravity : float or array of floats
             Gravity for given depths in [m/s^2]
         """
-        raise ValueError, "not implemented"
+        raise ValueError("not implemented")
         return -1
 
 
@@ -294,7 +295,7 @@ class SeismicTable(Seismic1DModel):
 
     def depth(self, pressure):
         if pressure > max(self.table_pressure) or pressure < min(self.table_pressure)  :
-            raise ValueError, "Pressure outside range of SeismicTable"
+            raise ValueError("Pressure outside range of SeismicTable")
 
         depth = np.interp(pressure, self.table_pressure, self.table_depth )
         return depth

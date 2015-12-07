@@ -11,6 +11,7 @@ Stixrude & Lithgow-Bertolloni 2005. Some information from personal communication
 
 
 """
+from __future__ import absolute_import
 import burnman.mineral_helpers as bmb
 from burnman.mineral import Mineral
 

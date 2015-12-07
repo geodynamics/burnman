@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -6,8 +7,8 @@ import numpy as np
 import scipy.optimize as opt
 import warnings
 
-import equation_of_state as eos
-import birch_murnaghan as bm
+from . import equation_of_state as eos
+from . import birch_murnaghan as bm
 import burnman.debye as debye
 import burnman.constants as constants
 

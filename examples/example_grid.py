@@ -8,6 +8,8 @@ example_grid
 
 This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 # Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
@@ -40,8 +42,8 @@ if __name__ == "__main__":
     # the seismic properties of the rock.
     T = np.linspace(1900,2400,15)
 
-    print "pressures:\n", p
-    print "temperatures:\n", T
+    print("pressures:\n", p)
+    print("temperatures:\n", T)
 
     # turn grid into array:
     tarray=np.tile(T,len(p))
