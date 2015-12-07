@@ -68,7 +68,8 @@ if __name__ == "__main__":
     #write to file:
     output_filename = "example_woutput.txt"
     f = open(output_filename, 'wb')
-    f.write("#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_G\n")
+    header = "#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_G\n"
+    f.write(header.encode('utf-8'))
 
     data = list(zip(pressures,temperature,mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_G))
     np.savetxt(f, data, fmt='%.10e', delimiter='\t')
