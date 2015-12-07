@@ -17,7 +17,7 @@ def create(method):
     Creates an instance of an EquationOfState from a string,
     a class EquationOfState, or an instance of EquationOfState.
     """
-    if isinstance(method, basestring):
+    if isinstance(method, str):
         if method == "slb2":
             return slb.SLB2()
         elif method == "mgd2":
