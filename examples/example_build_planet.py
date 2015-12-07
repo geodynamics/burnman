@@ -218,7 +218,7 @@ if __name__ == "__main__":
     import matplotlib.gridspec as gridspec
 
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
 
     #Come up with axes for the final plot

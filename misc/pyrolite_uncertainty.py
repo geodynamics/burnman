@@ -185,7 +185,7 @@ if whattodo=="plotgood":
     matplotlib.rc('font', **font)
     prop={'size':12}
     #plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=150,figsize=figsize)
     plt.subplots_adjust(hspace=0.3)
@@ -453,7 +453,7 @@ if whattodo=="plotone":
     figsize=(6,5)
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
@@ -598,7 +598,7 @@ elif whattodo=="plot":
 
     #do some setup for the figure
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
     plt.subplots_adjust(wspace=0.3)
 

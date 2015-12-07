@@ -27,7 +27,7 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,6))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)

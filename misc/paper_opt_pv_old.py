@@ -34,7 +34,7 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
     figsize=(6,5)
 
