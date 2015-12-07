@@ -542,7 +542,7 @@ if whattodo=="run":
 
 
 
-      data=zip(pressure_list, vs_list, vphi_list, density_list)
+      data= list(zip(pressure_list, vs_list, vphi_list, density_list))
       np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
     except ValueError:

@@ -49,7 +49,7 @@ def getmbr(ds, mbr):
                 od=[0]
             else:
                 flag=int(ds[i*4+6][4])
-            endmember=Endmember(mbr,atoms,formula, int(ds[i*4+3][1]), map(float,ds[i*4+3][2:(len(ds[i*4+3])-1)]), float(ds[i*4+4][0]), float(ds[i*4+4][1]), float(ds[i*4+4][2]), map(float,ds[i*4+5]), float(ds[i*4+6][0]), map(float,ds[i*4+6][1:4]), flag, map(float,ds[i*4+6][5:]))
+            endmember=Endmember(mbr,atoms,formula, int(ds[i*4+3][1]), list(map(float,ds[i*4+3][2:(len(ds[i*4+3])-1)])), float(ds[i*4+4][0]), float(ds[i*4+4][1]), float(ds[i*4+4][2]), map(float,ds[i*4+5]), float(ds[i*4+6][0]), list(map(float,ds[i*4+6][1:4])), flag, list(map(float,ds[i*4+6][5:])))
             return endmember
 
 print '# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences'

@@ -380,7 +380,7 @@ class Slow(SeismicTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table))
+        table=np.array(list(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table)))
 
 
         self.table_depth = table[:,0]
@@ -409,7 +409,7 @@ class Fast(SeismicTable):
         min_radius = self.earth_radius-max(table2[:,0])
         max_radius = self.earth_radius-min(table2[:,0])
 
-        table=np.array(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table))
+        table=np.array(list(filter(lambda x: (x[1]>=min_radius and x[1]<=max_radius), table)))
 
 
         self.table_depth = table[:,0]

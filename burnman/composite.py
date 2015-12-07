@@ -62,7 +62,7 @@ class Composite(Material):
             warnings.warn("Warning: list of molar fractions does not add up to one but %g. Normalizing." % total)
             fractions = [fr / total for fr in fractions]
 
-        self.children = zip(fractions, phases)
+        self.children = list(zip(fractions, phases))
 
     def debug_print(self, indent=""):
         print "%sComposite:" % indent

@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     ##let's create PREM for reference
     s=burnman.seismic.PREM()
-    depths = map(s.depth, seis_p_1)
+    depths = list(map(s.depth, seis_p_1))
     pressures, rho_prem, vp_prem, vs_prem, v_phi_prem = s.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 

@@ -68,7 +68,7 @@ def dictionarize_site_formula(formula):
     for site in range(len(s)):
         site_occupancy=re.split(r'\]', s[site])[0]
         mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
-        not_in_site=filter(None, re.split(r'\]', s[site]))[1]
+        not_in_site=str(filter(None, re.split(r'\]', s[site])))[1]
         not_in_site=not_in_site.replace(mult, '', 1)
         if mult == '':
             list_multiplicity[site]=1.0
@@ -89,7 +89,7 @@ def dictionarize_site_formula(formula):
 
         # Loop over elements not on a site
         for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-            element=filter(None, re.split(r'(\d+)', enamenumber))
+            element=str(filter(None, re.split(r'(\d+)', enamenumber)))
             f[element[0]]=f.get(element[0], 0.0) + float(element[1])
 
     return f
@@ -200,10 +200,10 @@ def process_solution_chemistry(formulae):
 
             # Loop over elements after site
             if len(site_split) != 1:
-                not_in_site=filter(None, site_split[1])
+                not_in_site=str(filter(None, site_split[1]))
                 not_in_site=not_in_site.replace(mult, '', 1)
                 for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                    element=filter(None, re.split(r'(\d+)', enamenumber))
+                    element=list(filter(None, re.split(r'(\d+)', enamenumber)))
                     # Look up number of atoms of element
                     if len(element) == 1:
                         nel=1.

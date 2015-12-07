@@ -19,8 +19,8 @@ filemin=[['SLB2011', '../../burnman/data/input_perplex/fo_SLB2011_params.dat', S
 for database, f, mineral in filemin:
     f = open(f, 'r')
     datalines = [ line.strip() for idx, line in enumerate(f.read().split('\n')) if line.strip() and idx>0 ]
-    data = [ map(float,"%".join(line.split("%")[:1]).split()) for line in datalines ]
-    P, T, H, S, V, C_p, alpha, beta, rho = zip(*data)
+    data = [ list(map(float,"%".join(line.split("%")[:1]).split())) for line in datalines ]
+    P, T, H, S, V, C_p, alpha, beta, rho = list(zip(*data))
 
     variables=['H','S','V','C_p','alpha','beta','rho']
     
