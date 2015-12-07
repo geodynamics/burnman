@@ -231,8 +231,8 @@ class Composite(Material):
         """
         Returns grueneisen parameter of the composite [unitless]
         """
-        raise NotImplementedError("need to implement grueneisen_parameter() for composite!")
-        return None
+        self._grueneisen_paramteer = self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
+        return self._grueneisen_parameter
 
     @property
     def isothermal_bulk_modulus(self):
