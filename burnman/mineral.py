@@ -128,7 +128,6 @@ class Mineral(Material):
         if self.method is None:
             raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
-        #self.V = self.method.volume(self.pressure, self.temperature, self.params)
 
 
 
@@ -185,7 +184,7 @@ class Mineral(Material):
         Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
         """
         self._compressibility = 1./self.isothermal_bulk_modulus
-        return self._compressibily
+        return self._compressibility
 
     @property
     def adiabatic_bulk_modulus(self):
