@@ -17,10 +17,11 @@ ordered_examples = ['example_beginner.py', \
                     'example_averaging.py', \
                     'example_woutput.py', \
                     'example_compare_all_methods.py', \
-                    'example_spintransition.py', \
-                    'example_partition_coef.py', \
-                    'example_compare_enstpyro.py', \
                     'example_optimize_pv.py', \
+                    'example_fit_data.py' , \
+                    'example_grid.py' , \
+                    'example_chemical_potentials.py' , \
+                    'example_solid_solution.py'
                         ]
 
 for ex in ordered_examples:

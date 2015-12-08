@@ -116,3 +116,304 @@ Here are some specific features and pitfalls on python:
 
 
 ## Examples 
+
+example_beginner 
+----------------
+
+This example script is intended for absolute beginners to BurnMan.
+We cover importing BurnMan modules, creating a composite material,
+and calculating its seismic properties at lower mantle pressures and
+temperatures.  Afterwards, we plot it against a 1D seismic model
+for visual comparison.
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
+
+
+*Demonstrates:*
+
+* creating basic composites
+* calculating thermoelastic properties
+* seismic comparison
+
+
+example_geotherms
+-----------------
+
+This example shows each of the geotherms currently possible with BurnMan.
+These are:
+
+1. Brown and Shankland, 1981 :cite:`Brown1981`
+2. Anderson, 1982 :cite:`anderson1982earth`
+3. Watson and Baxter, 2007 :cite:`Watson2007`
+4. linear extrapolation
+5. Read in from file from user
+6. Adiabatic from potential temperature and choice of mineral 
+
+*Uses:*
+
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.geotherm.anderson`
+* input geotherm file *input_geotherm/example_geotherm.txt* (optional)
+* :class:`burnman.composite.Composite` for adiabat
+
+*Demonstrates:*
+
+* the available geotherms
+
+
+
+example_seismic
+---------------
+
+Shows the various ways to input seismic models (:math:`V_s, V_p, V_{\phi}, \rho`) as a
+function of depth (or pressure) as well as different velocity model libraries
+available within Burnman:
+
+1. PREM :cite:`dziewonski1981`
+2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
+   :cite:`Lekic2012`
+3. Reference model for slow regions (LLSVP's) in the lower mantle :cite:`Lekic2012`
+
+This example will first calculate or read in a seismic model and plot the
+model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`Kennett1995`.
+
+*Uses:*
+
+* :doc:`seismic`
+
+
+
+*Demonstrates:*
+
+* Utilization of library seismic models within BurnMan
+* Input of user-defined seismic models
+
+
+
+
+
+example_composition
+-------------------
+    
+This example shows how to create different minerals, how to compute seismic
+velocities, and how to compare them to a seismic reference model.
+
+There are many different ways in BurnMan to combine minerals into a
+composition. Here we present a couple of examples:
+
+1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
+   libraries or from user defined minerals (see example_user_input_material)
+2. Example with three minerals
+3. Using preset solid solutions
+4. Defining your own solid solution
+
+
+To turn a method of mineral creation "on" the first if statement above the
+method must be set to True, with all others set to False.
+
+Note: These minerals can include a spin transition in (Mg,Fe)O, see
+example_spintransition.py for explanation of how to implement this
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.minerals.Mineral`
+* :class:`burnman.solidsolution.SolidSolution`
+
+*Demonstrates:*
+
+* Different ways to define a composite
+* Using minerals and solid solutions
+* Compare computations to seismic models
+
+
+
+    
+example_user_input_material
+---------------------------
+
+Shows user how to input a mineral of his/her choice without usint the library and which physical values
+need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density at depth.
+
+*Specifically uses:*
+
+
+* :class:`burnman.mineral.Mineral`
+
+*Demonstrates:*
+
+* how to create your own minerals
+
+
+
+example_averaging
+-----------------
+
+This example shows the effect of different averaging schemes. Currently four
+averaging schemes are available:
+
+1. Voight-Reuss-Hill
+2. Voight averaging
+3. Reuss averaging
+4. Hashin-Shtrikman averaging
+
+See :cite:`Watt1976` Journal of Geophysics and Space Physics for explanations
+of each averaging scheme.
+
+*Specifically uses:*
+
+* :class:`burnman.averaging_schemes.VoigtReussHill`
+* :class:`burnman.averaging_schemes.Voigt`
+* :class:`burnman.averaging_schemes.Reuss`
+* :class:`burnman.averaging_schemes.HashinShtrikmanUpper`
+* :class:`burnman.averaging_schemes.HashinShtrikmanLower`
+
+*Demonstrates:*
+
+* implemented averaging schemes
+
+
+
+example_woutput
+---------------
+
+This example explains how to perform the basic i/o of BurnMan. A method of
+calculation is chosen, a composite mineral/material (see
+example_composition.py for explanation of this process) is created in the
+class "rock," finally a geotherm is created and seismic velocities calculated.
+
+Post-calculation, the results are written to a simple text file to
+plot/manipulate at the user's whim.
+
+requires:
+- creating minerals
+- compute seismic velocities
+- geotherms
+
+teaches:
+- output computed seismic data to file
+
+
+
+    
+example_compare_all_methods
+---------------------------
+
+This example demonstrates how to call each of the individual calculation
+methodologies that exist within BurnMan. See below for current options. This
+example calculates seismic velocity profiles for the same set of minerals and
+a plot of :math:`V_s, V_\phi` and :math:`\rho` is produce for the user to compare each of the
+different methods.
+
+*Specifically uses:*
+
+* :doc:`eos`
+
+
+*Demonstrates:*
+
+* Each method for calculating velocity profiles currently included within BurnMan
+
+
+
+    
+example_optimize_pv
+-------------------
+
+Vary the amount perovskite vs. ferropericlase and compute the error in the
+seismic data against PREM. For more extensive comments on this setup, see tutorial/step_2.py
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :class:`burnman.seismic.PREM`
+* :func:`burnman.geotherm.brown_shankland`
+* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.main.compare_l2`
+
+*Demonstrates:*
+
+* compare errors between models
+* loops over models
+
+
+
+    
+example_fit_data
+----------------
+
+This example demonstrates BurnMan's functionality to fit thermoelastic data to
+both 2nd and 3rd orders using the EoS of the user's choice at 300 K. User's
+must create a file with :math:`P, T` and :math:`V_s`. See input_minphys/ for example input
+files.
+
+requires:
+- compute seismic velocities
+
+teaches:
+- averaging
+
+
+
+example_grid
+------------
+
+This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
+
+
+
+example_chemical_potentials
+---------------------------
+    
+This example shows how to use the chemical potentials library of functions.
+
+*Demonstrates:*
+
+* How to calculate chemical potentials
+* How to compute fugacities and relative fugacities
+
+
+
+
+example_solid_solution
+----------------------
+    
+This example shows how to create different solid solution models and output
+thermodynamic and thermoelastic quantities.
+
+There are four main types of solid solution currently implemented in 
+BurnMan:
+
+1. Ideal solid solutions
+2. Symmmetric solid solutions
+3. Asymmetric solid solutions
+4. Subregular solid solutions
+
+These solid solutions can potentially deal with:
+
+* Disordered endmembers (more than one element on a crystallographic site)
+* Site vacancies
+* More than one valence/spin state of the same element on a site
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.solidsolution.SolidSolution`
+* :class:`burnman.solutionmodel.SolutionModel`
+
+
+*Demonstrates:*
+
+* Different ways to define a solid solution
+* How to set composition and state
+* How to output thermodynamic and thermoelastic properties
+
+
