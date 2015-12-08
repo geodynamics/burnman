@@ -47,6 +47,10 @@ class Mineral(Material):
             self.set_method(self.params['equation_of_state'])
         if 'name' in self.params:
             self.name=self.params['name']
+        class_items = Mineral.__dict__.iteritems()
+        for k, v in class_items:
+            if isinstance(v, property):
+                setattr(self,'_'+k,None)
 
             
     def set_method(self, equation_of_state):
@@ -271,18 +275,18 @@ class Mineral(Material):
         """
         Returns Gibbs free energy of the mineral [J]
         """
-        if self._gibbs_free_energy is None:
-            self._gibbs_free_energy = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._gibbs_free_energy
+        if self._molar_gibbs is None:
+            self._molar_gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._molar_gibbs
 
     @property
     def molar_helmholtz(self):
         """
         Returns Helmholtz free energy of the mineral [J]
         """
-        if self._helmholtz_free_energy is None:
-            self._helmholtz_free_energy = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._helmholtz_free_energy
+        if self._molar_helmholtz is None:
+            self._molar_helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self._molar_helmholtz
 
     @property
     def molar_enthalpy(self):

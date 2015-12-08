@@ -94,6 +94,12 @@ class SolidSolution(Mineral):
         if molar_fractions is not None:
             self.set_composition(molar_fractions)
 
+        # Initialize properties
+        class_items = Mineral.__dict__.iteritems()
+        for k, v in class_items:
+            if isinstance(v, property):
+                setattr(self,'_'+k,None)
+
     def get_endmembers(self):
         return self.endmembers
 
@@ -134,7 +140,10 @@ class SolidSolution(Mineral):
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
-        
+        class_items = Mineral.__dict__.iteritems()
+        for k, v in class_items:
+            if isinstance(v, property):
+                setattr(self,'_'+k,None)
 
 
     def calcgibbs(self, pressure, temperature, molar_fractions): 
