@@ -140,6 +140,7 @@ class SolidSolution(Mineral):
         # Set the state of all the endmembers
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
+        #reset properties
         class_items = SolidSolution.__dict__.iteritems()
         for k, v in class_items:
             if isinstance(v, property):
