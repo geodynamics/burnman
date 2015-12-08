@@ -131,6 +131,7 @@ class Mineral(Material):
 
 
 
+
     # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
     def calcgibbs(self, pressure, temperature):
         return self.method.gibbs_free_energy(pressure, temperature, self.params)
@@ -143,7 +144,8 @@ class Mineral(Material):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-        self._molar_mass = self.params['molar_mass']
+        if self._molar_mass is None:
+            self._molar_mass = self.params['molar_mass']
         return self._molar_mass
 
     @property
@@ -151,7 +153,8 @@ class Mineral(Material):
         """
         Returns density of the mineral [kg/m^3]
         """
-        self._density = self.molar_mass/self.molar_volume
+        if self._density is None:
+            self._density = self.molar_mass/self.molar_volume
         return self._density
 
     @property
@@ -159,7 +162,8 @@ class Mineral(Material):
         """
         Returns molar volume of the mineral [m^3/mol]
         """
-        self._molar_volume=self.method.volume(self.pressure, self.temperature, self.params)
+        if self._molar_volume is None:
+            self._molar_volume=self.method.volume(self.pressure, self.temperature, self.params)
         return self._molar_volume
 
     @property
@@ -167,7 +171,8 @@ class Mineral(Material):
         """
         Returns grueneisen parameter of the mineral [unitless]
         """
-        self._grueneisen_parameter = self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
+        if self._grueneisen_parameter is None:
+            self._grueneisen_parameter = self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
         return self._grueneisen_parameter
 
     @property
@@ -175,7 +180,8 @@ class Mineral(Material):
         """
         Returns isothermal bulk modulus of the mineral [Pa]
         """
-        self._isothermal_bulk_modulus = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._isothermal_bulk_modulus is None:
+            self._isothermal_bulk_modulus = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._isothermal_bulk_modulus
 
     @property
@@ -183,7 +189,8 @@ class Mineral(Material):
         """
         Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
         """
-        self._compressibility = 1./self.isothermal_bulk_modulus
+        if self._compressibility is None:
+            self._compressibility = 1./self.isothermal_bulk_modulus
         return self._compressibility
 
     @property
@@ -191,7 +198,8 @@ class Mineral(Material):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
         """
-        self._adiabatic_bulk_modulus = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._adiabatic_bulk_modulus is None:
+            self._adiabatic_bulk_modulus = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._adiabatic_bulk_modulus
 
     @property
@@ -199,7 +207,8 @@ class Mineral(Material):
         """
         Returns shear modulus of the mineral [Pa]
         """
-        self._shear_modulus = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._shear_modulus is None:
+            self._shear_modulus = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._shear_modulus
 
     @property
@@ -207,7 +216,8 @@ class Mineral(Material):
         """
         Returns thermal expansion coefficient (alpha) of the mineral [1/K]
         """
-        self._thermal_expansivity = self.method.thermal_expansivity(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._thermal_expansivity is None:
+            self._thermal_expansivity = self.method.thermal_expansivity(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._thermal_expansivity
 
     @property
@@ -215,7 +225,8 @@ class Mineral(Material):
         """
         Returns heat capacity at constant volume of the mineral [J/K/mol]
         """
-        self._heat_capacity_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._heat_capacity_v is None :
+            self._heat_capacity_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._heat_capacity_v
 
     @property
@@ -223,7 +234,8 @@ class Mineral(Material):
         """
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
         """
-        self._heat_capacity_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume , self.params)
+        if self._heat_capacity_p is None :
+            self._heat_capacity_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume , self.params)
         return self._heat_capacity_p
 
     @property
@@ -231,7 +243,8 @@ class Mineral(Material):
         """
         Returns shear wave speed of the mineral [m/s]
         """
-        self._v_s = np.sqrt(self.shear_modulus / self.density)
+        if self._v_s is None:
+            self._v_s = np.sqrt(self.shear_modulus / self.density)
         return self._v_s
 
     @property
@@ -239,7 +252,8 @@ class Mineral(Material):
         """
         Returns P wave speed of the mineral [m/s]
         """
-        self._v_p = np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+        if self._v_p is None:
+            self._v_p = np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
                              self.shear_modulus) / self.density)
         return self._v_p
 
@@ -248,7 +262,8 @@ class Mineral(Material):
         """
         Returns bulk sound speed of the mineral [m/s]
         """
-        self._v_phi = np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        if self._v_phi is None:
+            self._v_phi = np.sqrt(self.adiabatic_bulk_modulus / self.density)
         return self._v_phi
     
     @property
@@ -256,7 +271,8 @@ class Mineral(Material):
         """
         Returns Gibbs free energy of the mineral [J]
         """
-        self._gibbs_free_energy = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        if self._gibbs_free_energy is None:
+            self._gibbs_free_energy = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
         return self._gibbs_free_energy
 
     @property
@@ -264,7 +280,8 @@ class Mineral(Material):
         """
         Returns Helmholtz free energy of the mineral [J]
         """
-        self._helmholtz_free_energy = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+        if self._helmholtz_free_energy is None:
+            self._helmholtz_free_energy = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
         return self._helmholtz_free_energy
 
     @property
@@ -272,7 +289,8 @@ class Mineral(Material):
         """
         Returns enthalpy of the mineral [J]
         """
-        self._molar_enthalpy = self.method.enthalpy(self.pressure, self.temperature, self.molar_volume, self.params)
+        if self._molar_enthalpy is None:
+            self._molar_enthalpy = self.method.enthalpy(self.pressure, self.temperature, self.molar_volume, self.params)
         return self._molar_enthalpy
 
     @property
@@ -280,7 +298,8 @@ class Mineral(Material):
         """
         Returns enthalpy of the mineral [J]
         """
-        self._molar_entropy = self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params)
+        if self._molar_entropy is None :
+            self._molar_entropy = self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params)
         return self._molar_entropy
 
     gibbs = molar_gibbs
