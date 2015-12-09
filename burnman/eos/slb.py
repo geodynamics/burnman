@@ -11,6 +11,12 @@ from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
 
+try:
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
 class SLBBase(eos.EquationOfState):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state detailed
@@ -28,6 +34,15 @@ class SLBBase(eos.EquationOfState):
         a1_ii = 6. * params['grueneisen_0'] # EQ 47
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         return params['Debye_0'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+ 
+    def __debye_temperature_shortcut(self,x,Debye_0,a1_ii,a2_iikk):
+        """
+         Finite strain approximation for Debye Temperature [K]
+         x = ref_vol/vol
+         """
+        f = 1./2. * (pow(x, 2./3.) - 1.)
+        return Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+    
 
     def volume_dependent_q(self, x, params):
         """
@@ -63,6 +78,18 @@ class SLBBase(eos.EquationOfState):
         gr = self.grueneisen_parameter(0., T, V, params) # P not important
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
+    
+    def __volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
+        
+        f= 0.5*(pow(V_0/x,2./3.)-1.)
+        debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+        E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
+        E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
+        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+        
+        return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
+                + gr*(E_th - E_th_ref)/x - pressure #EQ 21
 
     def _volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
         
@@ -91,23 +118,45 @@ class SLBBase(eos.EquationOfState):
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
 
+        #f = lambda x: 0.5*(pow(V_0/x,2./3.)-1.) # EQ 24
+        #debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
+        
+        debye_temperature = lambda x : Debye_0 * np.sqrt(1. + a1_ii * 0.5*(pow(V_0/x,2./3.)-1.) + 1./2. * a2_iikk*0.5*(pow(V_0/x,2./3.)-1.)*0.5*(pow(V_0/x,2./3.)-1.))
+        E_th =  lambda x : debye.thermal_energy(temperature, debye_temperature(x),  n) #thermal energy at temperature T
+        E_th_ref = lambda x : debye.thermal_energy(T_0, debye_temperature(x), n) #thermal energy at reference temperature
+        gr = lambda x : self.grueneisen_parameter_shortcut(pressure, temperature, x, params,a1_ii,a2_iikk)
+        
+        func = lambda x: (1./3.)*(pow(1.+2.*0.5*(pow(V_0/x,2./3.)-1.),5./2.)) \
+                        *((b_iikk*0.5*(pow(V_0/x,2./3.)-1.)) \
+                        +(0.5*b_iikkmm*pow(0.5*(pow(V_0/x,2./3.)-1.),2.))) \
+                        + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
+        
+
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
         a = 0.6*params['V_0']
         b = 1.2*params['V_0']
+        args=pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm
         # if we have a sign change, we are done:
-        vol_a =self._volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
-        vol_b =self._volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
-        if vol_a*vol_b<0:
-            return opt.brentq(self._volume, a, b,args=(pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm))
+        if self.__volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)*self.__volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)<0:
+            return opt.brentq(self.__volume, a, b,args=args)
         else:
             tol = 0.0001
-            sol = opt.fmin(lambda x : pow(self._volume(x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm),2.0), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
+            sol = opt.fmin(lambda x : self.__volume(x,args)*self.__volume(x,args), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
             if sol[1] > tol*2:
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
                 warnings.warn("May be outside the range of validity for EOS")
                 return sol[0][0]
+
+    def grueneisen_parameter_shortcut(self, pressure, temperature, volume, params,a1_ii,a2_iikk):
+        """
+        Returns grueneisen parameter :math:`[unitless]`
+        """
+        x = params['V_0'] / volume
+        f = 1./2. * (pow(x, 2./3.) - 1.)
+        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+        return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
 
 
     def pressure( self, temperature, volume, params):

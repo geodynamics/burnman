@@ -35,7 +35,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()
 
     depths = np.linspace(750e3, 2800e3, 10)
-    p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
+    [p] = seismic_model.evaluate(['pressure'],depths)
 
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.
@@ -48,8 +48,10 @@ if __name__ == "__main__":
     tarray=np.tile(T,len(p))
     parray=np.repeat(p,len(T))
 
+    print np.shape(parray), np.shape(tarray)
 
-    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, parray, tarray)
+
+    [vs] = rock.evaluate(['v_s'],parray,tarray)
 
     mat_vs = np.reshape(vs,[len(p),len(T)]);
 
@@ -67,4 +69,4 @@ if __name__ == "__main__":
     ax.set_zlabel("Vs")
     ax.view_init(22, 119)
 
-    plt.show()
+    #plt.show()
