@@ -225,7 +225,7 @@ class IdealSolution (SolutionModel):
             for occ in range(self.n_occupancies):
                 if self.endmember_occupancies[e][occ] > 1e-10:
                     activities[e]=activities[e]*np.power(site_occupancies[occ],self.endmember_occupancies[e][occ]*self.site_multiplicities[occ])
-            normalisation_constant=np.exp(self.endmember_configurational_entropies[e]/R)
+            normalisation_constant=np.exp(self.endmember_configurational_entropies[e]/constants.gas_constant)
             activities[e]=normalisation_constant*activities[e]
         return activities
 

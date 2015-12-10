@@ -79,6 +79,7 @@ class Mineral(Material):
 
         self.method = new_method
 
+
         #Validate the params object on the requested EOS. 
         try:
             self.method.validate_parameters(self.params)
