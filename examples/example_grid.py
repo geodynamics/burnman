@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.
-    T = np.linspace(1900,2400,100)
+    T = np.linspace(1900,2400,15)
 
     print("pressures:\n", p)
     print("temperatures:\n", T)
