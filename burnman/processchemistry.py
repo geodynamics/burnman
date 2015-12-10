@@ -55,7 +55,7 @@ def dictionarize_site_formula(formula):
     """
     A function to take a chemical formula with sites specified
     by square brackets and return a standard dictionary with
-    element keys and atoms of each element per formula unit as items. /
+    element keys and atoms of each element per formula unit as items. 
     """
     solution_formulae=dict()
     s=re.split(r'\[', formula)[1:]
