@@ -116,8 +116,7 @@ class SLBBase(eos.EquationOfState):
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
 
         b_iikk= 9.*params['K_0'] # EQ 28
-        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
-
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29z
         #f = lambda x: 0.5*(pow(V_0/x,2./3.)-1.) # EQ 24
         #debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
         
@@ -131,6 +130,7 @@ class SLBBase(eos.EquationOfState):
                         +(0.5*b_iikkmm*pow(0.5*(pow(V_0/x,2./3.)-1.),2.))) \
                         + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
         
+
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
