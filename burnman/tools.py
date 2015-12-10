@@ -8,6 +8,7 @@ import os
 import pkgutil
 import numpy as np
 import constants
+from scipy.optimize import fsolve, curve_fit
 
 def pretty_print_table(table,use_tabs=False):
     """
@@ -68,6 +69,25 @@ def read_table(filename):
             table.append(numbers)
     return np.array(table)
 
+def array_from_file(filename):
+    """
+    Generic function to read a file containing floats and commented lines
+    into a 2D numpy array.
+
+    Commented lines are prefixed by the characters # or %.
+    """
+    f=open(filename, 'r')
+    data = []
+    datastream = f.read()
+    f.close()
+    datalines = [ line.strip().split() for line in datastream.split('\n') if line.strip() ]
+    for line in datalines:
+        if line[0] != "#" and line[0] != "%":
+            data.append(map(float, line))
+
+    data = np.array(zip(*data))
+    return data
+
 def cut_table(table, min_value, max_value):
     tablen=[]
     for i in range(min_value,max_value,1):
@@ -86,10 +106,260 @@ def lookup_and_interpolate(table_x, table_y, x_value):
 
 def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     """
-    Takes unit cell volume in Angstroms^3 per unitcell, as is often reported,
-    and the z number for the mineral (number of formula units per unit cell,
-    NOT number of atoms per formula unit), and calculates
-    the molar volume, as expected by the equations of state.
-    """
-    return  unit_cell_v*constants.Avogadro/1e30/z
+    Converts a unit cell volume from Angstroms^3 per unitcell,
+    to m^3/mol.
 
+    Parameters
+    ----------
+    unit_cell_v : float
+        Unit cell volumes [A^3/unit cell]
+
+    z : float
+        Number of formula units per unit cell
+
+
+    Returns
+    -------
+    V : float
+        Volume [m^3/mol]
+    """
+    V = unit_cell_v*constants.Avogadro/1.e30/z
+    return V
+
+def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
+    """
+    Given a mineral of any type, a list of fit parameters 
+    and a set of PTV points and (optional) uncertainties, 
+    this function returns a list of optimized parameters 
+    and their associated covariances, fitted using the 
+    scipy.optimize.curve_fit routine.
+
+    Parameters
+    ----------
+    mineral : mineral
+        Mineral for which the parameters should be optimized
+
+    fit_params : list of strings
+        List of dictionary keys contained in mineral.params
+        corresponding to the variables to be optimized 
+        during fitting. Initial guesses are taken from the existing 
+        values for the parameters
+
+    PT : list of two lists of floats (or numpy arrays)
+        The two lists contain a set of pressures [Pa] 
+        and temperatures [K] of the volume data points
+
+    V : list (or numpy array) of floats
+        Volumes [m^3/mol] of the mineral at the P,T condition
+        given by parameter PT
+
+    V_sigma : list (or numpy array) of floats
+        Optional uncertainties on the volumes [m^3/mol] 
+        of the mineral at the P,T condition
+        given by parameter PT
+
+    Returns
+    -------
+    popt : numpy array of floats
+        A list of optimized parameters
+
+    pcov : 2D numpy array of floats
+        The covariance matrix of the optimized parameters
+    """
+    def fit_data(PT, *params):
+        for i, param in enumerate(fit_params):
+            mineral.params[param] = params[i]
+        volumes=[]
+        
+        for P, T in zip(*PT):
+            mineral.set_state(P, T)
+            volumes.append(mineral.V)
+        return volumes
+
+
+    guesses = [mineral.params[param] for param in fit_params]
+    popt, pcov = curve_fit(fit_data, PT, V, guesses, V_sigma)
+    
+    return popt, pcov
+
+
+def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a temperature of interest, compute the
+    equilibrium pressure of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    temperature : float
+        Temperature of interest [K]
+
+    pressure_initial_guess : optional float
+        Initial pressure guess [Pa]
+
+    Returns
+    -------
+    pressure : float
+        The equilibrium pressure of the reaction [Pa]
+    """
+    def eqm(P, T):
+        gibbs = 0.
+        for i, mineral in enumerate(minerals):
+            mineral.set_state(P[0], T)
+            gibbs = gibbs + mineral.gibbs*stoichiometry[i]
+        return gibbs
+
+    pressure = fsolve(eqm, [pressure_initial_guess], args=(temperature))[0]
+    
+    return pressure
+
+def equilibrium_temperature(minerals, stoichiometry, pressure, temperature_initial_guess=1000.):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a pressure of interest, compute the
+    equilibrium temperature of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    pressure : float
+        Pressure of interest [Pa]
+
+    temperature_initial_guess : optional float
+        Initial temperature guess [K]
+
+    Returns
+    -------
+    temperature : float
+        The equilibrium temperature of the reaction [K]
+    """
+    def eqm(T, P):
+        gibbs = 0.
+        for i, mineral in enumerate(minerals):
+            mineral.set_state(P, T[0])
+            gibbs = gibbs + mineral.gibbs*stoichiometry[i]
+        return gibbs
+
+    temperature = fsolve(eqm, [temperature_initial_guess], args=(pressure))[0]
+    
+    return temperature
+
+
+def invariant_point(minerals_r1, stoichiometry_r1,
+                    minerals_r2, stoichiometry_r2,
+                    pressure_temperature_initial_guess=[1.e9, 1000.]):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a pressure of interest, compute the
+    equilibrium temperature of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    pressure : float
+        Pressure of interest [Pa]
+
+    temperature_initial_guess : optional float
+        Initial temperature guess [K]
+
+    Returns
+    -------
+    temperature : float
+        The equilibrium temperature of the reaction [K]
+    """
+    def eqm(PT):
+        P, T = PT
+        gibbs_r1 = 0.
+        for i, mineral in enumerate(minerals_r1):
+            mineral.set_state(P, T)
+            gibbs_r1 = gibbs_r1 + mineral.gibbs*stoichiometry_r1[i]
+        gibbs_r2 = 0.
+        for i, mineral in enumerate(minerals_r2):
+            mineral.set_state(P, T)
+            gibbs_r2 = gibbs_r2 + mineral.gibbs*stoichiometry_r2[i]
+        return [gibbs_r1, gibbs_r2]
+
+    pressure, temperature = fsolve(eqm, pressure_temperature_initial_guess)
+    return pressure, temperature
+
+
+def hugoniot(mineral, P_ref, T_ref, pressures, reference_mineral=None):
+    """
+    Calculates the temperatures (and volumes) along a Hugoniot
+    as a function of pressure according to the Hugoniot equation
+    U2-U1 = 0.5*(p2 - p1)(V1 - V2) where U and V are the 
+    internal energies and volumes (mass or molar) and U = F + TS
+
+
+    Parameters
+    ----------
+    mineral : mineral
+        Mineral for which the Hugoniot is to be calculated.
+    
+    P_ref : float
+        Reference pressure [Pa]
+    
+    T_ref : float
+        Reference temperature [K]
+
+    pressures : numpy array of floats
+        Set of pressures [Pa] for which the Hugoniot temperature
+        and volume should be calculated
+    
+    reference_mineral : mineral
+        Mineral which is stable at the reference conditions
+        Provides an alternative U_0 and V_0 when the reference
+        mineral transforms to the mineral of interest at some
+        (unspecified) pressure.
+
+    Returns
+    -------
+    temperatures : numpy array of floats
+        The Hugoniot temperatures at pressure
+
+    volumes : numpy array of floats
+        The Hugoniot volumes at pressure
+    """
+
+    def Ediff(T, mineral, P, P_ref, U_ref, V_ref):
+        mineral.set_state(P, T[0])
+        U = mineral.helmholtz + T[0]*mineral.S
+        V = mineral.V
+        
+        return (U - U_ref) - 0.5*(P - P_ref)*(V_ref - V)
+
+
+    if reference_mineral is None:
+        reference_mineral = mineral
+        
+    reference_mineral.set_state(P_ref, T_ref)
+    U_ref = reference_mineral.helmholtz + T_ref*reference_mineral.S
+    V_ref = reference_mineral.V
+
+    temperatures = np.empty_like(pressures)
+    volumes = np.empty_like(pressures)
+    
+    for i, P in enumerate(pressures):
+        temperatures[i] = fsolve(Ediff, [T_ref], args = (mineral, P, P_ref, U_ref, V_ref))[0]
+        volumes[i] = mineral.V
+
+    return temperatures, volumes
