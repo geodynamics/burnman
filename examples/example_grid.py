@@ -37,9 +37,10 @@ if __name__ == "__main__":
     depths = np.linspace(750e3, 2800e3, 10)
     [p] = seismic_model.evaluate(['pressure'],depths)
 
+
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.
-    T = np.linspace(1900,2400,15)
+    T = np.linspace(1900,2400,100)
 
     print("pressures:\n", p)
     print("temperatures:\n", T)
@@ -69,4 +70,4 @@ if __name__ == "__main__":
     ax.set_zlabel("Vs")
     ax.view_init(22, 119)
 
-    #plt.show()
+    plt.show()

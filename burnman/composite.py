@@ -456,4 +456,15 @@ class Composite(Material):
     
         return molar_fractions
 
+    gibbs = molar_gibbs
+    V = molar_volume
+    H = molar_enthalpy
+    S  = molar_entropy
+    C_p = heat_capacity_p
+    C_v = heat_capacity_v
+    alpha = thermal_expansivity
+    K_T = isothermal_bulk_modulus
+    K_S = adiabatic_bulk_modulus
+    gr = grueneisen_parameter
+    G = shear_modulus
 
