@@ -49,8 +49,6 @@ if __name__ == "__main__":
     tarray=np.tile(T,len(p))
     parray=np.repeat(p,len(T))
 
-    print np.shape(parray), np.shape(tarray)
-
 
     [vs] = rock.evaluate(['v_s'],parray,tarray)
 
