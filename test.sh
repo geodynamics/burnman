@@ -14,7 +14,7 @@ fi
 
 if [ -z $PYTHON ]
 then
-  PYTHON=python2
+  PYTHON=python
 fi
 
 function testit {
