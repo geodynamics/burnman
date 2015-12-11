@@ -9,7 +9,7 @@ import numpy as np
 import scipy.optimize as opt
 
 from . import equation_of_state as eos
-import burnman.constants as constants
+from .. import constants
 
 import warnings
 

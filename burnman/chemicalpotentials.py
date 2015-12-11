@@ -5,10 +5,10 @@ from __future__ import absolute_import
 import numpy as np
 from scipy.linalg import lu
 
-import burnman
 from . import minerals
 from .processchemistry import *
 from . import constants
+from . import solidsolution
 
 # This module computes chemical potentials (partial molar gibbs free energies) for an assemblage based on the Gibbs free energies and compositions of the individual phases.
 
@@ -48,7 +48,7 @@ def chemical_potentials(assemblage, component_formulae):
     endmember_list=[]
     endmember_potentials=[]
     for mineral in assemblage:
-        if isinstance(mineral, burnman.SolidSolution):
+        if isinstance(mineral, solidsolution.SolidSolution):
             for member in mineral.endmembers:
                 endmember_list.append(member[0])
             for potential in mineral.partial_gibbs:
