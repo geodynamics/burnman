@@ -7,7 +7,7 @@ from burnman.mineral import Mineral
 from util import BurnManTest
 from burnman.tools import *
 
-class test_solidsolution(BurnManTest):
+class test_tools(BurnManTest):
 
     def test_eqm_T(self):
         fo = burnman.minerals.HP_2011_ds62.fo()
