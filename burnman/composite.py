@@ -1,12 +1,13 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
-
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy as np
 import warnings
 
-from burnman import Material
-from burnman import Mineral
+from .material import Material
+from .mineral import Mineral
 
 def check_pairs(fractions, minerals):
         if len(fractions) < 1:
@@ -62,13 +63,13 @@ class Composite(Material):
             warnings.warn("Warning: list of molar fractions does not add up to one but %g. Normalizing." % total)
             fractions = [fr / total for fr in fractions]
 
-        self.children = zip(fractions, phases)
+        self.children = list(zip(fractions, phases))
 
     def debug_print(self, indent=""):
-        print "%sComposite:" % indent
+        print("%sComposite:" % indent)
         indent += "  "
         for (fraction, phase) in self.children:
-            print "%s%g of" % (indent, fraction)
+            print("%s%g of" % (indent, fraction))
             phase.debug_print(indent + "  ")
 
 

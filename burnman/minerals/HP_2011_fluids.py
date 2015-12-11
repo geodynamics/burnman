@@ -27,9 +27,10 @@ Individual terms are divided through by P, P, P^1.5, P^2, so
 
 cork_P: kbar -> multiply by 1e8
 """
+from __future__ import absolute_import
 
-from burnman.mineral import Mineral
-from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+from ..mineral import Mineral
+from ..processchemistry import read_masses, dictionarize_formula, formula_mass
 
 atomic_masses=read_masses()
 

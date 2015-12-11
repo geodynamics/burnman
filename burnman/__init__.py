@@ -54,34 +54,35 @@ Acknowledgement and Support:
     Bill McDonough, Quentin Williams, Wendy Panero, and Wolfgang Bangerth.
 
 """
+from __future__ import absolute_import
 
-from version import version as __version__
+from .version import version as __version__
 
 # classes for representing rocks and minerals:
-from mineral import Mineral
-from material import Material
-from composite import Composite
-from solutionmodel import SolutionModel
-from solidsolution import SolidSolution
-from mineral_helpers import *
+from .mineral import Mineral
+from .material import Material
+from .composite import Composite
+from .solutionmodel import SolutionModel
+from .solidsolution import SolidSolution
+from .mineral_helpers import *
 
 # high level functions
-from main import *
-from model import Model
+from .main import *
+from .model import Model
 
 # mineral library
-import minerals
+from . import minerals
 
 # central user tools
-import seismic
-import averaging_schemes
-import eos
+from . import seismic
+from . import averaging_schemes
+from . import eos
 
-import processchemistry
-import chemicalpotentials
-from solutionmodel import SolutionModel
-import geotherm
+from . import processchemistry
+from . import chemicalpotentials
+from .solutionmodel import SolutionModel
+from . import geotherm
 
 # miscellaneous
-import tools
-from partitioning import calculate_partition_coefficient,calculate_phase_percents
+from . import tools
+from .partitioning import calculate_partition_coefficient,calculate_phase_percents

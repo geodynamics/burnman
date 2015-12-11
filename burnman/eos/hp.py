@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -5,12 +6,12 @@
 import numpy as np
 import warnings
 
-import modified_tait as mt
-import equation_of_state as eos
+from . import modified_tait as mt
+from . import equation_of_state as eos
 
-import einstein
+from . import einstein
 
-from burnman.endmemberdisorder import *
+from ..endmemberdisorder import *
 
 
 class HP_TMT(eos.EquationOfState):
@@ -33,10 +34,10 @@ class HP_TMT(eos.EquationOfState):
         Pth=self.__relative_thermal_pressure(temperature,params)
 
         # Add order-disorder terms if required
-        if params.has_key('landau_Vmax'): # For a phase transition described by Landau term
+        if 'landau_Vmax' in params: # For a phase transition described by Landau term
             Vdisord=volume_disorder_Landau(pressure, temperature, params)
         else:
-            if params.has_key('BW_deltaV'): # Add Bragg-Williams disordering
+            if 'BW_deltaV' in params: # Add Bragg-Williams disordering
                 Vdisord=volume_disorder_BW(pressure, temperature, params) - volume_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Vdisord=0.0
@@ -154,15 +155,15 @@ class HP_TMT(eos.EquationOfState):
             intVdP = 0.
 
         # Add order-disorder terms if required
-        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+        if 'landau_Tc' in params: # For a phase transition described by Landau term
             Gdisord=gibbs_disorder_Landau(pressure, temperature, params)
         else:
-            if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
+            if 'BW_deltaH' in params: # Add Bragg-Williams disordering
                 Gdisord=gibbs_disorder_BW(pressure, temperature, params) - gibbs_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Gdisord=0.0
 
-        if params.has_key('magnetic_moment'):
+        if 'magnetic_moment' in params:
             Gmagnetic=self._magnetic_gibbs(pressure, temperature, params)
         else:
             Gmagnetic=0.0
@@ -185,10 +186,10 @@ class HP_TMT(eos.EquationOfState):
         dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
 
         # Add order-disorder terms if required
-        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+        if 'landau_Tc' in params: # For a phase transition described by Landau term
             Sdisord=entropy_disorder_Landau(pressure, temperature, params)
         else:
-            if params.has_key('BW_deltaH'): # Add Bragg-Williams disordering
+            if 'BW_deltaH' in params: # Add Bragg-Williams disordering
                 Sdisord=entropy_disorder_BW(pressure, temperature, params) - entropy_disorder_BW(params['P_0'], params['T_0'], params)
             else:
                 Sdisord=0.0
@@ -218,7 +219,7 @@ class HP_TMT(eos.EquationOfState):
         dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.+b*(-Pth)), -1.-c))
 
         # Add order-disorder terms if required
-        if params.has_key('landau_Tc'): # For a phase transition described by Landau term
+        if 'landau_Tc' in params: # For a phase transition described by Landau term
             Cpdisord=heat_capacity_p_disorder_Landau(pressure, temperature, params)
         else:
             Cpdisord=0.0

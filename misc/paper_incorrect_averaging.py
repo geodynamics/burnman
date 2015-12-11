@@ -11,6 +11,7 @@ paper_incorrect_averaging
 This script reproduces :cite:`Cottaar2014`, Figure 5. 
 Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,6))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
@@ -120,7 +121,7 @@ if __name__ == "__main__":
 
     #seismic model for comparison:
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    depths = map(seismic_model.depth, pressure)
+    depths = list(map(seismic_model.depth, pressure))
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     #pure perovskite

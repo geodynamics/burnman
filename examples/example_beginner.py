@@ -27,6 +27,7 @@ for visual comparison.
 * calculating thermoelastic properties
 * seismic comparison
 """
+from __future__ import absolute_import
 
 # Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling

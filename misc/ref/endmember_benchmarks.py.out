@@ -1,4 +1,4 @@
-<stdin>:57: UserWarning: Warning, you are changing the method to MT even though the material is designed to be used with the method HP_TMT.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+<stdin>:59: UserWarning: Warning, you are changing the method to MT even though the material is designed to be used with the method HP_TMT.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
 Benchmarks for SLB2011 database with method slb3
 ['H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
 [0.00017156026591432655, 0.0002055800239183733, -6.4391026211448567e-05, 0.00014642709264959587, 0.00027680790069709911, 0.0043841690680523288, -0.0013546021287755491, -0.00014635661915870913]

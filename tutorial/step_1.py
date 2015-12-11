@@ -31,6 +31,7 @@ very realistic, and you will want to change it to one that is more
 in accordance with what we think the bulk composition of Earth's lower mantle is.
 
 """
+from __future__ import absolute_import
 
 
 

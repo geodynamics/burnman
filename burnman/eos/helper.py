@@ -1,15 +1,16 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
+from __future__ import absolute_import
 
 import inspect
-import slb
-import mie_grueneisen_debye as mgd
-import birch_murnaghan as bm
-import modified_tait as mt
-import hp 
-import cork
-from equation_of_state import EquationOfState
+from . import slb
+from . import mie_grueneisen_debye as mgd
+from . import birch_murnaghan as bm
+from . import modified_tait as mt
+from . import hp 
+from . import cork
+from .equation_of_state import EquationOfState
 
 
 def create(method):
@@ -17,7 +18,7 @@ def create(method):
     Creates an instance of an EquationOfState from a string,
     a class EquationOfState, or an instance of EquationOfState.
     """
-    if isinstance(method, basestring):
+    if isinstance(method, str):
         if method == "slb2":
             return slb.SLB2()
         elif method == "mgd2":

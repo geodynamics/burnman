@@ -21,6 +21,8 @@ teaches:
 - averaging
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..'))
@@ -37,7 +39,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)
-plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
 plt.rc('font', family='sans-serif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
@@ -83,7 +85,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm2")
     func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
     sol = opt.fmin(func, guess)
-    print "2nd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+    print("2nd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1])
     model_vs_2nd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
     mg_perovskite_test.set_method("bm3")
     model_vs_2nd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
@@ -92,7 +94,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm3")
     func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
     sol = opt.fmin(func, guess)
-    print "3rd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+    print("3rd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1])
     model_vs_3rd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
     mg_perovskite_test.set_method("bm2")
     model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)

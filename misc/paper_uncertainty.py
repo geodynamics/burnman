@@ -5,6 +5,8 @@
 """
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     figure=plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
 
     dashstyle2=(6,3)
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
         #testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be enough for now
         for x in testrange:
-            print i, names[i], x
+            print(i, names[i], x)
             uncertain = np.ones(len)
             uncertain[i] += spread[i] * x
             _, vs, vphi, _ = eval(uncertain)

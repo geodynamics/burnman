@@ -12,16 +12,23 @@ else
   echo "WARNING: numdiff not found, please install! Falling back to diff."
 fi
 
+if [ -z $PYTHON ]
+then
+  PYTHON=python
+fi
+
 function testit {
 t=$1
 fulldir=$2
 #echo "*** testing $t ..."
-(python <<EOF
+($PYTHON <<EOF
 import matplotlib as m
 m.use('Template')
 VERBOSE=1
 RUNNING_TESTS=1
-execfile('$t')
+with open('$t') as f:
+    CODE = compile(f.read(), '$t', 'exec')
+    exec(CODE)
 EOF
 ) >$t.tmp 2>&1
 ret=$?
@@ -64,13 +71,13 @@ do
 done
 
 cd tests
-python tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
+$PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
 cd ..
 
 
 cd misc
 echo "gen_doc..."
-python gen_doc.py >/dev/null || exit 0
+$PYTHON gen_doc.py >/dev/null || exit 0
 
 cd benchmarks
 for test in `ls *.py`

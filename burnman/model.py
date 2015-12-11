@@ -2,9 +2,10 @@
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
 
+from __future__ import absolute_import
 import numpy as np
-from material import Material
-from averaging_schemes import AveragingScheme
+from .material import Material
+from .averaging_schemes import AveragingScheme
 
 
 class Model(object):

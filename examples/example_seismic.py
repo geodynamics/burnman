@@ -31,6 +31,8 @@ model along the defined pressure range. The example also illustrates how to impo
 
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -72,7 +74,7 @@ if __name__ == "__main__":
                     plt.plot(depths/1.e3,values,color=colors[m],linestyle='-',label=models[m].__class__.__name__)
                 except:
                     # write out warning that the variable failed for given model
-                    print var[a] + ' is not defined for ' + models[m].__class__.__name__
+                    print(var[a] + ' is not defined for ' + models[m].__class__.__name__)
 
         plt.title(var[a])
         plt.legend(loc='center right')

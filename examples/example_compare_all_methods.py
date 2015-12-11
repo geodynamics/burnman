@@ -23,6 +23,8 @@ different methods.
 * Each method for calculating velocity profiles currently included within BurnMan
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -71,7 +73,7 @@ if __name__ == "__main__":
         rock.set_method(methods[m])
         temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
 
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
         mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \

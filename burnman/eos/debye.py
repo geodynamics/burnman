@@ -1,7 +1,7 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
-
+from __future__ import absolute_import
 import numpy as np
 
 # Try to import the jit from numba.  If it is
@@ -15,7 +15,7 @@ except ImportError:
 
 import scipy.integrate as integrate
 
-import constants
+from .. import constants
 
 """
 Functions for the Debye model.  Note that this is not Mie-Grueneisen-Debye,

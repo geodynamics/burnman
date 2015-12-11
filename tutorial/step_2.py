@@ -22,6 +22,8 @@ This script may be run by typing
     python step_2.py
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 # The imports here are identical to those from step 1
 import numpy as np
@@ -77,7 +79,7 @@ if __name__=='__main__':
         # Since we will call this misfit function many times, we may be interested
         # in a status report.  These lines print some debug output so we 
         # can keep track of what the script is doing.
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
         # Here we integrate an L2 difference with depth between our calculated seismic

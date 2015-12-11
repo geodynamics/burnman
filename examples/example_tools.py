@@ -13,6 +13,9 @@ This example demonstrates BurnMan's tools, which are currently
 - Hugoniot calculation
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
+
 import os, sys, numpy as np, matplotlib.pyplot as plt
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -41,9 +44,9 @@ if __name__ == "__main__":
     P = 14.e9
     T = burnman.tools.equilibrium_temperature([forsterite, mg_wadsleyite],
                                               [1.0, -1.0], P)
-    print 'Endmember equilibrium calculations'
-    print 'fo -> wad equilibrium at', P/1.e9, "GPa is reached at", round_to_n(T, T, 4), "K"
-    print ''
+    print('Endmember equilibrium calculations')
+    print('fo -> wad equilibrium at', P/1.e9, "GPa is reached at", round_to_n(T, T, 4), "K")
+    print('')
 
     # Now let's make the whole diagram using equilibrium_pressure
     for i, T in enumerate(temperatures):
@@ -101,7 +104,7 @@ if __name__ == "__main__":
           [47.49, 41.280, 0.007]]
 
     # Convert the data into the right units and format for fitting
-    PV = np.array(zip(*PV))
+    PV = np.array(list(zip(*PV)))
     PT = [PV[0]*1.e9, 298.15 + PV[0]*0.]
     V = burnman.tools.molar_volume_from_unit_cell_volume(PV[1], 2.)
     sigma = burnman.tools.molar_volume_from_unit_cell_volume(PV[2], 2.)
@@ -113,11 +116,11 @@ if __name__ == "__main__":
     popt, pcov = burnman.tools.fit_PVT_data(stv, params, PT, V)
 
     # Print the optimized parameters
-    print 'Equation of state calculations'
-    print 'Optimized equation of state for stishovite:'
+    print('Equation of state calculations')
+    print('Optimized equation of state for stishovite:')
     for i, p in enumerate(params):
-        print p+':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),\
-            '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
+        print (p+':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),\
+            '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1))
         
     # Finally, let's plot our equation of state
     pressures = np.linspace(1.e5, 60.e9, 101)
@@ -137,16 +140,16 @@ if __name__ == "__main__":
 
 
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
-    print ''
-    print 'Hugoniot calculations'
+    print('')
+    print('Hugoniot calculations')
     pressures = np.linspace(1.e5, 120.e9, 101)
     temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 298.15, pressures)
     plt.plot(pressures/1.e9, temperatures, label='298.15 K')
-    print 'Room temperature Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K'
+    print('Room temperature Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K')
     
     temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 1000., pressures)
     plt.plot(pressures/1.e9, temperatures, label='1000 K')
-    print '1000 K Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K'
+    print('1000 K Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K')
     
     plt.legend(loc="upper left")
     plt.ylabel("Temperature (K)")
