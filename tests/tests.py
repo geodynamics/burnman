@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 from util import *
-from test_vrh import *
+from test_averaging import *
 from test_spin import *
 from test_composite import *
 from test_model import *
