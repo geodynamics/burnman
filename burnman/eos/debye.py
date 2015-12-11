@@ -59,7 +59,7 @@ def debye_fn(x):
     Evaluate the Debye function.  Takes the parameter
     xi = Debye_T/T
     """
-    sol = integrate.quad( lambda xi: pow(xi,3.)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
+    sol = integrate.quad( lambda xi: (xi*xi*xi)/(np.exp(xi)-1.) , 0.0, x) # EQ B3
     return 3.*sol[0]/pow(x,3.)
 
 
