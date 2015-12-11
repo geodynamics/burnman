@@ -117,28 +117,13 @@ class Mineral(Material):
 
         This updates the other properties of this class (v_s, v_p, ...).
         """
-
-        #in an effort to avoid additional work, don't do all the calculations if nothing has changed REDUNDANT!
-        try:
-            if self.pressure == pressure and self.temperature == temperature and self.old_params == self.params:
-                return
-        except AttributeError:
-            pass  #do nothing
-
         self.pressure = pressure
         self.temperature = temperature
-        self.old_params = self.params
 
         if self.method is None:
             raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
 
-
-
-
-    # The following gibbs function avoids having to calculate a bunch of unnecessary parameters over P-T space. This will be useful for gibbs minimisation.
-    def calcgibbs(self, pressure, temperature):
-        return self.method.gibbs_free_energy(pressure, temperature, self.params)
 
     def composition(self):
         return self.params['formula']
