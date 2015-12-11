@@ -32,12 +32,6 @@ def birch_murnaghan(x, params):
     return 3.*params['K_0']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
     * (1 - .75*(4-params['Kprime_0'] )*(pow(x, 2./3.) - 1)) + params['P_0']
 
-def density(pressure, params):
-    """
-    Get the birch-murnaghan density at a reference temperature for a given
-    pressure :math:`[Pa]`. Returns density in :math:`[kg/m^3]'
-    """
-    return params['molar_mass']/volume(pressure,params)
 
 def volume(pressure, params):
     """

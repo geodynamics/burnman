@@ -59,17 +59,16 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def density(self, pressure, temperature, params):
+    def density(self, volume, params):
         """
         Calculate the density of the mineral :math:`[kg/m^3]`.  
         The params object must include a "molar_mass" field.
 
         Parameters
         ----------
-        pressure : float
-            Pressure at which to evaluate the equation of state. :math:`[Pa]`
-        temperature : float
-            Temperature at which to evaluate the equation of state. :math:`[K]`
+        volume : float
+        Molar volume of the mineral.  For consistency this should be calculated
+        using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
@@ -78,7 +77,7 @@ class EquationOfState(object):
         density : float
             Density of the mineral. :math:`[kg/m^3]`
         """
-        return params["molar_mass"] / self.volume(pressure, temperature, params)
+        return params["molar_mass"] / volume
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
