@@ -157,6 +157,77 @@ class SolutionModel(object):
         """
         return 0.0
 
+    def excess_dVdP(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(volume)/d(pressure) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dVdP_excess : float
+            The pressure gradient of the volume excess of the solution
+        """
+        return 0.0
+
+    def excess_dVdT(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(volume)/d(temperature) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dVdT_excess : float
+            The temperature gradient of the volume excess of the solution
+        """
+        return 0.0
+
+    def excess_dSdT(self, pressure, temperature, molar_fractions):
+        """
+        Given a list of molar fractions of different phases,
+        compute the excess d(entropy)/d(temperature) of the solution.
+        The base class implementation assumes that this excess is zero.
+
+        Parameters
+        ----------
+        pressure : float
+            Pressure at which to evaluate the solution model. [Pa]
+
+        temperature : float
+            Temperature at which to evaluate the solution. [K]
+
+        molar_fractions : list of floats
+            List of molar fractions of the different endmembers in solution
+
+        Returns
+        -------
+        dSdT_excess : float
+            The temperature gradient of the entropy excess of the solution
+        """
+        return 0.0
 
 class IdealSolution (SolutionModel):
     """
@@ -401,3 +472,123 @@ class SubregularSolution (IdealSolution):
     def excess_enthalpy(self, pressure, temperature, molar_fractions):
         H_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wh, molar_fractions))
         return H_excess + pressure*self.excess_volume (pressure, temperature, molar_fractions)
+
+class FullSubregularSolution (SubregularSolution):
+    """
+    Solution model implementing the subregular solution model formulation (Helffrich and Wood, 1989)
+    Intermediates are defined to describe each of the interaction terms as a function of P and T
+    """
+
+    def __init__( self, endmembers, intermediates): 
+        self.endmembers = endmembers
+        self.intermediates = intermediates
+        #initialize ideal solution model
+        IdealSolution.__init__(self, endmembers)
+
+    def set_interaction_terms(self, pressure, temperature):
+        for i in range(self.n_endmembers-1):
+            for j in range(self.n_endmembers-i-1):
+                self.intermediates[i][j][0].set_state(pressure, temperature)
+                self.intermediates[i][j][1].set_state(pressure, temperature)
+
+
+        # Create 2D arrays of interaction parameters
+        self.enthalpy_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+        self.entropy_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+        self.volume_interaction = [[[[] for k in xrange(2)] for j in xrange(self.n_endmembers - i - 1)] for i in xrange(self.n_endmembers - 1)]
+
+        self.Wg=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wh=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Ws=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wv=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+
+        self.Wdvdp=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wdvdt=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+        self.Wdsdt=np.zeros(shape=(self.n_endmembers,self.n_endmembers))
+
+        #setup excess enthalpy interaction matrix
+        for i in range(self.n_endmembers):
+            for j in range(i+1, self.n_endmembers):
+                fractions = []
+                for mbr in range(self.n_endmembers):
+                    if mbr == i or mbr == j:
+                        fractions.append(0.5)
+                    else:
+                        fractions.append(0.0)
+                Sconf = -constants.gas_constant*np.dot(IdealSolution._log_ideal_activities(self, fractions), fractions)
+
+
+                self.Wg[i][j]=4.*(self.intermediates[i][j-i-1][0].gibbs + temperature*Sconf) \
+                               - 2.*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs)
+                self.Wg[j][i]=4.*(self.intermediates[i][j-i-1][1].gibbs + temperature*Sconf) \
+                               - 2.*(self.endmembers[i][0].gibbs + self.endmembers[j][0].gibbs) 
+
+                self.Ws[i][j] = 4.*(self.intermediates[i][j-i-1][0].S - Sconf) \
+                               - 2.*(self.endmembers[i][0].S + self.endmembers[j][0].S) 
+                self.Ws[j][i] = 4.*(self.intermediates[i][j-i-1][1].S - Sconf) \
+                                - 2.*(self.endmembers[i][0].S + self.endmembers[j][0].S)
+                self.entropy_interaction[i][j-i-1][0] = self.Ws[i][j]
+                self.entropy_interaction[i][j-i-1][1] = self.Ws[j][i]
+
+                self.Wv[i][j] = 4.*(self.intermediates[i][j-i-1][0].V) \
+                                - 2.*(self.endmembers[i][0].V + self.endmembers[j][0].V)
+                self.Wv[j][i] = 4.*(self.intermediates[i][j-i-1][1].V) \
+                                - 2.*(self.endmembers[i][0].V + self.endmembers[j][0].V)
+                self.volume_interaction[i][j-i-1][0] = self.Wv[i][j]
+                self.volume_interaction[i][j-i-1][1] = self.Wv[j][i]
+
+                self.Wdvdp[i][j] = -4.*(self.intermediates[i][j-i-1][0].V \
+                                        / self.intermediates[i][j-i-1][0].K_T) \
+                    + 2.*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                          + self.endmembers[j][0].V/self.endmembers[j][0].K_T)
+                self.Wdvdp[j][i] = -4.*(self.intermediates[i][j-i-1][1].V \
+                                        / self.intermediates[i][j-i-1][1].K_T) \
+                    + 2.*(self.endmembers[i][0].V/self.endmembers[i][0].K_T \
+                          + self.endmembers[j][0].V/self.endmembers[j][0].K_T)
+                
+                self.Wdvdt[i][j] = 4.*(self.intermediates[i][j-i-1][0].alpha \
+                                       * self.intermediates[i][j-i-1][0].V) \
+                    - 2.*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                          + self.endmembers[j][0].alpha*self.endmembers[j][0].V)        
+                self.Wdvdt[j][i] = 4.*(self.intermediates[i][j-i-1][1].alpha \
+                                       * self.intermediates[i][j-i-1][1].V) \
+                    - 2.*(self.endmembers[i][0].alpha*self.endmembers[i][0].V \
+                          + self.endmembers[j][0].alpha*self.endmembers[j][0].V)
+
+                self.Wdsdt[i][j] = (1./temperature)*(4.*(self.intermediates[i][j-i-1][0].C_p)
+                                    - 2.*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))
+                self.Wdsdt[j][i] = (1./temperature)*(4.*(self.intermediates[i][j-i-1][1].C_p)
+                                    - 2.*(self.endmembers[i][0].C_p + self.endmembers[j][0].C_p))
+
+    def _non_ideal_function(self, W, molar_fractions):
+        return SubregularSolution._non_ideal_function(self, W, molar_fractions )
+
+    def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions) :
+        return self._non_ideal_function(self.Wg, molar_fractions)
+
+    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs (self, temperature, molar_fractions)
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)
+        return ideal_gibbs + non_ideal_gibbs
+
+    def excess_volume (self, pressure, temperature, molar_fractions):
+        return SubregularSolution.excess_volume(self, pressure, temperature, molar_fractions )
+
+    def excess_entropy(self, pressure, temperature, molar_fractions):
+        return SubregularSolution.excess_entropy(self, pressure, temperature, molar_fractions )
+
+    def excess_enthalpy(self, pressure, temperature, molar_fractions):
+        return self.excess_gibbs_free_energy(pressure, temperature, molar_fractions) \
+            + temperature*self.excess_entropy(pressure, temperature, molar_fractions)
+
+    def excess_dVdP (self, pressure, temperature, molar_fractions):
+        dVdP_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdvdp, molar_fractions))
+        return dVdP_excess
+
+    def excess_dVdT (self, pressure, temperature, molar_fractions):
+        dVdT_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdvdt, molar_fractions))
+        return dVdT_excess
+
+    def excess_dSdT (self, pressure, temperature, molar_fractions):
+        dSdT_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wdsdt, molar_fractions))
+        return dSdT_excess
