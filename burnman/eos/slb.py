@@ -55,10 +55,6 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
-    def pressure(self, temperature, volume, params):
-        return bm.birch_murnaghan(params['V_0']/volume, params) + \
-                self.__thermal_pressure(temperature,volume, params) - \
-                self.__thermal_pressure(params['T_0'],volume, params)
 
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
@@ -101,6 +97,7 @@ class SLBBase(eos.EquationOfState):
                 warnings.warn("May be outside the range of validity for EOS")
                 return sol[0][0]
 
+
     def pressure( self, temperature, volume, params):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
@@ -117,6 +114,7 @@ class SLBBase(eos.EquationOfState):
             +(0.5*b_iikkmm*pow(f,2.))) + gr*(E_th - E_th_ref)/volume #EQ 21
 
         return P
+
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
