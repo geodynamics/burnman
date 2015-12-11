@@ -38,7 +38,9 @@ class instantiate_minerals(BurnManTest):
                 if isinstance(m, burnman.solidsolution.SolidSolution):
                     m.set_composition( [1./m.n_endmembers]*m.n_endmembers )
 
+                # test that it works
                 m.set_state(P,T)
+                V = m.molar_volume()
 
 
 if __name__ == '__main__':
