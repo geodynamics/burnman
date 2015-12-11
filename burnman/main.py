@@ -220,8 +220,8 @@ def pressures_for_rock(rock, depths, T0, averaging_scheme=averaging_schemes.Voig
 
     """
     # use PREM pressures as inital guestimate
-    seismic_model = seismic.PREM()
-    pressures,_,_,_,_ = seismic_model.evaluate_all_at(depths)
+    seismic_model = burnman.seismic.PREM()
+    pressures = seismic_model.evaluate(['pressure'], depths)
     pressref = np.zeros_like(pressures)
     #gets table with PREM gravities
     g = seismic_model.gravity(depths)

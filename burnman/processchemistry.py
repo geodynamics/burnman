@@ -59,12 +59,14 @@ def dictionarize_site_formula(formula):
     element keys and atoms of each element per formula unit as items. 
     """
     solution_formulae=dict()
+    s=re.split(r'\[', formula)[1:]
     sites=[[] for i in range(len(s))]
     list_occupancies=[]
     list_multiplicity=np.empty(shape=(len(s)))
     n_occupancies=0
+    f=dict()
 
-    s=re.split(r'\[', formula)[1:]
+
     
     for site in range(len(s)):
         site_occupancy=re.split(r'\]', s[site])[0]
