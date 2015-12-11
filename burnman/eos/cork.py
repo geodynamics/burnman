@@ -1,10 +1,9 @@
-from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
-
-
 #TO DO: Correct heat capacity, volume where internal order-disorder is implemented (Landau and Bragg-Williams models)
+
+from __future__ import absolute_import
 
 import numpy as np
 import scipy.optimize as opt

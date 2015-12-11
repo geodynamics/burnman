@@ -1,15 +1,14 @@
-from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
-
+from __future__ import absolute_import
 import numpy as np
 from scipy.linalg import lu
 
 import burnman
-from burnman import minerals
+from . import minerals
 from .processchemistry import *
-import burnman.constants as constants
+from . import constants
 
 # This module computes chemical potentials (partial molar gibbs free energies) for an assemblage based on the Gibbs free energies and compositions of the individual phases.
 

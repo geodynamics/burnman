@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -7,6 +6,7 @@ from __future__ import absolute_import
 # ProcessChemistry returns the number of atoms and molar mass of a compound given its unit formula as an argument.
 # process_solution_chemistry returns information required to calculate solid solution properties from a set of endmember formulae
 
+from __future__ import absolute_import
 import re
 import numpy as np
 from fractions import Fraction

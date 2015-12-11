@@ -11,7 +11,7 @@ from . import equation_of_state as eos
 
 from . import einstein
 
-from burnman.endmemberdisorder import *
+from ..endmemberdisorder import *
 
 
 class HP_TMT(eos.EquationOfState):

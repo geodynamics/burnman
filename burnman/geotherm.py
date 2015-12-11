@@ -1,8 +1,7 @@
-from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
-
+from __future__ import absolute_import
 import numpy as np
 import scipy.integrate as integrate
 from . import tools

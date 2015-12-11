@@ -9,31 +9,31 @@ Other minerals
 """
 from __future__ import absolute_import
 
-import burnman.mineral_helpers as bmb
-from burnman.mineral import Mineral
+from .. import mineral_helpers as helpers
+from ..mineral import Mineral
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
 # This is ferropericlase with the deprecated solid solution setup, although it is still used in some of the /misc/paper* scripts
-class ferropericlase(bmb.HelperSolidSolution):
+class ferropericlase(helpers.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [periclase(), wuestite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
+        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 # this is mg_fe_perovskite with the depricated solid solution setup. Better not use...
-class mg_fe_perovskite(bmb.HelperSolidSolution):
+class mg_fe_perovskite(helpers.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [mg_perovskite(), fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
+        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 # similar to ferropericlase, using the old solid solution setup. These values are based on Zhang, Stixrude and Brodholt 2013
-class ZSB_2013_mg_fe_perovskite(bmb.HelperSolidSolution):
+class ZSB_2013_mg_fe_perovskite(helpers.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [ZSB_2013_mg_perovskite(), ZSB_2013_fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
+        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 class ZSB_2013_mg_perovskite(Mineral):
     def __init__(self):
@@ -92,9 +92,9 @@ class ZSB_2013_fe_perovskite(Mineral):
         Mineral.__init__(self)
 
 
-class Speziale_fe_periclase(bmb.HelperSpinTransition):
+class Speziale_fe_periclase(helpers.HelperSpinTransition):
     def __init__(self):
-        bmb.HelperSpinTransition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
+        helpers.HelperSpinTransition.__init__(self, 60.0e9, Speziale_fe_periclase_LS(), Speziale_fe_periclase_HS())
         self.cite = 'Speziale et al. 2007'
 
 

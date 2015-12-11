@@ -10,8 +10,8 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 from __future__ import absolute_import
-import burnman.mineral_helpers as bmb
-from burnman.mineral import Mineral
+from .. import mineral_helpers as helpers
+from ..mineral import Mineral
 
 
 class stishovite (Mineral):
@@ -67,18 +67,18 @@ class wuestite (Mineral):
 
         Mineral.__init__(self)
 
-class ferropericlase(bmb.HelperSolidSolution):
+class ferropericlase(helpers.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [periclase(), wuestite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
+        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
-class mg_fe_perovskite(bmb.HelperSolidSolution):
+class mg_fe_perovskite(helpers.HelperSolidSolution):
     def __init__(self, fe_num):
         endmembers = [mg_perovskite(), fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        bmb.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
+        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
 class mg_perovskite(Mineral):
@@ -117,17 +117,17 @@ class fe_perovskite(Mineral):
 
         Mineral.__init__(self)
 
-class mg_fe_perovskite_pt_dependent(bmb.HelperFeDependent):
+class mg_fe_perovskite_pt_dependent(helpers.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):
-        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
+        helpers.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return mg_fe_perovskite(iron_number)
 
 
-class ferropericlase_pt_dependent(bmb.HelperFeDependent):
+class ferropericlase_pt_dependent(helpers.HelperFeDependent):
     def __init__(self, iron_number_with_pt, idx):
-        bmb.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
+        helpers.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
 
     def create_inner_material(self, iron_number):
         return ferropericlase(iron_number)

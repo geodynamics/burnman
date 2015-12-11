@@ -12,8 +12,8 @@ Stixrude & Lithgow-Bertolloni 2005. Some information from personal communication
 
 """
 from __future__ import absolute_import
-import burnman.mineral_helpers as bmb
-from burnman.mineral import Mineral
+from .. import mineral_helpers as helpers
+from ..mineral import Mineral
 
 
 class mg_perovskite(Mineral):
@@ -88,14 +88,14 @@ class mg_periclase(Mineral):
 
         Mineral.__init__(self)
 
-class fe_periclase(bmb.HelperSpinTransition):
+class fe_periclase(helpers.HelperSpinTransition):
     def __init__(self):
-        bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        helpers.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
 
-class fe_periclase_3rd(bmb.HelperSpinTransition):
+class fe_periclase_3rd(helpers.HelperSpinTransition):
     def __init__(self):
-        bmb.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        helpers.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
 
 class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79

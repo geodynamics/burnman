@@ -9,11 +9,11 @@ This module provides several helper minerals/materials.
 from __future__ import absolute_import
 from __future__ import print_function
 
-
 import numpy as np
 import warnings
 
-from burnman import Material, Mineral
+from .material import Material
+from .mineral import Mineral
 
 #import burnman.equation_of_state as eos
 #import burnman.birch_murnaghan as bm
