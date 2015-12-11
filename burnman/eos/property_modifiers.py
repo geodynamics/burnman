@@ -2,6 +2,20 @@ import numpy as np
 from burnman.constants import gas_constant
 
 def _landau_excesses(pressure, temperature, params):
+    """
+    Applies a tricritical Landau correction to the properties 
+    of an endmember which undergoes a displacive phase transition. 
+    This correction follows Putnis (1992), and is done relative to 
+    the completely *ordered* state (at 0 K). 
+    It therefore differs in implementation from both 
+    Stixrude and Lithgow-Bertelloni (2011) and 
+    Holland and Powell (2011), who compute properties relative to 
+    the completely disordered state and standard states respectively.
+
+    The current implementation is preferred, as the excess
+    entropy (and heat capacity) terms are equal to zero at 0 K.
+    """
+
     Tc = params['Tc_0'] + params['V_D']*pressure/params['S_D']
 
     G_disordered = params['S_D']*((temperature - Tc) + params['Tc_0']/3.)
@@ -95,10 +109,17 @@ def _landau_hp_excesses(pressure, temperature, params):
 
 def _dqf_excesses(pressure, temperature, params):
     """
-    Applies a 'Darken's quadratic formalism' correction 
+    Applies a 'Darken's quadratic formalism' correction (Powell, 1987)
     to the thermodynamic properties of a mineral endmember.
     This correction is linear in P and T, and therefore 
     corresponds to a constant volume and entropy correction.
+
+    Applying either a volume or entropy term will generally break
+    equations of state (i.e. the properties of the mineral will 
+    no longer obey the equation of state defined in the 
+    params dictionary. However, this form of excess is extremely 
+    useful as a first order tweak to free energies 
+    (especially in solid solution calculations)
     """
 
     G = mineral.dqf['H'] \
@@ -115,7 +136,69 @@ def _dqf_excesses(pressure, temperature, params):
     
     return excesses
 
+def _bragg_williams_excesses(pressure, temperature, params):
+    """
+    Applies a Bragg-Williams type correction to the thermodynamic
+    properties of a mineral endmember.
+    Expressions are from Holland and Powell (1996).
+    """
+
+    G = 0.
+    dGdT = 0.
+    dGdP = 0.
+    d2GdT2 = 0.
+    d2GdP2 = 0.
+    d2GdPdT = 0.
+
+
+    excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
+                'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
+    
+    return excesses
+
+def _magnetic_excesses_chs(pressure, temperature, params):
+    """
+    Applies a magnetic contribution to the thermodynamic 
+    properties of a mineral endmember.
+    The expression for the gibbs energy contribution is that 
+    used by Chin, Hertzman and Sundman (1987) as reported 
+    in the Journal of Phase Equilibria (Sundman, 1991).
+    """
+    
+    structural_parameter=mineral.magnetic['magnetic_structural_parameter']
+    tau=temperature/(mineral.magnetic['curie_temperature'][0] + pressure*mineral.magnetic['curie_temperature'][1])
+    magnetic_moment=mineral.magnetic['magnetic_moment'][0] + pressure*mineral.magnetic['magnetic_moment'][1]
+
+    A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
+    if tau < 1: 
+        f=1.-(1./A)*(79./(140.*structural_parameter*tau) + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
+    else:
+        f=-(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
+
+
+    G = gas_constant*temperature*np.log(magnetic_moment + 1.)*f
+    dGdT = 0.
+    dGdP = 0.
+    d2GdT2 = 0.
+    d2GdP2 = 0.
+    d2GdPdT = 0.
+
+
+    excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
+                'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
+    
+    return excesses
+
+
 def _modify_properties(mineral, excesses):
+    """
+    Modifies the properties of a mineral based on
+    excess contributions to thermodynamic properties
+    (gibbs and the first and second derivatives with 
+    respect to pressure and temperature) contained
+    within the dictionary 'excesses'.
+    """
+    
     # Gibbs
     mineral.gibbs = mineral.gibbs + excesses['G']
 
@@ -139,7 +222,8 @@ def _modify_properties(mineral, excesses):
 
 def apply_property_modifiers(mineral):
     """
-
+    Modifies the properties of a mineral according to 
+    a list of modifiers.
     """
     for modifier in mineral.property_modifiers:
         if modifier[0] == 'landau':
@@ -148,10 +232,12 @@ def apply_property_modifiers(mineral):
             _modify_properties(mineral, _landau_hp_excesses(mineral.pressure, mineral.temperature, modifier[1])
         if modifier[0] == 'dqf':
             _modify_properties(mineral, _dqf_excesses(mineral.pressure, mineral.temperature, modifier[1])
-        if modifier[0] == 'bw':
+        if modifier[0] == 'bragg_williams':
             _modify_properties(mineral, _bragg_williams_excesses(mineral.pressure, mineral.temperature, modifier[1])
-        if modifier[0] == 'magnetic':
-            _modify_properties(mineral, _magnetic_excesses(mineral.pressure, mineral.temperature, modifier[1])
+        if modifier[0] == 'magnetic_chs':
+            _modify_properties(mineral, _magnetic_excesses_chs(mineral.pressure, mineral.temperature, modifier[1])
     
     return None
+
+
 
