@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Benchmarks for the chemical potential functions
 import os.path, sys
 sys.path.insert(1,os.path.abspath('../..'))

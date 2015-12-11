@@ -28,6 +28,7 @@ These are:
 * the available geotherms
 
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:

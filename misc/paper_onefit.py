@@ -10,6 +10,8 @@ paper_onefit
 This script reproduces :cite:`Cottaar2014`, Figure 7.
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os.path,sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -53,10 +55,10 @@ def make_rock():
 def output_rock( rock, file_handle ):
   for ph in rock.staticphases:
     if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-      for min in ph.mineral.endmembers:
-        file_handle.write( '\t' + min.to_string() + '\n')
-        for key in min.params:
-          file_handle.write('\t\t' + key + ': ' + str(min.params[key]) + '\n')
+      for mineral in ph.mineral.endmembers:
+        file_handle.write( '\t' + mineral.to_string() + '\n')
+        for key in mineral.params:
+          file_handle.write('\t\t' + key + ': ' + str(mineral.params[key]) + '\n')
     else:
       file_handle.write( '\t' + ph.mineral.to_string() + '\n' )
       for key in ph.mineral.params:
@@ -67,11 +69,11 @@ def realization_to_array(rock, anchor_t):
     names = ['anchor_T']
     for ph in rock.staticphases:
         if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-            for min in ph.mineral.endmembers:
-                for key in min.params:
+            for mineral in ph.mineral.endmembers:
+                for key in mineral.params:
                     if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
-                        arr.append(min.params[key])
-                        names.append(min.to_string()+'.'+key)
+                        arr.append(mineral.params[key])
+                        names.append(mineral.to_string()+'.'+key)
         else:
             for key in ph.mineral.params:
                     if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
@@ -85,14 +87,15 @@ def array_to_rock(arr, names):
     idx = 1
     for (fraction,phase) in rock.children:
         if isinstance(phase, HelperSolidSolution):
-            for min in phase.endmembers:
-                for key in min.params:
+            for mineral in phase.endmembers:
+                while mineral.to_string() in names[idx]:
+                    key = names[idx].split('.')[-1]
                     if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
-                        assert(names[idx]==min.to_string()+'.'+key)
-                        min.params[key] = arr[idx]
+                        assert(mineral.to_string() in names[idx])
+                        mineral.params[key] = arr[idx]
                         idx += 1
         else:
-            raise Exception, "unknown type"
+            raise Exception("unknown type")
     return rock, anchor_t
 
 
@@ -217,7 +220,7 @@ if __name__ == "__main__":
         for n in names:
             if "."+row in n:
                 val.append(mymap[n])
-        print row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3])
+        print(row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3]))
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
@@ -243,12 +246,12 @@ if __name__ == "__main__":
                                                     seis_rho/np.mean(seis_rho)])
     error = np.sum([err_rho, err_vphi, err_vs])
 
-    print "errors:", error, err_rho, err_vphi, err_vs
+    print("errors:", error, err_rho, err_vphi, err_vs)
 
     figsize=(6,5)
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
     plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
@@ -282,5 +285,5 @@ if __name__ == "__main__":
     #plt.ylim(6,11)
     if "RUNNING_TESTS" not in globals():
         plt.savefig("onefit.pdf", bbox_inches='tight')
-    print "wrote onefit.pdf"
+    print("wrote onefit.pdf")
     #plt.show()

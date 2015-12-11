@@ -1,14 +1,16 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
+from __future__ import absolute_import
+from __future__ import print_function
 
 import operator
 import bisect
 import os
 import pkgutil
 import numpy as np
-import constants
 from scipy.optimize import fsolve, curve_fit
+from . import constants
 
 def pretty_print_table(table,use_tabs=False):
     """
@@ -20,7 +22,7 @@ def pretty_print_table(table,use_tabs=False):
     """
     if use_tabs:
         for r in table:
-            print "\t".join(r).replace("_","\_")
+            print("\t".join(r).replace("_","\_"))
         return
 
     def col_width(table, colidx):
@@ -30,7 +32,7 @@ def pretty_print_table(table,use_tabs=False):
     # example:   {:<27}{:>11}{:>6}{:>8}
     frmt = "".join([ ('{:<' if i==0 else '{:>')+str(1+col_width(table,i))+'}' for i in range(len(table[0])) ])
     for r in table:
-        print frmt.format(*r)
+        print(frmt.format(*r))
 
 def sort_table(table, col=0):
     """
@@ -60,7 +62,7 @@ def linear_interpol(x, x1, x2, y1, y2):
 
 def read_table(filename):
     datastream = pkgutil.get_data('burnman', 'data/'+filename)
-    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
+    datalines = [ line.strip() for line in datastream.decode('ascii').split('\n') if line.strip() ]
     table=[]
 
     for line in datalines:

@@ -6,6 +6,7 @@
 # ProcessChemistry returns the number of atoms and molar mass of a compound given its unit formula as an argument.
 # process_solution_chemistry returns information required to calculate solid solution properties from a set of endmember formulae
 
+from __future__ import absolute_import
 import re
 import numpy as np
 from fractions import Fraction
@@ -17,7 +18,7 @@ def read_masses():
     elements and their masses into a dictionary
     """
     datastream = pkgutil.get_data('burnman', 'data/input_masses/atomic_masses.dat')
-    datalines = [ line.strip() for line in datastream.split('\n') if line.strip() ]
+    datalines = [ line.strip() for line in datastream.decode('ascii').split('\n') if line.strip() ]
     lookup=dict()
     for line in datalines:
         data="%".join(line.split("%")[:1]).split()
@@ -70,7 +71,7 @@ def dictionarize_site_formula(formula):
     for site in range(len(s)):
         site_occupancy=re.split(r'\]', s[site])[0]
         mult=re.split('[A-Z][^A-Z]*',re.split(r'\]', s[site])[1])[0]
-        not_in_site=filter(None, re.split(r'\]', s[site]))[1]
+        not_in_site=str(filter(None, re.split(r'\]', s[site])))[1]
         not_in_site=not_in_site.replace(mult, '', 1)
         if mult == '':
             list_multiplicity[site]=1.0
@@ -91,7 +92,7 @@ def dictionarize_site_formula(formula):
 
         # Loop over elements not on a site
         for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-            element=filter(None, re.split(r'(\d+)', enamenumber))
+            element=str(filter(None, re.split(r'(\d+)', enamenumber)))
             f[element[0]]=f.get(element[0], 0.0) + float(element[1])
 
     return f
@@ -202,10 +203,10 @@ def process_solution_chemistry(formulae):
 
             # Loop over elements after site
             if len(site_split) != 1:
-                not_in_site=filter(None, site_split[1])
+                not_in_site=str(filter(None, site_split[1]))
                 not_in_site=not_in_site.replace(mult, '', 1)
                 for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                    element=filter(None, re.split(r'(\d+)', enamenumber))
+                    element=list(filter(None, re.split(r'(\d+)', enamenumber)))
                     # Look up number of atoms of element
                     if len(element) == 1:
                         nel=1.

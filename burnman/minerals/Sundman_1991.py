@@ -10,11 +10,12 @@ EoS terms for bcc are from HP_2011_ds62 for iron
 EoS terms for fcc are from an unpublished calibration 
 (R. Myhill, 02/2015)  
 """
+from __future__ import absolute_import
 
-from burnman.mineral import Mineral
-from burnman.solidsolution import SolidSolution
-from burnman.solutionmodel import *
-from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+from ..mineral import Mineral
+from ..solidsolution import SolidSolution
+from ..solutionmodel import *
+from ..processchemistry import read_masses, dictionarize_formula, formula_mass
 
 atomic_masses=read_masses()
 

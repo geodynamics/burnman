@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import re
 
 versionstuff = dict(re.findall("(.+) = '(.+)'\n", open('burnman/version.py').read()))

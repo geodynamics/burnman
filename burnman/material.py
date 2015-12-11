@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
@@ -59,11 +60,11 @@ class Material(object):
         """
         (frs,mins) = self.unroll()
         if len(mins)==1:
-            print mins[0].to_string()
+            print(mins[0].to_string())
         else:
-            print "Material %s:" % self.to_string()
+            print("Material %s:" % self.to_string())
             for (fr,mi) in zip(frs,mins):
-                print "  %g of phase %s" % (fr, mi.to_string())
+                print("  %g of phase %s" % (fr, mi.to_string()))
 
     def set_state(self, pressure, temperature):
         """

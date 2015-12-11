@@ -26,7 +26,7 @@ ian.rose@berkeley.edu
 
 ## Requirements
 
-* Python 2.7 (not Python 3.x)
+* Python 2.7.x or Python 3.4+
 * Python modules:
   NumPy, SciPy, Matplotlib
 
@@ -44,8 +44,8 @@ Figures should show up, indicating that it is working.
 
 1. get Xcode
 2. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use the latest version 2.x version (I
-   used 2.7). To check your version of python, type the following in a
+   python.org/download . Make sure to use either Python 2.7 or Python 3.4+.
+   To check your version of python, type the following in a
    terminal: 
      python --version
 3. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
@@ -72,7 +72,7 @@ python
 
 ## Install under Windows
 
-make Python 2.7.3 (for example) running under windows (do not use Python 3.x, but 2.7.x):
+To get Python 2.7.x (for example) running under Windows:
 
 1. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
 2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
@@ -106,13 +106,13 @@ possible as well as each of the helpers involved with each example.
 Burnman has the advantage of being adaptable and extendable in easy scripts. The downside might be that we do not
 provide a graphical user interface. For those of you who are not familiar  with python, we suspect it will still be 
 relatively easy to adapt the scripts for computations and plotting. 
-Here are some specific features and pitfalls on python:
+Here are some specific features and pitfalls on Python:
 
 * Python uses specific identation. A script might fail if a code block is not idented correctly. We use four spaces and no tabs, 
   mixing these can give trouble.
 * Indices require square brackets and function or method calls parentheses (mainly different from Matlab).
 * The first index of an array is 0 (e.g. x[0])
-* Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (rounded downward), while 5./3. will give 1.66666666667)
+* Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (Python 2.x rounds downward), while 5./3. will give 1.66666666667)
 
 
 ## Examples 

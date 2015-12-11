@@ -3,6 +3,8 @@
 
 
 """ Generates a text table with mineral properties. Run 'python table.py latex' to write a tex version of the table to mytable.tex """
+from __future__ import absolute_import
+from __future__ import print_function
 
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
@@ -53,7 +55,7 @@ if __name__ == "__main__":
                             x=mineral()
                             phasenames.append((name,x))
                         except:
-                            print "Could not create '%s'" % name
+                            print("Could not create '%s'" % name)
 
             eos=phasenames[0][1].params['equation_of_state']
             if eos == 'hp_tmt':

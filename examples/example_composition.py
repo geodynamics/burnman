@@ -40,6 +40,8 @@ example_spintransition.py for explanation of how to implement this
 * Compare computations to seismic models
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -119,7 +121,7 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.brown_shankland(seis_p)
 
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
     moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)

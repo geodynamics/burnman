@@ -38,6 +38,7 @@ These solid solutions can potentially deal with:
 * How to output thermodynamic and thermoelastic properties
 
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
