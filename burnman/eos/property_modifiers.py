@@ -1,5 +1,18 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
+from __future__ import absolute_import
 import numpy as np
 from burnman.constants import gas_constant
+
+"""
+Functions for modifying the thermodynamic properties of minerals
+Currently includes modifications for second order transitions
+(landau, landau_hp), order-disorder (bragg_williams), 
+magnetism (magnetic_chs), and a linear gibbs energy modification 
+with respect to pressure and temperature (dqf). 
+"""
+
 
 def _landau_excesses(pressure, temperature, params):
     """
@@ -111,8 +124,8 @@ def _dqf_excesses(pressure, temperature, params):
     """
     Applies a 'Darken's quadratic formalism' correction (Powell, 1987)
     to the thermodynamic properties of a mineral endmember.
-    This correction is linear in P and T, and therefore 
-    corresponds to a constant volume and entropy correction.
+    This correction is relative to P = 0 and T = 0 and linear in P and T
+    and therefore corresponds to a constant volume and entropy correction.
 
     Applying either a volume or entropy term will generally break
     equations of state (i.e. the properties of the mineral will 
@@ -123,8 +136,8 @@ def _dqf_excesses(pressure, temperature, params):
     """
 
     G = mineral.dqf['H'] \
-        - (mineral.temperature - mineral.params['T_0'])*mineral.dqf['S'] \
-        + (mineral.pressure - mineral.params['P_0'])*mineral.dqf['V']
+        - (mineral.temperature)*mineral.dqf['S'] \
+        + (mineral.pressure)*mineral.dqf['V']
     dGdT = -mineral.dqf['S']
     dGdP = mineral.dqf['V']
     d2GdT2 = 0.
