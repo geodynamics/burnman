@@ -23,6 +23,7 @@ class SLBBase(eos.EquationOfState):
         """
         Finite strain approximation for Debye Temperature [K]
         x = ref_vol/vol
+        If you change  debye_temperature here, also change the definition in __volume.
         """
         f = 1./2. * (pow(x, 2./3.) - 1.)
         a1_ii = 6. * params['grueneisen_0'] # EQ 47
@@ -131,6 +132,7 @@ class SLBBase(eos.EquationOfState):
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter :math:`[unitless]` 
+        If you change grueneisen_parameter here, also change the definition in __volume.
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
