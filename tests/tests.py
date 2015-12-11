@@ -13,6 +13,7 @@ from test_geotherm import *
 from test_endmembers import *
 from test_solidsolution import *
 from test_tools import *
+from test_minerals import *
 
 
 import os, sys
