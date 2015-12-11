@@ -122,8 +122,8 @@ class Composite(Material):
         """
         Update the material to the given pressure [Pa] and temperature [K].
         """
-        self.pressure = pressure
-        self.temperature = temperature
+        self._pressure = pressure
+        self._temperature = temperature
         for phase in self.phases:
                 phase.set_state(pressure, temperature)
 
@@ -210,6 +210,45 @@ class Composite(Material):
     def fugacity(self, standard_material):
         return chemicalpotentials.fugacity(standard_material, self.phases)
 
+
+    @property
+    def internal_energy(self):
+        """
+        Returns internal energy of the mineral [J]
+        Aliased with self.energy
+        """
+        raise NotImplementedError("need to implement internal_energy for Composite()!")
+        return None
+    
+    @property
+    def molar_gibbs(self):
+        """
+        Returns Gibbs free energy of the composite [J]
+        Aliased with self.gibbs
+        """
+        raise NotImplementedError("need to implement molar_gibbs() for Composite()!")
+        return None
+
+    @property
+    def molar_helmholtz(self):
+        """
+        Returns Helmholtz free energy of the mineral [J]
+        Aliased with self.helmholtz
+        """
+        raise NotImplementedError("need to implement molar_helmholtz() for Composite()!")
+        return None
+
+    @property
+    def molar_volume(self):
+        """
+        Returns molar volume of the composite [m^3/mol]
+        Aliased with self.V
+        """
+        if self._molar_volume is None:
+            volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+            self._molar_volume = np.sum(volumes)
+        return self._molar_volume
+    
     @property
     def molar_mass(self):
         """
@@ -223,36 +262,38 @@ class Composite(Material):
     def density(self):
         """
         Compute the density of the composite based on the molar volumes and masses
+        Aliased with self.rho
         """
         if self._density is None:
             densities = np.array([phase.density for phase in self.phases])
             volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
             self._density = self.averaging_scheme.average_density(volumes,densities)
         return self._density
+            
+    @property
+    def molar_entropy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        Aliased with self.S
+        """
+        raise NotImplementedError("need to implement molar_entropy() in derived class!")
+        return None
 
     @property
-    def molar_volume(self):
+    def molar_enthalpy(self):
         """
-        Returns molar volume of the composite [m^3/mol]
+        Returns enthalpy of the mineral [J]
+        Aliased with self.H
         """
-        if self._molar_volume is None:
-            volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
-            self._molar_volume = np.sum(volumes)
-        return self._molar_volume
+        raise NotImplementedError("need to implement molar_enthalpy() for Composite!")
+        return None
 
-    @property
-    def grueneisen_parameter(self):
-        """
-        Returns grueneisen parameter of the composite [unitless]
-        """
-        if self._grueneisen_parameter is None:
-            self._grueneisen_paramteer = self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
-        return self._grueneisen_parameter
 
     @property
     def isothermal_bulk_modulus(self):
         """
         Returns isothermal bulk modulus of the composite [Pa]
+        Aliased with self.K_T
         """
         if self._isothermal_bulk_modulus is None:
             V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
@@ -263,18 +304,10 @@ class Composite(Material):
         return self._isothermal_bulk_modulus
 
     @property
-    def compressibility(self):
-        """
-        Returns compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
-        """
-        if self._compressibility is None:
-            self._compressibility = 1./self.isothermal_bulk_modulus()
-        return self._compressibility
-
-    @property
     def adiabatic_bulk_modulus(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
+        Aliased with self.K_S
         """
         if self._adiabatic_bulk_modulus is None:
             V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
@@ -286,9 +319,30 @@ class Composite(Material):
         return self._adiabatic_bulk_modulus
 
     @property
+    def isothermal_compressibility(self):
+        """
+        Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
+        Aliased with self.beta_T
+        """
+        if self._isothermal_compressibility is None:
+            self._isothermal_compressibility = 1./self.isothermal_bulk_modulus()
+        return self._isothermal_compressibility
+
+    @property
+    def adiabatic_compressibility(self):
+        """
+        Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
+        Aliased with self.beta_S
+        """
+        if self._adiabatic_compressibility is None:
+            self._adiabatic_compressibility = 1./self.adiabatic_bulk_modulus()
+        return self._adiabatic_compressibility
+
+    @property
     def shear_modulus(self):
         """
         Returns shear modulus of the mineral [Pa]
+        Aliased with self.G
         """
         if self._shear_modulus is None:
             V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
@@ -300,9 +354,52 @@ class Composite(Material):
         return self._shear_modulus
 
     @property
+    def p_wave_velocity(self):
+        """
+        Returns P wave speed of the composite [m/s]
+        Aliased with self.v_p
+        """
+        if self._p_wave_velocity is None:
+            self._p_wave_velocity =  np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+                            self.shear_modulus) / self.density)
+        return self._p_wave_velocity
+
+    @property
+    def bulk_sound_velocity(self):
+        """
+        Returns bulk sound speed of the composite [m/s]
+        Aliased with self.v_phi
+        """
+        if self._bulk_sound_velocity is None:
+            self._bulk_sound_velocity =  np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return self._bulk_sound_velocity
+
+    @property
+    def shear_wave_velocity(self):
+        """
+        Returns shear wave speed of the composite [m/s]
+        Aliased with self.v_s
+        """
+        if self._shear_wave_velocity is None:
+            self._shear_wave_velocity = np.sqrt(self.shear_modulus / self.density)
+        return self._shear_wave_velocity
+
+    @property
+    def grueneisen_parameter(self):
+        """
+        Returns grueneisen parameter of the composite [unitless]
+        Aliased with self.gr
+        """
+        if self._grueneisen_parameter is None:
+            self._grueneisen_paramteer = self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
+        return self._grueneisen_parameter
+
+
+    @property
     def thermal_expansivity(self):
         """
         Returns thermal expansion coefficient of the composite [1/K]
+        Aliased with self.alpha
         """
         if self._thermal_expansivity is None:
             V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
@@ -315,6 +412,7 @@ class Composite(Material):
     def heat_capacity_v(self):
         """
         Returns heat capacity at constant volume of the composite [J/K/mol]
+        Aliased with self.C_v
         """
         if self._heat_capacity_v is None:
             c_v = np.array([phase.heat_capacity_v for phase in self.phases])
@@ -325,77 +423,20 @@ class Composite(Material):
     def heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the composite [J/K/mol]
+        Aliased with self.C_p
         """
         if self._heat_capacity_p is None:
             c_p = np.array([phase.heat_capacity_v for phase in self.phases])
             self._heat_capacity_p = self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
         return self._heat_capacity_p
 
-    @property
-    def v_s(self):
-        """
-        Returns shear wave speed of the composite [m/s]
-        """
-        if self._v_s is None:
-            self._v_s = np.sqrt(self.shear_modulus / self.density)
-        return self._v_s
-
-    @property
-    def v_p(self):
-        """
-        Returns P wave speed of the composite [m/s]
-        """
-        if self._v_p is None:
-            self._v_p =  np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
-                            self.shear_modulus) / self.density)
-        return self._v_p
-
-    @property
-    def v_phi(self):
-        """
-        Returns bulk sound speed of the composite [m/s]
-        """
-        if self._v_phi is None:
-            self._v_phi =  np.sqrt(self.adiabatic_bulk_modulus / self.density)
-        return self._v_phi
-
-    @property
-    def molar_gibbs(self):
-        """
-        Returns Gibbs free energy of the composite [J]
-        """
-        raise NotImplementedError("need to implement molar_gibbs() for Composite()!")
-        return None
-
-    @property
-    def molar_helmholtz(self):
-        """
-        Returns Helmholtz free energy of the mineral [J]
-        """
-        raise NotImplementedError("need to implement molar_helmholtz() for Composite()!")
-        return None
-
-    @property
-    def molar_enthalpy(self):
-        """
-        Returns enthalpy of the mineral [J]
-        """
-        raise NotImplementedError("need to implement molar_enthalpy() for Composite!")
-        return None
-
-    @property
-    def molar_entropy(self):
-        """
-        Returns enthalpy of the mineral [J]
-        """
-        raise NotImplementedError("need to implement molar_entropy() in derived class!")
-        return None
 
 
 
 
     def _calculate_moduli(self):
         """
+        REWRITE to evaluate endmembers????
         Calculate the elastic moduli and densities of the individual phases in the assemblage.
 
         :returns:
@@ -456,15 +497,5 @@ class Composite(Material):
     
         return molar_fractions
 
-    gibbs = molar_gibbs
-    V = molar_volume
-    H = molar_enthalpy
-    S  = molar_entropy
-    C_p = heat_capacity_p
-    C_v = heat_capacity_v
-    alpha = thermal_expansivity
-    K_T = isothermal_bulk_modulus
-    K_S = adiabatic_bulk_modulus
-    gr = grueneisen_parameter
-    G = shear_modulus
+
 

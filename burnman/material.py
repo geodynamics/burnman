@@ -23,8 +23,8 @@ class Material(object):
     """
 
     def __init__(self):
-        self.pressure = None
-        self.temperature = None
+        self._pressure = None
+        self._temperature = None
 
     def set_method(self, method):
         """
@@ -79,8 +79,8 @@ class Material(object):
         temperature : float
             The desired temperature in [K].
         """
-        self.pressure = pressure
-        self.temperature = temperature
+        self._pressure = pressure
+        self._temperature = temperature
 
     def unroll(self):
         """
@@ -134,6 +134,83 @@ class Material(object):
 
 
     @property
+    def pressure (self):
+        """
+        Returns pressure set in state [Pa]
+        Aliased with self.P
+        
+        Returns
+        -------
+        pressure : float
+        
+        """
+        return self._pressure
+    
+    @property
+    def temperature (self):
+        """
+        Returns pressure set in state [K]
+        Aliased with self.T
+            
+        Returns
+        -------
+        pressure : float
+        
+        """
+        return self._temperature
+ 
+    @property
+    def internal_energy(self):
+        """
+        Returns internal energy of the mineral [J]
+        Aliased with self.energy
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        internal energies : float
+        """
+        raise NotImplementedError("need to implement internal_energy() in derived class!")
+        return None
+    
+    @property
+    def molar_gibbs(self):
+        """
+        Returns Gibbs free energy of the mineral [J]
+        Aliased with self.gibbs
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        Gibbs free energies : float
+        """
+        raise NotImplementedError("need to implement molar_gibbs() in derived class!")
+        return None
+    
+    @property
+    def molar_helmholtz(self):
+        """
+        Returns Helmholtz free energy of the mineral [J]
+        Aliased with self.helholtz
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        Helmholtz free energies : float
+        """
+        raise NotImplementedError("need to implement molar_helmholtz() in derived class!")
+        return None
+
+    @property
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
@@ -144,16 +221,35 @@ class Material(object):
         
         Returns
         -------
-        molar_mass : array of floats
+        molar_mass : float
         
         """
         raise NotImplementedError("need to implement molar_mass() in derived class!")
+        return None
+    
+    
+    @property
+    def molar_volume(self):
+        """
+        Returns molar volume of the mineral [m^3/mol]
+        Aliased with self.V
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        molar_volume : float
+        """
+        raise NotImplementedError("need to implement molar_volume() in derived class!")
         return None
 
     @property
     def density(self):
         """
         Returns the density of this material.
+        Aliased with self.rho
         
         Notes
         -----
@@ -168,10 +264,12 @@ class Material(object):
         raise NotImplementedError("need to implement density() in derived class!")
         return None
 
+
     @property
-    def molar_volume(self):
+    def molar_entropy(self):
         """
-        Returns molar volume of the mineral [m^3/mol]
+        Returns entropy of the mineral [J]
+        Aliased with self.S
         
         Notes
         -----
@@ -179,15 +277,176 @@ class Material(object):
         
         Returns
         -------
-        V : array of floats
+        entropies : float
         """
-        raise NotImplementedError("need to implement molar_volume() in derived class!")
+        raise NotImplementedError("need to implement molar_entropy() in derived class!")
         return None
+
+
+    @property
+    def molar_enthalpy(self):
+        """
+        Returns enthalpy of the mineral [J]
+        Aliased with self.H
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        enthalpies : float
+        """
+        raise NotImplementedError("need to implement molar_enthalpy() in derived class!")
+        return None
+    
+    
+    @property
+    def isothermal_bulk_modulus(self):
+        """
+        Returns isothermal bulk modulus of the mineral [Pa]
+        Aliased with self.K_T
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        isothermal_bulk_modulus : float
+        """
+        raise NotImplementedError("need to implement isothermal_bulk_moduls() in derived class!")
+        return None
+
+    @property
+    def adiabatic_bulk_modulus(self):
+        """
+        Returns adiabatic bulk modulus of the mineral [Pa]
+        Aliased with self.K_S
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        adiabatic_bulk_modulus : array of floats
+        """
+        raise NotImplementedError("need to implement adiabatic_bulk_modulus() in derived class!")
+        return None
+    
+    
+    @property
+    def isothermal_compressibility(self):
+        """
+        Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
+        Aliased with self.beta_T
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        (K_T)^-1 : float
+        
+        """
+        raise NotImplementedError("need to implement compressibility() in derived class!")
+        return None
+    
+    
+    @property
+    def adiabatic_compressibility(self):
+        """
+        Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus) [1/Pa]
+        Aliased with self.beta_S
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        (K_S)^-1 : float
+        
+        """
+        raise NotImplementedError("need to implement compressibility() in derived class!")
+        return None
+
+    @property
+    def shear_modulus(self):
+        """
+        Returns shear modulus of the mineral [Pa]
+        Aliased with self.G
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        shear_modulus : float
+        """
+        raise NotImplementedError("need to implement shear_modulus() in derived class!")
+        return None
+    
+    @property
+    def p_wave_velocity(self):
+        """
+        Returns P wave speed of the mineral [m/s]
+        Aliased with self.v_p
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        p_wave_velocity : float
+        """
+        raise NotImplementedError("need to implement p_wave_velocity() in derived class!")
+        return None
+    
+    @property
+    def bulk_sound_velocity(self):
+        """
+        Returns bulk sound speed of the mineral [m/s]
+        Aliased with self.v_phi
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        bulk sound velocity: float
+        """
+        raise NotImplementedError("need to implement bulk_sound_velocity() in derived class!")
+        return None
+    
+    @property
+    def shear_wave_velocity(self):
+        """
+        Returns shear wave speed of the mineral [m/s]
+        Aliased with self.v_s
+        
+        Notes
+        -----
+        Needs to be implemented in derived classes.
+        
+        Returns
+        -------
+        shear wave velociy : float
+        """
+        raise NotImplementedError("need to implement shear_wave_velocity() in derived class!")
+        return None
+
 
     @property
     def grueneisen_parameter(self):
         """
         Returns grueneisen parameter of the mineral [unitless]
+        Aliased with self.gr
                 
         Notes
         -----
@@ -195,80 +454,17 @@ class Material(object):
         
         Returns
         -------
-        gr : array of floats
+        gr : float
         """
         raise NotImplementedError("need to implement grueneisen_parameter() in derived class!")
         return None
-
-    @property
-    def isothermal_bulk_modulus(self):
-        """
-        Returns isothermal bulk modulus of the mineral [Pa]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        K_T : array of floats
-        """
-        raise NotImplementedError("need to implement isothermal_bulk_moduls() in derived class!")
-        return None
-
-    @property
-    def compressibility(self):
-        """
-        Returns compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        (K_T)^-1 : array of floats
-        
-        """
-        raise NotImplementedError("need to implement compressibility() in derived class!")
-        return None
-
-    @property
-    def adiabatic_bulk_modulus(self):
-        """
-        Returns adiabatic bulk modulus of the mineral [Pa]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        K_S : array of floats
-        """
-        raise NotImplementedError("need to implement adiabatic_bulk_modulus() in derived class!")
-        return None
-
-    @property
-    def shear_modulus(self):
-        """
-        Returns shear modulus of the mineral [Pa]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        G : array of floats
-        """
-        raise NotImplementedError("need to implement shear_modulus() in derived class!")
-        return None
-
+    
+    
     @property
     def thermal_expansivity(self):
         """
         Returns thermal expansion coefficient of the mineral [1/K]
+        Aliased with self.alpha
         
         Notes
         -----
@@ -276,22 +472,25 @@ class Material(object):
         
         Returns
         -------
-        alpha : array of floats
+        alpha : float
         """
         raise NotImplementedError("need to implement thermal_expansivity() in derived class!")
         return None
+
 
     @property
     def heat_capacity_v(self):
         """
         Returns heat capacity at constant volume of the mineral [J/K/mol]
+        Aliased with self.C_v
+        
         Notes
         -----
         Needs to be implemented in derived classes.
         
         Returns
         -------
-        C_v : array of floats
+        heat_capacity_v : float
         """
         raise NotImplementedError("need to implement heat_capacity_v() in derived class!")
         return None
@@ -300,6 +499,7 @@ class Material(object):
     def heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
+        Aliased with self.C_p
         
         Notes
         -----
@@ -307,125 +507,101 @@ class Material(object):
         
         Returns
         -------
-        C_p : array of floats
+        heat_capacity_p : float
         """
         raise NotImplementedError("need to implement heat_capacity_p() in derived class!")
         return None
 
-    @property
-    def v_s(self):
-        """
-        Returns shear wave speed of the mineral [m/s]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        v_s : array of floats
-        """
-        raise NotImplementedError("need to implement v_s() in derived class!")
-        return None
-
-    @property
-    def v_p(self):
-        """
-        Returns P wave speed of the mineral [m/s]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        v_p : array of floats
-        """
-        raise NotImplementedError("need to implement v_p() in derived class!")
-        return None
-
-    @property
-    def v_phi(self):
-        """
-        Returns bulk sound speed of the mineral [m/s]
-            
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        v_phi: array of floats
-        """
-        raise NotImplementedError("need to implement v_phi() in derived class!")
-        return None
-
-    @property
-    def molar_gibbs(self):
-        """
-        Returns Gibbs free energy of the mineral [J]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        Gibbs free energies : array of floats
-        """
-        raise NotImplementedError("need to implement molar_gibbs() in derived class!")
-        return None
- 
-    @property
-    def molar_helmholtz(self):
-        """
-        Returns Helmholtz free energy of the mineral [J]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        Helmholtz free energies : array of floats
-        """
-        raise NotImplementedError("need to implement molar_helmholtz() in derived class!")
-        return None
-
-    @property
-    def molar_enthalpy(self):
-        """
-        Returns enthalpy of the mineral [J]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        enthalpies : array of floats
-        """
-        raise NotImplementedError("need to implement molar_enthalpy() in derived class!")
-        return None
-
-    @property
-    def molar_entropy(self):
-        """
-        Returns entropy of the mineral [J]
-        
-        Notes
-        -----
-        Needs to be implemented in derived classes.
-        
-        Returns
-        -------
-        entropies : array of floats
-        """
-        raise NotImplementedError("need to implement molar_entropy() in derived class!")
-        return None
 
     def copy(self):
         return copy.deepcopy(self)
+
+
+
+
+
+
+
+
+    ########################################################################
+    # Aliased properties
+    
+    @property
+    def P(self):
+        return self.pressure
+    @property
+    def T(self):
+        return self.temperature
+    @property
+    def energy(self):
+        return self.internal_energy
+    @property
+    def helmholtz(self):
+        return self.molar_helmholtz
+    @property
+    def gibbs(self):
+        return self.molar_gibbs
+    @property
+    def V(self):
+        return self.molar_volume
+    @property
+    def rho(self):
+        return self.density
+    @property
+    def S(self):
+        return self.molar_entropy
+    @property
+    def H(self):
+        return self.molar_enthalpy
+    @property
+    def K_T(self):
+        return self.isothermal_bulk_modulus
+    @property
+    def K_S(self):
+        return self.adiabatic_bulk_modulus
+    @property
+    def beta_T(self):
+        return self.isothermal_compressibility
+    @property
+    def beta_S(self):
+        return self.adiabatic_compressibility
+    @property
+    def G(self):
+        return self.shear_modulus
+    @property
+    def v_p(self):
+        return self.p_wave_velocity
+    @property
+    def v_phi(self):
+        return self.bulk_sound_velocity
+    @property
+    def v_s(self):
+        return self.shear_wave_velocity
+    @property
+    def gr(self):
+        return self.grueneisen_parameter
+    @property
+    def alpha(self):
+        return self.thermal_expansivity
+    @property
+    def C_v(self):
+        return self.heat_capacity_v
+    @property
+    def C_p(self):
+        return self.heat_capacity_p
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
