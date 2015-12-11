@@ -92,3 +92,25 @@ def _landau_hp_excesses(pressure, temperature, params):
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
     
     return excesses
+
+def _dqf_excesses(pressure, temperature, params):
+    """
+    Applies a 'Darken's quadratic formalism' correction 
+    to the thermodynamic properties of a mineral endmember.
+    This correction is linear in P and T, and therefore 
+    corresponds to a constant volume and entropy correction.
+    """
+
+    G = mineral.dqf['H'] \
+        - (mineral.temperature - mineral.params['T_0'])*mineral.dqf['S'] \
+        + (mineral.pressure - mineral.params['P_0'])*mineral.dqf['V']
+    dGdT = -mineral.dqf['S']
+    dGdP = mineral.dqf['V']
+    d2GdT2 = 0.
+    d2GdP2 = 0.
+    d2GdPdT = 0.
+
+    excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
+                'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
+    
+    return excesses
