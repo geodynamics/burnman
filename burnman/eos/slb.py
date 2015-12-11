@@ -95,15 +95,14 @@ class SLBBase(eos.EquationOfState):
         # conservative guess:
         a = 0.6*params['V_0']
         b = 1.2*params['V_0']
-        args=pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm
         # if we have a sign change, we are done:
         vol_a =self.__volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
         vol_b =self.__volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
         if vol_a*vol_b<0:
-            return opt.brentq(self.__volume, a, b,args=args)
+            return opt.brentq(self.__volume, a, b,args=(pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm))
         else:
             tol = 0.0001
-            sol = opt.fmin(lambda x : self.__volume(x,args)*self.__volume(x,args), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
+            sol = opt.fmin(lambda x : pow(self.__volume(x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm),2.0), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
             if sol[1] > tol*2:
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
