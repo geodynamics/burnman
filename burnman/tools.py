@@ -90,6 +90,43 @@ def array_from_file(filename):
     data = np.array(zip(*data))
     return data
 
+def array_to_file(labels, array, filename):
+    """
+    Generic function to read a list of lists into a file.
+    Includes a one-line label header initiated with a 
+    % character.
+
+    Parameters
+    ----------
+    labels : list of strings
+        Column labels for array 
+        
+    array : list of lists
+        array to print to file
+    
+    filename : string
+        Name of file to be created 
+        (new directories are created as necessary)
+    """
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    f=open(filename, 'w')
+    n_data = len(array[0])
+    n_properties = len(array)
+
+    f.write( "% " )
+    for label in labels:
+        f.write( str(label)+' ' )
+    f.write('\n')
+    
+    for i in range(n_data):
+        for j in range(n_properties):
+            f.write( str(array[j][i])+' ' )
+        f.write('\n')
+    
+    f.close()
+    return None
+
 def cut_table(table, min_value, max_value):
     tablen=[]
     for i in range(min_value,max_value,1):
