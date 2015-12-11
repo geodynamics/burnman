@@ -64,33 +64,46 @@ class SLBBase(eos.EquationOfState):
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
 
+    def _volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
+        
+        f= 0.5*(pow(V_0/x,2./3.)-1.)
+        debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+        E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
+        E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
+        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+        
+        return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
+                + gr*(E_th - E_th_ref)/x - pressure #EQ 21
+
     def volume(self, pressure, temperature, params):
         """
         Returns molar volume. :math:`[m^3]`
         """
         T_0 = params['T_0']
-        debye_T = lambda x : self._debye_temperature(params['V_0']/x, params)
-        gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
-        E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
-        E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
+        Debye_0 = params['Debye_0']
+        V_0 = params['V_0']
+        n = params['n']
+        
+        a1_ii = 6. * params['grueneisen_0'] # EQ 47
+        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
-        f = lambda x: 0.5*(pow(params['V_0']/x,2./3.)-1.) # EQ 24
-        func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
-            +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
         a = 0.6*params['V_0']
         b = 1.2*params['V_0']
-
+        args=pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm
         # if we have a sign change, we are done:
-        if func(a)*func(b)<0:
-            return opt.brentq(func, a, b)
+        vol_a =self.__volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
+        vol_b =self.__volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
+        if vol_a*vol_b<0:
+            return opt.brentq(self.__volume, a, b,args=args)
         else:
             tol = 0.0001
-            sol = opt.fmin(lambda x : func(x)*func(x), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
+            sol = opt.fmin(lambda x : self.__volume(x,args)*self.__volume(x,args), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
             if sol[1] > tol*2:
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
