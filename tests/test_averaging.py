@@ -28,6 +28,23 @@ class mypericlase (burnman.Mineral):
             'eta_s_0': 2.8 }
         burnman.Mineral.__init__(self)
 
+class my_nonrigid_mineral (burnman.Mineral):
+    def __init__(self):
+        self.params = {
+            'equation_of_state':'slb3',
+            'V_0': 11.24e-6,
+            'K_0': 161.0e9,
+            'Kprime_0': 3.8,
+            'G_0': 0.e9,
+            'Gprime_0': 0.0,
+            'molar_mass': .0403,
+            'n': 2,
+            'Debye_0': 773.,
+            'grueneisen_0': 1.5,
+            'q_0': 1.5,
+            'eta_s_0': 0.0 }
+        burnman.Mineral.__init__(self)
+
 class VRH_average(BurnManTest):
     def test_one_object(self):
         v = avg.voigt_reuss_hill_function([2.0],[0.123])
@@ -126,6 +143,12 @@ class Reuss(BurnManTest):
         self.assertFloatEqual(7473.353, v_phi[0])
         self.assertFloatEqual(272.635, K[0]/1.e9)
         self.assertFloatEqual(153.452, G[0]/1.e9)
+
+    def test_non_present_non_rigid_phase(self):
+        rock = burnman.Composite ( [1.0, 0.0], [mypericlase(), my_nonrigid_mineral()] )
+        rho, v_p, v_s, v_phi, K, G = \
+            burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Reuss())
+        self.assertFloatEqual(150.901, G[0]/1.e9)
 
 class Voigt(BurnManTest):
     def test_1(self):
