@@ -19,7 +19,7 @@ class SLBBase(eos.EquationOfState):
     :class:`burnman.slb.SLB3` classes.
     """
 
-    def __debye_temperature(self,x,params):
+    def _debye_temperature(self,x,params):
         """
         Finite strain approximation for Debye Temperature [K]
         x = ref_vol/vol
@@ -42,7 +42,7 @@ class SLBBase(eos.EquationOfState):
         q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
         return q
 
-    def __isotropic_eta_s(self, x, params):
+    def _isotropic_eta_s(self, x, params):
         """
         Finite strain approximation for :math:`eta_{s0}`, the isotropic shear
         strain derivative of the grueneisen parameter.
@@ -56,11 +56,10 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
-
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
-    def __thermal_pressure(self,T,V, params):
-        Debye_T = self.__debye_temperature(params['V_0']/V, params)
+    def _thermal_pressure(self,T,V, params):
+        Debye_T = self._debye_temperature(params['V_0']/V, params)
         gr = self.grueneisen_parameter(0., T, V, params) # P not important
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
@@ -70,7 +69,7 @@ class SLBBase(eos.EquationOfState):
         Returns molar volume. :math:`[m^3]`
         """
         T_0 = params['T_0']
-        debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
+        debye_T = lambda x : self._debye_temperature(params['V_0']/x, params)
         gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
         E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
         E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
@@ -103,7 +102,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
         """
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(0.0, temperature, volume, params) #does not depend on pressure
         E_th = debye.thermal_energy(temperature, debye_T, params['n'])
         E_th_ref = debye.thermal_energy(params['T_0'], debye_T, params['n']) #thermal energy at reference temperature
@@ -134,7 +133,7 @@ class SLBBase(eos.EquationOfState):
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
         T_0 = params['T_0'] 
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
         E_th = debye.thermal_energy(temperature, debye_T, params['n']) #thermal energy at temperature T
@@ -166,8 +165,8 @@ class SLBBase(eos.EquationOfState):
         Returns shear modulus. :math:`[Pa]` 
         """
         T_0 = params['T_0'] 
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
+        eta_s = self._isotropic_eta_s(params['V_0']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
         E_th_ref = debye.thermal_energy(T_0,debye_T, params['n'])
@@ -183,7 +182,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         return debye.heat_capacity_v(temperature, debye_T,params['n'])
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
@@ -219,7 +218,7 @@ class SLBBase(eos.EquationOfState):
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        Debye_T = self._debye_temperature(params['V_0']/volume, params)
         S = debye.entropy( temperature, Debye_T, params['n'] )
         return S 
 
@@ -238,7 +237,7 @@ class SLBBase(eos.EquationOfState):
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        Debye_T = self._debye_temperature(params['V_0']/volume, params)
 
         F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
                           debye.helmholtz_free_energy(params['T_0'], Debye_T, params['n'] )
