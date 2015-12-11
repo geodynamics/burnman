@@ -114,3 +114,44 @@ def _dqf_excesses(pressure, temperature, params):
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
     
     return excesses
+
+def _modify_properties(mineral, excesses):
+    # Gibbs
+    mineral.gibbs = mineral.gibbs + excesses['G']
+
+    # Second derivatives first
+    mineral.C_p = mineral.C_p - mineral.temperature*excesses['d2GdT2'] # -T*d2G/dT2
+    mineral.K_T = - (mineral.V + excesses['dGdP']) / (excesses['d2GdP2'] - (mineral.V / mineral.K_T)) # - excesses['dGdP / (excesses['d2GdP2'])
+    mineral.alpha = ((mineral.alpha*mineral.V) + excesses['d2GdPdT']) / (mineral.V + excesses['dGdP']) # d2GdPdT / dGdP
+
+    # Now first derivatives 
+    mineral.S = mineral.S - excesses['dGdT'] # dGdT
+    mineral.V = mineral.V + excesses['dGdP'] # dGdP
+    mineral.H = mineral.gibbs + mineral.temperature*mineral.S # H = G + TS
+
+    # Now volume derivatives
+    mineral.helmholtz = mineral.gibbs - mineral.pressure*mineral.V
+    mineral.C_v = mineral.C_p - mineral.V*mineral.temperature*mineral.alpha*mineral.alpha*mineral.K_T
+    mineral.gr = mineral.alpha*mineral.K_T*mineral.V/mineral.C_v
+    mineral.K_S = mineral.K_T*mineral.C_p/mineral.C_v
+
+    return None
+
+def apply_property_modifiers(mineral):
+    """
+
+    """
+    for modifier in mineral.property_modifiers:
+        if modifier[0] == 'landau':
+            _modify_properties(mineral, _landau_excesses(mineral.pressure, mineral.temperature, modifier[1])
+        if modifier[0] == 'landau_hp':
+            _modify_properties(mineral, _landau_hp_excesses(mineral.pressure, mineral.temperature, modifier[1])
+        if modifier[0] == 'dqf':
+            _modify_properties(mineral, _dqf_excesses(mineral.pressure, mineral.temperature, modifier[1])
+        if modifier[0] == 'bw':
+            _modify_properties(mineral, _bragg_williams_excesses(mineral.pressure, mineral.temperature, modifier[1])
+        if modifier[0] == 'magnetic':
+            _modify_properties(mineral, _magnetic_excesses(mineral.pressure, mineral.temperature, modifier[1])
+    
+    return None
+
