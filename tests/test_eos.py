@@ -53,7 +53,7 @@ class eos(BurnManTest):
             self.assertFloatEqual(K_test, Kt_test)
             G_test = i.shear_modulus(pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(G_test, rock.params['G_0'])
-            Density_test = i.density(pressure, temperature, rock.params)
+            Density_test = i.density(rock.params['V_0'], rock.params)
             self.assertFloatEqual(Density_test, rock.params['molar_mass'] / rock.params['V_0'])
             alpha_test = i.thermal_expansivity(pressure, temperature, rock.params['V_0'], rock.params)
             Cp_test = i.heat_capacity_p(pressure, temperature, rock.params['V_0'], rock.params)
