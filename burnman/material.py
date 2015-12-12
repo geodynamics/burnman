@@ -143,7 +143,7 @@ class Material(object):
         pressure : array of float
         Array of pressures in [Pa].
         temperature : float
-        Array of temperaturesin [K].
+        Array of temperatures in [K].
         
         Returns
         -------

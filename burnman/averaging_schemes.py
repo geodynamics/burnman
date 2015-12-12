@@ -64,7 +64,7 @@ class AveragingScheme(object):
     def average_density(self, volumes, densities):
         """
         Average the densities of a composite, given a list of volume
-        fractions and densitites. This  is implemented in the base class,
+        fractions and densitites. This is implemented in the base class,
         as how to calculate it is not dependent on the geometry of the rock.
         The formula for density is given by
 
