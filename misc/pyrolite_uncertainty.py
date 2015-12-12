@@ -20,7 +20,7 @@ import matplotlib.colors
 from scipy import interpolate
 from scipy.stats import norm
 import matplotlib.mlab as mlab
-from . import colors
+import misc.colors as colors
 
 import signal
 import sys
