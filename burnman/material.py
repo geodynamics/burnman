@@ -7,6 +7,16 @@ import numpy as np
 
 
 def material_property(func):
+    """
+    Decorator @material_property to be used for cached properties of materials.
+
+    To be used on function in Material or derived classes that should be exposed
+    as read-only properties that are cached. The function Material.reset() will
+    reset the cached values.
+
+    Internally, the values are stored in a dictionary member called _cached, which
+    is emptied by .reset().
+    """
     class mat_obj():
         def __init__(self, func):
             self.func = func
@@ -17,8 +27,8 @@ def material_property(func):
             if self.varname not in cache_array:
                 cache_array[self.varname] = self.func(obj)
             return cache_array[self.varname]
-    
-    return property(mat_obj(func).get)
+
+    return property(mat_obj(func).get, doc=func.__doc__)
 
 
 class Material(object):
