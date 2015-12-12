@@ -8,10 +8,11 @@ from ..constants import gas_constant
 
 """
 Functions for modifying the thermodynamic properties of minerals
-Currently includes modifications for second order transitions
-(landau, landau_hp), order-disorder (bragg_williams), 
-magnetism (magnetic_chs), and a linear gibbs energy modification 
-with respect to pressure and temperature (dqf). 
+Currently includes modifications for: 
+- second order transitions (landau, landau_hp), 
+- order-disorder (bragg_williams), 
+- magnetism (magnetic_chs), 
+- and a linear modification (linear). 
 """
 
 
@@ -70,7 +71,7 @@ def _landau_excesses(pressure, temperature, params):
     
     return excesses
 
-def _landau_hp_excesses(pressure, temperature, P_0, T_0, params):
+def _landau_hp_excesses(pressure, temperature, params):
     """
     Applies a tricritical Landau correction to the properties 
     of an endmember which undergoes a displacive phase transition. 
@@ -94,11 +95,11 @@ def _landau_hp_excesses(pressure, temperature, P_0, T_0, params):
     T = temperature
     
     if T_0 < params['Tc_0']:
-        Q_0 = np.power((params['Tc_0'] - T_0)/params['Tc_0'], 0.25)
+        Q_0 = np.power((params['Tc_0'] - params['T_0'])/params['Tc_0'], 0.25)
     else:
         Q_0 = 0.
 
-    Tc = params['Tc_0'] + params['V_D']*(P - P_0)/params['S_D']
+    Tc = params['Tc_0'] + params['V_D']*(P - params['P_0'])/params['S_D']
     if T < Tc:
         Q = np.power((Tc - T)/params['Tc_0'], 0.25)
     else:
@@ -107,7 +108,7 @@ def _landau_hp_excesses(pressure, temperature, P_0, T_0, params):
     # Gibbs
     G = params['Tc_0']*params['S_D']*(Q_0*Q_0 - np.power(Q_0, 6.)/3.) \
         - params['S_D']*(Tc*Q*Q - params['Tc_0']*np.power(Q, 6.)/3.) \
-        - T*params['S_D']*(Q_0*Q_0 - Q*Q) + (P-P_0)*params['V_D']*Q_0*Q_0
+        - T*params['S_D']*(Q_0*Q_0 - Q*Q) + (P-params['P_0'])*params['V_D']*Q_0*Q_0
     
     dGdT = params['S_D']*(Q*Q - Q_0*Q_0)
     dGdP = -params['V_D']*(Q*Q - Q_0*Q_0)
@@ -126,7 +127,7 @@ def _landau_hp_excesses(pressure, temperature, P_0, T_0, params):
     
     return excesses
 
-def _dqf_excesses(pressure, temperature, params):
+def _linear_excesses(pressure, temperature, params):
     """
     Applies a 'Darken's quadratic formalism' correction (Powell, 1987)
     to the thermodynamic properties of a mineral endmember.
@@ -141,11 +142,11 @@ def _dqf_excesses(pressure, temperature, params):
     (especially in solid solution calculations)
     """
 
-    G = params['H'] \
-        - (temperature)*params['S'] \
-        + (pressure)*params['V']
-    dGdT = -params['S']
-    dGdP = params['V']
+    G = params['G_0'] \
+        - (temperature)*params['delta_S'] \
+        + (pressure)*params['delta_V']
+    dGdT = -params['delta_S']
+    dGdP = params['delta_V']
     d2GdT2 = 0.
     d2GdP2 = 0.
     d2GdPdT = 0.
@@ -291,6 +292,31 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     
     return excesses
 
+def calculate_total_excesses(mineral):
+    """
+    Sums the excesses from all the modifiers
+    """
+    excesses = {'G': 0., 'dGdT': 0., 'dGdP': 0.,
+                'd2GdT2': 0., 'd2GdP2': 0., 'd2GdPdT': 0.}
+    for modifier in mineral.property_modifiers:
+        if modifier[0] == 'landau':
+            xs_function = _landau_excesses
+        if modifier[0] == 'landau_hp':
+            xs_function = _landau_hp_excesses
+        if modifier[0] == 'linear':
+            xs_function = _linear_excesses
+        if modifier[0] == 'bragg_williams':
+            xs_function = _bragg_williams_excesses
+        if modifier[0] == 'magnetic_chs':
+            xs_function = _magnetic_excesses_chs
+            
+        xs_component = xs_function(mineral.pressure, mineral.temperature, modifier[1])
+        for key, value in xs_component.iteritems():
+            excesses[key] += value
+
+            
+    return excesses
+
 
 def _modify_properties(mineral, excesses):
     """
@@ -322,21 +348,4 @@ def _modify_properties(mineral, excesses):
 
     return None
 
-def apply_property_modifiers(mineral):
-    """
-    Modifies the properties of a mineral according to 
-    a list of modifiers.
-    """
-    for modifier in mineral.property_modifiers:
-        if modifier[0] == 'landau':
-            _modify_properties(mineral, _landau_excesses(mineral.pressure, mineral.temperature, modifier[1]))
-        if modifier[0] == 'landau_hp':
-            _modify_properties(mineral, _landau_hp_excesses(mineral.pressure, mineral.temperature, mineral.params['P_0'], mineral.params['T_0'], modifier[1]))
-        if modifier[0] == 'dqf':
-            _modify_properties(mineral, _dqf_excesses(mineral.pressure, mineral.temperature, modifier[1]))
-        if modifier[0] == 'bragg_williams':
-            _modify_properties(mineral, _bragg_williams_excesses(mineral.pressure, mineral.temperature, modifier[1]))
-        if modifier[0] == 'magnetic_chs':
-            _modify_properties(mineral, _magnetic_excesses_chs(mineral.pressure, mineral.temperature, modifier[1]))
-    
-    return None
+

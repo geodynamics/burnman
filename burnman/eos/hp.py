@@ -11,8 +11,6 @@ from . import equation_of_state as eos
 
 from . import einstein
 
-from ..endmemberdisorder import *
-
 
 class HP_TMT(eos.EquationOfState):
     """
@@ -32,17 +30,7 @@ class HP_TMT(eos.EquationOfState):
         EQ 12
         """
         Pth=self.__relative_thermal_pressure(temperature,params)
-
-        # Add order-disorder terms if required
-        if 'landau_Vmax' in params: # For a phase transition described by Landau term
-            Vdisord=volume_disorder_Landau(pressure, temperature, params)
-        else:
-            if 'BW_deltaV' in params: # Add Bragg-Williams disordering
-                Vdisord=volume_disorder_BW(pressure, temperature, params) - volume_disorder_BW(params['P_0'], params['T_0'], params)
-            else:
-                Vdisord=0.0
-
-        return mt.volume(pressure-Pth, params) + Vdisord
+        return mt.volume(pressure-Pth, params)
 
     def pressure(self, temperature, volume, params):
         """
@@ -102,7 +90,6 @@ class HP_TMT(eos.EquationOfState):
         C_V0 = einstein.heat_capacity_v(params['T_0'], params['T_einstein'], params['n'] )
         C_V =  einstein.heat_capacity_v(temperature, params['T_einstein'],params['n'])
         alpha = params['a_0'] * (C_V/C_V0) *1./((1.+b*psubpth)*(a + (1.-a)*np.power((1+b*psubpth), c)))
- 
         return alpha
 
     def heat_capacity_p0(self,temperature,params):
@@ -153,22 +140,7 @@ class HP_TMT(eos.EquationOfState):
             intVdP = (pressure-params['P_0'])*params['V_0']*(1. - a + (a*(np.power((1.-b*Pth), 1.-c) - np.power((1. + b*(psubpth)), 1.-c))/(b*(c-1.)*(pressure-params['P_0']))))
         else:
             intVdP = 0.
-
-        # Add order-disorder terms if required
-        if 'landau_Tc' in params: # For a phase transition described by Landau term
-            Gdisord=gibbs_disorder_Landau(pressure, temperature, params)
-        else:
-            if 'BW_deltaH' in params: # Add Bragg-Williams disordering
-                Gdisord=gibbs_disorder_BW(pressure, temperature, params) - gibbs_disorder_BW(params['P_0'], params['T_0'], params)
-            else:
-                Gdisord=0.0
-
-        if 'magnetic_moment' in params:
-            Gmagnetic=self._magnetic_gibbs(pressure, temperature, params)
-        else:
-            Gmagnetic=0.0
-
-        return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP + Gdisord + Gmagnetic
+        return params['H_0'] + self.__intCpdT(temperature, params) - temperature*(params['S_0'] + self.__intCpoverTdT(temperature, params)) + intVdP
 
     def helmholtz_free_energy(self,pressure,temperature, volume, params):
         return self.gibbs_free_energy(pressure,temperature, volume, params) - pressure*self.volume(pressure, temperature, params)
@@ -184,17 +156,7 @@ class HP_TMT(eos.EquationOfState):
         ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['T_einstein'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['T_einstein'], params['n'] )
 
         dintVdpdx=(params['V_0']*params['a_0']*params['K_0']*a*ksi_over_ksi_0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), 0.-c) - np.power((1.-b*Pth), 0.-c))
-
-        # Add order-disorder terms if required
-        if 'landau_Tc' in params: # For a phase transition described by Landau term
-            Sdisord=entropy_disorder_Landau(pressure, temperature, params)
-        else:
-            if 'BW_deltaH' in params: # Add Bragg-Williams disordering
-                Sdisord=entropy_disorder_BW(pressure, temperature, params) - entropy_disorder_BW(params['P_0'], params['T_0'], params)
-            else:
-                Sdisord=0.0
-
-        return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdx + Sdisord
+        return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdx
 
     def enthalpy(self, pressure, temperature, volume, params):
         """
@@ -203,7 +165,6 @@ class HP_TMT(eos.EquationOfState):
         """
         gibbs=self.gibbs_free_energy(pressure,temperature,volume, params)
         entropy=self.entropy(pressure,temperature,volume, params)
-
         return gibbs + temperature*entropy
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
@@ -217,14 +178,7 @@ class HP_TMT(eos.EquationOfState):
         ksi_over_ksi_0=einstein.heat_capacity_v( temperature, params['T_einstein'], params['n'] )/einstein.heat_capacity_v( params['T_0'], params['T_einstein'], params['n'] )
 
         dSdT=params['V_0']*params['K_0']*np.power((ksi_over_ksi_0*params['a_0']),2.0)*(np.power((1.+b*(pressure-params['P_0']-Pth)), -1.-c) - np.power((1.+b*(-Pth)), -1.-c))
-
-        # Add order-disorder terms if required
-        if 'landau_Tc' in params: # For a phase transition described by Landau term
-            Cpdisord=heat_capacity_p_disorder_Landau(pressure, temperature, params)
-        else:
-            Cpdisord=0.0
-
-        return self.heat_capacity_p0(temperature,params) + temperature*dSdT + Cpdisord
+        return self.heat_capacity_p0(temperature,params) + temperature*dSdT
     
     def __thermal_pressure(self,T,params):
         """
@@ -268,30 +222,11 @@ class HP_TMT(eos.EquationOfState):
         at ambient pressure [Pa]
         """
         return (params['Cp'][0]*np.log(temperature) + params['Cp'][1]*temperature - 0.5*params['Cp'][2]/np.power(temperature,2.) - 2.0*params['Cp'][3]/np.sqrt(temperature)) - (params['Cp'][0]*np.log(params['T_0']) + params['Cp'][1]*params['T_0'] - 0.5*params['Cp'][2]/(params['T_0']*params['T_0']) - 2.0*params['Cp'][3]/np.sqrt(params['T_0']))
-
-    def _magnetic_gibbs(self, pressure, temperature, params):
-        """
-        Returns the magnetic contribution to the Gibbs free energy [J/mol]
-        Expressions are those used by Chin, Hertzman and Sundman (1987)
-        as reported in Sundman in the Journal of Phase Equilibria (1991)
-        """
-
-        structural_parameter=params['magnetic_structural_parameter']
-        tau=temperature/(params['curie_temperature'][0] + pressure*params['curie_temperature'][1])
-        magnetic_moment=params['magnetic_moment'][0] + pressure*params['magnetic_moment'][1]
-
-        A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
-        if tau < 1: 
-            f=1.-(1./A)*(79./(140.*structural_parameter*tau) + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
-        else:
-            f=-(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
-        return constants.gas_constant*temperature*np.log(magnetic_moment + 1.)*f
         
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters
         """
-
         if 'T_0' not in params:
             params['T_0'] = 298.15
 

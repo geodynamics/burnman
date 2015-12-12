@@ -37,7 +37,7 @@ class CFMASO_garnet(SolidSolution):
                                    [5.e3, 37.24e3],
                                    [2.e3]]
         SolidSolution.__init__(self, molar_fractions)
-        
+
 
 """
 ENDMEMBERS
@@ -122,7 +122,11 @@ class lrn (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 1710.0 , 'S_D': 10.03 , 'V_D': 5e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 1710.0 ,
+                          'S_D': 10.03 ,
+                          'V_D': 5e-07 }]]
         Mineral.__init__(self)
 
 class mont (Mineral):
@@ -1306,7 +1310,11 @@ class sph (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 485.0 , 'S_D': 0.4 , 'V_D': 5e-08 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 485.0 ,
+                          'S_D': 0.4 ,
+                          'V_D': 5e-08 }]]
         Mineral.__init__(self)
 
 class cstn (Mineral):
@@ -2936,7 +2944,11 @@ class q (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 847.0 , 'S_D': 4.95 , 'V_D': 1.188e-06 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 847.0 ,
+                          'S_D': 4.95 ,
+                          'V_D': 1.188e-06 }]]
         Mineral.__init__(self)
 
 class trd (Mineral):
@@ -3038,7 +3050,11 @@ class ne (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 467.0 , 'S_D': 10.0 , 'V_D': 8e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 467.0 ,
+                          'S_D': 10.0 ,
+                          'V_D': 8e-07 }]]
         Mineral.__init__(self)
 
 class cg (Mineral):
@@ -3427,7 +3443,11 @@ class hem (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 955.0 , 'S_D': 15.6 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 955.0 ,
+                          'S_D': 15.6 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class esk (Mineral):
@@ -3489,7 +3509,11 @@ class NiO (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 520.0 , 'S_D': 5.7 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 520.0 ,
+                          'S_D': 5.7 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class pnt (Mineral):
@@ -3551,7 +3575,11 @@ class ilm (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 1900.0 , 'S_D': 12.0 , 'V_D': 2e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 1900.0 ,
+                          'S_D': 12.0 ,
+                          'V_D': 2e-07 }]]
         Mineral.__init__(self)
 
 class bdy (Mineral):
@@ -3687,7 +3715,11 @@ class mt (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 848.0 , 'S_D': 35.0 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 848.0 ,
+                          'S_D': 35.0 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class mft (Mineral):
@@ -3709,7 +3741,11 @@ class mft (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 665.0 , 'S_D': 17.0 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 665.0 ,
+                          'S_D': 17.0 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class usp (Mineral):
@@ -3838,7 +3874,11 @@ class cc (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 1240.0 , 'S_D': 10.0 , 'V_D': 4e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 1240.0 ,
+                          'S_D': 10.0 ,
+                          'V_D': 4e-07 }]]
         Mineral.__init__(self)
 
 class arag (Mineral):
@@ -4054,7 +4094,11 @@ class trot (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 598.0 , 'S_D': 12.0 , 'V_D': 4.1e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 598.0 ,
+                          'S_D': 12.0 ,
+                          'V_D': 4.1e-07 }]]
         Mineral.__init__(self)
 
 class tro (Mineral):
@@ -4076,7 +4120,11 @@ class tro (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 598.0 , 'S_D': 12.0 , 'V_D': 4.1e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 598.0 ,
+                          'S_D': 12.0 ,
+                          'V_D': 4.1e-07 }]]
         Mineral.__init__(self)
 
 class lot (Mineral):
@@ -4098,7 +4146,11 @@ class lot (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 420.0 , 'S_D': 10.0 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 420.0 ,
+                          'S_D': 10.0 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class trov (Mineral):
@@ -4120,7 +4172,11 @@ class trov (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 595.0 , 'S_D': 10.0 , 'V_D': 1.6e-07 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 595.0 ,
+                          'S_D': 10.0 ,
+                          'V_D': 1.6e-07 }]]
         Mineral.__init__(self)
 
 class any (Mineral):
@@ -4162,7 +4218,11 @@ class iron (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 1042.0 , 'S_D': 8.3 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 1042.0 ,
+                          'S_D': 8.3 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class Ni (Mineral):
@@ -4184,7 +4244,11 @@ class Ni (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula, atomic_masses)}
         self.property_modifiers = [[
-            'landau_hp', {'Tc_0': 631.0 , 'S_D': 3.0 , 'V_D': 0.0 }]]
+            'landau_hp', {'P_0': 100000.0 ,
+                          'T_0': 298.15 ,
+                          'Tc_0': 631.0 ,
+                          'S_D': 3.0 ,
+                          'V_D': 0.0 }]]
         Mineral.__init__(self)
 
 class Cu (Mineral):

@@ -110,7 +110,11 @@ for i in range(int(ds[0][0])):
         if M.flag!=0:
             print '        self.property_modifiers = [['
         if M.flag==1:
-            print '            \'landau_hp\', {\'Tc_0\':', M.od[0], ', \'S_D\':', M.od[1]*1e3, ', \'V_D\':', M.od[2]*1e-5, '}]]'
+            print '            \'landau_hp\', {\'P_0\':', 1.e5, ','
+            print '                          \'T_0\':', 298.15, ','
+            print '                          \'Tc_0\':', M.od[0], ','
+            print '                          \'S_D\':', M.od[1]*1e3, ','
+            print '                          \'V_D\':', M.od[2]*1e-5, '}]]'
         if M.flag==2:
             print '            \'bragg_williams\', {\'deltaH\':', M.od[0]*1e3, ','
             print '                               \'deltaV\':', M.od[1]*1e-5, ','
