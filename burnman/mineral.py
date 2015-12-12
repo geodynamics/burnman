@@ -48,9 +48,7 @@ class Mineral(Material):
             self.set_method(self.params['equation_of_state'])
         if 'name' in self.params:
             self.name=self.params['name']
-        self._pressure = None
-        self._temperature = None
-        self._cached = {}
+        Material.__init__(self)
 
 
 

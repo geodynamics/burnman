@@ -11,11 +11,7 @@ from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
 
-try:
-    from numba import jit
-except ImportError:
-    def jit(fn):
-        return fn
+
 
 class SLBBase(eos.EquationOfState):
     """

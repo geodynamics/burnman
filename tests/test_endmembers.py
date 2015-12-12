@@ -61,7 +61,6 @@ class test_endmembers(BurnManTest):
     def test0_T_ref(self):
         fo=forsterite()
         fo.params['P_0'] = 0.99999999999e5
-        
         fo.set_state(1.e5, 500.)
         data = [fo.H, fo.S]
         T_0 = 2000.

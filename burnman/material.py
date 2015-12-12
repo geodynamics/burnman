@@ -102,6 +102,9 @@ class Material(object):
         self._temperature = temperature
     
     def reset(self):
+        """
+        Resets all cached properties in the material
+        """
         self._cached = {}
 
     
@@ -144,6 +147,8 @@ class Material(object):
         
         Returns
         -------
+        output : array of float
+        Array returning all variables at pressures and temperatures
         
         """
         old_pressure = self.pressure

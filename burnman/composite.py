@@ -8,9 +8,8 @@ import warnings
 
 from .material import Material, material_property
 from .mineral import Mineral
-
-from burnman import averaging_schemes
-from burnman import chemicalpotentials
+from . import averaging_schemes
+from . import chemicalpotentials
 
 
 def check_pairs(phases, fractions):
@@ -67,9 +66,7 @@ class Composite(Material):
 
         self.set_averaging_scheme('VoigtReussHill')
 
-        self._pressure = None
-        self._temperature = None
-        self._cached = {}
+        Material.__init__(self)
 
 
     def set_fractions(self, fractions, fraction_type='molar'):
