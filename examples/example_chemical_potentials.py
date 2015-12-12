@@ -28,6 +28,7 @@ import burnman.constants as constants
 from burnman.processchemistry import *
 from burnman.chemicalpotentials import *
 import numpy as np
+import burnman.minerals as minerals
 
 if __name__ == "__main__":
     atomic_masses=read_masses()

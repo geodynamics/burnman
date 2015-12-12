@@ -168,7 +168,13 @@ class Material(object):
             self.set_state(pressures[i],temperatures[i])
             for j in range(len(vars_list)):
                 output[j,i]=getattr(self,vars_list[j])
-        self.set_state(old_pressure,old_temperature)
+        if old_pressure is None or old_temperature is None:
+            # do not set_state if old values were None. Just reset to None manually
+            self._pressure = self._temperature = None
+            self.reset()
+        else:
+            self.set_state(old_pressure,old_temperature)
+
         return output
 
 
