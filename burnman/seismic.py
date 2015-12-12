@@ -292,7 +292,8 @@ class SeismicTable(Seismic1DModel):
 
 
     def density(self, depth):
-
+        if len(self.table_density)==0:
+            raise ValueError("Density has not been defined for this seismic model")
         return self._lookup(depth, self.table_density)
 
     def depth(self, pressure):
@@ -373,7 +374,7 @@ class Slow(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
 
-        table = tools.read_table("input_seismic/prem.txt")#data is: radius pressure density V_p V_s Q_K Q_G
+        table = tools.read_table("input_seismic/prem.txt")#data is: depth radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table2 = tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
@@ -389,7 +390,7 @@ class Slow(SeismicTable):
         self.table_depth = table[:,0]
         self.table_radius = table[:,1]
         self.table_pressure = table[:,2]
-        self.table_density = table[:,4]
+        self.table_density = table[:,3]
         self.table_vp = np.interp(self.table_depth,table3[:,0][::-1],table3[:,1][::-1])
         self.table_vs = np.interp(self.table_depth,table2[:,0][::-1],table2[:,1][::-1])
 
@@ -418,7 +419,7 @@ class Fast(SeismicTable):
         self.table_depth = table[:,0]
         self.table_radius = table[:,1]
         self.table_pressure = table[:,2]
-        self.table_density = table[:,4]
+        self.table_density = table[:,3]
         self.table_vp = np.interp(self.table_depth,table3[:,0][::-1],table3[:,1][::-1])
         self.table_vs = np.interp(self.table_depth,table2[:,0][::-1],table2[:,1][::-1])
 
@@ -457,7 +458,7 @@ class IASP91(SeismicTable):
     """
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table("input_seismic/iasp91.txt") # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/iasp91.txt") # depth, radius, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:,0]
         self.table_radius = table[:,1]
