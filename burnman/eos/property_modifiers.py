@@ -3,7 +3,8 @@
 
 from __future__ import absolute_import
 import numpy as np
-from burnman.constants import gas_constant
+import scipy.optimize as opt
+from ..constants import gas_constant
 
 """
 Functions for modifying the thermodynamic properties of minerals
@@ -69,7 +70,7 @@ def _landau_excesses(pressure, temperature, params):
     
     return excesses
 
-def _landau_hp_excesses(pressure, temperature, params):
+def _landau_hp_excesses(pressure, temperature, P_0, T_0, params):
     """
     Applies a tricritical Landau correction to the properties 
     of an endmember which undergoes a displacive phase transition. 
@@ -88,18 +89,16 @@ def _landau_hp_excesses(pressure, temperature, params):
     i.e. the seismic wave propagation is *slow* compared to the 
     rate of reaction. 
     """
-    params = mineral.landau_HP
-    P = mineral.pressure
-    T = mineral.temperature
-    P_0 = mineral.params['P_0']
-    T_0 = mineral.params['T_0']
 
+    P = pressure
+    T = temperature
+    
     if T_0 < params['Tc_0']:
         Q_0 = np.power((params['Tc_0'] - T_0)/params['Tc_0'], 0.25)
     else:
         Q_0 = 0.
 
-    Tc = params['Tc_0'] + params['V_D']*(P-P_0)/params['S_D']
+    Tc = params['Tc_0'] + params['V_D']*(P - P_0)/params['S_D']
     if T < Tc:
         Q = np.power((Tc - T)/params['Tc_0'], 0.25)
     else:
@@ -110,14 +109,13 @@ def _landau_hp_excesses(pressure, temperature, params):
         - params['S_D']*(Tc*Q*Q - params['Tc_0']*np.power(Q, 6.)/3.) \
         - T*params['S_D']*(Q_0*Q_0 - Q*Q) + (P-P_0)*params['V_D']*Q_0*Q_0
     
-    
     dGdT = params['S_D']*(Q*Q - Q_0*Q_0)
     dGdP = -params['V_D']*(Q*Q - Q_0*Q_0)
 
     if Q > 1.e-12:
         d2GdT2 = -params['S_D']/(2.*params['Tc_0']*Q*Q)
         d2GdP2 = -params['V_D']*params['V_D']/(2.*params['S_D']*params['Tc_0']*Q*Q)
-        d2GdPdT = -params['V_D']/(2.*params['Tc_0']*Q*Q)
+        d2GdPdT = params['V_D']/(2.*params['Tc_0']*Q*Q)
     else:
         d2GdT2 = 0.
         d2GdP2 = 0.
@@ -143,11 +141,11 @@ def _dqf_excesses(pressure, temperature, params):
     (especially in solid solution calculations)
     """
 
-    G = mineral.dqf['H'] \
-        - (mineral.temperature)*mineral.dqf['S'] \
-        + (mineral.pressure)*mineral.dqf['V']
-    dGdT = -mineral.dqf['S']
-    dGdP = mineral.dqf['V']
+    G = params['H'] \
+        - (temperature)*params['S'] \
+        + (pressure)*params['V']
+    dGdT = -params['S']
+    dGdP = params['V']
     d2GdT2 = 0.
     d2GdP2 = 0.
     d2GdPdT = 0.
@@ -174,10 +172,10 @@ def _bragg_williams_excesses(pressure, temperature, params):
     can be calculated with a solid solution model.
     """
 
-    R = constants.gas_constant
+    R = gas_constant
     n=params['n']
     f=params['factor']
-    deltaS = entropydisorder(n)
+    deltaS = gas_constant*((1.+n)*np.log(1.+n) - n*np.log(n))
 
     lnxord = lambda n, Q: np.log(1.+n*Q) + n*np.log(n+Q) - (1.+n)*np.log(1.+n)
     lnxdisord = lambda n, Q: (1./(1.+n))*np.log(1.+n*Q) + (n/(1.+n))*np.log(1.-Q) \
@@ -187,16 +185,15 @@ def _bragg_williams_excesses(pressure, temperature, params):
         if Q>1.0:
             Q=0.9 # A simple catch to make sure the optimisation doesn't fail
         return gibbs_disorder + (2.*Q - 1.)*W \
-            f*R*temperature*(lnxdisord(n,Q) - lnxord(n,Q))
+            + f*R*temperature*(lnxdisord(n,Q) - lnxord(n,Q))
 
     def order_gibbs(pressure, temperature, params):
         W=params['Wh'] + pressure*params['Wv']
         gibbs_disorder = params['deltaH'] - f*temperature*deltaS + pressure*params['deltaV']
         Q = opt.fsolve(reaction_bragg_williams, 0.999995,
-                       args=(gibbs_disorder, pressure, temperature, params))[0]
+                       args=(gibbs_disorder, temperature, n, f, W))[0]
         G = (1.-Q) * (gibbs_disorder + f*R*temperature*lnxdisord(n,Q)) \
             + f*Q*(R*temperature*lnxord(n,Q)) + (1.-Q)*Q*W
-
         return Q, G
 
     # Calculating partial differentials with respect to P and T
@@ -238,15 +235,15 @@ def _magnetic_excesses_chs(pressure, temperature, params):
 
     structural_parameter=params['structural_parameter']
     curie_temperature = params['curie_temperature'][0] + pressure*params['curie_temperature'][1]
-    tau=temperature/curie_temperature
-    dtaudT = 1./(params['curie_temperature'][0] + pressure*params['curie_temperature'][1])
-    dtaudP = (temperature*params['curie_temperature'][1])/(curie_temperature*curie_temperature)
-    d2taudPdT = params['curie_temperature'][1])/(curie_temperature*curie_temperature)
-    d2taudP2 = 2.*temperature*params['curie_temperature'][1]*params['curie_temperature'][1]*pressure) \
-               /(curie_temperature*curie_temperature*curie_temperature) \
-               - (temperature*params['curie_temperature'][1])/(curie_temperature*curie_temperature)
+    tau = temperature / curie_temperature
+    dtaudT = 1. / curie_temperature
+    dtaudP = -(temperature*params['curie_temperature'][1]) / (curie_temperature*curie_temperature)
+    d2taudPdT = params['curie_temperature'][1] / (curie_temperature*curie_temperature)
+    d2taudP2 = 2.*temperature*params['curie_temperature'][1]*params['curie_temperature'][1] \
+               / (curie_temperature*curie_temperature*curie_temperature)
     magnetic_moment=params['magnetic_moment'][0] + pressure*params['magnetic_moment'][1]
     dmagnetic_momentdP = params['magnetic_moment'][1]
+
     
     A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
     if tau < 1: 
@@ -255,33 +252,33 @@ def _magnetic_excesses_chs(pressure, temperature, params):
                                                                        + np.power(tau, 9.)/135.
                                                                        + np.power(tau, 15.)/600.))
         dfdtau = -(1./A)*( -79./(140.*structural_parameter*tau*tau)
-                       + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 2.)/3.
+                       + (474./497.)*(1./structural_parameter - 1.)*(tau*tau/2.
                                                                      + np.power(tau, 8.)/15.
                                                                      + np.power(tau, 14.)/40.))
         d2fdtau2 = -(1./A)*( 2.*79./(140.*structural_parameter*np.power(tau, 3.))
-                             + (474./497.)*(1./structural_parameter - 1.)*(2.*tau/3.
+                             + (474./497.)*(1./structural_parameter - 1.)*(tau
                                                                            + 8.*np.power(tau, 7.)/15.
                                                                            + 14.*np.power(tau, 13.)/40.))
 
         
     else:
-        f = -(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
-        dfdtau = (1./A)*(np.power(tau,-6)/2. + np.power(tau,-16)/21. + np.power(tau, -26)/60.)
-        d2fdtau2 = -(1./A)*(6.*np.power(tau,-7)/2.
-                            + 16.*np.power(tau,-17)/21.
-                            + 26.*np.power(tau, -27)/60.)
-        
+        f = -(1./A)*(np.power(tau,-5.)/10. + np.power(tau,-15.)/315. + np.power(tau, -25.)/1500.)
+        dfdtau = (1./A)*(np.power(tau,-6.)/2. + np.power(tau,-16.)/21. + np.power(tau, -26.)/60.)
+        d2fdtau2 = -(1./A)*(6.*np.power(tau,-7.)/2. + 16.*np.power(tau,-17.)/21. + 26.*np.power(tau, -27.)/60.)
+
     dfdT = dfdtau*dtaudT
-    d2fdT2 = d2fdtau2*dtaudT
+    d2fdT2 = d2fdtau2*dtaudT*dtaudT
     dfdP = dfdtau*dtaudP
-    d2fdP2 = d2fdtau2*dtaudP + dfdtau*d2taudP2
-    d2fdPdT = d2fdtau2*dtaudT*dtaudP + dfdtau*d2taudPdT
-        
+    d2fdP2 = d2fdtau2*dtaudP*dtaudP + dfdtau*d2taudP2
+    d2fdPdT = d2fdtau2*dtaudT*dtaudP - dfdtau*d2taudPdT
+
     G = gas_constant*temperature*np.log(magnetic_moment + 1.)*f
     dGdT = gas_constant*np.log(magnetic_moment + 1.)*(f + temperature*dfdT)
+    d2GdT2 = gas_constant*np.log(magnetic_moment + 1.)*(2.*dfdT + temperature*d2fdT2)
+
+
     dGdP = gas_constant*temperature*(f*dmagnetic_momentdP/(magnetic_moment + 1.)
                                      + dfdP*np.log(magnetic_moment + 1.))
-    d2GdT2 = gas_constant*np.log(magnetic_moment + 1.)*(2.*dfdT + temperature*d2fdT2)
     d2GdP2 = gas_constant*temperature*(-f*np.power(dmagnetic_momentdP/(magnetic_moment + 1.), 2.)
                                        + 2*dfdP*dmagnetic_momentdP/(magnetic_moment + 1.)
                                        + d2fdP2*np.log(magnetic_moment + 1.))
@@ -332,14 +329,14 @@ def apply_property_modifiers(mineral):
     """
     for modifier in mineral.property_modifiers:
         if modifier[0] == 'landau':
-            _modify_properties(mineral, _landau_excesses(mineral.pressure, mineral.temperature, modifier[1])
+            _modify_properties(mineral, _landau_excesses(mineral.pressure, mineral.temperature, modifier[1]))
         if modifier[0] == 'landau_hp':
-            _modify_properties(mineral, _landau_hp_excesses(mineral.pressure, mineral.temperature, modifier[1])
+            _modify_properties(mineral, _landau_hp_excesses(mineral.pressure, mineral.temperature, mineral.params['P_0'], mineral.params['T_0'], modifier[1]))
         if modifier[0] == 'dqf':
-            _modify_properties(mineral, _dqf_excesses(mineral.pressure, mineral.temperature, modifier[1])
+            _modify_properties(mineral, _dqf_excesses(mineral.pressure, mineral.temperature, modifier[1]))
         if modifier[0] == 'bragg_williams':
-            _modify_properties(mineral, _bragg_williams_excesses(mineral.pressure, mineral.temperature, modifier[1])
+            _modify_properties(mineral, _bragg_williams_excesses(mineral.pressure, mineral.temperature, modifier[1]))
         if modifier[0] == 'magnetic_chs':
-            _modify_properties(mineral, _magnetic_excesses_chs(mineral.pressure, mineral.temperature, modifier[1])
+            _modify_properties(mineral, _magnetic_excesses_chs(mineral.pressure, mineral.temperature, modifier[1]))
     
     return None
