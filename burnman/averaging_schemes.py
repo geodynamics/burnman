@@ -572,15 +572,11 @@ def reuss_average_function(phase_volume, X):
     volumes and moduli, returns a modulus.
     """
     vol_frac = phase_volume/np.sum(phase_volume)
-    zero_exists = False
     for f,x in zip(vol_frac,X):
-        if x <= 0 and f != 0. :
-            zero_exists = True
-    if zero_exists:
-        warnings.warn("Oops, called reuss_average with Xi<=0!")
-        X_reuss = 0.0
-    else:
-        X_reuss = 1./sum( f/x for f,x in zip(vol_frac, X))
+        if x <= 0 and np.abs(f) > np.finfo(float).eps :
+            warnings.warn("Oops, called reuss_average with Xi<=0!")
+            return 0.0
+    X_reuss = 1./sum( f/x for f,x in zip(vol_frac, X))
     return X_reuss
 
 
