@@ -18,38 +18,29 @@ class composite(BurnManTest):
     def test_unroll(self):
 
         min1 = minerals.Murakami_etal_2012.fe_periclase()
-        min_hs = burnman.minerals.Murakami_etal_2012.fe_periclase_HS()
         min2 = minerals.SLB_2005.periclase()
 
         c = burnman.Composite( [min1], [1.0] )
         c.set_state(5e9,300)
         (m,f) = c.unroll()
-        mins=",".join([a.to_string() for a in m])
-        self.assertEqual(f,[1.0])
-        self.assertEqual(mins,min_hs.to_string())
+        self.assertEqual(f,[0.0, 1.0])
         c = burnman.Composite( [min1, min2], [0.4, 0.6] )
         c.set_state(5e9,300)
         (m,f) = c.unroll()
-        self.assertEqual(f,[0.4,0.6])
+        self.assertEqual(f,[0.0, 0.4, 0.6])
 
         c1 = burnman.Composite( [min1], [1.0] )
         c2 = burnman.Composite( [min2], [1.0] )
         c = burnman.Composite( [min1, c1, c2], [0.1, 0.4, 0.5] )
         (m,f) = c.unroll()
-        mins=",".join([a.to_string() for a in m])
-        self.assertEqual(f,[0.1,0.4,0.5])
-        self.assertEqual(mins,min_hs.to_string()+','+min_hs.to_string()+','+min2.to_string())
+        self.assertEqual(f,[0.0, 0.1, 0.0, 0.4, 0.5])
 
+        min1 = burnman.minerals.Murakami_etal_2012.fe_periclase_HS()
         c1 = burnman.Composite( [min1, min2], [0.1, 0.9] )
         c2 = burnman.Composite( [min2], [1.0] )
         c = burnman.Composite( [min1, c1, c2], [0.3, 0.1, 0.6] )
         (m,f) = c.unroll()
-        mins=",".join([a.to_string() for a in m])
-        self.assertArraysAlmostEqual(f,[0.3,0.01,0.09,0.6])
-        self.assertEqual(mins,",".join([min_hs.to_string(),min_hs.to_string(),min2.to_string(),min2.to_string()]))
-        
-        #c.set_method("slb2")
-        #c.set_state(5e9,300)
+        self.assertArraysAlmostEqual(f,[0.3, 0.01, 0.09, 0.6])
 
     def test_changevalues(self):
         class mycomposite(burnman.Material):

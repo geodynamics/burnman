@@ -16,7 +16,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.material.evaluate`
 * :func:`burnman.main.compare_l2`
 
 *Demonstrates:*
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
         # Compute velocities
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
+            rock.evaluate(['density','v_p','v_s','v_phi','K_S','G'], seis_p, temperature)
 
         print("Calculations are done for:")
         rock.debug_print()

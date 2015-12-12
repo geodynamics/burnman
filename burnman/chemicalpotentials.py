@@ -5,7 +5,6 @@ from __future__ import absolute_import
 import numpy as np
 from scipy.linalg import lu
 
-from . import minerals
 from .processchemistry import *
 from . import constants
 from . import solidsolution

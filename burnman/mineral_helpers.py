@@ -14,11 +14,8 @@ import warnings
 
 from .material import Material
 from .mineral import Mineral
+from .composite import Composite
 
-#import burnman.equation_of_state as eos
-#import burnman.birch_murnaghan as bm
-#import burnman.slb as slb
-#import burnman.mie_grueneisen_debye as mgd
 
 
 class HelperSolidSolution(Mineral):
@@ -56,6 +53,7 @@ class HelperSolidSolution(Mineral):
         
         self.params = {}
 
+
     def debug_print(self, indent=""):
         print("%sHelperSolidSolution(%s):" % (indent, self.to_string()))
         indent += "  "
@@ -83,7 +81,7 @@ class HelperSolidSolution(Mineral):
 
         Mineral.set_state(self,pressure,temperature)
 
-class HelperSpinTransition(Material):
+class HelperSpinTransition(Composite):
     """
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
@@ -100,28 +98,20 @@ class HelperSpinTransition(Material):
         self.transition_pressure = transition_pressure
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
-        self.active_mat = None
+        Composite.__init__(self, [ls_mat, hs_mat])
 
     def debug_print(self, indent=""):
         print("%sHelperSpinTransition:" % indent)
         self.ls_mat.debug_print(indent+"  ")
         self.hs_mat.debug_print(indent+"  ")
 
-    def set_method(self, method):
-        self.ls_mat.set_method(method)
-        self.hs_mat.set_method(method)
-
     def set_state(self, pressure, temperature):
         if (pressure >= self.transition_pressure):
-            self.active_mat = self.ls_mat
+            Composite.set_fractions(self, [1.0, 0.0])
         else:
-            self.active_mat = self.hs_mat
-        Material.set_state(self, pressure, temperature)
-        self.active_mat.set_state(pressure, temperature)
+            Composite.set_fractions(self, [0.0, 1.0])
 
-    def unroll(self):
-        """ return (fractions, minerals) where both are arrays. May depend on current state """
-        return ([self.active_mat],[1.0])
+        Composite.set_state(self, pressure, temperature)
 
 
 
@@ -129,7 +119,8 @@ class HelperSpinTransition(Material):
 
 
 
-class HelperFeDependent(Material):
+
+class HelperFeDependent(Mineral):
 
     """
     This material is deprecated!
