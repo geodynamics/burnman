@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import numpy as np
 import warnings
 
-from .mineral import Mineral
+from .mineral import Mineral, material_property
 from .solutionmodel import *
 
 

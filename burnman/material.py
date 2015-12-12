@@ -6,7 +6,7 @@ import numpy as np
 import copy
 
 
-def   material_property(func):
+def material_property(func):
     class mat_obj():
         def __init__(self, func):
             self.func = func
@@ -78,11 +78,11 @@ class Material(object):
         """
         (minerals, fractions) = self.unroll()
         if len(minerals)==1:
-            print minerals[0].to_string()
+            print(minerals[0].to_string())
         else:
-            print "Material %s:" % self.to_string()
+            print("Material %s:" % self.to_string())
             for (mineral, fraction) in zip(minerals, fractions):
-                print "  %g of phase %s" % (fraction, mineral.to_string())
+                print("  %g of phase %s" % (fraction, mineral.to_string()))
 
 
     def set_state(self, pressure, temperature):

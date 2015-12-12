@@ -8,13 +8,9 @@ import warnings
 
 import numpy as np
 
-<<<<<<< 35dd6884656f448febc9f233f39523328456f118
-from .material import Material
+from .material import Material, material_property
 from . import eos
-=======
-from burnman.material import Material,material_property
-import burnman.eos as eos
->>>>>>> added cached material properties
+
 
 
 class Mineral(Material):

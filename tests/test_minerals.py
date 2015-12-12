@@ -40,7 +40,7 @@ class instantiate_minerals(BurnManTest):
 
                 # test that it works
                 m.set_state(P,T)
-                V = m.molar_volume()
+                V = m.molar_volume
 
 
 if __name__ == '__main__':

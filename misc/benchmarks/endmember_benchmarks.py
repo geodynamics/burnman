@@ -68,13 +68,8 @@ T=298.15
 for P, V, beta, rho in perplex_output:
     fo.set_state(P*1.e5,T)
     PT.append([P/1.e4,T])
-<<<<<<< a5b2e42871ee8c8b57de12ff72170ae10768e907
-    diff=[p(fo.V, V/1.e5), p(fo.K_T, 1.e5/beta), p(fo.density(), rho)]
-    print(diff)
-=======
     diff=[p(fo.V, V/1.e5), p(fo.K_T, 1.e5/beta), p(fo.density, rho)]
-    print diff
->>>>>>> added properties to all materials
+    print(diff)
     percentage_diff.append(diff)
 
 percentage_diff=np.array(percentage_diff)

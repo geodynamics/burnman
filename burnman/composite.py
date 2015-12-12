@@ -6,9 +6,11 @@ from __future__ import print_function
 import numpy as np
 import warnings
 
-from .material import Material
+from .material import Material, material_property
 from .mineral import Mineral
 
+from burnman import averaging_schemes
+from burnman import chemicalpotentials
 
 
 def check_pairs(phases, fractions):
@@ -49,6 +51,15 @@ class Composite(Material):
 
         
         assert(len(phases)>0)
+        self.phases = phases
+        
+        self.phase_names = []
+        for i in range(len(self.phases)):
+            try:
+                self.phase_names.append(self.phases[i].name)
+            except AttributeError:
+                self.phase_names.append('')
+
         if fractions is not None:
             self.set_fractions(fractions, fraction_type)
         else:
@@ -139,13 +150,13 @@ class Composite(Material):
                     bulk_composition[element] += self.molar_fractions[i]*composition[element]
         return bulk_composition
             
->>>>>>> Added examples and core functionality. Elastic/thermodynamic functionality not yet tested.
+
     def debug_print(self, indent=""):
         print("%sComposite:" % indent)
         indent += "  "
         try: # if fractions have been defined
             for i, phase in enumerate(self.phases):
-                print "%s%g of" % (indent, self.molar_fractions[i])
+                print("%s%g of" % (indent, self.molar_fractions[i]))
                 phase.debug_print(indent + "  ")
         except:
             for i, phase in enumerate(self.phases):
