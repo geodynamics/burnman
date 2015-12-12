@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import unittest
 import os, sys
+import warnings
 sys.path.insert(1,os.path.abspath('..'))
 
 import burnman
@@ -149,6 +150,14 @@ class Reuss(BurnManTest):
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Reuss())
         self.assertFloatEqual(150.901, G[0]/1.e9)
+
+    def test_present_non_rigid_phase(self):
+        rock = burnman.Composite ( [0.5, 0.5], [mypericlase(), my_nonrigid_mineral()] )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("ignore")
+            rho, v_p, v_s, v_phi, K, G = \
+                burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Reuss())
+            self.assertFloatEqual(0.0, G[0]/1.e9)
 
 class Voigt(BurnManTest):
     def test_1(self):
