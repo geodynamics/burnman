@@ -56,6 +56,7 @@ class HelperSolidSolution(Mineral):
         
         self.params = {}
 
+
     def debug_print(self, indent=""):
         print("%sHelperSolidSolution(%s):" % (indent, self.to_string()))
         indent += "  "
@@ -83,7 +84,7 @@ class HelperSolidSolution(Mineral):
 
         Mineral.set_state(self,pressure,temperature)
 
-class HelperSpinTransition(Material):
+class HelperSpinTransition(Mineral):
     """
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
@@ -100,6 +101,7 @@ class HelperSpinTransition(Material):
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
         self.active_mat = None
+        Mineral.__init__(self)
 
     def debug_print(self, indent=""):
         print("%sHelperSpinTransition:" % indent)
@@ -117,6 +119,18 @@ class HelperSpinTransition(Material):
             self.active_mat = self.hs_mat
         Material.set_state(self, pressure, temperature)
         self.active_mat.set_state(pressure, temperature)
+
+    def evaluate(self,vars_list,pressures, temperatures):
+        output = np.empty((len(vars_list),len(pressures)))
+        for i in range(len(pressures)):
+            if (pressures[i] >= self.transition_pressure):
+                self.active_mat = self.ls_mat
+            else:
+                self.active_mat = self.hs_mat
+            self.active_mat.set_state(pressures[i], temperatures[i])
+            for j in range(len(vars_list)):
+                output[j,i]=getattr(self.active_mat,vars_list[j])
+        return output
 
     def unroll(self):
         """ return (fractions, minerals) where both are arrays. May depend on current state """

@@ -89,20 +89,17 @@ if __name__ == "__main__":
 
     rock = minerals.Murakami_etal_2012.fe_periclase_LS()
 
-    mat_rho_LS, mat_vp_LS, mat_vs_LS, mat_vphi_LS, _, _ = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho_LS, mat_vs_LS, mat_vphi_LS= \
+        rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
     rock = minerals.Murakami_etal_2012.fe_periclase_HS()
-    mat_rho_HS, mat_vp_HS, mat_vs_HS, mat_vphi_HS, _, _ = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho_HS, mat_vs_HS, mat_vphi_HS = \
+        rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
 
     rock = minerals.Murakami_etal_2012.fe_periclase()
-    mat_rho_ON, mat_vp_ON, mat_vs_ON, mat_vphi_ON, _, _ = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho_ON, mat_vs_ON, mat_vphi_ON= \
+        rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
     plt.subplot(2,2,2)
     plt.plot(seis_p/1.e9,mat_vs_LS/1.e3,color='b',linestyle='-',marker='.', \
@@ -123,9 +120,8 @@ if __name__ == "__main__":
     rock = minerals.other.Speziale_fe_periclase()
 
 
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho, mat_vs, mat_vphi = \
+        rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
     print("Calculations are done for:")
     rock.debug_print()

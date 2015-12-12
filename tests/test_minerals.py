@@ -29,10 +29,10 @@ class instantiate_minerals(BurnManTest):
                             and issubclass(m, burnman.Mineral)
                             and m is not burnman.mineral.Mineral 
                             and m is not burnman.solidsolution.SolidSolution
-                            and issubclass(m, burnman.mineral_helpers.HelperSolidSolution)==False]
-            
+                            and issubclass(m, burnman.mineral_helpers.HelperSolidSolution)==False
+                            and issubclass(m, burnman.mineral_helpers.HelperFeDependent)==False
+                            and issubclass(m, burnman.mineral_helpers.HelperSpinTransition)==False]
             for mineral_ in mineral_list:
-		print(mineral_())
                 m = mineral_() # instantiate
 
                 # Call set_composition if necessary

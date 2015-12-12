@@ -16,7 +16,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.material.evaluate`
 * :func:`burnman.main.compare_l2`
 
 *Demonstrates:*

@@ -64,9 +64,7 @@ if __name__ == "__main__":
     rock.debug_print()
 
     mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-        burnman.velocities_from_rock(rock, pressures, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
-
+        rock.evaluate(['density','v_p','v_s','v_phi','K_S','G'], pressures, temperature)
     #write to file:
     output_filename = "example_woutput.txt"
     f = open(output_filename, 'wb')
