@@ -33,6 +33,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
+from misc.helper_solid_solution import *
 import misc.colors as colors
 
 if __name__ == "__main__":
@@ -76,15 +77,9 @@ if __name__ == "__main__":
     #temperature = burnman.geotherm.brown_shankland(seis_p)
 
     def eval_material(amount_perovskite):
-#        rock = burnman.composite ( [minerals.Murakami_etal_2012.fe_perovskite(),\
-#                                    minerals.Murakami_etal_2012.fe_periclase()], \
-#                                   [amount_perovskite, 1.0 - amount_perovskite ] )
-        rock = burnman.Composite ( [minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07),
-                                    minerals.other.ferropericlase(0.2)], \
+        rock = burnman.Composite ( [SLB_2011_ZSB_2013_mg_fe_perovskite(0.07),
+                                    other_ferropericlase(0.2)], \
                                    [amount_perovskite, 1.0 - amount_perovskite] )
-#        rock = burnman.composite ( [minerals.SLB_2011.mg_fe_perovskite(0.),\
-#                                   minerals.other.ferropericlase(1.0)],
-#                                  [amount_perovskite, 1.0 - amount_perovskite] )
         rock.set_method(method)
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
         print("Calculations are done for:")

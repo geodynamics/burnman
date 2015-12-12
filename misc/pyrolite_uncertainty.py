@@ -14,7 +14,7 @@ import numpy.random
 import burnman
 import pickle
 from burnman import minerals
-from burnman.mineral_helpers import HelperSolidSolution
+from misc.helper_solid_solution import HelperSolidSolution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate

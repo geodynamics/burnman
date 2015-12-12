@@ -29,7 +29,7 @@ from burnman import minerals
 class TestRock(BurnManTest):
     def test_rock(self):
         amount_perovskite = 0.3
-        rock = burnman.Composite([minerals.SLB_2005.mg_fe_perovskite(0.1), minerals.SLB_2005.ferropericlase(0.2)], \
+        rock = burnman.Composite([minerals.SLB_2005.mg_perovskite(), minerals.SLB_2005.periclase()], \
                                  [amount_perovskite, 1.0-amount_perovskite])
         (phases, fr)=rock.unroll()
         self.assertFloatEqual(fr[0], 0.3)

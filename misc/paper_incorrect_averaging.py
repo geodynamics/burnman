@@ -20,7 +20,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.mineral_helpers import HelperSolidSolution
+from misc.helper_solid_solution import HelperSolidSolution
 import matplotlib.image as mpimg
 import misc.colors as colors
 

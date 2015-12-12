@@ -101,20 +101,6 @@ class wuestite (Mineral):
         Mineral.__init__(self)
 
 
-class ferropericlase(helpers.HelperSolidSolution):
-    def __init__(self, fe_num):
-        endmembers = [periclase(), wuestite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
-
-
-class mg_fe_perovskite(helpers.HelperSolidSolution):
-    def __init__(self, fe_num):
-        endmembers = [mg_perovskite(), fe_perovskite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
-
-
 class mg_perovskite(Mineral):
     def __init__(self):
         self.params = {
@@ -171,24 +157,5 @@ class fe_perovskite(Mineral):
 
         Mineral.__init__(self)
 
-
-class mg_fe_perovskite_pt_dependent(helpers.HelperFeDependent):
-    def __init__(self, iron_number_with_pt, idx):
-        helpers.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return mg_fe_perovskite(iron_number)
-
-
-class ferropericlase_pt_dependent(helpers.HelperFeDependent):
-    def __init__(self, iron_number_with_pt, idx):
-        helpers.HelperFeDependent.__init__(self, iron_number_with_pt, idx)
-
-    def create_inner_material(self, iron_number):
-        return ferropericlase(iron_number)
-
-
 mg_bridgmanite = mg_perovskite
 fe_bridgmanite = fe_perovskite
-mg_fe_bridgmanite = mg_fe_perovskite
-mg_fe_bridgmanite_pt_dependent = mg_fe_perovskite_pt_dependent

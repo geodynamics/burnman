@@ -28,10 +28,8 @@ class instantiate_minerals(BurnManTest):
             mineral_list = [m for m in member_list if inspect.isclass(m) 
                             and issubclass(m, burnman.Mineral)
                             and m is not burnman.mineral.Mineral 
-                            and m is not burnman.solidsolution.SolidSolution
-                            and issubclass(m, burnman.mineral_helpers.HelperSolidSolution)==False
-                            and issubclass(m, burnman.mineral_helpers.HelperFeDependent)==False
-                            and issubclass(m, burnman.mineral_helpers.HelperSpinTransition)==False]
+                            and m is not burnman.solidsolution.SolidSolution]
+            
             for mineral_ in mineral_list:
                 m = mineral_() # instantiate
 

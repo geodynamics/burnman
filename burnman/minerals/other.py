@@ -14,26 +14,6 @@ from ..mineral import Mineral
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
-# This is ferropericlase with the deprecated solid solution setup, although it is still used in some of the /misc/paper* scripts
-class ferropericlase(helpers.HelperSolidSolution):
-    def __init__(self, fe_num):
-        endmembers = [periclase(), wuestite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
-
-# this is mg_fe_perovskite with the depricated solid solution setup. Better not use...
-class mg_fe_perovskite(helpers.HelperSolidSolution):
-    def __init__(self, fe_num):
-        endmembers = [mg_perovskite(), fe_perovskite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
-
-# similar to ferropericlase, using the old solid solution setup. These values are based on Zhang, Stixrude and Brodholt 2013
-class ZSB_2013_mg_fe_perovskite(helpers.HelperSolidSolution):
-    def __init__(self, fe_num):
-        endmembers = [ZSB_2013_mg_perovskite(), ZSB_2013_fe_perovskite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
-        helpers.HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 class ZSB_2013_mg_perovskite(Mineral):
     def __init__(self):
