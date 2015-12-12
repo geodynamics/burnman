@@ -3,7 +3,7 @@ from __future__ import print_function
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
 import numpy as np
-import copy
+
 
 
 def material_property(func):
@@ -536,9 +536,6 @@ class Material(object):
         raise NotImplementedError("need to implement heat_capacity_p() in derived class!")
         return None
 
-
-    def copy(self):
-        return copy.deepcopy(self)
 
 
 

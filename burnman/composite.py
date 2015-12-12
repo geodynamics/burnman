@@ -302,8 +302,8 @@ class Composite(Material):
         K_ph = np.array([phase.isothermal_bulk_modulus for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
    
-        self._isothermal_bulk_modulus = self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
-        return self._isothermal_bulk_modulus
+        return self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -315,8 +315,8 @@ class Composite(Material):
         K_ph = np.array([phase.adiabatic_bulk_modulus for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
         
-        self._adiabatic_bulk_modulus = self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
-        return self._adiabatic_bulk_modulus
+        return self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+
 
     @material_property
     def isothermal_compressibility(self):
@@ -324,8 +324,8 @@ class Composite(Material):
         Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_T
         """
-        self._isothermal_compressibility = 1./self.isothermal_bulk_modulus()
-        return self._isothermal_compressibility
+        return 1./self.isothermal_bulk_modulus()
+
 
     @material_property
     def adiabatic_compressibility(self):
@@ -333,8 +333,8 @@ class Composite(Material):
         Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_S
         """
-        self._adiabatic_compressibility = 1./self.adiabatic_bulk_modulus()
-        return self._adiabatic_compressibility
+        return 1./self.adiabatic_bulk_modulus()
+
 
     @material_property
     def shear_modulus(self):
@@ -346,9 +346,9 @@ class Composite(Material):
         K_ph = np.array([phase.adiabatic_bulk_modulus for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
         
-        self._shear_modulus = self.averaging_scheme.average_shear_moduli(V_frac, K_ph, G_ph)
+        return self.averaging_scheme.average_shear_moduli(V_frac, K_ph, G_ph)
                                                         
-        return self._shear_modulus
+
 
     @material_property
     def p_wave_velocity(self):
@@ -356,9 +356,9 @@ class Composite(Material):
         Returns P wave speed of the composite [m/s]
         Aliased with self.v_p
         """
-        self._p_wave_velocity =  np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
                             self.shear_modulus) / self.density)
-        return self._p_wave_velocity
+
 
     @material_property
     def bulk_sound_velocity(self):
@@ -366,8 +366,8 @@ class Composite(Material):
         Returns bulk sound speed of the composite [m/s]
         Aliased with self.v_phi
         """
-        self._bulk_sound_velocity =  np.sqrt(self.adiabatic_bulk_modulus / self.density)
-        return self._bulk_sound_velocity
+        return  np.sqrt(self.adiabatic_bulk_modulus / self.density)
+  
 
     @material_property
     def shear_wave_velocity(self):
@@ -375,8 +375,8 @@ class Composite(Material):
         Returns shear wave speed of the composite [m/s]
         Aliased with self.v_s
         """
-        self._shear_wave_velocity = np.sqrt(self.shear_modulus / self.density)
-        return self._shear_wave_velocity
+        return np.sqrt(self.shear_modulus / self.density)
+
 
     @material_property
     def grueneisen_parameter(self):
@@ -384,8 +384,8 @@ class Composite(Material):
         Returns grueneisen parameter of the composite [unitless]
         Aliased with self.gr
         """
-        self._grueneisen_paramteer = self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
-        return self._grueneisen_parameter
+        return self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
+
 
 
     @material_property
@@ -396,9 +396,8 @@ class Composite(Material):
         """
         V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
         alphas = np.array([phase.thermal_expansivity for phase in self.phases])
-        
-        self._thermal_expansivity = self.averaging_scheme.average_thermal_expansivity(volumes,alphas)
-        return self._thermal_expansivity
+        return self.averaging_scheme.average_thermal_expansivity(volumes,alphas)
+
 
     @material_property
     def heat_capacity_v(self):
@@ -407,8 +406,8 @@ class Composite(Material):
         Aliased with self.C_v
         """
         c_v = np.array([phase.heat_capacity_v for phase in self.phases])
-        self._heat_capacity_v = self.averaging_scheme.averaging_heat_capacity_v(self.molar_fractions,c_v)
-        return self._heat_capacity_v
+        return self.averaging_scheme.averaging_heat_capacity_v(self.molar_fractions,c_v)
+
 
     @material_property
     def heat_capacity_p(self):
@@ -417,8 +416,8 @@ class Composite(Material):
         Aliased with self.C_p
         """
         c_p = np.array([phase.heat_capacity_v for phase in self.phases])
-        self._heat_capacity_p = self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
-        return self._heat_capacity_p
+        return self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
+
 
 
 

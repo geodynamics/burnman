@@ -167,8 +167,8 @@ class SolidSolution(Mineral):
         Returns excess partial gibbs free energy [J]
         Property specific to solid solutions.
         """
-        self._excess_partial_gibbs = self.solution_model.excess_partial_gibbs_free_energies( self.pressure, self.temperature, self.molar_fractions)
-        return self._excess_partial_gibbs
+        return self.solution_model.excess_partial_gibbs_free_energies( self.pressure, self.temperature, self.molar_fractions)
+
 
     @material_property
     def partial_gibbs(self):
@@ -176,8 +176,8 @@ class SolidSolution(Mineral):
         Returns excess partial gibbs free energy [J]
         Property specific to solid solutions.
         """
-        self._partial_gibbs = np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
-        return self._partial_gibbs
+        return np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
+
 
  
     @material_property
@@ -186,8 +186,8 @@ class SolidSolution(Mineral):
         Returns excess gibbs free energy [J]
         Property specific to solid solutions.
         """
-        self._excess_gibbs = self.solution_model.excess_gibbs_free_energy( self.pressure, self.temperature, self.molar_fractions)
-        return self._excess_gibbs
+        return self.solution_model.excess_gibbs_free_energy( self.pressure, self.temperature, self.molar_fractions)
+
     
     @material_property
     def molar_gibbs(self):
@@ -195,8 +195,8 @@ class SolidSolution(Mineral):
         Returns Gibbs free energy of the solid solution [J]
         Aliased with self.gibbs
         """
-        self._molar_gibbs= sum([ self.endmembers[i][0].gibbs * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
-        return self._molar_gibbs
+        return sum([ self.endmembers[i][0].gibbs * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_gibbs
+   
     
     @material_property
     def molar_helmholtz(self):
@@ -213,8 +213,8 @@ class SolidSolution(Mineral):
         """
         Returns molar mass of the solid solution [kg/mol]
         """
-        self._molar_mass = sum([ self.endmembers[i][0].molar_mass*self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        return self._molar_mass
+        return sum([ self.endmembers[i][0].molar_mass*self.molar_fractions[i] for i in range(self.n_endmembers) ])
+
 
     @material_property
     def excess_volume(self):
@@ -222,8 +222,8 @@ class SolidSolution(Mineral):
         Returns excess volume of the solid solution [m^3/mol]
         Specific property for solid solutions
         """
-        self._excess_volume = self.solution_model.excess_volume(self.pressure, self.temperature, self.molar_fractions)
-        return self._excess_volume
+        return self.solution_model.excess_volume(self.pressure, self.temperature, self.molar_fractions)
+
             
     @material_property
     def molar_volume(self):
@@ -231,8 +231,8 @@ class SolidSolution(Mineral):
         Returns molar volume of the solid solution [m^3/mol]
         Aliased with self.V
         """
-        self._molar_volume=sum([ self.endmembers[i][0].molar_volume * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_volume
-        return self._molar_volume
+        return sum([ self.endmembers[i][0].molar_volume * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_volume
+
 
     @material_property
     def density(self):
@@ -240,8 +240,8 @@ class SolidSolution(Mineral):
         Returns density of the solid solution [kg/m^3]
         Aliased with self.rho
         """
-        self._density = self.molar_mass/self.molar_volume
-        return self._density
+        return self.molar_mass/self.molar_volume
+   
 
     @material_property
     def excess_entropy(self):
@@ -249,8 +249,8 @@ class SolidSolution(Mineral):
         Returns excess entropy [J]
         Property specific to solid solutions.
         """
-        self._excess_entropy = self.solution_model.excess_entropy( self.pressure, self.temperature, self.molar_fractions)
-        return self._excess_entropy
+        return self.solution_model.excess_entropy( self.pressure, self.temperature, self.molar_fractions)
+
     
     @material_property
     def molar_entropy(self):
@@ -258,8 +258,8 @@ class SolidSolution(Mineral):
         Returns enthalpy of the solid solution [J]
         Aliased with self.S
         """
-        self._molar_entropy = sum([ self.endmembers[i][0].S * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
-        return self._molar_entropy
+        return sum([ self.endmembers[i][0].S * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
+
 
 
     @material_property
@@ -268,8 +268,8 @@ class SolidSolution(Mineral):
         Returns excess enthalpy [J]
         Property specific to solid solutions.
         """
-        self._excess_enthalpy = self.solution_model.excess_enthalpy( self.pressure, self.temperature, self.molar_fractions)
-        return self._excess_enthalpy
+        return  self.solution_model.excess_enthalpy( self.pressure, self.temperature, self.molar_fractions)
+
     
     @material_property
     def molar_enthalpy(self):
@@ -277,8 +277,8 @@ class SolidSolution(Mineral):
         Returns enthalpy of the solid solution [J]
         Aliased with self.H
         """
-        self._molar_enthalpy = sum([ self.endmembers[i][0].H * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
-        return self._molar_enthalpy
+        return  sum([ self.endmembers[i][0].H * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_enthalpy
+
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -286,8 +286,8 @@ class SolidSolution(Mineral):
         Returns isothermal bulk modulus of the solid solution [Pa]
         Aliased with self.K_T
         """
-        self._isothermal_bulk_modulus = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].K_T)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
-        return self._isothermal_bulk_modulus
+        return self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].K_T)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
+
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -296,10 +296,10 @@ class SolidSolution(Mineral):
         Aliased with self.K_S
         """
         if self.temperature<1e-10:
-            self._adiabatic_bulk_modulus = self.isothermal_bulk_modulus
+            return  self.isothermal_bulk_modulus
         else:
-            self._adiabatic_bulk_modulus = self.isothermal_bulk_modulus*self.heat_capacity_p/self.heat_capacity_v
-        return self._adiabatic_bulk_modulus
+            return  self.isothermal_bulk_modulus*self.heat_capacity_p/self.heat_capacity_v
+
     
     @material_property
     def isothermal_compressibility(self):
@@ -307,8 +307,8 @@ class SolidSolution(Mineral):
         Returns isothermal compressibility of the solid solution (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.K_T
         """
-        self._isothermal_compressibility = 1./self.isothermal_bulk_modulus
-        return self._isothermal_compressibility
+        return 1./self.isothermal_bulk_modulus
+
     
     @material_property
     def adiabatic_compressibility(self):
@@ -316,8 +316,8 @@ class SolidSolution(Mineral):
         Returns adiabatic compressibility of the solid solution (or inverse adiabatic bulk modulus) [1/Pa]
         Aliased with self.K_S
         """
-        self._adiabatic_compressibility = 1./self.adiabatic_bulk_modulus
-        return self._adiabatic_compressibility
+        return 1./self.adiabatic_bulk_modulus
+
     
     @material_property
     def shear_modulus(self):
@@ -327,10 +327,9 @@ class SolidSolution(Mineral):
         """
         G_list = [ self.endmembers[i][0].G for i in range(self.n_endmembers) ]
         if 0.0 in G_list:
-            self._shear_modulus = 0.0
+            return 0.0
         else:
-            self._shear_modulus = self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
-        return self._shear_modulus
+            return self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
 
     
     @material_property
@@ -339,9 +338,9 @@ class SolidSolution(Mineral):
         Returns P wave speed of the solid solution [m/s]
         Aliased with self.v_p
         """
-        self._p_wave_velocity = np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
                              self.shear_modulus) / self.density)
-        return self._p_wave_velocity
+
     
     @material_property
     def bulk_sound_velocity(self):
@@ -349,8 +348,8 @@ class SolidSolution(Mineral):
         Returns bulk sound speed of the solid solution [m/s]
         Aliased with self.v_phi
         """
-        self._bulk_sound_velocity = np.sqrt(self.adiabatic_bulk_modulus / self.density)
-        return self._bulk_sound_velocity
+        return np.sqrt(self.adiabatic_bulk_modulus / self.density)
+
 
     @material_property
     def shear_wave_velocity(self):
@@ -358,8 +357,8 @@ class SolidSolution(Mineral):
         Returns shear wave speed of the solid solution [m/s]
         Aliased with self.v_s
         """
-        self._shear_wave_velocity = np.sqrt(self.shear_modulus / self.density)
-        return self._shear_wave_velocity
+        return np.sqrt(self.shear_modulus / self.density)
+
 
     
     @material_property
@@ -369,10 +368,10 @@ class SolidSolution(Mineral):
         Aliased with self.gr
         """
         if self.temperature<1e-10:
-            self._grueneisen_parameter = float('nan')
+            return float('nan')
         else:
-            self._grueneisen_parameter = self.thermal_expansivity*self.isothermal_bulk_modulus*self.molar_volume/self.heat_capacity_v
-        return self._grueneisen_parameter
+            return self.thermal_expansivity*self.isothermal_bulk_modulus*self.molar_volume/self.heat_capacity_v
+
     
 
     
@@ -382,8 +381,8 @@ class SolidSolution(Mineral):
         Returns thermal expansion coefficient (alpha) of the solid solution [1/K]
         Aliased with self.alpha
         """
-        self._thermal_expansivity = (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        return self._thermal_expansivity
+        return (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+
     
     @material_property
     def heat_capacity_v(self):
@@ -391,8 +390,7 @@ class SolidSolution(Mineral):
         Returns heat capacity at constant volume of the solid solution [J/K/mol]
         Aliased with self.C_v
         """
-        self._heat_capacity_v = self.heat_capacity_p - self.molar_volume*self.temperature*self.thermal_expansivity*self.thermal_expansivity*self.isothermal_bulk_modulus
-        return self._heat_capacity_v
+        return self.heat_capacity_p - self.molar_volume*self.temperature*self.thermal_expansivity*self.thermal_expansivity*self.isothermal_bulk_modulus
     
     @material_property
     def heat_capacity_p(self):
@@ -400,9 +398,8 @@ class SolidSolution(Mineral):
         Returns heat capacity at constant pressure of the solid solution [J/K/mol]
         Aliased with self.C_p
         """
-        self._heat_capacity_p = sum([ self.endmembers[i][0].heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
-        return self._heat_capacity_p
-    
+        return sum([ self.endmembers[i][0].heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+
 
 
 

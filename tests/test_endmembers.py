@@ -8,6 +8,7 @@ import burnman
 from burnman.mineral import Mineral
 from burnman.processchemistry import *
 from util import BurnManTest
+import copy
 
 atomic_masses=read_masses()
 
@@ -65,7 +66,7 @@ class test_endmembers(BurnManTest):
         data = [fo.H, fo.S]
         T_0 = 2000.
         fo.set_state(1.e5, T_0)
-        fo2=fo.copy()
+        fo2=copy.deepcopy(fo)
         fo2.params['T_0'] = T_0
         fo2.params['H_0'] = fo.H
         fo2.params['S_0'] = fo.S

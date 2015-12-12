@@ -137,8 +137,8 @@ class Mineral(Material):
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        self._internal_energy = self.method.internal_energy( self, pressure, temperature, volume, params )
-        return self._internal_energy
+        return self.method.internal_energy( self, pressure, temperature, volume, params )
+
     
     @material_property
     def molar_gibbs(self):
@@ -146,8 +146,8 @@ class Mineral(Material):
         Returns Gibbs free energy of the mineral [J]
         Aliased with self.gibbs
         """
-        self._molar_gibbs = self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._molar_gibbs
+        return self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
+
 
     @material_property
     def molar_helmholtz(self):
@@ -155,16 +155,15 @@ class Mineral(Material):
         Returns Helmholtz free energy of the mineral [J]
         Aliased with self.helmholtz
         """
-        self._molar_helmholtz = self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._molar_helmholtz
+        return self.method.helmholtz_free_energy(self.pressure, self.temperature, self.molar_volume, self.params)
     
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-        self._molar_mass = self.params['molar_mass']
-        return self._molar_mass
+        return self.params['molar_mass']
+
 
     @material_property
     def molar_volume(self):
@@ -172,8 +171,8 @@ class Mineral(Material):
         Returns molar volume of the mineral [m^3/mol]
         Aliased with self.V
         """
-        self._molar_volume=self.method.volume(self.pressure, self.temperature, self.params)
-        return self._molar_volume
+        return self.method.volume(self.pressure, self.temperature, self.params)
+  
 
     @material_property
     def density(self):
@@ -181,8 +180,8 @@ class Mineral(Material):
         Returns density of the mineral [kg/m^3]
         Aliased with self.rho
         """
-        self._density = self.molar_mass/self.molar_volume
-        return self._density
+        return self.molar_mass/self.molar_volume
+
 
     @material_property
     def molar_entropy(self):
@@ -190,8 +189,8 @@ class Mineral(Material):
         Returns enthalpy of the mineral [J]
         Aliased with self.S
         """
-        self._molar_entropy = self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._molar_entropy
+        return self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params)
+
 
     @material_property
     def molar_enthalpy(self):
@@ -199,8 +198,8 @@ class Mineral(Material):
         Returns enthalpy of the mineral [J]
         Aliased with self.H
         """
-        self._molar_enthalpy = self.method.enthalpy(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._molar_enthalpy
+        return self.method.enthalpy(self.pressure, self.temperature, self.molar_volume, self.params)
+
 
 
     @material_property
@@ -209,8 +208,8 @@ class Mineral(Material):
         Returns isothermal bulk modulus of the mineral [Pa]
         Aliased with self.K_T
         """
-        self._isothermal_bulk_modulus = self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._isothermal_bulk_modulus
+        return  self.method.isothermal_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
+
 
 
     @material_property
@@ -219,8 +218,7 @@ class Mineral(Material):
         Returns adiabatic bulk modulus of the mineral [Pa]
         Aliased with self.K_S
         """
-        self._adiabatic_bulk_modulus = self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._adiabatic_bulk_modulus
+        return self.method.adiabatic_bulk_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
 
     @material_property
     def isothermal_compressibility(self):
@@ -228,8 +226,8 @@ class Mineral(Material):
         Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_T
         """
-        self._isothermal_compressibility = 1./self.isothermal_bulk_modulus
-        return self._isothermal_compressibility
+        return 1./self.isothermal_bulk_modulus
+
 
     @material_property
     def adiabatic_compressibility(self):
@@ -237,8 +235,7 @@ class Mineral(Material):
         Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus) [1/Pa]
         Aliased with self.beta_S
         """
-        self._adiabatic_compressibility = 1./self.adiabatic_bulk_modulus
-        return self._adiabatic_compressibility
+        return 1./self.adiabatic_bulk_modulus
 
 
     @material_property
@@ -247,8 +244,7 @@ class Mineral(Material):
         Returns shear modulus of the mineral [Pa]
         Aliased with self.G
         """
-        self._shear_modulus = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._shear_modulus
+        return self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
 
     @material_property
     def p_wave_velocity(self):
@@ -256,9 +252,9 @@ class Mineral(Material):
         Returns P wave speed of the mineral [m/s]
         Aliased with self.v_p
         """
-        self._p_wave_velocity = np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
+        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
                              self.shear_modulus) / self.density)
-        return self._p_wave_velocity
+
 
     @material_property
     def bulk_sound_velocity(self):
@@ -266,8 +262,8 @@ class Mineral(Material):
         Returns bulk sound speed of the mineral [m/s]
         Aliased with self.v_phi
         """
-        self._bulk_sound_velocity = np.sqrt(self.adiabatic_bulk_modulus / self.density)
-        return self._bulk_sound_velocity
+        return np.sqrt(self.adiabatic_bulk_modulus / self.density)
+ 
 
     @material_property
     def shear_wave_velocity(self):
@@ -275,8 +271,8 @@ class Mineral(Material):
         Returns shear wave speed of the mineral [m/s]
         Aliased with self.v_s
         """
-        self._shear_wave_velocity = np.sqrt(self.shear_modulus / self.density)
-        return self._shear_wave_velocity
+        return np.sqrt(self.shear_modulus / self.density)
+
 
     @material_property
     def grueneisen_parameter(self):
@@ -284,8 +280,8 @@ class Mineral(Material):
         Returns grueneisen parameter of the mineral [unitless]
         Aliased with self.gr
         """
-        self._grueneisen_parameter = self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
-        return self._grueneisen_parameter
+        return self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
+
 
 
     @material_property
@@ -294,8 +290,8 @@ class Mineral(Material):
         Returns thermal expansion coefficient (alpha) of the mineral [1/K]
         Aliased with self.alpha
         """
-        self._thermal_expansivity = self.method.thermal_expansivity(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._thermal_expansivity
+        return self.method.thermal_expansivity(self.pressure, self.temperature, self.molar_volume , self.params)
+
 
     @material_property
     def heat_capacity_v(self):
@@ -303,8 +299,8 @@ class Mineral(Material):
         Returns heat capacity at constant volume of the mineral [J/K/mol]
         Aliased with self.C_v
         """
-        self._heat_capacity_v = self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._heat_capacity_v
+        return self.method.heat_capacity_v(self.pressure, self.temperature, self.molar_volume , self.params)
+
 
     @material_property
     def heat_capacity_p(self):
@@ -312,8 +308,8 @@ class Mineral(Material):
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
         Aliased with self.C_p
         """
-        self._heat_capacity_p = self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume , self.params)
-        return self._heat_capacity_p
+        return self.method.heat_capacity_p(self.pressure, self.temperature, self.molar_volume , self.params)
+
 
 
 
