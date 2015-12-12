@@ -95,6 +95,7 @@ class HelperSpinTransition(Material):
         pressure, and the thermoelastic parameters for hs_mat
         above the transition pressure
         """
+        Material.__init__(self)
         self.transition_pressure = transition_pressure
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
@@ -141,6 +142,7 @@ class HelperFeDependent(Material):
     """
 
     def __init__(self, iron_number_with_pt, idx):
+        Material.__init__(self)
         self.iron_number_with_pt = iron_number_with_pt
         self.which_index = idx  # take input 0 or 1 from iron_number_with_pt()
         self.method = None
