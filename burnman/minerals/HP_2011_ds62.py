@@ -37,7 +37,7 @@ class CFMASO_garnet(SolidSolution):
                                    [5.e3, 37.24e3],
                                    [2.e3]]
         SolidSolution.__init__(self, molar_fractions)
-	
+        
 
 """
 ENDMEMBERS
