@@ -5,6 +5,22 @@ from __future__ import print_function
 import numpy as np
 import copy
 
+
+def   material_property(func):
+    class mat_obj():
+        def __init__(self, func):
+            self.func = func
+            self.varname = self.func.__name__
+        
+        def get(self, obj):
+            cache_array = getattr(obj, "_cached")
+            if self.varname not in cache_array:
+                cache_array[self.varname] = self.func(obj)
+            return cache_array[self.varname]
+    
+    return property(mat_obj(func).get)
+
+
 class Material(object):
     """
     Base class for all materials. The main functionality is unroll() which
@@ -25,6 +41,7 @@ class Material(object):
     def __init__(self):
         self._pressure = None
         self._temperature = None
+        self._cached = {}
 
     def set_method(self, method):
         """
@@ -79,8 +96,15 @@ class Material(object):
         temperature : float
             The desired temperature in [K].
         """
+        self.reset()
+        
         self._pressure = pressure
         self._temperature = temperature
+    
+    def reset(self):
+        self._cached = {}
+
+    
 
     def unroll(self):
         """
@@ -159,7 +183,7 @@ class Material(object):
         """
         return self._temperature
  
-    @property
+    @material_property
     def internal_energy(self):
         """
         Returns internal energy of the mineral [J]
@@ -176,7 +200,7 @@ class Material(object):
         raise NotImplementedError("need to implement internal_energy() in derived class!")
         return None
     
-    @property
+    @material_property
     def molar_gibbs(self):
         """
         Returns Gibbs free energy of the mineral [J]
@@ -193,7 +217,7 @@ class Material(object):
         raise NotImplementedError("need to implement molar_gibbs() in derived class!")
         return None
     
-    @property
+    @material_property
     def molar_helmholtz(self):
         """
         Returns Helmholtz free energy of the mineral [J]
@@ -210,7 +234,7 @@ class Material(object):
         raise NotImplementedError("need to implement molar_helmholtz() in derived class!")
         return None
 
-    @property
+    @material_property
     def molar_mass(self):
         """
         Returns molar mass of the mineral [kg/mol]
@@ -228,7 +252,7 @@ class Material(object):
         return None
     
     
-    @property
+    @material_property
     def molar_volume(self):
         """
         Returns molar volume of the mineral [m^3/mol]
@@ -245,7 +269,7 @@ class Material(object):
         raise NotImplementedError("need to implement molar_volume() in derived class!")
         return None
 
-    @property
+    @material_property
     def density(self):
         """
         Returns the density of this material.
@@ -265,7 +289,7 @@ class Material(object):
         return None
 
 
-    @property
+    @material_property
     def molar_entropy(self):
         """
         Returns entropy of the mineral [J]
@@ -283,7 +307,7 @@ class Material(object):
         return None
 
 
-    @property
+    @material_property
     def molar_enthalpy(self):
         """
         Returns enthalpy of the mineral [J]
@@ -301,7 +325,7 @@ class Material(object):
         return None
     
     
-    @property
+    @material_property
     def isothermal_bulk_modulus(self):
         """
         Returns isothermal bulk modulus of the mineral [Pa]
@@ -318,7 +342,7 @@ class Material(object):
         raise NotImplementedError("need to implement isothermal_bulk_moduls() in derived class!")
         return None
 
-    @property
+    @material_property
     def adiabatic_bulk_modulus(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
@@ -336,7 +360,7 @@ class Material(object):
         return None
     
     
-    @property
+    @material_property
     def isothermal_compressibility(self):
         """
         Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
@@ -355,7 +379,7 @@ class Material(object):
         return None
     
     
-    @property
+    @material_property
     def adiabatic_compressibility(self):
         """
         Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus) [1/Pa]
@@ -373,7 +397,7 @@ class Material(object):
         raise NotImplementedError("need to implement compressibility() in derived class!")
         return None
 
-    @property
+    @material_property
     def shear_modulus(self):
         """
         Returns shear modulus of the mineral [Pa]
@@ -390,7 +414,7 @@ class Material(object):
         raise NotImplementedError("need to implement shear_modulus() in derived class!")
         return None
     
-    @property
+    @material_property
     def p_wave_velocity(self):
         """
         Returns P wave speed of the mineral [m/s]
@@ -407,7 +431,7 @@ class Material(object):
         raise NotImplementedError("need to implement p_wave_velocity() in derived class!")
         return None
     
-    @property
+    @material_property
     def bulk_sound_velocity(self):
         """
         Returns bulk sound speed of the mineral [m/s]
@@ -424,7 +448,7 @@ class Material(object):
         raise NotImplementedError("need to implement bulk_sound_velocity() in derived class!")
         return None
     
-    @property
+    @material_property
     def shear_wave_velocity(self):
         """
         Returns shear wave speed of the mineral [m/s]
@@ -442,7 +466,7 @@ class Material(object):
         return None
 
 
-    @property
+    @material_property
     def grueneisen_parameter(self):
         """
         Returns grueneisen parameter of the mineral [unitless]
@@ -460,7 +484,7 @@ class Material(object):
         return None
     
     
-    @property
+    @material_property
     def thermal_expansivity(self):
         """
         Returns thermal expansion coefficient of the mineral [1/K]
@@ -478,7 +502,7 @@ class Material(object):
         return None
 
 
-    @property
+    @material_property
     def heat_capacity_v(self):
         """
         Returns heat capacity at constant volume of the mineral [J/K/mol]
@@ -495,7 +519,7 @@ class Material(object):
         raise NotImplementedError("need to implement heat_capacity_v() in derived class!")
         return None
 
-    @property
+    @material_property
     def heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
@@ -532,61 +556,61 @@ class Material(object):
     @property
     def T(self):
         return self.temperature
-    @property
+    @material_property
     def energy(self):
         return self.internal_energy
-    @property
+    @material_property
     def helmholtz(self):
         return self.molar_helmholtz
-    @property
+    @material_property
     def gibbs(self):
         return self.molar_gibbs
-    @property
+    @material_property
     def V(self):
         return self.molar_volume
-    @property
+    @material_property
     def rho(self):
         return self.density
-    @property
+    @material_property
     def S(self):
         return self.molar_entropy
-    @property
+    @material_property
     def H(self):
         return self.molar_enthalpy
-    @property
+    @material_property
     def K_T(self):
         return self.isothermal_bulk_modulus
-    @property
+    @material_property
     def K_S(self):
         return self.adiabatic_bulk_modulus
-    @property
+    @material_property
     def beta_T(self):
         return self.isothermal_compressibility
-    @property
+    @material_property
     def beta_S(self):
         return self.adiabatic_compressibility
-    @property
+    @material_property
     def G(self):
         return self.shear_modulus
-    @property
+    @material_property
     def v_p(self):
         return self.p_wave_velocity
-    @property
+    @material_property
     def v_phi(self):
         return self.bulk_sound_velocity
-    @property
+    @material_property
     def v_s(self):
         return self.shear_wave_velocity
-    @property
+    @material_property
     def gr(self):
         return self.grueneisen_parameter
-    @property
+    @material_property
     def alpha(self):
         return self.thermal_expansivity
-    @property
+    @material_property
     def C_v(self):
         return self.heat_capacity_v
-    @property
+    @material_property
     def C_p(self):
         return self.heat_capacity_p
     

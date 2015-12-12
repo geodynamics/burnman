@@ -121,8 +121,6 @@ class HelperSpinTransition(Material):
         """ return (fractions, minerals) where both are arrays. May depend on current state """
         return ([self.active_mat],[1.0])
 
-    def density(self):
-        return self.active_mat.density()
 
 
 
@@ -172,7 +170,6 @@ class HelperFeDependent(Material):
         """ return (fractions, minerals) where both are arrays. May depend on current state """
         return ([self.endmembers],[1.0])
 
-    def density(self):
-        return self.endmembers.density()
+
 
 
