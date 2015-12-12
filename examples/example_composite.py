@@ -54,11 +54,11 @@ if __name__ == "__main__":
     assemblage=simple_mantle()
 
     assemblage.set_fractions([0.8, 0.2])
-    print assemblage.composition()
+    print(assemblage.composition())
     assemblage.set_state(P, T)
-    print 'Assemblage 1 (endmembers only)'
-    print assemblage.phase_names
-    print ''
+    print('Assemblage 1 (endmembers only)')
+    print(assemblage.phase_names)
+    print('')
 
     olivine=minerals.SLB_2011.mg_fe_olivine()
     orthopyroxene=minerals.SLB_2011.orthopyroxene()
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     assemblage.set_fractions([0.8, 0.2])
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_state(P, T)
-    print 'Assemblage 2 (with solid solutions), method 1'
-    print assemblage.phase_names
-    print ''
+    print('Assemblage 2 (with solid solutions), method 1')
+    print(assemblage.phase_names)
+    print('')
 
     """
     Here's a briefer way of doing the same thing
@@ -87,9 +87,9 @@ if __name__ == "__main__":
     assemblage.set_composition([[0.9,0.1], [0.94, 0.06, 0.0, 0.0]])
     assemblage.set_fractions([0.8, 0.2])
     assemblage.set_state(P, T)
-    print 'Assemblage 2 (with solid solutions), method 2'
-    print assemblage.phase_names
-    print ''
+    print('Assemblage 2 (with solid solutions), method 2')
+    print(assemblage.phase_names)
+    print('')
     '''
     Allow fractions to be set as molar (default), volume or mass
     Volume and mass fractions only possible *after* phase compositions have been set
@@ -97,17 +97,17 @@ if __name__ == "__main__":
     The fractions stored and used by burnman are *always* molar fractions - volume and mass fractions are converted before use. Note that mass fractions will change with set_composition, and volume fractions will change with set_state...
     '''
     assemblage.set_fractions([0.8, 0.2], 'molar')
-    print 'Assemblage composition when molar phase fractions are', assemblage.molar_fractions
-    print assemblage.composition()
-    print ''
+    print('Assemblage composition when molar phase fractions are', assemblage.molar_fractions)
+    print(assemblage.composition())
+    print('')
 
-    print 'Converting between fraction types'
+    print('Converting between fraction types')
     assemblage.set_fractions([0.8, 0.2], 'mass')
-    print 'Molar fractions from mass fractions:', assemblage.molar_fractions
+    print('Molar fractions from mass fractions:', assemblage.molar_fractions)
 
     assemblage.set_fractions([0.8, 0.2], 'volume')
-    print 'Molar fractions from volume fractions:', assemblage.molar_fractions
-    print ''
+    print('Molar fractions from volume fractions:', assemblage.molar_fractions)
+    print('')
 
 
     """
@@ -121,14 +121,14 @@ if __name__ == "__main__":
 
     FMQ=burnman.Composite([fayalite, magnetite, quartz])
     FMQ.set_state(P, T)
-    print 'Chemical potentials for the FMQ buffer at', P/1.e9, "GPa and", T, "K"
-    print FMQ.phase_names
+    print('Chemical potentials for the FMQ buffer at', P/1.e9, "GPa and", T, "K")
+    print(FMQ.phase_names)
     components=['FeO', 'SiO2', 'O2']
 
     for i, component in enumerate(components):
-        print component + ':', FMQ.chemical_potentials(components)[i]/1.e3, 'kJ/mol'
+        print(component + ':', FMQ.chemical_potentials(components)[i]/1.e3, 'kJ/mol')
 
-    print 'log10(fO2):', np.log10(FMQ.fugacity(O2))
+    print('log10(fO2):', np.log10(FMQ.fugacity(O2)))
 
 
 
