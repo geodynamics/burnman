@@ -14,6 +14,7 @@ import warnings
 
 from .material import Material
 from .mineral import Mineral
+from .composite import Composite
 
 
 
@@ -79,7 +80,7 @@ class HelperSolidSolution(Mineral):
 
         Mineral.set_state(self,pressure,temperature)
 
-class HelperSpinTransition(Mineral):
+class HelperSpinTransition(Composite):
     """
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]
@@ -95,41 +96,21 @@ class HelperSpinTransition(Mineral):
         self.transition_pressure = transition_pressure
         self.ls_mat = ls_mat
         self.hs_mat = hs_mat
-        self.active_mat = None
-        Mineral.__init__(self)
+        Composite.__init__(self, [ls_mat, hs_mat])
 
     def debug_print(self, indent=""):
         print("%sHelperSpinTransition:" % indent)
         self.ls_mat.debug_print(indent+"  ")
         self.hs_mat.debug_print(indent+"  ")
 
-    def set_method(self, method):
-        self.ls_mat.set_method(method)
-        self.hs_mat.set_method(method)
-
     def set_state(self, pressure, temperature):
         if (pressure >= self.transition_pressure):
-            self.active_mat = self.ls_mat
+            Composite.set_fractions(self, [1.0, 0.0])
         else:
-            self.active_mat = self.hs_mat
-        Material.set_state(self, pressure, temperature)
-        self.active_mat.set_state(pressure, temperature)
+            Composite.set_fractions(self, [0.0, 1.0])
 
-    def evaluate(self,vars_list,pressures, temperatures):
-        output = np.empty((len(vars_list),len(pressures)))
-        for i in range(len(pressures)):
-            if (pressures[i] >= self.transition_pressure):
-                self.active_mat = self.ls_mat
-            else:
-                self.active_mat = self.hs_mat
-            self.active_mat.set_state(pressures[i], temperatures[i])
-            for j in range(len(vars_list)):
-                output[j,i]=getattr(self.active_mat,vars_list[j])
-        return output
+        Composite.set_state(self, pressure, temperature)
 
-    def unroll(self):
-        """ return (fractions, minerals) where both are arrays. May depend on current state """
-        return ([self.active_mat],[1.0])
 
 
 
