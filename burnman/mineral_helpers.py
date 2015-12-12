@@ -38,6 +38,7 @@ class HelperSolidSolution(Mineral):
         comes up with a new mineral by doing a weighted arithmetic
         average of the end member minerals
         """
+        Mineral.__init__(self)
         self.endmembers = endmembers
         self.molar_fractions = molar_fractions
         assert(len(endmembers) == len(molar_fractions))
