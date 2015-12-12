@@ -1,4 +1,3 @@
-{'Mg': 2.0, 'Si': 1.2000000000000002, 'O': 4.4}
 Assemblage 1 (endmembers only)
 ['Forsterite', 'Enstatite']
 
@@ -9,7 +8,6 @@ Assemblage 2 (with solid solutions), method 2
 ['olivine', 'orthopyroxene']
 
 Assemblage composition when molar phase fractions are [0.8, 0.2]
-{'Mg': 1.8160000000000003, 'Ca': 0.0, 'Al': 0.0, 'O': 4.4, 'Si': 1.2000000000000002, 'Fe': 0.18400000000000002}
 
 Converting between fraction types
 Molar fractions from mass fractions: [0.8477066923291057, 0.15229330767089438]

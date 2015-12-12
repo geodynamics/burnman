@@ -56,7 +56,7 @@ if __name__ == "__main__":
     assemblage=simple_mantle()
 
     assemblage.set_fractions([0.8, 0.2])
-    print(assemblage.composition())
+    #print(assemblage.composition())
     assemblage.set_state(P, T)
     print('Assemblage 1 (endmembers only)')
     print(assemblage.phase_names)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     '''
     assemblage.set_fractions([0.8, 0.2], 'molar')
     print('Assemblage composition when molar phase fractions are', assemblage.molar_fractions)
-    print(assemblage.composition())
+    #print(assemblage.composition())
     print('')
 
     print('Converting between fraction types')
