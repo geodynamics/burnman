@@ -128,12 +128,12 @@ if __name__ == "__main__":
             shear_velocity = np.empty_like(radii)    
 
             for i in range(len(radii)):
-                density = vp = vs = vphi = K = G = 0.
+                density = vs = vphi = 0.
 
                 if radii[i] > self.cmb:
-                    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(self.mantle, np.array([pressures[i]]), np.array([temperatures[i]]))
+                    density, vs, vphi = self.mantle.evaluate(['density','v_s','v_phi'],[pressures[i]], [temperatures[i]])
                 else:
-                    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(self.core, np.array([pressures[i]]), np.array([temperatures[i]]))
+                    density, vs, vphi = self.core.evaluate(['density','v_s','v_phi'],[pressures[i]], [temperatures[i]])
  
                 rho[i] = density
                 bulk_sound_speed[i] = vphi

@@ -12,6 +12,7 @@ from __future__ import print_function
 import numpy as np
 import warnings
 
+
 from .material import Material
 from .mineral import Mineral
 
@@ -127,7 +128,7 @@ class HelperSpinTransition(Material):
 
 
 
-class HelperFeDependent(Material):
+class HelperFeDependent(Mineral):
 
     """
     This material is deprecated!

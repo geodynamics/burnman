@@ -123,12 +123,8 @@ if __name__ == "__main__":
     print("Calculations are done for:")
     rock.debug_print()
 
-    moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
-    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.VoigtReussHill())
-    mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
-    mat_K = np.array([m.K for m in moduli])
-    mat_G = np.array([m.G for m in moduli])
-    mat_rho = np.array([m.rho for m in moduli])
+
+    mat_rho, mat_vp, mat_vphi, mat_vs, mat_K, mat_G = rock.evaluate(['density','v_p','v_phi','v_s','K_S','G'],seis_p,temperature)
 
     [vs_err, vphi_err, rho_err] = burnman.compare_chifactor (
         [mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])

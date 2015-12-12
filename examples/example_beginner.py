@@ -80,16 +80,13 @@ if __name__ == "__main__":
     # geotherm for mapping pressure to temperature
     temperature = burnman.geotherm.brown_shankland(pressure)
 
-    # Here is the step which does the heavy lifting.  burnman.velocities_from_rock
+    # Here is the step which does the heavy lifting.  burnman.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,
     # then calculates the elastic moduli and density of each individual phase.  After that,
-    # it performs elastic averaging on the phases to get a single bulk and shear
-    # modulus for the rock.  This averaging scheme defaults to Voigt-Reuss-Hilli,
-    # but see example_averaging.py for other options.  Finally, it calculates the seismic
-    # wave speeds for the whole rock.  It returns a tuple of density, p-wave velocity
-    # s-wave velocity, bulk sound speed, bulk modulus, and shear modulus.
-    #density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
+    # it calcalates all the variables asked for. For the composite a default averaging scheme
+    # of Voigt-Reuss-Hill is used (this can be changes with set_averaging scheme)
     density, vp , vs, vphi = rock.evaluate(['density','v_p','v_s','v_phi'],pressure, temperature)
+
 
     # All the work is done except the plotting!  Here we want to plot the seismic wave
     # speeds and the density against PREM using the matplotlib plotting tools.  We make

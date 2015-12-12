@@ -51,6 +51,8 @@ if __name__ == "__main__":
                                   minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)],\
                                  [phase_fractions_pyro['pv'], phase_fractions_pyro['fp']])
 
+    pyrolite = burnman.Composite([minerals.SLB_2011.mg_fe_perovskite])
+
     #input pressure range for first model.
     seis_p_1 = np.arange(25e9, 125e9, 5e9)
 
@@ -70,11 +72,12 @@ if __name__ == "__main__":
         calculate_phase_percents(weight_percents_enst)
     iron_content = lambda p,t: burnman.calculate_partition_coefficient \
             (p,t,relative_molar_percent_enst, Kd_0)
+    print(iron_content)
     enstatite = burnman.Composite ([minerals.SLB_2005.mg_fe_perovskite_pt_dependent(iron_content,0), \
                                     minerals.SLB_2005.ferropericlase_pt_dependent(iron_content,1)], \
                                    [phase_fractions_enst['pv'], phase_fractions_enst['fp']])
 
-
+    preset_solidsolution=minerals.SLB_2011.mg_fe_perovskite()
     #input second pressure range. Same as the first for comparison
     seis_p_2 = seis_p_1
 
@@ -85,20 +88,19 @@ if __name__ == "__main__":
     #Now we'll calculate the models.
 
 
+    print(pyrolite.density)
 
-
-    mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro, mat_K_pyro, mat_G_pyro = \
-        burnman.velocities_from_rock(pyrolite, seis_p_1, temperature_1, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho_pyro, mat_vp_pyro, mat_vs_pyro, mat_vphi_pyro = \
+        pyrolite.evaluate(['density','v_p','v_s','v_phi'], seis_p_1,temperature_1)
 
     print("Calculations are done for:")
     pyrolite.debug_print()
 
 
 
-    mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst, mat_K_enst, mat_G_enst = \
-        burnman.velocities_from_rock(enstatite, seis_p_2, temperature_2, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho_enst, mat_vp_enst, mat_vs_enst, mat_vphi_enst = \
+        enstatite.evaluate(['density','v_p','v_s','v_phi'], seis_p_2,temperature_2)
+
 
     print("Calculations are done for:")
     enstatite.debug_print()
