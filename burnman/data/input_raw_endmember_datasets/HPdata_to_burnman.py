@@ -109,18 +109,16 @@ for i in range(int(ds[0][0])):
         if M.flag==0:
             print '            \'molar_mass\': formula_mass(formula, atomic_masses)}'
         else:
-            print '            \'molar_mass\': formula_mass(formula, atomic_masses),'
+            print '        self.property_modifiers = [['
         if M.flag==1:
-            print '            \'landau_Tc\':', M.od[0], ','
-            print '            \'landau_Smax\':', M.od[1]*1e3, ','
-            print '            \'landau_Vmax\':', M.od[2]*1e-5, '}'
+            print '            \'landau_hp\', {\'Tc\':', M.od[0], ', \'S_D\':', M.od[1]*1e3, ', \'V_D\':', M.od[2]*1e-5, '}]]'
         if M.flag==2:
-            print '            \'BW_deltaH\':', M.od[0]*1e3, ','
-            print '            \'BW_deltaV\':', M.od[1]*1e-5, ','
-            print '            \'BW_W\':', M.od[2]*1e3, ','
-            print '            \'BW_Wv\':', M.od[3]*1e-5, ','
-            print '            \'BW_n\':', M.od[4], ','
-            print '            \'BW_factor\':', M.od[5], '}'
+            print '            \'bragg_williams\', {\'deltaH\':', M.od[0]*1e3, ','
+            print '                               \'deltaV\':', M.od[1]*1e-5, ','
+            print '                               \'W\':', M.od[2]*1e3, ','
+            print '                               \'Wv\':', M.od[3]*1e-5, ','
+            print '                               \'n\':', M.od[4], ','
+            print '                               \'factor\':', M.od[5], '}]]'
         print '        Mineral.__init__(self)'
         print ''
 print ''
