@@ -132,6 +132,7 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)
         self.method = self.endmembers[0][0].method
+        self.reset()
 
 
     def set_state(self, pressure, temperature):
@@ -141,14 +142,6 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
-
-
-
-    def calcgibbs(self, pressure, temperature, molar_fractions): 
-        return sum([ self.endmembers[i][0].calcgibbs(pressure, temperature) * molar_fractions[i] for i in range(self.n_endmembers) ]) + self.solution_model.excess_gibbs_free_energy( pressure, temperature, molar_fractions)
-
-    def calcpartialgibbsexcesses(self, pressure, temperature, molar_fractions):
-        return self.solution_model.excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions)
 
 
     @material_property
