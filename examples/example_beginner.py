@@ -18,7 +18,7 @@ for visual comparison.
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.material.evaluate`
 
 
 *Demonstrates:*

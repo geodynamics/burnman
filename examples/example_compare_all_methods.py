@@ -76,9 +76,8 @@ if __name__ == "__main__":
         print("Calculations are done for:")
         rock.debug_print()
 
-        mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+        mat_rho_1, mat_vs_1, mat_vphi_1 = \
+            rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
         ##Now let's plot the comparison. You can conversely just output to a data   file
         #(see example_woutput.py)

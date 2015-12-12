@@ -37,7 +37,7 @@ if __name__ == "__main__":
                                  [amount_perovskite, 1.0-amount_perovskite])
 
 
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
+        mat_rho, mat_vp, mat_vs = rock.evaluate(['density','v_phi','v_s'], seis_p,temperature)
         return mat_vp, mat_vs, mat_rho
 
     def error(a,b,c):

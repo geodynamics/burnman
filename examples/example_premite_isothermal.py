@@ -42,7 +42,8 @@ def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
     rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
+    mat_rho, mat_vphi, mat_vs = \
+        rock.evaluate(['density','v_phi','v_s'],seis_p,temperature)
 
     return mat_rho, mat_vphi, mat_vs
 
