@@ -248,16 +248,15 @@ class Composite(Material):
         Aliased with self.V
         """
         volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
-        self._molar_volume = np.sum(volumes)
-        return self._molar_volume
+        return  np.sum(volumes)
     
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the composite [kg/mol]
         """
-        self._molar_mass = sum([ phase.molar_mass*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
-        return self._molar_mass
+        return sum([ phase.molar_mass*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+
 
     @material_property
     def density(self):
@@ -267,8 +266,8 @@ class Composite(Material):
         """
         densities = np.array([phase.density for phase in self.phases])
         volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
-        self._density = self.averaging_scheme.average_density(volumes,densities)
-        return self._density
+        return  self.averaging_scheme.average_density(volumes,densities)
+
             
     @material_property
     def molar_entropy(self):
