@@ -559,9 +559,8 @@ def voigt_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    V_i = phase_volume
-    V_tot = sum(V_i)
-    X_voigt = sum(V_i[i]/V_tot * X[i] for i in range(len(phase_volume)))
+    vol_frac = phase_volume/np.sum(phase_volume)
+    X_voigt = sum( f*x for f,x in zip(vol_frac, X))
     return X_voigt
 
 
@@ -572,13 +571,12 @@ def reuss_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    V_i = phase_volume
-    V_tot = sum(V_i)
-    if (min(X)<=0.0):
-        X_reuss = 0.0
-        warnings.warn("Oops, called reuss_average with Xi<=0!")
-    else:
-        X_reuss = 1./sum(V_i[i]/V_tot* 1./X[i] for i in range(len(phase_volume)))
+    vol_frac = phase_volume/np.sum(phase_volume)
+    for f,x in zip(vol_frac,X):
+        if x <= 0 and np.abs(f) > np.finfo(float).eps :
+            warnings.warn("Oops, called reuss_average with Xi<=0!")
+            return 0.0
+    X_reuss = 1./sum( f/x for f,x in zip(vol_frac, X))
     return X_reuss
 
 
