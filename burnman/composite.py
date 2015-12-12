@@ -113,9 +113,7 @@ class Composite(Material):
         """
         Update the material to the given pressure [Pa] and temperature [K].
         """
-        self.reset()
-        self._pressure = pressure
-        self._temperature = temperature
+        Material.set_state(self, pressure, temperature)
         for phase in self.phases:
                 phase.set_state(pressure, temperature)
 

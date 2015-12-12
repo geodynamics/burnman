@@ -117,10 +117,7 @@ class Mineral(Material):
 
         This updates the other properties of this class (v_s, v_p, ...).
         """
-        
-        self.reset()
-        self._pressure = pressure
-        self._temperature = temperature
+        Material.set_state(self, pressure, temperature)
 
         if self.method is None:
              raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
