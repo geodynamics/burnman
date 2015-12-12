@@ -233,9 +233,9 @@ if __name__ == "__main__":
 
     rock, anchor_t = array_to_rock(fit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'],pressure,temperature)
 
     err_vs, err_vphi, err_rho = burnman.compare_l2(depths/np.mean(depths),
                                                    [vs/np.mean(seis_vs),
@@ -271,9 +271,9 @@ if __name__ == "__main__":
 
     rock, anchor_t = array_to_rock(lit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'],pressure,temperature)
     plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
     plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
     plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)

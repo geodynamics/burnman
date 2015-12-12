@@ -62,8 +62,7 @@ if __name__ == "__main__":
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)
 
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
+        mat_rho, mat_vs, mat_vphi = rock.evaluate(['rho','v_s','v_phi'], seis_p, temperature)
 
         return seis_p, mat_vs, mat_vphi, mat_rho
 

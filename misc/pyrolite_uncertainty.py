@@ -240,8 +240,9 @@ if whattodo=="plotgood":
         rock, anchor_t = array_to_rock(fit, names)
         temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
 
-        rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
+        rho, vs, vphi = rock.evaluate(['rho','v_s','v_phi'], pressure, temperature)
+
 
         print(".")
 
@@ -443,8 +444,8 @@ if whattodo=="plotone":
     rock, anchor_t = array_to_rock(fit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
 
-    rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
+    rho, vs, vphi = rock.evaluate(['rho','v_s','v_phi'], pressure, temperature)
 
     err_vs, err_vphi, err_rho = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))
@@ -477,8 +478,9 @@ if whattodo=="plotone":
     rock, anchor_t = array_to_rock(lit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
 
-    rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
+    rho, vs, vphi = rock.evaluate(['rho','v_s','v_phi'], pressure, temperature)
+
     plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
     plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
     plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)
@@ -514,8 +516,9 @@ if whattodo=="run":
       temperature = burnman.geotherm.adiabatic(pressure, anchor_temperature, pyrolite)
 
       #calculate the seismic observables
-      rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(pyrolite, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+      rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
+      rho, vs, vphi = pyrolite.evaluate(['rho','v_s','v_phi'], pressure, temperature)
+
 
       #estimate the misfit with the seismic model
       err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
@@ -559,8 +562,9 @@ elif whattodo=="error":
     rock, anchor_t = array_to_rock(values, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
 
-    rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
+    rho, vs, vphi = rock.evaluate(['rho','v_s','v_phi'], pressure, temperature)
+
 
     err_rho, err_vphi, err_vs = burnman.compare_l2(depths/np.mean(depths), vs/np.mean(seis_vs), vphi/np.mean(seis_vphi), \
         rho/np.mean(seis_rho), seis_vs/np.mean(seis_vs), seis_vphi/np.mean(seis_vphi), seis_rho/np.mean(seis_rho))

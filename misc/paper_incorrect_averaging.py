@@ -144,10 +144,14 @@ if __name__ == "__main__":
     preferred_mixture.set_method(method)
 
 
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = burnman.velocities_from_rock(perovskitite,seis_p, temperature_bs)
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = burnman.velocities_from_rock(periclasite,seis_p, temperature_bs)
-    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = burnman.velocities_from_rock(pyrolite,seis_p, temperature_bs)
-    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = burnman.velocities_from_rock(preferred_mixture,seis_p, temperature_bs)
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
+        perovskitite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p,temperature_bs)
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = \
+        periclasite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p,temperature_bs)
+    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = \
+        pyrolite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p, temperature_bs)
+    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = \
+        preferred_mixture.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p, temperature_bs)
 
 
 
