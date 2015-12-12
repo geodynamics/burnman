@@ -53,6 +53,9 @@ class composite(BurnManTest):
 
     def test_changevalues(self):
         class mycomposite(burnman.Material):
+            def __init__(self):
+                burnman.Material.__init__(self)
+
             def unroll(self):
                 fractions = [0.3, 0.7]
                 mins = [minerals.Murakami_etal_2012.fe_periclase(), minerals.SLB_2005.periclase()]
@@ -73,6 +76,9 @@ class composite(BurnManTest):
 
     def test_number(self):
         class mycomposite(burnman.Material):
+            def __init__(self):
+                burnman.Material.__init__(self)
+
             def unroll(self):
                 if (self.temperature>500):
                     return ([minerals.Murakami_etal_2012.fe_periclase()],[1.0])

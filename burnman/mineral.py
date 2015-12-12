@@ -41,14 +41,15 @@ class Mineral(Material):
     """
 
     def __init__(self):
+        Material.__init__(self)
         if 'params' not in self.__dict__:
             self.params = {}
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
         if 'name' in self.params:
-            self.name=self.params['name']
-        Material.__init__(self)
+            self.name = self.params['name']
+
 
 
 

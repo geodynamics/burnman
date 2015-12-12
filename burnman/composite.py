@@ -48,18 +48,17 @@ class Composite(Material):
             molar fraction for each phase.
         """
 
-        
+        Material.__init__(self)
+
         assert(len(phases)>0)
         self.phases = phases
-        
+
         if fractions is not None:
             self.set_fractions(fractions, fraction_type)
         else:
             self.molar_fractions=None
 
         self.set_averaging_scheme('VoigtReussHill')
-
-        Material.__init__(self)
 
 
     def set_fractions(self, fractions, fraction_type='molar'):

@@ -23,6 +23,9 @@ def material_property(func):
             self.varname = self.func.__name__
         
         def get(self, obj):
+            if not hasattr(obj,"_cached"):
+                raise Exception("The material_property decorator could not find class member _cached. "
+                                "Did you forget to call Material.__init__(self) in __init___?")
             cache_array = getattr(obj, "_cached")
             if self.varname not in cache_array:
                 cache_array[self.varname] = self.func(obj)
@@ -51,7 +54,25 @@ class Material(object):
     def __init__(self):
         self._pressure = None
         self._temperature = None
+        if not hasattr(self, "name"):
+            # if a derived class decides to set .name before calling this
+            # constructor (I am looking at you, SLB_2011.py!), do not
+            # overwrite the name here.
+            self.name = self.__class__.__name__
         self._cached = {}
+
+    @property
+    def name(self):
+        """ Human-readable name of this material.
+
+        By default this will return the name of the class, but it can be set
+        to an arbitrary string. Overriden in Mineral.
+        """
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     def set_method(self, method):
         """
@@ -73,7 +94,7 @@ class Material(object):
         name : string
             Name of this material.
         """
-        return "'" + self.__class__.__name__ + "'"
+        return "'" + self.name + "'"
 
     def debug_print(self, indent=""):
         """
@@ -106,6 +127,9 @@ class Material(object):
         temperature : float
             The desired temperature in [K].
         """
+        if not hasattr(self, "_pressure"):
+            raise Exception("Material.set_state() could not find class member _pressure. "
+                            "Did you forget to call Material.__init__(self) in __init___?")
         self.reset()
         
         self._pressure = pressure

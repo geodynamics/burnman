@@ -16,6 +16,7 @@ from test_tools import *
 from test_minerals import *
 from test_seismic import *
 from test_decorators import *
+from test_material import *
 
 
 import os, sys
