@@ -11,11 +11,6 @@ from util import BurnManTest
 
 class Modifiers(BurnManTest):
     def test_excess_functions(self):
-        dT = 1.
-        dP = 1000.
-        P = 1.e5
-        T = 1000.
-        
         dqf_params = {'H': 1200., 'S': 5., 'V': 1.e-7}
         landau_params = {'Tc_0': 800., 'S_D': 5., 'V_D': 1.e-7}
         landau_params_2 = {'Tc_0': 1200., 'S_D': 5., 'V_D': 1.e-7}
@@ -31,7 +26,13 @@ class Modifiers(BurnManTest):
         bragg_williams_excesses=[]
         magnetic_excesses=[]
         magnetic_excesses_2=[]
+
+        P = 1.e11
+        T = 1000.
         
+        dP = 1000.
+        dT = 1.
+
         pressures = [P-dP, P, P+dP]
         temperatures = [T-dT, T, T+dT]
         for P in pressures:
