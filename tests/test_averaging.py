@@ -146,13 +146,13 @@ class Reuss(BurnManTest):
         self.assertFloatEqual(153.452, G[0]/1.e9)
 
     def test_non_present_non_rigid_phase(self):
-        rock = burnman.Composite ( [1.0, 0.0], [mypericlase(), my_nonrigid_mineral()] )
+        rock = burnman.Composite ( [mypericlase(), my_nonrigid_mineral()], [1.0, 0.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Reuss())
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def test_present_non_rigid_phase(self):
-        rock = burnman.Composite ( [0.5, 0.5], [mypericlase(), my_nonrigid_mineral()] )
+        rock = burnman.Composite ( [mypericlase(), my_nonrigid_mineral()], [0.5,0.5] )
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("ignore")
             rho, v_p, v_s, v_phi, K, G = \
