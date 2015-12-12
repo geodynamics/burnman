@@ -124,10 +124,6 @@ class Mineral(Material):
         if self.method is None:
              raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
-
-
-    def composition(self):
-        return self.params['formula']
     
     @material_property
     def internal_energy(self):

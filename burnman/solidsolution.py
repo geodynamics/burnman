@@ -75,22 +75,10 @@ class SolidSolution(Mineral):
         # Number of endmembers in the solid solution
         self.n_endmembers = len(self.endmembers)
 
-        # Endmember names
-        self.endmember_names = []
-        for i in range(self.n_endmembers):
-            self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])
-            try:
-                self.endmember_names.append(self.endmembers[i][0].params['name'])
-            except AttributeError:
-                self.endmember_names.append('')
-
         # Equation of state
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(self.endmembers[i][0].params['equation_of_state'])
 
-        # Endmember compositions
-        self.endmember_compositions=[self.endmembers[i][0].composition() for i in range(self.n_endmembers)]
-        
         # Molar fractions
         if molar_fractions is not None:
             self.set_composition(molar_fractions)
@@ -117,17 +105,7 @@ class SolidSolution(Mineral):
         assert(sum(molar_fractions) < 1.0001)
         self.molar_fractions = molar_fractions 
 
-        # solid solution composition
-    def composition(self):
-        bulk_composition=dict()
-        for i, mbr_composition in enumerate(self.endmember_compositions):
-            for element in mbr_composition:
-                if element not in bulk_composition:
-                    bulk_composition[element] = self.molar_fractions[i]*mbr_composition[element]
-                else:
-                    bulk_composition[element] += self.molar_fractions[i]*mbr_composition[element]
-        return bulk_composition
-                    
+
     def set_method(self, method):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)

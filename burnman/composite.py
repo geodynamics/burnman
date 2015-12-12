@@ -52,13 +52,6 @@ class Composite(Material):
         assert(len(phases)>0)
         self.phases = phases
         
-        self.phase_names = []
-        for i in range(len(self.phases)):
-            try:
-                self.phase_names.append(self.phases[i].name)
-            except AttributeError:
-                self.phase_names.append('')
-
         if fractions is not None:
             self.set_fractions(fractions, fraction_type)
         else:
@@ -90,21 +83,12 @@ class Composite(Material):
             molar_fractions = fractions
         elif fraction_type == 'mass':
             molar_fractions = self._mass_to_molar_fractions(self.phases, fractions)
-        elif fraction_type == 'volume':
-            molar_fractions = self._volume_to_molar_fractions(self.phases, fractions)
         else:
-            raise Exception("Fraction type not recognised. Please use 'molar', 'mass' or 'volume'")
-
+            raise Exception("Fraction type not recognised. Please use 'molar' or mass")
            
         # Set minimum value of a molar fraction at 0.0 (rather than -1.e-12)
         self.molar_fractions = [max(0.0, fraction) for fraction in molar_fractions]  
 
-    def set_composition(self, phase_compositions):
-        assert(len(self.phases)==len(phase_compositions))
-        for i, composition in enumerate(phase_compositions):
-            if composition != []:
-                self.phases[i].set_composition(composition)
-            
 
     def set_method(self, method):
         """
@@ -125,6 +109,7 @@ class Composite(Material):
         else:
             self.averaging_scheme = averaging_scheme
 
+
     def set_state(self, pressure, temperature):
         """
         Update the material to the given pressure [Pa] and temperature [K].
@@ -136,18 +121,6 @@ class Composite(Material):
                 phase.set_state(pressure, temperature)
 
             
-    def composition(self):
-        self.phase_compositions=[self.phases[i].composition() for i in range(len(self.phases))]
-        bulk_composition=dict()
-        for i, composition in enumerate(self.phase_compositions):
-            for element in composition:
-                if element not in bulk_composition:
-                    bulk_composition[element] = self.molar_fractions[i]*composition[element]
-                else:
-                    bulk_composition[element] += self.molar_fractions[i]*composition[element]
-        return bulk_composition
-            
-
     def debug_print(self, indent=""):
         print("%sComposite:" % indent)
         indent += "  "
@@ -178,41 +151,6 @@ class Composite(Material):
         return the name of the composite
         """
         return "'" + self.__class__.__name__ + "'"
-
-    def evaluate_phase_properties(self,vars_list):
-        values = np.empty((len(vars_list),len(self.phases)))
-        for v,var in enumerate(vars_list):
-            for p,phase in enumerate(self.phases):
-                values[v,p] = getattr(phase.var)()
-
-
-
-    def calculate_elastic_properties(self, averaging_scheme=averaging_schemes.VoigtReussHill()):
-        """
-        Calculates the seismic velocities of the Assemblage, using
-        an averaging scheme for the velocities of individual phases
-
-        :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
-        :param averaging_scheme: Averaging scheme to use.
-
-        :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
-        :rtype: lists of floats
-
-        """
-        moduli = [self._calculate_moduli()]
-        moduli = burnman.average_moduli(moduli, averaging_scheme)[0]
-        self.Vp, self.Vs, self.Vphi = burnman.compute_velocity(moduli)
-        self.rho = moduli.rho
-        self.K = moduli.K
-        self.G = moduli.G
-
-    def chemical_potentials(self, component_formulae):
-        component_formulae_dict=[chemicalpotentials.dictionarize_formula(f) for f in component_formulae]
-        return chemicalpotentials.chemical_potentials(self.phases, component_formulae_dict)
-
-    def fugacity(self, standard_material):
-        return chemicalpotentials.fugacity(standard_material, self.phases)
-
 
     @material_property
     def internal_energy(self):
@@ -415,60 +353,6 @@ class Composite(Material):
         return self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
 
 
-
-
-
-
-    def _calculate_moduli(self):
-        """
-        REWRITE to evaluate endmembers????
-        Calculate the elastic moduli and densities of the individual phases in the assemblage.
-
-        :returns:
-        answer -- an array of (n_evaluation_points by n_phases) of
-        elastic_properties(), so the result is of the form
-        answer[pressure_idx][phase_idx].V
-        :rtype: list of list of :class:`burnman.elastic_properties`
-        """
-        elastic_properties_of_phases = []
-        (minerals, molar_fractions) = self.unroll()
-        volume_fractions = self._molar_to_volume_fractions(minerals, molar_fractions)
-
-        for (mineral, volume_fraction) in zip(minerals, volume_fractions):
-
-            e = burnman.ElasticProperties()
-            e.V = volume_fraction * mineral.molar_volume
-            e.K = mineral.adiabatic_bulk_modulus()
-            e.G = mineral.shear_modulus()
-            e.rho = mineral.molar_mass / mineral.molar_volume
-            e.fraction = volume_fraction
-            elastic_properties_of_phases.append(e)
-
-        return elastic_properties_of_phases
-
-    def _molar_to_volume_fractions(self, minerals, molar_fractions):
-        total_volume=0.
-        try:
-            for i, mineral in enumerate(minerals):
-                total_volume+=molar_fractions[i]*mineral.V
-            volume_fractions=[]
-            for i, mineral in enumerate(minerals):
-                volume_fractions.append(molar_fractions[i]*mineral.V/total_volume)
-        except AttributeError:
-            raise Exception("Volume fractions cannot be set before set_state.")
-    
-        return volume_fractions
-
-    def _volume_to_molar_fractions(self, minerals, volume_fractions):
-        total_moles=0.
-        for i, mineral in enumerate(minerals):
-            total_moles+=volume_fractions[i]/mineral.V
-        molar_fractions=[]
-        for i, mineral in enumerate(minerals):
-            molar_fractions.append(volume_fractions[i]/(mineral.V*total_moles))
-            
-        return molar_fractions
-
     def _mass_to_molar_fractions(self, minerals, mass_fractions):
         total_moles=0.
         try:
@@ -481,6 +365,4 @@ class Composite(Material):
             raise Exception("Mass fractions cannot be set before composition has been set for all the phases in the composite.")
     
         return molar_fractions
-
-
 
