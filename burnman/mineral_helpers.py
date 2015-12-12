@@ -12,14 +12,9 @@ from __future__ import print_function
 import numpy as np
 import warnings
 
-
 from .material import Material
 from .mineral import Mineral
 
-#import burnman.equation_of_state as eos
-#import burnman.birch_murnaghan as bm
-#import burnman.slb as slb
-#import burnman.mie_grueneisen_debye as mgd
 
 
 class HelperSolidSolution(Mineral):
