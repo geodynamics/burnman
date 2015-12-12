@@ -9,6 +9,7 @@ import warnings
 
 from .mineral import Mineral, material_property
 from .solutionmodel import *
+from .averaging_schemes import reuss_average_function
 
 
 
@@ -298,11 +299,8 @@ class SolidSolution(Mineral):
         Returns shear modulus of the solid solution [Pa]
         Aliased with self.G
         """
-        G_list = [ self.endmembers[i][0].G for i in range(self.n_endmembers) ]
-        if 0.0 in G_list:
-            return 0.0
-        else:
-            return self.V * 1./(sum([ self.endmembers[i][0].V / (self.endmembers[i][0].G)  * self.molar_fractions[i] for i in range(self.n_endmembers) ]))
+        G_list = np.fromiter( (e[0].G for e in self.endmembers), dtype=np.float, count=self.n_endmembers)
+        return reuss_average_function( self.molar_fractions, G_list) 
 
     
     @material_property
