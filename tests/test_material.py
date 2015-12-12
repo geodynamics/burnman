@@ -8,8 +8,8 @@ import burnman
 from burnman import minerals
 from util import BurnManTest
 
-# Instantiate every mineral in the mineral library
 class test_material_name(BurnManTest):
+    """ test Material.name and that we can edit and override it in Mineral"""
 
     class min_no_name(burnman.Mineral):
         """
