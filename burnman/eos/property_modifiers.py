@@ -235,24 +235,58 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     used by Chin, Hertzman and Sundman (1987) as reported 
     in the Journal of Phase Equilibria (Sundman, 1991).
     """
-    
-    structural_parameter=mineral.magnetic['magnetic_structural_parameter']
-    tau=temperature/(mineral.magnetic['curie_temperature'][0] + pressure*mineral.magnetic['curie_temperature'][1])
-    magnetic_moment=mineral.magnetic['magnetic_moment'][0] + pressure*mineral.magnetic['magnetic_moment'][1]
 
+    structural_parameter=params['structural_parameter']
+    curie_temperature = params['curie_temperature'][0] + pressure*params['curie_temperature'][1]
+    tau=temperature/curie_temperature
+    dtaudT = 1./(params['curie_temperature'][0] + pressure*params['curie_temperature'][1])
+    dtaudP = (temperature*params['curie_temperature'][1])/(curie_temperature*curie_temperature)
+    d2taudPdT = params['curie_temperature'][1])/(curie_temperature*curie_temperature)
+    d2taudP2 = 2.*temperature*params['curie_temperature'][1]*params['curie_temperature'][1]*pressure) \
+               /(curie_temperature*curie_temperature*curie_temperature) \
+               - (temperature*params['curie_temperature'][1])/(curie_temperature*curie_temperature)
+    magnetic_moment=params['magnetic_moment'][0] + pressure*params['magnetic_moment'][1]
+    dmagnetic_momentdP = params['magnetic_moment'][1]
+    
     A = (518./1125.) + (11692./15975.)*((1./structural_parameter) - 1.)
     if tau < 1: 
-        f=1.-(1./A)*(79./(140.*structural_parameter*tau) + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
+        f = 1. - (1./A)*(79./(140.*structural_parameter*tau)
+                         + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 3.)/6.
+                                                                       + np.power(tau, 9.)/135.
+                                                                       + np.power(tau, 15.)/600.))
+        dfdtau = -(1./A)*( -79./(140.*structural_parameter*tau*tau)
+                       + (474./497.)*(1./structural_parameter - 1.)*(np.power(tau, 2.)/3.
+                                                                     + np.power(tau, 8.)/15.
+                                                                     + np.power(tau, 14.)/40.))
+        d2fdtau2 = -(1./A)*( 2.*79./(140.*structural_parameter*np.power(tau, 3.))
+                             + (474./497.)*(1./structural_parameter - 1.)*(2.*tau/3.
+                                                                           + 8.*np.power(tau, 7.)/15.
+                                                                           + 14.*np.power(tau, 13.)/40.))
+
+        
     else:
-        f=-(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
-
-
+        f = -(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
+        dfdtau = (1./A)*(np.power(tau,-6)/2. + np.power(tau,-16)/21. + np.power(tau, -26)/60.)
+        d2fdtau2 = -(1./A)*(6.*np.power(tau,-7)/2.
+                            + 16.*np.power(tau,-17)/21.
+                            + 26.*np.power(tau, -27)/60.)
+        
+    dfdT = dfdtau*dtaudT
+    d2fdT2 = d2fdtau2*dtaudT
+    dfdP = dfdtau*dtaudP
+    d2fdP2 = d2fdtau2*dtaudP + dfdtau*d2taudP2
+    d2fdPdT = d2fdtau2*dtaudT*dtaudP + dfdtau*d2taudPdT
+        
     G = gas_constant*temperature*np.log(magnetic_moment + 1.)*f
-    dGdT = 0.
-    dGdP = 0.
-    d2GdT2 = 0.
-    d2GdP2 = 0.
-    d2GdPdT = 0.
+    dGdT = gas_constant*np.log(magnetic_moment + 1.)*(f + temperature*dfdT)
+    dGdP = gas_constant*temperature*(f*dmagnetic_momentdP/(magnetic_moment + 1.)
+                                     + dfdP*np.log(magnetic_moment + 1.))
+    d2GdT2 = gas_constant*np.log(magnetic_moment + 1.)*(2.*dfdT + temperature*d2fdT2)
+    d2GdP2 = gas_constant*temperature*(-f*np.power(dmagnetic_momentdP/(magnetic_moment + 1.), 2.)
+                                       + 2*dfdP*dmagnetic_momentdP/(magnetic_moment + 1.)
+                                       + d2fdP2*np.log(magnetic_moment + 1.))
+    d2GdPdT = dGdP/temperature + gas_constant*temperature*np.log(magnetic_moment + 1.)*d2fdPdT \
+              + gas_constant*temperature*dmagnetic_momentdP/(magnetic_moment + 1.)*dfdT 
 
 
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
@@ -309,6 +343,3 @@ def apply_property_modifiers(mineral):
             _modify_properties(mineral, _magnetic_excesses_chs(mineral.pressure, mineral.temperature, modifier[1])
     
     return None
-
-
-
