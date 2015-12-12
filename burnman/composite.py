@@ -52,13 +52,6 @@ class Composite(Material):
         assert(len(phases)>0)
         self.phases = phases
         
-        self.phase_names = []
-        for i in range(len(self.phases)):
-            try:
-                self.phase_names.append(self.phases[i].name)
-            except AttributeError:
-                self.phase_names.append('')
-
         if fractions is not None:
             self.set_fractions(fractions, fraction_type)
         else:
