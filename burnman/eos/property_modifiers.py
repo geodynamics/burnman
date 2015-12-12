@@ -27,6 +27,10 @@ def _landau_excesses(pressure, temperature, params):
 
     The current implementation is preferred, as the excess
     entropy (and heat capacity) terms are equal to zero at 0 K.
+
+    N.B. The excesses are for a *completely relaxed* mineral;
+    i.e. the seismic wave propagation is *slow* compared to the 
+    rate of reaction. 
     """
 
     Tc = params['Tc_0'] + params['V_D']*pressure/params['S_D']
@@ -79,6 +83,10 @@ def _landau_hp_excesses(pressure, temperature, params):
     Note that this formalism is still inconsistent, as it predicts that 
     the order parameter can be greater than one. For this reason
     _landau_excesses is preferred.
+
+    N.B. The excesses are for a *completely relaxed* mineral;
+    i.e. the seismic wave propagation is *slow* compared to the 
+    rate of reaction. 
     """
     params = mineral.landau_HP
     P = mineral.pressure
@@ -152,18 +160,68 @@ def _dqf_excesses(pressure, temperature, params):
 def _bragg_williams_excesses(pressure, temperature, params):
     """
     Applies a Bragg-Williams type correction to the thermodynamic
-    properties of a mineral endmember.
+    properties of a mineral endmember. Used for modelling 
+    order-disorder processes.
     Expressions are from Holland and Powell (1996).
+
+    N.B. The excesses are for a *completely relaxed* mineral;
+    i.e. the seismic wave propagation is *slow* compared to the 
+    rate of reaction. 
+
+    This may not be reasonable for order-disorder, especially 
+    for slow or coupled diffusers (Si-Al, for example).
+    The completely *unrelaxed* mineral (in terms of order-disorder)
+    can be calculated with a solid solution model.
     """
 
-    G = 0.
-    dGdT = 0.
-    dGdP = 0.
-    d2GdT2 = 0.
-    d2GdP2 = 0.
-    d2GdPdT = 0.
+    R = constants.gas_constant
+    n=params['n']
+    f=params['factor']
+    deltaS = entropydisorder(n)
 
+    lnxord = lambda n, Q: np.log(1.+n*Q) + n*np.log(n+Q) - (1.+n)*np.log(1.+n)
+    lnxdisord = lambda n, Q: (1./(1.+n))*np.log(1.+n*Q) + (n/(1.+n))*np.log(1.-Q) \
+                + (n/(1.+n))*np.log(n*(1.-Q)) + (n*n/(1.+n))*np.log(n+Q) - n*np.log(n)
+    
+    def reaction_bragg_williams(Q, gibbs_disorder, temperature, n, f, W):
+        if Q>1.0:
+            Q=0.9 # A simple catch to make sure the optimisation doesn't fail
+        return gibbs_disorder + (2.*Q - 1.)*W \
+            f*R*temperature*(lnxdisord(n,Q) - lnxord(n,Q))
 
+    def order_gibbs(pressure, temperature, params):
+        W=params['Wh'] + pressure*params['Wv']
+        gibbs_disorder = params['deltaH'] - f*temperature*deltaS + pressure*params['deltaV']
+        Q = opt.fsolve(reaction_bragg_williams, 0.999995,
+                       args=(gibbs_disorder, pressure, temperature, params))[0]
+        G = (1.-Q) * (gibbs_disorder + f*R*temperature*lnxdisord(n,Q)) \
+            + f*Q*(R*temperature*lnxord(n,Q)) + (1.-Q)*Q*W
+
+        return Q, G
+
+    # Calculating partial differentials with respect to P and T
+    # are complicated by the fact that Q changes with P and T
+    # Since there's no analytical solution for Q(P, T), we are
+    # unfortunately driven to numerical differentiation. Schade.
+    dT = 1.
+    dP = 1000.
+    
+    Q, G = order_gibbs(pressure, temperature, params)
+    Q, GsubPsubT = order_gibbs(pressure - dP, temperature - dT, params)
+    Q, GsubPaddT = order_gibbs(pressure - dP, temperature + dT, params)
+    Q, GaddPsubT = order_gibbs(pressure + dP, temperature - dT, params)
+    Q, GaddPaddT = order_gibbs(pressure + dP, temperature + dT, params)
+    Q, GsubP = order_gibbs(pressure - dP, temperature, params)
+    Q, GaddP = order_gibbs(pressure + dP, temperature, params)
+    Q, GsubT = order_gibbs(pressure, temperature - dT, params)
+    Q, GaddT = order_gibbs(pressure, temperature + dT, params)
+
+    dGdT = (GaddT - GsubT)/(2.*dT)
+    dGdP = (GaddP - GsubP)/(2.*dP)
+    d2GdT2 = (GaddT + GsubT - 2.*G) / (dT*dT)
+    d2GdP2 = (GaddP + GsubP - 2.*G) / (dP*dP)
+    d2GdPdT = (GaddPaddT - GsubPaddT - GaddPsubT + GsubPsubT)/(4.*dT*dP)
+    
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
     
