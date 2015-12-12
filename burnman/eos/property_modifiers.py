@@ -94,7 +94,7 @@ def _landau_hp_excesses(pressure, temperature, params):
     P = pressure
     T = temperature
     
-    if T_0 < params['Tc_0']:
+    if params['T_0'] < params['Tc_0']:
         Q_0 = np.power((params['Tc_0'] - params['T_0'])/params['Tc_0'], 0.25)
     else:
         Q_0 = 0.
@@ -292,9 +292,26 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     
     return excesses
 
-def calculate_total_excesses(mineral):
+def calculate_property_modifications(mineral):
     """
-    Sums the excesses from all the modifiers
+    Sums the excesses from all the modifiers.
+
+    To calculate thermodynamic properties from the outputs, 
+    the following functions should be used 
+    (the _o suffix stands for original value):
+
+    gibbs = gibbs_o + excesses['G']
+    S = S_o - excesses['dGdT']
+    V = V_o + excesses['dGdP']
+    K_T = V / ((V_o / K_T_o) - excesses['d2GdP2']) 
+    C_p = C_p_o - temperature*excesses['d2GdT2'] 
+    alpha = ((alpha_o*V_o) + excesses['d2GdPdT']) / V
+
+    H = gibbs + temperature*S
+    helmholtz = gibbs - pressure*V 
+    C_v = C_p - V*temperature*alpha*alpha*K_T
+    gr = alpha*K_T*V/C_v
+    K_S = K_T*C_p/C_v
     """
     excesses = {'G': 0., 'dGdT': 0., 'dGdP': 0.,
                 'd2GdT2': 0., 'd2GdP2': 0., 'd2GdPdT': 0.}
@@ -311,41 +328,7 @@ def calculate_total_excesses(mineral):
             xs_function = _magnetic_excesses_chs
             
         xs_component = xs_function(mineral.pressure, mineral.temperature, modifier[1])
-        for key, value in xs_component.iteritems():
-            excesses[key] += value
-
+        for key in xs_component:
+            excesses[key] += xs_component[key]
             
     return excesses
-
-
-def _modify_properties(mineral, excesses):
-    """
-    Modifies the properties of a mineral based on
-    excess contributions to thermodynamic properties
-    (gibbs and the first and second derivatives with 
-    respect to pressure and temperature) contained
-    within the dictionary 'excesses'.
-    """
-    
-    # Gibbs
-    mineral.gibbs = mineral.gibbs + excesses['G']
-
-    # Second derivatives first
-    mineral.C_p = mineral.C_p - mineral.temperature*excesses['d2GdT2'] # -T*d2G/dT2
-    mineral.K_T = - (mineral.V + excesses['dGdP']) / (excesses['d2GdP2'] - (mineral.V / mineral.K_T)) # - excesses['dGdP / (excesses['d2GdP2'])
-    mineral.alpha = ((mineral.alpha*mineral.V) + excesses['d2GdPdT']) / (mineral.V + excesses['dGdP']) # d2GdPdT / dGdP
-
-    # Now first derivatives 
-    mineral.S = mineral.S - excesses['dGdT'] # dGdT
-    mineral.V = mineral.V + excesses['dGdP'] # dGdP
-    mineral.H = mineral.gibbs + mineral.temperature*mineral.S # H = G + TS
-
-    # Now volume derivatives
-    mineral.helmholtz = mineral.gibbs - mineral.pressure*mineral.V
-    mineral.C_v = mineral.C_p - mineral.V*mineral.temperature*mineral.alpha*mineral.alpha*mineral.K_T
-    mineral.gr = mineral.alpha*mineral.K_T*mineral.V/mineral.C_v
-    mineral.K_S = mineral.K_T*mineral.C_p/mineral.C_v
-
-    return None
-
-
