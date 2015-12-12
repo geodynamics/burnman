@@ -128,7 +128,7 @@ class Material(object):
             The desired temperature in [K].
         """
         if not hasattr(self, "_pressure"):
-            raise Exception("Material.set_state() could not find class member _cached. "
+            raise Exception("Material.set_state() could not find class member _pressure. "
                             "Did you forget to call Material.__init__(self) in __init___?")
         self.reset()
         
