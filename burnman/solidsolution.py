@@ -41,6 +41,14 @@ class SolidSolution(Mineral):
         solution_model: :class:`burnman.SolutionModel`
             SolutionModel to use.
         """
+        Mineral.__init__(self)
+        class SolidSolutionMethod(object):
+            """Dummy class because SolidSolution needs a method to call
+            Mineral.set_state(), but should never have a method that
+            is used for minerals. Note that set_method() below will
+            not change self.method"""
+            pass
+        self.method = SolidSolutionMethod()
 
         if hasattr(self, 'endmembers') == False:
             raise Exception("'endmembers' attribute missing from solid solution")
@@ -83,11 +91,6 @@ class SolidSolution(Mineral):
         if molar_fractions is not None:
             self.set_composition(molar_fractions)
 
-        self._pressure = None
-        self._temperature = None
-        self._cached = {}
-    
-
     def get_endmembers(self):
         return self.endmembers
 
@@ -109,14 +112,13 @@ class SolidSolution(Mineral):
     def set_method(self, method):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)
-        self.method = self.endmembers[0][0].method
+        # note: do not set self.method here!
         self.reset()
 
 
     def set_state(self, pressure, temperature):
-        self.reset()
-        self._pressure=pressure
-        self._temperature=temperature
+
+        Mineral.set_state(self, pressure, temperature)
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
