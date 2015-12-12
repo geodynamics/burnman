@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
 
     def eval(uncertain):
-        rock = burnman.Composite ( [ (my_perovskite(uncertain), 1.0) ])
+        rock = burnman.Composite ( [my_perovskite(uncertain)], [1.0])
         rock.set_method('slb3')
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)

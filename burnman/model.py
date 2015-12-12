@@ -98,17 +98,17 @@ class Model(object):
 
                 for idx in range(len(self.p)):
                     self.rock.set_state(self.p[idx], self.T[idx])
-                    (fractions, minerals) = self.rock.unroll()
-                    for (fraction, mineral) in zip(fractions, minerals):
+                    (minerals, fractions) = self.rock.unroll()
+                    for (mineral, fraction) in zip(minerals, fractions):
                         e = {}
                         e['fraction'] = fraction
-                        e['V'] = fraction * mineral.molar_volume()
-                        e['K'] = mineral.adiabatic_bulk_modulus()
-                        e['G'] = mineral.shear_modulus()
-                        e['rho'] = mineral.molar_mass() / mineral.molar_volume()
-                        e['alpha'] = mineral.thermal_expansivity()
-                        e['c_v'] = mineral.heat_capacity_v()
-                        e['c_p'] = mineral.heat_capacity_p()
+                        e['V'] = fraction * mineral.molar_volume
+                        e['K'] = mineral.adiabatic_bulk_modulus
+                        e['G'] = mineral.shear_modulus
+                        e['rho'] = mineral.molar_mass / mineral.molar_volume
+                        e['alpha'] = mineral.thermal_expansivity
+                        e['c_v'] = mineral.heat_capacity_v
+                        e['c_p'] = mineral.heat_capacity_p
                         self.moduli[idx].append(e)
 
     def avg_moduli_(self):

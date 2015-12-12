@@ -52,7 +52,7 @@ def calc_shear_velocities(G_0, Gprime_0, mineral, pressures):
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
         mineral.set_state(pressures[i], 0.0) # set state with dummy temperature
-        shear_velocities[i] = mineral.v_s()
+        shear_velocities[i] = mineral.v_s
 
     return shear_velocities
 

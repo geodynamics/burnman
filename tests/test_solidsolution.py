@@ -203,7 +203,7 @@ class test_solidsolution(BurnManTest):
     def test_molar_mass(self):
         ss = olivine_ss()
         ss.set_composition( np.array([0.5, 0.5]) )
-        self.assertArraysAlmostEqual([ss.molar_mass()], [0.5*forsterite().params['molar_mass']+0.5*fayalite().params['molar_mass']])    
+        self.assertArraysAlmostEqual([ss.molar_mass], [0.5*forsterite().params['molar_mass']+0.5*fayalite().params['molar_mass']])
 
     def test_subregular(self):
         ss0=two_site_ss()
@@ -216,6 +216,7 @@ class test_solidsolution(BurnManTest):
         ss1.set_state(1.e5,300.)
 
         self.assertArraysAlmostEqual(ss0.excess_partial_gibbs, ss1.excess_partial_gibbs)
+
 
 if __name__ == '__main__':
     unittest.main()

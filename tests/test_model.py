@@ -49,7 +49,7 @@ class test_model(BurnManTest):
         return burnman.Model(rock, p, T, burnman.averaging_schemes.VoigtReussHill())
 
     def model12(self):
-        rock = burnman.Composite([0.2, 0.8], [min1(), min2()])
+        rock = burnman.Composite([min1(), min2()], [0.2, 0.8])
         rock.set_method('slb3')
         p = [40e9]
         T = [2000]
@@ -81,9 +81,9 @@ class test_model(BurnManTest):
         # reproduce by hand:
         min = m.rock
         min.set_state(m.p[0], m.T[0])
-        self.assertArraysAlmostEqual(m.thermal_expansivity(), [min.thermal_expansivity()])
-        self.assertArraysAlmostEqual(m.heat_capacity_v(), [min.heat_capacity_v()])
-        self.assertArraysAlmostEqual(m.heat_capacity_p(), [min.heat_capacity_p()])
+        self.assertArraysAlmostEqual(m.thermal_expansivity(), [min.thermal_expansivity])
+        self.assertArraysAlmostEqual(m.heat_capacity_v(), [min.heat_capacity_v])
+        self.assertArraysAlmostEqual(m.heat_capacity_p(), [min.heat_capacity_p])
 
     def test_heat2(self):
         m1 = self.model1()

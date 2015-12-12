@@ -49,6 +49,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
+
 if __name__ == "__main__":
 
     # This is the first actual work done in this example.  We define
@@ -58,8 +59,9 @@ if __name__ == "__main__":
     # and 20% periclase.  More minerals may be added by simply extending
     # the list given to burnman.composite
     # For the preset minerals from the SLB_2011, the equation of state formulation from Stixrude and Lithgow-Bertolloni (2005) will be used.
-    rock = burnman.Composite([0.8, 0.2], [minerals.SLB_2011.mg_perovskite(),
-                                          minerals.SLB_2011.periclase()])
+    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()], \
+                             [0.8, 0.2])
 
 
     # Here we create and load the PREM seismic velocity model, which will be
@@ -78,8 +80,6 @@ if __name__ == "__main__":
     # geotherm for mapping pressure to temperature
     temperature = burnman.geotherm.brown_shankland(pressure)
 
-
-
     # Here is the step which does the heavy lifting.  burnman.velocities_from_rock
     # sets the state of the rock at each of the pressures and temperatures defined,
     # then calculates the elastic moduli and density of each individual phase.  After that,
@@ -88,8 +88,8 @@ if __name__ == "__main__":
     # but see example_averaging.py for other options.  Finally, it calculates the seismic
     # wave speeds for the whole rock.  It returns a tuple of density, p-wave velocity
     # s-wave velocity, bulk sound speed, bulk modulus, and shear modulus.
-    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
-
+    #density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
+    density, vp , vs, vphi = rock.evaluate(['density','v_p','v_s','v_phi'],pressure, temperature)
 
     # All the work is done except the plotting!  Here we want to plot the seismic wave
     # speeds and the density against PREM using the matplotlib plotting tools.  We make

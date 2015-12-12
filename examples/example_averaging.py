@@ -57,9 +57,9 @@ if __name__ == "__main__":
 
     amount_perovskite = 0.6
 
-    rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                             [minerals.SLB_2011.mg_perovskite(),
-                              minerals.SLB_2011.periclase()])
+    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()],
+                             [amount_perovskite, 1.0-amount_perovskite])
 
     perovskitite = minerals.SLB_2011.mg_perovskite()
 

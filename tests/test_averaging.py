@@ -65,7 +65,7 @@ class VRH_average(BurnManTest):
 
 class VRH(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite ( [mypericlase()], [1.0] )
         rock.set_method('slb3') 
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock, [10e9,], [300,])
@@ -77,7 +77,7 @@ class VRH(BurnManTest):
         self.assertFloatEqual(150.901, G_vrh[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite ( [mypericlase()]*number, [1.0/number] * number )
         
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
@@ -95,7 +95,7 @@ class VRH(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite (  [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()], [0.5, 0.5] )
         rock.set_method('slb3')
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = \
             burnman.velocities_from_rock(rock,[10e9,], [300,])
@@ -108,7 +108,7 @@ class VRH(BurnManTest):
 
 class Reuss(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite (  [mypericlase()], [1.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.Reuss())
         self.assertFloatEqual(3791.392, rho[0])
@@ -119,7 +119,7 @@ class Reuss(BurnManTest):
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite ( [mypericlase()]*number,  [1.0/number] * number )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.Reuss())
         self.assertFloatEqual(3791.392, rho[0])
@@ -135,7 +135,7 @@ class Reuss(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite ( [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()],[0.5, 0.5] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Reuss())
         self.assertFloatEqual(4881.469, rho[0])
@@ -161,7 +161,7 @@ class Reuss(BurnManTest):
 
 class Voigt(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite ( [mypericlase()], [1.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.Voigt())
         self.assertFloatEqual(3791.392, rho[0])
@@ -172,7 +172,7 @@ class Voigt(BurnManTest):
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite ( [mypericlase()]*number, [1.0/number] * number )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.Voigt())
         self.assertFloatEqual(3791.392, rho[0])
@@ -188,7 +188,7 @@ class Voigt(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite ( [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] ,[0.5, 0.5])
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.Voigt())
         self.assertFloatEqual(4881.469, rho[0])
@@ -200,7 +200,7 @@ class Voigt(BurnManTest):
 
 class HSLower(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite ( [mypericlase()],[1.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanLower())
         self.assertFloatEqual(3791.392, rho[0])
@@ -211,7 +211,7 @@ class HSLower(BurnManTest):
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite ( [mypericlase()]*number, [1.0/number] * number )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanLower())
         self.assertFloatEqual(3791.392, rho[0])
@@ -227,7 +227,7 @@ class HSLower(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite ( [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()], [0.5, 0.5] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.HashinShtrikmanLower())
         self.assertFloatEqual(4881.469, rho[0])
@@ -239,7 +239,7 @@ class HSLower(BurnManTest):
 
 class HSUpper(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite ( [mypericlase()], [1.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanUpper())
         self.assertFloatEqual(3791.392, rho[0])
@@ -250,7 +250,7 @@ class HSUpper(BurnManTest):
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite (  [mypericlase()]*number, [1.0/number] * number )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanUpper())
         self.assertFloatEqual(3791.392, rho[0])
@@ -266,7 +266,7 @@ class HSUpper(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite (  [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()], [0.5, 0.5] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.HashinShtrikmanUpper())
         self.assertFloatEqual(4881.469, rho[0])
@@ -279,7 +279,7 @@ class HSUpper(BurnManTest):
 
 class HSAverage(BurnManTest):
     def test_1(self):
-        rock = burnman.Composite ( [1.0], [mypericlase()] )
+        rock = burnman.Composite ( [mypericlase()], [1.0] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanAverage())
         self.assertFloatEqual(3791.392, rho[0])
@@ -290,7 +290,7 @@ class HSAverage(BurnManTest):
         self.assertFloatEqual(150.901, G[0]/1.e9)
 
     def same(self, number):
-        rock = burnman.Composite ( [1.0/number] * number, [mypericlase()]*number )
+        rock = burnman.Composite (  [mypericlase()]*number, [1.0/number] * number)
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock, [10e9,], [300,], averaging_scheme=avg.HashinShtrikmanAverage())
         self.assertFloatEqual(3791.392, rho[0])
@@ -306,7 +306,7 @@ class HSAverage(BurnManTest):
         self.same(4)
 
     def test_two_different(self):
-        rock = burnman.Composite ( [0.5, 0.5], [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()] )
+        rock = burnman.Composite ( [minerals.SLB_2005.periclase(), minerals.SLB_2005.fe_perovskite()], [0.5, 0.5] )
         rho, v_p, v_s, v_phi, K, G = \
             burnman.velocities_from_rock(rock,[10e9,], [300,], averaging_scheme=avg.HashinShtrikmanAverage())
         self.assertFloatEqual(4881.469, rho[0])

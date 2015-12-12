@@ -83,17 +83,17 @@ def check_slb_fig7_txt():
 
     for i in range(len(temperature)):
         forsterite.set_state(pressure[i], temperature[i])
-        rho_comp[i] = 100.*(forsterite.density()/1000. - rho[i])/rho[i]
-        Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus()/1.e9 - Kt[i])/Kt[i]
-        Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus()/1.e9 - Ks[i])/Ks[i]
-        G_comp[i] = 100.*(forsterite.shear_modulus()/1.e9 - G[i])/G[i]
-        VB_comp[i] = 100.*(forsterite.v_phi()/1000. - VB[i])/VB[i]
-        VS_comp[i] = 100.*(forsterite.v_s()/1000. - VS[i])/VS[i]
-        VP_comp[i] = 100.*(forsterite.v_p()/1000. - VP[i])/VP[i]
-        vol_comp[i] = 100.*(forsterite.molar_volume()*1.e6 - vol[i])/vol[i]
-        alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/(alpha[-1])
-        Cp_comp[i] = 100.*(forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
-        gr_comp[i] = (forsterite.grueneisen_parameter() - gr[i])/gr[i]
+        rho_comp[i] = 100.*(forsterite.density/1000. - rho[i])/rho[i]
+        Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus/1.e9 - Kt[i])/Kt[i]
+        Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus/1.e9 - Ks[i])/Ks[i]
+        G_comp[i] = 100.*(forsterite.shear_modulus/1.e9 - G[i])/G[i]
+        VB_comp[i] = 100.*(forsterite.v_phi/1000. - VB[i])/VB[i]
+        VS_comp[i] = 100.*(forsterite.v_s/1000. - VS[i])/VS[i]
+        VP_comp[i] = 100.*(forsterite.v_p/1000. - VP[i])/VP[i]
+        vol_comp[i] = 100.*(forsterite.molar_volume*1.e6 - vol[i])/vol[i]
+        alpha_comp[i] = 100.*(forsterite.thermal_expansivity/1.e-5 - alpha[i])/(alpha[-1])
+        Cp_comp[i] = 100.*(forsterite.heat_capacity_p/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
+        gr_comp[i] = (forsterite.grueneisen_parameter - gr[i])/gr[i]
 
     plt.plot(temperature, rho_comp, label=r'$\rho$')
     plt.plot(temperature, Kt_comp, label=r'$K_S$')
