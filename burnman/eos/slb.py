@@ -42,7 +42,10 @@ class SLBBase(eos.EquationOfState):
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
         gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
+        if np.abs(params['grueneisen_0']) < 1.e-10: # avoids divide by zero if grueneisen_0 = 0.
+            q = 1./9.*(18.*gr - 6.)
+        else:
+            q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
         return q
 
     def _isotropic_eta_s(self, x, params):
