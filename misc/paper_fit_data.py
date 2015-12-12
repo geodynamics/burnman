@@ -29,7 +29,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import scipy.optimize as opt
 import burnman
-from . import colors
+import misc.colors as colors
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):

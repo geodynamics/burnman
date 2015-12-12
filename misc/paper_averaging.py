@@ -37,7 +37,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from . import colors
+import misc.colors as colors
 
 if __name__ == "__main__":
     figsize=(6,5)

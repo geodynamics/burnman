@@ -22,7 +22,7 @@ import burnman
 from burnman import minerals
 from burnman.mineral_helpers import HelperSolidSolution
 import matplotlib.image as mpimg
-from . import colors
+import misc.colors as colors
 
 if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,6))
