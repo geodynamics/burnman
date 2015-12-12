@@ -158,8 +158,8 @@ class Composite(Material):
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        raise NotImplementedError("need to implement internal_energy for Composite()!")
-        return None
+        U = sum(phase.internal_energy*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions))
+        return U
     
     @material_property
     def molar_gibbs(self):
@@ -167,8 +167,8 @@ class Composite(Material):
         Returns Gibbs free energy of the composite [J]
         Aliased with self.gibbs
         """
-        raise NotImplementedError("need to implement molar_gibbs() for Composite()!")
-        return None
+        G = sum(phase.molar_gibbs*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions))
+        return G
 
     @material_property
     def molar_helmholtz(self):
@@ -176,8 +176,8 @@ class Composite(Material):
         Returns Helmholtz free energy of the mineral [J]
         Aliased with self.helmholtz
         """
-        raise NotImplementedError("need to implement molar_helmholtz() for Composite()!")
-        return None
+        F = sum(phase.molar_helmholtz*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions))
+        return F
 
     @material_property
     def molar_volume(self):
@@ -213,8 +213,8 @@ class Composite(Material):
         Returns enthalpy of the mineral [J]
         Aliased with self.S
         """
-        raise NotImplementedError("need to implement molar_entropy() in derived class!")
-        return None
+        S = sum(phase.molar_entropy*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions))
+        return S
 
     @material_property
     def molar_enthalpy(self):
@@ -222,8 +222,8 @@ class Composite(Material):
         Returns enthalpy of the mineral [J]
         Aliased with self.H
         """
-        raise NotImplementedError("need to implement molar_enthalpy() for Composite!")
-        return None
+        H = sum(phase.molar_enthalpy*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions))
+        return H
 
 
     @material_property

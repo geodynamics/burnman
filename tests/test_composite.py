@@ -119,6 +119,75 @@ class composite(BurnManTest):
         assert(d2 == 5275)
         assert(dmix == 4744)
 
+    def test_thermodynamic_potentials(self):
+        rock1 = burnman.Composite([minerals.SLB_2011.mg_perovskite(), \
+                                   minerals.SLB_2011.periclase()], \
+                                   [1.0, 0.0] )
+        rock2 = burnman.Composite([minerals.SLB_2011.mg_perovskite(), \
+                                   minerals.SLB_2011.periclase()], \
+                                   [0.0, 1.0] )
+        rock3 = burnman.Composite([minerals.SLB_2011.mg_perovskite(), \
+                                   minerals.SLB_2011.periclase()], \
+                                   [0.4, 0.6] )
+        mineral1 = minerals.SLB_2011.mg_perovskite()
+        mineral2 = minerals.SLB_2011.periclase()
+
+        rock1.set_state(40.e9, 2000.)
+        rock2.set_state(40.e9, 2000.)
+        rock3.set_state(40.e9, 2000.)
+        mineral1.set_state(40.e9, 2000.)
+        mineral2.set_state(40.e9, 2000.)
+
+        # Gibbs
+        gibbs1 = mineral1.molar_gibbs
+        gibbs2 = mineral2.molar_gibbs
+        G1 = rock1.molar_gibbs
+        G2 = rock2.molar_gibbs
+        G3 = rock3.molar_gibbs
+        self.assertFloatEqual(G1,gibbs1)
+        self.assertFloatEqual(G2,gibbs2)
+        self.assertFloatEqual(G3,0.4*gibbs1+0.6*gibbs2)
+
+        # Helmholtz
+        helmholtz1 = mineral1.molar_helmholtz
+        helmholtz2 = mineral2.molar_helmholtz
+        F1 = rock1.molar_helmholtz
+        F2 = rock2.molar_helmholtz
+        F3 = rock3.molar_helmholtz
+        self.assertFloatEqual(F1,helmholtz1)
+        self.assertFloatEqual(F2,helmholtz2)
+        self.assertFloatEqual(F3,0.4*helmholtz1+0.6*helmholtz2)
+
+        # Enthalpy
+        enthalpy1 = mineral1.molar_enthalpy
+        enthalpy2 = mineral2.molar_enthalpy
+        H1 = rock1.molar_enthalpy
+        H2 = rock2.molar_enthalpy
+        H3 = rock3.molar_enthalpy
+        self.assertFloatEqual(H1,enthalpy1)
+        self.assertFloatEqual(H2,enthalpy2)
+        self.assertFloatEqual(H3,0.4*enthalpy1+0.6*enthalpy2)
+
+        # Energy
+        internal_energy1 = mineral1.internal_energy
+        internal_energy2 = mineral2.internal_energy
+        U1 = rock1.internal_energy
+        U2 = rock2.internal_energy
+        U3 = rock3.internal_energy
+        self.assertFloatEqual(U1,internal_energy1)
+        self.assertFloatEqual(U2,internal_energy2)
+        self.assertFloatEqual(U3,0.4*internal_energy1+0.6*internal_energy2)
+
+        # Entropy
+        molar_entropy1 = mineral1.molar_entropy
+        molar_entropy2 = mineral2.molar_entropy
+        S1 = rock1.molar_entropy
+        S2 = rock2.molar_entropy
+        S3 = rock3.molar_entropy
+        self.assertFloatEqual(S1,molar_entropy1)
+        self.assertFloatEqual(S2,molar_entropy2)
+        self.assertFloatEqual(S3,0.4*molar_entropy1+0.6*molar_entropy2)
+
     def test_summing_bigger(self):
         min1 = minerals.SLB_2005.periclase()
         with warnings.catch_warnings(record=True) as w:

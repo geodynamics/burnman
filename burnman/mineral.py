@@ -131,7 +131,7 @@ class Mineral(Material):
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        return self.method.internal_energy( self, pressure, temperature, volume, params )
+        return self.method.internal_energy(self.pressure, self.temperature, self.molar_volume, self.params )
 
     
     @material_property

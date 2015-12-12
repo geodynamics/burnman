@@ -239,6 +239,13 @@ class SLBBase(eos.EquationOfState):
         G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
+    def internal_energy( self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy at the pressure and temperature of the mineral [J/mol]
+        """
+        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
+               temperature * self.entropy( pressure, temperature, volume, params)
+
     def entropy( self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
