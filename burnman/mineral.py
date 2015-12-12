@@ -124,7 +124,7 @@ class Mineral(Material):
         self._temperature = temperature
 
         if self.method is None:
-            raise AttributeError, "no method set for mineral, or equation_of_state given in mineral.params"
+             raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
 
 
 
