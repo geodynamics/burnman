@@ -163,3 +163,66 @@ if __name__ == "__main__":
     plt.legend(loc="lower right")
     plt.show()
 
+
+    # Wuestite has a Landau-type transition at low temperature,
+    # but we could also choose to simplify things by just having an excess entropy
+    # to estimate the thermal properties at high temperature
+    # Here we ignore the 0 Pa, 0 K gibbs and volume contributions, as the endmember
+    # properties would need refitting too...
+
+    class wuestite (burnman.Mineral):
+        def __init__(self):
+            formula='FeO'
+            formula = dictionarize_formula(formula)
+            self.params = {
+                'name': 'Wuestite',
+                'formula': formula,
+                'equation_of_state': 'slb3',
+                'F_0': -242000.0 ,
+                'V_0': 1.226e-05 ,
+                'K_0': 1.79e+11 ,
+                'Kprime_0': 4.9 ,
+                'Debye_0': 454.0 ,
+                'grueneisen_0': 1.53 ,
+                'q_0': 1.7 ,
+                'G_0': 59000000000.0 ,
+                'Gprime_0': 1.4 ,
+                'eta_s_0': -0.1 ,
+                'n': sum(formula.values()),
+                'molar_mass': formula_mass(formula, atomic_masses)}
+
+            self.property_modifiers = [
+                ['linear', {'G_0': 0., 'delta_S': 12., 'delta_V': 0.}]]
+        
+            self.uncertainties = {
+                'err_F_0': 1000.0 ,
+                'err_V_0': 0.0 ,
+                'err_K_0': 1000000000.0 ,
+                'err_K_prime_0': 0.2 ,
+                'err_Debye_0': 21.0 ,
+                'err_grueneisen_0': 0.13 ,
+                'err_q_0': 1.0 ,
+                'err_G_0': 1000000000.0 ,
+                'err_Gprime_0': 0.1 ,
+                'err_eta_s_0': 1.0 }
+            burnman.Mineral.__init__(self)
+
+    wus = wuestite()
+    wus_HP = burnman.minerals.HP_2011_ds62.fper()
+    
+    P = 1.e5
+    temperatures = np.linspace(300., 1300., 101)
+    Ss = np.empty_like(temperatures)
+    Ss_HP = np.empty_like(temperatures)
+    for i, T in enumerate(temperatures):
+        wus.set_state(P, T)
+        Ss[i] = wus.S
+        wus_HP.set_state(P, T)
+        Ss_HP[i] = wus_HP.S
+        
+    plt.plot(temperatures, Ss, label='linear')
+    plt.plot(temperatures, Ss_HP, label='HP_2011_ds62')
+    plt.xlabel('T (K)')
+    plt.ylabel('S (J/K/mol)')
+    plt.legend(loc="lower right")
+    plt.show()
