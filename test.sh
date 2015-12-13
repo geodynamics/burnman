@@ -71,6 +71,7 @@ do
 	grep -n $'\t' $f && exit 0
 done
 
+
 cd tests
 $PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
 cd ..
