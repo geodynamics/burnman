@@ -91,6 +91,19 @@ class test_endmembers(BurnManTest):
         K2=fo.K_T
         self.assertArraysAlmostEqual([K1], [K2])
 
+    def test_mgd(self):
+        bdg = burnman.minerals.Matas_etal_2007.mg_perovskite()
+        bdg.set_state(1.e5, 300.)
+        self.assertFloatEqual(bdg.grueneisen_parameter, bdg.params['grueneisen_0'])
+        self.assertFloatEqual(bdg.isothermal_bulk_modulus, bdg.params['K_0'])
+        self.assertFloatEqual(bdg.molar_volume, bdg.params['V_0'])
+        self.assertFloatEqual(bdg.shear_modulus, bdg.params['G_0'])
+        bdg.set_state(1.e5, 0.)
+        self.assertFloatEqual(bdg.heat_capacity_v, 0.)
+        self.assertFloatEqual(bdg.heat_capacity_p, 0.)
+        self.assertFloatEqual(bdg.thermal_expansivity, 0.)
+        self.assertFloatEqual(bdg.isothermal_bulk_modulus, bdg.adiabatic_bulk_modulus)
+        
 
 if __name__ == '__main__':
     unittest.main()
