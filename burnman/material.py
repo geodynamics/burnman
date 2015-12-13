@@ -58,7 +58,7 @@ class Material(object):
             # if a derived class decides to set .name before calling this
             # constructor (I am looking at you, SLB_2011.py!), do not
             # overwrite the name here.
-            self.name = self.__class__.__name__
+            self._name = self.__class__.__name__
         self._cached = {}
 
     @property
