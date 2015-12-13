@@ -216,6 +216,22 @@ class composite(BurnManTest):
         self.assertArraysAlmostEqual(f, [0.8, 0.2, 0.0])
         self.assertTrue(f[2]>=0.0)
 
+    def test_swap_averaging(self):
+        rock = burnman.Composite( [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5,0.5])
+
+        rock.set_state(5.e9,1000.)
+        G1 = rock.shear_modulus
+        self.assertFloatEqual(108.686, G1/1.e9)
+
+        rock.set_averaging_scheme('HashinShtrikmanLower')
+        rock.set_state(5.e9,1000.)
+        G2 = rock.shear_modulus
+        self.assertFloatEqual(104.451, G2/1.e9)
+
+        rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanUpper())
+        rock.set_state(5.e9,1000.)
+        G3 = rock.shear_modulus
+        self.assertFloatEqual(115.155, G3/1.e9)
 
 if __name__ == '__main__':
     unittest.main()
