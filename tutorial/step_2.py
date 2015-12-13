@@ -66,15 +66,14 @@ if __name__=='__main__':
 
         # Here we define the rock as before. 
         phase_2_fraction = 1.0-phase_1_fraction
-        rock = burnman.Composite([phase_1_fraction, phase_2_fraction], 
-                                 [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
+        rock = burnman.Composite([minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()],[phase_1_fraction, phase_2_fraction])
 
         # Just as in step 1, we want to set which equation of state we use,
         # then call burnman.velocities_from_rock, which evaluates the 
         # elastic properties and seismic velocities at the predefined 
         # pressures and temperatures
         rock.set_method('slb3')
-        density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
+        density, vphi, vs = rock.evaluate(['density','v_phi','v_s'], pressure, temperature)
 
         # Since we will call this misfit function many times, we may be interested
         # in a status report.  These lines print some debug output so we 
