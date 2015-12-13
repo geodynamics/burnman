@@ -32,11 +32,6 @@ Mineral helpers
 
 .. autoclass:: burnman.mineral_helpers.HelperSpinTransition
 
-.. autoclass:: burnman.mineral_helpers.HelperSolidSolution
-
-.. autoclass:: burnman.mineral_helpers.HelperFeDependent
-
-
 Composites
 ----------
 

@@ -101,20 +101,19 @@ class composite(BurnManTest):
         self.assertEqual(mins,",".join([min1.to_string(),min2.to_string()]))
 
     def test_density_composite(self):
-        pyrolite = burnman.Composite([minerals.SLB_2005.mg_fe_perovskite(0.2), \
-                                      minerals.SLB_2005.ferropericlase(0.4)], \
+        pyrolite = burnman.Composite([minerals.SLB_2005.mg_perovskite(), \
+                                      minerals.SLB_2005.periclase()], \
                                      [0.95, 0.05] )
         pyrolite.set_method('slb3')
         pyrolite.set_state(40.e9, 2000)
-        
-        d1 = int(pyrolite.phases[0].density)
-        d2 = int(pyrolite.phases[1].density)
-        dmix = int(pyrolite.density)
-        assert(d1<dmix)
-        assert(dmix<d2)
-        assert(d1 == 4732)
-        assert(d2 == 5275)
-        assert(dmix == 4744)
+
+        d1 = pyrolite.phases[0].density
+        d2 = pyrolite.phases[1].density
+        dmix = pyrolite.density
+
+        self.assertFloatEqual(d1, 4494.483)
+        self.assertFloatEqual(d2, 4130.096)
+        self.assertFloatEqual(dmix, 4486.263)
 
     def test_thermodynamic_potentials(self):
         rock1 = burnman.Composite([minerals.SLB_2011.mg_perovskite(), \
