@@ -109,14 +109,14 @@ class Composite(Material):
             
             phase.set_method(method)
 
-    def set_averaging_scheme(self,averaging_scheme):
+    def set_averaging_scheme(self, averaging_scheme):
         """
         Set the averaging scheme for the moduli in the composite.
         Default is set to VoigtReussHill, when Composite is initialized.
         """
         
         if type(averaging_scheme)==str:
-            self.averaging_scheme = getattr(averaging_schemes,averaging_scheme)()
+            self.averaging_scheme = getattr(averaging_schemes, averaging_scheme)()
         else:
             self.averaging_scheme = averaging_scheme
 
@@ -362,15 +362,10 @@ class Composite(Material):
 
 
     def _mass_to_molar_fractions(self, minerals, mass_fractions):
-        total_moles=0.
-        try:
-            for i, mineral in enumerate(minerals):
-                total_moles+=mass_fractions[i]/mineral.molar_mass
-            molar_fractions=[]
-            for i, mineral in enumerate(minerals):
-                molar_fractions.append(mass_fractions[i]/(mineral.molar_mass*total_moles))
-        except AttributeError:
-            raise Exception("Mass fractions cannot be set before composition has been set for all the phases in the composite.")
+        """
+        Converts a set of mass fractions for phases into a set of molar fractions.
+        """
+        total_moles = sum(mass_fraction/mineral.molar_mass for mass_fraction, mineral in zip(mass_fractions, minerals))
+        return [mass_fraction/(mineral.molar_mass*total_moles) for mass_fraction, mineral in zip(mass_fractions, minerals)]
 
-        return molar_fractions
 

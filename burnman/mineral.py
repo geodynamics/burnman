@@ -154,7 +154,11 @@ class Mineral(Material):
         """
         Returns molar mass of the mineral [kg/mol]
         """
-        return self.params['molar_mass']
+        if 'molar_mass' in self.params:
+            return self.params['molar_mass']
+        else:
+            raise ValueError("No molar_mass parameter for mineral "+self.to_string+".")
+
 
 
     @material_property

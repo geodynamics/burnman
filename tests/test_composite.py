@@ -233,5 +233,11 @@ class composite(BurnManTest):
         G3 = rock.shear_modulus
         self.assertFloatEqual(115.155, G3/1.e9)
 
+    def test_mass_to_molar_fractions(self):
+        min1 = minerals.SLB_2005.periclase()
+        mass_fractions = [0.8, 0.2]
+        c = burnman.Composite( [min1, min1], mass_fractions, fraction_type='mass')
+        self.assertArraysAlmostEqual(c.molar_fractions, mass_fractions)
+
 if __name__ == '__main__':
     unittest.main()

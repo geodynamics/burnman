@@ -331,7 +331,6 @@ class SolidSolution(Mineral):
         return np.sqrt(self.shear_modulus / self.density)
 
 
-    
     @material_property
     def grueneisen_parameter(self):
         """
@@ -343,9 +342,7 @@ class SolidSolution(Mineral):
         else:
             return self.thermal_expansivity*self.isothermal_bulk_modulus*self.molar_volume/self.heat_capacity_v
 
-    
 
-    
     @material_property
     def thermal_expansivity(self):
         """
@@ -354,7 +351,7 @@ class SolidSolution(Mineral):
         """
         return (1./self.V) * sum([ self.endmembers[i][0].alpha * self.endmembers[i][0].V * self.molar_fractions[i] for i in range(self.n_endmembers) ])
 
-    
+
     @material_property
     def heat_capacity_v(self):
         """
@@ -362,7 +359,8 @@ class SolidSolution(Mineral):
         Aliased with self.C_v
         """
         return self.heat_capacity_p - self.molar_volume*self.temperature*self.thermal_expansivity*self.thermal_expansivity*self.isothermal_bulk_modulus
-    
+
+
     @material_property
     def heat_capacity_p(self):
         """
@@ -370,9 +368,3 @@ class SolidSolution(Mineral):
         Aliased with self.C_p
         """
         return sum([ self.endmembers[i][0].heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
-
-
-
-
-
-
