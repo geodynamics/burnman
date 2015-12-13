@@ -234,6 +234,12 @@ class composite(BurnManTest):
         self.assertFloatEqual(115.155, G3/1.e9)
 
     def test_mass_to_molar_fractions(self):
+        pv = burnman.minerals.HP_2011_ds62.mpv()
+        en = burnman.minerals.HP_2011_ds62.en()
+        c = burnman.Composite([pv, en], [0.5, 0.5], 'mass')
+        self.assertArraysAlmostEqual(c.molar_fractions, [2./3., 1./3.])
+        
+    def test_mass_to_molar_fractions_2(self):
         min1 = minerals.SLB_2005.periclase()
         mass_fractions = [0.8, 0.2]
         c = burnman.Composite( [min1, min1], mass_fractions, fraction_type='mass')

@@ -389,3 +389,59 @@ def hugoniot(mineral, P_ref, T_ref, pressures, reference_mineral=None):
         volumes[i] = mineral.V
 
     return temperatures, volumes
+
+
+def convert_fractions(composite, phase_fractions, input_type, output_type):
+    """
+    Takes a composite with a set of user defined molar, volume
+    or mass fractions (which do not have to be the fractions 
+    currently associated with the composite) and 
+    converts the fractions to molar, mass or volume.
+
+    Conversions to and from mass require a molar mass to be 
+    defined for all phases. Conversions to and from volume
+    require set_state to have been called for the composite.
+
+    Parameters
+    ----------
+    composite : Composite
+        Composite for which fractions are to be defined.
+    
+    phase_fractions : list of floats
+        List of input phase fractions (of type input_type)
+    
+    input_type : string
+        Input fraction type: 'molar', 'mass' or 'volume'
+
+    output_type : string
+        Output fraction type: 'molar', 'mass' or 'volume'
+
+    Returns
+    -------
+    output_fractions : list of floats
+        List of output phase fractions (of type output_type)
+    """
+    if input_type == 'volume' or output_type == 'volume':
+        if composite.temperature == None:
+            raise Exception(composite.to_string()+".set_state(P, T) has not been called, so volume fractions are currently undefined. Exiting.")
+    
+    if input_type == 'molar':
+        molar_fractions = phase_fractions
+    if input_type == 'volume':
+        total_moles = sum(volume_fraction/phase.molar_volume for volume_fraction, phase in zip(phase_fractions, composite.phases))
+        molar_fractions = [volume_fraction/(phase.molar_volume*total_moles) for volume_fraction, phase in zip(phase_fractions, composite.phases)]
+    if input_type == 'mass':
+        total_moles = sum(mass_fraction/phase.molar_mass for mass_fraction, phase in zip(phase_fractions, composite.phases))
+        molar_fractions = [mass_fraction/(phase.molar_mass*total_moles) for mass_fraction, phase in zip(phase_fractions, composite.phases)]
+
+
+    if output_type == 'volume':
+        total_volume = sum(molar_fraction*phase.molar_volume for molar_fraction, phase in zip(molar_fractions, composite.phases))
+        output_fractions = [molar_fraction*phase.molar_volume/total_volume for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+    elif output_type == 'mass':
+        total_mass = sum(molar_fraction*phase.molar_mass for molar_fraction, phase in zip(molar_fractions, composite.phases))
+        output_fractions = [molar_fraction*phase.molar_mass/total_mass for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+    elif output_type == 'molar':
+        output_fractions = molar_fractions
+
+    return output_fractions
