@@ -491,7 +491,7 @@ def bracket( fn, x0, dx, args=(), ratio=1.618, maxiter=100):
 
     # Overshot zero, try making dx smaller
     if (f0-f_left)*(f_right-f0) < 0.:
-        while (f0-f_left)*(f_right-f0) < 0. and dx > np.finfo('float') and niter < maxiter:
+        while (f0-f_left)*(f_right-f0) < 0. and dx > np.finfo('float').eps and niter < maxiter:
             dx /= ratio
             x_left = x0-dx
             x_right = x0+dx

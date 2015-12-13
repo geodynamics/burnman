@@ -95,6 +95,46 @@ class test_tools(BurnManTest):
         c.set_state(1.e5, 300.)
         mass_fractions = convert_fractions(c, [0.25, 0.25, 0.5], 'molar', 'volume')
         self.assertArraysAlmostEqual([mass_fractions[0] + mass_fractions[1]], [mass_fractions[2]])
+
+    def test_bracket(self):
+        def fn(x):
+            return (x-1.)*(x-2.)
+
+        # Test that it can find the root at one from the right
+        sol = bracket(fn, 1.2, 1.e-2)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[1] < 1.0 )
+        self.assertTrue( sol[0] > 1.0 )
+
+        # Test that it can find the root at one from the left
+        sol = bracket(fn, 0.6, 1.e-2)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[0] < 1.0 )
+        self.assertTrue( sol[1] > 1.0 )
+
+        # Test that it can find the root at two from the left
+        sol = bracket(fn, 1.7, 1.e-2)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[0] < 2.0 )
+        self.assertTrue( sol[1] > 2.0 )
+
+        # Test that it can find the root at two from the right
+        sol = bracket(fn, 2.5, 1.e-2)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[1] < 2.0 )
+        self.assertTrue( sol[0] > 2.0 )
+
+        # Test that it can find the root at one if we take too large of a dx
+        sol = bracket(fn, 1.2, 2.0)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[1] < 1.0 )
+        self.assertTrue( sol[0] > 1.0 )
+
+        # Test that it can find the root at two if we take too large of a dx
+        sol = bracket(fn, 1.8, 2.0)
+        self.assertTrue( sol[2]*sol[3] < 0.)
+        self.assertTrue( sol[0] < 2.0 )
+        self.assertTrue( sol[1] > 2.0 )
         
 if __name__ == '__main__':
     unittest.main()
