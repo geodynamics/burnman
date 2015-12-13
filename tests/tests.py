@@ -17,7 +17,7 @@ from test_minerals import *
 from test_seismic import *
 from test_decorators import *
 from test_material import *
-
+from test_chemical_potentials import *
 
 import os, sys
 sys.path.insert(1,os.path.abspath('..'))
