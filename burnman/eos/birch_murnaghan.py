@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import scipy.optimize as opt
 from . import equation_of_state as eos
+from ..tools import bracket
 import warnings
 
 def bulk_modulus(volume, params):
@@ -41,8 +42,11 @@ def volume(pressure, params):
     """
 
     func = lambda x: birch_murnaghan(params['V_0']/x, params) - pressure
-    V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
-    return V
+    try:
+        sol = bracket(func, params['V_0'], 1.e-2*params['V_0'])
+    except ValueError:
+        raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+    return opt.brentq(func, sol[0], sol[1])
 
 def shear_modulus_second_order(volume, params):
     """

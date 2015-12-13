@@ -11,6 +11,7 @@ from . import equation_of_state as eos
 from . import birch_murnaghan as bm
 from . import debye
 from .. import constants
+from ..tools import bracket
 
 class MGDBase(eos.EquationOfState):
     """
@@ -38,8 +39,11 @@ class MGDBase(eos.EquationOfState):
         func = lambda x: bm.birch_murnaghan(params['V_0']/x, params) + \
             self._thermal_pressure(temperature, x, params) - \
             self._thermal_pressure(T_0, x, params) - pressure
-        V = opt.brentq(func, 0.5*params['V_0'], 1.5*params['V_0'])
-        return V
+        try:
+            sol = bracket(func, params['V_0'], 1.e-2*params['V_0'])
+        except ValueError:
+            raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        return opt.brentq(func, sol[0], sol[1])
 
     def isothermal_bulk_modulus(self, pressure,temperature,volume, params):
         """
