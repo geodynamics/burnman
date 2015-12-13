@@ -33,6 +33,7 @@ def copy_documentation(copy_from):
         if hasattr(copy_from, "__name__"):
             copied_from = "(copied from "+copy_from.__name__+"):\n"
         wrapper.__doc__ = copied_from+copy_from.__doc__ + old
+        wrapper.__name__ = func.__name__
         return wrapper
     return mydecorator
 

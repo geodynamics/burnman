@@ -116,5 +116,42 @@ class test_decorators_copy_documentation(BurnManTest):
 
 
 
+class ClassC_for_copy_documentation(burnman.Material):
+
+    def __init__(self):
+        burnman.Material.__init__(self)
+
+    @material_property
+    @copy_documentation(ClassA_for_copy_documentation.my_func)
+    def some_func(self):
+        """C.some_func doc"""
+        return 1.0
+
+    @material_property
+    def some_func2(self):
+        return 2.0
+
+    @material_property
+    @copy_documentation(ClassA_for_copy_documentation.my_func)
+    def some_func3(self):
+        return 3.0
+
+class test_two_decorators(BurnManTest):
+
+    def check(self, C):
+        self.assertEqual(C.some_func, 1.0)
+        self.assertEqual(C.some_func2, 2.0)
+        self.assertEqual(C.some_func3, 3.0)
+
+    def test(self):
+        c = ClassC_for_copy_documentation()
+
+        self.check(c)
+        self.check(c)
+        c.reset()
+        self.check(c)
+        self.check(c)
+
+
 if __name__ == '__main__':
     unittest.main()
