@@ -14,6 +14,8 @@ class Modifiers(BurnManTest):
         linear_params = {'G_0': 1200., 'delta_S': 5., 'delta_V': 1.e-7}
         landau_params = {'Tc_0': 800., 'S_D': 5., 'V_D': 1.e-7}
         landau_params_2 = {'Tc_0': 1200., 'S_D': 5., 'V_D': 1.e-7}
+        landau_hp_params = {'P_0': 1.e5, 'T_0': 298.15, 'Tc_0': 800., 'S_D': 5., 'V_D': 1.e-7}
+        landau_hp_params_2 = {'P_0': 1.e5, 'T_0': 298.15, 'Tc_0': 1200., 'S_D': 5., 'V_D': 1.e-7}
         bragg_williams_params = {'n': 1., 'factor': 0.8, 'Wh': 13000., 'Wv': 1.e-7, 'deltaH': 13000., 'deltaV': 1.e-7}
         magnetic_params = {'structural_parameter': 0.4, 'curie_temperature': [800., 1.e-8], 'magnetic_moment': [2.2, 1.e-10]}
         magnetic_params_2 = {'structural_parameter': 0.4, 'curie_temperature': [1200., 1.e-8], 'magnetic_moment': [2.2, 1.e-10]}
@@ -40,8 +42,8 @@ class Modifiers(BurnManTest):
                 linear_excesses.append(pm._linear_excesses(P, T, linear_params))
                 landau_excesses.append(pm._landau_excesses(P, T, landau_params))
                 landau_excesses_2.append(pm._landau_excesses(P, T, landau_params_2))
-                landau_hp_excesses.append(pm._landau_hp_excesses(P, T, 1.e5, 298.15, landau_params))
-                landau_hp_excesses_2.append(pm._landau_hp_excesses(P, T, 1.e5, 298.15, landau_params_2))
+                landau_hp_excesses.append(pm._landau_hp_excesses(P, T, landau_hp_params))
+                landau_hp_excesses_2.append(pm._landau_hp_excesses(P, T, landau_hp_params_2))
                 bragg_williams_excesses.append(pm._bragg_williams_excesses(P, T, bragg_williams_params))
                 magnetic_excesses.append(pm._magnetic_excesses_chs(P, T, magnetic_params))
                 magnetic_excesses_2.append(pm._magnetic_excesses_chs(P, T, magnetic_params_2))
