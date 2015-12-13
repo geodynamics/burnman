@@ -58,7 +58,7 @@ class Material(object):
             # if a derived class decides to set .name before calling this
             # constructor (I am looking at you, SLB_2011.py!), do not
             # overwrite the name here.
-            self.name = self.__class__.__name__
+            self._name = self.__class__.__name__
         self._cached = {}
 
     @property
@@ -137,7 +137,9 @@ class Material(object):
     
     def reset(self):
         """
-        Resets all cached properties in the material
+        Resets all cached material properties.
+
+        It is typically not required for the user to call this function.
         """
         self._cached = {}
 
@@ -163,26 +165,26 @@ class Material(object):
         raise NotImplementedError("need to implement unroll() in derived class!")
         return ([], [])
 
-
-    def evaluate(self,vars_list,pressures, temperatures):
+    def evaluate(self, vars_list, pressures, temperatures):
         """
-        Returns an array of material properties requested through a list of strings at given pressure and temperature conditions. At the end it resets the set_state to the original values.
+        Returns an array of material properties requested through a list of strings at given pressure and temperature
+        conditions. At the end it resets the set_state to the original values.
         The user needs to call set_method() before.
-        
             
         Parameters
         ----------
         vars_list : list of strings
-        Variables to be returned for given conditions
+            Variables to be returned for given conditions
         pressure : array of float
-        Array of pressures in [Pa].
+            Array of pressures in [Pa].
         temperature : float
-        Array of temperatures in [K].
+            Array of temperatures in [K].
         
         Returns
         -------
-        output : array of float
-        Array returning all variables at pressures and temperatures
+        output : array of array of float
+            Array returning all variables at given pressure/temperature values. output[i][j] is property vars_list[j]
+            and temperatures[i] and pressures[i].
         
         """
         old_pressure = self.pressure
@@ -205,42 +207,50 @@ class Material(object):
     @property
     def pressure (self):
         """
-        Returns pressure set in state [Pa]
-        Aliased with self.P
+        Returns current pressure that was set with :func:`~burnman.material.Material.set_state`.
+
+
+        Notes
+        -----
+        - Aliased with :func:`~burnman.material.Material.P`.
         
         Returns
         -------
         pressure : float
-        
+            Pressure in [Pa].
         """
         return self._pressure
     
     @property
     def temperature (self):
         """
-        Returns pressure set in state [K]
-        Aliased with self.T
-            
+        Returns current temperature that was set with :func:`~burnman.material.Material.set_state`.
+
+        Notes
+        -----
+        - Aliased with :func:`~burnman.material.Material.T`.
+
         Returns
         -------
-        pressure : float
-        
+        temperature : float
+            Temperature in [K].
         """
         return self._temperature
  
     @material_property
     def internal_energy(self):
         """
-        Returns internal energy of the mineral [J]
-        Aliased with self.energy
-        
+        Returns the internal energy of the mineral.
+
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.energy`.
         
         Returns
         -------
-        internal energies : float
+        internal_energy : float
+            The internal energy in [J].
         """
         raise NotImplementedError("need to implement internal_energy() in derived class!")
         return None
@@ -248,16 +258,17 @@ class Material(object):
     @material_property
     def molar_gibbs(self):
         """
-        Returns Gibbs free energy of the mineral [J]
-        Aliased with self.gibbs
+        Returns the Gibbs free energy of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.gibbs`.
+
         Returns
         -------
-        Gibbs free energies : float
+        molar_gibbs : float
+            Gibbs free energy in [J].
         """
         raise NotImplementedError("need to implement molar_gibbs() in derived class!")
         return None
@@ -265,16 +276,17 @@ class Material(object):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns Helmholtz free energy of the mineral [J]
-        Aliased with self.helholtz
+        Returns the Helmholtz free energy of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.helmholtz`.
+
         Returns
         -------
-        Helmholtz free energies : float
+        molar_helmholtz : float
+            Helmholtz free energy in [J].
         """
         raise NotImplementedError("need to implement molar_helmholtz() in derived class!")
         return None
@@ -282,16 +294,16 @@ class Material(object):
     @material_property
     def molar_mass(self):
         """
-        Returns molar mass of the mineral [kg/mol]
+        Returns molar mass of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
         
         Returns
         -------
         molar_mass : float
-        
+            Molar mass in [kg/mol].
         """
         raise NotImplementedError("need to implement molar_mass() in derived class!")
         return None
@@ -300,16 +312,17 @@ class Material(object):
     @material_property
     def molar_volume(self):
         """
-        Returns molar volume of the mineral [m^3/mol]
-        Aliased with self.V
+        Returns molar volume of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.V`.
+
         Returns
         -------
         molar_volume : float
+            Molar volume in [m^3/mol].
         """
         raise NotImplementedError("need to implement molar_volume() in derived class!")
         return None
@@ -318,17 +331,16 @@ class Material(object):
     def density(self):
         """
         Returns the density of this material.
-        Aliased with self.rho
-        
+
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.rho`.
         
         Returns
         -------
         density : float
-        The density of this material in [kg/m^3]
-        
+            The density of this material in [kg/m^3].
         """
         raise NotImplementedError("need to implement density() in derived class!")
         return None
@@ -337,34 +349,35 @@ class Material(object):
     @material_property
     def molar_entropy(self):
         """
-        Returns entropy of the mineral [J]
-        Aliased with self.S
+        Returns entropy of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.S`.
+
         Returns
         -------
-        entropies : float
+        entropy : float
+            Entropy in [J].
         """
         raise NotImplementedError("need to implement molar_entropy() in derived class!")
         return None
 
-
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpy of the mineral [J]
-        Aliased with self.H
+        Returns enthalpy of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.H`.
         
         Returns
         -------
-        enthalpies : float
+        enthalpy : float
+            Enthalpy in [J].
         """
         raise NotImplementedError("need to implement molar_enthalpy() in derived class!")
         return None
@@ -373,16 +386,17 @@ class Material(object):
     @material_property
     def isothermal_bulk_modulus(self):
         """
-        Returns isothermal bulk modulus of the mineral [Pa]
-        Aliased with self.K_T
+        Returns isothermal bulk modulus of the material.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.K_T`.
+
         Returns
         -------
         isothermal_bulk_modulus : float
+            Bulk modulus in [Pa].
         """
         raise NotImplementedError("need to implement isothermal_bulk_moduls() in derived class!")
         return None
@@ -390,16 +404,17 @@ class Material(object):
     @material_property
     def adiabatic_bulk_modulus(self):
         """
-        Returns adiabatic bulk modulus of the mineral [Pa]
-        Aliased with self.K_S
+        Returns the adiabatic bulk modulus of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.K_S`.
         
         Returns
         -------
-        adiabatic_bulk_modulus : array of floats
+        adiabatic_bulk_modulus : float
+            Adiabatic bulk modulus in [Pa].
         """
         raise NotImplementedError("need to implement adiabatic_bulk_modulus() in derived class!")
         return None
@@ -408,17 +423,17 @@ class Material(object):
     @material_property
     def isothermal_compressibility(self):
         """
-        Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
-        Aliased with self.beta_T
+        Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus).
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_T`.
         
         Returns
         -------
         (K_T)^-1 : float
-        
+            Compressibility in [1/Pa].
         """
         raise NotImplementedError("need to implement compressibility() in derived class!")
         return None
@@ -427,17 +442,18 @@ class Material(object):
     @material_property
     def adiabatic_compressibility(self):
         """
-        Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus) [1/Pa]
-        Aliased with self.beta_S
+        Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus).
+
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_S`.
         
         Returns
         -------
-        (K_S)^-1 : float
-        
+        adiabatic_compressibility : float
+            adiabatic compressibility in [1/Pa].
         """
         raise NotImplementedError("need to implement compressibility() in derived class!")
         return None
@@ -445,16 +461,17 @@ class Material(object):
     @material_property
     def shear_modulus(self):
         """
-        Returns shear modulus of the mineral [Pa]
-        Aliased with self.G
+        Returns shear modulus of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_G`.
+
         Returns
         -------
         shear_modulus : float
+            Shear modulus in [Pa].
         """
         raise NotImplementedError("need to implement shear_modulus() in derived class!")
         return None
@@ -462,16 +479,17 @@ class Material(object):
     @material_property
     def p_wave_velocity(self):
         """
-        Returns P wave speed of the mineral [m/s]
-        Aliased with self.v_p
+        Returns P wave speed of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_p`.
         
         Returns
         -------
         p_wave_velocity : float
+            P wave speed in [m/s].
         """
         raise NotImplementedError("need to implement p_wave_velocity() in derived class!")
         return None
@@ -479,16 +497,17 @@ class Material(object):
     @material_property
     def bulk_sound_velocity(self):
         """
-        Returns bulk sound speed of the mineral [m/s]
-        Aliased with self.v_phi
+        Returns bulk sound speed of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_phi`.
         
         Returns
         -------
         bulk sound velocity: float
+            Sound velocity in [m/s].
         """
         raise NotImplementedError("need to implement bulk_sound_velocity() in derived class!")
         return None
@@ -496,16 +515,17 @@ class Material(object):
     @material_property
     def shear_wave_velocity(self):
         """
-        Returns shear wave speed of the mineral [m/s]
-        Aliased with self.v_s
+        Returns shear wave speed of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_s`.
         
         Returns
         -------
-        shear wave velociy : float
+        shear_wave_velocity : float
+            Wave speed in [m/s].
         """
         raise NotImplementedError("need to implement shear_wave_velocity() in derived class!")
         return None
@@ -514,16 +534,17 @@ class Material(object):
     @material_property
     def grueneisen_parameter(self):
         """
-        Returns grueneisen parameter of the mineral [unitless]
-        Aliased with self.gr
+        Returns the grueneisen parameter of the mineral.
                 
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.gr`.
         
         Returns
         -------
         gr : float
+            Grueneisen parameters [unitless].
         """
         raise NotImplementedError("need to implement grueneisen_parameter() in derived class!")
         return None
@@ -532,16 +553,17 @@ class Material(object):
     @material_property
     def thermal_expansivity(self):
         """
-        Returns thermal expansion coefficient of the mineral [1/K]
-        Aliased with self.alpha
+        Returns thermal expansion coefficient of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.alpha`.
         
         Returns
         -------
         alpha : float
+            Thermal expansivity in [1/K].
         """
         raise NotImplementedError("need to implement thermal_expansivity() in derived class!")
         return None
@@ -550,16 +572,17 @@ class Material(object):
     @material_property
     def heat_capacity_v(self):
         """
-        Returns heat capacity at constant volume of the mineral [J/K/mol]
-        Aliased with self.C_v
+        Returns heat capacity at constant volume of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
-        
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.C_v`.
+
         Returns
         -------
         heat_capacity_v : float
+            Heat capacity in [J/K/mol].
         """
         raise NotImplementedError("need to implement heat_capacity_v() in derived class!")
         return None
@@ -567,16 +590,17 @@ class Material(object):
     @material_property
     def heat_capacity_p(self):
         """
-        Returns heat capacity at constant pressure of the mineral [J/K/mol]
-        Aliased with self.C_p
+        Returns heat capacity at constant pressure of the mineral.
         
         Notes
         -----
-        Needs to be implemented in derived classes.
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.C_p`.
         
         Returns
         -------
         heat_capacity_p : float
+            Heat capacity in [J/K/mol].
         """
         raise NotImplementedError("need to implement heat_capacity_p() in derived class!")
         return None
@@ -594,66 +618,87 @@ class Material(object):
     
     @property
     def P(self):
+        """Alias for :func:`~burnman.material.Material.pressure`"""
         return self.pressure
     @property
     def T(self):
+        """Alias for :func:`~burnman.material.Material.temperature`"""
         return self.temperature
-    @material_property
+    @property
     def energy(self):
+        """Alias for :func:`~burnman.material.Material.internal_energy`"""
         return self.internal_energy
-    @material_property
+    @property
     def helmholtz(self):
+        """Alias for :func:`~burnman.material.Material.molar_helmholtz`"""
         return self.molar_helmholtz
-    @material_property
+    @property
     def gibbs(self):
+        """Alias for :func:`~burnman.material.Material.molar_gibbs`"""
         return self.molar_gibbs
-    @material_property
+    @property
     def V(self):
+        """Alias for :func:`~burnman.material.Material.molar_volume`"""
         return self.molar_volume
-    @material_property
+    @property
     def rho(self):
+        """Alias for :func:`~burnman.material.Material.density`"""
         return self.density
-    @material_property
+    @property
     def S(self):
+        """Alias for :func:`~burnman.material.Material.molar_entropy`"""
         return self.molar_entropy
-    @material_property
+    @property
     def H(self):
+        """Alias for :func:`~burnman.material.Material.molar_enthalpy`"""
         return self.molar_enthalpy
-    @material_property
+    @property
     def K_T(self):
+        """Alias for :func:`~burnman.material.Material.isothermal_bulk_modulus`"""
         return self.isothermal_bulk_modulus
-    @material_property
+    @property
     def K_S(self):
+        """Alias for :func:`~burnman.material.Material.adiabatic_bulk_modulus`"""
         return self.adiabatic_bulk_modulus
-    @material_property
+    @property
     def beta_T(self):
+        """Alias for :func:`~burnman.material.Material.isothermal_compressibility`"""
         return self.isothermal_compressibility
-    @material_property
+    @property
     def beta_S(self):
+        """Alias for :func:`~burnman.material.Material.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
-    @material_property
+    @property
     def G(self):
+        """Alias for :func:`~burnman.material.Material.shear_modulus`"""
         return self.shear_modulus
-    @material_property
+    @property
     def v_p(self):
+        """Alias for :func:`~burnman.material.Material.p_wave_velocity`"""
         return self.p_wave_velocity
-    @material_property
+    @property
     def v_phi(self):
+        """Alias for :func:`~burnman.material.Material.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
-    @material_property
+    @property
     def v_s(self):
+        """Alias for :func:`~burnman.material.Material.shear_wave_velocity`"""
         return self.shear_wave_velocity
-    @material_property
+    @property
     def gr(self):
+        """Alias for :func:`~burnman.material.Material.grueneisen_parameter`"""
         return self.grueneisen_parameter
-    @material_property
+    @property
     def alpha(self):
+        """Alias for :func:`~burnman.material.Material.thermal_expansivity`"""
         return self.thermal_expansivity
-    @material_property
+    @property
     def C_v(self):
+        """Alias for :func:`~burnman.material.Material.heat_capacity_v`"""
         return self.heat_capacity_v
-    @material_property
+    @property
     def C_p(self):
+        """Alias for :func:`~burnman.material.Material.heat_capacity_p`"""
         return self.heat_capacity_p
     
 
