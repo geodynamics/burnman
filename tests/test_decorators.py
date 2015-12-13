@@ -60,7 +60,7 @@ class test_decorators__material_property(BurnManTest):
                          burnman.Material.internal_energy.__doc__)
 
         pressure_doc = burnman.Material.pressure.__doc__
-        self.assertTrue("pressure set" in pressure_doc)
+        self.assertTrue("current pressure" in pressure_doc)
 
         
 if __name__ == '__main__':
