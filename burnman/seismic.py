@@ -63,8 +63,7 @@ class Seismic1DModel(object):
         depths : array of floats
             Depths [m].
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
     def pressure(self, depth):
         """
@@ -78,8 +77,7 @@ class Seismic1DModel(object):
         pressure : float or array of floats
             Pressure(s) at given depth(s) in [Pa].
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
     def v_p(self, depth):
         """
@@ -93,8 +91,7 @@ class Seismic1DModel(object):
         v_p : float or array of floats
             P wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
     def v_s(self, depth):
         """
@@ -108,8 +105,7 @@ class Seismic1DModel(object):
         v_s : float or array of floats
             S wave velocity at given depth(s) in [m/s].
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
     
     def v_phi(self, depth):
         """
@@ -140,8 +136,7 @@ class Seismic1DModel(object):
         density : float or array of floats
             Density at given depth(s) in [kg/m^3].
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
     
     
     def G(self, depth):
@@ -175,8 +170,7 @@ class Seismic1DModel(object):
         Qk : float or array of floats
             Quality factor (dimensionless) for bulk modulus at given depth(s).
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
     def QG(self, depth):
         """
@@ -190,8 +184,7 @@ class Seismic1DModel(object):
         QG : float or array of floats
             Quality factor (dimensionless) for shear modulus at given depth(s).
         """
-        raise ValueError("not implemented")
-        return 0
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
 
 
@@ -207,8 +200,7 @@ class Seismic1DModel(object):
         depth : float or array of floats
             Depth(s) [m] for given pressure(s)
         """
-        raise ValueError("not implemented")
-        return -1
+        raise NotImplementedError("abstract method to be implemented in derived class")
     
 
 
@@ -224,8 +216,7 @@ class Seismic1DModel(object):
         gravity : float or array of floats
             Gravity for given depths in [m/s^2]
         """
-        raise ValueError("not implemented")
-        return -1
+        raise NotImplementedError("abstract method to be implemented in derived class")
 
 
 class SeismicTable(Seismic1DModel):

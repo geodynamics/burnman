@@ -163,7 +163,6 @@ class Material(object):
             List of minerals.
         """
         raise NotImplementedError("need to implement unroll() in derived class!")
-        return ([], [])
 
     def evaluate(self, vars_list, pressures, temperatures):
         """
@@ -253,8 +252,7 @@ class Material(object):
             The internal energy in [J].
         """
         raise NotImplementedError("need to implement internal_energy() in derived class!")
-        return None
-    
+
     @material_property
     def molar_gibbs(self):
         """
@@ -271,8 +269,7 @@ class Material(object):
             Gibbs free energy in [J].
         """
         raise NotImplementedError("need to implement molar_gibbs() in derived class!")
-        return None
-    
+
     @material_property
     def molar_helmholtz(self):
         """
@@ -289,7 +286,6 @@ class Material(object):
             Helmholtz free energy in [J].
         """
         raise NotImplementedError("need to implement molar_helmholtz() in derived class!")
-        return None
 
     @material_property
     def molar_mass(self):
@@ -306,8 +302,7 @@ class Material(object):
             Molar mass in [kg/mol].
         """
         raise NotImplementedError("need to implement molar_mass() in derived class!")
-        return None
-    
+
     
     @material_property
     def molar_volume(self):
@@ -325,7 +320,6 @@ class Material(object):
             Molar volume in [m^3/mol].
         """
         raise NotImplementedError("need to implement molar_volume() in derived class!")
-        return None
 
     @material_property
     def density(self):
@@ -343,8 +337,6 @@ class Material(object):
             The density of this material in [kg/m^3].
         """
         raise NotImplementedError("need to implement density() in derived class!")
-        return None
-
 
     @material_property
     def molar_entropy(self):
@@ -362,7 +354,6 @@ class Material(object):
             Entropy in [J].
         """
         raise NotImplementedError("need to implement molar_entropy() in derived class!")
-        return None
 
     @material_property
     def molar_enthalpy(self):
@@ -380,9 +371,7 @@ class Material(object):
             Enthalpy in [J].
         """
         raise NotImplementedError("need to implement molar_enthalpy() in derived class!")
-        return None
-    
-    
+
     @material_property
     def isothermal_bulk_modulus(self):
         """
@@ -399,7 +388,6 @@ class Material(object):
             Bulk modulus in [Pa].
         """
         raise NotImplementedError("need to implement isothermal_bulk_moduls() in derived class!")
-        return None
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -417,9 +405,7 @@ class Material(object):
             Adiabatic bulk modulus in [Pa].
         """
         raise NotImplementedError("need to implement adiabatic_bulk_modulus() in derived class!")
-        return None
-    
-    
+
     @material_property
     def isothermal_compressibility(self):
         """
@@ -436,8 +422,7 @@ class Material(object):
             Compressibility in [1/Pa].
         """
         raise NotImplementedError("need to implement compressibility() in derived class!")
-        return None
-    
+
     
     @material_property
     def adiabatic_compressibility(self):
@@ -456,7 +441,6 @@ class Material(object):
             adiabatic compressibility in [1/Pa].
         """
         raise NotImplementedError("need to implement compressibility() in derived class!")
-        return None
 
     @material_property
     def shear_modulus(self):
@@ -474,8 +458,7 @@ class Material(object):
             Shear modulus in [Pa].
         """
         raise NotImplementedError("need to implement shear_modulus() in derived class!")
-        return None
-    
+
     @material_property
     def p_wave_velocity(self):
         """
@@ -492,8 +475,7 @@ class Material(object):
             P wave speed in [m/s].
         """
         raise NotImplementedError("need to implement p_wave_velocity() in derived class!")
-        return None
-    
+
     @material_property
     def bulk_sound_velocity(self):
         """
@@ -510,8 +492,7 @@ class Material(object):
             Sound velocity in [m/s].
         """
         raise NotImplementedError("need to implement bulk_sound_velocity() in derived class!")
-        return None
-    
+
     @material_property
     def shear_wave_velocity(self):
         """
@@ -528,7 +509,6 @@ class Material(object):
             Wave speed in [m/s].
         """
         raise NotImplementedError("need to implement shear_wave_velocity() in derived class!")
-        return None
 
 
     @material_property
@@ -547,8 +527,7 @@ class Material(object):
             Grueneisen parameters [unitless].
         """
         raise NotImplementedError("need to implement grueneisen_parameter() in derived class!")
-        return None
-    
+
     
     @material_property
     def thermal_expansivity(self):
@@ -566,8 +545,6 @@ class Material(object):
             Thermal expansivity in [1/K].
         """
         raise NotImplementedError("need to implement thermal_expansivity() in derived class!")
-        return None
-
 
     @material_property
     def heat_capacity_v(self):
@@ -585,7 +562,6 @@ class Material(object):
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError("need to implement heat_capacity_v() in derived class!")
-        return None
 
     @material_property
     def heat_capacity_p(self):
@@ -603,11 +579,6 @@ class Material(object):
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError("need to implement heat_capacity_p() in derived class!")
-        return None
-
-
-
-
 
 
 
