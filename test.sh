@@ -121,6 +121,8 @@ cd tutorial
 for test in `ls step*.py`
 do
 testit $test $fulldir
+done
+cd ..
 
 echo "checking ipython/ ..."
 cd ipython
@@ -128,6 +130,7 @@ for test in `ls *.ipynb`
 do
     ipython nbconvert --to=python $test >/dev/null
 done
+
 for test in `ls *.py`
 do
     testit $test $fulldir
