@@ -106,8 +106,9 @@ class Composite(Material):
         set the same equation of state method for all the phases in the composite
         """
         for phase in self.phases:
-            
             phase.set_method(method)
+        # Clear the cache on resetting method
+        self.reset() 
 
     def set_averaging_scheme(self,averaging_scheme):
         """
@@ -119,6 +120,8 @@ class Composite(Material):
             self.averaging_scheme = getattr(averaging_schemes,averaging_scheme)()
         else:
             self.averaging_scheme = averaging_scheme
+        # Clear the cache on resetting averaging scheme
+        self.reset() 
 
 
     def set_state(self, pressure, temperature):
@@ -127,7 +130,7 @@ class Composite(Material):
         """
         Material.set_state(self, pressure, temperature)
         for phase in self.phases:
-                phase.set_state(pressure, temperature)
+            phase.set_state(pressure, temperature)
 
             
     def debug_print(self, indent=""):
