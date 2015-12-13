@@ -30,8 +30,9 @@ with open('$t') as f:
     CODE = compile(f.read(), '$t', 'exec')
     exec(CODE)
 EOF
-) >$t.tmp 2>&1
+) >$t.tmp 2>$t.tmp.error
 ret=$?
+cat $t.tmp.error >>$t.tmp
 if [ "$ret" -ne 0 ]
 then
   echo "!  $t ... FAIL";
