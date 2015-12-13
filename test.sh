@@ -116,6 +116,16 @@ done
 testit table.py $fulldir
 cd ..
 
+echo "checking tutorial/ ..."
+cd tutorial
+for test in `ls step*.py`
+do
+testit $test $fulldir
+done
+cd ..
+
+
+
 echo "   done"
 
 

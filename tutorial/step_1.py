@@ -113,8 +113,7 @@ if __name__=='__main__':
 
     phase_1_fraction = 0.5
     phase_2_fraction = 1.0-phase_1_fraction
-    rock = burnman.Composite([phase_1_fraction, phase_2_fraction], 
-                             [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
+    rock = burnman.Composite([minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()],[phase_1_fraction, phase_2_fraction])
 
     #---------------------------------------------------------#
     #---------------------------------------------------------#
@@ -135,9 +134,8 @@ if __name__=='__main__':
     # but see example_averaging.py for other options.  Finally, it calculates the seismic
     # wave speeds for the whole rock.  It returns a tuple of density, p-wave velocity
     # s-wave velocity, bulk sound speed, bulk modulus, and shear modulus.
-    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
-
-
+    density, vp, vs = rock.evaluate(['density','v_p','v_s'], pressure, temperature)
+    
     """
     Part (3) --- Plotting and comparison
 

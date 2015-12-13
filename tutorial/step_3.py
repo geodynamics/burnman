@@ -96,7 +96,7 @@ if __name__=='__main__':
         realize_mineral(phase_2)
 
         # Set up the rock with the now-perturbed mineral phases
-        mantle_rock = burnman.Composite( [phase_1_fraction, phase_2_fraction], [phase_1, phase_2] )
+        mantle_rock = burnman.Composite(  [phase_1, phase_2], [phase_1_fraction, phase_2_fraction] )
         mantle_rock.set_method('slb3')
 
         # Give back the realization of the rock with the perturbed phases.
@@ -123,7 +123,7 @@ if __name__=='__main__':
     """
 
     n_realizations = 1000
-    outfile = open('uncertainty.dat', 'w')
+    outfile = open('uncertainty.dat', 'wb')
 
     for i in range(n_realizations):
 
@@ -133,8 +133,7 @@ if __name__=='__main__':
           rock = realize_rock()
 
           # Calculate the wavespeed profiles, just as before.
-          rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.VoigtReussHill())
+          rho, vphi, vs = rock.evaluate(['rho','v_phi','v_s'], pressure, temperature)
 
           # This block of code interpolates the resulting densities and wavespeeds
           # to a higher resolution line to make the plot look nicer.
