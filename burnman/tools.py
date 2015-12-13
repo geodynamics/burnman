@@ -475,7 +475,7 @@ def bracket( fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     xa, xb, fa, fb: floats
         xa and xb are the inputs which bracket a root of fn.
         fa and fb are the values of the function at those points.
-        If the bracket function takes more than niter steps,
+        If the bracket function takes more than maxiter steps,
         it raises a ValueError.
     """
     niter = 0
