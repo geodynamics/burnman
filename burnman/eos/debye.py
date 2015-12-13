@@ -8,6 +8,9 @@ import numpy as np
 # not available, just go with the standard 
 # python interpreter
 try:
+    import os
+    if 'NUMBA_DISABLE_JIT' in os.environ and int(os.environ['NUMBA_DISABLE_JIT'])==1:
+        raise ImportError("NOOOO!")
     from numba import jit
 except ImportError:
     def jit(fn):
