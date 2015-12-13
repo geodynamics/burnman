@@ -82,12 +82,11 @@ class Mineral(Material):
         if self.method is not None and type(new_method) is not type(self.method):
 
             # Warn user that they are changing the EoS
-            warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ + ' even though the material is designed to be used with the method ' + self.method.__class__.__name__ + '.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).', stacklevel=2)
-
-            try:
-                self.pressure=self.temperature=float('nan')
-            except AttributeError:
-                pass
+            warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ +
+                          ' even though the material is designed to be used with the method ' +
+                          self.method.__class__.__name__ +
+                          '.  This does not overwrite any mineral attributes', stacklevel=2)
+            self.reset()
 
         self.method = new_method
 
@@ -115,12 +114,6 @@ class Mineral(Material):
 
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
-        """
-        Update the material to the given pressure [Pa] and temperature [K].
-
-        This updates the other properties of this class (v_s, v_p, ...).
-        """
-
         Material.set_state(self, pressure, temperature)
         self._property_modifiers = eos.property_modifiers.calculate_property_modifications(self)
 
@@ -133,42 +126,29 @@ class Mineral(Material):
     We choose the P, T properties (e.g. Gibbs(P, T) rather than Helmholtz(V, T)), 
     as it allows us to more easily apply corrections to the free energy
     """
-    
     @material_property
+    @copy_documentation(Material.molar_gibbs)
     def molar_gibbs(self):
-        """
-        Returns Gibbs free energy of the mineral [J]
-        Aliased with self.gibbs
-        """
         return self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params) \
             + self._property_modifiers['G']
 
     
     @material_property
+    @copy_documentation(Material.molar_volume)
     def molar_volume(self):
-        """
-        Returns molar volume of the mineral [m^3/mol]
-        Aliased with self.V
-        """
         return self.method.volume(self.pressure, self.temperature, self.params) \
             + self._property_modifiers['dGdP']
 
 
     @material_property
+    @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
-        """
-        Returns enthalpy of the mineral [J]
-        Aliased with self.S
-        """
         return self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params) \
             - self._property_modifiers['dGdT']
 
     @material_property
+    @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
-        """
-        Returns isothermal bulk modulus of the mineral [Pa]
-        Aliased with self.K_T
-        """
         V_orig = self.method.volume(self.pressure, self.temperature, self.params)
         K_T_orig = self.method.isothermal_bulk_modulus(self.pressure, self.temperature,
                                                   self.molar_volume, self.params)
@@ -176,24 +156,17 @@ class Mineral(Material):
         return self.molar_volume \
             / ((V_orig/K_T_orig) - self._property_modifiers['d2GdP2'])
     
-
     @material_property
+    @copy_documentation(Material.heat_capacity_p)
     def heat_capacity_p(self):
-        """
-        Returns heat capacity at constant pressure of the mineral [J/K/mol]
-        Aliased with self.C_p
-        """
         return self.method.heat_capacity_p(self.pressure, self.temperature,
                                            self.molar_volume , self.params) \
             - self.temperature*self._property_modifiers['d2GdT2']
 
     
     @material_property
+    @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
-        """
-        Returns thermal expansion coefficient (alpha) of the mineral [1/K]
-        Aliased with self.alpha
-        """
         return ((self.method.thermal_expansivity(self.pressure, self.temperature,
                                                  self.molar_volume , self.params) \
                  * self.method.volume(self.pressure, self.temperature, self.params)) \
@@ -201,11 +174,8 @@ class Mineral(Material):
 
     
     @material_property
+    @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
-        """
-        Returns shear modulus of the mineral [Pa]
-        Aliased with self.G
-        """
         return self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
     
     
@@ -216,128 +186,83 @@ class Mineral(Material):
     """
     
     @material_property
+    @copy_documentation(Material.molar_mass)
     def molar_mass(self):
-        """
-        Returns molar mass of the mineral [kg/mol]
-        """
         if 'molar_mass' in self.params:
             return self.params['molar_mass']
         else:
             raise ValueError("No molar_mass parameter for mineral "+self.to_string+".")
 
-
     @material_property
+    @copy_documentation(Material.density)
     def density(self):
-        """
-        Returns density of the mineral [kg/m^3]
-        Aliased with self.rho
-        """
         return self.molar_mass/self.molar_volume
 
     
     @material_property
+    @copy_documentation(Material.internal_energy)
     def internal_energy(self):
-        """
-        Returns internal energy of the mineral [J]
-        Aliased with self.energy
-        """
         return self.molar_gibbs - self.pressure*self.molar_volume + self.temperature*self.molar_entropy
 
     
     @material_property
+    @copy_documentation(Material.molar_helmholtz)
     def molar_helmholtz(self):
-        """
-        Returns Helmholtz free energy of the mineral [J]
-        Aliased with self.helmholtz
-        """
         return self.molar_gibbs - self.pressure*self.molar_volume
 
     
     @material_property
+    @copy_documentation(Material.molar_enthalpy)
     def molar_enthalpy(self):
-        """
-        Returns enthalpy of the mineral [J]
-        Aliased with self.H
-        """
         return self.molar_gibbs + self.temperature*self.molar_entropy
 
-
     @material_property
+    @copy_documentation(Material.adiabatic_bulk_modulus)
     def adiabatic_bulk_modulus(self):
-        """
-        Returns adiabatic bulk modulus of the mineral [Pa]
-        Aliased with self.K_S
-        """
         if self.temperature < 1.e-10:
             return self.isothermal_bulk_modulus
         else:
             return self.isothermal_bulk_modulus * self.heat_capacity_p / self.heat_capacity_v
 
     @material_property
+    @copy_documentation(Material.isothermal_compressibility)
     def isothermal_compressibility(self):
-        """
-        Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus) [1/Pa]
-        Aliased with self.beta_T
-        """
         return 1./self.isothermal_bulk_modulus
 
-
     @material_property
+    @copy_documentation(Material.adiabatic_compressibility)
     def adiabatic_compressibility(self):
-        """
-        Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus) [1/Pa]
-        Aliased with self.beta_S
-        """
         return 1./self.adiabatic_bulk_modulus
 
     
     @material_property
+    @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
-        """
-        Returns P wave speed of the mineral [m/s]
-        Aliased with self.v_p
-        """
         return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
                              self.shear_modulus) / self.density)
 
-
     @material_property
+    @copy_documentation(Material.bulk_sound_velocity)
     def bulk_sound_velocity(self):
-        """
-        Returns bulk sound speed of the mineral [m/s]
-        Aliased with self.v_phi
-        """
         return np.sqrt(self.adiabatic_bulk_modulus / self.density)
- 
 
     @material_property
+    @copy_documentation(Material.shear_wave_velocity)
     def shear_wave_velocity(self):
-        """
-        Returns shear wave speed of the mineral [m/s]
-        Aliased with self.v_s
-        """
         return np.sqrt(self.shear_modulus / self.density)
 
-
     @material_property
+    @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        """
-        Returns grueneisen parameter of the mineral [unitless]
-        Aliased with self.gr
-        """
         if self.temperature < 1.e-12:
             return 0.
         else:
             return self.thermal_expansivity * self.isothermal_bulk_modulus \
                 * self.molar_volume / self.heat_capacity_v
 
-
     @material_property
+    @copy_documentation(Material.heat_capacity_v)
     def heat_capacity_v(self):
-        """
-        Returns heat capacity at constant volume of the mineral [J/K/mol]
-        Aliased with self.C_v
-        """
         return self.heat_capacity_p - self.molar_volume * self.temperature \
             * self.thermal_expansivity * self.thermal_expansivity \
             * self.isothermal_bulk_modulus

@@ -1,12 +1,12 @@
-BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to MGD3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to MGD3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to MGD2 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to MGD2 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to SLB3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes other than temperature and pressure, which are set to nan. Stale attributes will be preserved unless they are refreshed (for example, by set_state).
+BURNMAN/burnman/composite.py: UserWarning: Warning, you are changing the method to SLB3 even though the material is designed to be used with the method SLB2.  This does not overwrite any mineral attributes
   phase.set_method(method)
 Calculations are done for:
 Composite:
