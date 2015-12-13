@@ -274,7 +274,7 @@ class Composite(Material):
         Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_T
         """
-        return 1./self.isothermal_bulk_modulus()
+        return 1./self.isothermal_bulk_modulus
 
 
     @material_property
@@ -283,7 +283,7 @@ class Composite(Material):
         Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_S
         """
-        return 1./self.adiabatic_bulk_modulus()
+        return 1./self.adiabatic_bulk_modulus
 
 
     @material_property
@@ -334,8 +334,7 @@ class Composite(Material):
         Returns grueneisen parameter of the composite [unitless]
         Aliased with self.gr
         """
-        return self.thermal_expansivity * self.isothermal_bulk_modulus / (self.density * self.heat_capacity_v)
-
+        return self.thermal_expansivity * self.isothermal_bulk_modulus * self.molar_volume / self.heat_capacity_v
 
 
     @material_property
@@ -344,7 +343,7 @@ class Composite(Material):
         Returns thermal expansion coefficient of the composite [1/K]
         Aliased with self.alpha
         """
-        V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
+        volumes = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
         alphas = np.array([phase.thermal_expansivity for phase in self.phases])
         return self.averaging_scheme.average_thermal_expansivity(volumes, alphas)
 
@@ -356,7 +355,7 @@ class Composite(Material):
         Aliased with self.C_v
         """
         c_v = np.array([phase.heat_capacity_v for phase in self.phases])
-        return self.averaging_scheme.averaging_heat_capacity_v(self.molar_fractions,c_v)
+        return self.averaging_scheme.average_heat_capacity_v(self.molar_fractions,c_v)
 
 
     @material_property
@@ -365,8 +364,8 @@ class Composite(Material):
         Returns heat capacity at constant pressure of the composite [J/K/mol]
         Aliased with self.C_p
         """
-        c_p = np.array([phase.heat_capacity_v for phase in self.phases])
-        return self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
+        c_p = np.array([phase.heat_capacity_p for phase in self.phases])
+        return self.averaging_scheme.average_heat_capacity_p(self.molar_fractions,c_p)
 
 
     def _mass_to_molar_fractions(self, phases, mass_fractions):
