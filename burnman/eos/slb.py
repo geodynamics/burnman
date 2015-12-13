@@ -10,6 +10,7 @@ import warnings
 from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
+from ..tools import bracket
 
 
 
@@ -100,39 +101,10 @@ class SLBBase(eos.EquationOfState):
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
         args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
-        print pressure,temperature
-
-        def my_bracket( fn, x0, dx, args=()):
-            ratio = 1.618
-            maxiter = 100
-            niter = 0
-
-            f0 = fn(x0, *args)
-            x1 = x0+dx
-            f1 = fn(x1, *args)
-            print x1, f1/1.e9, dx, niter
-            if (f1-f0)/(x1-x0) > 0:
-                dx = -dx
-                x1 = x0+dx
-                f1 = fn(x1, *args)
-
-            while f0 * f1 > 0. and niter < maxiter:
-                dx *= ratio
-                xnew = x1+dx
-                fnew = fn(xnew, *args)
-                print xnew, fnew/1.e9, dx, niter
-                x0 = x1
-                f0 = f1
-                x1 = xnew
-                f1 = fnew
-                niter += 1
-
-            if f0 * f1 > 0.:
-                raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
-            else:
-                return x0,x1,f0,f1
-            
-        sol = my_bracket(self._delta_pressure, params['V_0'], -1.e-16*params['V_0'], args) 
+        try:
+            sol = bracket(self._delta_pressure, params['V_0'], -1.e-2*params['V_0'], args) 
+        except ValueError:
+            raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
         return opt.brentq(self._delta_pressure, sol[0], sol[1] ,args=args)
 
     def pressure( self, temperature, volume, params):
