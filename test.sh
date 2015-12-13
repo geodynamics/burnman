@@ -63,8 +63,9 @@ fi
 echo "*** running test suite..."
 
 # check for tabs in code:
-for f in `find . -name \*.py`
+for f in `find . -name \*.py | grep -v ipython/`
 do
+    
     grep $'\t' -q $f && \
 	echo "ERROR: tabs found in '$f':" && \
 	grep -n $'\t' $f && exit 0
@@ -112,7 +113,6 @@ do
 
     testit $test $fulldir
 done
-
 testit table.py $fulldir
 cd ..
 
@@ -121,13 +121,22 @@ cd tutorial
 for test in `ls step*.py`
 do
 testit $test $fulldir
+
+echo "checking ipython/ ..."
+cd ipython
+for test in `ls *.ipynb`
+do
+    ipython nbconvert --to=python $test >/dev/null
+done
+for test in `ls *.py`
+do
+    testit $test $fulldir
+    rm $test
 done
 cd ..
 
 
-
 echo "   done"
-
 
 
 echo ""
