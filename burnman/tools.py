@@ -12,6 +12,30 @@ import numpy as np
 from scipy.optimize import fsolve, curve_fit
 from . import constants
 
+def copy_documentation(copy_from):
+    """
+    Decorator @copy_documentation(another_function) will copy the documentation found in a different
+    function (for example from a base class). The docstring applied to some function a() will be ::
+
+        (copied from BaseClass.some_function):
+        <documentation from BaseClass.some_function>
+        <optionally the documentation found in a()>
+
+    """
+    def mydecorator(func):
+        def wrapper(*args):
+            return func(*args)
+        old = ""
+        if func.__doc__:
+            old = "\n"+func.__doc__
+
+        copied_from = ""
+        if hasattr(copy_from, "__name__"):
+            copied_from = "(copied from "+copy_from.__name__+"):\n"
+        wrapper.__doc__ = copied_from+copy_from.__doc__ + old
+        return wrapper
+    return mydecorator
+
 def pretty_print_table(table,use_tabs=False):
     """
     Takes a 2d table and prints it in a nice text based format. If

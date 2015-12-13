@@ -10,6 +10,7 @@ import numpy as np
 
 from .material import Material, material_property
 from . import eos
+from .tools import copy_documentation
 
 
 
@@ -110,15 +111,8 @@ class Mineral(Material):
     def unroll(self):
         return ([self], [1.0])
 
-    def eos_pressure(self, temperature, volume):
-        return self.method.pressure(temperature, volume, self.params)
-
+    @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
-        """
-        Update the material to the given pressure [Pa] and temperature [K].
-
-        This updates the other properties of this class (v_s, v_p, ...).
-        """
         Material.set_state(self, pressure, temperature)
 
         if self.method is None:
@@ -126,11 +120,8 @@ class Mineral(Material):
 
     
     @material_property
+    @copy_documentation(Material.internal_energy)
     def internal_energy(self):
-        """
-        Returns internal energy of the mineral [J]
-        Aliased with self.energy
-        """
         return self.method.internal_energy(self.pressure, self.temperature, self.molar_volume, self.params )
 
     
