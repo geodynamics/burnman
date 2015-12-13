@@ -497,41 +497,39 @@ def bracket( fn, x0, dx, args=(), ratio=1.618, maxiter=100):
             x_right = x0+dx
             f_left = fn(x_left, *args)
             f_right = fn(x_right, *args)
-            print(x_left, x_right, f_left, f_right)
             niter+= 1
-        if f_left*f_right < 0.: #different sign, we found it
-            return x_left,x_right,f_left,f_right
-        else:
+        if niter == maxiter: #Couldn't find something with same slope in both directions
             raise ValueError('Cannot find zero.')
 
+    niter=0
+    slope = f_right-f0
+    if slope > 0. and f0 > 0.: # Walk left
+        dx = -dx
+        x1 = x_left
+        f1 = f_left
+    elif slope > 0. and f0 < 0.: #Walk right
+        x1 = x_right
+        f1 = f_right
+    elif slope < 0. and f0 > 0: #Walk right
+        x1 = x_right
+        f1 = f_right
+    else: # Walk left
+        dx = -dx
+        x1 = x_left
+        f1 = f_left
+
+    # Do the walking
+    while f0 * f1 > 0. and niter < maxiter:
+        dx *= ratio
+        xnew = x1+dx
+        fnew = fn(xnew, *args)
+        x0 = x1
+        f0 = f1
+        x1 = xnew
+        f1 = fnew
+        niter += 1
+
+    if f0 * f1 > 0.:
+        raise ValueError('Cannot find zero.')
     else:
-        slope = f_right-f0
-        if slope > 0. and f0 > 0.: # Walk left
-            dx = -dx
-            x1 = x_left
-            f1 = f_left
-        elif slope > 0. and f0 < 0.: #Walk right
-            x1 = x_right
-            f1 = f_right
-        elif slope < 0. and f0 > 0: #Walk right
-            x1 = x_right
-            f1 = f_right
-        else: # Walk left
-            dx = -dx
-            x1 = x_left
-            f1 = f_left
-
-        while f0 * f1 > 0. and niter < maxiter:
-            dx *= ratio
-            xnew = x1+dx
-            fnew = fn(xnew, *args)
-            x0 = x1
-            f0 = f1
-            x1 = xnew
-            f1 = fnew
-            niter += 1
-
-        if f0 * f1 > 0.:
-            raise ValueError('Cannot find zero.')
-        else:
-            return x0,x1,f0,f1
+        return x0,x1,f0,f1
