@@ -84,22 +84,22 @@ class test_material_name(BurnManTest):
 
     def test_mineral_without_name(self):
         m = self.min_no_name()
-        self.assertEquals(m.name, "min_no_name")
+        self.assertEqual(m.name, "min_no_name")
         m.name = "bla"
-        self.assertEquals(m.name, "bla")
+        self.assertEqual(m.name, "bla")
 
     def test_mineral_with_name(self):
 
         m = self.min_with_name()
-        self.assertEquals(m.name, "name set in params")
+        self.assertEqual(m.name, "name set in params")
         m.name = "bla"
-        self.assertEquals(m.name, "bla")
+        self.assertEqual(m.name, "bla")
 
     def test_set_name_before_init(self):
         m = self.min_with_name_manually()
-        self.assertEquals(m.name, "manually set")
+        self.assertEqual(m.name, "manually set")
         m.name = "bla"
-        self.assertEquals(m.name, "bla")
+        self.assertEqual(m.name, "bla")
 
 
 if __name__ == '__main__':
