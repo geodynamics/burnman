@@ -30,9 +30,14 @@ def check_pairs(phases, fractions):
 # static composite of minerals/composites
 class Composite(Material):
     """
-    Base class for a static composite material with fixed molar fractions. The
-    elements can be minerals or materials, meaning composite can be nested
-    arbitrarily.
+    Base class for a composite material.
+    The static phases can be minerals or materials,
+    meaning composite can be nested arbitrarily.
+
+    The fractions of the phases can be input
+    as either 'molar' or 'mass' during instantiation,
+    and modified (or initialised) after this point by
+    using set_fractions.
 
     This class is available as ``burnman.Composite``.
     """
@@ -46,7 +51,7 @@ class Composite(Material):
             list of phases.
         fractions: list of floats
             molar or mass fraction for each phase.
-        fraction_type: 'molar' or 'mass'
+        fraction_type: 'molar' or 'mass' (optional, 'molar' as standard)
             specify whether molar or mass fractions are specified.
         """
 
@@ -364,11 +369,23 @@ class Composite(Material):
         return self.averaging_scheme.averaging_heat_capacity_p(self.molar_fractions,c_p)
 
 
-    def _mass_to_molar_fractions(self, minerals, mass_fractions):
+    def _mass_to_molar_fractions(self, phases, mass_fractions):
         """
         Converts a set of mass fractions for phases into a set of molar fractions.
+
+        Parameters
+        ----------
+        phases : list of :class:`burnman.Material`
+        The list of phases for which fractions should be converted.
+
+        mass_fractions : list of floats
+        The list of mass fractions of the input phases.
+
+        Returns
+        -------
+        molar_fractions : list of floats
+        The list of molar fractions corresponding to the input molar fractions
         """
-        total_moles = sum(mass_fraction/mineral.molar_mass for mass_fraction, mineral in zip(mass_fractions, minerals))
-        return [mass_fraction/(mineral.molar_mass*total_moles) for mass_fraction, mineral in zip(mass_fractions, minerals)]
-
-
+        total_moles = sum(mass_fraction/phase.molar_mass for mass_fraction, phase in zip(mass_fractions, phases))
+        molar_fractions = [mass_fraction/(phase.molar_mass*total_moles) for mass_fraction, phase in zip(mass_fractions, phases)]
+        return molar_fractions
