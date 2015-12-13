@@ -41,7 +41,7 @@ class MGDBase(eos.EquationOfState):
             self._thermal_pressure(T_0, x, params) - pressure
         try:
             sol = bracket(func, params['V_0'], 1.e-2*params['V_0'])
-        except ValueError:
+        except:
             raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
         return opt.brentq(func, sol[0], sol[1])
 
