@@ -239,5 +239,28 @@ class composite(BurnManTest):
         c = burnman.Composite( [min1, min1], mass_fractions, fraction_type='mass')
         self.assertArraysAlmostEqual(c.molar_fractions, mass_fractions)
 
+    def test_velocities_from_rock(self):
+
+        rock = burnman.Composite( [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5,0.5])
+
+        # Use default averaging schemes
+        _,_,_,_,K,G = burnman.velocities_from_rock( rock, [40.e9,], [2000.,] )
+        rock.set_state(40.e9, 2000.)
+        K2 = rock.K_S
+        G2 = rock.G
+        self.assertFloatEqual(K, K2)
+        self.assertFloatEqual(G, G2)
+
+        #Now change the averaging schemes
+        _,_,_,_,K,G = burnman.velocities_from_rock( rock, [40.e9,], [2000.,] , averaging_scheme=burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.set_averaging_scheme('HashinShtrikmanAverage')
+        rock.set_state(40.e9, 2000.)
+        K2 = rock.K_S
+        G2 = rock.G
+        self.assertFloatEqual(K, K2)
+        self.assertFloatEqual(G, G2)
+
+
+
 if __name__ == '__main__':
     unittest.main()

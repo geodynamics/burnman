@@ -9,6 +9,38 @@ from . import geotherm
 from . import seismic
 from . import averaging_schemes
 
+def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averaging_schemes.VoigtReussHill()):
+    """
+    This function is deprecated. Use :func:`burnman.material.Material.evaluate` instead.
+
+    A function that rolls several steps into one: given a rock and a list of
+    pressures and temperatures, it calculates the elastic moduli of the
+    individual phases using calculate_moduli(), averages them using
+    average_moduli(), and calculates the seismic velocities using
+    compute_velocities().
+
+
+    :param burnman.abstract_material rock: this is a rock
+
+    :type pressures: list of float
+    :param pressures: list of pressures you want to evaluate the rock at. :math:`[Pa]`
+
+    :type temperatures: list of float
+    :param temperatures: list of temperatures you want to evaluate the rock at. :math:`[K]`
+
+
+    :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
+    :param averaging_scheme: Averaging scheme to use.
+
+    :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
+    :rtype: lists of floats
+
+    """
+    old_averaging_scheme = rock.averaging_scheme
+    rock.set_averaging_scheme(averaging_scheme)
+    rho, vp, vs, vphi, K, G = rock.evaluate( ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
+    rock.set_averaging_scheme(old_averaging_scheme)
+    return rho, vp, vs, vphi, K, G
 
 def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
     """
