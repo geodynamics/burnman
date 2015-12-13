@@ -325,8 +325,11 @@ class Mineral(Material):
         Returns grueneisen parameter of the mineral [unitless]
         Aliased with self.gr
         """
-        return self.thermal_expansivity * self.isothermal_bulk_modulus \
-            * self.molar_volume / self.heat_capacity_v
+        if self.temperature < 1.e-12:
+            return 0.
+        else:
+            return self.thermal_expansivity * self.isothermal_bulk_modulus \
+                * self.molar_volume / self.heat_capacity_v
 
 
     @material_property
