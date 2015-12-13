@@ -135,6 +135,16 @@ class test_tools(BurnManTest):
         self.assertTrue( sol[2]*sol[3] < 0.)
         self.assertTrue( sol[0] < 2.0 )
         self.assertTrue( sol[1] > 2.0 )
+
+    def test_bracket_failure(self):
+
+        mineral = burnman.minerals.SLB_2011.fayalite()
+        # This should be too high pressure for the EoS
+        mineral.set_state(300.e9, 300.)
+        def fn():
+            return mineral.molar_volume
+        with np.errstate(all='ignore'):
+            self.assertRaises(Exception, fn)
         
 if __name__ == '__main__':
     unittest.main()
