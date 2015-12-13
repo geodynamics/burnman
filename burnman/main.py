@@ -19,21 +19,26 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     average_moduli(), and calculates the seismic velocities using
     compute_velocities().
 
+    Parameters
+    ----------
+    rock : :class:`burnman.Material`
+         this is the rock for which you are calculating velocities
 
-    :param burnman.abstract_material rock: this is a rock
+    pressures: list of float
+        list of pressures you want to evaluate the rock at. :math:`[Pa]`
 
-    :type pressures: list of float
-    :param pressures: list of pressures you want to evaluate the rock at. :math:`[Pa]`
-
-    :type temperatures: list of float
-    :param temperatures: list of temperatures you want to evaluate the rock at. :math:`[K]`
+    temperatures: list of float
+        list of temperatures you want to evaluate the rock at. :math:`[K]`
 
 
-    :type averaging_scheme: :class:`burnman.averaging_schemes.averaging_scheme`
-    :param averaging_scheme: Averaging scheme to use.
+    averaging_scheme: :class:`burnman.averaging_schemes.AveragingScheme`
+        Averaging scheme to use.
 
-    :returns: :math:`\\rho` :math:`[kg/m^3]` , :math:`V_p, V_s,` and :math:`V_{\phi}` :math:`[m/s]`, bulk modulus :math:`K` :math:`[Pa]`,shear modulus :math:`G` :math:`[Pa]`
-    :rtype: lists of floats
+    Returns
+    -------
+
+    rho, V_p, V_s, V_phi, K, G : lists of floats
+        Lists of density [kg/m^3], P-wave velocity [m/s], shear-wave velocity [m/s], bulk sound velocity [m/s], bulk modulus [Pa], and shear modulus [Pa] for each P,T point.
 
     """
     old_averaging_scheme = rock.averaging_scheme
