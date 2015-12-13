@@ -70,19 +70,7 @@ class SLBBase(eos.EquationOfState):
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
     
-    def __volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
-        
-        f= 0.5*(pow(V_0/x,2./3.)-1.)
-        debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
-        E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
-        E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        
-        return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
-                + gr*(E_th - E_th_ref)/x - pressure #EQ 21
-
-    def _volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
+    def _delta_pressure(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
         
         f= 0.5*(pow(V_0/x,2./3.)-1.)
         debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
@@ -111,22 +99,41 @@ class SLBBase(eos.EquationOfState):
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
-        a = 0.6*params['V_0']
-        b = 1.2*params['V_0']
-        args=pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm
-        # if we have a sign change, we are done:
-        if self._volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)*self._volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)<0:
-            return opt.brentq(self._volume, a, b,args=args)
-        else:
-            tol = 0.0001
-            sol = opt.fmin(lambda x : self._volume(x,args)*self._volume(x,args), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
-            if sol[1] > tol*2:
+        args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
+        print pressure,temperature
+
+        def my_bracket( fn, x0, dx, args=()):
+            ratio = 1.618
+            maxiter = 100
+            niter = 0
+
+            f0 = fn(x0, *args)
+            x1 = x0+dx
+            f1 = fn(x1, *args)
+            print x1, f1/1.e9, dx, niter
+            if (f1-f0)/(x1-x0) > 0:
+                dx = -dx
+                x1 = x0+dx
+                f1 = fn(x1, *args)
+
+            while f0 * f1 > 0. and niter < maxiter:
+                dx *= ratio
+                xnew = x1+dx
+                fnew = fn(xnew, *args)
+                print xnew, fnew/1.e9, dx, niter
+                x0 = x1
+                f0 = f1
+                x1 = xnew
+                f1 = fnew
+                niter += 1
+
+            if f0 * f1 > 0.:
                 raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
             else:
-                warnings.warn("May be outside the range of validity for EOS")
-                return sol[0][0]
-
-
+                return x0,x1,f0,f1
+            
+        sol = my_bracket(self._delta_pressure, params['V_0'], -1.e-16*params['V_0'], args) 
+        return opt.brentq(self._delta_pressure, sol[0], sol[1] ,args=args)
 
     def pressure( self, temperature, volume, params):
         """
