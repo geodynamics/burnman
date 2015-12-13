@@ -266,7 +266,20 @@ class composite(BurnManTest):
         self.assertFloatEqual(K, K2)
         self.assertFloatEqual(G, G2)
 
-
+    def test_query_properties(self):
+        min1 = minerals.SLB_2011.periclase()
+        rock1 = burnman.Composite( [min1, min1], [0.5,0.5])
+        rock1.set_state(min1.params['P_0'], min1.params['T_0'])
+        
+        self.assertFloatEqual(rock1.molar_volume, min1.params['V_0'])
+        self.assertFloatEqual(rock1.molar_mass, min1.params['molar_mass'])
+        self.assertFloatEqual(rock1.isothermal_bulk_modulus, min1.params['K_0'])
+        self.assertFloatEqual(rock1.isothermal_compressibility, 1./min1.params['K_0'])
+        self.assertFloatEqual(rock1.adiabatic_compressibility, 1./rock1.adiabatic_bulk_modulus)
+        self.assertFloatEqual(rock1.grueneisen_parameter, min1.params['grueneisen_0'])
+        self.assertFloatEqual(rock1.thermal_expansivity, min1.alpha)
+        self.assertFloatEqual(rock1.heat_capacity_v, min1.C_v)
+        self.assertFloatEqual(rock1.heat_capacity_p, min1.C_p)
 
 if __name__ == '__main__':
     unittest.main()
