@@ -88,13 +88,15 @@ class Mineral(Material):
 
         self.method = new_method
 
-
         #Validate the params object on the requested EOS. 
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
             print('Mineral ' + self.to_string() + ' failed to validate parameters with message : \" ' + e.message + '\"')
             raise
+
+        # Invalidate the cache upon resetting the method
+        self.reset()
 
     def to_string(self):
         """
