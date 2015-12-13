@@ -45,7 +45,9 @@ class Composite(Material):
         phases: list of :class:`burnman.Material`
             list of phases.
         fractions: list of floats
-            molar fraction for each phase.
+            molar or mass fraction for each phase.
+        fraction_type: 'molar' or 'mass'
+            specify whether molar or mass fractions are specified.
         """
 
         Material.__init__(self)
@@ -62,6 +64,16 @@ class Composite(Material):
 
 
     def set_fractions(self, fractions, fraction_type='molar'):
+        """
+        Change the fractions of the phases of this Composite.
+
+        Parameters
+        ----------
+        fractions: list of floats
+            molar or mass fraction for each phase.
+        fraction_type: 'molar' or 'mass'
+            specify whether molar or mass fractions are specified.
+        """
         assert(len(self.phases)==len(fractions))
 
         try:
@@ -121,27 +133,26 @@ class Composite(Material):
     def debug_print(self, indent=""):
         print("%sComposite:" % indent)
         indent += "  "
-        try: # if fractions have been defined
+        if self.molar_fractions is None:
+            for i, phase in enumerate(self.phases):
+                phase.debug_print(indent + "  ")
+        else:
             for i, phase in enumerate(self.phases):
                 print("%s%g of" % (indent, self.molar_fractions[i]))
-                phase.debug_print(indent + "  ")
-        except:
-            for i, phase in enumerate(self.phases):
                 phase.debug_print(indent + "  ")
 
 
     def unroll(self):
+        if self.molar_fractions is None:
+            raise Exception("Unroll only works if the composite has defined fractions.")
         phases = []
         fractions = []
-        try:
-            for i, phase in enumerate(self.phases):
-                p_mineral, p_fraction = phase.unroll()
-                check_pairs(p_mineral, p_fraction)
-                fractions.extend([f*self.molar_fractions[i] for f in p_fraction])
-                phases.extend(p_mineral)
-        except:
-            raise Exception("Unroll only works if the composite has defined fractions.")
-        return (phases, fractions)
+        for i, phase in enumerate(self.phases):
+            p_mineral, p_fraction = phase.unroll()
+            check_pairs(p_mineral, p_fraction)
+            fractions.extend([f*self.molar_fractions[i] for f in p_fraction])
+            phases.extend(p_mineral)
+        return phases, fractions
 
     def to_string(self):
         """
@@ -327,7 +338,7 @@ class Composite(Material):
         """
         V_frac = np.array([phase.molar_volume*molar_fraction for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)])
         alphas = np.array([phase.thermal_expansivity for phase in self.phases])
-        return self.averaging_scheme.average_thermal_expansivity(volumes,alphas)
+        return self.averaging_scheme.average_thermal_expansivity(volumes, alphas)
 
 
     @material_property
@@ -360,6 +371,6 @@ class Composite(Material):
                 molar_fractions.append(mass_fractions[i]/(mineral.molar_mass*total_moles))
         except AttributeError:
             raise Exception("Mass fractions cannot be set before composition has been set for all the phases in the composite.")
-    
+
         return molar_fractions
 
