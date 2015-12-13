@@ -71,6 +71,20 @@ class test_tools(BurnManTest):
 
         self.assertArraysAlmostEqual(temperatures, np.array([T_ref]))
 
+    def test_fraction_conversion_mass(self):
+        per = burnman.minerals.SLB_2011.periclase()
+        stv = burnman.minerals.SLB_2011.stishovite()
+        fo = burnman.minerals.SLB_2011.forsterite()
+        c = burnman.Composite([per, stv, fo], [0.5, 0.25, 0.25])
+        mass_fractions = convert_fractions(c, [0.5, 0.25, 0.25], 'molar', 'mass')
+        self.assertArraysAlmostEqual([mass_fractions[0] + mass_fractions[1]], [mass_fractions[2]])
+        
+    def test_fraction_conversion_volume(self):
+        per = burnman.minerals.SLB_2011.periclase()
+        c = burnman.Composite([per, per, per], [0.25, 0.25, 0.5])
+        c.set_state(1.e5, 300.)
+        mass_fractions = convert_fractions(c, [0.25, 0.25, 0.5], 'molar', 'volume')
+        self.assertArraysAlmostEqual([mass_fractions[0] + mass_fractions[1]], [mass_fractions[2]])
         
 if __name__ == '__main__':
     unittest.main()
