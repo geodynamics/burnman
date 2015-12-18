@@ -195,10 +195,10 @@ if __name__=='__main__':
     right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
     bottom_edge= 4.3
     top_edge=11.3
-    aspect_ratio = (right_edge-left_edge)/(top_edge-bottom_edge)
+    aspect_ratio = 'auto'
     gamma = 0.5  #Mess with this to change intensity of colormaps near the edges
 
-    plt.subplot(111, aspect='equal')
+    plt.subplot(111, aspect=aspect_ratio)
     plt.xlim(left_edge, right_edge)
     plt.ylim(bottom_edge, top_edge)
     plt.xlabel('Pressure (GPa)')
