@@ -446,3 +446,90 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
         output_fractions = molar_fractions
 
     return output_fractions
+
+
+def bracket( fn, x0, dx, args=(), ratio=1.618, maxiter=100):
+    """
+    Given a function and a starting guess, find two
+    inputs for the function that bracket a root.
+
+    Parameters
+    ----------
+    fn : function
+        The function to bracket
+    x0 : float
+        The starting guess
+    dx : float
+        Small step for starting the search
+    args : parameter list
+        Additional arguments to give to fn
+    ratio :
+        The step size increases by this ratio
+        every step in the search. Defaults to
+        the golden ratio.
+    maxiter : int
+        The maximum number of steps before giving up.
+
+    Returns
+    -------
+    xa, xb, fa, fb: floats
+        xa and xb are the inputs which bracket a root of fn.
+        fa and fb are the values of the function at those points.
+        If the bracket function takes more than maxiter steps,
+        it raises a ValueError.
+    """
+    niter = 0
+    dx = np.abs(dx)
+    assert(ratio>1.0)
+
+    # Get the starting positions
+    f0 = fn(x0, *args)
+    x_left = x0-dx
+    x_right = x0+dx
+    f_left = fn(x_left, *args)
+    f_right = fn(x_right, *args)
+
+    # Overshot zero, try making dx smaller
+    if (f0-f_left)*(f_right-f0) < 0.:
+        while (f0-f_left)*(f_right-f0) < 0. and dx > np.finfo('float').eps and niter < maxiter:
+            dx /= ratio
+            x_left = x0-dx
+            x_right = x0+dx
+            f_left = fn(x_left, *args)
+            f_right = fn(x_right, *args)
+            niter+= 1
+        if niter == maxiter: #Couldn't find something with same slope in both directions
+            raise ValueError('Cannot find zero.')
+
+    niter=0
+    slope = f_right-f0
+    if slope > 0. and f0 > 0.: # Walk left
+        dx = -dx
+        x1 = x_left
+        f1 = f_left
+    elif slope > 0. and f0 < 0.: #Walk right
+        x1 = x_right
+        f1 = f_right
+    elif slope < 0. and f0 > 0: #Walk right
+        x1 = x_right
+        f1 = f_right
+    else: # Walk left
+        dx = -dx
+        x1 = x_left
+        f1 = f_left
+
+    # Do the walking
+    while f0 * f1 > 0. and niter < maxiter:
+        dx *= ratio
+        xnew = x1+dx
+        fnew = fn(xnew, *args)
+        x0 = x1
+        f0 = f1
+        x1 = xnew
+        f1 = fnew
+        niter += 1
+
+    if f0 * f1 > 0.:
+        raise ValueError('Cannot find zero.')
+    else:
+        return x0,x1,f0,f1

@@ -10,6 +10,7 @@ import warnings
 from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
+from ..tools import bracket
 
 
 
@@ -70,19 +71,7 @@ class SLBBase(eos.EquationOfState):
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
     
-    def __volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
-        
-        f= 0.5*(pow(V_0/x,2./3.)-1.)
-        debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
-        E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
-        E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        
-        return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
-                + gr*(E_th - E_th_ref)/x - pressure #EQ 21
-
-    def _volume(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
+    def _delta_pressure(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
         
         f= 0.5*(pow(V_0/x,2./3.)-1.)
         debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
@@ -111,22 +100,12 @@ class SLBBase(eos.EquationOfState):
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
-        a = 0.6*params['V_0']
-        b = 1.2*params['V_0']
-        args=pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm
-        # if we have a sign change, we are done:
-        if self._volume(a,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)*self._volume(b,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)<0:
-            return opt.brentq(self._volume, a, b,args=args)
-        else:
-            tol = 0.0001
-            sol = opt.fmin(lambda x : self._volume(x,args)*self._volume(x,args), 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
-            if sol[1] > tol*2:
-                raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
-            else:
-                warnings.warn("May be outside the range of validity for EOS")
-                return sol[0][0]
-
-
+        args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
+        try:
+            sol = bracket(self._delta_pressure, params['V_0'], 1.e-2*params['V_0'], args)
+        except:
+            raise Exception('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        return opt.brentq(self._delta_pressure, sol[0], sol[1] ,args=args)
 
     def pressure( self, temperature, volume, params):
         """
