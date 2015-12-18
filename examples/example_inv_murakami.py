@@ -24,24 +24,20 @@ if __name__ == "__main__":
     depths = np.linspace(1000e3,2500e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
-
     temperature = burnman.geotherm.brown_shankland(seis_p)
-
 
     print("preparations done")
 
-    def calc_velocities(a,b,c):
-        amount_perovskite = a
-        rock = burnman.Composite([minerals.SLB_2005.mg_fe_perovskite(b),
-                                  minerals.SLB_2005.ferropericlase(c)],\
-                                 [amount_perovskite, 1.0-amount_perovskite])
+    def calc_velocities(amount_pv,iron_pv,iron_fp):
+        pv = minerals.SLB_2011.mg_fe_perovskite([1.0-iron_pv, iron_pv, 0.0])
+        fp = minerals.SLB_2011.ferropericlase([1.0-iron_fp, iron_fp])
+        rock = burnman.Composite([pv, fp], [amount_pv, 1.0-amount_pv])
 
-
-        mat_rho, mat_vp, mat_vs = rock.evaluate(['density','v_phi','v_s'], seis_p,temperature)
+        mat_rho, mat_vp, mat_vs = rock.evaluate(['density','v_p','v_s'], seis_p, temperature)
         return mat_vp, mat_vs, mat_rho
 
-    def error(a,b,c):
-        mat_vp, mat_vs, mat_rho = calc_velocities(a,b,c)
+    def error(amount_pv,iron_pv,iron_fp):
+        mat_vp, mat_vs, mat_rho = calc_velocities(amount_pv,iron_pv,iron_fp)
 
         vs_err = burnman.l2(depths, mat_vs, seis_vs) /1e9
         vp_err = burnman.l2(depths, mat_vp, seis_vp) /1e9
@@ -57,26 +53,20 @@ if __name__ == "__main__":
     iron_pv = pymc.Uniform('iron_pv', lower= 0.0, upper=1.0, value=0.5)
     iron_fp = pymc.Uniform('iron_fp', lower= 0.0, upper=1.0, value=0.5)
 
-    # mg_pv_K = pymc.Normal('mg_pv_K', mu=251.e9, tau=1./(sigma**2))
-
     minerr = 1e100
 
-    #(plot=False)
     @pymc.deterministic
-    def theta(p1=amount_pv,p2=iron_pv,p3=iron_fp):
+    def theta(amount_pv=amount_pv,iron_pv=iron_pv,iron_fp=iron_fp):
         global minerr
-        #if (p1<0 or p2<0 or p3<0 or p4<0 or p5<0 or p6<0 or p7<0 or p8<0):
-        #    return 1e30
 
         try:
-            e = error(p1,p2,p3)
+            e = error(amount_pv,iron_pv,iron_fp)
             if (e<minerr):
                 minerr=e
-                print("best fit", e, "values:", p1,p2,p3)
+                print("best fit", e, "values:", amount_pv,iron_pv,iron_fp)
             return e
         except ValueError:
             return 1e20#float("inf")
-
 
     sig = 10.0
     misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
@@ -90,18 +80,18 @@ if __name__ == "__main__":
         print("run <dbname>")
         print("continue <dbname>")
         print("plot <dbname1> <dbname2> ...")
+        print("show amount_pv iron_pv iron_fp")
     else:
         whattodo = sys.argv[1]
         dbname = sys.argv[2]
 
     if whattodo=="run":
         S = pymc.MCMC(model, db='pickle', dbname=dbname)
-        S.sample(iter=100, burn=0, thin=1)
+        S.sample(iter=400, burn=200, thin=1)
         S.db.close()
-        whattodo="continue"
 
     if whattodo=="continue":
-        n_runs = 1000
+        n_runs = 50
         for l in range(0,n_runs):
             db = pymc.database.pickle.load(dbname)
             print("*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('amount_pv').stats()['n'] ))
@@ -113,7 +103,7 @@ if __name__ == "__main__":
         files=sys.argv[2:]
         print("files:",files)
 
-        toburn=1000
+        toburn=0
         plot_idx=1
 
         for t in things:
@@ -123,6 +113,7 @@ if __name__ == "__main__":
             print("trace:",t)
             for filename in files:
                 db = pymc.database.pickle.load(filename)
+                dir(db)
                 newtrace=db.trace(t,chain=None).gettrace(burn=toburn,chain=None)
                 if (trace!=[]):
                     trace = np.append(trace, newtrace)
@@ -163,7 +154,8 @@ if __name__ == "__main__":
                 dist = sp.genextreme(X[0],X[1],X[2])
                 x = np.array(bins)
                 y = dist.pdf(x)
-            #plt.plot(x, y,'b--',linewidth=2)
+                plt.plot(x, y,'b--',linewidth=2)
+                plt.title("%s" % (t),fontsize='small')
 
 
             elif plot_idx==3:
@@ -185,7 +177,7 @@ if __name__ == "__main__":
                 print(bins)
                 print(dist.pdf(np.array(bins)))
                 plt.plot(bins, dist.pdf(np.array(bins)),'r--', linewidth=2)
-                plt.title("%s, mean: %.3e, std dev.: %.3e" % (t,mu,sigma),fontsize='small')
+                plt.title("%s, mu: %.3e, sigma: %.3e" % (t,mu,sigma),fontsize='small')
 
 
 
@@ -227,7 +219,7 @@ if __name__ == "__main__":
         plt.title("Vs (km/s)")
 
 
-        # plot Vphi
+        # plot Vp
         plt.subplot(2,2,2)
         plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
         plt.ylim([10, 14])
@@ -298,8 +290,10 @@ if __name__ == "__main__":
         values = [float(i) for i in sys.argv[2:]]
         mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
 
-        print("misfit: %s " % error(values[0], values[1], values[2]))
+        misfit = error(values[0], values[1], values[2])
+        print("misfit: %s " % misfit)
 
+        plt.suptitle('misfit %.3e, amount_pv=%.4f, iron_pv=%.4f, iron_fp=%.4f' % (misfit, values[0], values[1], values[2]))
 
         plt.subplot(2,2,1)
         plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
@@ -308,7 +302,7 @@ if __name__ == "__main__":
         plt.title("Vs (km/s)")
 
 
-        # plot Vphi
+        # plot Vp
         plt.subplot(2,2,2)
         plt.plot(seis_p/1.e9,mat_vp/1.e3,color='r',linestyle='-',marker='x',markerfacecolor='r',markersize=4)
         plt.plot(seis_p/1.e9,seis_vp/1.e3,color='k',linestyle='-',marker='o',markerfacecolor='k',markersize=4)
