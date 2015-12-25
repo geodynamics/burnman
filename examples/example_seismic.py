@@ -11,12 +11,12 @@ function of depth (or pressure) as well as different velocity model libraries
 available within Burnman:
 
 1. PREM :cite:`dziewonski1981`
-2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
-   :cite:`Lekic2012`
-3. Reference model for slow regions (LLSVP's) in the lower mantle :cite:`Lekic2012`
+2. STW105 :cite:`kustowski2008`
+3. AK135 :cite:`kennett1995`
+4. IASP91 :cite:`kennett1991`
 
 This example will first calculate or read in a seismic model and plot the
-model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`Kennett1995`.
+model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`kennett1995`.
 
 *Uses:*
 
@@ -51,11 +51,12 @@ if __name__ == "__main__":
     units=['Pa','m/s^2','m/s','m/s','m/s','kg/m^3','Pa','m/s^2']
     
     
-    plt.figure(figsize=(14,8))
+    plt.figure(figsize=(10,9))
     
 
     # Run through models and variables
     for a in range(len(var)):
+        ax = plt.subplot(3,2,a+1)
         for m in range(len(models)):
 
                 # specify where we want to evaluate, here we map from pressure to depth
@@ -77,10 +78,15 @@ if __name__ == "__main__":
                     print(var[a] + ' is not defined for ' + models[m].__class__.__name__)
 
         plt.title(var[a])
-        plt.legend(loc='center right')
-        plt.xlabel('depth in km')
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        if a ==3 :
+            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        if a >3 :
+            plt.xlabel('depth in km')
         plt.ylabel(units[a])
-        plt.show()
+        plt.gca().set_xticks([660,2891,5150])
+    plt.show()
 
 
     
