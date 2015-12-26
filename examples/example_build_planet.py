@@ -30,7 +30,7 @@ Here we show an example that does this, using the planet Mercury as motivation.
 
 * :doc:`mineral_database`
 * :class:`burnman.composite.Composite`
-* :func:`burnman.material.evaluate`
+* :func:`burnman.material.Material.evaluate`
 '''
 from __future__ import absolute_import
 from __future__ import print_function
