@@ -6,7 +6,7 @@
 Welcome to BurnMan's documentation!
 ===================================
 
-The code documentation including class and function description can be found online at `<http://burnman.org/current-doc>`_.
+The code documentation including class and function description can be found online at `burnman.org/current-doc <http://burnman.org/current-doc>`_.
 
 .. automodule:: burnman
 
