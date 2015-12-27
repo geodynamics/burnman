@@ -24,9 +24,6 @@ The tutorial for BurnMan currently consists of three separate units:
 
 .. _ref-example-tut1:
 
-.. #CIDER 2014 BurnMan Tutorial --- step 1
-.. #--------------------------------------
-
 .. automodule:: tutorial.step_1
 
 When run (without putting in a more realistic composition), the program produces the following image:
@@ -36,18 +33,12 @@ When run (without putting in a more realistic composition), the program produces
 Your goal in this tutorial is to improve this awful fit...
 
 
-link to source code: `tutorial/step1.py <../../../tutorial/step_1.py>`_
-
-
-
 
 .. automodule:: tutorial.step_2
 
 Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
 .. image:: figures/tut-step2.png
-
-link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 
 
