@@ -324,8 +324,8 @@ class EquationOfState(object):
         and an equation of state is not required to implement it.  This function will
         not return anything, though it may raise warnings or errors.
 
-        Params
-        ------
+        Parameters
+        ----------
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
         """

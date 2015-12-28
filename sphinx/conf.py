@@ -288,7 +288,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'BurnMan.tex', u'BurnMan Documentation',
+  ('index_pdf', 'BurnMan.tex', u'BurnMan Documentation',
    u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'manual'),
 ]
 
@@ -310,7 +310,7 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_domain_indices = True
+latex_domain_indices = False
 
 
 # -- Options for manual page output --------------------------------------------
@@ -319,7 +319,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'burnman', u'BurnMan Documentation',
-     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn'], 1)
+     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -333,7 +333,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'BurnMan', u'BurnMan Documentation',
-   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
+   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
    'Miscellaneous'),
 ]
 
