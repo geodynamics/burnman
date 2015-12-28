@@ -7,11 +7,45 @@ import numpy as np
 import scipy.optimize as opt
 import warnings
 
+# Try to import the jit from numba.  If it is
+# not available, just go with the standard
+# python interpreter
+try:
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
+
 from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
 from ..tools import bracket
 
+
+@jit
+def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
+    """global function with plain parameters so jit will work"""
+    x = V_0 / volume
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * gruen_0 # EQ 47
+    a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*q_0*gruen_0 # EQ 47
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+    return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+
+@jit
+def _delta_pressure_fast1(V_0, a1_ii, a2_iikk, x, Debye_0):
+    f = 0.5 * (pow(V_0 / x, 2. / 3.) - 1.)
+    debye_temperature = Debye_0 * np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
+    return debye_temperature, f
+
+
+@jit
+def _delta_pressure_fast2(E_th, E_th_ref, a1_ii, a2_iikk, b_iikk, b_iikkmm, f, pressure, x):
+    nu_o_nu0_sq = 1. + a1_ii * f + (1. / 2.) * a2_iikk * f * f  # EQ 41
+    gr = 1. / 6. / nu_o_nu0_sq * (2. * f + 1.) * ( a1_ii + a2_iikk * f )
+    return (1. / 3.) * (pow(1. + 2. * f, 5. / 2.)) * ((b_iikk * f) + (0.5 * b_iikkmm * f * f)) \
+           + gr * (E_th - E_th_ref) / x - pressure  # EQ 21
 
 
 class SLBBase(eos.EquationOfState):
@@ -70,18 +104,13 @@ class SLBBase(eos.EquationOfState):
         gr = self.grueneisen_parameter(0., T, V, params) # P not important
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
-    
+
     def _delta_pressure(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
         
-        f= 0.5*(pow(V_0/x,2./3.)-1.)
-        debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+        debye_temperature, f = _delta_pressure_fast1(V_0, a1_ii, a2_iikk, x, Debye_0)
         E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
         E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        
-        return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
-                + gr*(E_th - E_th_ref)/x - pressure #EQ 21
+        return _delta_pressure_fast2(E_th, E_th_ref, a1_ii, a2_iikk, b_iikk, b_iikkmm, f, pressure, x)
 
     def volume(self, pressure, temperature, params):
         """
@@ -124,18 +153,11 @@ class SLBBase(eos.EquationOfState):
 
         return P
 
-
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter :math:`[unitless]` 
         """
-        x = params['V_0'] / volume
-        f = 1./2. * (pow(x, 2./3.) - 1.)
-        gruen_0 = params['grueneisen_0']
-        a1_ii = 6. * gruen_0 # EQ 47
-        a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*params['q_0']*gruen_0 # EQ 47
-        nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
-        return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+        return _grueneisen_parameter_fast(params['V_0'], volume, params['grueneisen_0'], params['q_0'])
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
