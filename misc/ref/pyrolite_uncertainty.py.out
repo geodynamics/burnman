@@ -1,0 +1,6 @@
+Options:
+  run <dbname>    -- run realizations and write into given database name
+  plot <dbname>   -- plot given database
+  plotgood <dbname1> <dbname2> ...   -- aggregate databases and plot
+  plotone  -- plot a single hardcoded nice result
+  error    -- testing, compute errors of a single hardcoded realization
