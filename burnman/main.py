@@ -47,36 +47,6 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     rock.set_averaging_scheme(old_averaging_scheme)
     return rho, vp, vs, vphi, K, G
 
-def apply_attenuation_correction(v_p,v_s,v_phi,Qs,Qphi):
-    """
-    PUT IN SEISMIC
-    
-    Returns lists of corrected velocities  for a given :math:`Q_s, Q_{\\mu}` and :math:`Q_{\\phi}`
-
-
-
-    :type Vp: list of float
-    :param Vp: list of :math:`V_p`. :math:`[m/s]`
-    :type Vs: list of float
-    :param Vs: list of :math:`V_s`. :math:`[m/s]`
-    :type Vphi: list of float
-    :param Vphi: list of :math:`V_{\phi}`. :math:`[m/s]`
-
-    :returns: :math:`V_p` ,:math:`V_s`, `V_{\phi}`. :math:`[m/s]`
-    :rtype: list of floats
-
-    """
-
-    length = len(v_p)
-    ret_v_p = np.zeros(length)
-    ret_v_s = np.zeros(length)
-    ret_v_phi = np.zeros(length)
-    for i in range(length):
-        ret_v_p[i],ret_v_s[i],ret_v_phi[i] = \
-            burnman.seismic.attenuation_correction(v_p[i], v_s[i], v_phi[i],Qs,Qphi)
-
-    return ret_v_p, ret_v_s, ret_v_phi
-
 
 def compare_l2(depth,calc, obs):
     """
