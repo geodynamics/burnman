@@ -21,23 +21,23 @@ from test_solidsolution import *
 from test_spin import *
 from test_tools import *
 
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+import os
+import sys
+sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 
 
 class TestRock(BurnManTest):
+
     def test_rock(self):
         amount_perovskite = 0.3
-        rock = burnman.Composite([minerals.SLB_2005.mg_perovskite(), minerals.SLB_2005.periclase()], \
-                                 [amount_perovskite, 1.0-amount_perovskite])
-        (phases, fr)=rock.unroll()
+        rock = burnman.Composite([minerals.SLB_2005.mg_perovskite(), minerals.SLB_2005.periclase()],
+                                 [amount_perovskite, 1.0 - amount_perovskite])
+        (phases, fr) = rock.unroll()
         self.assertFloatEqual(fr[0], 0.3)
         self.assertFloatEqual(fr[1], 0.7)
-
-
 
 
 if __name__ == '__main__':

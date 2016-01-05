@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import unittest
-import os, sys
+import os
+import sys
 
 sys.path.insert(1, os.path.abspath('..'))
 import warnings
@@ -13,7 +14,7 @@ from util import BurnManTest
 
 class mypericlase(burnman.Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
 
     def __init__(self):
@@ -34,13 +35,14 @@ class mypericlase(burnman.Mineral):
 
 
 class geotherm(BurnManTest):
+
     def test_adiabat(self):
         rock = mypericlase()
-        pressure = [100.e9,150.e9]
+        pressure = [100.e9, 150.e9]
         rock.set_method('slb3')
         T0 = 1500.
-        test_K_adiabat = burnman.geotherm.adiabatic(pressure,T0,rock)
-        self.assertArraysAlmostEqual(test_K_adiabat,[1500,1650.22034002])
+        test_K_adiabat = burnman.geotherm.adiabatic(pressure, T0, rock)
+        self.assertArraysAlmostEqual(test_K_adiabat, [1500, 1650.22034002])
 
 
 if __name__ == '__main__':

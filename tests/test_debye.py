@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import unittest
-import os, sys
+import os
+import sys
 
 sys.path.insert(1, os.path.abspath('..'))
 import warnings
@@ -13,7 +14,7 @@ from util import BurnManTest
 
 class mypericlase(burnman.Mineral):
     """
-    Stixrude & Lithgow-Bertelloni 2005 and references therein 
+    Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
 
     def __init__(self):
@@ -43,22 +44,28 @@ class Debye(BurnManTest):
     def test_return_zero(self):
         rock = mypericlase()
         x = 0.
-        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_helmholtz,0.)
-        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_heat_capacity_v,0.)
-        test_thermal_energy = burnman.eos.debye.thermal_energy(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_thermal_energy,0.)
+        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_helmholtz, 0.)
+        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_heat_capacity_v, 0.)
+        test_thermal_energy = burnman.eos.debye.thermal_energy(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_thermal_energy, 0.)
 
     def test_small(self):
         rock = mypericlase()
         x = 1e-16
-        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_helmholtz,0.)
-        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_heat_capacity_v,0.)
-        test_thermal_energy = burnman.eos.debye.thermal_energy(x,rock.params['Debye_0'],rock.params['n'])
-        self.assertFloatEqual(test_thermal_energy,0.)
+        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_helmholtz, 0.)
+        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_heat_capacity_v, 0.)
+        test_thermal_energy = burnman.eos.debye.thermal_energy(
+            x, rock.params['Debye_0'], rock.params['n'])
+        self.assertFloatEqual(test_thermal_energy, 0.)
 
 if __name__ == '__main__':
     unittest.main()

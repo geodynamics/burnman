@@ -1,9 +1,10 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
-    
+
 example_tools
 ----------------
 
@@ -16,14 +17,18 @@ This example demonstrates BurnMan's tools, which are currently
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os, sys, numpy as np, matplotlib.pyplot as plt
+import os
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
-#hack to allow scripts to be placed in subdirectories next to burnman:
+# hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+    sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
-round_to_n = lambda x, xerr, n: round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
+round_to_n = lambda x, xerr, n: round(
+    x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
 if __name__ == "__main__":
 
@@ -39,13 +44,20 @@ if __name__ == "__main__":
     pressures_wd_rw = np.empty_like(temperatures)
     pressures_rw_perpv = np.empty_like(temperatures)
 
-
     # Here's one example where we find the equilibrium temperature:
     P = 14.e9
     T = burnman.tools.equilibrium_temperature([forsterite, mg_wadsleyite],
                                               [1.0, -1.0], P)
     print('Endmember equilibrium calculations')
-    print('fo -> wad equilibrium at', P/1.e9, "GPa is reached at", round_to_n(T, T, 4), "K")
+    print(
+        'fo -> wad equilibrium at',
+        P / 1.e9,
+        "GPa is reached at",
+        round_to_n(
+            T,
+            T,
+            4),
+        "K")
     print('')
 
     # Now let's make the whole diagram using equilibrium_pressure
@@ -54,21 +66,20 @@ if __name__ == "__main__":
                                                [1.0, -1.0],
                                                T)
         pressures_fo_wd[i] = P
-        
+
         P = burnman.tools.equilibrium_pressure([mg_wadsleyite, mg_ringwoodite],
                                                [1.0, -1.0],
                                                T)
         pressures_wd_rw[i] = P
-        
+
         P = burnman.tools.equilibrium_pressure([mg_ringwoodite, periclase, mg_perovskite],
                                                [1.0, -1.0, -1.0],
                                                T)
         pressures_rw_perpv[i] = P
 
-
-    plt.plot(temperatures, pressures_fo_wd/1.e9, label='fo -> wd')
-    plt.plot(temperatures, pressures_wd_rw/1.e9, label='wd -> rw')
-    plt.plot(temperatures, pressures_rw_perpv/1.e9, label='rw -> per + pv')
+    plt.plot(temperatures, pressures_fo_wd / 1.e9, label='fo -> wd')
+    plt.plot(temperatures, pressures_wd_rw / 1.e9, label='wd -> rw')
+    plt.plot(temperatures, pressures_rw_perpv / 1.e9, label='rw -> per + pv')
     plt.xlabel("Temperature (K)")
     plt.ylabel("Pressure (GPa)")
     plt.legend(loc="lower right")
@@ -105,7 +116,7 @@ if __name__ == "__main__":
 
     # Convert the data into the right units and format for fitting
     PV = np.array(list(zip(*PV)))
-    PT = [PV[0]*1.e9, 298.15 + PV[0]*0.]
+    PT = [PV[0] * 1.e9, 298.15 + PV[0] * 0.]
     V = burnman.tools.molar_volume_from_unit_cell_volume(PV[1], 2.)
     sigma = burnman.tools.molar_volume_from_unit_cell_volume(PV[2], 2.)
 
@@ -119,9 +130,9 @@ if __name__ == "__main__":
     print('Equation of state calculations')
     print('Optimized equation of state for stishovite:')
     for i, p in enumerate(params):
-        print (p+':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),\
-            '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1))
-        
+        print (p + ':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),
+               '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1))
+
     # Finally, let's plot our equation of state
     pressures = np.linspace(1.e5, 60.e9, 101)
     volumes = np.empty_like(pressures)
@@ -129,31 +140,45 @@ if __name__ == "__main__":
         stv.set_state(P, 298.15)
         volumes[i] = stv.V
 
-    plt.plot(pressures/1.e9, volumes*1.e6, label='Optimized fit for stishovite')
-    plt.errorbar(PT[0]/1.e9, V*1.e6, yerr=sigma*1.e6, linestyle='None', marker='o', label='Andrault et al. (2003)')
-    
+    plt.plot(
+        pressures / 1.e9,
+        volumes * 1.e6,
+        label='Optimized fit for stishovite')
+    plt.errorbar(
+        PT[0] / 1.e9,
+        V * 1.e6,
+        yerr=sigma * 1.e6,
+        linestyle='None',
+        marker='o',
+        label='Andrault et al. (2003)')
+
     plt.ylabel("Volume (cm^3/mol)")
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="upper right")
     plt.title("Stishovite EoS (room temperature)")
     plt.show()
 
-
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
     print('')
     print('Hugoniot calculations')
     pressures = np.linspace(1.e5, 120.e9, 101)
-    temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 298.15, pressures)
-    plt.plot(pressures/1.e9, temperatures, label='298.15 K')
-    print('Room temperature Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K')
-    
-    temperatures, volumes = burnman.tools.hugoniot(periclase, 1.e5, 1000., pressures)
-    plt.plot(pressures/1.e9, temperatures, label='1000 K')
-    print('1000 K Hugoniot temperature at', pressures[-1]/1.e9, 'GPa:',  int(temperatures[-1]+0.5), 'K')
-    
+    temperatures, volumes = burnman.tools.hugoniot(
+        periclase, 1.e5, 298.15, pressures)
+    plt.plot(pressures / 1.e9, temperatures, label='298.15 K')
+    print('Room temperature Hugoniot temperature at',
+          pressures[-1] / 1.e9, 'GPa:', int(temperatures[-1] + 0.5), 'K')
+
+    temperatures, volumes = burnman.tools.hugoniot(
+        periclase, 1.e5, 1000., pressures)
+    plt.plot(pressures / 1.e9, temperatures, label='1000 K')
+    print('1000 K Hugoniot temperature at',
+          pressures[-1] / 1.e9,
+          'GPa:',
+          int(temperatures[-1] + 0.5),
+          'K')
+
     plt.legend(loc="upper left")
     plt.ylabel("Temperature (K)")
     plt.xlabel("Pressure (GPa)")
     plt.title("Periclase Hugoniot")
     plt.show()
-    

@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 from __future__ import absolute_import
@@ -19,6 +20,7 @@ class Model(object):
     all computations are done automatically and lazily
 
     """
+
     def __init__(self, rock, p, T, avgscheme):
         assert(len(p) == len(T))
         assert(len(p) > 0)
@@ -77,7 +79,8 @@ class Model(object):
             for idx in range(n_pressures):
                 V = np.array([m['V'] for m in self.moduli[idx]])
                 alpha = np.array([m['alpha'] for m in self.moduli[idx]])
-                self.alpha[idx] = self.avgscheme.average_thermal_expansivity(V, alpha)
+                self.alpha[idx] = self.avgscheme.average_thermal_expansivity(
+                    V, alpha)
 
         return self.alpha
 
@@ -94,22 +97,22 @@ class Model(object):
         Internal function to compute the moduli if necessary.
         """
         if self.moduli is None:
-                self.moduli = [[] for p in self.p]
+            self.moduli = [[] for p in self.p]
 
-                for idx in range(len(self.p)):
-                    self.rock.set_state(self.p[idx], self.T[idx])
-                    (minerals, fractions) = self.rock.unroll()
-                    for (mineral, fraction) in zip(minerals, fractions):
-                        e = {}
-                        e['fraction'] = fraction
-                        e['V'] = fraction * mineral.molar_volume
-                        e['K'] = mineral.adiabatic_bulk_modulus
-                        e['G'] = mineral.shear_modulus
-                        e['rho'] = mineral.molar_mass / mineral.molar_volume
-                        e['alpha'] = mineral.thermal_expansivity
-                        e['c_v'] = mineral.heat_capacity_v
-                        e['c_p'] = mineral.heat_capacity_p
-                        self.moduli[idx].append(e)
+            for idx in range(len(self.p)):
+                self.rock.set_state(self.p[idx], self.T[idx])
+                (minerals, fractions) = self.rock.unroll()
+                for (mineral, fraction) in zip(minerals, fractions):
+                    e = {}
+                    e['fraction'] = fraction
+                    e['V'] = fraction * mineral.molar_volume
+                    e['K'] = mineral.adiabatic_bulk_modulus
+                    e['G'] = mineral.shear_modulus
+                    e['rho'] = mineral.molar_mass / mineral.molar_volume
+                    e['alpha'] = mineral.thermal_expansivity
+                    e['c_v'] = mineral.heat_capacity_v
+                    e['c_p'] = mineral.heat_capacity_p
+                    self.moduli[idx].append(e)
 
     def avg_moduli_(self):
         """
@@ -124,7 +127,7 @@ class Model(object):
             self.mat_rho = np.zeros(len(self.p))
 
             for idx in range(n_pressures):
-                mods  = self.moduli[idx]
+                mods = self.moduli[idx]
 
                 fractions = np.array([e['fraction'] for e in mods])
                 V_frac = np.array([m['V'] for m in mods])
@@ -133,9 +136,12 @@ class Model(object):
                 rho_ph = np.array([m['rho'] for m in mods])
 
                 self.mat_V[idx] = sum(V_frac)
-                self.mat_K[idx] = self.avgscheme.average_bulk_moduli(V_frac, K_ph, G_ph)
-                self.mat_G[idx] = self.avgscheme.average_shear_moduli(V_frac, K_ph, G_ph)
-                self.mat_rho[idx] = self.avgscheme.average_density(V_frac, rho_ph)
+                self.mat_K[idx] = self.avgscheme.average_bulk_moduli(
+                    V_frac, K_ph, G_ph)
+                self.mat_G[idx] = self.avgscheme.average_shear_moduli(
+                    V_frac, K_ph, G_ph)
+                self.mat_rho[idx] = self.avgscheme.average_density(
+                    V_frac, rho_ph)
 
     def calc_heat_capacities_(self):
         """
@@ -150,8 +156,10 @@ class Model(object):
                 alphas = np.array([m['alpha'] for m in self.moduli[idx]])
                 c_v = np.array([m['c_v'] for m in self.moduli[idx]])
                 c_p = np.array([m['c_p'] for m in self.moduli[idx]])
-                self.c_v[idx] = self.avgscheme.average_heat_capacity_v(fractions, c_v)
-                self.c_p[idx] = self.avgscheme.average_heat_capacity_p(fractions, c_p)
+                self.c_v[idx] = self.avgscheme.average_heat_capacity_v(
+                    fractions, c_v)
+                self.c_p[idx] = self.avgscheme.average_heat_capacity_p(
+                    fractions, c_p)
 
     def compute_velocities_(self):
         """
@@ -164,6 +172,7 @@ class Model(object):
             self.mat_vphi = np.ndarray(len(self.p))
 
             for i in range(len(self.p)):
-                self.mat_vs[i] = np.sqrt( self.mat_G[i] / self.mat_rho[i])
-                self.mat_vp[i] = np.sqrt( (self.mat_K[i] + 4./3.*self.mat_G[i]) / self.mat_rho[i])
+                self.mat_vs[i] = np.sqrt(self.mat_G[i] / self.mat_rho[i])
+                self.mat_vp[i] = np.sqrt(
+                    (self.mat_K[i] + 4. / 3. * self.mat_G[i]) / self.mat_rho[i])
                 self.mat_vphi[i] = np.sqrt(self.mat_K[i] / self.mat_rho[i])

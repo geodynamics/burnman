@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 from __future__ import absolute_import
 
@@ -8,7 +9,7 @@ from . import slb
 from . import mie_grueneisen_debye as mgd
 from . import birch_murnaghan as bm
 from . import modified_tait as mt
-from . import hp 
+from . import hp
 from . import cork
 from .equation_of_state import EquationOfState
 
@@ -44,4 +45,6 @@ def create(method):
     elif inspect.isclass(method) and issubclass(method, EquationOfState):
         return method()
     else:
-        raise Exception("unsupported material method " + method.__class__.__name__)
+        raise Exception(
+            "unsupported material method " +
+            method.__class__.__name__)

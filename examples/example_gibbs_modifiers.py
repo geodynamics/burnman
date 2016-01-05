@@ -1,19 +1,20 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
 example_gibbs_modifiers
 ----------------
 
-This example script demonstrates the modifications to 
-the gibbs free energy (and derivatives) that can be applied 
+This example script demonstrates the modifications to
+the gibbs free energy (and derivatives) that can be applied
 as masks over the results from the equations of state.
 
 These modifications currently take the forms:
-- Landau corrections (implementations of Putnis (1992) 
+- Landau corrections (implementations of Putnis (1992)
   and Holland and Powell (2011)
-- Bragg-Williams corrections 
+- Bragg-Williams corrections
   (implementation of Holland and Powell (1996))
 - Linear (a simple G_0 + deltaV*P - deltaS*T
 - Magnetic (Chin, Hertzman and Sundman (1987))
@@ -34,11 +35,14 @@ from __future__ import absolute_import
 # usage of BurnMan.  In particular, numpy is used for handling
 # numerical arrays and mathematical operations on them, and
 # matplotlib is used for generating plots of results of calculations
-import os, sys, numpy as np, matplotlib.pyplot as plt
+import os
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
-#hack to allow scripts to be placed in subdirectories next to burnman:
+# hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+    sys.path.insert(1, os.path.abspath('..'))
 
 
 # Here we import the relevant modules from BurnMan.  The burnman
@@ -65,7 +69,7 @@ if __name__ == "__main__":
         stv.set_state(P, T)
         v_ps[i] = stv.v_p
 
-    plt.plot(pressures/1.e9, v_ps/1.e3, label='stishovite')
+    plt.plot(pressures / 1.e9, v_ps / 1.e3, label='stishovite')
     plt.xlabel('P (GPa)')
     plt.ylabel('V_p (km/s)')
     plt.legend(loc="lower right")
@@ -75,7 +79,6 @@ if __name__ == "__main__":
     # Here we show an example of troilite, as implemented by
     # Evans et al. (2010) and incorporated into the dataset
     # of Holland and Powell (2011)
-
 
     # Here we show you how to create a mineral with a
     # Landau transition.
@@ -88,37 +91,38 @@ if __name__ == "__main__":
     # of tro also included.
 
     from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
-    atomic_masses=read_masses()
+    atomic_masses = read_masses()
 
     class lot (burnman.Mineral):
+
         def __init__(self):
-            formula='Fe1.0S1.0'
+            formula = 'Fe1.0S1.0'
             formula = dictionarize_formula(formula)
             self.params = {
                 'name': 'lot',
                 'formula': formula,
                 'equation_of_state': 'hp_tmt',
-                'H_0': -102160.0 ,
-                'S_0': 60.0 ,
-                'V_0': 1.818e-05 ,
-                'Cp': [50.2, 0.011052, -940000.0, 0.0] ,
-                'a_0': 4.93e-05 ,
-                'K_0': 65800000000.0 ,
-                'Kprime_0': 4.17 ,
-                'Kdprime_0': -6.3e-11 ,
+                'H_0': -102160.0,
+                'S_0': 60.0,
+                'V_0': 1.818e-05,
+                'Cp': [50.2, 0.011052, -940000.0, 0.0],
+                'a_0': 4.93e-05,
+                'K_0': 65800000000.0,
+                'Kprime_0': 4.17,
+                'Kdprime_0': -6.3e-11,
                 'n': sum(formula.values()),
                 'molar_mass': formula_mass(formula, atomic_masses)}
             self.property_modifiers = [
-                ['landau_hp', {'P_0': 100000.0 ,
-                               'T_0': 298.15 ,
-                               'Tc_0': 420.0 ,
-                               'S_D': 10.0 ,
-                               'V_D': 0.0 }],
-                ['landau_hp', {'P_0': 100000.0 ,
-                               'T_0': 298.15 ,
-                               'Tc_0': 598.0 ,
-                               'S_D': 12.0 ,
-                               'V_D': 4.1e-7 }]]
+                ['landau_hp', {'P_0': 100000.0,
+                               'T_0': 298.15,
+                               'Tc_0': 420.0,
+                               'S_D': 10.0,
+                               'V_D': 0.0}],
+                ['landau_hp', {'P_0': 100000.0,
+                               'T_0': 298.15,
+                               'Tc_0': 598.0,
+                               'S_D': 12.0,
+                               'V_D': 4.1e-7}]]
             burnman.Mineral.__init__(self)
 
     troilite = lot()
@@ -144,9 +148,7 @@ if __name__ == "__main__":
     plt.ylabel('C_p (J/K/mol)')
     plt.legend(loc="lower right")
     plt.show()
-    
 
-    
     # Spinel is a mineral with a Bragg-Williams type model
     sp = minerals.HP_2011_ds62.sp()
     P = 1.e5
@@ -155,14 +157,13 @@ if __name__ == "__main__":
     for i, T in enumerate(temperatures):
         sp.set_state(P, T)
         C_ps[i] = sp.C_p
-        #print sp._property_modifiers
+        # print sp._property_modifiers
 
     plt.plot(temperatures, C_ps, label='spinel')
     plt.xlabel('T (K)')
     plt.ylabel('C_p (J/K/mol)')
     plt.legend(loc="lower right")
     plt.show()
-
 
     # Wuestite has a Landau-type transition at low temperature,
     # but we could also choose to simplify things by just having an excess entropy
@@ -171,45 +172,46 @@ if __name__ == "__main__":
     # properties would need refitting too...
 
     class wuestite (burnman.Mineral):
+
         def __init__(self):
-            formula='FeO'
+            formula = 'FeO'
             formula = dictionarize_formula(formula)
             self.params = {
                 'name': 'Wuestite',
                 'formula': formula,
                 'equation_of_state': 'slb3',
-                'F_0': -242000.0 ,
-                'V_0': 1.226e-05 ,
-                'K_0': 1.79e+11 ,
-                'Kprime_0': 4.9 ,
-                'Debye_0': 454.0 ,
-                'grueneisen_0': 1.53 ,
-                'q_0': 1.7 ,
-                'G_0': 59000000000.0 ,
-                'Gprime_0': 1.4 ,
-                'eta_s_0': -0.1 ,
+                'F_0': -242000.0,
+                'V_0': 1.226e-05,
+                'K_0': 1.79e+11,
+                'Kprime_0': 4.9,
+                'Debye_0': 454.0,
+                'grueneisen_0': 1.53,
+                'q_0': 1.7,
+                'G_0': 59000000000.0,
+                'Gprime_0': 1.4,
+                'eta_s_0': -0.1,
                 'n': sum(formula.values()),
                 'molar_mass': formula_mass(formula, atomic_masses)}
 
             self.property_modifiers = [
                 ['linear', {'G_0': 0., 'delta_S': 12., 'delta_V': 0.}]]
-        
+
             self.uncertainties = {
-                'err_F_0': 1000.0 ,
-                'err_V_0': 0.0 ,
-                'err_K_0': 1000000000.0 ,
-                'err_K_prime_0': 0.2 ,
-                'err_Debye_0': 21.0 ,
-                'err_grueneisen_0': 0.13 ,
-                'err_q_0': 1.0 ,
-                'err_G_0': 1000000000.0 ,
-                'err_Gprime_0': 0.1 ,
-                'err_eta_s_0': 1.0 }
+                'err_F_0': 1000.0,
+                'err_V_0': 0.0,
+                'err_K_0': 1000000000.0,
+                'err_K_prime_0': 0.2,
+                'err_Debye_0': 21.0,
+                'err_grueneisen_0': 0.13,
+                'err_q_0': 1.0,
+                'err_G_0': 1000000000.0,
+                'err_Gprime_0': 0.1,
+                'err_eta_s_0': 1.0}
             burnman.Mineral.__init__(self)
 
     wus = wuestite()
     wus_HP = burnman.minerals.HP_2011_ds62.fper()
-    
+
     P = 1.e5
     temperatures = np.linspace(300., 1300., 101)
     Ss = np.empty_like(temperatures)
@@ -219,7 +221,7 @@ if __name__ == "__main__":
         Ss[i] = wus.S
         wus_HP.set_state(P, T)
         Ss_HP[i] = wus_HP.S
-        
+
     plt.plot(temperatures, Ss, label='linear')
     plt.plot(temperatures, Ss_HP, label='HP_2011_ds62')
     plt.xlabel('T (K)')

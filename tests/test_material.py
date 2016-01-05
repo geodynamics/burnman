@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 import unittest
 import inspect
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+import os
+import sys
+sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 from util import BurnManTest
+
 
 class test_material_name(BurnManTest):
     """ test Material.name and that we can edit and override it in Mineral"""
