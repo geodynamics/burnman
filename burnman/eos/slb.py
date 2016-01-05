@@ -33,20 +33,19 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
     return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
 
-@jit
-def _delta_pressure_fast1(V_0, a1_ii, a2_iikk, x, Debye_0):
-    f = 0.5 * (pow(V_0 / x, 2. / 3.) - 1.)
-    debye_temperature = Debye_0 * np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
-    return debye_temperature, f
-
 
 @jit
-def _delta_pressure_fast2(E_th, E_th_ref, a1_ii, a2_iikk, b_iikk, b_iikkmm, f, pressure, x):
-    nu_o_nu0_sq = 1. + a1_ii * f + (1. / 2.) * a2_iikk * f * f  # EQ 41
-    gr = 1. / 6. / nu_o_nu0_sq * (2. * f + 1.) * ( a1_ii + a2_iikk * f )
-    return (1. / 3.) * (pow(1. + 2. * f, 5. / 2.)) * ((b_iikk * f) + (0.5 * b_iikkmm * f * f)) \
-           + gr * (E_th - E_th_ref) / x - pressure  # EQ 21
+def _delta_pressure(x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
 
+    f= 0.5*(pow(V_0/x,2./3.)-1.)
+    debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+    E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
+    E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+    gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+
+    return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
+            + gr*(E_th - E_th_ref)/x - pressure #EQ 21
 
 class SLBBase(eos.EquationOfState):
     """
@@ -104,13 +103,8 @@ class SLBBase(eos.EquationOfState):
         gr = self.grueneisen_parameter(0., T, V, params) # P not important
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
+    
 
-    def _delta_pressure(self,x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
-        
-        debye_temperature, f = _delta_pressure_fast1(V_0, a1_ii, a2_iikk, x, Debye_0)
-        E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
-        E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
-        return _delta_pressure_fast2(E_th, E_th_ref, a1_ii, a2_iikk, b_iikk, b_iikkmm, f, pressure, x)
 
     def volume(self, pressure, temperature, params):
         """
@@ -131,10 +125,10 @@ class SLBBase(eos.EquationOfState):
         # conservative guess:
         args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
         try:
-            sol = bracket(self._delta_pressure, params['V_0'], 1.e-2*params['V_0'], args)
+            sol = bracket(_delta_pressure, params['V_0'], 1.e-2*params['V_0'], args)
         except:
             raise Exception('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
-        return opt.brentq(self._delta_pressure, sol[0], sol[1] ,args=args)
+        return opt.brentq(_delta_pressure, sol[0], sol[1] ,args=args)
 
     def pressure( self, temperature, volume, params):
         """
