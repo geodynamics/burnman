@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 from __future__ import absolute_import
@@ -13,13 +14,12 @@ from . import eos
 from .tools import copy_documentation
 
 
-
 class Mineral(Material):
     """
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature
     using set_state(). The method for computing properties of
-    the material is set using set_method(). This is done during 
+    the material is set using set_method(). This is done during
     initialisation if the param 'equation_of_state' has been defined.
     The method can be overridden later by the user.
 
@@ -53,9 +53,6 @@ class Mineral(Material):
         if 'name' in self.params:
             self.name = self.params['name']
 
-
-
-
     def set_method(self, equation_of_state):
         """
         Set the equation of state to be used for this mineral.
@@ -77,9 +74,11 @@ class Mineral(Material):
             self.method = eos.create(self.params['equation_of_state'])
 
         if type(new_method).__name__ == 'instance':
-            raise Exception("Please derive your method from object (see python old style classes)")
+            raise Exception(
+                "Please derive your method from object (see python old style classes)")
 
-        if self.method is not None and type(new_method) is not type(self.method):
+        if self.method is not None and not isinstance(
+                new_method, type(self.method)):
 
             # Warn user that they are changing the EoS
             warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ +
@@ -90,11 +89,16 @@ class Mineral(Material):
 
         self.method = new_method
 
-        #Validate the params object on the requested EOS. 
+        # Validate the params object on the requested EOS.
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
-            print('Mineral ' + self.to_string() + ' failed to validate parameters with message : \" ' + e.message + '\"')
+            print(
+                'Mineral ' +
+                self.to_string() +
+                ' failed to validate parameters with message : \" ' +
+                e.message +
+                '\"')
             raise
 
         # Invalidate the cache upon resetting the method
@@ -104,7 +108,8 @@ class Mineral(Material):
         """
         Returns the name of the mineral class
         """
-        return "'" + self.__class__.__module__.replace(".minlib_",".") + "." + self.__class__.__name__ + "'"
+        return "'" + self.__class__.__module__.replace(
+            ".minlib_", ".") + "." + self.__class__.__name__ + "'"
 
     def debug_print(self, indent=""):
         print("%s%s" % (indent, self.to_string()))
@@ -115,15 +120,16 @@ class Mineral(Material):
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
         Material.set_state(self, pressure, temperature)
-        self._property_modifiers = eos.property_modifiers.calculate_property_modifications(self)
+        self._property_modifiers = eos.property_modifiers.calculate_property_modifications(
+            self)
 
         if self.method is None:
-             raise AttributeError("no method set for mineral, or equation_of_state given in mineral.params")
+            raise AttributeError(
+                "no method set for mineral, or equation_of_state given in mineral.params")
 
-    
     """
     Properties from equations of state
-    We choose the P, T properties (e.g. Gibbs(P, T) rather than Helmholtz(V, T)), 
+    We choose the P, T properties (e.g. Gibbs(P, T) rather than Helmholtz(V, T)),
     as it allows us to more easily apply corrections to the free energy
     """
     @material_property
@@ -132,13 +138,11 @@ class Mineral(Material):
         return self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params) \
             + self._property_modifiers['G']
 
-    
     @material_property
     @copy_documentation(Material.molar_volume)
     def molar_volume(self):
         return self.method.volume(self.pressure, self.temperature, self.params) \
             + self._property_modifiers['dGdP']
-
 
     @material_property
     @copy_documentation(Material.molar_entropy)
@@ -149,72 +153,72 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
-        V_orig = self.method.volume(self.pressure, self.temperature, self.params)
+        V_orig = self.method.volume(
+            self.pressure, self.temperature, self.params)
         K_T_orig = self.method.isothermal_bulk_modulus(self.pressure, self.temperature,
-                                                  self.molar_volume, self.params)
+                                                       self.molar_volume, self.params)
 
         return self.molar_volume \
-            / ((V_orig/K_T_orig) - self._property_modifiers['d2GdP2'])
-    
+            / ((V_orig / K_T_orig) - self._property_modifiers['d2GdP2'])
+
     @material_property
     @copy_documentation(Material.heat_capacity_p)
     def heat_capacity_p(self):
         return self.method.heat_capacity_p(self.pressure, self.temperature,
-                                           self.molar_volume , self.params) \
-            - self.temperature*self._property_modifiers['d2GdT2']
+                                           self.molar_volume, self.params) \
+            - self.temperature * self._property_modifiers['d2GdT2']
 
-    
     @material_property
     @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
         return ((self.method.thermal_expansivity(self.pressure, self.temperature,
-                                                 self.molar_volume , self.params) \
-                 * self.method.volume(self.pressure, self.temperature, self.params)) \
+                                                 self.molar_volume, self.params)
+                 * self.method.volume(self.pressure, self.temperature, self.params))
                 + self._property_modifiers['d2GdPdT']) / self.molar_volume
 
-    
     @material_property
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
-        return self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume , self.params)
-    
-    
+        return self.method.shear_modulus(
+            self.pressure, self.temperature, self.molar_volume, self.params)
+
     """
     Properties from mineral parameters,
-    Legendre transformations 
+    Legendre transformations
     or Maxwell relations
     """
-    
+
     @material_property
     @copy_documentation(Material.molar_mass)
     def molar_mass(self):
         if 'molar_mass' in self.params:
             return self.params['molar_mass']
         else:
-            raise ValueError("No molar_mass parameter for mineral "+self.to_string+".")
+            raise ValueError(
+                "No molar_mass parameter for mineral " +
+                self.to_string +
+                ".")
 
     @material_property
     @copy_documentation(Material.density)
     def density(self):
-        return self.molar_mass/self.molar_volume
+        return self.molar_mass / self.molar_volume
 
-    
     @material_property
     @copy_documentation(Material.internal_energy)
     def internal_energy(self):
-        return self.molar_gibbs - self.pressure*self.molar_volume + self.temperature*self.molar_entropy
+        return self.molar_gibbs - self.pressure * \
+            self.molar_volume + self.temperature * self.molar_entropy
 
-    
     @material_property
     @copy_documentation(Material.molar_helmholtz)
     def molar_helmholtz(self):
-        return self.molar_gibbs - self.pressure*self.molar_volume
+        return self.molar_gibbs - self.pressure * self.molar_volume
 
-    
     @material_property
     @copy_documentation(Material.molar_enthalpy)
     def molar_enthalpy(self):
-        return self.molar_gibbs + self.temperature*self.molar_entropy
+        return self.molar_gibbs + self.temperature * self.molar_entropy
 
     @material_property
     @copy_documentation(Material.adiabatic_bulk_modulus)
@@ -227,19 +231,18 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.isothermal_compressibility)
     def isothermal_compressibility(self):
-        return 1./self.isothermal_bulk_modulus
+        return 1. / self.isothermal_bulk_modulus
 
     @material_property
     @copy_documentation(Material.adiabatic_compressibility)
     def adiabatic_compressibility(self):
-        return 1./self.adiabatic_bulk_modulus
+        return 1. / self.adiabatic_bulk_modulus
 
-    
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
-        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. * \
-                             self.shear_modulus) / self.density)
+        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. *
+                        self.shear_modulus) / self.density)
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)

@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -14,9 +15,10 @@ from ..mineral import Mineral
 
 
 class mg_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 24.43e-6,
             'K_0': 250.0e9,
             'Kprime_0': 4.0,
@@ -27,13 +29,15 @@ class mg_perovskite(Mineral):
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
             'q_0': 1.4}
-        
+
         Mineral.__init__(self)
 
+
 class fe_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 25.34e-6,
             'K_0': 250.0e9,
             'Kprime_0': 4.0,
@@ -47,10 +51,12 @@ class fe_perovskite(Mineral):
 
         Mineral.__init__(self)
 
-class al_perovskite(Mineral): 
+
+class al_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 24.58e-6,
             'K_0': 249.0e9,
             'Kprime_0': 4.0,
@@ -62,13 +68,14 @@ class al_perovskite(Mineral):
             'grueneisen_0': 1.48,
             'q_0': 1.4}
 
-
         Mineral.__init__(self)
 
-class ca_perovskite(Mineral): 
+
+class ca_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 27.45e-6,
             'K_0': 236.0e9,
             'Kprime_0': 3.9,
@@ -82,10 +89,12 @@ class ca_perovskite(Mineral):
 
         Mineral.__init__(self)
 
+
 class periclase (Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 11.25e-6,
             'K_0': 160.1e9,
             'Kprime_0': 3.83,
@@ -95,24 +104,26 @@ class periclase (Mineral):
             'n': 2,
             'Debye_0': 673.,
             'grueneisen_0': 1.41,
-            'q_0': 1.3 }
- 
+            'q_0': 1.3}
+
         Mineral.__init__(self)
 
+
 class wuestite (Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'mgd2',
+            'equation_of_state': 'mgd2',
             'V_0': 12.26e-6,
             'K_0': 160.1e9,
             'Kprime_0': 3.83,
             'G_0': 46.0e9,
-            'Gprime_0':  0.6,
+            'Gprime_0': 0.6,
             'molar_mass': .0718,
             'n': 2,
             'Debye_0': 673.,
             'grueneisen_0': 1.41,
-            'q_0': 1.3 }
+            'q_0': 1.3}
 
         Mineral.__init__(self)
 

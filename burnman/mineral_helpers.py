@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -38,8 +39,8 @@ class HelperSpinTransition(Composite):
 
     def debug_print(self, indent=""):
         print("%sHelperSpinTransition:" % indent)
-        self.ls_mat.debug_print(indent+"  ")
-        self.hs_mat.debug_print(indent+"  ")
+        self.ls_mat.debug_print(indent + "  ")
+        self.hs_mat.debug_print(indent + "  ")
 
     def set_state(self, pressure, temperature):
         if (pressure >= self.transition_pressure):

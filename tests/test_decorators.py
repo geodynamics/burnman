@@ -1,7 +1,8 @@
 import unittest
-import os, sys
+import os
+import sys
 
-sys.path.insert(1,os.path.abspath('..'))
+sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
 from burnman.mineral import Mineral
@@ -10,7 +11,6 @@ from burnman.tools import *
 
 from burnman.material import material_property
 from burnman.tools import copy_documentation
-
 
 
 class test_decorators__material_property(BurnManTest):
@@ -52,7 +52,9 @@ class test_decorators__material_property(BurnManTest):
     def test_doc(self):
         """make sure documentation is passed through with the new decorator"""
 
-        self.assertEqual(self.MyCountingMaterial.some_property.__doc__, "my documentation")
+        self.assertEqual(
+            self.MyCountingMaterial.some_property.__doc__,
+            "my documentation")
 
         internal_energy_doc = burnman.Material.internal_energy.__doc__
         self.assertTrue("internal energy of" in internal_energy_doc)
@@ -65,15 +67,18 @@ class test_decorators__material_property(BurnManTest):
 
 
 class ClassA_for_copy_documentation(object):
+
     def my_func(self):
         """A.my_func doc"""
         pass
 
     def func_with_args(self, x, y):
         """doc for func_with_args"""
-        return x+y
+        return x + y
+
 
 class ClassB_for_copy_documentation(object):
+
     @copy_documentation(ClassA_for_copy_documentation.my_func)
     def some_func(self):
         """B.some_func doc"""
@@ -83,21 +88,31 @@ class ClassB_for_copy_documentation(object):
     def some_func_without_doc(self):
         pass
 
+
 class test_decorators_copy_documentation(BurnManTest):
 
     def test(self):
-        self.assertEqual(ClassA_for_copy_documentation.my_func.__doc__, "A.my_func doc")
-        self.assertEqual(ClassB_for_copy_documentation.some_func.__doc__,"(copied from my_func):\nA.my_func doc\nB.some_func doc")
-        self.assertEqual(ClassB_for_copy_documentation.some_func_without_doc.__doc__, "(copied from my_func):\nA.my_func doc")
+        self.assertEqual(
+            ClassA_for_copy_documentation.my_func.__doc__,
+            "A.my_func doc")
+        self.assertEqual(
+            ClassB_for_copy_documentation.some_func.__doc__,
+            "(copied from my_func):\nA.my_func doc\nB.some_func doc")
+        self.assertEqual(
+            ClassB_for_copy_documentation.some_func_without_doc.__doc__,
+            "(copied from my_func):\nA.my_func doc")
 
     def test_with_args(self):
         """ early versions couldn't deal with functions with parameters"""
         class C(object):
+
             @copy_documentation(ClassA_for_copy_documentation.func_with_args)
             def another(self):
                 return 1.0
 
-        self.assertEqual(C.another.__doc__, "(copied from func_with_args):\ndoc for func_with_args")
+        self.assertEqual(
+            C.another.__doc__,
+            "(copied from func_with_args):\ndoc for func_with_args")
 
         c = C()
         self.assertEqual(c.another(), 1.0)
@@ -105,15 +120,17 @@ class test_decorators_copy_documentation(BurnManTest):
     def test_with_args2(self):
         """ early versions couldn't deal with functions with parameters"""
         class C(object):
-            @copy_documentation(ClassA_for_copy_documentation.func_with_args)
-            def bla(self,z):
-                "bla"
-                return 1.0+z
 
-        self.assertEqual(C.bla.__doc__, "(copied from func_with_args):\ndoc for func_with_args\nbla")
+            @copy_documentation(ClassA_for_copy_documentation.func_with_args)
+            def bla(self, z):
+                "bla"
+                return 1.0 + z
+
+        self.assertEqual(
+            C.bla.__doc__,
+            "(copied from func_with_args):\ndoc for func_with_args\nbla")
         c = C()
         self.assertEqual(c.bla(1.0), 2.0)
-
 
 
 class ClassC_for_copy_documentation(burnman.Material):
@@ -135,6 +152,7 @@ class ClassC_for_copy_documentation(burnman.Material):
     @copy_documentation(ClassA_for_copy_documentation.my_func)
     def some_func3(self):
         return 3.0
+
 
 class test_two_decorators(BurnManTest):
 

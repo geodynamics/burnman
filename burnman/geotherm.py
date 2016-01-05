@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 from __future__ import absolute_import
 import numpy as np
@@ -24,10 +25,12 @@ def brown_shankland(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])
-      if depth < min(table_brown_depth):
-        raise ValueError("depth smaller than range Brown & Shankland, 1981")
-      temperature[i] = tools.lookup_and_interpolate(table_brown_depth, table_brown_temperature, depth)
+        depth = seismic.prem_model.depth(pressure[i])
+        if depth < min(table_brown_depth):
+            raise ValueError(
+                "depth smaller than range Brown & Shankland, 1981")
+        temperature[i] = tools.lookup_and_interpolate(
+            table_brown_depth, table_brown_temperature, depth)
     return temperature
 
 
@@ -47,9 +50,11 @@ def anderson(pressure):
     """
     temperature = np.empty_like(pressure)
     for i in range(len(pressure)):
-      depth = seismic.prem_model.depth(pressure[i])
-      temperature[i] = tools.lookup_and_interpolate(table_anderson_depth, table_anderson_temperature, depth)
+        depth = seismic.prem_model.depth(pressure[i])
+        temperature[i] = tools.lookup_and_interpolate(
+            table_anderson_depth, table_anderson_temperature, depth)
     return temperature
+
 
 def adiabatic(pressures, T0, rock):
     """
@@ -84,8 +89,11 @@ def adiabatic(pressures, T0, rock):
     temperature: list of floats
         The list of temperatures for each pressure. :math:`[K]`
     """
-    temperatures = integrate.odeint(lambda t,p : dTdP(t,p,rock), T0, pressures)
+    temperatures = integrate.odeint(
+        lambda t, p: dTdP(
+            t, p, rock), T0, pressures)
     return temperatures.ravel()
+
 
 def dTdP(temperature, pressure, rock):
     """
@@ -96,8 +104,8 @@ def dTdP(temperature, pressure, rock):
     First consider compression of the composite to a new pressure P+dP.  They all heat up
     different amounts dT[i], according to their thermoelastic parameters.  Then allow them
     to equilibrate to a constant temperature dT, conserving heat within the composite.
-    This works out to the formula: 
-    
+    This works out to the formula:
+
     .. math::
         dT/dP = T*\\frac{\Sigma_i(X[i]*C_{p}[i]*\gamma[i]/K[i])}{\Sigma(X[i]*C_{p}[i])}
 
@@ -121,7 +129,7 @@ def dTdP(temperature, pressure, rock):
     Returns
     -------
         dT/dP : float
-          Adiabatic temperature gradient for the composite at a given temperature and pressure. :math:`[K/Pa]` 
+          Adiabatic temperature gradient for the composite at a given temperature and pressure. :math:`[K/Pa]`
     """
     top = 0
     bottom = 0
@@ -132,17 +140,16 @@ def dTdP(temperature, pressure, rock):
         K_s = mineral.adiabatic_bulk_modulus
         C_p = mineral.heat_capacity_p
 
-        top += fraction*gr*C_p/K_s
-        bottom += fraction*C_p
+        top += fraction * gr * C_p / K_s
+        bottom += fraction * C_p
 
-    return temperature*top/bottom
+    return temperature * top / bottom
 
 
 table_brown = tools.read_table("input_geotherm/brown_81.txt")
-table_brown_depth = np.array(table_brown)[:,0]
-table_brown_temperature = np.array(table_brown)[:,1]
+table_brown_depth = np.array(table_brown)[:, 0]
+table_brown_temperature = np.array(table_brown)[:, 1]
 
 table_anderson = tools.read_table("input_geotherm/anderson_82.txt")
-table_anderson_depth = np.array(table_anderson)[:,0]
-table_anderson_temperature = np.array(table_anderson)[:,1]
-
+table_anderson_depth = np.array(table_anderson)[:, 0]
+table_anderson_temperature = np.array(table_anderson)[:, 1]
