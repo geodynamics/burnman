@@ -111,6 +111,7 @@ def debye_fn_cheb(x):
         return ((val_infinity/x)/x)/x;
 
 
+@jit
 def thermal_energy(T, debye_T, n):
     """
     calculate the thermal energy of a substance.  Takes the temperature,
@@ -122,6 +123,7 @@ def thermal_energy(T, debye_T, n):
     E_th = 3.*n*constants.gas_constant*T * debye_fn_cheb(debye_T/T)
     return E_th
 
+@jit
 def heat_capacity_v(T,debye_T,n):
     """
     Heat capacity at constant volume.  In J/K/mol
@@ -132,6 +134,7 @@ def heat_capacity_v(T,debye_T,n):
     C_v = 3.0*n*constants.gas_constant* ( 4.0*debye_fn_cheb(x) - 3.0*x/(np.exp(x)-1.0) )
     return C_v
 
+@jit
 def helmholtz_free_energy(T, debye_T, n):
     """
     Helmholtz free energy of lattice vibrations in the Debye model.
