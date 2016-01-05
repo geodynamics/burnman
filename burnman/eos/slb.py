@@ -126,7 +126,7 @@ class SLBBase(eos.EquationOfState):
         args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
         try:
             sol = bracket(_delta_pressure, params['V_0'], 1.e-2*params['V_0'], args)
-        except:
+        except ValueError:
             raise Exception('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
         return opt.brentq(_delta_pressure, sol[0], sol[1] ,args=args)
 
