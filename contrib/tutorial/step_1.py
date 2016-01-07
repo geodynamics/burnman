@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
-
+# Ian Rose ian.r.rose@gmail.com
 
 """
 CIDER 2014 BurnMan Tutorial --- step 1
@@ -44,8 +44,8 @@ import matplotlib.pyplot as plt
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 import os, sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1,os.path.abspath('../../'))
 
 # Here we import the relevant modules from BurnMan.  The burnman
 # module imports several of the most important functionalities of

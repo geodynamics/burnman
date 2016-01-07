@@ -3,20 +3,15 @@
 
 
 """
-    
-paper_uncertain
----------------
 
-This script reproduces :cite:`Cottaar2014`, Figure 8.
-It shows the sensitivity of the velocities to various mineralogical parameters.
 """
 from __future__ import absolute_import
 from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1,os.path.abspath('../..'))
 
 import burnman
 from burnman import minerals
@@ -24,7 +19,7 @@ import misc.colors as colors
 
 class my_perovskite(burnman.Mineral):
     """
-    based on Stixrude & Lithgow-Bertelloni 2011 and references therein
+    based on :cite:`Stixrude2011` and references therein
     """
     def __init__(self, uncertain):
         self.params = {
@@ -42,6 +37,7 @@ class my_perovskite(burnman.Mineral):
             'eta_s_0': 2.6 * uncertain[7]}
         burnman.Mineral.__init__(self)
 
+
 if __name__ == "__main__":
     figure=plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
@@ -56,7 +52,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 10 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'], depths)
 
 
 
@@ -66,7 +62,6 @@ if __name__ == "__main__":
 
         temperature = burnman.geotherm.adiabatic(seis_p,1900*uncertain[8],rock)
 
- 
         mat_rho, mat_vs, mat_vphi = rock.evaluate(['rho','v_s','v_phi'], seis_p, temperature)
 
         return seis_p, mat_vs, mat_vphi, mat_rho

@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
-
+# Ian Rose ian.r.rose@gmail.com
 
 """
 
@@ -46,8 +46,8 @@ from matplotlib.colors import LinearSegmentedColormap
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 import os, sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1,os.path.abspath('../..'))
 
 #The BurnMan imports, however, are the same.
 import burnman
