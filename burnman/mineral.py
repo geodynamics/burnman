@@ -132,11 +132,14 @@ class Mineral(Material):
         return self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params) \
             + self._property_modifiers['G']
 
+    @material_property
+    def _molar_volume_unmodified(self):
+        return self.method.volume(self.pressure, self.temperature, self.params)
     
     @material_property
     @copy_documentation(Material.molar_volume)
     def molar_volume(self):
-        return self.method.volume(self.pressure, self.temperature, self.params) \
+        return self._molar_volume_unmodified \
             + self._property_modifiers['dGdP']
 
 
@@ -149,12 +152,11 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
-        V_orig = self.method.volume(self.pressure, self.temperature, self.params)
         K_T_orig = self.method.isothermal_bulk_modulus(self.pressure, self.temperature,
                                                   self.molar_volume, self.params)
 
         return self.molar_volume \
-            / ((V_orig/K_T_orig) - self._property_modifiers['d2GdP2'])
+            / ((self._molar_volume_unmodified/K_T_orig) - self._property_modifiers['d2GdP2'])
     
     @material_property
     @copy_documentation(Material.heat_capacity_p)
@@ -169,7 +171,7 @@ class Mineral(Material):
     def thermal_expansivity(self):
         return ((self.method.thermal_expansivity(self.pressure, self.temperature,
                                                  self.molar_volume , self.params) \
-                 * self.method.volume(self.pressure, self.temperature, self.params)) \
+                 * self._molar_volume_unmodified) \
                 + self._property_modifiers['d2GdPdT']) / self.molar_volume
 
     
