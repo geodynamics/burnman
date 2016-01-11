@@ -24,19 +24,13 @@ The tutorial for BurnMan currently consists of three separate units:
 
 .. _ref-example-tut1:
 
-.. #CIDER 2014 BurnMan Tutorial --- step 1
-.. #--------------------------------------
-
 .. automodule:: tutorial.step_1
 
 When run (without putting in a more realistic composition), the program produces the following image:
 
 .. image:: figures/tut-step1.png
-Your goal in this tutorial is to improve this awful fit....
 
-
-link to source code: `tutorial/step1.py <../../../tutorial/step_2.py>`_
-
+Your goal in this tutorial is to improve this awful fit...
 
 
 
@@ -45,8 +39,6 @@ link to source code: `tutorial/step1.py <../../../tutorial/step_2.py>`_
 Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
 .. image:: figures/tut-step2.png
-
-link to source code: `tutorial/step_2.py <../../../tutorial/step_2.py>`_
 
 
 
@@ -64,11 +56,12 @@ Simple Examples
 
 The following is a list of simple examples:
   - :mod:`~examples.example_beginner`,
+  - :mod:`~examples.example_solid_solution`,
   - :mod:`~examples.example_geotherms`,
   - :mod:`~examples.example_seismic`,
-  - :mod:`~examples.example_composition`, and
-  - :mod:`~examples.example_averaging`.
-
+  - :mod:`~examples.example_composition`,
+  - :mod:`~examples.example_averaging`, and
+  - :mod:`~examples.example_chemical_potentials`.
 
 .. automodule:: examples.example_beginner
 
@@ -77,6 +70,17 @@ The following is a list of simple examples:
 .. image:: figures/example_beginner.png
 
 
+.. automodule:: examples.example_solid_solution
+
+*Resulting figures:*
+
+.. image:: figures/example_solid_solution_1.png
+
+.. image:: figures/example_solid_solution_2.png
+
+.. image:: figures/example_solid_solution_3.png
+
+.. image:: figures/example_solid_solution_4.png
 
 .. automodule:: examples.example_geotherms
 
@@ -104,6 +108,11 @@ The following is a list of simple examples:
 
 .. image:: figures/example_averaging.png
 
+.. automodule:: examples.example_chemical_potentials
+
+*Resulting figure:*
+
+.. image:: figures/example_fO2.png
 
 .. _ref-example-advanced:
 
@@ -130,6 +139,13 @@ Advanced examples:
 *Resulting figure:*
 
 .. image:: figures/example_opt_pv.png
+
+
+.. automodule:: examples.example_build_planet
+
+*Resulting figure:*
+
+.. image:: figures/example_build_planet.png
 
 
 .. automodule:: examples.example_compare_all_methods  

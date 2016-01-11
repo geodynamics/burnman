@@ -1,6 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
+from __future__ import absolute_import
 
 import numpy as np
 # Try to import the jit from numba.  If it is
@@ -15,9 +16,45 @@ except ImportError:
 import scipy.optimize as opt
 import warnings
 
-import birch_murnaghan as bm
-import burnman.debye as debye
-import equation_of_state as eos
+# Try to import the jit from numba.  If it is
+# not available, just go with the standard
+# python interpreter
+try:
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
+
+from . import birch_murnaghan as bm
+from . import debye
+from . import equation_of_state as eos
+from ..tools import bracket
+
+
+@jit
+def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
+    """global function with plain parameters so jit will work"""
+    x = V_0 / volume
+    f = 1./2. * (pow(x, 2./3.) - 1.)
+    a1_ii = 6. * gruen_0 # EQ 47
+    a2_iikk = -12.*gruen_0 + 36.*gruen_0*gruen_0 - 18.*q_0*gruen_0 # EQ 47
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+    return 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+
+
+@jit
+def _delta_pressure(x,pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm):
+
+    f= 0.5*(pow(V_0/x,2./3.)-1.)
+    debye_temperature =  Debye_0 * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+    E_th =  debye.thermal_energy(temperature, debye_temperature, n) #thermal energy at temperature T
+    E_th_ref = debye.thermal_energy(T_0, debye_temperature, n) #thermal energy at reference temperature
+    nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
+    gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
+
+    return (1./3.)*(pow(1.+2.*f,5./2.))*((b_iikk*f)+(0.5*b_iikkmm*f*f)) \
+            + gr*(E_th - E_th_ref)/x - pressure #EQ 21
 
 @jit
 def _debye_temperature_fast(x,gruen_0,debye_0, q_0):
@@ -56,7 +93,7 @@ class SLBBase(eos.EquationOfState):
     :class:`burnman.slb.SLB3` classes.
     """
 
-    def __debye_temperature(self,x,params):
+    def _debye_temperature(self,x,params):
         """
         Finite strain approximation for Debye Temperature [K]
         x = ref_vol/vol
@@ -65,6 +102,7 @@ class SLBBase(eos.EquationOfState):
         a1_ii = 6. * params['grueneisen_0'] # EQ 47
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         return params['Debye_0'] * np.sqrt(1. + a1_ii * f + 1./2. * a2_iikk*f*f)
+
 
     def volume_dependent_q(self, x, params):
         """
@@ -76,10 +114,13 @@ class SLBBase(eos.EquationOfState):
         a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
         nu_o_nu0_sq = 1.+ a1_ii*f + (1./2.)*a2_iikk * f*f # EQ 41
         gr = 1./6./nu_o_nu0_sq * (2.*f+1.) * ( a1_ii + a2_iikk*f )
-        q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
+        if np.abs(params['grueneisen_0']) < 1.e-10: # avoids divide by zero if grueneisen_0 = 0.
+            q = 1./9.*(18.*gr - 6.)
+        else:
+            q = 1./9.*(18.*gr - 6. - 1./2. / nu_o_nu0_sq * (2.*f+1.)*(2.*f+1.)*a2_iikk/gr)
         return q
 
-    def __isotropic_eta_s(self, x, params):
+    def _isotropic_eta_s(self, x, params):
         """
         Finite strain approximation for :math:`eta_{s0}`, the isotropic shear
         strain derivative of the grueneisen parameter.
@@ -93,18 +134,15 @@ class SLBBase(eos.EquationOfState):
         eta_s = - gr - (1./2. * pow(nu_o_nu0_sq,-1.) * pow((2.*f)+1.,2.)*a2_s) # EQ 46 NOTE the typo from Stixrude 2005
         return eta_s
 
-    def pressure(self, temperature, volume, params):
-        return bm.birch_murnaghan(params['V_0']/volume, params) + \
-                self.__thermal_pressure(temperature,volume, params) - \
-                self.__thermal_pressure(300.,volume, params)
-
     #calculate isotropic thermal pressure, see
     # Matas et. al. (2007) eq B4
-    def __thermal_pressure(self,T,V, params):
-        Debye_T = self.__debye_temperature(params['V_0']/V, params)
+    def _thermal_pressure(self,T,V, params):
+        Debye_T = self._debye_temperature(params['V_0']/V, params)
         gr = self.grueneisen_parameter(0., T, V, params) # P not important
         P_th = gr * debye.thermal_energy(T,Debye_T, params['n'])/V
         return P_th
+    
+
 
 
     
@@ -124,52 +162,34 @@ class SLBBase(eos.EquationOfState):
         """
         Returns molar volume. :math:`[m^3]`
         """
-        T_0 = self.reference_temperature( params )
-        debye_T = lambda x : self.__debye_temperature(params['V_0']/x, params)
-        gr = lambda x : self.grueneisen_parameter(pressure, temperature, x, params)
-        E_th =  lambda x : debye.thermal_energy(temperature, debye_T(x), params['n']) #thermal energy at temperature T
-        E_th_ref = lambda x : debye.thermal_energy(T_0, debye_T(x), params['n']) #thermal energy at reference temperature
+        T_0 = params['T_0']
+        Debye_0 = params['Debye_0']
+        V_0 = params['V_0']
+        n = params['n']
+        
+        a1_ii = 6. * params['grueneisen_0'] # EQ 47
+        a2_iikk = -12.*params['grueneisen_0']+36.*pow(params['grueneisen_0'],2.) - 18.*params['q_0']*params['grueneisen_0'] # EQ 47
 
         b_iikk= 9.*params['K_0'] # EQ 28
-        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
-        f = lambda x: 0.5*(pow(params['V_0']/x,2./3.)-1.) # EQ 24
-        #func = lambda x: (1./3.)*(pow(1.+2.*f(x),5./2.))*((b_iikk*f(x)) \
-        #    +(0.5*b_iikkmm*pow(f(x),2.))) + gr(x)*(E_th(x) - E_th_ref(x))/x - pressure #EQ 21
-
-        n = params['n']
-        gruen_0 = params['grueneisen_0']
-        V_0 = params['V_0']
-        q_0 = params['q_0']
-        debye_0 = params['Debye_0']
-
-        func = lambda x: _volume_opt_func(x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0)
-        func2 = lambda x: pow(self._volume_opt_func2(x, temperature, T_0, b_iikk, b_iikkmm, V_0, pressure, q_0, gruen_0, n, debye_0),2.)
+        b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29z
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
-        a = 0.6*params['V_0']
-        b = 1.2*params['V_0']
-
-        # if we have a sign change, we are done:
-        if func(a)*func(b)<0:
-            return opt.brentq(func, a, b)
-        else:
-            tol = 0.0001
-            sol = opt.fmin(func2, 1.0*params['V_0'], ftol=tol, full_output=1, disp=0)
-            if sol[1] > tol*2:
-                raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
-            else:
-                warnings.warn("May be outside the range of validity for EOS")
-                return sol[0]
+        args = (pressure,temperature,V_0,T_0,Debye_0,n,a1_ii,a2_iikk,b_iikk,b_iikkmm)
+        try:
+            sol = bracket(_delta_pressure, params['V_0'], 1.e-2*params['V_0'], args)
+        except ValueError:
+            raise Exception('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        return opt.brentq(_delta_pressure, sol[0], sol[1] ,args=args)
 
     def pressure( self, temperature, volume, params):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
         """
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(0.0, temperature, volume, params) #does not depend on pressure
         E_th = debye.thermal_energy(temperature, debye_T, params['n'])
-        E_th_ref = debye.thermal_energy(300., debye_T, params['n']) #thermal energy at reference temperature
+        E_th_ref = debye.thermal_energy(params['T_0'], debye_T, params['n']) #thermal energy at reference temperature
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
@@ -185,17 +205,14 @@ class SLBBase(eos.EquationOfState):
         """
         Returns grueneisen parameter :math:`[unitless]` 
         """
-        gruen_0 = params['grueneisen_0']
-        V_0 = params['V_0']
-        q_0 = params['q_0']
-        return _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0)
+        return _grueneisen_parameter_fast(params['V_0'], volume, params['grueneisen_0'], params['q_0'])
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        T_0 = params['T_0'] 
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
 
         E_th = debye.thermal_energy(temperature, debye_T, params['n']) #thermal energy at temperature T
@@ -226,9 +243,9 @@ class SLBBase(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]` 
         """
-        T_0 = self.reference_temperature( params )
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
-        eta_s = self.__isotropic_eta_s(params['V_0']/volume, params)
+        T_0 = params['T_0'] 
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
+        eta_s = self._isotropic_eta_s(params['V_0']/volume, params)
 
         E_th = debye.thermal_energy(temperature ,debye_T, params['n'])
         E_th_ref = debye.thermal_energy(T_0,debye_T, params['n'])
@@ -244,7 +261,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
-        debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        debye_T = self._debye_temperature(params['V_0']/volume, params)
         return debye.heat_capacity_v(temperature, debye_T,params['n'])
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
@@ -274,13 +291,20 @@ class SLBBase(eos.EquationOfState):
         G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
+    def internal_energy( self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy at the pressure and temperature of the mineral [J/mol]
+        """
+        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
+               temperature * self.entropy( pressure, temperature, volume, params)
+
     def entropy( self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        Debye_T = self._debye_temperature(params['V_0']/volume, params)
         S = debye.entropy( temperature, Debye_T, params['n'] )
         return S 
 
@@ -290,7 +314,8 @@ class SLBBase(eos.EquationOfState):
         """
         
         return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
-               temperature * self.entropy( pressure, temperature, volume, params)
+               temperature * self.entropy( pressure, temperature, volume, params) + \
+               pressure * self.volume( pressure, temperature, params)
 
     def helmholtz_free_energy( self, pressure, temperature, volume, params):
         """
@@ -298,10 +323,10 @@ class SLBBase(eos.EquationOfState):
         """
         x = params['V_0'] / volume
         f = 1./2. * (pow(x, 2./3.) - 1.)
-        Debye_T = self.__debye_temperature(params['V_0']/volume, params)
+        Debye_T = self._debye_temperature(params['V_0']/volume, params)
 
         F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
-                          debye.helmholtz_free_energy( 300., Debye_T, params['n'] )
+                          debye.helmholtz_free_energy(params['T_0'], Debye_T, params['n'] )
 
         b_iikk= 9.*params['K_0'] # EQ 28
         b_iikkmm= 27.*params['K_0']*(params['Kprime_0']-4.) # EQ 29
@@ -316,39 +341,34 @@ class SLBBase(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+        if 'T_0' not in params:
+            params['T_0'] = 300.
 
-        #if G and Gprime are not included this is presumably deliberate,
-        #as we can model density and bulk modulus just fine without them,
-        #so just add them to the dictionary as nans
-        if 'G_0' not in params:
-            params['G_0'] = float('nan')
-        if 'Gprime_0' not in params:
-            params['Gprime_0'] = float('nan')
+        # If eta_s_0 is not included this is presumably deliberate,
+        # as we can model density and bulk modulus just fine without it,
+        # so just add it to the dictionary as nan
+        # The same goes for the standard state Helmholtz free energy
         if 'eta_s_0' not in params:
             params['eta_s_0'] = float('nan')
-  
-        #check that all the required keys are in the dictionary
-        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0', 'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
+        if 'F_0' not in params:
+            params['F_0'] = float('nan')
+
+        # First, let's check the EoS parameters for Tref
+        bm.BirchMurnaghanBase.validate_parameters(bm.BirchMurnaghanBase(),params)
+
+        # Now check all the required keys for the 
+        # thermal part of the EoS are in the dictionary
+        expected_keys = ['molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
         
-        #now check that the values are reasonable.  I mostly just
-        #made up these values from experience, and we are only 
-        #raising a warning.  Better way to do this? [IR]
-        if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
-            warnings.warn( 'Unusual value for V_0', stacklevel=2 )
-        if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0', stacklevel=2 )
-        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        if params['G_0'] < 0. or params['G_0'] > 1.e13:
-            warnings.warn( 'Unusual value for G_0', stacklevel=2 )
-        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
-        if params['molar_mass'] < 0.001 or params['molar_mass'] > 1.:
+        # Finally, check that the values are reasonable.
+        if params['T_0'] < 0.:
+            warnings.warn( 'Unusual value for T_0', stacklevel=2 )
+        if params['molar_mass'] < 0.001 or params['molar_mass'] > 10.:
             warnings.warn( 'Unusual value for molar_mass', stacklevel=2 )
-        if params['n'] < 1. or params['n'] > 100. or not float(params['n']).is_integer():
+        if params['n'] < 1. or params['n'] > 1000.:
             warnings.warn( 'Unusual value for n', stacklevel=2 )
         if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
             warnings.warn( 'Unusual value for Debye_0', stacklevel=2 )
@@ -358,14 +378,14 @@ class SLBBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for q_0' , stacklevel=2)
         if params['eta_s_0'] < -10. or params['eta_s_0'] > 10.:
             warnings.warn( 'Unusual value for eta_s_0' , stacklevel=2)
-            
+
 
 
 class SLB3(SLBBase):
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
-    consistent.
+    consistent.)
     """
     def __init__(self):
         self.order=3

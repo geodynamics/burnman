@@ -1,0 +1,119 @@
+.. _ref-methods-user-input:
+
+User input
+----------
+
+
+
+Mineralogical composition
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A number of pre-defined minerals are included in the mineral library and users can create their own.
+The library includes wrapper functions to include a transition from the high-spin mineral to the low-spin mineral :cite:`Lin2013` or to combine minerals for a given iron number.
+
+
+*Standard minerals* -- The 'standard' mineral format includes a list of parameters given in the above table.
+Each mineral includes a suggested EoS with which the mineral parameters are derived.
+For some minerals the parameters for the thermal corrections are not yet measured or calculated, and therefore the corrections can not be applied.
+An occasional mineral will not have a measured or calculated shear moduli, and therefore can only be used to compute densities and bulk sound velocities.
+The mineral library is subdivided by citation.
+BurnMan includes the option to produce a \LaTeX\;  table of the mineral parameters used.
+BurnMan can be easily setup to incorporate uncertainties for these parameters.
+
+*Minerals with a spin transition* -- A standard mineral for the high spin and low spin must be defined separately.
+These minerals are "wrapped," so as to switch from the high spin to high spin mineral at a give pressure.
+While not realistic, for the sake of simplicity, the spin transitions are considered to be sharp at a given pressure.
+
+*Minerals depending on Fe partitioning* -- The wrapper function can partition iron, for example between ferropericlase, fp, and perovskite, pv.
+It requires the input of the iron mol fraction with regards to Mg, :math:`X_\mathrm{fp}` and :math:`X_\mathrm{pv}`, which then defines the chemistry of an Mg-Fe solid solution according to (:math:`\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{fp}}},\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{fp}}})\mathrm{O}` or :math:`(\mathrm{Mg}_{1-X_{\mathrm{Fe}}^{\mathrm{pv}}},\mathrm{Fe}_{X_{\mathrm{Fe}}^{\mathrm{pv}}})\mathrm{SiO_3}`.
+The iron mol fractions can be set to be constant or varying with P and T as needed.
+Alternatively one can calculate the iron mol fraction from the distribution coefficient :math:`K_D` defined as
+
+.. math::
+    K_{D} = \frac{X_{\mathrm{Fe}}^{\mathrm{pv}}/X_{\mathrm{Mg}}^{\mathrm{pv}}}{X_{\mathrm{Fe}}^{\mathrm{fp}}/X_{\mathrm{Mg}}^{\mathrm{fp}}}.
+    :label: KD
+
+
+We adopt the formalism of :cite:`Nakajima2012` choosing a reference distribution coefficient :math:`K_{D0}` and standard state volume change (:math:`\Delta \upsilon^{0}`) for the Fe-Mg exchange between perovskite and ferropericlase
+
+.. math::
+    K_{D}={K_D}_0 \:\exp\left(\frac{(P_0-P)\Delta \upsilon^{0}}{RT}\right),
+    :label: KD2
+
+where :math:`R` is the gas constant and :math:`P_0` the reference pressure.
+As a default, we adopt the average :math:`\Delta \upsilon^{0}` of :cite:`Nakajima2012` of :math:`2\cdot10^{-7}` :math:`m^3 mol^{-1}` and suggest using their :math:`{K_D}_0` value of :math:`0.5`.
+
+
+The multiphase mixture of these minerals can be built by the user in three ways: 
+
+1. Molar fractions of an arbitrary number of pre-defined minerals,  for example mixing standard minerals mg\_perovskite (:math:`\mathrm{MgSiO_3}`), fe\_perovskite
+(:math:`\mathrm{FeSiO_3}`), periclase (:math:`\mathrm{MgO}`) and wüstite (:math:`\mathrm{FeO}`).
+
+2. A two-phase mixture with constant or (:math:`P,T`) varying Fe partitioning using the minerals that include Fe-dependency, 
+for example mixing :math:`\mathrm{(Mg,Fe)SiO_3}` and :math:`\mathrm{(Mg,Fe)O}` with a pre-defined distribution coefficient.
+
+3. Weight percents (wt\%) of (Mg, Si, Fe) and distribution coefficient (includes (P,T)-dependent Fe partitioning).
+This calculation assumes that each element is completely oxidized into its corresponding oxide mineral
+(:math:`\mathrm{MgO}`, :math:`\mathrm{FeO}`, :math:`\mathrm{SiO_2}`) and then combined to form iron-bearing perovskite and ferropericlase taking into account some Fe partition coefficient.
+
+
+
+.. _ref-methods-geothermal:
+
+Geotherm
+^^^^^^^^
+
+Unlike the pressure, the temperature of the lower mantle is relatively unconstrained.
+As elsewhere, BurnMan provides a number of built-in geotherms, as well as the ability to use user-defined temperature-depth relationships.
+A geotherm in BurnMan is an object that returns temperature as a function of pressure.
+Alternatively, the user could ignore the geothermal and compute elastic velocities for a range of temperatures at any give pressure.
+
+Currently, we include geotherms published by :cite:`Brown1981` and :cite:`anderson1982earth`.
+Alternatively one can use an adiabatic gradient defined by the thermoelastic properties of a given mineralogical model.
+For a homogeneous material, the adiabatic temperature profile is given by integrating the ordinary differential equation (ODE)
+
+.. math::
+    \left(\frac{\text{d}T}{\text{d}P}\right)_S = \frac{\gamma T}{K_S}.
+    :label: geoth
+
+This equation can be extended to multiphase composite using the first law of thermodynamics to arrive at
+
+.. math::
+    \left(\frac{\text{d}T}{\text{d}P}\right)_S = \frac{ T \displaystyle\sum_{i} \frac{ n_i C_{Pi} \gamma_i }{K_{Si}}}{ \displaystyle\sum_{i} n_i C_{Pi} },
+    :label: geoth2
+
+where the subscripts correspond to the :math:`i` th phase, :math:`C_P` is the heat capacity at constant pressure of a phase, and the other symbols are as defined above.
+Integrating this ODE requires a choice in anchor temperature (:math:`T_0`) at the top of the lower mantle (or including this as a parameter in an inversion).
+As the adiabatic geotherm is dependent on the thermoelastic parameters at high pressures and temperatures, it is dependent on the equation of state used.
+
+
+.. _ref-methods-seis:
+
+Seismic Models
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+BurnMan allows for direct visual and quantitative comparison with seismic velocity models.
+Various ways of plotting can be found in the examples.
+Quantitative misfits between two profiles include an L2-norm and a chi-squared misfit, but user defined norms can be implemented.
+A seismic model in BurnMan is
+an object that provides pressure, density, and seismic velocities (:math:`V_P, V_\Phi, V_S`) as a function of depth.
+
+To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`dziewonski1981`.
+One can choose to evaluate :math:`V_P, V_\Phi, V_S, \rho, K_S` and/or :math:`G`.
+The user can input their own seismic profile, an example of which is included using AK135 :cite:`kennett1995`.
+
+Besides standardized 1D radial profiles, one can also compare to regionalized average profiles for the lower mantle.
+This option accommodates the observation that the lowermost mantle can be clustered into two regions, a 'slow' region, which represents the so-called Large Low Shear Velocity Provinces, and 'fast' region, the continuous surrounding region where slabs might subduct :cite:`Lekic2012`.
+This clustering as well as the averaging of the 1D model occurs over five tomographic S wave velocity  models (SAW24B16: :cite:`megnin2000`; HMSL-S: :cite:`houser2008`; S362ANI: :cite:`kustowski2008`; GyPSuM: :cite:`Simmons2010`; S40RTS: :cite:`Ritsema2011`).
+The strongest deviations from PREM occur in the lowermost 1000 km.
+Using the 'fast' and 'slow' S wave velocity profiles is therefore most important when interpreting the lowermost mantle. Suggestion of compositional variation between these regions comes from seismology :cite:`to2005,He2012` as well as geochemistry :cite:`Deschamps2012,jackson2010`.
+Based on thermo-chemical convection models, :cite:`Styles2011` also show that averaging profiles in thermal boundary layers may cause problems for seismic interpretation.
+
+We additionally apply cluster analysis to and provide models for P wave velocity based on two tomographic models (MIT-P08: :cite:`Li2008`; GyPSuM: :cite:`Simmons2012`).
+The clustering results correlate well with the fast and slow regions for S wave velocities; this could well be due to the fact that the initial model for the P wave velocity models is scaled from S wave tomographic velocity models.
+Additionally, the variations in P wave velocities are a lot smaller than for S waves.
+For this reason using these adapted models is most important when comparing the S wave velocities.
+
+While interpreting lateral variations of seismic velocity in terms of composition and temperature is a major goal :cite:`Trampert2004,Mosca2012`, to determine the bulk composition the current challenge appears to be concurrently fitting absolute P and S wave velocities and incorporate the significant uncertainties in mineral physical parameters).
+

@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 example_geotherms
@@ -14,7 +14,7 @@ These are:
 3. Watson and Baxter, 2007 :cite:`Watson2007`
 4. linear extrapolation
 5. Read in from file from user
-6. Adiabatic from potential temperature and choice of mineral (pyrolite in this example)
+6. Adiabatic from potential temperature and choice of mineral 
 
 *Uses:*
 
@@ -28,6 +28,7 @@ These are:
 * the available geotherms
 
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -40,7 +41,7 @@ from burnman import minerals
 if __name__ == "__main__":
 
 # we want to evaluate several geotherms at these values
-    pressures = np.arange(8.5e9,128e9,3e9)
+    pressures = np.arange(9.0e9,128e9,3e9)
 
     #load two builtin geotherms and evaluate the temperatures at all pressures
     temperature1 = burnman.geotherm.brown_shankland(pressures)
@@ -69,15 +70,21 @@ if __name__ == "__main__":
     #geotherm for an assemblage of minerals
     #based on self compression of the composite rock.
     #First we need to define an assemblage
-    pyrolite = burnman.Composite([0.7, 0.3],
-                                 [minerals.SLB_2005.mg_fe_perovskite(0.1),
-                                  minerals.SLB_2005.ferropericlase(0.4)])
+    amount_perovskite = 0.8
+    fe_pv=0.05
+    fe_pc=0.2
+    pv=minerals.SLB_2011.mg_fe_perovskite()
+    pc=minerals.SLB_2011.ferropericlase()
+    pv.set_composition([1.-fe_pv,fe_pv,0.])
+    pc.set_composition([1.-fe_pc,fe_pc])
+    example_rock = burnman.Composite( [pv,pc], [amount_perovskite, 1.0-amount_perovskite] )
+    
     #next, define an anchor temperature at which we are starting.
     #Perhaps 1500 K for the upper mantle
     T0 = 1500.
     #then generate temperature values using the self consistent function.
     # This takes more time than the above methods
-    temperature5 = burnman.geotherm.adiabatic(pressures, T0, pyrolite)
+    temperature5 = burnman.geotherm.adiabatic(pressures, T0, example_rock)
 
     #you can also look at burnman/geotherm.py to see how the geotherms are implemented
 

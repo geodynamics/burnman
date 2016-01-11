@@ -1,6 +1,8 @@
 Changelog
 ---------
 
+  - BurnMan is now Python 3 compatible.
+
 Release v0.7 (June 24, 2014)
   - Cleanup and rewrite of the mineral/composite feature
   - online html documentation

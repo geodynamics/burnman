@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 
@@ -22,6 +22,8 @@ This script may be run by typing
     python step_2.py
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 # The imports here are identical to those from step 1
 import numpy as np
@@ -45,7 +47,7 @@ if __name__=='__main__':
     depths = np.linspace(min_depth, max_depth, n_depths)
 
     seismic_model = burnman.seismic.PREM()
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(['pressure', 'density', 'v_phi', 'v_s'], depths)
     temperature = burnman.geotherm.brown_shankland(pressure)
 
 
@@ -64,20 +66,19 @@ if __name__=='__main__':
 
         # Here we define the rock as before. 
         phase_2_fraction = 1.0-phase_1_fraction
-        rock = burnman.Composite([phase_1_fraction, phase_2_fraction], 
-                                 [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()])
+        rock = burnman.Composite([minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()],[phase_1_fraction, phase_2_fraction])
 
         # Just as in step 1, we want to set which equation of state we use,
         # then call burnman.velocities_from_rock, which evaluates the 
         # elastic properties and seismic velocities at the predefined 
         # pressures and temperatures
         rock.set_method('slb3')
-        density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, pressure, temperature)
+        density, vphi, vs = rock.evaluate(['density','v_phi','v_s'], pressure, temperature)
 
         # Since we will call this misfit function many times, we may be interested
         # in a status report.  These lines print some debug output so we 
         # can keep track of what the script is doing.
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
         # Here we integrate an L2 difference with depth between our calculated seismic

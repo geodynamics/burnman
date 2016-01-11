@@ -1,6 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -27,6 +28,8 @@ teaches:
 - averaging
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -35,13 +38,13 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-import colors
+import misc.colors as colors
 
 if __name__ == "__main__":
     figsize=(6,5)
     prop={'size':12}
     #plt.rc('text', usetex=True)
-    plt.rc('font', family='sanserif')
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
     """ choose 'slb2' (finite-strain 2nd order shear modulus,
@@ -59,12 +62,12 @@ if __name__ == "__main__":
 
     amount_perovskite = 0.6
 
-    rock = burnman.Composite( [ (minerals.SLB_2011.mg_perovskite(), amount_perovskite),
-                    (minerals.SLB_2011.wuestite(), 1.0-amount_perovskite) ] )
+    rock = burnman.Composite( [minerals.SLB_2011.mg_perovskite(), minerals.SLB_2011.wuestite()],
+                              [amount_perovskite, 1.0-amount_perovskite] )
 
-    perovskitite = burnman.Composite( [ (minerals.SLB_2011.mg_perovskite(), 1.0), ] )
+    perovskitite = burnman.Composite( [minerals.SLB_2011.mg_perovskite()], [1.0] )
 
-    periclasite = burnman.Composite( [ (minerals.SLB_2011.wuestite(), 1.0), ] )
+    periclasite = burnman.Composite( [minerals.SLB_2011.wuestite()], [1.0] )
 
     #seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
@@ -75,41 +78,47 @@ if __name__ == "__main__":
     depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
     #depths = seismic_model.internal_depth_list()
-    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     temperatures = burnman.geotherm.brown_shankland(pressures)
 
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
-        #calculate the seismic velocities of the rock using a whole battery of averaging schemes:
+    #calculate the seismic velocities of the rock using a whole battery of averaging schemes:
 
-        # do the end members, here averaging scheme does not matter (though it defaults to Voigt-Reuss-Hill)
+    # evaluate the end members
     rho_pv, vp_pv, vs_pv, vphi_pv, K_pv, G_pv = \
-            burnman.velocities_from_rock(perovskitite, pressures, temperatures)
+            perovskitite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
+
     rho_fp, vp_fp, vs_fp, vphi_fp, K_fp, G_fp = \
-            burnman.velocities_from_rock(periclasite, pressures, temperatures)
+            periclasite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
         #Voigt Reuss Hill averaging
+    rock.set_averaging_scheme(burnman.averaging_schemes.VoigtReussHill())
     rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.VoigtReussHill())
+            rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
         #Voigt averaging
+    rock.set_averaging_scheme(burnman.averaging_schemes.Voigt())
     rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Voigt())
+            rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
         #Reuss averaging
+    rock.set_averaging_scheme(burnman.averaging_schemes.Reuss())
     rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.Reuss())
+            rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
         #Upper bound for Hashin-Shtrikman averaging
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanUpper())
     rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanUpper())
+            rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
-        #Lower bound for Hashin-Shtrikman averaging
+    #Lower bound for Hashin-Shtrikman averaging
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanLower())
     rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = \
-            burnman.velocities_from_rock(rock, pressures, temperatures, averaging_scheme=burnman.averaging_schemes.HashinShtrikmanLower())
+            rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], pressures, temperatures)
 
     #linear fit
     vs_lin = vs_pv*amount_perovskite + vs_fp*(1.0-amount_perovskite)
@@ -150,5 +159,6 @@ if __name__ == "__main__":
 
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Shear velocity $V_s$ (km/s)')
-    plt.savefig("example_averaging.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_averaging.pdf",bbox_inches='tight')
     plt.show()

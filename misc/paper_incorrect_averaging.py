@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 
@@ -11,6 +11,7 @@ paper_incorrect_averaging
 This script reproduces :cite:`Cottaar2014`, Figure 5. 
 Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
+from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -19,15 +20,15 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-from burnman.mineral_helpers import HelperSolidSolution
+from misc.helper_solid_solution import HelperSolidSolution
 import matplotlib.image as mpimg
-import colors
+import misc.colors as colors
 
 if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,6))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
@@ -100,17 +101,17 @@ if __name__ == "__main__":
     #for the solid solutions is assumed...
     class ferropericlase(HelperSolidSolution):
         def __init__(self, fe_num):
-            base_materials = [periclase, wustite]
-            molar_fraction = [1. - fe_num, 0.0 + fe_num]
-            HelperSolidSolution.__init__(self, base_materials, molar_fraction)
+            endmembers = [periclase, wustite]
+            molar_fractions = [1. - fe_num, 0.0 + fe_num]
+            HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
 
     class perovskite(HelperSolidSolution):
         def __init__(self, fe_num):
-            base_materials = [mg_perovskite, fe_perovskite]
-            molar_fraction = [1. - fe_num, 0.0 + fe_num]
-            HelperSolidSolution.__init__(self, base_materials, molar_fraction)
+            endmembers = [mg_perovskite, fe_perovskite]
+            molar_fractions = [1. - fe_num, 0.0 + fe_num]
+            HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
     #define the P-T path
@@ -120,33 +121,37 @@ if __name__ == "__main__":
 
     #seismic model for comparison:
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    depths = map(seismic_model.depth, pressure)
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    depths = list(map(seismic_model.depth, pressure))
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     #pure perovskite
-    perovskitite = burnman.Composite( ( (perovskite(0.06), 1.0),) )
+    perovskitite = burnman.Composite( [perovskite(0.06)], [1.0] )
     perovskitite.set_method(method)
 
     #pure periclase
-    periclasite = burnman.Composite( ( (ferropericlase(0.21), 1.0),))
+    periclasite = burnman.Composite( [ferropericlase(0.21)], [1.0])
     periclasite.set_method(method)
 
     #pyrolite (80% perovskite)
-    pyrolite = burnman.Composite( ( (perovskite(0.06), 0.834),
-                                    (ferropericlase(0.21), 0.166) ) )
+    pyrolite = burnman.Composite( [perovskite(0.06), ferropericlase(0.21)],\
+                                  [0.834, 0.166] )
     pyrolite.set_method(method)
 
     #preferred mixture?
     amount_perovskite = 0.92
-    preferred_mixture = burnman.Composite( ( (perovskite(0.06), amount_perovskite),
-                                             (ferropericlase(0.21), 1.0-amount_perovskite) ) )
+    preferred_mixture = burnman.Composite( [perovskite(0.06), ferropericlase(0.21)],\
+                                           [amount_perovskite, 1.0-amount_perovskite] )
     preferred_mixture.set_method(method)
 
 
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = burnman.velocities_from_rock(perovskitite,seis_p, temperature_bs)
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = burnman.velocities_from_rock(periclasite,seis_p, temperature_bs)
-    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = burnman.velocities_from_rock(pyrolite,seis_p, temperature_bs)
-    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = burnman.velocities_from_rock(preferred_mixture,seis_p, temperature_bs)
+    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
+        perovskitite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p,temperature_bs)
+    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = \
+        periclasite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p,temperature_bs)
+    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = \
+        pyrolite.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p, temperature_bs)
+    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = \
+        preferred_mixture.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], seis_p, temperature_bs)
 
 
 
@@ -200,9 +205,7 @@ if __name__ == "__main__":
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Shear Velocity Vs (km/s)")
     plt.tight_layout()
-    plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_incorrect_averaging.pdf",bbox_inches='tight')
     plt.show()
-
-
-
 

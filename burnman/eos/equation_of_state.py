@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 
 class EquationOfState(object):
@@ -59,17 +59,16 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def density(self, pressure, temperature, params):
+    def density(self, volume, params):
         """
         Calculate the density of the mineral :math:`[kg/m^3]`.  
         The params object must include a "molar_mass" field.
 
         Parameters
         ----------
-        pressure : float
-            Pressure at which to evaluate the equation of state. :math:`[Pa]`
-        temperature : float
-            Temperature at which to evaluate the equation of state. :math:`[K]`
+        volume : float
+        Molar volume of the mineral.  For consistency this should be calculated
+        using :func:`volume`. :math:`[m^3]`
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
 
@@ -78,7 +77,7 @@ class EquationOfState(object):
         density : float
             Density of the mineral. :math:`[kg/m^3]`
         """
-        return params["molar_mass"] / self.volume(pressure, temperature, params)
+        return params["molar_mass"] / volume
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
@@ -227,24 +226,6 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def reference_temperature( self, params ):
-        """
-        Parameters
-        ----------
-        params : dictionary
-            Dictionary containing material parameters required by the equation of state.
-
-        Returns
-        -------
-        T_0 : float
-            If params contains a "T_0" entry, return that reference temperature, otherwise
-            return 300.0 Kelvin
-        """
-        if 'T_0' in params:
-            return params['T_0']
-        else:
-            return 300.0
-
     def gibbs_free_energy( self, pressure, temperature, volume, params ):
         """
         Parameters
@@ -343,8 +324,8 @@ class EquationOfState(object):
         and an equation of state is not required to implement it.  This function will
         not return anything, though it may raise warnings or errors.
 
-        Params
-        ------
+        Parameters
+        ----------
         params : dictionary
             Dictionary containing material parameters required by the equation of state.
         """

@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -21,13 +21,15 @@ teaches:
 - averaging
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 import os, sys, numpy as np, matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1,os.path.abspath('..'))
 
 import scipy.optimize as opt
 import burnman
-import colors
+import misc.colors as colors
 
 #hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -37,8 +39,8 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 figsize=(6,5)
 prop={'size':12}
 plt.rc('text', usetex=True)
-plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-plt.rc('font', family='sanserif')
+plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
+plt.rc('font', family='sans-serif')
 figure=plt.figure(dpi=100,figsize=figsize)
 
 
@@ -50,7 +52,7 @@ def calc_shear_velocities(G_0, Gprime_0, mineral, pressures):
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
         mineral.set_state(pressures[i], 0.0) # set state with dummy temperature
-        shear_velocities[i] = mineral.v_s()
+        shear_velocities[i] = mineral.v_s
 
     return shear_velocities
 
@@ -83,7 +85,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm2")
     func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
     sol = opt.fmin(func, guess)
-    print "2nd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+    print("2nd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1])
     model_vs_2nd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
     mg_perovskite_test.set_method("bm3")
     model_vs_2nd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
@@ -92,7 +94,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm3")
     func = lambda x : error( x, mg_perovskite_test, obs_pressures, obs_vs)
     sol = opt.fmin(func, guess)
-    print "3rd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1]
+    print("3rd order fit: G = ", sol[0]/1.e9, "GPa\tG' = ", sol[1])
     model_vs_3rd_order_correct = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
     mg_perovskite_test.set_method("bm2")
     model_vs_3rd_order_incorrect = calc_shear_velocities(sol[0], sol[1], mg_perovskite_test, pressures)
@@ -109,5 +111,6 @@ if __name__ == "__main__":
         plt.ylabel(r'Shear velocity ${V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc = "lower right",prop=prop)
-    plt.savefig("example_fit_data.pdf", bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("example_fit_data.pdf", bbox_inches='tight')
     plt.show()

@@ -1,0 +1,277 @@
+.. _ref-methods-EoS:
+
+Calculating Thermoelastic Properties
+------------------------------------
+
+
+To calculate the bulk (:math:`K`) modulus, shear modulus (:math:`G`) and
+density (:math:`\rho`) of a material at a given pressure (:math:`P`) and
+temperature (:math:`T`), optionally defined by a geotherm) and determine the
+seismic velocities (:math:`V_S, V_P, V_\Phi`), one uses an Equation of State
+(EoS).  Currently the following EoSs are supported in BurnMan:
+
+* Birch-Murnaghan finite-strain EoS (excludes temperature effects, :cite:`Poirier1991`), 
+* Birch-Murnaghan finite-strain EoS with a Mie-Grüneisen-Debye thermal correction, as formulated by :cite:`Stixrude2005`.
+* Birch-Murnaghan finite-strain EoS with a Mie-Grüneisen-Debye thermal correction, as formulated by :cite:`Matas2007`.
+* Modified Tait EoS (excludes temperature effects, :cite:`HC1974`), 
+* Modified Tait EoS with a pseudo-Einstein model for thermal corrections, as formulated by :cite:`HP2011`.
+* Compensated-Redlich-Kwong for fluids, as formulated by :cite:`HP1991`.
+
+
+To calculate these thermoelastic parameters, the EoS
+requires the user to input the pressure, temperature, and the phases
+and their molar fractions.  These inputs and outputs are further discussed in
+:ref:`ref-methods-user-input`.
+
+
+
+Birch-Murnaghan (isothermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Birch-Murnaghan equation is an isothermal Eulerian finite-strain EoS
+relating pressure and volume.  The negative finite-strain (or compression) is
+defined as
+
+.. math::
+    f=\frac{1}{2}\left[\left(\frac{V}{V_0}\right)^{-2/3}-1\right],
+    :label: f
+
+where :math:`V` is the volume at a given pressure and :math:`V_0` is the
+volume at a reference state (:math:`P = 10^5` Pa , :math:`T` = 300 K).  The
+pressure and elastic moduli are derived from a third-order Taylor expansion of
+Helmholtz free energy in :math:`f` and evaluating the appropriate volume and
+strain derivatives (e.g., :cite:`Poirier1991`).  For an isotropic
+material one obtains for the pressure, isothermal bulk modulus, and shear
+modulus:
+
+
+.. math::
+   P=3K_0f\left(1+2f\right)^{5/2}\left[1+\frac{3}{2}\left(K_0^\prime -4\right) f\right],
+   :label: V
+
+
+.. math::
+    K_{T}=(1+2f)^{5/2}\biggl[ & K_0+(3K_0{K}^\prime_{0}-5K_0)f\\ &+\frac{27}{2}(K_0{K}^\prime_{0}-4K_0)f^2 \biggr],
+    :label: K
+
+
+.. math::
+	G = (1+& 2f)^{5/2}  \biggl[G_0+(3K_0{G}^\prime_{0}-5G_0)f\\ & +(6K_0{G}^\prime_{0}-24K_0-14G_{0}
+	 + \frac{9}{2}K_{0}{K}^\prime_{0})f^2 \biggr].
+    :label: G
+
+Here :math:`K_0` and :math:`G_0` are the reference bulk modulus and shear
+modulus and :math:`K_0^\prime` and :math:`{G}^\prime_{0}` are the derivative
+of the respective moduli with respect to pressure.
+
+BurnMan has the option to use the second-order expansion for shear modulus by
+dropping the :math:`f^2` terms in these equations (as is sometimes done for
+experimental fits or EoS modeling).
+
+Modified Tait (isothermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Modified Tait equation of state was developed by :cite:`HC1974`. It has the considerable benefit of allowing volume to be expressed as a function of pressure. It performs very well to pressures and temperatures relevant to the deep Earth :cite:`HP2011`.
+
+.. math::
+    \frac{V_{P, T}}{V_{1 bar, 298 K}} &= 1 - a(1-(1+bP)^{-c}), \\
+    a &= \frac{1 + K_0'}{1 + K_0' + K_0K_0''}, \\
+    b &= \frac{K_0'}{K_0} - \frac{K_0''}{1 + K_0'}, \\
+    c &= \frac{1 + K_0' + K_0K_0''}{K_0'^2 + K_0' - K_0K_0''}
+    :label: mtait
+
+
+Mie-Grüneisen-Debye (thermal correction to Birch-Murnaghan)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Debye model for the Helmholtz free energy can be written as follows :cite:`Matas2007`
+
+.. math::
+    \mathcal{F} &= \frac{9nRT}{V}\frac{1}{x^3} \int_{0}^{x} \xi^2 \ln (1-e^{-\xi}) d\xi, \\
+    x &= \theta / T, \\
+    \theta &= \theta_0 \exp \left( \frac{\gamma_0-\gamma}{q_0} \right), \\
+    \gamma &= \gamma_0 \left( \frac{V}{V_0} \right)^{q_0}
+
+where :math:`\theta` is the Debye temperature and :math:`\gamma` is the Grüneisen parameter. 
+
+Using thermodynamic relations we can derive equations for the thermal pressure and bulk modulus
+
+.. math::
+    P_{th}(V,T) &= - \frac{\partial \mathcal{F(V, T)}}{\partial V}, \\
+    &= \frac{3 n \gamma R T}{V} D(x), \\
+    K_{th}(V,T) &= -V \frac{\partial P(V, T)}{\partial V}, \\
+    &= \frac{3 n \gamma R T}{V} \gamma \left[ (1-q_0 - 3 \gamma) D(x) + 3\gamma \frac{x}{e^x - 1} \right], \\
+    D(x) &= \frac{3}{x^3} \int_{0}^{x} \frac{\xi^3}{e^{\xi} - 1} d\xi
+
+The thermal shear correction used in BurnMan was developed by :cite:`HS1998`
+
+.. math::
+    G_{th}(V,T) &= \frac{3}{5} \left[ K_{th} (V, T) - 2\frac{3nRT}{V}\gamma D(x) \right]
+
+
+The total pressure, bulk and shear moduli can be calculated from the following sums
+
+.. math::
+    P(V, T) &= P_{\textrm{ref}}(V, T_0) + P_{th}(V, T) - P_{th}(V, T_0), \\
+    K(V, T) &= K_{\textrm{ref}}(V, T_0) + K_{th}(V, T) - K_{th}(V, T_0), \\
+    G(V, T) &= G_{\textrm{ref}}(V, T_0) + G_{th}(V, T) - G_{th}(V, T_0) 
+
+This equation of state is substantially the same as that in SLB2005 (see below).  
+The primary differences are in the thermal correction to the shear modulus and in the volume dependences of the Debye temperature and the Gruneisen parameter.
+
+
+HP2011 (thermal correction to Modified Tait)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-\left(P_{\textrm{th}} - P_{\textrm{th0}}\right)` in Equation :eq:`mtait` :cite:`HP2011`. Thermal pressure is calculated using a Mie-Grüneisen equation of state and an Einstein model for heat capacity, even though the Einstein model is not actually used for the heat capacity when calculating the enthalpy and entropy (see following section).
+
+.. math::
+    P_{\textrm{th}} &= \frac{\alpha_0 K_0 E_{\textrm{th}} }{C_{V0}}, \\
+    E_{\textrm{th}} &= 3 n R \Theta \left(0.5 + \frac{1}{ \exp(\frac{\Theta}{T}) - 1 }\right), \\
+    C_{V} &= 3 n R \frac{(\frac{\Theta}{T})^2\exp(\frac{\Theta}{T})}{(\exp(\frac{\Theta}{T})-1)^2}
+
+
+:math:`\Theta` is the Einstein temperature of the crystal in Kelvin, approximated for a substance :math:`i` with :math:`n_i` atoms in the unit formula and a molar entropy :math:`S_i` using the empirical formula 
+
+.. math::
+    \Theta_i=\frac{10636}{S_i/n_i + 6.44}
+
+
+SLB2005 (for solids, thermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Thermal corrections for pressure, and isothermal bulk modulus and shear
+modulus are derived from the Mie-Grüneisen-Debye EoS with the quasi-harmonic
+approximation.  Here we adopt the formalism of :cite:`Stixrude2005` where
+these corrections are added to equations :eq:`V`--:eq:`G`:
+
+.. math::
+    P_{th}(V,T) &={\frac{\gamma \Delta \mathcal{U}}{V}}, \\
+    K_{th}(V,T) &=(\gamma +1-q)\frac{\gamma \Delta \mathcal{U}}{V} -\gamma ^{2} \frac{\Delta(C_{V}T)}{V} ,\\
+    G_{th}(V,T) &=  -\frac{\eta_{S} \Delta \mathcal{U}}{V}.
+    :label: Pth
+
+The :math:`\Delta` refers to the difference in the relevant quantity from the
+reference temperature (300 K).  :math:`\gamma` is the Grüneisen parameter,
+:math:`q` is the logarithmic volume derivative of the Grüneisen parameter,
+:math:`\eta_{S}` is the shear strain derivative of the Grüneisen parameter,
+:math:`C_V` is the heat capacity at constant volume, and :math:`\mathcal{U}`
+is the internal energy at temperature :math:`T`.  :math:`C_V` and
+:math:`\mathcal{U}` are calculated using the Debye model for vibrational
+energy of a lattice. These quantities are calculated as follows:
+
+.. math::
+    C_V &= 9nR\left (  \frac{T}{\theta}\right )^3\int_{0}^{\frac{\theta}{T}}\frac{e^{\tau}\tau^{4}}{(e^{\tau}-1)^2}d\tau, \\
+    \mathcal{U} &= 9nRT\left ( \frac{T}{\theta} \right )^3\int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau, \\
+    \gamma &= \frac{1}{6}\frac{\nu_{0}^2}{\nu^{2}}(2f+1)\left [  a_{ii}^{(1)} +a_{iikk}^{(2)}f\right ], \\
+    q &= \frac{1}{9\gamma}\left [ 18\gamma^{2}-6\gamma -\frac{1}{2} \frac{\nu^{2}_0}{\nu^2}(2f+1)^{2}a_{iikk}^{(2)} \right ], \\
+    \eta_S &=-\gamma-\frac{1}{2}\frac{\nu_{0}^2}{\nu^2}(2f+1)^{2}a_{S}^{(2)}, \\
+    \frac{\nu^2}{\nu^2_0} &= 1+a_{ii}^{(1)}f+\frac{1}{2}a_{iikk}^{(2)}f^2, \\
+    a_{ii}^{(1)} &= 6\gamma _0, \\
+    a_{iikk}^{(2)} &= -12\gamma _0+36\gamma_{0}^{2}-18q_{0}\gamma_0,  \\
+    a_{S}^{(2)} &=-2\gamma _0-2\eta_{S0},
+
+where :math:`\theta` is the Debye temperature of the mineral, :math:`\nu` is
+the frequency of vibrational modes for the mineral, :math:`n` is the number of
+atoms per formula unit (e.g. 2 for periclase, 5 for perovskite), and :math:`R`
+is the gas constant.  Under the approximation that the vibrational frequencies
+behave the same under strain, we may identify :math:`\nu/\nu_0 =
+\theta/\theta_0`.  The quantities :math:`\gamma_0`, :math:`\eta_{S0}`
+:math:`q_0`, and :math:`\theta_0` are the experimentally determined values for
+those parameters at the reference state.
+
+
+Due to the fact that a planetary mantle is rarely isothermal along a geotherm,
+it is more appropriate to use the adiabatic bulk modulus :math:`K_S` instead
+of :math:`K_T`, which is calculated using
+
+.. math::
+    K_S=K_{T}(1+\gamma \alpha T),
+    :label: K_s
+
+where :math:`\alpha` is the coefficient of thermal expansion:
+
+
+.. math::
+    \alpha=\frac{\gamma C_{V}V}{K_T}.
+    :label: Cv
+
+
+There is no difference between the isothermal and adiabatic shear moduli for
+an isotropic solid.  All together this makes an eleven parameter EoS model,
+which is summarized in the Table below. For more details on the
+EoS, we refer readers to :cite:`Stixrude2005`.
+
+.. _table-parameters:
+
++--------------+------------------+-----------------------------------+-------------------------+
+|User Input    |Symbol            |Definition                         |Units                    |
+|              |                  |                                   |                         |
++==============+==================+===================================+=========================+
+|V_0           |:math:`V_{0}`     |Volume at P = :math:`10^5`         |m :math:`^{3}`           |
+|              |                  | Pa , T = 300 K                    |mol :math:`^{-1}`        |
++--------------+------------------+-----------------------------------+-------------------------+
+|K_0           |:math:`K_{0}`     |Isothermal bulk modulus at `P=10^5`|Pa                       |
+|              |                  |Pa, T = 300 K                      |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|Kprime_0      |:math:`K^\prime_0`|Pressure derivative of             |                         |
+|              |                  |:math:`K_{0}`                      |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|G_0           |:math:`G_{0}`     |Shear modulus at P = :math:`10^5`  |Pa                       |
+|              |                  |Pa, T = 300 K                      |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|Gprime_0      |:math:`G^\prime_0`|Pressure derivative of             |                         |
+|              |                  |:math:`G_{0}`                      |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|molar_mass    |:math:`\mu`       |mass per mole formula unit         |kg                       |
+|              |                  |                                   |:math:`\mathrm{mol}^{-1}`|
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|n             |n                 |number of atoms per formula unit   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|Debye_0       |:math:`\theta_{0}`|Debye Temperature                  |K                        |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|grueneisen_0  |:math:`\gamma_{0}`|Grüneisen parameter at P =         |                         |
+|              |                  |:math:`10^5` Pa, T = 300 K         |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|q0            |:math:`q_{0}`     |Logarithmic volume derivative of   |                         |
+|              |                  |the Grüneisen parameter            |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+|eta_s_0       |:math:`\eta_{S0}` |Shear strain derivative of the     |                         |
+|              |                  |Grüneisen parameter                |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
+|              |                  |                                   |                         |
++--------------+------------------+-----------------------------------+-------------------------+
+
+This equation of state is substantially the same as that of the Mie-Gruneisen-Debye (see above).  
+The primary differences are in the thermal correction to the shear modulus and in the volume dependences of the Debye temperature and the Gruneisen parameter.
+
+Compensated-Redlich-Kwong (for fluids, thermal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The CORK equation of state :cite:`HP1991` is a simple virial-type extension to the modified Redlich-Kwong (MRK) equation of state. It was designed to compensate for the tendency of the MRK equation of state to overestimate volumes at high pressures and accommodate the volume behaviour of coexisting gas and liquid phases along the saturation curve.
+
+.. math::
+    V &= \frac{RT}{P} + c_1 - \frac{c_0 R T^{0.5}}{(RT + c_1 P)(RT + 2 c_1 P)} + c_2 P^{0.5} + c_3 P, \\
+    c_0 &= c_{0,0} T_c^{2.5}/P_c + c_{0,1} T_c^{1.5}/P_c T, \\
+    c_1 &= c_{1,0} T_c/P_c, \\
+    c_2 &= c_{2,0} T_c/P_c^{1.5} + c_{2,1}/P_c^{1.5} T, \\
+    c_3 &= c_{3,0} T_c/P_c^2 + c_{3,1}/P_c^2 T
+    

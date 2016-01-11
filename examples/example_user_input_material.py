@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -20,6 +20,8 @@ need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density a
 * how to create your own minerals
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -91,22 +93,21 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast()
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(700e3,2800e3, number_of_points)
-    #depths = seismic_model.internal_depth_list()
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    #depths = seismic_model.internal_depth_list(mindepth=700.e3, maxdepth=2800.e3)
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 
     temperature = burnman.geotherm.brown_shankland(seis_p)
     # The next line is not required here, because the method is set automatically by defining 'equation_of_state' in mineral.params. This shows an alternative way to set the method later, or reset the method to a different one.
     rock.set_method(method)
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+    mat_rho, mat_vs, mat_vphi = \
+        rock.evaluate(['density','v_s','v_phi'], seis_p, temperature)
 
     [vs_err, vphi_err, rho_err]= \
         burnman.compare_chifactor([mat_vs,mat_vphi,mat_rho], [seis_vs,seis_vphi,seis_rho])
 
-    print vs_err, vphi_err, rho_err
+    print(vs_err, vphi_err, rho_err)

@@ -1,0 +1,4 @@
+# Species    T_C0    V_D           S_D                Ref
+#            (K)     (cm3 mol−1 ) (J mol−1 K −1 )
+Quartz       847.    1.222         5.164              Mirwald & Massone (1980)
+Stishovite   -4250.  0.001         0.012              Andrault et al. (1998) and Ono et al. (2002)

@@ -1,0 +1,21 @@
+Assemblage 1 (endmembers only)
+['Forsterite', 'Enstatite']
+
+Assemblage 2 (with solid solutions), method 1
+['olivine', 'orthopyroxene']
+
+Assemblage 2 (with solid solutions), method 2
+['olivine', 'orthopyroxene']
+
+Assemblage composition when molar phase fractions are [0.8, 0.2]
+
+Converting between fraction types
+Molar fractions from mass fractions: [0.8477066923291057, 0.15229330767089438]
+Molar fractions from volume fractions: [0.85142846274499095, 0.14857153725500905]
+
+Chemical potentials for the FMQ buffer at 0.0001 GPa and 1000.0 K
+['fa', 'mt', 'q']
+FeO: -363.397062598 kJ/mol
+SiO2: -981.477728588 kJ/mol
+O2: -534.910093216 kJ/mol
+log10(fO2): -16.4007435989

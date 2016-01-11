@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 Vary the amount perovskite vs. ferropericlase and compute the error in the
@@ -18,6 +18,8 @@ teaches:
 - loops over models
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -26,7 +28,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-import colors
+import misc.colors as colors
 
 if __name__ == "__main__":
 
@@ -34,8 +36,8 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
+    plt.rc('font', family='sans-serif')
     figsize=(6,5)
 
     dashstyle2=(7,3)
@@ -64,7 +66,7 @@ if __name__ == "__main__":
     depths = np.linspace(850e3,2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
 
-    print seis_p[0], seis_p[-1]
+    print(seis_p[0], seis_p[-1])
 
     #temperature = burnman.geotherm.brown_shankland(seis_p)
 
@@ -78,7 +80,7 @@ if __name__ == "__main__":
 
         rock.set_method(method)
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     yy_vphi=errs[:,1]
     vs_average_prem = sum(seis_vs)/len(seis_vs)
     vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
-    print vs_average_prem, vphi_average_prem
+    print(vs_average_prem, vphi_average_prem)
     yy_vs /= vs_average_prem
     yy_vphi /= vphi_average_prem
     yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot
@@ -118,7 +120,7 @@ if __name__ == "__main__":
     ymax = 1e2
     plt.ylim([ymin,ymax])
 
-    print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)]
+    print(xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)])
 
     B = np.around(xx[np.argmin(yy_vs)], decimals=3)
     A = np.around(xx[np.argmin(yy_vphi)], decimals=3)

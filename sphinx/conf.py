@@ -29,11 +29,13 @@ import burnman.version
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram','sphinx.ext.viewcode','sphinxcontrib.bibtex']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.mathjax',
+              'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
+              'sphinx.ext.viewcode','sphinxcontrib.bibtex']
 numpydoc_show_class_members = False
 
 autodoc_default_flags = ['members', 'undoc-members', 'show-inheritance', 'inherited-members']
-
+autodoc_member_order = 'bysource'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -225,7 +227,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 \hspace{0.1in}\burnman{}\hspace{0.1in}
 }}}
 \\[12pt]
-{\Large a lower mantle mineral physics toolkit}
+{\Large a thermodynamics and thermoelasticity toolkit}
 \end{center}
 
 %MAIN PICTURE%
@@ -286,7 +288,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'BurnMan.tex', u'BurnMan Documentation',
+  ('index_pdf', 'BurnMan.tex', u'BurnMan Documentation',
    u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'manual'),
 ]
 
@@ -308,7 +310,7 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_domain_indices = True
+latex_domain_indices = False
 
 
 # -- Options for manual page output --------------------------------------------
@@ -317,7 +319,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'burnman', u'BurnMan Documentation',
-     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn'], 1)
+     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -331,7 +333,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'BurnMan', u'BurnMan Documentation',
-   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
+   u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
    'Miscellaneous'),
 ]
 

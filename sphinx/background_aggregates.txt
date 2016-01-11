@@ -1,0 +1,95 @@
+Calculating Multi-phase Aggregate Properties
+--------------------------------------------
+
+.. _ref-methods-ave:
+
+Averaging schemes
+^^^^^^^^^^^^^^^^^
+
+
+After the thermoelastic parameters (:math:`K_S`, :math:`G`, :math:`\rho`) of each phase are determined at each pressure and/or
+temperature step, these values must be combined to determine the seismic velocity of a multiphase assemblage.
+We define the volume fraction of the individual minerals in an assemblage:
+
+.. math::
+    \nu_i = n_i \frac{V_i}{V},
+
+where :math:`V_i` and :math:`n_i` are the molar volume and the molar fractions of the :math:`i` th individual phase, and :math:`V` is the total molar volume of the assemblage:
+
+
+
+.. math::
+    V = \sum_i n_i  V_i.
+    :label: composite_volume
+
+
+The density of the multiphase assemblage is then
+
+
+.. math::
+    \rho = \sum_i \nu_i \rho_i = \frac{1}{V}\sum_i {n_i \mu_i},
+    :label: composite_density
+
+where :math:`\rho_i` is the density and :math:`\mu_i` is the molar mass of the :math:`i` th phase.
+
+
+Unlike density and volume, there is no straightforward way to average the bulk and shear moduli of a multiphase rock, as it depends on the specific distribution and orientation of the constituent minerals.
+BurnMan allows several schemes for averaging the elastic moduli: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
+
+
+The Voigt average, assuming constant strain across all phases, is defined as
+
+.. math::
+    X_V = \sum_i \nu_i X_i,
+    :label: voigt
+
+where :math:`X_i` is the bulk or shear modulus for the :math:`i` th phase.
+The Reuss average, assuming constant stress across all phases, is defined as
+
+.. math::
+    X_R = \left(\sum_i \frac{\nu_i}{X_i} \right)^{-1}.
+    :label: reuss
+
+The Voigt-Reuss-Hill average is the arithmetic mean of Voigt and Reuss bounds:
+
+.. math::
+    X_{VRH} = \frac{1}{2} \left( X_V + X_R \right).
+    :label: vrh
+
+The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic and are usually much narrower than the Voigt and Reuss bounds :cite:`Watt1976`.
+This may be a poor assumption in regions of Earth with high anisotropy, such as the lowermost mantle, however these bounds are more physically motivated than the commonly-used Voigt-Reuss-Hill average.
+In most instances, the Voigt-Reuss-Hill average and the arithmetic mean of the Hashin-Shtrikman bounds are quite similar with the pure arithmetic mean (linear averaging) being well outside of both.
+
+It is worth noting that each of the above bounding methods are derived from mechanical models of a linear elastic composite.
+It is thus only appropriate to apply them to elastic moduli, and not to other thermoelastic properties, such as wave speeds or density.
+
+
+
+Computing seismic velocities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Once the moduli for the multiphase assemblage are computed, the compressional (:math:`P`), shear (:math:`S`) and bulk sound (:math:`\Phi`)
+velocities are then result from the equations:
+
+
+.. math::
+    V_P = \sqrt{ \frac{K_S + \frac{4}{3} G} {\rho} }, \qquad
+    V_S = \sqrt{ \frac{G}{\rho} }, \qquad
+    V_\Phi = \sqrt{ \frac{K_S}{\rho} }.
+    :label: seismic
+
+To correctly compare to observed seismic velocities one needs to correct for the frequency sensitivity of attenuation.
+Moduli parameters are obtained from experiments that are done at high frequencies (MHz-GHz) compared to seismic frequencies (mHz-Hz).
+The frequency sensitivity of attenuation causes slightly lower velocities for seismic waves than they would be for high frequency waves.
+In BurnMan one can correct the calculated acoustic velocity values to those for long period seismic tomography :cite:`Minster1981`:
+
+.. math::
+    V_{S/P}=V_{S/P}^{\mathrm{uncorr.}}\left(1-\frac{1}{2}\cot(\frac{\beta\pi}{2})\frac{1}{Q_{S/P}}(\omega)\right).
+
+Similar to :cite:`Matas2007`, we use a :math:`\beta` value of 0.3, which falls in the range of values of :math:`0.2` to :math:`0.4` proposed for the lower mantle (e.g. :cite:`Karato1990`).
+The correction is implemented for :math:`Q` values of PREM for the lower mantle.
+As :math:`Q_S` is smaller than :math:`Q_P`, the correction is more significant for S waves.
+In both cases, though, the correction is minor compared to, for example, uncertainties in the temperature (corrections) and mineral physical parameters.
+More involved models of relaxation mechanisms can be implemented, but lead to the inclusion of more poorly constrained parameters, :cite:`Matas2007a`.
+While attenuation can be ignored in many applications :cite:`Trampert2001`, it might play a significant role in explaining strong variations in seismic velocities in the lowermost mantle :cite:`Davies2012`.
+

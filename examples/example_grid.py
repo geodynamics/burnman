@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 example_grid
@@ -8,6 +8,8 @@ example_grid
 
 This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 # Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
@@ -27,28 +29,28 @@ from burnman import minerals
 
 if __name__ == "__main__":
 
-    rock = burnman.Composite([0.8, 0.2],
-                             [minerals.SLB_2011.mg_perovskite(),
-                              minerals.SLB_2011.periclase()])
+    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()], [0.8, 0.2])
 
     seismic_model = burnman.seismic.PREM()
 
     depths = np.linspace(750e3, 2800e3, 10)
-    p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    [p] = seismic_model.evaluate(['pressure'],depths)
+
 
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.
     T = np.linspace(1900,2400,15)
 
-    print "pressures:\n", p
-    print "temperatures:\n", T
+    print("pressures:\n", p)
+    print("temperatures:\n", T)
 
     # turn grid into array:
     tarray=np.tile(T,len(p))
     parray=np.repeat(p,len(T))
 
 
-    density, vp, vs, vphi, K, G = burnman.velocities_from_rock(rock, parray, tarray)
+    [vs] = rock.evaluate(['v_s'],parray,tarray)
 
     mat_vs = np.reshape(vs,[len(p),len(T)]);
 
