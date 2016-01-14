@@ -27,7 +27,7 @@ number_of_points = 5 #set on how many depth slices the computations should be do
 # velocity constraints from seismology
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 seis_G= seis_vs**2.*seis_rho
 seis_K= seis_vphi**2*seis_rho
@@ -66,16 +66,17 @@ fraction_pv = pymc.Uniform('fraction_pv', 0.0, 1.0)
 fe_pv = pymc.Uniform('fe_pv', 0.0, 0.5)
 fe_pc= pymc.Uniform('fe_pc', 0.0, 0.5)
 
+# initialize minerals 
+pv=minerals.SLB_2011.mg_fe_perovskite()
+pc=minerals.SLB_2011.ferropericlase()
+
 def calc_all_velocities(fraction_pv, fe_pv, fe_pc):
-        method = 'slb3' #slb3|slb2|mgd3|mgd2
-        pv=minerals.other.mg_fe_perovskite(fe_pv)
-        pc=minerals.other.ferropericlase(fe_pc)
-        rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
-        
-        
-        rock.set_method(method)
-        
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
+        pv.set_composition([1-fe_pv,fe_pv,0])
+        pc.set_composition([1-fe_pc,fe_pc])
+        rock = burnman.Composite( [ pv,pc ], [fraction_pv, 1.0-fraction_pv] )
+        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G= \
+            rock.evaluate(['density','v_p','v_s','v_phi','K_T','G'],seis_p,temperature)
+
         return mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G
 
 def nrmse(funca,funcb):
@@ -237,7 +238,7 @@ if whattodo=="test":
 if whattodo=="show":
 	values = [float(i) for i in sys.argv[2:]]
 	#mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
-        mat_vp,mat_vs, mat_rho, mat_vphi=calc_all_velocities(values[0], values[1], values[2])
+        mat_vp,mat_vs, mat_rho, mat_vphi, mat_K, mat_G =calc_all_velocities(values[0], values[1], values[2])
 	plt.subplot(2,2,1)
 	plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
 	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)
