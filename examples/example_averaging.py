@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 example_averaging
@@ -30,6 +30,8 @@ of each averaging scheme.
 * implemented averaging schemes
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -55,13 +57,13 @@ if __name__ == "__main__":
 
     amount_perovskite = 0.6
 
-    rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                             [minerals.SLB_2005.mg_perovskite(),
-                              minerals.SLB_2005.periclase()])
+    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                              minerals.SLB_2011.periclase()],
+                             [amount_perovskite, 1.0-amount_perovskite])
 
-    perovskitite = minerals.SLB_2005.mg_perovskite()
+    perovskitite = minerals.SLB_2011.mg_perovskite()
 
-    periclasite = minerals.SLB_2005.periclase()
+    periclasite = minerals.SLB_2011.periclase()
 
     #seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
@@ -71,13 +73,13 @@ if __name__ == "__main__":
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
-    #depths = seismic_model.internal_depth_list()
-    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    #depths = seismic_model.internal_depth_list(mindepth=700.e3, maxdepth=2800.e3)
+    pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     temperatures = burnman.geotherm.brown_shankland(pressures)
 
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
     #calculate the seismic velocities of the rock using a whole battery of averaging schemes:

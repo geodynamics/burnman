@@ -1,10 +1,11 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
+
+from __future__ import absolute_import
 import numpy as np
-from material import Material
-from averaging_schemes import AveragingScheme
+from .material import Material
+from .averaging_schemes import AveragingScheme
 
 
 class Model(object):
@@ -97,17 +98,17 @@ class Model(object):
 
                 for idx in range(len(self.p)):
                     self.rock.set_state(self.p[idx], self.T[idx])
-                    (fractions, minerals) = self.rock.unroll()
-                    for (fraction, mineral) in zip(fractions, minerals):
+                    (minerals, fractions) = self.rock.unroll()
+                    for (mineral, fraction) in zip(minerals, fractions):
                         e = {}
                         e['fraction'] = fraction
-                        e['V'] = fraction * mineral.molar_volume()
-                        e['K'] = mineral.adiabatic_bulk_modulus()
-                        e['G'] = mineral.shear_modulus()
-                        e['rho'] = mineral.molar_mass() / mineral.molar_volume()
-                        e['alpha'] = mineral.thermal_expansivity()
-                        e['c_v'] = mineral.heat_capacity_v()
-                        e['c_p'] = mineral.heat_capacity_p()
+                        e['V'] = fraction * mineral.molar_volume
+                        e['K'] = mineral.adiabatic_bulk_modulus
+                        e['G'] = mineral.shear_modulus
+                        e['rho'] = mineral.molar_mass / mineral.molar_volume
+                        e['alpha'] = mineral.thermal_expansivity
+                        e['c_v'] = mineral.heat_capacity_v
+                        e['c_p'] = mineral.heat_capacity_p
                         self.moduli[idx].append(e)
 
     def avg_moduli_(self):

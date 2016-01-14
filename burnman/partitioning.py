@@ -1,9 +1,10 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
+
+from __future__ import absolute_import
 import numpy as np
-import constants
+from . import constants
 
 # TODO: add up weight percent and check <100 and tell them how much
 
@@ -55,7 +56,6 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
     Kd_0 = initial_distribution_coefficient
 
     delV = 2.e-7 #in m^3/mol, average taken from Nakajima et al 2012, JGR
-
 
     rs = ((25.e9-pressure)*(delV)/(constants.gas_constant*temperature))+np.log(Kd_0) #eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
 

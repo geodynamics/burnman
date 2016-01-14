@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 This example is under construction.
@@ -11,6 +11,8 @@ teaches:
 
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -23,25 +25,25 @@ import pymc
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 number_of_points = 20 #set on how many depth slices the computations should be done
 depths = np.linspace(750.e3,2890.e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
-print "preparations done"
+print("preparations done")
 
 
 def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
 
     rock = burnman.Mineral()
-
     rock.params['V_0'] = 10.e-6
     rock.params['molar_mass'] = ref_rho*rock.params['V_0']
     rock.params['K_0'] = K_0
     rock.params['Kprime_0'] = K_prime
     rock.params['G_0'] = G_0
     rock.params['Gprime_0'] = G_prime
-
+    rock.set_method('bm3')
 
     temperature = np.empty_like(seis_p)
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
+    mat_rho, mat_vphi, mat_vs = \
+        rock.evaluate(['density','v_phi','v_s'],seis_p,temperature)
 
     return mat_rho, mat_vphi, mat_vs
 
@@ -74,7 +76,7 @@ if __name__ == "__main__":
             e = error(p1,p2,p3,p4,p5)
             if (e<minerr):
                 minerr=e
-                print "best fit", e, "values:", p1,p2/1.e9,p3,p4/1.e9,p5
+                print("best fit", e, "values:", p1,p2/1.e9,p3,p4/1.e9,p5)
             return e
         except ValueError:
             return 1e20
@@ -112,6 +114,6 @@ if __name__ == "__main__":
     plt.ylim([3, 7 ])
     plt.show()
 
-    print "done"
+    print("done")
 
 

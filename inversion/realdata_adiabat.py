@@ -25,12 +25,12 @@ number_of_points = 5 #set on how many depth slices the computations should be do
 # velocity constraints from seismology
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 
 seismic_model2 = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p2, seis_rho2, seis_vp2, seis_vs2, seis_vphi2 = seismic_model2.evaluate_all_at(depths)
+seis_p2, seis_rho2, seis_vp2, seis_vs2, seis_vphi2 = seismic_model2.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 '''
 print seis_vs-seis_vs2
@@ -78,15 +78,19 @@ fraction_pv = pymc.Uniform('fraction_pv', 0.0, 1.0)
 fe_pv = pymc.Uniform('fe_pv', 0.0, 0.5)
 fe_pc= pymc.Uniform('fe_pc', 0.0, 0.5)
 T0 = pymc.Normal('T0',mu=1500.,tau=1./500.)
+
+# initialize solid solutions
+pv=minerals.SLB_2011.mg_fe_perovskite()
+pc=minerals.SLB_2011.ferropericlase()
+
 def calc_all_velocities(fraction_pv, fe_pv, fe_pc,T0):
-        method = 'slb3' #slb3|slb2|mgd3|mgd2
-        pv=minerals.other.mg_fe_perovskite(fe_pv)
-        pc=minerals.other.ferropericlase(fe_pc)
-        rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
+        pv.set_composition([1-fe_pv,fe_pv,0])
+        pc.set_composition([1-fe_pc,fe_pc])
+        rock = burnman.Composite( [ pv,pc ], [fraction_pv, 1.0-fraction_pv] )
         temperature = burnman.geotherm.adiabatic(seis_p,T0, rock)
+        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G= \
+            rock.evaluate(['density','v_p','v_s','v_phi','K_T','G'],seis_p,temperature)
 
-
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
         return mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G
 
 def nrmse(funca,funcb):
@@ -153,7 +157,7 @@ if whattodo=="run":
     whattodo="continue"
 
 if whattodo=="continue":
-    n_runs = 100
+    n_runs = 1
     for l in range(0,n_runs):
         db = pymc.database.pickle.load(dbname)
         print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
@@ -249,7 +253,7 @@ if whattodo=="test":
 if whattodo=="show":
 	values = [float(i) for i in sys.argv[2:]]
 	#mat_vp, mat_vs, mat_rho = calc_velocities(values[0], values[1], values[2])
-        mat_vp,mat_vs, mat_rho, mat_vphi=calc_all_velocities(values[0], values[1], values[2])
+        mat_vp,mat_vs, mat_rho, mat_vphi, mat_K, mat_G =calc_all_velocities(values[0], values[1], values[2], values[3])
 	plt.subplot(2,2,1)
 	plt.plot(seis_p/1.e9,mat_vs/1.e3,color='r',linestyle='-',marker='^',markerfacecolor='r',markersize=4)
 	plt.plot(seis_p/1.e9,seis_vs/1.e3,color='k',linestyle='-',marker='v',markerfacecolor='k',markersize=4)

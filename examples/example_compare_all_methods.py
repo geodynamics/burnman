@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -23,6 +23,8 @@ different methods.
 * Each method for calculating velocity profiles currently included within BurnMan
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -36,9 +38,9 @@ if __name__ == "__main__":
     #Input composition.
 
     amount_perovskite = 0.95
-    rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                             [minerals.Murakami_etal_2012.fe_perovskite(),
-                              minerals.Murakami_etal_2012.fe_periclase_LS()])
+    rock = burnman.Composite([minerals.Murakami_etal_2012.fe_perovskite(),
+                              minerals.Murakami_etal_2012.fe_periclase_LS()],\
+                             [amount_perovskite, 1.0-amount_perovskite])
 
     #(min pressure, max pressure, pressure step)
     seis_p = np.arange(25e9, 125e9, 5e9)
@@ -60,91 +62,58 @@ if __name__ == "__main__":
         (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
+    
+    methods=['bm3','bm2','mgd3','mgd2','slb3','slb2']
+    colors = ['r','k','g','b','y','m']
+    markers = ['+','x','>','^','<','v']
+    
+    plt.figure( figsize = (12,10) )
+    
+    for m in range(len(methods)):
+        rock.set_method(methods[m])
+        temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
 
-    rock.set_method('mgd3')
-    temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
+        print("Calculations are done for:")
+        rock.debug_print()
 
-    print "Calculations are done for:"
-    rock.debug_print()
+        mat_rho_1, mat_vs_1, mat_vphi_1 = \
+            rock.evaluate(['density','v_s','v_phi'],seis_p,temperature)
 
-    mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+        ##Now let's plot the comparison. You can conversely just output to a data   file
+        #(see example_woutput.py)
+        # plot Vs
+        plt.subplot(2,2,1)
+        plt.plot(seis_p/1.e9,mat_vs_1/1.e3,color=colors[m],linestyle='-',marker=markers[m], \
+             markerfacecolor=colors[m],markersize=4)
 
-    rock.set_method('slb2')
-    temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
 
-    mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
+        # plot Vphi
+        plt.subplot(2,2,2)
+        plt.plot(seis_p/1.e9,mat_vphi_1/1.e3,color=colors[m],linestyle='-',marker=markers[m], \
+                 markerfacecolor=colors[m],markersize=4)
 
-    rock.set_method('slb3')
-    temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
+        # plot density
+        plt.subplot(2,2,3)
+        plt.plot(seis_p/1.e9,mat_rho_1/1.e3,color=colors[m],linestyle='-',marker=markers[m], \
+                 markerfacecolor=colors[m],markersize=4)
 
-    mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
-
-    rock.set_method('bm2')
-    temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
-
-    mat_rho_4, mat_vp_4, mat_vs_4, mat_vphi_4, mat_K_4, mat_G_4 = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
-
-    rock.set_method('bm3')
-    temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
-    mat_rho_5, mat_vp_5, mat_vs_5, mat_vphi_5, mat_K_5, mat_G_5 = \
-        burnman.velocities_from_rock(rock, seis_p, temperature, \
-                                     burnman.averaging_schemes.VoigtReussHill())
-
-    ##Now let's plot the comparison. You can conversely just output to a data file
-    #(see example_woutput.py)
+        # plot temperature
+        plt.subplot(2,2,4)
+        plt.plot(seis_p/1.e9,temperature,color=colors[m],linestyle='-',marker=markers[m], \
+                markerfacecolor=colors[m],markersize=4,label=methods[m])
+        plt.legend(loc='upper left')
 
     plt.subplot(2,2,1)
-    plt.plot(seis_p/1.e9,mat_vs_1/1.e3,color='r',linestyle='-',marker='^', \
-             markerfacecolor='r',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vs_2/1.e3,color='k',linestyle='-',marker='v', \
-             markerfacecolor='k',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vs_3/1.e3,color='b',linestyle='-',marker='x', \
-             markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vs_4/1.e3,color='g',linestyle='-',marker='o', \
-             markerfacecolor='g',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vs_5/1.e3,color='y',linestyle='-',marker='*', \
-             markerfacecolor='y',markersize=4)
-    plt.title("Vs (km/s)")
-
-
-    # plot Vphi
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Vs (km/s)')
     plt.subplot(2,2,2)
-    plt.plot(seis_p/1.e9,mat_vphi_1/1.e3,color='r',linestyle='-',marker='^', \
-             markerfacecolor='r',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vphi_2/1.e3,color='k',linestyle='-',marker='v', \
-             markerfacecolor='k',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vphi_3/1.e3,color='b',linestyle='-',marker='x', \
-             markerfacecolor='b',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vphi_4/1.e3,color='g',linestyle='-',marker='o', \
-             markerfacecolor='g',markersize=4)
-    plt.plot(seis_p/1.e9,mat_vphi_5/1.e3,color='y',linestyle='-',marker='*', \
-             markerfacecolor='y',markersize=4)
-
-    plt.title("Vphi (km/s)")
-
-    # plot density
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Vphi (km/s)')
     plt.subplot(2,2,3)
-    plt.plot(seis_p/1.e9,mat_rho_1/1.e3,color='r',linestyle='-',marker='^', \
-             markerfacecolor='r',markersize=4,label='mgd')
-    plt.plot(seis_p/1.e9,mat_rho_2/1.e3,color='k',linestyle='-',marker='v', \
-             markerfacecolor='k',markersize=4,label='slb')
-    plt.plot(seis_p/1.e9,mat_rho_3/1.e3,color='b',linestyle='-',marker='x', \
-             markerfacecolor='b',markersize=4,label='slb3')
-    plt.plot(seis_p/1.e9,mat_rho_4/1.e3,color='g',linestyle='-',marker='o', \
-             markerfacecolor='g',markersize=4,label='bm2')
-    plt.plot(seis_p/1.e9,mat_rho_5/1.e3,color='y',linestyle='-',marker='*', \
-             markerfacecolor='y',markersize=4,label='bm3')
-    plt.title("density (kg/m^3)")
-    plt.legend(loc='upper left')
-
-
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Density (kg/m^3)')
+    plt.subplot(2,2,4)
+    plt.xlabel('Pressure (GPa)')
+    plt.ylabel('Temperature (K)')
     plt.savefig("output_figures/example_compare_all_methods.png")
     plt.show()

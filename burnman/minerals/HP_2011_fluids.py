@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 
@@ -27,9 +27,10 @@ Individual terms are divided through by P, P, P^1.5, P^2, so
 
 cork_P: kbar -> multiply by 1e8
 """
+from __future__ import absolute_import
 
-from burnman.mineral import Mineral
-from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+from ..mineral import Mineral
+from ..processchemistry import read_masses, dictionarize_formula, formula_mass
 
 atomic_masses=read_masses()
 

@@ -1,0 +1,4 @@
+.. _ref-methods-gibbs-min:
+
+Minimizing Gibbs Free Energies
+------------------------------

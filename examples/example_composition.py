@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 
@@ -15,18 +15,10 @@ composition. Here we present a couple of examples:
 
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
-2. Two minerals mixed in simple mole fractions with user-defined Fe
-   partitioning
-3. The user can input wt% of each cation (Mg, Fe and Si) and BurnMan will
-   calculate Fe partitioning along a :math:`P, T` profile (see
-   example_partition_coef.py)
-4. A mixture of three minerals.
+2. Example with three minerals
+3. Using preset solid solutions
+4. Defining your own solid solution
 
-In compositions 2, 3, and 4 of the above inputs, BurnMan will mix the mineral
-physical paremeters of end member minerals (pure Mg and Fe) of the user's
-choice using either volumetric (moduli) or molar averaging (all others) at
-room pressure and temperature (see example_user_input_material.py for
-information on these parameters).
 
 To turn a method of mineral creation "on" the first if statement above the
 method must be set to True, with all others set to False.
@@ -38,14 +30,18 @@ example_spintransition.py for explanation of how to implement this
 
 * :doc:`mineral_database`
 * :class:`burnman.composite.Composite`
-
+* :class:`burnman.mineral.Mineral`
+* :class:`burnman.solidsolution.SolidSolution`
 
 *Demonstrates:*
 
 * Different ways to define a composite
+* Using minerals and solid solutions
 * Compare computations to seismic models
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -68,40 +64,46 @@ if __name__ == "__main__":
     #Example 1: two simple fixed minerals
     if True:
         amount_perovskite = 0.95
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.SLB_2011.mg_perovskite(),
-                                  minerals.SLB_2011.periclase()])
-
-    #Example 2: specify fixed iron content
+        rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
+                                  minerals.SLB_2011.periclase()],\
+                                 [amount_perovskite, 1-amount_perovskite])
+        
+    #Example 2: three materials
     if False:
-        amount_perovskite = 0.95
-        rock = burnman.Composite([amount_perovskite, 1.0-amount_perovskite],
-                                 [minerals.SLB_2011.mg_fe_perovskite(0.2),
-                                  minerals.SLB_2011.ferropericlase(0.2)])
+        rock = burnman.Composite([minerals.SLB_2011.fe_perovskite(),
+                                  minerals.SLB_2011.periclase(),
+                                  minerals.SLB_2011.stishovite()],\
+                                 [0.7, 0.2, 0.1])
 
-    #Example 3: input weight percentages
-    #See comments in example_partition_coef.py for references to
-    #partition coefficent calculation
 
+    #Example 3: Mixing solid solutions
     if False:
-        weight_percents = {'Mg':0.213, 'Fe': 0.08, 'Si':0.27, 'Ca':0., 'Al':0.}
-        Kd_0 = .59 #Fig 5 Nakajima et al 2012
+        # Defining a rock using a predefined solid solution from the mineral library database.
+        preset_solidsolution=minerals.SLB_2011.mg_fe_perovskite()
+        # The line below is optional to see which endmembers (and in which order) are in the solid solution
+        #print preset_solidsolution.endmembers
+        #Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
+        preset_solidsolution.set_composition([0.9,0.1,0.]) # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
+        rock = burnman.Composite([preset_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
 
-        phase_fractions,relative_molar_percent = burnman. \
-            calculate_phase_percents(weight_percents)
-        iron_content = lambda p,t: burnman.calculate_partition_coefficient \
-                (p,t,relative_molar_percent,Kd_0)
 
-        rock = burnman.Composite([phase_fractions['pv'], phase_fractions['fp']],
-                                 [minerals.mg_fe_perovskite_pt_dependent(iron_content,0),
-                                  minerals.ferropericlase_pt_dependent(iron_content,1)])
-
-    #Example 4: three materials
+    #Example 4: Defining your own solid solution
     if False:
-        rock = burnman.Composite([0.7, 0.2, 0.1],
-                                 [minerals.SLB_2011.fe_perovskite(),
-                                  minerals.SLB_2011.ferropericlase(0.5),
-                                  minerals.SLB_2011.stishovite()])
+        # Define a new SolidSolution with mg and fe perovskite endmembers
+        class mg_fe_perovskite(burnman.SolidSolution):
+            def __init__(self, molar_fractions=None):
+                self.endmembers=[[minerals.SLB_2011.mg_perovskite(), '[Mg]SiO3'],
+                                 [minerals.SLB_2011.fe_perovskite(), '[Fe]SiO3']]
+                self.type='ideal'
+                burnman.SolidSolution.__init__(self, molar_fractions)
+
+        new_solidsolution=mg_fe_perovskite()
+
+        # Set molar fraction of endmembers
+        new_solidsolution.set_composition([0.9,0.1])
+        rock=burnman.Composite([new_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
+
+
 
 
     #seismic model for comparison:
@@ -111,22 +113,18 @@ if __name__ == "__main__":
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
     #alternatively, we could use the values where prem is defined:
-    #depths = seismic_model.internal_depth_list()
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    #depths = seismic_model.internal_depth_list(mindepth=700.e3, maxdepth=2800.e3)
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 
     temperature = burnman.geotherm.brown_shankland(seis_p)
 
 
-    print "Calculations are done for:"
+    print("Calculations are done for:")
     rock.debug_print()
 
-    moduli_list = burnman.calculate_moduli(rock, seis_p, temperature)
-    moduli = burnman.average_moduli(moduli_list, burnman.averaging_schemes.VoigtReussHill())
-    mat_vp, mat_vs, mat_vphi = burnman.compute_velocities(moduli)
-    mat_K = np.array([m.K for m in moduli])
-    mat_G = np.array([m.G for m in moduli])
-    mat_rho = np.array([m.rho for m in moduli])
+
+    mat_rho, mat_vp, mat_vphi, mat_vs, mat_K, mat_G = rock.evaluate(['density','v_p','v_phi','v_s','K_S','G'],seis_p,temperature)
 
     [vs_err, vphi_err, rho_err] = burnman.compare_chifactor (
         [mat_vs,mat_vphi,mat_rho],[seis_vs,seis_vphi,seis_rho])

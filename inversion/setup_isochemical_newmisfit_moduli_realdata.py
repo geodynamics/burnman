@@ -27,7 +27,7 @@ number_of_points = 5 #set on how many depth slices the computations should be do
 # velocity constraints from seismology
 seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
 depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
 seis_G= seis_vs**2.*seis_rho
 seis_K= seis_vphi**2*seis_rho
@@ -65,15 +65,13 @@ fe_pv = pymc.Uniform('fe_pv', 0.0, 0.5)
 fe_pc= pymc.Uniform('fe_pc', 0.0, 0.5)
 
 def calc_all_velocities(fraction_pv, fe_pv, fe_pc):
-        method = 'slb3' #slb3|slb2|mgd3|mgd2
-        pv=minerals.other.mg_fe_perovskite(fe_pv)
-        pc=minerals.other.ferropericlase(fe_pc)
-        rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
-        
-        
-        rock.set_method(method)
-        
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
+        pv=minerals.SLB_2011.mg_fe_perovskite()
+        pv.set_composition([1-fe_pv,fe_pv,0])
+        pc=minerals.SLB_2011.ferropericlase()
+        pc.set_composition([1-fe_pc,fe_pc])
+        rock = burnman.Composite( [ pv,pc ], [fraction_pv, 1.0-fraction_pv] )
+        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G= \
+            rock.evaluate(['density','v_p','v_s','v_phi','K_T','G'],seis_p,temperature)
         return mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G
 
 def nrmse(funca,funcb):
@@ -134,18 +132,18 @@ else:
 if whattodo=="run":
     #pymc.MAP(model).fit() # Find minimum to start search from
     S = pymc.MCMC(model, db='pickle', dbname=dbname)
-    S.sample(iter=100, burn=0, thin=1)
+    S.sample(iter=100, burn=90, thin=1)
     S.db.close()
-    whattodo="continue"
+    #whattodo="continue"
 
 if whattodo=="continue":
-    n_runs = 100
+    n_runs = 5
     for l in range(0,n_runs):
         db = pymc.database.pickle.load(dbname)
         print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
         S = pymc.MCMC(model, db=db)
         #S.sample(iter=100, burn=10, thin=1)
-        S.sample(iter=1000, burn=0, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+        S.sample(iter=10000, burn=100, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
         S.db.close()
 
 if whattodo=="plot":

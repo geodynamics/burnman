@@ -15,15 +15,16 @@ Welcome to BurnMan's documentation!
    background
    examples
    main
+   materials
    eos
    averaging
    geotherms
-   minerals
+   thermodynamics
    seismic
    mineral_database
    zreferences
 
-The functions in the :doc:`main` operate on :doc:`minerals` which can be
+The functions in the :doc:`main` operate on :doc:`materials` which can be
 combination of different minerals from :doc:`mineral_database`.
    
    

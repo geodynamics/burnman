@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -23,6 +23,8 @@ teaches:
 - loops over models
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
@@ -31,7 +33,8 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman import minerals
-import colors
+from misc.helper_solid_solution import *
+import misc.colors as colors
 
 if __name__ == "__main__":
 
@@ -39,8 +42,8 @@ if __name__ == "__main__":
     plt.figure(dpi=100,figsize=(12,10))
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
+    plt.rc('font', family='sans-serif')
     figsize=(6,5)
 
     dashstyle2=(7,3)
@@ -67,27 +70,22 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     number_of_points = 20 #set on how many depth slices the computations should be done
     depths = np.linspace(850e3,2700e3, number_of_points)
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
-    print seis_p[0], seis_p[-1]
+    print(seis_p[0], seis_p[-1])
 
     #temperature = burnman.geotherm.brown_shankland(seis_p)
 
     def eval_material(amount_perovskite):
-#        rock = burnman.composite ( [ (minerals.Murakami_etal_2012.fe_perovskite(), amount_perovskite),
-#                             (minerals.Murakami_etal_2012.fe_periclase(), 1.0 - amount_perovskite) ] )
-        rock = burnman.Composite ( [ (minerals.SLB_2011_ZSB_2013.mg_fe_perovskite(0.07), amount_perovskite),
-                             (minerals.other.ferropericlase(0.2), 1.0 - amount_perovskite) ] )
-#        rock = burnman.composite ( [ (minerals.SLB_2011.mg_fe_perovskite(0.), amount_perovskite),
-#                             (minerals.other.ferropericlase(1.0), 1.0 - amount_perovskite) ] )
+        rock = burnman.Composite ( [SLB_2011_ZSB_2013_mg_fe_perovskite(0.07),
+                                    other_ferropericlase(0.2)], \
+                                   [amount_perovskite, 1.0 - amount_perovskite] )
         rock.set_method(method)
         temperature = burnman.geotherm.adiabatic(seis_p,1900,rock)
-        print "Calculations are done for:"
+        print("Calculations are done for:")
         rock.debug_print()
 
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-            burnman.velocities_from_rock(rock, seis_p, temperature, burnman.averaging_schemes.VoigtReussHill())
-
+        mat_rho, mat_vs, mat_vphi = rock.evaluate(['rho','v_s','v_phi'],seis_p,temperature)
         #[rho_err,vphi_err,vs_err]=burnman.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
 
 
@@ -111,7 +109,7 @@ if __name__ == "__main__":
     yy_vphi=errs[:,1]
     vs_average_prem = sum(seis_vs)/len(seis_vs)
     vphi_average_prem = sum(seis_vphi)/len(seis_vphi)
-    print vs_average_prem, vphi_average_prem
+    print(vs_average_prem, vphi_average_prem)
     yy_vs /= vs_average_prem
     yy_vphi /= vphi_average_prem
     yy_sum = (yy_vs+yy_vphi) #we scale by a factor so it fits in the plot
@@ -126,7 +124,7 @@ if __name__ == "__main__":
     ymax = 1e2
     plt.ylim([ymin,ymax])
 
-    print xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)]
+    print(xx[np.argmin(yy_vs)], xx[np.argmin(yy_vphi)], xx[np.argmin(yy_sum)])
 
     B = np.around(xx[np.argmin(yy_vs)], decimals=3)
     A = np.around(xx[np.argmin(yy_vphi)], decimals=3)
@@ -204,5 +202,6 @@ if __name__ == "__main__":
 #    plt.show()
 
     plt.tight_layout()
-    plt.savefig("paper_opt_pv.pdf",bbox_inches='tight')
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("paper_opt_pv.pdf",bbox_inches='tight')
     plt.show()

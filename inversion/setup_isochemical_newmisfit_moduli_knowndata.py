@@ -20,18 +20,24 @@ from burnman import minerals
 
 
 
+number_of_points = 5 #set on how many depth slices the computations should be done
 
-number_of_points = 10 #set on how many depth slices the computations should be done
 
-
-'''
-# velocity constraints from seismology
-seismic_model = burnman.seismic.PREM() # pick from .prem() .slow() .fast() (see code/seismic.py)
-depths = np.linspace(1000e3,2500e3, number_of_points)
-seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
-
-seis_G= seis_vs**2.*seis_rho
-seis_K= seis_vphi**2*seis_rho
+#velocities from known material (still named seis*)
+amount_perovskite = 0.8
+pv=minerals.SLB_2011.mg_fe_perovskite()
+pv.set_composition([0.94,0.06,0.])
+pc=minerals.SLB_2011.ferropericlase()
+pc.set_composition([0.8,0.2])
+rock = burnman.Composite([ pv,pc ],[amount_perovskite, 1.0-amount_perovskite] )
+pressures = np.linspace(25e9,130e9,number_of_points)
+temperature = burnman.geotherm.brown_shankland(pressures)
+rock.set_method('slb3')
+print "Calculations are done for:"
+rock.debug_print()
+seis_p=pressures
+seis_rho, seis_vp, seis_vs, seis_vphi,seis_K,seis_G =\
+    rock.evaluate(['density','v_p','v_s','v_phi','K_T','G'],pressures, temperature)
 
 temperature = burnman.geotherm.brown_shankland(seis_p)
 '''
@@ -52,8 +58,8 @@ seis_rho, seis_vp, seis_vs, seis_vphi, seis_K, seis_G = \
                                  burnman.averaging_schemes.VoigtReussHill())
 depths= burnman.depths_for_rock(rock, pressures, temperature, \
                                  burnman.averaging_schemes.VoigtReussHill())
-print depths
 
+'''
 
 print "preparations done"
 
@@ -66,16 +72,12 @@ fe_pv = pymc.Uniform('fe_pv', 0.0, 0.5)
 fe_pc= pymc.Uniform('fe_pc', 0.0, 0.5)
 
 def calc_all_velocities(fraction_pv, fe_pv, fe_pc):
-        method = 'slb3' #slb3|slb2|mgd3|mgd2
-        pv=minerals.SLB_2011.mg_fe_perovskite(fe_pv)
-        pc=minerals.SLB_2011.ferropericlase(fe_pc)
-        rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
-        
-        
-        rock.set_method(method)
-        
-        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
-        return mat_vp, mat_vs, mat_rho, mat_vphi
+        pv.set_composition([1-fe_pv,fe_pv,0])
+        pc.set_composition([1-fe_pc,fe_pc])
+        rock = burnman.Composite( [ pv,pc ], [fraction_pv, 1.0-fraction_pv] )
+        mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G= \
+            rock.evaluate(['density','v_p','v_s','v_phi','K_T','G'],seis_p,temperature)
+        return mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G
 
 def nrmse(funca,funcb):
     """
@@ -94,42 +96,36 @@ def nrmse(funca,funcb):
     rmse=np.sqrt(np.sum(diff)/len(diff))
     nrmse=rmse/(np.max(funcb)-np.min(funcb))
     return nrmse
-# rewrite as function of f_pv and fe_content
-@pymc.deterministic
-def calc_misfit(fraction_pv=fraction_pv, fe_pv=fe_pv, fe_pc=fe_pc):
-    try:
-        print fraction_pv,fe_pv,fe_pc
+
+def error(fraction_pv, fe_pv, fe_pc):
         if fraction_pv>0. and fraction_pv<1.0 and fe_pv>0. and fe_pv<1.0 and fe_pc>0. and fe_pc<1.0:
-            method = 'slb3' #slb3|slb2|mgd3|mgd2
-            pv=minerals.SLB_2011.mg_fe_perovskite(fe_pv)
-            pc=minerals.SLB_2011.ferropericlase(fe_pc)
-            rock = burnman.Composite( [fraction_pv, 1.0-fraction_pv],[ pv,pc ] )
-
-
-            rock.set_method(method)
-
-            mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = burnman.velocities_from_rock(rock,seis_p, temperature)
-            #return mat_vp, mat_vs, mat_rho, mat_vphi
+            mat_vp, mat_vs, mat_rho, mat_vphi, mat_K, mat_G = calc_all_velocities(fraction_pv, fe_pv, fe_pc)
 
             misfit = nrmse(mat_rho,seis_rho)+nrmse(mat_K,seis_K)+nrmse(mat_G,seis_G)
-            print 'misfit',nrmse(mat_rho,seis_rho),nrmse(mat_K,seis_K),nrmse(mat_G,seis_G)
             return misfit
         else:
             return 1e30
-    except:
-        return 1e30
+    
+    #except:
+    #    return 1e30
+
+# rewrite as function of f_pv and fe_content
+@pymc.deterministic
+def calc_misfit(fraction_pv=fraction_pv, fe_pv=fe_pv, fe_pc=fe_pc):
+
+    return error(fraction_pv,fe_pv,fe_pc)
 
 
 #sig = 1e-2
 #misfit = pymc.Normal('d',mu=theta,tau=1.0/(sig*sig),value=0.,observed=True,trace=True)
 #sig = pymc.Uniform('sig', 0.0, 100.0, value=1.)
-sig=1.e-3 # Some sorts of error
+sig=1.e-2 # Some sorts of error
 obs = pymc.Normal('d',mu=calc_misfit,tau=1.0/(sig*sig),value=0,observed=True,trace=True)
 model = [fraction_pv, fe_pv, fe_pc,obs]
 things = ['fraction_pv', 'fe_pv','fe_pc']
 
 whattodo = ""
-
+print len(sys.argv)
 if len(sys.argv)<3:
     print "options:"
     print "run <dbname>"
@@ -140,20 +136,23 @@ else:
     dbname = sys.argv[2]
 
 if whattodo=="run":
-    pymc.MAP(model).fit() # Find minimum to start search from
+    #pymc.MAP(model).fit() # Find minimum to start search from
     S = pymc.MCMC(model, db='pickle', dbname=dbname)
-    S.sample(iter=100, burn=0, thin=1)
+    S.sample(iter=100, burn=50, thin=10)
     S.db.close()
     whattodo="continue"
 
 if whattodo=="continue":
-    n_runs = 10 # results in 1000 new points
+    n_runs = 5
     for l in range(0,n_runs):
         db = pymc.database.pickle.load(dbname)
-        print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
         S = pymc.MCMC(model, db=db)
+        #print db.trace('fraction_pv').stats()['n']
+        #print "*** run=%d/%d, # samples: %d" % (l, n_runs, db.trace('fraction_pv').stats()['n'] )
         #S.sample(iter=100, burn=10, thin=1)
-        S.sample(iter=10000, burn=1000, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+        print(l)
+        S.sample(iter=10000, burn=50, thin=10) # Search space for 100000 acceptable steps, forget first 1000 and save every 10.
+
         S.db.close()
 
 if whattodo=="plot":
@@ -272,11 +271,12 @@ if whattodo=="profile2":
 	#run with:
 	#python -m cProfile -o output.pstats example_inv_big_pv.py profile2 1
 	#gprof2dot.py -f pstats output.pstats | dot -Tpng -o output.png
-	[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]
+	[error(0.5,0.1,0.2) for i in range(0,1000)]
 
 if whattodo=="profile":
 	#just run normally
-	cProfile.run("[error(235.654790318e9, 3.87724833477, 165.45907725e9, 1.61618366689, 273.888690109e9, 4.38543140228, 306.635371217e9, 1.42610871557) for i in range(0,10)]")
+        print error(0.5,0.1,0.2)
+	cProfile.run("[error(0.5,0.1,0.2) for i in range(0,1000)]")
 
 
 

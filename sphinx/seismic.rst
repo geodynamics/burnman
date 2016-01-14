@@ -10,7 +10,7 @@ Base class for all seismic models
 
 Class for 1D Models
 -------------------
-.. autoclass:: burnman.seismic.SeismicRadiusTable
+.. autoclass:: burnman.seismic.SeismicTable
 
 
 
@@ -23,6 +23,11 @@ Models currently implemented
 
 .. autoclass:: burnman.seismic.Fast
 
+.. autoclass:: burnman.seismic.STW105
+
+.. autoclass:: burnman.seismic.IASP91
+
+.. autoclass:: burnman.seismic.AK135
 
 
 Attenuation Correction

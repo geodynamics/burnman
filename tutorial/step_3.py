@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2014, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 
@@ -27,6 +27,8 @@ This script may be run by typing
     python step_3.py
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 # We import a couple extra modules for this step than in the previous
 # ones.  In particular, we will use a function for a normal distribution
@@ -94,7 +96,7 @@ if __name__=='__main__':
         realize_mineral(phase_2)
 
         # Set up the rock with the now-perturbed mineral phases
-        mantle_rock = burnman.Composite( [phase_1_fraction, phase_2_fraction], [phase_1, phase_2] )
+        mantle_rock = burnman.Composite(  [phase_1, phase_2], [phase_1_fraction, phase_2_fraction] )
         mantle_rock.set_method('slb3')
 
         # Give back the realization of the rock with the perturbed phases.
@@ -109,7 +111,7 @@ if __name__=='__main__':
     max_depth = 2800.e3
     n_depths = 10
     depths = np.linspace(min_depth, max_depth, n_depths)
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(['pressure', 'density', 'v_phi', 'v_s'], depths)
     pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure))
 
     temperature = burnman.geotherm.brown_shankland(pressure)
@@ -121,18 +123,17 @@ if __name__=='__main__':
     """
 
     n_realizations = 1000
-    outfile = open('uncertainty.dat', 'w')
+    outfile = open('uncertainty.dat', 'wb')
 
     for i in range(n_realizations):
 
-        print "realization", i+1
+        print("realization", i+1)
         try:
           # We call the realize_rock() to create the ith model
           rock = realize_rock()
 
           # Calculate the wavespeed profiles, just as before.
-          rho, vp, vs, vphi, K, G = \
-            burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.VoigtReussHill())
+          rho, vphi, vs = rock.evaluate(['rho','v_phi','v_s'], pressure, temperature)
 
           # This block of code interpolates the resulting densities and wavespeeds
           # to a higher resolution line to make the plot look nicer.
@@ -146,14 +147,14 @@ if __name__=='__main__':
           vphi_list = func_vphi(pressures_sampled)
 
           # Save the output to a file
-          data = zip(pressure_list, vs_list, vphi_list, density_list)
+          data = list(zip(pressure_list, vs_list, vphi_list, density_list))
           np.savetxt(outfile,data,fmt='%.10e',delimiter='\t')
 
         # It is possible for the Birch-Murnaghan equation of state to go unstable for
         # some values of the parameters, which can make it fail.  If that happens, we
         # simply disregard this realization of the rock.
         except ValueError:
-          print "failed, skipping"
+          print("failed, skipping")
 
 
     """
@@ -194,7 +195,7 @@ if __name__=='__main__':
     right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
     bottom_edge= 4.3
     top_edge=11.3
-    aspect_ratio = (right_edge-left_edge)/(top_edge-bottom_edge)
+    aspect_ratio = float((right_edge-left_edge)/(top_edge-bottom_edge))
     gamma = 0.5  #Mess with this to change intensity of colormaps near the edges
 
     plt.subplot(111, aspect='equal')

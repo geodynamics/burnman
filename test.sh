@@ -2,19 +2,37 @@
 
 fulldir=`pwd`
 
+# use numdiff but fall back to diff if not found:
+which numdiff >/dev/null
+if [ $? -eq 0 ]
+then
+  diffcmd="numdiff -r 1e-5 -s ' \t\n[],'"
+else
+  diffcmd="diff"
+  echo "WARNING: numdiff not found, please install! Falling back to diff."
+fi
+
+if [ -z $PYTHON ]
+then
+  PYTHON=python
+fi
+
 function testit {
 t=$1
 fulldir=$2
 #echo "*** testing $t ..."
-(python <<EOF
+($PYTHON <<EOF
 import matplotlib as m
 m.use('Template')
 VERBOSE=1
 RUNNING_TESTS=1
-execfile('$t')
+with open('$t') as f:
+    CODE = compile(f.read(), '$t', 'exec')
+    exec(CODE)
 EOF
-) >$t.tmp 2>&1
+) >$t.tmp 2>$t.tmp.error
 ret=$?
+cat $t.tmp.error >>$t.tmp
 if [ "$ret" -ne 0 ]
 then
   echo "!  $t ... FAIL";
@@ -30,11 +48,11 @@ else
   sed -i'' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
   sed -i'' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
-  (numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 -q $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
+  (eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
   echo "!  $t ... FAIL";
-  echo "Check: `readlink -f $t.tmp` `readlink -f $fulldir/misc/ref/$t.out`";
-  numdiff -r 1e-6 -s ' \t\n[]' -a 1e-6 $t.tmp $fulldir/misc/ref/$t.out | head
+  echo "Check: `pwd`/$t.tmp $fulldir/misc/ref/$t.out";
+  eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out | head
   }
 
 fi
@@ -48,17 +66,19 @@ echo "*** running test suite..."
 # check for tabs in code:
 for f in `find . -name \*.py`
 do
-    grep -P "\t" -q $f && echo "ERROR: tabs found in '$f'" && exit 1
+    grep $'\t' -q $f && \
+	echo "ERROR: tabs found in '$f':" && \
+	grep -n $'\t' $f && exit 0
 done
 
 cd tests
-python tests.py || exit 1
+$PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
 cd ..
 
 
 cd misc
 echo "gen_doc..."
-python gen_doc.py >/dev/null || exit 1
+$PYTHON gen_doc.py >/dev/null || exit 0
 
 cd benchmarks
 for test in `ls *.py`
@@ -87,8 +107,12 @@ cd ..
 
 echo "checking misc/ ..."
 cd misc
-for test in `ls paper*.py`
+for test in `ls *.py`
 do
+    [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "__init__.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "table.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "paper_opt_pv_old.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir
@@ -96,6 +120,16 @@ done
 
 testit table.py $fulldir
 cd ..
+
+echo "checking tutorial/ ..."
+cd tutorial
+for test in `ls step*.py`
+do
+testit $test $fulldir
+done
+cd ..
+
+
 
 echo "   done"
 

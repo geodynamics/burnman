@@ -1,7 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
 
+from __future__ import absolute_import
 import numpy as np
 import warnings
 
@@ -64,8 +64,7 @@ class AveragingScheme(object):
     def average_density(self, volumes, densities):
         """
         Average the densities of a composite, given a list of volume
-        fractions and densitites. This is the only method of
-        :class:`burnman.averaging_schemes.AveragingScheme` which is implemented in the base class,
+        fractions and densitites. This is implemented in the base class,
         as how to calculate it is not dependent on the geometry of the rock.
         The formula for density is given by
 
@@ -142,7 +141,8 @@ class VoigtReussHill(AveragingScheme):
     """
     Class for computing the Voigt-Reuss-Hill average for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
-    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and
+    :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -268,7 +268,7 @@ class Reuss(AveragingScheme):
     Class for computing the Reuss (iso-stress) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`, and implements
     the :func:`burnman.averaging_schemes.averaging_scheme.average_bulk_moduli` and
-     :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
+    :func:`burnman.averaging_schemes.averaging_scheme.average_shear_moduli` functions.
     """
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -558,10 +558,8 @@ def voigt_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    it = range(len(phase_volume))
-    V_i = phase_volume
-    V_tot = sum(V_i)
-    X_voigt = sum(V_i[i]/V_tot * X[i] for i in it)
+    vol_frac = phase_volume/np.sum(phase_volume)
+    X_voigt = sum( f*x for f,x in zip(vol_frac, X))
     return X_voigt
 
 
@@ -572,14 +570,12 @@ def reuss_average_function(phase_volume, X):
     voigt_reuss_hill classes, takes a list of
     volumes and moduli, returns a modulus.
     """
-    it = range(len(phase_volume))
-    V_i = phase_volume
-    V_tot = sum(V_i)
-    if (min(X)<=0.0):
-        X_reuss = 0.0
-        warnings.warn("Oops, called reuss_average with Xi<=0!")
-    else:
-        X_reuss = 1./sum(V_i[i]/V_tot* 1./X[i] for i in it)
+    vol_frac = phase_volume/np.sum(phase_volume)
+    for f,x in zip(vol_frac,X):
+        if x <= 0 and np.abs(f) > np.finfo(float).eps :
+            warnings.warn("Oops, called reuss_average with Xi<=0!")
+            return 0.0
+    X_reuss = 1./sum( f/x for f,x in zip(vol_frac, X))
     return X_reuss
 
 

@@ -1,12 +1,12 @@
-<stdin>:88: UserWarning: Overriding database equation of state. From BM2 to BM3
-<stdin>:97: UserWarning: Overriding database equation of state. From BM3 to BM2
 Optimization terminated successfully.
-         Current function value: 14212.177931
+         Current function value: 14212.187371
+         Iterations: 113
+         Function evaluations: 245
+2nd order fit: G =  173.346202394 GPa	G' =  1.52206201609
+Optimization terminated successfully.
+         Current function value: 16309.304196
          Iterations: 117
-         Function evaluations: 255
-2nd order fit: G =  173.346204684 GPa	G' =  1.52206197715
-Optimization terminated successfully.
-         Current function value: 16309.293866
-         Iterations: 116
-         Function evaluations: 250
-3rd order fit: G =  168.927043753 GPa	G' =  1.66680645546
+         Function evaluations: 257
+3rd order fit: G =  168.927042088 GPa	G' =  1.66680648163
+<stdin>:90: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
+<stdin>:99: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes

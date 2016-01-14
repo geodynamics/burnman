@@ -1,3 +1,7 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
+from __future__ import absolute_import
 import scipy.constants
 
 """
@@ -7,7 +11,7 @@ gas_constant = scipy.constants.gas_constant
 
 
 """
-Avogradro constant (N_A) in mol ^ -1
+Avogadro constant (N_A) in mol ^ -1
 """
 Avogadro = scipy.constants.Avogadro
 
@@ -19,3 +23,10 @@ Note that we are not using scipy.constants.Boltzmann because it is not
 available in older versions.
 """
 Boltzmann = 1.3806488e-23 
+
+
+"""
+Newtonian constant of gravitation (G) in m^3 kg^-1 s^-2
+"""
+
+G = scipy.constants.G

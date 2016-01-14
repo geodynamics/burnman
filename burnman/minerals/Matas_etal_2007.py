@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
 Matas_etal_2007
@@ -8,8 +8,9 @@ Matas_etal_2007
 
 Minerals from Matas et al. 2007 and references therein. See Table 1 and 2.
 """
+from __future__ import absolute_import
 
-from burnman.mineral import Mineral
+from ..mineral import Mineral
 
 
 class mg_perovskite(Mineral):

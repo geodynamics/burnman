@@ -1,6 +1,6 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, 2014, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 """
     
@@ -10,6 +10,8 @@ paper_onefit
 This script reproduces :cite:`Cottaar2014`, Figure 7.
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os.path,sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -20,13 +22,13 @@ import numpy.random
 import burnman
 import pickle
 from burnman import minerals
-from burnman.mineral_helpers import HelperSolidSolution
+from misc.helper_solid_solution import HelperSolidSolution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate
 from scipy.stats import norm
 import matplotlib.mlab as mlab
-import colors
+import misc.colors as colors
 
 def make_rock():
 
@@ -44,7 +46,7 @@ def make_rock():
     perovskite = HelperSolidSolution( [ mg_perovskite, fe_perovskite], [1.0-pv_fe_num, pv_fe_num])
     ferropericlase = HelperSolidSolution( [ periclase, wuestite], [1.0-fp_fe_num, fp_fe_num])
 
-    pyrolite = burnman.Composite( [ (perovskite, x_pv), (ferropericlase, x_fp) ] )
+    pyrolite = burnman.Composite( [perovskite, ferropericlase], [x_pv, x_fp])
     pyrolite.set_method('slb3')
     anchor_temperature = 1935.0
 
@@ -52,11 +54,11 @@ def make_rock():
 
 def output_rock( rock, file_handle ):
   for ph in rock.staticphases:
-    if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-      for min in ph.mineral.base_materials:
-        file_handle.write( '\t' + min.to_string() + '\n')
-        for key in min.params:
-          file_handle.write('\t\t' + key + ': ' + str(min.params[key]) + '\n')
+    if( isinstance(ph.mineral, HelperSolidSolution) ):
+      for mineral in ph.mineral.endmembers:
+        file_handle.write( '\t' + mineral.to_string() + '\n')
+        for key in mineral.params:
+          file_handle.write('\t\t' + key + ': ' + str(mineral.params[key]) + '\n')
     else:
       file_handle.write( '\t' + ph.mineral.to_string() + '\n' )
       for key in ph.mineral.params:
@@ -67,14 +69,14 @@ def realization_to_array(rock, anchor_t):
     names = ['anchor_T']
     for ph in rock.staticphases:
         if( isinstance(ph.mineral, burnman.minerals_base.helper_solid_solution) ):
-            for min in ph.mineral.base_materials:
-                for key in min.params:
-                    if key != 'equation_of_state':
-                        arr.append(min.params[key])
-                        names.append(min.to_string()+'.'+key)
+            for mineral in ph.mineral.endmembers:
+                for key in mineral.params:
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
+                        arr.append(mineral.params[key])
+                        names.append(mineral.to_string()+'.'+key)
         else:
             for key in ph.mineral.params:
-                    if key != 'equation_of_state':
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
                         arr.append(ph.mineral.params[key])
                         names.append(mph.mineral.to_string()+'.'+key)
     return arr, names
@@ -83,16 +85,17 @@ def array_to_rock(arr, names):
     rock, _ = make_rock()
     anchor_t = arr[0]
     idx = 1
-    for (fraction,phase) in rock.children:
+    for phase in rock.phases:
         if isinstance(phase, HelperSolidSolution):
-            for min in phase.base_materials:
-                for key in min.params:
-                    if key != 'equation_of_state':
-                        assert(names[idx]==min.to_string()+'.'+key)
-                        min.params[key] = arr[idx]
+            for mineral in phase.endmembers:
+                while mineral.to_string() in names[idx]:
+                    key = names[idx].split('.')[-1]
+                    if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
+                        assert(mineral.to_string() in names[idx])
+                        mineral.params[key] = arr[idx]
                         idx += 1
         else:
-            raise Exception, "unknown type"
+            raise Exception("unknown type")
     return rock, anchor_t
 
 
@@ -102,7 +105,7 @@ if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()
     npts = 10
     depths = np.linspace(850e3,2700e3, npts)
-    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate_all_at(depths)
+    pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(['pressure','density','v_p','v_s','v_phi'],depths)
 
     pressures_sampled = np.linspace(pressure[0], pressure[-1], 20*len(pressure))
 
@@ -217,7 +220,7 @@ if __name__ == "__main__":
         for n in names:
             if "."+row in n:
                 val.append(mymap[n])
-        print row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3])
+        print(row, "& %g && %g && %g && %g & \\"%(val[0],val[1],val[2],val[3]))
 
     dashstyle2=(7,3)
     dashstyle3=(3,2)
@@ -230,9 +233,9 @@ if __name__ == "__main__":
 
     rock, anchor_t = array_to_rock(fit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'],pressure,temperature)
 
     err_vs, err_vphi, err_rho = burnman.compare_l2(depths/np.mean(depths),
                                                    [vs/np.mean(seis_vs),
@@ -243,13 +246,13 @@ if __name__ == "__main__":
                                                     seis_rho/np.mean(seis_rho)])
     error = np.sum([err_rho, err_vphi, err_vs])
 
-    print "errors:", error, err_rho, err_vphi, err_vs
+    print("errors:", error, err_rho, err_vphi, err_vs)
 
     figsize=(6,5)
     prop={'size':12}
     plt.rc('text', usetex=True)
-    plt.rcParams['text.latex.preamble'] = '\usepackage{relsize}'
-    plt.rc('font', family='sanserif')
+    plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
+    plt.rc('font', family='sans-serif')
     figure=plt.figure(dpi=100,figsize=figsize)
 
     #plot v_s
@@ -268,9 +271,9 @@ if __name__ == "__main__":
 
     rock, anchor_t = array_to_rock(lit, names)
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
-
+    rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = \
-        burnman.velocities_from_rock(rock, pressure, temperature, burnman.averaging_schemes.HashinShtrikmanAverage())
+        rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'],pressure,temperature)
     plt.plot(pressure/1.e9,vs/1.e3,dashes=dashstyle2,color=colors.color(4),linewidth=1.0)
     plt.plot(pressure/1.e9,vphi/1.e3,dashes=dashstyle2,color=colors.color(3),linewidth=1.0, label="literature")
     plt.plot(pressure/1.e9,rho/1.e3,dashes=dashstyle2,color=colors.color(2),linewidth=1.0)
@@ -280,6 +283,7 @@ if __name__ == "__main__":
     plt.legend(bbox_to_anchor=(1.0, 0.9),prop={'size':12})
     plt.xlim(25,135)
     #plt.ylim(6,11)
-    plt.savefig("onefit.pdf", bbox_inches='tight')
-    print "wrote onefit.pdf"
+    if "RUNNING_TESTS" not in globals():
+        plt.savefig("onefit.pdf", bbox_inches='tight')
+    print("wrote onefit.pdf")
     #plt.show()

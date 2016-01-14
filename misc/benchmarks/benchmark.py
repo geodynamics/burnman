@@ -1,6 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+from __future__ import absolute_import
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+
 
 import os.path, sys
 sys.path.insert(1,os.path.abspath('../..')) 
@@ -245,20 +246,20 @@ def check_slb_fig7_txt():
     
     for  i in range(len(temperature)):
       forsterite.set_state(pressure[i], temperature[i])
-      rho_comp[i] = 100.*(forsterite.density()/1000. - rho[i])/rho[i]
-      Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus()/1.e9 - Kt[i])/Kt[i]
-      Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus()/1.e9 - Ks[i])/Ks[i]
-      G_comp[i] = 100.*(forsterite.shear_modulus()/1.e9 - G[i])/G[i]
-      VB_comp[i] = 100.*(forsterite.v_phi()/1000. - VB[i])/VB[i]
-      VS_comp[i] = 100.*(forsterite.v_s()/1000. - VS[i])/VS[i]
-      VP_comp[i] = 100.*(forsterite.v_p()/1000. - VP[i])/VP[i]
-      vol_comp[i] = 100.*(forsterite.molar_volume()*1.e6 - vol[i])/vol[i]
-      alpha_comp[i] = 100.*(forsterite.thermal_expansivity()/1.e-5 - alpha[i])/(alpha[-1])
-      Cp_comp[i] = 100.*(forsterite.heat_capacity_p()/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
-      gr_comp[i] = (forsterite.grueneisen_parameter() - gr[i])/gr[i]
-      gibbs_comp[i] = 100.*(forsterite.molar_gibbs()/1.e6 - gibbs[i])/gibbs[i]
-      entropy_comp[i] = 100.*(forsterite.molar_entropy() - entropy[i])/(entropy[i] if entropy[i] != 0. else 1.)
-      enthalpy_comp[i] = 100.*(forsterite.molar_enthalpy()/1.e6 - enthalpy[i])/(enthalpy[i] if enthalpy[i] != 0. else 1.)
+      rho_comp[i] = 100.*(forsterite.density/1000. - rho[i])/rho[i]
+      Kt_comp[i] = 100.*(forsterite.isothermal_bulk_modulus/1.e9 - Kt[i])/Kt[i]
+      Ks_comp[i] = 100.*(forsterite.adiabatic_bulk_modulus/1.e9 - Ks[i])/Ks[i]
+      G_comp[i] = 100.*(forsterite.shear_modulus/1.e9 - G[i])/G[i]
+      VB_comp[i] = 100.*(forsterite.v_phi/1000. - VB[i])/VB[i]
+      VS_comp[i] = 100.*(forsterite.v_s/1000. - VS[i])/VS[i]
+      VP_comp[i] = 100.*(forsterite.v_p/1000. - VP[i])/VP[i]
+      vol_comp[i] = 100.*(forsterite.molar_volume*1.e6 - vol[i])/vol[i]
+      alpha_comp[i] = 100.*(forsterite.thermal_expansivity/1.e-5 - alpha[i])/(alpha[-1])
+      Cp_comp[i] = 100.*(forsterite.heat_capacity_p/forsterite.params['molar_mass']/1000. - Cp[i])/(Cp[-1])
+      gr_comp[i] = (forsterite.grueneisen_parameter - gr[i])/gr[i]
+      gibbs_comp[i] = 100.*(forsterite.molar_gibbs/1.e6 - gibbs[i])/gibbs[i]
+      entropy_comp[i] = 100.*(forsterite.molar_entropy - entropy[i])/(entropy[i] if entropy[i] != 0. else 1.)
+      enthalpy_comp[i] = 100.*(forsterite.molar_enthalpy/1.e6 - enthalpy[i])/(enthalpy[i] if enthalpy[i] != 0. else 1.)
       
     plt.plot(temperature, rho_comp, label=r'$\rho$')
     plt.plot(temperature, Kt_comp, label=r'$K_S$')
@@ -311,15 +312,15 @@ def check_slb_fig7():
 
     pressure = 1.0e5
     forsterite.set_state(pressure, 300.)
-    Ks_0 = forsterite.adiabatic_bulk_modulus()
+    Ks_0 = forsterite.adiabatic_bulk_modulus
 
     #calculate its thermal properties
     for i in range(len(temperature)):
         forsterite.set_state(pressure, temperature[i])
-        volume[i] = forsterite.molar_volume()/forsterite.params['V_0']
-        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus()/Ks_0
-        shear_modulus[i] = forsterite.shear_modulus()/forsterite.params['G_0']
-        heat_capacity[i] = forsterite.heat_capacity_p()/forsterite.params['n']
+        volume[i] = forsterite.molar_volume/forsterite.params['V_0']
+        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus/Ks_0
+        shear_modulus[i] = forsterite.shear_modulus/forsterite.params['G_0']
+        heat_capacity[i] = forsterite.heat_capacity_p/forsterite.params['n']
  
 
     #compare with figure 7
