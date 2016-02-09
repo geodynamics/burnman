@@ -126,27 +126,8 @@ done
 cd ..
 
 
-which ipython3 >/dev/null
-if [ $? -eq 0 ]
-then
-echo "checking ipython/ ..."
-PYTHON=python3
-cd ipython
-for test in `ls *.ipynb`
-do
-    ipython3 nbconvert --to=python $test >/dev/null || echo "ERROR: $test FAILED to convert."
-done
-
-for test in `ls *.py`
-do
-    testit $test $fulldir
-    rm $test
-done
-cd ..
-fi
 
 echo "   done"
-
 
 echo ""
 echo "*** tests done"
