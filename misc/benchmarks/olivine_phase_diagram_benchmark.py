@@ -68,7 +68,8 @@ T=1673. # K
 Find invariant point
 '''
 invariant=optimize.fsolve(eqm_P_xMgABC(ol, wd, rw), [15.e9, 0.2, 0.3, 0.4], args=(T))
-print invariant[0]/1.e9, 'GPa', invariant[1:4]
+print(str(invariant[0]/1.e9)+' GPa')
+print(invariant[1:4])
 
 '''
 Initialise arrays
