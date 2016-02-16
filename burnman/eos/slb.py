@@ -318,7 +318,7 @@ class SLBBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for n', stacklevel=2 )
         if params['Debye_0'] < 1. or params['Debye_0'] > 10000.:
             warnings.warn( 'Unusual value for Debye_0', stacklevel=2 )
-        if params['grueneisen_0'] < 0. or params['grueneisen_0'] > 10.:
+        if params['grueneisen_0'] < -0.005 or params['grueneisen_0'] > 10.:
             warnings.warn( 'Unusual value for grueneisen_0' , stacklevel=2)
         if params['q_0'] < -10. or params['q_0'] > 10.:
             warnings.warn( 'Unusual value for q_0' , stacklevel=2)

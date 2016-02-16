@@ -408,5 +408,3 @@ other.fe_perovskite (SLB_2011.fe_perovskite)  2.5485e-05 2.721152e+11     4.14  
 other.mg_perovskite (SLB_2011.mg_perovskite)  2.4445e-05 2.505264e+11     4.14     1.729e+11  1.69037  0.1003887 5.0 905.9412      1.56508 1.10945  2.56536
 other.periclase (SLB_2011.periclase)          1.1244e-05 1.613836e+11  3.84045     1.309e+11   2.1438  0.0403044 2.0 767.0977      1.36127  1.7217  2.81765
 other.wuestite (SLB_2011.wuestite)            1.2264e-05 1.794442e+11   4.9376 59000000000.0  1.44673  0.0718444 2.0 454.1592      1.53047  1.7217 -0.05731
-BURNMAN/burnman/mineral.py: UserWarning: Unusual value for grueneisen_0
-  self.method.validate_parameters(self.params)
