@@ -64,12 +64,14 @@ fi
 echo "*** running test suite..."
 
 # check for tabs in code:
-for f in `find . -name \*.py`
+for f in `find . -name \*.py | grep -v ipython/`
 do
+    
     grep $'\t' -q $f && \
 	echo "ERROR: tabs found in '$f':" && \
 	grep -n $'\t' $f && exit 0
 done
+
 
 cd tests
 $PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
@@ -117,7 +119,6 @@ do
 
     testit $test $fulldir
 done
-
 testit table.py $fulldir
 cd ..
 
@@ -132,8 +133,6 @@ cd ..
 
 
 echo "   done"
-
-
 
 echo ""
 echo "*** tests done"
