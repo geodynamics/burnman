@@ -7,7 +7,16 @@
 
 
 import sys
+import os.path
 
+if os.path.isfile('tc-ds62.txt') == False:
+    print('This code requires the data file tc-ds62.txt.')
+    print('This file is bundled with the software package THERMOCALC, which can be found here:')
+    print('http://www.metamorph.geo.uni-mainz.de/thermocalc/dataset6/index.html')
+    print('')
+    print('Please download the file and place it in this directory.')
+    exit()
+    
 # Components
 components=['Si','Ti','Al','Fe','Mg','Mn','Ca','Na','K','O','H','C','Cl','e-','Ni','Zr','S','Cu','Cr']
 class Endmember:

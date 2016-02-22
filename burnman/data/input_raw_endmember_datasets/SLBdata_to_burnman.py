@@ -6,6 +6,16 @@
 
 
 import sys
+import os.path
+
+if os.path.isfile('stx11ver.dat') == False:
+    print('This code requires the data file stx11ver.dat.')
+    print('This file is bundled with the Perple_X data files, which can be found here:')
+    print('http://www.perplex.ethz.ch/perplex/ibm_and_mac_archives/')
+    print('')
+    print('Please download the file and place it in this directory.')
+    exit()
+
 
 def read_dataset(datafile):
     f=open(datafile,'r')
