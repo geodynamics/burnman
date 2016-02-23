@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -32,17 +33,19 @@ from __future__ import absolute_import
 from ..mineral import Mineral
 from ..processchemistry import read_masses, dictionarize_formula, formula_mass
 
-atomic_masses=read_masses()
+atomic_masses = read_masses()
+
 
 class CO2 (Mineral):
+
     def __init__(self):
-        formula='CO2'
+        formula = 'CO2'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'carbon dioxide',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 304.2,
             'cork_P': 0.0738e8,
             'H_0': -393.51e3,
@@ -50,15 +53,17 @@ class CO2 (Mineral):
             'Cp': [87.8, -2.644e-3, 706.4e3, -998.9]}
         Mineral.__init__(self)
 
+
 class CH4 (Mineral):
+
     def __init__(self):
-        formula='CH4'
+        formula = 'CH4'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'methane',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 190.6,
             'cork_P': 0.0460e8,
             'H_0': -74.81e3,
@@ -66,15 +71,17 @@ class CH4 (Mineral):
             'Cp': [150.1, 0.002063, 3427700., -2650.4]}
         Mineral.__init__(self)
 
+
 class O2 (Mineral):
+
     def __init__(self):
-        formula='O2'
+        formula = 'O2'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'oxygen gas',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 0.,
             'cork_P': 1.0e5,
             'H_0': 0.,
@@ -82,15 +89,17 @@ class O2 (Mineral):
             'Cp': [48.3, -0.000691, 499200., -420.7]}
         Mineral.__init__(self)
 
+
 class H2 (Mineral):
+
     def __init__(self):
-        formula='H2'
+        formula = 'H2'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'hydrogen gas',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 41.2,
             'cork_P': 0.0211e8,
             'H_0': 0.,
@@ -98,15 +107,17 @@ class H2 (Mineral):
             'Cp': [23.3, 0.004627, 0.0, 76.3]}
         Mineral.__init__(self)
 
+
 class S2 (Mineral):
+
     def __init__(self):
-        formula='S2'
+        formula = 'S2'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'sulfur gas',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 1314.00,
             'cork_P': 0.21000e8,
             'H_0': 128.54e3,
@@ -114,15 +125,17 @@ class S2 (Mineral):
             'Cp': [37.1, 0.002398, -161000.0, -65.0]}
         Mineral.__init__(self)
 
+
 class H2S (Mineral):
+
     def __init__(self):
-        formula='H2S'
+        formula = 'H2S'
         formula = dictionarize_formula(formula)
         self.params = {
             'name': 'hydrogen sulfide',
             'formula': formula,
             'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1,-8.63920e0], [9.18301e-1], [-3.30558e-2,2.30524e-3], [6.93054e-4,-8.38293e-5]],
+            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
             'cork_T': 373.15,
             'cork_P': 0.08937e8,
             'H_0': 128.54e3,
