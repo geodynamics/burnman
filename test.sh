@@ -129,7 +129,7 @@ do
 
 testit $test $fulldir
 done
-cd ../../..
+cd ../..
 
 
 echo "checking contrib/tutorial/ ..."
@@ -138,8 +138,7 @@ for test in `ls step*.py`
 do
 testit $test $fulldir
 done
-cd ../../..
-
+cd ../..
 
 
 echo "   done"
