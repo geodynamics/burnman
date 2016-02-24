@@ -7,7 +7,6 @@ sys.path.insert(1,os.path.abspath('../..'))
 import burnman
 from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
-from burnman.minerals import Sundman_1991
 from burnman import constants
 import numpy as np
 
@@ -39,13 +38,13 @@ for database, f, mineral in filemin:
         gibbs=H-T*S
         PT.append([P/1.e4,T])
         diff=[p(fo.gibbs, gibbs), p(fo.H, H), p(fo.S, S), p(fo.V, V/1.e5), p(fo.C_p, C_p), p(fo.alpha, alpha), p(fo.K_T, 1.e5/beta), p(fo.density, rho)]
-        print(diff)
-        percentage_diff.append(diff)
+        print(fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.alpha, fo.K_T, fo.density)
+        percentage_diff.append(100.*np.abs(diff))
 
     percentage_diff=np.array(percentage_diff)
     i,j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-    print('Maximum error in', database, 'database:')
+    print('Maximum percentage error in', database, 'database:')
     print(variables[j], ':', percentage_diff[i,j], '% at', PT[i][0], 'GPa and', PT[i][1], 'K')
     print('')
 
@@ -69,83 +68,54 @@ for P, V, beta, rho in perplex_output:
     fo.set_state(P*1.e5,T)
     PT.append([P/1.e4,T])
     diff=[p(fo.V, V/1.e5), p(fo.K_T, 1.e5/beta), p(fo.density, rho)]
-    print(diff)
-    percentage_diff.append(diff)
+    print(fo.V, fo.K_T, fo.density)
+    percentage_diff.append(100.*np.abs(diff))
 
 percentage_diff=np.array(percentage_diff)
 i,j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-print('Maximum error in', database, 'database:')
+print('Maximum percentage error in', database, 'database:')
 print(variables[j], ':', percentage_diff[i,j], '% at', PT[i][0], 'GPa and', PT[i][1], 'K')
 print('')
 
 
-'''
-Sundman (1991) models for fcc and bcc iron
-'''
+print('Check excess entropy and landau in SLB2011')
 
+file='../../burnman/data/input_perplex/test_SLB_entropy_and_landau.dat'
 
-def magnetic_gibbs(T, Tc, beta, p):
-    A = (518./1125.) + (11692./15975.)*((1./p) - 1.)
-    tau=T/Tc
-    if tau < 1: 
-        f=1.-(1./A)*(79./(140.*p*tau) + (474./497.)*(1./p - 1.)*(np.power(tau, 3.)/6. + np.power(tau, 9.)/135. + np.power(tau, 15.)/600.))
-    else:
-        f=-(1./A)*(np.power(tau,-5)/10. + np.power(tau,-15)/315. + np.power(tau, -25)/1500.)
-    return constants.gas_constant*T*np.log(beta + 1.)*f
+f = open(file, 'r')
 
-def HSERFe(T):
-    if T < 1811:
-        gibbs=1224.83 + 124.134*T - 23.5143*T*np.log(T) - 0.00439752*T*T - 5.89269e-8*T*T*T + 77358.3/T
-    else:
-        gibbs=-25384.451 + 299.31255*T - 46.*T*np.log(T) + 2.2960305e31*np.power(T,-9.)
-    return gibbs 
+mins={}
+mins['Wus'] = SLB_2011.wuestite()
+mins['Per'] = SLB_2011.periclase()
+mins['Wad'] = SLB_2011.mg_wadsleyite()
+mins['Ring'] = SLB_2011.mg_ringwoodite()
+mins['Stv'] = SLB_2011.stishovite()
 
-def gibbs_bcc_1bar(T):
-    Tc=1043.
-    beta=2.22
-    p=0.4
-    return HSERFe(T) + magnetic_gibbs(T, Tc, beta, p)
+variables=['H','S','V','C_p','alpha','beta','rho']
+percentage_diff = []
+mineral_names=[]
 
-def gibbs_fcc_1bar(T):
-    Tc=201.
-    beta=2.10
-    p=0.28
-    if T < 1811:
-        gibbs=HSERFe(T) - 1462.4 + 8.282*T - 1.15*T*np.log(T) + 0.00064*T*T
-    else:
-        gibbs= - 27098.266 + 300.25256*T - 46.*T*np.log(T) + 2.78854e31*np.power(T,-9.)
-    return gibbs + magnetic_gibbs(T, Tc, beta, p)
+print(variables)
+datalines = [ line.strip().split() for idx, line in enumerate(f.read().split('\n')) if line.strip() and idx>0 ]
+for line in datalines:
+    m = mins[line[0]]
+    mineral_names.append(m.name)
+    data = map(float, line[1:])
+    P, T, M, H, S, V, C_p, alpha, beta, C_p_over_C_v, rho = data
+    PT.append([P,T])
+    P = P*1.e9
+    m.set_state(P, T)
+    
 
-bcc=Sundman_1991.bcc_iron()
-fcc=Sundman_1991.fcc_iron()
+    diff=[p(m.H, H), p(m.S, S), p(m.V, V/1.e5), p(m.C_p, C_p), p(m.alpha, alpha), p(1.e5/m.K_T, beta), p(m.density, rho)]
+    print(m.name, ':', m.H, m.S, m.V, m.C_p, m.alpha, m.K_T, m.density)
+    percentage_diff.append(100.*np.abs(diff))
 
+    
+percentage_diff=np.array(percentage_diff)
+i,j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-temperatures=np.linspace(298.15, 1798.15, 101)
-Pr=1.e5
-
-fcc_gibbs=[]
-bcc_gibbs=[]
-fcc_gibbs_model=[]
-bcc_gibbs_model=[]
-for T in temperatures:
-    fcc.set_state(Pr, T)
-    bcc.set_state(Pr, T)
-
-    fcc_gibbs.append(fcc.gibbs)
-    bcc_gibbs.append(bcc.gibbs)
-
-    fcc_gibbs_model.append(gibbs_fcc_1bar(T))
-    bcc_gibbs_model.append(gibbs_bcc_1bar(T))
-
-import matplotlib.pyplot as plt
-plt.plot( temperatures, np.array(fcc_gibbs)-np.array(bcc_gibbs), 'r-', linewidth=1., label='FCC-BCC')
-plt.plot( temperatures, np.array(fcc_gibbs_model)-np.array(bcc_gibbs_model), 'b-', linewidth=1., label='FCC-BCC model')
-
-plt.title("Gibbs free energy difference between bcc and fcc iron")
-plt.ylabel("Gibbs free energy (J/mol)")
-plt.xlabel("Temperature (K)")
-plt.xlim(1100, 1700)
-plt.ylim(-10, 0)
-plt.legend(loc='lower left')
-plt.show()
+print('Maximum percentage error in SLB database with configurational entropy and landau transition:')
+print(variables[j], ':', percentage_diff[i,j], '% at', PT[i][0], 'GPa and', PT[i][1], 'K for', mineral_names[i])
+print('')

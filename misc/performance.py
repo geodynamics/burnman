@@ -56,8 +56,6 @@ if True:
         vp_err = burnman.l2(depths, mat_vp, seis_vp) /1e9
         den_err = burnman.l2(depths, mat_rho, seis_rho) /1e9
 
-        #print vs_err, vp_err, den_err
-
         return vs_err + vp_err + den_err
 
     def run():
