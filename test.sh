@@ -112,23 +112,33 @@ cd misc
 for test in `ls *.py`
 do
     [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "__init__.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "table.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "paper_opt_pv_old.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir
 done
 testit table.py $fulldir
 cd ..
 
-echo "checking tutorial/ ..."
-cd tutorial
+echo "checking contrib/CHRU2014 ..."
+cd contrib/CHRU2014
+for test in `ls *.py`
+do
+[ $test == "__init__.py" ] && echo "  *** skipping $test !" && continue
+
+testit $test $fulldir
+done
+cd ../../..
+
+
+echo "checking contrib/tutorial/ ..."
+cd contrib/tutorial/
 for test in `ls step*.py`
 do
 testit $test $fulldir
 done
-cd ..
+cd ../../..
 
 
 

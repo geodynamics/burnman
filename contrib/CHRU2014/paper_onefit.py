@@ -14,8 +14,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import os.path,sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1,os.path.abspath('../..'))
 import numpy as np, matplotlib.pyplot as plt
 import numpy.ma as ma
 import numpy.random

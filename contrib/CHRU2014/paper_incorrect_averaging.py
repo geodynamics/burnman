@@ -15,8 +15,8 @@ from __future__ import absolute_import
 
 import os, sys, numpy as np, matplotlib.pyplot as plt
 #hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1,os.path.abspath('..'))
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1,os.path.abspath('../..'))
 
 import burnman
 from burnman import minerals
