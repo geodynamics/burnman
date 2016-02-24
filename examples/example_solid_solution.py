@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
     plt.plot( comp, g2_pyrope_gamma, 'r-.', linewidth=1., label='Pyrope activity coefficient')
     plt.plot( comp, g2_almandine_gamma, 'b--', linewidth=1., label='Almandine activity coefficient')
-    plt.title("Ideal pyrope-almandine join")
+    plt.title("Non-ideal pyrope-almandine join")
     plt.ylabel("Activities")
     plt.xlabel("Almandine fraction")
     plt.legend(loc='lower right')

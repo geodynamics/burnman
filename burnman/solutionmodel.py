@@ -229,6 +229,13 @@ class IdealSolution (SolutionModel):
             activities[e]=normalisation_constant*activities[e]
         return activities
 
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        return np.ones_like(molar_fractions)
+    
+    def activities (self, pressure, temperature, molar_fractions):
+        return self._ideal_activities(molar_fractions)
+
+    
  
 class AsymmetricRegularSolution (IdealSolution):
     """
@@ -314,7 +321,15 @@ class AsymmetricRegularSolution (IdealSolution):
         H_excess=np.dot(self.alpha.T,molar_fractions)*np.dot(phi.T,np.dot(self.Wh,phi))
         return H_excess + pressure*self.excess_volume ( pressure, temperature, molar_fractions )
 
-
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        if temperature > 1.e-10:
+            return np.exp(self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)/(constants.gas_constant*temperature))
+        else:
+            raise Exception("Activity coefficients not defined at 0 K.")
+            
+    def activities(self, pressure, temperature, molar_fractions):
+        return IdealSolution.activities(self, pressure, temperature, molar_fractions) * self.activity_coefficients(pressure, temperature, molar_fractions)
+    
 class SymmetricRegularSolution (AsymmetricRegularSolution):
     """
     Solution model implementing the symmetric regular solution model
@@ -401,3 +416,13 @@ class SubregularSolution (IdealSolution):
     def excess_enthalpy(self, pressure, temperature, molar_fractions):
         H_excess=np.dot(molar_fractions, self._non_ideal_function(self.Wh, molar_fractions))
         return H_excess + pressure*self.excess_volume (pressure, temperature, molar_fractions)
+
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        if temperature > 1.e-10:
+            return np.exp(self._non_ideal_excess_partial_gibbs(pressure, temperature, molar_fractions)/(constants.gas_constant*temperature))
+        else:
+            raise Exception("Activity coefficients not defined at 0 K.")
+        
+    def activities(self, pressure, temperature, molar_fractions):
+        return IdealSolution.activities(self, pressure, temperature, molar_fractions) * self.activity_coefficients(pressure, temperature, molar_fractions)
+   

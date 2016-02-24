@@ -126,23 +126,16 @@ class SolidSolution(Mineral):
     @material_property
     def activities(self):
         """
-        Returns a list of endmember activities
+        Returns a list of endmember activities [unitless]
         """
-        if self.temperature > 1.e-10:
-            return np.exp(self.excess_partial_gibbs/(constants.gas_constant*self.temperature))
-        else:
-            return None
+        return self.solution_model.activities( self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def activity_coefficients(self):
         """
-        Returns a list of endmember activity coefficients (the non-ideal part of the activities
+        Returns a list of endmember activity coefficients (gamma = activity / ideal activity) [unitless]
         """
-        if self.temperature > 1.e-10:
-            return np.exp(self.excess_partial_gibbs/(constants.gas_constant*self.temperature)
-                          - IdealSolution._log_ideal_activities(self.solution_model, self.molar_fractions))
-        else:
-            return None
+        return self.solution_model.activity_coefficients( self.pressure, self.temperature, self.molar_fractions)
 
             
     @material_property
@@ -151,8 +144,7 @@ class SolidSolution(Mineral):
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        raise NotImplementedError("need to implement internal_energy() for solid solution!")
-        return None
+        return self.molar_helmholtz - self.pressure*self.molar_volume
 
     
     @material_property
@@ -197,8 +189,7 @@ class SolidSolution(Mineral):
         Returns Helmholtz free energy of the solid solution [J]
         Aliased with self.helmholtz
         """
-        raise NotImplementedError("need to implement molar_helmholtz() for solid solution!")
-        return None
+        return self.molar_gibbs + self.temperature*self.molar_entropy
 
 
     @material_property
@@ -248,7 +239,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_entropy(self):
         """
-        Returns enthalpy of the solid solution [J]
+        Returns entropy of the solid solution [J]
         Aliased with self.S
         """
         return sum([ self.endmembers[i][0].S * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
