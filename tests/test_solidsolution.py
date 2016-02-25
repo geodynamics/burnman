@@ -70,6 +70,15 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
+# Ideal solid solution
+class olivine_ideal_ss(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name='Fo-Fo solid solution'
+        self.type='ideal'
+        self.endmembers = [[forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+        
 # Olivine solid solution
 class olivine_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
@@ -86,8 +95,8 @@ class orthopyroxene(burnman.SolidSolution):
         # Name
         self.name='orthopyroxene'
         self.type='symmetric'
-        self.endmembers = [[forsterite(), 'Mg[Mg]Si2O6'], [forsterite(), '[Mg1/2Al1/2]2AlSiO6']]
-        self.enthalpy_interaction=[[10.0e3]]
+        self.endmembers = [[forsterite(), '[Mg][Mg]Si2O6'], [forsterite(), '[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6']]
+        self.enthalpy_interaction=[[burnman.constants.gas_constant*1.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -217,6 +226,24 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(ss0.excess_partial_gibbs, ss1.excess_partial_gibbs)
 
+    def test_activities_ideal(self):
+        ol = olivine_ideal_ss()
+        ol.set_composition( np.array([0.5, 0.5]) )
+        ol.set_state(1.e5,1000.)
+        self.assertArraysAlmostEqual(ol.activities, [0.25, 0.25])
 
+        
+    def test_activity_coefficients_ideal(self):
+        ol = olivine_ideal_ss()
+        ol.set_composition( np.array([0.5, 0.5]) )
+        ol.set_state(1.e5,1000.)
+        self.assertArraysAlmostEqual(ol.activity_coefficients, [1., 1.])
+        
+    def test_activity_coefficients_non_ideal(self):
+        opx = orthopyroxene()
+        opx.set_composition( np.array([0.0, 1.0]) )
+        opx.set_state(1.e5,1000.)
+        self.assertArraysAlmostEqual(opx.activity_coefficients, [np.exp(1.), 1.])
+        
 if __name__ == '__main__':
     unittest.main()

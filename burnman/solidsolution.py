@@ -10,8 +10,7 @@ import warnings
 from .mineral import Mineral, material_property
 from .solutionmodel import *
 from .averaging_schemes import reuss_average_function
-
-
+from . import constants
 
 class SolidSolution(Mineral):
     """
@@ -122,17 +121,30 @@ class SolidSolution(Mineral):
         Mineral.set_state(self, pressure, temperature)
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
+            
 
+    @material_property
+    def activities(self):
+        """
+        Returns a list of endmember activities [unitless]
+        """
+        return self.solution_model.activities( self.pressure, self.temperature, self.molar_fractions)
 
+    @material_property
+    def activity_coefficients(self):
+        """
+        Returns a list of endmember activity coefficients (gamma = activity / ideal activity) [unitless]
+        """
+        return self.solution_model.activity_coefficients( self.pressure, self.temperature, self.molar_fractions)
 
+            
     @material_property
     def internal_energy(self):
         """
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        raise NotImplementedError("need to implement internal_energy() for solid solution!")
-        return None
+        return self.molar_helmholtz - self.pressure*self.molar_volume
 
     
     @material_property
@@ -152,8 +164,7 @@ class SolidSolution(Mineral):
         """
         return np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
 
-
- 
+    
     @material_property
     def excess_gibbs(self):
         """
@@ -178,8 +189,7 @@ class SolidSolution(Mineral):
         Returns Helmholtz free energy of the solid solution [J]
         Aliased with self.helmholtz
         """
-        raise NotImplementedError("need to implement molar_helmholtz() for solid solution!")
-        return None
+        return self.molar_gibbs + self.temperature*self.molar_entropy
 
 
     @material_property
@@ -229,7 +239,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_entropy(self):
         """
-        Returns enthalpy of the solid solution [J]
+        Returns entropy of the solid solution [J]
         Aliased with self.S
         """
         return sum([ self.endmembers[i][0].S * self.molar_fractions[i] for i in range(self.n_endmembers) ]) + self.excess_entropy
@@ -273,7 +283,7 @@ class SolidSolution(Mineral):
             return  self.isothermal_bulk_modulus
         else:
             return  self.isothermal_bulk_modulus*self.heat_capacity_p/self.heat_capacity_v
-
+        
     
     @material_property
     def isothermal_compressibility(self):
@@ -368,3 +378,4 @@ class SolidSolution(Mineral):
         Aliased with self.C_p
         """
         return sum([ self.endmembers[i][0].heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers) ])
+
