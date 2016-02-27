@@ -7,9 +7,11 @@ import inspect
 from . import slb
 from . import mie_grueneisen_debye as mgd
 from . import birch_murnaghan as bm
+from . import birch_murnaghan_4th as bm4
 from . import modified_tait as mt
 from . import hp 
 from . import cork
+from . import vinet
 from .equation_of_state import EquationOfState
 
 
@@ -21,6 +23,8 @@ def create(method):
     if isinstance(method, str):
         if method == "slb2":
             return slb.SLB2()
+        elif method == "vinet":
+            return vinet.Vinet()
         elif method == "mgd2":
             return mgd.MGD2()
         elif method == "mgd3":
@@ -31,6 +35,8 @@ def create(method):
             return bm.BM2()
         elif method == "bm3":
             return bm.BM3()
+        elif method == "bm4":
+            return bm4.BM4()
         elif method == "mt":
             return mt.MT()
         elif method == "hp_tmt":

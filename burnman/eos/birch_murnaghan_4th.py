@@ -8,9 +8,9 @@ from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
 
-def bulk_modulus(volume, params):
+def bulk_modulus_fourth(volume, params):
     """
-    compute the bulk modulus as per the third order
+    compute the bulk modulus as per the fourth order
     birch-murnaghan equation of state.  Returns bulk
     modulus in the same units as the reference bulk
     modulus.  Pressure must be in :math:`[Pa]`.
@@ -19,96 +19,70 @@ def bulk_modulus(volume, params):
     x = params['V_0']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
 
-    K = pow(1. + 2.*f, 5./2.)* (params['K_0'] + (3. * params['K_0'] * params['Kprime_0'] -  \
-           5*params['K_0'] ) * f + 27./2. * (params['K_0']*params['Kprime_0'] - 4.* params['K_0'])*f*f)
+    Xi = (3./4.)*(4.-params['Kprime_0'])
+    Zeta = (3./8.)*((params['K_0']*params['Kprime_prime_0'])+params['Kprime_0']*(params['Kprime_0']-7.)+143./9.)
+
+    K = (5.*f*pow((1.+2.*f),5./2.)*params['K_0']*(1.-(2.*Xi*f)+(4.*Zeta*pow(f,2.)))) + \
+        (pow(1.+(2.*f),7./2.)*params['K_0']*(1.-(4.*Xi*f)+(12.*Zeta*pow(f,2.))))
+
+
     return K
 
-
-def birch_murnaghan(x, params):
-    """
-    equation for the third order birch-murnaghan equation of state, returns
-    pressure in the same units that are supplied for the reference bulk
-    modulus (params['K_0'])
-    """
-
-    return 3.*params['K_0']/2. * (pow(x, 7./3.) - pow(x, 5./3.)) \
-    * (1. - .75*(4.-params['Kprime_0'] )*(pow(x, 2./3.) - 1.)) + params['P_0']
-
-
-def volume(pressure, params):
-    """
-    Get the birch-murnaghan volume at a reference temperature for a given
-    pressure :math:`[Pa]`. Returns molar volume in :math:`[m^3]`
-    """
-
-    func = lambda x: birch_murnaghan(params['V_0']/x, params) - pressure
+def volume_fourth_order(pressure,params):
+    func = lambda x: birch_murnaghan_fourth(params['V_0']/x, params) - pressure
     try:
         sol = bracket(func, params['V_0'], 1.e-2*params['V_0'])
     except:
         raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
     return opt.brentq(func, sol[0], sol[1])
 
-def shear_modulus_second_order(volume, params):
+def birch_murnaghan_fourth(x, params):
     """
-    Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
-    params['G_0']).  This uses a second order finite strain expansion
-    """
-
-    x = params['V_0']/volume
-    G=params['G_0'] * pow(x,5./3.)*(1.-0.5*(pow(x,2./3.)-1.)*(5.-3.*params['Gprime_0']*params['K_0']/params['G_0']))
-    return G
-
-def shear_modulus_third_order(volume, params):
-    """
-    Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
-    params['G_0']).  This uses a third order finite strain expansion
+    equation for the fourth order birch-murnaghan equation of state, returns
+    pressure in the same units that are supplied for the reference bulk
+    modulus (params['K_0'])
     """
 
-    x = params['V_0']/volume
     f = 0.5*(pow(x, 2./3.) - 1.0)
-    G = pow((1. + 2.*f), 5./2.)*(params['G_0']+(3.*params['K_0']*params['Gprime_0'] - 5.*params['G_0'])*f + (6.*params['K_0']*params['Gprime_0']-24.*params['K_0']-14.*params['G_0']+9./2. * params['K_0']*params['Kprime_0'])*f*f)
-    return G
+    Xi = (3./4.)*(4.-params['Kprime_0'])
+    Zeta = (3./8.)*((params['K_0']*params['Kprime_prime_0'])+params['Kprime_0']*(params['Kprime_0']-7.)+143./9.)
+
+    return 3.*f*pow(1.+2.*f,5./2.)*params['K_0']*(1.-(2.*Xi*f)+(4.*Zeta*pow(f,2.)))
 
 
-class BirchMurnaghanBase(eos.EquationOfState):
+class BM4(eos.EquationOfState):
     """
-    Base class for the isothermal Birch Murnaghan equation of state.  This is third order in strain, and
-    has no temperature dependence.  However, the shear modulus is sometimes fit to a second order
-    function, so if this is the case, you should use that.  For more see :class:`burnman.birch_murnaghan.BM2` and :class:`burnman.birch_murnaghan.BM3`.
+    Base class for the isothermal Birch Murnaghan equation of state.  This is fourth order in strain, and
+    has no temperature dependence.
     """
     def volume(self,pressure, temperature, params):
         """
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
-        return volume(pressure,params)
+        return volume_fourth_order(pressure,params)
+
 
     def pressure(self, temperature, volume, params):
-        return birch_murnaghan(params['V_0']/volume, params)
+        return birch_murnaghan_fourth(volume/params['V_0'], params)
+
 
     def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        return bulk_modulus(volume, params)
-
+        return bulk_modulus_fourth(volume,params)
     def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
         """
-        return bulk_modulus(volume,params)
+        return bulk_modulus_fourth(volume,params)
 
     def shear_modulus(self,pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
         """
-        if(self.order == 2):
-          return shear_modulus_second_order(volume,params)
-        elif(self.order == 3):
-          return shear_modulus_third_order(volume,params)
-
+        return 0.
     def heat_capacity_v(self,pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -150,7 +124,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
             params['Gprime_0'] = float('nan')
 
         # Check that all the required keys are in the dictionary
-        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0']
+        expected_keys = ['V_0', 'K_0', 'Kprime_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
@@ -164,26 +138,5 @@ class BirchMurnaghanBase(eos.EquationOfState):
             warnings.warn( 'Unusual value for K_0' , stacklevel=2)
         if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
             warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
-        if params['G_0'] < 0.0 or params['G_0'] > 1.e13:
-            warnings.warn( 'Unusual value for G_0', stacklevel=2 )
-        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Gprime_0', stacklevel=2 )
-
-
-
-class BM3(BirchMurnaghanBase):
-    """
-    Third order Birch Murnaghan isothermal equation of state.
-    This uses the third order expansion for shear modulus.
-    """
-    def __init__(self):
-        self.order=3
-
-
-class BM2(BirchMurnaghanBase):
-    """
-    Third order Birch Murnaghan isothermal equation of state.
-    This uses the third order expansion for shear modulus.
-    """
-    def __init__(self):
-        self.order=2
+        if params['Kprime_prime_0'] > 0. or params['Kprime_prime_0'] < -10.:
+            warnings.warn( 'Unusual value for Kprime_prime_0', stacklevel=2 )

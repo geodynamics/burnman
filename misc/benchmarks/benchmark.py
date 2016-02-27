@@ -10,8 +10,10 @@ import numpy as np, matplotlib.pyplot as plt
 import burnman
 
 import burnman.eos.birch_murnaghan as bm
+import burnman.eos.birch_murnaghan_4th as bm4
 import burnman.eos.mie_grueneisen_debye as mgd
 import burnman.eos.slb as slb
+import burnman.eos.vinet as vinet
 import matplotlib.image as mpimg
 
 
@@ -55,6 +57,82 @@ def check_birch_murnaghan():
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Modulus (GPa)")
     plt.title("Comparing with Figure 1 of Stixrude and Lithgow-Bertelloni (2005)")
+
+    plt.show()
+
+def check_birch_murnaghan_4th():
+    """
+    Recreates the formulation of the 4th order Birch-Murnaghan EOS as in Ahmad and Alkammash, 2012; Figure 1.
+    """
+    plt.close()
+
+    #make a test mineral
+    test_mineral = burnman.Mineral()
+    test_mineral.params ={'name':'test',
+                        'V_0': 10.e-6,
+                        'K_0': 72.7e9,
+                        'Kprime_0':  4.14 ,
+                        'Kprime_prime_0':  -0.0484e-9,
+                        }
+
+    test_mineral.set_method('bm4')
+
+    pressure = np.linspace(0.,90.e9, 20)
+    volume = np.empty_like(pressure)
+
+    #calculate its static properties
+    for i in range(len(pressure)):
+        volume[i] = bm4.volume_fourth_order(pressure[i], test_mineral.params)/test_mineral.params.get('V_0')
+
+
+    #compare with figure 1
+    plt.plot(pressure/1.e9,volume)
+    fig1 = mpimg.imread('../../burnman/data/input_figures/Ahmad.png')
+    plt.imshow(fig1, extent=[0.,90.,.65,1.], aspect='auto')
+    plt.plot(pressure/1.e9 , volume,marker='o',color='r',linestyle='',label = 'BM4')
+    plt.legend(loc='lower left')
+    plt.xlim(0.,90.)
+    plt.ylim(.65,1.)
+    plt.xlabel("Volume/V0")
+    plt.ylabel("Pressure (GPa)")
+    plt.title("Comparing with Figure 1 of Ahmad et al., (2012)")
+
+    plt.show()
+
+def check_vinet():
+    """
+    Recreates Dewaele et al., 2006, Figure 1, fitting a Vinet EOS to Fe data
+    """
+    plt.close()
+
+    #make a test mineral
+    test_mineral = burnman.Mineral()
+    test_mineral.params ={'name':'test',
+                    'V_0': 6.75e-6,
+                    'K_0': 163.4e9,
+                    'Kprime_0': 5.38,
+                        }
+
+    test_mineral.set_method('vinet')
+
+    pressure = np.linspace(17.7e9,300.e9, 20)
+    volume = np.empty_like(pressure)
+
+    #calculate its static properties
+    for i in range(len(pressure)):
+        volume[i] = vinet.volume(pressure[i], test_mineral.params)
+
+    #compare with figure 1
+    plt.plot(pressure/1.e9,volume/6.02e-7)
+    fig1 = mpimg.imread('../../burnman/data/input_figures/Dewaele.png')
+    plt.imshow(fig1, extent=[0.,300.,6.8,11.8], aspect='auto')
+    plt.plot(pressure/1.e9 , volume/6.02e-7,marker='o',color='r',linestyle='',label = 'Vinet Fit')
+    plt.legend(loc='lower left')
+    plt.xlim(0.,300.)
+    plt.ylim(6.8,11.8)
+    plt.ylabel("Volume (Angstroms^3/atom")
+    plt.xlabel("Pressure (GPa)")
+    plt.title("Comparing with Figure 1 of Dewaele et al., (2006)")
 
     plt.show()
 
@@ -597,6 +675,8 @@ if __name__ == "__main__":
     check_averaging_2()
     check_averaging_3()
     check_birch_murnaghan()
+    check_birch_murnaghan_4th()
+    check_vinet()
     check_slb_fig7()
     check_slb_fig3()
     check_mgd_shim_duffy_kenichi()
