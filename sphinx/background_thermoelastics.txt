@@ -1,7 +1,10 @@
 .. _ref-methods-EoS:
 
+Endmember Properties
+--------------------
+
 Calculating Thermoelastic Properties
-------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 To calculate the bulk (:math:`K`) modulus, shear modulus (:math:`G`) and
@@ -26,7 +29,7 @@ and their molar fractions.  These inputs and outputs are further discussed in
 
 
 Birch-Murnaghan (isothermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""
 
 The Birch-Murnaghan equation is an isothermal Eulerian finite-strain EoS
 relating pressure and volume.  The negative finite-strain (or compression) is
@@ -69,7 +72,7 @@ dropping the :math:`f^2` terms in these equations (as is sometimes done for
 experimental fits or EoS modeling).
 
 Modified Tait (isothermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""
 
 The Modified Tait equation of state was developed by :cite:`HC1974`. It has the considerable benefit of allowing volume to be expressed as a function of pressure. It performs very well to pressures and temperatures relevant to the deep Earth :cite:`HP2011`.
 
@@ -82,7 +85,7 @@ The Modified Tait equation of state was developed by :cite:`HC1974`. It has the 
 
 
 Mie-Grüneisen-Debye (thermal correction to Birch-Murnaghan)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The Debye model for the Helmholtz free energy can be written as follows :cite:`Matas2007`
 
@@ -121,7 +124,7 @@ The primary differences are in the thermal correction to the shear modulus and i
 
 
 HP2011 (thermal correction to Modified Tait)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""""""
 
 The thermal pressure can be incorporated into the Modified Tait equation of state, replacing :math:`P` with :math:`P-\left(P_{\textrm{th}} - P_{\textrm{th0}}\right)` in Equation :eq:`mtait` :cite:`HP2011`. Thermal pressure is calculated using a Mie-Grüneisen equation of state and an Einstein model for heat capacity, even though the Einstein model is not actually used for the heat capacity when calculating the enthalpy and entropy (see following section).
 
@@ -138,7 +141,7 @@ The thermal pressure can be incorporated into the Modified Tait equation of stat
 
 
 SLB2005 (for solids, thermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""
 
 Thermal corrections for pressure, and isothermal bulk modulus and shear
 modulus are derived from the Mie-Grüneisen-Debye EoS with the quasi-harmonic
@@ -264,7 +267,7 @@ This equation of state is substantially the same as that of the Mie-Gruneisen-De
 The primary differences are in the thermal correction to the shear modulus and in the volume dependences of the Debye temperature and the Gruneisen parameter.
 
 Compensated-Redlich-Kwong (for fluids, thermal)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""""""""""""""""
 
 The CORK equation of state :cite:`HP1991` is a simple virial-type extension to the modified Redlich-Kwong (MRK) equation of state. It was designed to compensate for the tendency of the MRK equation of state to overestimate volumes at high pressures and accommodate the volume behaviour of coexisting gas and liquid phases along the saturation curve.
 
