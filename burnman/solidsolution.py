@@ -310,8 +310,10 @@ class SolidSolution(Mineral):
         Aliased with self.G
         """
         G_list = np.fromiter( (e[0].G for e in self.endmembers), dtype=np.float, count=self.n_endmembers)
-        return reuss_average_function( self.molar_fractions, G_list) 
-
+        G = 0.
+        if min(G_list) > 1.e-10:
+            G = reuss_average_function( self.molar_fractions, G_list) 
+        return G
     
     @material_property
     def p_wave_velocity(self):
