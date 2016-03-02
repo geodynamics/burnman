@@ -56,7 +56,9 @@ if __name__ == "__main__":
     or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
        (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
-        (your choice in geotherm will not matter in this case))"""
+        (your choice in geotherm will not matter in this case)
+    or 'vinet' (vinet equation of state, if you choose to ignore temperature
+        (your choice in geotherm will not matter in this case)))"""
     method = 'slb3'
 
     #in form name_of_mineral (burnman.mineral <- creates list with parameters)

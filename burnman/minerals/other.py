@@ -95,6 +95,7 @@ class Speziale_fe_periclase_HS(Mineral):
                         'q_0': 1.2 }
         Mineral.__init__(self)
 
+
 class Speziale_fe_periclase_LS(Mineral):
     """
     Speziale et al. 2007, Mg#=83
@@ -113,6 +114,33 @@ class Speziale_fe_periclase_LS(Mineral):
         Mineral.__init__(self)
 
 
+class Liquid_Fe_Anderson(Mineral):
+    """
+    Anderson & Ahrens, 1994 JGR
+    """
+    def __init__(self):
+        self.params = {
+            'equation_of_state': 'bm4',
+            'V_0': 7.95626e-6,
+            'K_0': 109.7e9,
+            'Kprime_0': 4.66,
+            'Kprime_prime_0': -0.043e-9,
+            'molar_mass': 0.055845,
+        }
+        Mineral.__init__(self)
 
 
+class Fe_Dewaele(Mineral):
+    """
+    Dewaele et al., 2006, Physical Review Letters
+    """
+    def __init__(self):
+        self.params = {
+                'equation_of_state': 'vinet',
+                'V_0': 6.75e-6,
+                'K_0': 163.4e9,
+                'Kprime_0': 5.38,
+                'molar_mass': 0.055845,
+                'n': 1}
+        Mineral.__init__(self)
 
