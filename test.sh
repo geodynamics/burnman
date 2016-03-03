@@ -17,6 +17,8 @@ then
   PYTHON=python
 fi
 
+$PYTHON --version
+
 function testit {
 t=$1
 fulldir=$2
