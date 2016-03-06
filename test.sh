@@ -35,6 +35,7 @@ EOF
 ) >$t.tmp 2>$t.tmp.error
 ret=$?
 cat $t.tmp.error >>$t.tmp
+rm -f $t.tmp.error
 if [ "$ret" -ne 0 ]
 then
   echo "!  $t ... FAIL";
