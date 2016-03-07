@@ -160,11 +160,12 @@ class Reuss(BurnManTest):
 
     def test_present_non_rigid_phase(self):
         rock = burnman.Composite ( [mypericlase(), my_nonrigid_mineral()], [0.5,0.5] )
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             rock.set_averaging_scheme(avg.Reuss())
             rho, v_p, v_s, v_phi, K, G = \
                 rock.evaluate(['rho','v_p','v_s','v_phi','K_S','G'], [10.e9], [300.])
+            assert len(w) == 1
             self.assertFloatEqual(0.0, G[0]/1.e9)
 
 class Voigt(BurnManTest):
