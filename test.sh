@@ -43,13 +43,13 @@ then
 else
 
   sedthing="s#$fulldir#BURNMAN#g"
-  sed -i'' -e $sedthing $t.tmp #remove the absolute path from warnings
-  sed -i'' -e "s/.py:[0-9]*:/.py:/g" $t.tmp #remove line numbers
-  sed -i'' -e '/UserWarning: findfont: Could not match/d' $t.tmp #remove font warning crap
-  sed -i'' -e '/UserWarning: findfont: Font family/d' $t.tmp #remove font warning crap
-  sed -i'' -e '/tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
-  sed -i'' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
-  sed -i'' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
+  sed -i '' -e $sedthing $t.tmp #remove the absolute path from warnings
+  sed -i '' -e "s/.py:[0-9]*:/.py:/g" $t.tmp #remove line numbers
+  sed -i '' -e '/UserWarning: findfont: Could not match/d' $t.tmp #remove font warning crap
+  sed -i '' -e '/UserWarning: findfont: Font family/d' $t.tmp #remove font warning crap
+  sed -i '' -e '/tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
+  sed -i '' -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
+  sed -i '' -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
 
   (eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out >/dev/null && rm $t.tmp && echo "  $t ... ok"
   ) || {
