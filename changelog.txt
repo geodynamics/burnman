@@ -1,7 +1,23 @@
 Changelog
 ---------
 
-  - BurnMan is now Python 3 compatible.
+Release v0.9.0 (April 25, 2016)
+  - major documentation overhaul
+  - new tutorials
+  - huge performance improvements by caching property values
+  - python 3 compatibility
+  - gibbs free energy computation
+  - new SolidSolution class
+  - added ideal, symmetric, asymmetric and subregular solution model
+    formulations
+  - computation of chemical potentials
+  - updated ipython notebooks
+  - new seismic models
+  - added EoS fitting functions
+  - using jit compilation if available
+  - additional equations of state: Vinet, BM4, ...
+  - a large number of new minerals in the databases
+  - much better test coverage
 
 Release v0.7 (June 24, 2014)
   - Cleanup and rewrite of the mineral/composite feature
