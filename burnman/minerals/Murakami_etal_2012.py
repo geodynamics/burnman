@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -17,9 +18,10 @@ from ..mineral import Mineral
 
 
 class mg_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb2',
+            'equation_of_state': 'slb2',
             'V_0': 24.45e-6,  # S & L-B 2005
             'K_0': 281e9,
             'Kprime_0': 4.1,
@@ -30,14 +32,16 @@ class mg_perovskite(Mineral):
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
             'q_0': 1.4,
-            'eta_s_0': 2.4 }
+            'eta_s_0': 2.4}
 
         Mineral.__init__(self)
 
+
 class mg_perovskite_3rdorder(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 24.45e-6,  # S & L-B 2005
             'K_0': 281e9,
             'Kprime_0': 4.1,
@@ -48,14 +52,16 @@ class mg_perovskite_3rdorder(Mineral):
             'Debye_0': 1070.,
             'grueneisen_0': 1.48,
             'q_0': 1.4,
-            'eta_s_0': 2.4 }
+            'eta_s_0': 2.4}
 
         Mineral.__init__(self)
 
+
 class fe_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb2',
+            'equation_of_state': 'slb2',
             'V_0': 24.607e-6,
             'K_0': 251.9e9,
             'Kprime_0': 4.01,
@@ -66,14 +72,16 @@ class fe_perovskite(Mineral):
             'Debye_0': 1054.,
             'grueneisen_0': 1.48,
             'q_0': 1.4,
-            'eta_s_0': 2.4 }
+            'eta_s_0': 2.4}
 
         Mineral.__init__(self)
 
+
 class mg_periclase(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb2',
+            'equation_of_state': 'slb2',
             'V_0': 11.24e-6,  # S & L-B 2005
             'K_0': 161e9,
             'Kprime_0': 3.9,
@@ -81,27 +89,33 @@ class mg_periclase(Mineral):
             'Gprime_0': 1.92,
             'molar_mass': .0403,
             'n': 2,
-            'Debye_0': 773., # S& L-B 2005
+            'Debye_0': 773.,  # S& L-B 2005
             'grueneisen_0': 1.5,
-            'q_0': 1.5, #S&L-B 2005
-            'eta_s_0': 3.0 }
+            'q_0': 1.5,  # S&L-B 2005
+            'eta_s_0': 3.0}
 
         Mineral.__init__(self)
 
+
 class fe_periclase(helpers.HelperSpinTransition):
+
     def __init__(self):
-        helpers.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        helpers.HelperSpinTransition.__init__(
+            self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
 
 class fe_periclase_3rd(helpers.HelperSpinTransition):
+
     def __init__(self):
-        helpers.HelperSpinTransition.__init__(self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
+        helpers.HelperSpinTransition.__init__(
+            self, 63.0e9, fe_periclase_LS(), fe_periclase_HS())
 
 
 class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb2',
+            'equation_of_state': 'slb2',
             'V_0': 11.412e-6,
             'K_0': 159.1e9,
             'Kprime_0': 4.11,
@@ -112,14 +126,16 @@ class fe_periclase_HS(Mineral):  # From Murakami's emails, see Cayman for detail
             'Debye_0': 706.,
             'grueneisen_0': 1.45,
             'q_0': 1.5,
-            'eta_s_0': 2.54 }
+            'eta_s_0': 2.54}
 
         Mineral.__init__(self)
 
+
 class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for details, represents Mg# = .79
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb2',
+            'equation_of_state': 'slb2',
             'V_0': 11.171e-6,
             'K_0': 170.0e9,
             'Kprime_0': 4.00,
@@ -134,10 +150,12 @@ class fe_periclase_LS(Mineral):  # From Murakami's emails, see Cayman for detail
 
         Mineral.__init__(self)
 
+
 class fe_periclase_HS_3rd(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 11.412e-6,
             'K_0': 159.1e9,
             'Kprime_0': 4.11,
@@ -148,14 +166,16 @@ class fe_periclase_HS_3rd(Mineral):
             'Debye_0': 706.,
             'grueneisen_0': 1.45,
             'q_0': 1.5,
-            'eta_s_0': 2.54 }
+            'eta_s_0': 2.54}
 
         Mineral.__init__(self)
 
+
 class fe_periclase_LS_3rd(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 11.171e-6,
             'K_0': 170.0e9,
             'Kprime_0': 4.0,

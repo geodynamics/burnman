@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 from __future__ import absolute_import
 import numpy as np
@@ -8,6 +9,7 @@ import scipy.integrate as integrate
 from . import geotherm
 from . import seismic
 from . import averaging_schemes
+
 
 def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averaging_schemes.VoigtReussHill()):
     """
@@ -43,12 +45,13 @@ def velocities_from_rock(rock, pressures, temperatures, averaging_scheme=averagi
     """
     old_averaging_scheme = rock.averaging_scheme
     rock.set_averaging_scheme(averaging_scheme)
-    rho, vp, vs, vphi, K, G = rock.evaluate( ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
+    rho, vp, vs, vphi, K, G = rock.evaluate(
+        ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
     rock.set_averaging_scheme(old_averaging_scheme)
     return rho, vp, vs, vphi, K, G
 
 
-def compare_l2(depth,calc, obs):
+def compare_l2(depth, calc, obs):
     """
     PUT IN TOOLS
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
@@ -66,11 +69,12 @@ def compare_l2(depth,calc, obs):
     :returns: array of L2 norms of length N
     :rtype: array of floats
     """
-    err=[]
+    err = []
     for l in range(len(calc)):
-        err.append(l2(depth,calc[l],obs[l]))
+        err.append(l2(depth, calc[l], obs[l]))
 
     return err
+
 
 def compare_chifactor(calc, obs):
     """
@@ -86,13 +90,14 @@ def compare_chifactor(calc, obs):
     :returns: error array of length N
     :rtype: array of floats
     """
-    err=[]
+    err = []
     for l in range(len(calc)):
-        err.append(chi_factor(calc[l],obs[l]))
+        err.append(chi_factor(calc[l], obs[l]))
 
     return err
 
-def l2(x,funca,funcb):
+
+def l2(x, funca, funcb):
     """
     PUT IN TOOLS
     Computes the L2 norm for one profile(assumed to be linear between points).
@@ -107,12 +112,12 @@ def l2(x,funca,funcb):
     :returns: L2 norm
     :rtype: array of floats
     """
-    diff=np.array(funca-funcb)
-    diff=diff*diff
-    return integrate.trapz(diff,x)
+    diff = np.array(funca - funcb)
+    diff = diff * diff
+    return integrate.trapz(diff, x)
 
 
-def nrmse(x,funca,funcb):
+def nrmse(x, funca, funcb):
     """
     PUT IN TOOLS
     Normalized root mean square error for one profile
@@ -127,13 +132,14 @@ def nrmse(x,funca,funcb):
     :rtype: array of floats
 
     """
-    diff=np.array(funca-funcb)
-    diff=diff*diff
-    rmse=np.sqrt(np.sum(diff)/x)
-    nrmse=rmse/(np.max(funca)-np.min(funca))
+    diff = np.array(funca - funcb)
+    diff = diff * diff
+    rmse = np.sqrt(np.sum(diff) / x)
+    nrmse = rmse / (np.max(funca) - np.min(funca))
     return nrmse
 
-def chi_factor(calc,obs):
+
+def chi_factor(calc, obs):
     """
     PUT IN TOOLS
     :math:`\\chi` factor for one profile assuming 1% uncertainty on the reference model (obs)
@@ -147,10 +153,10 @@ def chi_factor(calc,obs):
 
     """
 
-    err=np.empty_like(calc)
+    err = np.empty_like(calc)
     for i in range(len(calc)):
-        err[i]=pow((calc[i]-obs[i])/(0.01*np.mean(obs)),2.)
+        err[i] = pow((calc[i] - obs[i]) / (0.01 * np.mean(obs)), 2.)
 
-    err_tot=np.sum(err)/len(err)
+    err_tot = np.sum(err) / len(err)
 
     return err_tot

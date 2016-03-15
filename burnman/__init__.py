@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -7,13 +8,13 @@ BurnMan
 =======
 
 BurnMan is an open source mineral physics toolbox written in Python which
-determines the velocities of seismic waves in mineral assemblages at 
-high pressure and temperature. It was designed to calculate seismic 
-velocities in the lower mantle, but is equally suited to any part 
-of the solid Earth (or indeed any of the terrestrial planets). 
-BurnMan calculates the isotropic thermoelastic moduli by solving the 
-equations-of-state for a mixture of minerals defined by the user. The user 
-may select from an extensive list of minerals obtained from published 
+determines the velocities of seismic waves in mineral assemblages at
+high pressure and temperature. It was designed to calculate seismic
+velocities in the lower mantle, but is equally suited to any part
+of the solid Earth (or indeed any of the terrestrial planets).
+BurnMan calculates the isotropic thermoelastic moduli by solving the
+equations-of-state for a mixture of minerals defined by the user. The user
+may select from an extensive list of minerals obtained from published
 databases. Alternatively, they can easily define their own minerals.
 
 Features:
@@ -34,7 +35,7 @@ Please cite:
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
     Geosystems, 15(4), 1164-1179 `(link) <http://dx.doi.org/10.1002/2013GC005122>`_
-  
+
 Acknowledgement and Support:
 
   - This project was initiated at, and follow-up research support was received
@@ -85,4 +86,4 @@ from . import geotherm
 
 # miscellaneous
 from . import tools
-from .partitioning import calculate_partition_coefficient,calculate_phase_percents
+from .partitioning import calculate_partition_coefficient, calculate_phase_percents

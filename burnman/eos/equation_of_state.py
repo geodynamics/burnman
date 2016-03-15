@@ -1,9 +1,10 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
-
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 class EquationOfState(object):
+
     """
     This class defines the interface for an equation of state
     that a mineral uses to determine its properties at a
@@ -14,12 +15,12 @@ class EquationOfState(object):
 
     In general these functions are functions of pressure,
     temperature, and volume, as well as a "params" object,
-    which is a Python dictionary that stores the material 
+    which is a Python dictionary that stores the material
     parameters of the mineral, such as reference volume,
     Debye temperature, reference moduli, etc.
 
-    The functions for volume and density are just functions 
-    of temperature, pressure, and "params"; after all, it 
+    The functions for volume and density are just functions
+    of temperature, pressure, and "params"; after all, it
     does not make sense for them to be functions of volume or density.
     """
 
@@ -61,7 +62,7 @@ class EquationOfState(object):
 
     def density(self, volume, params):
         """
-        Calculate the density of the mineral :math:`[kg/m^3]`.  
+        Calculate the density of the mineral :math:`[kg/m^3]`.
         The params object must include a "molar_mass" field.
 
         Parameters
@@ -226,7 +227,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def gibbs_free_energy( self, pressure, temperature, volume, params ):
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -247,7 +248,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def helmholtz_free_energy( self, pressure, temperature, volume, params ):
+    def helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -266,14 +267,14 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def entropy( self, pressure, temperature, volume, params):
+    def entropy(self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
 
         raise NotImplementedError("")
 
-    def enthalpy( self, pressure, temperature, volume, params ):
+    def enthalpy(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -291,7 +292,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def internal_energy( self, pressure, temperature, volume, params ):
+    def internal_energy(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -314,12 +315,12 @@ class EquationOfState(object):
 
     def validate_parameters(self, params):
         """
-        The params object is just a dictionary associating mineral physics parameters 
+        The params object is just a dictionary associating mineral physics parameters
         for the equation of state.  Different equation of states can have different parameters,
-        and the parameters may have ranges of validity.  The intent of this function is 
-        twofold. First, it can check for the existence of the parameters that the 
+        and the parameters may have ranges of validity.  The intent of this function is
+        twofold. First, it can check for the existence of the parameters that the
         equation of state needs, and second, it can check whether the parameters have reasonable
-        values.  Unreasonable values will frequently be due to unit issues (e.g., supplying 
+        values.  Unreasonable values will frequently be due to unit issues (e.g., supplying
         bulk moduli in GPa instead of Pa). In the base class this function does nothing,
         and an equation of state is not required to implement it.  This function will
         not return anything, though it may raise warnings or errors.

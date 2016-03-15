@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 import unittest
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+import os
+import sys
+sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
@@ -9,9 +10,10 @@ from util import BurnManTest
 
 
 class min1 (burnman.Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 11.24e-6,
             'K_0': 161.0e9,
             'Kprime_0': 3.8,
@@ -22,11 +24,12 @@ class min1 (burnman.Mineral):
             'Debye_0': 773.,
             'grueneisen_0': 1.5,
             'q_0': 1.5,
-            'eta_s_0': 2.8 }
+            'eta_s_0': 2.8}
         burnman.Mineral.__init__(self)
 
 
 class min2 (min1):
+
     def __init__(self):
         min1.__init__(self)
         self.params['V_0'] = 10e-6
@@ -57,8 +60,8 @@ class test_model(BurnManTest):
 
     def test_model1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.K()/1e11, [2.80999688])
-        self.assertArraysAlmostEqual(m.G()/1e11, [1.67031704])
+        self.assertArraysAlmostEqual(m.K() / 1e11, [2.80999688])
+        self.assertArraysAlmostEqual(m.G() / 1e11, [1.67031704])
 
     def test_vs1(self):
         m = self.model1()
@@ -81,9 +84,12 @@ class test_model(BurnManTest):
         # reproduce by hand:
         min = m.rock
         min.set_state(m.p[0], m.T[0])
-        self.assertArraysAlmostEqual(m.thermal_expansivity(), [min.thermal_expansivity])
-        self.assertArraysAlmostEqual(m.heat_capacity_v(), [min.heat_capacity_v])
-        self.assertArraysAlmostEqual(m.heat_capacity_p(), [min.heat_capacity_p])
+        self.assertArraysAlmostEqual(
+            m.thermal_expansivity(), [min.thermal_expansivity])
+        self.assertArraysAlmostEqual(
+            m.heat_capacity_v(), [min.heat_capacity_v])
+        self.assertArraysAlmostEqual(
+            m.heat_capacity_p(), [min.heat_capacity_p])
 
     def test_heat2(self):
         m1 = self.model1()
@@ -100,7 +106,8 @@ class test_model(BurnManTest):
 
         self.assertArraysAlmostEqual(m1.thermal_expansivity(), [2.40018801e-5])
         self.assertArraysAlmostEqual(m2.thermal_expansivity(), [2.74743810e-5])
-        self.assertArraysAlmostEqual(m12.thermal_expansivity(), [2.67155212e-5])
+        self.assertArraysAlmostEqual(
+            m12.thermal_expansivity(), [2.67155212e-5])
 
     def test_density(self):
         m1 = self.model1()
@@ -110,12 +117,6 @@ class test_model(BurnManTest):
         self.assertArraysAlmostEqual(m1.density(), [4130.09535243])
         self.assertArraysAlmostEqual(m2.density(), [4619.86433138])
         self.assertArraysAlmostEqual(m12.density(), [4512.8331140])
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
