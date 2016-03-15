@@ -8,6 +8,11 @@ Many minerals can exist over a range of compositions. The compositional domains 
     \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
 
 
+Implemented models
+^^^^^^^^^^^^^^^^^^
+
+Ideal solid solutions
+"""""""""""""""""""""
 A solid solution is not simply a mechanical mixture of its constituent endmembers. Most fundamentally, the mixing of different elements on sites results in an excess configurational entropy
 
 .. math::	
@@ -16,12 +21,26 @@ A solid solution is not simply a mechanical mixture of its constituent endmember
 
 where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
 
-Many solid solutions exhibit further deviations from ideality, which arise as a result of interactions between ions with different physical and chemical characteristics. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
+Symmetric solid solutions
+"""""""""""""""""""""""""
+Many minerals exhibit deviations from ideal solutions. These deviations arise as a result of interactions between ions with different physical and chemical characteristics. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
 
 .. math::
-    \alpha^T p (\phi^T W \phi)
+    \mathcal{G}_{\textrm{excess}} = p^T W p
 
-where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers, :math:`\alpha` is a vector of "van  Laar parameters" governing asymmetry in the excess properties, and 
+where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers and :math:`W` is a strictly upper-triangular matrix of interaction terms between endmembers. Excesses within binary systems (:math:`i`-:math:`j`) have a quadratic form and a maximum of :math:`W_{ij}/4` half-way between the two endmembers.
+
+
+Asymmetric solid solutions
+""""""""""""""""""""""""""
+
+Some solid solutions exhibit asymmetric excess terms. These can be accounted for with an asymmetric solid solution :cite:`DPWH2007`
+
+.. math::
+    \mathcal{G}_{\textrm{excess}} = \alpha^T p (\phi^T W \phi)
+
+:math:`\alpha` is a vector of "van  Laar parameters" governing asymmetry in the excess properties. 
+
 
 .. math::
     \phi_i &= \frac{\alpha_i p_i}{\sum_{k=1}^{n} \alpha_k p_k}, \\
@@ -29,10 +48,22 @@ where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembe
 
 The :math:`w_{ij}` terms are a set of interaction terms between endmembers :math:`i` and :math:`j`. If all the :math:`\alpha` terms are equal to unity, a non-zero :math:`w` yields an excess with a quadratic form and a maximum of :math:`w/4` half-way between the two endmembers. 
 
+
+Subregular solid solutions
+""""""""""""""""""""""""""
+An alternative way to create asymmetric solution models is to expand each binary term as a cubic expression :cite:`HW1989`. In this case,
+
+.. math::
+    \mathcal{G}_{\textrm{excess}} = \sum_i p_i p_j^2 W_{ij} + p_j p_i^2 W_{ji}
+
+Note the similarity with the symmetric solution model, the primary difference being that there are not two interaction terms for each binary.
+
+Thermodynamic and thermoelastic properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 From the preceeding equations, we can define the thermodynamic potentials of solid solutions:
  
 .. math::	
-    \mathcal{H}_{\textrm{SS}} &= \sum_in_i\mathcal{H}_i + \mathcal{H}_{\textrm{excess}} + PV_{\textrm{excess}}\\
+    \mathcal{H}_{\textrm{SS}} &= \sum_in_i\mathcal{E}_i + \mathcal{E}_{\textrm{excess}} + PV_{\textrm{excess}}\\
     \mathcal{S}_{\textrm{SS}} &= \sum_in_i\mathcal{S}_i + \mathcal{S}_{\textrm{conf}} + \mathcal{S}_{\textrm{excess}} \\
     \mathcal{G}_{\textrm{SS}} &= \mathcal{H}_{\textrm{SS}} - T\mathcal{S}_{\textrm{SS}}\\
     V_{\textrm{SS}} &= \sum_in_iV_i + V_{\textrm{excess}} 

@@ -4,41 +4,45 @@ Overview
 Overall Structure
 -----------------
 
-.. image:: figures/structure.png
+BurnMan is designed to be a general mineral physics and seismological toolkit
+which can enable a user to calculate (or fit) the physical and chemical properties
+of endmember minerals, fluids/melts, solid solutions, and composite assemblages.
+Such properties include:
 
-The goal of BurnMan is to calculate seismic velocity profiles for a given
-mineral composition, geotherm, EoS, and averaging scheme.  These calculated
-seismic velocity profiles can then be compared (either graphically or
-quantitatively) to profiles computed for other compositions or constrained by
-seismology.  It is written in the Python language and is run from the command
+* the thermodynamic free energies, allowing phase equilibrium calculations,
+  endmember activities, chemical potentials and oxygen (and other) fugacities.
+* entropy, enabling the user to calculate isentropes for a given assemblage.
+* volume, to allow the user to create density profiles.
+* seismic velocities, including Voigt-Reuss-Hill and Hashin-Strikman bounds
+  and averages.
+
+Data and functions are provided to allow the user to compare calculated
+isentropes and seismic velocity profiles  to profiles computed for other
+compositions or constrained by seismology.
+
+BurnMan is written in the Python language and is run from the command
 line.  This allows the library to be incorporated into other projects.
 BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_ and `NumPy <http://www.numpy.org/>`_, which are widely used Python
 libraries for scientific computation.  `Matplotlib <http://matplotlib.org/>`_ is used to display results
 and produce publication quality figures.  The computations are consistently
-done in SI units, although for this paper we convert units for plotting
-purposes.  A large collection of annotated examples on the usage of BurnMan
-are provided.  Scripts to reproduce the figures in this paper are included in
-the toolbox.  We are happy to accept contributions in form of corrections,
-examples, or new features.
+formulated in terms of SI units.
 
-The figure above shows each of the various steps in BurnMan and the input
-required at each step.  The user sets the composition and temperature and
-pressure profiles.  At later steps, the user can pick from several existing
-methodologies or supply an alternative implementation.  This makes BurnMan
-very extensible and allows for many combinations and configurations with which
-to run calculations.  Eventually, one can choose or provide a seismic model
-for comparison.
+The toolkit includes:
+ 
+* the full codebase, including many equations of state and solution models
+* popular datasets already coded into burnman-usable format
+* a tutorial on the basic use of BurnMan
+* a large collection of annotated examples
+* an extensive suite of unit tests to ensure code functions as intended
+* a series of benchmarks comparing BurnMan output with published data
+* a directory containing user-contributed code from published papers
+ 
+This software has been designed to allow the end-user a great deal of freedom
+to do whatever calculations they may wish. We have endeavoured to provide
+examples and benchmarks which cover the most popular uses of the software,
+some of which are included in the figure below. This list is certainly not
+exhaustive, and we will definitely have missed interesting
+applications. As a result we will be very happy to accept contributions in
+form of corrections, examples, or new features.
 
-This flow setup can be used to evaluate the isotropic seismic velocities in a
-geodynamic model or as the forward problem when inverting seismic profiles or
-seismic velocity variations for mineralogical compositions and temperature.
-The modular components of BurnMan can also be used separately or combined in
-different ways than shown in the figure above. For example, one can input
-experimental results at certain pressures and temperatures and fit reference
-elastic moduli for a specific EoS.  Additionally, one can implement their own
-alternatives for each of the existing modules.  BurnMan has the potential to
-expand to other planetary applications.  While all the features are modular,
-everything is available in a single library.
-
-
-
+ .. image:: figures/structure.png
