@@ -18,13 +18,13 @@ Tutorial
 ========
 
 The tutorial for BurnMan currently consists of three separate units:
-  - :mod:`step 1 <tutorial.step_1>`,
-  - :mod:`step 2 <tutorial.step_2>`, and
-  - :mod:`step 3 <tutorial.step_3>`.
+  - :mod:`step 1 <contrib.tutorial.step_1>`,
+  - :mod:`step 2 <contrib.tutorial.step_2>`, and
+  - :mod:`step 3 <contrib.tutorial.step_3>`.
 
 .. _ref-example-tut1:
 
-.. automodule:: tutorial.step_1
+.. automodule:: contrib.tutorial.step_1
 
 When run (without putting in a more realistic composition), the program produces the following image:
 
@@ -34,7 +34,7 @@ Your goal in this tutorial is to improve this awful fit...
 
 
 
-.. automodule:: tutorial.step_2
+.. automodule:: contrib.tutorial.step_2
 
 Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
@@ -42,7 +42,7 @@ Whithout changing any input, the program should produce the following image show
 
 
 
-.. automodule:: tutorial.step_3
+.. automodule:: contrib.tutorial.step_3
 
 After changing the standard deviations for :math:`K_{0}^{'}` and :math:`G_{0}^{'}` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
@@ -163,30 +163,29 @@ Reproducing Cottaar, Heister, Rose and Unterborn (2014)
 In this section we include the scripts that were used for all computations and
 figures in the 2014 BurnMan paper: Cottaar, Heister, Rose & Unterborn (2014) :cite:`Cottaar2014`
 
-.. automodule:: misc.paper_averaging
+.. automodule:: contrib.CHRU2014.paper_averaging
 
-.. automodule:: misc.paper_benchmark
+.. automodule:: contrib.CHRU2014.paper_benchmark
    :exclude-members: check_slb_fig7_txt
 
-.. automodule:: misc.paper_fit_data
+.. automodule:: contrib.CHRU2014.paper_fit_data
 
-.. automodule:: misc.paper_incorrect_averaging
+.. automodule:: contrib.CHRU2014.paper_incorrect_averaging
    :exclude-members: ferropericlase,perovskite
 
-.. automodule:: misc.paper_opt_pv
+.. automodule:: contrib.CHRU2014.paper_opt_pv
    :exclude-members: calc_shear_velocities,error
 
-.. automodule:: misc.paper_onefit
+.. automodule:: contrib.CHRU2014.paper_onefit
    :exclude-members: array_to_rock, make_rock, output_rock, realization_to_array
 
-.. automodule:: misc.paper_uncertain
+.. automodule:: contrib.CHRU2014.paper_uncertain
    :exclude-members: my_perovskite
 
 
 Misc or work in progress
 ========================
 
-.. automodule:: examples.example_inv_murakami
 .. broken: .. automodule:: example_optimize_slb2011
 .. automodule:: examples.example_compare_enstpyro     
 .. automodule:: examples.example_partition_coef
