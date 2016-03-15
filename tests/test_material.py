@@ -1,17 +1,21 @@
 from __future__ import absolute_import
 import unittest
 import inspect
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+import os
+import sys
+sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
 from burnman import minerals
 from util import BurnManTest
 
+
 class test_material_name(BurnManTest):
+
     """ test Material.name and that we can edit and override it in Mineral"""
 
     class min_no_name(burnman.Mineral):
+
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """
@@ -35,6 +39,7 @@ class test_material_name(BurnManTest):
             burnman.Mineral.__init__(self)
 
     class min_with_name(burnman.Mineral):
+
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """
@@ -59,6 +64,7 @@ class test_material_name(BurnManTest):
             burnman.Mineral.__init__(self)
 
     class min_with_name_manually(burnman.Mineral):
+
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """

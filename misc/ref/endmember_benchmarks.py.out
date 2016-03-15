@@ -38,4 +38,4 @@ Stishovite : -447890.420705 128.152802525 1.3542969771e-05 76.0954341665 1.98033
 Maximum percentage error in SLB database with configurational entropy and landau transition:
 alpha : 0.0370546509182 % at 20.0 GPa and 1673.15 K for Stishovite
 
-<stdin>:57: UserWarning: Warning, you are changing the method to MT even though the material is designed to be used with the method HP_TMT.  This does not overwrite any mineral attributes
+UserWarning: Warning, you are changing the method to MT even though the material is designed to be used with the method HP_TMT.  This does not overwrite any mineral attributes

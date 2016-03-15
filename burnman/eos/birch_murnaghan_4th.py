@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 import scipy.optimize as opt
 from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
+
 
 def bulk_modulus_fourth(volume, params):
     """
@@ -16,25 +18,30 @@ def bulk_modulus_fourth(volume, params):
     modulus.  Pressure must be in :math:`[Pa]`.
     """
 
-    x = params['V_0']/volume
-    f = 0.5*(pow(x, 2./3.) - 1.0)
+    x = params['V_0'] / volume
+    f = 0.5 * (pow(x, 2. / 3.) - 1.0)
 
-    Xi = (3./4.)*(4.-params['Kprime_0'])
-    Zeta = (3./8.)*((params['K_0']*params['Kprime_prime_0'])+params['Kprime_0']*(params['Kprime_0']-7.)+143./9.)
+    Xi = (3. / 4.) * (4. - params['Kprime_0'])
+    Zeta = (3. / 8.) * ((params['K_0'] * params['Kprime_prime_0']) + params[
+        'Kprime_0'] * (params['Kprime_0'] - 7.) + 143. / 9.)
 
-    K = (5.*f*pow((1.+2.*f),5./2.)*params['K_0']*(1.-(2.*Xi*f)+(4.*Zeta*pow(f,2.)))) + \
-        (pow(1.+(2.*f),7./2.)*params['K_0']*(1.-(4.*Xi*f)+(12.*Zeta*pow(f,2.))))
-
+    K = (5. * f * pow((1. + 2. * f), 5. / 2.) * params['K_0'] * (1. - (2. * Xi * f) + (4. * Zeta * pow(f, 2.)))) + \
+        (pow(1. + (2. * f), 7. / 2.) * params['K_0'] * (
+            1. - (4. * Xi * f) + (12. * Zeta * pow(f, 2.))))
 
     return K
 
-def volume_fourth_order(pressure,params):
-    func = lambda x: birch_murnaghan_fourth(params['V_0']/x, params) - pressure
+
+def volume_fourth_order(pressure, params):
+    func = lambda x: birch_murnaghan_fourth(
+        params['V_0'] / x, params) - pressure
     try:
-        sol = bracket(func, params['V_0'], 1.e-2*params['V_0'])
+        sol = bracket(func, params['V_0'], 1.e-2 * params['V_0'])
     except:
-        raise ValueError('Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        raise ValueError(
+            'Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
     return opt.brentq(func, sol[0], sol[1])
+
 
 def birch_murnaghan_fourth(x, params):
     """
@@ -43,65 +50,68 @@ def birch_murnaghan_fourth(x, params):
     modulus (params['K_0'])
     """
 
-    f = 0.5*(pow(x, 2./3.) - 1.0)
-    Xi = (3./4.)*(4.-params['Kprime_0'])
-    Zeta = (3./8.)*((params['K_0']*params['Kprime_prime_0'])+params['Kprime_0']*(params['Kprime_0']-7.)+143./9.)
+    f = 0.5 * (pow(x, 2. / 3.) - 1.0)
+    Xi = (3. / 4.) * (4. - params['Kprime_0'])
+    Zeta = (3. / 8.) * ((params['K_0'] * params['Kprime_prime_0']) + params[
+        'Kprime_0'] * (params['Kprime_0'] - 7.) + 143. / 9.)
 
-    return 3.*f*pow(1.+2.*f,5./2.)*params['K_0']*(1.-(2.*Xi*f)+(4.*Zeta*pow(f,2.)))
+    return 3. * f * pow(1. + 2. * f, 5. / 2.) * params['K_0'] * (1. - (2. * Xi * f) + (4. * Zeta * pow(f, 2.)))
 
 
 class BM4(eos.EquationOfState):
+
     """
     Base class for the isothermal Birch Murnaghan equation of state.  This is fourth order in strain, and
     has no temperature dependence.
     """
-    def volume(self,pressure, temperature, params):
+
+    def volume(self, pressure, temperature, params):
         """
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
-        return volume_fourth_order(pressure,params)
-
+        return volume_fourth_order(pressure, params)
 
     def pressure(self, temperature, volume, params):
-        return birch_murnaghan_fourth(volume/params['V_0'], params)
+        return birch_murnaghan_fourth(volume / params['V_0'], params)
 
-
-    def isothermal_bulk_modulus(self,pressure,temperature, volume, params):
+    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        return bulk_modulus_fourth(volume,params)
-    def adiabatic_bulk_modulus(self,pressure, temperature, volume, params):
+        return bulk_modulus_fourth(volume, params)
+
+    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
         """
-        return bulk_modulus_fourth(volume,params)
+        return bulk_modulus_fourth(volume, params)
 
-    def shear_modulus(self,pressure, temperature, volume, params):
+    def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
         """
         return 0.
-    def heat_capacity_v(self,pressure, temperature, volume, params):
+
+    def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
-    def heat_capacity_p(self,pressure, temperature, volume, params):
+    def heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
-    def thermal_expansivity(self,pressure, temperature, volume, params):
+    def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
         """
         return 0.
 
-    def grueneisen_parameter(self,pressure,temperature,volume,params):
+    def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
         """
@@ -131,12 +141,12 @@ class BM4(eos.EquationOfState):
 
         # Finally, check that the values are reasonable.
         if params['P_0'] < 0.:
-            warnings.warn( 'Unusual value for P_0', stacklevel=2 )
+            warnings.warn('Unusual value for P_0', stacklevel=2)
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-3:
-            warnings.warn( 'Unusual value for V_0', stacklevel=2 )
+            warnings.warn('Unusual value for V_0', stacklevel=2)
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
-            warnings.warn( 'Unusual value for K_0' , stacklevel=2)
+            warnings.warn('Unusual value for K_0', stacklevel=2)
         if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
-            warnings.warn( 'Unusual value for Kprime_0', stacklevel=2 )
+            warnings.warn('Unusual value for Kprime_0', stacklevel=2)
         if params['Kprime_prime_0'] > 0. or params['Kprime_prime_0'] < -10.:
-            warnings.warn( 'Unusual value for Kprime_prime_0', stacklevel=2 )
+            warnings.warn('Unusual value for Kprime_prime_0', stacklevel=2)

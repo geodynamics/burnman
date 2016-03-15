@@ -8,5 +8,5 @@ Optimization terminated successfully.
          Iterations: 117
          Function evaluations: 257
 3rd order fit: G =  168.927042088 GPa	G' =  1.66680648163
-<stdin>:90: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
-<stdin>:99: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes
+UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
+UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes

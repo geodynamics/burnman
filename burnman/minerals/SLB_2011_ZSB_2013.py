@@ -1,5 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 
 """
@@ -16,6 +17,7 @@ from ..mineral import Mineral
 
 
 class stishovite (Mineral):
+
     def __init__(self):
         self.params = {
             'equation_of_state': 'slb3',
@@ -32,22 +34,24 @@ class stishovite (Mineral):
             'eta_s_0': 4.6}
 
         self.uncertainties = {
-             'err_K_0':8.e9,
-             'err_Kprime_0':0.1,
-             'err_G_0':12.e9,
-             'err_Gprime_0':0.1,
-             'err_Debye_0' : 13.,
-             'err_grueneisen_0': .17,
-             'err_q_0': 2.2,
-             'err_eta_s_0' : 1.0
-            }
+            'err_K_0': 8.e9,
+            'err_Kprime_0': 0.1,
+            'err_G_0': 12.e9,
+            'err_Gprime_0': 0.1,
+            'err_Debye_0': 13.,
+            'err_grueneisen_0': .17,
+            'err_q_0': 2.2,
+            'err_eta_s_0': 1.0
+        }
 
         Mineral.__init__(self)
 
+
 class periclase (Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 11.24e-6,
             'K_0': 161.0e9,
             'Kprime_0': 3.8,
@@ -57,25 +61,27 @@ class periclase (Mineral):
             'n': 2,
             'Debye_0': 767.,
             'grueneisen_0': 1.36,
-            'q_0': 1.7, #1.7
-            'eta_s_0': 2.8 } # 2.8
+            'q_0': 1.7,  # 1.7
+            'eta_s_0': 2.8}  # 2.8
 
         self.uncertainties = {
-        'err_K_0': 3.e9,
-        'err_Kprime_0':.2,
-        'err_G_0':1.0e9,
-        'err_Gprime_0':.1,
-        'err_Debye_0':9.,
-        'err_grueneisen_0':.05,
-        'err_q_0':.2,
-        'err_eta_s_0':.2 }
+            'err_K_0': 3.e9,
+            'err_Kprime_0': .2,
+            'err_G_0': 1.0e9,
+            'err_Gprime_0': .1,
+            'err_Debye_0': 9.,
+            'err_grueneisen_0': .05,
+            'err_q_0': .2,
+            'err_eta_s_0': .2}
 
         Mineral.__init__(self)
 
+
 class wuestite (Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 12.26e-6,
             'K_0': 179.0e9,
             'Kprime_0': 4.9,
@@ -85,26 +91,27 @@ class wuestite (Mineral):
             'n': 2,
             'Debye_0': 454.,
             'grueneisen_0': 1.53,
-            'q_0': 1.7, #1.7
-            'eta_s_0': -0.1 } #
+            'q_0': 1.7,  # 1.7
+            'eta_s_0': -0.1}
 
         self.uncertainties = {
-            'err_K_0':1.e9,
-            'err_Kprime_0':.2,
-            'err_G_0':1.e9,
-            'err_Gprime_0':.1,
-            'err_Debye_0':21.,
-            'err_grueneisen_0':.13,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'err_K_0': 1.e9,
+            'err_Kprime_0': .2,
+            'err_G_0': 1.e9,
+            'err_Gprime_0': .1,
+            'err_Debye_0': 21.,
+            'err_grueneisen_0': .13,
+            'err_q_0': 1.0,
+            'err_eta_s_0': 1.0}
 
         Mineral.__init__(self)
 
 
 class mg_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 24.45e-6,
             'K_0': 250.5e9,
             'Kprime_0': 4.01,
@@ -115,24 +122,26 @@ class mg_perovskite(Mineral):
             'Debye_0': 905.9,
             'grueneisen_0': 1.44,
             'q_0': 1.09,
-            'eta_s_0': 2.13 } #2.6
+            'eta_s_0': 2.13}  # 2.6
 
         self.uncertainties = {
             'err_K_0': 3.e9,
             'err_Kprime_0': 0.1,
             'err_G_0': 2.e9,
-            'err_Gprime_0' : 0.0,
+            'err_Gprime_0': 0.0,
             'err_Debye_0': 5.,
-            'err_grueneisen_0':.05,
+            'err_grueneisen_0': .05,
             'err_q_0': .3,
-            'err_eta_s_0':.3}
+            'err_eta_s_0': .3}
 
         Mineral.__init__(self)
 
+
 class fe_perovskite(Mineral):
+
     def __init__(self):
         self.params = {
-            'equation_of_state':'slb3',
+            'equation_of_state': 'slb3',
             'V_0': 25.49e-6,
             'K_0': 272.0e9,
             'Kprime_0': 4.1,
@@ -143,17 +152,17 @@ class fe_perovskite(Mineral):
             'Debye_0': 871.,
             'grueneisen_0': 1.57,
             'q_0': 1.1,
-            'eta_s_0': 2.3 } #2.3
+            'eta_s_0': 2.3}  # 2.3
 
         self.uncertainties = {
-            'err_K_0':40e9,
-            'err_Kprime_0':1.,
-            'err_G_0':40e9,
-            'err_Gprime_0':0.0,
-            'err_Debye_0':26.,
-            'err_grueneisen_0':.3,
-            'err_q_0':1.0,
-            'err_eta_s_0':1.0}
+            'err_K_0': 40e9,
+            'err_Kprime_0': 1.,
+            'err_G_0': 40e9,
+            'err_Gprime_0': 0.0,
+            'err_Debye_0': 26.,
+            'err_grueneisen_0': .3,
+            'err_q_0': 1.0,
+            'err_eta_s_0': 1.0}
 
         Mineral.__init__(self)
 
