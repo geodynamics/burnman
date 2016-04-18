@@ -165,7 +165,7 @@ for idx, m in enumerate(ds):
             if landau_params.has_key(m[0].lower()):
                 print '[\'landau\', {\'Tc_0\':', landau_params[m[0].lower()][0], ', \'S_D\':', landau_params[m[0].lower()][2], ', \'V_D\':', landau_params[m[0].lower()][1], '}]',
             if configurational_entropies[m[0].lower()] != 'None':
-                print '[\'linear\', {\'G_0\':', 0., ', \'delta_S\':', configurational_entropies[m[0].lower()], ', \'delta_V\':', 0., '}]',
+                print '[\'linear\', {\'delta_E\':', 0., ', \'delta_S\':', configurational_entropies[m[0].lower()], ', \'delta_V\':', 0., '}]',
             print ']'
             print ''
         print '        self.uncertainties = {'

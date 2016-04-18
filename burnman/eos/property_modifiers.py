@@ -153,7 +153,7 @@ def _linear_excesses(pressure, temperature, params):
     (especially in solid solution calculations)
     """
 
-    G = params['G_0'] \
+    G = params['delta_E'] \
         - (temperature) * params['delta_S'] \
         + (pressure) * params['delta_V']
     dGdT = -params['delta_S']
