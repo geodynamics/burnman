@@ -32,7 +32,7 @@ from burnman.minerals import HP_2011_ds62, SLB_2011
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
-from burnman.equilibriumassemblage import gibbs_minimizer
+from burnman.equilibriumassemblage import gibbs_minimizer, gibbs_bulk_minimizer
 
 
 # Solve 1: Here's the classic aluminosilicate phase diagram
@@ -94,17 +94,15 @@ ol = SLB_2011.mg_fe_olivine()
 wad = SLB_2011.mg_fe_wadsleyite()
 rw = SLB_2011.mg_fe_ringwoodite()
 
-def delta_invariant_temperature(arg, T):
-    x_ol = arg[0]
-    assemblage = burnman.Composite([ol, wad, rw])
-    composition = { 'Mg': 2.*(1. - x_ol), 'Fe': 2.*x_ol, 'O': 4., 'Si': 1.}
-    constraints= [['X', [0., 0., 1., 0., 0., 0.], [1., 0., 1., 0., 1., 0.], 0.],
-                  ['X', [0., 0., 0., 0., 1., 0.], [1., 0., 1., 0., 1., 0.], 0.]]
-    inv = gibbs_minimizer(composition, assemblage, constraints)
-    return inv[1] - T
 
 T = 1400.
-opt.fsolve(delta_invariant_temperature, [0.25], T)
+composition1 = { 'Mg': 2., 'Si': 1., 'O': 4.}
+composition2 = { 'Fe': 2., 'Si': 1., 'O': 4.}
+assemblage = burnman.Composite([ol, wad, rw])
+constraints = [['T', T],
+               ['X', [0., 0., 1., 0., 0., 0.], [1., 0., 1., 0., 1., 0.], 0.],
+               ['X', [0., 0., 0., 0., 1., 0.], [1., 0., 1., 0., 1., 0.], 0.]]
+gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
 
 P_inv = ol.pressure
 x_ol_inv = ol.molar_fractions[1]
