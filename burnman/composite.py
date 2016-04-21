@@ -175,6 +175,21 @@ class Composite(Material):
         """
         return "'" + self.__class__.__name__ + "'"
 
+      
+    @material_property
+    def formula(self):
+        """
+        Returns a dictionary containing the bulk composition
+        """
+        f = {}
+        for (phase, fraction) in zip(*self.unroll()):
+            for key, value in phase.formula.items():
+                if key in f:
+                    f[key] += value*fraction
+                else:
+                    f[key] = value*fraction
+        return f
+                         
     @material_property
     def internal_energy(self):
         """

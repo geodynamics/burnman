@@ -133,6 +133,19 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
+            
+    @material_property
+    def formula(self):
+        f = {}
+        for i in xrange(self.n_endmembers):
+            for key, value in self.endmembers[i][0].formula.items():
+                if key in f:
+                    f[key] += value*self.molar_fractions[i]
+                else:
+                    f[key] = value*self.molar_fractions[i]
+        return f
+       
+            
     @material_property
     def activities(self):
         """
