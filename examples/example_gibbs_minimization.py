@@ -49,6 +49,9 @@ sol = gibbs_minimizer(composition, assemblage, constraints)
 P_inv = sol[0]
 T_inv = sol[1]
 
+print('The aluminosilicate invariant can be found at {0:.2f} GPa and {1:.0f} K'.format(P_inv/1.e9, T_inv))
+print()
+
 # Kyanite-sillimanite appears at positive P
 lo_pressures = np.linspace(1.e5, P_inv, 21)
 hi_pressures = np.linspace(P_inv, 2.*P_inv, 21)
@@ -103,12 +106,17 @@ def delta_invariant_temperature(arg, T):
 T = 1400.
 opt.fsolve(delta_invariant_temperature, [0.25], T)
 
-p_inv = ol.pressure
+P_inv = ol.pressure
 x_ol_inv = ol.molar_fractions[1]
 x_wad_inv = wad.molar_fractions[1]
 x_rw_inv = rw.molar_fractions[1]
 
-plt.plot([x_ol_inv, x_rw_inv], [p_inv/1.e9, p_inv/1.e9])
+
+print('The pressure of the olivine polymorph invariant at {0:.0f} K is {1:.1f} GPa'.format(T, P_inv/1.e9))
+print('The molar Fe2SiO4 contents of coexisting ol, wad and rw')
+print('at this point are {0:.2f}, {1:.2f} and {2:.2f}'.format(x_ol_inv, x_wad_inv, x_rw_inv))
+
+plt.plot([x_ol_inv, x_rw_inv], [P_inv/1.e9, P_inv/1.e9])
 
 assemblages = [burnman.Composite([ol, wad]),
                burnman.Composite([ol, rw]),
