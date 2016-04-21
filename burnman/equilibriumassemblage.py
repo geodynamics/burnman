@@ -354,4 +354,50 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
         sys.exit()
 
 
+def binary_composition(x, composition1, composition2):
+    composition = {}
+    for key, value in composition1.items():
+        composition[key] = value*(1. - x)
+    for key, value in composition2.items():
+        if key in composition:
+            composition[key] += value*x
+        else:
+            composition[key] = value*x
 
+    return composition
+
+        
+def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, constraints, guesses=None):
+
+    def minimize_P(x, composition1, composition2, assemblage, constraints, fixed_P, guesses):
+        composition = binary_composition(x, composition1, composition2)
+        return fixed_P - gibbs_minimizer(composition, assemblage, constraints)[0]
+
+    
+    def minimize_T(x, composition1, composition2, assemblage, constraints, fixed_T, guesses):
+        composition = binary_composition(x, composition1, composition2)
+        return fixed_T - gibbs_minimizer(composition, assemblage, constraints)[1]
+
+
+    c = 0
+    new_constraints = []
+    for constraint in constraints:
+        if (constraint[0] == 'P' or constraint[0] == 'T') and c==0:
+            master_constraint = constraint
+            c=1
+        else:
+            new_constraints.append(constraint)
+
+    if master_constraint[0] == 'P':
+        func = minimize_P
+    else:
+        func = minimize_T
+        
+    soln = opt.fsolve(func, [guessed_bulk], args=(composition1, composition2,
+                                                  assemblage, new_constraints, master_constraint[1], guesses),
+                      full_output=True, xtol=1.e-10)
+    if soln[2]==1:
+        return soln[0]
+    else:
+        return soln[3]
+        sys.exit()
