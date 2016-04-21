@@ -4,6 +4,8 @@
 
 
 from __future__ import absolute_import
+from __future__ import print_function
+
 import numpy as np
 import scipy.linalg as linalg
 import scipy.optimize as opt
@@ -314,16 +316,12 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
     
     resid = np.dot(stoichiometric_matrix,potential_endmember_amounts) - comp_vector
-    tol = 1.e-10
-    if (any(abs(resid[i]) > tol for i in range(len(resid)))):
-        print "Oh no! Bulk composition outside the compositional range of the chosen minerals ( Maximum residual:", max(resid),  ")"
     
-    tol=1.e-3
-    if (any(abs(resid[i]) > tol for i in range(len(resid)))):
-        print "Residuals too high to recast composition. Program exiting"
-        sys.exit()
+    ctol=1.e-3 # compositional tolerance. Users should express bulk compositions to about 3 d.p. to make sure that compositions can be recast
+    if (any(abs(resid[i]) > ctol for i in range(len(resid)))):
+        raise Exception("Bulk composition is well outside the compositional range of the chosen minerals (Maximum residual: "+str(max(resid))+"). Exiting.")
     else:
-        #    print "Residuals low enough to recast composition. Doing this now..."
+        # Recast composition
         comp_vector=np.dot(stoichiometric_matrix,potential_endmember_amounts)
 
 
