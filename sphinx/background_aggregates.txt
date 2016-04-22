@@ -3,6 +3,7 @@ Calculating Multi-phase Aggregate Properties
 
 .. _ref-methods-ave:
 
+
 Averaging schemes
 ^^^^^^^^^^^^^^^^^
 
@@ -21,6 +22,12 @@ where :math:`V_i` and :math:`n_i` are the molar volume and the molar fractions o
 .. math::
     V = \sum_i n_i  V_i.
     :label: composite_volume
+
+ The total energy of the system is defined in a similar way:
+
+.. math::
+    \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i
+    :label: gibbstotal
 
 
 The density of the multiphase assemblage is then

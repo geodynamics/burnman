@@ -7,6 +7,9 @@ Many minerals can exist over a range of compositions. The compositional domains 
 .. math::
     \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
 
+We typically calculate solid solution properties by appropriate differentiation of the Gibbs Free energy, where
+.. math::
+    \mathcal{G} = DONE TO HERE
 
 Implemented models
 ^^^^^^^^^^^^^^^^^^
