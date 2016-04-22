@@ -15,7 +15,7 @@ import warnings
 
 def assemble_stoichiometric_matrix ( minerals):
     """
-    This takes a list of minerals and assembles a matrix where 
+    This function takes a list of minerals and assembles a matrix where 
     the rows are elements and the columns are species (or endmembers).
     If a solid solution is passed in, then the endmembers are extracted
     from it. 
@@ -87,11 +87,11 @@ def compute_column_and_null_spaces ( stoichiometric_matrix ):
     Given a stoichiometric matrix, compute a basis for the column and nullspaces.
     These bases corresponds to the subspaces that do and do not change the 
     bulk composition.  The vectors of the nullspace correspond to chemical
-    reactions.  This merely identifies a set of linearly independent
+    reactions, which merely identify a set of linearly independent
     reactions, without saying anything about which ones are likely to
     occur.
 
-    The calculation of the nullspace is done with SVD.
+    The calculation of the column and nullspaces is done with SVD.
     
     Parameters
     ----------
@@ -188,20 +188,20 @@ def sparsify_basis ( basis ):
     new_basis[ np.abs(new_basis) < eps ] = 0.
     return new_basis
  
-def endmember_fractions_to_cvector(fvector, endmembers_per_phase):
+def endmember_fractions_to_cvector(mvector, endmembers_per_phase):
     """
     Converts a list of molar fractions of endmembers into the
     solution variables (mineral fractions and compositions). 
     
     Parameters
     ----------
-    fvector: list
+    mvector: list
         A list corresponding to molar fractions of all the endmembers
         in each of the phases.
 
     endmembers_per_phase : list
         A list containing the number of endmembers for each phase
-        (equal to 1 for a pure phase)
+        (equal to 1 for a pure phase).
    
     Returns
     -------
@@ -214,14 +214,39 @@ def endmember_fractions_to_cvector(fvector, endmembers_per_phase):
     p=0
     composition = []
     for i, n_endmembers in enumerate(endmembers_per_phase):
-        amount_phase = np.sum(fvector[p:p+n_endmembers])
+        amount_phase = np.sum(mvector[p:p+n_endmembers])
         composition.append(amount_phase)
-        composition.extend(fvector[p+1:p+n_endmembers]/amount_phase)
+        composition.extend(mvector[p+1:p+n_endmembers]/amount_phase)
         p += n_endmembers
 
     return composition
 
 def cvector_to_mineral_mbr_fractions(cvector, endmembers_per_phase):
+    """
+    Converts a compositional list such as that computed by
+    :func:`endmember_fractions_to_cvector` into two lists, one
+    containing the amounts of the different phases
+    (endmembers or solutions) and the second containing the molar
+    fractions of the endmembers in each solid solution. If the
+    phase is an endmember, the molar fraction is equal to 1.
+
+    Parameters
+    ----------
+    cvector: list
+        A list corresponding to the amounts of each phase and
+        the molar fractions of all the endmembers (apart from the first)
+        in each of the phases.
+
+    endmembers_per_phase : list
+        A list containing the number of endmembers for each phase
+        (equal to 1 for a pure phase).
+
+    Returns
+    -------
+    composition : list of lists
+        Two lists, one containing phase amounts, and the other
+        containing molar fractions of the endmembers in each phase.
+    """
     p=0
     composition = [[], []]
     for i, n_endmembers in enumerate(endmembers_per_phase):
@@ -237,22 +262,89 @@ def cvector_to_mineral_mbr_fractions(cvector, endmembers_per_phase):
     return composition
     
 def mineral_mbr_fractions_to_endmember_fractions(cvectors):
+    """
+    Converts a list of lists containing phase amounts and
+    the molar fractions of the endmembers in each phase into
+    a numpy array of endmember fractions.
+
+    Parameters
+    ----------
+    composition : list of lists
+        Two lists, one containing phase amounts, and the other
+        containing molar fractions of the endmembers in each phase.
+
+    Returns
+    -------
+    mvector: list
+        A list corresponding to molar fractions of all the endmembers
+        in each of the phases.
+
+    """
     mvector = []
     for i, c in enumerate(cvectors[1]):
         mvector.extend([f*cvectors[0][i] for f in c])
     return np.array(mvector)
 
     
-def set_eqns(PTX, assemblage, endmembers_per_phase, guessed_composition, col, null, constraints):
+def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, null, constraints):
     """
-    Set up the equations we need to solve a general equilibrium gibbs problem
+    Set up the equations we need to solve a general equilibrium gibbs problem.
+
+    Parameters
+    ----------
+    PTX : list of floats
+        A list of pressure, temperature and compositional variables.
+        The compositional part of the list described the
+        composition of the assemblage, ordered as
+        phase fraction, followed by the molar fractions
+        of the endmembers after the first endmember, i.e.
+        [f(phase[i]), f(phase[i].mbr[1]), f(phase[i].mbr[2]), ...].
+        
+    assemblage : composite
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+        
+    endmembers_per_phase : list of floats
+        A list of length len(composite.phases) containing
+        the number of endmembers in each phase.
+        
+    initial_composition : list of floats
+        A list with the same structure as the X part of PTX,
+        describing any composition which satisfies the bulk
+        composition to be investigated. Some of the returned
+        eqns are only zero if the bulk composition of X
+        and initial composition are the same. 
+        
+    col : numpy array
+        The column space of the stoichiometric matrix.
+        
+    null : numpy array
+        The null space of the stoichiometric matrix.
+        
+    constraints : list of lists
+        Two pressure, temperature or compositional constraints
+        on the problem of interest. The pressure
+        (or temperature) constraints have the form
+        [['P'], P_value].
+        The compositional constraints have the form
+        [['X'], list l0, list l1, float f]
+        where list[i] is of len(initial_composition),
+        and the constraint is
+        dot(l0, X)/dot(l1, X) = f.
+    
+    Returns
+    -------
+    eqns: list of floats
+        A list where all the elements are zero iff the
+        variables in PTX satisfy the equilibrium relation and
+        the bulk composition constraints.
     """
     
     P = PTX[0]
     T = PTX[1]
     X = PTX[2:]
 
-    # Here are the two compositional (or P or T) constraints
+    # Here are the two P, T or compositional constraints
     eqns = []
     for constraint in constraints:
         if constraint[0] == 'P':
@@ -268,7 +360,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, guessed_composition, col, nu
     # Here we convert our guesses from a single vector
     # to a vector of phase_fractions and molar_fractions
     c = cvector_to_mineral_mbr_fractions(X, endmembers_per_phase)
-    c_guess = cvector_to_mineral_mbr_fractions(guessed_composition, endmembers_per_phase)
+    c_initial = cvector_to_mineral_mbr_fractions(initial_composition, endmembers_per_phase)
 
     assemblage.set_fractions(c[0])
     for i, composition in enumerate(c[1]):
@@ -288,12 +380,32 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, guessed_composition, col, nu
 
     # On top of this, we should make sure that the bulk composition is correct
     # (i.e., that the reaction vector is in the reaction nullspace)
-    guessed_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c_guess)
+    initial_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c_initial)
     new_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c)
-    eqns.extend(np.dot((guessed_endmember_fractions - new_endmember_fractions), col))
+    eqns.extend(np.dot((initial_endmember_fractions - new_endmember_fractions), col))
     return eqns
 
 def compositional_variables(assemblage):
+    """
+    Takes an assemblage and outputs names for the
+    compositional variables which describe the bulk composition
+    and compositions of all the phases.
+
+    Parameters
+    ----------
+    assemblage : composite
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+    
+    Returns
+    -------
+    var_names : list of strings
+        Strings are provided in the same order as the X part
+        of the PTX variable input to :func:`set_eqns`. Phase
+        amount names are given as 'x(phase.name)', while
+        the molar fractions of endmembers in each phase are
+        given as 'p(endmember.name)'
+    """
     stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
     var_names=[]
     for i, phase in enumerate(assemblage.phases):
@@ -305,6 +417,36 @@ def compositional_variables(assemblage):
 def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     """
     Sets up a gibbs minimization problem at constant composition and attempts to solve it
+
+    Parameters
+    ----------
+    composition : dictionary of floats
+        Dictionary contains the number of atoms of each element.
+        
+    assemblage : composite
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+
+    constraints : list of lists
+        Two pressure, temperature or compositional constraints
+        on the problem of interest. The pressure
+        (or temperature) constraints have the form
+        [['P'], P_value].
+        The compositional constraints have the form
+        [['X'], list l0, list l1, float f]
+        where list[i] is of len(initial_composition),
+        and the constraint is
+        dot(l0, X)/dot(l1, X) = f.
+
+    guesses : optional list of floats
+        List has the same form as PTX in :func:`set_eqns`
+        
+    Returns
+    -------
+    sol_dict : dictionary of floats
+        Dictionary contains the solution vector of the minimization.
+        Dictionary keys are 'P', 'T' and the variable names output by
+        :func:`compositional_variables`
     """
     
     # The next two lines set up a matrix of the endmember compositions
@@ -362,11 +504,32 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
             sol_dict[variable] = soln[0][2+i]
         return sol_dict
     else:
-        return soln[3]
-        sys.exit()
+        raise Exception('Solution could not be found, error: '+soln[3])
 
 
-def binary_composition(x, composition1, composition2):
+def binary_composition(composition1, composition2, x):
+    """
+    Returns the composition within a binary system that
+    is defined by a fraction of the second composition.
+    
+    Parameters
+    ----------
+    composition1 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    composition2 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    x : float
+        Composition as a fraction of composition2.
+
+    Returns
+    -------
+    composition : dictionary of floats
+        (1-x)*composition1 + x*composition2.
+    """
     composition = {}
     for key, value in composition1.items():
         composition[key] = value*(1. - x)
@@ -380,8 +543,51 @@ def binary_composition(x, composition1, composition2):
 
         
 def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, constraints, guesses=None):
+    """
+    Sets up a gibbs minimization problem with variable composition and attempts to solve it
+
+    Parameters
+    ----------
+    composition1 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    composition2 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    guessed_bulk : float
+        Guessed composition satisfying the constraints, as a
+        fraction of composition2
+        
+    assemblage : composite
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+
+    constraints : list of lists
+        Two pressure, temperature or compositional constraints
+        on the problem of interest. The pressure
+        (or temperature) constraints have the form
+        [['P'], P_value].
+        The compositional constraints have the form
+        [['X'], list l0, list l1, float f]
+        where list[i] is of len(initial_composition),
+        and the constraint is
+        dot(l0, X)/dot(l1, X) = f.
+
+    guesses : optional list of floats
+        List has the same form as PTX in :func:`set_eqns`
+        
+    Returns
+    -------
+    sol_dict : dictionary of floats
+        Dictionary contains the solution vector of the minimization.
+        Dictionary keys are 'P', 'T', 'X' and the variable names
+        output by :func:`compositional_variables`
+    """
+    
     def minimize(x, composition1, composition2, assemblage, constraints, master_constraint, guesses):
-        composition = binary_composition(x, composition1, composition2)
+        composition = binary_composition(composition1, composition2, x)
         vecsol = gibbs_minimizer(composition, assemblage, constraints)
         return master_constraint[1] - vecsol[master_constraint[0]]
 
@@ -398,14 +604,13 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
                                                       assemblage, new_constraints,
                                                       master_constraint, guesses),
                                                       full_output=True, xtol=1.e-10)
-
-    # One more run to get the full solution vector
-    composition = binary_composition(soln[0][0], composition1, composition2)
-    vecsol = gibbs_minimizer(composition, assemblage, new_constraints)
         
     if soln[2]==1:
-        vecsol['X'] = soln[0][0]
-        return vecsol
+        # One more run to get the full solution vector
+        composition = binary_composition(composition1, composition2, soln[0][0])
+        sol_dict = gibbs_minimizer(composition, assemblage, new_constraints, guesses)
+        sol_dict['X'] = soln[0][0]
+        return sol_dict
     else:
-        return soln[3]
-        sys.exit()
+        raise Exception('Solution could not be found, error: '+soln[3])
+        
