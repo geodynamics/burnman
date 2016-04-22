@@ -7,42 +7,26 @@ Calculating Multi-phase Aggregate Properties
 Averaging schemes
 ^^^^^^^^^^^^^^^^^
 
+Some of the properties of multiphase aggregates are simple arithmetic averages/sums of the properties of the individual phases. This is true, for example, of the Gibbs free energy and volume of aggregate materials:
 
-After the thermoelastic parameters (:math:`K_S`, :math:`G`, :math:`\rho`) of each phase are determined at each pressure and/or
-temperature step, these values must be combined to determine the seismic velocity of a multiphase assemblage.
-We define the volume fraction of the individual minerals in an assemblage:
+.. math::
+    \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i,
+    :label: gibbstotal
+
+.. math::
+    V = \sum_i n_i V_i,
+    :label: composite_volume
+
+.. math::
+    \rho = \sum_i \nu_i \rho_i = \frac{1}{V}\sum_i {n_i \mu_i}
+    :label: composite_density
+
+Unlike density and volume, the bulk and shear moduli of a multiphase rock are dependent on the shape, orientation and texture of the individual phases. We first define the volume fraction of the individual minerals in an assemblage:
 
 .. math::
     \nu_i = n_i \frac{V_i}{V},
 
-where :math:`V_i` and :math:`n_i` are the molar volume and the molar fractions of the :math:`i` th individual phase, and :math:`V` is the total molar volume of the assemblage:
-
-
-
-.. math::
-    V = \sum_i n_i  V_i.
-    :label: composite_volume
-
- The total energy of the system is defined in a similar way:
-
-.. math::
-    \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i
-    :label: gibbstotal
-
-
-The density of the multiphase assemblage is then
-
-
-.. math::
-    \rho = \sum_i \nu_i \rho_i = \frac{1}{V}\sum_i {n_i \mu_i},
-    :label: composite_density
-
-where :math:`\rho_i` is the density and :math:`\mu_i` is the molar mass of the :math:`i` th phase.
-
-
-Unlike density and volume, there is no straightforward way to average the bulk and shear moduli of a multiphase rock, as it depends on the specific distribution and orientation of the constituent minerals.
-BurnMan allows several schemes for averaging the elastic moduli: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
-
+where :math:`V_i` and :math:`n_i` are the molar volume and the molar fractions of the :math:`i` th individual phase. BurnMan allows several schemes for averaging the elastic moduli: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
 
 The Voigt average, assuming constant strain across all phases, is defined as
 
