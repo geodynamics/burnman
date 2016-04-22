@@ -53,7 +53,7 @@ class clinopyroxene(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[diopside(), '[Ca][Mg][Si]2O6'], [hedenbergite(), '[Ca][Fe][Si]2O6'], [
                            clinoenstatite(), '[Mg][Mg][Si]2O6'], [ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6'], [jadeite(), '[Na][Al][Si]2O6']]
-        self.enthalpy_interaction = [
+        self.energy_interaction = [
             [0., 24.74e3, 26.e3, 24.3e3], [24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
 
         SolidSolution.__init__(self, molar_fractions)
@@ -66,7 +66,7 @@ class garnet(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[pyrope(), '[Mg]3[Al][Al]Si3O12'], [almandine(), '[Fe]3[Al][Al]Si3O12'], [
                                    grossular(), '[Ca]3[Al][Al]Si3O12'], [mg_majorite(), '[Mg]3[Mg][Si]Si3O12'], [jd_majorite(), '[Na2/3Al1/3]3[Al][Si]Si3O12']]
-        self.enthalpy_interaction = [
+        self.energy_interaction = [
             [0.0, 30.e3, 21.20278e3, 0.0], [0.0, 0.0, 0.0], [57.77596e3, 0.0], [0.0]]
 
         SolidSolution.__init__(self, molar_fractions)
@@ -79,7 +79,7 @@ class akimotoite(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[mg_akimotoite(), '[Mg][Si]O3'], [
                            fe_akimotoite(), '[Fe][Si]O3'], [corundum(), '[Al][Al]O3']]
-        self.enthalpy_interaction = [[0.0, 66.e3], [66.e3]]
+        self.energy_interaction = [[0.0, 66.e3], [66.e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -90,7 +90,7 @@ class ferropericlase(SolidSolution):
         self.name = 'magnesiowustite/ferropericlase'
         self.type = 'symmetric'
         self.endmembers = [[periclase(), '[Mg]O'], [wuestite(), '[Fe]O']]
-        self.enthalpy_interaction = [[13.e3]]
+        self.energy_interaction = [[13.e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -102,7 +102,7 @@ class mg_fe_olivine(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[
             forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
-        self.enthalpy_interaction = [[7.81322e3]]
+        self.energy_interaction = [[7.81322e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -114,7 +114,7 @@ class orthopyroxene(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[enstatite(), '[Mg][Mg][Si]SiO6'], [ferrosilite(), '[Fe][Fe][Si]SiO6'], [
                            mg_tschermaks(), '[Mg][Al][Al]SiO6'], [ortho_diopside(), '[Ca][Mg][Si]SiO6']]
-        self.enthalpy_interaction = [
+        self.energy_interaction = [
             [0.0, 0.0, 32.11352e3], [0.0, 0.0], [48.35316e3]]
 
         SolidSolution.__init__(self, molar_fractions)
@@ -127,7 +127,7 @@ class plagioclase(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [
             [anorthite(), '[Ca][Al]2Si2O8'], [albite(), '[Na][Al1/2Si1/2]2Si2O8']]
-        self.enthalpy_interaction = [[26.0e3]]
+        self.energy_interaction = [[26.0e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -139,7 +139,7 @@ class post_perovskite(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[mg_post_perovskite(), '[Mg][Si]O3'], [
                            fe_post_perovskite(), '[Fe][Si]O3'], [al_post_perovskite(), '[Al][Al]O3']]
-        self.enthalpy_interaction = [[0.0, 60.0e3], [0.0]]
+        self.energy_interaction = [[0.0, 60.0e3], [0.0]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -151,7 +151,7 @@ class mg_fe_perovskite(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[mg_perovskite(), '[Mg][Si]O3'], [
                            fe_perovskite(), '[Fe][Si]O3'], [al_perovskite(), '[Al][Al]O3']]
-        self.enthalpy_interaction = [[0.0, 116.0e3], [0.0]]
+        self.energy_interaction = [[0.0, 116.0e3], [0.0]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -163,7 +163,7 @@ class mg_fe_ringwoodite(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [
             [mg_ringwoodite(), '[Mg]2SiO4'], [fe_ringwoodite(), '[Fe]2SiO4']]
-        self.enthalpy_interaction = [[9.34084e3]]
+        self.energy_interaction = [[9.34084e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -175,7 +175,7 @@ class mg_fe_aluminous_spinel(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[spinel(), '[Mg3/4Al1/4]4[Al7/8Mg1/8]8O16'], [
                                    hercynite(), '[Fe3/4Al1/4]4[Al7/8Fe1/8]8O16']]
-        self.enthalpy_interaction = [[5.87646e3]]
+        self.energy_interaction = [[5.87646e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -187,7 +187,7 @@ class mg_fe_wadsleyite(SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [
             [mg_wadsleyite(), '[Mg]2SiO4'], [fe_wadsleyite(), '[Fe]2SiO4']]
-        self.enthalpy_interaction = [[16.74718e3]]
+        self.energy_interaction = [[16.74718e3]]
 
         SolidSolution.__init__(self, molar_fractions)
 
@@ -291,7 +291,7 @@ class spinel (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 43.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 43.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 32000.0,
@@ -330,7 +330,7 @@ class hercynite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 97.28, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 97.28, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 35000.0,
@@ -405,7 +405,7 @@ class fayalite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 1000.0,
@@ -480,7 +480,7 @@ class fe_wadsleyite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 7000.0,
@@ -555,7 +555,7 @@ class fe_ringwoodite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -630,7 +630,7 @@ class ferrosilite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -777,7 +777,7 @@ class hedenbergite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 45000.0,
@@ -852,7 +852,7 @@ class ca_tschermaks (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 11.525, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 11.525, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 5000.0,
@@ -963,7 +963,7 @@ class hp_clinoferrosilite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -1074,7 +1074,7 @@ class fe_akimotoite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 21000.0,
@@ -1185,7 +1185,7 @@ class almandine (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 40.14, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 40.14, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 29000.0,
@@ -1518,7 +1518,7 @@ class fe_perovskite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 6000.0,
@@ -1629,7 +1629,7 @@ class fe_post_perovskite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 21000.0,
@@ -1740,7 +1740,7 @@ class wuestite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 1000.0,
@@ -1815,7 +1815,7 @@ class fe_ca_ferrite (Mineral):
             'molar_mass': formula_mass(formula, atomic_masses)}
 
         self.property_modifiers = [
-            ['linear', {'G_0': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
+            ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
 
         self.uncertainties = {
             'err_F_0': 25000.0,

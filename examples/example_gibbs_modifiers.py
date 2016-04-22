@@ -16,7 +16,7 @@ These modifications currently take the forms:
   and Holland and Powell (2011)
 - Bragg-Williams corrections
   (implementation of Holland and Powell (1996))
-- Linear (a simple G_0 + deltaV*P - deltaS*T
+- Linear (a simple delta_E + delta_V*P - delta_S*T
 - Magnetic (Chin, Hertzman and Sundman (1987))
 
 *Uses:*
@@ -191,7 +191,7 @@ if __name__ == "__main__":
                 'molar_mass': formula_mass(formula, atomic_masses)}
 
             self.property_modifiers = [
-                ['linear', {'G_0': 0., 'delta_S': 12., 'delta_V': 0.}]]
+                ['linear', {'delta_E': 0., 'delta_S': 12., 'delta_V': 0.}]]
 
             self.uncertainties = {
                 'err_F_0': 1000.0,

@@ -36,9 +36,9 @@ class CFMASO_garnet(SolidSolution):
                            [andr(), '[Ca]3[Fe]2Si3O12']]
         self.type = 'asymmetric'
         self.alphas = [1.0, 1.0, 2.7, 2.7]
-        self.enthalpy_interaction = [[2.5e3, 31.e3, 53.2e3],
-                                    [5.e3, 37.24e3],
-                                    [2.e3]]
+        self.energy_interaction = [[2.5e3, 31.e3, 53.2e3],
+                                   [5.e3, 37.24e3],
+                                   [2.e3]]
         SolidSolution.__init__(self, molar_fractions)
 
 
