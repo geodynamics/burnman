@@ -293,6 +293,15 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, guessed_composition, col, nu
     eqns.extend(np.dot((guessed_endmember_fractions - new_endmember_fractions), col))
     return eqns
 
+def compositional_variables(assemblage):
+    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    var_names=[]
+    for i, phase in enumerate(assemblage.phases):
+        var_names.append('x('+phase.name+')')
+        for j in xrange(endmembers_per_phase[i] - 1):
+            var_names.append('p('+phase.endmembers[j+1][0].name+')')
+    return var_names
+    
 def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     """
     Sets up a gibbs minimization problem at constant composition and attempts to solve it
@@ -348,7 +357,10 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
                         args=(assemblage, endmembers_per_phase, initial_composition, col, null, constraints),
                         xtol=1e-10, full_output=True)
     if soln[2]==1:
-        return soln[0]
+        sol_dict = {'P': soln[0][0], 'T': soln[0][1]}
+        for i, variable in enumerate(compositional_variables(assemblage)):
+            sol_dict[variable] = soln[0][2+i]
+        return sol_dict
     else:
         return soln[3]
         sys.exit()
@@ -368,16 +380,10 @@ def binary_composition(x, composition1, composition2):
 
         
 def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, constraints, guesses=None):
-
-    def minimize_P(x, composition1, composition2, assemblage, constraints, fixed_P, guesses):
+    def minimize(x, composition1, composition2, assemblage, constraints, master_constraint, guesses):
         composition = binary_composition(x, composition1, composition2)
-        return fixed_P - gibbs_minimizer(composition, assemblage, constraints)[0]
-
-    
-    def minimize_T(x, composition1, composition2, assemblage, constraints, fixed_T, guesses):
-        composition = binary_composition(x, composition1, composition2)
-        return fixed_T - gibbs_minimizer(composition, assemblage, constraints)[1]
-
+        vecsol = gibbs_minimizer(composition, assemblage, constraints)
+        return master_constraint[1] - vecsol[master_constraint[0]]
 
     c = 0
     new_constraints = []
@@ -388,16 +394,18 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
         else:
             new_constraints.append(constraint)
 
-    if master_constraint[0] == 'P':
-        func = minimize_P
-    else:
-        func = minimize_T
+    soln = opt.fsolve(minimize, [guessed_bulk], args=(composition1, composition2,
+                                                      assemblage, new_constraints,
+                                                      master_constraint, guesses),
+                                                      full_output=True, xtol=1.e-10)
+
+    # One more run to get the full solution vector
+    composition = binary_composition(soln[0][0], composition1, composition2)
+    vecsol = gibbs_minimizer(composition, assemblage, new_constraints)
         
-    soln = opt.fsolve(func, [guessed_bulk], args=(composition1, composition2,
-                                                  assemblage, new_constraints, master_constraint[1], guesses),
-                      full_output=True, xtol=1.e-10)
     if soln[2]==1:
-        return soln[0]
+        vecsol['X'] = soln[0][0]
+        return vecsol
     else:
         return soln[3]
         sys.exit()
