@@ -8,8 +8,11 @@ Many minerals can exist over a range of compositions. The compositional domains 
     \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
 
 We typically calculate solid solution properties by appropriate differentiation of the Gibbs Free energy, where
+
 .. math::
-    \mathcal{G} = DONE TO HERE
+    \mathcal{G} = \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)\\
+    \alpha_i = \gamma_i \alpha_{\textrm{ideal}, i}
+    
 
 Implemented models
 ^^^^^^^^^^^^^^^^^^
@@ -22,14 +25,18 @@ A solid solution is not simply a mechanical mixture of its constituent endmember
     \mathcal{S}_{\textrm{conf}} = R \ln \prod_s (X_c^s)^{\nu}
 
 
-where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
+where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*. From this expression, we can see that
+
+.. math::	
+    \alpha_{\textrm{ideal}, i} = \prod_s (X_c^s)^{\nu}
+
 
 Symmetric solid solutions
 """""""""""""""""""""""""
 Many minerals exhibit deviations from ideal solutions. These deviations arise as a result of interactions between ions with different physical and chemical characteristics. Regular solid solution models are designed to account for this, by allowing the addition of excess enthalpies, entropies and volumes to the solution model. These excess terms have the matrix form :cite:`DPWH2007`
 
 .. math::
-    \mathcal{G}_{\textrm{excess}} = p^T W p
+    \mathcal{G}_{\textrm{excess}} = RT \ln \gamma = p^T W p
 
 where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers and :math:`W` is a strictly upper-triangular matrix of interaction terms between endmembers. Excesses within binary systems (:math:`i`-:math:`j`) have a quadratic form and a maximum of :math:`W_{ij}/4` half-way between the two endmembers.
 
@@ -65,11 +72,11 @@ Thermodynamic and thermoelastic properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 From the preceeding equations, we can define the thermodynamic potentials of solid solutions:
  
-.. math::	
-    \mathcal{H}_{\textrm{SS}} &= \sum_in_i\mathcal{E}_i + \mathcal{E}_{\textrm{excess}} + PV_{\textrm{excess}}\\
-    \mathcal{S}_{\textrm{SS}} &= \sum_in_i\mathcal{S}_i + \mathcal{S}_{\textrm{conf}} + \mathcal{S}_{\textrm{excess}} \\
-    \mathcal{G}_{\textrm{SS}} &= \mathcal{H}_{\textrm{SS}} - T\mathcal{S}_{\textrm{SS}}\\
-    V_{\textrm{SS}} &= \sum_in_iV_i + V_{\textrm{excess}} 
+.. math::
+    \mathcal{G}_{\textrm{SS}} &= \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)\\
+    \mathcal{S}_{\textrm{SS}} &= \sum_in_i\mathcal{S}_i + \mathcal{S}_{\textrm{conf}} - \frac{\partial \mathcal{G}_{\textrm{excess}}}{\partial T} \\	
+    \mathcal{H}_{\textrm{SS}} &= \mathcal{G}_{\textrm{SS}} + T\mathcal{S}_{\textrm{SS}}\\
+    V_{\textrm{SS}} &= \sum_in_iV_i + \frac{\partial \mathcal{G}_{\textrm{excess}}}{\partial P}
 
 We can also define the derivatives of volume with respect to pressure and temperature
 
