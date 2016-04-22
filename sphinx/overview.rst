@@ -45,4 +45,54 @@ exhaustive, and we will definitely have missed interesting
 applications. As a result we will be very happy to accept contributions in
 form of corrections, examples, or new features.
 
- .. image:: figures/structure.png
+.. graphviz::
+
+   digraph workflows {
+     rankdir=TB;
+     experimental_data [shape=ellipse,label="experimental data"]
+     assemblage [shape=ellipse,label="assemblage"]
+     bulk [shape=ellipse,label="bulk composition"]
+     pt [shape=ellipse,label="P-T conditions"]
+     mineral [shape=diamond,label="mineral",fillcolor=red, style=filled]
+     geotherm [shape=diamond,label="geotherm",fillcolor=red,
+     style=filled]
+     seismic_model [shape=diamond,label="seismic.SeismicTable",fillcolor=red, style=filled]
+     solution [shape=diamond,label="solution",fillcolor=red, style=filled]
+     composite[shape=diamond,label="composite",fillcolor=red,
+     style=filled]
+     av
+     [shape=diamond,label="averaging_schemes.AveragingScheme",fillcolor=red,
+     style=filled]
+     fit [shape=box,label="tools.fit_PVT_data",fillcolor=yellow, style=filled]
+     eqm
+     [shape=box,label="equilibriumassemblage.gibbs_minimizer",fillcolor=yellow,
+     style=filled]
+     chempot [shape=box,label="chemicalpotentials.chemical_potentials",fillcolor=yellow,
+     style=filled]
+     subgraph experimental {
+         label="Equation of state fitting";
+         mineral ->fit;
+         experimental_data ->fit;
+         fit-> "optimized EoS parameters";
+      }
+      subgraph thermodynamic {
+         label="Thermodynamic calculations";
+         mineral -> composite;
+         solution -> composite;
+         bulk -> eqm;
+	 pt -> eqm;
+         composite -> eqm;
+         eqm -> assemblage;
+         assemblage -> chempot;
+	 pt -> chempot;
+	 chempot -> "chemical potentials / fugacities";
+      }
+      subgraph seismic {
+         label="Seismic comparisons";
+	 geotherm -> pt;
+	 assemblage ->"seismic velocities";
+         av -> "seismic velocities";
+	 "seismic velocities" -> "velocity comparison"
+	 seismic_model-> "velocity comparison"
+      }
+   }
