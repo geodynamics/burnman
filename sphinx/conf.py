@@ -184,6 +184,7 @@ preamble1 = '''
 '''.format(release)
 preamble = preamble1 + r'''
 \usepackage{textpos}
+\usepackage{amssymb}
 
 \newcommand{\burnman}{\texttt{\bf BurnMan}}
 

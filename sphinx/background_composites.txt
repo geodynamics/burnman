@@ -1,13 +1,59 @@
-Calculating Multi-phase Aggregate Properties
+Calculating Multi-phase Composite Properties
 --------------------------------------------
 
 .. _ref-methods-ave:
+
+Equilibrium composition
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In any equilibrium problem at constant bulk composition with :math:`m` endmembers, we have :math:`m+2` unknowns, which are the compositions and amounts of the phases, and the pressure and temperature of the reaction. In order to solve such problems, a set of :math:`m+2` equations is required.
+
+
+Consider the :math:`m` x :math:`n` stoichiometric matrix :math:`\textbf{A}` where the :math:`m` rows correspond to the set of endmembers, and the :math:`n` columns correspond to the elements contained within those compounds. We're interested in finding the set of independent reactions between the endmembers which do not change the bulk composition, i.e., the set of vectors contained within the left nullspace:
+
+.. math::
+   \mathcal{N}(\textbf{A}^T) = \{ \textbf{y} \in \mathbb{R}^m \, : \, \textbf{A}^T \textbf{y} = 0 \}
+
+As will become clear later on, it is also useful to consider the set of vectors orthogonal to the left nullspace, which are known as the column space of A:
+
+.. math::
+   \mathcal{R}(\textbf{A}) = \{ \textbf{y} \in \mathbb{R}^m \, : \, \textbf{A}^T \textbf{y} \neq 0 \}
+
+
+We can find the column space and left null space of :math:`\textbf{A}` by singular value decomposition:
+
+.. math::
+   \textbf{A} = \textbf{U} \Sigma \textbf{V}^T
+
+where :math:`\textbf{U}` is an :math:`m` x :math:`m` matrix, :math:`\textbf{V}` is an :math:`n` x :math:`n` matrix, and :math:`\Sigma` is a :math:`m` x :math:`n` diagonal matrix where the diagonal entries are known as singular values. The left nullspace corresponds to the rows of :math:`U^T` with singular values equal to zero. 
+
+
+Now that we have these m vectors, we can use them to set up an equilibrium relation. The equilibrium relation must hold for all the reactions described by the left nullspace. For each reaction, the equilibrium relation states that
+
+.. math::
+   0 = \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)
+
+For a pure phase, the activity :math:`\alpha` is equal to 1. A second requirement is that the bulk composition must not change. For this to be true, the compositional vector :math:`X` must satisfy the following relationship
+
+.. math::
+   0 = \mathcal{R}(\textbf{A}) \left( X - X_0 \right)
+
+where :math:`X_0` is any initial guess which satisfies the bulk composition. These two requirements yield m reactions. Two further equations are required to solve for the :math:`m+2` unknowns, which may be constraints on the pressure, temperature or compositions of the phases.
+
+
+
+
+
+Chemical potentials
+^^^^^^^^^^^^^^^^^^^
+
+
 
 
 Averaging schemes
 ^^^^^^^^^^^^^^^^^
 
-Some of the properties of multiphase aggregates are simple arithmetic averages/sums of the properties of the individual phases. This is true, for example, of the Gibbs free energy and volume of aggregate materials:
+Some of the properties of multiphase composites are simple arithmetic averages/sums of the properties of the individual phases. This is true, for example, of the Gibbs free energy and volume of aggregate materials:
 
 .. math::
     \mathcal{G}_{\textrm{system}}= \sum_i n_i \mathcal{G}_i,
