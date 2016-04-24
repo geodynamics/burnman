@@ -11,6 +11,7 @@ import scipy.linalg as linalg
 import scipy.optimize as opt
 from .mineral import Mineral
 from .solidsolution import SolidSolution
+from .composite import Composite
 import warnings
 
 def assemble_stoichiometric_matrix ( minerals):
@@ -614,3 +615,56 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
     else:
         raise Exception('Solution could not be found, error: '+soln[3])
         
+
+def find_invariant(composition, phases, zero_phases, guesses=None):
+    all_phases = zero_phases
+    all_phases.extend(phases)
+    assemblage = Composite(all_phases)
+
+    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    c0a = []
+    c0b = []
+    c1 = []
+    for n_endmembers in endmembers_per_phase:
+        c0a.append(0.)
+        c0b.append(0.)
+        c1.append(1.)
+        for i in xrange(n_endmembers - 1):
+            c0.append(0.)
+            c1.append(0.)
+    c0a[0] = 1.
+    c0b[endmembers_per_phase[0]] = 1.
+
+    constraints= [['X', c0a, c1, 0.], ['X', c0b, c1, 0.]]
+    soln_array = gibbs_minimizer(composition, assemblage, constraints, guesses)
+
+    return (soln_array['P'], soln_array['T'])    
+    
+def find_univariant(composition, phases, zero_phase, condition_variable, condition_array, guesses=None):
+    all_phases = [zero_phase]
+    all_phases.extend(phases)
+    assemblage = Composite(all_phases)
+
+    
+    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    c0 = []
+    c1 = []
+    for n_endmembers in endmembers_per_phase:
+        c0.append(0.)
+        c1.append(1.)
+        for i in xrange(n_endmembers - 1):
+            c0.append(0.)
+            c1.append(0.)
+    c0[0] = 1.
+    
+    soln_array = np.empty_like(condition_array)
+    if condition_variable=='P':
+        for i, P in enumerate(condition_array):
+            constraints= [['P', P], ['X', c0, c1, 0.]]
+            soln_array[i] = gibbs_minimizer(composition, assemblage, constraints, guesses)['T']
+    elif condition_variable=='T':
+        for i, T in enumerate(condition_array):
+            constraints= [['T', T], ['X', c0, c1, 0.]]
+            soln_array[i] = gibbs_minimizer(composition, assemblage, constraints, guesses)['P']
+
+    return soln_array
