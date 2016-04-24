@@ -117,7 +117,7 @@ Here are some specific features and pitfalls on Python:
 
 ## Examples 
 
-example_beginner 
+example_beginner
 ----------------
 
 This example script is intended for absolute beginners to BurnMan.
@@ -132,7 +132,7 @@ for visual comparison.
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.material.Material.evaluate`
 
 
 *Demonstrates:*
@@ -153,7 +153,7 @@ These are:
 3. Watson and Baxter, 2007 :cite:`Watson2007`
 4. linear extrapolation
 5. Read in from file from user
-6. Adiabatic from potential temperature and choice of mineral 
+6. Adiabatic from potential temperature and choice of mineral
 
 *Uses:*
 
@@ -176,12 +176,12 @@ function of depth (or pressure) as well as different velocity model libraries
 available within Burnman:
 
 1. PREM :cite:`dziewonski1981`
-2. Reference model for fast regions (outside the LLSVP's) in the lower mantle
-   :cite:`Lekic2012`
-3. Reference model for slow regions (LLSVP's) in the lower mantle :cite:`Lekic2012`
+2. STW105 :cite:`kustowski2008`
+3. AK135 :cite:`kennett1995`
+4. IASP91 :cite:`kennett1991`
 
 This example will first calculate or read in a seismic model and plot the
-model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`Kennett1995`.
+model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`kennett1995`.
 
 *Uses:*
 
@@ -200,7 +200,7 @@ model along the defined pressure range. The example also illustrates how to impo
 
 example_composition
 -------------------
-    
+
 This example shows how to create different minerals, how to compute seismic
 velocities, and how to compare them to a seismic reference model.
 
@@ -224,7 +224,7 @@ example_spintransition.py for explanation of how to implement this
 
 * :doc:`mineral_database`
 * :class:`burnman.composite.Composite`
-* :class:`burnman.minerals.Mineral`
+* :class:`burnman.mineral.Mineral`
 * :class:`burnman.solidsolution.SolidSolution`
 
 *Demonstrates:*
@@ -235,7 +235,7 @@ example_spintransition.py for explanation of how to implement this
 
 
 
-    
+
 example_user_input_material
 ---------------------------
 
@@ -302,7 +302,7 @@ teaches:
 
 
 
-    
+
 example_compare_all_methods
 ---------------------------
 
@@ -323,7 +323,7 @@ different methods.
 
 
 
-    
+
 example_optimize_pv
 -------------------
 
@@ -336,7 +336,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.main.velocities_from_rock`
+* :func:`burnman.material.Material.evaluate`
 * :func:`burnman.main.compare_l2`
 
 *Demonstrates:*
@@ -346,7 +346,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 
 
 
-    
+
 example_fit_data
 ----------------
 
@@ -372,7 +372,7 @@ This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
 
 example_chemical_potentials
 ---------------------------
-    
+
 This example shows how to use the chemical potentials library of functions.
 
 *Demonstrates:*
@@ -385,11 +385,11 @@ This example shows how to use the chemical potentials library of functions.
 
 example_solid_solution
 ----------------------
-    
+
 This example shows how to create different solid solution models and output
 thermodynamic and thermoelastic quantities.
 
-There are four main types of solid solution currently implemented in 
+There are four main types of solid solution currently implemented in
 BurnMan:
 
 1. Ideal solid solutions
@@ -416,4 +416,33 @@ These solid solutions can potentially deal with:
 * How to set composition and state
 * How to output thermodynamic and thermoelastic properties
 
+
+
+example_build_planet
+--------------------
+
+For Earth we have well-constrained one-dimensional density models.  This allows us to
+calculate pressure as a funcion of depth.  Furthermore, petrologic data and assumptions
+regarding the convective state of the planet allow us to estimate the temperature.
+
+For planets other than Earth we have much less information, and in particular we
+know almost nothing about the pressure and temperature in the interior.  Instead, we tend
+to have measurements of things like mass, radius, and moment-of-inertia.  We would like
+to be able to make a model of the planet's interior that is consistent with those
+measurements.
+
+However, there is a difficulty with this.  In order to know the density of the planetary
+material, we need to know the pressure and temperature.  In order to know the pressure,
+we need to know the gravity profile.  And in order to the the gravity profile, we need
+to know the density.  This is a nonlinear problem which requires us to iterate to find
+a self-consistent solution.
+
+Here we show an example that does this, using the planet Mercury as motivation.
+
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.composite.Composite`
+* :func:`burnman.material.Material.evaluate`
 

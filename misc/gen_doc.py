@@ -24,7 +24,8 @@ ordered_examples = ['example_beginner.py',
                     'example_fit_data.py',
                     'example_grid.py',
                     'example_chemical_potentials.py',
-                    'example_solid_solution.py'
+                    'example_solid_solution.py',
+                    'example_build_planet.py'
                     ]
 
 for ex in ordered_examples:
