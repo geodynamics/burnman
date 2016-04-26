@@ -33,6 +33,7 @@ import matplotlib.pyplot as plt
 from burnman.equilibriumassemblage import gibbs_minimizer, gibbs_bulk_minimizer, find_invariant, find_univariant
 
 if __name__ == "__main__":
+    '''
     # Example 1: The classic aluminosilicate diagram.
     # This is a T-P phase diagram with composition Al2SiO5,
     # which is the composition of andalusite, sillimanite and
@@ -228,14 +229,15 @@ if __name__ == "__main__":
 
     
     composition = { 'Na': 0., 'Ca': 1.5, 'Fe': 0., 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
-    garnet = SLB_2011.garnet()
-    assemblage = burnman.Composite([garnet, garnet])
-
+    garnet0 = SLB_2011.garnet()
+    garnet1 = SLB_2011.garnet()
+    assemblage = burnman.Composite([garnet0, garnet1])
+    print(garnet0.endmembers)
     P = 1.e5
     temperatures = np.linspace(300., 800., 21)
 
     for i, T in enumerate(temperatures):
         constraints=[['P', P], ['T', T]]
-        sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[0.5, 0., 0., 0., 0., 0.5, 0., 1., 0., 0.])
+        sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[P, T, 0.5, 0., 0.979, 0., 0., 0.5, 0., 0.021, 0., 0.])
         
-    '''
+

@@ -2,6 +2,7 @@
 /misc/*.pdf
 /examples/example_woutput.txt
 /sphinx/_build/*
+/sphinx/*pdf
 /build/*
 *.tmp
 *.pyc
