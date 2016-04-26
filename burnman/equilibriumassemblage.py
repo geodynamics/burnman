@@ -373,17 +373,22 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
     for (phase, fraction) in zip(*assemblage.unroll()):
         if isinstance(phase, SolidSolution):
             partial_gibbs.extend(phase.partial_gibbs)
+            print(phase.activities)
         else:
             partial_gibbs.append(phase.gibbs)
 
     # The equilibrium relation is 0 = sum(G + RT ln a)
     eqns.extend(np.dot(partial_gibbs, null))
-
+    print('p', partial_gibbs)
+    print(eqns)
+    print(null)
+    exit()
     # On top of this, we should make sure that the bulk composition is correct
     # (i.e., that the reaction vector is in the reaction nullspace)
     initial_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c_initial)
     new_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c)
     eqns.extend(np.dot((initial_endmember_fractions - new_endmember_fractions), col))
+
     return eqns
 
 def compositional_variables(assemblage):
@@ -505,7 +510,8 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
             sol_dict[variable] = soln[0][2+i]
         return sol_dict
     else:
-        raise Exception('Solution could not be found, error: '+soln[3])
+        raise Exception('Solution could not be found, error: \n'+soln[3]+'\n Guesses:'
+                        +str(guesses))
 
 
 def binary_composition(composition1, composition2, x):
