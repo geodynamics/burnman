@@ -14,7 +14,7 @@ from .solidsolution import SolidSolution
 from .composite import Composite
 import warnings
 
-def assemble_stoichiometric_matrix ( minerals):
+def assemble_stoichiometric_matrix ( minerals, composition ):
     """
     This function takes a list of minerals and assembles a matrix where 
     the rows are elements and the columns are species (or endmembers).
@@ -26,6 +26,7 @@ def assemble_stoichiometric_matrix ( minerals):
     minerals : list of minerals
         List of objects of type :class:`burnman.Mineral` or `burnman.SolidSolution`.
         Other types cannot be understood, and an exception will be thrown.
+    composition : dict of floats
     
     Returns
     -------
@@ -41,46 +42,76 @@ def assemble_stoichiometric_matrix ( minerals):
         List of endmember formulae constructed from the minerals passed in.
         They are ordered in the same order as they are passed in, but with 
         The endmembers in the solid solutions also included.
+    indices: list of list of integers
+    
     """
- 
-    elements = set()
+
+    #Listify the elements and sort them so they have a consistent order.
+    #This will be the ordering of the rows.  The ordering of the columns
+    #will be the ordering of the endmembers as they are passed in.
+    elements = list(set(composition.keys()))
+    #elements.sort()
     formulae = []
-    n_phase_endmembers = []
+    endmembers_per_phase = []
     
     # Make a list of the different formulae, as well as a set of 
     # the elements that we have present in the mineral list
-    for m in minerals:
+
+    # Only add endmember formulae if all the elements are contained in the composition dictionary.
+    indices = []
+    
+    for m_idx, m in enumerate(minerals):
         # Add the endmembers if it is a solid solution
-        if isinstance(m, SolidSolution):
-            n_phase_endmembers.append(len(m.endmembers))
-            for e in m.endmembers:
+        if isinstance(m, SolidSolution):            
+            endmembers_per_phase.append(len(m.endmembers))
+            for e_idx, e in enumerate(m.endmembers):
                 f = e[0].params['formula']
-                formulae.append(f)
-                for k in f.keys():
-                    elements.add(k)
+                if all(keys in elements for keys in f.keys()):
+                    formulae.append(f)
+                    indices.append([m_idx, e_idx])
         # Add formula if it is a simple mineral
         elif isinstance(m, Mineral):
-            n_phase_endmembers.append(1)
+            endmembers_per_phase.append(1)
             f = m.params['formula']
-            formulae.append(f)
-            for k in f.keys():
-                elements.add(k)
+            if all(keys in elements for keys in f.keys()):
+                formulae.append(f)
+                indices.append([m_idx, 0])
         else:
             raise Exception('Unsupported mineral type, can only read burnman.Mineral or burnman.SolidSolution')
 
-    #Listify the elements and sort them so they have a well-defined order.
-    #This will be the ordering of the rows.  The ordering of the columns
-    #will be the ordering of the endmembers as they are passed in.
-    elements = list(elements)
-    elements.sort()
 
     #Populate the stoichiometric matrix
     stoichiometric_matrix = np.empty( [ len(elements), len(formulae) ] )
     for i,e in enumerate(elements):
         for j,f in enumerate(formulae):
             stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
+            
+    # Check that the bulk composition can be described by a linear set of the endmembers
+    comp_vector = np.array([composition[element] for element in elements])
+    potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
+    resid = np.dot(stoichiometric_matrix,potential_endmember_amounts) - comp_vector
 
-    return stoichiometric_matrix, elements, formulae, n_phase_endmembers
+    # Check that the chosen phases can describe the bulk composition
+    # Users should express bulk compositions to about 3 d.p. to make sure that compositions can be recast
+    ctol=1.e-3 # compositional tolerance.
+    if (any(abs(residual) > ctol for residual in resid)):
+        raise Exception("Bulk composition is well outside the compositional range of the chosen minerals (Maximum residual: "+str(max(resid))+"). Exiting.")
+        
+    # Try to remove endmembers which cannot be constituents of the solution
+    null_endmember_indices = [ i for i, amount in enumerate(potential_endmember_amounts) if amount < 1.e-10]
+    for i in reversed(null_endmember_indices):
+        stoichiometric_matrix = np.delete(stoichiometric_matrix, i, 1)
+        del indices[i]
+        del formulae[i]
+
+    
+    # Now we can find a potential solution to our problem (one that satisfies the bulk composition constraints)
+    potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
+
+    # Recast composition. We already checked that the composition is ok, so this should have a negligible effect on the bulk composition.
+    comp_vector=np.dot(stoichiometric_matrix,potential_endmember_amounts)
+    
+    return stoichiometric_matrix, comp_vector, elements, formulae, indices, endmembers_per_phase, potential_endmember_amounts
 
 
 def compute_column_and_null_spaces ( stoichiometric_matrix ):
@@ -189,16 +220,19 @@ def sparsify_basis ( basis ):
     new_basis[ np.abs(new_basis) < eps ] = 0.
     return new_basis
  
-def endmember_fractions_to_cvector(mvector, endmembers_per_phase):
+def endmember_fractions_to_cvector(partial_mvector, indices, endmembers_per_phase):
     """
-    Converts a list of molar fractions of endmembers into the
-    solution variables (mineral fractions and compositions). 
+    Converts a list of molar fractions of endmembers along with their
+    indices into the solution variables
+    (mineral fractions and compositions). 
     
     Parameters
     ----------
     mvector: list
         A list corresponding to molar fractions of all the endmembers
         in each of the phases.
+
+    indices: list of list of integers
 
     endmembers_per_phase : list
         A list containing the number of endmembers for each phase
@@ -213,16 +247,24 @@ def endmember_fractions_to_cvector(mvector, endmembers_per_phase):
         [f(phase[i]), f(phase[i].mbr[1]), f(phase[i].mbr[2]), ...]
     """
     p=0
+
+    mvector = [[0. for i in xrange(endmembers_per_phase[i])] for i in xrange(len(endmembers_per_phase))]
+    for i_idx, i in enumerate(indices):
+        mvector[i[0]][i[1]] = partial_mvector[i_idx]
+
+    # Need to return phase quantities and compositions in the reduced endmember space
     composition = []
     for i, n_endmembers in enumerate(endmembers_per_phase):
-        amount_phase = np.sum(mvector[p:p+n_endmembers])
+        amount_phase = np.sum(mvector[i])
         composition.append(amount_phase)
-        composition.extend(mvector[p+1:p+n_endmembers]/amount_phase)
-        p += n_endmembers
+
+        endmember_indices = [j_idx for (i_idx, j_idx) in indices if i == i_idx]
+        for j in xrange(len(endmember_indices)-1):
+            composition.append(mvector[i][endmember_indices[j+1]]/amount_phase)
 
     return composition
 
-def cvector_to_mineral_mbr_fractions(cvector, endmembers_per_phase):
+def cvector_to_mineral_mbr_fractions(cvector, indices, endmembers_per_phase):
     """
     Converts a compositional list such as that computed by
     :func:`endmember_fractions_to_cvector` into two lists, one
@@ -248,21 +290,32 @@ def cvector_to_mineral_mbr_fractions(cvector, endmembers_per_phase):
         Two lists, one containing phase amounts, and the other
         containing molar fractions of the endmembers in each phase.
     """
-    p=0
-    composition = [[], []]
-    for i, n_endmembers in enumerate(endmembers_per_phase):
-        amount_phase = cvector[p]
-        if amount_phase < 0.:
-            amount_phase = 0.
-        composition[0].append(amount_phase)
-        molar_fractions = [1. - sum(cvector[p+1:p+n_endmembers])]
-        molar_fractions.extend(cvector[p+1:p+n_endmembers])
-        composition[1].append(molar_fractions)
-        p += n_endmembers
-            
-    return composition
     
-def mineral_mbr_fractions_to_endmember_fractions(cvectors):
+    phase_amounts = [0. for n_endmembers in endmembers_per_phase]
+    molar_fractions = [[0. for i_mbr in xrange(n_endmembers)] for n_endmembers in endmembers_per_phase]
+
+    old_idx = -1
+    first_j_idx = 0
+    
+    for i, c in enumerate(cvector):
+        i_idx, j_idx = indices[i]
+        if i_idx != old_idx:
+            if c >= 0.:
+                phase_amounts[i_idx] = c
+            else:
+                phase_amounts[i_idx] = 0.
+                
+            molar_fractions[i_idx][j_idx] = 1.
+            old_idx = i_idx
+            first_j_idx = j_idx
+        else:
+            molar_fractions[i_idx][j_idx] = c
+            molar_fractions[i_idx][first_j_idx] -= c
+
+    
+    return [phase_amounts, molar_fractions]
+    
+def mineral_mbr_fractions_to_endmember_fractions(cvectors, indices):
     """
     Converts a list of lists containing phase amounts and
     the molar fractions of the endmembers in each phase into
@@ -282,12 +335,13 @@ def mineral_mbr_fractions_to_endmember_fractions(cvectors):
 
     """
     mvector = []
-    for i, c in enumerate(cvectors[1]):
-        mvector.extend([f*cvectors[0][i] for f in c])
+    for (i, j) in indices:
+        mvector.append(cvectors[0][i]*cvectors[1][i][j])
+        
     return np.array(mvector)
 
     
-def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, null, constraints):
+def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints):
     """
     Set up the equations we need to solve a general equilibrium gibbs problem.
 
@@ -321,7 +375,11 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
         
     null : numpy array
         The null space of the stoichiometric matrix.
-        
+
+    indices :
+        The indices of the endmembers corresponding to the columns
+        of the stoichiometric matrix
+    
     constraints : list of lists
         Two pressure, temperature or compositional constraints
         on the problem of interest. The pressure
@@ -344,7 +402,6 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
     P = PTX[0]
     T = PTX[1]
     X = PTX[2:]
-
     # Here are the two P, T or compositional constraints
     eqns = []
     for constraint in constraints:
@@ -360,8 +417,14 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
 
     # Here we convert our guesses from a single vector
     # to a vector of phase_fractions and molar_fractions
-    c = cvector_to_mineral_mbr_fractions(X, endmembers_per_phase)
-    c_initial = cvector_to_mineral_mbr_fractions(initial_composition, endmembers_per_phase)
+    c = cvector_to_mineral_mbr_fractions(X, indices, endmembers_per_phase)
+    c_initial = cvector_to_mineral_mbr_fractions(initial_composition, indices, endmembers_per_phase)
+
+    if any(f < 0. for f in c_initial[0]):
+        raise Exception('The starting guess contains a phase amount < 0. If you did not provide a starting guess, this is a bug. Please contact the burnman team.')
+
+    if any(f < 0. for f in c[0]):
+        raise Exception('Gibbs minimization failed as a result of a phase amount being < 0. This might indicate that the starting guess is poor, or that there is no solution to this problem')
 
     assemblage.set_fractions(c[0])
     for i, composition in enumerate(c[1]):
@@ -369,29 +432,31 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
             assemblage.phases[i].set_composition(composition)
 
     assemblage.set_state(P, T)
-    partial_gibbs = []
+    full_partial_gibbs = []
     for (phase, fraction) in zip(*assemblage.unroll()):
         if isinstance(phase, SolidSolution):
-            partial_gibbs.extend(phase.partial_gibbs)
-            print(phase.activities)
+            full_partial_gibbs.append(phase.partial_gibbs)
         else:
-            partial_gibbs.append(phase.gibbs)
+            full_partial_gibbs.append([phase.gibbs])
 
+    # Remove endmembers from the partial_gibbs vector if they do not fall within the
+    # compositional space given by "indices"
+    partial_gibbs = []
+    for (i_idx, j_idx) in indices:
+        partial_gibbs.append(full_partial_gibbs[i_idx][j_idx])
+            
     # The equilibrium relation is 0 = sum(G + RT ln a)
     eqns.extend(np.dot(partial_gibbs, null))
-    print('p', partial_gibbs)
-    print(eqns)
-    print(null)
-    exit()
+    
     # On top of this, we should make sure that the bulk composition is correct
     # (i.e., that the reaction vector is in the reaction nullspace)
-    initial_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c_initial)
-    new_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c)
+    initial_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c_initial, indices)
+    new_endmember_fractions = mineral_mbr_fractions_to_endmember_fractions(c, indices)
     eqns.extend(np.dot((initial_endmember_fractions - new_endmember_fractions), col))
 
     return eqns
 
-def compositional_variables(assemblage):
+def compositional_variables(assemblage, indices):
     """
     Takes an assemblage and outputs names for the
     compositional variables which describe the bulk composition
@@ -412,12 +477,15 @@ def compositional_variables(assemblage):
         the molar fractions of endmembers in each phase are
         given as 'p(endmember.name)'
     """
-    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    old_i = -1
     var_names=[]
-    for i, phase in enumerate(assemblage.phases):
-        var_names.append('x('+phase.name+')')
-        for j in xrange(endmembers_per_phase[i] - 1):
-            var_names.append('p('+phase.endmembers[j+1][0].name+')')
+    for (i, j) in indices:
+        if i != old_i:
+            var_names.append('x('+assemblage.phases[i].name+')')
+            old_i = i
+        else:
+            var_names.append('p('+assemblage.phases[i].endmembers[j][0].name+')')
+
     return var_names
     
 def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
@@ -454,37 +522,21 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
         Dictionary keys are 'P', 'T' and the variable names output by
         :func:`compositional_variables`
     """
-    
+
+    # Redefine composition removing negligible elements (where n atoms < 0.0001 % total atoms)
+    s = sum(composition.values())
+    composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
+        
     # The next two lines set up a matrix of the endmember compositions
     # and then finds the nullspace, which corresponds to a set of independent reactions
-    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    stoichiometric_matrix, comp_vector, elements, \
+      formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
+      
     col, null = compute_column_and_null_spaces(stoichiometric_matrix)
     null = sparsify_basis(null)
     col = sparsify_basis(col)
-    
-    # Create a compositional vector with elements in the same order as the 
-    # stoichiometric matrix
-    comp_vector=np.empty( (len(elements)) )
-    for idx, element in enumerate(elements):
-        comp_vector[idx]=composition[element]
-        
-    # Check that the bulk composition can be described by a linear set of the
-    # endmembers
-    potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
-    
-    resid = np.dot(stoichiometric_matrix,potential_endmember_amounts) - comp_vector
-    
-    ctol=1.e-3 # compositional tolerance. Users should express bulk compositions to about 3 d.p. to make sure that compositions can be recast
-    if (any(abs(resid[i]) > ctol for i in range(len(resid)))):
-        raise Exception("Bulk composition is well outside the compositional range of the chosen minerals (Maximum residual: "+str(max(resid))+"). Exiting.")
-    else:
-        # Recast composition
-        comp_vector=np.dot(stoichiometric_matrix,potential_endmember_amounts)
 
-
-    initial_composition = endmember_fractions_to_cvector(potential_endmember_amounts, endmembers_per_phase)
-
-
+    initial_composition = endmember_fractions_to_cvector(potential_endmember_amounts, indices, endmembers_per_phase)
     # If an initial guess hasn't been given, make one
     if guesses == None:
         guesses = [10.e9, 1200.]
@@ -502,12 +554,12 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         soln=opt.fsolve(set_eqns, guesses,
-                        args=(assemblage, endmembers_per_phase, initial_composition, col, null, constraints),
+                        args=(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints),
                         xtol=1e-10, full_output=True)
+
+    
     if soln[2]==1:
-        sol_dict = {'P': soln[0][0], 'T': soln[0][1]}
-        for i, variable in enumerate(compositional_variables(assemblage)):
-            sol_dict[variable] = soln[0][2+i]
+        sol_dict = {'P': soln[0][0], 'T': soln[0][1], 'c': soln[0][2:2+len(indices)], 'variables': compositional_variables(assemblage, indices)}
         return sol_dict
     else:
         raise Exception('Solution could not be found, error: \n'+soln[3]+'\n Guesses:'
@@ -594,8 +646,8 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
     """
     
     def minimize(x, composition1, composition2, assemblage, constraints, master_constraint, guesses):
-        composition = binary_composition(composition1, composition2, x)
-        vecsol = gibbs_minimizer(composition, assemblage, constraints)
+        composition = binary_composition(composition1, composition2, x[0])
+        vecsol = gibbs_minimizer(composition, assemblage, constraints, guesses)
         return master_constraint[1] - vecsol[master_constraint[0]]
 
     c = 0
@@ -606,7 +658,7 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
             c=1
         else:
             new_constraints.append(constraint)
-
+            
     soln = opt.fsolve(minimize, [guessed_bulk], args=(composition1, composition2,
                                                       assemblage, new_constraints,
                                                       master_constraint, guesses),
@@ -627,19 +679,35 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     all_phases.extend(phases)
     assemblage = Composite(all_phases)
 
-    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    
+    s = sum(composition.values())
+    composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
+
+    stoichiometric_matrix, comp_vector, elements, \
+      formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
+
+    old_i = -1
     c0a = []
     c0b = []
     c1 = []
-    for n_endmembers in endmembers_per_phase:
-        c0a.append(0.)
-        c0b.append(0.)
-        c1.append(1.)
-        for i in xrange(n_endmembers - 1):
-            c0.append(0.)
+    for (i, j) in indices:
+        if i != old_i:
+            if i==0:
+                c0a.append(1.)
+                c0b.append(0.)
+            elif i==1:
+                c0a.append(0.)
+                c0b.append(1.)
+            else:
+                c0a.append(0.)
+                c0b.append(0.)
+            c1.append(1.)
+            old_i = i
+        else:
+            c0a.append(0.)
+            c0b.append(0.)
             c1.append(0.)
-    c0a[0] = 1.
-    c0b[endmembers_per_phase[0]] = 1.
+
 
     constraints= [['X', c0a, c1, 0.], ['X', c0b, c1, 0.]]
     soln_array = gibbs_minimizer(composition, assemblage, constraints, guesses)
@@ -652,15 +720,24 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     assemblage = Composite(all_phases)
 
     
-    stoichiometric_matrix, elements, formulae, endmembers_per_phase = assemble_stoichiometric_matrix ( assemblage.phases )
+    s = sum(composition.values())
+    composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
+
+    stoichiometric_matrix, comp_vector, elements, \
+      formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
+
+
+    old_i = -1
     c0 = []
     c1 = []
-    for n_endmembers in endmembers_per_phase:
+    for (i, j) in indices:
         c0.append(0.)
-        c1.append(1.)
-        for i in xrange(n_endmembers - 1):
-            c0.append(0.)
+        if i != old_i:
+            c1.append(1.)
+            old_i = i
+        else:
             c1.append(0.)
+
     c0[0] = 1.
     
     soln_array = np.empty_like(condition_array)

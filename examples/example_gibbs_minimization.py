@@ -33,7 +33,6 @@ import matplotlib.pyplot as plt
 from burnman.equilibriumassemblage import gibbs_minimizer, gibbs_bulk_minimizer, find_invariant, find_univariant
 
 if __name__ == "__main__":
-    '''
     # Example 1: The classic aluminosilicate diagram.
     # This is a T-P phase diagram with composition Al2SiO5,
     # which is the composition of andalusite, sillimanite and
@@ -77,10 +76,8 @@ if __name__ == "__main__":
     plt.ylabel('Pressure (GPa)')
     plt.legend(loc='upper left')
     plt.show()
-
-
-
-
+    
+    
     # Example 2: The olivine phase diagram at 1400 K
     # Our aim here is to plot the X-P phase diagram
     # for Mg2SiO4-Fe2SiO4 olivine at a fixed temperature
@@ -132,9 +129,9 @@ if __name__ == "__main__":
     # (where X is the distance along the compositional binary),
     # followed by the compositional vector
     P_inv = sol['P']
-    x_ol_inv = sol['p(Fayalite)']
-    x_wad_inv = sol['p(Fe_Wadsleyite)']
-    x_rw_inv = sol['p(Fe_Ringwoodite)']
+    x_ol_inv = sol['c'][sol['variables'].index('p(Fayalite)')]
+    x_wad_inv = sol['c'][sol['variables'].index('p(Fe_Wadsleyite)')]
+    x_rw_inv = sol['c'][sol['variables'].index('p(Fe_Ringwoodite)')]
 
     # Here we print the properties of the invariant point
     print('Example 2: The olivine polymorphs')
@@ -152,11 +149,9 @@ if __name__ == "__main__":
                    burnman.Composite([ol, rw]),
                    burnman.Composite([wad, rw])]
 
-    # Note that the bounds do not extend to the edges of the binary,
-    # as the problem is ill-posed here. 
-    c_bounds = [[0.000001, x_ol_inv, 21],
-                [x_ol_inv, 0.999999, 21],
-                [0.0000001, x_wad_inv, 21]]
+    c_bounds = [[0., x_ol_inv, 21],
+                [x_ol_inv, 1., 21],
+                [0., x_wad_inv, 21]]
 
     # For a given composition, find the pressure at which the
     # second phase of each binary loop becomes stable,
@@ -171,10 +166,8 @@ if __name__ == "__main__":
     
         for i, x in enumerate(x1):
             composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
-            constraints= [['T', T], ['X', [1., 0., 0., 0.], [1., 0., 1., 0.], 0.999999]]
-            sol = gibbs_minimizer(composition, assemblage, constraints)
-            pressures[i] = sol['P']
-            x2[i] = sol['p('+assemblage.phases[1].endmembers[1][0].name+')']
+            pressures[i] = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T])[0]
+            x2[i] = assemblage.phases[1].molar_fractions[1]
         plt.plot(x1, pressures/1.e9, label=assemblage.phases[1].name+'-in')
         plt.plot(x2, pressures/1.e9, label=assemblage.phases[0].name+'-in')
 
@@ -185,7 +178,7 @@ if __name__ == "__main__":
     plt.ylabel('Pressure (GPa)')
     plt.legend(loc='upper right')
     plt.show()
-
+    
 
 
     # Example 3: Lower mantle phase relations
@@ -209,35 +202,54 @@ if __name__ == "__main__":
     x_fper = np.empty_like(pressures)
     for i, P in enumerate(pressures):
         sol = gibbs_minimizer(composition, assemblage, [['P', P], ['T', T]])
-        x_bdg[i] = sol['p('+bdg.endmembers[1][0].name+')']
-        x_fper[i] = sol['p('+fper.endmembers[1][0].name+')']
+        
+        x_bdg[i] = sol['c'][1]
+        x_fper[i] = sol['c'][4]
 
     # Let's print out a bit of information
     print('Example 3: Lower mantle phase relations in peridotite')
     print('Composition: {}'.format(composition))
     print('At {0:.1f} GPa and {1:.0f} K, ferropericlase contains {2:.1f} mole percent FeO'.format(pressures[0]/1.e9, T, 100.*x_fper[0]))
     print('At {0:.1f} GPa and {1:.0f} K, this has changed to {2:.1f} mole percent FeO'.format(pressures[-1]/1.e9, T, 100.*x_fper[-1]))
-
+    print()
+    
     # Finally, we plot the coexisting compositions 
     plt.plot(pressures, x_bdg, label='x(Fe) bdg')
     plt.plot(pressures, x_fper, label='x(Fe) fper')
     plt.legend(loc='upper right')
+    plt.title('Bridgmanite-ferropericlase compositions at '+str(T)+' K')
     plt.show()
     
-    '''
-    # Example 4: Solvus in pyrope-grossular
-
     
-    composition = { 'Na': 0., 'Ca': 1.5, 'Fe': 0., 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
+    # Example 4: Solvus in pyrope-grossular
+    composition = { 'Ca': 1.5, 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
     garnet0 = SLB_2011.garnet()
     garnet1 = SLB_2011.garnet()
     assemblage = burnman.Composite([garnet0, garnet1])
-    print(garnet0.endmembers)
+    
     P = 1.e5
-    temperatures = np.linspace(300., 800., 21)
-
-    for i, T in enumerate(temperatures):
+    temperatures = []
+    c_g1 = []
+    c_g2 = []
+    
+    for T in np.linspace(300., 600., 21):
         constraints=[['P', P], ['T', T]]
-        sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[P, T, 0.5, 0., 0.979, 0., 0., 0.5, 0., 0.021, 0., 0.])
-        
+        try:
+            sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[P, T, 0.5, 0.021, 0.5, 0.979])
+            if np.abs(sol['c'][1] - sol['c'][3]) > 1.e-10:
+                temperatures.append(T)
+                c_g1.append(sol['c'][1])
+                c_g2.append(sol['c'][3])
+        except:
+            print('No solution found at '+str(T)+' K')
 
+            
+    print('Example 4: Garnet immiscibility')
+    print('At {0:.1f} GPa and {1:.0f} K, the pyrope-grossular immiscibility gap extends from {2:.3f} to {3:.3f} mole percent grossular'.format(P/1.e9, temperatures[0], c_g1[0], c_g2[0]))
+
+            
+    plt.plot(c_g1, temperatures)
+    plt.plot(c_g2, temperatures)
+    plt.xlabel(sol['variables'][1])
+    plt.title('Pyrope-grossular immiscibility at '+str(P/1.e9)+' GPa')
+    plt.show()

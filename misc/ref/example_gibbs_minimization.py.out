@@ -10,3 +10,6 @@ Example 3: Lower mantle phase relations in peridotite
 Composition: {'Mg': 1.775, 'Si': 0.975, 'Fe': 0.2, 'O': 4.0, 'Al': 0.05}
 At 22.0 GPa and 2000 K, ferropericlase contains 15.7 mole percent FeO
 At 130.0 GPa and 2000 K, this has changed to 13.4 mole percent FeO
+
+Example 4: Garnet immiscibility
+At 0.0 GPa and 300 K, the pyrope-grossular immiscibility gap extends from 0.021 to 0.979 mole percent grossular
