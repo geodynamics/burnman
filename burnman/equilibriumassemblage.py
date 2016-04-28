@@ -85,7 +85,7 @@ def assemble_stoichiometric_matrix ( minerals, composition ):
     for i,e in enumerate(elements):
         for j,f in enumerate(formulae):
             stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
-            
+    
     # Check that the bulk composition can be described by a linear set of the endmembers
     comp_vector = np.array([composition[element] for element in elements])
     potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
@@ -96,14 +96,14 @@ def assemble_stoichiometric_matrix ( minerals, composition ):
     ctol=1.e-3 # compositional tolerance.
     if (any(abs(residual) > ctol for residual in resid)):
         raise Exception("Bulk composition is well outside the compositional range of the chosen minerals (Maximum residual: "+str(max(resid))+"). Exiting.")
-        
+       
     # Try to remove endmembers which cannot be constituents of the solution
-    null_endmember_indices = [ i for i, amount in enumerate(potential_endmember_amounts) if amount < 1.e-10]
-    for i in reversed(null_endmember_indices):
-        stoichiometric_matrix = np.delete(stoichiometric_matrix, i, 1)
-        del indices[i]
-        del formulae[i]
-
+    # This is not correct at the moment
+    #null_endmember_indices = [ i for i, amount in enumerate(potential_endmember_amounts) if amount < 1.e-10]
+    #for i in reversed(null_endmember_indices):
+    #    stoichiometric_matrix = np.delete(stoichiometric_matrix, i, 1)
+    #    del indices[i]
+    #    del formulae[i]
     
     # Now we can find a potential solution to our problem (one that satisfies the bulk composition constraints)
     potential_endmember_amounts,resid,rank,s = linalg.lstsq(stoichiometric_matrix,comp_vector)
@@ -402,6 +402,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
     P = PTX[0]
     T = PTX[1]
     X = PTX[2:]
+
     # Here are the two P, T or compositional constraints
     eqns = []
     for constraint in constraints:
@@ -531,12 +532,16 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     # and then finds the nullspace, which corresponds to a set of independent reactions
     stoichiometric_matrix, comp_vector, elements, \
       formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
-      
+
+
+    print('WARNING: still need to find a better starting guess for endmember amounts and compositions')  
+    print('Also need to find way to remove phases which cannot be stable')  
     col, null = compute_column_and_null_spaces(stoichiometric_matrix)
     null = sparsify_basis(null)
     col = sparsify_basis(col)
-
+    
     initial_composition = endmember_fractions_to_cvector(potential_endmember_amounts, indices, endmembers_per_phase)
+    
     # If an initial guess hasn't been given, make one
     if guesses == None:
         guesses = [10.e9, 1200.]
@@ -682,14 +687,9 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
 
-    stoichiometric_matrix, comp_vector, elements, \
-      formulae, indices, endmembers_per_phase, base_potential_endmember_amounts = assemble_stoichiometric_matrix ( base_assemblage.phases, composition )
-      
+    # Only needed for indices
     stoichiometric_matrix, comp_vector, elements, \
       formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
-
-    potential_endmember_amounts = [0. for i in xrange(len(potential_endmember_amounts) - len(base_potential_endmember_amounts))]
-    potential_endmember_amounts.extend(base_potential_endmember_amounts)
 
     c0a = [0. for index in indices]
     c0b = [0. for index in indices]
@@ -711,16 +711,11 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
-
-    stoichiometric_matrix, comp_vector, elements, \
-      formulae, indices, endmembers_per_phase, base_potential_endmember_amounts = assemble_stoichiometric_matrix ( base_assemblage.phases, composition )
       
+    # Only needed for indices
     stoichiometric_matrix, comp_vector, elements, \
       formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
-
-    potential_endmember_amounts = [0. for i in xrange(len(potential_endmember_amounts) - len(base_potential_endmember_amounts))]
-    potential_endmember_amounts.extend(base_potential_endmember_amounts)
-
+    
     c0 = [0. for index in indices]
     c0[0] = 1.
     c1 = [1.]

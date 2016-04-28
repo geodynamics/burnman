@@ -30,7 +30,7 @@ from burnman.minerals import HP_2011_ds62, SLB_2011
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
-from burnman.equilibriumassemblage import gibbs_minimizer, gibbs_bulk_minimizer, find_invariant, find_univariant
+from burnman.equilibriumassemblage import *
 
 if __name__ == "__main__":
     # Example 1: The classic aluminosilicate diagram.
@@ -85,12 +85,16 @@ if __name__ == "__main__":
     # behind find_invariant and find_univariant
     
     # Here we define the temperature and assemblage
-    T = 1400.
+    T = 1673.
     
     ol = SLB_2011.mg_fe_olivine()
     wad = SLB_2011.mg_fe_wadsleyite()
     rw = SLB_2011.mg_fe_ringwoodite()
+    fp = SLB_2011.ferropericlase()
+    pv = SLB_2011.mg_fe_bridgmanite()
+    stv = SLB_2011.stishovite()
     assemblage = burnman.Composite([ol, wad, rw])
+    assemblage2 = burnman.Composite([rw, pv, fp, stv])
 
     # We are interested in reactions at various compositions,
     # so here we define the compositions bounding the binary
@@ -124,7 +128,7 @@ if __name__ == "__main__":
 
     # Here we call the gibbs bulk minimizer.
     sol = gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
-
+    
     # The output of the bulk minimizer is a dictionary containing P, T, X
     # (where X is the distance along the compositional binary),
     # followed by the compositional vector
@@ -133,6 +137,20 @@ if __name__ == "__main__":
     x_wad_inv = sol['c'][sol['variables'].index('p(Fe_Wadsleyite)')]
     x_rw_inv = sol['c'][sol['variables'].index('p(Fe_Ringwoodite)')]
 
+    # Let's do the same for the second invariant
+    composition = binary_composition(composition1, composition2, 0.4)
+    constraints2 = [['T', T],
+                    ['X', [1., 0., 0., 0., 0., 0., 0.], [1., 0., 1., 0., 1., 0., 1.], 0.]]    
+
+    # Here we call the gibbs bulk minimizer.
+    sol = find_univariant(composition, [fp, stv], rw, 'T', [T])
+    
+    print(sol)
+    sol = find_univariant(composition, [fp, stv], pv, 'T', [T])
+    print(sol)
+
+    exit()
+        
     # Here we print the properties of the invariant point
     print('Example 2: The olivine polymorphs')
     print('The pressure of the olivine polymorph invariant at {0:.0f} K is {1:.1f} GPa'.format(T, P_inv/1.e9))
