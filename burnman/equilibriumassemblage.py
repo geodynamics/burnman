@@ -426,7 +426,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
     if any(f < 0. for f in c[0]):
         raise Exception('Gibbs minimization failed as a result of a phase amount being < 0. This might indicate that the starting guess is poor, or that there is no solution to this problem')
 
-    assemblage.set_fractions(c[0])
+    assemblage.set_fractions(c[0]/sum(c[0]))
     for i, composition in enumerate(c[1]):
         if len(composition) > 1:
             assemblage.phases[i].set_composition(composition)
@@ -551,11 +551,9 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     
     # Set up the problem and attempt to solve it
     # Ignore warning due to changing the phase fractions such that they don't equal 1. They're renormalised anyway.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        soln=opt.fsolve(set_eqns, guesses,
-                        args=(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints),
-                        xtol=1e-10, full_output=True)
+    soln=opt.fsolve(set_eqns, guesses,
+                    args=(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints),
+                    xtol=1e-10, full_output=True)
 
     
     if soln[2]==1:
@@ -675,39 +673,30 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
         
 
 def find_invariant(composition, phases, zero_phases, guesses=None):
+
     all_phases = zero_phases
     all_phases.extend(phases)
     assemblage = Composite(all_phases)
+    base_assemblage = Composite(phases)
 
-    
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
 
     stoichiometric_matrix, comp_vector, elements, \
+      formulae, indices, endmembers_per_phase, base_potential_endmember_amounts = assemble_stoichiometric_matrix ( base_assemblage.phases, composition )
+      
+    stoichiometric_matrix, comp_vector, elements, \
       formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
 
-    old_i = -1
-    c0a = []
-    c0b = []
-    c1 = []
-    for (i, j) in indices:
-        if i != old_i:
-            if i==0:
-                c0a.append(1.)
-                c0b.append(0.)
-            elif i==1:
-                c0a.append(0.)
-                c0b.append(1.)
-            else:
-                c0a.append(0.)
-                c0b.append(0.)
-            c1.append(1.)
-            old_i = i
-        else:
-            c0a.append(0.)
-            c0b.append(0.)
-            c1.append(0.)
+    potential_endmember_amounts = [0. for i in xrange(len(potential_endmember_amounts) - len(base_potential_endmember_amounts))]
+    potential_endmember_amounts.extend(base_potential_endmember_amounts)
 
+    c0a = [0. for index in indices]
+    c0b = [0. for index in indices]
+    c1 = [1.]
+    c1.extend([float(t - s) for s, t in zip(zip(*indices)[0], zip(*indices)[0][1:])])
+    c0a[0] = 1.
+    c0b[c1.index(1., 1)] = 1.
 
     constraints= [['X', c0a, c1, 0.], ['X', c0b, c1, 0.]]
     soln_array = gibbs_minimizer(composition, assemblage, constraints, guesses)
@@ -718,27 +707,24 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     all_phases = [zero_phase]
     all_phases.extend(phases)
     assemblage = Composite(all_phases)
-
+    base_assemblage = Composite(phases)
     
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
 
     stoichiometric_matrix, comp_vector, elements, \
+      formulae, indices, endmembers_per_phase, base_potential_endmember_amounts = assemble_stoichiometric_matrix ( base_assemblage.phases, composition )
+      
+    stoichiometric_matrix, comp_vector, elements, \
       formulae, indices, endmembers_per_phase, potential_endmember_amounts = assemble_stoichiometric_matrix ( assemblage.phases, composition )
 
+    potential_endmember_amounts = [0. for i in xrange(len(potential_endmember_amounts) - len(base_potential_endmember_amounts))]
+    potential_endmember_amounts.extend(base_potential_endmember_amounts)
 
-    old_i = -1
-    c0 = []
-    c1 = []
-    for (i, j) in indices:
-        c0.append(0.)
-        if i != old_i:
-            c1.append(1.)
-            old_i = i
-        else:
-            c1.append(0.)
-
+    c0 = [0. for index in indices]
     c0[0] = 1.
+    c1 = [1.]
+    c1.extend([float(t - s) for s, t in zip(zip(*indices)[0], zip(*indices)[0][1:])])
     
     soln_array = np.empty_like(condition_array)
     if condition_variable=='P':
