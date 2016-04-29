@@ -32,6 +32,31 @@ import scipy.optimize as opt
 import matplotlib.pyplot as plt
 from burnman.equilibriumassemblage import *
 
+'''
+andalusite = HP_2011_ds62.andalusite()
+sillimanite = HP_2011_ds62.sill()
+kyanite = HP_2011_ds62.ky()
+
+composition = andalusite.params['formula']
+constraints = [['X', [1., 0., 0.], [1., 1., 1.], 0.],
+               ['X', [0., 1., 0.], [1., 1., 1.], 0.]]
+
+col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, [andalusite, kyanite, sillimanite], constraints )
+#print(col, null, initial_composition, indices, endmembers_per_phase)
+
+
+composition = { 'Ca': 1.5, 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
+garnet0 = SLB_2011.garnet()
+garnet1 = SLB_2011.garnet()
+constraints=[['P', 1.e5], ['T', 300.]]
+col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, [garnet0, garnet1], constraints )
+#print(col, null, initial_composition, indices, endmembers_per_phase)
+
+
+exit()
+'''
+
+
 if __name__ == "__main__":
     # Example 1: The classic aluminosilicate diagram.
     # This is a T-P phase diagram with composition Al2SiO5,
@@ -90,11 +115,7 @@ if __name__ == "__main__":
     ol = SLB_2011.mg_fe_olivine()
     wad = SLB_2011.mg_fe_wadsleyite()
     rw = SLB_2011.mg_fe_ringwoodite()
-    fp = SLB_2011.ferropericlase()
-    pv = SLB_2011.mg_fe_bridgmanite()
-    stv = SLB_2011.stishovite()
     assemblage = burnman.Composite([ol, wad, rw])
-    assemblage2 = burnman.Composite([rw, pv, fp, stv])
 
     # We are interested in reactions at various compositions,
     # so here we define the compositions bounding the binary
@@ -137,20 +158,7 @@ if __name__ == "__main__":
     x_wad_inv = sol['c'][sol['variables'].index('p(Fe_Wadsleyite)')]
     x_rw_inv = sol['c'][sol['variables'].index('p(Fe_Ringwoodite)')]
 
-    # Let's do the same for the second invariant
-    composition = binary_composition(composition1, composition2, 0.4)
-    constraints2 = [['T', T],
-                    ['X', [1., 0., 0., 0., 0., 0., 0.], [1., 0., 1., 0., 1., 0., 1.], 0.]]    
-
-    # Here we call the gibbs bulk minimizer.
-    sol = find_univariant(composition, [fp, stv], rw, 'T', [T])
-    
-    print(sol)
-    sol = find_univariant(composition, [fp, stv], pv, 'T', [T])
-    print(sol)
-
-    exit()
-        
+       
     # Here we print the properties of the invariant point
     print('Example 2: The olivine polymorphs')
     print('The pressure of the olivine polymorph invariant at {0:.0f} K is {1:.1f} GPa'.format(T, P_inv/1.e9))
@@ -244,23 +252,25 @@ if __name__ == "__main__":
     garnet0 = SLB_2011.garnet()
     garnet1 = SLB_2011.garnet()
     assemblage = burnman.Composite([garnet0, garnet1])
-    
     P = 1.e5
     temperatures = []
     c_g1 = []
     c_g2 = []
-    
+
+    c1=0.021
+    c2=0.979
     for T in np.linspace(300., 600., 21):
         constraints=[['P', P], ['T', T]]
         try:
-            sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[P, T, 0.5, 0.021, 0.5, 0.979])
+            sol = gibbs_minimizer(composition, assemblage, constraints, guesses=[P, T, 0.5, c1, 0.5, c2])
             if np.abs(sol['c'][1] - sol['c'][3]) > 1.e-10:
                 temperatures.append(T)
-                c_g1.append(sol['c'][1])
-                c_g2.append(sol['c'][3])
+                c1=sol['c'][1]
+                c2=sol['c'][3]
+                c_g1.append(c1)
+                c_g2.append(c2)
         except:
-            print('No solution found at '+str(T)+' K')
-
+            print('No solution found at {0:.1f} K'.format(T))
             
     print('Example 4: Garnet immiscibility')
     print('At {0:.1f} GPa and {1:.0f} K, the pyrope-grossular immiscibility gap extends from {2:.3f} to {3:.3f} mole percent grossular'.format(P/1.e9, temperatures[0], c_g1[0], c_g2[0]))
