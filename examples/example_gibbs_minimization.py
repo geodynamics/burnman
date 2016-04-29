@@ -32,31 +32,6 @@ import scipy.optimize as opt
 import matplotlib.pyplot as plt
 from burnman.equilibriumassemblage import *
 
-'''
-andalusite = HP_2011_ds62.andalusite()
-sillimanite = HP_2011_ds62.sill()
-kyanite = HP_2011_ds62.ky()
-
-composition = andalusite.params['formula']
-constraints = [['X', [1., 0., 0.], [1., 1., 1.], 0.],
-               ['X', [0., 1., 0.], [1., 1., 1.], 0.]]
-
-col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, [andalusite, kyanite, sillimanite], constraints )
-#print(col, null, initial_composition, indices, endmembers_per_phase)
-
-
-composition = { 'Ca': 1.5, 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
-garnet0 = SLB_2011.garnet()
-garnet1 = SLB_2011.garnet()
-constraints=[['P', 1.e5], ['T', 300.]]
-col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, [garnet0, garnet1], constraints )
-#print(col, null, initial_composition, indices, endmembers_per_phase)
-
-
-exit()
-'''
-
-
 if __name__ == "__main__":
     # Example 1: The classic aluminosilicate diagram.
     # This is a T-P phase diagram with composition Al2SiO5,
@@ -73,7 +48,7 @@ if __name__ == "__main__":
     # three phases coexist. The function find_invariant takes a bulk composition
     # and then two variables which constitute the stable phases and the two phases
     # which become stable at that point.
-    P_inv, T_inv = find_invariant(composition, [andalusite], [sillimanite, kyanite])
+    P_inv, T_inv = find_invariant(composition, [andalusite], [sillimanite, kyanite])[0:2]
     
     # Here we print the P-T position of the invariant point
     print('Example 1: The aluminosilicates')
@@ -88,13 +63,13 @@ if __name__ == "__main__":
     # For isochemical diagrams, we can make use of the function find_univariant,
     # which for a given composition and a pressure (temperature) range outputs the temperatures
     # (pressures) where one phase in an assemblage becomes unstable.
-    and_ky_temperatures = find_univariant(composition, [andalusite], kyanite, 'P', lo_pressures)
-    and_sill_temperatures = find_univariant(composition, [andalusite], sillimanite, 'P', lo_pressures)
-    sill_ky_temperatures = find_univariant(composition, [sillimanite], kyanite, 'P', hi_pressures)
+    and_ky_eqm = find_univariant(composition, [andalusite], kyanite, 'P', lo_pressures)
+    and_sill_eqm = find_univariant(composition, [andalusite], sillimanite, 'P', lo_pressures)
+    sill_ky_eqm = find_univariant(composition, [sillimanite], kyanite, 'P', hi_pressures)
 
-    plt.plot(and_ky_temperatures, lo_pressures/1.e9, label='and-ky')
-    plt.plot(and_sill_temperatures, lo_pressures/1.e9, label='and-sill')
-    plt.plot(sill_ky_temperatures, hi_pressures/1.e9, label='sill-ky')
+    plt.plot(zip(*and_ky_eqm)[1], lo_pressures/1.e9, label='and-ky')
+    plt.plot(zip(*and_sill_eqm)[1], lo_pressures/1.e9, label='and-sill')
+    plt.plot(zip(*sill_ky_eqm)[1], hi_pressures/1.e9, label='sill-ky')
     
     plt.title('Aluminosilicate phase diagram')
     plt.xlabel('Temperature (K)')
@@ -115,13 +90,56 @@ if __name__ == "__main__":
     ol = SLB_2011.mg_fe_olivine()
     wad = SLB_2011.mg_fe_wadsleyite()
     rw = SLB_2011.mg_fe_ringwoodite()
+    pv = SLB_2011.mg_fe_bridgmanite()
+    fper = SLB_2011.ferropericlase()
+    stv = SLB_2011.stishovite()
     assemblage = burnman.Composite([ol, wad, rw])
 
+    
     # We are interested in reactions at various compositions,
     # so here we define the compositions bounding the binary
     composition1 = { 'Mg': 2., 'Si': 1., 'O': 4.}
     composition2 = { 'Fe': 2., 'Si': 1., 'O': 4.}
 
+    '''
+    # The following illustrates some starting-composition-sensitive solves. 
+    # It would be quite nice to make the solver more robust with respect to these guys...  
+    composition = binary_composition(composition1, composition2, 0.3)
+    pressure0 = find_univariant(composition, [fper, rw], stv, 'T', [T], [2.e10, T, 0., 0., 0.5, 1., 0.3])[0]
+    print(pressure0/1.e9)
+
+    guesses = [23.6e9, T, 0.0, 0.1, 0.6, 2., 0.3, 0., 0.1]
+    pressure = find_univariant(composition, [stv, fper, rw], pv, 'T', [T], guesses)[0]
+    print(pressure/1.e9)
+
+    #pressure1 = find_univariant(composition, [stv, fper], rw, 'T', [T])[0]
+    #print(pressure1/1.e9)
+    #pressure = find_univariant(composition, [stv, fper], pv, 'T', [T])[0]
+    #print(pressure/1.e9)
+    
+    pressure = find_univariant(composition, [pv, fper], stv, 'T', [T])[0]
+    print(pressure/1.e9)
+
+    pressures = np.linspace(pressure0 + 1.e6, pressure1 - 1.e6, 21)
+    pwus0 = np.empty_like(pressures)
+    pwus1 = np.empty_like(pressures)
+    
+    sfr = burnman.Composite([stv, fper, rw])
+    sfp = burnman.Composite([stv, fper, pv])
+    for i, P in enumerate(pressures):
+        sfr_guesses = [P, T, 0., 0., 0.5, 1., 0.3]
+        sfp_guesses = [P, T, 1., 2., 0.3, 0., 0.1]
+        sol = gibbs_minimizer(composition, sfr, [['P', P], ['T', T]], sfr_guesses)
+        pwus0[i] = sol['c'][sol['variables'].index('x(Stishovite)')]
+        sol = gibbs_minimizer(composition, sfp, [['P', P], ['T', T]], sfp_guesses)
+        pwus1[i] = sol['c'][sol['variables'].index('x(Stishovite)')]
+
+    plt.plot(pressures/1.e9, pwus0)
+    plt.plot(pressures/1.e9, pwus1)
+    plt.show()
+    exit()
+    '''
+    
     # First, we want to find the pressure at which olivine,
     # wadsleyite and ringwoodite coexist, and their compositions
     # There are many ways to do this, but here we fix the temperature
@@ -189,10 +207,11 @@ if __name__ == "__main__":
         x1 = np.linspace(*c_bounds[i])
         x2 = np.empty_like(x1)
         pressures = np.empty_like(x1)
-    
+        guesses = None
         for i, x in enumerate(x1):
             composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
-            pressures[i] = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T])[0]
+            sol = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T], guesses)
+            pressures[i] = sol[0][0]
             x2[i] = assemblage.phases[1].molar_fractions[1]
         plt.plot(x1, pressures/1.e9, label=assemblage.phases[1].name+'-in')
         plt.plot(x2, pressures/1.e9, label=assemblage.phases[0].name+'-in')

@@ -174,7 +174,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     amount = 1.
     for i, index in enumerate(indices):
         i_idx, j_idx = index
-        if i_idx == old_idx and amount < 1.e-5:
+        if i_idx == old_idx and amount < 1.e-3:
             initial_composition[i] = 1./endmembers_per_phase[i_idx]/2.
         else:
             old_idx = i_idx
@@ -509,7 +509,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
         else:
             full_partial_gibbs.append([phase.gibbs])
 
-    # Remove endmembers from the partial_gibbs vector if they do not fall within the
+    # Add endmembers to the partial_gibbs vector only if they fall within the
     # compositional space given by "indices"
     partial_gibbs = []
     for (i_idx, j_idx) in indices:
@@ -594,13 +594,13 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     """
 
     # Redefine composition removing negligible elements (where n atoms < 0.0001 % total atoms)
+    # Set up the inputs to the gibbs minimizer 
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
-        
-    # The function assemble_compositional_tensors sets up a matrix of the endmember compositions
-    # and finds the column and left nullspace which corresponds to a set of independent reactions
     col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, constraints )
-    
+    return _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+
+def _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses=None):
     # If an initial guess hasn't been given, make one
     if guesses == None:
         guesses = [10.e9, 1200.]
@@ -757,9 +757,13 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     c0b[c1.index(1., 1)] = 1.
 
     constraints= [['X', c0a, c1, 0.], ['X', c0b, c1, 0.]]
-    soln_array = gibbs_minimizer(composition, assemblage, constraints, guesses)
-
-    return (soln_array['P'], soln_array['T'])    
+    
+    col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, constraints )
+    
+    sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+    solvec = [sol['P'], sol['T']]
+    solvec.extend(sol['c'])
+    return solvec
     
 def find_univariant(composition, phases, zero_phase, condition_variable, condition_array, guesses=None):
     all_phases = [zero_phase]
@@ -775,15 +779,30 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     c0[0] = 1.
     c1 = [1.]
     c1.extend([float(t - s) for s, t in zip(zip(*indices)[0], zip(*indices)[0][1:])])
-    
-    soln_array = np.empty_like(condition_array)
+
+    X_constraint = ['X', c0, c1, 0.]
+    col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, [X_constraint] )
+
+    soln_array = []
     if condition_variable=='P':
         for i, P in enumerate(condition_array):
-            constraints= [['P', P], ['X', c0, c1, 0.]]
-            soln_array[i] = gibbs_minimizer(composition, assemblage, constraints, guesses)['T']
+            constraints= [['P', P], X_constraint]
+            try:
+                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+                guesses = [sol['P'], sol['T']]
+                guesses.extend(sol['c'])
+                soln_array.append(guesses)
+            except:
+                print('No solution found at {0:.5f} GPa'.format(P/1.e9))
     elif condition_variable=='T':
         for i, T in enumerate(condition_array):
-            constraints= [['T', T], ['X', c0, c1, 0.]]
-            soln_array[i] = gibbs_minimizer(composition, assemblage, constraints, guesses)['P']
+            constraints= [['T', T], X_constraint]
+            try:
+                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+                guesses = [sol['P'], sol['T']]
+                guesses.extend(sol['c'])
+                soln_array.append(guesses)
+            except:
+                print('No solution found at {0:.1f} K'.format(T))
 
     return soln_array
