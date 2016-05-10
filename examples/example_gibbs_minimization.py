@@ -85,7 +85,6 @@ if __name__ == "__main__":
     # behind find_invariant and find_univariant
     
     # Here we define the temperature and assemblage
-    T = 1673.
     
     ol = SLB_2011.mg_fe_olivine()
     wad = SLB_2011.mg_fe_wadsleyite()
@@ -93,7 +92,6 @@ if __name__ == "__main__":
     pv = SLB_2011.mg_fe_bridgmanite()
     fper = SLB_2011.ferropericlase()
     stv = SLB_2011.stishovite()
-    assemblage = burnman.Composite([ol, wad, rw])
 
     
     # We are interested in reactions at various compositions,
@@ -159,69 +157,78 @@ if __name__ == "__main__":
     # dot(constraint[1],cvector)/dot(constraint[2],cvector) = constraint[3]
     # For the invariant point, the two constraints are that the proportion
     # of two of the phases goes to zero.
-    
-    constraints = [['T', T],
-                   ['X', [0., 0., 1., 0., 0., 0.], [1., 0., 1., 0., 1., 0.], 0.],
-                   ['X', [0., 0., 0., 0., 1., 0.], [1., 0., 1., 0., 1., 0.], 0.]]
+    for T, color in [(1673., 'black')]:
+        
+        assemblage = burnman.Composite([ol, wad, rw])
+        constraints = [['T', T],
+                       ['X', [0., 0., 1., 0., 0., 0.], [1., 0., 1., 0., 1., 0.], 0.],
+                       ['X', [0., 0., 0., 0., 1., 0.], [1., 0., 1., 0., 1., 0.], 0.]]
+        
 
-
-    # Here we call the gibbs bulk minimizer.
-    sol = gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
+        # Here we call the gibbs bulk minimizer.
+        sol = gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
     
-    # The output of the bulk minimizer is a dictionary containing P, T, X
-    # (where X is the distance along the compositional binary),
-    # followed by the compositional vector
-    P_inv = sol['P']
-    x_ol_inv = sol['c'][sol['variables'].index('p(Fayalite)')]
-    x_wad_inv = sol['c'][sol['variables'].index('p(Fe_Wadsleyite)')]
-    x_rw_inv = sol['c'][sol['variables'].index('p(Fe_Ringwoodite)')]
+        # The output of the bulk minimizer is a dictionary containing P, T, X
+        # (where X is the distance along the compositional binary),
+        # followed by the compositional vector
+        P_inv = sol['P']
+        x_ol_inv = sol['c'][sol['variables'].index('p(Fayalite)')]
+        x_wad_inv = sol['c'][sol['variables'].index('p(Fe_Wadsleyite)')]
+        x_rw_inv = sol['c'][sol['variables'].index('p(Fe_Ringwoodite)')]
 
        
-    # Here we print the properties of the invariant point
-    print('Example 2: The olivine polymorphs')
-    print('The pressure of the olivine polymorph invariant at {0:.0f} K is {1:.1f} GPa'.format(T, P_inv/1.e9))
-    print('The molar Fe2SiO4 contents of coexisting ol, wad and rw')
-    print('at this point are {0:.2f}, {1:.2f} and {2:.2f}'.format(x_ol_inv, x_wad_inv, x_rw_inv))
-    print()
+        # Here we print the properties of the invariant point
+        print('Example 2: The olivine polymorphs')
+        print('The pressure of the olivine polymorph invariant at {0:.0f} K is {1:.1f} GPa'.format(T, P_inv/1.e9))
+        print('The molar Fe2SiO4 contents of coexisting ol, wad and rw')
+        print('at this point are {0:.2f}, {1:.2f} and {2:.2f}'.format(x_ol_inv, x_wad_inv, x_rw_inv))
+        print()
 
 
-    # Now we find the rest of the phase diagram.
-    # The compositions of the phases at the invariant point
-    # tell us the ranges of compositions of those phases
-    # we should expect within the stable parts of each binary loop
-    assemblages = [burnman.Composite([ol, wad]),
-                   burnman.Composite([ol, rw]),
-                   burnman.Composite([wad, rw])]
+        # Now we find the rest of the phase diagram.
+        # The compositions of the phases at the invariant point
+        # tell us the ranges of compositions of those phases
+        # we should expect within the stable parts of each binary loop
+        import matplotlib.gridspec as gridspec
+        plt.rc('text', usetex=True)
+        plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
+        plt.rc('font', family='sans-serif')
+        
+        ax1 = plt.figure(figsize=(10, 6))
+        
+        assemblages = [burnman.Composite([ol, wad]),
+                       burnman.Composite([ol, rw]),
+                       burnman.Composite([wad, rw])]
 
-    c_bounds = [[0., x_ol_inv, 21],
-                [x_ol_inv, 1., 21],
-                [0., x_wad_inv, 21]]
+        c_bounds = [[0., x_ol_inv, 21],
+                    [x_ol_inv, 1., 21],
+                    [0., x_wad_inv, 21]]
 
-    # For a given composition, find the pressure at which the
-    # second phase of each binary loop becomes stable,
-    # and the composition of the phase at that point.
+        # For a given composition, find the pressure at which the
+        # second phase of each binary loop becomes stable,
+        # and the composition of the phase at that point.
 
-    # Because each calculation is at a constant composition, we use the
-    # function gibbs_minimizer.
-    for i, assemblage in enumerate(assemblages):
-        x1 = np.linspace(*c_bounds[i])
-        x2 = np.empty_like(x1)
-        pressures = np.empty_like(x1)
-        guesses = None
-        for i, x in enumerate(x1):
-            composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
-            sol = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T], guesses)
-            pressures[i] = sol[0][0]
-            x2[i] = assemblage.phases[1].molar_fractions[1]
-        plt.plot(x1, pressures/1.e9, label=assemblage.phases[1].name+'-in')
-        plt.plot(x2, pressures/1.e9, label=assemblage.phases[0].name+'-in')
+        # Because each calculation is at a constant composition, we use the
+        # function gibbs_minimizer.
+        for i, assemblage in enumerate(assemblages):
+            x1 = np.linspace(*c_bounds[i])
+            x2 = np.empty_like(x1)
+            pressures = np.empty_like(x1)
+            guesses = None
+            for i, x in enumerate(x1):
+                composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
+                sol = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T], guesses)
+                pressures[i] = sol[0][0]
+                x2[i] = assemblage.phases[1].molar_fractions[1]
+            plt.plot(x1, pressures/1.e9, label=assemblage.phases[1].name+'-in', color=color)
+            plt.plot(x2, pressures/1.e9, label=assemblage.phases[0].name+'-in', color=color)
 
-    # Here we finish off the plotting    
-    plt.plot([x_ol_inv, x_rw_inv], [P_inv/1.e9, P_inv/1.e9])
+        # Here we finish off the plotting    
+        plt.plot([x_ol_inv, x_rw_inv], [P_inv/1.e9, P_inv/1.e9], color=color)
     plt.title('Mg2SiO4-Fe2SiO4 phase diagram at '+str(T)+' K')
-    plt.xlabel('p (Fe2SiO4)')
+    plt.xlabel('X Fe2SiO4')
     plt.ylabel('Pressure (GPa)')
-    plt.legend(loc='upper right')
+    #plt.legend(loc='upper right')
     plt.show()
     
 
