@@ -14,7 +14,99 @@ import warnings
 from .mineral import Mineral
 from .solidsolution import SolidSolution
 from .composite import Composite
+from .processchemistry import process_solution_chemistry
 
+def cartesian(arrays, out=None):
+    """
+    Generate a cartesian product of input arrays.
+
+    Parameters
+    ----------
+    arrays : list of array-like
+        1-D arrays to form the cartesian product of.
+    out : ndarray
+        Array to place the cartesian product in.
+
+    Returns
+    -------
+    out : ndarray
+        2-D array of shape (M, len(arrays)) containing cartesian products
+        formed of input arrays.
+
+    """
+
+    arrays = [np.asarray(x) for x in arrays]
+    dtype = arrays[0].dtype
+
+    n = np.prod([x.size for x in arrays])
+    if out is None:
+        out = np.zeros([n, len(arrays)], dtype=dtype)
+
+    m = n / arrays[0].size
+    out[:,0] = np.repeat(arrays[0], m)
+    if arrays[1:]:
+        cartesian(arrays[1:], out=out[0:m,1:])
+        for j in xrange(1, arrays[0].size):
+            out[j*m:(j+1)*m,1:] = out[0:m,1:]
+    return out
+
+def indicize(inp_arr):
+    arr=np.zeros([len(inp_arr), 1+max(inp_arr.flat)])
+    for i, site_indices in enumerate(inp_arr):
+        for j in site_indices:
+            arr[i][j] = 1
+    return arr
+
+def dependent_endmembers(formulae):
+    solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities = process_solution_chemistry(formulae)
+
+    # First, we redefine our endmembers using unique site occupancy indices
+    # We can then find the set of unique occupancies for each site
+    i=0
+    n_sites = 0
+    indices = []
+    site_indices = []
+    
+    for site in sites:
+        site_indices.append([])
+        site_occupancies = map(tuple, endmember_occupancies[:, i:i+len(site)])
+        set_site_occupancies = map(np.array, set(site_occupancies))
+        
+        for site_occupancy in site_occupancies:
+            site_indices[-1].append([i+n_sites for i, set_occupancy in enumerate(set_site_occupancies) if np.array_equal(set_occupancy, site_occupancy)][0])
+        indices.append(np.arange(n_sites,n_sites+len(set_site_occupancies)))
+        
+        i += len(site)
+        n_sites += len(set_site_occupancies)
+
+    given_members = indicize(np.array(zip(*site_indices)))
+
+    
+    # All the potential endmembers can be created from permutations of the unique site occupancies
+    # Note that the solution may not allow all of these endmembers; for example, if there
+    # is an endmember with unique occupancies on two sites,
+    # (e.g. Ca2+ and Fe3+ in the X, Y sites in garnet)
+    # then it will not be possible to exchange Ca2+ for Mg2+ on the X site and retain Fe3+ on the Y site.
+    all_members=indicize(cartesian(indices))
+
+    # Now we return only the endmembers which are not contained within the user-provided independent set
+    a=np.concatenate((given_members, all_members), axis=0)
+    b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
+    _, idx, cnts = np.unique(b, return_index=True, return_counts=True)
+    potential_dependents = a[[i for i, cnt in zip(*[idx, cnts]) if cnt==1]]
+    
+    
+    # We only want the dependent endmembers which can be described by a
+    # linear combination of the independent set
+    tol = 1e-12
+    dependent_endmembers = []
+    for mbr in potential_dependents:
+        a,resid,rank,s = np.linalg.lstsq(given_members.T, mbr)
+        if resid[0] < tol:
+            a.real[abs(a.real) < tol] = 0.0
+            dependent_endmembers.append(a)
+
+    return np.array(dependent_endmembers)
 
 def get_formulae_indices_endmembers(composition, minerals):
     """
@@ -138,6 +230,28 @@ def potential_amounts(comp_vector, stoichiometric_matrix, new_constraints=None):
     check = sol.fun<1.e-15
     return sol.x/norm, check
 
+def make_stoichiometric_matrix(elements, formulae):
+    stoichiometric_matrix = np.empty( [ len(elements), len(formulae) ] )
+    for i,e in enumerate(elements):
+        for j,f in enumerate(formulae):
+            stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
+    return stoichiometric_matrix
+    
+def make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
+                                     indices, minerals,
+                                     endmembers_per_phase):
+    dependent_stoichiometric_matrix = []
+    dependent_vector_lists = []
+    for i in xrange(len(endmembers_per_phase)):
+        mbr_indices = [(index, mbr_idx) for index, (phase_idx, mbr_idx) in enumerate(indices) if phase_idx == i]
+        if len(mbr_indices) > 1:
+            dependent_vectors = dependent_endmembers([minerals[i].solution_model.formulas[idx[1]] for idx in mbr_indices])
+            if len(dependent_vectors) > 0:
+                dependent_vector_lists.append(dependent_vector_lists)
+                dependent_stoichiometric_matrix.append(np.dot(np.array([stoichiometric_matrix[idx[0]] for idx in mbr_indices]), independent_indices[-1]))
+
+    return dependent_stoichiometric_matrix, dependent_vector_lists
+    
 def assemble_compositional_tensors ( composition, minerals, constraints ):
     """
     This function takes a list of minerals and assembles a matrix where 
@@ -185,10 +299,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     elements = list(set(composition.keys()))
     
     #Populate the stoichiometric matrix
-    stoichiometric_matrix = np.empty( [ len(elements), len(formulae) ] )
-    for i,e in enumerate(elements):
-        for j,f in enumerate(formulae):
-            stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
+    stoichiometric_matrix = make_stoichiometric_matrix(elements, formulae)
     
     # Check that the bulk composition can be described by a linear set of the endmembers
     comp_vector = np.array([composition[element] for element in elements])
@@ -215,21 +326,30 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     delta = 1.e-5
     null_endmember_indices = [ i for i, amount in enumerate(potential_endmember_amounts) if amount < 1.e-10]
     for i in reversed(null_endmember_indices):
-        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, stoichiometric_matrix, [[[i], delta]])
+        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector,
+                                                                               stoichiometric_matrix,
+                                                                               [[[i], delta]])
         if not composition_satisfied:
             stoichiometric_matrix = np.delete(stoichiometric_matrix, i, 1)
             del indices[i]
             del formulae[i]
 
+    # Now, let's find the dependent endmembers for each of the solid solutions:
+    dependent_stoichiometric_matrix = make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
+                                                                       indices, minerals,
+                                                                       endmembers_per_phase)
     
     # Now we can find a potential solution to our problem (one that satisfies the bulk composition constraints)
     new_constraints = []
     for compositional_constraint in compositional_constraints:
         new_constraints.append([[i for i, idx in enumerate(indices) if idx[0] == compositional_constraint[0] ], compositional_constraint[1]])
     if new_constraints != []:
-        potential_endmember_amounts, check_composition = potential_amounts(comp_vector, stoichiometric_matrix, new_constraints)
+        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, stoichiometric_matrix, new_constraints)
     else:
-        potential_endmember_amounts, check_composition = potential_amounts(comp_vector, stoichiometric_matrix)
+        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, stoichiometric_matrix)
+
+    if not composition_satisfied:
+        raise Exception('Composition not satisfied. This is a bug; please contact the BurnMan team.')
         
     col, null = compute_column_and_null_spaces(stoichiometric_matrix)
     null = sparsify_basis(null)

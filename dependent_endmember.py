@@ -101,3 +101,9 @@ formulae = ['[Mg]3[Al]2Si3O12',
             '[Ca]3[Fe1/2Si1/2]2Si3O12']
 
 print dependent_endmembers(formulae)
+
+
+this = [[0., 1.], [0., 1.]]
+
+for i, (j, k) in enumerate(this):
+    print i, j, k

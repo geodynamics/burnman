@@ -278,18 +278,16 @@ if __name__ == "__main__":
         composition = { 'Ca': 1.5, 'Mg': 1.5, 'Al': 2., 'Si': 3., 'O': 12.}
         assemblage = burnman.Composite([SLB_2011.garnet(), SLB_2011.garnet()])
         P = 1.e5
-        
-        c1=0.021
-        c2=0.979
-        
+            
+        sol={'c': [0.5, 0.021, 0.5, 0.979]}
         Tccs = []
         for T in np.linspace(300., 600., 21):
             constraints=[['P', P], ['T', T]]
             try:
                 sol = gibbs_minimizer(composition, assemblage, constraints,
                                       guesses=[P, T,
-                                               0.5, 0.0, c1, 0.0, 0.0,
-                                               0.5, 0.0, c2, 0.0, 0.0])
+                                               0.5, 0.0, sol['c'][1], 0.0, 0.0,
+                                               0.5, 0.0, sol['c'][3], 0.0, 0.0])
                 if np.abs(sol['c'][1] - sol['c'][3]) > 1.e-10:
                     Tccs.append([T, sol['c'][1], sol['c'][3]])
             except:
