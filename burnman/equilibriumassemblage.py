@@ -9,10 +9,12 @@ from __future__ import print_function
 import numpy as np
 import scipy.linalg as linalg
 import scipy.optimize as opt
+import warnings
+
 from .mineral import Mineral
 from .solidsolution import SolidSolution
 from .composite import Composite
-import warnings
+
 
 def get_formulae_indices_endmembers(composition, minerals):
     """
@@ -130,16 +132,11 @@ def potential_amounts(comp_vector, stoichiometric_matrix, new_constraints=None):
     # Apply inequality constraints to make sure that the phase amounts are positive
     # At the moment, this doesn't take into account the possibility of negative endmember
     # amounts in solid solutions (to create dependent endmembers; we need to fix this)
-    cons = [{'type': 'ineq', 'fun': lambda x, i=[i]: x[i[0]]} for i in xrange(len(stoichiometric_matrix[0]))]
-    
-    sol = opt.minimize(objective, guessed_amounts, args=(b, A), method='SLSQP', constraints=cons)
-    potential_endmember_amounts = sol.x
-    resid = np.dot(A,potential_endmember_amounts) - b
-    
-    ctol=1.e-12 # compositional tolerance.
-    check_composition = all(abs(residual) < ctol for residual in resid)
-
-    return potential_endmember_amounts, check_composition
+    norm = 1./sum(guessed_amounts)
+    cons = [{'type': 'ineq', 'fun': lambda x, i=[i]: x[i[0]]*norm} for i in xrange(len(stoichiometric_matrix[0]))]
+    sol = opt.minimize(objective, guessed_amounts, args=(b*norm, A), method='SLSQP', constraints=cons, tol=1.e-15, options={'eps': 1.e-15, 'maxiter' :1000})
+    check = sol.fun<1.e-15
+    return sol.x/norm, check
 
 def assemble_compositional_tensors ( composition, minerals, constraints ):
     """
@@ -150,10 +147,22 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     
     Parameters
     ----------
+    composition : dict of floats
+
     minerals : list of minerals
         List of objects of type :class:`burnman.Mineral` or `burnman.SolidSolution`.
         Other types cannot be understood, and an exception will be thrown.
-    composition : dict of floats
+
+    constraints : list of lists
+        Two pressure, temperature or compositional constraints
+        on the problem of interest. The pressure
+        (or temperature) constraints have the form
+        [['P'], P_value].
+        The compositional constraints have the form
+        [['X'], list l0, list l1, float f]
+        where list[i] is of len(initial_composition),
+        and the constraint is
+        dot(l0, X)/dot(l1, X) = f.
     
     Returns
     -------
@@ -172,7 +181,6 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     indices: list of list of integers
     
     """
-    
     formulae, indices, endmembers_per_phase = get_formulae_indices_endmembers(composition, minerals)
     elements = list(set(composition.keys()))
     
@@ -222,7 +230,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
         potential_endmember_amounts, check_composition = potential_amounts(comp_vector, stoichiometric_matrix, new_constraints)
     else:
         potential_endmember_amounts, check_composition = potential_amounts(comp_vector, stoichiometric_matrix)
-    
+        
     col, null = compute_column_and_null_spaces(stoichiometric_matrix)
     null = sparsify_basis(null)
     col = sparsify_basis(col)
@@ -239,7 +247,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
         else:
             old_idx = i_idx
             amount = initial_composition[i]
-
+    
     return col, null, initial_composition, indices, endmembers_per_phase
 
 
@@ -531,7 +539,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
     P = PTX[0]
     T = PTX[1]
     X = PTX[2:]
-
+    
     # Here are the two P, T or compositional constraints
     eqns = []
     for constraint in constraints:
@@ -658,27 +666,39 @@ def gibbs_minimizer(composition, assemblage, constraints, guesses=None):
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
     col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, constraints )
+        
     return _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
 
 def _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses=None):
-    # If an initial guess hasn't been given, make one
-    if guesses == None:
-        guesses = [10.e9, 1200.]
-        guesses.extend(initial_composition)
-        
-        for constraint in constraints:
-            if constraint[0] == 'P':
-                guesses[0] = constraint[1]
-            if constraint[1] == 'T':
-                guesses[1] = constraint[1]
 
-    
+    if guesses == None:
+        # Make an initial guess
+        new_guesses = [10.e9, 1200.]
+        new_guesses.extend(initial_composition)
+    else:    
+        # Remove unstable endmembers from guesses
+        new_guesses=guesses[0:2] # keep P and T
+        i_guess=2
+        for i_phase, n_mbrs in enumerate(endmembers_per_phase):
+            new_guesses.append(guesses[i_guess])
+            i_mbrs=[j for i, j in indices if i==i_phase][1:]
+            new_guesses.extend([guesses[i_guess + i_mbr] for i_mbr in i_mbrs])
+            i_guess += n_mbrs
+
+    # If P or T are fixed constraints, make sure that the initial guess is equal to that constraint!
+    for constraint in constraints:
+        if constraint[0] == 'P':
+            new_guesses[0] = constraint[1]
+        if constraint[1] == 'T':
+            new_guesses[1] = constraint[1]
+
     # Set up the problem and attempt to solve it
     # Ignore warning due to changing the phase fractions such that they don't equal 1. They're renormalised anyway.
-    soln=opt.fsolve(set_eqns, guesses,
-                    args=(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints),
+    soln=opt.fsolve(set_eqns, new_guesses,
+                    args=(assemblage, endmembers_per_phase,
+                          initial_composition, col, null,
+                          indices, constraints),
                     xtol=1e-10, full_output=True)
-
     
     if soln[2]==1:
         sol_dict = {'P': soln[0][0], 'T': soln[0][1], 'c': soln[0][2:2+len(indices)], 'variables': compositional_variables(assemblage, indices)}
@@ -848,7 +868,8 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
         for i, P in enumerate(condition_array):
             constraints= [['P', P], X_constraint]
             try:
-                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition,
+                                       col, null, indices, constraints, guesses)
                 guesses = [sol['P'], sol['T']]
                 guesses.extend(sol['c'])
                 soln_array.append(guesses)
@@ -858,7 +879,8 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
         for i, T in enumerate(condition_array):
             constraints= [['T', T], X_constraint]
             try:
-                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
+                sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition,
+                                       col, null, indices, constraints, guesses)
                 guesses = [sol['P'], sol['T']]
                 guesses.extend(sol['c'])
                 soln_array.append(guesses)

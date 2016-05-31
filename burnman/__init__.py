@@ -81,6 +81,7 @@ from . import eos
 
 from . import processchemistry
 from . import chemicalpotentials
+from . import equilibriumassemblage
 from .solutionmodel import SolutionModel
 from . import geotherm
 

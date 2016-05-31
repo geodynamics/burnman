@@ -13,7 +13,7 @@ import re
 import numpy as np
 from fractions import Fraction
 import pkgutil
-
+from collections import Counter
 
 def read_masses():
     """
@@ -293,3 +293,22 @@ def ordered_compositional_array(formulae, elements):
             formula_array[idx][elements.index(element)] = formula[element]
 
     return formula_array
+
+
+def component_to_atom_fractions(composition_dictionary, fraction_type):
+    component_formulae = [dictionarize_formula(c) for c in composition_dictionary]
+
+    if fraction_type == 'weight':
+        component_masses = np.array([formula_mass(f, read_masses()) for f in component_formulae])
+        n_moles = composition_dictionary.values() /component_masses
+    elif fraction_type == 'molar':
+        n_moles = composition_dictionary.values()
+    else:
+        raise Exception('Fraction type not recognised. Should be weight or molar')
+
+    molar_composition = [{key: f[key]*m for key in f} for f, m in zip(*[component_formulae, n_moles])]
+    atomic_fractions = sum((Counter(c) for c in molar_composition), Counter())
+    
+    n_atoms = sum(atomic_fractions.values())
+    
+    return {key: atomic_fractions[key]/n_atoms for key in atomic_fractions}
