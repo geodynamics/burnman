@@ -107,45 +107,6 @@ if __name__ == "__main__":
         # so here we define the compositions bounding the binary
         composition1 = { 'Mg': 2., 'Si': 1., 'O': 4.}
         composition2 = { 'Fe': 2., 'Si': 1., 'O': 4.}
-
-        '''
-        # The following illustrates some starting-composition-sensitive solves. 
-        # It would be quite nice to make the solver more robust with respect to these guys...  
-        composition = binary_composition(composition1, composition2, 0.3)
-        pressure0 = find_univariant(composition, [fper, rw], stv, 'T', [T], [2.e10, T, 0., 0., 0.5, 1., 0.3])[0]
-        print(pressure0/1.e9)
-    
-        guesses = [23.6e9, T, 0.0, 0.1, 0.6, 2., 0.3, 0., 0.1]
-        pressure = find_univariant(composition, [stv, fper, rw], pv, 'T', [T], guesses)[0]
-        print(pressure/1.e9)
-        
-        #pressure1 = find_univariant(composition, [stv, fper], rw, 'T', [T])[0]
-        #print(pressure1/1.e9)
-        #pressure = find_univariant(composition, [stv, fper], pv, 'T', [T])[0]
-        #print(pressure/1.e9)
-    
-        pressure = find_univariant(composition, [pv, fper], stv, 'T', [T])[0]
-        print(pressure/1.e9)
-
-        pressures = np.linspace(pressure0 + 1.e6, pressure1 - 1.e6, 21)
-        pwus0 = np.empty_like(pressures)
-        pwus1 = np.empty_like(pressures)
-        
-        sfr = burnman.Composite([stv, fper, rw])
-        sfp = burnman.Composite([stv, fper, pv])
-        for i, P in enumerate(pressures):
-            sfr_guesses = [P, T, 0., 0., 0.5, 1., 0.3]
-            sfp_guesses = [P, T, 1., 2., 0.3, 0., 0.1]
-            sol = gibbs_minimizer(composition, sfr, [['P', P], ['T', T]], sfr_guesses)
-            pwus0[i] = sol['c'][sol['variables'].index('x(Stishovite)')]
-            sol = gibbs_minimizer(composition, sfp, [['P', P], ['T', T]], sfp_guesses)
-            pwus1[i] = sol['c'][sol['variables'].index('x(Stishovite)')]
-
-        plt.plot(pressures/1.e9, pwus0)
-        plt.plot(pressures/1.e9, pwus1)
-        plt.show()
-        exit()
-        '''
         
         # First, we want to find the pressure at which olivine,
         # wadsleyite and ringwoodite coexist, and their compositions
@@ -176,7 +137,7 @@ if __name__ == "__main__":
 
             # Here we call the gibbs bulk minimizer.
             sol = gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
-    
+            
             # The output of the bulk minimizer is a dictionary containing P, T, X
             # (where X is the distance along the compositional binary),
             # followed by the compositional vector
@@ -193,20 +154,35 @@ if __name__ == "__main__":
             print('at this point are {0:.2f}, {1:.2f} and {2:.2f}'.format(x_ol_inv, x_wad_inv, x_rw_inv))
             print()
             
+            
+            # There's another invariant...
+            assemblage = burnman.Composite([rw, fper, pv, stv])
+            constraints = [['T', T],
+                           ['X', [1., 0., 0., 0., 0., 0., 0.], [1., 0., 1., 0., 1., 0., 1.], 0.],
+                           ['X', [0., 0., 0., 0., 1., 0., 0.], [1., 0., 1., 0., 1., 0., 1.], 0.]]
+        
 
+            # Here we call the gibbs bulk minimizer.
+            sol = gibbs_bulk_minimizer(composition1, composition2, 0.30, assemblage, constraints)
+
+            x_fper_pv_inv = sol['c'][1]
+            
+            
             # Now we find the rest of the phase diagram.
             # The compositions of the phases at the invariant point
             # tell us the ranges of compositions of those phases
             # we should expect within the stable parts of each binary loop
             ax1 = plt.figure(figsize=(10, 6))
             
-            assemblages = [burnman.Composite([ol, wad]),
-                           burnman.Composite([ol, rw]),
-                           burnman.Composite([wad, rw])]
+            assemblages = [[[ol], wad],
+                           [[ol], rw],
+                           [[wad], rw],
+                           [[fper, stv], rw]]
             
             c_bounds = [[0., x_ol_inv, 21],
                         [x_ol_inv, 1., 21],
-                        [0., x_wad_inv, 21]]
+                        [0., x_wad_inv, 21],
+                        [x_fper_pv_inv, 1., 21]]
             
             # For a given composition, find the pressure at which the
             # second phase of each binary loop becomes stable,
@@ -220,18 +196,17 @@ if __name__ == "__main__":
                 pressures = np.empty_like(x1)
                 for i, x in enumerate(x1):
                     composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
-                    sol = find_univariant(composition, [assemblage.phases[0]], assemblage.phases[1], 'T', [T])
+                    sol = find_univariant(composition, assemblage[0], assemblage[1], 'T', [T])
                     pressures[i] = sol[0][0]
-                    x2[i] = assemblage.phases[1].molar_fractions[1]
-                plt.plot(x1, pressures/1.e9, label=assemblage.phases[1].name+'-in', color=color)
-                plt.plot(x2, pressures/1.e9, label=assemblage.phases[0].name+'-in', color=color)
+                    x2[i] = assemblage[1].molar_fractions[1]
+                plt.plot(x1, pressures/1.e9, color=color)
+                plt.plot(x2, pressures/1.e9, color=color)
 
             # Here we finish off the plotting    
             plt.plot([x_ol_inv, x_rw_inv], [P_inv/1.e9, P_inv/1.e9], color=color)
         plt.title('Mg2SiO4-Fe2SiO4 phase diagram at '+str(T)+' K')
         plt.xlabel('X Fe2SiO4')
         plt.ylabel('Pressure (GPa)')
-        #plt.legend(loc='upper right')
         plt.show()
     
     if run_lower_mantle_equilibrium:

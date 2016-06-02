@@ -16,23 +16,23 @@ from .solidsolution import SolidSolution
 from .composite import Composite
 from .processchemistry import process_solution_chemistry
 
-def cartesian(arrays, out=None):
+def _cartesian(arrays, out=None):
     """
     Generate a cartesian product of input arrays.
+    Shamelessly taken from stackoverflow (question 1208118)
 
     Parameters
     ----------
-    arrays : list of array-like
-        1-D arrays to form the cartesian product of.
+    arrays : list of 1-D arrays 
+        Arrays from which to form the cartesian product.
     out : ndarray
-        Array to place the cartesian product in.
+        Array in which to place the cartesian product.
 
     Returns
     -------
     out : ndarray
-        2-D array of shape (M, len(arrays)) containing cartesian products
-        formed of input arrays.
-
+        2-D array of shape (M, len(arrays)) containing 
+        cartesian products formed of input arrays.
     """
 
     arrays = [np.asarray(x) for x in arrays]
@@ -45,12 +45,12 @@ def cartesian(arrays, out=None):
     m = n / arrays[0].size
     out[:,0] = np.repeat(arrays[0], m)
     if arrays[1:]:
-        cartesian(arrays[1:], out=out[0:m,1:])
+        _cartesian(arrays[1:], out=out[0:m,1:])
         for j in xrange(1, arrays[0].size):
             out[j*m:(j+1)*m,1:] = out[0:m,1:]
     return out
 
-def indicize(inp_arr):
+def _indicize(inp_arr):
     arr=np.zeros([len(inp_arr), 1+max(inp_arr.flat)])
     for i, site_indices in enumerate(inp_arr):
         for j in site_indices:
@@ -58,6 +58,29 @@ def indicize(inp_arr):
     return arr
 
 def dependent_endmembers(formulae):
+    """
+    Find the set of possible dependent endmembers from a set of site formulae.
+    Dependent endmembers are those which can be made from a set of independent 
+    endmembers. For example, the simple alkali salts [Na][Cl], [K][Cl] 
+    and [Na][I] form an independent set, with a single dependent endmember 
+    [K][I] (equal to [K][Cl] + [Na][I] - [Na][Cl]). 
+    If we also have the independent endmember [Cs][F], no more dependent 
+    endmembers can be constructed; for example, [Cs][I] cannot be made because
+    this would also require an additional independent endmember 
+    ([Na][F] or [K][F]).
+
+    Parameters
+    ----------
+    formulae : list of dictionaries
+        Site formulae (see description in processchemistry)
+
+    Returns
+    -------
+    dependent_endmembers : 2d numpy array
+        2-D array containing the reaction coefficients of the independent 
+        endmembers required to create the dependent endmembers.
+    """
+
     solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities = process_solution_chemistry(formulae)
 
     # First, we redefine our endmembers using unique site occupancy indices
@@ -79,7 +102,7 @@ def dependent_endmembers(formulae):
         i += len(site)
         n_sites += len(set_site_occupancies)
 
-    given_members = indicize(np.array(zip(*site_indices)))
+    given_members = _indicize(np.array(zip(*site_indices)))
 
     
     # All the potential endmembers can be created from permutations of the unique site occupancies
@@ -87,7 +110,7 @@ def dependent_endmembers(formulae):
     # is an endmember with unique occupancies on two sites,
     # (e.g. Ca2+ and Fe3+ in the X, Y sites in garnet)
     # then it will not be possible to exchange Ca2+ for Mg2+ on the X site and retain Fe3+ on the Y site.
-    all_members=indicize(cartesian(indices))
+    all_members=_indicize(_cartesian(indices))
 
     # Now we return only the endmembers which are not contained within the user-provided independent set
     a=np.concatenate((given_members, all_members), axis=0)
@@ -99,16 +122,15 @@ def dependent_endmembers(formulae):
     # We only want the dependent endmembers which can be described by a
     # linear combination of the independent set
     tol = 1e-12
-    dependent_endmembers = []
+    dependent_endmembers = np.array([]).reshape(0, len(formulae))
     for mbr in potential_dependents:
         a,resid,rank,s = np.linalg.lstsq(given_members.T, mbr)
         if resid[0] < tol:
             a.real[abs(a.real) < tol] = 0.0
-            dependent_endmembers.append(a)
+            dependent_endmembers = np.concatenate((dependent_endmembers, np.array([a])), axis=0)
+    return dependent_endmembers
 
-    return np.array(dependent_endmembers)
-
-def get_formulae_indices_endmembers(composition, minerals):
+def _get_formulae_indices_endmembers(composition, minerals):
     """
     Takes a bulk composition and a endmembers and a list of minerals.
     Creates a list of endmember formulae, a unique index according to the
@@ -229,13 +251,6 @@ def potential_amounts(comp_vector, stoichiometric_matrix, new_constraints=None):
     sol = opt.minimize(objective, guessed_amounts, args=(b*norm, A), method='SLSQP', constraints=cons, tol=1.e-15, options={'eps': 1.e-15, 'maxiter' :1000})
     check = sol.fun<1.e-15
     return sol.x/norm, check
-
-def make_stoichiometric_matrix(elements, formulae):
-    stoichiometric_matrix = np.empty( [ len(elements), len(formulae) ] )
-    for i,e in enumerate(elements):
-        for j,f in enumerate(formulae):
-            stoichiometric_matrix[i,j] = ( f[e]  if e in f else 0.0 )
-    return stoichiometric_matrix
     
 def make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
                                      indices, minerals,
@@ -249,7 +264,7 @@ def make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
         mbr_indices = [(index, mbr_idx) for index, (phase_idx, mbr_idx) in enumerate(indices) if phase_idx == i]
         if len(mbr_indices) > 1:
             dependent_vectors = dependent_endmembers([minerals[i].solution_model.formulas[idx[1]] for idx in mbr_indices])
-            if len(dependent_vectors) > 0:
+            if dependent_vectors != []:
                 vector_to_matrix = np.zeros((len(dependent_vectors), len(indices)))
                 for idx, (i, j) in enumerate(mbr_indices):
                     for v_idx, v in enumerate(dependent_vectors):
@@ -308,12 +323,13 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     indices: list of list of integers
     
     """
-    formulae, indices, endmembers_per_phase = get_formulae_indices_endmembers(composition, minerals)
+    formulae, indices, endmembers_per_phase = _get_formulae_indices_endmembers(composition, minerals)
     elements = list(set(composition.keys()))
     
     #Populate the stoichiometric matrix
-    stoichiometric_matrix = make_stoichiometric_matrix(elements, formulae)
-    
+    stoichiometric_matrix = np.array( [[ ( f[e]  if e in f else 0.0 ) for f in formulae ]
+                                       for e in elements])
+            
     # Check that the bulk composition can be described by a linear set of the endmembers
     comp_vector = np.array([composition[element] for element in elements])
 
@@ -507,7 +523,7 @@ def endmember_fractions_to_cvector(partial_mvector, indices, endmembers_per_phas
         A list corresponding to molar fractions of all the endmembers
         in each of the phases.
 
-    indices: list of list of integers
+    indices: list of lists of integers
 
     endmembers_per_phase : list
         A list containing the number of endmembers for each phase
@@ -521,9 +537,8 @@ def endmember_fractions_to_cvector(partial_mvector, indices, endmembers_per_phas
         of the endmembers after the first endmember, i.e.
         [f(phase[i]), f(phase[i].mbr[1]), f(phase[i].mbr[2]), ...]
     """
-    p=0
 
-    mvector = [[0. for i in xrange(endmembers_per_phase[i])] for i in xrange(len(endmembers_per_phase))]
+    mvector = [[0. for j in xrange(endmembers_per_phase[i])] for i in xrange(len(endmembers_per_phase))]
     for i_idx, i in enumerate(indices):
         mvector[i[0]][i[1]] = partial_mvector[i_idx]
 
@@ -571,7 +586,6 @@ def cvector_to_mineral_mbr_fractions(cvector, indices, endmembers_per_phase):
 
     old_idx = -1
     first_j_idx = 0
-    
     for i, c in enumerate(cvector):
         i_idx, j_idx = indices[i]
         if i_idx != old_idx:
@@ -688,8 +702,7 @@ def set_eqns(PTX, assemblage, endmembers_per_phase, initial_composition, col, nu
         elif constraint[0] == 'X':
             eqns.append(constraint[3] - np.dot(X, constraint[1])/np.dot(X, constraint[2]))
         else:
-            print('Constraint type not recognised')
-            exit()
+            raise Exception('Constraint type not recognised. Gibbs minimization calculations accept pressure (P), temperature (T) or compositional (X) constraints.')
 
     # Here we convert our guesses from a single vector
     # to a vector of phase_fractions and molar_fractions
@@ -955,7 +968,32 @@ def gibbs_bulk_minimizer(composition1, composition2, guessed_bulk, assemblage, c
         
 
 def find_invariant(composition, phases, zero_phases, guesses=None):
+    """
+    Sets up a invariant gibbs minimization problem and attempts to solve it
 
+    Parameters
+    ----------
+    composition : dictionary of floats
+        Dictionary contains the number of atoms of each element 
+        in the bulk composition.
+        
+    phases : list of Minerals
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+
+    zero_phases : list of Mineral
+        The two minerals which becomes unstable at the invariant.
+
+    guesses : optional list of floats
+        List has the same form as PTX in :func:`set_eqns`.
+        
+    Returns
+    -------
+    sol_array : List of floats
+        List of P, T, compositional variables for the problem.
+
+    """
+    
     all_phases = zero_phases
     all_phases.extend(phases)
     assemblage = Composite(all_phases)
@@ -965,7 +1003,7 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
 
     
-    formulae, indices, endmembers_per_phase = get_formulae_indices_endmembers(composition, assemblage.phases)
+    formulae, indices, endmembers_per_phase = _get_formulae_indices_endmembers(composition, assemblage.phases)
     
     c0a = [0. for index in indices]
     c0b = [0. for index in indices]
@@ -979,11 +1017,46 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, constraints )
     
     sol = _gibbs_minimizer(assemblage, endmembers_per_phase, initial_composition, col, null, indices, constraints, guesses)
-    solvec = [sol['P'], sol['T']]
-    solvec.extend(sol['c'])
-    return solvec
+    sol_array = [sol['P'], sol['T']]
+    sol_array.extend(sol['c'])
+    sol_array.extend(sol['variables'])
+    return sol_array
     
 def find_univariant(composition, phases, zero_phase, condition_variable, condition_array, guesses=None):
+    """
+    Sets up a univariant gibbs minimization problem and attempts to solve it
+
+    Parameters
+    ----------
+    composition : dictionary of floats
+        Dictionary contains the number of atoms of each element 
+        in the bulk composition.
+        
+    phases : list of Minerals
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+
+    zero_phase : Mineral
+        The mineral which becomes unstable along the univariant.
+
+    condition_variable : string
+        Either 'P' or 'T', depending on the extensive quantity to loop over.
+
+    condition_array : list (or array) of floats 
+        List of the condition variable to loop over.
+
+    guesses : optional list of floats
+        List has the same form as PTX in :func:`set_eqns`.
+        
+    Returns
+    -------
+    sol_array : List of list of floats
+        List of lists of P, T, compositional variables for the problem. 
+        If a solution is not found for one of the values in condition_array
+        nothing is appended to sol_array.
+
+    """
+
     all_phases = [zero_phase]
     all_phases.extend(phases)
     assemblage = Composite(all_phases)
@@ -991,7 +1064,7 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     s = sum(composition.values())
     composition = {element:amount for element, amount in composition.items() if amount/s > 1.e-6}
 
-    formulae, indices, endmembers_per_phase = get_formulae_indices_endmembers(composition, assemblage.phases)
+    formulae, indices, endmembers_per_phase = _get_formulae_indices_endmembers(composition, assemblage.phases)
     
     c0 = [0. for index in indices]
     c0[0] = 1.
@@ -1001,7 +1074,7 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     X_constraint = ['X', c0, c1, 0.]
     col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, [X_constraint] )
 
-    soln_array = []
+    sol_array = []
     if condition_variable=='P':
         for i, P in enumerate(condition_array):
             constraints= [['P', P], X_constraint]
@@ -1010,7 +1083,7 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
                                        col, null, indices, constraints, guesses)
                 guesses = [sol['P'], sol['T']]
                 guesses.extend(sol['c'])
-                soln_array.append(guesses)
+                sol_array.append(guesses)
             except:
                 print('No solution found at {0:.5f} GPa'.format(P/1.e9))
     elif condition_variable=='T':
@@ -1021,8 +1094,9 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
                                        col, null, indices, constraints, guesses)
                 guesses = [sol['P'], sol['T']]
                 guesses.extend(sol['c'])
-                soln_array.append(guesses)
+                sol_array.append(guesses)
+                sol_array[-1].extend(sol['variables'])
             except:
                 print('No solution found at {0:.1f} K'.format(T))
 
-    return soln_array
+    return sol_array
