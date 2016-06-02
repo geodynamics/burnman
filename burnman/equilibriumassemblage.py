@@ -240,17 +240,30 @@ def make_stoichiometric_matrix(elements, formulae):
 def make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
                                      indices, minerals,
                                      endmembers_per_phase):
-    dependent_stoichiometric_matrix = []
-    dependent_vector_lists = []
-    for i in xrange(len(endmembers_per_phase)):
+
+    dependent_stoichiometric_matrix = np.array([]).reshape(0, len(stoichiometric_matrix))
+    dependency_matrix = np.identity(len(indices))
+    
+    n_start = 0
+    for i, n_mbrs in enumerate(endmembers_per_phase):
         mbr_indices = [(index, mbr_idx) for index, (phase_idx, mbr_idx) in enumerate(indices) if phase_idx == i]
         if len(mbr_indices) > 1:
             dependent_vectors = dependent_endmembers([minerals[i].solution_model.formulas[idx[1]] for idx in mbr_indices])
             if len(dependent_vectors) > 0:
-                dependent_vector_lists.append(dependent_vector_lists)
-                dependent_stoichiometric_matrix.append(np.dot(np.array([stoichiometric_matrix[idx[0]] for idx in mbr_indices]), independent_indices[-1]))
+                vector_to_matrix = np.zeros((len(dependent_vectors), len(indices)))
+                for idx, (i, j) in enumerate(mbr_indices):
+                    for v_idx, v in enumerate(dependent_vectors):
+                        vector_to_matrix[v_idx][i] = v[idx]
 
-    return dependent_stoichiometric_matrix, dependent_vector_lists
+                dependency_matrix = np.concatenate((dependency_matrix, vector_to_matrix))
+                
+                independent_compositions = np.array([stoichiometric_matrix.T[idx[0]] for idx in mbr_indices])
+                matrix=np.dot(independent_compositions.T, dependent_vectors.T)
+                dependent_stoichiometric_matrix = np.concatenate((dependent_stoichiometric_matrix, matrix.T))
+        n_start = n_start + n_mbrs
+
+    dependent_stoichiometric_matrix = np.array(dependent_stoichiometric_matrix).T
+    return dependent_stoichiometric_matrix, dependency_matrix
     
 def assemble_compositional_tensors ( composition, minerals, constraints ):
     """
@@ -335,26 +348,31 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
             del formulae[i]
 
     # Now, let's find the dependent endmembers for each of the solid solutions:
-    dependent_stoichiometric_matrix = make_dpdnt_stoichiometric_matrix(stoichiometric_matrix,
-                                                                       indices, minerals,
-                                                                       endmembers_per_phase)
+    dependent_stoichiometric_matrix, dependency_matrix = make_dpdnt_stoichiometric_matrix(stoichiometric_matrix, indices, minerals, endmembers_per_phase)
+
+    complete_stoichiometric_matrix = np.concatenate((stoichiometric_matrix,
+                                                     dependent_stoichiometric_matrix), axis=1)
     
     # Now we can find a potential solution to our problem (one that satisfies the bulk composition constraints)
     new_constraints = []
     for compositional_constraint in compositional_constraints:
         new_constraints.append([[i for i, idx in enumerate(indices) if idx[0] == compositional_constraint[0] ], compositional_constraint[1]])
     if new_constraints != []:
-        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, stoichiometric_matrix, new_constraints)
+        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, complete_stoichiometric_matrix, new_constraints)
     else:
-        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, stoichiometric_matrix)
+        potential_endmember_amounts, composition_satisfied = potential_amounts(comp_vector, complete_stoichiometric_matrix)
 
     if not composition_satisfied:
         raise Exception('Composition not satisfied. This is a bug; please contact the BurnMan team.')
-        
+
+    # Now let's rework the dependent endmembers back into the independent set
+    potential_endmember_amounts = np.dot(dependency_matrix.T, potential_endmember_amounts)
+    
     col, null = compute_column_and_null_spaces(stoichiometric_matrix)
     null = sparsify_basis(null)
     col = sparsify_basis(col)
 
+    
     initial_composition = endmember_fractions_to_cvector(potential_endmember_amounts, indices, endmembers_per_phase)
     # Finally, we don't want the solutions with modal abundances = zero
     # to have endmember compositions. We fairly arbitrarily choose small amounts of the secondary endmembers.
@@ -367,7 +385,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
         else:
             old_idx = i_idx
             amount = initial_composition[i]
-    
+
     return col, null, initial_composition, indices, endmembers_per_phase
 
 
