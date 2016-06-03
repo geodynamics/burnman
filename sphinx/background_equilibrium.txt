@@ -1,0 +1,85 @@
+.. _ref-methods-equilibrium:
+
+Finding equilibrium assemblages
+-------------------------------
+
+In the Earth Sciences literature, there are two primary strategies for finding the equilibrium assemblage given a bulk composition. One strategy is a brute force approach, which trials a series of potential assemblages (satisfying the bulk composition constraints) to find the minimum free energy. This technique is adopted by Perple\_X. One potential algorithm using this method is:
+
+- Break solid solutions into a set of pseudocompounds, calculate molar Gibbs free energies for each
+- Find the set of mechanical mixtures (assemblages/composites) of pseudocompounds which satisfy the bulk compositional constraints
+- Find the mixture with the minimum Gibbs free energy
+- Refine the compositions if necessary
+
+The other strategy for finding equilibrium assemblages is to solve the equilibrium relations directly. The equilibrium relations have the form:
+
+.. math::
+   0 = \Delta G ^ 0 + RT \ln K
+   :label: eqm_relations
+
+where :math:`\Delta G ^ 0` is the Gibbs energy of the reaction between the pure end-members in the same structure as the phases in which they occur, :math:`K` is the equilibrium constant, in terms of the activities of the end-members in their phases, :math:`T` is temperature, and :math:`R` is the gas constant. This is mathematically equivalent to saying that the chemical potentials of the reactant snd product endmembers are equal to each other. This strategy is adopted by thermodynamics software such as THERMOCALC. One potential algorithm using this method is:
+
+- Find the set of possible reactions which keep the bulk composition the same within a given assemblage.
+- Apply a set of constraints (fixed P/T, compositional constraints)
+- Find the amounts and compositions of the phases in the assemblage for which the equilibrium relations are satisfied, subject the the bulk compositional constraints.
+
+There are benefits and drawbacks to each approach. The brute-force Gibbs energy minimisation provides no guarantee that the equilibrium composition has been reached (without an additional check), and can be computationally expensive. In particular, the number of pseudocompounds grows geometrically with the number of endmembers. On the other hand, the algorithm is simple to understand, can easily be extrapolated to large systems, and can handle solvi naturally. In terms of extant software, Perple\_X is written so that even people with little or no understanding of thermodynamics (or Earth Sciences in general!) can calculate high resolution phase diagrams in around 30 minutes. Recent advances in the minimization procedure have done much to reduce artefacts imposed by not finding the true minimum free energy. In contrast, the equilibrium approach relies on an appropriate starting guess for the composition, but has the benefit of finding the exact solution to a given problem. An additional benefit is that a myriad of different problems can be solved with the approach, such as finding the P-T conditions where a phase first becomes stable, calculating the position of invariant points, calculating isopleths (lines where phases have a certain compositional property, such as a constant Mg/(Mg+Fe) value). 
+
+Equilibrium calculations in BurnMan currently apply the equilibrium relation strategy, but there is no reason why both cannot be implemented at some point in the future. Indeed the two strategies are complementary. The existing strategy is outlined in the following section, and includes details of the following:
+
+- Method for declaring a starting composition and two constraints.
+- Finding a starting guess which satisfies the bulk composition and mineralogical constraints.
+- Finding the set of equilibrium reactions and bulk compositional constraints.
+
+
+User inputs
+^^^^^^^^^^^
+Bulk composition
+""""""""""""""""
+Bulk composition is provided as a dictionary of elements.
+
+Assemblage
+""""""""""
+The assemblage to solve should be given as a burnman.Composite object.
+
+Constraints
+"""""""""""
+For any fixed composition equilibrium problem, the user must define two constraints. Typically, one or both of these is a fixed pressure (['P', *P*]) or temperature (['T', *T*]), and the remaining constraints are compositional. In BurnMan, the compositional constraints are given in the form:
+
+.. math::
+   \frac{X[0]}{X[1]} = X[2]
+
+where X[0] and X[1] are ordered vectors of phase amount and endmember fractions (without the first element. So, for an assemblage of (Mg, Fe)-olivine and (Mg, Fe)-wadsleyite, the vector would be [x_ol, p_fa, x_opx, p_fwd]. To look at the constraint where the proportions of olivine and wadsleyite are equal (roughly in the middle of the two-phase loop), the constraint would take the form ['X', [1, 0, 0, 0], [1, 0, 1, 0], 0.5].
+
+Starting guesses (optional)
+"""""""""""""""""""""""""""
+Starting guesses should be given in the same format as the X vectors for constraints.
+
+
+Finding initial starting phase amounts and compositions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We first define a stoichiometric :math:`E \times F` matrix :math:`M`, which is a matrix of number of atoms of each element :math:`e` in each endmember formula :math:`f`. All possible compositional solutions  :math:`\mathbf{c}` satifying the bulk composition :math:`\mathbf{b}` then obey the equation :math:`M \mathbf{c}  = \mathbf{b}`. An additional constraint is that all of the endmember amounts must be greater than or equal to zero. There are a number of ways to calculate a possible compositional vector :math:`\mathbf{c}`; in BurnMan we use scipy.optimize.minimize with method SLSQP.
+
+
+Dependent endmembers
+""""""""""""""""""""
+It is often the case in multi-site solution chemistry that the set of independent endmembers implies the existence of dependent endmembers, which may or may not be stable, but which are completely described by the properties of the independent endmembers and their interaction parameters. The simplest example of this is the binary salt [Na, K][Cl, I]. It is clear that there are four possible endmembers: NaCl, NaI, KCl, KI, but only three of these are independent - the fourth can be constructed from a linear combination of the first three. This poses an interesting problem for finding starting compositions and bounding the composition of the solid solution, because now it is possible to have a solid solution with negative endmember fractions. For example, if the endmember set were chosen to be NaCl, KCl and NaI, then KI could be described by the molar fractions [1, -1, 1].
+
+Perhaps the easiest way to find a valid starting composition where dependent endmembers are involved is to temporarily add the dependent endmembers to the stoichiometric matrix; then the constraints are exactly the same as in the previous case; all the endmember fractions must be greater than or equal to zero. After a solution has been found, the fractions of the dependent endmembers can be reincorporated into the independent set.
+
+To find the dependent endmembers for a solis solution :math:`S` in BurnMan, each endmember site occupancy is given a unique reference (for example, Mg on Site A = 1, Fe on Site A = 2, Mg on Site B = 3 ...). The set of occupancies for each of the n-sites in the solution are then found, after which the n-fold Cartesian product of the site occupancy sets (:math:`A \times B \times C \times ...`) is found. This array contains all possible combinations of site occupancies, including those which are not describable by a linear combination of the independent endmembers. The independent endmembers are removed from the Cartesian product, and the dependent endmembers are extracted by finding those n-tuples which can be described by a linear combination of the independent endmembers (i.e. the set of dependent vectors :math:`\mathbf{d}` which are solutions to the equation :math:`M^S \mathbf{x} = \mathbf{d}`, where :math:`M^S` is the stoichiometric matrix for the solid solution and :math:`\mathbf{x}` is the vector of coefficients of the independent endmembers which correspond to the composition of the dependent endmember).
+
+
+Finding the set of equilibrium relations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An independent set of reaction vectors which correspond to the equilibrium relations do not change the bulk composition. Mathematically, this independent set corresponds to the left null space (cokernel) of the stoichiometric matrix (:math:`N(M^T)`). The left null space is defined as an independent set of vectors :math:`\mathbf{x}` which satisfy the equation :math:`\mathbf{x}^T M = \mathbf{0}^T`.
+
+In general the set of equilibrium relations is not sufficient to determine the phase fractions and compositions of the equilibrium assemblage. In other words, the nullity of the stoichiometric matrix is less than the row dimension of the matrix. Bulk compositional constraints provide the other non-user defined equations required to solve for the assemblage unknowns. These bulk compositional constraints are provided by the column space :math:`C(M)`, which corresponds to the set of independent reactions which can change the bulk composition (relative to some starting guess). Thus, the N non-user defined constraints are:
+
+.. math::
+   \boldsymbol{\mu} \cdot N(M^T) = \mathbf{0}, \\
+   (\mathbf{f} - \mathbf{f_{init}}) \cdot C(M) = \mathbf{0}
+
+where :math:`\boldsymbol{\mu}` is the vector of chemical potentials (partial gibbs free energies) of the endmembers and :math:`\mathbf{f}` and :math:`\mathbf{f_{init}}` are the final and initial fractions of the endmembers. The null and column spaces are found by singular value decomposition, where :math:`M` is factorized into the form :math:`U \Sigma V^*`. The columns of V that correspond to large and small (or nonexistent) singular values are the column and left null spaces of :math:`M` respectively.
+
+Also including the two user-provided constraints (pressure, temperature and/or composition) then yields N+2 equations for the N+2 unknowns (pressure, temperature, phase amounts and compositions). BurnMan solves this non-linear system of equations with scipy.optimize.fsolve.

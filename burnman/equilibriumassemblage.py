@@ -85,6 +85,8 @@ def dependent_endmembers(formulae):
 
     # First, we redefine our endmembers using unique site occupancy indices
     # We can then find the set of unique occupancies for each site
+    # site indices contains the unique integer indices for the occupancies on
+    # each site, indices contains the sets of indices for each site.
     i=0
     n_sites = 0
     indices = []
@@ -104,15 +106,16 @@ def dependent_endmembers(formulae):
 
     given_members = _indicize(np.array(zip(*site_indices)))
 
-    
     # All the potential endmembers can be created from permutations of the unique site occupancies
     # Note that the solution may not allow all of these endmembers; for example, if there
     # is an endmember with unique occupancies on two sites,
     # (e.g. Ca2+ and Fe3+ in the X, Y sites in garnet)
-    # then it will not be possible to exchange Ca2+ for Mg2+ on the X site and retain Fe3+ on the Y site.
+    # then it will not be possible to exchange Ca2+ for Mg2+ on the X site
+    # and retain Fe3+ on the Y site.
     all_members=_indicize(_cartesian(indices))
 
-    # Now we return only the endmembers which are not contained within the user-provided independent set
+    # Now we return only the endmembers which are not contained within the user-provided
+    # independent set
     a=np.concatenate((given_members, all_members), axis=0)
     b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
     _, idx, cnts = np.unique(b, return_index=True, return_counts=True)
@@ -329,7 +332,7 @@ def assemble_compositional_tensors ( composition, minerals, constraints ):
     #Populate the stoichiometric matrix
     stoichiometric_matrix = np.array( [[ ( f[e]  if e in f else 0.0 ) for f in formulae ]
                                        for e in elements])
-            
+
     # Check that the bulk composition can be described by a linear set of the endmembers
     comp_vector = np.array([composition[element] for element in elements])
 
@@ -419,7 +422,7 @@ def compute_column_and_null_spaces ( stoichiometric_matrix ):
     Parameters
     ----------
     stoichiometric_matrix: numpy array
-        The stoichiometric matrix, presumably calculated using :func:`compute_stoichiometric_matrix`.
+        The stoichiometric matrix
     
     Returns
     -------
