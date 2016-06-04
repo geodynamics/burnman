@@ -33,7 +33,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman.minerals import HP_2011_ds62, SLB_2011
-from burnman.equilibriumassemblage import *
+from burnman.equilibrate import *
 
 if __name__ == "__main__":
     run_aluminosilicate_example=True
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         # three phases coexist. The function find_invariant takes a bulk composition
         # and then two variables which constitute the stable phases and the two phases
         # which become stable at that point.
-        P_inv, T_inv = find_invariant(composition, [andalusite], [sillimanite, kyanite])[0:2]
+        P_inv, T_inv = equilibrate_invariant(composition, [andalusite], [sillimanite, kyanite])[0:2]
     
         # Here we print the P-T position of the invariant point
         print('Example 1: The aluminosilicates')
@@ -69,12 +69,12 @@ if __name__ == "__main__":
         lo_pressures = np.linspace(1.e5, P_inv, 21)
         hi_pressures = np.linspace(P_inv, 1.e9, 21)
 
-        # For isochemical diagrams, we can make use of the function find_univariant,
+        # For isochemical diagrams, we can make use of the function equilibrate_univariant,
         # which for a given composition and a pressure (temperature) range outputs the temperatures
         # (pressures) where one phase in an assemblage becomes unstable.
-        and_ky_eqm = find_univariant(composition, [andalusite], kyanite, 'P', lo_pressures)
-        and_sill_eqm = find_univariant(composition, [andalusite], sillimanite, 'P', lo_pressures)
-        sill_ky_eqm = find_univariant(composition, [sillimanite], kyanite, 'P', hi_pressures)
+        and_ky_eqm = equilibrate_univariant(composition, [andalusite], kyanite, 'P', lo_pressures)
+        and_sill_eqm = equilibrate_univariant(composition, [andalusite], sillimanite, 'P', lo_pressures)
+        sill_ky_eqm = equilibrate_univariant(composition, [sillimanite], kyanite, 'P', hi_pressures)
 
         plt.plot(zip(*and_ky_eqm)[1], lo_pressures/1.e9, label='and-ky')
         plt.plot(zip(*and_sill_eqm)[1], lo_pressures/1.e9, label='and-sill')
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         # Our aim here is to plot the X-P phase diagram
         # for Mg2SiO4-Fe2SiO4 olivine at a fixed temperature
         # For this example we illustrate the lower level functions
-        # behind find_invariant and find_univariant
+        # behind equilibrate_invariant and equilibrate_univariant
     
         # Here we define the temperature and assemblage
     
@@ -136,7 +136,7 @@ if __name__ == "__main__":
         
 
             # Here we call the gibbs bulk minimizer.
-            sol = gibbs_bulk_minimizer(composition1, composition2, 0.25, assemblage, constraints)
+            sol = find_equilibrium_composition(composition1, composition2, 0.25, assemblage, constraints)
             
             # The output of the bulk minimizer is a dictionary containing P, T, X
             # (where X is the distance along the compositional binary),
@@ -163,7 +163,7 @@ if __name__ == "__main__":
         
 
             # Here we call the gibbs bulk minimizer.
-            sol = gibbs_bulk_minimizer(composition1, composition2, 0.30, assemblage, constraints)
+            sol = find_equilibrium_composition(composition1, composition2, 0.30, assemblage, constraints)
 
             x_fper_pv_inv = sol['c'][1]
             
@@ -196,7 +196,7 @@ if __name__ == "__main__":
                 pressures = np.empty_like(x1)
                 for i, x in enumerate(x1):
                     composition = { 'Mg': 2.*(1. - x), 'Fe': 2.*x, 'O': 4., 'Si': 1.}
-                    sol = find_univariant(composition, assemblage[0], assemblage[1], 'T', [T])
+                    sol = equilibrate_univariant(composition, assemblage[0], assemblage[1], 'T', [T])
                     pressures[i] = sol[0][0]
                     x2[i] = assemblage[1].molar_fractions[1]
                 plt.plot(x1, pressures/1.e9, color=color)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         x_bdg = np.empty_like(pressures)
         x_fper = np.empty_like(pressures)
         for i, P in enumerate(pressures):
-            sol = gibbs_minimizer(composition, assemblage, [['P', P], ['T', T]])
+            sol = equilibrate(composition, assemblage, [['P', P], ['T', T]])
             x_bdg[i] = sol['c'][1]
             x_fper[i] = sol['c'][4]
 
@@ -259,10 +259,10 @@ if __name__ == "__main__":
         for T in np.linspace(300., 600., 21):
             constraints=[['P', P], ['T', T]]
             try:
-                sol = gibbs_minimizer(composition, assemblage, constraints,
-                                      guesses=[P, T,
-                                               0.5, 0.0, sol['c'][1], 0.0, 0.0,
-                                               0.5, 0.0, sol['c'][3], 0.0, 0.0])
+                sol = equilibrate(composition, assemblage, constraints,
+                                  guesses=[P, T,
+                                           0.5, 0.0, sol['c'][1], 0.0, 0.0,
+                                           0.5, 0.0, sol['c'][3], 0.0, 0.0])
                 if np.abs(sol['c'][1] - sol['c'][3]) > 1.e-10:
                     Tccs.append([T, sol['c'][1], sol['c'][3]])
             except:

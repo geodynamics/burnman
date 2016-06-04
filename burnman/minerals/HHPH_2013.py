@@ -34,7 +34,7 @@ class mg_fe_ringwoodite(SolidSolution):
         self.endmembers = [[mrw(), '[Mg]2SiO4'],
                            [frw(), '[Fe]2SiO4']]
         self.type = 'symmetric'
-        self.enthalpy_interaction = [[4.e3]]
+        self.energy_interaction = [[4.e3]]
         SolidSolution.__init__(self, molar_fractions)
 
 

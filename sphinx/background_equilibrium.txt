@@ -3,26 +3,26 @@
 Finding equilibrium assemblages
 -------------------------------
 
-In the Earth Sciences literature, there are two primary strategies for finding the equilibrium assemblage given a bulk composition. One strategy is a brute force approach, which trials a series of potential assemblages (satisfying the bulk composition constraints) to find the minimum free energy. This technique is adopted by Perple\_X. One potential algorithm using this method is:
+There are two primary strategies for finding the equilibrium assemblage given a bulk composition. One strategy trials a set of potential assemblages which satisfy the bulk composition constraints to find the assemblage with the minimum free energy. This technique is adopted by Perple\_X :cite:`Connolly2005`. This method can be broken down into the following steps:
 
 - Break solid solutions into a set of pseudocompounds, calculate molar Gibbs free energies for each
 - Find the set of mechanical mixtures (assemblages/composites) of pseudocompounds which satisfy the bulk compositional constraints
 - Find the mixture with the minimum Gibbs free energy
 - Refine the compositions if necessary
 
-The other strategy for finding equilibrium assemblages is to solve the equilibrium relations directly. The equilibrium relations have the form:
+The other strategy for finding equilibrium assemblages is to solve the equilibrium relations, which have the form:
 
 .. math::
    0 = \Delta G ^ 0 + RT \ln K
    :label: eqm_relations
 
-where :math:`\Delta G ^ 0` is the Gibbs energy of the reaction between the pure end-members in the same structure as the phases in which they occur, :math:`K` is the equilibrium constant, in terms of the activities of the end-members in their phases, :math:`T` is temperature, and :math:`R` is the gas constant. This is mathematically equivalent to saying that the chemical potentials of the reactant snd product endmembers are equal to each other. This strategy is adopted by thermodynamics software such as THERMOCALC. One potential algorithm using this method is:
+where :math:`\Delta G ^ 0` is the Gibbs energy of the reaction between the pure end-members in the same structure as the phases in which they occur, :math:`K` is the equilibrium constant, in terms of the activities of the end-members in their phases, :math:`T` is temperature, and :math:`R` is the gas constant. This is mathematically equivalent to saying that the chemical potentials of the reactant snd product endmembers are equal to each other. This strategy is adopted by thermodynamics software such as THERMOCALC :cite:`HP1998;HP2011`. This method can be broken down into the following steps:
 
 - Find the set of possible reactions which keep the bulk composition the same within a given assemblage.
 - Apply a set of constraints (fixed P/T, compositional constraints)
-- Find the amounts and compositions of the phases in the assemblage for which the equilibrium relations are satisfied, subject the the bulk compositional constraints.
+- Find the amounts and compositions of the phases in the assemblage for which the equilibrium relations are satisfied, subject to the bulk compositional constraints.
 
-There are benefits and drawbacks to each approach. The brute-force Gibbs energy minimisation provides no guarantee that the equilibrium composition has been reached (without an additional check), and can be computationally expensive. In particular, the number of pseudocompounds grows geometrically with the number of endmembers. On the other hand, the algorithm is simple to understand, can easily be extrapolated to large systems, and can handle solvi naturally. In terms of extant software, Perple\_X is written so that even people with little or no understanding of thermodynamics (or Earth Sciences in general!) can calculate high resolution phase diagrams in around 30 minutes. Recent advances in the minimization procedure have done much to reduce artefacts imposed by not finding the true minimum free energy. In contrast, the equilibrium approach relies on an appropriate starting guess for the composition, but has the benefit of finding the exact solution to a given problem. An additional benefit is that a myriad of different problems can be solved with the approach, such as finding the P-T conditions where a phase first becomes stable, calculating the position of invariant points, calculating isopleths (lines where phases have a certain compositional property, such as a constant Mg/(Mg+Fe) value). 
+There are benefits and drawbacks to each approach. The brute-force Gibbs energy minimisation provides only an approximate solution to the free energy assemblage. The method can be computationally expensive, since the number of pseudocompounds grows geometrically with the number of endmembers. On the other hand, the algorithm is simple to understand, can easily be extrapolated to large systems, and can handle solvi naturally. In terms of extant software, Perple\_X is written so that even people with little or no understanding of thermodynamics (or Earth Sciences in general!) can calculate high resolution phase diagrams in around 30 minutes. Recent advances in the minimization procedure have done much to reduce artefacts imposed by not finding the true minimum free energy. In contrast, the equilibrium approach is heavily dependent on solver and starting guesses, and constructing phase diagrams requires a knowledge of Schreinemakers' Rules :cite:`Schreinemakers1916`. On the other hand, it has the benefit of finding the exact solution to a given problem. An additional benefit is that a myriad of different problems can be solved with the approach, such as finding the P-T conditions where a phase first becomes stable, calculating the position of invariant points, calculating isopleths (lines where phases have a certain compositional property, such as a constant Mg/(Mg+Fe) value). 
 
 Equilibrium calculations in BurnMan currently apply the equilibrium relation strategy, but there is no reason why both cannot be implemented at some point in the future. Indeed the two strategies are complementary. The existing strategy is outlined in the following section, and includes details of the following:
 

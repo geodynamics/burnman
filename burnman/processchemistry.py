@@ -312,3 +312,189 @@ def component_to_atom_fractions(composition_dictionary, fraction_type):
     n_atoms = sum(atomic_fractions.values())
     
     return {key: atomic_fractions[key]/n_atoms for key in atomic_fractions}
+
+
+def binary_composition(composition1, composition2, x):
+    """
+    Returns the composition within a binary system that
+    is defined by a fraction of the second composition.
+    
+    Parameters
+    ----------
+    composition1 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    composition2 : dictionary of floats
+        Dictionary contains the number of atoms of each element
+        at one end of a binary.
+
+    x : float
+        Composition as a fraction of composition2.
+
+    Returns
+    -------
+    composition : dictionary of floats
+        (1-x)*composition1 + x*composition2.
+    """
+    composition = {}
+    for key, value in composition1.items():
+        composition[key] = value*(1. - x)
+    for key, value in composition2.items():
+        if key in composition:
+            composition[key] += value*x
+        else:
+            composition[key] = value*x
+
+    return composition
+
+
+def _cartesian(arrays, out=None):
+    """
+    Generate a cartesian product of input arrays.
+    Shamelessly taken from stackoverflow (question 1208118)
+
+    Parameters
+    ----------
+    arrays : list of 1-D arrays 
+        Arrays from which to form the cartesian product.
+    out : ndarray
+        Array in which to place the cartesian product.
+
+    Returns
+    -------
+    out : ndarray
+        2-D array of shape (M, len(arrays)) containing 
+        cartesian products formed of input arrays.
+    """
+
+    arrays = [np.asarray(x) for x in arrays]
+    dtype = arrays[0].dtype
+
+    n = np.prod([x.size for x in arrays])
+    if out is None:
+        out = np.zeros([n, len(arrays)], dtype=dtype)
+
+    m = n / arrays[0].size
+    out[:,0] = np.repeat(arrays[0], m)
+    if arrays[1:]:
+        _cartesian(arrays[1:], out=out[0:m,1:])
+        for j in xrange(1, arrays[0].size):
+            out[j*m:(j+1)*m,1:] = out[0:m,1:]
+    return out
+
+def _indicize(inp_arr):
+    arr=np.zeros([len(inp_arr), 1+max(inp_arr.flat)])
+    for i, site_indices in enumerate(inp_arr):
+        for j in site_indices:
+            arr[i][j] = 1
+    return arr
+
+def dependent_endmembers(formulae):
+    """
+    Find the set of possible dependent endmembers from a set of site formulae.
+    Dependent endmembers are those which can be made from a set of independent 
+    endmembers. For example, the simple alkali salts [Na][Cl], [K][Cl] 
+    and [Na][I] form an independent set, with a single dependent endmember 
+    [K][I] (equal to [K][Cl] + [Na][I] - [Na][Cl]). 
+    If we also have the independent endmember [Cs][F], no more dependent 
+    endmembers can be constructed; for example, [Cs][I] cannot be made because
+    this would also require an additional independent endmember 
+    ([Na][F] or [K][F]).
+
+    Parameters
+    ----------
+    formulae : list of dictionaries
+        Site formulae (see description in processchemistry)
+
+    Returns
+    -------
+    dependent_endmembers : 2d numpy array
+        2-D array containing the reaction coefficients of the independent 
+        endmembers required to create the dependent endmembers.
+    """
+
+    solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities = process_solution_chemistry(formulae)
+
+    # First, we redefine our endmembers using unique site occupancy indices
+    # We can then find the set of unique occupancies for each site
+    # site indices contains the unique integer indices for the occupancies on
+    # each site, indices contains the sets of indices for each site.
+    i=0
+    n_sites = 0
+    indices = []
+    site_indices = []
+    
+    for site in sites:
+        site_indices.append([])
+        site_occupancies = map(tuple, endmember_occupancies[:, i:i+len(site)])
+        set_site_occupancies = map(np.array, set(site_occupancies))
+        
+        for site_occupancy in site_occupancies:
+            site_indices[-1].append([i+n_sites for i, set_occupancy in enumerate(set_site_occupancies) if np.array_equal(set_occupancy, site_occupancy)][0])
+        indices.append(np.arange(n_sites,n_sites+len(set_site_occupancies)))
+        
+        i += len(site)
+        n_sites += len(set_site_occupancies)
+
+    given_members = _indicize(np.array(zip(*site_indices)))
+
+    # All the potential endmembers can be created from permutations of the unique site occupancies
+    # Note that the solution may not allow all of these endmembers; for example, if there
+    # is an endmember with unique occupancies on two sites,
+    # (e.g. Ca2+ and Fe3+ in the X, Y sites in garnet)
+    # then it will not be possible to exchange Ca2+ for Mg2+ on the X site
+    # and retain Fe3+ on the Y site.
+    all_members=_indicize(_cartesian(indices))
+
+    # Now we return only the endmembers which are not contained within the user-provided
+    # independent set
+    a=np.concatenate((given_members, all_members), axis=0)
+    b = np.ascontiguousarray(a).view(np.dtype((np.void, a.dtype.itemsize * a.shape[1])))
+    _, idx, cnts = np.unique(b, return_index=True, return_counts=True)
+    potential_dependents = a[[i for i, cnt in zip(*[idx, cnts]) if cnt==1]]
+    
+    
+    # We only want the dependent endmembers which can be described by a
+    # linear combination of the independent set
+    tol = 1e-12
+    dependent_endmembers = np.array([]).reshape(0, len(formulae))
+    for mbr in potential_dependents:
+        a,resid,rank,s = np.linalg.lstsq(given_members.T, mbr)
+        if resid[0] < tol:
+            a.real[abs(a.real) < tol] = 0.0
+            dependent_endmembers = np.concatenate((dependent_endmembers, np.array([a])), axis=0)
+    return dependent_endmembers
+
+def compositional_variables(assemblage, indices):
+    """
+    Takes an assemblage and outputs names for the
+    compositional variables which describe the bulk composition
+    and compositions of all the phases.
+
+    Parameters
+    ----------
+    assemblage : composite
+        The assemblage of minerals for which we want to find
+        amounts and compositions.
+    
+    Returns
+    -------
+    var_names : list of strings
+        Strings are provided in the same order as the X part
+        of the PTX variable input to :func:`_set_eqns`. Phase
+        amount names are given as 'x(phase.name)', while
+        the molar fractions of endmembers in each phase are
+        given as 'p(endmember.name)'
+    """
+    old_i = -1
+    var_names=[]
+    for (i, j) in indices:
+        if i != old_i:
+            var_names.append('x('+assemblage.phases[i].name+')')
+            old_i = i
+        else:
+            var_names.append('p('+assemblage.phases[i].endmembers[j][0].name+')')
+
+    return var_names
+    
