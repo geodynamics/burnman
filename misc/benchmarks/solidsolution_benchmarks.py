@@ -44,7 +44,7 @@ class o_d_spinel(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[minerals.HP_2011_ds62.sp(), '[Mg][Al]2O4'], [
                            minerals.HP_2011_ds62.sp(), '[Al][Mg1/2Al1/2]2O4']]
-        self.enthalpy_interaction = [[0.0]]
+        self.energy_interaction = [[0.0]]
 
         burnman.SolidSolution.__init__(self)
 
@@ -82,7 +82,7 @@ class orthopyroxene_red(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]SiO6'], [
             minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al]SiO6']]
-        self.enthalpy_interaction = [[0.0]]
+        self.energy_interaction = [[0.0]]
 
         burnman.SolidSolution.__init__(self)
 
@@ -94,7 +94,7 @@ class orthopyroxene_blue(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'], [
             minerals.SLB_2011.mg_tschermaks(), 'Mg[Al]AlSiO6']]
-        self.enthalpy_interaction = [[0.0]]
+        self.energy_interaction = [[0.0]]
 
         burnman.SolidSolution.__init__(self)
 
@@ -106,7 +106,7 @@ class orthopyroxene_long_dashed(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg]Si2O6'], [
             minerals.SLB_2011.mg_tschermaks(), '[Mg1/2Al1/2]2AlSiO6']]
-        self.enthalpy_interaction = [[10.0e3]]
+        self.energy_interaction = [[10.0e3]]
 
         burnman.SolidSolution.__init__(self)
 
@@ -118,7 +118,7 @@ class orthopyroxene_short_dashed(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[minerals.SLB_2011.enstatite(), 'Mg[Mg][Si]2O6'], [
             minerals.SLB_2011.mg_tschermaks(), 'Mg[Al][Al1/2Si1/2]2O6']]
-        self.enthalpy_interaction = [[0.0]]
+        self.energy_interaction = [[0.0]]
 
         burnman.SolidSolution.__init__(self)
 
@@ -150,7 +150,7 @@ plt.show()
 
 # Excess volume of solution
 
-# Excess enthalpy of solution
+# Excess energy of solution
 # Figure 5 of Stixrude and Lithgow-Bertelloni, 2011
 
 
@@ -161,7 +161,7 @@ class clinopyroxene(burnman.SolidSolution):
         self.type = 'asymmetric'
         self.endmembers = [[minerals.SLB_2011.diopside(), '[Ca][Mg][Si]2O6'], [
                            minerals.SLB_2011.ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6']]
-        self.enthalpy_interaction = [[26.e3]]
+        self.energy_interaction = [[26.e3]]
         self.alphas = [1.0, 3.5]
 
         burnman.SolidSolution.__init__(self)
@@ -185,6 +185,6 @@ plt.imshow(fig1, extent=[0.0, 1.0, -2., 8.0], aspect='auto')
 plt.plot(comp, gibbs / 1000., 'b--', linewidth=3.)
 plt.xlim(0.0, 1.0)
 plt.ylim(-2., 8.0)
-plt.ylabel("Excess enthalpy of solution (kJ/mol)")
+plt.ylabel("Excess energy of solution (kJ/mol)")
 plt.xlabel("cats fraction")
 plt.show()

@@ -14,7 +14,7 @@ from util import BurnManTest
 class Modifiers(BurnManTest):
 
     def test_excess_functions(self):
-        linear_params = {'G_0': 1200., 'delta_S': 5., 'delta_V': 1.e-7}
+        linear_params = {'delta_E': 1200., 'delta_S': 5., 'delta_V': 1.e-7}
         landau_params = {'Tc_0': 800., 'S_D': 5., 'V_D': 1.e-7}
         landau_params_2 = {'Tc_0': 1200., 'S_D': 5., 'V_D': 1.e-7}
         landau_hp_params = {

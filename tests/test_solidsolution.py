@@ -65,7 +65,7 @@ class forsterite_ss(burnman.SolidSolution):
         self.name = 'Dummy solid solution'
         self.type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]2SiO4']]
-        self.enthalpy_interaction = []
+        self.energy_interaction = []
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -79,7 +79,7 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]2SiO4'], [
                            forsterite(), '[Mg]2SiO4']]
-        self.enthalpy_interaction = [[0.]]
+        self.energy_interaction = [[0.]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -106,7 +106,7 @@ class olivine_ss(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[
             forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
-        self.enthalpy_interaction = [[8.4e3]]
+        self.energy_interaction = [[8.4e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -121,7 +121,7 @@ class orthopyroxene(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg][Mg]Si2O6'], [
                            forsterite(), '[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6']]
-        self.enthalpy_interaction = [[burnman.constants.gas_constant * 1.0e3]]
+        self.energy_interaction = [[burnman.constants.gas_constant * 1.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -135,7 +135,7 @@ class two_site_ss(burnman.SolidSolution):
         self.type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
                            forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
-        self.enthalpy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
+        self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -151,7 +151,7 @@ class two_site_ss_subregular(burnman.SolidSolution):
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
                            forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         # Interaction parameters
-        self.enthalpy_interaction = [
+        self.energy_interaction = [
             [[10.e3, 10.e3], [5.e3, 5.e3]], [[-10.e3, -10.e3]]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -225,9 +225,9 @@ class test_solidsolution(BurnManTest):
     def test_ol_Wh(self):
         ol_ss = olivine_ss()
         H_excess = ol_ss.solution_model.excess_enthalpy(
-            1.e5, 1000., [0.5, 0.5])
-        Wh = ol_ss.solution_model.Wh[0][1]
-        self.assertArraysAlmostEqual([Wh / 4.0], [H_excess])
+            1.e5, 1000., [0.5, 0.5]) # Hxs = Exs if Vxs=0
+        We = ol_ss.solution_model.We[0][1]
+        self.assertArraysAlmostEqual([We / 4.0], [H_excess])
 
     def test_order_disorder(self):
         opx = orthopyroxene()

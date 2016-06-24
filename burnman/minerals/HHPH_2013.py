@@ -20,9 +20,27 @@ from ..processchemistry import read_masses, dictionarize_formula, formula_mass
 atomic_masses = read_masses()
 
 """
-ENDMEMBERS
+SOLID SOLUTIONS
+
+N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has t
+he opposite sign to the values in Holland and Powell, 2011. This is consistent w
+ith its treatment as an excess entropy term (G=H-T*S+P*V), rather than a thermal
+ correction to the interaction parameter (W=W+T*W_T+P*W_P).
 """
 
+class mg_fe_ringwoodite(SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = 'ringwoodite'
+        self.endmembers = [[mrw(), '[Mg]2SiO4'],
+                           [frw(), '[Fe]2SiO4']]
+        self.type = 'symmetric'
+        self.energy_interaction = [[4.e3]]
+        SolidSolution.__init__(self, molar_fractions)
+
+
+"""
+ENDMEMBERS
+"""
 
 class fo (Mineral):
 
