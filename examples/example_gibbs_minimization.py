@@ -27,12 +27,47 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman.minerals import HP_2011_ds62, SLB_2011
+from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
 from burnman.equilibriumassemblage import *
 
 if __name__ == "__main__":
+    # Let's solve for the composition of Martian crust at 1173 K (900 C) and 1 GPa
+    P = 1.e9
+    T = 1173.15
+    atomic_masses = read_masses()
+    wt_composition = { 'K': 0.3740, 'Na': 2.20, 'Ca': 4.95, 'Fe': 14.1, 'Mg': 5.46, 'Al': 5.56, 'Si': 23.0, 'Ti': 0.5880}
+    oxidation_state = { 'K': 1., 'Na': 1., 'Ca': 2., 'Fe': 2., 'Mg': 2., 'Al': 3., 'Si': 4., 'Ti': 4.}
+    moles = {key: value/formula_mass({key: 1.}, atomic_masses) for key, value in wt_composition.iteritems()}
+    moles['Na'] += moles['K']
+    del moles['K']
+    moles['Si'] += moles['Ti']
+    del moles['Ti']
+    moles['O'] = np.sum([value*oxidation_state[key]/2. for key, value in moles.iteritems()])
+    total = np.sum(moles.values())
+    moles = {key: value / total for key, value in moles.iteritems()}
+    mol_oxides = {'Na2O': moles['Na']/2., 'CaO': moles['Ca'], 'FeO': moles['Fe'],
+                  'MgO': moles['Mg'], 'Al2O3': moles['Al']/2., 'SiO2': moles['Si']}
+    total = np.sum(mol_oxides.values())
+    mol_oxides = {key: value / total*100. for key, value in mol_oxides.iteritems()}
+    print(mol_oxides) 
+    
+    ol = SLB_2011.mg_fe_olivine()
+    opx = SLB_2011.orthopyroxene()
+    pl = SLB_2011.plagioclase()
+    cpx = SLB_2011.clinopyroxene()
+    sp = SLB_2011.mg_fe_aluminous_spinel()
+    gt = SLB_2011.garnet()
+    q = SLB_2011.quartz()
+    
+    assemblage = burnman.Composite([sp, opx, pl, q])
+    sol = gibbs_minimizer(moles, assemblage, [['P', P], ['T', T]])
+    
+    exit()
+
+    
     # Example 1: The classic aluminosilicate diagram.
     # This is a T-P phase diagram with composition Al2SiO5,
     # which is the composition of andalusite, sillimanite and
