@@ -73,7 +73,7 @@ def potential_amounts(comp_vector, stoichiometric_matrix, new_constraints=None):
     potential_endmember_amounts = sol.x
     resid = np.dot(A,potential_endmember_amounts) - b
     
-    ctol=1.e-12 # compositional tolerance.
+    ctol=1.e-3 # compositional tolerance.
     if (any(abs(residual) > ctol for residual in resid)):
         return potential_endmember_amounts, False
     else:
