@@ -61,7 +61,9 @@ class SolidSolution(Mineral):
 
         # Set default solution model type
         if hasattr(self, 'type'):
-            if self.type == 'ideal':
+            if self.type == 'mechanical':
+                self.solution_model = MechanicalSolution(self.endmembers, self.ESV)
+            elif self.type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'energy_interaction') == False:
@@ -117,8 +119,11 @@ class SolidSolution(Mineral):
             molar abundance for each endmember, needs to sum to one.
         """
         assert(len(self.endmembers) == len(molar_fractions))
-        assert(sum(molar_fractions) > 0.9999)
-        assert(sum(molar_fractions) < 1.0001)
+
+        if self.type != 'mechanical':
+            assert(sum(molar_fractions) > 0.9999)
+            assert(sum(molar_fractions) < 1.0001)
+            
         self.molar_fractions = molar_fractions
 
     def set_method(self, method):

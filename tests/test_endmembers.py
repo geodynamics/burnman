@@ -110,6 +110,13 @@ class test_endmembers(BurnManTest):
         self.assertFloatEqual(
             bdg.isothermal_bulk_modulus, bdg.adiabatic_bulk_modulus)
 
+    def test_made_mbr(self):
+     bdg = burnman.minerals.SLB_2011.mg_perovskite()
+     made_bdg = burnman.minerals.other.make_endmember([bdg, bdg], [2., -1.], [0., 0., 0.])
 
+     bdg.set_state(1.e5, 1000.)
+     made_bdg.set_state(1.e5, 1000.)
+     self.assertFloatEqual(bdg.S, made_bdg.S)
+        
 if __name__ == '__main__':
     unittest.main()

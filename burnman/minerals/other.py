@@ -12,10 +12,34 @@ from __future__ import absolute_import
 
 from .. import mineral_helpers as helpers
 from ..mineral import Mineral
+from ..solidsolution import SolidSolution
+from ..solutionmodel import *
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
+class make_endmember(SolidSolution):
+    """
+    This class makes a new endmember from a linear combination of minerals
+    and a Gibbs free energy adjustment which is linear in
+    pressure and temperature (i.e. a constant energy, entropy and
+    volume adjustment).
+    
+    For example, a crude approximation to a bridgmanite model might be
+    bdg = make_endmember([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
 
+    The endmember is actually a mechanical solid solution of constant composition, 
+    as this is the easiest way to create such a model. 
+    The function set_composition is called on initialisation, 
+    and shouldn't be called again.
+    """
+    def __init__(self, mineral_list, stoichiometry_list, ESV):
+        self.name = 'User-created endmember'
+        self.type = 'mechanical'
+        self.endmembers = [[m, ''] for m in mineral_list]
+        self.ESV = ESV
+        SolidSolution.__init__(self, stoichiometry_list)
+
+        
 class ZSB_2013_mg_perovskite(Mineral):
 
     def __init__(self):

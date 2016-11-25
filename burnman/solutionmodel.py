@@ -159,7 +159,41 @@ class SolutionModel(object):
         """
         return 0.0
 
+class MechanicalSolution (SolutionModel):
 
+    """
+    An extremely simple class representing a mechanical solution model.
+    The ESV variable is a list containing a constant energy, 
+    entropy and volume offset from the linear mechanical solution.
+    """
+
+    def __init__(self, endmembers, ESV):
+        self.n_endmembers = len(endmembers)
+        self.formulas = [e[1] for e in endmembers]
+        self.ESV = ESV
+
+    def excess_gibbs_free_energy(self, pressure, temperature, molar_fractions):
+        return self.ESV[0] + pressure * self.ESV[2] - temperature * self.ESV[1]
+    
+    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+        return np.zeros_like(molar_fractions)
+
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        return np.ones_like(molar_fractions)
+
+    def activities(self, pressure, temperature, molar_fractions):
+        return np.ones_like(molar_fractions)
+
+    def excess_volume(self, pressure, temperature, molar_fractions):
+        return self.ESV[2]
+
+    def excess_entropy(self, pressure, temperature, molar_fractions):
+        return self.ESV[1]
+
+    def excess_enthalpy(self, pressure, temperature, molar_fractions):
+        return self.ESV[0] + pressure * self.ESV[2]
+
+    
 class IdealSolution (SolutionModel):
 
     """
