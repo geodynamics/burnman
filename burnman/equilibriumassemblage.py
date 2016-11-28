@@ -67,7 +67,7 @@ def potential_amounts(comp_vector, stoichiometric_matrix, new_constraints=None):
     # Apply inequality constraints to make sure that the phase amounts are positive
     # At the moment, this doesn't take into account the possibility of negative endmember
     # amounts in solid solutions (to create dependent endmembers; we need to fix this)
-    cons = [{'type': 'ineq', 'fun': lambda x, i=[i]: x[i[0]]} for i in xrange(len(stoichiometric_matrix[0]))]
+    cons = [{'type': 'ineq', 'fun': lambda x, i=[i]: x[i[0]]} for i in range(len(stoichiometric_matrix[0]))]
     
     sol = opt.minimize(objective, guessed_amounts, args=(b, A), method='SLSQP', constraints=cons)
     potential_endmember_amounts = sol.x
@@ -317,7 +317,7 @@ def endmember_fractions_to_cvector(partial_mvector, indices, endmembers_per_phas
     """
     p=0
 
-    mvector = [[0. for i in xrange(endmembers_per_phase[i])] for i in xrange(len(endmembers_per_phase))]
+    mvector = [[0. for i in range(endmembers_per_phase[i])] for i in range(len(endmembers_per_phase))]
     for i_idx, i in enumerate(indices):
         mvector[i[0]][i[1]] = partial_mvector[i_idx]
 
@@ -328,7 +328,7 @@ def endmember_fractions_to_cvector(partial_mvector, indices, endmembers_per_phas
         composition.append(amount_phase)
 
         endmember_indices = [j_idx for (i_idx, j_idx) in indices if i == i_idx]
-        for j in xrange(len(endmember_indices)-1):
+        for j in range(len(endmember_indices)-1):
             composition.append(mvector[i][endmember_indices[j+1]]/amount_phase)
 
     return composition
@@ -361,7 +361,7 @@ def cvector_to_mineral_mbr_fractions(cvector, indices, endmembers_per_phase):
     """
     
     phase_amounts = [0. for n_endmembers in endmembers_per_phase]
-    molar_fractions = [[0. for i_mbr in xrange(n_endmembers)] for n_endmembers in endmembers_per_phase]
+    molar_fractions = [[0. for i_mbr in range(n_endmembers)] for n_endmembers in endmembers_per_phase]
 
     old_idx = -1
     first_j_idx = 0
@@ -752,7 +752,7 @@ def find_invariant(composition, phases, zero_phases, guesses=None):
     c0a = [0. for index in indices]
     c0b = [0. for index in indices]
     c1 = [1.]
-    c1.extend([float(t - s) for s, t in zip(zip(*indices)[0], zip(*indices)[0][1:])])
+    c1.extend([float(t - s) for s, t in list(zip(zip(*indices))[0], list(zip(*indices))[0][1:])])
     c0a[0] = 1.
     c0b[c1.index(1., 1)] = 1.
 
@@ -778,7 +778,7 @@ def find_univariant(composition, phases, zero_phase, condition_variable, conditi
     c0 = [0. for index in indices]
     c0[0] = 1.
     c1 = [1.]
-    c1.extend([float(t - s) for s, t in zip(zip(*indices)[0], zip(*indices)[0][1:])])
+    c1.extend([float(t - s) for s, t in zip(list(zip(*indices))[0], list(zip(*indices))[0][1:])])
 
     X_constraint = ['X', c0, c1, 0.]
     col, null, initial_composition, indices, endmembers_per_phase = assemble_compositional_tensors ( composition, assemblage.phases, [X_constraint] )
