@@ -162,8 +162,11 @@ class MechanicalSolution (SolutionModel):
 
     """
     An extremely simple class representing a mechanical solution model.
-    The ESV variable is a list containing a constant energy, 
-    entropy and volume offset from the linear mechanical solution.
+    A mechanical solution experiences no interaction between materials.
+    Therefore, unlike ideal solutions there is no entropy of mixing;
+    the total gibbs free energy of the solution is equal to the 
+    dot product of the molar gibbs free energies and molar fractions
+    of the constituent materials.
     """
 
     def __init__(self, endmembers):
