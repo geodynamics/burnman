@@ -11,6 +11,7 @@ import warnings
 from .mineral import Mineral, material_property
 from .solutionmodel import *
 from .averaging_schemes import reuss_average_function
+from .processchemistry import sum_formulae
 from . import constants
 
 
@@ -62,7 +63,7 @@ class SolidSolution(Mineral):
         # Set default solution model type
         if hasattr(self, 'type'):
             if self.type == 'mechanical':
-                self.solution_model = MechanicalSolution(self.endmembers, self.ESV)
+                self.solution_model = MechanicalSolution(self.endmembers)
             elif self.type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
@@ -125,7 +126,7 @@ class SolidSolution(Mineral):
             assert(sum(molar_fractions) < 1.0001)
             
         self.molar_fractions = molar_fractions
-
+        
     def set_method(self, method):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)
@@ -206,6 +207,14 @@ class SolidSolution(Mineral):
         Returns molar mass of the solid solution [kg/mol]
         """
         return sum([self.endmembers[i][0].molar_mass * self.molar_fractions[i] for i in range(self.n_endmembers)])
+    
+    @material_property
+    def formula(self):
+        """
+        Returns chemical formula of the solid solution
+        """
+        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
+                            self.molar_fractions)
 
     @material_property
     def excess_volume(self):
