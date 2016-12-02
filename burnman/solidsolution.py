@@ -34,7 +34,7 @@ class SolidSolution(Mineral):
     and P derivatives in J/K/mol and m^3/mol.
     """
 
-    def __init__(self, molar_fractions=None, endmembers=None, solution_type=None):
+    def __init__(self, solution_type, endmembers, molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
 
@@ -56,19 +56,11 @@ class SolidSolution(Mineral):
             pass
         self.method = SolidSolutionMethod()
 
-        if solution_type is not None:
-            self.type = solution_type
-        else:
-            if hasattr(self, 'type') == False:
-                raise Exception(
-                    "'type' attribute missing from solid solution")
-        if endmembers is not None:
-            self.endmembers = endmembers
-        else:
-            if hasattr(self, 'endmembers') == False:
-                raise Exception(
-                    "'endmembers' attribute missing from solid solution")
+        
+        self.type = solution_type
+        self.endmembers = endmembers
 
+        
         # Set default solution model type
         if self.type == 'mechanical':
             self.solution_model = MechanicalSolution(self.endmembers)
