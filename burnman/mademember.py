@@ -19,29 +19,23 @@ from . import constants
 class MadeMember(Mineral):
 
     """
-    This is the base class for all solid solutions.
-    Site occupancies, endmember activities and the constant
-    and pressure and temperature dependencies of the excess
-    properties can be queried after using set_composition()
-    States of the solid solution can only be queried after setting
-    the pressure, temperature and composition using set_state().
+    This is the base class for endmembers constructed from a set of other minerals.
 
-    This class is available as :class:`burnman.SolidSolution`.
-    It uses an instance of :class:`burnman.SolutionModel` to
-    calculate interaction terms between endmembers.
+    This class is available as :class:`burnman.MadeMember`.
 
     All the solid solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T
     and P derivatives in J/K/mol and m^3/mol.
     """
 
-    def __init__(self):
+    def __init__(self, mineral_list, molar_amounts):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
         """
-        if hasattr(self, 'mixture') == False:
-            raise Exception(
-                "'mixture' attribute missing from made member")
+
+        self.mixture = SolidSolution(solution_type='mechanical',
+                                     endmembers=[[m, ''] for m in mineral_list],
+                                     molar_fractions = molar_amounts)
 
         self.params = {
             'name': 'User-created endmember',
@@ -272,19 +266,9 @@ def make_endmember(mineral_list, molar_amounts, free_energy_adjustment):
     """
     assert(len(free_energy_adjustment) == 3)
 
-    class mechanical_mixture(SolidSolution):
-        def __init__(self, mineral_list, molar_amounts):
-            self.type = 'mechanical'
-            self.endmembers = [[m, ''] for m in mineral_list]
-            SolidSolution.__init__(self, molar_amounts)
-
-    class made_endmember(MadeMember):
-        def __init__(self):
-            self.mixture = mechanical_mixture(mineral_list, molar_amounts)
-            self.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
-                                                   'delta_S': free_energy_adjustment[1],
-                                                   'delta_V': free_energy_adjustment[2]}]]
-
-            MadeMember.__init__(self)
+    x = MadeMember(mineral_list, molar_amounts)
+    x.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
+                                        'delta_S': free_energy_adjustment[1],
+                                        'delta_V': free_energy_adjustment[2]}]]
             
-    return made_endmember()
+    return x
