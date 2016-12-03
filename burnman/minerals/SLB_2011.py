@@ -32,7 +32,7 @@ class c2c_pyroxene(SolidSolution):
         self.endmembers = [
             [hp_clinoenstatite(), '[Mg]2Si2O6'], [hp_clinoferrosilite(), '[Fe]2Si2O6']]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class ca_ferrite_structured_phase(SolidSolution):
@@ -43,7 +43,7 @@ class ca_ferrite_structured_phase(SolidSolution):
         self.endmembers = [[mg_ca_ferrite(), '[Mg]Al[Al]O4'], [
                            fe_ca_ferrite(), '[Fe]Al[Al]O4'], [na_ca_ferrite(), '[Na]Al[Si]O4']]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class clinopyroxene(SolidSolution):
@@ -56,7 +56,7 @@ class clinopyroxene(SolidSolution):
         self.energy_interaction = [
             [0., 24.74e3, 26.e3, 24.3e3], [24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class garnet(SolidSolution):
@@ -69,7 +69,7 @@ class garnet(SolidSolution):
         self.energy_interaction = [
             [0.0, 30.e3, 21.20278e3, 0.0], [0.0, 0.0, 0.0], [57.77596e3, 0.0], [0.0]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class akimotoite(SolidSolution):
@@ -81,7 +81,7 @@ class akimotoite(SolidSolution):
                            fe_akimotoite(), '[Fe][Si]O3'], [corundum(), '[Al][Al]O3']]
         self.energy_interaction = [[0.0, 66.e3], [66.e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class ferropericlase(SolidSolution):
@@ -92,7 +92,7 @@ class ferropericlase(SolidSolution):
         self.endmembers = [[periclase(), '[Mg]O'], [wuestite(), '[Fe]O']]
         self.energy_interaction = [[13.e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_olivine(SolidSolution):
@@ -104,7 +104,7 @@ class mg_fe_olivine(SolidSolution):
             forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
         self.energy_interaction = [[7.81322e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class orthopyroxene(SolidSolution):
@@ -117,7 +117,7 @@ class orthopyroxene(SolidSolution):
         self.energy_interaction = [
             [0.0, 0.0, 32.11352e3], [0.0, 0.0], [48.35316e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class plagioclase(SolidSolution):
@@ -129,7 +129,7 @@ class plagioclase(SolidSolution):
             [anorthite(), '[Ca][Al]2Si2O8'], [albite(), '[Na][Al1/2Si1/2]2Si2O8']]
         self.energy_interaction = [[26.0e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class post_perovskite(SolidSolution):
@@ -141,7 +141,7 @@ class post_perovskite(SolidSolution):
                            fe_post_perovskite(), '[Fe][Si]O3'], [al_post_perovskite(), '[Al][Al]O3']]
         self.energy_interaction = [[0.0, 60.0e3], [0.0]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_perovskite(SolidSolution):
@@ -153,7 +153,7 @@ class mg_fe_perovskite(SolidSolution):
                            fe_perovskite(), '[Fe][Si]O3'], [al_perovskite(), '[Al][Al]O3']]
         self.energy_interaction = [[0.0, 116.0e3], [0.0]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_ringwoodite(SolidSolution):
@@ -165,7 +165,7 @@ class mg_fe_ringwoodite(SolidSolution):
             [mg_ringwoodite(), '[Mg]2SiO4'], [fe_ringwoodite(), '[Fe]2SiO4']]
         self.energy_interaction = [[9.34084e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_aluminous_spinel(SolidSolution):
@@ -177,7 +177,7 @@ class mg_fe_aluminous_spinel(SolidSolution):
                                    hercynite(), '[Fe3/4Al1/4]4[Al7/8Fe1/8]8O16']]
         self.energy_interaction = [[5.87646e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_wadsleyite(SolidSolution):
@@ -189,7 +189,7 @@ class mg_fe_wadsleyite(SolidSolution):
             [mg_wadsleyite(), '[Mg]2SiO4'], [fe_wadsleyite(), '[Fe]2SiO4']]
         self.energy_interaction = [[16.74718e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 """
 ENDMEMBERS
