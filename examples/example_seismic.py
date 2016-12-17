@@ -52,14 +52,14 @@ if __name__ == "__main__":
               burnman.seismic.AK135(), burnman.seismic.IASP91()]
     colors = ['r', 'b', 'm', 'k']
     # Variables to plot
-    var = ['pressure', 'gravity', 'v_p', 'v_s', 'v_phi', 'density']
+    variables = ['pressure', 'gravity', 'v_p', 'v_s', 'v_phi', 'density']
     units = ['Pa', 'm/s^2', 'm/s', 'm/s', 'm/s', 'kg/m^3', 'Pa', 'm/s^2']
 
     plt.figure(figsize=(10, 9))
 
     # Run through models and variables
-    for a in range(len(var)):
-        ax = plt.subplot(3, 2, a + 1)
+    for variable_index in range(len(variables)):
+        ax = plt.subplot(3, 2, variable_index + 1)
         for m in range(len(models)):
 
                 # specify where we want to evaluate, here we map from pressure to depth
@@ -77,23 +77,23 @@ if __name__ == "__main__":
                 # try to get and plot values for given model, if this fails the
                 # variable is likely not defined for that model
                 try:
-                    values = getattr(models[m], var[a])(depths)
+                    values = getattr(models[m], variables[variable_index])(depths)
                     plt.plot(depths / 1.e3, values, color=colors[
                              m], linestyle='-', label=models[m].__class__.__name__)
                 except:
                     # write out warning that the variable failed for given
                     # model
                     print(
-                        var[a] + ' is not defined for ' + models[m].__class__.__name__)
+                        variables[variable_index] + ' is not defined for ' + models[m].__class__.__name__)
 
-        plt.title(var[a])
+        plt.title(variables[variable_index])
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-        if a == 3:
+        if variable_index == 3:
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        if a > 3:
+        if variable_index > 3:
             plt.xlabel('depth in km')
-        plt.ylabel(units[a])
+        plt.ylabel(units[variable_index])
         plt.gca().set_xticks([660, 2891, 5150])
     plt.show()
 
