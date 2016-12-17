@@ -79,12 +79,12 @@ if __name__ == "__main__":
     pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
-    # Now we get an array of temperatures at which will be used for computing
+    # Now we get an array of temperatures at which we compute
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
-    # geotherm for mapping pressure to temperature
+    # geotherm for mapping pressure to temperature.
     temperature = burnman.geotherm.brown_shankland(pressure)
 
-    # Here is the step which does the heavy lifting.  burnman.evaluate
+    # This is the step that does the heavy lifting.  burnman.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,
     # then calculates the elastic moduli and density of each individual phase.  After that,
     # it calcalates all the variables asked for. For the composite a default averaging scheme
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     plt.xlabel("Pressure (GPa)")
     plt.title("density (kg/m^3)")
 
-    # Finally, we plot the goetherm used
+    # Finally, we plot the used geotherm
     plt.subplot(2, 2, 4)
     plt.plot(pressure / 1e9, temperature, color='r', linestyle='-',
              marker='o', markerfacecolor='r', markersize=4)
