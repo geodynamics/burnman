@@ -60,31 +60,31 @@ if __name__ == "__main__":
     # Run through models and variables
     for variable_index in range(len(variables)):
         ax = plt.subplot(3, 2, variable_index + 1)
-        for m in range(len(models)):
+        for model_index in range(len(models)):
 
                 # specify where we want to evaluate, here we map from pressure to depth
                 # 1. format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
                 # p = np.arange(1.0e9,360.0e9,1.e9)
-                # depths = np.array([models[m].depth(pr) for pr in p])
+                # depths = np.array([models[model_index].depth(pr) for pr in p])
                 # 2. we could also just specify some depth levels directly like this
                 # depths = np.arange(700e3,2800e3,100e3)
                 # 3. we could also use the data points where the seismic model is specified over a depth range, this will bring out any discontinuities
                 # this is the preferred way to plot seismic discontinuities
                 # correctly
-                depths = models[m].internal_depth_list(
+                depths = models[model_index].internal_depth_list(
                     mindepth=0, maxdepth=6371e3)
                 # now evaluate everything at the given depths levels (using linear interpolation)
                 # try to get and plot values for given model, if this fails the
                 # variable is likely not defined for that model
                 try:
-                    values = getattr(models[m], variables[variable_index])(depths)
+                    values = getattr(models[model_index], variables[variable_index])(depths)
                     plt.plot(depths / 1.e3, values, color=colors[
-                             m], linestyle='-', label=models[m].__class__.__name__)
+                             model_index], linestyle='-', label=models[model_index].__class__.__name__)
                 except:
                     # write out warning that the variable failed for given
                     # model
                     print(
-                        variables[variable_index] + ' is not defined for ' + models[m].__class__.__name__)
+                        variables[variable_index] + ' is not defined for ' + models[model_index].__class__.__name__)
 
         plt.title(variables[variable_index])
         box = ax.get_position()
