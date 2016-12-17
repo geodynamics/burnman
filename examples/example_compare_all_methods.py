@@ -46,7 +46,7 @@ if __name__ == "__main__":
                               minerals.Murakami_etal_2012.fe_periclase_LS()],
                              [amount_perovskite, 1.0 - amount_perovskite])
 
-    #(min pressure, max pressure, pressure step)
+    # (min pressure, max pressure, pressure step)
     seis_p = np.arange(25e9, 125e9, 5e9)
 
     # Input adiabat potential temperature
@@ -84,8 +84,9 @@ if __name__ == "__main__":
         mat_rho_1, mat_vs_1, mat_vphi_1 = \
             rock.evaluate(['density', 'v_s', 'v_phi'], seis_p, temperature)
 
-        # Now let's plot the comparison. You can conversely just output to a data   file
-        #(see example_woutput.py)
+        # Now let's plot the comparison. You can conversely just output to a data file
+        # (see example_woutput.py)
+
         # plot Vs
         plt.subplot(2, 2, 1)
         plt.plot(

@@ -54,12 +54,11 @@ if __name__ == "__main__":
 
     # Define solid solutions
     perovskite = minerals.SLB_2011.mg_fe_perovskite()
+    # Set molar_fraction of fe_perovskite and al_perovskite:
     perovskite.set_composition([0.94, 0.06, 0.])
-                               # Set molar_fraction of mg_perovskite,
-                               # fe_perovskite and al_perovskite
     ferropericlase = minerals.SLB_2011.ferropericlase()
-    ferropericlase.set_composition(
-        [0.8, 0.2])  # Set molar_fraction of MgO and FeO
+    # Set molar_fraction of MgO and FeO:
+    ferropericlase.set_composition([0.8, 0.2])
 
     def material_error(amount_perovskite):
         # Define composite using the values

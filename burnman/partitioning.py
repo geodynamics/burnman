@@ -57,18 +57,16 @@ def calculate_partition_coefficient(pressure, temperature, components, initial_d
 
     delV = 2.e-7  # in m^3/mol, average taken from Nakajima et al 2012, JGR
 
+    # eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
     rs = ((25.e9 - pressure) * (delV) / (constants.gas_constant * temperature)) + \
         np.log(Kd_0)
-                 # eq 5 Nakajima et al 2012, JGR. Solved for ln(K(P,T,X))
 
+    # The exchange coefficent at P and T. K(P,T,X) in eq 5 Nakajima et al 2012
     K = np.exp(rs)
-               # The exchange coefficent at P and T. K(P,T,X) in eq 5 Nakajima
-               # et al 2012
 
-    """
-    Solving equation 6 in Nakajima et al., 2012 for X_Fe_fp (we define as a) and X_Fe_pv (we define as b)
-    Solved using the definition of the distribution coefficient to define X_Fe_fp as a function of X_Fe_pv
-    """
+    # Solving equation 6 in Nakajima et al., 2012 for X_Fe_fp (we define as a) and X_Fe_pv (we define as b)
+    # Solved using the definition of the distribution coefficient to define X_Fe_fp as a function of X_Fe_pv
+
     num_to_sqrt = (-4. * frac_mol_FeO * (K - 1.) * K * frac_mol_SiO2) + (
         pow(1. + (frac_mol_FeO * (K - 1)) + ((K - 1.) * frac_mol_SiO2), 2.))
 

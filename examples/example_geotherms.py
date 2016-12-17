@@ -43,8 +43,7 @@ import burnman
 from burnman import minerals
 
 if __name__ == "__main__":
-
-# we want to evaluate several geotherms at these values
+    # we want to evaluate several geotherms at these values
     pressures = np.arange(9.0e9, 128e9, 3e9)
 
     # load two builtin geotherms and evaluate the temperatures at all pressures
@@ -53,8 +52,7 @@ if __name__ == "__main__":
 
     # a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
     # so we can just write our own function
-    my_geotherm_function = lambda p:  [
-        1500 + (2500 - 1500) * x / 128e9 for x in p]
+    my_geotherm_function = lambda p: [1500 + (2500 - 1500) * x / 128e9 for x in p]
     temperature3 = my_geotherm_function(pressures)
 
     # what about a geotherm defined from datapoints given in a file (our
@@ -66,7 +64,7 @@ if __name__ == "__main__":
     table_pressure = np.array(table)[:, 0]
     table_temperature = np.array(table)[:, 1]
 
-    my_geotherm_interpolate = lambda p:  [np.interp(x, table_pressure,
+    my_geotherm_interpolate = lambda p: [np.interp(x, table_pressure,
                                                     table_temperature) for x in p]
 
     temperature4 = my_geotherm_interpolate(pressures)

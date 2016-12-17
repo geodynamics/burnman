@@ -10,11 +10,7 @@ This module provides several helper minerals/materials.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import numpy as np
-import warnings
-
 from .material import Material
-from .mineral import Mineral
 from .composite import Composite
 
 

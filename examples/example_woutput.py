@@ -30,7 +30,6 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
@@ -39,9 +38,6 @@ import burnman
 from burnman import minerals
 
 if __name__ == "__main__":
-
-# See bottom for output tool
-
     # input variables ###
     #
     # specify material
