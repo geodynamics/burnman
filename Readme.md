@@ -108,7 +108,7 @@ provide a graphical user interface. For those of you who are not familiar  with 
 relatively easy to adapt the scripts for computations and plotting. 
 Here are some specific features and pitfalls on Python:
 
-* Python uses specific identation. A script might fail if a code block is not idented correctly. We use four spaces and no tabs, 
+* Python uses specific indentation. A script might fail if a code block is not indented correctly. We use four spaces and no tabs, 
   mixing these can give trouble.
 * Indices require square brackets and function or method calls parentheses (mainly different from Matlab).
 * The first index of an array is 0 (e.g. x[0])
