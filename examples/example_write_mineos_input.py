@@ -20,7 +20,6 @@ import os
 import sys  # Library used to interact with your operating system
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
-from matplotlib import cm  # Library used for colormap
 # Import BurnMan
 sys.path.insert(1, os.path.abspath('../'))  # add path to burnman
 import burnman
@@ -36,7 +35,7 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
 
     """
     # Load reference input
-    lines = open('mineos_' + mineos_ref + '.txt').readlines()
+    lines = open('../burnman/data/input_seismic/mineos_' + mineos_ref + '.txt').readlines()
     table = []
     for line in lines[3:]:
         numbers = np.fromstring(line, sep=' ')
