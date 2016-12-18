@@ -1,7 +1,0 @@
-/contrib/tutorial/uncertainty.dat
-/misc/*.pdf
-/examples/example_woutput.txt
-/sphinx/_build/*
-/build/*
-*.tmp
-*.pyc
