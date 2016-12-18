@@ -158,7 +158,43 @@ class SolutionModel(object):
         """
         return 0.0
 
+class MechanicalSolution (SolutionModel):
 
+    """
+    An extremely simple class representing a mechanical solution model.
+    A mechanical solution experiences no interaction between endmembers.
+    Therefore, unlike ideal solutions there is no entropy of mixing;
+    the total gibbs free energy of the solution is equal to the 
+    dot product of the molar gibbs free energies and molar fractions
+    of the constituent materials.
+    """
+
+    def __init__(self, endmembers):
+        self.n_endmembers = len(endmembers)
+        self.formulas = [e[1] for e in endmembers]
+
+    def excess_gibbs_free_energy(self, pressure, temperature, molar_fractions):
+        return 0.
+    
+    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+        return np.zeros_like(molar_fractions)
+
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        return np.ones_like(molar_fractions)
+
+    def activities(self, pressure, temperature, molar_fractions):
+        return np.ones_like(molar_fractions)
+
+    def excess_volume(self, pressure, temperature, molar_fractions):
+        return 0.
+
+    def excess_entropy(self, pressure, temperature, molar_fractions):
+        return 0.
+
+    def excess_enthalpy(self, pressure, temperature, molar_fractions):
+        return 0.
+
+    
 class IdealSolution (SolutionModel):
 
     """
