@@ -1,15 +1,12 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
-
-
 """
-_________________________________________________________________________
 This example script produces an input file to compute normal modes in
 Mineos for a lower mantle with pyrolitic or chondritic composition.
-Thanks for input from Jessica Irving.
-_________________________________________________________________________
-
+Mineos Masters et al. 2007
+https://geodynamics.org/cig/software/mineos/
+Thanks for input on this script from Jessica Irving.
 
 """
 # Import supporting libraries
@@ -29,9 +26,7 @@ from burnman import minerals  # import mineral library seperately
 def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmantestrock',
                        mineos_ref='prem_noocean', plotting=False):
     """
-    _________________________________________________________________________
     Writing velocities and densities to Mineos input file
-    _________________________________________________________________________
 
     """
     # Load reference input
