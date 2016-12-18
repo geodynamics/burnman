@@ -39,7 +39,7 @@ class CFMASO_garnet(SolidSolution):
         self.energy_interaction = [[2.5e3, 31.e3, 53.2e3],
                                    [5.e3, 37.24e3],
                                    [2.e3]]
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
 """

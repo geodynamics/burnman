@@ -71,7 +71,7 @@ if __name__ == "__main__":
             self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'], [
                                minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
 
-            burnman.SolidSolution.__init__(self, molar_fractions)
+            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
     g1 = mg_fe_garnet()
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
                                minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
             self.energy_interaction = [[2.5e3]]
 
-            burnman.SolidSolution.__init__(self, molar_fractions)
+            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
     g2 = mg_fe_garnet_2()
     g2_excess_gibbs = np.empty_like(comp)
@@ -229,7 +229,7 @@ if __name__ == "__main__":
             self.entropy_interaction = [[0.0e3, 0.0e3], [0.0e3]]
             self.volume_interaction = [[0.0e3, 0.0e3], [0.0e3]]
 
-            burnman.SolidSolution.__init__(self, molar_fractions)
+            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
     g3 = hp_mg_fe_garnet()
     g3_configurational_entropy = np.empty_like(comp)
@@ -274,7 +274,7 @@ if __name__ == "__main__":
             self.energy_interaction = [[2.5e3, 31.e3, 53.2e3],
                                         [5.e3, 37.24e3],
                                         [2.e3]]
-            burnman.SolidSolution.__init__(self, molar_fractions)
+            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
     g4 = burnman.minerals.HP_2011_ds62.CFMASO_garnet()
     g4_excess_gibbs_400 = np.empty_like(comp)
@@ -326,7 +326,7 @@ if __name__ == "__main__":
                         for k in range(len(interaction[i][j])):
                             interaction[i][j][k] *= 3.
 
-            burnman.SolidSolution.__init__(self, molar_fractions)
+            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
     g5 = mg_fe_ca_garnet_Ganguly()
     g5_excess_gibbs = np.empty_like(comp)
