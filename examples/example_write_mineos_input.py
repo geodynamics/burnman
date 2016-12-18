@@ -62,10 +62,7 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
     # Computing adiabatic temperatures. T0 is a choice!
     T0 = 1900  # K
     temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)
-    # An alternative is the Brown+Shankland (1981)
-    # geotherm for mapping pressure to temperature.
-    # To use this include the line below.
-    #temperature = burnman.geotherm.brown_shankland(pressure)
+
     
     print("Calculations are done for:")
     rock.debug_print()
@@ -140,18 +137,9 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
 
 
 if __name__ == "__main__":
-    # We'll compute the velocities for different compositions at 20 points
-    # within the lower mantle. Here we define the array of those depths.
-    depths = np.linspace(750e3, 2700e3, 20)
-    # We use PREM to convert these depths to pressure values.
-    [pressures] = burnman.seismic.PREM().evaluate(['pressure'], depths)
 
-    #-Defining the rock-
-    #The object burnman.Composite expects two lists, one with the minerals
-    #themselves and one with the molar fractions of the different minerals
-    #making up the rock
+    #-Defining the rocks-
     #Here we test the models for a Pyrolitic and Chondritic lower mantle.
-
 
     # Perovksite solide solution
     frac_mg = 0.94
@@ -189,6 +177,6 @@ if __name__ == "__main__":
     print("Calculations are done for:")
     pyrolitic_mantle.debug_print()
 
-    # writing mineos input!
+    # Writing mineos input
     write_mineos_input(pyrolitic_mantle, name='pyrolite', plotting=True)
     write_mineos_input(chondritic_mantle, name='chondrite', plotting=True)
