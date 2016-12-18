@@ -10,6 +10,7 @@ import warnings
 
 from .mineral import Mineral, material_property
 from .solutionmodel import *
+from .processchemistry import sum_formulae
 from .averaging_schemes import reuss_average_function
 from . import constants
 
@@ -84,7 +85,9 @@ class SolidSolution(Mineral):
 
         # Set default solution model type
         if hasattr(self, 'type'):
-            if self.type == 'ideal':
+            if self.type == 'mechanical':
+                self.solution_model = MechanicalSolution(self.endmembers)
+            elif self.type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'energy_interaction') == False:
@@ -140,8 +143,10 @@ class SolidSolution(Mineral):
             molar abundance for each endmember, needs to sum to one.
         """
         assert(len(self.endmembers) == len(molar_fractions))
-        assert(sum(molar_fractions) > 0.9999)
-        assert(sum(molar_fractions) < 1.0001)
+
+        if self.type != 'mechanical':
+            assert(sum(molar_fractions) > 0.9999)
+            assert(sum(molar_fractions) < 1.0001)
         self.molar_fractions = molar_fractions
 
     def set_method(self, method):
@@ -156,6 +161,14 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
+    @material_property
+    def formula(self):
+        """
+        Returns chemical formula of the solid solution
+        """
+        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
+                            self.molar_fractions)
+    
     @material_property
     def activities(self):
         """

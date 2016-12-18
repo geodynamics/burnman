@@ -162,7 +162,7 @@ class MechanicalSolution (SolutionModel):
 
     """
     An extremely simple class representing a mechanical solution model.
-    A mechanical solution experiences no interaction between materials.
+    A mechanical solution experiences no interaction between endmembers.
     Therefore, unlike ideal solutions there is no entropy of mixing;
     the total gibbs free energy of the solution is equal to the 
     dot product of the molar gibbs free energies and molar fractions
