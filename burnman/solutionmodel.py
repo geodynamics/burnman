@@ -5,8 +5,7 @@
 from __future__ import absolute_import
 
 import numpy as np
-import warnings
-from .processchemistry import *
+from . import processchemistry
 from . import constants
 
 """
@@ -174,7 +173,7 @@ class IdealSolution (SolutionModel):
 
         # Process solid solution chemistry
         self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
-            process_solution_chemistry(self.formulas)
+            processchemistry.process_solution_chemistry(self.formulas)
 
         self._calculate_endmember_configurational_entropies()
 

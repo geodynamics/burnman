@@ -24,7 +24,7 @@ metadata = dict(name='burnman',
 # if the system does not have setuptools, fall back on
 # distutils.
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup
     metadata['install_requires'] = ['numpy', 'matplotlib', 'scipy']
 except ImportError:
     from distutils.core import setup

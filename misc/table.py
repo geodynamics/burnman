@@ -10,8 +10,6 @@ from __future__ import print_function
 
 import os
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
@@ -47,7 +45,7 @@ if __name__ == "__main__":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
                 if inspect.isclass(mineral) and mineral != burnman.Mineral and issubclass(mineral, burnman.Mineral) \
-                        and issubclass(mineral, burnman.mineral_helpers.HelperSpinTransition) == False:
+                        and not issubclass(mineral, burnman.mineral_helpers.HelperSpinTransition):
                     if issubclass(mineral, burnman.SolidSolution):
                         continue
                     # print mineral.__module__ + mineral.__name__
@@ -55,7 +53,7 @@ if __name__ == "__main__":
                     name = name1.replace("burnman.minerals.", "")
                     # name = mineral.__module__.replace("minlib_","").replace("burnman.","").replace("minerals.","") + "." + mineral.__name__
                     # print mineral, name, name1
-                    if not name in names:
+                    if name not in names:
                         names.add(name)
                         try:
                             x = mineral()

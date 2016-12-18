@@ -45,7 +45,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.integrate import quad
-from scipy.interpolate import interp1d
 from scipy.interpolate import UnivariateSpline
 
 import burnman
@@ -105,7 +104,7 @@ if __name__ == "__main__":
             self.mantle = burnman.Composite([minerals.SLB_2011.forsterite(),
                                              minerals.SLB_2011.enstatite()],
                                             [amount_olivine, 1.0 - amount_olivine])
-             # The core will be represented by solid iron.
+            # The core will be represented by solid iron.
             self.core = iron()
 
         def generate_profiles(self, n_iterations):
@@ -161,7 +160,10 @@ if __name__ == "__main__":
             rhofunc = UnivariateSpline(radii, density)
 
             # Numerically integrate Poisson's equation
-            poisson = lambda p, x: 4.0 * np.pi * G * rhofunc(x) * x * x
+
+            def poisson(p, x):
+                return 4.0 * np.pi * G * rhofunc(x) * x * x
+
             grav = np.ravel(odeint(poisson, 0.0, radii))
             grav[1:] = grav[1:] / radii[1:] / radii[1:]
             grav[
@@ -228,8 +230,6 @@ if __name__ == "__main__":
     # with a liquid outer core, light alloying elements in the core, and a more realistic
     # temperature profile.  That, however, is outside of the scope of this
     # example.
-
-    import matplotlib.gridspec as gridspec
 
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'

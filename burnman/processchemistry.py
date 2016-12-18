@@ -67,12 +67,8 @@ def dictionarize_site_formula(formula):
     by square brackets and return a standard dictionary with
     element keys and atoms of each element per formula unit as items.
     """
-    solution_formulae = dict()
     s = re.split(r'\[', formula)[1:]
-    sites = [[] for i in range(len(s))]
-    list_occupancies = []
     list_multiplicity = np.empty(shape=(len(s)))
-    n_occupancies = 0
     f = dict()
 
     for site in range(len(s)):
@@ -169,7 +165,7 @@ def process_solution_chemistry(formulae):
     list_multiplicity = np.empty(shape=(n_sites))
     n_occupancies = 0
 
-        # Number of unique site occupancies (e.g.. Mg on X etc.)
+    # Number of unique site occupancies (e.g.. Mg on X etc.)
     for endmember in range(n_endmembers):
         solution_formula = dict()
         list_occupancies.append([[0] * len(sites[site])

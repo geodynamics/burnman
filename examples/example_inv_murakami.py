@@ -23,8 +23,6 @@ import matplotlib.mlab as mlab
 
 if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()
-                                         # pick from .prem() .slow() .fast()
-                                         # (see code/seismic.py)
     number_of_points = 10  # set on how many depth slices the computations should be done
     depths = np.linspace(1000e3, 2500e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
@@ -140,7 +138,7 @@ if __name__ == "__main__":
             plt.subplot(2, len(things) / 2, plot_idx)
             if plot_idx == 2:
                 n, bins, patches = plt.hist(
-                    np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
+                    np.array(trace), 50, normed=1, facecolor='green', alpha=0.75)
 
                 X = sp.gumbel_l.fit(np.array(trace))
                 print(X)
@@ -167,20 +165,13 @@ if __name__ == "__main__":
 
             elif plot_idx == 3:
                 n, bins, patches = plt.hist(
-                    np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
-
-                # copied = np.append(np.array(trace), -np.array(trace))
-                #(mu, sigma) = sp.norm.fit(copied)
-                # y = mlab.normpdf( bins, mu, sigma)
-                # l = plt.plot(bins, y, 'r--', linewidth=2)
+                    np.array(trace), 50, normed=1, facecolor='green', alpha=0.75)
 
                 X = sp.expon.fit(np.array(trace), floc=0)
 
                 print(X)
 
-                # X = sp.burr.fit(np.array(trace))
                 dist = sp.expon(X[0], X[1])
-                # print X
                 print(bins)
                 print(dist.pdf(np.array(bins)))
                 plt.plot(bins, dist.pdf(np.array(bins)), 'r--', linewidth=2)
@@ -191,7 +182,7 @@ if __name__ == "__main__":
                 (mu, sigma) = sp.norm.fit(np.array(trace))
                 print("mu, sigma: %e %e" % (mu, sigma))
                 n, bins, patches = plt.hist(
-                    np.array(trace), 50,  normed=1, facecolor='green', alpha=0.75)
+                    np.array(trace), 50, normed=1, facecolor='green', alpha=0.75)
                 y = mlab.normpdf(bins, mu, sigma)
                 l = plt.plot(bins, y, 'r--', linewidth=2)
                 plt.title("%s, mean: %.3e, std dev.: %.3e" %

@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import numpy as np
 import warnings
 import scipy.integrate
-import matplotlib.pyplot as plt
 
 from . import tools
 from . import constants
@@ -22,7 +21,6 @@ class Seismic1DModel(object):
 
     def __init__(self):
         pass
-
 
     def evaluate(self, vars_list, depth_list):
         """
@@ -46,8 +44,7 @@ class Seismic1DModel(object):
             values[a,:] = getattr(self, vars_list[a])(depth_list)
         return values
 
-
-    def internal_depth_list(self, mindepth=0.,maxdepth=1.e99):
+    def internal_depth_list(self, mindepth=0., maxdepth=1.e99):
         """
         Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation. The depths can be bounded by the mindepth and maxdepth parameters.
 
@@ -125,7 +122,7 @@ class Seismic1DModel(object):
         """
         v_s = self.v_s(depth)
         v_p = self.v_p(depth)
-        return np.sqrt(v_p * v_p-4./3.*v_s*v_s)
+        return np.sqrt(v_p * v_p - 4./3. * v_s * v_s)
 
     def density(self, depth):
         """
@@ -190,7 +187,6 @@ class Seismic1DModel(object):
         raise NotImplementedError(
             "abstract method to be implemented in derived class")
 
-
     def depth(self, pressure):
         """
         Parameters
@@ -205,7 +201,6 @@ class Seismic1DModel(object):
         """
         raise NotImplementedError(
             "abstract method to be implemented in derived class")
-
 
     def gravity(self, depth):
         """
@@ -318,11 +313,9 @@ class SeismicTable(Seismic1DModel):
         density = self.table_density[::-1]
         radii = self.table_radius[::-1]
         g = scipy.integrate.cumtrapz(constants.G*4.*np.pi*density*radii*radii, x=radii, initial=0)
-        g[1:] = g[1:]/radii[1:]/radii[1:]
-
+        g[1:] = g[1:] / radii[1:] / radii[1:]
 
         self.table_gravity = g[::-1]
-
 
     def _compute_pressure(self):
         # Calculate the pressure profile based on density and gravity.  This integrates
@@ -348,7 +341,6 @@ class PREM(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table("input_seismic/prem.txt")
-                                 # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -371,8 +363,8 @@ class Slow(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
 
+        # data is: depth radius pressure density V_p V_s Q_K Q_G
         table = tools.read_table("input_seismic/prem.txt")
-                                 # data is: depth radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table2 = tools.read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
@@ -405,8 +397,8 @@ class Fast(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
 
+        # data is: radius pressure density V_p V_s Q_K Q_G
         table = tools.read_table("input_seismic/prem.txt")
-                                 # data is: radius pressure density V_p V_s Q_K Q_G
         table = np.array(table)
         table2 = tools.read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
@@ -431,8 +423,8 @@ class Fast(SeismicTable):
 class STW105(SeismicTable):
 
     """
-        Reads  STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
-        See also :class:`burnman.seismic.SeismicTable`.
+    Reads  STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
+    See also :class:`burnman.seismic.SeismicTable`.
     """
 
     def __init__(self):
@@ -457,10 +449,9 @@ class STW105(SeismicTable):
 
 
 class IASP91(SeismicTable):
-
     """
-        Reads  REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
-        See also :class:`burnman.seismic.SeismicTable`.
+    Reads  REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
+    See also :class:`burnman.seismic.SeismicTable`.
     """
 
     def __init__(self):
@@ -475,10 +466,9 @@ class IASP91(SeismicTable):
 
 
 class AK135(SeismicTable):
-
     """
-        Reads  AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
-        See also :class:`burnman.seismic.SeismicTable`.
+    Reads  AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
+    See also :class:`burnman.seismic.SeismicTable`.
     """
 
     def __init__(self):
@@ -522,9 +512,6 @@ def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
         corrected S wave velocitiy in [m/s].
     v_phi : float
         corrected Bulk sound velocity in [m/s].
-
-
-
     """
     beta = 0.3  # Matas et al. (2007) page 4
     Qp  = 3. / 4.*pow((v_p/v_s), 2.)*Qs    # Matas et al. (2007) page 4
@@ -535,6 +522,7 @@ def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
     v_s *= 1. - 1. / 2. * cot * 1. / Qs
     v_phi *= 1. - 1. / 2. * cot * 1. / Qphi
     return v_p, v_s, v_phi
+
 
 """
 shared variable of prem, so that other routines do not need to create

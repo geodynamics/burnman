@@ -27,8 +27,9 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
-round_to_n = lambda x, xerr, n: round(
-    x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
+
+def round_to_n(x, xerr, n):
+    return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
 if __name__ == "__main__":
 
@@ -153,13 +154,13 @@ if __name__ == "__main__":
         periclase, 1.e5, 298.15, pressures)
     plt.plot(pressures / 1.e9, temperatures, label='298.15 K')
     print('Room temperature Hugoniot temperature at',
-          pressures[-1] / 1.e9, 'GPa:',  int(temperatures[-1] + 0.5), 'K')
+          pressures[-1] / 1.e9, 'GPa:', int(temperatures[-1] + 0.5), 'K')
 
     temperatures, volumes = burnman.tools.hugoniot(
         periclase, 1.e5, 1000., pressures)
     plt.plot(pressures / 1.e9, temperatures, label='1000 K')
     print('1000 K Hugoniot temperature at',
-          pressures[-1] / 1.e9, 'GPa:',  int(temperatures[-1] + 0.5), 'K')
+          pressures[-1] / 1.e9, 'GPa:', int(temperatures[-1] + 0.5), 'K')
 
     plt.legend(loc="upper left")
     plt.ylabel("Temperature (K)")

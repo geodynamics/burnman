@@ -40,8 +40,7 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
 def _delta_pressure(x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm):
 
     f = 0.5 * (pow(V_0 / x, 2. / 3.) - 1.)
-    debye_temperature =  Debye_0 * \
-        np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
+    debye_temperature = Debye_0 * np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
     E_th = debye.thermal_energy(
         temperature, debye_temperature, n)  # thermal energy at temperature T
     E_th_ref = debye.thermal_energy(
@@ -105,9 +104,10 @@ class SLBBase(eos.EquationOfState):
         nu_o_nu0_sq = 1. + a1_ii * f + \
             (1. / 2.) * a2_iikk * pow(f, 2.)  # EQ 41
         gr = 1. / 6. / nu_o_nu0_sq * (2. * f + 1.) * (a1_ii + a2_iikk * f)
+        # EQ 46 NOTE the typo from Stixrude 2005:
         eta_s = - gr - \
             (1. / 2. * pow(nu_o_nu0_sq, -1.) * pow((2. * f) + 1., 2.) * a2_s)
-                        # EQ 46 NOTE the typo from Stixrude 2005
+
         return eta_s
 
     # calculate isotropic thermal pressure, see
@@ -160,8 +160,9 @@ class SLBBase(eos.EquationOfState):
         b_iikk = 9. * params['K_0']  # EQ 28
         b_iikkmm = 27. * params['K_0'] * (params['Kprime_0'] - 4.)  # EQ 29
         f = 0.5 * (pow(params['V_0'] / volume, 2. / 3.) - 1.)  # EQ 24
-        P = (1. / 3.) * (pow(1. + 2. * f, 5. / 2.)) * ((b_iikk * f)
-                                                       + (0.5 * b_iikkmm * pow(f, 2.))) + gr * (E_th - E_th_ref) / volume  # EQ 21
+        P = (1. / 3.) * (pow(1. + 2. * f, 5. / 2.)) \
+            * ((b_iikk * f) + (0.5 * b_iikkmm * pow(f, 2.)))\
+            + gr * (E_th - E_th_ref) / volume  # EQ 21
 
         return P
 
@@ -192,7 +193,7 @@ class SLBBase(eos.EquationOfState):
         q = self.volume_dependent_q(params['V_0'] / volume, params)
 
         K = bm.bulk_modulus(volume, params) \
-            + (gr + 1. - q) * ( gr / volume ) * (E_th - E_th_ref) \
+            + (gr + 1. - q) * (gr / volume) * (E_th - E_th_ref) \
             - (pow(gr, 2.) / volume) * (C_v * temperature - C_v_ref * T_0)
 
         return K
@@ -265,7 +266,7 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the internal energy at the pressure and temperature of the mineral [J/mol]
         """
-        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
+        return self.helmholtz_free_energy(pressure, temperature, volume, params) + \
             temperature * \
             self.entropy(pressure, temperature, volume, params)
 
@@ -273,8 +274,6 @@ class SLBBase(eos.EquationOfState):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        x = params['V_0'] / volume
-        f = 1. / 2. * (pow(x, 2. / 3.) - 1.)
         Debye_T = self._debye_temperature(params['V_0'] / volume, params)
         S = debye.entropy(temperature, Debye_T, params['n'])
         return S
@@ -284,8 +283,8 @@ class SLBBase(eos.EquationOfState):
         Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
         """
 
-        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
-            temperature * self.entropy( pressure, temperature, volume, params) + \
+        return self.helmholtz_free_energy(pressure, temperature, volume, params) + \
+            temperature * self.entropy(pressure, temperature, volume, params) + \
             pressure * volume
 
     def helmholtz_free_energy(self, pressure, temperature, volume, params):
@@ -296,7 +295,7 @@ class SLBBase(eos.EquationOfState):
         f = 1. / 2. * (pow(x, 2. / 3.) - 1.)
         Debye_T = self._debye_temperature(params['V_0'] / volume, params)
 
-        F_quasiharmonic = debye.helmholtz_free_energy( temperature, Debye_T, params['n'] ) - \
+        F_quasiharmonic = debye.helmholtz_free_energy(temperature, Debye_T, params['n']) - \
             debye.helmholtz_free_energy(
                 params['T_0'], Debye_T, params['n'])
 

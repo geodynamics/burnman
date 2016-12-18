@@ -7,7 +7,7 @@ from __future__ import print_function
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
@@ -34,8 +34,6 @@ if True:
 
 if True:
     seismic_model = burnman.seismic.PREM()
-                                         # pick from .prem() .slow() .fast()
-                                         # (see code/seismic.py)
     number_of_points = 10  # set on how many depth slices the computations should be done
     depths = np.linspace(1000e3, 2500e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(

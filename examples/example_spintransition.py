@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # Note the reference to the low spin and high spin minerals (_LS and _HS).
 
     # Now we calculate the velocities
-    mat_rho, mat_vs, mat_vphi  = \
+    mat_rho, mat_vs, mat_vphi = \
         rock.evaluate(['density', 'v_s', 'v_phi'], seis_p, temperature)
 
     print("Calculations are done for:")
