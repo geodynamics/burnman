@@ -252,12 +252,8 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        if self.temperature < 1.e-12:
-            return 0.
-        else:
-            return self.thermal_expansivity * self.isothermal_bulk_modulus \
-                * self.molar_volume / self.heat_capacity_v
-
+        return self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
+    
     @material_property
     @copy_documentation(Material.heat_capacity_v)
     def heat_capacity_v(self):
