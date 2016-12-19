@@ -5,7 +5,6 @@ from __future__ import print_function
 
 import os
 import sys
-import os
 import re
 
 sys.path.insert(1, os.path.abspath('../examples'))
@@ -36,7 +35,7 @@ for ex in ordered_examples:
 # check we do not forget an example
 all = os.listdir('../examples/')
 examples = list(filter(lambda k: re.match("^example(.*)\.py$", k), all))
-not_listed = list(filter(lambda x: (not x in ordered_examples), examples))
+not_listed = list(filter(lambda x: (x not in ordered_examples), examples))
 
 for l in not_listed:
     sys.stderr.write("WARNING EXAMPLE NOT LISTED: " + l + "\n")

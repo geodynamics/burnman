@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import numpy as np
 
 import burnman
-from burnman.minerals import *
+import burnman.minerals as minerals
 
 
 class HelperSolidSolution(burnman.Mineral):
@@ -76,7 +76,7 @@ class HelperSolidSolution(burnman.Mineral):
 class SLB_2005_ferropericlase(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [SLB_2005.periclase(), SLB_2005.wuestite()]
+        endmembers = [minerals.SLB_2005.periclase(), minerals.SLB_2005.wuestite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]
             # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -85,7 +85,7 @@ class SLB_2005_ferropericlase(HelperSolidSolution):
 class SLB_2005_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [SLB_2005.mg_perovskite(), SLB_2005.fe_perovskite()]
+        endmembers = [minerals.SLB_2005.mg_perovskite(), minerals.SLB_2005.fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]
             # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -94,7 +94,7 @@ class SLB_2005_mg_fe_perovskite(HelperSolidSolution):
 class Murakami_2013_ferropericlase(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [Murakami_2013.periclase(), Murakami_2013.wuestite()]
+        endmembers = [minerals.Murakami_2013.periclase(), minerals.Murakami_2013.wuestite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]
             # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -104,7 +104,7 @@ class Murakami_2013_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
         endmembers = [
-            Murakami_2013.mg_perovskite(), Murakami_2013.fe_perovskite()]
+            minerals.Murakami_2013.mg_perovskite(), minerals.Murakami_2013.fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]
             # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -116,7 +116,7 @@ class Murakami_2013_mg_fe_perovskite(HelperSolidSolution):
 class other_ferropericlase(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [other.periclase(), other.wuestite()]
+        endmembers = [minerals.other.periclase(), minerals.other.wuestite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]
             # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -128,7 +128,7 @@ class other_ferropericlase(HelperSolidSolution):
 class other_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [other.mg_perovskite(), other.fe_perovskite()]
+        endmembers = [minerals.other.mg_perovskite(), minerals.other.fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
@@ -140,8 +140,8 @@ class other_ZSB_2013_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
         endmembers = [
-            other.ZSB_2013_mg_perovskite(), other.ZSB_2013_fe_perovskite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+            other.ZSB_2013_mg_perovskite(), minerals.other.ZSB_2013_fe_perovskite()]
+        molar_fractions = [1. - fe_num, 0.0 + fe_num]  # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
@@ -149,8 +149,8 @@ class SLB_2011_ZSB_2013_ferropericlase(HelperSolidSolution):
 
     def __init__(self, fe_num):
         endmembers = [
-            SLB_2011_ZSB_2013.periclase(), SLB_2011_ZSB_2013.wuestite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+            minerals.SLB_2011_ZSB_2013.periclase(), minerals.SLB_2011_ZSB_2013.wuestite()]
+        molar_fractions = [1. - fe_num, 0.0 + fe_num]  # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 
@@ -158,6 +158,6 @@ class SLB_2011_ZSB_2013_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
         endmembers = [
-            SLB_2011_ZSB_2013.mg_perovskite(), SLB_2011_ZSB_2013.fe_perovskite()]
-        molar_fractions = [1. - fe_num, 0.0 + fe_num] # keep the 0.0 +, otherwise it is an array sometimes
+            minerals.SLB_2011_ZSB_2013.mg_perovskite(), minerals.SLB_2011_ZSB_2013.fe_perovskite()]
+        molar_fractions = [1. - fe_num, 0.0 + fe_num]  # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
