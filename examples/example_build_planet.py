@@ -66,14 +66,8 @@ if __name__ == "__main__":
     Core = [burnman.minerals.other.Liquid_Fe_Anderson(),3485e3]
     LM = burnman.minerals.SLB_2011.mg_bridgmanite()
     UM = burnman.minerals.SLB_2011.forsterite()
-
-    class Mantle_switch(helpers.HelperSpinTransition):
-
-        def __init__(self):
-            helpers.HelperSpinTransition.__init__(
-                self, 25.0e9, LM, UM)
-
-    Mantle = [Mantle_switch(),2886e3]
+    mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, LM, UM)
+    Mantle = [mantle_rock, 2886e3]
     Planet_radius = (Core[1]+Mantle[1])
     #temperatures = [300. for i in radii]
 
