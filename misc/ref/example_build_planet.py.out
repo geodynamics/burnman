@@ -1,2 +1,28 @@
-Total mass of the planet: 3.89e+23, or 129% of the observed mass
-Moment of inertia factor of the planet: 0.333, or 96% of the observed factor
+on iteration 1
+  relative central core pressure error between iterations: 1.000000e+00
+on iteration 2
+  relative central core pressure error between iterations: 5.696703e-02
+on iteration 3
+  relative central core pressure error between iterations: 7.656563e-03
+on iteration 4
+  relative central core pressure error between iterations: 8.691880e-04
+on iteration 5
+  relative central core pressure error between iterations: 1.102990e-03
+on iteration 6
+  relative central core pressure error between iterations: 5.376594e-04
+on iteration 7
+  relative central core pressure error between iterations: 2.135054e-04
+on iteration 8
+  relative central core pressure error between iterations: 7.882841e-05
+on iteration 9
+  relative central core pressure error between iterations: 2.834653e-05
+on iteration 10
+  relative central core pressure error between iterations: 1.010377e-05
+on iteration 11
+  relative central core pressure error between iterations: 3.592235e-06
+
+mass/Earth= 1.028, moment of inertia= 0.320
+inner core mass fraction of planet 0.018
+outer core mass fraction of planet 0.339
+mantle mass fraction of planet 0.642
+

@@ -104,7 +104,7 @@ class Planet(object):
             # compute relative error (pressure in the center of our planet)
             rel_err = abs(last_center_pressure - self.pressures[0]) / self.pressures[0]
             if verbose:
-                print("  relative core pressure error: %e" % rel_err)
+                print("  relative central core pressure error between iterations: %e" % rel_err)
 
             if rel_err < 1e-5:
                 break
@@ -133,11 +133,9 @@ class Planet(object):
             mypressures = self.pressures[layer.n_start: layer.n_end]
             mytemperatures = self.temperatures[layer.n_start: layer.n_end]
 
-            density, vs, vphi = layer.rock.evaluate(['density', 'v_s', 'v_phi'], mypressures, mytemperatures)
+            density = layer.rock.evaluate(['density'], mypressures, mytemperatures)
 
             self.densities[layer.n_start: layer.n_end] = density
-            self.bulk_sound_speed[layer.n_start: layer.n_end] = vs
-            self.shear_velocity[layer.n_start: layer.n_end] = vphi
 
     def _compute_gravity(self, density, radii):
         """
