@@ -7,13 +7,8 @@ import numpy as np
 from scipy.optimize import fsolve
 import warnings
 
-
-from . import birch_murnaghan as bm
-from . import debye
 from . import equation_of_state as eos
-from ..tools import bracket
 from ..constants import gas_constant
-from . import electronic as electronic
 
 class AA(eos.EquationOfState):
     """
@@ -38,12 +33,11 @@ class AA(eos.EquationOfState):
 
     # Potential heat capacity functions
     def _lambdaxi(self, V, params):
-
         rhofrac = params['V_0']/V
-        
         xi = params['xi_0']*np.power(rhofrac, -0.6)
         F = 1./(1. + np.exp((rhofrac - params['F'][0])/params['F'][1]))
-        lmda = (F*(params['lmda'][0]*rhofrac + params['lmda'][1]) + params['lmda'][2])*np.power(rhofrac, 0.4)
+        lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac) + params['lmda'][2])*np.power(rhofrac, 0.4)
+        #lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
 
         return lmda, xi
     
@@ -68,8 +62,6 @@ class AA(eos.EquationOfState):
     def _C_v_el(self, V, T, params):
         A, B, Theta = self._ABTheta(V, params)
         C_e = A*(1. - (Theta*Theta)/(Theta*Theta + T*T)) + B*np.power(T, 0.6)
-        
-        #C_e = electronic.heat_capacity_v(T, params['V_0']/V, params['Tel_0'], params['Cvel_max'])
         return C_e
 
     # Equation A15
@@ -89,13 +81,13 @@ class AA(eos.EquationOfState):
     def _internal_energy_el(self, Ts, T, V, params):
         A, B, Theta = self._ABTheta(V, params)
         E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 0.625*B*(np.power(T, 1.6) - np.power(Ts, 1.6))
-        #E_el = electronic.thermal_energy(T, params['V_0']/V, params['Tel_0'], params['Cvel_max']) - electronic.thermal_energy(Ts, params['V_0']/V, params['Tel_0'], params['Cvel_max'])
         return E_el
     
     def _internal_energy_pot(self, Ts, T, V, params):
         lmda, xi = self._lambdaxi(V, params)
         E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts)))
         return E_pot
+    
     '''
     Contributions to entropy
     '''
@@ -113,7 +105,6 @@ class AA(eos.EquationOfState):
             S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6)))
         else:
             S_el = 0.
-        #S_el = electronic.entropy(T, params['V_0']/V, params['Tel_0'], params['Cvel_max']) - electronic.entropy(Ts, params['V_0']/V, params['Tel_0'], params['Cvel_max'])
         return S_el
     
     def _entropy_pot(self, Ts, T, V, params):
@@ -195,8 +186,9 @@ class AA(eos.EquationOfState):
         """
         Finite strain approximation for :math:`eta_{s0}`, the isotropic shear
         strain derivative of the grueneisen parameter.
+        Zero for a liquid
         """
-        raise NotImplementedError("")
+        return 0.
 
 
     def _volume(self, volume, pressure, temperature, params):
@@ -212,22 +204,31 @@ class AA(eos.EquationOfState):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
         """
+        
         Ts = self._isentropic_temperature(volume, params)
         dE = self._isochoric_energy_change(Ts, temperature, volume, params)
         E1 = self._isentropic_energy_change(volume, params) # should also include params['E_0'] given the expression in Anderson and Ahrens. Here, we take the energy change relative to the reference isentrope (effective E_0 = 0). The energy at standard state is *only* used to calculate the final energies, not the physical properties.
         E2 = E1 + dE
+
+        # Integrate along isochore (\int dP = \int gr/V dE)
         dP = (params['grueneisen_0']*dE
               + 0.5*params['grueneisen_prime']*np.power(params['V_0']/volume,
                                                         params['grueneisen_n'])*(E2*E2 - E1*E1))/volume
-        return self._isentropic_pressure(volume, params) + dP
+        P = self._isentropic_pressure(volume, params) + dP
+    
+        return P
+
+        
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter :math:`[unitless]` 
-        """    
-        gr = (self.thermal_expansivity(pressure, temperature, volume, params)
-              * self.isothermal_bulk_modulus(pressure, temperature, volume, params)
-              * volume) / self.heat_capacity_v(pressure, temperature, volume, params)
+        """
+        gr = (params['grueneisen_0'] +
+              params['grueneisen_prime'] *
+              (np.power(params['V_0']/volume,
+                        params['grueneisen_n']) *
+               self.internal_energy(pressure, temperature, volume, params)))
         return gr
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
@@ -255,8 +256,9 @@ class AA(eos.EquationOfState):
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus. :math:`[Pa]` 
+        Zero for a liquid
         """
-        raise NotImplementedError("")
+        return 0.
 
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
@@ -281,22 +283,23 @@ class AA(eos.EquationOfState):
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Returns thermal expansivity. :math:`[1/K]` 
+        Returns thermal expansivity. :math:`[1/K]`
+        Currently found by numerical differentiation (1/V * dV/dT) 
         """
 
         delta_T = 1.
-        delta_V = ( self.volume(pressure, temperature+delta_T, params) - volume ) / delta_T
+        delta_V = ( self.volume(pressure, temperature+delta_T, params) - volume )
             
-        alpha = delta_V/(delta_T*volume)
-        
-        return alpha
+        return (1./volume)*delta_V/delta_T
 
     def gibbs_free_energy( self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
+        E + PV
         """
-        G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
-        return G
+        
+        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
+            pressure * self.volume( pressure, temperature, params)
 
     def internal_energy( self, pressure, temperature, volume, params):
         """
@@ -322,15 +325,16 @@ class AA(eos.EquationOfState):
     def enthalpy( self, pressure, temperature, volume, params):
         """
         Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
+        E + PV
         """
         
-        return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
-               temperature * self.entropy( pressure, temperature, volume, params) + \
-               pressure * self.volume( pressure, temperature, params)
+        return self.internal_energy(pressure, temperature, volume, params) + \
+            pressure * self.volume( pressure, temperature, params)
 
     def helmholtz_free_energy( self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
+        E - TS
         """
         
         return self.internal_energy(pressure, temperature, volume, params) - temperature*self.entropy(pressure, temperature, volume, params)
