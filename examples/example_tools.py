@@ -170,4 +170,5 @@ if __name__ == "__main__":
 
 
     # Finally, let's check the EoS consistency of SLB_2011 periclase
+    print('')
     burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase())
