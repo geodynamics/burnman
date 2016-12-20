@@ -621,19 +621,16 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
                [m.K_T, -0.5*(V2 + V0)*dP/(V2 - V0)]])
 
     consistencies = [np.abs(e[0]/e[1] - 1) < tol for e in eq]
-    if np.all(consistencies):
-        consistency = True
-    else:
-        consistency = False
+    consistency = np.all(consistencies)
     
     if verbose == True:
-        print('Checking EoS consistency for {0:s}'.format(m))
+        print('Checking EoS consistency for {0:s}'.format(m.to_string()))
         print('Expressions within tolerance of {0:2f}'.format(tol))
         for i, c in enumerate(consistencies):
             print('{0:10s} : {1:5s}'.format(expr[i], str(c)))
         if consistency == True:
-            print('All EoS consistency constraints satisfied for {0:s}'.format(str(m)))
+            print('All EoS consistency constraints satisfied for {0:s}'.format(m.to_string()))
         else:
-            print('Not satisfied all EoS consistency constraints for {0:s}'.format(str(m)))
+            print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
             
     return consistency
