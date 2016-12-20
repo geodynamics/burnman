@@ -556,3 +556,39 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
         raise ValueError('Cannot find zero.')
     else:
         return x0, x1, f0, f1
+
+def check_eos_consistency(m, P=1.e9, T=300.):
+    dT = 1.
+    dP = 1.
+    
+    m.set_state(P, T)
+    G0 = m.gibbs
+    S0 = m.S
+    V0 = m.V
+    
+    l0 = [m.gibbs/(m.helmholtz + P*m.V) - 1., m.gibbs/(m.H - T*m.S) - 1., m.gibbs/(m.internal_energy - T*m.S + P*m.V) - 1.]
+    
+    m.set_state(P, T + dT)
+    G1 = m.gibbs
+    S1 = m.S
+    
+    
+    m.set_state(P + dP, T)
+    G2 = m.gibbs
+    V2 = m.V
+    
+    # T derivatives
+    m.set_state(P, T + 0.5*dT)
+    l0.extend([(-(G1 - G0)/dT/m.S - 1.),
+               ((T + 0.5*dT)*(S1 - S0)/dT/m.heat_capacity_p - 1.)])
+    
+    # P derivatives
+    m.set_state(P + 0.5*dP, T)
+    l0.extend([((G2 - G0)/dP/m.V - 1.), (-0.5*(V2 + V0)*dP/(V2 - V0))/m.K_T - 1.])
+    
+    if np.max(np.abs(l0)) < 0.01:
+        return True
+    else:
+        print(l0)
+        raise Exception('The EoS of '+str(m)+' has been found to be self-inconsistent')
+        return False

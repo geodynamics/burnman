@@ -167,3 +167,7 @@ if __name__ == "__main__":
     plt.xlabel("Pressure (GPa)")
     plt.title("Periclase Hugoniot")
     plt.show()
+
+
+    # Finally, let's check the EoS consistency of SLB_2011 periclase
+    burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase())
