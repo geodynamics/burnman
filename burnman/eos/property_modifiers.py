@@ -54,18 +54,15 @@ def _landau_excesses(pressure, temperature, params):
         dGdP = - \
             params['V_D'] * Q2 * (1. + 0.5 * temperature / Tc * (
                 1. - params['Tc_0'] / Tc)) - dGdP_disordered
-        dGdT = params['S_D'] * Q2 * (
-            1.5 - 0.5 * params['Tc_0'] / Tc) - dGdT_disordered
+        dGdT = params['S_D'] * Q2 * (1.5 - 0.5 * params['Tc_0'] / Tc) - dGdT_disordered
         d2GdP2 = params['V_D'] * params['V_D'] * temperature / (params['S_D'] * Tc * Tc * Q2) \
             * (temperature * (1. + params['Tc_0'] / Tc) / (4. * Tc)
                + Q2 * Q2 * (1. - params['Tc_0'] / Tc) - 1.)
-        d2GdT2 = -params['S_D'] / (Tc * Q2) * (
-            0.75 - 0.25 * params['Tc_0'] / Tc)
-        d2GdPdT = params['V_D'] / (2. * Tc * Q2) * (1. + (temperature / (2. * Tc) - Q2 * Q2)
-                                                    * (1. - params['Tc_0'] / Tc))
+        d2GdT2 = -params['S_D'] / (Tc * Q2) * (0.75 - 0.25 * params['Tc_0'] / Tc)
+        d2GdPdT = params['V_D'] / (2. * Tc * Q2) \
+                  * (1. + (temperature / (2. * Tc) - Q2 * Q2) * (1. - params['Tc_0'] / Tc))
 
     else:
-        Q = 0.
         G = -G_disordered
         dGdT = -dGdT_disordered
         dGdP = -dGdP_disordered
@@ -124,8 +121,8 @@ def _landau_hp_excesses(pressure, temperature, params):
 
     if Q > 1.e-12:
         d2GdT2 = -params['S_D'] / (2. * params['Tc_0'] * Q * Q)
-        d2GdP2 = -params['V_D'] * params['V_D'] / (
-            2. * params['S_D'] * params['Tc_0'] * Q * Q)
+        d2GdP2 = -params['V_D'] * params['V_D'] \
+                 / (2. * params['S_D'] * params['Tc_0'] * Q * Q)
         d2GdPdT = params['V_D'] / (2. * params['Tc_0'] * Q * Q)
     else:
         d2GdT2 = 0.
@@ -190,11 +187,11 @@ def _bragg_williams_excesses(pressure, temperature, params):
     f = params['factor']
     deltaS = gas_constant * ((1. + n) * np.log(1. + n) - n * np.log(n))
 
-    lnxord = lambda n, Q: np.log(
-        1. + n * Q) + n * np.log(n + Q) - (1. + n) * np.log(1. + n)
-    lnxdisord = lambda n, Q: (1. / (1. + n)) * np.log(1. + n * Q) + (n / (1. + n)) * np.log(1. - Q) \
-        + (n / (1. + n)) * np.log(n * (1. - Q)) + \
-        (n * n / (1. + n)) * np.log(n + Q) - n * np.log(n)
+    lnxord = lambda n, Q: np.log(1. + n * Q) + n * np.log(n + Q) - (1. + n) * np.log(1. + n)
+    lnxdisord = lambda n, Q: (1. / (1. + n)) * np.log(1. + n * Q) \
+        + (n / (1. + n)) * np.log(1. - Q) \
+        + (n / (1. + n)) * np.log(n * (1. - Q))\
+        + (n * n / (1. + n)) * np.log(n + Q) - n * np.log(n)
 
     def reaction_bragg_williams(Q, gibbs_disorder, temperature, n, f, W):
         if Q > 1.0:

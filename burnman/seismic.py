@@ -41,7 +41,7 @@ class Seismic1DModel(object):
 
         values = np.empty((len(vars_list), len(depth_list)))
         for a in range(len(vars_list)):
-            values[a,:] = getattr(self, vars_list[a])(depth_list)
+            values[a, :] = getattr(self, vars_list[a])(depth_list)
         return values
 
     def internal_depth_list(self, mindepth=0., maxdepth=1.e99):
@@ -122,7 +122,7 @@ class Seismic1DModel(object):
         """
         v_s = self.v_s(depth)
         v_p = self.v_p(depth)
-        return np.sqrt(v_p * v_p - 4./3. * v_s * v_s)
+        return np.sqrt(v_p * v_p - 4. / 3. * v_s * v_s)
 
     def density(self, depth):
         """
@@ -246,11 +246,11 @@ class SeismicTable(Seismic1DModel):
 
     def internal_depth_list(self, mindepth=0., maxdepth=1.e10):
         depths = np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x] >= mindepth and self.table_depth[x] <= maxdepth])
-        discontinuities = np.where(depths[1:]-depths[:-1] == 0)[0]
+        discontinuities = np.where(depths[1:] - depths[:-1] == 0)[0]
         # Shift values at discontinities by 1 m to simplify evaluating values
         # around these.
-        depths[discontinuities] = depths[discontinuities]-1.
-        depths[discontinuities+1] = depths[discontinuities+1]+1.
+        depths[discontinuities] = depths[discontinuities] - 1.
+        depths[discontinuities + 1] = depths[discontinuities + 1] + 1.
         return depths
 
     def pressure(self, depth):
@@ -303,12 +303,10 @@ class SeismicTable(Seismic1DModel):
     def _lookup(self, depth, value_table):
         return np.interp(depth, self.table_depth, value_table)
 
-
     def _compute_gravity(self):
         # Calculate the gravity of the planet, based on a density profile.
         # There is a check of the surface value is within reason for this
         # model, otherwise values for PREM are used.
-
 
         density = self.table_density[::-1]
         radii = self.table_radius[::-1]
@@ -429,8 +427,7 @@ class STW105(SeismicTable):
 
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table("input_seismic/STW105.txt")
-                                 # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/STW105.txt") # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_radius = table[:, 0][::-1]
         self.table_density = table[:, 1][::-1]
@@ -457,7 +454,7 @@ class IASP91(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table(
-            "input_seismic/iasp91.txt") # depth, radius, v_p, v_s
+            "input_seismic/iasp91.txt")  # depth, radius, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -474,7 +471,7 @@ class AK135(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
         table = tools.read_table(
-            "input_seismic/ak135.txt") # radius, pressure, density, v_p, v_s
+            "input_seismic/ak135.txt")  # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -515,7 +512,6 @@ def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
     """
     beta = 0.3  # Matas et al. (2007) page 4
     Qp  = 3. / 4.*pow((v_p/v_s), 2.)*Qs    # Matas et al. (2007) page 4
-
 
     cot = 1./np.tan(beta*np.pi/2.)
     v_p *= 1. - 1. / 2. * cot * 1. / Qp  # Matas et al. (2007) page 1

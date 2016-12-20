@@ -31,6 +31,8 @@ import sys
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     sys.exit(0)
+
+
 signal.signal(signal.SIGINT, signal_handler)
 
 
@@ -551,7 +553,7 @@ elif whattodo == "run" and len(sys.argv) > 2:
 
     for i in range(n_realizations):
         if (i > 0 and i % 25 == 0):
-        # save good fits
+            # save good fits
             print("saving %d fits to %s" % (len(goodfits), dbname))
             pickle.dump(goodfits, open(dbname + ".tmp", "wb"))
             os.rename(dbname + ".tmp", dbname)
@@ -678,7 +680,7 @@ elif whattodo == "plot":
         'vphi', [(0, '#ffffff'), (0.2, '#eff3ff'), (0.4, '#bdd7e7'), (0.6, '#6baed6'), (0.8, '#3182bd'), (1.0, '#08519c')], gamma=gamma)
     c.set_bad('w', alpha=1.0)
     plt.imshow(
-        vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', alpha=.7,
+        vs_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7,
         aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]])
     plt.plot(pressure / 1.e9, seis_vs / 1.e3, linestyle="--",
              color='k', linewidth=2.0, label='PREM')

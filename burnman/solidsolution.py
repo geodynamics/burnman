@@ -77,7 +77,7 @@ class SolidSolution(Mineral):
             self.alphas = alphas
         if endmembers is not None:
             self.endmembers = endmembers
-        
+
         if hasattr(self, 'endmembers') == False:
             raise Exception(
                 "'endmembers' attribute missing from solid solution")
