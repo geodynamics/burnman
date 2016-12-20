@@ -45,36 +45,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman import planet
+import burnman.planet as planet
 from burnman import mineral_helpers as helpers
-
-
-def core_mass(density, radii):
-    # returns a mass for a layer or sum of layers smaller than the whole planet
-
-    rhofunc = UnivariateSpline(radii, density)
-    mass = quad(lambda r: 4. * np.pi * rhofunc(r) * r * r,
-                radii[0], radii[-1])[0]
-    return mass
 
 if __name__ == "__main__":
 
-    # gravitational constant
-    Radius_of_earth = 6371.e3
-    # A basic set of EoS parameters for solid iron
-
-    Core = [burnman.minerals.other.Liquid_Fe_Anderson(),3485e3]
+    core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, 3)
     LM = burnman.minerals.SLB_2011.mg_bridgmanite()
     UM = burnman.minerals.SLB_2011.forsterite()
-    mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, LM, UM)
-    Mantle = [mantle_rock, 2886e3]
-    Planet_radius = (Core[1]+Mantle[1])
-    #temperatures = [300. for i in radii]
-
-    compositions = [Core,Mantle]
+    mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, UM, LM)
+    mantle = planet.Planet.Layer("mantle", mantle_rock, 6371e3, 10)
 
     #Plan = planet.Planet(compositions, radii, temperatures, n_layers ,n_iterations)
-    Plan = planet.Planet(compositions)
+    #core = planet.Planet.LayerLinearTemperature("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, 300.0, 300.0, 300)
+    core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, 300.0, 100)
+    #mantle = planet.Planet.Layer("mantle", mantle_rock, 1.3*6371e3, 300.0, 500)
+    mantle = planet.Planet.LayerLinearTemperature("mantle", mantle_rock, 6371e3, 3000.0, 300.0, 100)
+    Plan = planet.Planet([core, mantle], verbose=True)
+
+    core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3000e3, 1000.0, 50)
+    mantle_lower = planet.Planet.LayerLinearTemperature("lower mantle", burnman.minerals.SLB_2011.mg_bridgmanite(), 5000e3, 1000, 300.0, 50)
+    mantle_upper = planet.Planet.Layer("upper mantle", burnman.minerals.SLB_2011.forsterite(), 7000e3, 400.0, 50)
+    Plan  = planet.Planet([core, mantle_lower, mantle_upper], verbose=True)
+
+    print("mass/Earth=%f, momentfac=%e" % (Plan.mass/5.97e24, Plan.moment_of_inertia_factor))
+
+
+    for layer in Plan.layers:
+        print("%s mass %e" %(layer.name, layer.mass/Plan.mass))
+
 
     #Plan.generate_profiles(radii, n_iterations)
     import matplotlib.gridspec as gridspec
@@ -85,25 +84,27 @@ if __name__ == "__main__":
 
     #Come up with axes for the final plot
     figure = plt.figure( figsize = (12,10) )
-    ax1 = plt.subplot2grid( (5,3) , (0,0), colspan=3, rowspan=3)
-    ax2 = plt.subplot2grid( (5,3) , (3,0), colspan=3, rowspan=1)
-    ax3 = plt.subplot2grid( (5,3) , (4,0), colspan=3, rowspan=1)
-         #Plot density, vphi, and vs for the planet.
+    ax1 = plt.subplot2grid( (6,3) , (0,0), colspan=3, rowspan=3)
+    ax2 = plt.subplot2grid( (6,3) , (3,0), colspan=3, rowspan=1)
+    ax3 = plt.subplot2grid( (6,3) , (4,0), colspan=3, rowspan=1)
+    ax4 = plt.subplot2grid( (6,3) , (5,0), colspan=3, rowspan=1)
 
     #Also plot a black line for the icb, cmb and upper mantle
-    ylimits = [2., (Plan.densities[0]/1e3)+1.]
-    ax1.plot(Plan.radii/1.e3,Plan.densities/1.e3,'k', linewidth = 2.,color='r')
-    #ax1.plot( [trans_radii/1.e3, trans_radii/1.e3], ylimits, 'k', linewidth = 2.,color='g')
-
+    ax1.plot(Plan.radial_slices/1.e3,Plan.densities/1.e3,'k', linewidth = 2.,color='r')
     ax1.set_ylabel("Density (kg/m$^3$)")
 
     #Make a subplot showing the calculated pressure profile
-    ax2.plot( Plan.radii/1.e3, Plan.pressures/1.e9, 'k', linewidth=2.)
+    ax2.plot( Plan.radial_slices/1.e3, Plan.pressures/1.e9, 'k', linewidth=1.)
     ax2.set_ylabel("Pressure (GPa)")
 
     #Make a subplot showing the calculated gravity profile
-    ax3.plot( Plan.radii/1.e3, Plan.gravity, 'k', linewidth=2.)
+    ax3.plot( Plan.radial_slices/1.e3, Plan.gravity, 'k', linewidth=2.)
     ax3.set_ylabel("Gravity (m/s$^2)$")
     ax3.set_xlabel("Radius (km)")
+
+    ax4.plot( Plan.radial_slices/1.e3, Plan.temperatures, 'b', linewidth=2.)
+    ax4.set_ylabel("Temperature ($K$)")
+    ax4.set_xlabel("Radius (km)")
+    #ax4.set_ylim(0,4e3)
 
     plt.show()

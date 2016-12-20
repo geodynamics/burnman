@@ -10,63 +10,134 @@ from scipy.interpolate import UnivariateSpline
 from burnman import averaging_schemes
 from burnman import constants
 
+
 class Planet(object):
-    def __init__(self, compositions,radii = None, temperatures = None, n_layers = None,n_iterations = None):
+    """
+    A planet class that find a self-consistent planet.
+    """
+
+    class LayerBase(object):
         """
-        Generate the density, gravity, pressure, vphi, and vs profiles for the planet.
+        Base class for a layer of a planet.
         """
-        if n_layers == None:
-            n_layers = 1000
-        if n_iterations == None:
-            n_iterations = 7
-        if radii == None:
-            Planet_radius = sum([k[1] for k in compositions])
-            self.radii = np.linspace(0., Planet_radius, n_layers)
-        if temperatures == None:
-            self.temperatures = [300. for i in self.radii]
+        def __init__(self, name, rock, outer_radius, n_slices=100):
+            self.name = name
+            self.rock = rock
+            self.inner_radius = None
+            self.outer_radius = outer_radius
+            self.thickness = None
+            self.n_slices = n_slices
+            self.n_start = None
+            self.n_end = None
+            self.mass = None
+            assert(n_slices>=6)
 
-        self.pressures = np.linspace(350.0e9, 0.0, len(self.radii)) # initial guess at pressure profile
-        self.compositions = compositions
-
-        averaging_scheme = averaging_schemes.VoigtReussHill()
-
-        for i in range(n_iterations):
-            print("on iteration #", str(i+1)+"/"+str(n_iterations))
-            self.densities, self.bulk_sound_speed, self.shear_velocity = self._evaluate_eos(self.compositions,self.pressures, self.temperatures, self.radii,averaging_scheme)
-            self.gravity = self._compute_gravity(self.densities, self.radii)
-            self.pressures = self._compute_pressure(self.densities, self.gravity, self.radii)
-
-        self.mass = self._compute_mass(self.densities, self.radii)
-
-        self.moment_of_inertia = self._compute_moment_of_inertia(self.densities, self.radii)
-        self.moment_of_inertia_factor = self.moment_of_inertia / self.mass / self.radii[-1] / self.radii[-1]
-
-    def _evaluate_eos(self, compositions, pressures, temperatures, radii,averaging_scheme):
+    class Layer(LayerBase):
         """
-        Evaluates the equation of state for each radius slice of the model.
-        Returns density, bulk sound speed, and shear speed.
+        A layer with a constant temperature.
         """
-        rho = np.empty_like(radii)
-        bulk_sound_speed = np.empty_like(radii)
-        shear_velocity = np.empty_like(radii)
-        for i in range(len(radii)):
-            dummy_depth = 0.
-            for j in range(len(compositions)):
-                dummy_depth+=compositions[j][1]
+        def __init__(self, name, rock, outer_radius, temperature = 300.0, n_slices = 100):
+            Planet.LayerBase.__init__(self, name, rock, outer_radius, n_slices)
+            self.constant_temperature = temperature
 
-                if radii[i] <= dummy_depth:
-                    rock = compositions[j][0]
-                    break
+        def temperature(self, radius):
+            return self.constant_temperature
 
-            density, vs, vphi = rock.evaluate(['density', 'v_s', 'v_phi'], np.array([pressures[i]]),np.array([temperatures[i]]))
+    class LayerLinearTemperature(LayerBase):
+        """
+        A layer with a linear temperature profile.
+        """
+        def __init__(self, name, rock, outer_radius, temperature_inner, temperature_outer, n_slices = 100):
+            Planet.LayerBase.__init__(self, name, rock, outer_radius, n_slices)
+            self._temperature_inner = temperature_inner
+            self._temperature_outer = temperature_outer
 
-            rho[i] = density
-            bulk_sound_speed[i] = vphi
-            shear_velocity[i] = vs
+        def temperature(self, radius):
+            return self._temperature_inner + (self._temperature_outer-self._temperature_inner)*(radius-self.inner_radius)/self.thickness
 
+    def __init__(self, layers, n_max_iterations = 50, verbose = False):
+        """
+        Generate the planet based on the given layers (List of Layer)
+        """
 
-        return rho, bulk_sound_speed, shear_velocity
+        # sort layers
+        self.layers = sorted(layers, key=lambda x: x.outer_radius)
 
+        # compute thickness, slices, indices, etc.
+        self.radial_slices = np.array([])
+        current_radius = 0.0
+        n = 0
+        for layer in self.layers:
+            layer.inner_radius = current_radius
+            slices = np.linspace(current_radius, layer.outer_radius, layer.n_slices)
+            layer.thickness = layer.outer_radius - layer.inner_radius
+            current_radius = layer.outer_radius
+            slices[0] += 1 # make the boundaries one meter thick
+            layer.n_start = n
+            layer.n_end = n + layer.n_slices
+            n += layer.n_slices
+            self.radial_slices = np.append(self.radial_slices, slices)
+
+        self.radial_slices[0] = 0.0  # overwrite inner-most radius to zero
+        self.radius = current_radius
+
+        # initial pressure guess: linear as a function of radius
+        max_p = 350e9
+        self.pressures = np.array([max_p * (1.0 - r / self.radius) for r in self.radial_slices])
+        self.temperatures = [self.get_layer_by_radius(r).temperature(r) for r in self.radial_slices]
+        self.densities = np.empty_like(self.pressures)
+        self.gravity = np.empty_like(self.pressures)
+        self.bulk_sound_speed = np.empty_like(self.pressures)
+        self.shear_velocity = np.empty_like(self.pressures)
+
+        self.averaging_scheme = averaging_schemes.VoigtReussHill()
+
+        last_center_pressure = 0.0
+        for i in range(n_max_iterations):
+            if verbose:
+                print("on iteration %d" % (i+1))
+            self._evaluate_eos()
+
+            self._compute_gravity(self.densities, self.radial_slices)
+            self._compute_pressure(self.densities, self.gravity, self.radial_slices)
+
+            # compute relative error (pressure in the center of our planet)
+            rel_err = abs(last_center_pressure - self.pressures[0]) / self.pressures[0]
+            if verbose:
+                print("  relative core pressure error: %e" % rel_err)
+
+            if rel_err < 1e-5:
+                break
+            last_center_pressure = self.pressures[0]
+
+        self.mass = self._compute_mass()
+
+        self.moment_of_inertia = self._compute_moment_of_inertia()
+        self.moment_of_inertia_factor = self.moment_of_inertia / self.mass / self.radial_slices[-1] / self.radial_slices[-1]
+
+    def get_layer(self, name):
+        for layer in self.layers:
+            if layer.name == name:
+                return layer
+        raise LookupError()
+
+    def get_layer_by_radius(self, radius):
+        for layer in self.layers:
+            if layer.outer_radius >= radius:
+                return layer
+        raise LookupError()
+
+    def _evaluate_eos(self):
+        # evaluate each layer separately
+        for layer in self.layers:
+            mypressures = self.pressures[layer.n_start: layer.n_end]
+            mytemperatures = self.temperatures[layer.n_start: layer.n_end]
+
+            density, vs, vphi = layer.rock.evaluate(['density', 'v_s', 'v_phi'], mypressures, mytemperatures)
+
+            self.densities[layer.n_start: layer.n_end] = density
+            self.bulk_sound_speed[layer.n_start: layer.n_end] = vs
+            self.shear_velocity[layer.n_start: layer.n_end] = vphi
 
     def _compute_gravity(self, density, radii):
         """
@@ -74,48 +145,72 @@ class Planet(object):
         Poisson's equation in radius, under the assumption that the planet is laterally
         homogeneous.
         """
-        #Create a spline fit of density as a function of radius
-        rhofunc = UnivariateSpline(radii, density )
 
-        #Numerically integrate Poisson's equation
-        poisson = lambda p, x : 4.0 * np.pi * constants.G * rhofunc(x) * x * x
-        grav = np.ravel(odeint( poisson, 0.0, radii ))
-        grav[1:] = grav[1:]/radii[1:]/radii[1:]
-        grav[0] = 0.0 #Set it to zero a the center, since radius = 0 there we cannot divide by r^2
-        return grav
+        start_gravity = 0.0
+        for layer in self.layers:
+            radii = self.radial_slices[layer.n_start: layer.n_end]
+            density = self.densities[layer.n_start: layer.n_end]
+            rhofunc = UnivariateSpline(radii, density)
+            #Create a spline fit of density as a function of radius
+
+            #Numerically integrate Poisson's equation
+            poisson = lambda p, x: 4.0 * np.pi * constants.G * rhofunc(x) * x * x
+            grav = np.ravel(odeint( poisson, start_gravity, radii))
+            start_gravity = grav[-1]
+            self.gravity[layer.n_start: layer.n_end] = grav
+
+        # we need to skip scaling gravity[0]
+        self.gravity[1:] = self.gravity[1:]/self.radial_slices[1:]/self.radial_slices[1:]
 
     def _compute_pressure(self, density, gravity, radii):
         """
         Calculate the pressure profile based on density and gravity.  This integrates
         the equation for hydrostatic equilibrium  P = rho g z.
         """
-        #convert radii to depths
-        depth = radii[-1]-radii
 
-        #Make a spline fit of density as a function of depth
-        rhofunc = UnivariateSpline( depth[::-1], density[::-1] )
-        #Make a spline fit of gravity as a function of depth
-        gfunc = UnivariateSpline( depth[::-1], gravity[::-1] )
+        start_pressure = 0.0
+        for layer in self.layers[::-1]:
+            radii = self.radial_slices[layer.n_start: layer.n_end]
+            density = self.densities[layer.n_start: layer.n_end]
+            gravity = self.gravity[layer.n_start: layer.n_end]
 
-        #integrate the hydrostatic equation
-        pressure = np.ravel(odeint( (lambda p, x : gfunc(x)* rhofunc(x)), 0.0,depth[::-1]))
-        return pressure[::-1]
+            # convert radii to depths
+            depths = radii[-1]-radii
 
-    def _compute_mass( self, density, radii):
+            # Make a spline fit of density as a function of depth
+            rhofunc = UnivariateSpline(depths[::-1], density[::-1])
+            # Make a spline fit of gravity as a function of depth
+            gfunc = UnivariateSpline(depths[::-1], gravity[::-1])
+
+            # integrate the hydrostatic equation
+            pressure = np.ravel(odeint((lambda p, x : gfunc(x)* rhofunc(x)), start_pressure, depths[::-1]))
+            start_pressure = pressure[-1]
+
+            self.pressures[layer.n_start: layer.n_end] = pressure[::-1]
+
+    def _compute_mass( self):
         """
         calculates the mass of the entire planet [kg]
         """
-        rhofunc = UnivariateSpline(radii, density )
-        mass = quad( lambda r : 4*np.pi*rhofunc(r)*r*r,
-                                 radii[0], radii[-1] )[0]
+        mass = 0.0
+        for layer in self.layers:
+            radii = self.radial_slices[layer.n_start: layer.n_end]
+            density = self.densities[layer.n_start: layer.n_end]
+            rhofunc = UnivariateSpline(radii, density)
+            layer.mass = quad(lambda r : 4*np.pi*rhofunc(r)*r*r,
+                            radii[0], radii[-1])[0]
+            mass += layer.mass
         return mass
 
-
-    def _compute_moment_of_inertia( self, density, radii):
+    def _compute_moment_of_inertia( self):
         """
         #Returns the moment of inertia of the planet [kg m^2]
         """
-        rhofunc = UnivariateSpline(radii, density )
-        moment = quad( lambda r : 8.0/3.0*np.pi*rhofunc(r)*r*r*r*r,
-                                 radii[0], radii[-1] )[0]
+        moment = 0.0
+        for layer in self.layers:
+            radii = self.radial_slices[layer.n_start: layer.n_end]
+            density = self.densities[layer.n_start: layer.n_end]
+            rhofunc = UnivariateSpline(radii, density)
+            moment += quad(lambda r : 8.0/3.0*np.pi*rhofunc(r)*r*r*r*r,
+                           radii[0], radii[-1])[0]
         return moment
