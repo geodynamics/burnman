@@ -25,18 +25,18 @@ class AA(eos.EquationOfState):
     def _ABTheta(self, V, params):
         Vfrac = V/params['V_0']
         
-        A = params['a'][0] + params['a'][1]*Vfrac
-        B = params['b'][0] + params['b'][1]*Vfrac*Vfrac
-        Theta = params['Theta'][0]*np.power(Vfrac, -params['Theta'][1])
+        A = params['a'][0] + params['a'][1]*Vfrac # A2
+        B = params['b'][0] + params['b'][1]*Vfrac*Vfrac # A3
+        Theta = params['Theta'][0]*np.power(Vfrac, -params['Theta'][1]) # A4
 
         return A, B, Theta
 
     # Potential heat capacity functions
     def _lambdaxi(self, V, params):
         rhofrac = params['V_0']/V
-        xi = params['xi_0']*np.power(rhofrac, -0.6)
-        F = 1./(1. + np.exp((rhofrac - params['F'][0])/params['F'][1]))
-        lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac) + params['lmda'][2])*np.power(rhofrac, 0.4)
+        xi = params['xi_0']*np.power(rhofrac, -0.6) # A16
+        F = 1./(1. + np.exp((rhofrac - params['F'][0])/params['F'][1])) # A18
+        lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac) + params['lmda'][2])*np.power(rhofrac, 0.4) # A17
         #lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
 
         return lmda, xi
@@ -54,20 +54,19 @@ class AA(eos.EquationOfState):
     '''
     
     # High temperature limit of the kinetic contribution to the heat capacity
-    # Anderson and Ahrens (1994), just after equation 29.
     def _C_v_kin(self, V, T, params):
-        return 1.5*params['n']*gas_constant
+        return 1.5*params['n']*gas_constant # just after equation 29.
     
     # Equation A1
     def _C_v_el(self, V, T, params):
         A, B, Theta = self._ABTheta(V, params)
-        C_e = A*(1. - (Theta*Theta)/(Theta*Theta + T*T)) + B*np.power(T, 0.6)
+        C_e = A*(1. - (Theta*Theta)/(Theta*Theta + T*T)) + B*np.power(T, 0.6) # A1
         return C_e
 
     # Equation A15
     def _C_v_pot(self, V, T, params):
         lmda, xi = self._lambdaxi(V, params)
-        C_pot = (lmda*T + xi*params['theta']) / (params['theta'] + T)
+        C_pot = (lmda*T + xi*params['theta']) / (params['theta'] + T) # A15
         return C_pot
 
     '''
@@ -80,12 +79,12 @@ class AA(eos.EquationOfState):
     
     def _internal_energy_el(self, Ts, T, V, params):
         A, B, Theta = self._ABTheta(V, params)
-        E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 0.625*B*(np.power(T, 1.6) - np.power(Ts, 1.6))
+        E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 5./8*B*(np.power(T, 1.6) - np.power(Ts, 1.6)) # A5
         return E_el
     
     def _internal_energy_pot(self, Ts, T, V, params):
         lmda, xi = self._lambdaxi(V, params)
-        E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts)))
+        E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts))) # A19
         return E_pot
     
     '''
@@ -102,7 +101,7 @@ class AA(eos.EquationOfState):
     def _entropy_el(self, Ts, T, V, params):
         if np.abs(T- Ts) > 1.e-10:
             A, B, Theta = self._ABTheta(V, params)
-            S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6)))
+            S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6))) # A6
         else:
             S_el = 0.
         return S_el
@@ -110,7 +109,7 @@ class AA(eos.EquationOfState):
     def _entropy_pot(self, Ts, T, V, params):
         if np.abs(T- Ts) > 1.e-10:
             lmda, xi = self._lambdaxi(V, params)
-            S_pot = (lmda*np.log((params['theta'] + T)/(params['theta'] + Ts)) + xi*np.log((T*(params['theta'] + Ts))/(Ts*(params['theta'] + T))))
+            S_pot = (lmda*np.log((params['theta'] + T)/(params['theta'] + Ts)) + xi*np.log((T*(params['theta'] + Ts))/(Ts*(params['theta'] + T)))) # A20
         else:
             S_pot = 0.
         return S_pot
@@ -151,12 +150,11 @@ class AA(eos.EquationOfState):
         x5 = x3*x2
         x7 = x5*x2
     
-        Ps = 1.5*params['K_S'] * (x7 - x5) * (1. + ksi1 - ksi1*x2 + ksi2 * (x2 - 1.) * (x2 - 1.))
+        Ps = 1.5*params['K_S'] * (x7 - x5) * (1. + ksi1 - ksi1*x2 + ksi2 * (x2 - 1.) * (x2 - 1.)) # Eq. 17
     
         return Ps
 
     # Birch Murnaghan equation of state expression for the energy change along an isentrope
-    # Anderson and Ahrens, 1994 (Equation 21)
     def _isentropic_energy_change(self, V, params):
         rhofrac, x, ksi1, ksi2 = self._rhofracxksis(V, params)
         x2 = x*x
@@ -165,7 +163,7 @@ class AA(eos.EquationOfState):
         x8 = x4*x4
         
         E_S = 4.5*params['V_0']*params['K_S'] * ((ksi1 + 1.) * (x4/4. - x2/2. + 0.25) - ksi1*(x6/6. - x4/4. + 1./12.)
-                                                + ksi2*(x8/8. - x6/2. + 0.75*x4 - x2/2. + 0.125))
+                                                + ksi2*(x8/8. - x6/2. + 0.75*x4 - x2/2. + 0.125)) # Eq. 21
         return E_S
 
     # int Cv dT 
@@ -210,10 +208,12 @@ class AA(eos.EquationOfState):
         E1 = self._isentropic_energy_change(volume, params) # should also include params['E_0'] given the expression in Anderson and Ahrens. Here, we take the energy change relative to the reference isentrope (effective E_0 = 0). The energy at standard state is *only* used to calculate the final energies, not the physical properties.
         E2 = E1 + dE
 
-        # Integrate along isochore (\int dP = \int gr/V dE)
-        dP = (params['grueneisen_0']*dE
-              + 0.5*params['grueneisen_prime']*np.power(params['V_0']/volume,
-                                                        params['grueneisen_n'])*(E2*E2 - E1*E1))/volume
+        # Integrate at constant volume (V \int dP = \int gr dE)
+        dP = (params['grueneisen_0']*(E2 - E1) +
+              (0.5*params['grueneisen_prime'] *
+               np.power(params['V_0']/volume, params['grueneisen_n']) *
+               (E2*E2 - E1*E1))) / volume # eq. 23
+              
         P = self._isentropic_pressure(volume, params) + dP
     
         return P
@@ -226,8 +226,7 @@ class AA(eos.EquationOfState):
         """
         gr = (params['grueneisen_0'] +
               params['grueneisen_prime'] *
-              (np.power(params['V_0']/volume,
-                        params['grueneisen_n']) *
+              (np.power(params['V_0']/volume, params['grueneisen_n']) *
                self.internal_energy(pressure, temperature, volume, params)))
         return gr
 
@@ -236,10 +235,10 @@ class AA(eos.EquationOfState):
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
         # K_T = -V * dP/dV
-        delta_V = params['V_0']*1.e-5
+        delta_V = params['V_0']*1.e-4
         delta_P = self.pressure(temperature, volume+delta_V, params) - pressure
 
-        K_T = -volume*delta_P/delta_V
+        K_T = -(volume + 0.5*delta_V)*delta_P/delta_V
         
         return K_T
 
@@ -336,7 +335,7 @@ class AA(eos.EquationOfState):
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         E - TS
         """
-        
+        print(pressure, temperature, volume)
         return self.internal_energy(pressure, temperature, volume, params) - temperature*self.entropy(pressure, temperature, volume, params)
 
 
