@@ -10,7 +10,9 @@ from test_debye import *
 from test_decorators import *
 from test_endmembers import *
 from test_eos import *
+from test_equilibrate import *
 from test_geotherm import *
+from test_gibbs_minimization import *
 from test_material import *
 from test_minerals import *
 from test_model import *

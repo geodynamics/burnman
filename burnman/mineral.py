@@ -122,6 +122,10 @@ class Mineral(Material):
             raise AttributeError(
                 "no method set for mineral, or equation_of_state given in mineral.params")
 
+    @material_property
+    def formula(self):
+        return self.params['formula']
+
     """
     Properties from equations of state
     We choose the P, T properties (e.g. Gibbs(P, T) rather than Helmholtz(V, T)),
