@@ -37,7 +37,7 @@ class liquid_iron( burnman.Mineral ):
             'b': [0.4057*m, -1.1499*m],
             'Theta': [1747.3, 1.537],
             'theta': 5000.,
-            'lmda': [302.07*m, -325.23*m, 30.45*m],
+            'lmda': [-325.23*m, 302.07*m, 30.45*m],
             'xi_0': 282.67*m,
             'F': [D/rho_0, Lambda/rho_0],
             'n': sum(formula.values()),
@@ -47,6 +47,223 @@ class liquid_iron( burnman.Mineral ):
 
         
 liq = liquid_iron()
+
+P0 = 10.e9
+T0 = 7000.
+dP = 10.
+dT = 1.
+liq.set_state(P0, T0)
+G0 = liq.gibbs
+Cv0 = liq.heat_capacity_v
+S0 = liq.S
+E0 = liq.internal_energy
+V0 = liq.V
+A0 = liq.helmholtz
+
+
+P1 = liq.method.pressure(T0+dT , liq.V, liq.params)
+liq.set_state(P1, T0 + dT)
+
+# Check Cv, S, E, V calculations
+Cv1 = liq.heat_capacity_v
+S1 = liq.S
+E1 = liq.internal_energy
+
+print 'Cv', Cv0, (E1 - E0)/dT, T0*(S1 - S0)/dT
+print 'dEdP|V', (E1 - E0)/(P1 - P0), liq.V/liq.gr
+print 'dEdS|V', (E1 - E0)/(S1 - S0), T0 + 0.5*dT
+
+def diffS(args, T1, P0, T0, S0, m):
+    P1 = args[0]
+    liq.set_state(P0, T0)
+    S0 = liq.S
+    liq.set_state(P1, T1)
+    S1 = liq.S
+    return S1 - S0
+
+
+def diffV(args, T1, P0, T0, V0, m):
+    P1 = args[0]
+    liq.set_state(P0, T0)
+    V0 = liq.V
+    liq.set_state(P1, T1)
+    V1 = liq.V
+    return V1 - V0
+
+T1 = T0 + 1.
+P1 = fsolve(diffS, [P0], args=(T1, P0, T0, S0, liq))[0]
+E1 = liq.internal_energy
+V1 = liq.V
+print 'dEdV|S', (E1 - E0)/(V0 - V1)/1.e9, P0/1.e9
+
+
+# Check isentropic energy change
+dV = V0*1.e-5
+E0i = liq.method._isentropic_energy_change(V0, liq.params)
+E1i = liq.method._isentropic_energy_change(V0+dV, liq.params)
+Pi = liq.method._isentropic_pressure(V0, liq.params)
+print 'Pth', -(E1i - E0i)/dV/1.e9, Pi/1.e9
+
+
+# We now have E, S, V, P, T, which is enough to provide the whole EoS:
+liq.set_state(P0, T0)
+print 'Helmholtz', A0, E0 - T0*S0
+print 'Gibbs', G0, E0 - T0*S0 + P0*V0
+
+
+# Why gr*dE/dP|V = dG/dP|T
+
+liq.set_state(P0 + dP, T0)
+print 'Volume', liq.V, (liq.gibbs - G0)/dP
+
+
+per = burnman.minerals.SLB_2011.periclase()
+per = burnman.minerals.HP_2011_ds62.per()
+P0 = 10.e9
+T0 = 300.
+per.set_state(P0, T0)
+E0 = per.internal_energy
+V0 = per.V
+S0 = per.S
+
+T1 = T0 + 1.
+P1 = fsolve(diffS, [P0], args=(T1, P0, T0, S0, per))[0]
+per.set_state(P1, T1)
+E1 = per.internal_energy
+V1 = per.V
+S1 = per.S
+print 'dEdV|S', (E1 - E0)/(V0 - V1)/1.e9, P0/1.e9
+
+T1 = T0 + 1.
+P1 = fsolve(diffV, [P0], args=(T1, P0, T0, V0, per))[0]
+per.set_state(P1, T1)
+E1 = per.internal_energy
+V1 = per.V
+S1 = per.S
+print 'dEdS|V', (E1 - E0)/(S1 - S0), T0
+
+
+# Gibbs
+P0 = 10.e9
+T0 = 2000.
+per.set_state(P0, T0)
+G0 = per.gibbs
+S0 = per.S
+V0 = per.V
+H0 = per.H
+F0 = per.helmholtz
+E0 = per.internal_energy
+
+# P constant
+per.set_state(P0, T0+dT)
+G1 = per.gibbs
+F1 = per.helmholtz
+H1 = per.H
+S1 = per.S
+
+# T constant
+per.set_state(P0+dP, T0)
+G2 = per.gibbs
+H2 = per.H
+V2 = per.V
+F2 = per.helmholtz
+P2 = P0 + dP
+
+# S constant
+T3 = T0+dT
+P3 = fsolve(diffS, [P0], args=(T0 + dT, P0, T0, V0, per), xtol=1.e-20)[0]
+per.set_state(P3, T0+dT)
+H3 = per.H
+E3 = per.internal_energy
+V3 = per.V
+print S0, per.S
+
+# V constant
+T4 = T0 + dT
+P4 = fsolve(diffV, [P0], args=(T1, P0, T0, V0, per), xtol=1.e-20)[0]
+F4 = per.helmholtz
+E4 = per.internal_energy
+S4 = per.S
+print V0, per.V
+
+
+print 'Check EoS consistency'
+# Gibbs
+print 'Gibbs:', G0, F0 + P0*V0, H0 - T0*S0, E0 - T0*S0 + P0*V0
+
+# T derivatives
+per.set_state(P0, T0 + 0.5*dT)
+print 'S:', -(G1 - G0)/dT, per.S
+print 'Cp:', (T0 + 0.5*dT)*(S1 - S0)/dT, per.heat_capacity_p
+
+# P derivatives
+per.set_state(P0 + 0.5*dP, T0)
+print 'V:', (G2 - G0)/dP, per.V
+print 'K_T:', -0.5*(V0 + V2)*dP/(V2 - V0), per.K_T
+
+exit()
+
+
+
+
+
+print 'dG = -SdT + VdP'
+print -(G1 - G0)/dT, S1 # P constant
+print (G2 - G0)/dP, V2 # T constant
+
+print 'dH = TdS + VdP'
+print (H1 - H0)/(S1 - S0), T1 # P constant
+print (H3 - H0)/(P3 - P0), V2 # S constant
+
+print 'dE = TdS - PdV'
+print -(E4 - E0)/(S4 - S0), T4 # V constant
+print (E3 - E0)/(V3 - V0)/1.e9, -P3/1.e9  # S constant
+
+print 'dF = -SdT - PdV'
+print (F4 - F0)/(T4 - T0), -S4 # V constant
+print (F2 - F0)/(V2 - V0)/1.e9, -P2/1.e9 # T constant
+
+exit()
+
+
+liq.set_state(P0+dP, T0)
+G1 = liq.gibbs
+E1 = liq.internal_energy
+V1 = liq.V
+
+print (G1 - G0)/dP, liq.V
+
+
+
+liq.set_state(P0, T0 + dT)
+G2 = liq.gibbs
+S2 = liq.S
+
+print -(G2 - G0)/dT, liq.S
+
+print T0*(S2 - S0)/dT, liq.heat_capacity_p
+
+print liq.gr, (liq.params['grueneisen_0'] +
+               liq.params['grueneisen_prime']*(np.power(liq.params['V_0']/liq.V,
+                                                        liq.params['grueneisen_n']) *
+                                               liq.internal_energy))
+
+
+Cv = liq.method.heat_capacity_v(0., T0 , liq.V, liq.params)
+Cv1 = liq.method.heat_capacity_v(0., T0+dT , liq.V, liq.params)
+S0 = liq.method.entropy(0., T0 , liq.V, liq.params)
+S1 = liq.method.entropy(0., T0+dT , liq.V, liq.params)
+E0 = liq.method.internal_energy(0., T0 , liq.V, liq.params)
+E1 = liq.method.internal_energy(0., T0+dT , liq.V, liq.params)
+print E1, liq.internal_energy
+print S1, liq.S
+print Cv1, liq.heat_capacity_v
+print (E1 - E0)/dT, Cv
+print T0*(S1 - S0)/dT, Cv
+
+exit()
+
+
 
 # Find heat capacities
 temperatures = np.linspace(1000., 15000., 101)
@@ -146,7 +363,7 @@ P = 1.e5
 for i, T in enumerate(temperatures):
     liq.set_state(1.e5, T)
     rhos[i] = liq.density/1.e3
-    Vps[i] = np.sqrt(liq.K_S/liq.rho)
+    Vps[i] = np.sqrt(liq.p_wave_velocity)
     rhos_mizuno[i] = (7162. - 0.735*(T - 1808.))/1.e3
 
 plt.plot(temperatures, Vps)
