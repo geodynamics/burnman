@@ -585,7 +585,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
 
     """
     dT = 1.
-    dP = 1.
+    dP = 1000.
     
     m.set_state(P, T)
     G0 = m.gibbs
