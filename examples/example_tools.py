@@ -9,6 +9,7 @@ example_tools
 ----------------
 
 This example demonstrates BurnMan's tools, which are currently
+- EoS consistency
 - equation of state fitting
 - equilibrium temperature and pressure calculations
 - Hugoniot calculation
@@ -32,8 +33,12 @@ def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
 if __name__ == "__main__":
-
-    # First, let's create the Mg2SiO4 phase diagram
+    
+    # First, let's check the EoS consistency of SLB_2011 periclase
+    burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(), P=10.e9, T=3000., verbose=True)
+    print('')
+    
+    # Next, let's create the Mg2SiO4 phase diagram
     forsterite = burnman.minerals.HP_2011_ds62.fo()
     mg_wadsleyite = burnman.minerals.HP_2011_ds62.mwd()
     mg_ringwoodite = burnman.minerals.HP_2011_ds62.mrw()
