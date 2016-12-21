@@ -21,6 +21,8 @@ from test_seismic import *
 from test_solidsolution import *
 from test_spin import *
 from test_tools import *
+from test_helper_rock_switcher import *
+from test_planet import *
 
 import os
 import sys

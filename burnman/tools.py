@@ -63,6 +63,15 @@ def pretty_print_table(table, use_tabs=False):
     for r in table:
         print(frmt.format(*r))
 
+def pretty_plot():
+    """
+    Makes pretty plots. Overwrites the matplotlib default settings to allow
+    for better fonts. Slows down plotting
+    """
+    import matplotlib.pyplot as plt
+    plt.rc('text', usetex=True)
+    plt.rcParams['text.latex.preamble'] = '\\usepackage{relsize}'
+    plt.rc('font', family='sanserif')
 
 def sort_table(table, col=0):
     """
