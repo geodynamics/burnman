@@ -69,7 +69,6 @@ def pretty_plot():
     for better fonts. Slows down plotting
     """
     import matplotlib.pyplot as plt
-    print("inhere")
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\\usepackage{relsize}'
     plt.rc('font', family='sanserif')
