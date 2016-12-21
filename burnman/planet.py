@@ -86,7 +86,7 @@ class Planet(object):
         self.pressures = np.array([max_p * (1.0 - r / self.radius) for r in self.radial_slices])
         self.temperatures = [self.get_layer_by_radius(r).temperature(r) for r in self.radial_slices]
         self.densities = np.empty_like(self.pressures)
-        self.gravity = np.empty_like(self.pressures)sh
+        self.gravity = np.empty_like(self.pressures)
 
         self.averaging_scheme = averaging_schemes.VoigtReussHill()
 
