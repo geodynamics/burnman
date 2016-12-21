@@ -37,7 +37,7 @@ class AA(eos.EquationOfState):
         xi = params['xi_0']*np.power(rhofrac, -0.6) # A16
         F = 1./(1. + np.exp((rhofrac - params['F'][0])/params['F'][1])) # A18
         lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac) + params['lmda'][2])*np.power(rhofrac, 0.4) # A17
-        #lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
+        lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
 
         return lmda, xi
     
@@ -204,6 +204,8 @@ class AA(eos.EquationOfState):
         """
         
         Ts = self._isentropic_temperature(volume, params)
+
+        '''
         dE = self._isochoric_energy_change(Ts, temperature, volume, params)
         E1 = self._isentropic_energy_change(volume, params) # should also include params['E_0'] given the expression in Anderson and Ahrens. Here, we take the energy change relative to the reference isentrope (effective E_0 = 0). The energy at standard state is *only* used to calculate the final energies, not the physical properties.
         E2 = E1 + dE
@@ -215,7 +217,23 @@ class AA(eos.EquationOfState):
                (E2*E2 - E1*E1))) / volume # eq. 23
               
         P = self._isentropic_pressure(volume, params) + dP
-    
+        '''
+
+        dV = volume*1.e-5
+        S0 = self.entropy(0., temperature, volume, params)
+        E0 = self.internal_energy(0., temperature, volume, params)
+
+        def Sdiff(args, S, dV):
+            T = args[0]
+            S1 = self.entropy(0., T, volume+dV, params)
+            return S1 - S0
+
+        T1 = fsolve(Sdiff, [temperature], args=(S0, dV))[0]
+                  
+        S1 = self.entropy(0., T1, volume+dV, params)
+        E1 = self.internal_energy(0., T1, volume+dV, params)
+
+        P = -(E1 - E0)/dV
         return P
 
         
@@ -228,6 +246,13 @@ class AA(eos.EquationOfState):
               params['grueneisen_prime'] *
               (np.power(params['V_0']/volume, params['grueneisen_n']) *
                self.internal_energy(pressure, temperature, volume, params)))
+
+        dT = 1.
+        dE = (self.internal_energy(0., temperature, volume, params) -
+                                   self.internal_energy(0., temperature+dT, volume, params))
+        dP = (self.pressure(temperature, volume, params) -
+              self.pressure(temperature+dT, volume, params))
+        gr = volume*dP/dE
         return gr
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
@@ -239,7 +264,6 @@ class AA(eos.EquationOfState):
         delta_P = self.pressure(temperature, volume+delta_V, params) - pressure
 
         K_T = -(volume + 0.5*delta_V)*delta_P/delta_V
-        
         return K_T
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
@@ -335,7 +359,6 @@ class AA(eos.EquationOfState):
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         E - TS
         """
-        print(pressure, temperature, volume)
         return self.internal_energy(pressure, temperature, volume, params) - temperature*self.entropy(pressure, temperature, volume, params)
 
 

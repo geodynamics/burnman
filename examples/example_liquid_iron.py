@@ -47,8 +47,63 @@ class liquid_iron( burnman.Mineral ):
 
         
 liq = liquid_iron()
-
 burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=0.01, verbose=True)
+
+P = 10.e9
+T = 7000.
+dP = 10000.
+liq.set_state(P, T)
+V0 = liq.V
+
+liq.set_state(P + dP, T)
+V2 = liq.V
+print(liq.K_T, -0.5*(V2 + V0)*dP/(V2 - V0))
+exit()
+
+def diffS(args, T1, P0, T0, m):
+    P1 = args[0]
+    liq.set_state(P0, T0)
+    S0 = liq.S
+    liq.set_state(P1, T1)
+    S1 = liq.S
+    return S1 - S0
+
+
+def diffV(args, T1, P0, T0, m):
+    P1 = args[0]
+    liq.set_state(P0, T0)
+    V0 = liq.V
+    liq.set_state(P1, T1)
+    V1 = liq.V
+    return V1 - V0
+
+# Check isentropic energy change
+V0 = liq.params['V_0']*0.9
+dV = V0*1.e-5
+E0i = liq.method._isentropic_energy_change(V0, liq.params)
+E1i = liq.method._isentropic_energy_change(V0+dV, liq.params)
+Pi = liq.method._isentropic_pressure(V0, liq.params)
+Ti = liq.method._isentropic_temperature(V0, liq.params)
+print 'Pth', -(E1i - E0i)/dV/1.e9, Pi/1.e9
+
+liq.set_state(Pi, Ti)
+Ei = liq.internal_energy
+Si = liq.S
+print Pi/1.e9, Ti, liq.V - V0, liq.params['S_0'] - liq.S, E0i - Ei
+
+
+# Check isochoric energy change
+Tv = Ti + 1.
+Pv = fsolve(diffV, [Pi], args=(Tv, Pi, Ti, liq))[0]
+liq.set_state(Pv, Tv)
+Sv = liq.S
+Ev = liq.internal_energy
+print (Pv-Pi)/1.e9, Tv - Ti, liq.V - V0
+print 'dE/dP|V = V/gr : ', (Ev - Ei)/(Pv-Pi) - liq.V/liq.gr
+print 'dE/dS|V = T :    ', (Ev - Ei)/(Sv - Si) - (Ti + 0.5)
+
+
+
 
 # Gibbs
 P0 = 10.e9
@@ -77,36 +132,14 @@ print 'Cv', Cv0, (E1 - E0)/dT, T0*(S1 - S0)/dT
 print 'dEdP|V', (E1 - E0)/(P1 - P0), liq.V/liq.gr
 print 'dEdS|V', (E1 - E0)/(S1 - S0), T0 + 0.5*dT
 
-def diffS(args, T1, P0, T0, S0, m):
-    P1 = args[0]
-    liq.set_state(P0, T0)
-    S0 = liq.S
-    liq.set_state(P1, T1)
-    S1 = liq.S
-    return S1 - S0
 
-
-def diffV(args, T1, P0, T0, V0, m):
-    P1 = args[0]
-    liq.set_state(P0, T0)
-    V0 = liq.V
-    liq.set_state(P1, T1)
-    V1 = liq.V
-    return V1 - V0
 
 T1 = T0 + 1.
-P1 = fsolve(diffS, [P0], args=(T1, P0, T0, S0, liq))[0]
+P1 = fsolve(diffS, [P0], args=(T1, P0, T0, liq))[0]
 E1 = liq.internal_energy
 V1 = liq.V
 print 'dEdV|S', (E1 - E0)/(V0 - V1)/1.e9, P0/1.e9
 
-
-# Check isentropic energy change
-dV = V0*1.e-5
-E0i = liq.method._isentropic_energy_change(V0, liq.params)
-E1i = liq.method._isentropic_energy_change(V0+dV, liq.params)
-Pi = liq.method._isentropic_pressure(V0, liq.params)
-print 'Pth', -(E1i - E0i)/dV/1.e9, Pi/1.e9
 
 
 
@@ -130,7 +163,7 @@ F2 = liq.helmholtz
 
 # S constant
 T3 = T0+dT
-P3 = fsolve(diffS, [P0], args=(T0 + dT, P0, T0, V0, liq), xtol=1.e-20)[0]
+P3 = fsolve(diffS, [P0], args=(T0 + dT, P0, T0, liq), xtol=1.e-20)[0]
 liq.set_state(P3, T0+dT)
 H3 = liq.H
 E3 = liq.internal_energy
@@ -138,7 +171,7 @@ V3 = liq.V
 
 # V constant
 T4 = T0 + dT
-P4 = fsolve(diffV, [P0], args=(T1, P0, T0, V0, liq), xtol=1.e-20)[0]
+P4 = fsolve(diffV, [P0], args=(T1, P0, T0, liq), xtol=1.e-20)[0]
 F4 = liq.helmholtz
 E4 = liq.internal_energy
 S4 = liq.S
@@ -160,7 +193,6 @@ print -(F4 - F0)/(T4 - T0), (S4 + S0)/2. # V constant
 print -(F2 - F0)/(V2 - V0)/1.e9, (P2 + P0)/2./1.e9 # T constant
 
 
-exit()
 
 
 # Find heat capacities
