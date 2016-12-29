@@ -1,5 +1,8 @@
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+from __future__ import absolute_import
+from __future__ import print_function
+import os.path
+import sys
+sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
 from burnman.minerals import DKS_2013_liquids

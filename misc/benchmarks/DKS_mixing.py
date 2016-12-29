@@ -17,15 +17,15 @@ import matplotlib.image as mpimg
 
 
 fig1 = mpimg.imread('figures/MgO-SiO2_enthalpy_mixing.png')
-plt.subplot(232)
+plt.subplot(131)
 plt.imshow(fig1, extent=[0, 1, -40000, 10000], aspect='auto')
 
 fig1 = mpimg.imread('figures/MgO-SiO2_entropy_mixing.png')
-plt.subplot(233)
+plt.subplot(132)
 plt.imshow(fig1, extent=[0, 1, 0, 24], aspect='auto')
 
 fig1 = mpimg.imread('figures/MgO-SiO2_volume_mixing.png')
-plt.subplot(234)
+plt.subplot(133)
 plt.imshow(fig1, extent=[0, 1, -2.0e-6, 0.4e-6], aspect='auto')
 
 phases = [DKS_2013_liquids.SiO2_liquid(),
@@ -86,51 +86,37 @@ for p, t in pts:
     K_Ts=[]
     K_Texs=[]
     for phase in phases:
-        
-        nSi = phase.params['formula']['Si']
-        nMg = phase.params['formula']['Mg']
+        try:
+            nSi = phase.params['formula']['Si']
+        except:
+            nSi = 0.
+        try:
+            nMg = phase.params['formula']['Mg']
+        except:
+            nMg = 0.
         
         sum_cations = nSi+nMg
         fSi=nSi/sum_cations
         
         phase.set_state(pressure, temperature)
-        Gex = phase.gibbs/sum_cations - (fSi*SiO2_gibbs + (1.-fSi)*MgO_gibbs)       
         Hex = phase.H/sum_cations - (fSi*SiO2_H + (1.-fSi)*MgO_H)
-
         Sex = phase.S/sum_cations - (fSi*SiO2_S + (1.-fSi)*MgO_S)
-
         Vex = phase.V/sum_cations - (fSi*SiO2_V + (1.-fSi)*MgO_V)
 
-        K_T = phase.K_T
-        K_Tex = (phase.K_T - (fSi*SiO2_K_T + (1.-fSi)*MgO_K_T))/K_T
-
         fSis.append(fSi)
-        Gexs.append(Gex)
         Hexs.append(Hex)
         Sexs.append(Sex)
         Vexs.append(Vex)
-        K_Ts.append(K_T)
-        K_Texs.append(K_Tex)
 
-
-    plt.subplot(231)
-    plt.title('Excess Gibbs') 
-    plt.plot(fSis, Gexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(232)
+    plt.subplot(131)
     plt.title('Excess Enthalpies') 
     plt.plot(fSis, Hexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(233)
+    plt.subplot(132)
     plt.title('Excess Entropies') 
     plt.plot(fSis, Sexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(234)
+    plt.subplot(133)
     plt.title('Excess Volumes') 
     plt.plot(fSis, Vexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(235)
-    plt.title('Fractional excess K_T') 
-    plt.plot(fSis, K_Texs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(236)
-    plt.title('K_T') 
-    plt.plot(fSis, K_Ts, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
 
 plt.legend(loc='lower right')
 plt.show()

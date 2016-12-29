@@ -1,5 +1,8 @@
-import os, sys
-sys.path.insert(1,os.path.abspath('..'))
+from __future__ import absolute_import
+from __future__ import print_function
+import os.path
+import sys
+sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
 from burnman.minerals import DKS_2013_solids, DKS_2008_fo
@@ -21,7 +24,6 @@ phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 
           ['periclase', DKS_2013_solids.periclase(), [6.5, 14, -25, 275], [6.5, 14, -1200, -560]]]
 
 for name, phase, PVT_range, EVT_range in phases:
-    print name
     vmin=PVT_range[0]
     vmax=PVT_range[1]
  
