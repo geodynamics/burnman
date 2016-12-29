@@ -9,6 +9,9 @@ Mineral database
   - :mod:`~burnman.minerals.SLB_2005`
   - :mod:`~burnman.minerals.SLB_2011_ZSB_2013`
   - :mod:`~burnman.minerals.SLB_2011`
+  - :mod:`~burnman.minerals.DKS_2013_liquids`
+  - :mod:`~burnman.minerals.DKS_2013_solids`
+  - :mod:`~burnman.minerals.RS_2014_liquids`
   - :mod:`~burnman.minerals.Murakami_etal_2012`
   - :mod:`~burnman.minerals.Murakami_2013`
   - :mod:`~burnman.minerals.Matas_etal_2007`
@@ -23,6 +26,11 @@ from __future__ import absolute_import
 from . import SLB_2011
 from . import SLB_2011_ZSB_2013
 from . import SLB_2005
+
+# ab initio
+from . import DKS_2013_liquids
+from . import DKS_2013_solids
+from . import RS_2014_liquids
 
 # Murakami and coworkers
 from . import Murakami_etal_2012
