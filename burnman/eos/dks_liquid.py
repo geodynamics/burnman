@@ -21,18 +21,26 @@ class DKS_L(eos.EquationOfState):
     Base class for the finite strain liquid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
     """
-    ##########################################################
-    # IDEAL GAS CONTRIBUTIONS (TRANSLATIONAL AND ELECTRONIC) #
-    ##########################################################
+
+    """
+    Ideal gas contributions (translational and electronic)
+    to thermodynamic properties
+    """
 
     def _ln_partition_function(self, mass, temperature):
+        """
+        Calculates the natural log of the partition function
+        """
         return 3./2.*np.log(temperature) \
             + 3./2.*np.log(mass*constants.Boltzmann \
                            /(2*np.pi*constants.Dirac*constants.Dirac)) \
             
-    def _F_ig(self, temperature, volume, params): # F_ig, eq. S6
-        # ideal gas
-        # see also eq. 16.72 of Callen., 1985; p. 373
+    def _F_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the helmholtz free energy
+        Eq. S6, see also eq. 16.72 of Callen., 1985; p. 373
+        """
+        
         V = volume/constants.Avogadro
         figoverRT=0.
         for element, N in params['formula'].iteritems(): # N is a.p.f.u
@@ -43,8 +51,11 @@ class DKS_L(eos.EquationOfState):
         return constants.gas_constant*temperature*figoverRT
             
 
-    def _S_ig(self, temperature, volume, params): # F_ig, eq. S6
-        # ideal gas
+    def _S_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the entropy
+        """
+        
         V = volume/constants.Avogadro
         entropy_sum=0.
         for element, N in params['formula'].iteritems(): # N is a.p.f.u
@@ -54,35 +65,52 @@ class DKS_L(eos.EquationOfState):
                                      + 5./2.) + N*np.log(N)
         return constants.gas_constant*entropy_sum
 
-    def _C_v_ig(self, temperature, volume, params): # F_ig, eq. S6
-        # ideal gas
+    def _C_v_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the heat capacity
+        """
+        
         n_atoms=0
         for element, N in params['formula'].iteritems():
             n_atoms += N
         return 1.5*constants.gas_constant*n_atoms
 
-    def _P_ig(self, temperature, volume, params): # PV = nRT
+    def _P_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the pressure
+        PV = nRT
+        """
+        
         n_atoms=0
         for element, N in params['formula'].iteritems():
             n_atoms += N
         return n_atoms*constants.gas_constant*temperature / volume
 
-    def _K_T_ig(self, temperature, volume, params): # V * d/dV(-nRT/V) = V*nRT/V^2
+    def _K_T_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the isothermal bulk modulus
+        V * d/dV(-nRT/V) = V*nRT/V^2
+        """
         n_atoms=0
         for element, N in params['formula'].iteritems():
             n_atoms += N
         return n_atoms*constants.gas_constant*temperature / volume
 
-    def _alphaK_T_ig(self, temperature, volume, params): # d/dT(nRT/V) = nR/V
+    def _alphaK_T_ig(self, temperature, volume, params):
+        """
+        The ideal gas contribution to the product of the 
+        thermal expansivity and isothermal bulk modulus
+        d/dT(nRT/V) = nR/V
+        """
+        
         n_atoms=0
         for element, N in params['formula'].iteritems():
             n_atoms += N
         return n_atoms*constants.gas_constant / volume
 
-
-    ############################
-    # ELECTRONIC CONTRIBUTIONS #
-    ############################
+    """
+    Electronic contributions to thermodynamic properties
+    """
     
     def _zeta(self, temperature, volume, params): # eq. S5a, beta in deKoker thesis (3.34)
         return params['zeta_0']*(np.power(volume/params['el_V_0'], params['xi']))
@@ -200,9 +228,9 @@ class DKS_L(eos.EquationOfState):
 
 
 
-    ##################################
-    # EXCESS (BONDING) CONTRIBUTIONS #
-    ##################################
+    """
+    Excess (bonding) contributions to thermodynamic properties
+    """
     
     # Finite strain
     def _finite_strain(self, temperature, volume, params): # f(V), eq. S3a
@@ -318,10 +346,10 @@ class DKS_L(eos.EquationOfState):
         return -temperature*C_voverT
 
 
-    ##########################
-    # MAGNETIC CONTRIBUTIONS #
-    ##########################
-    # (as found in Ramo and Stixrude, 2014)
+    """
+    Magnetic contributions to thermodynamic properties
+    (as found in Ramo and Stixrude, 2014)
+    """
     
     def _spin(self, temperature, volume, params):
         S_a = 0.
