@@ -14,15 +14,53 @@ class AA(eos.EquationOfState):
     """
     Base class for the liquid metal EOS detailed in Anderson and Ahrens (1994).
 
-    This equation of state is described by a fourth order BM isentropic EoS
-    (V_0, KS, KS', KS''), a description of the volumetric heat capacity
-    (which gives energy along an isochore as a function of temperature), and
-    a description of the gruneisen parameter as a function of volume and energy
-    (which defines the thermal pressure).
+    This is an EVS equation of state. Internal energy (E) is first calculated 
+    along a reference isentrope using a fourth order BM EoS
+    (V_0, KS, KS', KS''), which gives volume as a function of pressure, 
+    and the thermodynamic identity:
+
+    -dE/dV | S = P.
+
+    The temperature along the isentrope is calculated via
+
+    d(ln T)/d(ln rho) | S = grueneisen
+
+    which gives:
+    Ts/T0 = exp(int(grueneisen/rho drho))
+    
+    The thermal effect on internal energy is calculated at constant volume 
+    using expressions for the kinetic, electronic and potential contributions 
+    to the volumetric heat capacity, which can then be integrated with respect 
+    to temperature:
+
+    dE/dT | V = Cv
+    dE/dS | V = T
+
+    We note that Anderson and Ahrens (1994) also include a detailed description
+    of the gruneisen parameter as a function of volume and energy, and incorporate
+    their preferred expression into the table which provides all of their 
+    parameters for the equation of state. However, this expression is not 
+    required to formulate the equation of state 
+    (other than finding the temperature along the principal isentrope), 
+    and indeed is generally inconsistent with it. This can be seen 
+    most simply by considering the following:
+
+    1) As energy and entropy are defined by the equation of state at any 
+    temperature and volume, the grueneisen parameter is also 
+    (implicitly) defined via the expressions:
+
+    dE = TdS - PdV (and so dE/dV | S = P)
+    grueneisen = V dP/dE | V 
+
+    Away from the reference isentrope, the grueneisen parameter 
+    calculated using these expressions is not equal to the
+    analytical expression given by Anderson and Ahrens (1994).
     """
 
-    # Electronic heat capacity functions
     def _ABTheta(self, V, params):
+        """
+        Electronic heat capacity functions
+        """
         Vfrac = V/params['V_0']
         
         A = params['a'][0] + params['a'][1]*Vfrac # A2
@@ -31,95 +69,34 @@ class AA(eos.EquationOfState):
 
         return A, B, Theta
 
-    # Potential heat capacity functions
     def _lambdaxi(self, V, params):
+        """
+        Potential heat capacity functions
+        """
         rhofrac = params['V_0']/V
         xi = params['xi_0']*np.power(rhofrac, -0.6) # A16
         F = 1./(1. + np.exp((rhofrac - params['F'][0])/params['F'][1])) # A18
         lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac) + params['lmda'][2])*np.power(rhofrac, 0.4) # A17
-        lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
+        #lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]))*np.power(rhofrac, 0.4) # this incorrect expression for lmda seems to provide a very close fit to figure 5
 
         return lmda, xi
     
-    # Fourth order BM functions
     def _rhofracxksis(self, V, params):
+        """
+        Functions for the fourth order Birch-Murnaghan equation of state
+        """
         rhofrac = params['V_0']/V # rho/rho0 = V0/V
         x = np.power(rhofrac, 1./3.) # equation 18
         ksi1 = 0.75*(4. - params['Kprime_S']) # equation 19
         ksi2 = 0.375*(params['K_S']*params['Kprime_prime_S'] + params['Kprime_S']*(params['Kprime_S'] - 7.)) + 143./24. # equation 20
         return rhofrac, x, ksi1, ksi2
+    
 
-    '''     
-    Contributions to the heat capacity
-    '''
-    
-    # High temperature limit of the kinetic contribution to the heat capacity
-    def _C_v_kin(self, V, T, params):
-        return 1.5*params['n']*gas_constant # just after equation 29.
-    
-    # Equation A1
-    def _C_v_el(self, V, T, params):
-        A, B, Theta = self._ABTheta(V, params)
-        C_e = A*(1. - (Theta*Theta)/(Theta*Theta + T*T)) + B*np.power(T, 0.6) # A1
-        return C_e
-
-    # Equation A15
-    def _C_v_pot(self, V, T, params):
-        lmda, xi = self._lambdaxi(V, params)
-        C_pot = (lmda*T + xi*params['theta']) / (params['theta'] + T) # A15
-        return C_pot
-
-    '''
-    Contributions to the internal energy
-    '''
-        
-    def _internal_energy_kin(self, Ts, T, V, params):
-        E_kin = 1.5*params['n']*gas_constant*(T - Ts)
-        return E_kin
-    
-    def _internal_energy_el(self, Ts, T, V, params):
-        A, B, Theta = self._ABTheta(V, params)
-        E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 5./8*B*(np.power(T, 1.6) - np.power(Ts, 1.6)) # A5
-        return E_el
-    
-    def _internal_energy_pot(self, Ts, T, V, params):
-        lmda, xi = self._lambdaxi(V, params)
-        E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts))) # A19
-        return E_pot
-    
-    '''
-    Contributions to entropy
-    '''
-    
-    def _entropy_kin(self, Ts, T, V, params):
-        if np.abs(T- Ts) > 1.e-10:
-            S_kin = 1.5*params['n']*gas_constant*(np.log(T) - np.log(Ts))
-        else:
-            S_kin = 0.
-        return S_kin
-        
-    def _entropy_el(self, Ts, T, V, params):
-        if np.abs(T- Ts) > 1.e-10:
-            A, B, Theta = self._ABTheta(V, params)
-            S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6))) # A6
-        else:
-            S_el = 0.
-        return S_el
-    
-    def _entropy_pot(self, Ts, T, V, params):
-        if np.abs(T- Ts) > 1.e-10:
-            lmda, xi = self._lambdaxi(V, params)
-            S_pot = (lmda*np.log((params['theta'] + T)/(params['theta'] + Ts)) + xi*np.log((T*(params['theta'] + Ts))/(Ts*(params['theta'] + T)))) # A20
-        else:
-            S_pot = 0.
-        return S_pot
-            
-    '''
-    Isentropic and isochoric calculations
-    '''
-    
-    # Temperature along an isentrope (Anderson and Ahrens; Equation B5)
     def _isentropic_temperature(self, V, params):
+        """
+        Temperature along the reference isentrope
+        """
+        
         rhofrac, x, ksi1, ksi2 = self._rhofracxksis(V, params)
         
         # equation B6 -- B10
@@ -142,8 +119,10 @@ class AA(eos.EquationOfState):
 
 
 
-    # Pressure along the reference isentrope
     def _isentropic_pressure(self, V, params):
+        """
+        Pressure along the reference isentrope
+        """
         rhofrac, x, ksi1, ksi2 = self._rhofracxksis(V, params)
         x2 = x*x
         x3 = x*x*x
@@ -154,8 +133,10 @@ class AA(eos.EquationOfState):
     
         return Ps
 
-    # Birch Murnaghan equation of state expression for the energy change along an isentrope
     def _isentropic_energy_change(self, V, params):
+        """
+        Birch Murnaghan equation of state expression for the energy change along an isentrope
+        """
         rhofrac, x, ksi1, ksi2 = self._rhofracxksis(V, params)
         x2 = x*x
         x4 = x2*x2
@@ -166,12 +147,19 @@ class AA(eos.EquationOfState):
                                                 + ksi2*(x8/8. - x6/2. + 0.75*x4 - x2/2. + 0.125)) # Eq. 21
         return E_S
 
-    # int Cv dT 
     def _isochoric_energy_change(self, Ts, T, V, params):
-        return (self._internal_energy_kin(Ts, T, V, params)
-                + self._internal_energy_el(Ts, T, V, params)
-                + self._internal_energy_pot(Ts, T, V, params))
-    
+        """
+        int Cv dT 
+        """
+        A, B, Theta = self._ABTheta(V, params)
+        lmda, xi = self._lambdaxi(V, params)
+        
+        E_kin = 1.5*params['n']*gas_constant*(T - Ts)
+        E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 5./8*B*(np.power(T, 1.6) - np.power(Ts, 1.6)) # A5
+        E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts))) # A19
+
+        return E_kin + E_el + E_pot
+
     
     def volume_dependent_q(self, x, params):
         """
@@ -242,11 +230,13 @@ class AA(eos.EquationOfState):
         """
         Returns grueneisen parameter :math:`[unitless]` 
         """
+
+        '''
         gr = (params['grueneisen_0'] +
               params['grueneisen_prime'] *
               (np.power(params['V_0']/volume, params['grueneisen_n']) *
                self.internal_energy(pressure, temperature, volume, params)))
-
+        '''
         dT = 1.
         dE = (self.internal_energy(0., temperature, volume, params) -
                                    self.internal_energy(0., temperature+dT, volume, params))
@@ -287,10 +277,16 @@ class AA(eos.EquationOfState):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
-        C_v = (self._C_v_kin(volume, temperature, params)
-                + self._C_v_pot(volume, temperature, params)
-                + self._C_v_el(volume, temperature, params))
-        return C_v
+
+        A, B, Theta = self._ABTheta(volume, params)
+        lmda, xi = self._lambdaxi(volume, params)
+        
+        C_kin = 1.5*params['n']*gas_constant # HT limit of kinetic contribution (just after equation 29.)
+        C_e = A*(1. - (Theta*Theta)/(Theta*Theta + temperature*temperature)) + B*np.power(temperature, 0.6) # Equation A1
+        C_pot = (lmda*temperature + xi*params['theta']) / (params['theta'] + temperature) # Equation A15
+        
+        return C_kin + C_e + C_pot
+
     
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """
@@ -338,11 +334,20 @@ class AA(eos.EquationOfState):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
+        T = temperature
         Ts = self._isentropic_temperature(volume, params)
-        S = (params['S_0'] + self._entropy_kin(Ts, temperature, volume, params)
-             + self._entropy_el(Ts, temperature, volume, params)
-             + self._entropy_pot(Ts, temperature, volume, params))
 
+        if np.abs(T- Ts) < 1.e-10:
+            Delta_S = 0.
+        else:
+            A, B, Theta = self._ABTheta(volume, params)
+            lmda, xi = self._lambdaxi(volume, params)
+            S_kin = 1.5*params['n']*gas_constant*(np.log(T) - np.log(Ts))
+            S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6))) # A6
+            S_pot = (lmda*np.log((params['theta'] + T)/(params['theta'] + Ts)) + xi*np.log((T*(params['theta'] + Ts))/(Ts*(params['theta'] + T)))) # A20
+            Delta_S = S_kin + S_el + S_pot
+        
+        S = params['S_0'] + Delta_S
         return S 
 
     def enthalpy( self, pressure, temperature, volume, params):
