@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     figure = plt.figure(figsize = (12,10))
     figure.suptitle('Your planet is %.3f Earth Masses with Average Density of %.1f kg/m$^3$' %((Plan.mass/5.97e24), \
-                    (Plan.mass/(4.*np.pi*Plan.radial_slices[-1]*Plan.radial_slices[-1]*Plan.radial_slices[-1]))),\
+                    (Plan.mass/(4./3.*np.pi*Plan.radial_slices[-1]*Plan.radial_slices[-1]*Plan.radial_slices[-1]))),\
                      fontsize=20)
 
     ax1 = plt.subplot2grid( (6,3) , (0,0), colspan=3, rowspan=3)
