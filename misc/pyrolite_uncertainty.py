@@ -537,7 +537,7 @@ elif whattodo == "plotone":
              color=colors.color(2), linewidth=1.0)
 
     plt.xlabel("Pressure (GPa)")
-    plt.ylabel("Velocities (km/s) and Density (kg/m$^3$)")
+    plt.ylabel("Velocities (km/s) and Density ($\cdot 10^3$ kg/m$^3$)")
     plt.legend(bbox_to_anchor=(1.0, 0.9), prop={'size': 12})
     plt.xlim(25, 135)
     # plt.ylim(6,11)

@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     figure = plt.figure(figsize = (12,10))
     figure.suptitle('Your planet is %.3f Earth Masses with Average Density of %.1f kg/m$^3$' %((Plan.mass/5.97e24), \
-                    (Plan.mass/(4.*np.pi*Plan.radial_slices[-1]*Plan.radial_slices[-1]*Plan.radial_slices[-1]))),\
+                    (Plan.mass/(4./3.*np.pi*Plan.radial_slices[-1]*Plan.radial_slices[-1]*Plan.radial_slices[-1]))),\
                      fontsize=20)
 
     ax1 = plt.subplot2grid( (6,3) , (0,0), colspan=3, rowspan=3)
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     ax1.plot(Plan.radial_slices/1.e3,Plan.densities/1.e3,'k', linewidth = 2.)
     ax1.set_ylim(0.,(max(Plan.densities)/1.e3)+1.)
     ax1.set_xlim(0.,max(Plan.radial_slices)/1.e3)
-    ax1.set_ylabel("Density (kg/m$^3$)")
+    ax1.set_ylabel("Density ( $\cdot 10^3$ kg/m$^3$)")
 
     #Make a subplot showing the calculated pressure profile
     ax2.plot( Plan.radial_slices/1.e3, Plan.pressures/1.e9, 'b', linewidth=2.)

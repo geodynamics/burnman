@@ -187,7 +187,7 @@ if __name__ == '__main__':
              linestyle='-', marker='o', markerfacecolor='k', markersize=4)
     plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
     plt.xlabel("Pressure (GPa)")
-    plt.title("density (kg/m^3)")
+    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
 
     # Finally, we plot the goetherm used
     plt.subplot(2, 2, 4)

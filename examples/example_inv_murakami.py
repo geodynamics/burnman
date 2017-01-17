@@ -232,7 +232,7 @@ if __name__ == "__main__":
         plt.subplot(2, 2, 3)
         plt.plot(seis_p / 1.e9, seis_rho / 1.e3, color='k', linestyle='-',
                  marker='o', markerfacecolor='k', markersize=4, label='ref')
-        plt.title("density (kg/m^3)")
+        plt.title("density ($\cdot 10^3$ kg/m^$3$)")
         plt.legend(loc='upper left')
         plt.ylim([4, 8])
         plt.savefig("output_figures/example_inv_murakami_2.png")
@@ -337,7 +337,7 @@ if __name__ == "__main__":
                  marker='x', markerfacecolor='r', markersize=4, label='model 1')
         plt.plot(seis_p / 1.e9, seis_rho / 1.e3, color='k', linestyle='-',
                  marker='o', markerfacecolor='k', markersize=4, label='ref')
-        plt.title("density (kg/m^3)")
+        plt.title("density ($\cdot 10^3$ kg/m$^3$)")
         plt.legend(loc='upper left')
         plt.ylim([4, 8])
         plt.savefig("output_figures/example_inv_murakami_2.png")

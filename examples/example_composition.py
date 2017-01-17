@@ -167,7 +167,7 @@ if __name__ == "__main__":
     plt.plot(
         seis_p / 1.e9, seis_rho / 1.e3, color='k', linestyle='-', marker='o',
         markerfacecolor='k', markersize=4)
-    plt.title("density (kg/m^3)")
+    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
     plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
     plt.text(40, 4.3, "misfit= %3.3f" % rho_err)
     plt.xlabel("Pressure (GPa)")
