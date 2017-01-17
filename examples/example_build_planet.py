@@ -142,7 +142,7 @@ if __name__ == "__main__":
     ax1.plot(Plan.radial_slices/1.e3,Plan.densities/1.e3,'k', linewidth = 2.)
     ax1.set_ylim(0.,(max(Plan.densities)/1.e3)+1.)
     ax1.set_xlim(0.,max(Plan.radial_slices)/1.e3)
-    ax1.set_ylabel("Density (kg/m$^3$)")
+    ax1.set_ylabel("Density ( $\cdot 10^3$ kg/m$^3$)")
 
     #Make a subplot showing the calculated pressure profile
     ax2.plot( Plan.radial_slices/1.e3, Plan.pressures/1.e9, 'b', linewidth=2.)

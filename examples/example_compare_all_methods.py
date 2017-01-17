@@ -120,7 +120,7 @@ if __name__ == "__main__":
     plt.ylabel('Vphi (km/s)')
     plt.subplot(2, 2, 3)
     plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Density (kg/m^3)')
+    plt.ylabel('Density ($\cdot 10^3$ kg/m^3)')
     plt.subplot(2, 2, 4)
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Temperature (K)')

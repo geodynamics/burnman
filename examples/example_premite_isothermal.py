@@ -123,7 +123,7 @@ if __name__ == "__main__":
              marker='^', markerfacecolor='r', markersize=4, label='model 1')
     plt.plot(seis_p / 1.e9, seis_rho / 1000., color='k', linestyle='-',
              marker='v', markerfacecolor='k', markersize=4, label='ref')
-    plt.title("density (kg/m^3)")
+    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
     plt.legend(loc='upper left')
     plt.ylim([3, 7])
     plt.show()
