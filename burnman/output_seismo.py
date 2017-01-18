@@ -9,6 +9,7 @@ import numpy as np
 import warnings
 import scipy.integrate
 import matplotlib.pyplot as plt
+import pkgutil
 
 from . import tools
 from . import constants
@@ -45,10 +46,13 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
         True means plot of the old model and replaced model will be shown (default = False)
 
     """
-    
+
+
     
     # Load reference input
-    lines = open('../burnman/data/input_seismic/' + axisem_ref ).readlines()
+    datastream = pkgutil.get_data('burnman', '/data/input_seismic/' + axisem_ref)
+    lines = [line.strip()
+                 for line in datastream.decode('ascii').split('\n') if line.strip()]
     table = []
     for line in lines[18:]:
         numbers = np.fromstring(line, sep=' ')
@@ -73,7 +77,7 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
     indrange.insert(0, indrange[0] - 1)
     indrange.append(indrange[-1] + 1)
     # Invert depthrange so adiabatic computations work!
-    depthrange = ref_depth[indrange][::-1]
+    depthrange = ref_depth[indrange]
 
     # convert depths to pressures
     pressures = seismic.PREM().pressure(depthrange)
@@ -81,6 +85,7 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
     # Computing adiabatic temperatures. T0 is an input parameter!
     T0 = T0  # K
     temperatures = geotherm.adiabatic(pressures, T0, rock)
+
 
     
     print("Calculations are done for:")
@@ -107,7 +112,7 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
 
 
     for i in range(indrange[0], indrange[-1]):
-        ind2 = -1 - i + indrange[0]
+        ind2 = -1 + i - indrange[0]
         if ref_radius[i] ==ref_radius[i-1]:
             discontinuity = discontinuity + 1
             f.write('#          Discontinuity   '+ str(discontinuity) + ', depth:    '+ str(np.round(ref_depth[i]/1.e3,decimals=2))+' km \n')
@@ -149,7 +154,7 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
         plt.show()
 
 
-def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, filename='mineos_burnmantestrock.txt',
+def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, T0 = 1900, filename='mineos_burnmantestrock.txt',
                        mineos_ref='mineos_prem_noocean.txt', plotting=False):
     """
     Writing velocities and densities to Mineos (https://geodynamics.org/cig/software/mineos/) input file
@@ -182,8 +187,10 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, filename='mine
     
     
     # Load reference input
-    lines = open('../burnman/data/input_seismic/' + mineos_ref ).readlines()
-    table = []
+    datastream = pkgutil.get_data('burnman', '/data/input_seismic/' + mineos_ref)
+    lines = [line.strip()
+             for line in datastream.decode('ascii').split('\n') if line.strip()]
+    table=[]
     for line in lines[3:]:
         numbers = np.fromstring(line, sep=' ')
         table.append(numbers)
@@ -212,7 +219,7 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, filename='mine
     pressures = seismic.PREM().pressure(depthrange)
 
     # Computing adiabatic temperatures. T0 is a choice!
-    T0 = 1900  # K
+    T0 = T0  # K
     temperatures = geotherm.adiabatic(pressures, T0, rock)
 
     

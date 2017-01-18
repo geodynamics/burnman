@@ -67,10 +67,6 @@ if __name__ == "__main__":
 
 
 
-
-    print("Calculations are done for:")
-    pyrolitic_mantle.debug_print()
-
     # Writing axisem input file
     burnman.output_seismo.write_axisem_input(pyrolitic_mantle, filename='axisem_pyrolite.txt', plotting=True)
     burnman.output_seismo.write_axisem_input(chondritic_mantle, filename='axisem_chondrite.txt', plotting=True)
