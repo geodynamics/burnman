@@ -2,11 +2,17 @@
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 """
-This example script produces an input file to compute normal modes in
-Mineos for a lower mantle with pyrolitic or chondritic composition.
+This example script produces an input files for AXISEM and Mineos while
+replacing the lower mantle with a chosen composition
+
+Mineos computes normal mode synthetics
 Mineos Masters et al. 2007
 https://geodynamics.org/cig/software/mineos/
 Thanks for input on this script from Jessica Irving.
+
+Axisem computes 2.5D synthetic seismograms
+Nissen-Meyer et al. (2014), AxiSEM: broadband 3-D seismic wavefields in axisymmetric media, Solid Earth, 5, 425-445. doi:10.5194/se-5-425-2014
+www.axisem.info
 
 """
 # Import supporting libraries
@@ -66,8 +72,8 @@ if __name__ == "__main__":
     pyrolitic_mantle.debug_print()
 
     # Writing axisem input file
-    burnman.output_seismo.write_axisem_input(pyrolitic_mantle, name='pyrolite', plotting=True)
-    burnman.output_seismo.write_axisem_input(chondritic_mantle, name='chondrite', plotting=True)
+    burnman.output_seismo.write_axisem_input(pyrolitic_mantle, filename='axisem_pyrolite.txt', plotting=True)
+    burnman.output_seismo.write_axisem_input(chondritic_mantle, filename='axisem_chondrite.txt', plotting=True)
     # Write mineous input file
-    burnman.output_seismo.write_mineos_input(pyrolitic_mantle, name='pyrolite', plotting=True)
-    burnman.output_seismo.write_mineos_input(chondritic_mantle, name='chondrite', plotting=True)
+    burnman.output_seismo.write_mineos_input(pyrolitic_mantle, filename='mineos_pyrolite.txt', plotting=True)
+    burnman.output_seismo.write_mineos_input(chondritic_mantle, filename='mineos_chondrite.txt', plotting=True)

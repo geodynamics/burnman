@@ -15,8 +15,8 @@ from . import constants
 from . import seismic
 from . import geotherm
 
-def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900,name='burnmantestrock',
-                       axisem_ref='axisem_prem_ani_noocean', plotting=False):
+def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, filename='axisem_burnmantestrock.txt',
+                       axisem_ref='axisem_prem_ani_noocean.txt', plotting=False):
     """
     Writing velocities and densities to AXISEM (www.axisem.info) input file
     Default is set to replacing the lower mantle with the BurnMan rock
@@ -24,11 +24,31 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900,name=
         - This implementation uses PREM to convert from depths to pressures to compute at
         - This implementation assumes an adiabatic temperature profile, only T0 at min_depth can be set
         - Currently, it only honors the discontinuities already in the synthetic input file, so it is best 
-            to only replace certain layers with burnman values (this should be improved in the future.
+            to only replace certain layers with burnman values (this should be improved in the future).
+            
+            
+    Parameters
+    ----------
+    rock  :  burnman.Composite()
+        Composition to implement in the model
+    min_depth : float
+        minimum depth to replace model (m) (default = 670 km)
+    max_depth : float 
+        minimum depth to replace model (m) (default = 2890 km)
+    T0 : float
+        Anchor temperature at min_depth for adiabatic profile (K) (default=1900)
+    filename: string
+        Output filename (default ='axisem_burnmantestrock.txt')
+    axisem_ref: string
+        Input filename (in burnman/data/input_seismic/) (default = 'axisem_prem_ani_noocean.txt')
+    plotting: Boolean
+        True means plot of the old model and replaced model will be shown (default = False)
 
     """
+    
+    
     # Load reference input
-    lines = open('../burnman/data/input_seismic/' + axisem_ref + '.txt').readlines()
+    lines = open('../burnman/data/input_seismic/' + axisem_ref ).readlines()
     table = []
     for line in lines[18:]:
         numbers = np.fromstring(line, sep=' ')
@@ -70,28 +90,22 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900,name=
         ['v_p', 'v_s', 'density'], pressures, temperatures)
     discontinuity =0
     # WRITE OUT FILE
-    f = open('axisem_' + name + '.txt', 'w')
-    print('Writing axisem_' + name + '.txt ...')
-    f.write('# Input file for AXISEM created using BurnMan, replacing ' + axisem_ref+ ' with ' +name+ ' between ' +str(np.round(min_depth/1.e3)) + ' and ' + str(np.round(max_depth /1.e3)) +' km \n')
-    f.write('NAME ' + name + '\n')
+    f = open(filename, 'w')
+    print('Writing ' + filename + ' ...')
+    f.write('# Input file '+ filename +' for AXISEM created using BurnMan, replacing ' + axisem_ref+ ' between ' +str(np.round(min_depth/1.e3)) + ' and ' + str(np.round(max_depth /1.e3)) +' km \n')
+    f.write('NAME ' + filename + '\n')
     for line in lines[2:18]:
         f.write(line[:-1] + '\n')
     for i in range(indrange[0]):
-        if i>0:
-            if ref_radius[i] ==ref_radius[i-1]:
+        if i>0 and ref_radius[i] ==ref_radius[i-1]:
                 discontinuity = discontinuity + 1
                 f.write('#          Discontinuity   ' +str(discontinuity) + ', depth:    '+ str(np.round(ref_depth[i]/1.e3,decimals=2)) +' km \n')
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             ref_density[i],
-             ref_vpv[i],
-             ref_vsv[i],
-             ref_Qk[i],
-                ref_Qmu[i],
-                ref_vph[i],
-                ref_vsh[i],
-                ref_eta[i]))
+            (ref_radius[i], ref_density[i], ref_vpv[i], ref_vsv[i], ref_Qk[i],
+                ref_Qmu[i], ref_vph[i], ref_vsh[i], ref_eta[i]))
+
+
     for i in range(indrange[0], indrange[-1]):
         ind2 = -1 - i + indrange[0]
         if ref_radius[i] ==ref_radius[i-1]:
@@ -99,30 +113,18 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900,name=
             f.write('#          Discontinuity   '+ str(discontinuity) + ', depth:    '+ str(np.round(ref_depth[i]/1.e3,decimals=2))+' km \n')
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             rock_rho[ind2],
-             rock_vp[ind2],
-             rock_vs[ind2],
-             ref_Qk[i],
-                ref_Qmu[i],
-                rock_vp[ind2],
-                rock_vs[ind2],
-                ref_eta[i]))
+            (ref_radius[i], rock_rho[ind2], rock_vp[ind2], rock_vs[ind2], ref_Qk[i],
+                ref_Qmu[i], rock_vp[ind2], rock_vs[ind2], ref_eta[i]))
+
     for i in range(indrange[-1], len(ref_radius)):
         if ref_radius[i] ==ref_radius[i-1]:
             discontinuity = discontinuity + 1
             f.write('#          Discontinuity   ' +str(discontinuity) + ', depth:    '+ str(np.round(ref_depth[i]/1.e3,decimals=2))+' km \n')
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             ref_density[i],
-             ref_vpv[i],
-             ref_vsv[i],
-             ref_Qk[i],
-                ref_Qmu[i],
-                ref_vph[i],
-                ref_vsh[i],
-                ref_eta[i]))
+                (ref_radius[i], ref_density[i], ref_vpv[i], ref_vsv[i], ref_Qk[i],
+                 ref_Qmu[i], ref_vph[i], ref_vsh[i], ref_eta[i]))
+
     f.close()
 
     if plotting:
@@ -141,14 +143,14 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900,name=
         plt.plot(depthrange / 1.e3, rock_rho / 1.e3, color='r', linestyle='-',
                  marker='o', markerfacecolor='r', markersize=1)
 
-        plt.title(axisem_ref + ' replaced with ' + name + ' between ' +
+        plt.title(filename + ' = ' + axisem_ref + ' replaced  between ' +
                   str(min_depth / 1.e3) + ' and ' + str(max_depth / 1.e3) + ' km')
         plt.legend(loc='lower right')
         plt.show()
 
 
-def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmantestrock',
-                       mineos_ref='prem_noocean', plotting=False):
+def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, filename='mineos_burnmantestrock.txt',
+                       mineos_ref='mineos_prem_noocean.txt', plotting=False):
     """
     Writing velocities and densities to Mineos (https://geodynamics.org/cig/software/mineos/) input file
     Default is set to replacing the lower mantle with the BurnMan rock
@@ -156,11 +158,31 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
         - This implementation uses PREM to convert from depths to pressures to compute at
         - This implementation assumes an adiabatic temperature profile, only T0 at min_depth can be set
         - Currently, it only honors the discontinuities already in the synthetic input file, so it is best 
-            to only replace certain layers with burnman values (this should be improved in the future.
+            to only replace certain layers with burnman values (this should be improved in the future).
 
+
+    Parameters
+    ----------
+    rock  :  burnman.Composite()
+    Composition to implement in the model
+    min_depth : float
+    minimum depth to replace model (m) (default = 670 km)
+    max_depth : float
+    minimum depth to replace model (m) (default = 2890 km)
+    T0 : float
+    Anchor temperature at min_depth for adiabatic profile (K) (default=1900)
+    filename: string
+    Output filename (default ='mineos_burnmantestrock.txt')
+    axisem_ref: string
+    Input filename (in burnman/data/input_seismic/) (default = 'mineos_prem_noocean.txt')
+    plotting: Boolean
+    True means plot of the old model and replaced model will be shown (default = False)
+    
     """
+    
+    
     # Load reference input
-    lines = open('../burnman/data/input_seismic/mineos_' + mineos_ref + '.txt').readlines()
+    lines = open('../burnman/data/input_seismic/' + mineos_ref ).readlines()
     table = []
     for line in lines[3:]:
         numbers = np.fromstring(line, sep=' ')
@@ -201,48 +223,31 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
         ['v_p', 'v_s', 'density'], pressures, temperatures)
 
     # WRITE OUT FILE
-    f = open('mineos_' + name + '.txt', 'w')
-    print('Writing mineos_' + name + '.txt ...')
-    f.write(lines[0][:-2] + ' +  ' + name + '\n')
+    f = open(filename , 'w')
+    print('Writing ' + filename + ' ...')
+    f.write(lines[0][:-2] + ' +  ' + filename + '\n')
     for line in lines[1:3]:
         f.write(line[:-2] + '\n')
     for i in range(indrange[0]):
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             ref_density[i],
-             ref_vpv[i],
-             ref_vsv[i],
-             ref_Qk[i],
-                ref_Qmu[i],
-                ref_vph[i],
-                ref_vsh[i],
-                ref_eta[i]))
+                (ref_radius[i], ref_density[i], ref_vpv[i], ref_vsv[i], ref_Qk[i],
+                 ref_Qmu[i], ref_vph[i], ref_vsh[i], ref_eta[i]))
+
     for i in range(indrange[0], indrange[-1]):
         ind2 = -1 - i + indrange[0]
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             rock_rho[ind2],
-             rock_vp[ind2],
-             rock_vs[ind2],
-             ref_Qk[i],
-                ref_Qmu[i],
-                rock_vp[ind2],
-                rock_vs[ind2],
-                ref_eta[i]))
+                (ref_radius[i], rock_rho[ind2], rock_vp[ind2], rock_vs[ind2], ref_Qk[i],
+                 ref_Qmu[i], rock_vp[ind2], rock_vs[ind2], ref_eta[i]))
+
+
     for i in range(indrange[-1], len(ref_radius)):
         f.write(
             '%8.0f %9.2f %9.2f %9.2f %9.1f %9.1f %9.2f %9.2f %9.5f \n' %
-            (ref_radius[i],
-             ref_density[i],
-             ref_vpv[i],
-             ref_vsv[i],
-             ref_Qk[i],
-                ref_Qmu[i],
-                ref_vph[i],
-                ref_vsh[i],
-                ref_eta[i]))
+                (ref_radius[i], ref_density[i], ref_vpv[i], ref_vsv[i], ref_Qk[i],
+                 ref_Qmu[i], ref_vph[i], ref_vsh[i], ref_eta[i]))
+
     f.close()
 
     if plotting:
@@ -261,7 +266,7 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, name='burnmant
         plt.plot(depthrange / 1.e3, rock_rho / 1.e3, color='r', linestyle='-',
                  marker='o', markerfacecolor='r', markersize=1)
 
-        plt.title(mineos_ref + ' replaced with ' + name + ' between ' +
+        plt.title(filename + ' = ' + mineos_ref + ' replaced  between ' +
                   str(min_depth / 1.e3) + ' and ' + str(max_depth / 1.e3) + ' km')
         plt.legend(loc='lower right')
         plt.show()
