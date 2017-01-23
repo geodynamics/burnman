@@ -50,7 +50,7 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
 
     
     # Load reference input
-    datastream = pkgutil.get_data('burnman', '/data/input_seismic/' + axisem_ref)
+    datastream = pkgutil.get_data('burnman', 'data/input_seismic/' + axisem_ref)
     lines = [line.strip()
                  for line in datastream.decode('ascii').split('\n') if line.strip()]
     table = []
@@ -187,7 +187,7 @@ def write_mineos_input(rock, min_depth=670.e3, max_depth=2890.e3, T0 = 1900, fil
     
     
     # Load reference input
-    datastream = pkgutil.get_data('burnman', '/data/input_seismic/' + mineos_ref)
+    datastream = pkgutil.get_data('burnman', 'data/input_seismic/' + mineos_ref)
     lines = [line.strip()
              for line in datastream.decode('ascii').split('\n') if line.strip()]
     table=[]
