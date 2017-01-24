@@ -57,7 +57,8 @@ def write_axisem_input(rock, min_depth=670.e3, max_depth=2890.e3, T0= 1900, file
     for line in lines[18:]:
         numbers = np.fromstring(line, sep=' ')
         if len(numbers)>0:
-            table.append(numbers)
+            if line[0] != "#" and line[0] != "%":
+                table.append(numbers)
     table = np.array(table)
     ref_radius = table[:, 0]
     ref_depth = 6371.e3 - ref_radius
