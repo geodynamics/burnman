@@ -15,8 +15,30 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
-
+import cProfile,pstats,StringIO
 import timeit
+
+if False:
+    def test_set_state(runs=10000):
+        g = burnman.minerals.SLB_2011.garnet()
+        g.set_composition([0.1, 0.2, 0.4, 0.2, 0.1])
+        x = 0.0
+        for x in range(0,runs):
+            g.set_state(10.e9+x, 1500.)
+            x += g.activities
+        print(x)
+    
+    test_set_state(1)
+    pr = cProfile.Profile()
+    pr.enable()
+    test_set_state()
+    pr.disable()
+    s = StringIO.StringIO()
+    sortby = 'cumulative'
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    ps.print_stats()
+    print (s.getvalue())
+
 
 if True:
     def test_grueneisen():

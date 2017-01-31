@@ -8,10 +8,51 @@ import numpy as np
 from . import processchemistry
 from . import constants
 
-"""
-kronecker delta function for integers
-"""
-kd = lambda x, y: 1 if x == y else 0
+# Try to import the jit from numba.  If it is
+# not available, just go with the standard
+# python interpreter
+try:
+    import os
+    if 'NUMBA_DISABLE_JIT' in os.environ and int(os.environ['NUMBA_DISABLE_JIT']) == 1:
+        raise ImportError("NOOOO!")
+    from numba import jit
+except ImportError:
+    def jit(fn):
+        return fn
+
+@jit
+def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, n_occupancies, site_multiplicities, endmember_configurational_entropies):
+    site_occupancies = np.dot(molar_fractions, endmember_occupancies)
+    activities = np.empty(shape=(n_endmembers))
+    
+    for e in range(n_endmembers):
+        a = 1.0
+        for occ in range(n_occupancies):
+            if endmember_occupancies[e][occ] > 1e-10:
+                a *= np.power(
+                        site_occupancies[occ], endmember_occupancies[e][occ] * site_multiplicities[occ])
+        normalisation_constant = np.exp(
+            endmember_configurational_entropies[e] / constants.gas_constant)
+        activities[e] = normalisation_constant * a
+    return activities
+
+@jit
+def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, We, Ws, Wv):
+    # -sum(sum(qi.qj.Wij*)
+    # equation (2) of Holland and Powell 2003
+    Eint = np.zeros(len(molar_fractions))
+    Sint = np.zeros(len(molar_fractions))
+    Vint = np.zeros(len(molar_fractions))
+    
+    for l in range(n_endmembers):
+        q = -phi
+        q[l] += 1.0
+
+        Eint[l] = 0. - alpha[l] * np.dot(q, np.dot(We, q))
+        Sint[l] = 0. - alpha[l] * np.dot(q, np.dot(Ws, q))
+        Vint[l] = 0. - alpha[l] * np.dot(q, np.dot(Wv, q))
+        
+    return Eint, Sint, Vint
 
 
 class SolutionModel(object):
@@ -226,20 +267,14 @@ class IdealSolution (SolutionModel):
                 e] / constants.gas_constant
         return lna
 
-    def _ideal_activities(self, molar_fractions):
-        site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        activities = np.empty(shape=(self.n_endmembers))
 
-        for e in range(self.n_endmembers):
-            activities[e] = 1.0
-            for occ in range(self.n_occupancies):
-                if self.endmember_occupancies[e][occ] > 1e-10:
-                    activities[e] = activities[e] * np.power(
-                        site_occupancies[occ], self.endmember_occupancies[e][occ] * self.site_multiplicities[occ])
-            normalisation_constant = np.exp(
-                self.endmember_configurational_entropies[e] / constants.gas_constant)
-            activities[e] = normalisation_constant * activities[e]
-        return activities
+    def _ideal_activities(self, molar_fractions):
+        return _ideal_activities_fct(molar_fractions, 
+                                     self.endmember_occupancies, 
+                                     self.n_endmembers, 
+                                     self.n_occupancies, 
+                                     self.site_multiplicities, 
+                                     self.endmember_configurational_entropies)
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         return np.ones_like(molar_fractions)
@@ -293,24 +328,12 @@ class AsymmetricRegularSolution (IdealSolution):
         phi = np.divide(phi, np.sum(phi))
         return phi
 
+
     def _non_ideal_interactions(self, molar_fractions):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
         phi = self._phi(molar_fractions)
-
-        q = np.zeros(len(molar_fractions))
-        Eint = np.zeros(len(molar_fractions))
-        Sint = np.zeros(len(molar_fractions))
-        Vint = np.zeros(len(molar_fractions))
-
-        for l in range(self.n_endmembers):
-            q = np.array([kd(i, l) - phi[i] for i in range(self.n_endmembers)])
-
-            Eint[l] = 0. - self.alpha[l] * np.dot(q, np.dot(self.We, q))
-            Sint[l] = 0. - self.alpha[l] * np.dot(q, np.dot(self.Ws, q))
-            Vint[l] = 0. - self.alpha[l] * np.dot(q, np.dot(self.Wv, q))
-
-        return Eint, Sint, Vint
+        return _non_ideal_interactions_fct(phi, molar_fractions, self.n_endmembers, self.alpha, self.We, self.Ws, self.Wv)
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
         Eint, Sint, Vint = self._non_ideal_interactions(molar_fractions)
