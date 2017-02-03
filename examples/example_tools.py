@@ -135,13 +135,23 @@ if __name__ == "__main__":
                '+/-', round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1))
     
     # Finally, let's plot our equation of state
+    T = 298.15
     pressures = np.linspace(1.e5, 60.e9, 101)
     volumes = np.empty_like(pressures)
-    for i, P in enumerate(pressures):
-        stv.set_state(P, 298.15)
-        volumes[i] = stv.V
 
-    plt.plot(pressures / 1.e9, volumes * 1.e6,
+    PTVs = np.empty((len(pressures), 3))
+    for i, P in enumerate(pressures):
+        stv.set_state(P, T)
+        PTVs[i] = [P, T, stv.V]
+        
+    bands = fitted_eos.confidence_prediction_bands(PTVs, 0.95, [])
+
+    plt.plot(bands[0][:,0]/1.e9, bands[0][:,2] * 1.e6, linestyle='--', color='r')
+    plt.plot(bands[1][:,0]/1.e9, bands[1][:,2] * 1.e6, linestyle='--', color='r')
+    plt.plot(bands[2][:,0]/1.e9, bands[2][:,2] * 1.e6, linestyle='--', color='b')
+    plt.plot(bands[3][:,0]/1.e9, bands[3][:,2] * 1.e6, linestyle='--', color='b')
+        
+    plt.plot(PTVs[:,0] / 1.e9, PTVs[:,2] * 1.e6,
              label='Optimized fit for stishovite')
     plt.errorbar(PTV[:,0] / 1.e9, PTV[:,2] * 1.e6,
                  xerr=PTV_covariances.T[0][0] / 1.e9,
