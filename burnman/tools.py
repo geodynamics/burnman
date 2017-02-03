@@ -12,10 +12,13 @@ import pkgutil
 import numpy as np
 from scipy.optimize import fsolve, curve_fit
 from scipy.ndimage.filters import gaussian_filter
-from . import constants
 from scipy.interpolate import interp2d
 from collections import Counter
 import itertools
+
+from . import constants
+from . import nonlinear_fitting
+
 
 def copy_documentation(copy_from):
     """
@@ -178,7 +181,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
+def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of PTV points and (optional) uncertainties,
@@ -197,41 +200,62 @@ def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
         during fitting. Initial guesses are taken from the existing
         values for the parameters
 
-    PT : list of two lists of floats (or numpy arrays)
-        The two lists contain a set of pressures [Pa]
-        and temperatures [K] of the volume data points
+    PTV : numpy array of observed PTV values
 
-    V : list (or numpy array) of floats
-        Volumes [m^3/mol] of the mineral at the P,T condition
-        given by parameter PT
-
-    V_sigma : list (or numpy array) of floats
-        Optional uncertainties on the volumes [m^3/mol]
-        of the mineral at the P,T condition
-        given by parameter PT
+    PTV_covariances : numpy array of PTV covariances (optional)
+        If not given, all covariance matrices are chosen 
+        such that C00 = 1, otherwise Cij = 0. 
+        In other words, all data points have equal weight, 
+        with all error in the pressure.
 
     Returns
     -------
-    popt : numpy array of floats
+    fitted_eos : instance of nonlinear_least_squares class
         A list of optimized parameters
-
-    pcov : 2D numpy array of floats
-        The covariance matrix of the optimized parameters
     """
-    def fit_data(PT, *params):
-        for i, param in enumerate(fit_params):
-            mineral.params[param] = params[i]
-        volumes = []
 
-        for P, T in zip(*PT):
-            mineral.set_state(P, T)
-            volumes.append(mineral.V)
-        return volumes
+    class Model():
+        def __init__(self, m, fit_params, guessed_params, delta_params):
+            self.m = m
+            self.fit_params = fit_params
+            self.set_params(guessed_params)
+            self.delta_params = delta_params
+            
+        def set_params(self, param_values):
+            for i, param in enumerate(self.fit_params):
+                self.m.params[param] = param_values[i]
+        
+        def get_params(self):
+            params = np.empty(len(self.fit_params))
+            for i, param in enumerate(self.fit_params):
+                params[i] = self.m.params[param]
+            return params
 
-    guesses = [mineral.params[param] for param in fit_params]
-    popt, pcov = curve_fit(fit_data, PT, V, guesses, V_sigma)
+        def function(self, x):
+            P, T, Vobs = x
+            self.m.set_state(P, T)
+            return np.array([P, T, self.m.V])
 
-    return popt, pcov
+        def normal(self, x):
+            P, T, Vobs = x
+            self.m.set_state(P, T)
+            n = np.array([-1., self.m.alpha*self.m.K_T, -self.m.K_T/self.m.V])
+            return n/np.linalg.norm(n)
+
+    guessed_params = np.array([mineral.params[prm] for prm in fit_params])
+    delta_params = guessed_params*1.e-5
+
+    mineral.set_state(1.e5, 300.)
+    mle_tolerance = 1.e-5*mineral.V
+    
+    fitted_eos = nonlinear_fitting.NonlinearLeastSquaresFit(x=PTV, cov=PTV_covariances,
+                                                            mle_tolerance=mle_tolerance,
+                                                            model=Model(mineral,
+                                                                        fit_params,
+                                                                        guessed_params,
+                                                                        delta_params))
+
+    return fitted_eos
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):
