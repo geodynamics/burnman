@@ -153,7 +153,7 @@ class NonlinearLeastSquaresFit():
         for i, Gprime in enumerate(dxdbeta.T):
             variance[i] = Gprime.T.dot(self.pcov).dot(Gprime)
 
-        critical_value = t.isf(confidence_interval, self.dof)
+        critical_value = t.isf(0.5*(confidence_interval + 1.), self.dof)
         
         confidence_half_widths = critical_value*np.sqrt(variance)
         prediction_half_widths = critical_value*np.sqrt(variance + self.noise_variance)
