@@ -144,12 +144,12 @@ if __name__ == "__main__":
         stv.set_state(P, T)
         PTVs[i] = [P, T, stv.V]
         
-    bands = fitted_eos.confidence_prediction_bands(PTVs, 0.95, [])
+    cp_bands = fitted_eos.confidence_prediction_bands(PTVs, 0.95, [])
 
-    plt.plot(bands[0][:,0]/1.e9, bands[0][:,2] * 1.e6, linestyle='--', color='r')
-    plt.plot(bands[1][:,0]/1.e9, bands[1][:,2] * 1.e6, linestyle='--', color='r')
-    plt.plot(bands[2][:,0]/1.e9, bands[2][:,2] * 1.e6, linestyle='--', color='b')
-    plt.plot(bands[3][:,0]/1.e9, bands[3][:,2] * 1.e6, linestyle='--', color='b')
+    plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
+    plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
+    plt.plot(cp_bands[2][:,0]/1.e9, cp_bands[2][:,2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
+    plt.plot(cp_bands[3][:,0]/1.e9, cp_bands[3][:,2] * 1.e6, linestyle='--', color='b')
         
     plt.plot(PTVs[:,0] / 1.e9, PTVs[:,2] * 1.e6,
              label='Optimized fit for stishovite')
