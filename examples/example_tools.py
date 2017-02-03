@@ -144,7 +144,7 @@ if __name__ == "__main__":
         stv.set_state(P, T)
         PTVs[i] = [P, T, stv.V]
         
-    cp_bands = fitted_eos.confidence_prediction_bands(PTVs, 0.95, [])
+    cp_bands = fitted_eos.orthogonal_distance_confidence_prediction_bands(PTVs, 0.95, [])
 
     plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
     plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
@@ -164,6 +164,18 @@ if __name__ == "__main__":
     plt.title("Stishovite EoS (room temperature)")
     plt.show()
 
+
+    cp2_bands = fitted_eos.secondary_function_confidence_prediction_bands(PTVs, 0.95)
+    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e9, linestyle='--', color='b', label='Best fit')
+    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
+    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/1.e9, linestyle='--', color='r')
+    plt.ylabel("Bulk modulus (GPa)")
+    plt.xlabel("Pressure (GPa)")
+    plt.legend(loc="upper right")
+    plt.title("Stishovite EoS; uncertainty in bulk modulus (room temperature)")
+    plt.show()
+
+    
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
     print('')
     print('Hugoniot calculations')

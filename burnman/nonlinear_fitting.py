@@ -119,7 +119,7 @@ class NonlinearLeastSquaresFit():
         # Estimate the noise variance normal to the curve
         self.noise_variance = r.dot(np.diag(1./self.weights)).dot(r.T)/self.dof
 
-    def confidence_prediction_bands(self, x_array, confidence_interval, projection_axis=[]):
+    def orthogonal_distance_confidence_prediction_bands(self, x_array, confidence_interval, projection_axis=[]):
         '''
         The delta method states that the variance of a function f with parameters B will be
         f'(B, x) Var(B) f'(B, x)
@@ -175,6 +175,60 @@ class NonlinearLeastSquaresFit():
         confidence_bound_1 = x_m_0 + projected_confidence_half_widths
         prediction_bound_0 = x_m_0 - projected_prediction_half_widths
         prediction_bound_1 = x_m_0 + projected_prediction_half_widths
+
+
+        return np.array([confidence_bound_0, confidence_bound_1,
+                         prediction_bound_0, prediction_bound_1])
+
+
+
+    def secondary_function_confidence_prediction_bands(self, x_array, confidence_interval):
+        '''
+        The delta method states that the variance of a function f with parameters B will be
+        f'(B, x) Var(B) f'(B, x)
+        where f' is the vector of partial derivatives of the function with respect to B 
+        '''
+        
+        # Check array dimensions
+        if len(x_array[0]) != self.n_dimensions:
+            raise Exception('Dimensions of each point must be the same as the total number of dimensions')
+
+        
+        param_values = self.model.get_params()
+        normals = np.empty_like(x_array)
+        x_m_0 = np.empty_like(x_array)
+        f_m_0 = np.empty(len(x_array))
+        for i, x in enumerate(x_array):
+            normals[i] = self.model.normal(x)
+            x_m_0[i] = self.model.function(x)
+            f_m_0[i] = self.model.function2(x)
+            
+        diag_delta = np.diag(self.model.delta_params)
+        dxdbeta = np.empty([self.n_params, len(x_array)])      
+        for i, value in enumerate(param_values):
+            self.model.set_params(param_values + diag_delta[i])
+
+            for j, x in enumerate(x_m_0):
+                x_hat = self.model.function(x + (self.model.function(x) - x).dot(normals[j]))
+                dxdbeta[i][j] = (self.model.function2(x_hat) - f_m_0[j])/diag_delta[i][i]
+
+        self.model.set_params(param_values) # reset params
+        
+
+        variance = np.empty(len(x_array))
+        for i, Gprime in enumerate(dxdbeta.T):
+            variance[i] = Gprime.T.dot(self.pcov).dot(Gprime)
+
+        critical_value = t.isf(0.5*(confidence_interval + 1.), self.dof)
+        
+        confidence_half_widths = critical_value*np.sqrt(variance)
+        prediction_half_widths = critical_value*np.sqrt(variance + self.noise_variance)
+
+        
+        confidence_bound_0 = f_m_0 - confidence_half_widths
+        confidence_bound_1 = f_m_0 + confidence_half_widths
+        prediction_bound_0 = f_m_0 - prediction_half_widths
+        prediction_bound_1 = f_m_0 + prediction_half_widths
 
 
         return np.array([confidence_bound_0, confidence_bound_1,

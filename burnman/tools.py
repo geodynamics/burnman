@@ -236,6 +236,11 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
             self.m.set_state(P, T)
             return np.array([P, T, self.m.V])
 
+        def function2(self, x):
+            P, T, Vobs = x
+            self.m.set_state(P, T)
+            return self.m.K_T
+
         def normal(self, x):
             P, T, Vobs = x
             self.m.set_state(P, T)
