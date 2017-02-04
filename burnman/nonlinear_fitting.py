@@ -157,7 +157,7 @@ def nonlinear_least_squares_fit(model,
     model.dof = n_data - n_params
     
 
-    for n_it in xrange(max_lm_iterations):
+    for n_it in range(max_lm_iterations):
         f_delta_beta = _update_beta(lm_damping)
         if np.max(np.abs(f_delta_beta)) < param_tolerance:
             break
@@ -433,8 +433,8 @@ def corner_plot(popt, pcov, param_names=[]):
 
     fig = plt.figure()
     
-    for i in xrange(n_params):
-        for j in xrange(i+1, n_params):
+    for i in range(n_params):
+        for j in range(i+1, n_params):
             indices = np.array([i, j])
             projected_cov = (pcov*scaling)[indices[:, None], indices]
 
@@ -451,10 +451,10 @@ def corner_plot(popt, pcov, param_names=[]):
             ax.set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
 
     if param_names != []:
-        for i in xrange(n_params-1):
+        for i in range(n_params-1):
             ax = fig.add_subplot(n_params-1, n_params-1, (n_params-2)*(n_params-1)+(i+1))
             ax.set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
-        for j in xrange(n_params-1):
+        for j in range(n_params-1):
             ax = fig.add_subplot(n_params-1, n_params-1, j*(n_params-1)+1)
             ax.set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j+1], -int(np.log10(np.sqrt(scaling[j+1][j+1])))))
             

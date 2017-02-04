@@ -15,9 +15,9 @@ fo -> wad equilibrium at 14.0 GPa is reached at 1650.0 K
 
 Equation of state calculations
 Optimized equation of state for stishovite:
-V_0: 1.4006e-05 +/- 9e-09
-K_0: 3.12e+11 +/- 10000000000.0
-Kprime_0: 4.4 +/- 0.5
+V_0: (1.4003 +/- 0.0009) x 1e-05
+K_0: (3.19 +/- 0.09) x 1e+11
+Kprime_0: (3.9 +/- 0.5) x 1e+00
 
 Hugoniot calculations
 Room temperature Hugoniot temperature at 120.0 GPa: 1769 K

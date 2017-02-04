@@ -50,7 +50,7 @@ class test_tools(BurnManTest):
 
         PTV = np.empty((len(pressures), 3))
 
-        for i in xrange(len(pressures)):
+        for i in range(len(pressures)):
             fo.set_state(pressures[i], temperatures[i])
             PTV[i] = [pressures[i], temperatures[i], fo.V]
 

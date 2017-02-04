@@ -125,15 +125,18 @@ if __name__ == "__main__":
     # The mineral parameters are automatically updated during fitting
     stv = burnman.minerals.HP_2011_ds62.stv()
     params = ['V_0', 'K_0', 'Kprime_0']
-    fitted_eos = burnman.tools.fit_PTV_data(stv, params, PTV, PTV_covariances)
+    fitted_eos = burnman.tools.fit_PTV_data(stv, params, PTV, PTV_covariances, verbose=False)
 
     # Print the optimized parameters
     print('Equation of state calculations')
     print('Optimized equation of state for stishovite:')
     for i, p in enumerate(params):
-        print (p + ':', round_to_n(fitted_eos.popt[i], np.sqrt(fitted_eos.pcov[i][i]), 1),
-               '+/-', round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1))
-
+        p_rnd = round_to_n(fitted_eos.popt[i], np.sqrt(fitted_eos.pcov[i][i]), 1)
+        c_rnd = round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1)
+        scale = np.power(10., np.floor(np.log10(p_rnd)))
+        nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
+        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+               
 
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
