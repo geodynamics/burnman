@@ -10,27 +10,30 @@ def nonlinear_least_squares_fit(model,
                                 verbose = False):
 
     """
-    Base class for optimal nonlinear least squares fitting.
+    Function to compute the "best-fit" parameters for a model
+    by nonlinear least squares fitting.
 
     The nonlinear least squares algorithm closely follows the logic in 
     Section 23.1 of Bayesian Probability Theory
     (von der Linden et al., 2014; Cambridge University Press).
 
-    Initialisation inputs
-    ---------------------
-    x : 2D numpy array. 
-        Elements of x[i][j] contain the observed position of 
-        data point i
-
-    cov : 3D numpy array
-        Elements of cov[i][j][k] contain the covariance matrix
-        of data point i
-
-    mle_tolerance : float
-        
-
+    Parameters
+    ----------
+    
     model : class instance
-        Must contain the following functions:
+        Must have the following attributes:
+            data : 2D numpy array. 
+                Elements of x[i][j] contain the observed position of 
+                data point i
+
+            data_covariance : 3D numpy array
+                Elements of cov[i][j][k] contain the covariance matrix
+                of data point i
+
+            delta_params : numpy array
+                parameter perturbations used to compute the jacobian
+
+        Must also contain the following functions:
             set_params(self, param_values):
                 Function to set parameters
 
@@ -47,26 +50,33 @@ def nonlinear_least_squares_fit(model,
                 Returns value of normal to the model function 
                 evaluated at x
 
+    mle_tolerance : float
+        Tolerance value for 
+        np.linalg.norm(x_mle_i - model.function(x_mle_i))
+        to stop iterating to find the maximum likelihood estimator
+
     lm_damping : float (optional, default: 0)
+        Levenberg-Marquardt parameter for least squares minimization
 
     param_tolerance : float (optional, default: 1.e-7)
+        Maximum fractional change in any of the parameters during
+        a Levenberg-Marquardt iteration required to stop
+        iterations
 
     max_lm_iterations : integer (optional, default: 100)
+        Maximum number of Levenberg-Marquardt iterations
 
     verbose : bool
+        Print some information to standard output
         
 
-    Attributes
+    Attributes added to model
     ----------
-    As above, plus 
-    n_dimensions : integer
-        Number of dimensions
-    n_data : integer
-        Number of data points
-    n_params : integer
-        Number of fitting params
     n_dof : integer
         Degrees of freedom of the system
+    data_mle : 2D numpy array
+        Maximum likelihood estimates of the observed data points 
+        on the best-fit curve
     jacobian : 2D numpy array
         d(weighted_residuals)/d(parameter)
     weighted_residuals : numpy array
@@ -82,7 +92,7 @@ def nonlinear_least_squares_fit(model,
     noise_variance : float
         Estimate of the variance of the data normal to the curve
 
-    This class is available as ``burnman.NonlinearLeastSquaresFit``.
+    This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
     def normalised(a, order=2, axis=-1):
         l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
@@ -137,7 +147,7 @@ def nonlinear_least_squares_fit(model,
         # Performs a Levenberg-Marquardt iteration
         # Note that if lambda = 0, this is a simple Gauss-Newton iteration
         calculate_jacobian()
-        model.x_mle, model.weighted_residuals, model.weights = _find_mle()
+        model.data_mle, model.weighted_residuals, model.weights = _find_mle()
 
         J = model.jacobian # this the weighted Jacobian
         JTJ = J.T.dot(J)
@@ -157,8 +167,8 @@ def nonlinear_least_squares_fit(model,
     tol_achieved = False
     while tol_achieved == False and n_it < max_lm_iterations:
         n_it += 1
-        delta_beta = _update_beta(lm_damping)
-        tol_achieved = np.min(np.abs(delta_beta)) < param_tolerance
+        f_delta_beta = _update_beta(lm_damping)
+        tol_achieved = np.min(np.abs(f_delta_beta)) < param_tolerance
         
     if verbose == True:
         print 'Converged in {0:d} iterations'.format(n_it)
