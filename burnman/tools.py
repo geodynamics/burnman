@@ -181,7 +181,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[]):
+def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of PTV points and (optional) uncertainties,
@@ -272,12 +272,12 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[]):
 
     if PTV_covariances == []:
         PTV_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
-        for i in PTV_covariances:
+        for i in xrange(len(PTV_covariances)):
             PTV_covariances[i][0][0] = 1.
             
     model.data_covariance=PTV_covariances
     mineral.set_state(1.e5, 300.)
-    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V, verbose=True)
+    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V, verbose=verbose)
 
     return model
 
