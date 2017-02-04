@@ -133,7 +133,12 @@ if __name__ == "__main__":
     for i, p in enumerate(params):
         print (p + ':', round_to_n(fitted_eos.popt[i], np.sqrt(fitted_eos.pcov[i][i]), 1),
                '+/-', round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1))
-    
+
+
+    # Create a corner plot of the covariances
+    fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
+    plt.show()
+        
     # Finally, let's plot our equation of state
     T = 298.15
     pressures = np.linspace(1.e5, 60.e9, 101)

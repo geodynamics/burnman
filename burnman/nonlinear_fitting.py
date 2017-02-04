@@ -1,7 +1,11 @@
 import numpy as np
 from scipy.stats import t
 import itertools
-    
+import copy
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+
 def nonlinear_least_squares_fit(model,
                                 mle_tolerance,
                                 lm_damping = 0.,
@@ -93,14 +97,6 @@ def nonlinear_least_squares_fit(model,
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
-    def normalised(a, order=2, axis=-1):
-        l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
-        l2[l2==0] = 1
-        return a / np.expand_dims(l2, axis)[0][0]
-
-    def abs_line_project(M, n):
-        n = normalised(n)
-        return n.dot(M).dot(n.T)
 
     def _mle_estimate(x, x_m, cov):
         n = model.normal(x_m)
@@ -360,4 +356,106 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval):
     return np.array([confidence_bound_0, confidence_bound_1,
                      prediction_bound_0, prediction_bound_1])
 
+def normalised(a, order=2, axis=-1):
+    l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
+    l2[l2==0] = 1
+    return a / np.expand_dims(l2, axis)[0][0]
 
+def abs_line_project(M, n):
+    n = normalised(n)
+    return n.dot(M).dot(n.T)
+
+def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
+    """
+    Plots an `nstd` sigma error ellipse based on the specified covariance
+    matrix (`cov`). Additional keyword arguments are passed on to the 
+    ellipse patch artist.
+
+    Parameters
+    ----------
+        cov : The 2x2 covariance matrix to base the ellipse on
+        pos : The location of the center of the ellipse. Expects a 2-element
+            sequence of [x0, y0].
+        nstd : The radius of the ellipse in numbers of standard deviations.
+            Defaults to 2 standard deviations.
+        ax : The axis that the ellipse will be plotted on. Defaults to the 
+            current axis.
+        Additional keyword arguments are pass on to the ellipse patch.
+
+    Returns
+    -------
+        A matplotlib ellipse artist
+    """
+    def eigsorted(cov):
+        vals, vecs = np.linalg.eigh(cov)
+        order = vals.argsort()[::-1]
+        return vals[order], vecs[:,order]
+
+    if ax is None:
+        ax = plt.gca()
+        
+    vals, vecs = eigsorted(cov)
+    theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
+
+    # Width and height are "full" widths, not radius
+    width, height = 2 * nstd * np.sqrt(vals)
+    ellip = Ellipse(xy=pos, width=width, height=height, angle=theta, **kwargs)
+
+    ax.add_artist(ellip)
+    return ellip
+
+
+def corner_plot(popt, pcov, param_names=[]):
+    """
+    Creates a corner plot of covariances
+
+    Parameters
+    ----------
+
+
+    Returns
+    -------
+    fig : Instance of matplotlib.pyplot.figure
+
+    """
+    
+    if len(pcov[0]) != len(pcov[:,0]):
+        raise Exception('Covariance matrices must be square')
+
+    n_params = len(pcov[0])
+    if n_params < 2:
+        raise Exception('Covariance matrix must be at least 2x2 for a corner plot to be plotted')
+
+    
+    # ellipse plotting is prone to rounding errors, so we scale the plots here
+    scaling = 1./np.power(10., np.around(np.log10(popt) - 0.5))
+    scaling = np.outer(scaling, scaling)
+
+    fig = plt.figure()
+    
+    for i in xrange(n_params):
+        for j in xrange(i+1, n_params):
+            indices = np.array([i, j])
+            projected_cov = (pcov*scaling)[indices[:, None], indices]
+
+            scaled_pos = np.array([popt[i]*np.sqrt(scaling[i][i]),
+                                   popt[j]*np.sqrt(scaling[j][j])])
+
+            nstd = 1.
+            ax = fig.add_subplot(n_params-1, n_params-1, (j-1)*(n_params-1)+(i+1))
+            plot_cov_ellipse(cov=projected_cov, pos=scaled_pos,
+                             nstd=nstd, ax=ax, color='grey')
+            maxx = 1.5*nstd*np.sqrt(projected_cov[0][0])
+            maxy = 1.5*nstd*np.sqrt(projected_cov[1][1])
+            ax.set_xlim(scaled_pos[0]-maxx, scaled_pos[0]+maxx)
+            ax.set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
+
+    if param_names != []:
+        for i in xrange(n_params-1):
+            ax = fig.add_subplot(n_params-1, n_params-1, (n_params-2)*(n_params-1)+(i+1))
+            ax.set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
+        for j in xrange(n_params-1):
+            ax = fig.add_subplot(n_params-1, n_params-1, j*(n_params-1)+1)
+            ax.set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j+1], -int(np.log10(np.sqrt(scaling[j+1][j+1])))))
+            
+    return fig
