@@ -166,9 +166,9 @@ if __name__ == "__main__":
 
     
     cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
-                                                                      burnman.nonlinear_fitting.attribute_function(stv, 'K_T'),
+                                                                      burnman.tools.attribute_function(stv, 'K_T'),
                                                                       PTVs, 0.95)
-    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e9, linestyle='--', color='b', label='Best fit')
+    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e9, color='b', label='Best fit')
     plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
     plt.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/1.e9, linestyle='--', color='r')
     plt.ylabel("Bulk modulus (GPa)")

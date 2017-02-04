@@ -181,7 +181,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
+def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[]):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of PTV points and (optional) uncertainties,
@@ -210,8 +210,27 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
 
     Returns
     -------
-    fitted_eos : instance of nonlinear_least_squares class
-        A list of optimized parameters
+    model : instance of fitted model
+        Fitting-related attributes are as follows:
+            n_dof : integer
+                Degrees of freedom of the system
+            data_mle : 2D numpy array
+                Maximum likelihood estimates of the observed data points 
+                on the best-fit curve
+            jacobian : 2D numpy array
+                d(weighted_residuals)/d(parameter)
+            weighted_residuals : numpy array
+                Weighted residuals
+            weights : numpy array
+                1/(data variances normal to the best fit curve)
+            WSS : float
+                Weighted sum of squares residuals
+            popt : numpy array
+                Optimized parameters
+            pcov : 2D numpy array
+                Covariance matrix of optimized parameters
+            noise_variance : float
+                Estimate of the variance of the data normal to the curve
     """
 
     class Model(object):
@@ -250,9 +269,15 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
                   delta_params=guessed_params*1.e-5)
 
     model.data = PTV
+
+    if PTV_covariances == []:
+        PTV_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
+        for i in PTV_covariances:
+            PTV_covariances[i][0][0] = 1.
+            
     model.data_covariance=PTV_covariances
     mineral.set_state(1.e5, 300.)
-    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V)
+    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V, verbose=True)
 
     return model
 
@@ -670,7 +695,6 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
             
     return consistency
 
-
 def _pad_ndarray_inverse_mirror(array, padding):
     """
     Pads an ndarray according to an inverse mirror
@@ -845,3 +869,45 @@ def interp_smoothed_array_and_derivatives(array,
                interp2d(x_values, y_values, dSAdydy/dy, kind='linear'))
 
     return interps
+
+
+def attribute_function(m, attributes, powers=[]):
+    """
+    Function which returns a function which can be used to 
+    evaluate material properties at a point. This function 
+    allows the user to define the property returned 
+    as a string. The function can itself be passed to another 
+    function 
+    (such as nonlinear_fitting.confidence_prediction_bands()).
+
+    Properties can either be simple attributes (e.g. K_T) or
+    a product of attributes, each raised to some power.
+
+    Parameters
+    ----------
+    m : Material
+        The material instance evaluated by the output function.
+    attributes : list of strings
+        The list of material attributes / properties to
+        be evaluated in the product
+    powers : list of floats
+        The powers to which each attribute should be raised 
+        during evaluation
+    Returns
+    -------
+    f : function(x)
+        Function which returns the value of product(a_i**p_i)
+        as a function of condition (x = [P, T, V])
+    """
+    if type(attributes) is str:
+        attributes = [attributes]
+    if powers == []:
+        powers = [1. for a in attributes]
+    def f(x):
+        P, T, V = x
+        m.set_state(P, T)
+        value = 1.
+        for a, p in zip(*[attributes, powers]):
+            value *= np.power(getattr(m, a), p)
+        return value
+    return f

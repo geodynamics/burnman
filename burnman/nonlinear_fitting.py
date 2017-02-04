@@ -5,7 +5,7 @@ import itertools
 def nonlinear_least_squares_fit(model,
                                 mle_tolerance,
                                 lm_damping = 0.,
-                                param_tolerance = 1.e-7,
+                                param_tolerance = 1.e-5,
                                 max_lm_iterations = 100,
                                 verbose = False):
 
@@ -19,7 +19,6 @@ def nonlinear_least_squares_fit(model,
 
     Parameters
     ----------
-    
     model : class instance
         Must have the following attributes:
             data : 2D numpy array. 
@@ -58,10 +57,10 @@ def nonlinear_least_squares_fit(model,
     lm_damping : float (optional, default: 0)
         Levenberg-Marquardt parameter for least squares minimization
 
-    param_tolerance : float (optional, default: 1.e-7)
-        Maximum fractional change in any of the parameters during
-        a Levenberg-Marquardt iteration required to stop
-        iterations
+    param_tolerance : float (optional, default: 1.e-5)
+        Levenberg-Marquardt iterations are terminated when 
+        the maximum fractional change in any of the parameters 
+        during an iteration drops below this value
 
     max_lm_iterations : integer (optional, default: 100)
         Maximum number of Levenberg-Marquardt iterations
@@ -140,8 +139,6 @@ def nonlinear_least_squares_fit(model,
             
             model.jacobian[:,prm_i] = (residual_arr_1 - residual_arr_0)/(2.*diag_delta[prm_i][prm_i])
         model.set_params(param_values) # reset params
-        
-        return None
 
     def _update_beta(lmbda):
         # Performs a Levenberg-Marquardt iteration
@@ -163,16 +160,12 @@ def nonlinear_least_squares_fit(model,
     n_dimensions = len(model.data[:,0])
     model.dof = n_data - n_params
     
-    n_it = -1
-    tol_achieved = False
-    while tol_achieved == False and n_it < max_lm_iterations:
-        n_it += 1
-        f_delta_beta = _update_beta(lm_damping)
-        tol_achieved = np.min(np.abs(f_delta_beta)) < param_tolerance
-        
-    if verbose == True:
-        print 'Converged in {0:d} iterations'.format(n_it)
 
+    for n_it in xrange(max_lm_iterations):
+        f_delta_beta = _update_beta(lm_damping)
+        if np.max(np.abs(f_delta_beta)) < param_tolerance:
+            break
+        
     J = model.jacobian
     r = model.weighted_residuals
     model.WSS = r.dot(r.T)
@@ -182,14 +175,57 @@ def nonlinear_least_squares_fit(model,
     
     # Estimate the noise variance normal to the curve
     model.noise_variance = r.dot(np.diag(1./model.weights)).dot(r.T)/model.dof
+    
+    if verbose == True:
+        if n_it == max_lm_iterations - 1:
+            print('Max iterations ({0:d}) reached (param tolerance = {1:1e})'.format(max_lm_iterations, param_tolerance))
+        else:
+            print('Converged in {0:d} iterations'.format(n_it))
+        print('\nOptimised parameter values:')
+        print(model.popt)
+        print('\nParameter covariance matrix:')
+        print(model.pcov)
+        print('')
+
 
     
 def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_interval, projection_axis=[]):
-    '''
-    The delta method states that the variance of a function f with parameters B will be
-    f'(B, x) Var(B) f'(B, x)
-    where f' is the vector of partial derivatives of the function with respect to B 
-    '''
+    """
+    This function calculates the confidence and prediction bands of the orthogonal distance 
+    from a best-fit model with uncertainties in its parameters as calculated (for example) 
+    by the function nonlinear_least_squares_fit().
+
+    The values are calculated via the delta method, which estimates the variance of a function f 
+    evaluated at x as var(f,x) = df(x)/dB var(B) df(x)/dB
+    where df(x)/dB is the vector of partial derivatives of f(x) with respect to B 
+
+
+    Parameters
+    ----------
+    model : class instance
+        As modified (for example) by the function nonlinear_least_squares_fit().
+        Should contain the following attributes:
+            function, normal, delta_params, pcov, dof, noise_variance
+
+    x_array : 2D numpy array
+        coordinates at which to evaluate the bounds
+
+    confidence_interval : float
+        Probability level of finding the true model (confidence bound) or any new 
+        data point (probability bound). For example, the 95% confidence bounds 
+        should be calculated using a confidence interval of 0.95.
+
+    projection_axis : list or numpy array
+        Axis along which the confidence bounds should be projected
+        For example, we are often interested in plotting the confidence and prediction
+        bounds as a function of a single coordinate direction.
+
+    Output
+    ------
+    bounds : 3D numpy array
+        An element of bounds[i][j][k] gives the lower and upper confidence (i=0, i=1) and
+        prediction (i=2, i=3) bounds for the jth data point on the kth coordinate axis.
+    """
     
     # Check array dimensions
     n_dimensions = len(model.data[0])
@@ -245,12 +281,39 @@ def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_i
     return np.array([confidence_bound_0, confidence_bound_1,
                      prediction_bound_0, prediction_bound_1])
     
-def confidence_prediction_bands(model, function, x_array, confidence_interval):
-    '''
-    The delta method states that the variance of a function f with parameters B will be
-    f'(B, x) Var(B) f'(B, x)
-    where f' is the vector of partial derivatives of the function with respect to B 
-    '''
+def confidence_prediction_bands(model, f, x_array, confidence_interval):
+    """
+    This function calculates the confidence and prediction bands of the function f
+    from a best-fit model with uncertainties in its parameters as calculated (for example) 
+    by the function nonlinear_least_squares_fit().
+
+    The values are calculated via the delta method, which estimates the variance of f 
+    evaluated at x as var(f(x)) = df(x)/dB var(B) df(x)/dB
+    where df(x)/dB is the vector of partial derivatives of f(x) with respect to B 
+
+
+    Parameters
+    ----------
+    model : class instance
+        As modified (for example) by the function nonlinear_least_squares_fit().
+        Should contain the following attributes:
+            function, normal, delta_params, pcov, dof, noise_variance
+
+    x_array : 2D numpy array
+        coordinates at which to evaluate the bounds
+
+    confidence_interval : float
+        Probability level of finding the true model (confidence bound) or any new 
+        data point (probability bound). For example, the 95% confidence bounds 
+        should be calculated using a confidence interval of 0.95.
+
+
+    Output
+    ------
+    bounds : 2D numpy array
+        An element of bounds[i][j] gives the lower and upper confidence (i=0, i=1) and
+        prediction (i=2, i=3) bounds for the jth data point.
+    """
     
     # Check array dimensions
     n_dimensions = len(model.data[0])
@@ -265,7 +328,7 @@ def confidence_prediction_bands(model, function, x_array, confidence_interval):
     for i, x in enumerate(x_array):
         normals[i] = model.normal(x)
         x_m_0s[i] = model.function(x)
-        f_m_0s[i] = function(x)
+        f_m_0s[i] = f(x)
             
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])
@@ -275,7 +338,7 @@ def confidence_prediction_bands(model, function, x_array, confidence_interval):
 
         for j, x_m_0 in enumerate(x_m_0s):
             x_m_1 = x_m_0 + ((model.function(x_m_0) - x_m_0).dot(normals[j]))*normals[j]
-            dxdbeta[i][j] = (function(x_m_1) - f_m_0s[j])/diag_delta[i][i]
+            dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j])/diag_delta[i][i]
 
     model.set_params(param_values) # reset params
     
@@ -298,17 +361,3 @@ def confidence_prediction_bands(model, function, x_array, confidence_interval):
                      prediction_bound_0, prediction_bound_1])
 
 
-
-def attribute_function(mineral, attributes, powers=[]):
-    if type(attributes) is str:
-        attributes = [attributes]
-    if powers == []:
-        powers = [1. for a in attributes]
-    def f(x):
-        P, T, V = x
-        mineral.set_state(P, T)
-        value = 1.
-        for a, p in zip(*[attributes, powers]):
-            value *= np.power(getattr(mineral, a), p)
-        return value
-    return f
