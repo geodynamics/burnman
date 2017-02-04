@@ -1,235 +1,304 @@
 import numpy as np
 from scipy.stats import t
+import itertools
+    
+def nonlinear_least_squares_fit(model,
+                                mle_tolerance,
+                                lm_damping = 0.,
+                                param_tolerance = 1.e-7,
+                                max_lm_iterations = 100,
+                                verbose = False):
 
-class NonlinearLeastSquaresFit():
-    '''
-    This is the base class for optimal 
-    nonlinear least squares fits
-    The algorithm closely follows the logic in 
+    """
+    Base class for optimal nonlinear least squares fitting.
+
+    The nonlinear least squares algorithm closely follows the logic in 
     Section 23.1 of Bayesian Probability Theory
-    (von der Linden et al., 2014; Cambridge University Press)
-    '''
+    (von der Linden et al., 2014; Cambridge University Press).
 
-    def __init__(self, x, cov, 
-                 mle_tolerance,
-                 model,
-                 lm_damping = 0.,
-                 param_tolerance = 1.e-7,
-                 max_lm_iterations = 100.,
-                 verbose = False):
+    Initialisation inputs
+    ---------------------
+    x : 2D numpy array. 
+        Elements of x[i][j] contain the observed position of 
+        data point i
+
+    cov : 3D numpy array
+        Elements of cov[i][j][k] contain the covariance matrix
+        of data point i
+
+    mle_tolerance : float
         
-        self.x_arr = x
-        self.cov_arr = cov
-        self.mle_tolerance = mle_tolerance
-        self.model = model
-        self.lm_damping = lm_damping
-        self.max_lm_iterations = max_lm_iterations
-        self.param_tolerance = param_tolerance
-        self.verbose = verbose
 
-        self.n_dimensions = len(x[0])
-        self.n_data = len(x)
-        self.n_params = len(model.get_params())
-        self.dof = self.n_data - self.n_params
+    model : class instance
+        Must contain the following functions:
+            set_params(self, param_values):
+                Function to set parameters
+
+            get_params(self):
+                Function to get current model parameters
+
+            function(self, x):
+                Returns value of model function evaluated at x
+
+            (self, x):
+                Returns value of model function evaluated at x
+
+            normal(self, x):
+                Returns value of normal to the model function 
+                evaluated at x
+
+    lm_damping : float (optional, default: 0)
+
+    param_tolerance : float (optional, default: 1.e-7)
+
+    max_lm_iterations : integer (optional, default: 100)
+
+    verbose : bool
         
-        self.calculate_best_fit()
 
-    def normalised(self, a, order=2, axis=-1):
+    Attributes
+    ----------
+    As above, plus 
+    n_dimensions : integer
+        Number of dimensions
+    n_data : integer
+        Number of data points
+    n_params : integer
+        Number of fitting params
+    n_dof : integer
+        Degrees of freedom of the system
+    jacobian : 2D numpy array
+        d(weighted_residuals)/d(parameter)
+    weighted_residuals : numpy array
+        Weighted residuals
+    weights : numpy array
+        1/(data variances normal to the best fit curve)
+    WSS : float
+        Weighted sum of squares residuals
+    popt : numpy array
+        Optimized parameters
+    pcov : 2D numpy array
+        Covariance matrix of optimized parameters
+    noise_variance : float
+        Estimate of the variance of the data normal to the curve
+
+    This class is available as ``burnman.NonlinearLeastSquaresFit``.
+    """
+    def normalised(a, order=2, axis=-1):
         l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
         l2[l2==0] = 1
         return a / np.expand_dims(l2, axis)[0][0]
-    
-    def abs_line_project(self, M, n):
-        n = self.normalised(n)
+
+    def abs_line_project(M, n):
+        n = normalised(n)
         return n.dot(M).dot(n.T)
 
-    def _mle_estimate(self, x, x_m, cov):
-        n = self.model.normal(x_m)
-        var_n = self.abs_line_project(cov, n)
+    def _mle_estimate(x, x_m, cov):
+        n = model.normal(x_m)
+        var_n = abs_line_project(cov, n)
         d = (x_m - x).dot(n)
         x_mle = x + d*((n.dot(cov)).T)/var_n
         return x_mle, d, var_n
-
-    def _find_mle(self):
-        x_mle_arr = np.empty_like(self.x_arr)
-        residual_arr = np.empty(self.n_data)
-        var_arr = np.empty(self.n_data)
-
-        for i, (x, cov) in enumerate(zip(*[self.x_arr, self.cov_arr])):
-            x_mle_arr[i] = self.model.function(x)
-            x_mle_est, residual_arr[i], var_arr[i] = self._mle_estimate(x, x_mle_arr[i], cov)
+    
+    def _find_mle():
+        x_mle_arr = np.empty_like(model.data)
+        residual_arr = np.empty(n_data)
+        var_arr = np.empty(n_data)
+        for i, (x, cov) in enumerate(zip(*[model.data, model.data_covariance])):
+            x_mle_arr[i] = model.function(x)
+            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov)
             delta_x = x_mle_arr[i] - x
         
-            while np.linalg.norm(delta_x) > self.mle_tolerance:
-                x_mle_est, residual_arr[i], var_arr[i] = self._mle_estimate(x, x_mle_arr[i], cov)
-                x_mle_arr[i] = self.model.function(x_mle_est)
+            while np.linalg.norm(delta_x) > mle_tolerance:
+                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov)
+                x_mle_arr[i] = model.function(x_mle_est)
                 delta_x = x_mle_arr[i] - x_mle_est
 
         return x_mle_arr, residual_arr/np.sqrt(var_arr), 1./var_arr
 
-    def calculate_jacobian(self):
-        self.jacobian = np.empty((self.n_data, self.n_params))
+    def calculate_jacobian():
+        model.jacobian = np.empty((n_data, n_params))
+        diag_delta = np.diag(model.delta_params)
+        param_values = model.get_params()
+        for prm_i, value in enumerate(param_values):
 
-        diag_delta = np.diag(self.model.delta_params)
-        param_values = self.model.get_params()
-        for i, value in enumerate(param_values):
+            model.set_params(param_values - diag_delta[prm_i])
+            x_mle_arr, residual_arr_0, weights_0 = _find_mle()
 
-            self.model.set_params(param_values - diag_delta[i])
-            x_mle_arr, residual_arr_0, weights_0 = self._find_mle()
-
-            self.model.set_params(param_values + diag_delta[i])
-            x_mle_arr, residual_arr_1, weights_1 = self._find_mle()
+            model.set_params(param_values + diag_delta[prm_i])
+            x_mle_arr, residual_arr_1, weights_1 = _find_mle()
             
-            self.jacobian[:,i] = (residual_arr_1 - residual_arr_0)/(2.*diag_delta[i][i])
-        self.model.set_params(param_values) # reset params
+            model.jacobian[:,prm_i] = (residual_arr_1 - residual_arr_0)/(2.*diag_delta[prm_i][prm_i])
+        model.set_params(param_values) # reset params
+        
         return None
 
-    def _update_beta(self, lmbda):
+    def _update_beta(lmbda):
         # Performs a Levenberg-Marquardt iteration
         # Note that if lambda = 0, this is a simple Gauss-Newton iteration
-        self.calculate_jacobian()
-        self.x_mle, self.weighted_residuals, self.weights = self._find_mle()
+        calculate_jacobian()
+        model.x_mle, model.weighted_residuals, model.weights = _find_mle()
 
-        J = self.jacobian # this the weighted Jacobian
+        J = model.jacobian # this the weighted Jacobian
         JTJ = J.T.dot(J)
-        delta_beta = np.linalg.inv(JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(self.weighted_residuals)
-        f_delta_beta = delta_beta/self.model.delta_params
+        delta_beta = np.linalg.inv(JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(model.weighted_residuals)
+        f_delta_beta = delta_beta/model.delta_params
 
-        self.model.set_params(self.model.get_params() - delta_beta)
+        model.set_params(model.get_params() - delta_beta)
         
         return f_delta_beta
+
+    n_data = len(model.data)
+    n_params = len(model.get_params())
+    n_dimensions = len(model.data[:,0])
+    model.dof = n_data - n_params
     
-    def calculate_best_fit(self):
-        n_it = -1
-        tol_achieved = False
-        while tol_achieved == False and n_it < self.max_lm_iterations:
-            n_it += 1
-            delta_beta = self._update_beta(self.lm_damping)
-            tol_achieved = np.min(np.abs(delta_beta)) < self.param_tolerance
-        if self.verbose == True:
-            print 'Converged in {0:d} iterations'.format(n_it)
-
-        J = self.jacobian
-        r = self.weighted_residuals
-        self.WSS = r.dot(r.T)
+    n_it = -1
+    tol_achieved = False
+    while tol_achieved == False and n_it < max_lm_iterations:
+        n_it += 1
+        delta_beta = _update_beta(lm_damping)
+        tol_achieved = np.min(np.abs(delta_beta)) < param_tolerance
         
-        self.popt=self.model.get_params()
-        self.pcov = np.linalg.inv(J.T.dot(J))*r.dot(r.T)/self.dof
+    if verbose == True:
+        print 'Converged in {0:d} iterations'.format(n_it)
 
-        # Estimate the noise variance normal to the curve
-        self.noise_variance = r.dot(np.diag(1./self.weights)).dot(r.T)/self.dof
-
-    def orthogonal_distance_confidence_prediction_bands(self, x_array, confidence_interval, projection_axis=[]):
-        '''
-        The delta method states that the variance of a function f with parameters B will be
-        f'(B, x) Var(B) f'(B, x)
-        where f' is the vector of partial derivatives of the function with respect to B 
-        '''
+    J = model.jacobian
+    r = model.weighted_residuals
+    model.WSS = r.dot(r.T)
         
-        # Check array dimensions
-        if len(x_array[0]) != self.n_dimensions:
-            raise Exception('Dimensions of each point must be the same as the total number of dimensions')
+    model.popt = model.get_params()
+    model.pcov = np.linalg.inv(J.T.dot(J))*r.dot(r.T)/model.dof
+    
+    # Estimate the noise variance normal to the curve
+    model.noise_variance = r.dot(np.diag(1./model.weights)).dot(r.T)/model.dof
 
-        
-        param_values = self.model.get_params()
-        normals = np.empty_like(x_array)
-        x_m_0 = np.empty_like(x_array)
-        for i, x in enumerate(x_array):
-            normals[i] = self.model.normal(x)
-            x_m_0[i] = self.model.function(x)
+    
+def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_interval, projection_axis=[]):
+    '''
+    The delta method states that the variance of a function f with parameters B will be
+    f'(B, x) Var(B) f'(B, x)
+    where f' is the vector of partial derivatives of the function with respect to B 
+    '''
+    
+    # Check array dimensions
+    n_dimensions = len(model.data[0])
+    if len(x_array[0]) != n_dimensions:
+        raise Exception('Dimensions of each point must be the same as the total number of dimensions')
+
+
+    param_values = model.get_params()
+    normals = np.empty_like(x_array)
+    x_m_0 = np.empty_like(x_array)
+    for i, x in enumerate(x_array):
+        normals[i] = model.normal(x)
+        x_m_0[i] = model.function(x)
             
-        diag_delta = np.diag(self.model.delta_params)
-        dxdbeta = np.empty([self.n_params, len(x_array)])      
-        for i, value in enumerate(param_values):
-            self.model.set_params(param_values + diag_delta[i])
+    diag_delta = np.diag(model.delta_params)
+    dxdbeta = np.empty([len(param_values), len(x_array)])      
+    for i, value in enumerate(param_values):
+        model.set_params(param_values + diag_delta[i])
 
-            for j, x in enumerate(x_m_0):
-                dxdbeta[i][j] = (self.model.function(x) - x).dot(normals[j])/diag_delta[i][i]
+        for j, x in enumerate(x_m_0):
+            dxdbeta[i][j] = (model.function(x) - x).dot(normals[j])/diag_delta[i][i]
 
-        self.model.set_params(param_values) # reset params
+    model.set_params(param_values) # reset params
         
 
-        variance = np.empty(len(x_array))
-        for i, Gprime in enumerate(dxdbeta.T):
-            variance[i] = Gprime.T.dot(self.pcov).dot(Gprime)
+    variance = np.empty(len(x_array))
+    for i, Gprime in enumerate(dxdbeta.T):
+        variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
 
-        critical_value = t.isf(0.5*(confidence_interval + 1.), self.dof)
+    critical_value = t.isf(0.5*(confidence_interval + 1.), model.dof)
         
-        confidence_half_widths = critical_value*np.sqrt(variance)
-        prediction_half_widths = critical_value*np.sqrt(variance + self.noise_variance)
+    confidence_half_widths = critical_value*np.sqrt(variance)
+    prediction_half_widths = critical_value*np.sqrt(variance + model.noise_variance)
 
-        if projection_axis == []:
-            projection_axis = normals[0]
+    if projection_axis == []:
+        projection_axis = normals[0]
 
-        norms = np.empty(len(x_array))
-        for i, normal in enumerate(normals):
-            norms[i] = projection_axis.dot(normal)
+    norms = np.empty(len(x_array))
+    for i, normal in enumerate(normals):
+        norms[i] = projection_axis.dot(normal)
 
-        axes = np.array([projection_axis,]*len(x_array))
+    axes = np.array([projection_axis,]*len(x_array))
         
-        projected_confidence_half_widths = np.array([confidence_half_widths/norms,]*self.n_dimensions).T * axes
-        projected_prediction_half_widths = np.array([prediction_half_widths/norms,]*self.n_dimensions).T * axes
-
-        
-        confidence_bound_0 = x_m_0 - projected_confidence_half_widths
-        confidence_bound_1 = x_m_0 + projected_confidence_half_widths
-        prediction_bound_0 = x_m_0 - projected_prediction_half_widths
-        prediction_bound_1 = x_m_0 + projected_prediction_half_widths
-
-
-        return np.array([confidence_bound_0, confidence_bound_1,
-                         prediction_bound_0, prediction_bound_1])
-
-
-
-    def secondary_function_confidence_prediction_bands(self, x_array, confidence_interval):
-        '''
-        The delta method states that the variance of a function f with parameters B will be
-        f'(B, x) Var(B) f'(B, x)
-        where f' is the vector of partial derivatives of the function with respect to B 
-        '''
-        
-        # Check array dimensions
-        if len(x_array[0]) != self.n_dimensions:
-            raise Exception('Dimensions of each point must be the same as the total number of dimensions')
+    projected_confidence_half_widths = np.array([confidence_half_widths/norms,]*n_dimensions).T * axes
+    projected_prediction_half_widths = np.array([prediction_half_widths/norms,]*n_dimensions).T * axes
 
         
-        param_values = self.model.get_params()
-        normals = np.empty_like(x_array)
-        x_m_0 = np.empty_like(x_array)
-        f_m_0 = np.empty(len(x_array))
-        for i, x in enumerate(x_array):
-            normals[i] = self.model.normal(x)
-            x_m_0[i] = self.model.function(x)
-            f_m_0[i] = self.model.function2(x)
+    confidence_bound_0 = x_m_0 - projected_confidence_half_widths
+    confidence_bound_1 = x_m_0 + projected_confidence_half_widths
+    prediction_bound_0 = x_m_0 - projected_prediction_half_widths
+    prediction_bound_1 = x_m_0 + projected_prediction_half_widths
+    
+    return np.array([confidence_bound_0, confidence_bound_1,
+                     prediction_bound_0, prediction_bound_1])
+    
+def confidence_prediction_bands(model, function, x_array, confidence_interval):
+    '''
+    The delta method states that the variance of a function f with parameters B will be
+    f'(B, x) Var(B) f'(B, x)
+    where f' is the vector of partial derivatives of the function with respect to B 
+    '''
+    
+    # Check array dimensions
+    n_dimensions = len(model.data[0])
+    if len(x_array[0]) != n_dimensions:
+        raise Exception('Dimensions of each point must be the same as the total number of dimensions')
+
+        
+    param_values = model.get_params()
+    normals = np.empty_like(x_array)
+    x_m_0s = np.empty_like(x_array)
+    f_m_0s = np.empty_like(x_array[:,0])
+    for i, x in enumerate(x_array):
+        normals[i] = model.normal(x)
+        x_m_0s[i] = model.function(x)
+        f_m_0s[i] = function(x)
             
-        diag_delta = np.diag(self.model.delta_params)
-        dxdbeta = np.empty([self.n_params, len(x_array)])      
-        for i, value in enumerate(param_values):
-            self.model.set_params(param_values + diag_delta[i])
+    diag_delta = np.diag(model.delta_params)
+    dxdbeta = np.empty([len(param_values), len(x_array)])
 
-            for j, x in enumerate(x_m_0):
-                x_hat = self.model.function(x + (self.model.function(x) - x).dot(normals[j]))
-                dxdbeta[i][j] = (self.model.function2(x_hat) - f_m_0[j])/diag_delta[i][i]
+    for i, value in enumerate(param_values):
+        model.set_params(param_values + diag_delta[i])
 
-        self.model.set_params(param_values) # reset params
+        for j, x_m_0 in enumerate(x_m_0s):
+            x_m_1 = x_m_0 + ((model.function(x_m_0) - x_m_0).dot(normals[j]))*normals[j]
+            dxdbeta[i][j] = (function(x_m_1) - f_m_0s[j])/diag_delta[i][i]
+
+    model.set_params(param_values) # reset params
+    
+    variance = np.empty(len(x_array))
+    for i, Gprime in enumerate(dxdbeta.T):
+        variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
+
+    critical_value = t.isf(0.5*(confidence_interval + 1.), model.dof)
         
-
-        variance = np.empty(len(x_array))
-        for i, Gprime in enumerate(dxdbeta.T):
-            variance[i] = Gprime.T.dot(self.pcov).dot(Gprime)
-
-        critical_value = t.isf(0.5*(confidence_interval + 1.), self.dof)
+    confidence_half_widths = critical_value*np.sqrt(variance)
+    prediction_half_widths = critical_value*np.sqrt(variance + model.noise_variance)
         
-        confidence_half_widths = critical_value*np.sqrt(variance)
-        prediction_half_widths = critical_value*np.sqrt(variance + self.noise_variance)
+    confidence_bound_0 = f_m_0s - confidence_half_widths
+    confidence_bound_1 = f_m_0s + confidence_half_widths
+    prediction_bound_0 = f_m_0s - prediction_half_widths
+    prediction_bound_1 = f_m_0s + prediction_half_widths
+    
 
-        
-        confidence_bound_0 = f_m_0 - confidence_half_widths
-        confidence_bound_1 = f_m_0 + confidence_half_widths
-        prediction_bound_0 = f_m_0 - prediction_half_widths
-        prediction_bound_1 = f_m_0 + prediction_half_widths
+    return np.array([confidence_bound_0, confidence_bound_1,
+                     prediction_bound_0, prediction_bound_1])
 
 
-        return np.array([confidence_bound_0, confidence_bound_1,
-                         prediction_bound_0, prediction_bound_1])
+
+def attribute_function(mineral, attributes, powers=[]):
+    if type(attributes) is str:
+        attributes = [attributes]
+    if powers == []:
+        powers = [1. for a in attributes]
+    def f(x):
+        P, T, V = x
+        mineral.set_state(P, T)
+        value = 1.
+        for a, p in zip(*[attributes, powers]):
+            value *= np.power(getattr(mineral, a), p)
+        return value
+    return f

@@ -214,7 +214,7 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
         A list of optimized parameters
     """
 
-    class Model():
+    class Model(object):
         def __init__(self, m, fit_params, guessed_params, delta_params):
             self.m = m
             self.fit_params = fit_params
@@ -236,31 +236,25 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=None):
             self.m.set_state(P, T)
             return np.array([P, T, self.m.V])
 
-        def function2(self, x):
-            P, T, Vobs = x
-            self.m.set_state(P, T)
-            return self.m.K_T
-
         def normal(self, x):
             P, T, Vobs = x
             self.m.set_state(P, T)
             n = np.array([-1., self.m.alpha*self.m.K_T, -self.m.K_T/self.m.V])
             return n/np.linalg.norm(n)
 
+        
     guessed_params = np.array([mineral.params[prm] for prm in fit_params])
-    delta_params = guessed_params*1.e-5
+    model = Model(mineral,
+                  fit_params,
+                  guessed_params,
+                  delta_params=guessed_params*1.e-5)
 
+    model.data = PTV
+    model.data_covariance=PTV_covariances
     mineral.set_state(1.e5, 300.)
-    mle_tolerance = 1.e-5*mineral.V
-    
-    fitted_eos = nonlinear_fitting.NonlinearLeastSquaresFit(x=PTV, cov=PTV_covariances,
-                                                            mle_tolerance=mle_tolerance,
-                                                            model=Model(mineral,
-                                                                        fit_params,
-                                                                        guessed_params,
-                                                                        delta_params))
+    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V)
 
-    return fitted_eos
+    return model
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):
