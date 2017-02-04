@@ -136,7 +136,6 @@ if __name__ == "__main__":
         scale = np.power(10., np.floor(np.log10(p_rnd)))
         nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
         print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
-               
 
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
@@ -151,9 +150,9 @@ if __name__ == "__main__":
     for i, P in enumerate(pressures):
         stv.set_state(P, T)
         PTVs[i] = [P, T, stv.V]
-        
-    cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [])
 
+    # Plot the 95% confidence and prediction bands 
+    cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [])
     plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
     plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
     plt.plot(cp_bands[2][:,0]/1.e9, cp_bands[2][:,2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
@@ -173,6 +172,7 @@ if __name__ == "__main__":
     plt.show()
 
     
+    # Plot the 95% confidence and prediction bands for the bulk modulus
     cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
                                                                       burnman.tools.attribute_function(stv, 'K_T'),
                                                                       PTVs, 0.95)

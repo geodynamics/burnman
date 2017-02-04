@@ -39,12 +39,12 @@ class test_fitting(BurnManTest):
 
         guessed_params = np.array([-0.5, 5.5])
         delta_params = np.array([1.e-3, 1.e-3])
-        fitted_eos = m(data, cov, guessed_params, delta_params)
-        nonlinear_least_squares_fit(model=fitted_eos,
+        fitted_curve = m(data, cov, guessed_params, delta_params)
+        nonlinear_least_squares_fit(model=fitted_curve,
                                     mle_tolerance = 1.e-1,
                                     param_tolerance = 1.e-1)
         
-        self.assertArraysAlmostEqual([fitted_eos.WSS], [11.8663531941])
+        self.assertArraysAlmostEqual([fitted_curve.WSS], [11.8663531941])
 
 
 if __name__ == '__main__':

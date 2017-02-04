@@ -272,7 +272,7 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
 
     if PTV_covariances == []:
         PTV_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
-        for i in xrange(len(PTV_covariances)):
+        for i in range(len(PTV_covariances)):
             PTV_covariances[i][0][0] = 1.
             
     model.data_covariance=PTV_covariances
