@@ -38,11 +38,11 @@ class test_fitting(BurnManTest):
                 return n/np.linalg.norm(n)
 
         guessed_params = np.array([-0.5, 5.5])
-        delta_params = np.array([1.e-3, 1.e-3])
+        delta_params = np.array([1.e-3, 1.e-3]) # unimportant for a linear model
         fitted_curve = m(data, cov, guessed_params, delta_params)
         nonlinear_least_squares_fit(model=fitted_curve,
-                                    mle_tolerance = 1.e-1,
-                                    param_tolerance = 1.e-1)
+                                    mle_tolerance = 1.e-1, # again, a linear model
+                                    param_tolerance = 1.e-5)
         
         self.assertArraysAlmostEqual([fitted_curve.WSS], [11.8663531941])
 

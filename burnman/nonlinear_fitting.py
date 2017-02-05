@@ -9,7 +9,7 @@ from matplotlib.patches import Ellipse
 def nonlinear_least_squares_fit(model,
                                 mle_tolerance,
                                 lm_damping = 0.,
-                                param_tolerance = 1.e-5,
+                                param_tolerance = 1.e-7,
                                 max_lm_iterations = 100,
                                 verbose = False):
 
@@ -145,9 +145,10 @@ def nonlinear_least_squares_fit(model,
         J = model.jacobian # this the weighted Jacobian
         JTJ = J.T.dot(J)
         delta_beta = np.linalg.inv(JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(model.weighted_residuals)
-        f_delta_beta = delta_beta/model.delta_params
+        new_params = model.get_params() - delta_beta
+        f_delta_beta = delta_beta/new_params
 
-        model.set_params(model.get_params() - delta_beta)
+        model.set_params(new_params)
         
         return f_delta_beta
 
@@ -159,7 +160,10 @@ def nonlinear_least_squares_fit(model,
 
     for n_it in range(max_lm_iterations):
         f_delta_beta = _update_beta(lm_damping)
-        if np.max(np.abs(f_delta_beta)) < param_tolerance:
+        max_f = np.max(np.abs(f_delta_beta))
+        if verbose == True:
+            print('Iteration {0:d}: {1}. Max change in param: {2}'.format(n_it, model.get_params(), max_f))
+        if max_f < param_tolerance:
             break
         
     J = model.jacobian

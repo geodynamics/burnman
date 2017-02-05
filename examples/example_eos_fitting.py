@@ -25,7 +25,12 @@ if __name__ == "__main__":
     T, Terr, Pta, P, Perr, V, Verr = np.loadtxt('../burnman/data/input_fitting/PVT_MgO_Dewaele_et_al_2000.dat', unpack=True)
     PTV = np.array([P*1.e9, T, burnman.tools.molar_volume_from_unit_cell_volume(V, 4.)]).T
     nul = 0.*PTV.T[0]
-    PTV_covariance = np.array([[Perr*1.e9, nul, nul], [nul, Terr, nul], [nul, nul, burnman.tools.molar_volume_from_unit_cell_volume(Verr, 4.)]]).T
+
+    Pcov = np.power(Perr*1.e9, 2.)
+    Tcov = np.power(Terr, 2.)
+    Vcov = np.power(burnman.tools.molar_volume_from_unit_cell_volume(Verr, 4.), 2.)
+    
+    PTV_covariance = np.array([[Pcov, nul, nul], [nul, Tcov, nul], [nul, nul, Vcov]]).T
 
     
     # Here's where we fit the data
@@ -52,7 +57,8 @@ if __name__ == "__main__":
     ax = fig.add_subplot(1, 1, 1)
     im = ax.scatter(PTV[:,0]/1.e9, PTV[:,1], c=fitted_eos.weighted_residuals, cmap=plt.cm.RdYlBu, s=50)
     fig.colorbar(im, ax=ax)
-    #im.set_clim(-1., 1.)
+    max_abs_r = np.max(np.abs(fitted_eos.weighted_residuals))
+    im.set_clim(-max_abs_r, max_abs_r)
     plt.show()
     
     # Here we plot our equation of state, along with the 95% confidence intervals for the volume
@@ -74,13 +80,11 @@ if __name__ == "__main__":
                  label='Optimized fit for periclase at {0:.0f} K'.format(T))
         
     plt.errorbar(PTV[:,0] / 1.e9, PTV[:,2] * 1.e6,
-                 xerr=PTV_covariance.T[0][0] / 1.e9,
-                 yerr=PTV_covariance.T[2][2] * 1.e6,
+                 xerr=np.sqrt(PTV_covariance.T[0][0]) / 1.e9,
+                 yerr=np.sqrt(PTV_covariance.T[2][2]) * 1.e6,
                  linestyle='None', marker='o', label='Dewaele et al. (2000)')
 
-    plt.scatter(fitted_eos.data_mle[:,0] / 1.e9, fitted_eos.data_mle[:,2] * 1.e6, s=20)
-    plt.xlim(20., 30.)
-    plt.ylim(9.5, 10.5)
+    plt.scatter(fitted_eos.data_mle[:,0] / 1.e9, fitted_eos.data_mle[:,2] * 1.e6, s=20, label='Maximum likelihood estimates')
     plt.ylabel("Volume (cm^3/mol)")
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="upper right")

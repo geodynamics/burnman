@@ -276,6 +276,7 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
 
         def function(self, x):
             P, T, p = x
+            
             self.m.set_state(P, T)
             return np.array([P, T, getattr(self.m, self.observed_property)])
 
@@ -284,8 +285,8 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
                 n = self.normal_function(self.m, x)
             else:
                 P, T, p = x
-                dP = 100.
-                dT = 0.1
+                dP = 1.e5
+                dT = 1.
                 
                 dPdp = (2.*dP)/(self.function([P+dP, T, 0.])[2] - self.function([P-dP, T, 0.])[2])
                 dpdT = (self.function([P, T+dT, 0.])[2] - self.function([P, T-dT, 0.])[2])/(2.*dT)
@@ -296,7 +297,7 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
 
 
     if PTp_covariances == []:
-        PTp_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
+        PTp_covariances = np.zeros((len(PTp[:,0]), len(PTp[0]), len(PTp[0])))
         for i in range(len(PTp_covariances)):
             PTp_covariances[i][0][0] = 1.
     
@@ -328,7 +329,7 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
     def normal(m, x):
         P, T, Vobs = x
         m.set_state(P, T)
-        n = np.array([-1., m.alpha*m.K_T, -m.K_T/m.V])
+        n = np.array([-1./m.K_T, m.alpha, -1./m.V])
         return n/np.linalg.norm(n)
         
     return fit_PTp_data(mineral=mineral, observed_property='V',
