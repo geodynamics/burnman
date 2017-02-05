@@ -46,6 +46,23 @@ def copy_documentation(copy_from):
     return mydecorator
 
 
+def round_to_n(x, xerr, n):
+    return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
+
+def pretty_print_values(popt, pcov, params):
+    """
+    Takes a numpy array of parameters, the corresponding covariance matrix 
+    and a set of parameter names and prints the parameters and 
+    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i])) 
+    in a nice text based format. 
+    """
+    for i, p in enumerate(params):
+        p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
+        c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
+        scale = np.power(10., np.floor(np.log10(p_rnd)))
+        nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
+        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+
 def pretty_print_table(table, use_tabs=False):
     """
     Takes a 2d table and prints it in a nice text based format. If
@@ -68,7 +85,7 @@ def pretty_print_table(table, use_tabs=False):
         [('{:<' if i == 0 else '{:>') + str(1 + col_width(table, i)) + '}' for i in range(len(table[0]))])
     for r in table:
         print(frmt.format(*r))
-
+        
 def pretty_plot():
     """
     Makes pretty plots. Overwrites the matplotlib default settings to allow
@@ -181,10 +198,10 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
+def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[], verbose=True, normal_function=None):
     """
     Given a mineral of any type, a list of fit parameters
-    and a set of PTV points and (optional) uncertainties,
+    and a set of P-T-property points and (optional) uncertainties,
     this function returns a list of optimized parameters
     and their associated covariances, fitted using the
     scipy.optimize.curve_fit routine.
@@ -194,15 +211,18 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
     mineral : mineral
         Mineral for which the parameters should be optimized
 
+    observed_property : string
+        Attribute name for the property to be fit (e.g. 'V')
+
     fit_params : list of strings
         List of dictionary keys contained in mineral.params
         corresponding to the variables to be optimized
         during fitting. Initial guesses are taken from the existing
         values for the parameters
 
-    PTV : numpy array of observed PTV values
+    PTp : numpy array of observed P-T-property values
 
-    PTV_covariances : numpy array of PTV covariances (optional)
+    PTp_covariances : numpy array of P-T-property covariances (optional)
         If not given, all covariance matrices are chosen 
         such that C00 = 1, otherwise Cij = 0. 
         In other words, all data points have equal weight, 
@@ -234,11 +254,13 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
     """
 
     class Model(object):
-        def __init__(self, m, fit_params, guessed_params, delta_params):
+        def __init__(self, m, observed_property, fit_params, guessed_params, delta_params, normal_function=None):
             self.m = m
+            self.observed_property = observed_property
             self.fit_params = fit_params
             self.set_params(guessed_params)
             self.delta_params = delta_params
+            self.normal_function = normal_function
             
         def set_params(self, param_values):
             for i, param in enumerate(self.fit_params):
@@ -251,35 +273,66 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
             return params
 
         def function(self, x):
-            P, T, Vobs = x
+            P, T, p = x
             self.m.set_state(P, T)
-            return np.array([P, T, self.m.V])
+            return np.array([P, T, getattr(self.m, self.observed_property)])
 
         def normal(self, x):
-            P, T, Vobs = x
-            self.m.set_state(P, T)
-            n = np.array([-1., self.m.alpha*self.m.K_T, -self.m.K_T/self.m.V])
+            if self.normal_function != None:
+                n = self.normal_function(self.m, x)
+            else:
+                P, T, p = x
+                dP = 100.
+                dT = 0.1
+                
+                dPdp = (2.*dP)/(self.function([P+dP, T, 0.])[2] - self.function([P-dP, T, 0.])[2])
+                dpdT = (self.function([P, T+dT, 0.])[2] - self.function([P, T-dT, 0.])[2])/(2.*dT)
+                dPdT = -dPdp*dpdT
+                n = np.array([-1., dPdT, dPdp])
+            
             return n/np.linalg.norm(n)
 
         
     guessed_params = np.array([mineral.params[prm] for prm in fit_params])
     model = Model(mineral,
+                  observed_property,
                   fit_params,
                   guessed_params,
-                  delta_params=guessed_params*1.e-5)
+                  delta_params=guessed_params*1.e-5,
+                  normal_function=normal_function)
 
-    model.data = PTV
+    model.data = PTp
 
-    if PTV_covariances == []:
-        PTV_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
-        for i in range(len(PTV_covariances)):
-            PTV_covariances[i][0][0] = 1.
+    if PTp_covariances == []:
+        PTp_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
+        for i in range(len(PTp_covariances)):
+            PTp_covariances[i][0][0] = 1.
             
-    model.data_covariance=PTV_covariances
+    model.data_covariance=PTp_covariances
     mineral.set_state(1.e5, 300.)
-    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*mineral.V, verbose=verbose)
+    nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*getattr(mineral, observed_property), verbose=verbose)
 
     return model
+
+
+def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
+    """
+    Given a mineral of any type, a list of fit parameters
+    and a set of P-T-property points and (optional) uncertainties,
+    this function returns a list of optimized parameters
+    and their associated covariances, fitted using the
+    scipy.optimize.curve_fit routine.
+    """
+
+    def normal(m, x):
+        P, T, Vobs = x
+        m.set_state(P, T)
+        n = np.array([-1., m.alpha*m.K_T, -m.K_T/m.V])
+        return n/np.linalg.norm(n)
+        
+    return fit_PTp_data(mineral=mineral, observed_property='V',
+                        fit_params=fit_params, normal_function=normal,
+                        PTp=PTV, PTp_covariances=PTV_covariances, verbose=verbose)
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):

@@ -1,0 +1,10 @@
+2nd order fit:
+G_0: (1.68 +/- 0.02) x 1e+11
+Gprime_0: (1.51 +/- 0.02) x 1e+00
+
+3rd order fit:
+G_0: (1.63 +/- 0.02) x 1e+11
+Gprime_0: (1.65 +/- 0.02) x 1e+00
+
+UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
+UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes

@@ -20,9 +20,6 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 
-def round_to_n(x, xerr, n):
-    return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
-
 if __name__ == "__main__":
     # First, let's read in the PVT equation of state data for MgO from Dewaele et al., (2000).
     T, Terr, Pta, P, Perr, V, Verr = np.loadtxt('../burnman/data/input_fitting/PVT_MgO_Dewaele_et_al_2000.dat', unpack=True)
@@ -44,13 +41,7 @@ if __name__ == "__main__":
     # Print the optimized parameters
     print('Equation of state calculations')
     print('Optimized equation of state for periclase:')
-    for i, p in enumerate(params):
-        p_rnd = round_to_n(fitted_eos.popt[i], np.sqrt(fitted_eos.pcov[i][i]), 1)
-        c_rnd = round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1)
-        scale = np.power(10., np.floor(np.log10(p_rnd)))
-        nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
-        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
-
+    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, params)
         
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
