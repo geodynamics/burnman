@@ -88,23 +88,52 @@ if __name__ == "__main__":
 
 
     # We can also look at the uncertainty in other properties
-    # For example, let's look at the uncertainty in P wave velocities
+    # For example, let's look at the uncertainty in P wave velocities, bulk modulus, thermal expansion and thermal pressure
+    fig = plt.figure()
     for T in [298.15, 2000.]:
         for i, P in enumerate(pressures):
             per.set_state(P, T)
             PTVs[i] = [P, T, per.V]
+
+        for i, (material_property, scaling, name) in enumerate([('p_wave_velocity', 1.e3, 'P wave velocity (km/s)'),
+                                                                ('K_T', 1.e9, 'Bulk modulus (GPa)'),
+                                                                ('alpha', 1., 'Thermal expansion (/K)'),
+                                                                (['alpha', 'K_T'], 1.e6, 'Thermal pressure (MPa/K)')]):
+            ax = fig.add_subplot(2, 2, i+1)
             
-        # Plot the 95% confidence bands for the bulk modulus
+            # Plot the 95% confidence bands for the various material properties
+            cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
+                                                                              burnman.tools.attribute_function(per, material_property),
+                                                                              PTVs, 0.95)
+            ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2/scaling, label='Best fit at {0:.0f} K'.format(T))
+            ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/scaling, linestyle='--', color='r', label='95% confidence band')
+            ax.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/scaling, linestyle='--', color='r')
+            plt.ylabel(name)
+            plt.xlabel('Pressure (GPa)')
+            
+    plt.legend(loc='upper right')
+    plt.show()
+
+    
+    # Finally, let's look at the effect of uncertainties in the equation of state on gibbs free energy at high pressure
+    fig = plt.figure()
+    for T in [298.15, 2000.]:
+        for i, P in enumerate(pressures):
+            per.set_state(P, T)
+            PTVs[i] = [P, T, per.V]
+
+        ax = fig.add_subplot(1, 1, 1)
+        scaling = 1.e3
+        
+        # Plot the 95% confidence bands for the gibbs free energy
         cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
-                                                                          burnman.tools.attribute_function(per, 'p_wave_velocity'),
+                                                                          burnman.tools.attribute_function(per, 'gibbs'),
                                                                           PTVs, 0.95)
-        plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e3, label='Best fit at {0:.0f} K'.format(T))
-        plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/1.e3, linestyle='--', color='r', label='95% confidence band')
-        plt.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/1.e3, linestyle='--', color='r')
-    plt.ylabel("P wave velocity (km/s)")
-    plt.xlabel("Pressure (GPa)")
-    plt.legend(loc="lower right")
-    plt.title("Periclase EoS; uncertainty in P wave velocities")
+        ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0] - cp2_bands[1])/2/scaling, label='95% confidence half width at {0:.0f} K'.format(T))
+        plt.ylabel('Gibbs free energy uncertainty (kJ/mol)')
+        plt.xlabel('Pressure (GPa)')
+            
+    plt.legend(loc='lower right')
     plt.show()
 
     
