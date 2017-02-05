@@ -47,6 +47,13 @@ if __name__ == "__main__":
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
     plt.show()
 
+    # Now let's plot the residuals
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    im = ax.scatter(PTV[:,0]/1.e9, PTV[:,1], c=fitted_eos.weighted_residuals, cmap=plt.cm.RdYlBu, s=50)
+    fig.colorbar(im, ax=ax)
+    #im.set_clim(-1., 1.)
+    plt.show()
     
     # Here we plot our equation of state, along with the 95% confidence intervals for the volume
     pressures = np.linspace(1.e5, 60.e9, 101)
@@ -71,6 +78,9 @@ if __name__ == "__main__":
                  yerr=PTV_covariance.T[2][2] * 1.e6,
                  linestyle='None', marker='o', label='Dewaele et al. (2000)')
 
+    plt.scatter(fitted_eos.data_mle[:,0] / 1.e9, fitted_eos.data_mle[:,2] * 1.e6, s=20)
+    plt.xlim(20., 30.)
+    plt.ylim(9.5, 10.5)
     plt.ylabel("Volume (cm^3/mol)")
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="upper right")

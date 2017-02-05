@@ -254,8 +254,10 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
     """
 
     class Model(object):
-        def __init__(self, m, observed_property, fit_params, guessed_params, delta_params, normal_function=None):
-            self.m = m
+        def __init__(self, mineral, data, data_covariance, observed_property, fit_params, guessed_params, delta_params, normal_function=None):
+            self.m = mineral
+            self.data = data
+            self.data_covariance = data_covariance 
             self.observed_property = observed_property
             self.fit_params = fit_params
             self.set_params(guessed_params)
@@ -292,23 +294,22 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
             
             return n/np.linalg.norm(n)
 
-        
-    guessed_params = np.array([mineral.params[prm] for prm in fit_params])
-    model = Model(mineral,
-                  observed_property,
-                  fit_params,
-                  guessed_params,
-                  delta_params=guessed_params*1.e-5,
-                  normal_function=normal_function)
-
-    model.data = PTp
 
     if PTp_covariances == []:
         PTp_covariances = np.zeros((len(model.data[:,0]), len(model.data[0]), len(model.data[0])))
         for i in range(len(PTp_covariances)):
             PTp_covariances[i][0][0] = 1.
-            
-    model.data_covariance=PTp_covariances
+    
+    guessed_params = np.array([mineral.params[prm] for prm in fit_params])
+    model = Model(mineral = mineral,
+                  data = PTp,
+                  data_covariance = PTp_covariances,
+                  observed_property = observed_property,
+                  fit_params = fit_params,
+                  guessed_params = guessed_params,
+                  delta_params = guessed_params*1.e-5,
+                  normal_function = normal_function)
+
     mineral.set_state(1.e5, 300.)
     nonlinear_fitting.nonlinear_least_squares_fit(model, mle_tolerance=1.e-5*getattr(mineral, observed_property), verbose=verbose)
 
