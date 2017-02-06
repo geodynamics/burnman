@@ -262,7 +262,11 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
             self.fit_params = fit_params
             self.set_params(guessed_params)
             self.delta_params = delta_params
-            self.normal_function = normal_function
+            if normal_function != None:
+                self.normal = normal_function(self.m)
+            else:
+                self.normal = default_normal
+
             
         def set_params(self, param_values):
             for i, param in enumerate(self.fit_params):
@@ -280,18 +284,15 @@ def fit_PTp_data(mineral, observed_property, fit_params, PTp, PTp_covariances=[]
             self.m.set_state(P, T)
             return np.array([P, T, getattr(self.m, self.observed_property)])
 
-        def normal(self, x):
-            if self.normal_function != None:
-                n = self.normal_function(self.m, x)
-            else:
-                P, T, p = x
-                dP = 1.e5
-                dT = 1.
-                
-                dPdp = (2.*dP)/(self.function([P+dP, T, 0.])[2] - self.function([P-dP, T, 0.])[2])
-                dpdT = (self.function([P, T+dT, 0.])[2] - self.function([P, T-dT, 0.])[2])/(2.*dT)
-                dPdT = -dPdp*dpdT
-                n = np.array([-1., dPdT, dPdp])
+        def default_normal(self, x):
+            P, T, p = x
+            dP = 1.e5
+            dT = 1.
+            
+            dPdp = (2.*dP)/(self.function([P+dP, T, 0.])[2] - self.function([P-dP, T, 0.])[2])
+            dpdT = (self.function([P, T+dT, 0.])[2] - self.function([P, T-dT, 0.])[2])/(2.*dT)
+            dPdT = -dPdp*dpdT
+            n = np.array([-1., dPdT, dPdp])
             
             return n/np.linalg.norm(n)
 
@@ -326,14 +327,16 @@ def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
     scipy.optimize.curve_fit routine.
     """
 
-    def normal(m, x):
-        P, T, Vobs = x
-        m.set_state(P, T)
-        n = np.array([-1./m.K_T, m.alpha, -1./m.V])
-        return n/np.linalg.norm(n)
+    def normal_function(m):
+        def normal(x):
+            P, T, Vobs = x
+            m.set_state(P, T)
+            n = np.array([-1./m.K_T, m.alpha, -1./m.V])
+            return n/np.linalg.norm(n)
+        return normal
         
     return fit_PTp_data(mineral=mineral, observed_property='V',
-                        fit_params=fit_params, normal_function=normal,
+                        fit_params=fit_params, normal_function=normal_function,
                         PTp=PTV, PTp_covariances=PTV_covariances, verbose=verbose)
 
 
