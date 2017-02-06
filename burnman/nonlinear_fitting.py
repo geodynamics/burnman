@@ -431,7 +431,7 @@ def corner_plot(popt, pcov, param_names=[]):
 
     
     # ellipse plotting is prone to rounding errors, so we scale the plots here
-    scaling = 1./np.power(10., np.around(np.log10(popt) - 0.5))
+    scaling = 1./np.power(10., np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
 
     fig = plt.figure()

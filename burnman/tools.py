@@ -18,7 +18,7 @@ import itertools
 
 from . import constants
 from . import nonlinear_fitting
-
+import itertools
 
 def copy_documentation(copy_from):
     """
@@ -45,6 +45,7 @@ def copy_documentation(copy_from):
         return wrapper
     return mydecorator
 
+def flatten(l): return flatten(l[0]) + (flatten(l[1:]) if len(l) > 1 else []) if type(l) is list or type(l) is np.ndarray else [l]
 
 def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
@@ -59,8 +60,8 @@ def pretty_print_values(popt, pcov, params):
     for i, p in enumerate(params):
         p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
         c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
-        scale = np.power(10., np.floor(np.log10(p_rnd)))
-        nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
+        scale = np.power(10., np.floor(np.log10(np.abs(p_rnd))))
+        nd = np.floor(np.log10(np.abs(p_rnd))) - np.floor(np.log10(np.abs(c_rnd)))
         print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
 
 def pretty_print_table(table, use_tabs=False):
@@ -198,7 +199,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], verbose=True):
+def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tolerances=[], max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -265,14 +266,21 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], verbose=
             self.mle_tolerances = mle_tolerances
             
         def set_params(self, param_values):
-            for i, param in enumerate(self.fit_params):
-                self.m.params[param] = param_values[i]
-        
+            i=0
+            for param in self.fit_params:
+                if isinstance(self.m.params[param], float):
+                    self.m.params[param] = param_values[i]
+                    i += 1
+                else:
+                    for j in range(len(self.m.params[param])):
+                        self.m.params[param][j] = param_values[i]
+                        i += 1
+
         def get_params(self):
-            params = np.empty(len(self.fit_params))
+            params = []
             for i, param in enumerate(self.fit_params):
-                params[i] = self.m.params[param]
-            return params
+                params.append(self.m.params[param])
+            return np.array(flatten([mineral.params[prm] for prm in fit_params]))
 
         def function(self, x, p_flag):
             P, T, p = x
@@ -298,17 +306,19 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], verbose=
 
         
     # If only one property flag is given, assume it applies to all data
-    # Apply mle tolerances
-    mle_tolerance_factor = 1.e-5
-    
     if type(p_flags) is str:
-        mineral.set_state(1.e5, 300.)
-        mle_tolerances = np.array([mle_tolerance_factor*getattr(mineral, p_flags)] * len(PTp[:,0]))
         p_flags = np.array([p_flags] * len(PTp[:,0]))
-    else:
+
+    # Apply mle tolerances if they dont exist
+    if mle_tolerances == []:
+        mineral.set_state(1.e5, 300.)
+        mle_tolerance_factor = 1.e-5
         mle_tolerances = np.empty(len(p_flags))
         for i, p_flag in enumerate(p_flags):
-            mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, p_flag)
+            if p_flag in ['gibbs', 'enthalpy', 'H', 'helmholtz']:
+                mle_tolerances[i] = 1. # 1 J
+            else:
+                mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, p_flag)
         
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
@@ -316,8 +326,8 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], verbose=
         PTp_covariances = np.zeros((len(PTp[:,0]), len(PTp[0]), len(PTp[0])))
         for i in range(len(PTp_covariances)):
             PTp_covariances[i][0][0] = 1.
-
-    guessed_params = np.array([mineral.params[prm] for prm in fit_params])
+    
+    guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
     model = Model(mineral = mineral,
                   data = PTp,
                   data_covariance = PTp_covariances,
@@ -326,20 +336,20 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], verbose=
                   guessed_params = guessed_params,
                   delta_params = guessed_params*1.e-5,
                   mle_tolerances = mle_tolerances)
-                                    
-    nonlinear_fitting.nonlinear_least_squares_fit(model, verbose=verbose)
+
+    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations = max_lm_iterations, verbose=verbose)
 
     return model
 
 
-def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], verbose=True):
+def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], max_lm_iterations=50, verbose=True):
     """
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
         
     return fit_PTp_data(mineral=mineral, p_flags='V',
                         PTp=PTV, PTp_covariances=PTV_covariances, 
-                        fit_params=fit_params, verbose=verbose)
+                        fit_params=fit_params, max_lm_iterations=max_lm_iterations, verbose=verbose)
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):

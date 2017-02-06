@@ -4,7 +4,16 @@
 
 
 """
-EoS calculation example
+
+example_fit_eos
+----------------
+
+This example demonstrates BurnMan's functionality to fit PVT data to
+an EoS of the user's choice. 
+
+teaches:
+- least squares fitting
+
 """
 from __future__ import absolute_import
 from __future__ import print_function
