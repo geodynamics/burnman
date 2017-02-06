@@ -128,14 +128,8 @@ if __name__ == "__main__":
     fitted_eos = burnman.tools.fit_PTV_data(stv, params, PTV, PTV_covariances, verbose=False)
 
     # Print the optimized parameters
-    print('Equation of state calculations')
     print('Optimized equation of state for stishovite:')
-    for i, p in enumerate(params):
-        p_rnd = round_to_n(fitted_eos.popt[i], np.sqrt(fitted_eos.pcov[i][i]), 1)
-        c_rnd = round_to_n(np.sqrt(fitted_eos.pcov[i][i]), np.sqrt(fitted_eos.pcov[i][i]), 1)
-        scale = np.power(10., np.floor(np.log10(p_rnd)))
-        nd = np.floor(np.log10(p_rnd)) - np.floor(np.log10(c_rnd))
-        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
 
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
@@ -152,7 +146,7 @@ if __name__ == "__main__":
         PTVs[i] = [P, T, stv.V]
 
     # Plot the 95% confidence and prediction bands 
-    cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [])
+    cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [], 'V')
     plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
     plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
     plt.plot(cp_bands[2][:,0]/1.e9, cp_bands[2][:,2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
@@ -175,7 +169,7 @@ if __name__ == "__main__":
     # Plot the 95% confidence and prediction bands for the bulk modulus
     cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
                                                                       burnman.tools.attribute_function(stv, 'K_T'),
-                                                                      PTVs, 0.95)
+                                                                      PTVs, 0.95, 'V')
     plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e9, color='b', label='Best fit')
     plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
     plt.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/1.e9, linestyle='--', color='r')

@@ -11,8 +11,8 @@ example_fit_data
 This example demonstrates BurnMan's functionality to fit various mineral physics data to
 an EoS of the user's choice. 
 
-Please note also the separate file example_fit_eos.py, which deals specifically with 
-PVT fitting as a special case.
+Please note also the separate file example_fit_eos.py, which can be viewed as a more
+advanced example in the same general field.
 
 teaches:
 - least squares fitting
@@ -34,54 +34,8 @@ import burnman
 
 if __name__ == "__main__":
 
-
-    # 1) Fitting standard enthalpy and heat capacity to enthalpy data
-    per_SLB = burnman.minerals.SLB_2011.periclase()
-    per_HP = burnman.minerals.HP_2011_ds62.per()
-    per_opt = burnman.minerals.HP_2011_ds62.per() # this is the mineral we'll optimise
-
-
-    # Load some example enthalpy data
-    TH_data = np.loadtxt('../burnman/data/input_fitting/Victor_Douglas_1963_deltaH_MgO.dat')
-    per_HP.set_state(1.e5, 298.15)
-    PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184 + per_HP.H]).T
-    nul = TH_data[:,0]*0.
-    PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
-
-    per_opt.params['S_0'] = 6.439*4.184
-    model = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                       p_flags = 'H',
-                                       fit_params = ['H_0', 'Cp'],
-                                       PTp = PTH_data,
-                                       PTp_covariances = PTH_covariances,
-                                       max_lm_iterations = 10,
-                                       verbose = False)
-
-    print('Optimised values:')
-    params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']
-    burnman.tools.pretty_print_values(model.popt, model.pcov, params)
-    print('')
-    
-    # Corner plot
-    fig=burnman.nonlinear_fitting.corner_plot(model.popt, model.pcov, params)
-    plt.show()
-
-    # Plot models
-    temperatures = np.linspace(200., 2000., 101)
-    pressures = np.array([298.15] * len(temperatures))
-    plt.plot(temperatures, per_HP.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
-    plt.plot(temperatures, per_SLB.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
-    plt.plot(temperatures, per_opt.evaluate(['heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
-
-    plt.legend(loc='lower right')
-    plt.xlim(0., temperatures[-1])
-    plt.xlabel('Temperature (K)')
-    plt.ylabel('Heat capacity (J/K/mol)')
-    plt.show()
-
-
-
-    # 2) Fitting shear modulus and its derivative to shear wave velocity data
+    # 1) Fitting shear modulus and its derivative to shear wave velocity data
+    print('1) Fitting shear modulus and its derivative to shear wave velocity data\n')
     
     # First, read in the data from file and convert to SI units.
     PTp_data = np.loadtxt('../burnman/data/input_minphys/Murakami_perovskite.txt')
@@ -152,4 +106,50 @@ if __name__ == "__main__":
     plt.savefig("output_figures/example_fit_data.png")
     plt.show()
 
+    
+    # 2) Fitting standard enthalpy and heat capacity to enthalpy data
+    print('2) Fitting standard enthalpy and heat capacity to enthalpy data\n')
+    
+    per_SLB = burnman.minerals.SLB_2011.periclase()
+    per_HP = burnman.minerals.HP_2011_ds62.per()
+    per_opt = burnman.minerals.HP_2011_ds62.per() # this is the mineral we'll optimise
+
+
+    # Load some example enthalpy data
+    TH_data = np.loadtxt('../burnman/data/input_fitting/Victor_Douglas_1963_deltaH_MgO.dat')
+    per_HP.set_state(1.e5, 298.15)
+    PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184 + per_HP.H]).T
+    nul = TH_data[:,0]*0.
+    PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
+
+    per_opt.params['S_0'] = 6.439*4.184
+    model = burnman.tools.fit_PTp_data(mineral = per_opt,
+                                       p_flags = 'H',
+                                       fit_params = ['H_0', 'Cp'],
+                                       PTp = PTH_data,
+                                       PTp_covariances = PTH_covariances,
+                                       max_lm_iterations = 10,
+                                       verbose = False)
+
+    print('Optimised values:')
+    params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']
+    burnman.tools.pretty_print_values(model.popt, model.pcov, params)
+    print('')
+    
+    # Corner plot
+    fig=burnman.nonlinear_fitting.corner_plot(model.popt, model.pcov, params)
+    plt.show()
+
+    # Plot models
+    temperatures = np.linspace(200., 2000., 101)
+    pressures = np.array([298.15] * len(temperatures))
+    plt.plot(temperatures, per_HP.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
+    plt.plot(temperatures, per_SLB.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
+    plt.plot(temperatures, per_opt.evaluate(['heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
+
+    plt.legend(loc='lower right')
+    plt.xlim(0., temperatures[-1])
+    plt.xlabel('Temperature (K)')
+    plt.ylabel('Heat capacity (J/K/mol)')
+    plt.show()
     

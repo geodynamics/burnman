@@ -1,9 +1,4 @@
-Optimised values:
-H_0: (-6.0065 +/- 0.0006) x 1e+05
-Cp_a: (6 +/- 1) x 1e+01
-Cp_b: (0.000 +/- 0.004) x 1e+00
-Cp_c: (-5 +/- 6) x 1e+05
-Cp_d: (-3 +/- 3) x 1e+02
+1) Fitting shear modulus and its derivative to shear wave velocity data
 
 2nd order fit:
 G_0: (1.68 +/- 0.02) x 1e+11
@@ -13,3 +8,14 @@ Gprime_0: (1.51 +/- 0.02) x 1e+00
 G_0: (1.63 +/- 0.02) x 1e+11
 Gprime_0: (1.65 +/- 0.02) x 1e+00
 
+2) Fitting standard enthalpy and heat capacity to enthalpy data
+
+Optimised values:
+H_0: (-6.0065 +/- 0.0006) x 1e+05
+Cp_a: (6 +/- 1) x 1e+01
+Cp_b: (0.000 +/- 0.004) x 1e+00
+Cp_c: (-5 +/- 6) x 1e+05
+Cp_d: (-3 +/- 3) x 1e+02
+
+UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
+UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes

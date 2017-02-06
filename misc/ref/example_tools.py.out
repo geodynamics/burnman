@@ -13,7 +13,6 @@ All EoS consistency constraints satisfied for 'burnman.minerals.SLB_2011.pericla
 Endmember equilibrium calculations
 fo -> wad equilibrium at 14.0 GPa is reached at 1650.0 K
 
-Equation of state calculations
 Optimized equation of state for stishovite:
 V_0: (1.4003 +/- 0.0009) x 1e-05
 K_0: (3.19 +/- 0.09) x 1e+11
