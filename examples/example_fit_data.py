@@ -46,10 +46,10 @@ if __name__ == "__main__":
     per_HP.set_state(1.e5, 298.15)
     PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184 + per_HP.H]).T
     nul = TH_data[:,0]*0.
-    PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.01, 2.)]]).T
+    PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
 
     per_opt.params['S_0'] = 6.439*4.184
-    model = burnman.tools.fit_PTp_data(mineral = per,
+    model = burnman.tools.fit_PTp_data(mineral = per_opt,
                                        p_flags = 'H',
                                        fit_params = ['H_0', 'Cp'],
                                        PTp = PTH_data,
@@ -60,7 +60,8 @@ if __name__ == "__main__":
     print('Optimised values:')
     params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']
     burnman.tools.pretty_print_values(model.popt, model.pcov, params)
-
+    print('')
+    
     # Corner plot
     fig=burnman.nonlinear_fitting.corner_plot(model.popt, model.pcov, params)
     plt.show()

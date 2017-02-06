@@ -60,8 +60,14 @@ def pretty_print_values(popt, pcov, params):
     for i, p in enumerate(params):
         p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
         c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
-        scale = np.power(10., np.floor(np.log10(np.abs(p_rnd))))
-        nd = np.floor(np.log10(np.abs(p_rnd))) - np.floor(np.log10(np.abs(c_rnd)))
+
+        if p_rnd != 0.:
+            p_expnt = np.floor(np.log10(np.abs(p_rnd)))
+        else:
+            p_expnt = 0.
+            
+        scale = np.power(10., p_expnt)
+        nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
         print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
 
 def pretty_print_table(table, use_tabs=False):
