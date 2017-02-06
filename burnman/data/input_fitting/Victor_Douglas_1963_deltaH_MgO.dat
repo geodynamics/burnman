@@ -1,0 +1,25 @@
+# T (K)  Terr H(T) - H(273) (cal/mol) 
+373.15	 1    923.5
+373.15	 1    922.7
+473.15	 1    1960.3
+473.15	 1    1961.1
+573.15	 1    3060.4
+573.15	 1    3058.0
+673.15	 1    4194.8
+673.15	 1    4203.6
+673.15	 1    4194.0
+773.15	 1    5375.5
+773.15	 1    5371.0
+773.15	 1    5376.7
+873.15	 1    6560.6
+873.15	 1    6558.2
+973.15	 1    7777.6
+973.15	 1    7773.6
+1073.15	 1    9007.5
+1073.15	 1    9009.1
+1173.15	 1    10245.4
+1173.15	 1    10246.6
+# taken from
+# Victor, A. C., & Douglas, T. B. (1963).
+# Thermodynamic properties of magnesium oxide and beryllium oxide from 298 to 1200 K.
+# Journal of Research of the National Institute of Standards and Technology A, 67, 325-329.
