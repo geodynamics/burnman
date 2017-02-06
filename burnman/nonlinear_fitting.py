@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
 def nonlinear_least_squares_fit(model,
-                                mle_tolerance,
                                 lm_damping = 0.,
                                 param_tolerance = 1.e-7,
                                 max_lm_iterations = 100,
@@ -33,6 +32,11 @@ def nonlinear_least_squares_fit(model,
                 Elements of cov[i][j][k] contain the covariance matrix
                 of data point i
 
+            mle_tolerances : numpy array
+                The iterations to find the maximum likelihood estimator 
+                for each observed data point will stop when mle_tolerances[i] <  
+                np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
+
             delta_params : numpy array
                 parameter perturbations used to compute the jacobian
 
@@ -46,17 +50,9 @@ def nonlinear_least_squares_fit(model,
             function(self, x):
                 Returns value of model function evaluated at x
 
-            (self, x):
-                Returns value of model function evaluated at x
-
             normal(self, x):
                 Returns value of normal to the model function 
                 evaluated at x
-
-    mle_tolerance : float
-        Tolerance value for 
-        np.linalg.norm(x_mle_i - model.function(x_mle_i))
-        to stop iterating to find the maximum likelihood estimator
 
     lm_damping : float (optional, default: 0)
         Levenberg-Marquardt parameter for least squares minimization
@@ -97,9 +93,9 @@ def nonlinear_least_squares_fit(model,
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
-
-    def _mle_estimate(x, x_m, cov):
-        n = model.normal(x_m)
+    
+    def _mle_estimate(x, x_m, cov, flag):
+        n = model.normal(x_m, flag)
         var_n = abs_line_project(cov, n)
         d = (x_m - x).dot(n)
         x_mle = x + d*((n.dot(cov)).T)/var_n
@@ -109,14 +105,14 @@ def nonlinear_least_squares_fit(model,
         x_mle_arr = np.empty_like(model.data)
         residual_arr = np.empty(n_data)
         var_arr = np.empty(n_data)
-        for i, (x, cov) in enumerate(zip(*[model.data, model.data_covariance])):
-            x_mle_arr[i] = model.function(x)
-            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov)
+        for i, (x, cov, flag) in enumerate(zip(*[model.data, model.data_covariance, model.flags])):
+            x_mle_arr[i] = model.function(x, flag)
+            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
             delta_x = x_mle_arr[i] - x
         
-            while np.linalg.norm(delta_x) > mle_tolerance:
-                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov)
-                x_mle_arr[i] = model.function(x_mle_est)
+            while np.linalg.norm(delta_x) > model.mle_tolerances[i]:
+                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
+                x_mle_arr[i] = model.function(x_mle_est, flag)
                 delta_x = x_mle_arr[i] - x_mle_est
 
         return x_mle_arr, residual_arr/np.sqrt(var_arr), 1./var_arr
@@ -156,7 +152,10 @@ def nonlinear_least_squares_fit(model,
     n_params = len(model.get_params())
     n_dimensions = len(model.data[:,0])
     model.dof = n_data - n_params
+
     
+    if not hasattr(model, 'flags'):
+        model.flags = [None] * n_data
 
     for n_it in range(max_lm_iterations):
         f_delta_beta = _update_beta(lm_damping)
@@ -189,7 +188,7 @@ def nonlinear_least_squares_fit(model,
 
 
     
-def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_interval, projection_axis=[]):
+def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_interval, projection_axis=[], flag=None):
     """
     This function calculates the confidence and prediction bands of the orthogonal distance 
     from a best-fit model with uncertainties in its parameters as calculated (for example) 
@@ -237,8 +236,8 @@ def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_i
     normals = np.empty_like(x_array)
     x_m_0 = np.empty_like(x_array)
     for i, x in enumerate(x_array):
-        normals[i] = model.normal(x)
-        x_m_0[i] = model.function(x)
+        normals[i] = model.normal(x, flag)
+        x_m_0[i] = model.function(x, flag)
             
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])      
@@ -246,7 +245,7 @@ def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_i
         model.set_params(param_values + diag_delta[i])
 
         for j, x in enumerate(x_m_0):
-            dxdbeta[i][j] = (model.function(x) - x).dot(normals[j])/diag_delta[i][i]
+            dxdbeta[i][j] = (model.function(x, flag) - x).dot(normals[j])/diag_delta[i][i]
 
     model.set_params(param_values) # reset params
         
@@ -281,7 +280,7 @@ def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_i
     return np.array([confidence_bound_0, confidence_bound_1,
                      prediction_bound_0, prediction_bound_1])
     
-def confidence_prediction_bands(model, f, x_array, confidence_interval):
+def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=None):
     """
     This function calculates the confidence and prediction bands of the function f
     from a best-fit model with uncertainties in its parameters as calculated (for example) 
@@ -326,8 +325,8 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval):
     x_m_0s = np.empty_like(x_array)
     f_m_0s = np.empty_like(x_array[:,0])
     for i, x in enumerate(x_array):
-        normals[i] = model.normal(x)
-        x_m_0s[i] = model.function(x)
+        normals[i] = model.normal(x, flag)
+        x_m_0s[i] = model.function(x, flag)
         f_m_0s[i] = f(x)
             
     diag_delta = np.diag(model.delta_params)
@@ -337,7 +336,7 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval):
         model.set_params(param_values + diag_delta[i])
 
         for j, x_m_0 in enumerate(x_m_0s):
-            x_m_1 = x_m_0 + ((model.function(x_m_0) - x_m_0).dot(normals[j]))*normals[j]
+            x_m_1 = x_m_0 + ((model.function(x_m_0, flag) - x_m_0).dot(normals[j]))*normals[j]
             dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j])/diag_delta[i][i]
 
     model.set_params(param_values) # reset params

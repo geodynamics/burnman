@@ -72,7 +72,7 @@ if __name__ == "__main__":
             PTVs[i] = [P, T, per.V]
 
         # Plot the 95% confidence bands 
-        cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [])
+        cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [], 'V')
         plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
         plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
         
@@ -109,7 +109,7 @@ if __name__ == "__main__":
             # Plot the 95% confidence bands for the various material properties
             cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
                                                                               burnman.tools.attribute_function(per, material_property),
-                                                                              PTVs, 0.95)
+                                                                              PTVs, 0.95, 'V')
             ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2/scaling, label='Best fit at {0:.0f} K'.format(T))
             ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/scaling, linestyle='--', color='r', label='95% confidence band')
             ax.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/scaling, linestyle='--', color='r')
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         # Plot the 95% confidence bands for the gibbs free energy
         cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
                                                                           burnman.tools.attribute_function(per, 'gibbs'),
-                                                                          PTVs, 0.95)
+                                                                          PTVs, 0.95, 'V')
         ax.plot(PTVs[:,0]/1.e9, (cp2_bands[0] - cp2_bands[1])/2/scaling, label='95% confidence half width at {0:.0f} K'.format(T))
         plt.ylabel('Gibbs free energy uncertainty (kJ/mol)')
         plt.xlabel('Pressure (GPa)')

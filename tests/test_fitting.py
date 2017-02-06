@@ -23,6 +23,7 @@ class test_fitting(BurnManTest):
                 self.data_covariance = cov
                 self.set_params(guessed_params)
                 self.delta_params = delta_params
+                self.mle_tolerances = np.array([1.e-1] * len(data[:,0])) # irrelevant for a linear model
 
             def set_params(self, param_values):
                 self.params = param_values
@@ -30,10 +31,10 @@ class test_fitting(BurnManTest):
             def get_params(self):
                 return self.params
     
-            def function(self, x):
+            def function(self, x, flag):
                 return np.array([x[0], self.params[0]*x[0] + self.params[1]])
 
-            def normal(self, x):
+            def normal(self, x, flag):
                 n = np.array([self.params[0], -1.])
                 return n/np.linalg.norm(n)
 
@@ -41,7 +42,6 @@ class test_fitting(BurnManTest):
         delta_params = np.array([1.e-3, 1.e-3]) # unimportant for a linear model
         fitted_curve = m(data, cov, guessed_params, delta_params)
         nonlinear_least_squares_fit(model=fitted_curve,
-                                    mle_tolerance = 1.e-1, # again, a linear model
                                     param_tolerance = 1.e-5)
         
         self.assertArraysAlmostEqual([fitted_curve.WSS], [11.8663531941])

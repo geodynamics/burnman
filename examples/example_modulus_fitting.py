@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     def best_fit():
         return burnman.tools.fit_PTp_data(mineral = mg_perovskite_test,
-                                          observed_property = 'shear_wave_velocity',
+                                          p_flags = 'shear_wave_velocity',
                                           fit_params = ['G_0', 'Gprime_0'],
                                           PTp = PTp_data,
                                           verbose = False)
