@@ -146,11 +146,16 @@ if __name__ == "__main__":
         PTVs[i] = [P, T, stv.V]
 
     # Plot the 95% confidence and prediction bands 
-    cp_bands = burnman.nonlinear_fitting.orthogonal_distance_confidence_prediction_bands(fitted_eos, PTVs, 0.95, [], 'V')
-    plt.plot(cp_bands[0][:,0]/1.e9, cp_bands[0][:,2] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
-    plt.plot(cp_bands[1][:,0]/1.e9, cp_bands[1][:,2] * 1.e6, linestyle='--', color='r')
-    plt.plot(cp_bands[2][:,0]/1.e9, cp_bands[2][:,2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
-    plt.plot(cp_bands[3][:,0]/1.e9, cp_bands[3][:,2] * 1.e6, linestyle='--', color='b')
+    cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
+                                                                     x_array = PTVs,
+                                                                     confidence_interval = 0.95,
+                                                                     f=burnman.tools.attribute_function(stv, 'V'),
+                                                                     flag='V')
+    
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[0] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[1] * 1.e6, linestyle='--', color='r')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[3] * 1.e6, linestyle='--', color='b')
         
     plt.plot(PTVs[:,0] / 1.e9, PTVs[:,2] * 1.e6,
              label='Optimized fit for stishovite')
@@ -167,12 +172,14 @@ if __name__ == "__main__":
 
     
     # Plot the 95% confidence and prediction bands for the bulk modulus
-    cp2_bands = burnman.nonlinear_fitting.confidence_prediction_bands(fitted_eos,
-                                                                      burnman.tools.attribute_function(stv, 'K_T'),
-                                                                      PTVs, 0.95, 'V')
-    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0] + cp2_bands[1])/2.e9, color='b', label='Best fit')
-    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
-    plt.plot(PTVs[:,0]/1.e9, (cp2_bands[1])/1.e9, linestyle='--', color='r')
+    cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
+                                                                     x_array = PTVs,
+                                                                     confidence_interval = 0.95,
+                                                                     f=burnman.tools.attribute_function(stv, 'K_T'),
+                                                                     flag='V')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2.e9, color='b', label='Best fit')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[1])/1.e9, linestyle='--', color='r')
     plt.ylabel("Bulk modulus (GPa)")
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="upper right")

@@ -185,104 +185,11 @@ def nonlinear_least_squares_fit(model,
         print('\nParameter covariance matrix:')
         print(model.pcov)
         print('')
-
-
+        
     
-def orthogonal_distance_confidence_prediction_bands(model, x_array, confidence_interval, projection_axis=[], flag=None):
+def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=None):
     """
-    This function calculates the confidence and prediction bands of the orthogonal distance 
-    from a best-fit model with uncertainties in its parameters as calculated (for example) 
-    by the function nonlinear_least_squares_fit().
-
-    The values are calculated via the delta method, which estimates the variance of a function f 
-    evaluated at x as var(f,x) = df(x)/dB var(B) df(x)/dB
-    where df(x)/dB is the vector of partial derivatives of f(x) with respect to B 
-
-
-    Parameters
-    ----------
-    model : class instance
-        As modified (for example) by the function nonlinear_least_squares_fit().
-        Should contain the following attributes:
-            function, normal, delta_params, pcov, dof, noise_variance
-
-    x_array : 2D numpy array
-        coordinates at which to evaluate the bounds
-
-    confidence_interval : float
-        Probability level of finding the true model (confidence bound) or any new 
-        data point (probability bound). For example, the 95% confidence bounds 
-        should be calculated using a confidence interval of 0.95.
-
-    projection_axis : list or numpy array
-        Axis along which the confidence bounds should be projected
-        For example, we are often interested in plotting the confidence and prediction
-        bounds as a function of a single coordinate direction.
-
-    Output
-    ------
-    bounds : 3D numpy array
-        An element of bounds[i][j][k] gives the lower and upper confidence (i=0, i=1) and
-        prediction (i=2, i=3) bounds for the jth data point on the kth coordinate axis.
-    """
-    
-    # Check array dimensions
-    n_dimensions = len(model.data[0])
-    if len(x_array[0]) != n_dimensions:
-        raise Exception('Dimensions of each point must be the same as the total number of dimensions')
-
-
-    param_values = model.get_params()
-    normals = np.empty_like(x_array)
-    x_m_0 = np.empty_like(x_array)
-    for i, x in enumerate(x_array):
-        normals[i] = model.normal(x, flag)
-        x_m_0[i] = model.function(x, flag)
-            
-    diag_delta = np.diag(model.delta_params)
-    dxdbeta = np.empty([len(param_values), len(x_array)])      
-    for i, value in enumerate(param_values):
-        model.set_params(param_values + diag_delta[i])
-
-        for j, x in enumerate(x_m_0):
-            dxdbeta[i][j] = (model.function(x, flag) - x).dot(normals[j])/diag_delta[i][i]
-
-    model.set_params(param_values) # reset params
-        
-
-    variance = np.empty(len(x_array))
-    for i, Gprime in enumerate(dxdbeta.T):
-        variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
-
-    critical_value = t.isf(0.5*(confidence_interval + 1.), model.dof)
-        
-    confidence_half_widths = critical_value*np.sqrt(variance)
-    prediction_half_widths = critical_value*np.sqrt(variance + model.noise_variance)
-
-    if projection_axis == []:
-        projection_axis = normals[0]
-
-    norms = np.empty(len(x_array))
-    for i, normal in enumerate(normals):
-        norms[i] = projection_axis.dot(normal)
-
-    axes = np.array([projection_axis,]*len(x_array))
-        
-    projected_confidence_half_widths = np.array([confidence_half_widths/norms,]*n_dimensions).T * axes
-    projected_prediction_half_widths = np.array([prediction_half_widths/norms,]*n_dimensions).T * axes
-
-        
-    confidence_bound_0 = x_m_0 - projected_confidence_half_widths
-    confidence_bound_1 = x_m_0 + projected_confidence_half_widths
-    prediction_bound_0 = x_m_0 - projected_prediction_half_widths
-    prediction_bound_1 = x_m_0 + projected_prediction_half_widths
-    
-    return np.array([confidence_bound_0, confidence_bound_1,
-                     prediction_bound_0, prediction_bound_1])
-    
-def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=None):
-    """
-    This function calculates the confidence and prediction bands of the function f
+    This function calculates the confidence and prediction bands of the function f(x)
     from a best-fit model with uncertainties in its parameters as calculated (for example) 
     by the function nonlinear_least_squares_fit().
 
@@ -293,7 +200,7 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=Non
 
     Parameters
     ----------
-    model : class instance
+'    model : class instance
         As modified (for example) by the function nonlinear_least_squares_fit().
         Should contain the following attributes:
             function, normal, delta_params, pcov, dof, noise_variance
@@ -306,6 +213,13 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=Non
         data point (probability bound). For example, the 95% confidence bounds 
         should be calculated using a confidence interval of 0.95.
 
+    f : function
+        This is the function defining the variable y=f(x) for which the 
+        confidence and prediction bounds are desired
+
+    flag : variable type
+        This (optional) flag is passed to model.function to control how the 
+        modified position of x is calculated. This value is then used by f(x)
 
     Output
     ------
@@ -321,11 +235,9 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=Non
 
         
     param_values = model.get_params()
-    normals = np.empty_like(x_array)
     x_m_0s = np.empty_like(x_array)
     f_m_0s = np.empty_like(x_array[:,0])
     for i, x in enumerate(x_array):
-        normals[i] = model.normal(x, flag)
         x_m_0s[i] = model.function(x, flag)
         f_m_0s[i] = f(x)
             
@@ -336,7 +248,7 @@ def confidence_prediction_bands(model, f, x_array, confidence_interval, flag=Non
         model.set_params(param_values + diag_delta[i])
 
         for j, x_m_0 in enumerate(x_m_0s):
-            x_m_1 = x_m_0 + ((model.function(x_m_0, flag) - x_m_0).dot(normals[j]))*normals[j]
+            x_m_1 = model.function(x_m_0, flag)
             dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j])/diag_delta[i][i]
 
     model.set_params(param_values) # reset params
