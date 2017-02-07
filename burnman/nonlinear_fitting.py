@@ -272,7 +272,8 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
                      prediction_bound_0, prediction_bound_1])
 
 def normalised(a, order=2, axis=-1):
-    l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
+    l2 = np.atleast_1d(np.apply_along_axis(np.linalg.norm, axis, a, order))
+
     l2[l2==0] = 1
     return a / np.expand_dims(l2, axis)[0][0]
 
