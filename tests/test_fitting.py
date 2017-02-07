@@ -20,7 +20,7 @@ class test_fitting(BurnManTest):
         class m():
             def __init__(self, data, cov, guessed_params, delta_params):
                 self.data = data
-                self.data_covariance = cov
+                self.data_covariances = cov
                 self.set_params(guessed_params)
                 self.delta_params = delta_params
                 self.mle_tolerances = np.array([1.e-1] * len(data[:,0])) # irrelevant for a linear model

@@ -4,6 +4,7 @@ import itertools
 import copy
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 from matplotlib.patches import Ellipse
 
 def nonlinear_least_squares_fit(model,
@@ -28,7 +29,7 @@ def nonlinear_least_squares_fit(model,
                 Elements of x[i][j] contain the observed position of 
                 data point i
 
-            data_covariance : 3D numpy array
+            data_covariances : 3D numpy array
                 Elements of cov[i][j][k] contain the covariance matrix
                 of data point i
 
@@ -105,7 +106,7 @@ def nonlinear_least_squares_fit(model,
         x_mle_arr = np.empty_like(model.data)
         residual_arr = np.empty(n_data)
         var_arr = np.empty(n_data)
-        for i, (x, cov, flag) in enumerate(zip(*[model.data, model.data_covariance, model.flags])):
+        for i, (x, cov, flag) in enumerate(zip(*[model.data, model.data_covariances, model.flags])):
             x_mle_arr[i] = model.function(x, flag)
             x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
             delta_x = x_mle_arr[i] - x
@@ -152,7 +153,6 @@ def nonlinear_least_squares_fit(model,
     n_params = len(model.get_params())
     n_dimensions = len(model.data[:,0])
     model.dof = n_data - n_params
-
     
     if not hasattr(model, 'flags'):
         model.flags = [None] * n_data
@@ -173,6 +173,7 @@ def nonlinear_least_squares_fit(model,
     model.pcov = np.linalg.inv(J.T.dot(J))*r.dot(r.T)/model.dof
     
     # Estimate the noise variance normal to the curve
+    model.goodness_of_fit = model.WSS/model.dof
     model.noise_variance = r.dot(np.diag(1./model.weights)).dot(r.T)/model.dof
     
     if verbose == True:
@@ -321,17 +322,30 @@ def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
     return ellip
 
 
-def corner_plot(popt, pcov, param_names=[]):
+def corner_plot(popt, pcov, param_names=[], n_std = 1.):
     """
     Creates a corner plot of covariances
 
     Parameters
     ----------
+    
+    popt : numpy array
+        Optimized parameters
 
+    pcov : 2D numpy array
+        Covariance matrix of the parameters
+
+    param_names : optional list
+        Parameter names
+
+    n_std : float
+        Number of standard deviations for ellipse
 
     Returns
     -------
-    fig : Instance of matplotlib.pyplot.figure
+    fig : matplotlib.pyplot.figure object
+
+    ax_array : list of matplotlib Axes objects 
 
     """
     
@@ -347,9 +361,12 @@ def corner_plot(popt, pcov, param_names=[]):
     scaling = 1./np.power(10., np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
 
-    fig = plt.figure()
-    
-    for i in range(n_params):
+    fig, ax_array = plt.subplots(n_params-1, n_params-1)
+
+    for i in range(n_params-1):
+        for j in range(1, i+1):
+            fig.delaxes(ax_array[j-1][i])
+                        
         for j in range(i+1, n_params):
             indices = np.array([i, j])
             projected_cov = (pcov*scaling)[indices[:, None], indices]
@@ -357,21 +374,34 @@ def corner_plot(popt, pcov, param_names=[]):
             scaled_pos = np.array([popt[i]*np.sqrt(scaling[i][i]),
                                    popt[j]*np.sqrt(scaling[j][j])])
 
-            nstd = 1.
-            ax = fig.add_subplot(n_params-1, n_params-1, (j-1)*(n_params-1)+(i+1))
             plot_cov_ellipse(cov=projected_cov, pos=scaled_pos,
-                             nstd=nstd, ax=ax, color='grey')
-            maxx = 1.5*nstd*np.sqrt(projected_cov[0][0])
-            maxy = 1.5*nstd*np.sqrt(projected_cov[1][1])
-            ax.set_xlim(scaled_pos[0]-maxx, scaled_pos[0]+maxx)
-            ax.set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
+                             nstd=n_std, ax=ax_array[j-1][i], color='grey')
+            maxx = 1.5*n_std*np.sqrt(projected_cov[0][0])
+            maxy = 1.5*n_std*np.sqrt(projected_cov[1][1])
+            ax_array[j-1][i].set_xlim(scaled_pos[0]-maxx, scaled_pos[0]+maxx)
+            ax_array[j-1][i].set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
 
     if param_names != []:
         for i in range(n_params-1):
-            ax = fig.add_subplot(n_params-1, n_params-1, (n_params-2)*(n_params-1)+(i+1))
-            ax.set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
-        for j in range(n_params-1):
-            ax = fig.add_subplot(n_params-1, n_params-1, j*(n_params-1)+1)
-            ax.set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j+1], -int(np.log10(np.sqrt(scaling[j+1][j+1])))))
+            ax_array[n_params-2][i].set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
             
-    return fig
+        for j in range(1, n_params):
+            ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
+            
+    return fig, ax_array
+
+
+def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu, plot_axes=[0, 1], scale_axes=[1., 1.]):
+
+    if flag == None:
+        mask = range(len(model.data[:,0]))
+    else:
+        mask = [i for i, flg in enumerate(model.flags) if flg == flag]
+
+    cmap.set_under('k')
+    cmap.set_over('k')
+    bounds = np.linspace(-sd_limit, sd_limit, sd_limit*2+1)
+    norm = colors.BoundaryNorm(bounds, cmap.N)
+    
+    im = ax.scatter(model.data[:,plot_axes[0]][mask]*scale_axes[0], model.data[:,plot_axes[1]][mask]*scale_axes[1], c=model.weighted_residuals[mask], cmap=cmap, norm=norm, s=50)
+    plt.colorbar(im, ax=ax, label='Misfit (standard deviations)')

@@ -149,8 +149,10 @@ if __name__ == "__main__":
     # Let's load some enthalpy data as extra constraints.
     # We'll use the data that we used in example_fit_data.py:
     TH_data = np.loadtxt('../burnman/data/input_fitting/Victor_Douglas_1963_deltaH_MgO.dat')
-    per_opt.set_state(1.e5, 298.15)
-    PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184 + per_opt.H]).T
+    per_opt.set_state(1.e5, 300.)
+    per_opt.params['F_0'] = per_opt.params['F_0'] - per_opt.H # necessary to fit the enthalpy relative to 298.15
+    
+    PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184]).T
     nul = TH_data[:,0]*0.
     PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
 
@@ -167,8 +169,8 @@ if __name__ == "__main__":
     fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
                                             p_flags = flags,
                                             fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'F_0'],
-                                            PTp = PTp_data,
-                                            PTp_covariances = PTp_covariances,
+                                            data = PTp_data,
+                                            data_covariances = PTp_covariances,
                                             verbose = False)
 
 

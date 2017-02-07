@@ -205,7 +205,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tolerances=[], max_lm_iterations=50, verbose=True):
+def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_tolerances=[], max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -227,9 +227,9 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tole
         during fitting. Initial guesses are taken from the existing
         values for the parameters
 
-    PTp : numpy array of observed P-T-property values
+    data : numpy array of observed P-T-property values
 
-    PTp_covariances : numpy array of P-T-property covariances (optional)
+    data_covariances : numpy array of P-T-property covariances (optional)
         If not given, all covariance matrices are chosen 
         such that C00 = 1, otherwise Cij = 0. 
         In other words, all data points have equal weight, 
@@ -261,10 +261,10 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tole
     """
 
     class Model(object):
-        def __init__(self, mineral, data, data_covariance, flags, fit_params, guessed_params, delta_params, mle_tolerances):
+        def __init__(self, mineral, data, data_covariances, flags, fit_params, guessed_params, delta_params, mle_tolerances):
             self.m = mineral
             self.data = data
-            self.data_covariance = data_covariance
+            self.data_covariances = data_covariances
             self.flags = flags
             self.fit_params = fit_params
             self.set_params(guessed_params)
@@ -328,15 +328,15 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tole
         
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
-    if PTp_covariances == []:
-        PTp_covariances = np.zeros((len(PTp[:,0]), len(PTp[0]), len(PTp[0])))
-        for i in range(len(PTp_covariances)):
+    if data_covariances == []:
+        data_covariances = np.zeros((len(PTp[:,0]), len(PTp[0]), len(PTp[0])))
+        for i in range(len(data_covariances)):
             PTp_covariances[i][0][0] = 1.
     
     guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
     model = Model(mineral = mineral,
-                  data = PTp,
-                  data_covariance = PTp_covariances,
+                  data = data,
+                  data_covariances = data_covariances,
                   flags = p_flags,
                   fit_params = fit_params,
                   guessed_params = guessed_params,
@@ -348,13 +348,13 @@ def fit_PTp_data(mineral, fit_params, p_flags, PTp, PTp_covariances=[], mle_tole
     return model
 
 
-def fit_PTV_data(mineral, fit_params, PTV, PTV_covariances=[], max_lm_iterations=50, verbose=True):
+def fit_PTV_data(mineral, fit_params, data, data_covariances=[], max_lm_iterations=50, verbose=True):
     """
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
         
     return fit_PTp_data(mineral=mineral, p_flags='V',
-                        PTp=PTV, PTp_covariances=PTV_covariances, 
+                        data=data, data_covariances=data_covariances, 
                         fit_params=fit_params, max_lm_iterations=max_lm_iterations, verbose=verbose)
 
 

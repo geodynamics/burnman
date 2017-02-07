@@ -56,7 +56,7 @@ if __name__ == "__main__":
         return burnman.tools.fit_PTp_data(mineral = mg_perovskite_test,
                                           p_flags = 'shear_wave_velocity',
                                           fit_params = ['G_0', 'Gprime_0'],
-                                          PTp = PTp_data,
+                                          data = PTp_data,
                                           verbose = False)
 
     pressures = np.linspace(1.e5, 150.e9, 101)
@@ -126,8 +126,8 @@ if __name__ == "__main__":
     model = burnman.tools.fit_PTp_data(mineral = per_opt,
                                        p_flags = 'H',
                                        fit_params = ['H_0', 'Cp'],
-                                       PTp = PTH_data,
-                                       PTp_covariances = PTH_covariances,
+                                       data = PTH_data,
+                                       data_covariances = PTH_covariances,
                                        max_lm_iterations = 10,
                                        verbose = False)
 
