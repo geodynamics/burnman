@@ -313,7 +313,7 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
         
     # If only one property flag is given, assume it applies to all data
     if type(p_flags) is str:
-        p_flags = np.array([p_flags] * len(PTp[:,0]))
+        p_flags = np.array([p_flags] * len(data[:,0]))
 
     # Apply mle tolerances if they dont exist
     if mle_tolerances == []:
@@ -329,9 +329,9 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
     if data_covariances == []:
-        data_covariances = np.zeros((len(PTp[:,0]), len(PTp[0]), len(PTp[0])))
+        data_covariances = np.zeros((len(data[:,0]), len(data[0]), len(data[0])))
         for i in range(len(data_covariances)):
-            PTp_covariances[i][0][0] = 1.
+            data_covariances[i][0][0] = 1.
     
     guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
     model = Model(mineral = mineral,
