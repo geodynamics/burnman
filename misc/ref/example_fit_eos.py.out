@@ -21,6 +21,6 @@ K_0: (1.54 +/- 0.03) x 1e+11
 Kprime_0: (4.5 +/- 0.3) x 1e+00
 grueneisen_0: (1.37 +/- 0.02) x 1e+00
 q_0: (-4 +/- 4) x 1e-01
-F_0: (-5.6856 +/- 0.0002) x 1e+05
+F_0: (-7.15 +/- 0.02) x 1e+03
 
 Hurrah! That looks much better! Note that not only have the errors on grueneisen_0 and q_0 got smaller, but they have also moved well-outside the previous 1-s.d. uncertainty bounds. Plus, now the heat capacities don't blow up at high temperature. Cool, huh?!

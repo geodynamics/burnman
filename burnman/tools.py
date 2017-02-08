@@ -298,16 +298,27 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
             
             if p_flag == 'V':
                 self.m.set_state(P, T)
-                n = np.array([-1./self.m.K_T, self.m.alpha, -1./self.m.V])
+                dPdp = -self.m.K_T/self.m.V
+                dpdT = self.m.alpha*self.m.V
+            elif p_flag == 'H':
+                self.m.set_state(P, T)
+                dPdp = 1./((1.-T*self.m.alpha)*self.m.V)
+                dpdT = self.m.heat_capacity_p
+            elif p_flag == 'S':
+                self.m.set_state(P, T)
+                dPdp = -1./(self.m.alpha*self.m.V)
+                dpdT = self.m.heat_capacity_p/T
+            elif p_flag == 'gibbs':
+                self.m.set_state(P, T)
+                dPdp = 1./self.m.V
+                dpdT = -self.S
             else:
                 dP = 1.e5
                 dT = 1.
-                
                 dPdp = (2.*dP)/(self.function([P+dP, T, 0.], p_flag)[2] - self.function([P-dP, T, 0.], p_flag)[2])
                 dpdT = (self.function([P, T+dT, 0.], p_flag)[2] - self.function([P, T-dT, 0.], p_flag)[2])/(2.*dT)
-                dPdT = -dPdp*dpdT
-                n = np.array([-1., dPdT, dPdp])
-                
+            dPdT = -dPdp*dpdT    
+            n = np.array([-1., dPdT, dPdp])
             return n/np.linalg.norm(n)
 
         

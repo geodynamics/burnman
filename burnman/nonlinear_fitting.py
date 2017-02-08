@@ -203,8 +203,10 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     ----------
 '    model : class instance
         As modified (for example) by the function nonlinear_least_squares_fit().
-        Should contain the following attributes:
-            function, normal, delta_params, pcov, dof, noise_variance
+        Should contain the following functions:
+            get_params, set_params, function, normal
+        And attributes:
+            delta_params, pcov, dof, noise_variance
 
     x_array : 2D numpy array
         coordinates at which to evaluate the bounds
