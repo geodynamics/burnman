@@ -16,11 +16,35 @@ How should we improve on this "optimal" PVT fit?
 2) Fitting to PTV *and* PT-enthalpy data
 
 Optimized equation of state:
-V_0: (1.1238 +/- 0.0002) x 1e-05
-K_0: (1.54 +/- 0.03) x 1e+11
-Kprime_0: (4.5 +/- 0.3) x 1e+00
-grueneisen_0: (1.37 +/- 0.02) x 1e+00
-q_0: (-4 +/- 4) x 1e-01
-F_0: (-7.15 +/- 0.02) x 1e+03
+V_0: (1.1237 +/- 0.0002) x 1e-05
+K_0: (1.56 +/- 0.03) x 1e+11
+Kprime_0: (4.4 +/- 0.3) x 1e+00
+grueneisen_0: (1.40 +/- 0.03) x 1e+00
+q_0: (-3 +/- 4) x 1e-01
+Debye_0: (7.8 +/- 0.1) x 1e+02
+F_0: (-6.9 +/- 0.2) x 1e+03
 
-Hurrah! That looks much better! Note that not only have the errors on grueneisen_0 and q_0 got smaller, but they have also moved well-outside the previous 1-s.d. uncertainty bounds. Plus, now the heat capacities don't blow up at high temperature. Cool, huh?!
+Hmmm, looks promising. The heat capacities don't blow up any more. Let's check our residual plot...
+
+Eugh. There are still two volume points with very large weighted residuals. You might be interested in asking what the chances are that those extreme residuals belong in our data set. Here we use extreme value theory to calculate how many of our data have residuals that are greater than we would expect for a data set of this size at a given confidence interval.
+
+There are 2 outliers (at the 90.0% confidence interval). Their indices and probabilities are:
+[68]: 0.00% (6.6 s.d. from the model)
+[70]: 0.09% (4.3 s.d. from the model)
+
+As we expected, those two data points are way outside what we should expect. Least squares fitting is very sensitive to data with large residuals, so we should always consider adjusting uncertainties or removing suspicious data.
+Here, the offending data points are so far outside reasonable values that we remove them altogether.
+Optimized equation of state (outliers removed):
+V_0: (1.1249 +/- 0.0002) x 1e-05
+K_0: (1.65 +/- 0.02) x 1e+11
+Kprime_0: (3.6 +/- 0.1) x 1e+00
+grueneisen_0: (1.40 +/- 0.02) x 1e+00
+q_0: (4 +/- 2) x 1e-01
+Debye_0: (7.75 +/- 0.05) x 1e+02
+F_0: (-7.00 +/- 0.09) x 1e+03
+
+Goodness of fit:
+0.320602656406
+
+
+Hurrah! That looks much better! The patches of positive and negative weighted residuals in P-T space have completely disappeared, strongly suggesting that those two data points were skewing our results. The errors on all the parameters have got much smaller, and several have moved outside the previous 1-s.d. uncertainty bounds. Cool, huh?! Let's look at some pretty plots characterising our optimised equation of state.

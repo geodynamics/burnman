@@ -61,7 +61,13 @@ if __name__ == "__main__":
     # We choose to fit to the SLB_2011 equation of state with four parameters (V_0, K_0, K'_0, grueneisen_0)
     per_opt = burnman.minerals.SLB_2011.periclase()
     params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0']
-    fitted_eos = burnman.tools.fit_PTV_data(per_opt, params, PTV_data, PTV_covariances, verbose=False)
+    param_tolerance = 1.e-3 # fairly low resolution fitting (corresponding to 0.1% variation)
+    fitted_eos = burnman.tools.fit_PTV_data(mineral = per_opt,
+                                            fit_params = params,
+                                            data = PTV_data,
+                                            data_covariances = PTV_covariances, 
+                                            param_tolerance = param_tolerance,
+                                            verbose = False)
 
     
     # We're done! That wasn't too painful, was it?!
@@ -161,11 +167,13 @@ if __name__ == "__main__":
     V_mask = [i for i, flag in enumerate(flags) if flag == 'V']
     
     # And now we can fit our data!
+    fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
     fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
                                             p_flags = flags,
-                                            fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'F_0'],
+                                            fit_params = fit_params,
                                             data = PTp_data,
                                             data_covariances = PTp_covariances,
+                                            param_tolerance = param_tolerance,
                                             verbose = False)
 
 
@@ -173,7 +181,83 @@ if __name__ == "__main__":
     print('Optimized equation of state:')
     burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print('')
+
+
     
+    # Create a corner plot of the covariances
+    fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    plt.show()
+
+    # And a plot of the revised heat capacities
+    per_SLB = burnman.minerals.SLB_2011.periclase()
+    per_HP = burnman.minerals.HP_2011_ds62.per()
+    temperatures = np.linspace(200., 2000., 101)
+    pressures = np.array([298.15] * len(temperatures))
+    plt.plot(temperatures, per_HP.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
+    plt.plot(temperatures, per_SLB.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
+    plt.plot(temperatures, per_opt.evaluate(['heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
+
+    plt.legend(loc='lower right')
+    plt.xlim(0., temperatures[-1])
+    plt.xlabel('Temperature (K)')
+    plt.ylabel('Heat capacity (J/K/mol)')
+    plt.show()
+
+    print('Hmmm, looks promising. The heat capacities don\'t blow up any more. '
+          'Let\'s check our residual plot...\n')
+    
+    # Now let's plot the new residuals
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    burnman.nonlinear_fitting.weighted_residual_plot(ax=ax, model=fitted_eos, flag='V', sd_limit=3,
+                                                     cmap=plt.cm.RdYlBu, plot_axes=[0, 1],
+                                                     scale_axes=[1.e-9, 1.])
+    ax.set_title('Weighted residual plot for volumes')
+    ax.set_xlabel('Pressure (GPa)')
+    ax.set_ylabel('Temperature (K)')
+    plt.show()
+
+
+    print('Eugh. There are still two volume points with very large weighted residuals. '
+          'You might be interested in asking what the chances are that those extreme '
+          'residuals belong in our data set. Here we use extreme value theory to calculate '
+          'how many of our data have residuals that are greater than we would expect for a '
+          'data set of this size at a given confidence interval.\n')
+
+    # Let's pick a confidence interval of 90%. Essentially we're now calculating the
+    # number of standard deviations from the mean that would bracket an *entire* data set of
+    # this size 90% of the time.
+    good_data_confidence_interval = 0.9
+    confidence_bound, indices, probabilities = burnman.nonlinear_fitting.extreme_values(fitted_eos.weighted_residuals, good_data_confidence_interval)
+
+    print('There are {0:d} outliers (at the {1:.1f}% confidence interval). Their indices and probabilities are:'.format(len(indices), good_data_confidence_interval*100.))
+    for i, idx in enumerate(indices):
+        print('[{0:d}]: {1:.2f}% ({2:.1f} s.d. from the model)'.format(idx, probabilities[i]*100., np.abs(fitted_eos.weighted_residuals[idx])))
+    print('')
+    print('As we expected, those two data points are way outside what we should expect. '
+          'Least squares fitting is very sensitive to data with large residuals, '
+          'so we should always consider adjusting uncertainties or removing suspicious data.\n'
+          'Here, the offending data points are so far outside reasonable values that we remove them altogether.')
+
+    mask = [i for i in range(len(fitted_eos.weighted_residuals)) if i not in indices]
+    flags = [flag for i, flag in enumerate(flags) if i not in indices]
+    PTp_data = PTp_data[mask]
+    PTp_covariances = PTp_covariances[mask]  
+    fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
+                                            p_flags = flags,
+                                            fit_params = fit_params,
+                                            data = PTp_data,
+                                            data_covariances = PTp_covariances,
+                                            param_tolerance = 1.e-5, # higher resolution fitting now that we removed those outliers
+                                            verbose = False)
+
+    # Print the optimized parameters
+    print('Optimized equation of state (outliers removed):')
+    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    print('\nGoodness of fit:')
+    print(fitted_eos.goodness_of_fit)
+    print('\n')
+
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     plt.show()
@@ -189,6 +273,13 @@ if __name__ == "__main__":
     ax.set_ylabel('Temperature (K)')
     plt.show()
 
+    
+    print('Hurrah! That looks much better! The patches of positive and negative weighted residuals '
+          'in P-T space have completely disappeared, strongly suggesting that those two data points '
+          'were skewing our results. The errors on all the parameters have got much smaller, '
+          'and several have moved outside the previous 1-s.d. uncertainty bounds. '
+          'Cool, huh?! Let\'s look at some pretty plots characterising our optimised equation of state.')
+    
     # A plot of the volumes at 1 bar
     temperatures = np.linspace(1., 3000., 101)
     pressures = np.array([1.e5] * 101)
@@ -207,31 +298,6 @@ if __name__ == "__main__":
     plt.ylabel('Volume (cm^3/mol)')
     plt.title('Periclase volumes at 1 bar')
     plt.show()
-
-    # And a plot of the revised heat capacities
-    per_SLB = burnman.minerals.SLB_2011.periclase()
-    per_HP = burnman.minerals.HP_2011_ds62.per()
-    temperatures = np.linspace(200., 2000., 101)
-    pressures = np.array([298.15] * len(temperatures))
-    plt.plot(temperatures, per_HP.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
-    plt.plot(temperatures, per_SLB.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
-    plt.plot(temperatures, per_opt.evaluate(['heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
-
-    plt.legend(loc='lower right')
-    plt.xlim(0., temperatures[-1])
-    plt.xlabel('Temperature (K)')
-    plt.ylabel('Heat capacity (J/K/mol)')
-    plt.show()
-
-
-
-    print('Hurrah! That looks much better! Note that not only have the errors on grueneisen_0 and q_0 got smaller, '
-          'but they have also moved well-outside the previous 1-s.d. uncertainty bounds. '
-          'Plus, now the heat capacities don\'t blow up at high temperature. Cool, huh?!')
-
-
-
-    
     
     # Here we plot our equation of state, along with the 95% confidence intervals for the volume
     temperature_sections = [298.15, 2000.]

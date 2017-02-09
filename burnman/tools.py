@@ -205,7 +205,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_tolerances=[], max_lm_iterations=50, verbose=True):
+def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -339,7 +339,9 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
         
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
+    covariances_defined = True
     if data_covariances == []:
+        covariances_defined = False
         data_covariances = np.zeros((len(data[:,0]), len(data[0]), len(data[0])))
         for i in range(len(data_covariances)):
             data_covariances[i][0][0] = 1.
@@ -354,19 +356,32 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
                   delta_params = guessed_params*1.e-5,
                   mle_tolerances = mle_tolerances)
 
-    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations = max_lm_iterations, verbose=verbose)
+    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations = max_lm_iterations, param_tolerance=param_tolerance, verbose=verbose)
 
+    if verbose == True and covariances_defined == True:
+        confidence_interval = 0.9
+        confidence_bound, indices, probabilities = nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval)
+        if indices != []:
+            print('The function nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval) '
+                  'has determined that there are {0:d} data points which have residuals which are not '
+                  'expected at the {1:.1f}% confidence level (> {2:.1f} s.d. away from the model fit).\n'
+                  'Their indices and the probabilities of finding such extreme values are:'.format(len(indices), confidence_interval*100., confidence_bound))
+            for i, idx in enumerate(indices):
+                print('[{0:d}]: {1:.4f} ({2:.1f} s.d. from the model)'.format(idx, probabilities[i], np.abs(model.weighted_residuals[idx])))
+            print('You might consider removing them from your fit, '
+                  'or increasing the uncertainties in their measured values.\n')
+        
     return model
 
 
-def fit_PTV_data(mineral, fit_params, data, data_covariances=[], max_lm_iterations=50, verbose=True):
+def fit_PTV_data(mineral, fit_params, data, data_covariances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
         
     return fit_PTp_data(mineral=mineral, p_flags='V',
                         data=data, data_covariances=data_covariances, 
-                        fit_params=fit_params, max_lm_iterations=max_lm_iterations, verbose=verbose)
+                        fit_params=fit_params, param_tolerance=param_tolerance, max_lm_iterations=max_lm_iterations, verbose=verbose)
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):

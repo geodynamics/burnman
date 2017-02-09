@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import t
+from scipy.stats import t, norm, genextreme
 import itertools
 import copy
 
@@ -394,7 +394,44 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
 
 
 def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu, plot_axes=[0, 1], scale_axes=[1., 1.]):
+    """
+    Creates a plot of the weighted residuals 
+    The user can choose the projection axes, and scaling to apply to those axes
+    The chosen color palette (cmap) is discretised by standard deviation up to a cut off value
+    of sd_limit.
 
+    Parameters
+    ----------
+    
+    ax : matplotlib Axes object
+
+    model : user-defined object
+        A model as used by nonlinear_least_squares_fit
+        Must contain the attributes model.data, 
+        model.weighted_residuals and 
+        model.flags (if flag is not None).
+
+    flag : string
+        String to determine which data to plot.
+        Finds matches with model.flags.
+
+    sd_limit : float
+        Data with weighted residuals exceeding this 
+        limit are plotted in black
+
+    cmap : matplotlib color palette
+
+    plot_axes : list of integers
+        Data axes to use as plot axes
+
+    scale_axes : list of floats
+        Plot axes are scaled by multiplication of the data by these values
+
+    Returns
+    -------
+    ax : matplotlib Axes object
+
+    """
     if flag == None:
         mask = range(len(model.data[:,0]))
     else:
@@ -407,3 +444,59 @@ def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu,
     
     im = ax.scatter(model.data[:,plot_axes[0]][mask]*scale_axes[0], model.data[:,plot_axes[1]][mask]*scale_axes[1], c=model.weighted_residuals[mask], cmap=cmap, norm=norm, s=50)
     plt.colorbar(im, ax=ax, label='Misfit (standard deviations)')
+
+
+
+def extreme_values(weighted_residuals, confidence_interval):
+    '''
+    This function uses extreme value theory to calculate the number of 
+    standard deviations away from the mean at which we should expect to bracket
+    *all* of our n data points at a certain confidence level. 
+    
+    It then uses that value to identify which (if any) of the data points 
+    lie outside that region, and calculates the corresponding probabilities 
+    of finding a data point at least that many standard deviations away.  
+
+
+    Parameters
+    ----------
+
+    weighted_residuals : array of floats
+        Array of residuals weighted by the square root of their
+        variances wr_i = r_i/sqrt(var_i)
+
+    confidence_interval : float
+        Probability at which all the weighted residuals lie 
+        within the confidence bounds
+
+    Returns
+    -------
+    confidence_bound : float
+        Number of standard deviations at which we should expect to encompass all 
+        data at the user-defined confidence interval.
+
+    indices : array of floats
+        Indices of weighted residuals exceeding the confidence_interval 
+        defined by the user
+
+    probabilities : array of floats
+        The probabilities that the extreme data point of the distribution lies
+        further from the mean than the observed position wr_i for each i in
+        the "indices" output array.
+    '''
+
+    n=len(weighted_residuals)
+    mean = norm.isf(1./n)
+    scale = 0.8/np.power(np.log(n), 1./2.) # good approximation for > 10 data points
+    c = 0.33/np.power(np.log(n), 3./4.)  # good approximation for > 10 data points
+
+    # We now need a 1-tailed probability from the given confidence_interval
+    # p_total = 1. - confidence_interval = p_upper + p_lower - p_upper*p_lower
+    # p_total = 1. - confidence_interval = 2p - p^2, therefore:
+    p = 1. - np.sqrt(confidence_interval)
+    confidence_bound = genextreme.isf(p, c, loc=mean, scale=scale)
+
+    indices = [i for i, r in enumerate(weighted_residuals) if np.abs(r) > confidence_bound]
+    probabilities = 1. - np.power(genextreme.sf(np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.) # Convert back to 2-tailed probabilities
+    
+    return confidence_bound, indices, probabilities

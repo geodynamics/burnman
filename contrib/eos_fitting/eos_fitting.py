@@ -61,7 +61,7 @@ if __name__ == "__main__":
     mineral.params['F_0'] = mineral.params['F_0'] - mineral.H
 
     # Fit parameters
-    fit_params =  ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'F_0']
+    fit_params =  ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
 
     # Pressure and temperature sections to plot through the models
     pressures = np.linspace(1.e5, 100.e9, 101)
@@ -80,8 +80,9 @@ if __name__ == "__main__":
                                        ('alpha', 1., 'Thermal expansion (/K)'),
                                        (['alpha', 'K_T'], 1.e-6, 'Thermal pressure (MPa/K)')]
     confidence_interval = 0.95
-
-    
+    remove_outliers = True
+    good_data_confidence_interval = 0.9
+    param_tolerance = 1.e-5
 
     # That's it for user inputs. Now just sit back and watch the plots appear...
     flags, data, data_covariances = read_fitting_file(filename)
@@ -94,6 +95,7 @@ if __name__ == "__main__":
                                             fit_params = fit_params,
                                             data = data,
                                             data_covariances = data_covariances,
+                                            param_tolerance = param_tolerance,
                                             verbose = False)
 
     # Print the optimized parameters
@@ -106,6 +108,35 @@ if __name__ == "__main__":
     print('\nGoodness of fit:')
     print(fitted_eos.goodness_of_fit)
     print('\n')
+
+
+    confidence_bound, indices, probabilities = burnman.nonlinear_fitting.extreme_values(fitted_eos.weighted_residuals, good_data_confidence_interval)
+    if indices != [] and remove_outliers == True:
+        print('Removing {0:d} outliers (at the {1:.1f}% confidence interval) and refitting. Please wait just a little longer.'.format(len(indices), good_data_confidence_interval*100.))
+        
+        mask = [i for i in range(len(fitted_eos.weighted_residuals)) if i not in indices]
+        flags = [flag for i, flag in enumerate(flags) if i not in indices]
+        data = data[mask]
+        data_covariances = data_covariances[mask]  
+        fitted_eos = burnman.tools.fit_PTp_data(mineral = mineral,
+                                                p_flags = flags,
+                                                fit_params = fit_params,
+                                                data = data,
+                                                data_covariances = data_covariances,
+                                                param_tolerance = param_tolerance,
+                                                verbose = False)
+
+    # Print the optimized parameters
+    print('Optimized equation of state:')
+    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    print('\nParameters:')
+    print(fitted_eos.popt)
+    print('\nFull covariance matrix:')
+    print(fitted_eos.pcov)
+    print('\nGoodness of fit:')
+    print(fitted_eos.goodness_of_fit)
+    print('\n')
+        
     
     # Create a corner plot of the covariances
     fig, ax_array = burnman.nonlinear_fitting.corner_plot(popt=fitted_eos.popt,
