@@ -13,13 +13,17 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from fitting_functions import read_fitting_file
+plt.style.use('ggplot')
+plt.rcParams['axes.facecolor'] = 'white'
+plt.rcParams['axes.edgecolor'] = 'black'
+
 
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
+from fitting_functions import read_fitting_file
 
 if __name__ == "__main__":
 
@@ -50,8 +54,7 @@ if __name__ == "__main__":
 
     Make sure that *all* parameters are in SI units.
     """
-
-
+    
     # Input file
     filename = 'test.dat'
 
@@ -91,7 +94,7 @@ if __name__ == "__main__":
     
     print('Starting to fit user-defined data. Please be patient.')    
     fitted_eos = burnman.tools.fit_PTp_data(mineral = mineral,
-                                            p_flags = flags,
+                                            flags = flags,
                                             fit_params = fit_params,
                                             data = data,
                                             data_covariances = data_covariances,
@@ -109,6 +112,12 @@ if __name__ == "__main__":
     print(fitted_eos.goodness_of_fit)
     print('\n')
 
+    # Create a plot of the residuals
+    fig, ax = plt.subplots()
+    burnman.nonlinear_fitting.plot_residuals(ax=ax,
+                                             weighted_residuals=fitted_eos.weighted_residuals,
+                                             flags=fitted_eos.flags)
+    plt.show()
 
     confidence_bound, indices, probabilities = burnman.nonlinear_fitting.extreme_values(fitted_eos.weighted_residuals, good_data_confidence_interval)
     if indices != [] and remove_outliers == True:
@@ -119,7 +128,7 @@ if __name__ == "__main__":
         data = data[mask]
         data_covariances = data_covariances[mask]  
         fitted_eos = burnman.tools.fit_PTp_data(mineral = mineral,
-                                                p_flags = flags,
+                                                flags = flags,
                                                 fit_params = fit_params,
                                                 data = data,
                                                 data_covariances = data_covariances,
@@ -137,6 +146,13 @@ if __name__ == "__main__":
     print(fitted_eos.goodness_of_fit)
     print('\n')
         
+
+    # Create a plot of the residuals
+    fig, ax = plt.subplots()
+    burnman.nonlinear_fitting.plot_residuals(ax=ax,
+                                             weighted_residuals=fitted_eos.weighted_residuals,
+                                             flags=fitted_eos.flags)
+    plt.show()
     
     # Create a corner plot of the covariances
     fig, ax_array = burnman.nonlinear_fitting.corner_plot(popt=fitted_eos.popt,

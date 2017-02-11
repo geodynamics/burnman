@@ -205,7 +205,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
+def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -216,10 +216,7 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
     Parameters
     ----------
     mineral : mineral
-        Mineral for which the parameters should be optimized
-
-    observed_property : string
-        Attribute name for the property to be fit (e.g. 'V')
+        Mineral for which the parameters should be optimized.
 
     fit_params : list of strings
         List of dictionary keys contained in mineral.params
@@ -227,13 +224,17 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
         during fitting. Initial guesses are taken from the existing
         values for the parameters
 
+    flags : string or list of strings
+        Attribute names for the property to be fit for the whole 
+        dataset or each datum individually (e.g. 'V')
+
     data : numpy array of observed P-T-property values
 
     data_covariances : numpy array of P-T-property covariances (optional)
         If not given, all covariance matrices are chosen 
-        such that C00 = 1, otherwise Cij = 0. 
+        such that C00 = 1, otherwise Cij = 0
         In other words, all data points have equal weight, 
-        with all error in the pressure.
+        with all error in the pressure
 
     Returns
     -------
@@ -288,54 +289,54 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
                 params.append(self.m.params[param])
             return np.array(flatten([mineral.params[prm] for prm in fit_params]))
 
-        def function(self, x, p_flag):
+        def function(self, x, flag):
             P, T, p = x
             self.m.set_state(P, T)
-            return np.array([P, T, getattr(self.m, p_flag)])
+            return np.array([P, T, getattr(self.m, flag)])
 
-        def normal(self, x, p_flag):
+        def normal(self, x, flag):
             P, T, p = x
             
-            if p_flag == 'V':
+            if flag == 'V':
                 self.m.set_state(P, T)
                 dPdp = -self.m.K_T/self.m.V
                 dpdT = self.m.alpha*self.m.V
-            elif p_flag == 'H':
+            elif flag == 'H':
                 self.m.set_state(P, T)
                 dPdp = 1./((1.-T*self.m.alpha)*self.m.V)
                 dpdT = self.m.heat_capacity_p
-            elif p_flag == 'S':
+            elif flag == 'S':
                 self.m.set_state(P, T)
                 dPdp = -1./(self.m.alpha*self.m.V)
                 dpdT = self.m.heat_capacity_p/T
-            elif p_flag == 'gibbs':
+            elif flag == 'gibbs':
                 self.m.set_state(P, T)
                 dPdp = 1./self.m.V
                 dpdT = -self.S
             else:
                 dP = 1.e5
                 dT = 1.
-                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], p_flag)[2] - self.function([P-dP, T, 0.], p_flag)[2])
-                dpdT = (self.function([P, T+dT, 0.], p_flag)[2] - self.function([P, T-dT, 0.], p_flag)[2])/(2.*dT)
+                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2] - self.function([P-dP, T, 0.], flag)[2])
+                dpdT = (self.function([P, T+dT, 0.], flag)[2] - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
             dPdT = -dPdp*dpdT    
             n = np.array([-1., dPdT, dPdp])
             return n/np.linalg.norm(n)
 
         
     # If only one property flag is given, assume it applies to all data
-    if type(p_flags) is str:
-        p_flags = np.array([p_flags] * len(data[:,0]))
+    if type(flags) is str:
+        flags = np.array([flags] * len(data[:,0]))
 
     # Apply mle tolerances if they dont exist
     if mle_tolerances == []:
         mineral.set_state(1.e5, 300.)
         mle_tolerance_factor = 1.e-5
-        mle_tolerances = np.empty(len(p_flags))
-        for i, p_flag in enumerate(p_flags):
-            if p_flag in ['gibbs', 'enthalpy', 'H', 'helmholtz']:
+        mle_tolerances = np.empty(len(flags))
+        for i, flag in enumerate(flags):
+            if flag in ['gibbs', 'enthalpy', 'H', 'helmholtz']:
                 mle_tolerances[i] = 1. # 1 J
             else:
-                mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, p_flag)
+                mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, flag)
         
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
@@ -350,7 +351,7 @@ def fit_PTp_data(mineral, fit_params, p_flags, data, data_covariances=[], mle_to
     model = Model(mineral = mineral,
                   data = data,
                   data_covariances = data_covariances,
-                  flags = p_flags,
+                  flags = flags,
                   fit_params = fit_params,
                   guessed_params = guessed_params,
                   delta_params = guessed_params*1.e-5,
@@ -379,7 +380,7 @@ def fit_PTV_data(mineral, fit_params, data, data_covariances=[], param_tolerance
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
         
-    return fit_PTp_data(mineral=mineral, p_flags='V',
+    return fit_PTp_data(mineral=mineral, flags='V',
                         data=data, data_covariances=data_covariances, 
                         fit_params=fit_params, param_tolerance=param_tolerance, max_lm_iterations=max_lm_iterations, verbose=verbose)
 

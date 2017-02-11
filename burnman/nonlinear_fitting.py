@@ -500,3 +500,47 @@ def extreme_values(weighted_residuals, confidence_interval):
     probabilities = 1. - np.power(genextreme.sf(np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.) # Convert back to 2-tailed probabilities
     
     return confidence_bound, indices, probabilities
+
+
+def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
+
+    if flags == []:
+        flags = [''] * len(weighted_residuals)
+        list_flags = ['']
+    else:
+        list_flags = list(set(flags))
+
+    
+    if n_bins is None:
+        try: # Only works for recent versions of numpy
+            bin_heights, bin_bounds = np.histogram(weighted_residuals,
+                                                   bins='auto',
+                                                   normed=1.)
+            n_bins = len(bin_heights)
+        except:
+            n_bins = 11.
+            
+    mask = [ i for i, f in enumerate(flags) ]
+    for flag in list_flags:
+        binwidth = np.ptp(weighted_residuals)/n_bins
+        dmin = min(weighted_residuals) - binwidth
+        dmax = max(weighted_residuals) + binwidth
+        bins = np.linspace(dmin, dmax, n_bins)
+        bin_heights, bin_bounds = np.histogram(weighted_residuals[mask],
+                                               bins=bins,
+                                               normed=1.)
+
+        normalisation = float(len(weighted_residuals[mask]))/float(len(weighted_residuals))
+        bin_centers = (bin_bounds[:-1] + bin_bounds[1:])/2.
+        bin_heights = bin_heights*normalisation
+        bin_widths = bin_bounds[1] - bin_bounds[0]
+        plt.bar(bin_centers, bin_heights, width = bin_widths, label=flag, alpha=0.2)
+        mask = [ i for i, f in enumerate(flags) if f != flag and i in mask ]
+
+        x = np.linspace(bin_bounds[0], bin_bounds[-1], 1001)
+        ax.plot(x, norm.pdf(x)*normalisation)
+        
+    ax.set_title('Residual plot versus expected normal distribution')
+    ax.set_xlabel('Number of standard deviations from the mean')
+    ax.set_ylabel('Probability')
+    ax.legend(loc='upper right')

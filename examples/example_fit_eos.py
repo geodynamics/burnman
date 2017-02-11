@@ -112,7 +112,7 @@ if __name__ == "__main__":
     plt.show()
 
     print('Fitting an equation of state using only high pressure P-T-V data can produce some surprising '
-          '(read incorrect) thermodynamic predictions. We must use additional data to provide strong '
+          '(incorrect) thermodynamic predictions. We must use additional data to provide strong '
           'constraints on all parameters. In this case, we would like to improve our constraints on '
           'grueneisen_0 and q_0.\n\n'
           'How should we improve on this "optimal" PVT fit?\n')
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     # And now we can fit our data!
     fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
     fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                            p_flags = flags,
+                                            flags = flags,
                                             fit_params = fit_params,
                                             data = PTp_data,
                                             data_covariances = PTp_covariances,
@@ -204,9 +204,9 @@ if __name__ == "__main__":
     plt.show()
 
     print('Hmmm, looks promising. The heat capacities don\'t blow up any more. '
-          'Let\'s check our residual plot...\n')
+          'Let\'s check the new weighted residuals...\n')
     
-    # Now let's plot the new residuals
+    # Plot the new residuals
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     burnman.nonlinear_fitting.weighted_residual_plot(ax=ax, model=fitted_eos, flag='V', sd_limit=3,
@@ -217,12 +217,22 @@ if __name__ == "__main__":
     ax.set_ylabel('Temperature (K)')
     plt.show()
 
+    
+    # Create a plot of the residuals
+    fig, ax = plt.subplots()
+    burnman.nonlinear_fitting.plot_residuals(ax=ax,
+                                             weighted_residuals=fitted_eos.weighted_residuals,
+                                             flags=fitted_eos.flags)
+    plt.show()
 
-    print('Eugh. There are still two volume points with very large weighted residuals. '
+    print('Eugh. There are two volume points with very large weighted residuals. '
           'You might be interested in asking what the chances are that those extreme '
-          'residuals belong in our data set. Here we use extreme value theory to calculate '
+          'residuals belong in our data set.\n'
+          'Here we use extreme value theory to calculate '
           'how many of our data have residuals that are greater than we would expect for a '
-          'data set of this size at a given confidence interval.\n')
+          'data set of this size at a given confidence interval. We assume that the errors '
+          'provided by the user are approximately correct '
+          '(i.e. the variance of weighted residuals should be similar to 1).\n')
 
     # Let's pick a confidence interval of 90%. Essentially we're now calculating the
     # number of standard deviations from the mean that would bracket an *entire* data set of
@@ -244,7 +254,7 @@ if __name__ == "__main__":
     PTp_data = PTp_data[mask]
     PTp_covariances = PTp_covariances[mask]  
     fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                            p_flags = flags,
+                                            flags = flags,
                                             fit_params = fit_params,
                                             data = PTp_data,
                                             data_covariances = PTp_covariances,
@@ -273,12 +283,19 @@ if __name__ == "__main__":
     ax.set_ylabel('Temperature (K)')
     plt.show()
 
+    # Create a plot of the residuals
+    fig, ax = plt.subplots()
+    burnman.nonlinear_fitting.plot_residuals(ax=ax,
+                                             weighted_residuals=fitted_eos.weighted_residuals,
+                                             flags=fitted_eos.flags)
+    plt.show()
     
     print('Hurrah! That looks much better! The patches of positive and negative weighted residuals '
-          'in P-T space have completely disappeared, strongly suggesting that those two data points '
-          'were skewing our results. The errors on all the parameters have got much smaller, '
+          'in P-T space have completely disappeared, and the weighted residuals are now distributed '
+          'more evenly about zero. The uncertainties on all the parameters have got much smaller, '
           'and several have moved outside the previous 1-s.d. uncertainty bounds. '
-          'Cool, huh?! Let\'s look at some pretty plots characterising our optimised equation of state.')
+          'Cool, huh?! Let\'s finish this example by looking at some pretty plots '
+          'characterising our optimised equation of state.')
     
     # A plot of the volumes at 1 bar
     temperatures = np.linspace(1., 3000., 101)
