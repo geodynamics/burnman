@@ -79,7 +79,7 @@ def read_2D_perplex_file(filename):
 
 class PerplexMaterial(Material):
     """
-    This is the base class for a PerpleX material. States of the mineral
+    This is the base class for a PerpleX material. States of the material
     can only be queried after setting the pressure and temperature
     using set_state(). 
 

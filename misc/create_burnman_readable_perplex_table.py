@@ -1,61 +1,50 @@
 from subprocess import Popen, PIPE, STDOUT
+import argparse
 
-'''
-# Properties
-    1 - Specific Enthalpy (J/m3)                                    
-X    2 - Density (kg/m3)                                             
-    3 - Specific heat capacity (J/K/m3)                             
+parser = argparse.ArgumentParser(description='Call werami to create a burnman-readable tab file.')
+
+parser.add_argument('--werami_path', metavar='path', type=str, nargs='+', required=True,
+                    help='The path to werami')
+parser.add_argument('--project', metavar='project name', type=str, nargs='+', required=True,
+                    help='The name of the project file (without the suffix)')
+parser.add_argument('--n_pressures', type=int, nargs=1, required=True,
+                    help='The number of pressure steps in the grid')
+parser.add_argument('--n_temperatures', type=int, nargs=1, required=True,
+                    help='The number of pressure steps in the grid')
+parser.add_argument('--P_range', type=float, nargs=2,
+                    help='Minimum and maximum values of pressure (Pa; optional)')
+parser.add_argument('--T_range', type=float, nargs=2,
+                    help='Minimum and maximum values of temperature (K; optional)')
+
+args = parser.parse_args()
+
+'''                                  
+X    2 - Density (kg/m3)                           
 X    4 - Expansivity (1/K, for volume)                               
-X    5 - Compressibility (1/bar, for volume)                         
-    6 - Composition (Mol or Wt%) of the system                      
-    7 - Mode (Vol, Mol, or Wt proportion) of a phase                
-    8 - Composition (Mol or Wt%) of a solution phase                
-    9 - Grueneisen thermal ratio                                    
+X    5 - Compressibility (1/bar, for volume)                     
 X   10 - Adiabatic bulk modulus (bar)                                
 X   11 - Adiabatic shear modulus (bar)                               
 X   12 - Sound velocity (km/s)                                       
 X   13 - P-wave velocity (Vp, km/s)                                  
-X   14 - S-wave velocity (Vs, km/s)                                  
-   15 - Vp/Vs                                                       
-   16 - Specific entropy (J/K/m3)                                   
+X   14 - S-wave velocity (Vs, km/s)                               
 X   17 - Entropy (J/K/kg)                                            
 X   18 - Enthalpy (J/kg)                                             
-X   19 - Heat Capacity (J/K/kg)                                      
-   20 - Specific mass of a phase (kg/m3-system)                     
-   21 - Poisson ratio                                               
-X   22 - Molar Volume (J/bar)                                        
-   23 - Dependent potentials (J/mol, bar, K)                        
-   24 - Assemblage Index                                            
-   25 - Modes of all phases                                         
-   26 - Sound velocity T derivative (km/s/K)                        
-   27 - P-wave velocity T derivative (km/s/K)                       
-   28 - S-wave velocity T derivative (km/s/K)                       
-   29 - Adiabatic bulk modulus T derivative (bar/K)                 
-   30 - Shear modulus T derivative (bar/K)                          
-   31 - Sound velocity P derivative (km/s/bar)                      
-   32 - P-wave velocity P derivative (km/s/bar)                     
-   33 - S-wave velocity P derivative (km/s/bar)                     
-   34 - Adiabatic bulk modulus P derivative (unitless)              
-   35 - Shear modulus P derivative (unitless)                       
-   36 - All phase &/or system properties                            
-   37 - Absolute amount (Vol, Mol, or Wt) of a phase                
-   38 - Multiple property output                                    
-   39 - Heat capacity ratio (Cp/Cv)
+X   19 - Heat Capacity (J/K/kg)                              
+X   22 - Molar Volume (J/bar)        
 '''
 
-werami_path = '../programs_6.6.8_20140304/werami'
-project = 'in23'
-n_pressures = 11
-n_temperatures = 11
-change_PT_range = 'y'
-P_range = [10.e9, 110.e9] # Pa
-T_range = [300., 3000.] # K
 
-if change_PT_range == 'n':
+print('Working on creating {0}x{1} P-T table file using werami. Please wait.\n'.format(args.n_pressures[0], args.n_temperatures[0]))
+
+try:
+    str2 = 'y\n{0} {1}\n{2} {3}\n'.format(args.P_range[0]/1.e5, args.P_range[1]/1.e5,
+                                          args.T_range[0], args.T_range[1])
+except:
+    print('Keeping P-T range the same as the original project range.\n'
+          'If you wish to change the range, you will need to add the following command line arguments:\n'
+          '--P_range [P_min] [P_max] (in Pa)\n'
+          '--T_range [T_min] [T_max] (in K)\n')
     str2 = 'n\n'
-else:
-    str2 = 'y\n{0} {1}\n{2} {3}\n'.format(P_range[0]/1.e5, P_range[1]/1.e5,
-                                          T_range[0], T_range[1])
     
 stdin='{0:s}\n' \
     '2\n' \
@@ -86,12 +75,10 @@ stdin='{0:s}\n' \
     '0\n' \
     '{1:s}' \
     '{2:d} {3:d}\n' \
-    '0'.format(project, str2, n_pressures, n_temperatures)
+    '0'.format(args.project[0], str2, args.n_pressures[0], args.n_temperatures[0])
 
 
-p = Popen([werami_path], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-
-print('Working on creating {0}x{1} P-T table file using werami. Please wait.'.format(n_pressures, n_temperatures))
+p = Popen(args.werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 stdout = p.communicate(input=stdin)[0]
 print(stdout)
 print('Processing complete')
