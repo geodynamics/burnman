@@ -7,7 +7,7 @@ from __future__ import print_function
 import warnings
 
 import numpy as np
-from scipy.interpolate import RegularGridInterpolator
+from .gridinterpolator import RegularGridInterpolator
 
 from .material import Material, material_property
 from . import eos

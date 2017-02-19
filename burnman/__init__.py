@@ -88,4 +88,5 @@ from . import geotherm
 
 # miscellaneous
 from . import tools
+from . import gridinterpolator
 from .partitioning import calculate_partition_coefficient, calculate_phase_percents
