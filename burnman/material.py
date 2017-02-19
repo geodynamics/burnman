@@ -176,10 +176,10 @@ class Material(object):
         ----------
         vars_list : list of strings
             Variables to be returned for given conditions
-        pressure : array of float
-            Array of pressures in [Pa].
-        temperature : float
-            Array of temperatures in [K].
+        pressures : ndlist or ndarray of float
+            n-dimensional array of pressures in [Pa].
+        temperatures : ndlist or ndarray of float
+            n-dimensional array of temperatures in [K].
 
         Returns
         -------
@@ -190,11 +190,16 @@ class Material(object):
         """
         old_pressure = self.pressure
         old_temperature = self.temperature
-        output = np.empty((len(vars_list), len(pressures)))
-        for i in range(len(pressures)):
-            self.set_state(pressures[i], temperatures[i])
+        pressures = np.array(pressures)
+        temperatures = np.array(temperatures)
+
+        assert(pressures.shape == temperatures.shape)
+        
+        output = np.empty((len(vars_list),) + pressures.shape)
+        for i, p in np.ndenumerate(pressures):
+            self.set_state(p, temperatures[i])
             for j in range(len(vars_list)):
-                output[j, i] = getattr(self, vars_list[j])
+                output[(j,) + i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
             # do not set_state if old values were None. Just reset to None
             # manually
