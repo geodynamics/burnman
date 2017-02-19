@@ -71,71 +71,6 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
     print('Output file renamed to {0:s}'.format(outfile))
     print('Processing complete')
 
-    
-def read_2D_perplex_file(filename):
-    with open(filename, 'r') as f:
-        datastream = f.read()
-
-    lines = [line.strip().split()
-             for line in datastream.split('\n') if line.strip()]
-
-    if lines[2][0] != '2':
-        raise Exception('This is not a 2D PerpleX table')
-
-    Pmin = float(lines[4][0])*1.e5
-    Pint = float(lines[5][0])*1.e5
-    nP = int(lines[6][0])
-    pressures = np.linspace(Pmin, Pmin + Pint*(nP-1.), nP)
-    
-    Tmin = float(lines[8][0])
-    Tint = float(lines[9][0])
-    nT = int(lines[10][0])
-    temperatures = np.linspace(Tmin, Tmin + Tint*(nT-1.), nT)
-
-    n_properties = int(lines[11][0])
-    property_list = lines[12]
-    
-    # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
-    property_table = np.swapaxes(np.array([[float(string) for string in line]
-                                           for line in lines[13:13+nP*nT]]).reshape(nT, nP, n_properties),
-                                 0, 1)
-
-    ordered_property_list = ['rho,kg/m3',
-                             'alpha,1/K',
-                             'beta,1/bar',
-                             'Ks,bar',
-                             'Gs,bar',
-                             'v0,km/s',
-                             'vp,km/s',
-                             'vs,km/s',
-                             's,J/K/kg',
-                             'h,J/kg',
-                             'cp,J/K/kg',
-                             'V,J/bar/mol']
-    p_indices = [[i for i, p in enumerate(property_list) if p == ordered_p] for ordered_p in ordered_property_list]
-
-    densities = property_table[:,:,p_indices[0]][:,:,0]
-    volumes = 1.e-5 * property_table[:,:,p_indices[11]][:,:,0]
-    molar_masses = densities*volumes
-    molar_mass = np.mean(molar_masses)
-
-
-    property_interpolators = {'rho': interp2d(pressures, temperatures, densities.T),
-                              'alpha': interp2d(pressures, temperatures, property_table[:,:,p_indices[1]][:,:,0].T),
-                              'K_T': interp2d(pressures, temperatures, 1.e5 / property_table[:,:,p_indices[2]][:,:,0].T),
-                              'K_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[3]][:,:,0].T),
-                              'G_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[4]][:,:,0].T),
-                              'bulk_sound_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[5]][:,:,0].T),
-                              'p_wave_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[6]][:,:,0].T),
-                              's_wave_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[7]][:,:,0].T),
-                              'S': interp2d(pressures, temperatures, property_table[:,:,p_indices[8]][:,:,0].T*molar_masses.T),
-                              'H': interp2d(pressures, temperatures, property_table[:,:,p_indices[9]][:,:,0].T*molar_masses.T),
-                              'C_p': interp2d(pressures, temperatures, property_table[:,:,p_indices[10]][:,:,0].T*molar_masses.T),
-                              'V': interp2d(pressures, temperatures, volumes.T)}
-        
-    return property_interpolators, molar_mass
-
-
 class PerplexMaterial(Material):
     """
     This is the base class for a PerpleX material. States of the material
@@ -157,9 +92,71 @@ class PerplexMaterial(Material):
     """
     def __init__(self, tab_file):
         self.params = {'name': tab_file}
-        self._property_interpolators, self.params['molar_mass'] = read_2D_perplex_file(tab_file)
+        self._property_interpolators, self.params['molar_mass'] = self._read_2D_perplex_file(tab_file)
         Material.__init__(self)
 
+    def _read_2D_perplex_file(self, filename):
+        with open(filename, 'r') as f:
+            datastream = f.read()
+
+        lines = [line.strip().split()
+                 for line in datastream.split('\n') if line.strip()]
+
+        if lines[2][0] != '2':
+            raise Exception('This is not a 2D PerpleX table')
+
+        Pmin = float(lines[4][0])*1.e5
+        Pint = float(lines[5][0])*1.e5
+        nP = int(lines[6][0])
+        pressures = np.linspace(Pmin, Pmin + Pint*(nP-1.), nP)
+        
+        Tmin = float(lines[8][0])
+        Tint = float(lines[9][0])
+        nT = int(lines[10][0])
+        temperatures = np.linspace(Tmin, Tmin + Tint*(nT-1.), nT)
+        
+        n_properties = int(lines[11][0])
+        property_list = lines[12]
+        
+        # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
+        property_table = np.swapaxes(np.array([[float(string) for string in line]
+                                               for line in lines[13:13+nP*nT]]).reshape(nT, nP, n_properties),
+                                     0, 1)
+        
+        ordered_property_list = ['rho,kg/m3',
+                                 'alpha,1/K',
+                                 'beta,1/bar',
+                                 'Ks,bar',
+                                 'Gs,bar',
+                                 'v0,km/s',
+                                 'vp,km/s',
+                                 'vs,km/s',
+                                 's,J/K/kg',
+                                 'h,J/kg',
+                                 'cp,J/K/kg',
+                                 'V,J/bar/mol']
+        p_indices = [[i for i, p in enumerate(property_list) if p == ordered_p] for ordered_p in ordered_property_list]
+
+        densities = property_table[:,:,p_indices[0]][:,:,0]
+        volumes = 1.e-5 * property_table[:,:,p_indices[11]][:,:,0]
+        molar_masses = densities*volumes
+        molar_mass = np.mean(molar_masses)
+        
+        
+        property_interpolators = {'rho': interp2d(pressures, temperatures, densities.T),
+                                  'alpha': interp2d(pressures, temperatures, property_table[:,:,p_indices[1]][:,:,0].T),
+                                  'K_T': interp2d(pressures, temperatures, 1.e5 / property_table[:,:,p_indices[2]][:,:,0].T),
+                                  'K_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[3]][:,:,0].T),
+                                  'G_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[4]][:,:,0].T),
+                                  'bulk_sound_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[5]][:,:,0].T),
+                                  'p_wave_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[6]][:,:,0].T),
+                                  's_wave_velocity': interp2d(pressures, temperatures, property_table[:,:,p_indices[7]][:,:,0].T),
+                                  'S': interp2d(pressures, temperatures, property_table[:,:,p_indices[8]][:,:,0].T*molar_masses.T),
+                                  'H': interp2d(pressures, temperatures, property_table[:,:,p_indices[9]][:,:,0].T*molar_masses.T),
+                                  'C_p': interp2d(pressures, temperatures, property_table[:,:,p_indices[10]][:,:,0].T*molar_masses.T),
+                                  'V': interp2d(pressures, temperatures, volumes.T)}
+        
+        return property_interpolators, molar_mass
     
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):

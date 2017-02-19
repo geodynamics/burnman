@@ -1,6 +1,15 @@
 from __future__ import absolute_import
-import argparse
+from __future__ import print_function
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
+import argparse
+import os.path
+import sys
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+    sys.path.insert(1, os.path.abspath('..'))
+    
 from burnman.perplex import create_perplex_table
 
 parser = argparse.ArgumentParser(description='Call werami to create a burnman-readable tab file.')
