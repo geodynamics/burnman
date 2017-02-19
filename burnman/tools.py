@@ -11,6 +11,7 @@ import os
 import pkgutil
 import numpy as np
 from scipy.optimize import fsolve, curve_fit
+from scipy.ndimage.filters import gaussian_filter
 from . import constants
 
 
@@ -643,3 +644,109 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
             print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
             
     return consistency
+
+
+def _pad_ndarray_inverse_mirror(array, padding):
+    """
+    Pads an ndarray according to an inverse mirror
+    scheme. For example, for a 1D array 
+    [2, 4, 6, 7, 8] padded by 3 cells, we have:
+
+     padding  |  original array |  padding
+
+    -3 -2  0  |  2  4  6  7  8  |  9 10 12
+
+    Parameters
+    ----------
+    array : numpy ndarray
+        The array to be padded
+    padding : tuple
+        The number of elements with which to pad the
+        array in each dimension.
+
+    Returns
+    -------
+    padded_array: numpy ndarray
+        The padded array
+
+    """
+    padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
+    padded_array = np.zeros(padded_shape)
+
+    array_indices = []
+    for idx, v in np.ndenumerate(array):
+        idx = tuple([idx[i] + padding[i] for i in range(len(padding))])
+        padded_array[idx] = v
+        array_indices.append(idx)
+    padded_indices = [idx for idx, v in np.ndenumerate(padded_array) if idx not in array_indices]
+    
+    edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
+                                 for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
+    mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j] for j in range(len(array.shape))]) for i in range(len(padded_indices))])
+
+    for i, idx in enumerate(padded_indices):
+        padded_array[idx] = 2.*padded_array[edge_indices[i]] - padded_array[mirror_indices[i]]
+
+    return padded_array
+    
+                         
+def smooth_gridded_property(material, gridded_property, pressures, temperatures,
+                            pressure_stdev, temperature_stdev, truncate=4.0):
+    """
+    Creates a smoothed array of a certain property of a rock
+    on a regular grid of pressures and temperatures. Smoothing 
+    is achieved by convolution of the unsmoothed array with 
+    a Gaussian with user-defined standard deviations in pressure and 
+    temperature. The smoothing is truncated at a user-defined 
+    number of standard deviations
+
+    Parameters
+    ----------
+    material : burnman Material
+        The material whose properties to smooth
+    gridded_property : string
+        The property to smooth
+    pressures : 1D numpy array
+        The pressures over which to create a smoothed grid
+    temperatures : 1D numpy array
+        The temperatures over which to create a smoothed grid
+    pressure_stdev : float
+        The standard deviation of pressure for the Gaussian filter
+    temperature_stdev : float
+        The standard deviation of temperature for the Gaussian filter
+    truncate : float (optional) 
+        The number of standard deviations at which to truncate 
+        the smoothing (default = 4.).
+
+    Returns
+    -------
+    pp: 2D numpy array
+        meshed pressures
+    TT: 2D numpy array
+        meshed temperatures
+    property_grid: 2D numpy array
+        meshed property grid
+    smoothed_property_grid: 2D numpy array
+        meshed smoothed property grid
+
+    """
+    
+    pp, TT = np.meshgrid(pressures, temperatures)
+    property_grid = material.evaluate([gridded_property], pp, TT)[0]
+
+    pressure_resolution = pressures[1] - pressures[0] 
+    temperature_resolution = temperatures[1] - temperatures[0]
+
+    sigma = (temperature_stdev/temperature_resolution,
+             pressure_stdev/pressure_resolution)
+
+    padding = (int(np.ceil(truncate*sigma[0])), int(np.ceil(truncate*sigma[1])))
+    padded_property_grid = _pad_ndarray_inverse_mirror(property_grid, padding)
+
+    smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
+                                                    sigma=sigma)
+
+    smoothed_property_grid = smoothed_padded_property_grid[padding[0]:padding[0] + property_grid.shape[0],
+                                                           padding[1]:padding[1] + property_grid.shape[1]]
+    
+    return pp, TT, property_grid, smoothed_property_grid
