@@ -38,7 +38,7 @@ def read_2D_perplex_file(filename):
     
     # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
     property_table = np.swapaxes(np.array([[float(string) for string in line]
-                                           for line in lines[13:13+nP*nT]]).reshape(nP, nT, n_properties),
+                                           for line in lines[13:13+nP*nT]]).reshape(nT, nP, n_properties),
                                  0, 1)
 
     ordered_property_list = ['rho,kg/m3',
@@ -55,22 +55,22 @@ def read_2D_perplex_file(filename):
                              'V,J/bar/mol']
     p_indices = [[i for i, p in enumerate(property_list) if p == ordered_p] for ordered_p in ordered_property_list]
 
-    densities = property_table[:,:,p_indices[0]] 
-    volumes = 1.e-5 * property_table[:,:,p_indices[11]]
+    densities = property_table[:,:,p_indices[0]][:,:,0]
+    volumes = 1.e-5 * property_table[:,:,p_indices[11]][:,:,0]
     molar_masses = densities*volumes
     molar_mass = np.mean(molar_masses)
-    
+
     property_interpolators = {'rho': RegularGridInterpolator((pressures, temperatures), densities),
-                              'alpha': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[1]]),
-                              'K_T': RegularGridInterpolator((pressures, temperatures), 1.e5 / property_table[:,:,p_indices[2]]),
-                              'K_S': RegularGridInterpolator((pressures, temperatures), 1.e5 * property_table[:,:,p_indices[3]]),
-                              'G_S': RegularGridInterpolator((pressures, temperatures), 1.e5 * property_table[:,:,p_indices[4]]),
-                              'bulk_sound_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[5]]),
-                              'p_wave_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[6]]),
-                              's_wave_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[7]]),
-                              'S': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[8]]*molar_masses),
-                              'H': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[9]]*molar_masses),
-                              'C_p': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[10]]*molar_masses),
+                              'alpha': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[1]][:,:,0]),
+                              'K_T': RegularGridInterpolator((pressures, temperatures), 1.e5 / property_table[:,:,p_indices[2]][:,:,0]),
+                              'K_S': RegularGridInterpolator((pressures, temperatures), 1.e5 * property_table[:,:,p_indices[3]][:,:,0]),
+                              'G_S': RegularGridInterpolator((pressures, temperatures), 1.e5 * property_table[:,:,p_indices[4]][:,:,0]),
+                              'bulk_sound_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[5]][:,:,0]),
+                              'p_wave_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[6]][:,:,0]),
+                              's_wave_velocity': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[7]][:,:,0]),
+                              'S': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[8]][:,:,0]*molar_masses),
+                              'H': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[9]][:,:,0]*molar_masses),
+                              'C_p': RegularGridInterpolator((pressures, temperatures), property_table[:,:,p_indices[10]][:,:,0]*molar_masses),
                               'V': RegularGridInterpolator((pressures, temperatures), volumes)
                               }
     
@@ -98,7 +98,7 @@ class PerplexMaterial(Material):
     """
     def __init__(self, tab_file):
         self.params = {'name': tab_file}
-        self._property_interpolators, self.params['molar_mass'] = read_2D_perplex_file('in23_1.tab')
+        self._property_interpolators, self.params['molar_mass'] = read_2D_perplex_file(tab_file)
         Material.__init__(self)
 
     
@@ -113,57 +113,57 @@ class PerplexMaterial(Material):
     @material_property
     @copy_documentation(Material.molar_volume)
     def molar_volume(self):
-        return self._property_interpolators['V']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['V']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.molar_enthalpy)
     def molar_enthalpy(self):
-        return self._property_interpolators['H']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['H']([[self.pressure, self.temperature]])[0]
     
     @material_property
     @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
-        return self._property_interpolators['S']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['S']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
-        return self._property_interpolators['K_T']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['K_T']([[self.pressure, self.temperature]])[0]
     
     @material_property
     @copy_documentation(Material.adiabatic_bulk_modulus)
     def adiabatic_bulk_modulus(self):
-        return self._property_interpolators['K_S']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['K_S']([[self.pressure, self.temperature]])[0]
         
     @material_property
     @copy_documentation(Material.heat_capacity_p)
     def heat_capacity_p(self):
-        return self._property_interpolators['C_p']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['C_p']([[self.pressure, self.temperature]])[0]
     
     @material_property
     @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._property_interpolators['alpha']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['alpha']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
-        return self._property_interpolators['G_S']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['G_S']([[self.pressure, self.temperature]])[0]
     
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
-        return self._property_interpolators['p_wave_velocity']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['p_wave_velocity']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
     def bulk_sound_velocity(self):
-        return self._property_interpolators['bulk_sound_velocity']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['bulk_sound_velocity']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.shear_wave_velocity)
     def shear_wave_velocity(self):
-        return self._property_interpolators['s_wave_velocity']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['s_wave_velocity']([[self.pressure, self.temperature]])[0]
 
     """
     Properties from mineral parameters,
@@ -188,7 +188,7 @@ class PerplexMaterial(Material):
     @material_property
     @copy_documentation(Material.density)
     def density(self):
-        return self._property_interpolators['rho']([[self.pressure, self.temperature]])[0,0]
+        return self._property_interpolators['rho']([[self.pressure, self.temperature]])[0]
 
     @material_property
     @copy_documentation(Material.internal_energy)

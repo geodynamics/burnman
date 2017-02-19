@@ -1,6 +1,24 @@
 from subprocess import Popen, PIPE, STDOUT
 import argparse
 
+'''  
+This python file uses PerpleX's werami software 
+to output a table file containing the following
+material properties.            
+    2 - Density (kg/m3)                           
+    4 - Expansivity (1/K, for volume)                               
+    5 - Compressibility (1/bar, for volume)                     
+   10 - Adiabatic bulk modulus (bar)                                
+   11 - Adiabatic shear modulus (bar)                               
+   12 - Sound velocity (km/s)                                       
+   13 - P-wave velocity (Vp, km/s)                                  
+   14 - S-wave velocity (Vs, km/s)                               
+   17 - Entropy (J/K/kg)                                            
+   18 - Enthalpy (J/kg)                                             
+   19 - Heat Capacity (J/K/kg)                              
+   22 - Molar Volume (J/bar)        
+'''
+
 parser = argparse.ArgumentParser(description='Call werami to create a burnman-readable tab file.')
 
 parser.add_argument('--werami_path', metavar='path', type=str, nargs='+', required=True,
@@ -17,22 +35,6 @@ parser.add_argument('--T_range', type=float, nargs=2,
                     help='Minimum and maximum values of temperature (K; optional)')
 
 args = parser.parse_args()
-
-'''                                  
-X    2 - Density (kg/m3)                           
-X    4 - Expansivity (1/K, for volume)                               
-X    5 - Compressibility (1/bar, for volume)                     
-X   10 - Adiabatic bulk modulus (bar)                                
-X   11 - Adiabatic shear modulus (bar)                               
-X   12 - Sound velocity (km/s)                                       
-X   13 - P-wave velocity (Vp, km/s)                                  
-X   14 - S-wave velocity (Vs, km/s)                               
-X   17 - Entropy (J/K/kg)                                            
-X   18 - Enthalpy (J/kg)                                             
-X   19 - Heat Capacity (J/K/kg)                              
-X   22 - Molar Volume (J/bar)        
-'''
-
 
 print('Working on creating {0}x{1} P-T table file using werami. Please wait.\n'.format(args.n_pressures[0], args.n_temperatures[0]))
 
