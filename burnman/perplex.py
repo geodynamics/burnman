@@ -104,6 +104,11 @@ class PerplexMaterial(Material):
     
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
+        
+        for i, p in enumerate([pressure, temperature]):
+            if not np.logical_and(np.all(self._property_interpolators['V'].grid[i][0] <= p),
+                                  np.all(p <= self._property_interpolators['V'].grid[i][-1])):
+                raise ValueError("The set_state condition is outside the bounds of the perplex table.")
         Material.set_state(self, pressure, temperature)
         
     """

@@ -32,7 +32,11 @@ import matplotlib.pyplot as plt
 
 
 rock=burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
-rock.set_state(1.e9, 300.)
+P = 1.e9
+T = 1650.
+rock.set_state(P, T)
+print('P: {0:.1f} GPa, T: {1:.1f} K, density: {2:.1f} kg/m^3'.format(P/1.e9, T, rock.rho))
+                                                                    
 pressures = np.linspace(1.e9, 100.e9, 101)
 temperatures = [1650.] * len(pressures)
 densities = rock.evaluate(['rho'], pressures, temperatures)[0]
