@@ -681,7 +681,7 @@ def _pad_ndarray_inverse_mirror(array, padding):
         padded_array_indices.append(idx)
 
     counter = Counter(padded_array_indices)
-    keys = counter.keys()
+    keys = list(counter.keys())
     values = counter.values()
     padded_indices = [keys[i] for i, value in enumerate(values) if value == 1]
     

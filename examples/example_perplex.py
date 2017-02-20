@@ -55,8 +55,9 @@ entropies = rock.evaluate(['S'], pressures, np.array([T] * len(pressures)))[0]
 
 pressure_stdev = 5.e8
 temperature_stdev = 0.
-interp_smoothed_entropy = burnman.tools.interp_smoothed_property(rock, 'S', pressures, temperatures,
+S_interps = burnman.tools.interp_smoothed_property(rock, 'S', pressures, temperatures,
                                                                  pressure_stdev, temperature_stdev)
+interp_smoothed_entropy, interp_dSdP, interp_dSdT = S_interps
 
 smoothed_entropies = np.array([interp_smoothed_entropy(P, T) for P in pressures])
 

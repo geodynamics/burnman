@@ -52,7 +52,7 @@ def compute_pressure_gradient(pressures, densities):
     g0 = 9.81
     gravity = pressures * 0. + 10. # starting guess
     n_gravity_iterations = 5
-    for i in xrange(n_gravity_iterations):    
+    for i in range(n_gravity_iterations):    
         # Integrate the hydrostatic equation
         # Make a spline fit of densities as a function of pressures
         rhofunc = UnivariateSpline(pressures, densities)
@@ -83,43 +83,64 @@ pressures = np.linspace(1.e5, 25.e9, n_points)
 temperatures = isentrope(rock, pressures, entropy)
 
 
-volumes, densities, C_p, alphas, compressibilities = rock.evaluate(['V', 'rho',
-                                                                    'heat_capacity_p',
-                                                                    'thermal_expansivity',
-                                                                    'isothermal_compressibility'],
-                                                                   pressures,
-                                                                   temperatures)
+volumes, densities, C_p, alphas, compressibilities, p_wave_velocities, s_wave_velocities = rock.evaluate(['V', 'rho',
+                                                                                                          'heat_capacity_p',
+                                                                                                          'thermal_expansivity',
+                                                                                                          'isothermal_compressibility',
+                                                                                                          'p_wave_velocity',
+                                                                                                          'shear_wave_velocity'],
+                                                                                                         pressures,
+                                                                                                         temperatures)
 
 specific_heats = C_p / rock.params['molar_mass']
 depths, gravity = compute_pressure_gradient(pressures, densities)
 
-for i in xrange(1,7):
-    plt.subplot(2, 4, i)
-    plt.xlabel('Pressures (GPa)')
 
 x = pressures/1.e9
 
-plt.subplot(2, 4, 1)
-plt.plot(x, temperatures)
-plt.ylabel('Temperature (K)')
-plt.subplot(2, 4, 2)
-plt.plot(x, depths/1.e3)
-plt.ylabel('Depths (km)')
-plt.subplot(2, 4, 3)
-plt.plot(x, gravity)
-plt.ylabel('Gravity (m/s^2)')
-plt.subplot(2, 4, 4)
-plt.plot(x, densities)
-plt.ylabel('Density (kg/m^3)')
-plt.subplot(2, 4, 5)
-plt.plot(x, specific_heats)
-plt.ylabel('Cp (J/K/kg)')
-plt.subplot(2, 4, 6)
-plt.plot(x, alphas)
-plt.ylabel('alpha (/K)')
-plt.subplot(2, 4, 7)
-plt.plot(x, compressibilities)
-plt.ylabel('compressibilities (/Pa)')
+plt.rcParams['figure.figsize'] = 16, 8 # inches
+fig = plt.figure()
+ax_T = fig.add_subplot(2, 4, 1)
+ax_T.plot(x, temperatures, label='unrelaxed')
+ax_T.set_ylabel('Temperature (K)')
+ax_T.set_xlabel('Pressures (GPa)')
+
+ax_z = fig.add_subplot(2, 4, 2)
+ax_z.plot(x, depths/1.e3)
+ax_z.set_ylabel('Depths (km)')
+ax_z.set_xlabel('Pressures (GPa)')
+
+ax_g = fig.add_subplot(2, 4, 3)
+ax_g.plot(x, gravity)
+ax_g.set_ylabel('Gravity (m/s^2)')
+ax_g.set_xlabel('Pressures (GPa)')
+
+ax_rho = fig.add_subplot(2, 4, 4)
+ax_rho.plot(x, densities)
+ax_rho.set_ylabel('Density (kg/m^3)')
+ax_rho.set_xlabel('Pressures (GPa)')
+
+ax_cp = fig.add_subplot(2, 4, 5)
+ax_cp.plot(x, specific_heats)
+ax_cp.set_ylabel('Cp (J/K/kg)')
+ax_cp.set_xlabel('Pressures (GPa)')
+
+ax_alpha = fig.add_subplot(2, 4, 6)
+ax_alpha.plot(x, alphas)
+ax_alpha.set_ylabel('alpha (/K)')
+ax_alpha.set_xlabel('Pressures (GPa)')
+
+ax_beta = fig.add_subplot(2, 4, 7)
+ax_beta.plot(x, compressibilities)
+ax_beta.set_ylabel('compressibilities (/Pa)')
+ax_beta.set_xlabel('Pressures (GPa)')
+
+ax_vs = fig.add_subplot(2, 4, 8)
+ax_vs.plot(x, p_wave_velocities, label='P')
+ax_vs.plot(x, s_wave_velocities, label='S')
+ax_vs.legend(loc='upper left')
+ax_vs.set_ylabel('Velocities (km/s)')
+ax_vs.set_xlabel('Pressures (GPa)')
 
 grid_pressures = np.linspace(1.e5, 25.e9, 501)
 grid_temperatures = np.linspace(1400., 2000., 101)
@@ -156,28 +177,30 @@ for pressure_stdev in [0., 5.e8]:
     alphas_relaxed = dVdT / volumes
     compressibilities_relaxed = -dVdP / volumes
 
-
-    plt.subplot(2, 4, 1)
-    plt.plot(x, temperatures)
-    plt.subplot(2, 4, 2)
-    plt.plot(x, depths/1.e3)
-    plt.subplot(2, 4, 3)
-    plt.plot(x, gravity)
-    plt.subplot(2, 4, 4)
-    plt.plot(x, densities)
-    plt.subplot(2, 4, 5)
-    plt.plot(x, specific_heats_relaxed)
-    plt.subplot(2, 4, 6)
-    plt.plot(x, alphas_relaxed)
-    plt.subplot(2, 4, 7)
-    plt.plot(x, compressibilities_relaxed)
+    print('Min and max relaxed property when pressure smoothing standard deviation is {0:.2f} GPa'.format(pressure_stdev/1.e9))
+    print('Specific heat: {0:.2e}, {1:.2e}'.format(np.min(specific_heats_relaxed), np.max(specific_heats_relaxed)))
+    print('Thermal expansivity: {0:.2e}, {1:.2e}'.format(np.min(alphas_relaxed), np.max(alphas_relaxed)))
+    print('Compressibilities: {0:.2e}, {1:.2e}\n'.format(np.min(compressibilities_relaxed), np.max(compressibilities_relaxed)))
     
+    ax_T.plot(x, temperatures, label='relaxed, smoothed (P_sd: {0:.1f} GPa)'.format(pressure_stdev/1.e9))
+    ax_z.plot(x, depths/1.e3)
+    ax_g.plot(x, gravity)
+    ax_rho.plot(x, densities)
+    ax_cp.plot(x, specific_heats_relaxed)
+    ax_alpha.plot(x, alphas_relaxed)
+    ax_beta.plot(x, compressibilities_relaxed)
+
+
+
+ax_T.legend(loc='upper left')
+fig.tight_layout()
+
 plt.show()
 
 
 
 
 # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity
-np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, temperatures, densities, gravity, alphas, specific_heats, compressibilities]).T,
-           header='POINTS: '+str(n_points)+' \ndepth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (/K), Cp (J/K/kg), beta (/Pa)',
-           fmt='%.10e', delimiter='\t')
+#np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, temperatures, densities, gravity, alphas, specific_heats, compressibilities]).T,
+#           header='POINTS: '+str(n_points)+' \ndepth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (/K), Cp (J/K/kg), beta (/Pa)',
+#           fmt='%.10e', delimiter='\t')
