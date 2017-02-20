@@ -16,15 +16,26 @@ from .processchemistry import sum_formulae
 from . import constants
 
 
-class MadeMember(Mineral):
+class CombinedMineral(Mineral):
 
     """
-    This is the base class for endmembers constructed from a set of other minerals.
+    This is the base class for endmembers constructed from a 
+    linear combination of other minerals.
 
-    This class is available as :class:`burnman.MadeMember`.
+    Instances of this class should be initialised with a 
+    list of Mineral instances, a second list containing the 
+    number of moles of each mineral, and (optionally) a 
+    third list containing three floats describing a 
+    free energy adjustment which is linear in pressure and temperature 
+    (i.e. a constant energy, entropy and volume adjustment).
+
+    For example, a crude approximation to a bridgmanite model might be
+    bdg = CombinedMineral([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
+
+    This class is available as :class:`burnman.CombinedMineral`.
     """
 
-    def __init__(self, mineral_list, molar_amounts):
+    def __init__(self, mineral_list, molar_amounts, free_energy_adjustment=[]):
         self.mixture = SolidSolution(solution_type='mechanical',
                                      endmembers=[[m, ''] for m in mineral_list],
                                      molar_fractions = molar_amounts)
@@ -35,6 +46,13 @@ class MadeMember(Mineral):
             'molar_mass': self.mixture.molar_mass,
             'n': sum(self.mixture.formula.values())
         }
+
+        if free_energy_adjustment != []:
+            assert(len(free_energy_adjustment) == 3)
+            self.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
+                                                   'delta_S': free_energy_adjustment[1],
+                                                   'delta_V': free_energy_adjustment[2]}]]
+
         Mineral.__init__(self)
         
         class MadeMemberMethod(object):
@@ -245,44 +263,3 @@ class MadeMember(Mineral):
             * self.thermal_expansivity * self.thermal_expansivity \
             * self.isothermal_bulk_modulus
 
-
-def make_endmember(mineral_list, molar_amounts, free_energy_adjustment=[]):
-    """
-    This function makes a new endmember from a linear combination of minerals
-    and a Gibbs free energy adjustment which is linear in
-    pressure and temperature (i.e. a constant energy, entropy and
-    volume adjustment).
-    
-    For example, a crude approximation to a bridgmanite model might be
-    bdg = make_endmember([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
-
-
-    Parameters
-    ----------
-    mineral_list : list of instances of class Mineral
-        Minerals from which the linear combination is to be constructed
-
-    molar_amounts : list of floats
-        Stoichiometric coefficients for the linear combination
-        These can be negative.
-
-    free_energy_adjustment : list of floats (optional)
-        This list of three floats should contain constant 
-        internal energy, entropy and volume modifiers. 
-        These should be given in SI units.
-
-    Returns
-    -------
-    m : Instance of MadeMember class
-        The desired mineral 
-    """
-    assert(len(free_energy_adjustment) == 3)
-
-    m = MadeMember(mineral_list, molar_amounts)
-
-    if free_energy_adjustment != []:
-        m.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
-                                            'delta_S': free_energy_adjustment[1],
-                                            'delta_V': free_energy_adjustment[2]}]]
-            
-    return m

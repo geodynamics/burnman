@@ -65,7 +65,7 @@ from .material import Material
 from .composite import Composite
 from .solutionmodel import SolutionModel
 from .solidsolution import SolidSolution
-from .mademember import MadeMember
+from .combinedmineral import CombinedMineral
 from .mineral_helpers import *
 
 # high level functions
@@ -87,4 +87,3 @@ from . import geotherm
 # miscellaneous
 from . import tools
 from .partitioning import calculate_partition_coefficient, calculate_phase_percents
-from .mademember import make_endmember
