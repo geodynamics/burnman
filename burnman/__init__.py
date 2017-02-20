@@ -65,6 +65,7 @@ from .material import Material
 from .composite import Composite
 from .solutionmodel import SolutionModel
 from .solidsolution import SolidSolution
+from .combinedmineral import CombinedMineral
 from .mineral_helpers import *
 
 # high level functions
@@ -82,7 +83,6 @@ from . import eos
 
 from . import processchemistry
 from . import chemicalpotentials
-from .solutionmodel import SolutionModel
 from . import geotherm
 
 # miscellaneous

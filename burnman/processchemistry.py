@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import re
 import numpy as np
 from fractions import Fraction
+from collections import Counter
 import pkgutil
 
 
@@ -50,6 +51,16 @@ def dictionarize_formula(formula):
 
     return f
 
+def sum_formulae(formulae, amounts=None):
+    if amounts == None:
+        amounts = [1. for formula in formulae]
+    else:
+        assert (len(formulae) == len(amounts))
+        
+    summed_formula = Counter()
+    for i, formula in enumerate(formulae):
+        summed_formula = summed_formula + Counter({element: amounts[i] * n_atoms for (element, n_atoms) in formula.items()})
+    return summed_formula
 
 def formula_mass(formula, atomic_masses):
     """

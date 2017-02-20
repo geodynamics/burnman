@@ -10,6 +10,7 @@ import warnings
 
 from .mineral import Mineral, material_property
 from .solutionmodel import *
+from .processchemistry import sum_formulae
 from .averaging_schemes import reuss_average_function
 from . import constants
 
@@ -62,7 +63,6 @@ class SolidSolution(Mineral):
             pass
         self.method = SolidSolutionMethod()
 
-
         if solution_type is not None:
             self.type = solution_type
         if endmembers is not None:
@@ -82,9 +82,12 @@ class SolidSolution(Mineral):
             raise Exception(
                 "'endmembers' attribute missing from solid solution")
 
+        
         # Set default solution model type
         if hasattr(self, 'type'):
-            if self.type == 'ideal':
+            if self.type == 'mechanical':
+                self.solution_model = MechanicalSolution(self.endmembers)
+            elif self.type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'energy_interaction') == False:
@@ -111,8 +114,29 @@ class SolidSolution(Mineral):
                     raise Exception(
                         "Solution model type " + self.params['type'] + "not recognised.")
         else:
-            warnings.warn(
-                "Warning, you have not set a solution model 'type' attribute for this solid solution.", stacklevel=2)
+            if hasattr(self, 'energy_interaction') == False:
+                self.energy_interaction = None
+            if hasattr(self, 'volume_interaction') == False:
+                self.volume_interaction = None
+            if hasattr(self, 'entropy_interaction') == False:
+                self.entropy_interaction = None
+
+            if self.type == 'symmetric':
+                self.solution_model = SymmetricRegularSolution(
+                    self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
+            elif self.type == 'asymmetric':
+                try:
+                    self.solution_model = AsymmetricRegularSolution(
+                        self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
+                except:
+                    raise Exception(
+                        "'alphas' attribute missing from solid solution")
+            elif self.type == 'subregular':
+                self.solution_model = SubregularSolution(
+                    self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
+            else:
+                raise Exception(
+                    "Solution model type " + self.params['type'] + "not recognised.")
             self.solution_model = SolutionModel()
 
         # Number of endmembers in the solid solution
@@ -140,10 +164,13 @@ class SolidSolution(Mineral):
             molar abundance for each endmember, needs to sum to one.
         """
         assert(len(self.endmembers) == len(molar_fractions))
-        assert(sum(molar_fractions) > 0.9999)
-        assert(sum(molar_fractions) < 1.0001)
-        self.molar_fractions = molar_fractions
 
+        if self.type != 'mechanical':
+            assert(sum(molar_fractions) > 0.9999)
+            assert(sum(molar_fractions) < 1.0001)
+            
+        self.molar_fractions = molar_fractions
+        
     def set_method(self, method):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(method)
@@ -156,6 +183,14 @@ class SolidSolution(Mineral):
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_state(pressure, temperature)
 
+    @material_property
+    def formula(self):
+        """
+        Returns chemical formula of the solid solution
+        """
+        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
+                            self.molar_fractions)
+    
     @material_property
     def activities(self):
         """
@@ -224,6 +259,14 @@ class SolidSolution(Mineral):
         Returns molar mass of the solid solution [kg/mol]
         """
         return sum([self.endmembers[i][0].molar_mass * self.molar_fractions[i] for i in range(self.n_endmembers)])
+    
+    @material_property
+    def formula(self):
+        """
+        Returns chemical formula of the solid solution
+        """
+        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
+                            self.molar_fractions)
 
     @material_property
     def excess_volume(self):
