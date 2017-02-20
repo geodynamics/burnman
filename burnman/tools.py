@@ -13,7 +13,8 @@ import numpy as np
 from scipy.optimize import fsolve, curve_fit
 from scipy.ndimage.filters import gaussian_filter
 from . import constants
-
+from scipy.interpolate import interp2d
+from collections import Counter
 
 def copy_documentation(copy_from):
     """
@@ -673,12 +674,16 @@ def _pad_ndarray_inverse_mirror(array, padding):
     padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
 
-    array_indices = []
+    padded_array_indices = [idx for idx, v in np.ndenumerate(padded_array)]
     for idx, v in np.ndenumerate(array):
         idx = tuple([idx[i] + padding[i] for i in range(len(padding))])
         padded_array[idx] = v
-        array_indices.append(idx)
-    padded_indices = [idx for idx, v in np.ndenumerate(padded_array) if idx not in array_indices]
+        padded_array_indices.append(idx)
+
+    counter = Counter(padded_array_indices)
+    keys = counter.keys()
+    values = counter.values()
+    padded_indices = [keys[i] for i, value in enumerate(values) if value == 1]
     
     edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
                                  for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
@@ -688,10 +693,11 @@ def _pad_ndarray_inverse_mirror(array, padding):
         padded_array[idx] = 2.*padded_array[edge_indices[i]] - padded_array[mirror_indices[i]]
 
     return padded_array
-    
-                         
-def smooth_gridded_property(material, gridded_property, pressures, temperatures,
-                            pressure_stdev, temperature_stdev, truncate=4.0):
+
+
+def interp_smoothed_property(material, gridded_property, pressures, temperatures,
+                             pressure_stdev=0, temperature_stdev=0, truncate=4.0,
+                             mode='inverse_mirror'):
     """
     Creates a smoothed array of a certain property of a rock
     on a regular grid of pressures and temperatures. Smoothing 
@@ -734,19 +740,27 @@ def smooth_gridded_property(material, gridded_property, pressures, temperatures,
     pp, TT = np.meshgrid(pressures, temperatures)
     property_grid = material.evaluate([gridded_property], pp, TT)[0]
 
+    
     pressure_resolution = pressures[1] - pressures[0] 
     temperature_resolution = temperatures[1] - temperatures[0]
 
     sigma = (temperature_stdev/temperature_resolution,
              pressure_stdev/pressure_resolution)
 
-    padding = (int(np.ceil(truncate*sigma[0])), int(np.ceil(truncate*sigma[1])))
-    padded_property_grid = _pad_ndarray_inverse_mirror(property_grid, padding)
-
-    smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
-                                                    sigma=sigma)
+    if mode == 'inverse_mirror':
+        padding = (int(np.ceil(truncate*sigma[0])), int(np.ceil(truncate*sigma[1])))
+        padded_property_grid = _pad_ndarray_inverse_mirror(property_grid, padding)
+        
+        smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
+                                                        sigma=sigma)
+    else:
+        padded_property_grid = property_grid
+        
+        smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
+                                                        sigma=sigma, mode=mode)
+        
 
     smoothed_property_grid = smoothed_padded_property_grid[padding[0]:padding[0] + property_grid.shape[0],
                                                            padding[1]:padding[1] + property_grid.shape[1]]
     
-    return pp, TT, property_grid, smoothed_property_grid
+    return interp2d(pressures, temperatures, smoothed_property_grid, kind='linear')
