@@ -726,14 +726,9 @@ def interp_smoothed_property(material, gridded_property, pressures, temperatures
 
     Returns
     -------
-    pp: 2D numpy array
-        meshed pressures
-    TT: 2D numpy array
-        meshed temperatures
-    property_grid: 2D numpy array
-        meshed property grid
-    smoothed_property_grid: 2D numpy array
-        meshed smoothed property grid
+    interps: tuple of three interp2d functors
+        interpolation functions for the smoothed property and 
+        the first derivatives with respect to pressure and temperature.
 
     """
     
@@ -762,5 +757,12 @@ def interp_smoothed_property(material, gridded_property, pressures, temperatures
 
     smoothed_property_grid = smoothed_padded_property_grid[padding[0]:padding[0] + property_grid.shape[0],
                                                            padding[1]:padding[1] + property_grid.shape[1]]
-    
-    return interp2d(pressures, temperatures, smoothed_property_grid, kind='linear')
+
+    dpropertydTdT, dpropertydPdP = np.gradient(smoothed_property_grid)
+    dP = pressures[1] - pressures[0]
+    dT = temperatures[1] - temperatures[0]
+
+    interps = (interp2d(pressures, temperatures, smoothed_property_grid, kind='linear'),
+               interp2d(pressures, temperatures, dpropertydPdP/dP, kind='linear'),
+               interp2d(pressures, temperatures, dpropertydTdT/dT, kind='linear'))
+    return interps
