@@ -22,17 +22,9 @@ class MadeMember(Mineral):
     This is the base class for endmembers constructed from a set of other minerals.
 
     This class is available as :class:`burnman.MadeMember`.
-
-    All the solid solution parameters are expected to be in SI units.  This
-    means that the interaction parameters should be in J/mol, with the T
-    and P derivatives in J/K/mol and m^3/mol.
     """
 
     def __init__(self, mineral_list, molar_amounts):
-        """
-        Set up matrices to speed up calculations for when P, T, X is defined.
-        """
-
         self.mixture = SolidSolution(solution_type='mechanical',
                                      endmembers=[[m, ''] for m in mineral_list],
                                      molar_fractions = molar_amounts)
@@ -254,7 +246,7 @@ class MadeMember(Mineral):
             * self.isothermal_bulk_modulus
 
 
-def make_endmember(mineral_list, molar_amounts, free_energy_adjustment):
+def make_endmember(mineral_list, molar_amounts, free_energy_adjustment=[]):
     """
     This function makes a new endmember from a linear combination of minerals
     and a Gibbs free energy adjustment which is linear in
@@ -263,12 +255,34 @@ def make_endmember(mineral_list, molar_amounts, free_energy_adjustment):
     
     For example, a crude approximation to a bridgmanite model might be
     bdg = make_endmember([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
+
+
+    Parameters
+    ----------
+    mineral_list : list of instances of class Mineral
+        Minerals from which the linear combination is to be constructed
+
+    molar_amounts : list of floats
+        Stoichiometric coefficients for the linear combination
+        These can be negative.
+
+    free_energy_adjustment : list of floats (optional)
+        This list of three floats should contain constant 
+        internal energy, entropy and volume modifiers. 
+        These should be given in SI units.
+
+    Returns
+    -------
+    m : Instance of MadeMember class
+        The desired mineral 
     """
     assert(len(free_energy_adjustment) == 3)
 
-    x = MadeMember(mineral_list, molar_amounts)
-    x.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
-                                        'delta_S': free_energy_adjustment[1],
-                                        'delta_V': free_energy_adjustment[2]}]]
+    m = MadeMember(mineral_list, molar_amounts)
+
+    if free_energy_adjustment != []:
+        m.property_modifiers = [['linear', {'delta_E': free_energy_adjustment[0],
+                                            'delta_S': free_energy_adjustment[1],
+                                            'delta_V': free_energy_adjustment[2]}]]
             
-    return x
+    return m

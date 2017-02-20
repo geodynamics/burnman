@@ -12,7 +12,6 @@ from .mineral import Mineral, material_property
 from .solutionmodel import *
 from .processchemistry import sum_formulae
 from .averaging_schemes import reuss_average_function
-from .processchemistry import sum_formulae
 from . import constants
 
 

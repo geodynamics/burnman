@@ -87,3 +87,4 @@ from . import geotherm
 # miscellaneous
 from . import tools
 from .partitioning import calculate_partition_coefficient, calculate_phase_percents
+from .mademember import make_endmember
