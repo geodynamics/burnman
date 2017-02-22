@@ -126,6 +126,7 @@ for test in `ls *.py`
 do
     [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "table.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "create_burnman_readable_perplex_table.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir
