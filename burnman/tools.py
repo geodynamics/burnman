@@ -15,6 +15,7 @@ from scipy.ndimage.filters import gaussian_filter
 from . import constants
 from scipy.interpolate import interp2d
 from collections import Counter
+import itertools
 
 def copy_documentation(copy_from):
     """
@@ -674,17 +675,17 @@ def _pad_ndarray_inverse_mirror(array, padding):
     padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
 
-    padded_array_indices = [idx for idx, v in np.ndenumerate(padded_array)]
-    for idx, v in np.ndenumerate(array):
-        idx = tuple([idx[i] + padding[i] for i in range(len(padding))])
-        padded_array[idx] = v
-        padded_array_indices.append(idx)
+    slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+    padded_array[slices] = array
+
+    padded_array_indices = list(itertools.product(*[range(n + 2*padding[i]) for i, n in enumerate(array.shape)]))
+    inserted_indices = list(itertools.product(*[range(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]))
+    padded_array_indices.extend(inserted_indices)
 
     counter = Counter(padded_array_indices)
     keys = list(counter.keys())
     values = counter.values()
     padded_indices = [keys[i] for i, value in enumerate(values) if value == 1]
-    
     edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
                                  for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
     mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j] for j in range(len(array.shape))]) for i in range(len(padded_indices))])
@@ -763,8 +764,6 @@ def interp_smoothed_array_and_derivatives(array,
 
     Parameters
     ----------
-    material : burnman Material
-        The material whose properties to smooth
     array : 2D numpy array
         The array to smooth. Each element array[i][j]
         corresponds to the position x_values[i], y_values[j]
