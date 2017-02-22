@@ -53,13 +53,10 @@ temperatures = np.linspace(1600., 1800., 3)
 T = 1650.
 entropies = rock.evaluate(['S'], pressures, np.array([T] * len(pressures)))[0]
 
-pressure_stdev = 5.e8
-temperature_stdev = 0.
-S_interps = burnman.tools.interp_smoothed_property(rock, 'S', pressures, temperatures,
-                                                                 pressure_stdev, temperature_stdev)
-interp_smoothed_entropy, interp_dSdP, interp_dSdT = S_interps
 
-smoothed_entropies = np.array([interp_smoothed_entropy(P, T) for P in pressures])
+smoothed_entropies = burnman.tools.smooth_array(array=entropies,
+                                                grid_resolutions=np.array([pressures[1] - pressures[0]]),
+                                                gaussian_rms_widths = np.array([5.e8]))
 
 plt.plot(pressures/1.e9, entropies, label='entropies')
 plt.plot(pressures/1.e9, smoothed_entropies, label='smoothed entropies')

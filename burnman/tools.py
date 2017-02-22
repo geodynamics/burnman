@@ -695,31 +695,88 @@ def _pad_ndarray_inverse_mirror(array, padding):
     return padded_array
 
 
-def interp_smoothed_property(material, gridded_property, pressures, temperatures,
-                             pressure_stdev=0, temperature_stdev=0, truncate=4.0,
-                             mode='inverse_mirror'):
+def smooth_array(array, grid_resolutions,
+                 gaussian_rms_widths, truncate=4.0,
+                 mode='inverse_mirror'):
     """
-    Creates a smoothed array of a certain property of a rock
-    on a regular grid of pressures and temperatures. Smoothing 
-    is achieved by convolution of the unsmoothed array with 
-    a Gaussian with user-defined standard deviations in pressure and 
-    temperature. The smoothing is truncated at a user-defined 
-    number of standard deviations
+    Creates a smoothed array by convolving it with a gaussian filter. 
+    Grid resolutions and gaussian RMS widths are required for each of
+    the axes of the numpy array. The smoothing is truncated at a 
+    user-defined number of standard deviations. The edges of the array
+    can be padded in a number of different ways given by the
+    'mode' parameter.
+
+    Parameters
+    ----------
+    array : numpy ndarray
+        The array to smooth
+    grid_resolution : numpy array of floats
+        The resolution of each grid along each axis
+    gaussian_rms_widths : numpy array of floats
+        The Gaussian RMS widths/standard deviations for the 
+        Gaussian convolution.
+    truncate : float (default=4.) 
+        The number of standard deviations at which to truncate 
+        the smoothing.
+    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+        The mode parameter determines how the array borders are handled
+        either by scipy.ndimage.filters.gaussian_filter.
+        Default is 'inverse_mirror', which uses 
+        burnman.tools._pad_ndarray_inverse_mirror().
+
+    Returns
+    -------
+    smoothed_array: numpy ndarray
+       The smoothed array
+
+    """
+
+    # gaussian_filter works with standard deviations normalised to
+    # the grid spacing. For some reason, it uses
+    # the inverse axis order to that used by np.meshgrid
+    normed_stdev = np.array(gaussian_rms_widths)/np.array(grid_resolutions)
+    sigma = tuple(normed_stdev[::-1]) 
+    
+    if mode == 'inverse_mirror':
+        padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
+        padded_array = _pad_ndarray_inverse_mirror(array, padding)
+        smoothed_padded_array = gaussian_filter(padded_array,
+                                                sigma=sigma)
+        slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+        smoothed_array = smoothed_padded_array[slices]
+    else:
+        smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
+        
+    return smoothed_array
+
+
+def interp_smoothed_array_and_derivatives(array,
+                                          x_values, y_values,
+                                          x_stdev=0, y_stdev=0,
+                                          truncate=4.):
+    """
+    Creates a smoothed array on a regular 2D grid. Smoothing 
+    is achieved using burnman.tools.smooth_array(). 
+    Outputs scipy.interpolate.interp2d() interpolators 
+    which can be used to query the array, or its derivatives in the 
+    x- and y- directions.
 
     Parameters
     ----------
     material : burnman Material
         The material whose properties to smooth
-    gridded_property : string
-        The property to smooth
-    pressures : 1D numpy array
-        The pressures over which to create a smoothed grid
-    temperatures : 1D numpy array
-        The temperatures over which to create a smoothed grid
-    pressure_stdev : float
-        The standard deviation of pressure for the Gaussian filter
-    temperature_stdev : float
-        The standard deviation of temperature for the Gaussian filter
+    array : 2D numpy array
+        The array to smooth. Each element array[i][j]
+        corresponds to the position x_values[i], y_values[j]
+        (for ease of use with np.meshgrid(x_values, y_values))
+    x_values : 1D numpy array
+        The gridded x values over which to create the smoothed grid
+    y_values : 1D numpy array
+        The gridded y_values over which to create the smoothed grid
+    x_stdev : float
+        The standard deviation for the Gaussian filter along the x axis
+    y_stdev : float
+        The standard deviation for the Gaussian filter along the x axis
     truncate : float (optional) 
         The number of standard deviations at which to truncate 
         the smoothing (default = 4.).
@@ -728,41 +785,25 @@ def interp_smoothed_property(material, gridded_property, pressures, temperatures
     -------
     interps: tuple of three interp2d functors
         interpolation functions for the smoothed property and 
-        the first derivatives with respect to pressure and temperature.
+        the first derivatives with respect to x and y.
 
     """
-    
-    pp, TT = np.meshgrid(pressures, temperatures)
-    property_grid = material.evaluate([gridded_property], pp, TT)[0]
 
     
-    pressure_resolution = pressures[1] - pressures[0] 
-    temperature_resolution = temperatures[1] - temperatures[0]
+    dx = x_values[1] - x_values[0]
+    dy = y_values[1] - y_values[0]
 
-    sigma = (temperature_stdev/temperature_resolution,
-             pressure_stdev/pressure_resolution)
+    smoothed_array = smooth_array(array = array,
+                                  grid_resolutions = np.array([dx, dy]),
+                                  gaussian_rms_widths = np.array([x_stdev,
+                                                                  y_stdev]),
+                                  truncate=4.0,
+                                  mode='inverse_mirror')
+    
+    dSAdydy, dSAdxdx = np.gradient(smoothed_array)
 
-    if mode == 'inverse_mirror':
-        padding = (int(np.ceil(truncate*sigma[0])), int(np.ceil(truncate*sigma[1])))
-        padded_property_grid = _pad_ndarray_inverse_mirror(property_grid, padding)
-        
-        smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
-                                                        sigma=sigma)
-    else:
-        padded_property_grid = property_grid
-        
-        smoothed_padded_property_grid = gaussian_filter(padded_property_grid,
-                                                        sigma=sigma, mode=mode)
-        
+    interps = (interp2d(x_values, y_values, smoothed_array, kind='linear'),
+               interp2d(x_values, y_values, dSAdxdx/dx, kind='linear'),
+               interp2d(x_values, y_values, dSAdydy/dy, kind='linear'))
 
-    smoothed_property_grid = smoothed_padded_property_grid[padding[0]:padding[0] + property_grid.shape[0],
-                                                           padding[1]:padding[1] + property_grid.shape[1]]
-
-    dpropertydTdT, dpropertydPdP = np.gradient(smoothed_property_grid)
-    dP = pressures[1] - pressures[0]
-    dT = temperatures[1] - temperatures[0]
-
-    interps = (interp2d(pressures, temperatures, smoothed_property_grid, kind='linear'),
-               interp2d(pressures, temperatures, dpropertydPdP/dP, kind='linear'),
-               interp2d(pressures, temperatures, dpropertydTdT/dT, kind='linear'))
     return interps

@@ -149,18 +149,20 @@ temperature_stdev = 10.
 
 for pressure_stdev in [0., 5.e8]:
 
-    S_interps = burnman.tools.interp_smoothed_property(rock, 'S',
-                                                       grid_pressures,
-                                                       grid_temperatures,
-                                                       pressure_stdev,
-                                                       temperature_stdev)
+    pp, TT = np.meshgrid(grid_pressures, grid_temperatures)
+    grid_entropies, grid_volumes = rock.evaluate(['S', 'V'], pp, TT)
+    S_interps = burnman.tools.interp_smoothed_array_and_derivatives(grid_entropies,
+                                                                    grid_pressures,
+                                                                    grid_temperatures,
+                                                                    pressure_stdev,
+                                                                    temperature_stdev)
     interp_smoothed_S, interp_smoothed_dSdP, interp_smoothed_dSdT = S_interps
     
-    V_interps = burnman.tools.interp_smoothed_property(rock, 'V',
-                                                       grid_pressures,
-                                                       grid_temperatures,
-                                                       pressure_stdev,
-                                                       temperature_stdev)
+    V_interps = burnman.tools.interp_smoothed_array_and_derivatives(grid_volumes,
+                                                                    grid_pressures,
+                                                                    grid_temperatures,
+                                                                    pressure_stdev,
+                                                                    temperature_stdev)
     
     interp_smoothed_V, interp_smoothed_dVdP, interp_smoothed_dVdT = V_interps
 
