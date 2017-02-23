@@ -111,7 +111,9 @@ Prhos = [[1.e5, 7019.],
          [277.4e9, 12643.],
          [331.5e9, 13015.],
          [397.1e9, 13417.]]
+
+print('Pressure (GPa), Temperature (K), Density (kg/m^3), Grueneisen parameter')
 for Prho in Prhos:
     P, rho = Prho
     T = fsolve(temperature, 1811., args=(P, rho, liq))[0]
-    print P, rho, T, liq.grueneisen_parameter
+    print('{0:.1f} {1:.0f} {2:.1f} {3:.4f}'.format(P/1.e9, rho, T, liq.grueneisen_parameter))
