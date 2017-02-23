@@ -15,19 +15,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
-fig1 = mpimg.imread('figures/MgO-SiO2_enthalpy_mixing.png')
-plt.subplot(131)
-plt.imshow(fig1, extent=[0, 1, -40000, 10000], aspect='auto')
-
-fig1 = mpimg.imread('figures/MgO-SiO2_entropy_mixing.png')
-plt.subplot(132)
-plt.imshow(fig1, extent=[0, 1, 0, 24], aspect='auto')
-
-fig1 = mpimg.imread('figures/MgO-SiO2_volume_mixing.png')
-plt.subplot(133)
-plt.imshow(fig1, extent=[0, 1, -2.0e-6, 0.4e-6], aspect='auto')
-
 phases = [DKS_2013_liquids.SiO2_liquid(),
          DKS_2013_liquids.MgSiO3_liquid(),
          DKS_2013_liquids.MgSi2O5_liquid(),
@@ -46,78 +33,72 @@ temperature = 3000. # K
 MgO_liq = DKS_2013_liquids.MgO_liquid()
 SiO2_liq = DKS_2013_liquids.SiO2_liquid()
 
-pts = [[0, 3000],
-       [5, 3000],
-       [10, 3000],
-       [25, 3000],
-       [50, 4000],
-       [75, 5000],
-       [100, 6000],
-       [135, 6000]]
+pressures = np.array(   [0.,    5.,    10.,   25.,   50.,   75.,   100.,  135.])*1.e9
+temperatures = np.array([3000., 3000., 3000., 3000., 4000., 5000., 6000., 6000.])
+
+SiO2_enthalpies, SiO2_entropies, SiO2_volumes = phases[0].evaluate(['H', 'S', 'V'], pressures, temperatures)
+MgO_enthalpies, MgO_entropies, MgO_volumes = phases[-1].evaluate(['H', 'S', 'V'], pressures, temperatures)
 
 
-
-for p, t in pts:
-    pressure=p*1.e9
-    temperature=t*1.
-
-    MgO_liq.set_state(pressure, temperature)
-    SiO2_liq.set_state(pressure, temperature)
-    MgO_gibbs = MgO_liq.gibbs
-    SiO2_gibbs = SiO2_liq.gibbs
-
-    MgO_H = MgO_liq.H
-    SiO2_H = SiO2_liq.H
-
-    MgO_S = MgO_liq.S
-    SiO2_S = SiO2_liq.S
-
-    MgO_V = MgO_liq.V
-    SiO2_V = SiO2_liq.V
-
-    MgO_K_T = MgO_liq.K_T
-    SiO2_K_T = SiO2_liq.K_T
-
-    fSis=[]
-    Gexs=[]
-    Hexs=[]
-    Sexs=[]
-    Vexs=[]
-    K_Ts=[]
-    K_Texs=[]
-    for phase in phases:
-        try:
-            nSi = phase.params['formula']['Si']
-        except:
-            nSi = 0.
-        try:
-            nMg = phase.params['formula']['Mg']
-        except:
-            nMg = 0.
+excesses = []
+for phase in phases[1:-1]:
+    try:
+        nSi = phase.params['formula']['Si']
+    except:
+        nSi = 0.
+    try:
+        nMg = phase.params['formula']['Mg']
+    except:
+        nMg = 0.
         
-        sum_cations = nSi+nMg
-        fSi=nSi/sum_cations
-        
-        phase.set_state(pressure, temperature)
-        Hex = phase.H/sum_cations - (fSi*SiO2_H + (1.-fSi)*MgO_H)
-        Sex = phase.S/sum_cations - (fSi*SiO2_S + (1.-fSi)*MgO_S)
-        Vex = phase.V/sum_cations - (fSi*SiO2_V + (1.-fSi)*MgO_V)
+    sum_cations = nSi+nMg
+    fSi=nSi/sum_cations
 
-        fSis.append(fSi)
-        Hexs.append(Hex)
-        Sexs.append(Sex)
-        Vexs.append(Vex)
+    enthalpies, entropies, volumes = phase.evaluate(['H', 'S', 'V'], pressures, temperatures)
 
-    plt.subplot(131)
-    plt.title('Excess Enthalpies') 
-    plt.plot(fSis, Hexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(132)
-    plt.title('Excess Entropies') 
-    plt.plot(fSis, Sexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
-    plt.subplot(133)
-    plt.title('Excess Volumes') 
-    plt.plot(fSis, Vexs, marker='o', linestyle='None', label=str(p)+' GPa, '+str(t)+' K')
+    excess_enthalpies = enthalpies/sum_cations - (fSi*SiO2_enthalpies + (1.-fSi)*MgO_enthalpies)
+    excess_entropies = entropies/sum_cations - (fSi*SiO2_entropies + (1.-fSi)*MgO_entropies)
+    excess_volumes = volumes/sum_cations - (fSi*SiO2_volumes + (1.-fSi)*MgO_volumes)
+
+
+
+    excesses.extend([[pressure, temperatures[i], fSi,
+                      excess_enthalpies[i], excess_entropies[i], excess_volumes[i]]
+                     for i, pressure in enumerate(pressures)])
+
+
+excesses = np.array(excesses)
+
+fig = plt.figure()
+ax_H = fig.add_subplot(1,3,1)
+ax_S = fig.add_subplot(1,3,2)
+ax_V = fig.add_subplot(1,3,3)
+
+ax_H.set_title('Excess Enthalpy') 
+ax_S.set_title('Excess Entropy')
+ax_V.set_title('Excess Volume') 
+
+figH = mpimg.imread('figures/MgO-SiO2_enthalpy_mixing.png')
+figS = mpimg.imread('figures/MgO-SiO2_entropy_mixing.png')
+figV = mpimg.imread('figures/MgO-SiO2_volume_mixing.png')
+
+ax_H.imshow(figH, extent=[0, 1, -40000, 10000], aspect='auto')
+ax_S.imshow(figS, extent=[0, 1, 0, 24], aspect='auto')
+ax_V.imshow(figV, extent=[0, 1, -2.0e-6, 0.4e-6], aspect='auto')
+
+for (pressure, temperature) in zip(*[pressures, temperatures]):
+    mask = [i for i in range(len(excesses[:,1])) if np.abs(excesses[i][0] - pressure) < 1. and np.abs(excesses[i][1] - temperature) < 1.]
+    ax_H.plot(excesses[mask,2], excesses[mask,3], marker='o', linestyle='None', label='{0:.0f} GPa, {1:.0f} K'.format(pressure/1.e9, temperature))
+    ax_S.plot(excesses[mask,2], excesses[mask,4], marker='o', linestyle='None', label='{0:.0f} GPa, {1:.0f} K'.format(pressure/1.e9, temperature))
+    ax_V.plot(excesses[mask,2], excesses[mask,5], marker='o', linestyle='None', label='{0:.0f} GPa, {1:.0f} K'.format(pressure/1.e9, temperature))
 
 plt.legend(loc='lower right')
 plt.show()
+    
+print('Excess properties of mixing at a 1:1 Mg:Si composition:\n')
+mask = [i for i in range(len(excesses[:,2])) if np.abs(excesses[i][2] - 0.5) < 1.e-12]
+print('P (GPa)   T (K)   H (J/mol)   S (J/K/mol)   V (cm^3/mol)')
+for excess in excesses[mask]:
+    print('{0:.0f} {1:.0f} {2:.1e} {3:.1e} {4:.1e}'.format(excess[0]/1.e9, excess[1], excess[3], excess[4], excess[5]))
+
 

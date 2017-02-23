@@ -15,115 +15,54 @@ import matplotlib.image as mpimg
 SiO2_liq=DKS_2013_liquids.SiO2_liquid()
 MgO_liq=DKS_2013_liquids.MgO_liquid()
 
-fig1 = mpimg.imread('figures/SiO2_liquid_PVT.png')
-plt.imshow(fig1, extent=[9, 30, -10, 220], aspect='auto')
+MgO_temperatures=np.array([2000., 3000., 4000., 5000., 6000., 7000., 10000.])
+MgO_volumes=np.linspace(7e-6, 18e-6, 101)
 
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(9e-6, 30e-6, 101)
-pressures=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        pressures[i]=SiO2_liq.method.pressure(temperature, volume, SiO2_liq.params)/1e9
-    plt.plot(volumes*1e6, pressures, linewidth=2, label=str(temperature)+'K')
+SiO2_temperatures=np.array([2000., 3000., 4000., 5000., 6000., 7000.])
+SiO2_volumes=np.linspace(9e-6, 30e-6, 101)
 
-plt.legend(loc='upper right')
-plt.xlim(9,30)
-plt.ylim(-10,220)
-plt.show()
+plots = [[['figures/SiO2_liquid_PVT.png', [9, 30, -10, 220]],
+          ['figures/SiO2_liquid_SelVT.png', [9, 30, -0.03, 0.75]],
+          ['figures/SiO2_liquid_EVT.png', [9, 30, -2400, -1200]]],
+         [['figures/MgO_liquid_PVT.png', [7, 18, -6, 240]],
+          ['figures/MgO_liquid_SelVT.png', [6, 18, -0.04, 0.84]],
+          ['figures/MgO_liquid_EVT.png', [7, 18, -1200, -200]]]]
 
-fig1 = mpimg.imread('figures/SiO2_liquid_SelVT.png')
-plt.imshow(fig1, extent=[9, 30, -0.03, 0.75], aspect='auto')
 
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(9e-6, 30e-6, 101)
-entropies=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        entropies[i]=SiO2_liq.method._S_el(temperature, volume, SiO2_liq.params)
-    plt.plot(volumes*1e6, entropies/3./constants.gas_constant, linewidth=2, label=str(temperature)+'K')
+for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2_temperatures,
+                                                              SiO2_volumes),
+                                                             (MgO_liq, 2., MgO_temperatures,
+                                                              MgO_volumes)]):
 
-plt.legend(loc='upper right')
-plt.xlim(9,30)
-plt.show()
-
-fig1 = mpimg.imread('figures/SiO2_liquid_EVT.png')
-plt.imshow(fig1, extent=[9, 30, -2400, -1200], aspect='auto')
-
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(9e-6, 30e-6, 101)
-energies=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        energies[i]=SiO2_liq.method.internal_energy(0., temperature, volume, SiO2_liq.params)
-    plt.plot(volumes*1e6, energies/1e3, linewidth=2, label=str(temperature)+'K')
-
-plt.legend(loc='upper right')
-plt.xlim(9,30)
-plt.show()
-
-# Plot MgO
-fig1 = mpimg.imread('figures/MgO_liquid_PVT.png')
-plt.imshow(fig1, extent=[7, 18, -6, 240], aspect='auto')
-
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(7e-6, 18e-6, 101)
-pressures=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        pressures[i]=SiO2_liq.method.pressure(temperature, volume, MgO_liq.params)/1e9
-    plt.plot(volumes*1e6, pressures, linewidth=2, label=str(temperature)+'K')
-
-temperature = 10000. # K
-for i, volume in enumerate(volumes):
-    pressures[i]=SiO2_liq.method.pressure(temperature, volume, MgO_liq.params)/1e9
-plt.plot(volumes*1e6, pressures, linewidth=2, label=str(temperature)+'K')
-
+    fig = plt.figure()
+    ax_P = fig.add_subplot(1,3,1)
+    ax_S = fig.add_subplot(1,3,2)
+    ax_E = fig.add_subplot(1,3,3)
+    ax_P.set_xlabel('Volume (cm^3/mol)')
+    ax_S.set_xlabel('Volume (cm^3/mol)')
+    ax_E.set_xlabel('Volume (cm^3/mol)')
     
-plt.legend(loc='upper right')
-plt.xlim(7,18)
-plt.ylim(-6,240)
-plt.show()
+    ax_P.set_ylabel('Pressure (GPa)')
+    ax_S.set_ylabel('Entropy/nR (J)')
+    ax_E.set_ylabel('Internal Energy (kJ/mol)')
 
-
-fig1 = mpimg.imread('figures/MgO_liquid_SelVT.png')
-plt.imshow(fig1, extent=[6, 18, -0.04, 0.84], aspect='auto')
-
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(7e-6, 18e-6, 101)
-entropies=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        entropies[i]=SiO2_liq.method._S_el(temperature, volume, MgO_liq.params)
-    plt.plot(volumes*1e6, entropies/2./constants.gas_constant, linewidth=2, label=str(temperature)+'K')
-
-temperature = 10000. # K
-for i, volume in enumerate(volumes):
-    entropies[i]=SiO2_liq.method._S_el(temperature, volume, MgO_liq.params)
-plt.plot(volumes*1e6, entropies/2./constants.gas_constant, linewidth=2, label=str(temperature)+'K')
-
+    ax_P.imshow(mpimg.imread(plots[i][0][0]), extent=plots[i][0][1], aspect='auto')
+    ax_S.imshow(mpimg.imread(plots[i][1][0]), extent=plots[i][1][1], aspect='auto')
+    ax_E.imshow(mpimg.imread(plots[i][2][0]), extent=plots[i][2][1], aspect='auto')
     
-plt.legend(loc='upper right')
-plt.xlim(6,18)
-plt.ylim(-0.04,0.84)
-plt.show()
+    for temperature in temperatures:
+        pressures = np.empty_like(volumes)
+        entropies= np.empty_like(volumes)
+        energies = np.empty_like(volumes)
 
+        for j, volume in enumerate(volumes):
+            pressures[j]=phase.method.pressure(temperature, volume, phase.params)
+            entropies[j]=phase.method._S_el(temperature, volume, phase.params)
+            energies[j]=phase.method.internal_energy(0., temperature, volume, phase.params)
 
-fig1 = mpimg.imread('figures/MgO_liquid_EVT.png')
-plt.imshow(fig1, extent=[7, 18, -1200, -200], aspect='auto')
-
-temperatures=np.linspace(2000., 7000., 6)
-volumes=np.linspace(7e-6, 18e-6, 101)
-energies=np.empty_like(volumes)
-for temperature in temperatures:
-    for i, volume in enumerate(volumes):
-        energies[i]=MgO_liq.method.internal_energy(0., temperature, volume, MgO_liq.params)
-    plt.plot(volumes*1e6, energies/1e3, linewidth=2, label=str(temperature)+'K')
-
-temperature=10000. # K
-for i, volume in enumerate(volumes):
-    energies[i]=MgO_liq.method.internal_energy(0., temperature, volume, MgO_liq.params)
-plt.plot(volumes*1e6, energies/1e3, linewidth=2, label=str(temperature)+'K')
-
-plt.legend(loc='upper right')
-plt.xlim(7,18)
-plt.show()
+        ax_P.plot(volumes*1.e6, pressures/1.e9, linewidth=2, label='{0:.0f} K'.format(temperature))
+        ax_S.plot(volumes*1.e6, entropies/n_atoms/constants.gas_constant, linewidth=2, label='{0:.0f} K'.format(temperature))
+        ax_E.plot(volumes*1.e6, energies/1.e3, linewidth=2, label='{0:.0f} K'.format(temperature))
+        
+        ax_E.legend(loc='upper right')
+    plt.show()

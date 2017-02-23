@@ -1,16 +1,18 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
+
+from __future__ import absolute_import
+
 from os import path
 import numpy as np
 import scipy.optimize as opt
 from scipy.misc import factorial
-
 import warnings
 
-import equation_of_state as eos
-import burnman.constants as constants
-from burnman.processchemistry import read_masses
+from . import equation_of_state as eos
+from .. import constants as constants
+from ..processchemistry import read_masses
 
 atomic_masses=read_masses()
 # energy_states should provide the energies and degeneracies of each electronic level in a variety of elements
@@ -43,7 +45,7 @@ class DKS_L(eos.EquationOfState):
         
         V = volume/constants.Avogadro
         figoverRT=0.
-        for element, N in params['formula'].iteritems(): # N is a.p.f.u
+        for element, N in params['formula'].items(): # N is a.p.f.u
             if N > 1.e-5:
                 mass = atomic_masses[element]/constants.Avogadro
                 figoverRT += -N*(np.log(V) + self._ln_partition_function(mass, temperature) \
@@ -58,7 +60,7 @@ class DKS_L(eos.EquationOfState):
         
         V = volume/constants.Avogadro
         entropy_sum=0.
-        for element, N in params['formula'].iteritems(): # N is a.p.f.u
+        for element, N in params['formula'].items(): # N is a.p.f.u
             if N > 1.e-5:
                 mass = atomic_masses[element]/constants.Avogadro
                 entropy_sum -= -N*(np.log(V) + self._ln_partition_function(mass, temperature) \
@@ -71,7 +73,7 @@ class DKS_L(eos.EquationOfState):
         """
         
         n_atoms=0
-        for element, N in params['formula'].iteritems():
+        for element, N in params['formula'].items():
             n_atoms += N
         return 1.5*constants.gas_constant*n_atoms
 
@@ -82,7 +84,7 @@ class DKS_L(eos.EquationOfState):
         """
         
         n_atoms=0
-        for element, N in params['formula'].iteritems():
+        for element, N in params['formula'].items():
             n_atoms += N
         return n_atoms*constants.gas_constant*temperature / volume
 
@@ -92,7 +94,7 @@ class DKS_L(eos.EquationOfState):
         V * d/dV(-nRT/V) = V*nRT/V^2
         """
         n_atoms=0
-        for element, N in params['formula'].iteritems():
+        for element, N in params['formula'].items():
             n_atoms += N
         return n_atoms*constants.gas_constant*temperature / volume
 
@@ -104,7 +106,7 @@ class DKS_L(eos.EquationOfState):
         """
         
         n_atoms=0
-        for element, N in params['formula'].iteritems():
+        for element, N in params['formula'].items():
             n_atoms += N
         return n_atoms*constants.gas_constant / volume
 
@@ -358,7 +360,7 @@ class DKS_L(eos.EquationOfState):
         numerator_2 = 0.
         n_atoms = 0.
         if 'spin_a' in params:
-            for element, N in params['formula'].iteritems():
+            for element, N in params['formula'].items():
                 if element == 'Fe':
                     n_atoms += N
                     

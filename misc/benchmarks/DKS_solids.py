@@ -22,9 +22,13 @@ phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 
 for name, phase, PVT_range, EVT_range in phases:
     vmin=PVT_range[0]
     vmax=PVT_range[1]
- 
+
+    fig = plt.figure()
+    ax_P = fig.add_subplot(1, 2, 1)
+    ax_E = fig.add_subplot(1, 2, 2)
+    
     fig1 = mpimg.imread('figures/'+name+'_PVT.png')
-    plt.imshow(fig1, extent=PVT_range, aspect='auto')
+    ax_P.imshow(fig1, extent=PVT_range, aspect='auto')
     
     temperatures=np.linspace(1000., 6000., 6)
     volumes=np.linspace(PVT_range[0]*1.e-6, PVT_range[1]*1.e-6, 101)
@@ -32,16 +36,15 @@ for name, phase, PVT_range, EVT_range in phases:
     for temperature in temperatures:
         for i, volume in enumerate(volumes):
             pressures[i]=phase.method.pressure(temperature, volume, phase.params)
-        plt.plot(volumes*1e6, pressures/1e9, linewidth=2, label=str(temperature)+'K')
+        ax_P.plot(volumes*1e6, pressures/1e9, linewidth=2, label='{0:.0f} K'.format(temperature))
 
-    plt.legend(loc='upper right')
-    plt.xlim(PVT_range[0], PVT_range[1])
-    plt.show()
+    ax_P.set_xlim(PVT_range[0], PVT_range[1])
+    ax_P.set_xlabel('Volume (cm^3/mol)')
+    ax_P.set_ylabel('Pressure (GPa)')
     
 
-
     fig1 = mpimg.imread('figures/'+name+'_EVT.png')
-    plt.imshow(fig1, extent=EVT_range, aspect='auto')
+    ax_E.imshow(fig1, extent=EVT_range, aspect='auto')
     
     temperatures=np.linspace(2000., 6000., 5)
     volumes=np.linspace(EVT_range[0]*1.e-6, EVT_range[1]*1.e-6, 101)
@@ -49,8 +52,12 @@ for name, phase, PVT_range, EVT_range in phases:
     for temperature in temperatures:
         for i, volume in enumerate(volumes):
             energies[i]=phase.method.internal_energy(0., temperature, volume, phase.params)
-        plt.plot(volumes*1e6, energies/1e3, linewidth=2, label=str(temperature)+'K')
+        ax_E.plot(volumes*1e6, energies/1e3, linewidth=2, label='{0:.0f} K'.format(temperature))
 
-    plt.legend(loc='upper right')
-    plt.xlim(EVT_range[0], EVT_range[1])
+    ax_E.legend(loc='upper right')
+    ax_E.set_xlim(EVT_range[0], EVT_range[1])
+    ax_E.set_xlabel('Volume (cm^3/mol)')
+    ax_E.set_ylabel('Internal energy (kJ/mol)')
+    
+    fig.canvas.set_window_title(name)
     plt.show()
