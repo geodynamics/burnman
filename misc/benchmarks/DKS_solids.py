@@ -5,7 +5,7 @@ import sys
 sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.minerals import DKS_2013_solids, DKS_2008_fo
+from burnman.minerals import DKS_2013_solids
 from burnman import constants
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,10 +14,6 @@ import matplotlib.image as mpimg
 '''
 SOLIDS
 '''
-
-# Vxfo = fo.params['V_x']*1.e6
-#['forsterite', DKS_2008_fo.forsterite(), [0.67*Vxfo, 1.03*Vxfo, -15, 55], [0.67*Vxfo, 1.03*Vxfo, -2400, -1800]], \
-#['fo_liquid', DKS_2008_fo.fo_liquid(), [0.48*Vxfo, 1.23*Vxfo, -5, 205], [0.48*Vxfo, 1.23*Vxfo, -2400, -1800]], \
           
 phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 18, -2400, -1800]], \
           ['perovskite', DKS_2013_solids.perovskite(), [14.5, 27.5, 0, 344], [14.5, 27.5, -3600, -2000]], \
