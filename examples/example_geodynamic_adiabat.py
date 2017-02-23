@@ -151,6 +151,7 @@ for pressure_stdev in [0., 5.e8]:
 
     pp, TT = np.meshgrid(grid_pressures, grid_temperatures)
     grid_entropies, grid_volumes = rock.evaluate(['S', 'V'], pp, TT)
+
     S_interps = burnman.tools.interp_smoothed_array_and_derivatives(grid_entropies,
                                                                     grid_pressures,
                                                                     grid_temperatures,
@@ -166,16 +167,16 @@ for pressure_stdev in [0., 5.e8]:
     
     interp_smoothed_V, interp_smoothed_dVdP, interp_smoothed_dVdT = V_interps
 
-    temperatures = smooth_isentrope(interp_smoothed_S, pressures, entropy)
-    densities = rock.evaluate(['rho'], pressures, temperatures)[0]
+    smoothed_temperatures = smooth_isentrope(interp_smoothed_S, pressures, entropy)
+    densities = rock.evaluate(['rho'], pressures, smoothed_temperatures)[0]
     depths, gravity = compute_pressure_gradient(pressures, densities)
     
-    volumes = np.array([interp_smoothed_V(p, T)[0] for (p, T) in zip(*[pressures, temperatures])])
-    dSdT = np.array([interp_smoothed_dSdT(p, T)[0] for (p, T) in zip(*[pressures, temperatures])])
-    dVdT = np.array([interp_smoothed_dVdT(p, T)[0] for (p, T) in zip(*[pressures, temperatures])])
-    dVdP = np.array([interp_smoothed_dVdP(p, T)[0] for (p, T) in zip(*[pressures, temperatures])])
+    volumes = np.array([interp_smoothed_V(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
+    dSdT = np.array([interp_smoothed_dSdT(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
+    dVdT = np.array([interp_smoothed_dVdT(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
+    dVdP = np.array([interp_smoothed_dVdP(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
     
-    specific_heats_relaxed = temperatures * dSdT / rock.params['molar_mass']
+    specific_heats_relaxed = smoothed_temperatures * dSdT / rock.params['molar_mass']
     alphas_relaxed = dVdT / volumes
     compressibilities_relaxed = -dVdP / volumes
 
@@ -184,7 +185,7 @@ for pressure_stdev in [0., 5.e8]:
     print('Thermal expansivity: {0:.2e}, {1:.2e}'.format(np.min(alphas_relaxed), np.max(alphas_relaxed)))
     print('Compressibilities: {0:.2e}, {1:.2e}\n'.format(np.min(compressibilities_relaxed), np.max(compressibilities_relaxed)))
     
-    ax_T.plot(x, temperatures, label='relaxed, smoothed (P_sd: {0:.1f} GPa)'.format(pressure_stdev/1.e9))
+    ax_T.plot(x, smoothed_temperatures, label='relaxed, smoothed (P_sd: {0:.1f} GPa)'.format(pressure_stdev/1.e9))
     ax_z.plot(x, depths/1.e3)
     ax_g.plot(x, gravity)
     ax_rho.plot(x, densities)

@@ -684,8 +684,7 @@ def _pad_ndarray_inverse_mirror(array, padding):
 
     counter = Counter(padded_array_indices)
     keys = list(counter.keys())
-    values = counter.values()
-    padded_indices = [keys[i] for i, value in enumerate(values) if value == 1]
+    padded_indices = [keys[i] for i, value in enumerate(counter.values()) if value == 1]
     edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
                                  for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
     mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j] for j in range(len(array.shape))]) for i in range(len(padded_indices))])
@@ -722,7 +721,7 @@ def smooth_array(array, grid_resolutions,
     mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
         The mode parameter determines how the array borders are handled
         either by scipy.ndimage.filters.gaussian_filter.
-        Default is 'inverse_mirror', which uses 
+        Default is 'inverse_mirror', which uses
         burnman.tools._pad_ndarray_inverse_mirror().
 
     Returns
@@ -733,10 +732,8 @@ def smooth_array(array, grid_resolutions,
     """
 
     # gaussian_filter works with standard deviations normalised to
-    # the grid spacing. For some reason, it uses
-    # the inverse axis order to that used by np.meshgrid
-    normed_stdev = np.array(gaussian_rms_widths)/np.array(grid_resolutions)
-    sigma = tuple(normed_stdev[::-1]) 
+    # the grid spacing.
+    sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_resolutions))
     
     if mode == 'inverse_mirror':
         padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
@@ -754,7 +751,9 @@ def smooth_array(array, grid_resolutions,
 def interp_smoothed_array_and_derivatives(array,
                                           x_values, y_values,
                                           x_stdev=0, y_stdev=0,
-                                          truncate=4.):
+                                          truncate=4.,
+                                          mode='inverse_mirror',
+                                          indexing='xy'):
     """
     Creates a smoothed array on a regular 2D grid. Smoothing 
     is achieved using burnman.tools.smooth_array(). 
@@ -767,7 +766,6 @@ def interp_smoothed_array_and_derivatives(array,
     array : 2D numpy array
         The array to smooth. Each element array[i][j]
         corresponds to the position x_values[i], y_values[j]
-        (for ease of use with np.meshgrid(x_values, y_values))
     x_values : 1D numpy array
         The gridded x values over which to create the smoothed grid
     y_values : 1D numpy array
@@ -779,6 +777,14 @@ def interp_smoothed_array_and_derivatives(array,
     truncate : float (optional) 
         The number of standard deviations at which to truncate 
         the smoothing (default = 4.).
+    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+        The mode parameter determines how the array borders are handled
+        either by scipy.ndimage.filters.gaussian_filter.
+        Default is 'inverse_mirror', which uses
+        burnman.tools._pad_ndarray_inverse_mirror().
+    indexing : {'xy', 'ij'}, optional
+        Cartesian ('xy', default) or matrix ('ij') indexing of output.
+        See numpy.meshgrid for more details.
 
     Returns
     -------
@@ -792,12 +798,22 @@ def interp_smoothed_array_and_derivatives(array,
     dx = x_values[1] - x_values[0]
     dy = y_values[1] - y_values[0]
 
-    smoothed_array = smooth_array(array = array,
-                                  grid_resolutions = np.array([dx, dy]),
-                                  gaussian_rms_widths = np.array([x_stdev,
-                                                                  y_stdev]),
-                                  truncate=4.0,
-                                  mode='inverse_mirror')
+    if indexing == 'xy':
+        smoothed_array = smooth_array(array = array,
+                                      grid_resolutions = np.array([dy, dx]),
+                                      gaussian_rms_widths = np.array([y_stdev, x_stdev]),
+                                      truncate=truncate,
+                                      mode=mode)
+
+    elif indexing == 'ij':
+        smoothed_array = smooth_array(array = array,
+                                      grid_resolutions = np.array([dx, dy]),
+                                      gaussian_rms_widths = np.array([x_stdev, y_stdev]),
+                                      truncate=truncate,
+                                      mode=mode).T
+
+    else:
+        raise Exception('Indexing scheme not recognised. Should be ij or xy.')
     
     dSAdydy, dSAdxdx = np.gradient(smoothed_array)
 
