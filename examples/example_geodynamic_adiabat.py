@@ -1,3 +1,42 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
+
+
+"""
+example_geodynamic_adiabat
+----------------
+
+This example script demonstrates how burnman can be used to
+self-consistently calculate properties along 1D adiabatic profiles
+for use in geodynamics simulations.
+
+We use interrogate a PerplexMaterial for material properties
+as a function of pressure and temperature, and calculate
+both unrelaxed (short timescale) and relaxed (long timescale)
+properties. The latter are particularly important for
+convection studies, where reactions are fast compared with
+timescales of convection.
+
+Finally, we show how burnman can be used to smooth entropy and
+volume in order to create smoothly varying relaxed properties.
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.perplex.PerplexMaterial`
+* :func:`burnman.material.Material.evaluate`
+* :func:`burnman.tools.interp_smoothed_array_and_derivatives`
+
+
+*Demonstrates:*
+
+* creation of a PerpleX material
+* calculation of relaxed and unrelaxed thermodynamic properties
+* smoothing of thermodynamic properties
+* self consistent 1D geophysical profile generation
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -13,9 +52,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 
 import burnman
-from burnman.minerals import SLB_2011
 from scipy.optimize import fsolve
-
 from scipy.integrate import odeint
 from scipy.interpolate import UnivariateSpline
 
@@ -35,7 +72,9 @@ def isentrope(rock, pressures, entropy):
 
     return temperatures
 
-def smooth_isentrope(interp, pressures, entropy):
+# Define function to find an isentrope given a
+# 2D entropy interpolation function
+def interp_isentrope(interp, pressures, entropy):
     def temperature_on_isentrope(args, S, P):
         T = args[0]
         return interp(P, T)[0] - S
@@ -48,9 +87,10 @@ def smooth_isentrope(interp, pressures, entropy):
 
     return temperatures
 
-def compute_pressure_gradient(pressures, densities):
-    g0 = 9.81
-    gravity = pressures * 0. + 10. # starting guess
+# Define function to self consistently calculate depth and gravity profiles
+# from pressure and density profiles.
+def compute_depth_gravity_profiles(pressures, densities, surface_gravity):
+    gravity = [surface_gravity] * len(pressures) # starting guess
     n_gravity_iterations = 5
     for i in range(n_gravity_iterations):    
         # Integrate the hydrostatic equation
@@ -66,7 +106,7 @@ def compute_pressure_gradient(pressures, densities):
         
         rhofunc = UnivariateSpline(radii[::-1], densities[::-1])
         poisson = lambda p, x: 4.0 * np.pi * burnman.constants.G * rhofunc(x) * x * x
-        gravity = np.ravel(odeint(poisson, g0*radii[0]*radii[0], radii))
+        gravity = np.ravel(odeint(poisson, surface_gravity*radii[0]*radii[0], radii))
         gravity = gravity / radii / radii
     return depths, gravity
 
@@ -82,18 +122,14 @@ entropy = rock.S
 pressures = np.linspace(1.e5, 25.e9, n_points)
 temperatures = isentrope(rock, pressures, entropy)
 
-
-volumes, densities, C_p, alphas, compressibilities, p_wave_velocities, s_wave_velocities = rock.evaluate(['V', 'rho',
-                                                                                                          'heat_capacity_p',
-                                                                                                          'thermal_expansivity',
-                                                                                                          'isothermal_compressibility',
-                                                                                                          'p_wave_velocity',
-                                                                                                          'shear_wave_velocity'],
-                                                                                                         pressures,
-                                                                                                         temperatures)
-
+# Properties can then be calculated along the isentrope
+properties = rock.evaluate(['V', 'rho', 'heat_capacity_p',
+                            'thermal_expansivity', 'isothermal_compressibility',
+                            'p_wave_velocity', 'shear_wave_velocity'],
+                           pressures, temperatures)
+volumes, densities, C_p, alphas, compressibilities, p_wave_velocities, s_wave_velocities = properties
 specific_heats = C_p / rock.params['molar_mass']
-depths, gravity = compute_pressure_gradient(pressures, densities)
+depths, gravity = compute_depth_gravity_profiles(pressures, densities, 9.81)
 
 
 x = pressures/1.e9
@@ -142,34 +178,79 @@ ax_vs.legend(loc='upper left')
 ax_vs.set_ylabel('Velocities (km/s)')
 ax_vs.set_xlabel('Pressures (GPa)')
 
+# Now let's calculate some relaxed material properties.
+# These are commonly used in geodynamic simulations, because
+# advective velocities due to convection are slow compared
+# with the velocity of reaction fronts at mantle temperatures
+
+# Before computing relaxed properties, we can optionally choose
+# to smooth the entropy and volume. In this way, we avoid peaks
+# in the relaxed thermal expansivity and compressibility which
+# tend to cause numerical problems for geodynamics software.
+
+# Let's first define a grid to calculate properties.
+# This grid needs to be reasonably densely sampled to
+# capture all the gradients. Obviously, the density of
+# sampling can be lower if we intend to smooth over long wavelengths
 grid_pressures = np.linspace(1.e5, 25.e9, 501)
 grid_temperatures = np.linspace(1400., 2000., 101)
-temperature_stdev = 10.
 
+# Here we choose to smooth by convolving the entropy and volume
+# with a 2D Gaussian function with RMS widths of 10 K in temperature
+# and 0 or 0.5 GPa in pressure. The smoothing is truncated at the
+# 4 sigma level.
+
+temperature_stdev = 10.
+truncate = 4.
 
 for pressure_stdev in [0., 5.e8]:
 
     pp, TT = np.meshgrid(grid_pressures, grid_temperatures)
-    grid_entropies, grid_volumes = rock.evaluate(['S', 'V'], pp, TT)
+    mesh_shape = pp.shape
+    pp = np.ndarray.flatten(pp)
+    TT = np.ndarray.flatten(TT)
+    
+    # We could compute properties over the whole grid:
+    # grid_entropies, grid_volumes = rock.evaluate(['S', 'V'], pp, TT)
+    # However, we can save some time by computing only when temperature is close enough
+    # to the unsmoothed isentrope to affect the smoothing.
+    # The maximum temperature jump for this rock is about 50 K, so a reasonable Tmax is
+    # ~50 + 4.*temperature_stdev. We pad a bit more (an extra 30 K) just to be sure.
+    Tdiff_max = 50 + 30 + truncate*temperature_stdev
+    grid_entropies = np.zeros_like(pp)
+    grid_volumes = np.zeros_like(pp)
+    isentrope = UnivariateSpline(pressures, temperatures)
+    Tdiff = np.abs(isentrope(pp) - TT)
+    mask = [idx for idx, Td in enumerate(Tdiff) if Td < Tdiff_max]
+    grid_entropies[mask], grid_volumes[mask] = rock.evaluate(['S', 'V'], pp[mask], TT[mask])
 
-    S_interps = burnman.tools.interp_smoothed_array_and_derivatives(grid_entropies,
-                                                                    grid_pressures,
-                                                                    grid_temperatures,
-                                                                    pressure_stdev,
-                                                                    temperature_stdev)
+    grid_entropies = grid_entropies.reshape(mesh_shape)
+    grid_volumes = grid_volumes.reshape(mesh_shape)
+    
+    # Having defined the grid and calculated unsmoothed properties,
+    # we now calculate the smoothed entropy and volume and derivatives with
+    # respect to pressure and temperature.
+    S_interps = burnman.tools.interp_smoothed_array_and_derivatives(array=grid_entropies,
+                                                                    x_values=grid_pressures,
+                                                                    y_values=grid_temperatures,
+                                                                    x_stdev=pressure_stdev,
+                                                                    y_stdev=temperature_stdev,
+                                                                    truncate=truncate)
     interp_smoothed_S, interp_smoothed_dSdP, interp_smoothed_dSdT = S_interps
     
-    V_interps = burnman.tools.interp_smoothed_array_and_derivatives(grid_volumes,
-                                                                    grid_pressures,
-                                                                    grid_temperatures,
-                                                                    pressure_stdev,
-                                                                    temperature_stdev)
+    V_interps = burnman.tools.interp_smoothed_array_and_derivatives(array=grid_volumes,
+                                                                    x_values=grid_pressures,
+                                                                    y_values=grid_temperatures,
+                                                                    x_stdev=pressure_stdev,
+                                                                    y_stdev=temperature_stdev,
+                                                                    truncate=truncate)
     
     interp_smoothed_V, interp_smoothed_dVdP, interp_smoothed_dVdT = V_interps
 
-    smoothed_temperatures = smooth_isentrope(interp_smoothed_S, pressures, entropy)
+    # Now we can calculate and plot the relaxed and smoothed properties along the isentrope 
+    smoothed_temperatures = interp_isentrope(interp_smoothed_S, pressures, entropy)
     densities = rock.evaluate(['rho'], pressures, smoothed_temperatures)[0]
-    depths, gravity = compute_pressure_gradient(pressures, densities)
+    depths, gravity = compute_depth_gravity_profiles(pressures, densities, 9.81)
     
     volumes = np.array([interp_smoothed_V(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
     dSdT = np.array([interp_smoothed_dSdT(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
@@ -202,8 +283,8 @@ plt.show()
 
 
 
-
+# Finally, here's the ability to output smoothed, relaxed properties for use in ASPECT
 # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity
-#np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, temperatures, densities, gravity, alphas, specific_heats, compressibilities]).T,
+#np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, smoothed_temperatures, densities, gravity, alphas_relaxed, specific_heats_relaxed, compressibilities_relaxed]).T,
 #           header='POINTS: '+str(n_points)+' \ndepth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (/K), Cp (J/K/kg), beta (/Pa)',
 #           fmt='%.10e', delimiter='\t')

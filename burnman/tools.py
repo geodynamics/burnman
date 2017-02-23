@@ -695,7 +695,7 @@ def _pad_ndarray_inverse_mirror(array, padding):
     return padded_array
 
 
-def smooth_array(array, grid_resolutions,
+def smooth_array(array, grid_spacing,
                  gaussian_rms_widths, truncate=4.0,
                  mode='inverse_mirror'):
     """
@@ -710,8 +710,8 @@ def smooth_array(array, grid_resolutions,
     ----------
     array : numpy ndarray
         The array to smooth
-    grid_resolution : numpy array of floats
-        The resolution of each grid along each axis
+    grid_spacing : numpy array of floats
+        The spacing of points along each axis
     gaussian_rms_widths : numpy array of floats
         The Gaussian RMS widths/standard deviations for the 
         Gaussian convolution.
@@ -733,7 +733,7 @@ def smooth_array(array, grid_resolutions,
 
     # gaussian_filter works with standard deviations normalised to
     # the grid spacing.
-    sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_resolutions))
+    sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_spacing))
     
     if mode == 'inverse_mirror':
         padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
@@ -750,7 +750,7 @@ def smooth_array(array, grid_resolutions,
 
 def interp_smoothed_array_and_derivatives(array,
                                           x_values, y_values,
-                                          x_stdev=0, y_stdev=0,
+                                          x_stdev=0., y_stdev=0.,
                                           truncate=4.,
                                           mode='inverse_mirror',
                                           indexing='xy'):
@@ -800,14 +800,14 @@ def interp_smoothed_array_and_derivatives(array,
 
     if indexing == 'xy':
         smoothed_array = smooth_array(array = array,
-                                      grid_resolutions = np.array([dy, dx]),
+                                      grid_spacing = np.array([dy, dx]),
                                       gaussian_rms_widths = np.array([y_stdev, x_stdev]),
                                       truncate=truncate,
                                       mode=mode)
 
     elif indexing == 'ij':
         smoothed_array = smooth_array(array = array,
-                                      grid_resolutions = np.array([dx, dy]),
+                                      grid_spacing = np.array([dx, dy]),
                                       gaussian_rms_widths = np.array([x_stdev, y_stdev]),
                                       truncate=truncate,
                                       mode=mode).T

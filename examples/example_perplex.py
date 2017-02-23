@@ -13,7 +13,8 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 *Uses:*
 
 * :doc:`PerplexMaterial`
-
+* :func:`burnman.material.Material.evaluate`
+* :func:`burnman.tools.smooth_array`
 
 *Demonstrates:*
 
@@ -55,7 +56,7 @@ entropies = rock.evaluate(['S'], pressures, np.array([T] * len(pressures)))[0]
 
 
 smoothed_entropies = burnman.tools.smooth_array(array=entropies,
-                                                grid_resolutions=np.array([pressures[1] - pressures[0]]),
+                                                grid_spacing=np.array([pressures[1] - pressures[0]]),
                                                 gaussian_rms_widths = np.array([5.e8]))
 
 plt.plot(pressures/1.e9, entropies, label='entropies')
