@@ -28,6 +28,7 @@ from . import SLB_2011_ZSB_2013
 from . import SLB_2005
 
 # ab initio
+from . import RS_2014_liquids
 from . import DKS_2013_liquids
 from . import DKS_2013_solids
 

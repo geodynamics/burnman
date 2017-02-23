@@ -29,10 +29,10 @@ class stishovite(Mineral):
             'E_0': -.2274840214E+04 * 1e3, # [J/mol]
             'S_0': 0.1668222552E+00 * 1e3, # [J/K/mol]
             'K_0': K_0,
-            'K_prime_0': Kp_0,
-            'K_dprime_0': Kdp_0,
+            'Kprime_0': Kp_0,
+            'Kdprime_0': Kdp_0,
             'n': 2., # called fsn in param file
-            'C_V': 0.7794230433E-01 * 1e3, # [J/K/mol]
+            'Cv': 0.7794230433E-01 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1389501259E+01,
             'q_0': 0.1332025550E+01
             } 
@@ -55,10 +55,10 @@ class perovskite(Mineral):
             'E_0': -.3355012782E+04 * 1e3, # [J/mol]
             'S_0': 0.3384574347E+00 * 1e3, # [J/K/mol]
             'K_0': K_0,
-            'K_prime_0': Kp_0,
-            'K_dprime_0': Kdp_0,
+            'Kprime_0': Kp_0,
+            'Kdprime_0': Kdp_0,
             'n': 2., # called fsn in param file
-            'C_V': 0.1338111589E+00 * 1e3, # [J/K/mol]
+            'Cv': 0.1338111589E+00 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1893754815E+01,
             'q_0': 0.1487809730E+01
             } 
@@ -81,10 +81,10 @@ class periclase(Mineral):
             'E_0': -.1164949141E+04 * 1e3, # [J/mol]
             'S_0': 0.1198358648E+00 * 1e3, # [J/K/mol]
             'K_0': K_0,
-            'K_prime_0': Kp_0,
-            'K_dprime_0': Kdp_0,
+            'Kprime_0': Kp_0,
+            'Kdprime_0': Kdp_0,
             'n': 2., # called fsn in param file
-            'C_V': 0.4904715075E-01 * 1e3, # [J/K/mol]
+            'Cv': 0.4904715075E-01 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1412003694E+01,
             'q_0': 0.6317609916E+00
             } 

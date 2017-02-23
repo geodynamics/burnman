@@ -23,20 +23,20 @@ class DKS_S(eos.EquationOfState):
 
     # Evaluate the integral of aK_T(V,To) from V1 to V2, assuming gamma = gamma_0*(V/Vo)^q
     def __int_aKt_dV(self, temperature, volume, params):
-        return params['C_V']*params['grueneisen_0']/params['q_0']*(np.power(volume/params['V_0'], params['q_0']) - 1.)
+        return params['Cv']*params['grueneisen_0']/params['q_0']*(np.power(volume/params['V_0'], params['q_0']) - 1.)
 
     def __F_cmp(self, temperature, volume, params):
         f = self.__finite_strain(temperature, volume, params)
         K_0 = params['K_0']
-        K_prime_0 = params['K_prime_0']
-        K_dprime_0 = params['K_dprime_0']
-        a3 = 3.*(K_prime_0 - 4.)
-        a4 = 9.* ( K_0 * K_dprime_0 + K_prime_0 * (K_prime_0 - 7.) ) + 143.
+        Kprime_0 = params['Kprime_0']
+        Kdprime_0 = params['Kdprime_0']
+        a3 = 3.*(Kprime_0 - 4.)
+        a4 = 9.* ( K_0 * Kdprime_0 + Kprime_0 * (Kprime_0 - 7.) ) + 143.
         return 9.*K_0*params['V_0']*(f*f/2. + a3*f*f*f/6. + a4*f*f*f*f/24.)
 
     def __F_th(self, temperature, volume, params):
         F_th = -params['S_0']*(temperature - params['T_0'])  \
-            - params['C_V']*(temperature*np.log(temperature/params['T_0']) \
+            - params['Cv']*(temperature*np.log(temperature/params['T_0']) \
                                  - (temperature - params['T_0'])) \
                                  - self.__int_aKt_dV(temperature, volume, params) * (temperature - params['T_0'])
         return F_th
@@ -46,12 +46,12 @@ class DKS_S(eos.EquationOfState):
         f = self.__finite_strain(temperature, volume, params)
         n = params['n']
         K_0 = params['K_0']
-        K_prime_0 = params['K_prime_0']
-        K_dprime_0 = params['K_dprime_0']
-        a3 = 3. * ( K_prime_0 - 4. )
-        a4 = 9. * ( K_0 * K_dprime_0 + K_prime_0 * (K_prime_0 - 7.) ) + 143.
+        Kprime_0 = params['Kprime_0']
+        Kdprime_0 = params['Kdprime_0']
+        a3 = 3. * ( Kprime_0 - 4. )
+        a4 = 9. * ( K_0 * Kdprime_0 + Kprime_0 * (Kprime_0 - 7.) ) + 143.
         return 3.*params['K_0']*np.power(1+2.*f, 2.5)*(f + a3*f*f/2. + a4/6.*f*f*f) \
-            + params['C_V'] * (temperature - params['T_0']) \
+            + params['Cv'] * (temperature - params['T_0']) \
             * self.grueneisen_parameter(0., temperature, volume, params) / volume
 
 
@@ -94,7 +94,7 @@ class DKS_S(eos.EquationOfState):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
-        return params['C_V']
+        return params['Cv']
 
     def heat_capacity_p(self, pressure, temperature, volume, params):
         """
@@ -119,7 +119,7 @@ class DKS_S(eos.EquationOfState):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
         """
-        S = params['S_0'] + self.__int_aKt_dV(temperature, volume, params) + params['C_V']*np.log(temperature/params['T_0'])
+        S = params['S_0'] + self.__int_aKt_dV(temperature, volume, params) + params['Cv']*np.log(temperature/params['T_0'])
         return S 
 
     def enthalpy( self, pressure, temperature, volume, params):
@@ -151,7 +151,7 @@ class DKS_S(eos.EquationOfState):
         """
   
         #check that all the required keys are in the dictionary
-        expected_keys = ['V_0', 'T_0', 'E_0', 'S_0', 'K_0', 'K_prime_0', 'K_dprime_0', 'n', 'C_V', 'grueneisen_0', 'q_0']
+        expected_keys = ['V_0', 'T_0', 'E_0', 'S_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'n', 'Cv', 'grueneisen_0', 'q_0']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)

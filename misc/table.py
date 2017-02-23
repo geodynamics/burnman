@@ -70,7 +70,12 @@ if __name__ == "__main__":
                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
             elif eos == 'cork':
                 params = ['cork_params', 'cork_T', 'cork_P', 'Cp']
-
+            elif eos == 'dks_s':
+                params = ['V_0', 'T_0', 'E_0', 'S_0', 'K_0',
+                          'Kprime_0', 'Kdprime_0', 'n', 'Cv', 'grueneisen_0', 'q_0']
+            elif eos == 'dks_l':
+                params = ['V_0', 'T_0', 'O_theta', 'O_f', 'm', 'zeta_0', 'xi', 'Tel_0', 'eta']
+                
             table = [['Name'] + params]
             tablel = []
 
