@@ -13,6 +13,7 @@ import warnings
 from . import equation_of_state as eos
 from .. import constants as constants
 from ..processchemistry import read_masses
+from ..tools import bracket
 
 atomic_masses=read_masses()
 # energy_states should provide the energies and degeneracies of each electronic level in a variety of elements
@@ -365,7 +366,7 @@ class DKS_L(eos.EquationOfState):
                     n_atoms += N
                     
             VoverVx = volume/params['V_0']
-            S_a = (params['spin_a'][0] + params['spin_a'][1]*VoverVx)
+            S_a = params['spin_a'][0] + params['spin_a'][1]*VoverVx
             S_b = (params['spin_b'][0]
                    + params['spin_b'][1]/VoverVx
                    + params['spin_b'][2]/(np.power(VoverVx, 2.))
@@ -383,7 +384,6 @@ class DKS_L(eos.EquationOfState):
                                + 6.*params['spin_b'][2]/(np.power(VoverVx, 4.))
                                + 12.*params['spin_b'][3]/(np.power(VoverVx, 5.)))
                               /np.power(params['V_0'], 2.))
-            
         return S_a, S_b, numerator, numerator_2, n_atoms
     
         
@@ -441,14 +441,18 @@ class DKS_L(eos.EquationOfState):
         return P
 
     def volume(self, pressure, temperature, params):
-        p_residual = lambda x: pressure - self.pressure(temperature, x, params)
-        tol = 0.0001
-        sol = opt.fsolve(p_residual, 0.8e-6, xtol=1e-12, full_output=True)
-        if sol[2] != 1:
-            raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
-        else:
-            return sol[0][0]
-
+        _delta_pressure = lambda x, pressure, temperature, params: pressure - self.pressure(temperature, x, params)
+        
+        # we need to have a sign change in [a,b] to find a zero. Let us start with a
+        # conservative guess:
+        args = (pressure, temperature, params)
+        try:
+            sol = bracket(_delta_pressure, params['V_0'],
+                          1.e-2 * params['V_0'], args)
+        except ValueError:
+            raise Exception(
+                'Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """

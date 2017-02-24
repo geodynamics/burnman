@@ -9,6 +9,7 @@ import scipy.optimize as opt
 import warnings
 
 from . import equation_of_state as eos
+from ..tools import bracket
 
 
 class DKS_S(eos.EquationOfState):
@@ -56,13 +57,18 @@ class DKS_S(eos.EquationOfState):
 
 
     def volume(self, pressure, temperature, params):
-        p_residual = lambda x: pressure - self.pressure(temperature, x, params)
-        tol = 0.0001
-        sol = opt.fsolve(p_residual, 0.8e-6, xtol=1e-12, full_output=True)
-        if sol[2] != 1:
-            raise ValueError('Cannot find volume, likely outside of the range of validity for EOS')
-        else:
-            return sol[0][0]
+        _delta_pressure = lambda x, pressure, temperature, params: pressure - self.pressure(temperature, x, params)
+        
+        # we need to have a sign change in [a,b] to find a zero. Let us start with a
+        # conservative guess:
+        args = (pressure, temperature, params)
+        try:
+            sol = bracket(_delta_pressure, params['V_0'],
+                          1.e-2 * params['V_0'], args)
+        except ValueError:
+            raise Exception(
+                'Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
 
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
