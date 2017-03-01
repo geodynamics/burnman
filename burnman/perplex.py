@@ -285,7 +285,7 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
         return ( self.thermal_expansivity *
-                 self.bulk_sound_velocity *
-                 self.bulk_sound_velocity /
+                 self.molar_volume *
+                 self.adiabatic_bulk_modulus /
                  self.heat_capacity_p )
     
