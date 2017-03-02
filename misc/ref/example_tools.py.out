@@ -1,9 +1,9 @@
 Checking EoS consistency for 'burnman.minerals.SLB_2011.periclase'
-Expressions within tolerance of 0.010000
+Expressions within tolerance of 0.000100
 G = F + PV : True 
 G = H - TS : True 
 G = E - TS + PV : True 
-S = dG/dT  : True 
+S = -dG/dT : True 
 alpha = 1/V dV/dT : True 
 C_p = T dS/dT : True 
 V = dG/dP  : True 

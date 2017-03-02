@@ -27,14 +27,13 @@ for database, f, mineral in filemin:
             for line in datalines]
     P, T, H, S, V, C_p, alpha, beta, rho = list(zip(*data))
 
-    variables = ['H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+    variables = ['G', 'H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
 
     fo = mineral
     percentage_diff = []
     PT = []
 
-    print('Benchmarks for', database,
-          'database with method', fo.params['equation_of_state'])
+    print('Benchmarks for {0} database with method {1}'.format(database, fo.params['equation_of_state']))
     print(variables)
 
     for line in data:
@@ -44,15 +43,15 @@ for database, f, mineral in filemin:
         PT.append([P / 1.e4, T])
         diff = [p(fo.gibbs, gibbs), p(fo.H, H), p(fo.S, S), p(fo.V, V / 1.e5), p(
             fo.C_p, C_p), p(fo.alpha, alpha), p(fo.K_T, 1.e5 / beta), p(fo.density, rho)]
-        print(fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.alpha, fo.K_T, fo.density)
+        print('{0:.3e} {1:.3e} {2:.3e} {3:.3e} '
+              '{4:.3e} {5:.3e} {6:.3e} {7:.3e}'.format(fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.alpha, fo.K_T, fo.density))
         percentage_diff.append(100. * np.abs(diff))
 
     percentage_diff = np.array(percentage_diff)
     i, j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-    print('Maximum percentage error in', database, 'database:')
-    print(variables[j], ':', percentage_diff[i, j],
-          '% at', PT[i][0], 'GPa and', PT[i][1], 'K')
+    print('Maximum percentage error in {0} database:'.format(database))
+    print('{0}: {1:.0e}% at {2:.0f} GPa and {3:.0f} K'.format(variables[j], percentage_diff[i, j], PT[i][0], PT[i][1]))
     print('')
 
 
@@ -63,8 +62,7 @@ fo.set_method('mt')
 percentage_diff = []
 PT = []
 
-print('Benchmarks for', database,
-      'database with method', fo.params['equation_of_state'])
+print('Benchmarks for {0} database with method {1}'.format(database, fo.params['equation_of_state']))
 print(variables)
 
 
@@ -75,15 +73,14 @@ for P, V, beta, rho in perplex_output:
     fo.set_state(P * 1.e5, T)
     PT.append([P / 1.e4, T])
     diff = [p(fo.V, V / 1.e5), p(fo.K_T, 1.e5 / beta), p(fo.density, rho)]
-    print(fo.V, fo.K_T, fo.density)
+    print('{0:.3e} {1:.3e} {2:.3e}'.format(fo.V, fo.K_T, fo.density))
     percentage_diff.append(100. * np.abs(diff))
 
 percentage_diff = np.array(percentage_diff)
 i, j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-print('Maximum percentage error in', database, 'database:')
-print(variables[j], ':', percentage_diff[i, j],
-      '% at', PT[i][0], 'GPa and', PT[i][1], 'K')
+print('Maximum percentage error in {0} database:'.format(database))
+print('{0}: {1:.0e}% at {2:.0f} GPa and {3:.0f} K'.format(variables[j], percentage_diff[i, j], PT[i][0], PT[i][1]))
 print('')
 
 
@@ -118,15 +115,16 @@ for line in datalines:
 
     diff = [p(m.H, H), p(m.S, S), p(m.V, V / 1.e5), p(m.C_p, C_p),
             p(m.alpha, alpha), p(1.e5 / m.K_T, beta), p(m.density, rho)]
-    print(m.name, ':', m.H, m.S, m.V, m.C_p, m.alpha, m.K_T, m.density)
+    print('{0}: {1:.3e} {2:.3e} {3:.3e} '
+          '{4:.3e} {5:.3e} {6:.3e} {7:.3e}'.format(m.name, m.H, m.S, m.V, m.C_p, m.alpha, m.K_T, m.density))
     percentage_diff.append(100. * np.abs(diff))
 
 
 percentage_diff = np.array(percentage_diff)
 i, j = np.unravel_index(percentage_diff.argmax(), percentage_diff.shape)
 
-print(
-    'Maximum percentage error in SLB database with configurational entropy and landau transition:')
-print(variables[j], ':', percentage_diff[i, j], '% at',
-      PT[i][0], 'GPa and', PT[i][1], 'K for', mineral_names[i])
+print('Maximum percentage error in SLB database '
+      'with configurational entropy and landau transition:')
+print('{0}: {1:.0e}% at {2:.0f} GPa and {3:.0f} K for {4}'.format(variables[j], percentage_diff[i, j],
+                                                                  PT[i][0], PT[i][1], mineral_names[i]))
 print('')
