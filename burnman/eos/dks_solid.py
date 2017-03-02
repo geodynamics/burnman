@@ -36,10 +36,8 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     nu_o_nu0_sq = 1. + a1_ii * f + (1. / 2.) * a2_iikk * f * f  # EQ 41
     return 1. / 6. / nu_o_nu0_sq * (2. * f + 1.) * (a1_ii + a2_iikk * f)
 
-
 def _intgroverVdV(V_0, volume, gruen_0, q_0):
     return integrate.quad(lambda x: _grueneisen_parameter_fast(V_0, x, gruen_0, q_0)/x, V_0, volume)[0]
-
 
 @jit
 def _delta_pressure(x, pressure, temperature, V_0, T_0, Cv, a1_ii, a2_iikk, b_iikk, b_iikkmm):
