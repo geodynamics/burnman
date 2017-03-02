@@ -19,7 +19,11 @@ phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 
           ['perovskite', DKS_2013_solids.perovskite(), [14.5, 27.5, 0, 344], [14.5, 27.5, -3600, -2000]], \
           ['periclase', DKS_2013_solids.periclase(), [6.5, 14, -25, 275], [6.5, 14, -1200, -560]]]
 
+temperatures=[1000., 2000., 3000., 4000., 5000., 6000., 8000.]
 for name, phase, PVT_range, EVT_range in phases:
+
+    print('EoS consistent for {0} model: {1}'.format(name, burnman.tools.check_eos_consistency(phase)))
+    
     vmin=PVT_range[0]
     vmax=PVT_range[1]
 
@@ -30,7 +34,6 @@ for name, phase, PVT_range, EVT_range in phases:
     fig1 = mpimg.imread('figures/'+name+'_PVT.png')
     ax_P.imshow(fig1, extent=PVT_range, aspect='auto')
     
-    temperatures=np.linspace(1000., 6000., 6)
     volumes=np.linspace(PVT_range[0]*1.e-6, PVT_range[1]*1.e-6, 101)
     pressures=np.empty_like(volumes)
     for temperature in temperatures:
@@ -45,8 +48,7 @@ for name, phase, PVT_range, EVT_range in phases:
 
     fig1 = mpimg.imread('figures/'+name+'_EVT.png')
     ax_E.imshow(fig1, extent=EVT_range, aspect='auto')
-    
-    temperatures=np.linspace(2000., 6000., 5)
+
     volumes=np.linspace(EVT_range[0]*1.e-6, EVT_range[1]*1.e-6, 101)
     energies=np.empty_like(volumes)
     for temperature in temperatures:
