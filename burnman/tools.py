@@ -569,7 +569,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     else:
         return x0, x1, f0, f1
 
-def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
+def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     """
     Compute numerical derivatives of the gibbs free energy of a mineral
     under given conditions, and check these values against those provided 
@@ -597,7 +597,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
 
     """
     dT = 1.
-    dP = 1.
+    dP = 1000.
     
     m.set_state(P, T)
     G0 = m.gibbs
@@ -621,7 +621,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
     
     # T derivatives
     m.set_state(P, T + 0.5*dT)
-    expr.extend(['S = dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
+    expr.extend(['S = -dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
     eq.extend([[m.S, -(G1 - G0)/dT],
                [m.alpha, (V1 - V0)/dT/m.V],
                [m.heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
