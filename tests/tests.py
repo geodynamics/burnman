@@ -17,6 +17,7 @@ from test_minerals import *
 from test_model import *
 from test_modifiers import *
 from test_partitioning import *
+from test_perplex import *
 from test_seismic import *
 from test_solidsolution import *
 from test_spin import *

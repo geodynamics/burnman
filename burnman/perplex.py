@@ -168,7 +168,7 @@ class PerplexMaterial(Material):
                     raise ValueError("The set_state condition is outside the bounds of the perplex table.")
             except:
                 pass
-            Material.set_state(self, pressure, temperature)
+        Material.set_state(self, pressure, temperature)
         
     """
     Properties by linear interpolation of Perple_X output
@@ -285,7 +285,7 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
         return ( self.thermal_expansivity *
-                 self.shear_wave_velocity *
-                 self.shear_wave_velocity /
+                 self.molar_volume *
+                 self.adiabatic_bulk_modulus /
                  self.heat_capacity_p )
     
