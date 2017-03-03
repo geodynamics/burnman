@@ -1,5 +1,5 @@
 Benchmarks for SLB2011 database with method slb3
-['G', 'H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+['G', 'H', 'S', 'V', 'C_p', 'alpha', 'K_T', 'rho']
 -2.193e+06 -1.916e+06 2.762e+02 4.453e-05 1.754e+02 3.481e-05 1.134e+11 3.159e+03
 -1.974e+06 -1.705e+06 2.695e+02 4.278e-05 1.733e+02 2.778e-05 1.356e+11 3.289e+03
 -1.764e+06 -1.500e+06 2.641e+02 4.134e-05 1.719e+02 2.317e-05 1.567e+11 3.404e+03
@@ -10,7 +10,7 @@ Maximum percentage error in SLB2011 database:
 C_p: 3e-03% at 5 GPa and 1000 K
 
 Benchmarks for HP2011 database with method hp_tmt
-['G', 'H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+['G', 'H', 'S', 'V', 'C_p', 'alpha', 'K_T', 'rho']
 -2.340e+06 -2.063e+06 2.771e+02 4.477e-05 1.751e+02 3.973e-05 1.165e+11 3.142e+03
 -2.121e+06 -1.852e+06 2.690e+02 4.303e-05 1.732e+02 3.409e-05 1.358e+11 3.270e+03
 -1.910e+06 -1.647e+06 2.623e+02 4.157e-05 1.719e+02 2.998e-05 1.544e+11 3.384e+03
@@ -21,15 +21,15 @@ Maximum percentage error in HP2011 database:
 H: 5e-03% at 10 GPa and 1500 K
 
 Benchmarks for HP2011 database with method hp_tmt
-['V', 'beta', 'rho']
+['V', 'K_T', 'rho']
 4.366e-05 1.285e+11 3.222e+03
 4.210e-05 1.473e+11 3.342e+03
 4.078e-05 1.655e+11 3.450e+03
 Maximum percentage error in HP2011 database:
-beta: 4e-03% at 0 GPa and 298 K
+K_T: 4e-03% at 0 GPa and 298 K
 
 Check excess entropy and landau in SLB2011
-['H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+['H', 'S', 'V', 'C_p', 'alpha', 'K_T', 'rho']
 Periclase: -2.836e+05 1.014e+02 1.050e-05 5.211e+01 2.818e-05 2.036e+11 3.837e+03
 Wuestite: 7.362e+04 1.409e+02 1.158e-05 5.267e+01 2.581e-05 2.323e+11 6.206e+03
 Mg_Wadsleyite: -1.084e+06 3.416e+02 3.812e-05 1.792e+02 2.287e-05 2.121e+11 3.691e+03

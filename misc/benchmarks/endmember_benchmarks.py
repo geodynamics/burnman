@@ -27,7 +27,7 @@ for database, f, mineral in filemin:
             for line in datalines]
     P, T, H, S, V, C_p, alpha, beta, rho = list(zip(*data))
 
-    variables = ['G', 'H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+    variables = ['G', 'H', 'S', 'V', 'C_p', 'alpha', 'K_T', 'rho']
 
     fo = mineral
     percentage_diff = []
@@ -55,7 +55,7 @@ for database, f, mineral in filemin:
     print('')
 
 
-variables = ['V', 'beta', 'rho']
+variables = ['V', 'K_T', 'rho']
 
 fo = HP_2011_ds62.fo()
 fo.set_method('mt')
@@ -97,7 +97,7 @@ mins['Wad'] = SLB_2011.mg_wadsleyite()
 mins['Ring'] = SLB_2011.mg_ringwoodite()
 mins['Stv'] = SLB_2011.stishovite()
 
-variables = ['H', 'S', 'V', 'C_p', 'alpha', 'beta', 'rho']
+variables = ['H', 'S', 'V', 'C_p', 'alpha', 'K_T', 'rho']
 percentage_diff = []
 mineral_names = []
 
@@ -114,7 +114,7 @@ for line in datalines:
     m.set_state(P, T)
 
     diff = [p(m.H, H), p(m.S, S), p(m.V, V / 1.e5), p(m.C_p, C_p),
-            p(m.alpha, alpha), p(1.e5 / m.K_T, beta), p(m.density, rho)]
+            p(m.alpha, alpha), p(m.K_T, 1.e5 / beta), p(m.density, rho)]
     print('{0}: {1:.3e} {2:.3e} {3:.3e} '
           '{4:.3e} {5:.3e} {6:.3e} {7:.3e}'.format(m.name, m.H, m.S, m.V, m.C_p, m.alpha, m.K_T, m.density))
     percentage_diff.append(100. * np.abs(diff))
