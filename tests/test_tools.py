@@ -146,5 +146,45 @@ class test_tools(BurnManTest):
         with np.errstate(all='ignore'):
             self.assertRaises(Exception, fn)
 
+    def test_padding_1D(self):
+        array = np.array([1., 2., 3., 5.])
+        padding = (1,)
+        padded_array = burnman.tools._pad_ndarray_inverse_mirror(array, padding)
+        self.assertArraysAlmostEqual(padded_array, np.array([0., 1., 2., 3., 5., 7.]))
+        
+    def test_padding_2D(self):
+        array = np.array([[1., 2.], [3., 5.]])
+        padding = (1,1)
+        padded_array = burnman.tools._pad_ndarray_inverse_mirror(array, padding)
+        self.assertArraysAlmostEqual(np.ndarray.flatten(padded_array),
+                                     np.ndarray.flatten(np.array([[-3., -1., -1., 1.],
+                                                                  [0., 1., 2., 3.],
+                                                                  [1., 3., 5., 7.],
+                                                                  [4., 5., 8., 9.]])))
+        
+    def test_smoothing(self):
+        array = np.array([0., 1., 2., 3., 4.])
+        smoothed_array = smooth_array(array, [1.], [1.])
+        self.assertArraysAlmostEqual(array, smoothed_array)
+
+    def test_interp_smoothing_ij(self):
+        array = np.array([[0., 1., 2.], [0., 1., 2.], [0., 1., 2.]])
+        axis_values = np.array([0., 1., 2.])
+        f, dfdx, dfdy = interp_smoothed_array_and_derivatives(array,
+                                                              axis_values, axis_values,
+                                                              0, 0, indexing='ij')
+        self.assertArraysAlmostEqual([f(0., 1.)[0], dfdx(0., 1.)[0], dfdy(0., 1.)[0]],
+                                     [array[0][1], 0., 1.])
+        
+    def test_interp_smoothing_xy(self):
+        array = np.array([[0., 1., 2.], [0., 1., 2.], [0., 1., 2.]])
+        axis_values = np.array([0., 1., 2.])
+        f, dfdx, dfdy = interp_smoothed_array_and_derivatives(array,
+                                                              axis_values, axis_values,
+                                                              0, 0, indexing='xy')
+        self.assertArraysAlmostEqual([f(0., 1.)[0], dfdx(0., 1.)[0], dfdy(0., 1.)[0]],
+                                     [array[1][0], 1., 0.])
+        
+        
 if __name__ == '__main__':
     unittest.main()

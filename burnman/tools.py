@@ -11,8 +11,11 @@ import os
 import pkgutil
 import numpy as np
 from scipy.optimize import fsolve, curve_fit
+from scipy.ndimage.filters import gaussian_filter
 from . import constants
-
+from scipy.interpolate import interp2d
+from collections import Counter
+import itertools
 
 def copy_documentation(copy_from):
     """
@@ -643,3 +646,179 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
             print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
             
     return consistency
+
+
+def _pad_ndarray_inverse_mirror(array, padding):
+    """
+    Pads an ndarray according to an inverse mirror
+    scheme. For example, for a 1D array 
+    [2, 4, 6, 7, 8] padded by 3 cells, we have:
+
+     padding  |  original array |  padding
+
+    -3 -2  0  |  2  4  6  7  8  |  9 10 12
+
+    Parameters
+    ----------
+    array : numpy ndarray
+        The array to be padded
+    padding : tuple
+        The number of elements with which to pad the
+        array in each dimension.
+
+    Returns
+    -------
+    padded_array: numpy ndarray
+        The padded array
+
+    """
+    padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
+    padded_array = np.zeros(padded_shape)
+
+    slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+    padded_array[slices] = array
+
+    padded_array_indices = list(itertools.product(*[range(n + 2*padding[i]) for i, n in enumerate(array.shape)]))
+    inserted_indices = list(itertools.product(*[range(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]))
+    padded_array_indices.extend(inserted_indices)
+
+    counter = Counter(padded_array_indices)
+    keys = list(counter.keys())
+    padded_indices = [keys[i] for i, value in enumerate(counter.values()) if value == 1]
+    edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
+                                 for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
+    mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j] for j in range(len(array.shape))]) for i in range(len(padded_indices))])
+
+    for i, idx in enumerate(padded_indices):
+        padded_array[idx] = 2.*padded_array[edge_indices[i]] - padded_array[mirror_indices[i]]
+
+    return padded_array
+
+
+def smooth_array(array, grid_spacing,
+                 gaussian_rms_widths, truncate=4.0,
+                 mode='inverse_mirror'):
+    """
+    Creates a smoothed array by convolving it with a gaussian filter. 
+    Grid resolutions and gaussian RMS widths are required for each of
+    the axes of the numpy array. The smoothing is truncated at a 
+    user-defined number of standard deviations. The edges of the array
+    can be padded in a number of different ways given by the
+    'mode' parameter.
+
+    Parameters
+    ----------
+    array : numpy ndarray
+        The array to smooth
+    grid_spacing : numpy array of floats
+        The spacing of points along each axis
+    gaussian_rms_widths : numpy array of floats
+        The Gaussian RMS widths/standard deviations for the 
+        Gaussian convolution.
+    truncate : float (default=4.) 
+        The number of standard deviations at which to truncate 
+        the smoothing.
+    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+        The mode parameter determines how the array borders are handled
+        either by scipy.ndimage.filters.gaussian_filter.
+        Default is 'inverse_mirror', which uses
+        burnman.tools._pad_ndarray_inverse_mirror().
+
+    Returns
+    -------
+    smoothed_array: numpy ndarray
+       The smoothed array
+
+    """
+
+    # gaussian_filter works with standard deviations normalised to
+    # the grid spacing.
+    sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_spacing))
+    
+    if mode == 'inverse_mirror':
+        padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
+        padded_array = _pad_ndarray_inverse_mirror(array, padding)
+        smoothed_padded_array = gaussian_filter(padded_array,
+                                                sigma=sigma)
+        slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+        smoothed_array = smoothed_padded_array[slices]
+    else:
+        smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
+        
+    return smoothed_array
+
+
+def interp_smoothed_array_and_derivatives(array,
+                                          x_values, y_values,
+                                          x_stdev=0., y_stdev=0.,
+                                          truncate=4.,
+                                          mode='inverse_mirror',
+                                          indexing='xy'):
+    """
+    Creates a smoothed array on a regular 2D grid. Smoothing 
+    is achieved using burnman.tools.smooth_array(). 
+    Outputs scipy.interpolate.interp2d() interpolators 
+    which can be used to query the array, or its derivatives in the 
+    x- and y- directions.
+
+    Parameters
+    ----------
+    array : 2D numpy array
+        The array to smooth. Each element array[i][j]
+        corresponds to the position x_values[i], y_values[j]
+    x_values : 1D numpy array
+        The gridded x values over which to create the smoothed grid
+    y_values : 1D numpy array
+        The gridded y_values over which to create the smoothed grid
+    x_stdev : float
+        The standard deviation for the Gaussian filter along the x axis
+    y_stdev : float
+        The standard deviation for the Gaussian filter along the x axis
+    truncate : float (optional) 
+        The number of standard deviations at which to truncate 
+        the smoothing (default = 4.).
+    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+        The mode parameter determines how the array borders are handled
+        either by scipy.ndimage.filters.gaussian_filter.
+        Default is 'inverse_mirror', which uses
+        burnman.tools._pad_ndarray_inverse_mirror().
+    indexing : {'xy', 'ij'}, optional
+        Cartesian ('xy', default) or matrix ('ij') indexing of output.
+        See numpy.meshgrid for more details.
+
+    Returns
+    -------
+    interps: tuple of three interp2d functors
+        interpolation functions for the smoothed property and 
+        the first derivatives with respect to x and y.
+
+    """
+
+    
+    dx = x_values[1] - x_values[0]
+    dy = y_values[1] - y_values[0]
+
+    if indexing == 'xy':
+        smoothed_array = smooth_array(array = array,
+                                      grid_spacing = np.array([dy, dx]),
+                                      gaussian_rms_widths = np.array([y_stdev, x_stdev]),
+                                      truncate=truncate,
+                                      mode=mode)
+
+    elif indexing == 'ij':
+        smoothed_array = smooth_array(array = array,
+                                      grid_spacing = np.array([dx, dy]),
+                                      gaussian_rms_widths = np.array([x_stdev, y_stdev]),
+                                      truncate=truncate,
+                                      mode=mode).T
+
+    else:
+        raise Exception('Indexing scheme not recognised. Should be ij or xy.')
+    
+    dSAdydy, dSAdxdx = np.gradient(smoothed_array)
+
+    interps = (interp2d(x_values, y_values, smoothed_array, kind='linear'),
+               interp2d(x_values, y_values, dSAdxdx/dx, kind='linear'),
+               interp2d(x_values, y_values, dSAdydy/dy, kind='linear'))
+
+    return interps
