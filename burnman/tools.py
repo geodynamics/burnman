@@ -632,7 +632,19 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     eq.extend([[m.V, (G2 - G0)/dP],
                [m.K_T, -0.5*(V2 + V0)*dP/(V2 - V0)]])
 
-    consistencies = [np.abs(e[0]/e[1] - 1) < tol for e in eq]
+    
+    expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv', 'gr = alpha*K_T*V/Cv'])
+    eq.extend([[m.heat_capacity_v, m.heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
+               [m.K_S, m.K_T*m.heat_capacity_p/m.heat_capacity_v],
+               [m.gr, m.alpha*m.K_T*m.V/m.heat_capacity_v]])
+
+
+    expr.extend(['Vphi = np.sqrt(K_S/rho)', 'Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
+    eq.extend([[m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)],
+               [m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
+               [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+
+    consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1]) + np.finfo('float').eps for e in eq]
     consistency = np.all(consistencies)
     
     if verbose == True:
