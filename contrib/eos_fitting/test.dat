@@ -1,3 +1,4 @@
+# Property Pressure (Pa) Temperature (K) Property_value (SI units) Perr (Pa) Terr (K)   Property_value error (SI units)
 H	1.000000e+05	3.731500e+02	3.863924e+03	0.000000e+00	1.000000e+00	1.545570e+00
 H	1.000000e+05	3.731500e+02	3.860577e+03	0.000000e+00	1.000000e+00	1.544231e+00
 H	1.000000e+05	4.731500e+02	8.201895e+03	0.000000e+00	1.000000e+00	3.280758e+00
@@ -92,3 +93,15 @@ V	1.000000e+05	2.961500e+02	1.121807e-05	0.000000e+00	2.300000e-02	3.998836e-08
 V	1.000000e+05	7.715000e+01	1.117813e-05	0.000000e+00	1.960000e-01	3.989339e-08
 V	1.000000e+05	2.961500e+02	1.125009e-05	0.000000e+00	2.300000e-02	8.012885e-09
 V	1.000000e+05	2.961500e+02	1.125009e-05	0.000000e+00	2.300000e-02	8.012885e-09
+# Data in this file is taken from published literature on periclase
+# Enthalpy data is from Victor and Douglas (1963).
+# Thermodynamic properties of magnesium oxide and beryllium oxide from 298 to 1200 K.
+# Journal of Research of the National Institute of Standards and Technology A, 67, 325-329.
+#
+# High pressure volume data is from Dewaele et al. (2000)
+# P-V-T equation of state of periclase from synchrotron radiation measurements
+# Journal of Geophysical Research: Solid Earth 105.B2: 2869-2877.
+#
+# Low pressure volume data is from Hazen (1976).
+# Effects of temperature and pressure on the cell dimension and X-ray temperature factors of periclase
+# American Mineralogist 61.3: 266-71.	
