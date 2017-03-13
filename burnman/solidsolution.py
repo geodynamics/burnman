@@ -35,6 +35,7 @@ class SolidSolution(Mineral):
     """
 
     def __init__(self,
+                 name=None,
                  solution_type=None,
                  endmembers=None,
                  energy_interaction=None,
@@ -54,6 +55,7 @@ class SolidSolution(Mineral):
         """
         Mineral.__init__(self)
 
+
         class SolidSolutionMethod(object):
 
             """Dummy class because SolidSolution needs a method to call
@@ -63,8 +65,10 @@ class SolidSolution(Mineral):
             pass
         self.method = SolidSolutionMethod()
 
+        if name is not None:
+            self.name = name
         if solution_type is not None:
-            self.type = solution_type
+            self.solution_type = solution_type
         if endmembers is not None:
             self.endmembers = endmembers
         if energy_interaction is not None:
@@ -84,10 +88,10 @@ class SolidSolution(Mineral):
 
         
         # Set default solution model type
-        if hasattr(self, 'type'):
-            if self.type == 'mechanical':
+        if hasattr(self, 'solution_type'):
+            if self.solution_type == 'mechanical':
                 self.solution_model = MechanicalSolution(self.endmembers)
-            elif self.type == 'ideal':
+            elif self.solution_type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
                 if hasattr(self, 'energy_interaction') == False:
@@ -97,22 +101,22 @@ class SolidSolution(Mineral):
                 if hasattr(self, 'entropy_interaction') == False:
                     self.entropy_interaction = None
 
-                if self.type == 'symmetric':
+                if self.solution_type == 'symmetric':
                     self.solution_model = SymmetricRegularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-                elif self.type == 'asymmetric':
+                elif self.solution_type == 'asymmetric':
                     try:
                         self.solution_model = AsymmetricRegularSolution(
                             self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                     except:
                         raise Exception(
                             "'alphas' attribute missing from solid solution")
-                elif self.type == 'subregular':
+                elif self.solution_type == 'subregular':
                     self.solution_model = SubregularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 else:
                     raise Exception(
-                        "Solution model type " + self.params['type'] + "not recognised.")
+                        "Solution model type " + self.solution_type + "not recognised.")
         else:
             if hasattr(self, 'energy_interaction') == False:
                 self.energy_interaction = None
@@ -121,22 +125,22 @@ class SolidSolution(Mineral):
             if hasattr(self, 'entropy_interaction') == False:
                 self.entropy_interaction = None
 
-            if self.type == 'symmetric':
+            if self.solution_type == 'symmetric':
                 self.solution_model = SymmetricRegularSolution(
                     self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-            elif self.type == 'asymmetric':
+            elif self.solution_type == 'asymmetric':
                 try:
                     self.solution_model = AsymmetricRegularSolution(
                         self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 except:
                     raise Exception(
                         "'alphas' attribute missing from solid solution")
-            elif self.type == 'subregular':
+            elif self.solution_type == 'subregular':
                 self.solution_model = SubregularSolution(
                     self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
             else:
                 raise Exception(
-                    "Solution model type " + self.params['type'] + "not recognised.")
+                    "Solution model type " + self.solution_type + "not recognised.")
             self.solution_model = SolutionModel()
 
         # Number of endmembers in the solid solution
@@ -165,7 +169,7 @@ class SolidSolution(Mineral):
         """
         assert(len(self.endmembers) == len(molar_fractions))
 
-        if self.type != 'mechanical':
+        if self.solution_type != 'mechanical':
             assert(sum(molar_fractions) > 0.9999)
             assert(sum(molar_fractions) < 1.0001)
             

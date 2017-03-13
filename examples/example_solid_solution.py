@@ -60,20 +60,38 @@ if __name__ == "__main__":
     T = 1000.
 
     """
-    Here we create an ideal solid solution for aluminous Mg,Fe garnets.
-    Further endmembers can be added simply by adding more endmember lists.
+    We can create an instance of a solid solution in two ways. 
+    We can create a single instance using the SolidSolution constructor
+    (here's an example of an ideal pyrope-almandine garnet) ...
     """
+    g1 = burnman.SolidSolution(name = 'Ideal pyrope-almandine garnet',
+                               solution_type = 'ideal',
+                               endmembers = [[minerals.HP_2011_ds62.py(),
+                                              '[Mg]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.alm(),
+                                              '[Fe]3[Al]2Si3O12']],
+                               molar_fractions = [0.5, 0.5])
+
+    g1.set_state(P, T)
+    gibbs = g1.gibbs
+
+    """ 
+    ... or we can create a class that derives from solid solution 
+    (so that we can create multiple instances of the same solution)
+    """
+    
     class mg_fe_garnet(burnman.SolidSolution):
 
         def __init__(self, molar_fractions=None):
             self.name = 'Ideal pyrope-almandine garnet'
-            self.type = 'ideal'
-            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'], [
-                               minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
+            self.solution_type = 'ideal'
+            self.endmembers = [[minerals.HP_2011_ds62.py(),
+                                '[Mg]3[Al]2Si3O12'],
+                               [minerals.HP_2011_ds62.alm(),
+                                '[Fe]3[Al]2Si3O12']]
 
             burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
-    g1 = mg_fe_garnet()
 
     """
     Initialisation can optionally include setting the composition of the solid solution, i.e.
@@ -89,6 +107,9 @@ if __name__ == "__main__":
     g1.set_state(P, T)
     py_gibbs = g1.gibbs
 
+    """
+    Let's plot some interesting stuff...
+    """
     comp = np.linspace(0.001, 0.999, 100)
     g1_gibbs = np.empty_like(comp)
     g1_excess_gibbs = np.empty_like(comp)
@@ -149,18 +170,15 @@ if __name__ == "__main__":
     The solid solution corresponding to the pyrope-almandine join is actually not quite ideal.
     It can be well-approximated with a symmetric regular solid solution model
     '''
-    class mg_fe_garnet_2(burnman.SolidSolution):
+    g2 = burnman.SolidSolution(name = 'Symmetric pyrope-almandine garnet',
+                               solution_type = 'symmetric',
+                               endmembers = [[minerals.HP_2011_ds62.py(),
+                                              '[Mg]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.alm(),
+                                              '[Fe]3[Al]2Si3O12']],
+                               energy_interaction = [[2.5e3]])
 
-        def __init__(self, molar_fractions=None):
-            self.name = 'Symmetric pyrope-almandine garnet'
-            self.type = 'symmetric'
-            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'], [
-                               minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12']]
-            self.energy_interaction = [[2.5e3]]
 
-            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
-
-    g2 = mg_fe_garnet_2()
     g2_excess_gibbs = np.empty_like(comp)
     g2_pyrope_activity = np.empty_like(comp)
     g2_almandine_activity = np.empty_like(comp)
@@ -218,20 +236,20 @@ if __name__ == "__main__":
     DQF[1] = -S_excess
     DQF[2] = V_excess
     '''
-    class hp_mg_fe_garnet(burnman.SolidSolution):
 
-        def __init__(self, molar_fractions=None):
-            self.name = 'Symmetric pyrope-almandine-majorite garnet'
-            self.type = 'symmetric'
-            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'], [
-                               minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'], [minerals.HP_2011_ds62.maj(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
-            self.energy_interaction = [[2.5e3, 0.0e3], [10.0e3]]
-            self.entropy_interaction = [[0.0e3, 0.0e3], [0.0e3]]
-            self.volume_interaction = [[0.0e3, 0.0e3], [0.0e3]]
+    g3 = burnman.SolidSolution(name = 'Symmetric pyrope-almandine-majorite garnet',
+                               solution_type = 'symmetric',
+                               endmembers = [[minerals.HP_2011_ds62.py(),
+                                              '[Mg]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.alm(),
+                                              '[Fe]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.maj(),
+                                              '[Mg]3[Mg1/2Si1/2]2Si3O12']],
+                               energy_interaction = [[2.5e3, 0.0e3], [10.0e3]],
+                               entropy_interaction = [[0.0e3, 0.0e3], [0.0e3]],
+                               volume_interaction = [[0.0e3, 0.0e3], [0.0e3]])
 
-            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
-    g3 = hp_mg_fe_garnet()
     g3_configurational_entropy = np.empty_like(comp)
     g3_excess_entropy = np.empty_like(comp)
     for i, c in enumerate(comp):
@@ -258,25 +276,21 @@ if __name__ == "__main__":
     This model is also found in the HP_2011_ds62 database
     '''
 
-    class CFMASO_garnet(burnman.SolidSolution):
+    g4 = burnman.SolidSolution(name = 'garnet',
+                               solution_type = 'asymmetric',
+                               endmembers = [[minerals.HP_2011_ds62.py(),
+                                              '[Mg]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.alm(),
+                                             '[Fe]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.gr(),
+                                              '[Ca]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.andr(),
+                                              '[Ca]3[Fe]2Si3O12']],
+                               alphas = [1.0, 1.0, 2.7, 2.7],
+                               energy_interaction = [[2.5e3, 31.e3, 53.2e3],
+                                                     [5.e3, 37.24e3],
+                                                     [2.e3]])
 
-        def __init__(self, molar_fractions=None):
-            self.name = 'garnet'
-            self.endmembers = [[minerals.HP_2011_ds62.py(
-            ), '[Mg]3[Al]2Si3O12'],
-                [minerals.HP_2011_ds62.alm(
-                ), '[Fe]3[Al]2Si3O12'],
-                [minerals.HP_2011_ds62.gr(
-                ), '[Ca]3[Al]2Si3O12'],
-                [minerals.HP_2011_ds62.andr(), '[Ca]3[Fe]2Si3O12']]
-            self.type = 'asymmetric'
-            self.alphas = [1.0, 1.0, 2.7, 2.7]
-            self.energy_interaction = [[2.5e3, 31.e3, 53.2e3],
-                                        [5.e3, 37.24e3],
-                                        [2.e3]]
-            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
-
-    g4 = burnman.minerals.HP_2011_ds62.CFMASO_garnet()
     g4_excess_gibbs_400 = np.empty_like(comp)
     g4_excess_gibbs_800 = np.empty_like(comp)
     g4_excess_gibbs_1200 = np.empty_like(comp)
@@ -303,32 +317,34 @@ if __name__ == "__main__":
     '''
     The subregular solution model (Helffrich and Wood, 1989)
     provides a more flexible way of constructing an asymmetric
-    model
+    model. Here's a garnet model from Ganguly et al., 1996:
+
+    (N.B. Published excesses are on a 4-oxygen (1-cation) basis, 
+    so we need to multiply each by 3.)
     '''
-    class mg_fe_ca_garnet_Ganguly(burnman.SolidSolution):
+    mult = lambda x, n: [[[v*n for v in i] for i in j] for j in x]
+    
+    g5 = burnman.SolidSolution(name = 'Subregular pyrope-almandine-grossular '
+                               'garnet (Ganguly et al., 1996)',
+                               solution_type = 'subregular',
+                               endmembers = [[minerals.HP_2011_ds62.py(),
+                                              '[Mg]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.alm(),
+                                              '[Fe]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.gr(),
+                                              '[Ca]3[Al]2Si3O12'],
+                                             [minerals.HP_2011_ds62.spss(),
+                                              '[Mn]3[Al]2Si3O12']],
+                               energy_interaction = mult([[[2117., 695.], [9834., 21627.], [12083., 12083.]],
+                                                          [[6773., 873.], [539., 539.]],
+                                                          [[0., 0.]]], 3.),
+                               volume_interaction = mult([[[0.07e-5, 0.], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
+                                                          [[0.03e-5, 0.], [0.04e-5, 0.01e-5]],
+                                                          [[0., 0.]]], 3.),
+                               entropy_interaction = mult([[[0., 0.], [5.78, 5.78], [7.67, 7.67]],
+                                                           [[1.69, 1.69], [0., 0.]],
+                                                           [[0., 0.]]], 3.))
 
-        def __init__(self, molar_fractions=None):
-            self.name = 'Subregular pyrope-almandine-grossular garnet'
-            self.type = 'subregular'
-            self.endmembers = [[minerals.HP_2011_ds62.py(), '[Mg]3[Al]2Si3O12'], [minerals.HP_2011_ds62.alm(), '[Fe]3[Al]2Si3O12'], [
-                               minerals.HP_2011_ds62.gr(), '[Ca]3[Al]2Si3O12'], [minerals.HP_2011_ds62.spss(), '[Mn]3[Al]2Si3O12']]
-            self.energy_interaction = [
-                [[2117., 695.], [9834., 21627.], [12083., 12083.]], [[6773., 873.], [539., 539.]], [[0., 0.]]]
-            self.volume_interaction = [[[0.07e-5, 0.], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]], [
-                [0.03e-5, 0.], [0.04e-5, 0.01e-5]], [[0., 0.]]]
-            self.entropy_interaction = [
-                [[0., 0.], [5.78, 5.78], [7.67, 7.67]], [[1.69, 1.69], [0., 0.]], [[0., 0.]]]
-
-            # Published values are on a 4-oxygen (1-cation) basis
-            for interaction in [self.energy_interaction, self.volume_interaction, self.entropy_interaction]:
-                for i in range(len(interaction)):
-                    for j in range(len(interaction[i])):
-                        for k in range(len(interaction[i][j])):
-                            interaction[i][j][k] *= 3.
-
-            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
-
-    g5 = mg_fe_ca_garnet_Ganguly()
     g5_excess_gibbs = np.empty_like(comp)
     for i, c in enumerate(comp):
         molar_fractions = [1. - c, 0., c, 0.]

@@ -63,7 +63,7 @@ class forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'Dummy solid solution'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]2SiO4']]
         self.energy_interaction = []
 
@@ -76,7 +76,7 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'Fo-Fo solid solution'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]2SiO4'], [
                            forsterite(), '[Mg]2SiO4']]
         self.energy_interaction = [[0.]]
@@ -90,7 +90,7 @@ class olivine_ideal_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'Fo-Fo solid solution'
-        self.type = 'ideal'
+        self.solution_type = 'ideal'
         self.endmembers = [[
             forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
 
@@ -103,7 +103,7 @@ class olivine_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'Olivine'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[
             forsterite(), '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
         self.energy_interaction = [[8.4e3]]
@@ -118,7 +118,7 @@ class orthopyroxene(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = 'orthopyroxene'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg][Mg]Si2O6'], [
                            forsterite(), '[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6']]
         self.energy_interaction = [[burnman.constants.gas_constant * 1.0e3]]
@@ -132,7 +132,7 @@ class two_site_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'two_site_ss'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
                            forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
@@ -147,7 +147,7 @@ class two_site_ss_subregular(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = 'two_site_ss (subregular symmetric)'
-        self.type = 'subregular'
+        self.solution_type = 'subregular'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
                            forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         # Interaction parameters
