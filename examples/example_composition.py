@@ -92,16 +92,12 @@ if __name__ == "__main__":
     # Example 4: Defining your own solid solution
     if False:
         # Define a new SolidSolution with mg and fe perovskite endmembers
-        class mg_fe_perovskite(burnman.SolidSolution):
-
-            def __init__(self, molar_fractions=None):
-                self.endmembers = [[minerals.SLB_2011.mg_perovskite(
-                ), '[Mg]SiO3'],
-                    [minerals.SLB_2011.fe_perovskite(), '[Fe]SiO3']]
-                self.type = 'ideal'
-                burnman.SolidSolution.__init__(self, molar_fractions)
-
-        new_solidsolution = mg_fe_perovskite()
+        new_solidsolution = burnman.SolidSolution(name = 'New Mg-Fe bridgmanite',
+                                                  endmembers = [[minerals.SLB_2011.mg_perovskite(),
+                                                                 '[Mg]SiO3'],
+                                                                [minerals.SLB_2011.fe_perovskite(),
+                                                                 '[Fe]SiO3']],
+                                                  solution_type = 'ideal')
 
         # Set molar fraction of endmembers
         new_solidsolution.set_composition([0.9, 0.1])
