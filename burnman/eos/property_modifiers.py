@@ -63,7 +63,7 @@ def _landau_excesses(pressure, temperature, params):
         d2GdT2 = -params['S_D'] / (Tc * Q2) * (0.75 - 0.25 * params['Tc_0'] / Tc)
         d2GdPdT = params['V_D'] / (2. * Tc * Q2) \
                   * (1. + (temperature / (2. * Tc) - Q2 * Q2) * (1. - params['Tc_0'] / Tc))
-        
+
     else:
         G = G_disordered
         dGdT = dGdT_disordered

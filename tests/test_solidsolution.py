@@ -198,7 +198,7 @@ class test_solidsolution(BurnManTest):
                                     fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
             ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p,
                              fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
-            assert len(w) == 3  # we expect to trigger a reuss_average warning
+            assert len(w) == 3  # we expect to trigger 3 shear modulus warnings
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_2_gibbs(self):
@@ -209,7 +209,7 @@ class test_solidsolution(BurnManTest):
                                     fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
             ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p,
                              fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
-            assert len(w) == 4  # we expect to trigger a reuss_average warning
+            assert len(w) == 4  # we expect to trigger 4 shear modulus warnings
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_ol_gibbs(self):
