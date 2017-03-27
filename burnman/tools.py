@@ -720,7 +720,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     else:
         return x0, x1, f0, f1
 
-def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
+def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     """
     Compute numerical derivatives of the gibbs free energy of a mineral
     under given conditions, and check these values against those provided 
@@ -748,7 +748,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
 
     """
     dT = 1.
-    dP = 1.
+    dP = 1000.
     
     m.set_state(P, T)
     G0 = m.gibbs
@@ -772,7 +772,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
     
     # T derivatives
     m.set_state(P, T + 0.5*dT)
-    expr.extend(['S = dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
+    expr.extend(['S = -dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
     eq.extend([[m.S, -(G1 - G0)/dT],
                [m.alpha, (V1 - V0)/dT/m.V],
                [m.heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
@@ -783,7 +783,19 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
     eq.extend([[m.V, (G2 - G0)/dP],
                [m.K_T, -0.5*(V2 + V0)*dP/(V2 - V0)]])
 
-    consistencies = [np.abs(e[0]/e[1] - 1) < tol for e in eq]
+    
+    expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv', 'gr = alpha*K_T*V/Cv'])
+    eq.extend([[m.heat_capacity_v, m.heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
+               [m.K_S, m.K_T*m.heat_capacity_p/m.heat_capacity_v],
+               [m.gr, m.alpha*m.K_T*m.V/m.heat_capacity_v]])
+
+
+    expr.extend(['Vphi = np.sqrt(K_S/rho)', 'Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
+    eq.extend([[m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)],
+               [m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
+               [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+
+    consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1]) + np.finfo('float').eps for e in eq]
     consistency = np.all(consistencies)
     
     if verbose == True:

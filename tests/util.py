@@ -4,9 +4,9 @@ import unittest
 
 class BurnManTest(unittest.TestCase):
 
-    def assertFloatEqual(self, a, b):
+    def assertFloatEqual(self, a, b, tol=1e-5):
         self.assertAlmostEqual(
-            a, b, delta=max(1e-16, max(abs(a), abs(b)) * 1e-5))
+            a, b, delta=max(1e-16, max(abs(a), abs(b)) * tol))
 
     def assertArraysAlmostEqual(self, a, b):
         self.assertEqual(len(a), len(b))

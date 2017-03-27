@@ -23,15 +23,15 @@ class test_planet(BurnManTest):
         LM = burnman.minerals.SLB_2011.mg_bridgmanite()
         UM = burnman.minerals.SLB_2011.forsterite()
         mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, UM, LM)
-        mantle = planet.Planet.Layer("mantle", mantle_rock, 6371e3, 10)
+        mantle = planet.Planet.Layer("mantle", mantle_rock, 6371.e3, 10)
         myplanet = planet.Planet([core, mantle])
 
         assert(myplanet.get_layer("core") == core)
-        assert(myplanet.get_layer_by_radius(2000e3) == core)
-        assert(myplanet.get_layer_by_radius(4000e3) == mantle)
-        assert(myplanet.get_layer_by_radius(5000e3) == mantle)
+        assert(myplanet.get_layer_by_radius(2000.e3) == core)
+        assert(myplanet.get_layer_by_radius(4000.e3) == mantle)
+        assert(myplanet.get_layer_by_radius(5000.e3) == mantle)
 
-        self.assertFloatEqual(myplanet.pressures[0], 438580390453.7)
+        self.assertFloatEqual(myplanet.pressures[0], 438580390453.7, tol=1.e-4)
 
 
     def test_sort_layers(self):

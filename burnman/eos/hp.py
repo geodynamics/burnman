@@ -165,9 +165,9 @@ class HP_TMT(eos.EquationOfState):
         ksi_over_ksi_0 = einstein.heat_capacity_v(temperature, params['T_einstein'], params[
                                                   'n']) / einstein.heat_capacity_v(params['T_0'], params['T_einstein'], params['n'])
 
-        dintVdpdx = (params['V_0'] * params['a_0'] * params['K_0'] * a * ksi_over_ksi_0) * (
+        dintVdpdT = (params['V_0'] * params['a_0'] * params['K_0'] * a * ksi_over_ksi_0) * (
             np.power((1. + b * (pressure - params['P_0'] - Pth)), 0. - c) - np.power((1. - b * Pth), 0. - c))
-        return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdx
+        return params['S_0'] + self.__intCpoverTdT(temperature, params) + dintVdpdT
 
     def enthalpy(self, pressure, temperature, volume, params):
         """
@@ -184,13 +184,29 @@ class HP_TMT(eos.EquationOfState):
         and temperature [K].
         """
         a, b, c = mt.tait_constants(params)
-        Pth = self.__relative_thermal_pressure(temperature, params)
+        T = temperature
+        T_e = params['T_einstein']
+        n = params['n']
+        Pth = self.__relative_thermal_pressure(T, params)
 
-        ksi_over_ksi_0 = einstein.heat_capacity_v(temperature, params['T_einstein'], params[
-                                                  'n']) / einstein.heat_capacity_v(params['T_0'], params['T_einstein'], params['n'])
+        ksi_over_ksi_0 = einstein.heat_capacity_v(T, T_e, n) \
+                         / einstein.heat_capacity_v(params['T_0'], T_e, n)
 
-        dSdT = params['V_0'] * params['K_0'] * np.power((ksi_over_ksi_0 * params['a_0']), 2.0) * (
-            np.power((1. + b * (pressure - params['P_0'] - Pth)), -1. - c) - np.power((1. + b * (-Pth)), -1. - c))
+        dintVdpdT = (params['V_0'] * params['a_0'] * params['K_0'] * a * ksi_over_ksi_0) * (
+            np.power((1. + b * (pressure - params['P_0'] - Pth)), 0. - c) - np.power((1. - b * Pth), 0. - c))
+
+        dSdT0 = params['V_0'] * params['K_0'] * np.power((ksi_over_ksi_0 * params['a_0']), 2.0) * \
+                (np.power((1. + b * (pressure - params['P_0'] - Pth)), -1. - c) -
+                 np.power((1. + b * (-Pth)), -1. - c))
+
+        x = T_e/T
+        dCv_einstdT = -(einstein.heat_capacity_v(T, T_e, n) *
+                        ( 1 - 2./x + 2./(np.exp(x) - 1.) ) * x/T)
+
+        dSdT1 = -dintVdpdT * dCv_einstdT \
+                / einstein.heat_capacity_v(T, T_e, n)
+
+        dSdT = dSdT0 + dSdT1
         return self.heat_capacity_p0(temperature, params) + temperature * dSdT
 
     def __thermal_pressure(self, T, params):
