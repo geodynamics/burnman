@@ -164,7 +164,6 @@ class test_solidsolution(BurnManTest):
         T = 1000.
         fo = forsterite()
         fo.set_state(P, T)
-
         fo_ss = forsterite_ss()
         fo_ss.set_composition([1.0])
         fo_ss.set_state(P, T)
@@ -175,7 +174,6 @@ class test_solidsolution(BurnManTest):
         T = 1000.
         fo = forsterite()
         fo.set_state(P, T)
-
         fo_fo_ss = forsterite_forsterite_ss()
         fo_fo_ss.set_composition([0.3, 0.7])
         fo_fo_ss.set_state(P, T)
@@ -194,24 +192,24 @@ class test_solidsolution(BurnManTest):
 
     def test_1_gibbs(self):
         fo, fo_ss = self.setup_1min_ss()
-        endmember_properties = [
-            fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
+            endmember_properties = [fo.gibbs, fo.H, fo.S, fo.V, fo.C_p,
+                                    fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
             ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p,
                              fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
-            assert len(w) == 1  # we expect to trigger a reuss_average warning
+            assert len(w) == 3  # we expect to trigger a reuss_average warning
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_2_gibbs(self):
         fo, fo_ss = self.setup_2min_ss()
-        endmember_properties = [
-            fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
+            endmember_properties = [fo.gibbs, fo.H, fo.S, fo.V, fo.C_p,
+                                    fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr, fo.G]
             ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V, fo_ss.C_p,
                              fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr, fo_ss.G]
-            assert len(w) == 1  # we expect to trigger a reuss_average warning
+            assert len(w) == 4  # we expect to trigger a reuss_average warning
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
     def test_ol_gibbs(self):
