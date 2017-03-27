@@ -12,9 +12,12 @@ import pkgutil
 import numpy as np
 from scipy.optimize import fsolve, curve_fit
 from scipy.ndimage.filters import gaussian_filter
-from . import constants
 from scipy.interpolate import interp2d
 from collections import Counter
+import itertools
+
+from . import constants
+from . import nonlinear_fitting
 import itertools
 
 def copy_documentation(copy_from):
@@ -42,6 +45,30 @@ def copy_documentation(copy_from):
         return wrapper
     return mydecorator
 
+def flatten(l): return flatten(l[0]) + (flatten(l[1:]) if len(l) > 1 else []) if type(l) is list or type(l) is np.ndarray else [l]
+
+def round_to_n(x, xerr, n):
+    return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
+
+def pretty_print_values(popt, pcov, params):
+    """
+    Takes a numpy array of parameters, the corresponding covariance matrix 
+    and a set of parameter names and prints the parameters and 
+    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i])) 
+    in a nice text based format. 
+    """
+    for i, p in enumerate(params):
+        p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
+        c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
+
+        if p_rnd != 0.:
+            p_expnt = np.floor(np.log10(np.abs(p_rnd)))
+        else:
+            p_expnt = 0.
+            
+        scale = np.power(10., p_expnt)
+        nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
+        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
 
 def pretty_print_table(table, use_tabs=False):
     """
@@ -65,7 +92,7 @@ def pretty_print_table(table, use_tabs=False):
         [('{:<' if i == 0 else '{:>') + str(1 + col_width(table, i)) + '}' for i in range(len(table[0]))])
     for r in table:
         print(frmt.format(*r))
-
+        
 def pretty_plot():
     """
     Makes pretty plots. Overwrites the matplotlib default settings to allow
@@ -178,10 +205,10 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     return V
 
 
-def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
+def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
-    and a set of PTV points and (optional) uncertainties,
+    and a set of P-T-property points and (optional) uncertainties,
     this function returns a list of optimized parameters
     and their associated covariances, fitted using the
     scipy.optimize.curve_fit routine.
@@ -189,7 +216,7 @@ def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
     Parameters
     ----------
     mineral : mineral
-        Mineral for which the parameters should be optimized
+        Mineral for which the parameters should be optimized.
 
     fit_params : list of strings
         List of dictionary keys contained in mineral.params
@@ -197,41 +224,165 @@ def fit_PVT_data(mineral, fit_params, PT, V, V_sigma=None):
         during fitting. Initial guesses are taken from the existing
         values for the parameters
 
-    PT : list of two lists of floats (or numpy arrays)
-        The two lists contain a set of pressures [Pa]
-        and temperatures [K] of the volume data points
+    flags : string or list of strings
+        Attribute names for the property to be fit for the whole 
+        dataset or each datum individually (e.g. 'V')
 
-    V : list (or numpy array) of floats
-        Volumes [m^3/mol] of the mineral at the P,T condition
-        given by parameter PT
+    data : numpy array of observed P-T-property values
 
-    V_sigma : list (or numpy array) of floats
-        Optional uncertainties on the volumes [m^3/mol]
-        of the mineral at the P,T condition
-        given by parameter PT
+    data_covariances : numpy array of P-T-property covariances (optional)
+        If not given, all covariance matrices are chosen 
+        such that C00 = 1, otherwise Cij = 0
+        In other words, all data points have equal weight, 
+        with all error in the pressure
 
     Returns
     -------
-    popt : numpy array of floats
-        A list of optimized parameters
-
-    pcov : 2D numpy array of floats
-        The covariance matrix of the optimized parameters
+    model : instance of fitted model
+        Fitting-related attributes are as follows:
+            n_dof : integer
+                Degrees of freedom of the system
+            data_mle : 2D numpy array
+                Maximum likelihood estimates of the observed data points 
+                on the best-fit curve
+            jacobian : 2D numpy array
+                d(weighted_residuals)/d(parameter)
+            weighted_residuals : numpy array
+                Weighted residuals
+            weights : numpy array
+                1/(data variances normal to the best fit curve)
+            WSS : float
+                Weighted sum of squares residuals
+            popt : numpy array
+                Optimized parameters
+            pcov : 2D numpy array
+                Covariance matrix of optimized parameters
+            noise_variance : float
+                Estimate of the variance of the data normal to the curve
     """
-    def fit_data(PT, *params):
-        for i, param in enumerate(fit_params):
-            mineral.params[param] = params[i]
-        volumes = []
 
-        for P, T in zip(*PT):
-            mineral.set_state(P, T)
-            volumes.append(mineral.V)
-        return volumes
+    class Model(object):
+        def __init__(self, mineral, data, data_covariances, flags, fit_params, guessed_params, delta_params, mle_tolerances):
+            self.m = mineral
+            self.data = data
+            self.data_covariances = data_covariances
+            self.flags = flags
+            self.fit_params = fit_params
+            self.set_params(guessed_params)
+            self.delta_params = delta_params
+            self.mle_tolerances = mle_tolerances
+            
+        def set_params(self, param_values):
+            i=0
+            for param in self.fit_params:
+                if isinstance(self.m.params[param], float):
+                    self.m.params[param] = param_values[i]
+                    i += 1
+                else:
+                    for j in range(len(self.m.params[param])):
+                        self.m.params[param][j] = param_values[i]
+                        i += 1
 
-    guesses = [mineral.params[param] for param in fit_params]
-    popt, pcov = curve_fit(fit_data, PT, V, guesses, V_sigma)
+        def get_params(self):
+            params = []
+            for i, param in enumerate(self.fit_params):
+                params.append(self.m.params[param])
+            return np.array(flatten([mineral.params[prm] for prm in fit_params]))
 
-    return popt, pcov
+        def function(self, x, flag):
+            P, T, p = x
+            self.m.set_state(P, T)
+            return np.array([P, T, getattr(self.m, flag)])
+
+        def normal(self, x, flag):
+            P, T, p = x
+            
+            if flag == 'V':
+                self.m.set_state(P, T)
+                dPdp = -self.m.K_T/self.m.V
+                dpdT = self.m.alpha*self.m.V
+            elif flag == 'H':
+                self.m.set_state(P, T)
+                dPdp = 1./((1.-T*self.m.alpha)*self.m.V)
+                dpdT = self.m.heat_capacity_p
+            elif flag == 'S':
+                self.m.set_state(P, T)
+                dPdp = -1./(self.m.alpha*self.m.V)
+                dpdT = self.m.heat_capacity_p/T
+            elif flag == 'gibbs':
+                self.m.set_state(P, T)
+                dPdp = 1./self.m.V
+                dpdT = -self.S
+            else:
+                dP = 1.e5
+                dT = 1.
+                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2] - self.function([P-dP, T, 0.], flag)[2])
+                dpdT = (self.function([P, T+dT, 0.], flag)[2] - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
+            dPdT = -dPdp*dpdT    
+            n = np.array([-1., dPdT, dPdp])
+            return n/np.linalg.norm(n)
+
+        
+    # If only one property flag is given, assume it applies to all data
+    if type(flags) is str:
+        flags = np.array([flags] * len(data[:,0]))
+
+    # Apply mle tolerances if they dont exist
+    if mle_tolerances == []:
+        mineral.set_state(1.e5, 300.)
+        mle_tolerance_factor = 1.e-5
+        mle_tolerances = np.empty(len(flags))
+        for i, flag in enumerate(flags):
+            if flag in ['gibbs', 'enthalpy', 'H', 'helmholtz']:
+                mle_tolerances[i] = 1. # 1 J
+            else:
+                mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, flag)
+        
+    # If covariance matrix is not given, apply unit weighting to all pressures
+    # (with zero errors on T and p)
+    covariances_defined = True
+    if data_covariances == []:
+        covariances_defined = False
+        data_covariances = np.zeros((len(data[:,0]), len(data[0]), len(data[0])))
+        for i in range(len(data_covariances)):
+            data_covariances[i][0][0] = 1.
+    
+    guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
+    model = Model(mineral = mineral,
+                  data = data,
+                  data_covariances = data_covariances,
+                  flags = flags,
+                  fit_params = fit_params,
+                  guessed_params = guessed_params,
+                  delta_params = guessed_params*1.e-5,
+                  mle_tolerances = mle_tolerances)
+
+    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations = max_lm_iterations, param_tolerance=param_tolerance, verbose=verbose)
+
+    if verbose == True and covariances_defined == True:
+        confidence_interval = 0.9
+        confidence_bound, indices, probabilities = nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval)
+        if indices != []:
+            print('The function nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval) '
+                  'has determined that there are {0:d} data points which have residuals which are not '
+                  'expected at the {1:.1f}% confidence level (> {2:.1f} s.d. away from the model fit).\n'
+                  'Their indices and the probabilities of finding such extreme values are:'.format(len(indices), confidence_interval*100., confidence_bound))
+            for i, idx in enumerate(indices):
+                print('[{0:d}]: {1:.4f} ({2:.1f} s.d. from the model)'.format(idx, probabilities[i], np.abs(model.weighted_residuals[idx])))
+            print('You might consider removing them from your fit, '
+                  'or increasing the uncertainties in their measured values.\n')
+        
+    return model
+
+
+def fit_PTV_data(mineral, fit_params, data, data_covariances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
+    """
+    A simple alias for the fit_PTp_data for when all the data is volume data
+    """
+        
+    return fit_PTp_data(mineral=mineral, flags='V',
+                        data=data, data_covariances=data_covariances, 
+                        fit_params=fit_params, param_tolerance=param_tolerance, max_lm_iterations=max_lm_iterations, verbose=verbose)
 
 
 def equilibrium_pressure(minerals, stoichiometry, temperature, pressure_initial_guess=1.e5):
@@ -647,7 +798,6 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=0.01, verbose=False):
             
     return consistency
 
-
 def _pad_ndarray_inverse_mirror(array, padding):
     """
     Pads an ndarray according to an inverse mirror
@@ -822,3 +972,45 @@ def interp_smoothed_array_and_derivatives(array,
                interp2d(x_values, y_values, dSAdydy/dy, kind='linear'))
 
     return interps
+
+
+def attribute_function(m, attributes, powers=[]):
+    """
+    Function which returns a function which can be used to 
+    evaluate material properties at a point. This function 
+    allows the user to define the property returned 
+    as a string. The function can itself be passed to another 
+    function 
+    (such as nonlinear_fitting.confidence_prediction_bands()).
+
+    Properties can either be simple attributes (e.g. K_T) or
+    a product of attributes, each raised to some power.
+
+    Parameters
+    ----------
+    m : Material
+        The material instance evaluated by the output function.
+    attributes : list of strings
+        The list of material attributes / properties to
+        be evaluated in the product
+    powers : list of floats
+        The powers to which each attribute should be raised 
+        during evaluation
+    Returns
+    -------
+    f : function(x)
+        Function which returns the value of product(a_i**p_i)
+        as a function of condition (x = [P, T, V])
+    """
+    if type(attributes) is str:
+        attributes = [attributes]
+    if powers == []:
+        powers = [1. for a in attributes]
+    def f(x):
+        P, T, V = x
+        m.set_state(P, T)
+        value = 1.
+        for a, p in zip(*[attributes, powers]):
+            value *= np.power(getattr(m, a), p)
+        return value
+    return f

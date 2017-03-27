@@ -47,18 +47,18 @@ class test_tools(BurnManTest):
 
         pressures = np.linspace(1.e9, 2.e9, 8)
         temperatures = np.ones_like(pressures) * fo.params['T_0']
-        V = np.empty_like(pressures)
 
-        PT = [pressures, temperatures]
-        for i, P in enumerate(pressures):
-            fo.set_state(P, temperatures[i])
-            V[i] = fo.V
+        PTV = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            PTV[i] = [pressures[i], temperatures[i], fo.V]
 
         params = ['V_0', 'K_0', 'Kprime_0']
-        popt, pcov = fit_PVT_data(fo, params, PT, V)
-        zeros = np.zeros_like(pcov[0])
+        fitted_eos = fit_PTV_data(fo, params, PTV, verbose=False)
+        zeros = np.zeros_like(fitted_eos.pcov[0])
 
-        self.assertArraysAlmostEqual(pcov[0], zeros)
+        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
 
     def test_hugoniot(self):
         fo = burnman.minerals.HP_2011_ds62.fo()

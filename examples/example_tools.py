@@ -89,60 +89,79 @@ if __name__ == "__main__":
 
     # Now let's fit some EoS data
     # Let's just take a bit of data from Andrault et al. (2003) on stishovite
-    PV = [[0.0001, 46.5126, 0.0061],
-          [1.168, 46.3429, 0.0053],
-          [2.299, 46.1756, 0.0043],
-          [3.137, 46.0550, 0.0051],
-          [4.252, 45.8969, 0.0045],
-          [5.037, 45.7902, 0.0053],
-          [5.851, 45.6721, 0.0038],
-          [6.613, 45.5715, 0.0050],
-          [7.504, 45.4536, 0.0041],
-          [8.264, 45.3609, 0.0056],
-          [9.635, 45.1885, 0.0042],
-          [11.69, 44.947, 0.002],
-          [17.67, 44.264, 0.002],
-          [22.38, 43.776, 0.003],
-          [29.38, 43.073, 0.009],
-          [37.71, 42.278, 0.008],
-          [46.03, 41.544, 0.017],
-          [52.73, 40.999, 0.009],
-          [26.32, 43.164, 0.006],
-          [30.98, 42.772, 0.005],
-          [34.21, 42.407, 0.003],
-          [38.45, 42.093, 0.004],
-          [43.37, 41.610, 0.004],
-          [47.49, 41.280, 0.007]]
+    PV = np.array([[0.0001, 46.5126, 0.0061],
+                   [1.168, 46.3429, 0.0053],
+                   [2.299, 46.1756, 0.0043],
+                   [3.137, 46.0550, 0.0051],
+                   [4.252, 45.8969, 0.0045],
+                   [5.037, 45.7902, 0.0053],
+                   [5.851, 45.6721, 0.0038],
+                   [6.613, 45.5715, 0.0050],
+                   [7.504, 45.4536, 0.0041],
+                   [8.264, 45.3609, 0.0056],
+                   [9.635, 45.1885, 0.0042],
+                   [11.69, 44.947, 0.002],
+                   [17.67, 44.264, 0.002],
+                   [22.38, 43.776, 0.003],
+                   [29.38, 43.073, 0.009],
+                   [37.71, 42.278, 0.008],
+                   [46.03, 41.544, 0.017],
+                   [52.73, 40.999, 0.009],
+                   [26.32, 43.164, 0.006],
+                   [30.98, 42.772, 0.005],
+                   [34.21, 42.407, 0.003],
+                   [38.45, 42.093, 0.004],
+                   [43.37, 41.610, 0.004],
+                   [47.49, 41.280, 0.007]])
+    
+    PTV = np.array([PV.T[0]*1.e9,
+                    PV.T[0]*0. + 298.15,
+                    burnman.tools.molar_volume_from_unit_cell_volume(PV.T[1], 2.)]).T
 
-    # Convert the data into the right units and format for fitting
-    PV = np.array(list(zip(*PV)))
-    PT = [PV[0] * 1.e9, 298.15 + PV[0] * 0.]
-    V = burnman.tools.molar_volume_from_unit_cell_volume(PV[1], 2.)
-    sigma = burnman.tools.molar_volume_from_unit_cell_volume(PV[2], 2.)
+    nul = 0.*PTV.T[0]
+    PTV_covariances = np.array([[0.03*PTV.T[0], nul, nul], [nul, nul, nul], [nul, nul, burnman.tools.molar_volume_from_unit_cell_volume(PV.T[2], 2.)]]).T
 
     # Here's where we fit the data
     # The mineral parameters are automatically updated during fitting
     stv = burnman.minerals.HP_2011_ds62.stv()
     params = ['V_0', 'K_0', 'Kprime_0']
-    popt, pcov = burnman.tools.fit_PVT_data(stv, params, PT, V)
+    fitted_eos = burnman.tools.fit_PTV_data(stv, params, PTV, PTV_covariances, verbose=False)
 
     # Print the optimized parameters
-    print('Equation of state calculations')
     print('Optimized equation of state for stishovite:')
-    for i, p in enumerate(params):
-        print (p + ':', round_to_n(popt[i], np.sqrt(pcov[i][i]), 1),
-               '+/-', round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1))
+    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
 
+    # Create a corner plot of the covariances
+    fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
+    plt.show()
+        
     # Finally, let's plot our equation of state
+    T = 298.15
     pressures = np.linspace(1.e5, 60.e9, 101)
     volumes = np.empty_like(pressures)
-    for i, P in enumerate(pressures):
-        stv.set_state(P, 298.15)
-        volumes[i] = stv.V
 
-    plt.plot(pressures / 1.e9, volumes * 1.e6,
+    PTVs = np.empty((len(pressures), 3))
+    for i, P in enumerate(pressures):
+        stv.set_state(P, T)
+        PTVs[i] = [P, T, stv.V]
+
+    # Plot the 95% confidence and prediction bands 
+    cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
+                                                                     x_array = PTVs,
+                                                                     confidence_interval = 0.95,
+                                                                     f=burnman.tools.attribute_function(stv, 'V'),
+                                                                     flag='V')
+    
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[0] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[1] * 1.e6, linestyle='--', color='r')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
+    plt.plot(PTVs[:,0]/1.e9, cp_bands[3] * 1.e6, linestyle='--', color='b')
+        
+    plt.plot(PTVs[:,0] / 1.e9, PTVs[:,2] * 1.e6,
              label='Optimized fit for stishovite')
-    plt.errorbar(PT[0] / 1.e9, V * 1.e6, yerr=sigma * 1.e6,
+    plt.errorbar(PTV[:,0] / 1.e9, PTV[:,2] * 1.e6,
+                 xerr=PTV_covariances.T[0][0] / 1.e9,
+                 yerr=PTV_covariances.T[2][2] * 1.e6,
                  linestyle='None', marker='o', label='Andrault et al. (2003)')
 
     plt.ylabel("Volume (cm^3/mol)")
@@ -151,6 +170,23 @@ if __name__ == "__main__":
     plt.title("Stishovite EoS (room temperature)")
     plt.show()
 
+    
+    # Plot the 95% confidence and prediction bands for the bulk modulus
+    cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
+                                                                     x_array = PTVs,
+                                                                     confidence_interval = 0.95,
+                                                                     f=burnman.tools.attribute_function(stv, 'K_T'),
+                                                                     flag='V')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2.e9, color='b', label='Best fit')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[0])/1.e9, linestyle='--', color='r', label='95% confidence band')
+    plt.plot(PTVs[:,0]/1.e9, (cp_bands[1])/1.e9, linestyle='--', color='r')
+    plt.ylabel("Bulk modulus (GPa)")
+    plt.xlabel("Pressure (GPa)")
+    plt.legend(loc="upper right")
+    plt.title("Stishovite EoS; uncertainty in bulk modulus (room temperature)")
+    plt.show()
+
+    
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
     print('')
     print('Hugoniot calculations')

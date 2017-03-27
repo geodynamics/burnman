@@ -11,6 +11,7 @@ from test_decorators import *
 from test_endmembers import *
 from test_eos import *
 from test_eos_consistency import *
+from test_fitting import *
 from test_geotherm import *
 from test_material import *
 from test_minerals import *

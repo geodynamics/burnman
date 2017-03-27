@@ -1,0 +1,17 @@
+# T (degrees C)	a (Angstroms)	aerr
+23	4.211	0.0012
+23	4.211	0.001
+150	4.217	0.001
+300	4.225	0.001
+450	4.233	0.001
+605	4.241	0.002
+753	4.249	0.001
+915	4.257	0.001
+1042	4.264	0.002
+23	4.208	0.005
+-196	4.203	0.005
+23	4.212	0.001
+23	4.212	0.001
+# Hazen, Robert M. 		
+# Effects of temperature and pressure on the cell dimension and X-ray temperature factors of periclase		
+# American Mineralogist 61.3 (1976): 266-71.		
