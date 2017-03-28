@@ -36,5 +36,7 @@ from . import HP_2011_ds62
 from . import HP_2011_fluids
 from . import HHPH_2013
 
+# Kurnosov et al. 2017
+from . import KMFBZ_2017
 # Other
 from . import other

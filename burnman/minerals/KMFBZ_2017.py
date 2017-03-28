@@ -4,7 +4,9 @@
 
 
 """
-from Kurnosov, Marquardt, Frost, Ballaran and Ziberna, Nature 2017
+from Kurnosov et al.  Nature 2017
+Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from (Al, Fe)-bearing bridgmanite elasticity data." 
+Nature 543.7646 (2017): 543-546. doi:10.1038/nature21390
 """
 
 from __future__ import absolute_import
@@ -25,6 +27,7 @@ SOLID SOLUTIONS
 class bridgmanite(SolidSolution):
 
     def __init__(self, molar_fractions=None):
+        self.name = 'bridgmanite/perovskite'
         self.endmembers = [[mg_perovskite(), '[Mg][Si]O3'],
             [fe_perovskite(), '[Fe][Si]O3'],
             [al_al_perovskite(), '[Al][Al]SiO3'],
@@ -40,7 +43,7 @@ class ferropericlase(SolidSolution):
         self.endmembers = [[periclase(), '[Mg]O'], [wuestite(), '[Fe]O']]
         self.energy_interaction = [[13.e3]]
 
-        SolidSolution.__init__(self, molar_fractions=molar_fractions)
+        SolidSolution.__init__(self, molar_fractions)
 
 """
 ENDMEMBERS
@@ -61,7 +64,7 @@ class mg_perovskite (Mineral):
             'V_0': 2.4445e-05,
             'K_0': 2.51e+11,
             'Kprime_0': 4.1,
-            'Debye_0': 905,
+            'Debye_0': 905.,
             'grueneisen_0': 1.57,
             'q_0': 1.1,
             'G_0': 1.73e+11,
@@ -85,7 +88,7 @@ class fe_perovskite (Mineral):
             'V_0': 2.534e-05,
             'K_0': 2.72e+11,
             'Kprime_0': 4.1,
-            'Debye_0': 871,
+            'Debye_0': 871.,
             'grueneisen_0': 1.57,
             'q_0': 1.1,
             'G_0': 1.33+11,
@@ -109,7 +112,7 @@ class fe_al_o3 (Mineral):
             'V_0': 2.69e-05,
             'K_0': 2.20e+11,
             'Kprime_0': 1.3,
-            'Debye_0': 886,
+            'Debye_0': 886.,
             'grueneisen_0': 1.57,
             'q_0': 1.1,
             'G_0': 96.0e+09,
@@ -210,7 +213,7 @@ class ca_perovskite (Mineral):
             'V_0': 2.754e-05,
             'K_0': 2.36e+11,
             'Kprime_0': 3.9,
-            'Debye_0': 802,
+            'Debye_0': 802.,
             'grueneisen_0': 1.89,
             'q_0': 0.9,
             'G_0': 1.57e+11,
@@ -237,7 +240,7 @@ class fe (Mineral):
             'V_0': 0.673e-05,
             'K_0': 1.64e+11,
             'Kprime_0': 4.,
-            'Debye_0': 422,
+            'Debye_0': 422.,
             'grueneisen_0': 1.71,
             'q_0': 1.4,
             'G_0': .815e+11,
