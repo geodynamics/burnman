@@ -19,6 +19,7 @@ from .modified_tait import MT
 from .hp import HP_TMT
 from .cork import CORK
 from .vinet import Vinet
+from .aa import AA
 from .birch_murnaghan_4th import BM4
 
 from .property_modifiers import calculate_property_modifications
