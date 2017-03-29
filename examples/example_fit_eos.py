@@ -4,7 +4,6 @@
 
 
 """
-
 example_fit_eos
 ----------------
 
@@ -62,12 +61,12 @@ if __name__ == "__main__":
     per_opt = burnman.minerals.SLB_2011.periclase()
     params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0']
     param_tolerance = 1.e-3 # fairly low resolution fitting (corresponding to 0.1% variation)
-    fitted_eos = burnman.tools.fit_PTV_data(mineral = per_opt,
-                                            fit_params = params,
-                                            data = PTV_data,
-                                            data_covariances = PTV_covariances, 
-                                            param_tolerance = param_tolerance,
-                                            verbose = False)
+    fitted_eos = burnman.eos_fitting.fit_PTV_data(mineral = per_opt,
+                                                  fit_params = params,
+                                                  data = PTV_data,
+                                                  data_covariances = PTV_covariances, 
+                                                  param_tolerance = param_tolerance,
+                                                  verbose = False)
 
     
     # We're done! That wasn't too painful, was it?!
@@ -168,13 +167,13 @@ if __name__ == "__main__":
     
     # And now we can fit our data!
     fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
-    fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                            flags = flags,
-                                            fit_params = fit_params,
-                                            data = PTp_data,
-                                            data_covariances = PTp_covariances,
-                                            param_tolerance = param_tolerance,
-                                            verbose = False)
+    fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = per_opt,
+                                                  flags = flags,
+                                                  fit_params = fit_params,
+                                                  data = PTp_data,
+                                                  data_covariances = PTp_covariances,
+                                                  param_tolerance = param_tolerance,
+                                                  verbose = False)
 
 
     # Print the optimized parameters
@@ -253,13 +252,13 @@ if __name__ == "__main__":
     flags = [flag for i, flag in enumerate(flags) if i not in indices]
     PTp_data = PTp_data[mask]
     PTp_covariances = PTp_covariances[mask]  
-    fitted_eos = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                            flags = flags,
-                                            fit_params = fit_params,
-                                            data = PTp_data,
-                                            data_covariances = PTp_covariances,
-                                            param_tolerance = 1.e-5, # higher resolution fitting now that we removed those outliers
-                                            verbose = False)
+    fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = per_opt,
+                                                  flags = flags,
+                                                  fit_params = fit_params,
+                                                  data = PTp_data,
+                                                  data_covariances = PTp_covariances,
+                                                  param_tolerance = 1.e-5, # higher resolution fitting now that we removed those outliers
+                                                  verbose = False)
 
     # Print the optimized parameters
     print('Optimized equation of state (outliers removed):')

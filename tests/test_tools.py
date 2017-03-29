@@ -7,8 +7,7 @@ import burnman
 from burnman.mineral import Mineral
 from util import BurnManTest
 from burnman.tools import *
-
-
+        
 class test_tools(BurnManTest):
 
     def test_eqm_T(self):
@@ -41,24 +40,6 @@ class test_tools(BurnManTest):
         P = fo.params['P_0'] + H_ex / V_ex
         P_calc = equilibrium_pressure([fo, fo2], [1.0, -1.0], fo.params['T_0'])
         self.assertArraysAlmostEqual([P], [P_calc])
-
-    def test_fit_PVT_data(self):
-        fo = burnman.minerals.HP_2011_ds62.fo()
-
-        pressures = np.linspace(1.e9, 2.e9, 8)
-        temperatures = np.ones_like(pressures) * fo.params['T_0']
-
-        PTV = np.empty((len(pressures), 3))
-
-        for i in range(len(pressures)):
-            fo.set_state(pressures[i], temperatures[i])
-            PTV[i] = [pressures[i], temperatures[i], fo.V]
-
-        params = ['V_0', 'K_0', 'Kprime_0']
-        fitted_eos = fit_PTV_data(fo, params, PTV, verbose=False)
-        zeros = np.zeros_like(fitted_eos.pcov[0])
-
-        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
 
     def test_hugoniot(self):
         fo = burnman.minerals.HP_2011_ds62.fo()

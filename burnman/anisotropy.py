@@ -3,18 +3,27 @@
 # GPL v2 or later.
 
 from __future__ import absolute_import
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .tools import normalize
+
 class AnisotropicMaterial(object):
     """
-    Base class for anisotropic materials
+    A class that represents an anisotropic elastic material. This class 
+    is initialised with a set of elastic constants and a density. It can
+    then be interrogated to find the values of different properties, 
+    such as bounds on seismic velocities. There are also several functions
+    which can be called to calculate properties along directions oriented
+    with respect to the elastic tensor.
 
-    Initialise this function with a density and a set of elastic constants
-    (either a list of the independent Cijs, 
-    or a full stiffness tensor in Voigt notation).
+    Initialization is with a density and either 
+    a) a set of independent elastic constants and a crystal system, or
+    b) a full stiffness tensor in Voigt notation
 
-    If only independent elastic constants are input, the number and order 
+    If initialization is via option (a), the number and order 
     of the constants is dependent on the crystal system:
     'isotropic': C12, C44 (i.e. lambda and mu, the Lame parameters)
     'cubic': C11, C12, C44
@@ -184,22 +193,13 @@ class AnisotropicMaterial(object):
         of the Voigt notation m (or n).
         """
         if m == 3:
-            i=1
-            j=2
+            return 1, 2
         elif m == 4:
-            i=0
-            j=2
+            return 0, 2
         elif m == 5:
-            i=0
-            j=1
+            return 0, 1
         else:
-            i=m
-            j=m
-        return i, j
-
-    def _normalize(self, vector):
-        v = np.array(vector)
-        return v/np.linalg.norm(v) 
+            return m, m
 
     def _voigt_notation_to_stiffness_tensor(self, voigt_notation):
         """
@@ -296,7 +296,7 @@ class AnisotropicMaterial(object):
 
         T_ik = C_ijkl n_j n_l
         """
-        propagation_direction = self._normalize(propagation_direction)
+        propagation_direction = normalize(propagation_direction)
         Tik = np.tensordot(np.tensordot(self.full_stiffness_tensor,
                                         propagation_direction,
                                         axes=([1],[0])),
@@ -309,7 +309,7 @@ class AnisotropicMaterial(object):
         Computes the linear compressibility in a given direction 
         relative to the stiffness tensor
         """
-        direction = self._normalize(direction)
+        direction = normalize(direction)
         Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
         beta = Sijkk.dot(direction).dot(direction)
         return beta
@@ -319,7 +319,7 @@ class AnisotropicMaterial(object):
         Computes the Youngs modulus in a given direction 
         relative to the stiffness tensor
         """
-        direction = self._normalize(direction)
+        direction = normalize(direction)
         Sijkl = self.full_compliance_tensor
         S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
         return 1./S
@@ -329,8 +329,8 @@ class AnisotropicMaterial(object):
         Computes the shear modulus on a plane in a given 
         shear direction relative to the stiffness tensor
         """
-        plane_normal = self._normalize(plane_normal)
-        shear_direction = self._normalize(shear_direction)
+        plane_normal = normalize(plane_normal)
+        shear_direction = normalize(shear_direction)
         
         assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(np.float).eps, 'plane_normal and shear_direction must be orthogonal'
         Sijkl = self.full_compliance_tensor
@@ -345,8 +345,8 @@ class AnisotropicMaterial(object):
         directions relative to the stiffness tensor
         """
         
-        axial_direction = self._normalize(axial_direction)
-        lateral_direction = self._normalize(lateral_direction)
+        axial_direction = normalize(axial_direction)
+        lateral_direction = normalize(lateral_direction)
         assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(np.float).eps, 'axial_direction and lateral_direction must be orthogonal'
         
         Sijkl = self.full_compliance_tensor
@@ -364,7 +364,7 @@ class AnisotropicMaterial(object):
         Returns two lists, containing the wave speeds and 
         directions of particle motion relative to the stiffness tensor
         """
-        propagation_direction = self._normalize(propagation_direction)
+        propagation_direction = normalize(propagation_direction)
         
         Tik = self.christoffel_tensor(propagation_direction)
 

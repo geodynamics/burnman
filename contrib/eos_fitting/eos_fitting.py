@@ -93,13 +93,13 @@ if __name__ == "__main__":
     list_flags = list(set(flags))
     
     print('Starting to fit user-defined data. Please be patient.')    
-    fitted_eos = burnman.tools.fit_PTp_data(mineral = mineral,
-                                            flags = flags,
-                                            fit_params = fit_params,
-                                            data = data,
-                                            data_covariances = data_covariances,
-                                            param_tolerance = param_tolerance,
-                                            verbose = False)
+    fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = mineral,
+                                                  flags = flags,
+                                                  fit_params = fit_params,
+                                                  data = data,
+                                                  data_covariances = data_covariances,
+                                                  param_tolerance = param_tolerance,
+                                                  verbose = False)
 
     # Print the optimized parameters
     print('Optimized equation of state:')
@@ -127,13 +127,13 @@ if __name__ == "__main__":
         flags = [flag for i, flag in enumerate(flags) if i not in indices]
         data = data[mask]
         data_covariances = data_covariances[mask]  
-        fitted_eos = burnman.tools.fit_PTp_data(mineral = mineral,
-                                                flags = flags,
-                                                fit_params = fit_params,
-                                                data = data,
-                                                data_covariances = data_covariances,
-                                                param_tolerance = param_tolerance,
-                                                verbose = False)
+        fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = mineral,
+                                                      flags = flags,
+                                                      fit_params = fit_params,
+                                                      data = data,
+                                                      data_covariances = data_covariances,
+                                                      param_tolerance = param_tolerance,
+                                                      verbose = False)
 
     # Print the optimized parameters
     print('Optimized equation of state:')

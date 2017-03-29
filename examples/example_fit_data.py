@@ -53,12 +53,12 @@ if __name__ == "__main__":
 
 
     def best_fit():
-        return burnman.tools.fit_PTp_data(mineral = mg_perovskite_test,
-                                          flags = 'shear_wave_velocity',
-                                          fit_params = ['G_0', 'Gprime_0'],
-                                          data = PTp_data,
-                                          verbose = False)
-
+        return burnman.eos_fitting.fit_PTp_data(mineral = mg_perovskite_test,
+                                                flags = 'shear_wave_velocity',
+                                                fit_params = ['G_0', 'Gprime_0'],
+                                                data = PTp_data,
+                                                verbose = False)
+    
     pressures = np.linspace(1.e5, 150.e9, 101)
     temperatures = pressures*0. + 300.
 
@@ -123,13 +123,13 @@ if __name__ == "__main__":
     PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
 
     per_opt.params['S_0'] = 6.439*4.184
-    model = burnman.tools.fit_PTp_data(mineral = per_opt,
-                                       flags = 'H',
-                                       fit_params = ['H_0', 'Cp'],
-                                       data = PTH_data,
-                                       data_covariances = PTH_covariances,
-                                       max_lm_iterations = 10,
-                                       verbose = False)
+    model = burnman.eos_fitting.fit_PTp_data(mineral = per_opt,
+                                             flags = 'H',
+                                             fit_params = ['H_0', 'Cp'],
+                                             data = PTH_data,
+                                             data_covariances = PTH_covariances,
+                                             max_lm_iterations = 10,
+                                             verbose = False)
 
     print('Optimised values:')
     params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']

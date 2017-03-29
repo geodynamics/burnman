@@ -32,14 +32,14 @@ class bridgmanite(SolidSolution):
             [fe_perovskite(), '[Fe][Si]O3'],
             [al_al_perovskite(), '[Al][Al]SiO3'],
             [fe_al_o3(), '[Fe][Al]SiO3'],]
-        self.type = 'ideal'
+        self.solution_type = 'ideal'
         SolidSolution.__init__(self, molar_fractions)
 
 class ferropericlase(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'magnesiowustite/ferropericlase'
-        self.type = 'symmetric'
+        self.solution_type = 'symmetric'
         self.endmembers = [[periclase(), '[Mg]O'], [wuestite(), '[Fe]O']]
         self.energy_interaction = [[13.e3]]
 
