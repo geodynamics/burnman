@@ -416,8 +416,8 @@ class AnisotropicMaterial(object):
                 vs2s[i][j] = velocities[0][2]
                 
         fig = plt.figure()
-        names = ['Vp (km/s)', 'S-wave anisotropy (%)', 'Vp/Vs1', 'linear beta (GPa^-1)', 'Youngs Modulus (GPa)']
-        items = [vps/1000., 200.*(vs1s - vs2s)/(vs1s + vs2s), vps/vs1s, betas*1.e9, Es/1.e9]
+        names = ['Vp (km/s)', 'Vs1 (km/s)', 'Vp/Vs1', 'S-wave anisotropy (%)', 'linear beta (GPa^-1)', 'Youngs Modulus (GPa)']
+        items = [vps/1000., vs1s/1000., vps/vs1s, 200.*(vs1s - vs2s)/(vs1s + vs2s), betas*1.e9, Es/1.e9]
         ax = []
         im = []
         ndivs = 100
@@ -443,7 +443,10 @@ class AnisotropicMaterial(object):
             
             ticks = np.linspace(tmin, tmax, nt)
             im.append(ax[i].contourf(theta, r, item, ndivs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax))
-            fig.colorbar(im[i], ax=ax[i], ticks=ticks)
+            lines = ax[i].contour(theta, r, item, ticks, colors=('black',), linewidths=(1,))
             
+            cbar = fig.colorbar(im[i], ax=ax[i], ticks=ticks)
+            cbar.add_lines(lines)
+
         plt.tight_layout()
         plt.show()
