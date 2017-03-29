@@ -1,0 +1,19 @@
+Basalt isotropic elastic properties:
+
+Bulk modulus bounds: 5.600e+10 5.600e+10 5.600e+10
+Shear modulus bounds: 2.400e+10 2.400e+10 2.400e+10
+Universal elastic anisotropy: -0.0000
+Isotropic poisson ratio: 0.3125
+
+Linear compressibility along 100: 5.952e-12
+Young's modulus along 100: 6.300e+10
+Shear modulus on 100 plane in direction 010: 2.400e+10
+Poisson ratio for 100/010: 0.3125
+Vp, Vs1, Vs2 (km/s): 5.67, 2.96, 2.96
+
+Talc elastic properties:
+
+Bulk modulus bounds: 1.889e+10 4.208e+10 6.527e+10
+Shear modulus bounds: 2.642e+10 4.044e+10 5.446e+10
+Universal elastic anisotropy: 7.763
+Isotropic poisson ratio: 0.136

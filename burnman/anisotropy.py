@@ -10,11 +10,12 @@ class AnisotropicMaterial(object):
     """
     Base class for anisotropic materials
 
-    Initialise this function with a density and a set of Cijs 
+    Initialise this function with a density and a set of elastic constants
     (either a list of the independent Cijs, 
     or a full stiffness tensor in Voigt notation).
 
-    Independent Cijs should be in the following order:
+    If only independent elastic constants are input, the number and order 
+    of the constants is dependent on the crystal system:
     'isotropic': C12, C44 (i.e. lambda and mu, the Lame parameters)
     'cubic': C11, C12, C44
     'hexagonal': C11, C12, C13, C33, C44
@@ -26,7 +27,6 @@ class AnisotropicMaterial(object):
     'monoclinic': C11, C12, C13, C15, C22, C23, 
                   C25, C33, C35, C44, C46, C55, C66
     'triclinic': Cij, where 1<=i<=6 and i<=j<=6 
-    ''
     
     See :cite:`Mainprice2011` Geological Society of London Special Publication 
     and https://materialsproject.org/wiki/index.php/Elasticity_calculations
@@ -79,7 +79,7 @@ class AnisotropicMaterial(object):
                 cijs.append((cijs[0] - cijs[1])/2.)
             # tetragonal_i corresponds to Laue class 4/mmm
             assert len(cijs) == 6
-            index_lists = [[(0, 0), (1, 1)], #C11
+            index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
                            [(2, 2)], # C33
@@ -91,7 +91,7 @@ class AnisotropicMaterial(object):
             assert len(cijs) == 7
             cijs = list(cijs)
             cijs.insert(4, cij[3]) # C26 = -C16
-            index_lists = [[(0, 0), (1, 1)], #C11
+            index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
                            [(0, 5)], # C16
@@ -105,7 +105,7 @@ class AnisotropicMaterial(object):
             assert len(cijs) == 7
             cijs = list(cijs)
             cijs.insert(4, cij[3]) # C24 = -C14
-            index_lists = [[(0, 0), (1, 1)], #C11
+            index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
                            [(0, 3), (4, 5)], # C14
@@ -207,9 +207,9 @@ class AnisotropicMaterial(object):
         to the full fourth rank tensor (3x3x3x3 matrix).
         """
         stiffness_tensor = np.zeros([3, 3, 3, 3])
-        for m in xrange(6):
+        for m in range(6):
             i, j = self._voigt_index_to_ij(m)
-            for n in xrange(6):
+            for n in range(6):
                 k, l = self._voigt_index_to_ij(n)
                 stiffness_tensor[i][j][k][l] = voigt_notation[m][n]
                 stiffness_tensor[j][i][k][l] = voigt_notation[m][n]
@@ -386,11 +386,14 @@ class AnisotropicMaterial(object):
         linear compressibility: beta
         Youngs Modulus: E
         """
-        
-        plt.style.use('ggplot')
-        plt.rcParams['axes.facecolor'] = 'white'
-        plt.rcParams['axes.edgecolor'] = 'black'
-        plt.rcParams['figure.figsize'] = 16, 10 # inches
+
+        try:
+            plt.style.use('ggplot')
+            plt.rcParams['axes.facecolor'] = 'white'
+            plt.rcParams['axes.edgecolor'] = 'black'
+            plt.rcParams['figure.figsize'] = 16, 10 # inches
+        except:
+            pass
         
         zeniths = np.linspace(np.pi/2., np.pi, 31)
         azimuths = np.linspace(0., 2.*np.pi, 91)

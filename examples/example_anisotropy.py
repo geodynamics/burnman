@@ -74,7 +74,9 @@ if __name__ == "__main__":
                                                Vp/1.e3, Vs1/1.e3, Vs2/1.e3))
     
     
-    # The next three lines initialise the AnisotropicMaterial
+    # Now let's look at the properties of an anisotropic material.
+    # Here we choose talc, as it is the mineral used as an example
+    # in Mainprice et al. (2011)
     talc_stiffness = [219.83e9,  59.66e9,  -4.82e9,  -0.82e9, -33.87e9, -1.04e9,
                       216.38e9, -3.67e9,   1.79e9, -16.51e9,  -0.62e9,
                       48.89e9,    4.12e9, -15.52e9,  -3.59e9,
@@ -83,10 +85,7 @@ if __name__ == "__main__":
                       78.29e9]
     rho = 2.75e3
     talc = anisotropy.AnisotropicMaterial(talc_stiffness, rho, 'triclinic')
-    
-    # Now we can calculate some isotropic properties of talc 
-    # Print the bounds on bulk and shear modulus and
-    # meaasures of elastic anisotropy and poisson ratio
+
     print('Talc elastic properties:\n')
     print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(talc.bulk_modulus_reuss,
                                                      talc.bulk_modulus_vrh,
@@ -98,7 +97,7 @@ if __name__ == "__main__":
           'Isotropic poisson ratio: {1:.3f}'.format(talc.universal_elastic_anisotropy,
                                                     talc.isotropic_poisson_ratio))
 
-    # Let's make a pretty plot illustrating the anisotropy in talc
+    # Finally, let's make a pretty plot illustrating the anisotropy in talc
     talc.plot_velocities()
 
 

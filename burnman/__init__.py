@@ -79,6 +79,7 @@ from . import minerals
 # central user tools
 from . import seismic
 from . import output_seismo
+from . import anisotropy
 from . import averaging_schemes
 from . import eos
 
