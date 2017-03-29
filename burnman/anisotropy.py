@@ -15,6 +15,7 @@ class AnisotropicMaterial(object):
     or a full stiffness tensor in Voigt notation).
 
     Independent Cijs should be in the following order:
+    'isotropic': C12, C44 (i.e. lambda and mu, the Lame parameters)
     'cubic': C11, C12, C44
     'hexagonal': C11, C12, C13, C33, C44
     'tetragonal I': C11, C12, C13, C33, C44, C66
@@ -43,8 +44,11 @@ class AnisotropicMaterial(object):
                            self.stiffness_tensor), 'stiffness_tensor must be symmetric'
         
         self.full_stiffness_tensor = self._voigt_notation_to_stiffness_tensor(self.stiffness_tensor)
+
         self.compliance_tensor = np.linalg.inv(self.stiffness_tensor)
-        self.full_compliance_tensor = self._voigt_notation_to_stiffness_tensor(self.compliance_tensor)
+        
+        block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
+        self.full_compliance_tensor = self._voigt_notation_to_stiffness_tensor(np.divide(self.compliance_tensor, block))
         self.rho = rho
 
     def _cijs_to_voigt(self, cijs, crystal_system):
@@ -55,7 +59,15 @@ class AnisotropicMaterial(object):
         is provided in the base class description.
         """
         
-        if crystal_system=='cubic':
+        if crystal_system=='isotropic':
+            assert len(cijs) == 2
+            cijs = list(cijs)
+            cijs.insert(0, cijs[0] + 2.*cijs[1]) # C11 = C12 + 2C44
+            index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
+                           [(0, 1), (0, 2), (1, 2)], # C12
+                           [(3, 3), (4, 4), (5, 5)]] # C44
+            
+        elif crystal_system=='cubic':
             assert len(cijs) == 3
             index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
                            [(0, 1), (0, 2), (1, 2)], # C12
@@ -153,9 +165,9 @@ class AnisotropicMaterial(object):
             
         else:
             raise Exception('Crystal system not recognised. Must be one of: '
-                            'cubic, hexagonal, tetragonal I, tetragonal II, '
-                            'rhombohedral I, rhombohedral II, orthorhombic, '
-                            'monoclinic or triclinic.')    
+                            'isotropic, cubic, hexagonal, tetragonal I, '
+                            'tetragonal II, rhombohedral I, rhombohedral II, '
+                            'orthorhombic, monoclinic or triclinic.')    
             
         
         C = np.zeros([6, 6])
@@ -185,12 +197,15 @@ class AnisotropicMaterial(object):
             j=m
         return i, j
 
+    def _normalize(self, vector):
+        v = np.array(vector)
+        return v/np.linalg.norm(v) 
+
     def _voigt_notation_to_stiffness_tensor(self, voigt_notation):
         """
         Converts a stiffness tensor in Voigt notation (6x6 matrix)
         to the full fourth rank tensor (3x3x3x3 matrix).
         """
-
         stiffness_tensor = np.zeros([3, 3, 3, 3])
         for m in xrange(6):
             i, j = self._voigt_index_to_ij(m)
@@ -271,7 +286,7 @@ class AnisotropicMaterial(object):
         (a description of the laterial response to loading)
         """
         return ( (3.*self.bulk_modulus_vrh - 2.*self.shear_modulus_vrh) /
-                 (6.*self.bulk_modulus_vrh - 2.*self.shear_modulus_vrh) )
+                 (6.*self.bulk_modulus_vrh + 2.*self.shear_modulus_vrh) )
 
     def christoffel_tensor(self, propagation_direction):
         """
@@ -281,6 +296,7 @@ class AnisotropicMaterial(object):
 
         T_ik = C_ijkl n_j n_l
         """
+        propagation_direction = self._normalize(propagation_direction)
         Tik = np.tensordot(np.tensordot(self.full_stiffness_tensor,
                                         propagation_direction,
                                         axes=([1],[0])),
@@ -293,10 +309,9 @@ class AnisotropicMaterial(object):
         Computes the linear compressibility in a given direction 
         relative to the stiffness tensor
         """
-    
+        direction = self._normalize(direction)
         Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
-        beta = np.dot(np.dot(Sijkk, direction),
-                      direction)
+        beta = Sijkk.dot(direction).dot(direction)
         return beta
     
     def youngs_modulus(self, direction):
@@ -304,43 +319,42 @@ class AnisotropicMaterial(object):
         Computes the Youngs modulus in a given direction 
         relative to the stiffness tensor
         """
+        direction = self._normalize(direction)
         Sijkl = self.full_compliance_tensor
-        S = np.tensordot(np.tensordot(np.tensordot(np.tensordot(Sijkl, direction, axes=([3], [0])),
-                                                   direction, axes=([2], [0])),
-                                      direction, axes=([1], [0])),
-                         direction, axes=([0], [0]))
+        S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
         return 1./S
-    
+
     def shear_modulus(self, plane_normal, shear_direction):
         """
         Computes the shear modulus on a plane in a given 
         shear direction relative to the stiffness tensor
         """
+        plane_normal = self._normalize(plane_normal)
+        shear_direction = self._normalize(shear_direction)
+        
+        assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(np.float).eps, 'plane_normal and shear_direction must be orthogonal'
         Sijkl = self.full_compliance_tensor
-        G = np.dot(np.dot(np.dot(np.dot(Sijkl, shear_direction),
-                                 plane_normal),
-                          shear_direction),
-                   plane_normal)
+        G = Sijkl.dot(shear_direction).dot(plane_normal).dot(shear_direction).dot(plane_normal)
         return 0.25/G
     
     def poissons_ratio(self,
-                       longitudinal_direction,
-                       transverse_direction):
+                       axial_direction,
+                       lateral_direction):
         """
         Computes the poisson ratio given loading and response 
         directions relative to the stiffness tensor
         """
-        Sijkl = self.full_compliance_tensor
         
-        num = np.dot(np.dot(np.dot(np.dot(Sijkl, longitudinal_direction),
-                                   longitudinal_direction),
-                            longitudinal_direction),
-                     longitudinal_direction)
-        denom = np.dot(np.dot(np.dot(np.dot(Sijkl, transverse_direction),
-                                 transverse_direction),
-                              transverse_direction),
-                       transverse_direction)
-        return num/denom
+        axial_direction = self._normalize(axial_direction)
+        lateral_direction = self._normalize(lateral_direction)
+        assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(np.float).eps, 'axial_direction and lateral_direction must be orthogonal'
+        
+        Sijkl = self.full_compliance_tensor
+        x = axial_direction
+        y = lateral_direction
+        nu = -(Sijkl.dot(y).dot(y).dot(x).dot(x) / 
+               Sijkl.dot(x).dot(x).dot(x).dot(x) )
+        return nu
     
     def wave_velocities(self, propagation_direction):
         """
@@ -350,16 +364,17 @@ class AnisotropicMaterial(object):
         Returns two lists, containing the wave speeds and 
         directions of particle motion relative to the stiffness tensor
         """
+        propagation_direction = self._normalize(propagation_direction)
+        
         Tik = self.christoffel_tensor(propagation_direction)
 
         eigenvalues, eigenvectors = np.linalg.eig(Tik)
 
         idx = eigenvalues.argsort()[::-1]   
-        eigenvalues = eigenvalues[idx]
+        eigenvalues = np.real(eigenvalues[idx])        
         eigenvectors = eigenvectors[:,idx]
-        
         velocities = np.sqrt(eigenvalues/self.rho)
-        
+
         return velocities, eigenvectors
 
     def plot_velocities(self):
@@ -375,7 +390,7 @@ class AnisotropicMaterial(object):
         plt.style.use('ggplot')
         plt.rcParams['axes.facecolor'] = 'white'
         plt.rcParams['axes.edgecolor'] = 'black'
-        plt.rcParams['figure.figsize'] = 8, 5 # inches
+        plt.rcParams['figure.figsize'] = 16, 10 # inches
         
         zeniths = np.linspace(np.pi/2., np.pi, 31)
         azimuths = np.linspace(0., 2.*np.pi, 91)
@@ -398,16 +413,34 @@ class AnisotropicMaterial(object):
                 vs2s[i][j] = velocities[0][2]
                 
         fig = plt.figure()
-        
-        names = ['Vp', 'anisotropy', 'Vp/Vs1', 'linear beta', 'Youngs Modulus']
-        items = [vps, (vs1s - vs2s)/(vs1s + vs2s), vps/vs1s, betas, Es]
+        names = ['Vp (km/s)', 'S-wave anisotropy (%)', 'Vp/Vs1', 'linear beta (GPa^-1)', 'Youngs Modulus (GPa)']
+        items = [vps/1000., 200.*(vs1s - vs2s)/(vs1s + vs2s), vps/vs1s, betas*1.e9, Es/1.e9]
         ax = []
         im = []
+        ndivs = 100
         for i, item in enumerate(items):
             ax.append(fig.add_subplot(2, 3, i+1, projection='polar'))
+            ax[i].set_yticks([100])
             ax[i].set_title(names[i])
-            im.append(ax[i].contourf(theta, r, item, 100, cmap=plt.cm.jet_r, vmin=np.min(item), vmax=np.max(item)))
-            fig.colorbar(im[i], ax=ax[i])
+
+            vmin = np.min(item)
+            vmax = np.max(item)
+            spacing = np.power(10., np.floor(np.log10(vmax - vmin)))
+            nt = int((vmax - vmin - vmax%spacing + vmin%spacing)/spacing)
+            if nt == 1:
+                spacing = spacing/4.
+            elif nt < 4:
+                spacing = spacing/2.
+            elif nt > 8:
+                spacing = spacing*2.
+                
+            tmin = vmin + (spacing - vmin%spacing)
+            tmax = vmax - vmax%spacing
+            nt = int((tmax - tmin)/spacing + 1)
+            
+            ticks = np.linspace(tmin, tmax, nt)
+            im.append(ax[i].contourf(theta, r, item, ndivs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax))
+            fig.colorbar(im[i], ax=ax[i], ticks=ticks)
             
         plt.tight_layout()
         plt.show()
