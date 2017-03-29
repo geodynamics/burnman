@@ -1,182 +1,413 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
+
+from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 
-def _voigt_index_to_ij(m):
+class AnisotropicMaterial(object):
     """
-    Returns the ij (or kl) indices of the 
-    stiffness tensor which correspond to those 
-    of the Voigt notation m (or n).
+    Base class for anisotropic materials
+
+    Initialise this function with a density and a set of Cijs 
+    (either a list of the independent Cijs, 
+    or a full stiffness tensor in Voigt notation).
+
+    Independent Cijs should be in the following order:
+    'cubic': C11, C12, C44
+    'hexagonal': C11, C12, C13, C33, C44
+    'tetragonal I': C11, C12, C13, C33, C44, C66
+    'tetragonal II': C11, C12, C13, C16, C33, C44, C66
+    'rhombohedral I': C11, C12, C13, C14, C33, C44, C66
+    'rhombohedral II': C11, C12, C13, C14, C15, C33, C44, C66
+    'orthorhombic': C11, C12, C13, C22, C23, C33, C44, C55, C66
+    'monoclinic': C11, C12, C13, C15, C22, C23, 
+                  C25, C33, C35, C44, C46, C55, C66
+    'triclinic': Cij, where 1<=i<=6 and i<=j<=6 
+    ''
+    
+    See :cite:`Mainprice2011` Geological Society of London Special Publication 
+    and https://materialsproject.org/wiki/index.php/Elasticity_calculations
+    for mathematical descriptions of each function.
     """
-    if m == 3:
-        i=1
-        j=2
-    elif m == 4:
-        i=0
-        j=2
-    elif m == 5:
-        i=0
-        j=1
-    else:
-        i=m
-        j=m
-    return i, j
+        
+    def __init__(self, cijs, rho, crystal_system=None):
+        if crystal_system is not None:
+            self.stiffness_tensor = self._cijs_to_voigt(cijs, crystal_system)
+        else:
+            self.stiffness_tensor = np.array(cijs)
+        
+        assert self.stiffness_tensor.shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
+        assert np.allclose(self.stiffness_tensor.T,
+                           self.stiffness_tensor), 'stiffness_tensor must be symmetric'
+        
+        self.full_stiffness_tensor = self._voigt_notation_to_stiffness_tensor(self.stiffness_tensor)
+        self.compliance_tensor = np.linalg.inv(self.stiffness_tensor)
+        self.full_compliance_tensor = self._voigt_notation_to_stiffness_tensor(self.compliance_tensor)
+        self.rho = rho
+
+    def _cijs_to_voigt(self, cijs, crystal_system):
+        """
+        Converts individual elastic tensors (cijs) to
+        the stiffness tensor in Voigt notation (6x6)
+        based on the crystal system. A list of crystal systems 
+        is provided in the base class description.
+        """
+        
+        if crystal_system=='cubic':
+            assert len(cijs) == 3
+            index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
+                           [(0, 1), (0, 2), (1, 2)], # C12
+                           [(3, 3), (4, 4), (5, 5)]] # C44
             
-def voigt_notation_to_stiffness_tensor(voigt_notation):
-    """
-    Converts a stiffness tensor in Voigt notation 
-    to the full fourth rank tensor.
-
-    Parameters
-    ----------
-    voigt_notation : numpy array
-        6 x 6 array
-
-    Returns
-    -------
-    stiffness_tensor : numpy array
-        3 x 3 x 3 x 3 array
-    """
-
-    stiffness_tensor = np.zeros([3, 3, 3, 3])
-    for m in xrange(6):
-        i, j = _voigt_index_to_ij(m)
-        for n in xrange(6):
-            k, l = _voigt_index_to_ij(n)
-            stiffness_tensor[i][j][k][l] = voigt_notation[m][n]
-            stiffness_tensor[j][i][k][l] = voigt_notation[m][n]
-            stiffness_tensor[i][j][l][k] = voigt_notation[m][n]
-            stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
-    return stiffness_tensor
-    
+        elif crystal_system=='hexagonal' or crystal_system=='tetragonal I':
+            if len(cijs) == 5: #for hexagonal, C66 = (C11-C12)/2.
+                cijs = list(cijs)
+                cijs.append((cijs[0] - cijs[1])/2.)
+            # tetragonal_i corresponds to Laue class 4/mmm
+            assert len(cijs) == 6
+            index_lists = [[(0, 0), (1, 1)], #C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
             
-def christoffel_tensor(stiffness_tensor, propagation_direction):
-    """
-    Computes the Christoffel tensor from an elastic stiffness
-    tensor and a propagation direction for a seismic wave.
+        elif crystal_system=='tetragonal II':
+            # tetragonal_ii corresponds to Laue class 4/m
+            assert len(cijs) == 7
+            cijs = list(cijs)
+            cijs.insert(4, cij[3]) # C26 = -C16
+            index_lists = [[(0, 0), (1, 1)], #C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 5)], # C16
+                           [(1, 5)], # C26
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+            
+        elif crystal_system=='rhombohedral I':
+            # rhombohedral_i corresponds to Laue class \bar{3}m
+            assert len(cijs) == 7
+            cijs = list(cijs)
+            cijs.insert(4, cij[3]) # C24 = -C14
+            index_lists = [[(0, 0), (1, 1)], #C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 3), (4, 5)], # C14
+                           [(1, 3)], # C24
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+            
+        elif crystal_system=='rhombohedral II':
+            # rhombohedral_ii corresponds to Laue class \bar{3}
+            assert len(cijs) == 8
+            cijs = list(cijs)
+            cijs.insert(4, cij[3]) # C24 = -C14
+            cijs.insert(6, cij[5]) # C25 = -C15
+            index_lists = [[(0, 0), (1, 1)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 3), (4, 5)], # C14
+                           [(1, 3)], # C24
+                           [(0, 4)], # C15
+                           [(1, 4), (3, 5)], # C25
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+            
+        elif crystal_system=='orthorhombic':
+            assert len(cijs) == 9
+            index_lists = [[(0, 0)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2)], # C13
+                           [(1, 1)], # C22
+                           [(1, 2)], # C23
+                           [(2, 2)], # C33
+                           [(3, 3)], # C44
+                           [(4, 4)], # C55
+                           [(5, 5)]] # C66
+            
+        elif crystal_system=='monoclinic':
+            assert len(cijs) == 13
+            index_lists = [[(0, 0)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2)], # C13
+                           [(0, 4)], # C15
+                           [(1, 1)], # C22
+                           [(1, 2)], # C23
+                           [(1, 4)], # C25
+                           [(2, 2)], # C33
+                           [(2, 4)], # C35
+                           [(3, 3)], # C44
+                           [(3, 5)], # C46
+                           [(4, 4)], # C55
+                           [(5, 5)]] # C66
+            
+        elif crystal_system=='triclinic':
+            assert len(cijs) == 21
+            index_lists=[[(i, j)] for i in range(6) for j in range(i, 6)]
+            
+        else:
+            raise Exception('Crystal system not recognised. Must be one of: '
+                            'cubic, hexagonal, tetragonal I, tetragonal II, '
+                            'rhombohedral I, rhombohedral II, orthorhombic, '
+                            'monoclinic or triclinic.')    
+            
+        
+        C = np.zeros([6, 6])
+        for i, index_list in enumerate(index_lists):
+            for indices in index_list:
+                C[indices] = cijs[i]
+                C[indices[::-1]] = cijs[i]
+        return C
+        
+    def _voigt_index_to_ij(self, m):
+        """
+        Returns the ij (or kl) indices of the 
+        stiffness tensor which correspond to those 
+        of the Voigt notation m (or n).
+        """
+        if m == 3:
+            i=1
+            j=2
+        elif m == 4:
+            i=0
+            j=2
+        elif m == 5:
+            i=0
+            j=1
+        else:
+            i=m
+            j=m
+        return i, j
 
-    # T_ik = C_ijkl n_j n_l
+    def _voigt_notation_to_stiffness_tensor(self, voigt_notation):
+        """
+        Converts a stiffness tensor in Voigt notation (6x6 matrix)
+        to the full fourth rank tensor (3x3x3x3 matrix).
+        """
 
-    Parameters
-    ----------
-    stiffness_tensor : numpy array
-        3 x 3 x 3 x 3 array
-
-    Returns
-    -------
-    Tik : numpy array
-        3 x 3 array
-    """
+        stiffness_tensor = np.zeros([3, 3, 3, 3])
+        for m in xrange(6):
+            i, j = self._voigt_index_to_ij(m)
+            for n in xrange(6):
+                k, l = self._voigt_index_to_ij(n)
+                stiffness_tensor[i][j][k][l] = voigt_notation[m][n]
+                stiffness_tensor[j][i][k][l] = voigt_notation[m][n]
+                stiffness_tensor[i][j][l][k] = voigt_notation[m][n]
+                stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
+        return stiffness_tensor
     
-    Tik = np.tensordot(np.tensordot(stiffness_tensor,
-                                    propagation_direction,
-                                    axes=([1],[0])),
-                       propagation_direction,
-                       axes=([2],[0]))
-    return Tik
-
-def compliance_tensor(tensor):
-    """
-    Computes the inverse of a tensor.
-    """
-    return np.linalg.inv(tensor)
-
-
-def volume_compressibility(stiffness_tensor):
-    """
-    Computes the volume compressibility
-    from a stiffness tensor
-
-    Parameters
-    ----------
-    stiffness_tensor : numpy array
-        3 x 3 x 3 x 3 array
-
-    Returns
-    -------
-    beta : float
-        volume compressibility
-    """
-    Sijkl = compliance_tensor(stiffness_tensor)
-    Sijkl = voigt_notation_to_stiffness_tensor(Sijkl)
-    beta = 0.
-    for i in range(3):
-        for k in range(3):
-            beta += Sijkl[i][i][k][k]
-    return beta
-
-def linear_compressibility(stiffness_tensor, direction):
-    """
-    Computes the linear compressibility
-    from a stiffness tensor
-
-    Parameters
-    ----------
-    stiffness_tensor : numpy array
-        3 x 3 x 3 x 3 array
-    direction : numpy array
-        1D array
-
-    Returns
-    -------
-    beta : float
-        linear compressibility
-    """
-    Sijkl = compliance_tensor(stiffness_tensor)
-    Sijkl = voigt_notation_to_stiffness_tensor(Sijkl)
+    @property
+    def bulk_modulus_voigt(self):
+        """
+        Computes the bulk modulus (Voigt bound)
+        """
+        K = np.sum([[self.stiffness_tensor[i][k] for k in range(3)] for i in range(3)])/9.
+        return K
     
-    Sijkk = np.einsum('ijkk', Sijkl)
+    @property
+    def bulk_modulus_reuss(self):
+        """
+        Computes the bulk modulus (Reuss bound)
+        """
+        beta = np.sum([[self.compliance_tensor[i][k] for k in range(3)] for i in range(3)])
+        return 1./beta
 
-    beta = np.dot(np.dot(Sijkk, direction),
-                        direction)
-    return beta
-
-def youngs_modulus(stiffness_tensor, direction):
-    Sijkl = compliance_tensor(stiffness_tensor)
-    Sijkl = voigt_notation_to_stiffness_tensor(Sijkl)
-    S = np.tensordot(np.tensordot(np.tensordot(np.tensordot(Sijkl, direction, axes=([3], [0])),
-                             direction, axes=([2], [0])),
-                      direction, axes=([1], [0])),
-                     direction, axes=([0], [0]))
-    return 1./S
-
-def shear_modulus(stiffness_tensor,
-                  plane_normal, shear_direction):
-    Sijkl = compliance_tensor(stiffness_tensor)
-    Sijkl = voigt_notation_to_stiffness_tensor(Sijkl)
-    G = np.dot(np.dot(np.dot(np.dot(Sijkl, shear_direction),
-                             plane_normal),
-                      shear_direction),
-               plane_normal)
-    return 0.25/G
-
-
-def poissons_ratio(stiffness_tensor,
-                   longitudinal_direction,
-                   transverse_direction):
-    Sijkl = compliance_tensor(stiffness_tensor)
-    Sijkl = voigt_notation_to_stiffness_tensor(Sijkl)
+    @property
+    def bulk_modulus_vrh(self):
+        """
+        Computes the bulk modulus (Voigt-Reuss-Hill average)
+        """
+        return 0.5*(self.bulk_modulus_voigt + self.bulk_modulus_reuss)
     
-    num = np.dot(np.dot(np.dot(np.dot(Sijkl, longitudinal_direction),
-                               longitudinal_direction),
-                        longitudinal_direction),
-                 longitudinal_direction)
-    denom = np.dot(np.dot(np.dot(np.dot(Sijkl, transverse_direction),
+    @property
+    def shear_modulus_voigt(self):
+        """
+        Computes the shear modulus (Voigt bound)
+        """
+        G = ( np.sum([self.stiffness_tensor[i][i] for i in [0, 1, 2]]) +
+              np.sum([self.stiffness_tensor[i][i] for i in [3, 4, 5]])*3. -
+              ( self.stiffness_tensor[0][1] +
+                self.stiffness_tensor[1][2] +
+                self.stiffness_tensor[2][0] )) / 15.
+        return G
+    
+    @property
+    def shear_modulus_reuss(self):
+        """
+        Computes the shear modulus (Reuss bound)
+        """
+        beta =  ( np.sum([self.compliance_tensor[i][i] for i in [0, 1, 2]])*4. +
+                  np.sum([self.compliance_tensor[i][i] for i in [3, 4, 5]])*3. -
+                  ( self.compliance_tensor[0][1] +
+                    self.compliance_tensor[1][2] + 
+                    self.compliance_tensor[2][0])*4. ) / 15.
+        return 1./beta
+    
+    @property
+    def shear_modulus_vrh(self):
+        """
+        Computes the shear modulus (Voigt-Reuss-Hill average)
+        """
+        return 0.5*(self.shear_modulus_voigt + self.shear_modulus_reuss)
+
+    @property
+    def universal_elastic_anisotropy(self):
+        """
+        Compute the universal elastic anisotropy
+        """
+        return ( 5.*(self.shear_modulus_voigt/self.shear_modulus_reuss) +
+                 (self.bulk_modulus_voigt/self.bulk_modulus_reuss) - 6. )
+
+    @property
+    def isotropic_poisson_ratio(self):
+        """
+        Compute mu, the isotropic Poisson ratio
+        (a description of the laterial response to loading)
+        """
+        return ( (3.*self.bulk_modulus_vrh - 2.*self.shear_modulus_vrh) /
+                 (6.*self.bulk_modulus_vrh - 2.*self.shear_modulus_vrh) )
+
+    def christoffel_tensor(self, propagation_direction):
+        """
+        Computes the Christoffel tensor from an elastic stiffness
+        tensor and a propagation direction for a seismic wave
+        relative to the stiffness tensor
+
+        T_ik = C_ijkl n_j n_l
+        """
+        Tik = np.tensordot(np.tensordot(self.full_stiffness_tensor,
+                                        propagation_direction,
+                                        axes=([1],[0])),
+                           propagation_direction,
+                           axes=([2],[0]))
+        return Tik
+
+    def linear_compressibility(self, direction):
+        """
+        Computes the linear compressibility in a given direction 
+        relative to the stiffness tensor
+        """
+    
+        Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
+        beta = np.dot(np.dot(Sijkk, direction),
+                      direction)
+        return beta
+    
+    def youngs_modulus(self, direction):
+        """
+        Computes the Youngs modulus in a given direction 
+        relative to the stiffness tensor
+        """
+        Sijkl = self.full_compliance_tensor
+        S = np.tensordot(np.tensordot(np.tensordot(np.tensordot(Sijkl, direction, axes=([3], [0])),
+                                                   direction, axes=([2], [0])),
+                                      direction, axes=([1], [0])),
+                         direction, axes=([0], [0]))
+        return 1./S
+    
+    def shear_modulus(self, plane_normal, shear_direction):
+        """
+        Computes the shear modulus on a plane in a given 
+        shear direction relative to the stiffness tensor
+        """
+        Sijkl = self.full_compliance_tensor
+        G = np.dot(np.dot(np.dot(np.dot(Sijkl, shear_direction),
+                                 plane_normal),
+                          shear_direction),
+                   plane_normal)
+        return 0.25/G
+    
+    def poissons_ratio(self,
+                       longitudinal_direction,
+                       transverse_direction):
+        """
+        Computes the poisson ratio given loading and response 
+        directions relative to the stiffness tensor
+        """
+        Sijkl = self.full_compliance_tensor
+        
+        num = np.dot(np.dot(np.dot(np.dot(Sijkl, longitudinal_direction),
+                                   longitudinal_direction),
+                            longitudinal_direction),
+                     longitudinal_direction)
+        denom = np.dot(np.dot(np.dot(np.dot(Sijkl, transverse_direction),
                                  transverse_direction),
-                          transverse_direction),
-                   transverse_direction)
-    return num/denom
-
-def wave_velocities(stiffness_tensor, propagation_direction, density):
-    stiffness_tensor = voigt_notation_to_stiffness_tensor(stiffness_tensor)
-    Tik = christoffel_tensor(stiffness_tensor, propagation_direction)
-
-    eigenvalues, eigenvectors = np.linalg.eig(Tik)
-
-    idx = eigenvalues.argsort()[::-1]   
-    eigenvalues = eigenvalues[idx]
-    eigenvectors = eigenvectors[:,idx]
+                              transverse_direction),
+                       transverse_direction)
+        return num/denom
     
-    velocities = np.sqrt(eigenvalues/density)
+    def wave_velocities(self, propagation_direction):
+        """
+        Computes the compressional wave velocity, and two 
+        shear wave velocities in a given propagation direction
 
-    return velocities, eigenvectors
+        Returns two lists, containing the wave speeds and 
+        directions of particle motion relative to the stiffness tensor
+        """
+        Tik = self.christoffel_tensor(propagation_direction)
 
+        eigenvalues, eigenvectors = np.linalg.eig(Tik)
+
+        idx = eigenvalues.argsort()[::-1]   
+        eigenvalues = eigenvalues[idx]
+        eigenvectors = eigenvectors[:,idx]
+        
+        velocities = np.sqrt(eigenvalues/self.rho)
+        
+        return velocities, eigenvectors
+
+    def plot_velocities(self):
+        """
+        Makes colour plots of:
+        Compressional wave velocity: Vp
+        Anisotropy: (Vs1 - Vs2)/(Vs1 + Vs2)
+        Vp/Vs1
+        linear compressibility: beta
+        Youngs Modulus: E
+        """
+        
+        plt.style.use('ggplot')
+        plt.rcParams['axes.facecolor'] = 'white'
+        plt.rcParams['axes.edgecolor'] = 'black'
+        plt.rcParams['figure.figsize'] = 8, 5 # inches
+        
+        zeniths = np.linspace(np.pi/2., np.pi, 31)
+        azimuths = np.linspace(0., 2.*np.pi, 91)
+        Rs = np.sin(zeniths)/(1. - np.cos(zeniths))
+        r, theta = np.meshgrid(Rs, azimuths)
+        
+        vps = np.empty_like(r)
+        vs1s = np.empty_like(r)
+        vs2s = np.empty_like(r)
+        betas = np.empty_like(r)
+        Es = np.empty_like(r)
+        for i, az in enumerate(azimuths):
+            for j, phi in enumerate(zeniths):
+                d = np.array([np.cos(az)*np.sin(phi), np.sin(az)*np.sin(phi), -np.cos(phi)]) # change_hemispheres
+                velocities = self.wave_velocities(d)
+                betas[i][j] = self.linear_compressibility(d)
+                Es[i][j] = self.youngs_modulus(d)
+                vps[i][j] = velocities[0][0]
+                vs1s[i][j] = velocities[0][1]
+                vs2s[i][j] = velocities[0][2]
+                
+        fig = plt.figure()
+        
+        names = ['Vp', 'anisotropy', 'Vp/Vs1', 'linear beta', 'Youngs Modulus']
+        items = [vps, (vs1s - vs2s)/(vs1s + vs2s), vps/vs1s, betas, Es]
+        ax = []
+        im = []
+        for i, item in enumerate(items):
+            ax.append(fig.add_subplot(2, 3, i+1, projection='polar'))
+            ax[i].set_title(names[i])
+            im.append(ax[i].contourf(theta, r, item, 100, cmap=plt.cm.jet_r, vmin=np.min(item), vmax=np.max(item)))
+            fig.colorbar(im[i], ax=ax[i])
+            
+        plt.tight_layout()
+        plt.show()

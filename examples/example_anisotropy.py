@@ -11,19 +11,12 @@ This example illustrates the basic functions required to convert
 an elastic stiffness tensor into elastic properties including:
 
 See :cite:`Mainprice2011` Geological Society of London Special Publication 
-for a mathematical description of each function.
+and https://materialsproject.org/wiki/index.php/Elasticity_calculations
+for mathematical descriptions of each function.
 
 *Specifically uses:*
 
-* :class:`burnman.anisotropy.voigt_notation_to_stiffness_tensor`
-* :class:`christoffel_tensor`
-* :class:`compliance_tensor`
-* :class:`volume_compressibility`
-* :class:`linear_compressibility`
-* :class:`youngs_modulus`
-* :class:`shear_modulus`
-* :class:`poissons_ratio`
-* :class:`wave_velocities`
+* :class:`burnman.AnisotropicMaterial`
 
 *Demonstrates:*
 
@@ -45,64 +38,34 @@ import burnman
 from burnman import anisotropy 
 
 if __name__ == "__main__":
-    
-    talc_stiffness = [[219.83,   59.66,   -4.82,  -0.82,  -33.87, -1.04],
-                      [59.66,  216.38,   -3.67,   1.79,  -16.51,  -0.62],
-                      [-4.82,   -3.67,   48.89,   4.12,  -15.52,  -3.59],
-                      [-0.82,    1.79,    4.12,  26.54,    -3.6,  -6.41],
-                      [-33.87,  -16.51,  -15.52,   -3.6,   22.85, -1.67],
-                      [-1.04,   -0.62,   -3.59,  -6.41,   -1.67,  78.29]]
-    '''
-    K = 2.
-    mu = 1.
-    a = K + 4./3.*mu
-    b = K - 2./3.*mu
-    talc_stiffness = np.array([[a, b, b, 0., 0., 0.],
-                               [b, a, b, 0., 0., 0.],
-                               [b, b, a, 0., 0., 0.],
-                               [0.,     0.,  0., mu, 0., 0.],
-                               [0.,     0.,  0., 0., mu, 0.],
-                               [0.,     0.,  0., 0., 0., mu]])
-    '''
-    #talc_stiffness = anisotropy.voigt_notation_to_stiffness_tensor(talc_stiffness)
-    
-    talc_compliance = anisotropy.compliance_tensor(talc_stiffness)
-    beta = anisotropy.volume_compressibility(talc_stiffness)
-    density = 3.
+    # The next three lines initialise the AnisotropicMaterial
+    talc_stiffness = [219.83e9, 59.66e9,  -4.82e9,  -0.82e9, -33.87e9, -1.04e9,
+                      216.38e9, -3.67e9,   1.79e9, -16.51e9,  -0.62e9,
+                      48.89e9,   4.12e9, -15.52e9,  -3.59e9,
+                      26.54e9,   -3.6e9,  -6.41e9,
+                      22.85e9,  -1.67e9,
+                      78.29e9]
+    rho = 2.75e3
+    talc = anisotropy.AnisotropicMaterial(talc_stiffness, rho, 'triclinic')
 
-    zeniths = np.linspace(np.pi/2., np.pi, 31)
-    azimuths = np.linspace(0., 2.*np.pi, 91)
-    Rs = np.sin(zeniths)/(1. - np.cos(zeniths))
-    r, theta = np.meshgrid(Rs, azimuths)
-    
-    vps = np.empty_like(r)
-    vs1s = np.empty_like(r)
-    vs2s = np.empty_like(r)
-    betas = np.empty_like(r)
-    Es = np.empty_like(r)
-    for i, az in enumerate(azimuths):
-        for j, phi in enumerate(zeniths):
-            d = np.array([np.cos(az)*np.sin(phi), np.sin(az)*np.sin(phi), -np.cos(phi)]) # change_hemispheres
-            velocities = anisotropy.wave_velocities(talc_stiffness, d, density)
-            betas[i][j] = anisotropy.linear_compressibility(talc_stiffness, d)
-            Es[i][j] = anisotropy.youngs_modulus(talc_stiffness, d)
-            vps[i][j] = velocities[0][0]
-            vs1s[i][j] = velocities[0][1]
-            vs2s[i][j] = velocities[0][2]
-            
-            
-            
-    fig = plt.figure()
+    # Now we can calculate some isotropic properties of talc 
+    # Print the bounds on bulk and shear modulus and
+    # meaasures of elastic anisotropy and poisson ratio
+    print('{0:.3e} {1:.3e} {2:.3e}'.format(talc.bulk_modulus_reuss,
+                                           talc.bulk_modulus_vrh,
+                                           talc.bulk_modulus_voigt))
+    print('{0:.3e} {1:.3e} {2:.3e}'.format(talc.shear_modulus_reuss,
+                                           talc.shear_modulus_vrh,
+                                           talc.shear_modulus_voigt))
+    print('{0:.3e} {1:.3e}'.format(talc.universal_elastic_anisotropy,
+                                   talc.isotropic_poisson_ratio))
 
-    names = ['Vp', 'anisotropy', 'Vp/Vs1', 'linear beta', 'Youngs Modulus']
-    items = [vps, (vs1s - vs2s)/(vs1s + vs2s), vps/vs1s, betas, Es]
-    ax = []
-    im = []
-    for i, item in enumerate(items):
-        ax.append(fig.add_subplot(2, 3, i+1, projection='polar'))
-        ax[i].set_title(names[i])
-        im.append(ax[i].contourf(theta, r, item, 100, cmap=plt.cm.jet_r, vmin=np.min(item), vmax=np.max(item)))
-        fig.colorbar(im[i], ax=ax[i])
+    # Let's make a pretty plot illustrating the anisotropy in talc
+    talc.plot_velocities()
 
-
-    plt.show()
+    # This plot uses the following functions:
+    # talc.linear_compressibility(direction)
+    # talc.youngs_modulus(direction)
+    # talc.shear_modulus(plane_normal, shear_direction)
+    # talc.poissons_ratio(longitudinal_direction, transverse_direction)
+    # talc.wave_velocities(propagation_direction)
