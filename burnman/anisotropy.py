@@ -9,8 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .tools import normalize
+from .material import Material, material_property
 
-class AnisotropicMaterial(object):
+class AnisotropicMaterial(Material):
     """
     A class that represents an anisotropic elastic material. This class 
     is initialised with a set of elastic constants and a density. It can
@@ -43,23 +44,19 @@ class AnisotropicMaterial(object):
     """
         
     def __init__(self, cijs, rho, crystal_system=None):
+        self.params = {'rho_0': rho}
         if crystal_system is not None:
-            self.stiffness_tensor = self._cijs_to_voigt(cijs, crystal_system)
+            self.params['stiffness_tensor_0'] = self._cijs_to_voigt(cijs, crystal_system)
         else:
-            self.stiffness_tensor = np.array(cijs)
+            self.params['stiffness_tensor_0'] = np.array(cijs)
         
-        assert self.stiffness_tensor.shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
-        assert np.allclose(self.stiffness_tensor.T,
-                           self.stiffness_tensor), 'stiffness_tensor must be symmetric'
-        
-        self.full_stiffness_tensor = self._voigt_notation_to_stiffness_tensor(self.stiffness_tensor)
+        assert self.params['stiffness_tensor_0'].shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
+        assert np.allclose(self.params['stiffness_tensor_0'].T,
+                           self.params['stiffness_tensor_0']), 'stiffness_tensor must be symmetric'
 
-        self.compliance_tensor = np.linalg.inv(self.stiffness_tensor)
+        Material.__init__(self)
         
-        block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
-        self.full_compliance_tensor = self._voigt_notation_to_stiffness_tensor(np.divide(self.compliance_tensor, block))
-        self.rho = rho
-
+        
     def _cijs_to_voigt(self, cijs, crystal_system):
         """
         Converts individual elastic tensors (cijs) to
@@ -216,8 +213,30 @@ class AnisotropicMaterial(object):
                 stiffness_tensor[i][j][l][k] = voigt_notation[m][n]
                 stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
         return stiffness_tensor
-    
-    @property
+
+
+    @material_property
+    def stiffness_tensor(self):
+        return self.params['stiffness_tensor_0']
+
+    @material_property
+    def full_stiffness_tensor(self):
+        return self._voigt_notation_to_stiffness_tensor(self.stiffness_tensor)
+
+    @material_property
+    def compliance_tensor(self):
+        return np.linalg.inv(self.stiffness_tensor)
+
+    @material_property
+    def full_compliance_tensor(self):
+        block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
+        return self._voigt_notation_to_stiffness_tensor(np.divide(self.compliance_tensor, block))
+
+    @material_property
+    def density(self):
+        return self.params['rho_0']
+        
+    @material_property
     def bulk_modulus_voigt(self):
         """
         Computes the bulk modulus (Voigt bound)
@@ -225,7 +244,7 @@ class AnisotropicMaterial(object):
         K = np.sum([[self.stiffness_tensor[i][k] for k in range(3)] for i in range(3)])/9.
         return K
     
-    @property
+    @material_property
     def bulk_modulus_reuss(self):
         """
         Computes the bulk modulus (Reuss bound)
@@ -233,14 +252,14 @@ class AnisotropicMaterial(object):
         beta = np.sum([[self.compliance_tensor[i][k] for k in range(3)] for i in range(3)])
         return 1./beta
 
-    @property
+    @material_property
     def bulk_modulus_vrh(self):
         """
         Computes the bulk modulus (Voigt-Reuss-Hill average)
         """
         return 0.5*(self.bulk_modulus_voigt + self.bulk_modulus_reuss)
     
-    @property
+    @material_property
     def shear_modulus_voigt(self):
         """
         Computes the shear modulus (Voigt bound)
@@ -252,7 +271,7 @@ class AnisotropicMaterial(object):
                 self.stiffness_tensor[2][0] )) / 15.
         return G
     
-    @property
+    @material_property
     def shear_modulus_reuss(self):
         """
         Computes the shear modulus (Reuss bound)
@@ -264,14 +283,14 @@ class AnisotropicMaterial(object):
                     self.compliance_tensor[2][0])*4. ) / 15.
         return 1./beta
     
-    @property
+    @material_property
     def shear_modulus_vrh(self):
         """
         Computes the shear modulus (Voigt-Reuss-Hill average)
         """
         return 0.5*(self.shear_modulus_voigt + self.shear_modulus_reuss)
 
-    @property
+    @material_property
     def universal_elastic_anisotropy(self):
         """
         Compute the universal elastic anisotropy
@@ -279,7 +298,7 @@ class AnisotropicMaterial(object):
         return ( 5.*(self.shear_modulus_voigt/self.shear_modulus_reuss) +
                  (self.bulk_modulus_voigt/self.bulk_modulus_reuss) - 6. )
 
-    @property
+    @material_property
     def isotropic_poisson_ratio(self):
         """
         Compute mu, the isotropic Poisson ratio
@@ -416,7 +435,7 @@ class AnisotropicMaterial(object):
                 vs2s[i][j] = velocities[0][2]
                 
         fig = plt.figure()
-        names = ['Vp (km/s)', 'Vs1 (km/s)', 'Vp/Vs1', 'S-wave anisotropy (%)', 'linear beta (GPa^-1)', 'Youngs Modulus (GPa)']
+        names = ['Vp (km/s)', 'Vs1 (km/s)', 'Vp/Vs1', 'S-wave anisotropy (%)', 'Linear compressibility (GPa$^{-1}$)', 'Youngs Modulus (GPa)']
         items = [vps/1000., vs1s/1000., vps/vs1s, 200.*(vs1s - vs2s)/(vs1s + vs2s), betas*1.e9, Es/1.e9]
         ax = []
         im = []
