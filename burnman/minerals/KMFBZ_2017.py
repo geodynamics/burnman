@@ -25,39 +25,36 @@ SOLID SOLUTIONS
 
 
 class bridgmanite(SolidSolution):
-
     def __init__(self, molar_fractions=None):
         self.name = 'bridgmanite/perovskite'
-        self.endmembers = [[mg_perovskite(), '[Mg][Si]O3'],
-            [fe_perovskite(), '[Fe][Si]O3'],
-            [al_al_perovskite(), '[Al][Al]SiO3'],
-            [fe_al_o3(), '[Fe][Al]SiO3'],]
         self.solution_type = 'ideal'
-        SolidSolution.__init__(self, molar_fractions)
+        self.endmembers = [[mg_si_perovskite(), '[Mg][Si]O3'],
+                           [fe_si_perovskite(), '[Fe][Si]O3'],
+                           [al_al_perovskite(), '[Al][Al]O3'],
+                           [fe_al_perovskite(), '[Fe][Al]O3']]
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 class ferropericlase(SolidSolution):
-
     def __init__(self, molar_fractions=None):
         self.name = 'magnesiowustite/ferropericlase'
         self.solution_type = 'symmetric'
-        self.endmembers = [[periclase(), '[Mg]O'], [wuestite(), '[Fe]O']]
+        self.endmembers = [[periclase(), '[Mg]O'],
+                           [wuestite(), '[Fe]O']]
         self.energy_interaction = [[13.e3]]
 
-        SolidSolution.__init__(self, molar_fractions)
+        SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 """
 ENDMEMBERS
 """
 
-
-
-class mg_perovskite (Mineral):
+class mg_si_perovskite (Mineral):
     
     def __init__(self):
         formula = 'MgSiO3'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'Mg_Perovskite',
+            'name': 'MgSiO3 perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
             'F_0': -1368000.0,
@@ -75,13 +72,13 @@ class mg_perovskite (Mineral):
 
         Mineral.__init__(self)
 
-class fe_perovskite (Mineral):
+class fe_si_perovskite (Mineral):
 
     def __init__(self):
         formula = 'FeSiO3'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'Fe_Perovskite',
+            'name': 'FeSiO3 perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
             'F_0': -1043000.0,
@@ -100,13 +97,13 @@ class fe_perovskite (Mineral):
         Mineral.__init__(self)
 
 
-class fe_al_o3 (Mineral):
+class fe_al_perovskite (Mineral):
     
     def __init__(self):
         formula = 'FeAlO3'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'FeAlO3',
+            'name': 'FeAlO3 perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
             'V_0': 2.69e-05,
@@ -127,10 +124,10 @@ class fe_al_o3 (Mineral):
 class al_al_perovskite(Mineral):
     
     def __init__(self):
-        formula = 'AlAlO3'
+        formula = 'Al2O3'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'AlAl_perovskite',
+            'name': 'Al2O3 perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
             'F_0': -1533878.0,
@@ -206,7 +203,7 @@ class ca_perovskite (Mineral):
         formula = 'CaSiO3'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'Ca_Perovskite',
+            'name': 'CaSiO3 perovskite',
             'formula': formula,
             'equation_of_state': 'slb3',
             'F_0': -1463358.0,
@@ -227,13 +224,13 @@ class ca_perovskite (Mineral):
 
 
 
-class fe (Mineral):
+class hcp_iron (Mineral):
     
     def __init__(self):
         formula = 'Fe'
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'Fe',
+            'name': 'Hexagonal close packed iron',
             'formula': formula,
             'equation_of_state': 'slb3',
             'F_0': -1463358.0,
