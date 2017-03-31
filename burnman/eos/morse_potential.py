@@ -13,8 +13,9 @@ import numpy as np
 def bulk_modulus(volume, params):
     """
     Compute the bulk modulus as per the Morse potential
-    equation of state.  Returns bulk modulus in the same 
-    units as the reference bulk modulus.  
+    equation of state.  
+    Returns bulk modulus in the same units as 
+    the reference bulk modulus.  
     Pressure must be in :math:`[Pa]`.
     """
 
@@ -28,7 +29,9 @@ def bulk_modulus(volume, params):
     return K
 
 def shear_modulus(volume, params):
-    print('Not implemented yet!!!')
+    """
+    Shear modulus not currently implemented for this equation of state
+    """
     return 0.
 
 def morse_potential(VoverV0, params):
@@ -61,7 +64,8 @@ def volume(pressure, params):
 class Morse(eos.EquationOfState):
 
     """
-    Class for the isothermal Morse Potential equation of state.  
+    Class for the isothermal Morse Potential equation of state 
+    detailed in :cite:`Stacey1981`.  
     This equation of state has no temperature dependence. 
     """
 

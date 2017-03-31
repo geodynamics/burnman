@@ -9,9 +9,7 @@ import warnings
 
 import burnman
 from burnman import minerals
-from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
-
-atomic_masses = read_masses()
+from burnman.processchemistry import dictionarize_formula, formula_mass
 
 from util import BurnManTest
 
@@ -90,7 +88,7 @@ class periclase_morse(burnman.Mineral):
             'K_0': 1.613836e+11,
             'Kprime_0': 3.84045,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         
         
 
