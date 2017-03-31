@@ -5,13 +5,12 @@ import sys
 import warnings
 sys.path.insert(1, os.path.abspath('..'))
 
+import numpy as np
+
 import burnman
 from burnman.mineral import Mineral
-from burnman.processchemistry import *
+from burnman.processchemistry import dictionarize_formula, formula_mass
 from util import BurnManTest
-
-atomic_masses = read_masses()
-
 
 class forsterite (Mineral):
 
@@ -31,7 +30,7 @@ class forsterite (Mineral):
             'Kprime_0': 3.84,
             'Kdprime_0': -3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
 
 
@@ -53,7 +52,7 @@ class fayalite (Mineral):
             'Kprime_0': 4.68,
             'Kdprime_0': -3.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
 
 # One-mineral solid solution

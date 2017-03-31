@@ -12,9 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-atomic_masses = read_masses()
-
-
 '''
 Solvus shapes (a proxy for Gibbs free energy checking
 '''

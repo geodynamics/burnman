@@ -15,9 +15,8 @@ from __future__ import absolute_import
 from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..solutionmodel import *
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
+from ..processchemistry import dictionarize_formula, formula_mass
 
-atomic_masses = read_masses()
 
 """
 ENDMEMBERS
@@ -42,7 +41,7 @@ class fo (Mineral):
             'Kprime_0': 3.84,
             'Kdprime_0': -3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 530.0}
@@ -67,7 +66,7 @@ class fa (Mineral):
             'Kprime_0': 4.68,
             'Kdprime_0': -3.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 640.0}
@@ -92,7 +91,7 @@ class mwd (Mineral):
             'Kprime_0': 3.84,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 620.0}
@@ -117,7 +116,7 @@ class fwd (Mineral):
             'Kprime_0': 4.35,
             'Kdprime_0': -2.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 900.0}
@@ -142,7 +141,7 @@ class mrw (Mineral):
             'Kprime_0': 4.35,
             'Kdprime_0': -2.4e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 630.0}
@@ -167,7 +166,7 @@ class frw (Mineral):
             'Kprime_0': 4.92,
             'Kdprime_0': -2.5e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 710.0}
@@ -192,7 +191,7 @@ class mpv (Mineral):
             'Kprime_0': 4.14,
             'Kdprime_0': -1.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 470.0}
@@ -217,7 +216,7 @@ class fpv (Mineral):
             'Kprime_0': 4.14,
             'Kdprime_0': -1.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 760.0}
@@ -242,7 +241,7 @@ class apv (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 770.0}
@@ -267,7 +266,7 @@ class npv (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 10240.0}
@@ -292,7 +291,7 @@ class cpv (Mineral):
             'Kprime_0': 3.9,
             'Kdprime_0': -1.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1090.0}
@@ -317,7 +316,7 @@ class mak (Mineral):
             'Kprime_0': 4.55,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 420.0}
@@ -342,7 +341,7 @@ class fak (Mineral):
             'Kprime_0': 4.55,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 9630.0}
@@ -367,7 +366,7 @@ class maj (Mineral):
             'Kprime_0': 4.56,
             'Kdprime_0': -2.8e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 2260.0}
@@ -392,7 +391,7 @@ class nagt (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 5120.0}
@@ -417,7 +416,7 @@ class py (Mineral):
             'Kprime_0': 4.05,
             'Kdprime_0': -2.3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 990.0}
@@ -442,7 +441,7 @@ class alm (Mineral):
             'Kprime_0': 2.98,
             'Kdprime_0': -1.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1200.0}
@@ -467,7 +466,7 @@ class gr (Mineral):
             'Kprime_0': 5.53,
             'Kdprime_0': -3.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1370.0}
@@ -492,7 +491,7 @@ class en (Mineral):
             'Kprime_0': 8.65,
             'Kdprime_0': -8.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 620.0}
@@ -517,7 +516,7 @@ class cen (Mineral):
             'Kprime_0': 8.65,
             'Kdprime_0': -8.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 620.0}
@@ -542,7 +541,7 @@ class hen (Mineral):
             'Kprime_0': 5.5,
             'Kdprime_0': -3.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 620.0}
@@ -567,7 +566,7 @@ class hfs (Mineral):
             'Kprime_0': 5.5,
             'Kdprime_0': -3.6e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 790.0}
@@ -592,7 +591,7 @@ class fs (Mineral):
             'Kprime_0': 4.08,
             'Kdprime_0': -4e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 750.0}
@@ -617,7 +616,7 @@ class mgts (Mineral):
             'Kprime_0': 8.55,
             'Kdprime_0': -8.3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 690.0}
@@ -642,7 +641,7 @@ class di (Mineral):
             'Kprime_0': 5.19,
             'Kdprime_0': -4.4e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 580.0}
@@ -667,7 +666,7 @@ class hed (Mineral):
             'Kprime_0': 3.97,
             'Kdprime_0': -3.3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 880.0}
@@ -692,7 +691,7 @@ class jd (Mineral):
             'Kprime_0': 3.81,
             'Kdprime_0': -3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1520.0}
@@ -717,7 +716,7 @@ class cats (Mineral):
             'Kprime_0': 5.19,
             'Kdprime_0': -4.4e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 750.0}
@@ -742,7 +741,7 @@ class stv (Mineral):
             'Kprime_0': 4.6,
             'Kdprime_0': -1.5e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 420.0}
@@ -767,7 +766,7 @@ class macf (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -1.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1080.0}
@@ -792,7 +791,7 @@ class mscf (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -1.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 1340.0}
@@ -817,7 +816,7 @@ class fscf (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -1.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 10240.0}
@@ -842,7 +841,7 @@ class nacf (Mineral):
             'Kprime_0': 4.6,
             'Kdprime_0': -2.5e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 3440.0}
@@ -867,7 +866,7 @@ class cacf (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.1e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 10240.0}
@@ -892,7 +891,7 @@ class manal (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 5120.0}
@@ -917,7 +916,7 @@ class nanal (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 5120.0}
@@ -942,7 +941,7 @@ class msnal (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 5120.0}
@@ -967,7 +966,7 @@ class fsnal (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 10240.0}
@@ -992,7 +991,7 @@ class canal (Mineral):
             'Kprime_0': 4.0,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 5120.0}
@@ -1017,7 +1016,7 @@ class per (Mineral):
             'Kprime_0': 3.95,
             'Kdprime_0': -2.4e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 260.0}
@@ -1042,7 +1041,7 @@ class fper (Mineral):
             'Kprime_0': 4.9,
             'Kdprime_0': -3.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 680.0}
@@ -1067,7 +1066,7 @@ class cor (Mineral):
             'Kprime_0': 4.34,
             'Kdprime_0': -1.7e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 700.0}
@@ -1092,7 +1091,7 @@ class mcor (Mineral):
             'Kprime_0': 4.55,
             'Kdprime_0': -2.2e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_H_0': 880.0}
