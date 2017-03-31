@@ -90,9 +90,7 @@ print ''
 print 'from ..mineral import Mineral'
 print 'from ..solidsolution import SolidSolution'
 print 'from ..solutionmodel import *'
-print 'from ..processchemistry import read_masses, dictionarize_formula, formula_mass'
-print ''
-print 'atomic_masses=read_masses()'
+print 'from ..processchemistry import dictionarize_formula, formula_mass'
 print ''
 
 solutionfile = 'tc-ds62_solutions.txt'
@@ -128,7 +126,7 @@ for i in range(int(ds[0][0])):
         print '            \'Kprime_0\':', M.k[1], ','
         print '            \'Kdprime_0\':', M.k[2] * 1e-8, ','
         print '            \'n\': sum(formula.values()),'
-        print '            \'molar_mass\': formula_mass(formula, atomic_masses)}'
+        print '            \'molar_mass\': formula_mass(formula)}'
         if M.flag != 0:
             print '        self.property_modifiers = [['
         if M.flag == 1:

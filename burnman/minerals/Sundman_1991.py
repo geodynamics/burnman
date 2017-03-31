@@ -16,10 +16,7 @@ from __future__ import absolute_import
 from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..solutionmodel import *
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
-
-atomic_masses = read_masses()
-
+from ..processchemistry import dictionarize_formula, formula_mass
 
 """
 ENDMEMBERS
@@ -44,7 +41,7 @@ class bcc_iron (Mineral):
             'Kprime_0': 5.16,
             'Kdprime_0': -3.1e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
+            'molar_mass': formula_mass(formula),
             'curie_temperature': [1043., 0.0],
             'magnetic_moment': [2.22, 0.0],
             'magnetic_structural_parameter': 0.4}
@@ -69,7 +66,7 @@ class fcc_iron (Mineral):
             'Kprime_0': 5.2,
             'Kdprime_0': -3.37e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses),
+            'molar_mass': formula_mass(formula),
             'curie_temperature': [201., 0.0],
             'magnetic_moment': [2.1, 0.0],
             'magnetic_structural_parameter': 0.28}

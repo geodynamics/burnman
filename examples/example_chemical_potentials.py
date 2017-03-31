@@ -34,7 +34,6 @@ import burnman.chemicalpotentials as chemical_potentials
 import burnman.minerals as minerals
 
 if __name__ == "__main__":
-    atomic_masses = processchemistry.read_masses()
 
     '''
     Here we initialise the minerals we'll be using
@@ -141,7 +140,7 @@ if __name__ == "__main__":
                 'Kprime_0': 4.05,
                 'Kdprime_0': -1.1e-11,
                 'n': sum(formula.values()),
-                'molar_mass': processchemistry.formula_mass(formula, atomic_masses)}
+                'molar_mass': processchemistry.formula_mass(formula)}
             burnman.Mineral.__init__(self)
 
     class ReO2 (burnman.Mineral):
@@ -162,7 +161,7 @@ if __name__ == "__main__":
                 'Kprime_0': 4.05,
                 'Kdprime_0': -2.25e-11,
                 'n': sum(formula.values()),
-                'molar_mass': processchemistry.formula_mass(formula, atomic_masses)}
+                'molar_mass': processchemistry.formula_mass(formula)}
             burnman.Mineral.__init__(self)
 
     '''

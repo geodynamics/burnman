@@ -88,8 +88,7 @@ if __name__ == "__main__":
     # Here's a copy of lot (low-temperature troilite) from
     # Holland and Powell (2011), with the Landau transition
     # of tro also included.
-    from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
-    atomic_masses = read_masses()
+    from burnman.processchemistry import dictionarize_formula, formula_mass
 
     class lot (burnman.Mineral):
 
@@ -109,7 +108,7 @@ if __name__ == "__main__":
                 'Kprime_0': 4.17,
                 'Kdprime_0': -6.3e-11,
                 'n': sum(formula.values()),
-                'molar_mass': formula_mass(formula, atomic_masses)}
+                'molar_mass': formula_mass(formula)}
             self.property_modifiers = [
                 ['landau_hp', {'P_0': 100000.0,
                                'T_0': 298.15,
@@ -188,7 +187,7 @@ if __name__ == "__main__":
                 'Gprime_0': 1.4,
                 'eta_s_0': -0.1,
                 'n': sum(formula.values()),
-                'molar_mass': formula_mass(formula, atomic_masses)}
+                'molar_mass': formula_mass(formula)}
 
             self.property_modifiers = [
                 ['linear', {'delta_E': 0., 'delta_S': 12., 'delta_V': 0.}]]
