@@ -14,9 +14,7 @@ from __future__ import absolute_import
 from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..solutionmodel import *
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
-
-atomic_masses = read_masses()
+from ..processchemistry import dictionarize_formula, formula_mass
 
 '''
 SOLID SOLUTIONS
@@ -216,7 +214,7 @@ class anorthite (Mineral):
             'Gprime_0': 1.09134,
             'eta_s_0': 1.6254,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -252,7 +250,7 @@ class albite (Mineral):
             'Gprime_0': 1.3855,
             'eta_s_0': 1.04208,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 5000.0,
@@ -288,7 +286,7 @@ class spinel (Mineral):
             'Gprime_0': 0.37303,
             'eta_s_0': 2.66282,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 43.76, 'delta_V': 0.0}]]
@@ -327,7 +325,7 @@ class hercynite (Mineral):
             'Gprime_0': 0.37303,
             'eta_s_0': 2.768,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 97.28, 'delta_V': 0.0}]]
@@ -366,7 +364,7 @@ class forsterite (Mineral):
             'Gprime_0': 1.46257,
             'eta_s_0': 2.29972,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -402,7 +400,7 @@ class fayalite (Mineral):
             'Gprime_0': 1.46257,
             'eta_s_0': 1.02497,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
@@ -441,7 +439,7 @@ class mg_wadsleyite (Mineral):
             'Gprime_0': 1.44424,
             'eta_s_0': 2.63683,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -477,7 +475,7 @@ class fe_wadsleyite (Mineral):
             'Gprime_0': 1.44424,
             'eta_s_0': 1.04017,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
@@ -516,7 +514,7 @@ class mg_ringwoodite (Mineral):
             'Gprime_0': 1.35412,
             'eta_s_0': 2.30461,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -552,7 +550,7 @@ class fe_ringwoodite (Mineral):
             'Gprime_0': 1.35412,
             'eta_s_0': 1.77249,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
@@ -591,7 +589,7 @@ class enstatite (Mineral):
             'Gprime_0': 1.54596,
             'eta_s_0': 2.50453,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -627,7 +625,7 @@ class ferrosilite (Mineral):
             'Gprime_0': 1.54596,
             'eta_s_0': 1.07706,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
@@ -666,7 +664,7 @@ class mg_tschermaks (Mineral):
             'Gprime_0': 1.54596,
             'eta_s_0': 2.49099,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 9000.0,
@@ -702,7 +700,7 @@ class ortho_diopside (Mineral):
             'Gprime_0': 1.54596,
             'eta_s_0': 1.36161,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,
@@ -738,7 +736,7 @@ class diopside (Mineral):
             'Gprime_0': 1.37293,
             'eta_s_0': 1.57351,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -774,7 +772,7 @@ class hedenbergite (Mineral):
             'Gprime_0': 1.17647,
             'eta_s_0': 1.5703,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -813,7 +811,7 @@ class clinoenstatite (Mineral):
             'Gprime_0': 1.62901,
             'eta_s_0': 1.69074,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,
@@ -849,7 +847,7 @@ class ca_tschermaks (Mineral):
             'Gprime_0': 1.54016,
             'eta_s_0': 1.9672,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 11.525, 'delta_V': 0.0}]]
@@ -888,7 +886,7 @@ class jadeite (Mineral):
             'Gprime_0': 1.37398,
             'eta_s_0': 2.18453,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,
@@ -924,7 +922,7 @@ class hp_clinoenstatite (Mineral):
             'Gprime_0': 1.84119,
             'eta_s_0': 2.14181,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,
@@ -960,7 +958,7 @@ class hp_clinoferrosilite (Mineral):
             'Gprime_0': 1.84119,
             'eta_s_0': 0.79216,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 26.76, 'delta_V': 0.0}]]
@@ -999,7 +997,7 @@ class ca_perovskite (Mineral):
             'Gprime_0': 2.22713,
             'eta_s_0': 1.28818,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 8000.0,
@@ -1035,7 +1033,7 @@ class mg_akimotoite (Mineral):
             'Gprime_0': 1.57889,
             'eta_s_0': 2.80782,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -1071,7 +1069,7 @@ class fe_akimotoite (Mineral):
             'Gprime_0': 1.57889,
             'eta_s_0': 3.5716,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -1110,7 +1108,7 @@ class corundum (Mineral):
             'Gprime_0': 1.64174,
             'eta_s_0': 2.8316,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 1000.0,
@@ -1146,7 +1144,7 @@ class pyrope (Mineral):
             'Gprime_0': 1.35756,
             'eta_s_0': 0.98186,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 10000.0,
@@ -1182,7 +1180,7 @@ class almandine (Mineral):
             'Gprime_0': 1.40927,
             'eta_s_0': 2.09292,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 40.14, 'delta_V': 0.0}]]
@@ -1221,7 +1219,7 @@ class grossular (Mineral):
             'Gprime_0': 1.16274,
             'eta_s_0': 2.38418,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 11000.0,
@@ -1257,7 +1255,7 @@ class mg_majorite (Mineral):
             'Gprime_0': 1.42969,
             'eta_s_0': 1.0178,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 10000.0,
@@ -1293,7 +1291,7 @@ class jd_majorite (Mineral):
             'Gprime_0': 1.35756,
             'eta_s_0': 3.30517,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 14000.0,
@@ -1329,7 +1327,7 @@ class quartz (Mineral):
             'Gprime_0': 0.95315,
             'eta_s_0': 2.36469,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['landau', {'Tc_0': 847.0, 'S_D': 5.164, 'V_D': 1.222e-06}]]
@@ -1368,7 +1366,7 @@ class coesite (Mineral):
             'Gprime_0': 1.24734,
             'eta_s_0': 2.39793,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 1000.0,
@@ -1404,7 +1402,7 @@ class stishovite (Mineral):
             'Gprime_0': 1.93334,
             'eta_s_0': 4.60904,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['landau', {'Tc_0': -4250.0, 'S_D': 0.012, 'V_D': 1e-09}]]
@@ -1443,7 +1441,7 @@ class seifertite (Mineral):
             'Gprime_0': 1.76965,
             'eta_s_0': 4.97108,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -1479,7 +1477,7 @@ class mg_perovskite (Mineral):
             'Gprime_0': 1.69037,
             'eta_s_0': 2.56536,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 1000.0,
@@ -1515,7 +1513,7 @@ class fe_perovskite (Mineral):
             'Gprime_0': 1.37485,
             'eta_s_0': 2.29211,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -1554,7 +1552,7 @@ class al_perovskite (Mineral):
             'Gprime_0': 1.49706,
             'eta_s_0': 2.47126,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 2000.0,
@@ -1590,7 +1588,7 @@ class mg_post_perovskite (Mineral):
             'Gprime_0': 1.97874,
             'eta_s_0': 1.16704,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,
@@ -1626,7 +1624,7 @@ class fe_post_perovskite (Mineral):
             'Gprime_0': 1.44675,
             'eta_s_0': 1.36382,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -1665,7 +1663,7 @@ class al_post_perovskite (Mineral):
             'Gprime_0': 1.81603,
             'eta_s_0': 2.83762,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -1701,7 +1699,7 @@ class periclase (Mineral):
             'Gprime_0': 2.1438,
             'eta_s_0': 2.81765,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 0.0,
@@ -1737,7 +1735,7 @@ class wuestite (Mineral):
             'Gprime_0': 1.44673,
             'eta_s_0': -0.05731,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -1776,7 +1774,7 @@ class mg_ca_ferrite (Mineral):
             'Gprime_0': 1.75878,
             'eta_s_0': 2.1073,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -1812,7 +1810,7 @@ class fe_ca_ferrite (Mineral):
             'Gprime_0': 1.75878,
             'eta_s_0': 3.0268,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.property_modifiers = [
             ['linear', {'delta_E': 0.0, 'delta_S': 13.38, 'delta_V': 0.0}]]
@@ -1851,7 +1849,7 @@ class na_ca_ferrite (Mineral):
             'Gprime_0': 2.07687,
             'eta_s_0': 2.79016,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 11000.0,
@@ -1887,7 +1885,7 @@ class kyanite (Mineral):
             'Gprime_0': 1.7308,
             'eta_s_0': 2.96665,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 4000.0,
@@ -1923,7 +1921,7 @@ class nepheline (Mineral):
             'Gprime_0': 1.33031,
             'eta_s_0': 0.6291,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         self.uncertainties = {
             'err_F_0': 3000.0,

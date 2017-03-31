@@ -11,7 +11,6 @@ import burnman
 from burnman.processchemistry import *
 from burnman.chemicalpotentials import *
 import burnman.constants as constants
-atomic_masses = read_masses()
 
 
 class Re (burnman.Mineral):
@@ -32,7 +31,7 @@ class Re (burnman.Mineral):
             'Kprime_0': 4.05,
             'Kdprime_0': -1.1e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         burnman.Mineral.__init__(self)
 
 
@@ -54,7 +53,7 @@ class ReO2 (burnman.Mineral):
             'Kprime_0': 4.05,
             'Kdprime_0': -2.25e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         burnman.Mineral.__init__(self)
 
 '''
