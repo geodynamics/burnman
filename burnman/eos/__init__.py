@@ -19,8 +19,8 @@ from .modified_tait import MT
 from .hp import HP_TMT
 from .cork import CORK
 from .vinet import Vinet
+from .morse_potential import Morse
 from .birch_murnaghan_4th import BM4
-
 from .property_modifiers import calculate_property_modifications
 
 from .helper import create

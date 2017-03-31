@@ -9,6 +9,9 @@ import warnings
 
 import burnman
 from burnman import minerals
+from burnman.processchemistry import read_masses, dictionarize_formula, formula_mass
+
+atomic_masses = read_masses()
 
 from util import BurnManTest
 
@@ -69,6 +72,27 @@ class Liquid_Fe_Anderson(burnman.Mineral):
             'molar_mass': 0.055845,
         }
 
+        
+class periclase_morse(burnman.Mineral):
+
+    """
+    Periclase parameters from SLB dataset (which uses BM3)
+    """
+
+    def __init__(self):
+        formula = 'MgO'
+        formula = dictionarize_formula(formula)
+        self.params = {
+            'name': 'Periclase',
+            'formula': formula,
+            'equation_of_state': 'morse',
+            'V_0': 1.1244e-05,
+            'K_0': 1.613836e+11,
+            'Kprime_0': 3.84045,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula, atomic_masses)}
+        
+        
 
 class eos(BurnManTest):
 
@@ -121,8 +145,7 @@ class eos(BurnManTest):
                 pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(Grun_test, rock.params['grueneisen_0'])
 
-    def test_reference_values_noG(self):
-        # First test Vinet
+    def test_reference_values_vinet(self):
         rock = Fe_Dewaele()
         pressure = 0.
         temperature = 300.
@@ -137,7 +160,7 @@ class eos(BurnManTest):
         self.assertFloatEqual(
             Density_test, rock.params['molar_mass'] / rock.params['V_0'])
 
-        # Now BM4
+    def test_reference_values_bm4(self):
         rock = Liquid_Fe_Anderson()
         pressure = 0.
         temperature = 300.
@@ -152,7 +175,20 @@ class eos(BurnManTest):
         self.assertFloatEqual(
             Density_test, rock.params['molar_mass'] / rock.params['V_0'])
 
-
+    def test_reference_values_morse(self):
+        rock = periclase_morse()
+        pressure = 0.
+        temperature = 300.
+        eos = burnman.eos.Morse()
+        Volume_test = eos.volume(pressure, temperature, rock.params)
+        self.assertFloatEqual(Volume_test, rock.params['V_0'])
+        Kt_test = eos.isothermal_bulk_modulus(
+            pressure, 300., rock.params['V_0'], rock.params)
+        self.assertFloatEqual(Kt_test, rock.params['K_0'])
+        Density_test = eos.density(rock.params['V_0'], rock.params)
+        self.assertFloatEqual(
+            Density_test, rock.params['molar_mass'] / rock.params['V_0'])
+        
 class test_eos_validation(BurnManTest):
 
     def test_no_shear_error(self):
