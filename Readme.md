@@ -1,5 +1,7 @@
 # BurnMan - a thermoelastic and thermodynamic toolkit for Earth and planetary sciences
-<img src="sphinx/burnjack.png", width="256">
+
+<img src="sphinx/burnjack.png" width="256">
+
 ## About
 
 BurnMan is a Python library for generating thermodynamic and thermoelastic models of planetary interiors.
