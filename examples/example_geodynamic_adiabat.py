@@ -121,6 +121,7 @@ rock.set_state(1.e5, potential_temperature)
 entropy = rock.S
 pressures = np.linspace(1.e5, 25.e9, n_points)
 temperatures = isentrope(rock, pressures, entropy)
+isentrope = UnivariateSpline(pressures, temperatures)
 
 # Properties can then be calculated along the isentrope
 properties = rock.evaluate(['V', 'rho', 'heat_capacity_p',
@@ -196,15 +197,21 @@ grid_pressures = np.linspace(1.e5, 25.e9, 501)
 grid_temperatures = np.linspace(1400., 2000., 101)
 
 # Here we choose to smooth by convolving the entropy and volume
-# with a 2D Gaussian function with RMS widths of 10 K in temperature
-# and 0 or 0.5 GPa in pressure. The smoothing is truncated at the
+# with a 2D Gaussian function with RMS widths of 0 or 0.5 GPa in pressure, and
+# a temperature smoothing of f*P_stdev*max(dT/dP), where f is a factor > 0.25.
+# The smoothing is truncated at the
 # 4 sigma level.
 
-temperature_stdev = 10.
 truncate = 4.
+temperature_smoothing_factor = 0.5
 
-for pressure_stdev in [0., 5.e8]:
+for pressure_stdev in [0., 0.5e9]:
 
+    unsmoothed_isentrope_temperatures = isentrope(grid_pressures)
+    temperature_stdev = ( temperature_smoothing_factor * pressure_stdev *
+                          np.max(np.abs( np.gradient(unsmoothed_isentrope_temperatures) )) /
+                          (grid_pressures[1] - grid_pressures[0]) )
+    
     pp, TT = np.meshgrid(grid_pressures, grid_temperatures)
     mesh_shape = pp.shape
     pp = np.ndarray.flatten(pp)
@@ -219,7 +226,6 @@ for pressure_stdev in [0., 5.e8]:
     Tdiff_max = 50 + 30 + truncate*temperature_stdev
     grid_entropies = np.zeros_like(pp)
     grid_volumes = np.zeros_like(pp)
-    isentrope = UnivariateSpline(pressures, temperatures)
     Tdiff = np.abs(isentrope(pp) - TT)
     mask = [idx for idx, Td in enumerate(Tdiff) if Td < Tdiff_max]
     grid_entropies[mask], grid_volumes[mask] = rock.evaluate(['S', 'V'], pp[mask], TT[mask])
@@ -275,7 +281,6 @@ for pressure_stdev in [0., 5.e8]:
     ax_beta.plot(x, compressibilities_relaxed)
 
 
-
 ax_T.legend(loc='upper left')
 fig.tight_layout()
 
@@ -285,6 +290,6 @@ plt.show()
 
 # Finally, here's the ability to output smoothed, relaxed properties for use in ASPECT
 # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity
-#np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, smoothed_temperatures, densities, gravity, alphas_relaxed, specific_heats_relaxed, compressibilities_relaxed]).T,
+#np.savetxt('isentrope_properties.txt', X=np.array([depths, pressures, smoothed_temperatures, densities,# gravity, alphas_relaxed, specific_heats_relaxed, compressibilities_relaxed]).T,
 #           header='POINTS: '+str(n_points)+' \ndepth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (/K), Cp (J/K/kg), beta (/Pa)',
 #           fmt='%.10e', delimiter='\t')
