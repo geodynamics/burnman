@@ -79,6 +79,7 @@ from . import minerals
 # central user tools
 from . import seismic
 from . import output_seismo
+from . import anisotropy
 from . import averaging_schemes
 from . import eos
 
@@ -89,4 +90,5 @@ from . import geotherm
 # miscellaneous
 from . import tools
 from . import nonlinear_fitting
+from . import eos_fitting
 from .partitioning import calculate_partition_coefficient, calculate_phase_percents

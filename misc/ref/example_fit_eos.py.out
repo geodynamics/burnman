@@ -1,6 +1,13 @@
 Least squares equation of state fitting
 
-1) Fitting to high pressure PTV data only
+1) Fitting to room temperature PV data
+
+Optimized equation of state for stishovite:
+V_0: (1.4003 +/- 0.0009) x 1e-05
+K_0: (3.19 +/- 0.09) x 1e+11
+Kprime_0: (3.9 +/- 0.5) x 1e+00
+
+2) Fitting to high pressure PTV data only
 
 Optimized equation of state:
 V_0: (1.1232 +/- 0.0004) x 1e-05

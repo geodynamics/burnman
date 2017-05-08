@@ -1,8 +1,16 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# GPL v2 or later.
+
+from __future__ import absolute_import
+from __future__ import print_function
+
 import numpy as np
 from scipy.stats import t, norm, genextreme
 import itertools
 import copy
 
+from .tools import unit_normalize
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib.patches import Ellipse
@@ -274,14 +282,8 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     return np.array([confidence_bound_0, confidence_bound_1,
                      prediction_bound_0, prediction_bound_1])
 
-def normalised(a, order=2, axis=-1):
-    l2 = np.atleast_1d(np.apply_along_axis(np.linalg.norm, axis, a, order))
-
-    l2[l2==0] = 1
-    return a / np.expand_dims(l2, axis)[0][0]
-
 def abs_line_project(M, n):
-    n = normalised(n)
+    n = unit_normalize(n)
     return n.dot(M).dot(n.T)
 
 def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
