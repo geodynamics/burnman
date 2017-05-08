@@ -15,7 +15,7 @@ class test_anisotropy(BurnManTest):
         l, G = (0.4e11, 0.24e11)
         elastic_constants = [l, G]
         rho = 2.735e3
-        m = anisotropy.AnisotropicMaterial(elastic_constants, rho, 'isotropic')
+        m = anisotropy.IsotropicMaterial(rho, elastic_constants)
 
         E = G*(3.*l + 2.*G)/(l+G)
         Vp = np.sqrt((m.bulk_modulus_reuss + 4./3.*m.shear_modulus_reuss)/rho)
@@ -46,5 +46,37 @@ class test_anisotropy(BurnManTest):
 
         self.assertArraysAlmostEqual(array_1, array_2)
 
+    def test_crystal_systems(self):
+        m = anisotropy.IsotropicMaterial(3000., [1., 1.])
+        m = anisotropy.CubicMaterial(3000., [1., 1., 1])
+        m = anisotropy.HexagonalMaterial(3000., [1., 1., 1., 1., 1.])
+        m = anisotropy.TetragonalMaterial(3000., [1., 1., 1., 1., 1., 1.])
+        m = anisotropy.TetragonalMaterial(3000., [1., 1., 1., 1., 1., 1., 1.])
+        m = anisotropy.RhombohedralMaterial(3000., [1., 1., 1., 1.,
+                                                    1., 1., 1.])
+        m = anisotropy.RhombohedralMaterial(3000., [1., 1., 1., 1.,
+                                                    1., 1., 1., 1.])
+        m = anisotropy.OrthorhombicMaterial(3000., [1., 1., 1., 1., 1.,
+                                                    1., 1., 1., 1.])
+        m = anisotropy.MonoclinicMaterial(3000., [1., 1., 1., 1., 1., 1.,
+                                                  1., 1., 1., 1., 1., 1., 1.])
+        m = anisotropy.TriclinicMaterial(3000., [1., 1., 1., 1., 1., 1., 1.,
+                                                 1., 1., 1., 1., 1., 1., 1.,
+                                                 1., 1., 1., 1., 1., 1., 1.])
+
+    def test_tetragonal_ii(self):
+        m = anisotropy.TetragonalMaterial(3000., [1., 2., 3., 4., 5., 6., 7.])
+        self.assertFloatEqual(m.stiffness_tensor[0][5], -m.stiffness_tensor[1][5])
+
+    def test_rhombohedral_i(self):
+        m = anisotropy.RhombohedralMaterial(3000., [1., 2., 3., 4., 5., 6., 7.])
+        self.assertFloatEqual(m.stiffness_tensor[0][3], -m.stiffness_tensor[1][3])
+        
+    def test_rhombohedral_ii(self):
+        m = anisotropy.RhombohedralMaterial(3000., [1., 2., 3., 4., 5., 6., 7., 8.])
+        self.assertArraysAlmostEqual([m.stiffness_tensor[0][3], m.stiffness_tensor[0][4]],
+                                     [-m.stiffness_tensor[1][3], -m.stiffness_tensor[1][4]])
+
+        
 if __name__ == '__main__':
     unittest.main()

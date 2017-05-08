@@ -331,7 +331,7 @@ class TetragonalMaterial(AnisotropicMaterial):
         elif len(cijs) == 7:
             # Tetragonal II / Laue class 4/m
             cijs = list(cijs)
-            cijs.insert(4, cij[3]) # C26 = -C16
+            cijs.insert(4, -cijs[3]) # C26 = -C16
             index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
@@ -359,7 +359,7 @@ class RhombohedralMaterial(AnisotropicMaterial):
         cijs = list(cijs)
         if len(cijs) == 7:
             # Rhombohedral I / Laue class \bar{3}m
-            cijs.insert(4, cij[3]) # C24 = -C14
+            cijs.insert(4, -cijs[3]) # C24 = -C14
             index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
@@ -371,8 +371,8 @@ class RhombohedralMaterial(AnisotropicMaterial):
             
         elif len(cijs) == 8:
             # Rhombohedral II / Laue class \bar{3}
-            cijs.insert(4, cij[3]) # C24 = -C14
-            cijs.insert(6, cij[5]) # C25 = -C15
+            cijs.insert(4, -cijs[3]) # C24 = -C14
+            cijs.insert(6, -cijs[5]) # C25 = -C15
             index_lists = [[(0, 0), (1, 1)], # C11
                            [(0, 1)], # C12
                            [(0, 2), (1, 2)], # C13
