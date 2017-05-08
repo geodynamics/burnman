@@ -10,7 +10,7 @@ from scipy.stats import t, norm, genextreme
 import itertools
 import copy
 
-from .tools import normalize
+from .tools import unit_normalize
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib.patches import Ellipse
@@ -283,7 +283,7 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
                      prediction_bound_0, prediction_bound_1])
 
 def abs_line_project(M, n):
-    n = normalize(n)
+    n = unit_normalize(n)
     return n.dot(M).dot(n.T)
 
 def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):

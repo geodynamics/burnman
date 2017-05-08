@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -8,7 +8,7 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .tools import normalize
+from .tools import unit_normalize
 from .material import Material, material_property
 
 class AnisotropicMaterial(Material):
@@ -18,170 +18,23 @@ class AnisotropicMaterial(Material):
     then be interrogated to find the values of different properties, 
     such as bounds on seismic velocities. There are also several functions
     which can be called to calculate properties along directions oriented
-    with respect to the elastic tensor.
-
-    Initialization is with a density and either 
-    a) a set of independent elastic constants and a crystal system, or
-    b) a full stiffness tensor in Voigt notation
-
-    If initialization is via option (a), the number and order 
-    of the constants is dependent on the crystal system:
-    'isotropic': C12, C44 (i.e. lambda and mu, the Lame parameters)
-    'cubic': C11, C12, C44
-    'hexagonal': C11, C12, C13, C33, C44
-    'tetragonal I': C11, C12, C13, C33, C44, C66
-    'tetragonal II': C11, C12, C13, C16, C33, C44, C66
-    'rhombohedral I': C11, C12, C13, C14, C33, C44, C66
-    'rhombohedral II': C11, C12, C13, C14, C15, C33, C44, C66
-    'orthorhombic': C11, C12, C13, C22, C23, C33, C44, C55, C66
-    'monoclinic': C11, C12, C13, C15, C22, C23, 
-                  C25, C33, C35, C44, C46, C55, C66
-    'triclinic': Cij, where 1<=i<=6 and i<=j<=6 
+    with respect to the elastic tensor. Initialization is via a density 
+    and a full stiffness tensor in Voigt notation
     
     See :cite:`Mainprice2011` Geological Society of London Special Publication 
     and https://materialsproject.org/wiki/index.php/Elasticity_calculations
     for mathematical descriptions of each function.
     """
         
-    def __init__(self, cijs, rho, crystal_system=None):
-        self.params = {'rho_0': rho}
-        if crystal_system is not None:
-            self.params['stiffness_tensor_0'] = self._cijs_to_voigt(cijs, crystal_system)
-        else:
-            self.params['stiffness_tensor_0'] = np.array(cijs)
+    def __init__(self, rho, cijs):
+        self.params = {'rho_0': rho,
+                       'stiffness_tensor_0': cijs}
         
         assert self.params['stiffness_tensor_0'].shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
         assert np.allclose(self.params['stiffness_tensor_0'].T,
                            self.params['stiffness_tensor_0']), 'stiffness_tensor must be symmetric'
 
         Material.__init__(self)
-        
-        
-    def _cijs_to_voigt(self, cijs, crystal_system):
-        """
-        Converts individual elastic tensors (cijs) to
-        the stiffness tensor in Voigt notation (6x6)
-        based on the crystal system. A list of crystal systems 
-        is provided in the base class description.
-        """
-        
-        if crystal_system=='isotropic':
-            assert len(cijs) == 2
-            cijs = list(cijs)
-            cijs.insert(0, cijs[0] + 2.*cijs[1]) # C11 = C12 + 2C44
-            index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
-                           [(0, 1), (0, 2), (1, 2)], # C12
-                           [(3, 3), (4, 4), (5, 5)]] # C44
-            
-        elif crystal_system=='cubic':
-            assert len(cijs) == 3
-            index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
-                           [(0, 1), (0, 2), (1, 2)], # C12
-                           [(3, 3), (4, 4), (5, 5)]] # C44
-            
-        elif crystal_system=='hexagonal' or crystal_system=='tetragonal I':
-            if len(cijs) == 5: #for hexagonal, C66 = (C11-C12)/2.
-                cijs = list(cijs)
-                cijs.append((cijs[0] - cijs[1])/2.)
-            # tetragonal_i corresponds to Laue class 4/mmm
-            assert len(cijs) == 6
-            index_lists = [[(0, 0), (1, 1)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2), (1, 2)], # C13
-                           [(2, 2)], # C33
-                           [(3, 3), (4, 4)], # C44
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='tetragonal II':
-            # tetragonal_ii corresponds to Laue class 4/m
-            assert len(cijs) == 7
-            cijs = list(cijs)
-            cijs.insert(4, cij[3]) # C26 = -C16
-            index_lists = [[(0, 0), (1, 1)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2), (1, 2)], # C13
-                           [(0, 5)], # C16
-                           [(1, 5)], # C26
-                           [(2, 2)], # C33
-                           [(3, 3), (4, 4)], # C44
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='rhombohedral I':
-            # rhombohedral_i corresponds to Laue class \bar{3}m
-            assert len(cijs) == 7
-            cijs = list(cijs)
-            cijs.insert(4, cij[3]) # C24 = -C14
-            index_lists = [[(0, 0), (1, 1)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2), (1, 2)], # C13
-                           [(0, 3), (4, 5)], # C14
-                           [(1, 3)], # C24
-                           [(2, 2)], # C33
-                           [(3, 3), (4, 4)], # C44
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='rhombohedral II':
-            # rhombohedral_ii corresponds to Laue class \bar{3}
-            assert len(cijs) == 8
-            cijs = list(cijs)
-            cijs.insert(4, cij[3]) # C24 = -C14
-            cijs.insert(6, cij[5]) # C25 = -C15
-            index_lists = [[(0, 0), (1, 1)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2), (1, 2)], # C13
-                           [(0, 3), (4, 5)], # C14
-                           [(1, 3)], # C24
-                           [(0, 4)], # C15
-                           [(1, 4), (3, 5)], # C25
-                           [(2, 2)], # C33
-                           [(3, 3), (4, 4)], # C44
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='orthorhombic':
-            assert len(cijs) == 9
-            index_lists = [[(0, 0)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2)], # C13
-                           [(1, 1)], # C22
-                           [(1, 2)], # C23
-                           [(2, 2)], # C33
-                           [(3, 3)], # C44
-                           [(4, 4)], # C55
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='monoclinic':
-            assert len(cijs) == 13
-            index_lists = [[(0, 0)], # C11
-                           [(0, 1)], # C12
-                           [(0, 2)], # C13
-                           [(0, 4)], # C15
-                           [(1, 1)], # C22
-                           [(1, 2)], # C23
-                           [(1, 4)], # C25
-                           [(2, 2)], # C33
-                           [(2, 4)], # C35
-                           [(3, 3)], # C44
-                           [(3, 5)], # C46
-                           [(4, 4)], # C55
-                           [(5, 5)]] # C66
-            
-        elif crystal_system=='triclinic':
-            assert len(cijs) == 21
-            index_lists=[[(i, j)] for i in range(6) for j in range(i, 6)]
-            
-        else:
-            raise Exception('Crystal system not recognised. Must be one of: '
-                            'isotropic, cubic, hexagonal, tetragonal I, '
-                            'tetragonal II, rhombohedral I, rhombohedral II, '
-                            'orthorhombic, monoclinic or triclinic.')    
-            
-        
-        C = np.zeros([6, 6])
-        for i, index_list in enumerate(index_lists):
-            for indices in index_list:
-                C[indices] = cijs[i]
-                C[indices[::-1]] = cijs[i]
-        return C
         
     def _voigt_index_to_ij(self, m):
         """
@@ -315,7 +168,7 @@ class AnisotropicMaterial(Material):
 
         T_ik = C_ijkl n_j n_l
         """
-        propagation_direction = normalize(propagation_direction)
+        propagation_direction = unit_normalize(propagation_direction)
         Tik = np.tensordot(np.tensordot(self.full_stiffness_tensor,
                                         propagation_direction,
                                         axes=([1],[0])),
@@ -328,7 +181,7 @@ class AnisotropicMaterial(Material):
         Computes the linear compressibility in a given direction 
         relative to the stiffness tensor
         """
-        direction = normalize(direction)
+        direction = unit_normalize(direction)
         Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
         beta = Sijkk.dot(direction).dot(direction)
         return beta
@@ -338,7 +191,7 @@ class AnisotropicMaterial(Material):
         Computes the Youngs modulus in a given direction 
         relative to the stiffness tensor
         """
-        direction = normalize(direction)
+        direction = unit_normalize(direction)
         Sijkl = self.full_compliance_tensor
         S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
         return 1./S
@@ -348,8 +201,8 @@ class AnisotropicMaterial(Material):
         Computes the shear modulus on a plane in a given 
         shear direction relative to the stiffness tensor
         """
-        plane_normal = normalize(plane_normal)
-        shear_direction = normalize(shear_direction)
+        plane_normal = unit_normalize(plane_normal)
+        shear_direction = unit_normalize(shear_direction)
         
         assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(np.float).eps, 'plane_normal and shear_direction must be orthogonal'
         Sijkl = self.full_compliance_tensor
@@ -364,8 +217,8 @@ class AnisotropicMaterial(Material):
         directions relative to the stiffness tensor
         """
         
-        axial_direction = normalize(axial_direction)
-        lateral_direction = normalize(lateral_direction)
+        axial_direction = unit_normalize(axial_direction)
+        lateral_direction = unit_normalize(lateral_direction)
         assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(np.float).eps, 'axial_direction and lateral_direction must be orthogonal'
         
         Sijkl = self.full_compliance_tensor
@@ -383,7 +236,7 @@ class AnisotropicMaterial(Material):
         Returns two lists, containing the wave speeds and 
         directions of particle motion relative to the stiffness tensor
         """
-        propagation_direction = normalize(propagation_direction)
+        propagation_direction = unit_normalize(propagation_direction)
         
         Tik = self.christoffel_tensor(propagation_direction)
 
@@ -396,76 +249,207 @@ class AnisotropicMaterial(Material):
 
         return velocities, eigenvectors
 
-    def plot_velocities(self):
-        """
-        Makes colour plots of:
-        Compressional wave velocity: Vp
-        Anisotropy: (Vs1 - Vs2)/(Vs1 + Vs2)
-        Vp/Vs1
-        linear compressibility: beta
-        Youngs Modulus: E
-        """
-
-        try:
-            plt.style.use('ggplot')
-            plt.rcParams['axes.facecolor'] = 'white'
-            plt.rcParams['axes.edgecolor'] = 'black'
-            plt.rcParams['figure.figsize'] = 16, 10 # inches
-        except:
-            pass
+def voigt_array_from_cijs(cijs, index_lists):
+    C = np.zeros([6, 6])
+    for i, index_list in enumerate(index_lists):
+        for indices in index_list:
+            C[indices] = cijs[i]
+            C[indices[::-1]] = cijs[i]
+    return C
+    
+class IsotropicMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C12, C44] (i.e. lambda and mu, the Lame parameters)
+    """
+    def __init__(self, rho, cijs):
         
-        zeniths = np.linspace(np.pi/2., np.pi, 31)
-        azimuths = np.linspace(0., 2.*np.pi, 91)
-        Rs = np.sin(zeniths)/(1. - np.cos(zeniths))
-        r, theta = np.meshgrid(Rs, azimuths)
+        assert len(cijs) == 2
+        cijs = list(cijs)
+        cijs.insert(0, cijs[0] + 2.*cijs[1]) # C11 = C12 + 2C44
+        index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
+                       [(0, 1), (0, 2), (1, 2)], # C12
+                       [(3, 3), (4, 4), (5, 5)]] # C44
+
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+
+class CubicMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C44]
+    """
+    def __init__(self, rho, cijs):
         
-        vps = np.empty_like(r)
-        vs1s = np.empty_like(r)
-        vs2s = np.empty_like(r)
-        betas = np.empty_like(r)
-        Es = np.empty_like(r)
-        for i, az in enumerate(azimuths):
-            for j, phi in enumerate(zeniths):
-                d = np.array([np.cos(az)*np.sin(phi), np.sin(az)*np.sin(phi), -np.cos(phi)]) # change_hemispheres
-                velocities = self.wave_velocities(d)
-                betas[i][j] = self.linear_compressibility(d)
-                Es[i][j] = self.youngs_modulus(d)
-                vps[i][j] = velocities[0][0]
-                vs1s[i][j] = velocities[0][1]
-                vs2s[i][j] = velocities[0][2]
-                
-        fig = plt.figure()
-        names = ['Vp (km/s)', 'Vs1 (km/s)', 'Vp/Vs1', 'S-wave anisotropy (%)', 'Linear compressibility (GPa$^{-1}$)', 'Youngs Modulus (GPa)']
-        items = [vps/1000., vs1s/1000., vps/vs1s, 200.*(vs1s - vs2s)/(vs1s + vs2s), betas*1.e9, Es/1.e9]
-        ax = []
-        im = []
-        ndivs = 100
-        for i, item in enumerate(items):
-            ax.append(fig.add_subplot(2, 3, i+1, projection='polar'))
-            ax[i].set_yticks([100])
-            ax[i].set_title(names[i])
+        assert len(cijs) == 3
+        index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
+                       [(0, 1), (0, 2), (1, 2)], # C12
+                       [(3, 3), (4, 4), (5, 5)]] # C44
 
-            vmin = np.min(item)
-            vmax = np.max(item)
-            spacing = np.power(10., np.floor(np.log10(vmax - vmin)))
-            nt = int((vmax - vmin - vmax%spacing + vmin%spacing)/spacing)
-            if nt == 1:
-                spacing = spacing/4.
-            elif nt < 4:
-                spacing = spacing/2.
-            elif nt > 8:
-                spacing = spacing*2.
-                
-            tmin = vmin + (spacing - vmin%spacing)
-            tmax = vmax - vmax%spacing
-            nt = int((tmax - tmin)/spacing + 1)
-            
-            ticks = np.linspace(tmin, tmax, nt)
-            im.append(ax[i].contourf(theta, r, item, ndivs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax))
-            lines = ax[i].contour(theta, r, item, ticks, colors=('black',), linewidths=(1,))
-            
-            cbar = fig.colorbar(im[i], ax=ax[i], ticks=ticks)
-            cbar.add_lines(lines)
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
 
-        plt.tight_layout()
-        plt.show()
+class HexagonalMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C13, C33, C44]
+    """
+    def __init__(self, rho, cijs):
+        assert len(cijs) == 5
+        cijs = list(cijs)
+        cijs.append((cijs[0] - cijs[1])/2.) # C66 = (C11-C12)/2.
+        
+        index_lists = [[(0, 0), (1, 1)], # C11
+                       [(0, 1)], # C12
+                       [(0, 2), (1, 2)], # C13
+                       [(2, 2)], # C33
+                       [(3, 3), (4, 4)], # C44
+                       [(5, 5)]] # C66
+
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+
+class TetragonalMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C13, C33, C44, C66] or
+    [C11, C12, C13, C16, C33, C44, C66]
+    """
+    def __init__(self, rho, cijs):
+        if len(cijs) == 6:
+            # Tetragonal I / Laue class 4/mmm
+            index_lists = [[(0, 0), (1, 1)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+        elif len(cijs) == 7:
+            # Tetragonal II / Laue class 4/m
+            cijs = list(cijs)
+            cijs.insert(4, cij[3]) # C26 = -C16
+            index_lists = [[(0, 0), (1, 1)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 5)], # C16
+                           [(1, 5)], # C26
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+        else:
+            raise Exception('Tetragonal materials should have '
+                            'either 6 or 7 independent Cijs')
+            
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+
+
+class RhombohedralMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C13, C14, C33, C44, C66] or
+    [C11, C12, C13, C14, C15, C33, C44, C66]
+    """
+    def __init__(self, rho, cijs):
+        cijs = list(cijs)
+        if len(cijs) == 7:
+            # Rhombohedral I / Laue class \bar{3}m
+            cijs.insert(4, cij[3]) # C24 = -C14
+            index_lists = [[(0, 0), (1, 1)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 3), (4, 5)], # C14
+                           [(1, 3)], # C24
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+            
+        elif len(cijs) == 8:
+            # Rhombohedral II / Laue class \bar{3}
+            cijs.insert(4, cij[3]) # C24 = -C14
+            cijs.insert(6, cij[5]) # C25 = -C15
+            index_lists = [[(0, 0), (1, 1)], # C11
+                           [(0, 1)], # C12
+                           [(0, 2), (1, 2)], # C13
+                           [(0, 3), (4, 5)], # C14
+                           [(1, 3)], # C24
+                           [(0, 4)], # C15
+                           [(1, 4), (3, 5)], # C25
+                           [(2, 2)], # C33
+                           [(3, 3), (4, 4)], # C44
+                           [(5, 5)]] # C66
+        
+        else:
+            raise Exception('Rhombohedral materials should have '
+                            'either 7 or 8 independent Cijs')
+        
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+          
+class OrthorhombicMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C13, C22, C23, C33, C44, C55, C66]
+    """
+    def __init__(self, rho, cijs):
+        
+        assert len(cijs) == 9
+        index_lists = [[(0, 0)], # C11
+                       [(0, 1)], # C12
+                       [(0, 2)], # C13
+                       [(1, 1)], # C22
+                       [(1, 2)], # C23
+                       [(2, 2)], # C33
+                       [(3, 3)], # C44
+                       [(4, 4)], # C55
+                       [(5, 5)]] # C66
+        
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+
+
+class MonoclinicMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [C11, C12, C13, C15, C22, C23, C25, C33, C35, C44, C46, C55, C66]
+    """
+    def __init__(self, rho, cijs):
+        
+        assert len(cijs) == 13
+        index_lists = [[(0, 0)], # C11
+                       [(0, 1)], # C12
+                       [(0, 2)], # C13
+                       [(0, 4)], # C15
+                       [(1, 1)], # C22
+                       [(1, 2)], # C23
+                       [(1, 4)], # C25
+                       [(2, 2)], # C33
+                       [(2, 4)], # C35
+                       [(3, 3)], # C44
+                       [(3, 5)], # C46
+                       [(4, 4)], # C55
+                       [(5, 5)]] # C66
+        
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))
+
+class TriclinicMaterial(AnisotropicMaterial):
+    """
+    A class derived from the AnisotropicMaterial base class
+    Initialization takes two input parameters; rho and 
+    [Cij, where 1<=i<=6 and i<=j<=6]
+    """
+    def __init__(self, rho, cijs):
+    
+        assert len(cijs) == 21
+        index_lists=[[(i, j)] for i in range(6) for j in range(i, 6)]
+            
+        AnisotropicMaterial.__init__(
+            self, rho, voigt_array_from_cijs(cijs, index_lists))

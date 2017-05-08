@@ -8,7 +8,7 @@ from __future__ import print_function
 import numpy as np
 
 from . import nonlinear_fitting
-from .tools import flatten, normalize
+from .tools import flatten, unit_normalize
 
 def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """
@@ -125,7 +125,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
                 dpdT = (self.function([P, T+dT, 0.], flag)[2] - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
             dPdT = -dPdp*dpdT    
             n = np.array([-1., dPdT, dPdp])
-            return normalize(n)
+            return unit_normalize(n)
 
         
     # If only one property flag is given, assume it applies to all data

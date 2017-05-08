@@ -49,7 +49,11 @@ def flatten(l): return flatten(l[0]) + (flatten(l[1:]) if len(l) > 1 else []) if
 def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
-def normalize(a, order=2, axis=-1):
+def unit_normalize(a, order=2, axis=-1):
+    """
+    Calculates the L2 normalized array of numpy array a
+    of a given order and along a given axis.
+    """
     l2 = np.atleast_1d(np.apply_along_axis(np.linalg.norm, axis, a, order))
 
     l2[l2==0] = 1
