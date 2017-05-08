@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -75,7 +75,7 @@ def getmbr(ds, mbr):
             return endmember
 
 print '# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences'
-print '# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU GPL v2 or later.'
+print '# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU GPL v2 or later.'
 print ''
 print ''
 print '"""'
