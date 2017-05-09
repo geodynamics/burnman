@@ -32,6 +32,7 @@ def read_masses():
             lookup[data[0]] = float(data[1])
     return lookup
 
+atomic_masses = read_masses()
 
 def dictionarize_formula(formula):
     """
@@ -62,15 +63,14 @@ def sum_formulae(formulae, amounts=None):
         summed_formula = summed_formula + Counter({element: amounts[i] * n_atoms for (element, n_atoms) in formula.items()})
     return summed_formula
 
-def formula_mass(formula, atomic_masses):
+def formula_mass(formula):
     """
     A function to take chemical formula and atomic mass
-    dictionaries and
+    dictionaries and compute the formula mass.
     """
     mass = sum(
         formula[element] * atomic_masses[element] for element in formula)
     return mass
-
 
 def dictionarize_site_formula(formula):
     """

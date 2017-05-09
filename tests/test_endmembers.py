@@ -7,12 +7,11 @@ import warnings
 
 import burnman
 from burnman.mineral import Mineral
-from burnman.processchemistry import *
+from burnman.processchemistry import dictionarize_formula, formula_mass
 from burnman.combinedmineral import CombinedMineral
 from util import BurnManTest
 import copy
 
-atomic_masses = read_masses()
 
 
 class forsterite (Mineral):
@@ -33,7 +32,7 @@ class forsterite (Mineral):
             'Kprime_0': 3.84,
             'Kdprime_0': -3e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
 
 

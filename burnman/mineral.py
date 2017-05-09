@@ -42,12 +42,18 @@ class Mineral(Material):
     unit cell. You can look up Z in many places, including www.mindat.org
     """
 
-    def __init__(self):
+    def __init__(self, params=None, property_modifiers=None):
         Material.__init__(self)
-        if 'params' not in self.__dict__:
+        if params is not None:
+            self.params = params
+        elif 'params' not in self.__dict__:
             self.params = {}
-        if 'property_modifiers' not in self.__dict__:
+            
+        if property_modifiers is not None:
+            self.property_modifiers = property_modifiers  
+        elif 'property_modifiers' not in self.__dict__:
             self.property_modifiers = []
+            
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])

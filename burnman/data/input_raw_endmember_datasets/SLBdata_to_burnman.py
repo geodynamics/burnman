@@ -115,9 +115,7 @@ print ''
 print 'from ..mineral import Mineral'
 print 'from ..solidsolution import SolidSolution'
 print 'from ..solutionmodel import *'
-print 'from ..processchemistry import read_masses, dictionarize_formula, formula_mass'
-print ''
-print 'atomic_masses=read_masses()'
+print 'from ..processchemistry import dictionarize_formula, formula_mass'
 print ''
 
 param_scales = [-1., -1.,  # not numbers, so we won't scale
@@ -158,7 +156,7 @@ for idx, m in enumerate(ds):
         for pid, param in enumerate(accurate_values[m[0].lower()]):
             print '            \'' + param_names[(pid + 1) * 2] + '\':', float(param) * param_scales[(pid + 1) * 2], ','
         print '            \'n\': sum(formula.values()),'
-        print '            \'molar_mass\': formula_mass(formula, atomic_masses)}'
+        print '            \'molar_mass\': formula_mass(formula)}'
         print ''
         if landau_params.has_key(m[0].lower()) or configurational_entropies[m[0].lower()] != 'None':
             print '        self.property_modifiers = [',

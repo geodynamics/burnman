@@ -14,10 +14,7 @@ from __future__ import absolute_import
 from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..solutionmodel import *
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
-
-atomic_masses = read_masses()
-
+from ..processchemistry import dictionarize_formula, formula_mass
 
 """
 SOLID SOLUTIONS
@@ -68,7 +65,7 @@ class mg_si_perovskite (Mineral):
             'Gprime_0': 1.7,
             'eta_s_0': 2.3,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         Mineral.__init__(self)
 
@@ -92,7 +89,7 @@ class fe_si_perovskite (Mineral):
             'Gprime_0': 1.4,
             'eta_s_0': 2.3,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         Mineral.__init__(self)
 
@@ -116,7 +113,7 @@ class fe_al_perovskite (Mineral):
             'Gprime_0': 3.4,
             'eta_s_0': 2.5,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
     
         Mineral.__init__(self)
 
@@ -141,7 +138,7 @@ class al_al_perovskite(Mineral):
             'Gprime_0': 1.5,
             'eta_s_0': 2.5,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
   
         Mineral.__init__(self)
 
@@ -166,7 +163,7 @@ class periclase (Mineral):
             'Gprime_0': 2.1,
             'eta_s_0': 2.8,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         Mineral.__init__(self)
 
@@ -191,7 +188,7 @@ class wuestite (Mineral):
             'Gprime_0': 1.8,
             'eta_s_0': 0.6,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
 
         Mineral.__init__(self)
 
@@ -217,7 +214,7 @@ class ca_perovskite (Mineral):
             'Gprime_0': 2.2,
             'eta_s_0': 1.3,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         
 
         Mineral.__init__(self)
@@ -244,7 +241,7 @@ class hcp_iron (Mineral):
             'Gprime_0': 1.9,
             'eta_s_0': 7,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         
         
         Mineral.__init__(self)
