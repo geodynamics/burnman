@@ -92,7 +92,7 @@ class PerplexMaterial(Material):
     """
     def __init__(self, tab_file):
         self.params = {'name': tab_file}
-        self._property_interpolators, self.params['molar_mass'] = self._read_2D_perplex_file(tab_file)
+        self._property_interpolators, self.params['molar_mass'], self.bounds = self._read_2D_perplex_file(tab_file)
         Material.__init__(self)
 
     def _read_2D_perplex_file(self, filename):
@@ -108,12 +108,14 @@ class PerplexMaterial(Material):
         Pmin = float(lines[4][0])*1.e5
         Pint = float(lines[5][0])*1.e5
         nP = int(lines[6][0])
-        pressures = np.linspace(Pmin, Pmin + Pint*(nP-1.), nP)
+        Pmax = Pmin + Pint*(nP-1.)
+        pressures = np.linspace(Pmin, Pmax, nP)
         
         Tmin = float(lines[8][0])
         Tint = float(lines[9][0])
         nT = int(lines[10][0])
-        temperatures = np.linspace(Tmin, Tmin + Tint*(nT-1.), nT)
+        Tmax = Tmin + Tint*(nT-1.)
+        temperatures = np.linspace(Tmin, Tmax, nT)
         
         n_properties = int(lines[11][0])
         property_list = lines[12]
@@ -142,7 +144,6 @@ class PerplexMaterial(Material):
         molar_masses = densities*volumes
         molar_mass = np.mean(molar_masses)
         
-        
         property_interpolators = {'rho': interp2d(pressures, temperatures, densities.T),
                                   'alpha': interp2d(pressures, temperatures, property_table[:,:,p_indices[1]][:,:,0].T),
                                   'K_T': interp2d(pressures, temperatures, 1.e5 / property_table[:,:,p_indices[2]][:,:,0].T),
@@ -155,19 +156,23 @@ class PerplexMaterial(Material):
                                   'H': interp2d(pressures, temperatures, property_table[:,:,p_indices[9]][:,:,0].T*molar_masses.T),
                                   'C_p': interp2d(pressures, temperatures, property_table[:,:,p_indices[10]][:,:,0].T*molar_masses.T),
                                   'V': interp2d(pressures, temperatures, volumes.T)}
-        
-        return property_interpolators, molar_mass
+
+        bounds = [[Pmin, Pmax], [Tmin, Tmax]]
+        return property_interpolators, molar_mass, bounds
     
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
         
-        for i, p in enumerate([pressure, temperature]):
-            try:
-                if not np.logical_and(np.all(self._property_interpolators['V'].grid[i][0] <= p),
-                                      np.all(p <= self._property_interpolators['V'].grid[i][-1])):
-                    raise ValueError("The set_state condition is outside the bounds of the perplex table.")
-            except:
-                pass
+        if not np.logical_and(np.all(self.bounds[0][0] <= pressure),
+                              np.all(pressure <= self.bounds[0][1])):
+            raise ValueError("The set_state pressure ({0:.4f}) is outside the bounds of this rock ({1:.4f}-{2:.4f} GPa)".format(pressure,
+                                                                                                                                self.bounds[0][0]/1.e9,
+                                                                                                                                self.bounds[0][1]/1.e9))
+        if not np.logical_and(np.all(self.bounds[1][0] <= temperature),
+                              np.all(temperature <= self.bounds[1][1])):
+            raise ValueError("The set_state temperature ({0:.1f}) is outside the bounds of this rock ({1:.1f}-{2:.1f} K)".format(temperature,
+                                                                                                                                 self.bounds[1][0],
+                                                                                                                                 self.bounds[1][1]))
         Material.set_state(self, pressure, temperature)
         
     """
