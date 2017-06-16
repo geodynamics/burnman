@@ -1,0 +1,43 @@
+1) Converting weight percents to molar and atomic fractions
+Forsterite:
+ ['Al2O3', 'Cr2O3', 'TiO2', 'Fe2O3', 'FeO', 'SiO2', 'MgO', 'H2O', 'Na2O', 'CaO', 'K2O', 'MnO']
+ [0.0, 0.0, 0.0007, 0.0, 0.02043, 0.41704, 0.55974, 0.0, 0.0, 0.0, 0.0, 0.00209] (wt)
+ [0.0, 0.0, 0.00041, 0.0, 0.01344, 0.32816, 0.65659, 0.0, 0.0, 0.0, 0.0, 0.00139] (molar)
+
+ ['Mg', 'H', 'Ca', 'Mn', 'Al', 'O', 'Si', 'Ti', 'Fe', 'Na', 'Cr', 'K']
+ [1.97685, 0.0, 0.0, 0.0042, 0.0, 4.0, 0.988, 0.00124, 0.04047, 0.0, 0.0, 0.0] 
+ (atoms, 4.0 oxygen basis)
+
+
+Pyrope:
+ ['Al2O3', 'Cr2O3', 'TiO2', 'Fe2O3', 'FeO', 'SiO2', 'MgO', 'H2O', 'Na2O', 'CaO', 'K2O', 'MnO']
+ [0.21819, 0.01729, 0.0028, 0.01439, 0.08996, 0.41309, 0.1959, 0.0, 0.0, 0.04398, 0.0, 0.0044] (wt)
+ [0.13199, 0.00702, 0.00216, 0.00556, 0.07723, 0.42406, 0.29979, 0.0, 0.0, 0.04837, 0.0, 0.00382] (molar)
+
+ ['Mg', 'H', 'Ca', 'Mn', 'Al', 'O', 'Si', 'Ti', 'Fe', 'Na', 'Cr', 'K']
+ [4.19452, 0.0, 0.67677, 0.0535, 3.69341, 24.0, 5.93312, 0.03024, 1.23607, 0.0, 0.19635, 0.0] 
+ (atoms, 24.0 oxygen basis)
+
+
+Cummingtonite:
+ ['Al2O3', 'Cr2O3', 'TiO2', 'Fe2O3', 'FeO', 'SiO2', 'MgO', 'H2O', 'Na2O', 'CaO', 'K2O', 'MnO']
+ [0.0089, 0.0, 0.0018, 0.0006, 0.17483, 0.55581, 0.21854, 0.0207, 0.0013, 0.0129, 0.0001, 0.0045] (wt)
+ [0.00467, 0.0, 0.00121, 0.0002, 0.13024, 0.49508, 0.2902, 0.06151, 0.00112, 0.01231, 6e-05, 0.0034] (molar)
+
+ ['Mg', 'H', 'Ca', 'Mn', 'Al', 'O', 'Si', 'Ti', 'Fe', 'Na', 'Cr', 'K']
+ [4.62459, 1.96035, 0.19623, 0.05411, 0.14892, 24.0, 7.88957, 0.01923, 2.08191, 0.03579, 0.0, 0.00181] 
+ (atoms, 24.0 oxygen basis)
+
+
+2) Fayalite starting mix calculations:
+Atomic composition: ['Si', 'Fe', 'O'] [1.0, 2.0000000000000009, 4.0000000000000009]
+Molar composition (1 mole SiO2): ['FeO', 'SiO2'] [2.0000000000000009, 1.0]
+Weight composition (1g SiO2): ['FeO', 'SiO2'] [2.3914533413886834, 1.0]
+
+FeO doesn't exist as a stoichiometric compound, so we commonly create 
+a starting mix from magnetite powder and then reduce the mix.
+Here, we add one third of an oxygen for every FeO in the required bulk composition.
+Atomic composition: ['Si', 'Fe', 'O'] [1.0, 2.0000000000000009, 4.6666666666666679]
+
+We can now print the modified starting mix:
+Weight composition (1g SiO2): ['SiO2', 'Fe3O4'] [0.99999999999999989, 2.5689750345209434]
