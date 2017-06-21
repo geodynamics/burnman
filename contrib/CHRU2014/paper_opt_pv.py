@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     print(seis_p[0], seis_p[-1])
 
-    # temperature = burnman.geotherm.brown_shankland(seis_p)
+
 
     def eval_material(amount_perovskite):
         rock = burnman.Composite([SLB_2011_ZSB_2013_mg_fe_perovskite(0.07),

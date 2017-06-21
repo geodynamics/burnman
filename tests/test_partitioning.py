@@ -30,6 +30,7 @@ class test(BurnManTest):
         temperature = gt([StartP])[0]
         (a, b) = burnman.calculate_partition_coefficient(
             pressure, temperature, rel_mol_per, 0.5)
+        print(a,b)
         self.assertFloatEqual(a, 0.0319126180713)
         self.assertFloatEqual(b, 0.125395826369)
 

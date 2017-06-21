@@ -116,10 +116,10 @@ if __name__ == "__main__":
             molar_fractions = [1. - fe_num, 0.0 + fe_num]
             HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
-    # define the P-T path
+    # define the pressures
     pressure = np.linspace(28.0e9, 129e9, 25.)
-    temperature_bs = burnman.geotherm.brown_shankland(pressure)
-    temperature_an = burnman.geotherm.anderson(pressure)
+
+
 
     # seismic model for comparison:
     seismic_model = burnman.seismic.PREM()
@@ -129,6 +129,10 @@ if __name__ == "__main__":
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
+    # define temperatures
+    temperature_bs = burnman.geotherm.brown_shankland(depths)
+    temperature_an = burnman.geotherm.anderson(depths)
+    
     # pure perovskite
     perovskitite = burnman.Composite([perovskite(0.06)], [1.0])
     perovskitite.set_method(method)
