@@ -45,10 +45,11 @@ from burnman import minerals
 if __name__ == "__main__":
     # we want to evaluate several geotherms at these values
     pressures = np.arange(9.0e9, 128e9, 3e9)
-
+    seismic_model = burnman.seismic.PREM()
+    depths = seismic_model.depth(pressures)
     # load two builtin geotherms and evaluate the temperatures at all pressures
-    temperature1 = burnman.geotherm.brown_shankland(pressures)
-    temperature2 = burnman.geotherm.anderson(pressures)
+    temperature1 = burnman.geotherm.brown_shankland(depths)
+    temperature2 = burnman.geotherm.anderson(depths)
 
     # a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
     # so we can just write our own function

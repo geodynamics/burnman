@@ -50,7 +50,7 @@ if __name__ == "__main__":
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi', 'K', 'G'], depths)
 
     # Define geotherm
-    temperature = burnman.geotherm.brown_shankland(seis_p)
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     # Define solid solutions
     perovskite = minerals.SLB_2011.mg_fe_perovskite()

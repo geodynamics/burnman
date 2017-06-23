@@ -87,7 +87,7 @@ if __name__ == "__main__":
     pressures, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
-    temperatures = burnman.geotherm.brown_shankland(pressures)
+    temperatures = burnman.geotherm.brown_shankland(depths)
 
     print("Calculations are done for:")
     rock.debug_print()

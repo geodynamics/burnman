@@ -119,7 +119,7 @@ if __name__ == '__main__':
     pressures_sampled = np.linspace(
         pressure[0], pressure[-1], 20 * len(pressure))
 
-    temperature = burnman.geotherm.brown_shankland(pressure)
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     """
     Finally, we make 1000 realizations of the rock and save the seismic profiles

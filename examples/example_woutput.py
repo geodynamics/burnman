@@ -53,8 +53,8 @@ if __name__ == "__main__":
 
     # define some pressure range
     pressures = np.arange(25e9, 130e9, 5e9)
-
-    temperature = burnman.geotherm.brown_shankland(pressures)
+    depths = burnman.seismic.PREM().depth(pressures)
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     # Begin calculating velocities and density as depth
     print("Calculations are done for:")

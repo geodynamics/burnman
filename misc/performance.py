@@ -63,7 +63,7 @@ if True:
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
-    temperature = burnman.geotherm.brown_shankland(seis_p)
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     def calc_velocities(a, b, c):
         amount_perovskite = a
