@@ -11,7 +11,7 @@ from burnman import averaging_schemes
 from burnman import constants
 import warnings
 
-from .material import Material
+from .material import Material, material_property
 from .mineral import Mineral
 from .composite import Composite
 from .seismic import Seismic1DModel
@@ -21,7 +21,7 @@ class Layer(object):
     """
     A planetary layer class
     """
-    def __init__(self, name=None,  min_depth=None, max_depth=None, n_slices = None):
+    def __init__(self, name=None, radius_planet=None, min_depth=None, max_depth=None, n_slices = None):
         
         self.name = name
 
@@ -29,105 +29,103 @@ class Layer(object):
         self.max_depth = max_depth
         self.thickness = self.max_depth-self.min_depth
         self.n_slices = n_slices
-        self.depths = np.arange(min_depth, max_depth, n_slices)
+        self.depths = np.linspace(min_depth, max_depth, n_slices)
+        self.radius_planet = radius_planet
 
-
-        #planet radius
         # mass
         # moment_inertia
         
     def set_composition(self,composition):
         assert(isinstance(composition, Material) or isinstance(composition, Composite) or isinstance(composition, Mineral)  )
         self.composition = composition
+
+
+
     
-    def set_pressures(self, seismicmodel_or_array):
-        if isinstance(seismicmodel_or_array, Seismic1DModel):
-            seismicmodel = seismicmodel_or_array
-            self.pressures = seismicmodel.get_pressures(self.depths)
-        else:
-            self.pressures = seismicmodel_or_array
-        warnings.Warn("By setting the pressures in your layer by hand, you are making the")
-
-    def set_temperature(self, temperatures)
-    
-    def set_state(self, pressuremode = 'selfconsistent',P=None, g0=None, temperaturemode='selfconsistent',T=None)
-        if temperaturemode == 'fixed':
-            assert(len(T)==len(self.depths))
-            self.temperatures = T
-        if pressuremode == 'fixed':
-            assert(len(P)==len(self.depths))
-            self.pressures = P
-            warnings.Warn("By setting the pressures in your layer by hand, you are making the")
-
-    def _evaluate_eos(self):
-        # evaluate each layer separately
-        for layer in self.layers:
-            mypressures = self.pressures[layer.n_start: layer.n_end]
-            mytemperatures = self.temperatures[layer.n_start: layer.n_end]
-
-            density = layer.rock.evaluate(['density'], mypressures, mytemperatures)
-
-            self.densities[layer.n_start: layer.n_end] = density
-
-    def _compute_gravity(self, density, radii):
+    def set_state(self, pressure_mode = 'selfconsistent',temperature_mode='adiabat',pressures = None, temperatures = None, pressure_top= None, gravity_bottom=None, temperature_top=None):
         """
-        Calculate the gravity of the planet, based on a density profile.  This integrates
-        Poisson's equation in radius, under the assumption that the planet is laterally
-        homogeneous.
+            temperature_mode is 'user_defined','adiabatic', or 'modified_adiabat'
+            pressure_mode is 'user_defined' or 'selfconsistent'
         """
+        if temperature_mode == 'user_defined':
+            assert(len(temperatures)==len(self.depths))
+            self.temperatures = temperatures
+        if pressure_mode == 'user_defined':
+            assert(len(pressures)==len(self.depths))
+            self.pressures = pressures
+            warnings.Warn("By setting the pressures in Layer it is unlikely to be self-consistent")
+            if temperature_mode == 'adiabat':
+                self.temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)
+            if  temperature_mode == 'modified_adiabat':
+                self.temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)+temperatures
 
-        start_gravity = 0.0
-        for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
+
+        if pressure_mode == 'selfconsistent':
+            self.pressure_top = pressure_top
+            self.gravity_bottom = gravity_bottom
+            
+            ref_press=np.zeros_like(pressures)
+            new_press=self.pressure_top + (self.depths-min(self.depths))*1.e5 # initial pressure curve
+            i=0
+            # Make it self-consistent!!!
+            while np.sum(np.abs(new_press-ref_press))>1.e6*len(self.depths):
+                i=i+1
+
+                if temperature_mode == 'adiabat':
+                    temperatures = burnman.geotherm.adiabatic(new_press, T0, rock)
+                if  temperature_mode == 'modified_adiabat':
+                    temperatures = burnman.geotherm.adiabatic(new_press, T0, rock)+temperatures
+                mat_rho = self.compositon.evaluate(['density'], new_press, temperatures)
+                grav=_compute_gravity(mat_rho[::-1]) #values with radius
+                ref_press=new_press
+                new_press=_compute_pressure(mat_rho[::-1],grav)#values with radius
+                if i>50:
+                    print('converged to ', str((new_press-ref_press/ref_press)*100.))
+                    break
+            self.pressures=new_press
+            self.temperatures=temperatures
+            self.gravity = grav
+                          
+    ##### Functions needed to compute self-consistent depths-pressures
+    def _compute_gravity(self,density):
+            self.radii=self.radius_planet - depths
+            radii=self.radii[::-1]
+            density =density[::-1]
+            # Create a spline fit of density as a function of radius
             rhofunc = UnivariateSpline(radii, density)
-            #Create a spline fit of density as a function of radius
-
-            #Numerically integrate Poisson's equation
-            poisson = lambda p, x: 4.0 * np.pi * constants.G * rhofunc(x) * x * x
-            grav = np.ravel(odeint( poisson, start_gravity, radii))
-            start_gravity = grav[-1]
-            self.gravity[layer.n_start: layer.n_end] = grav
-
-        # we need to skip scaling gravity[0]
-        self.gravity[1:] = self.gravity[1:]/self.radial_slices[1:]/self.radial_slices[1:]
-
-    def _compute_pressure(self, density, gravity, radii):
-        """
-        Calculate the pressure profile based on density and gravity.  This integrates
-        the equation for hydrostatic equilibrium  P = rho g z.
-        """
-
-        start_pressure = 0.0
-        for layer in self.layers[::-1]:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            gravity = self.gravity[layer.n_start: layer.n_end]
-
+            # Numerically integrate Poisson's equation
+            poisson = lambda p, x: 4.0 * np.pi * G * rhofunc(x) * x * x
+            grav = np.ravel(odeint(poisson, self_gravity_bottom*radii[0]*radii[0], radii))
+            grav[:] = grav[:] / radii[:] / radii[:]
+            return grav[::-1]
+            
+    def _compute_pressure(self,densities, gravity):
+            # Calculate the pressure profile based on density and gravity.  This integrates
+            # the equation for hydrostatic equilibrium  P = rho g z.
+            
             # convert radii to depths
-            depths = radii[-1]-radii
-
+            depth = self.depths
             # Make a spline fit of density as a function of depth
-            rhofunc = UnivariateSpline(depths[::-1], density[::-1])
+            rhofunc = UnivariateSpline(depth, density)
             # Make a spline fit of gravity as a function of depth
-            gfunc = UnivariateSpline(depths[::-1], gravity[::-1])
-
+            gfunc = UnivariateSpline(depth, gravity)
+            
             # integrate the hydrostatic equation
-            pressure = np.ravel(odeint((lambda p, x : gfunc(x)* rhofunc(x)), start_pressure, depths[::-1]))
-            start_pressure = pressure[-1]
+            pressure = np.ravel(
+                                odeint((lambda p, x: gfunc(x) * rhofunc(x)), self.pressure_top, depth))
+            return pressure
 
-            self.pressures[layer.n_start: layer.n_end] = pressure[::-1]
 
+    '''
     def _compute_mass( self):
         """
-        calculates the mass of the entire planet [kg]
+        calculates the mass of the layer [kg]
         """
         mass = 0.0
-        for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            rhofunc = UnivariateSpline(radii, density)
-            layer.mass = quad(lambda r : 4*np.pi*rhofunc(r)*r*r,
+        radii = radius_planet-self.depths
+        density = self.densities[layer.n_start: layer.n_end]
+        rhofunc = UnivariateSpline(radii, density)
+        layer.mass = quad(lambda r : 4*np.pi*rhofunc(r)*r*r,
                             radii[0], radii[-1])[0]
             mass += layer.mass
         return mass
@@ -145,7 +143,7 @@ class Layer(object):
                            radii[0], radii[-1])[0]
         return moment
 
-
+    '''
 
     @property
     def pressure(self):
