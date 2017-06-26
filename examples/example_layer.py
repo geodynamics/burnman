@@ -82,13 +82,16 @@ if __name__ == "__main__":
 
 
     lower_mantle = burnman.Layer(name='Lower Mantle', radius_planet=6371.e3, min_depth =750.e3, max_depth=2800.e3, n_slices=20)
-    
+
     lower_mantle.set_composition(rock)
+ 
     # Now we get an array of temperatures at which we compute
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
     # geotherm for mapping pressure to temperature.
-    temperature = burnman.geotherm.brown_shankland(pressure)
-    lower_mantle.set_state(pressure_mode='selfconsistent',pressure_top= min(pressure), gravity_bottom=10.0,temperature_mode='user_defined', temperatures=temperature)
+
+    lower_mantle.set_state(pressure_mode='selfconsistent',pressure_top= min(pressure), gravity_bottom=10.0,temperature_mode='user_defined', temperatures=burnman.geotherm.brown_shankland(lower_mantle.depths))
+    plt.plot(lower_mantle.depths, lower_mantle.bullen)
+    plt.show()
 
     # All the work is done except the plotting!  Here we want to plot the seismic wave
     # speeds and the density against PREM using the matplotlib plotting tools.  We make
@@ -96,7 +99,7 @@ if __name__ == "__main__":
     # this calculation.
     # First, we plot the s-wave speed verses the PREM s-wave speed
     plt.subplot(2, 2, 1)
-    plt.plot(pressure / 1.e9, vs / 1.e3, color='b', linestyle='-',
+    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.v_s / 1.e3, color='b', linestyle='-',
              marker='o', markerfacecolor='b', markersize=4, label='computation')
     plt.plot(pressure / 1.e9, seis_vs / 1.e3, color='k', linestyle='-',
              marker='o', markerfacecolor='k', markersize=4, label='reference')
@@ -107,7 +110,7 @@ if __name__ == "__main__":
 
     # Next, we plot the p-wave speed verses the PREM p-wave speed
     plt.subplot(2, 2, 2)
-    plt.plot(pressure / 1.e9, vp / 1.e3, color='b', linestyle='-',
+    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.v_p / 1.e3, color='b', linestyle='-',
              marker='o', markerfacecolor='b', markersize=4)
     plt.plot(pressure / 1.e9, seis_vp / 1.e3, color='k',
              linestyle='-', marker='o', markerfacecolor='k', markersize=4)
@@ -117,7 +120,7 @@ if __name__ == "__main__":
 
     # Next, we plot the density verses the PREM density
     plt.subplot(2, 2, 3)
-    plt.plot(pressure / 1.e9, density / 1.e3, color='b',
+    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.density / 1.e3, color='b',
              linestyle='-', marker='o', markerfacecolor='b', markersize=4)
     plt.plot(pressure / 1.e9, seis_rho / 1.e3, color='k',
              linestyle='-', marker='o', markerfacecolor='k', markersize=4)
@@ -127,7 +130,7 @@ if __name__ == "__main__":
 
     # Finally, we plot the used geotherm
     plt.subplot(2, 2, 4)
-    plt.plot(pressure / 1e9, temperature, color='r', linestyle='-',
+    plt.plot(lower_mantle.pressure / 1e9, lower_mantle.temperature, color='r', linestyle='-',
              marker='o', markerfacecolor='r', markersize=4)
     plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
     plt.xlabel("Pressure (GPa)")

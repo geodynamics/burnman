@@ -11,18 +11,21 @@ from burnman import averaging_schemes
 from burnman import constants
 import warnings
 
+
 from .material import Material, material_property
 from .mineral import Mineral
 from .composite import Composite
 from .seismic import Seismic1DModel
 
+import matplotlib.pyplot as plt
 
-class Layer(object):
+
+class Layer(Material):
     """
     A planetary layer class
     """
     def __init__(self, name=None, radius_planet=None, min_depth=None, max_depth=None, n_slices = None):
-        
+        Material.__init__(self)
         self.name = name
 
         self.min_depth = min_depth
@@ -31,6 +34,7 @@ class Layer(object):
         self.n_slices = n_slices
         self.depths = np.linspace(min_depth, max_depth, n_slices)
         self.radius_planet = radius_planet
+        self.radii = self.radius_planet-self.depths
 
         # mass
         # moment_inertia
@@ -49,15 +53,15 @@ class Layer(object):
         """
         if temperature_mode == 'user_defined':
             assert(len(temperatures)==len(self.depths))
-            self.temperatures = temperatures
+            self._temperatures = temperatures
         if pressure_mode == 'user_defined':
             assert(len(pressures)==len(self.depths))
-            self.pressures = pressures
+            self._pressures = pressures
             warnings.Warn("By setting the pressures in Layer it is unlikely to be self-consistent")
             if temperature_mode == 'adiabat':
-                self.temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)
+                self._temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)
             if  temperature_mode == 'modified_adiabat':
-                self.temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)+temperatures
+                self._temperatures = burnman.geotherm.adiabatic(pressures, T0, rock)+temperatures
 
 
         if pressure_mode == 'selfconsistent':
@@ -75,31 +79,36 @@ class Layer(object):
                     temperatures = burnman.geotherm.adiabatic(new_press, T0, rock)
                 if  temperature_mode == 'modified_adiabat':
                     temperatures = burnman.geotherm.adiabatic(new_press, T0, rock)+temperatures
-                mat_rho = self.compositon.evaluate(['density'], new_press, temperatures)
-                grav=_compute_gravity(mat_rho[::-1]) #values with radius
+                [mat_rho] = self.composition.evaluate(['density'], new_press, temperatures)
+                grav=self._compute_gravity(mat_rho[::-1]) #values with radius
                 ref_press=new_press
-                new_press=_compute_pressure(mat_rho[::-1],grav)#values with radius
+                new_press=self._compute_pressure(mat_rho[::-1],grav)#values with radius
+
                 if i>50:
                     print('converged to ', str((new_press-ref_press/ref_press)*100.))
                     break
-            self.pressures=new_press
-            self.temperatures=temperatures
-            self.gravity = grav
-                          
+            self._pressures=new_press
+            self._temperatures=temperatures
+            self.layer = []
+            for i in range(len(self.depths)):
+                self.layer.append(self.composition.copy())
+                self.layer[i].set_state(self._pressures[i],self._temperatures[i])
+
+
+
     ##### Functions needed to compute self-consistent depths-pressures
     def _compute_gravity(self,density):
-            self.radii=self.radius_planet - depths
             radii=self.radii[::-1]
             density =density[::-1]
             # Create a spline fit of density as a function of radius
             rhofunc = UnivariateSpline(radii, density)
             # Numerically integrate Poisson's equation
-            poisson = lambda p, x: 4.0 * np.pi * G * rhofunc(x) * x * x
-            grav = np.ravel(odeint(poisson, self_gravity_bottom*radii[0]*radii[0], radii))
+            poisson = lambda p, x: 4.0 * np.pi * constants.G * rhofunc(x) * x * x
+            grav = np.ravel(odeint(poisson, self.gravity_bottom*radii[0]*radii[0], radii))
             grav[:] = grav[:] / radii[:] / radii[:]
             return grav[::-1]
             
-    def _compute_pressure(self,densities, gravity):
+    def _compute_pressure(self,density, gravity):
             # Calculate the pressure profile based on density and gravity.  This integrates
             # the equation for hydrostatic equilibrium  P = rho g z.
             
@@ -115,36 +124,49 @@ class Layer(object):
                                 odeint((lambda p, x: gfunc(x) * rhofunc(x)), self.pressure_top, depth))
             return pressure
 
-
-    '''
-    def _compute_mass( self):
+    @property
+    def mass( self):
         """
         calculates the mass of the layer [kg]
         """
         mass = 0.0
-        radii = radius_planet-self.depths
-        density = self.densities[layer.n_start: layer.n_end]
-        rhofunc = UnivariateSpline(radii, density)
-        layer.mass = quad(lambda r : 4*np.pi*rhofunc(r)*r*r,
-                            radii[0], radii[-1])[0]
-            mass += layer.mass
+        rhofunc = UnivariateSpline(self.radii, self.density)
+        mass = np.abs(quad(lambda r : 4*np.pi*rhofunc(r)*r*r, self.radii[0], self.radii[-1])[0])
         return mass
 
-    def _compute_moment_of_inertia( self):
+    @property
+    def moment_of_inertia( self):
         """
-        #Returns the moment of inertia of the planet [kg m^2]
+        Returns the moment of inertia of the layer [kg m^2]
         """
         moment = 0.0
-        for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            rhofunc = UnivariateSpline(radii, density)
-            moment += quad(lambda r : 8.0/3.0*np.pi*rhofunc(r)*r*r*r*r,
-                           radii[0], radii[-1])[0]
+        rhofunc = UnivariateSpline(self.radii, self.density)
+        moment = np.abs(quad(lambda r : 8.0/3.0*np.pi*rhofunc(r)*r*r*r*r, self.radii[0], self.radii[-1])[0])
         return moment
 
-    '''
+    @property
+    def gravity(self):
+        """
+        Returns gravity of the layer
+        """
+        return self._compute_gravity(self.density)
 
+    @property
+    def bullen(self):
+        kappa=self.bulk_sound_velocity*self.bulk_sound_velocity*self.density
+        phi = self.bulk_sound_velocity*self.bulk_sound_velocity
+        dkappadP=np.gradient(kappa)/np.gradient(self.pressure)
+        dphidz=np.gradient(phi)/np.gradient(self.depths)/self.gravity
+        bullen = dkappadP-dphidz
+        return bullen
+
+    @property
+    def brunt_vasala(self):
+        kappa=self.bulk_sound_velocity*self.bulk_sound_velocity*self.density
+        brunt_vasala = self.density * self.gravity * self.gravity * (self.bullen -1.)/kappa
+        return brunt_vasala
+
+    
     @property
     def pressure(self):
         """
@@ -160,7 +182,7 @@ class Layer(object):
         pressure : float
             Pressure in [Pa].
         """
-        return self._pressure
+        return self._pressures
 
     @property
     def temperature(self):
@@ -176,8 +198,8 @@ class Layer(object):
         temperature : float
             Temperature in [K].
         """
-        return self._temperature
-
+        return self._temperatures
+    
     @material_property
     def internal_energy(self):
         """
@@ -193,8 +215,7 @@ class Layer(object):
         internal_energy : float
             The internal energy in [J].
         """
-        raise NotImplementedError(
-            "need to implement internal_energy() in derived class!")
+        return np.array([self.layer[i].internal_energy for i in range(len(self.layer))])
 
     @material_property
     def molar_gibbs(self):
@@ -211,8 +232,7 @@ class Layer(object):
         molar_gibbs : float
             Gibbs free energy in [J].
         """
-        raise NotImplementedError(
-            "need to implement molar_gibbs() in derived class!")
+        return np.array([self.layer[i].molar_gibbs for i in range(len(self.layer))])
 
     @material_property
     def molar_helmholtz(self):
@@ -229,8 +249,7 @@ class Layer(object):
         molar_helmholtz : float
             Helmholtz free energy in [J].
         """
-        raise NotImplementedError(
-            "need to implement molar_helmholtz() in derived class!")
+        return np.array([self.layer[i].molar_helmholtz for i in range(len(self.layer))])
 
     @material_property
     def molar_mass(self):
@@ -246,8 +265,7 @@ class Layer(object):
         molar_mass : float
             Molar mass in [kg/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_mass() in derived class!")
+        return np.array([self.layer[i].molar_mass for i in range(len(self.layer))])
 
     @material_property
     def molar_volume(self):
@@ -264,8 +282,7 @@ class Layer(object):
         molar_volume : float
             Molar volume in [m^3/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_volume() in derived class!")
+        return np.array([self.layer[i].molar_volume for i in range(len(self.layer))])
 
     @material_property
     def density(self):
@@ -282,9 +299,7 @@ class Layer(object):
         density : float
             The density of this material in [kg/m^3].
         """
-        raise NotImplementedError(
-            "need to implement density() in derived class!")
-
+        return np.array([self.layer[i].density for i in range(len(self.layer))])
     @material_property
     def molar_entropy(self):
         """
@@ -300,8 +315,7 @@ class Layer(object):
         entropy : float
             Entropy in [J].
         """
-        raise NotImplementedError(
-            "need to implement molar_entropy() in derived class!")
+        return np.array([self.layer[i].molar_entropy for i in range(len(self.layer))])
 
     @material_property
     def molar_enthalpy(self):
@@ -318,8 +332,7 @@ class Layer(object):
         enthalpy : float
             Enthalpy in [J].
         """
-        raise NotImplementedError(
-            "need to implement molar_enthalpy() in derived class!")
+        return np.array([self.layer[i].molar_enthalpy for i in range(len(self.layer))])
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -336,8 +349,7 @@ class Layer(object):
         isothermal_bulk_modulus : float
             Bulk modulus in [Pa].
         """
-        raise NotImplementedError(
-            "need to implement isothermal_bulk_moduls() in derived class!")
+        return np.array([self.layer[i].isothermal_bulk_modulus for i in range(len(self.layer))])
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -354,8 +366,7 @@ class Layer(object):
         adiabatic_bulk_modulus : float
             Adiabatic bulk modulus in [Pa].
         """
-        raise NotImplementedError(
-            "need to implement adiabatic_bulk_modulus() in derived class!")
+        return np.array([self.layer[i].adiabatic_bulk_modulus for i in range(len(self.layer))])
 
     @material_property
     def isothermal_compressibility(self):
@@ -372,8 +383,7 @@ class Layer(object):
         (K_T)^-1 : float
             Compressibility in [1/Pa].
         """
-        raise NotImplementedError(
-            "need to implement compressibility() in derived class!")
+        return np.array([self.layer[i].isothermal_compressibility for i in range(len(self.layer))])
 
     @material_property
     def adiabatic_compressibility(self):
@@ -391,8 +401,7 @@ class Layer(object):
         adiabatic_compressibility : float
             adiabatic compressibility in [1/Pa].
         """
-        raise NotImplementedError(
-            "need to implement compressibility() in derived class!")
+        return np.array([self.layer[i].adiabatic_compressibility for i in range(len(self.layer))])
 
     @material_property
     def shear_modulus(self):
@@ -409,8 +418,7 @@ class Layer(object):
         shear_modulus : float
             Shear modulus in [Pa].
         """
-        raise NotImplementedError(
-            "need to implement shear_modulus() in derived class!")
+        return np.array([self.layer[i].shear_modulus for i in range(len(self.layer))])
 
     @material_property
     def p_wave_velocity(self):
@@ -427,8 +435,7 @@ class Layer(object):
         p_wave_velocity : float
             P wave speed in [m/s].
         """
-        raise NotImplementedError(
-            "need to implement p_wave_velocity() in derived class!")
+        return np.array([self.layer[i].p_wave_velocity for i in range(len(self.layer))])
 
     @material_property
     def bulk_sound_velocity(self):
@@ -445,8 +452,7 @@ class Layer(object):
         bulk sound velocity: float
             Sound velocity in [m/s].
         """
-        raise NotImplementedError(
-            "need to implement bulk_sound_velocity() in derived class!")
+        return np.array([self.layer[i].bulk_sound_velocity for i in range(len(self.layer))])
 
     @material_property
     def shear_wave_velocity(self):
@@ -463,8 +469,9 @@ class Layer(object):
         shear_wave_velocity : float
             Wave speed in [m/s].
         """
-        raise NotImplementedError(
-            "need to implement shear_wave_velocity() in derived class!")
+        for i in range(len(self.layer)):
+            print(self.layer[i].pressure, self.layer[i].shear_wave_velocity)
+        return np.array([self.layer[i].shear_wave_velocity for i in range(len(self.layer))])
 
     @material_property
     def grueneisen_parameter(self):
@@ -481,8 +488,7 @@ class Layer(object):
         gr : float
             Grueneisen parameters [unitless].
         """
-        raise NotImplementedError(
-            "need to implement grueneisen_parameter() in derived class!")
+        return np.array([self.layer[i].grueneisen_parameter for i in range(len(self.layer))])
 
     @material_property
     def thermal_expansivity(self):
@@ -499,8 +505,7 @@ class Layer(object):
         alpha : float
             Thermal expansivity in [1/K].
         """
-        raise NotImplementedError(
-            "need to implement thermal_expansivity() in derived class!")
+        return np.array([self.layer[i].thermal_expansivity for i in range(len(self.layer))])
 
     @material_property
     def heat_capacity_v(self):
@@ -517,8 +522,7 @@ class Layer(object):
         heat_capacity_v : float
             Heat capacity in [J/K/mol].
         """
-        raise NotImplementedError(
-            "need to implement heat_capacity_v() in derived class!")
+        return np.array([self.layer[i].heat_capacity_v for i in range(len(self.layer))])
 
     @material_property
     def heat_capacity_p(self):
@@ -535,112 +539,5 @@ class Layer(object):
         heat_capacity_p : float
             Heat capacity in [J/K/mol].
         """
-        raise NotImplementedError(
-            "need to implement heat_capacity_p() in derived class!")
+        return np.array([self.layer[i].heat_capacity_p for i in range(len(self.layer))])
 
-    #
-    # Aliased properties
-    @property
-    def P(self):
-        """Alias for :func:`~burnman.material.Material.pressure`"""
-        return self.pressure
-
-    @property
-    def T(self):
-        """Alias for :func:`~burnman.material.Material.temperature`"""
-        return self.temperature
-
-    @property
-    def energy(self):
-        """Alias for :func:`~burnman.material.Material.internal_energy`"""
-        return self.internal_energy
-
-    @property
-    def helmholtz(self):
-        """Alias for :func:`~burnman.material.Material.molar_helmholtz`"""
-        return self.molar_helmholtz
-
-    @property
-    def gibbs(self):
-        """Alias for :func:`~burnman.material.Material.molar_gibbs`"""
-        return self.molar_gibbs
-
-    @property
-    def V(self):
-        """Alias for :func:`~burnman.material.Material.molar_volume`"""
-        return self.molar_volume
-
-    @property
-    def rho(self):
-        """Alias for :func:`~burnman.material.Material.density`"""
-        return self.density
-
-    @property
-    def S(self):
-        """Alias for :func:`~burnman.material.Material.molar_entropy`"""
-        return self.molar_entropy
-
-    @property
-    def H(self):
-        """Alias for :func:`~burnman.material.Material.molar_enthalpy`"""
-        return self.molar_enthalpy
-
-    @property
-    def K_T(self):
-        """Alias for :func:`~burnman.material.Material.isothermal_bulk_modulus`"""
-        return self.isothermal_bulk_modulus
-
-    @property
-    def K_S(self):
-        """Alias for :func:`~burnman.material.Material.adiabatic_bulk_modulus`"""
-        return self.adiabatic_bulk_modulus
-
-    @property
-    def beta_T(self):
-        """Alias for :func:`~burnman.material.Material.isothermal_compressibility`"""
-        return self.isothermal_compressibility
-
-    @property
-    def beta_S(self):
-        """Alias for :func:`~burnman.material.Material.adiabatic_compressibility`"""
-        return self.adiabatic_compressibility
-
-    @property
-    def G(self):
-        """Alias for :func:`~burnman.material.Material.shear_modulus`"""
-        return self.shear_modulus
-
-    @property
-    def v_p(self):
-        """Alias for :func:`~burnman.material.Material.p_wave_velocity`"""
-        return self.p_wave_velocity
-
-    @property
-    def v_phi(self):
-        """Alias for :func:`~burnman.material.Material.bulk_sound_velocity`"""
-        return self.bulk_sound_velocity
-
-    @property
-    def v_s(self):
-        """Alias for :func:`~burnman.material.Material.shear_wave_velocity`"""
-        return self.shear_wave_velocity
-
-    @property
-    def gr(self):
-        """Alias for :func:`~burnman.material.Material.grueneisen_parameter`"""
-        return self.grueneisen_parameter
-
-    @property
-    def alpha(self):
-        """Alias for :func:`~burnman.material.Material.thermal_expansivity`"""
-        return self.thermal_expansivity
-
-    @property
-    def C_v(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_v`"""
-        return self.heat_capacity_v
-
-    @property
-    def C_p(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_p`"""
-        return self.heat_capacity_p
