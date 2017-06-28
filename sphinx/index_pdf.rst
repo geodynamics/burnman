@@ -6,19 +6,40 @@
 Welcome to BurnMan's documentation!
 ===================================
 
-The code documentation including class and function description can be found online at `burnman.org/current-doc <http://burnman.org/current-doc>`_.
+The code documentation including class and function description can be found online at `http://burnman.readthedocs.io <http://burnman.readthedocs.io>`_.
 
 .. automodule:: burnman
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    overview
    background
    examples
+   main
+   materials
+   eos
+   averaging
+   geotherms
+   thermodynamics
+   seismic
+   mineral_database
+   zreferences
 
-
+The functions in the :doc:`main` operate on :doc:`materials` which can be
+combination of different minerals from :doc:`mineral_database`.
    
+   
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
    
 
 

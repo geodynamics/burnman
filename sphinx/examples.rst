@@ -36,7 +36,7 @@ Your goal in this tutorial is to improve this awful fit...
 
 .. automodule:: contrib.tutorial.step_2
 
-Whithout changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
+Without changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
 
 .. image:: figures/tut-step2.png
 
