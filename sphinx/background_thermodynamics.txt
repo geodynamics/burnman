@@ -54,8 +54,8 @@ The Debye model yields the Helmholtz free energy and entropy due to lattice vibr
     \mathcal{H} &= \mathcal{G} + T\mathcal{S}
 
 
-Modifying Properties
-^^^^^^^^^^^^^^^^^^^^
+Property modifiers
+^^^^^^^^^^^^^^^^^^
 
 The thermodynamic models above consider the effects of strain and quasiharmonic
 lattice vibrations on the free energies of minerals at given temperatures and
@@ -69,7 +69,7 @@ of different ways. Burnman currently includes implementations of the following:
 * Bragg-Williams model
 * Magnetic excesses
 
-In all cases, the excess Gibbs free energy and first and second partial derivatives with
+In all cases, the excess Gibbs free energy :math:`\mathcal{G}` and first and second partial derivatives with
 respect to pressure and temperature are calculated. The thermodynamic properties of each
 phase are then modified in a consistent manner; specifically:
 
@@ -88,13 +88,24 @@ phase are then modified in a consistent manner; specifically:
 
 Subscripts :math:`_o` and :math:`_m` indicate original properties and modifiers respectively.
 Importantly, this allows us to stack modifications such as multiple Landau transitions
-in a simple and straightforward manner.
+in a simple and straightforward manner. In the burnman code, we add property modifiers as an attribute to each
+mineral as a list. For example::
 
-In each of the following sections, :math:`\mathcal{G}` is the excess Gibbs free energy.
+    from burnman.minerals import SLB_2011
+    stv = SLB_2011.stishovite()
+    stv.property_modifiers = [
+    ['landau',
+    {'Tc_0': -4250.0, 'S_D': 0.012, 'V_D': 1e-09}]]
+    ['linear',
+    {'delta_E': 1.e3, 'delta_S': 0., 'delta_V': 0.}]]
+
+Each modifier is a list with two elements, first the name of the modifier type, and second a dictionary with
+the required parameters for that model. A list of parameters for each model is given in the following sections.
 
 Linear excesses (linear)
 """"""""""""""""""""""""
-
+A simple linear correction in pressure and temperature. Parameters are 'delta_E', 'delta_S' and 'delta_V'.
+     
 .. math::
    \mathcal{G} = \Delta \mathcal{E} - T \Delta \mathcal{S} + P \Delta \mathcal{V}, \\
    \frac{\partial \mathcal{G}}{\partial T} = - \Delta \mathcal{S}, \\
@@ -109,8 +120,8 @@ Tricritical Landau model (landau)
 Applies a tricritical Landau correction to the properties 
 of an endmember which undergoes a displacive phase transition. These
 transitions are not associated with an activation energy, and therefore
-they occur rapidly compared with seismic wave propagation. These minerals
-
+they occur rapidly compared with seismic wave propagation. Parameters are
+'Tc_0', 'S_D' and 'V_D'.
 
 This correction follows :cite:`Putnis1992`, and is done relative to 
 the completely *ordered* state (at 0 K). 
@@ -123,13 +134,13 @@ entropy (and heat capacity) terms are equal to zero at 0 K.
 
 
 .. math::
-   T_c = T_c0 + \frac{V_D P}{S_D}
+   Tc = Tc_0 + \frac{V_D P}{S_D}
    
 If the temperature is above the critical temperature,
 Q (the order parameter) is equal to zero, and the Gibbs free energy is simply that of the disordered phase:
 
 .. math::
-   \mathcal{G}_{\textrm{dis}} = -S_D \left( \left( T - T_c \right) + \frac{T_{c0}}{3} \right), \\
+   \mathcal{G}_{\textrm{dis}} = -S_D \left( \left( T - Tc \right) + \frac{Tc_0}{3} \right), \\
    \frac{\partial \mathcal{G}}{\partial P}_{\textrm{dis}} = V_D, \\
    \frac{\partial \mathcal{G}}{\partial T}_{\textrm{dis}} = -S_D
 
@@ -137,13 +148,13 @@ If temperature is below the critical temperature, Q is between 0 and 1.
 The gibbs free energy can be described thus:
 
 .. math::
-   Q^2 = \sqrt{\left( 1 - \frac{T}{T_c} \right)}, \\
-   \mathcal{G} = S_D \left((T - T_c) Q^2 + \frac{T_{c0} Q^6}{3} \right) + \mathcal{G}_{\textrm{dis}}, \\
-   \frac{\partial \mathcal{G}}{\partial P} = - V_D Q^2 \left(1 + \frac{T}{2 T_c} \left(1. - \frac{T_{c0}}{T_c} \right) \right) + \frac{\partial \mathcal{G}}{\partial P}_{\textrm{dis}}, \\
-   \frac{\partial \mathcal{G}}{\partial T} = S_D Q^2 \left(\frac{3}{2} - \frac{T_{c0}}{2 T_c} \right) + \frac{\partial \mathcal{G}}{\partial T}_{\textrm{dis}}, \\
-   \frac{\partial^2 \mathcal{G}}{\partial P^2} = V_D^2 \frac{T}{S_D T_c^2 Q^2} \left( \frac{T}{4 T_c} \left(1. + \frac{T_{c0}}{T_c} \right) + Q^4 \left(1. - \frac{T_{c0}}{Tc} \right) - 1 \right), \\
-   \frac{\partial^2 \mathcal{G}}{\partial T^2} = - \frac{S_D}{T_c Q^2} \left(\frac{3}{4} - \frac{T_{c0}}{4 Tc} \right), \\
-   \frac{\partial^2 \mathcal{G}}{\partial P \partial T} = \frac{V_D}{2 Tc Q^2} \left(1 + \left(\frac{T}{2 Tc} - Q^4 \right) \left(1 - \frac{T_{c0}}{Tc} \right) \right)
+   Q^2 = \sqrt{\left( 1 - \frac{T}{Tc} \right)}, \\
+   \mathcal{G} = S_D \left((T - Tc) Q^2 + \frac{Tc_0 Q^6}{3} \right) + \mathcal{G}_{\textrm{dis}}, \\
+   \frac{\partial \mathcal{G}}{\partial P} = - V_D Q^2 \left(1 + \frac{T}{2 Tc} \left(1. - \frac{Tc_0}{Tc} \right) \right) + \frac{\partial \mathcal{G}}{\partial P}_{\textrm{dis}}, \\
+   \frac{\partial \mathcal{G}}{\partial T} = S_D Q^2 \left(\frac{3}{2} - \frac{Tc_0}{2 Tc} \right) + \frac{\partial \mathcal{G}}{\partial T}_{\textrm{dis}}, \\
+   \frac{\partial^2 \mathcal{G}}{\partial P^2} = V_D^2 \frac{T}{S_D Tc^2 Q^2} \left( \frac{T}{4 Tc} \left(1. + \frac{Tc_0}{Tc} \right) + Q^4 \left(1. - \frac{Tc_0}{Tc} \right) - 1 \right), \\
+   \frac{\partial^2 \mathcal{G}}{\partial T^2} = - \frac{S_D}{Tc Q^2} \left(\frac{3}{4} - \frac{Tc_0}{4 Tc} \right), \\
+   \frac{\partial^2 \mathcal{G}}{\partial P \partial T} = \frac{V_D}{2 Tc Q^2} \left(1 + \left(\frac{T}{2 Tc} - Q^4 \right) \left(1 - \frac{Tc_0}{Tc} \right) \right)
 
 
 
@@ -152,7 +163,8 @@ Tricritical Landau model (landau_hp)
 
 Applies a tricritical Landau correction similar to that described
 above. However, this implementation follows :cite:`HP2011`,
-who compute properties relative to the standard state.
+who compute properties relative to the standard state. Parameters are
+'P_0', 'T_0', 'Tc_0', 'S_D' and 'V_D'.
 
 It is worth noting that the correction described by :cite:`HP2011`
 has been incorrectly used throughout the geological literature,
@@ -167,13 +179,13 @@ We include this implementation in order to reproduce the dataset of
 using the standard implementation.
 
 .. math::
-   T_c = T_c0 + \frac{V_D P}{S_D}
+   Tc = Tc0 + \frac{V_D P}{S_D}
 
 If the temperature is above the critical temperature,
 Q (the order parameter) is equal to zero. Otherwise
 
 .. math::
-   Q^2 = \sqrt{\left( \frac{T_c - T}{T_c0} \right)}
+   Q^2 = \sqrt{\left( \frac{Tc - T}{Tc0} \right)}
 
 .. math::
    \mathcal{G} = Tc_0 S_D \left( Q_0^2 - \frac{Q_0 ^ 6}{3} \right) \
@@ -202,11 +214,15 @@ The Bragg-Williams model is essentially a symmetric solid solution
 model between endmembers, with an excess configurational entropy term
 predicted on the basis of the specifics of order-disorder in the
 mineral, multiplied by some empirical factor. Expressions for the
-excess Gibbs free energy can be found in :cite:`HP1996`.
+excess Gibbs free energy can be found in :cite:`HP1996`. Parameters are
+'deltaH', 'deltaV', 'Wh', 'Wv', 'n' and 'factor'.
     
 Magnetic model (magnetic_chs)
 """""""""""""""""""""""""""""
 
 This model approximates the excess energy due to magnetic ordering. It
 was originally described in :cite:`CHS1987`. The expressions used
-by BurnMan can be found in :cite:`Sundman1991`.
+by BurnMan can be found in :cite:`Sundman1991`. Parameters are
+'structural_parameter', 'curie_temperature'[2] (zero pressure value
+and pressure dependence) and 'magnetic_moment'[2] (zero pressure value
+and pressure dependence).
