@@ -36,5 +36,4 @@ After changing the standard deviations for :math:`K_{0}^{'}` and :math:`G_{0}^{'
 
 .. image:: figures/tut-step3.png
 
-
-.. _ref-example-simple:
+	   

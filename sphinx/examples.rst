@@ -14,6 +14,8 @@ figures in the 2014 BurnMan paper in the misc/ folder, see
 
 
 
+.. _ref-example-simple:
+
 Simple Examples
 ===============
 
@@ -89,36 +91,68 @@ Advanced examples:
   - :mod:`~examples.example_compare_all_methods`.
 
 .. automodule:: examples.example_spintransition
-
-
 *Resulting figure:*
 
 .. image:: figures/example_spintransition.png
 
+	   
 .. automodule:: examples.example_user_input_material
 
 .. automodule:: examples.example_optimize_pv
-
 *Resulting figure:*
 
 .. image:: figures/example_opt_pv.png
 
 
 .. automodule:: examples.example_build_planet
-
 *Resulting figure:*
 
 .. image:: figures/example_build_planet.png
 
 
 .. automodule:: examples.example_compare_all_methods  
-
-
 *Resulting figure:*
 
 .. image:: figures/example_compare_all_methods.png
 
+.. automodule:: examples.example_anisotropy
+*Resulting figure:*
 
+.. image:: figures/example_anisotropy.png
+
+
+
+
+.. automodule:: examples.example_fit_data
+*Resulting figures:*
+
+.. image:: figures/example_fit_data1.png
+
+.. image:: figures/example_fit_data2.png
+
+.. image:: figures/example_fit_data3.png
+
+
+
+.. automodule:: examples.example_fit_eos
+*Last seven resulting figures:*
+
+
+.. image:: figures/example_fit_eos11.png
+	   
+.. image:: figures/example_fit_eos12.png
+
+.. image:: figures/example_fit_eos13.png
+
+.. image:: figures/example_fit_eos14.png
+	   
+.. image:: figures/example_fit_eos15.png
+
+.. image:: figures/example_fit_eos16.png
+
+.. image:: figures/example_fit_eos17.png
+
+	   
 .. _ref-example-paper:
 
 Reproducing Cottaar, Heister, Rose and Unterborn (2014)
@@ -148,14 +182,7 @@ figures in the 2014 BurnMan paper: Cottaar, Heister, Rose & Unterborn (2014) :ci
 
 Misc or work in progress
 ========================
-
-.. broken: .. automodule:: example_optimize_slb2011
-.. automodule:: examples.example_compare_enstpyro     
-.. automodule:: examples.example_partition_coef
-
-.. broken: .. automodule:: example_premite_isothermal
-
-.. automodule:: examples.example_fit_data             
+             
 .. automodule:: examples.example_grid                 
 .. automodule:: examples.example_woutput
 
