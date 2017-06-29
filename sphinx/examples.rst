@@ -1,55 +1,18 @@
 Examples
 ********
 
-BurnMan comes with a small tutorial in the tutorial/ folder, and large
-collection of example programs under examples/. Below you can find a summary
-of the different examples. They are grouped into :ref:`ref-example-tutorial`,
-:ref:`ref-example-simple`, and :ref:`ref-example-advanced`. We suggest
-starting with the tutorial before moving on to the simpler examples,
-especially if you are new to using BurnMan.
+BurnMan comes with a large collection of example programs under examples/.
+Below you can find a summary of the different examples.
+They are grouped into :ref:`ref-example-simple` and :ref:`ref-example-advanced`.
+We suggest starting with the :ref:`ref-example-tutorial`
+before moving on to the examples, especially if you are new to using BurnMan.
 
 Finally, we also include the scripts that were used for all computations and
 figures in the 2014 BurnMan paper in the misc/ folder, see
 :ref:`ref-example-paper`.
 
-.. _ref-example-tutorial:
-
-Tutorial
-========
-
-The tutorial for BurnMan currently consists of three separate units:
-  - :mod:`step 1 <contrib.tutorial.step_1>`,
-  - :mod:`step 2 <contrib.tutorial.step_2>`, and
-  - :mod:`step 3 <contrib.tutorial.step_3>`.
-
-.. _ref-example-tut1:
-
-.. automodule:: contrib.tutorial.step_1
-
-When run (without putting in a more realistic composition), the program produces the following image:
-
-.. image:: figures/tut-step1.png
-
-Your goal in this tutorial is to improve this awful fit...
 
 
-
-.. automodule:: contrib.tutorial.step_2
-
-Without changing any input, the program should produce the following image showing the misfit as a function of perovskite content:
-
-.. image:: figures/tut-step2.png
-
-
-
-.. automodule:: contrib.tutorial.step_3
-
-After changing the standard deviations for :math:`K_{0}^{'}` and :math:`G_{0}^{'}` to 0.2, the following figure of velocities for 1000 realizations is produced:
-
-.. image:: figures/tut-step3.png
-
-
-.. _ref-example-simple:
 
 Simple Examples
 ===============
