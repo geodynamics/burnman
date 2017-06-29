@@ -6,14 +6,11 @@
 Welcome to BurnMan's documentation!
 ===================================
 
-The code documentation including class and function description can be found online at `http://burnman.readthedocs.io <http://burnman.readthedocs.io>`_.
-
 .. automodule:: burnman
 
 .. toctree::
    :maxdepth: 4
 
-   overview
    background
    tutorial
    examples

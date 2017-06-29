@@ -11,7 +11,6 @@ Welcome to BurnMan's documentation!
 .. toctree::
    :maxdepth: 4
 
-   overview
    background
    tutorial
    examples
