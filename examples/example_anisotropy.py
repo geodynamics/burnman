@@ -5,7 +5,7 @@
 
 """
 example_anisotropy
------------------
+------------------
 
 This example illustrates the basic functions required to convert 
 an elastic stiffness tensor into elastic properties.
@@ -172,6 +172,7 @@ if __name__ == "__main__":
             cbar.add_lines(lines)
 
         plt.tight_layout()
+        plt.savefig("output_figures/example_anisotropy.png")
         plt.show()
 
     plot_anisotropic_seismic_properties(talc)
