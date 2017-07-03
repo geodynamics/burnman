@@ -177,6 +177,7 @@ from .material import Material
 from .perplex import PerplexMaterial
 from .composite import Composite
 from .layer import Layer
+from .planet import Planet
 from .solutionmodel import SolutionModel
 from .solidsolution import SolidSolution
 from .combinedmineral import CombinedMineral

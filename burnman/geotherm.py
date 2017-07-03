@@ -24,8 +24,8 @@ def brown_shankland(depths):
         The list of temperatures for each of the pressures. :math:`[K]`
     """
     
-    assert(min(depths) > min(table_brown_depth))
-    assert(max(depths) < max(table_brown_depth))
+    assert(min(depths) >= min(table_brown_depth))
+    assert(max(depths) <= max(table_brown_depth))
     temperature = np.empty_like(depths)
     for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(
@@ -47,8 +47,8 @@ def anderson(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    assert(min(depths) > min(table_anderson_depth))
-    assert(max(depths) < max(table_anderson_depth))
+    assert(min(depths) >= min(table_anderson_depth))
+    assert(max(depths) <= max(table_anderson_depth))
     temperature = np.empty_like(depths)
     for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(

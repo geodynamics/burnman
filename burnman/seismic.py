@@ -287,6 +287,20 @@ class SeismicTable(Seismic1DModel):
                 "Density has not been defined for this seismic model")
         return self._lookup(depth, self.table_density)
 
+    def bullen(self, depth):
+        """
+        Returns the Bullen parameter only for significant arrays
+        """
+        assert(len(depth)>3)
+        v_phi = self.v_phi(depth)
+        density = self.density(depth)
+        phi = v_phi * v_phi
+        kappa = phi * density
+        dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(self.pressure(depth), edge_order=2)
+        dphidz = np.gradient(phi, edge_order=2) / np.gradient(depth, edge_order=2) / self.gravity(depth)
+        bullen = dkappadP - dphidz
+        return bullen
+
     def depth(self, pressure):
         if max(pressure) > max(self.table_pressure) or min(pressure) < min(self.table_pressure):
             raise ValueError("Pressure outside range of SeismicTable")

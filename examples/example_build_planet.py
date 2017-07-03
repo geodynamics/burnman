@@ -45,7 +45,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import burnman
-import burnman.planet as planet
 import burnman.mineral_helpers as helpers
 
 if __name__ == "__main__":
@@ -90,11 +89,25 @@ if __name__ == "__main__":
 
     #The minerals that make up our core do not currently implement the thermal equation of state, so we will
     #define the temperature as None. For an isothermal profile this can be change to a singular value (e.g. 300)
+    radius_planet=6371.e3
+    # inner_core
+    inner_core = burnman.Layer("inner core", radius_planet=radius_planet, max_depth =radius_planet, min_depth =radius_planet-1220e3, n_slices = 10)
+    inner_core.set_composition(burnman.minerals.other.Fe_Dewaele())
+    inner_core.set_temperature_mode('user_defined', burnman.geotherm.brown_shankland(inner_core.depths))
 
-    inner_core = planet.Planet.Layer("inner core", burnman.minerals.other.Fe_Dewaele(), 1220e3, n_slices = 100)
-    outer_core = planet.Planet.Layer("outer core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, n_slices = 500)
+    
+    # outer_core
+    outer_core = burnman.Layer("outer core",radius_planet=radius_planet, max_depth =radius_planet-1220e3, min_depth =radius_planet-3480.e3, n_slices = 10)
+    outer_core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+    outer_core.set_temperature_mode('user_defined', burnman.geotherm.brown_shankland(outer_core.depths))
 
     #Next the Mantle.
+    mantle = burnman.Layer("mantle",radius_planet=radius_planet, max_depth =radius_planet-3480e3, min_depth =0., n_slices = 20)
+    mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+    mantle.set_temperature_mode('adiabat')
+    
+    '''
+    Include phase transition in layer. TO BE IMPLEMENTED
     LM = burnman.minerals.SLB_2011.mg_bridgmanite()
     UM = burnman.minerals.SLB_2011.forsterite()
 
@@ -104,17 +117,16 @@ if __name__ == "__main__":
     class mantle_rock(helpers.HelperLowHighPressureRockTransition):
         def __init__(self):
             helpers.HelperLowHighPressureRockTransition.__init__(self,25.e9,UM,LM)
+    '''
 
-    #Isothermal mantles are boring, here we define a mantle that has a linear temperature profile, all we need
-    #
-    mantle = planet.Planet.LayerLinearTemperature("mantle", mantle_rock(), 6371.e3, 3000.0, 300.0, 200)
 
     #Now we calculate the planet. Go BurnMan Go!
-    Plan = planet.Planet([inner_core, outer_core, mantle], verbose=True)
+    Plan = burnman.Planet('earth_like',[inner_core, outer_core, mantle], potential_temperature = 1200, verbose=True)
+    Plan.set_state()
 
     #Now we output the mass of the planet and moment of inertia
     print()
-    print("mass/Earth= %.3f, moment of inertia= %.3f" % (Plan.mass/5.97e24, Plan.moment_of_inertia_factor))
+    print("mass/Earth= %.3f, moment of inertia= %.3f" % (Plan.mass/5.97e24, Plan.moment_of_inertia))
 
     #And here's the mass of the individual layers:
     for layer in Plan.layers:

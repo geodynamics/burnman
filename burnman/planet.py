@@ -7,111 +7,44 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline
-from burnman import averaging_schemes
 from burnman import constants
+from .material import Material, material_property
 
-
-class Planet(object):
+class Planet(Material):
     """
     A planet class that find a self-consistent planet.
     """
 
-    class LayerBase(object):
-        """
-        Base class for a layer of a planet.
-        """
-        def __init__(self, name, rock, outer_radius, n_slices=100):
-            self.name = name
-            self.rock = rock
-            self.inner_radius = None
-            self.outer_radius = outer_radius
-            self.thickness = None
-            self.n_slices = n_slices
-            self.n_start = None
-            self.n_end = None
-            self.mass = None
-            assert(n_slices>=6)
-
-    class Layer(LayerBase):
-        """
-        A layer with a constant temperature.
-        """
-        def __init__(self, name, rock, outer_radius, temperature = 300.0, n_slices = 100):
-            Planet.LayerBase.__init__(self, name, rock, outer_radius, n_slices)
-            self.constant_temperature = temperature
-
-        def temperature(self, radius):
-            return self.constant_temperature
-
-    class LayerLinearTemperature(LayerBase):
-        """
-        A layer with a linear temperature profile.
-        """
-        def __init__(self, name, rock, outer_radius, temperature_inner, temperature_outer, n_slices = 100):
-            Planet.LayerBase.__init__(self, name, rock, outer_radius, n_slices)
-            self._temperature_inner = temperature_inner
-            self._temperature_outer = temperature_outer
-
-        def temperature(self, radius):
-            return self._temperature_inner + (self._temperature_outer-self._temperature_inner)*(radius-self.inner_radius)/self.thickness
-
-    def __init__(self, layers, n_max_iterations = 50, verbose = False):
+    def __init__(self, name, layers, potential_temperature =0., n_max_iterations = 50, verbose = False):
         """
         Generate the planet based on the given layers (List of Layer)
         """
-
         # sort layers
-        self.layers = sorted(layers, key=lambda x: x.outer_radius)
+        self.layers = sorted(layers, key=lambda x: x.min_depth)
+        #assert layers attach to one another
+        if len(self.layers)>1:
+            for l in range(1,len(self.layers)):
+                assert(self.layers[l].outer_radius==self.layers[l-1].inner_radius)
+        
 
-        # compute thickness, slices, indices, etc.
-        self.radial_slices = np.array([])
-        current_radius = 0.0
-        n = 0
+        self.name = name
+        
+   
+   
+        self.depths=self.evaluate_planet(['depths'])
+        self.min_depth = min(self.depths)
+        self.max_depth = max(self.depths)
+        self.n_slices = len(self.depths)
+        self.radius_planet = max(self.depths)
+        self.radii = self.radius_planet - self.depths
+        
         for layer in self.layers:
-            layer.inner_radius = current_radius
-            slices = np.linspace(current_radius, layer.outer_radius, layer.n_slices)
-            layer.thickness = layer.outer_radius - layer.inner_radius
-            current_radius = layer.outer_radius
-            slices[0] += 1 # make the boundaries one meter thick
-            layer.n_start = n
-            layer.n_end = n + layer.n_slices
-            n += layer.n_slices
-            self.radial_slices = np.append(self.radial_slices, slices)
+            layer.n_start = np.where(self.depths == layer.min_depth)[0][-1]
+            layer.n_end = np.where(self.depths == layer.max_depth)[0][0]+1
+        self.potential_temperature = potential_temperature
+        
+        self.verbose = verbose
 
-        self.radial_slices[0] = 0.0  # overwrite inner-most radius to zero
-        self.radius = current_radius
-
-        # initial pressure guess: linear as a function of radius
-        max_p = 350e9
-        self.pressures = np.array([max_p * (1.0 - r / self.radius) for r in self.radial_slices])
-        self.temperatures = [self.get_layer_by_radius(r).temperature(r) for r in self.radial_slices]
-        self.densities = np.empty_like(self.pressures)
-        self.gravity = np.empty_like(self.pressures)
-
-        self.averaging_scheme = averaging_schemes.VoigtReussHill()
-
-        last_center_pressure = 0.0
-        for i in range(n_max_iterations):
-            if verbose:
-                print("on iteration %d" % (i+1))
-            self._evaluate_eos()
-
-            self._compute_gravity(self.densities, self.radial_slices)
-            self._compute_pressure(self.densities, self.gravity, self.radial_slices)
-
-            # compute relative error (pressure in the center of our planet)
-            rel_err = abs(last_center_pressure - self.pressures[0]) / self.pressures[0]
-            if verbose:
-                print("  relative central core pressure error between iterations: %e" % rel_err)
-
-            if rel_err < 1e-5:
-                break
-            last_center_pressure = self.pressures[0]
-
-        self.mass = self._compute_mass()
-
-        self.moment_of_inertia = self._compute_moment_of_inertia()
-        self.moment_of_inertia_factor = self.moment_of_inertia / self.mass / self.radial_slices[-1] / self.radial_slices[-1]
 
     def get_layer(self, name):
         for layer in self.layers:
@@ -125,88 +58,574 @@ class Planet(object):
                 return layer
         raise LookupError()
 
-    def _evaluate_eos(self):
-        # evaluate each layer separately
+
+
+    def evaluate_planet(self,properties):
+        all=None
+        for prop in properties:
+            oneprop=None
+            for layer in self.layers:
+                if oneprop is None:
+                    oneprop = getattr(layer, prop)
+                else:
+                    oneprop = np.append(oneprop,getattr(layer, prop))
+            if all is None:
+                all=np.array(oneprop)
+            else:
+                np.append(all,oneprop, axis=0)
+        return all
+
+
+
+
+    def set_state(self,pressure_mode='selfconsistent',  pressures=None, pressure_top=0., gravity_bottom=0.,n_max_iterations=50):
+        """
+        Sets the pressure of the planet by user-defined values are in a self-consistent fashion.
+        pressure_mode is 'user_defined' or 'selfconsistent'.
+        The default for the planet is self-consistent, with zero pressure at the surface and zero pressure at the center.
+        """
+        assert(pressure_mode == 'user_defined' or pressure_mode == 'selfconsistent')
         for layer in self.layers:
-            mypressures = self.pressures[layer.n_start: layer.n_end]
-            mytemperatures = self.temperatures[layer.n_start: layer.n_end]
+            assert(layer.temperature_mode is not None)
+        
+        self.gravity_bottom = gravity_bottom
 
-            density = layer.rock.evaluate(['density'], mypressures, mytemperatures)
+        if pressure_mode == 'user_defined':
+            assert(len(pressures) == len(self.depths))
+            self._pressures = pressures
+            warnings.warn(
+                "By setting the pressures in Planet it is unlikely to be self-consistent")
+            self._temperatures = self._evaluate_temperature(self._pressures, self.potential_temperature)
 
-            self.densities[layer.n_start: layer.n_end] = density
+        if pressure_mode == 'selfconsistent':
+            self.pressure_top = pressure_top
+            ref_press = np.zeros_like(pressures)
+            new_press = self.pressure_top + \
+                (self.depths - min(self.depths)) * \
+                2.e5  # initial pressure curve guess
+            temperatures = self._evaluate_temperature(new_press, self.potential_temperature)
+            # Make it self-consistent!!!
+            i = 0
 
-    def _compute_gravity(self, density, radii):
+            while i< n_max_iterations:
+                i += 1
+                ref_press = new_press
+                new_grav, new_press = self._evaluate_eos(new_press, temperatures, gravity_bottom, pressure_top)
+                temperatures = self._evaluate_temperature(new_press, self.potential_temperature)
+                rel_err = abs((max(ref_press) - max(new_press) )/ max(new_press))
+                if self.verbose:
+                    print("Iteration %i  maximum core pressure error between iterations: %e" % (i,rel_err))
+
+                if rel_err < 1e-5:
+                    break
+            
+            self._pressures = new_press
+            self._temperatures = temperatures
+            self._gravity = new_grav
+            
+        
+        for layer in self.layers:
+            layer.layer = []
+            layer._pressures = self._pressures[layer.n_start: layer.n_end]
+            layer._temperatures = self._temperatures[layer.n_start: layer.n_end]
+            for l in range(len(layer.depths)):
+                layer.layer.append(layer.composition.copy())
+                layer.layer[l].set_state(
+                layer._pressures[l], self._temperatures[l])
+
+
+    def _evaluate_eos(self, pressures,temperatures, gravity_bottom, pressure_top):
+        density = self._evaluate_density(pressures,temperatures)
+        grav = self._compute_gravity(density , gravity_bottom)
+        press =  self._compute_pressure( density, grav, pressure_top)
+        return grav, press
+    
+    
+    def _evaluate_density(self, pressures,temperatures):
+        density = []
+        for layer in self.layers:
+            print(pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end])
+            density.append(layer.composition.evaluate(['density'], pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end]))
+        return np.squeeze(np.hstack(density))
+        
+
+
+
+    def _evaluate_temperature(self,pressures, temperature_top):
+        temps= []
+        for layer in self.layers:
+            print(len(pressures[layer.n_start:layer.n_end]))
+            temps.append(layer._evaluate_temperature(pressures[layer.n_start:layer.n_end], temperature_top))
+            temperature_top=temps[-1]
+        return np.hstack(np.squeeze(temps))
+
+    def _compute_gravity(self, density, gravity_bottom):
         """
         Calculate the gravity of the planet, based on a density profile.  This integrates
         Poisson's equation in radius, under the assumption that the planet is laterally
         homogeneous.
         """
 
-        start_gravity = 0.0
-        for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            rhofunc = UnivariateSpline(radii, density)
-            #Create a spline fit of density as a function of radius
-
-            #Numerically integrate Poisson's equation
-            poisson = lambda p, x: 4.0 * np.pi * constants.G * rhofunc(x) * x * x
-            grav = np.ravel(odeint( poisson, start_gravity, radii))
+        start_gravity = gravity_bottom
+        grav = []
+        print(density)
+        for layer in self.layers[::-1]:
+            print(layer.n_start, layer.n_end, start_gravity)
+            grav.extend(layer._compute_gravity(density[layer.n_start: layer.n_end], start_gravity)[::-1])
             start_gravity = grav[-1]
-            self.gravity[layer.n_start: layer.n_end] = grav
+            print(grav)
+        return np.array(grav)[::-1]
 
-        # we need to skip scaling gravity[0]
-        self.gravity[1:] = self.gravity[1:]/self.radial_slices[1:]/self.radial_slices[1:]
 
-    def _compute_pressure(self, density, gravity, radii):
+    def _compute_pressure(self, density, gravity, pressure_top):
         """
         Calculate the pressure profile based on density and gravity.  This integrates
         the equation for hydrostatic equilibrium  P = rho g z.
         """
 
-        start_pressure = 0.0
-        for layer in self.layers[::-1]:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            gravity = self.gravity[layer.n_start: layer.n_end]
+        start_pressure = pressure_top
+        press=[]
+        for layer in self.layers:
+            press.extend(layer._compute_pressure(density[layer.n_start: layer.n_end], gravity[layer.n_start: layer.n_end], start_pressure))
+        return np.array(press)
+                         
 
-            # convert radii to depths
-            depths = radii[-1]-radii
-
-            # Make a spline fit of density as a function of depth
-            rhofunc = UnivariateSpline(depths[::-1], density[::-1])
-            # Make a spline fit of gravity as a function of depth
-            gfunc = UnivariateSpline(depths[::-1], gravity[::-1])
-
-            # integrate the hydrostatic equation
-            pressure = np.ravel(odeint((lambda p, x : gfunc(x)* rhofunc(x)), start_pressure, depths[::-1]))
-            start_pressure = pressure[-1]
-
-            self.pressures[layer.n_start: layer.n_end] = pressure[::-1]
-
-    def _compute_mass( self):
+    @property
+    def mass( self):
         """
         calculates the mass of the entire planet [kg]
         """
         mass = 0.0
         for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            rhofunc = UnivariateSpline(radii, density)
-            layer.mass = quad(lambda r : 4*np.pi*rhofunc(r)*r*r,
-                            radii[0], radii[-1])[0]
+            print(layer.mass)
             mass += layer.mass
         return mass
 
-    def _compute_moment_of_inertia( self):
+    @property
+    def moment_of_inertia( self):
         """
         #Returns the moment of inertia of the planet [kg m^2]
         """
         moment = 0.0
         for layer in self.layers:
-            radii = self.radial_slices[layer.n_start: layer.n_end]
-            density = self.densities[layer.n_start: layer.n_end]
-            rhofunc = UnivariateSpline(radii, density)
-            moment += quad(lambda r : 8.0/3.0*np.pi*rhofunc(r)*r*r*r*r,
-                           radii[0], radii[-1])[0]
+            moment += layer.moment_of_inertia
         return moment
+
+    @property
+    def gravity(self):
+        """
+        Returns gravity of the layer [m s^(-2)]
+        """
+        return self._compute_gravity(self.density)
+
+    @property
+    def bullen(self):
+        """
+        Returns the Bullen parameter
+        """
+        kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
+        phi = self.bulk_sound_velocity * self.bulk_sound_velocity
+        dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(self.pressure, edge_order=2)
+        dphidz = np.gradient(phi, edge_order=2) / np.gradient(self.depths, edge_order=2) / self.gravity
+        bullen = dkappadP - dphidz
+        return bullen
+
+    @property
+    def brunt_vasala(self):
+        kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
+        brunt_vasala = self.density * self.gravity * \
+            self.gravity * (self.bullen - 1.) / kappa
+        return brunt_vasala
+
+    @property
+    def pressure(self):
+        """
+        Returns current pressure that was set with :func:`~burnman.material.Material.set_state`.
+
+
+        Notes
+        -----
+        - Aliased with :func:`~burnman.material.Material.P`.
+
+        Returns
+        -------
+        pressure : float
+            Pressure in [Pa].
+        """
+        return self._pressures
+
+    @property
+    def temperature(self):
+        """
+        Returns current temperature that was set with :func:`~burnman.material.Material.set_state`.
+
+        Notes
+        -----
+        - Aliased with :func:`~burnman.material.Material.T`.
+
+        Returns
+        -------
+        temperature : float
+            Temperature in [K].
+        """
+        return self._temperatures
+
+    @material_property
+    def internal_energy(self):
+        """
+        Returns the internal energy of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.energy`.
+
+        Returns
+        -------
+        internal_energy : float
+            The internal energy in [J].
+        """
+        return np.array(
+            [self.layer[i].internal_energy for i in range(len(self.layer))])
+
+    @material_property
+    def molar_gibbs(self):
+        """
+        Returns the Gibbs free energy of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.gibbs`.
+
+        Returns
+        -------
+        molar_gibbs : float
+            Gibbs free energy in [J].
+        """
+        return np.array(
+            [self.layer[i].molar_gibbs for i in range(len(self.layer))])
+
+    @material_property
+    def molar_helmholtz(self):
+        """
+        Returns the Helmholtz free energy of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.helmholtz`.
+
+        Returns
+        -------
+        molar_helmholtz : float
+            Helmholtz free energy in [J].
+        """
+        return np.array(
+            [self.layer[i].molar_helmholtz for i in range(len(self.layer))])
+
+    @material_property
+    def molar_mass(self):
+        """
+        Returns molar mass of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+
+        Returns
+        -------
+        molar_mass : float
+            Molar mass in [kg/mol].
+        """
+        return np.array(
+            [self.layer[i].molar_mass for i in range(len(self.layer))])
+
+    @material_property
+    def molar_volume(self):
+        """
+        Returns molar volume of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.V`.
+
+        Returns
+        -------
+        molar_volume : float
+            Molar volume in [m^3/mol].
+        """
+        return np.array(
+            [self.layer[i].molar_volume for i in range(len(self.layer))])
+
+    @material_property
+    def density(self):
+        """
+        Returns the density of this material.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.rho`.
+
+        Returns
+        -------
+        density : float
+            The density of this material in [kg/m^3].
+        """
+        return np.array(
+            [self.layer[i].density for i in range(len(self.layer))])
+
+    @material_property
+    def molar_entropy(self):
+        """
+        Returns entropy of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.S`.
+
+        Returns
+        -------
+        entropy : float
+            Entropy in [J].
+        """
+        return np.array(
+            [self.layer[i].molar_entropy for i in range(len(self.layer))])
+
+    @material_property
+    def molar_enthalpy(self):
+        """
+        Returns enthalpy of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.H`.
+
+        Returns
+        -------
+        enthalpy : float
+            Enthalpy in [J].
+        """
+        return np.array(
+            [self.layer[i].molar_enthalpy for i in range(len(self.layer))])
+
+    @material_property
+    def isothermal_bulk_modulus(self):
+        """
+        Returns isothermal bulk modulus of the material.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.K_T`.
+
+        Returns
+        -------
+        isothermal_bulk_modulus : float
+            Bulk modulus in [Pa].
+        """
+        return np.array(
+            [self.layer[i].isothermal_bulk_modulus for i in range(len(self.layer))])
+
+    @material_property
+    def adiabatic_bulk_modulus(self):
+        """
+        Returns the adiabatic bulk modulus of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.K_S`.
+
+        Returns
+        -------
+        adiabatic_bulk_modulus : float
+            Adiabatic bulk modulus in [Pa].
+        """
+        return np.array(
+            [self.layer[i].adiabatic_bulk_modulus for i in range(len(self.layer))])
+
+    @material_property
+    def isothermal_compressibility(self):
+        """
+        Returns isothermal compressibility of the mineral (or inverse isothermal bulk modulus).
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_T`.
+
+        Returns
+        -------
+        (K_T)^-1 : float
+            Compressibility in [1/Pa].
+        """
+        return np.array(
+            [self.layer[i].isothermal_compressibility for i in range(len(self.layer))])
+
+    @material_property
+    def adiabatic_compressibility(self):
+        """
+        Returns adiabatic compressibility of the mineral (or inverse adiabatic bulk modulus).
+
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_S`.
+
+        Returns
+        -------
+        adiabatic_compressibility : float
+            adiabatic compressibility in [1/Pa].
+        """
+        return np.array(
+            [self.layer[i].adiabatic_compressibility for i in range(len(self.layer))])
+
+    @material_property
+    def shear_modulus(self):
+        """
+        Returns shear modulus of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.beta_G`.
+
+        Returns
+        -------
+        shear_modulus : float
+            Shear modulus in [Pa].
+        """
+        return np.array(
+            [self.layer[i].shear_modulus for i in range(len(self.layer))])
+
+    @material_property
+    def p_wave_velocity(self):
+        """
+        Returns P wave speed of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_p`.
+
+        Returns
+        -------
+        p_wave_velocity : float
+            P wave speed in [m/s].
+        """
+        return np.array(
+            [self.layer[i].p_wave_velocity for i in range(len(self.layer))])
+
+    @material_property
+    def bulk_sound_velocity(self):
+        """
+        Returns bulk sound speed of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_phi`.
+
+        Returns
+        -------
+        bulk sound velocity: float
+            Sound velocity in [m/s].
+        """
+        return np.array(
+            [self.layer[i].bulk_sound_velocity for i in range(len(self.layer))])
+
+    @material_property
+    def shear_wave_velocity(self):
+        """
+        Returns shear wave speed of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.v_s`.
+
+        Returns
+        -------
+        shear_wave_velocity : float
+            Wave speed in [m/s].
+        """
+        return np.array(
+            [self.layer[i].shear_wave_velocity for i in range(len(self.layer))])
+
+    @material_property
+    def grueneisen_parameter(self):
+        """
+        Returns the grueneisen parameter of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.gr`.
+
+        Returns
+        -------
+        gr : float
+            Grueneisen parameters [unitless].
+        """
+        return np.array(
+            [self.layer[i].grueneisen_parameter for i in range(len(self.layer))])
+
+    @material_property
+    def thermal_expansivity(self):
+        """
+        Returns thermal expansion coefficient of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.alpha`.
+
+        Returns
+        -------
+        alpha : float
+            Thermal expansivity in [1/K].
+        """
+        return np.array(
+            [self.layer[i].thermal_expansivity for i in range(len(self.layer))])
+
+    @material_property
+    def heat_capacity_v(self):
+        """
+        Returns heat capacity at constant volume of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.C_v`.
+
+        Returns
+        -------
+        heat_capacity_v : float
+            Heat capacity in [J/K/mol].
+        """
+        return np.array(
+            [self.layer[i].heat_capacity_v for i in range(len(self.layer))])
+
+    @material_property
+    def heat_capacity_p(self):
+        """
+        Returns heat capacity at constant pressure of the mineral.
+
+        Notes
+        -----
+        - Needs to be implemented in derived classes.
+        - Aliased with :func:`~burnman.material.Material.C_p`.
+
+        Returns
+        -------
+        heat_capacity_p : float
+            Heat capacity in [J/K/mol].
+        """
+        return np.array(
+            [self.layer[i].heat_capacity_p for i in range(len(self.layer))])
