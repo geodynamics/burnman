@@ -83,7 +83,7 @@ if __name__ == "__main__":
     lower_mantle.set_temperature_mode(temperature_mode='adiabat', temperature_top=1900.)
     #Alternatively, we choose a user-defined temperature, given by the Brown & Shankland geotherm
     #lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
-                                          temperatures =burnman.geotherm.brown_shankland(depths))
+    #                                      temperatures =burnman.geotherm.brown_shankland(depths))
                            
     lower_mantle.set_state(pressure_mode='selfconsistent',
                                pressure_top=pressure[0], gravity_bottom=gravity[-1])

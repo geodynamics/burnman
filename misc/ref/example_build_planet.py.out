@@ -1,17 +1,22 @@
-on iteration 1
-on iteration 2
-on iteration 3
-on iteration 4
-on iteration 5
-on iteration 6
-on iteration 7
-on iteration 8
-on iteration 9
-on iteration 10
-on iteration 11
+Iteration 1  maximum core pressure error between iterations: 6.689277e-01
+Iteration 2  maximum core pressure error between iterations: 3.429670e-01
+Iteration 3  maximum core pressure error between iterations: 1.676346e-01
+Iteration 4  maximum core pressure error between iterations: 6.843174e-02
+Iteration 5  maximum core pressure error between iterations: 2.556444e-02
+Iteration 6  maximum core pressure error between iterations: 9.184659e-03
+Iteration 7  maximum core pressure error between iterations: 3.248780e-03
+Iteration 8  maximum core pressure error between iterations: 1.142705e-03
+Iteration 9  maximum core pressure error between iterations: 4.011601e-04
+Iteration 10  maximum core pressure error between iterations: 1.407470e-04
+Iteration 11  maximum core pressure error between iterations: 4.937207e-05
+Iteration 12  maximum core pressure error between iterations: 1.731808e-05
+Iteration 13  maximum core pressure error between iterations: 6.074510e-06
 
 mass/Earth= 1.028, moment of inertia= 0.320
+upper_mantle mass fraction of planet 0.167
+lower_mantle mass fraction of planet 0.476
+outer core mass fraction of planet 0.338
 inner core mass fraction of planet 0.018
-outer core mass fraction of planet 0.339
-mantle mass fraction of planet 0.642
 
+BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
+  " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")

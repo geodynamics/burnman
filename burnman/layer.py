@@ -211,15 +211,14 @@ class Layer(object):
         def poisson(p, x): return 4.0 * np.pi * \
             constants.G * rhofunc(x) * x * x
         grav = np.ravel(
-            odeint(
-                poisson,
-                gravity_bottom *
-                radii[0] *
-                radii[0],
-                radii))
-        grav[:] = grav[:] / radii[:] / radii[:]
+            odeint( poisson, gravity_bottom *
+                radii[0] * radii[0], radii))
+        
         if radii[0] == 0:
             grav[0] = 0
+            grav[1:] = grav[1:] / radii[1:] / radii[1:]
+        else:
+            grav[:] = grav[:] / radii[:] / radii[:]
         return grav[::-1]
 
     def _compute_pressure(self, density, gravity, pressure_top):
