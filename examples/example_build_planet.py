@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
     #Now we output the mass of the planet and moment of inertia
     print()
-    print("mass/Earth= %.3f, moment of inertia= %.3f" % (Plan.mass/5.97e24, Plan.moment_of_inertia))
+    print("mass/Earth= %.3f, moment of inertia= %.3f" % (Plan.mass/5.97e24, Plan.moment_of_inertia_factor))
 
     #And here's the mass of the individual layers:
     for layer in Plan.layers:
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     figure = plt.figure(figsize = (12,10))
     figure.suptitle('Your planet is %.3f Earth Masses with Average Density of %.1f kg/m$^3$' %((Plan.mass/5.97e24), \
-                    (Plan.mass/(4./3.*np.pi*Plan.radial_slices[-1]*Plan.radial_slices[-1]*Plan.radial_slices[-1]))),\
+                    (Plan.mass/(4./3.*np.pi*Plan.radius_planet*Plan.radius_planet*Plan.radius_planet))),\
                      fontsize=20)
 
     ax1 = plt.subplot2grid( (6,3) , (0,0), colspan=3, rowspan=3)
@@ -151,25 +151,26 @@ if __name__ == "__main__":
     ax3 = plt.subplot2grid( (6,3) , (4,0), colspan=3, rowspan=1)
     ax4 = plt.subplot2grid( (6,3) , (5,0), colspan=3, rowspan=1)
 
-    ax1.plot(Plan.radial_slices/1.e3,Plan.densities/1.e3,'k', linewidth = 2.)
-    ax1.set_ylim(0.,(max(Plan.densities)/1.e3)+1.)
-    ax1.set_xlim(0.,max(Plan.radial_slices)/1.e3)
+    ax1.plot(Plan.radii/1.e3,Plan.density/1.e3,'k', linewidth = 2.)
+    ax1.set_ylim(0.,(max(Plan.density)/1.e3)+1.)
+    ax1.set_xlim(0.,max(Plan.radii)/1.e3)
     ax1.set_ylabel("Density ( $\cdot 10^3$ kg/m$^3$)")
+    plt.show()
 
     #Make a subplot showing the calculated pressure profile
-    ax2.plot( Plan.radial_slices/1.e3, Plan.pressures/1.e9, 'b', linewidth=2.)
+    ax2.plot( Plan.radii/1.e3, Plan.pressures/1.e9, 'b', linewidth=2.)
     ax2.set_ylim(0.,(max(Plan.pressures)/1e9)+10.)
     ax2.set_xlim(0.,max(Plan.radial_slices)/1.e3)
     ax2.set_ylabel("Pressure (GPa)")
 
     #Make a subplot showing the calculated gravity profile
-    ax3.plot( Plan.radial_slices/1.e3, Plan.gravity, 'r', linewidth=2.)
+    ax3.plot( Plan.radii/1.e3, Plan.gravity, 'r', linewidth=2.)
     ax3.set_ylabel("Gravity (m/s$^2)$")
     ax3.set_xlim(0.,max(Plan.radial_slices)/1.e3)
     ax3.set_ylim(0.,max(Plan.gravity)+0.5)
 
     #Make a subplot showing the calculated temperature profile
-    ax4.plot( Plan.radial_slices/1.e3, Plan.temperatures, 'g', linewidth=2.)
+    ax4.plot( Plan.radii/1.e3, Plan.temperatures, 'g', linewidth=2.)
     ax4.set_ylabel("Temperature ($K$)")
     ax4.set_xlabel("Radius (km)")
     ax4.set_xlim(0.,max(Plan.radial_slices)/1.e3)

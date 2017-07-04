@@ -19,6 +19,7 @@ class Planet(Material):
         """
         Generate the planet based on the given layers (List of Layer)
         """
+        Material.__init__(self)
         # sort layers
         self.layers = sorted(layers, key=lambda x: x.min_depth)
         #assert layers attach to one another
@@ -144,7 +145,6 @@ class Planet(Material):
     def _evaluate_density(self, pressures,temperatures):
         density = []
         for layer in self.layers:
-            print(pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end])
             density.append(layer.composition.evaluate(['density'], pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end]))
         return np.squeeze(np.hstack(density))
         
@@ -154,7 +154,6 @@ class Planet(Material):
     def _evaluate_temperature(self,pressures, temperature_top):
         temps= []
         for layer in self.layers:
-            print(len(pressures[layer.n_start:layer.n_end]))
             temps.append(layer._evaluate_temperature(pressures[layer.n_start:layer.n_end], temperature_top))
             temperature_top=temps[-1]
         return np.hstack(np.squeeze(temps))
@@ -168,12 +167,9 @@ class Planet(Material):
 
         start_gravity = gravity_bottom
         grav = []
-        print(density)
         for layer in self.layers[::-1]:
-            print(layer.n_start, layer.n_end, start_gravity)
             grav.extend(layer._compute_gravity(density[layer.n_start: layer.n_end], start_gravity)[::-1])
             start_gravity = grav[-1]
-            print(grav)
         return np.array(grav)[::-1]
 
 
@@ -197,7 +193,6 @@ class Planet(Material):
         """
         mass = 0.0
         for layer in self.layers:
-            print(layer.mass)
             mass += layer.mass
         return mass
 
@@ -210,6 +205,14 @@ class Planet(Material):
         for layer in self.layers:
             moment += layer.moment_of_inertia
         return moment
+
+    @property
+    def moment_of_inertia_factor( self):
+        """
+        #Returns the moment of inertia of the planet [kg m^2]
+        """
+        moment_factor = self.moment_of_inertia/self.mass/self.radius_planet/self.radius_planet
+        return moment_factor
 
     @property
     def gravity(self):
@@ -374,8 +377,7 @@ class Planet(Material):
         density : float
             The density of this material in [kg/m^3].
         """
-        return np.array(
-            [self.layer[i].density for i in range(len(self.layer))])
+        return self.evaluate_planet(['density'])
 
     @material_property
     def molar_entropy(self):
