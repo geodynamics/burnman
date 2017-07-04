@@ -10,6 +10,8 @@ from . import mie_grueneisen_debye as mgd
 from . import birch_murnaghan as bm
 from . import birch_murnaghan_4th as bm4
 from . import modified_tait as mt
+from . import dks_liquid
+from . import dks_solid
 from . import hp
 from . import cork
 from . import vinet
@@ -44,6 +46,10 @@ def create(method):
             return hp.HP_TMT()
         elif method == "cork":
             return cork.CORK()
+        elif method == "dks_l":
+            return dks_liquid.DKS_L()
+        elif method == "dks_s":
+            return dks_solid.DKS_S()
         else:
             raise Exception("unsupported material method " + method)
     elif isinstance(method, EquationOfState):
