@@ -18,7 +18,62 @@ minerals applicable included or easily
 define one of their own.
 
 The code documentation including class and function descriptions can be found online at
-http://burnman.readthedocs.io.
+http://burnman.readthedocs.io. 
+
+Installation
+------------
+
+Requirements
+^^^^^^^^^^^^
+
+  - Python 2.7.x or Python 3.4+
+  - Python modules: NumPy, SciPy, Matplotlib
+
+
+Source code
+^^^^^^^^^^^
+The source code can be found at https://github.com/geodynamics/burnman.
+
+Install under Ubuntu
+^^^^^^^^^^^^^^^^^^^^
+
+1. Install dependencies using apt by opening a terminal window and entering
+   ``sudo apt-get install python python-scipy python-numpy python-matplotlib git``
+2. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
+3. Go to the Burnman examples directory and type:
+   ``python example_beginner.py``
+Figures should show up, indicating that it is working.
+
+
+Install on a Mac
+^^^^^^^^^^^^^^^^
+
+1. get Xcode
+2. If you don't have Python yet, download it (for free) from
+   python.org/download . Make sure to use either Python 2.7 or Python 3.4+.
+   To check your version of python, type the following in a
+   terminal: ``python --version``
+3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
+4. Install the latest Scipy from http://sourceforge.net/projects/scipy/files/
+5. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
+6. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
+7. Go to the Burnman examples directory and type `python example_beginner.py`
+   Figures should show up, indicating that it is working.
+
+Install under Windows
+^^^^^^^^^^^^^^^^^^^^^
+
+To get Python 2.7.x (for example) running under Windows:
+
+1. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
+2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
+4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
+5. Download BurnMan from github (https://github.com/geodynamics/burnman)
+6. Open Python Shell (IDLE Python GUI)
+7. File -- Open -- find one of the example files
+8. Run the module (or press F5)
+
 
 Citing BurnMan
 --------------
@@ -32,6 +87,9 @@ If you use BurnMan in your work, we ask that you cite the following publications
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
     Geosystems, 15(4), 1164-1179 `(link) <http://dx.doi.org/10.1002/2013GC005122>`_
+
+Contributing to BurnMan 
+-----------------------
 
 We welcome the submission of scripts used to create published results. If you 
 have any scripts that you would like to contribute, please contact us by raising an issue

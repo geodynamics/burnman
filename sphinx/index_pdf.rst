@@ -6,11 +6,10 @@
 Welcome to BurnMan's documentation!
 ===================================
 
-.. automodule:: burnman
-
 .. toctree::
    :maxdepth: 4
-
+	      
+   introduction
    background
    tutorial
    examples
