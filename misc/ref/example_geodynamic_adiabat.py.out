@@ -1,10 +1,10 @@
 Min and max relaxed property when pressure smoothing standard deviation is 0.00 GPa
-Specific heat: 1.16e+03, 1.69e+03
-Thermal expansivity: -5.78e-05, 2.27e-04
+Specific heat: 1.14e+03, 1.77e+03
+Thermal expansivity: -6.83e-05, 2.32e-04
 Compressibilities: 3.65e-12, 2.66e-10
 
 Min and max relaxed property when pressure smoothing standard deviation is 0.50 GPa
-Specific heat: 1.20e+03, 1.59e+03
-Thermal expansivity: -3.59e-05, 1.01e-04
-Compressibilities: 5.13e-12, 5.14e-11
+Specific heat: 1.21e+03, 1.56e+03
+Thermal expansivity: -2.03e-05, 9.62e-05
+Compressibilities: 5.17e-12, 5.15e-11
 
