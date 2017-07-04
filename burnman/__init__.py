@@ -4,8 +4,8 @@
 
 
 """
-A brief introduction to BurnMan
-===============================
+Introducing BurnMan
+===================
 
 Overview
 --------
