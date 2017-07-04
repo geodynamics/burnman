@@ -91,14 +91,13 @@ if __name__ == "__main__":
     upper_mantle = burnman.Layer( "upper_mantle", radius_planet=radius_planet,
         max_depth=660e3, min_depth=0., n_slices=10)
     upper_mantle.set_composition(burnman.minerals.SLB_2011.forsterite())
-    upper_mantle.set_temperature_mode('adiabat')
+    upper_mantle.set_temperature_mode('adiabat', temperature_top =1200.)
 
 
 
     # Now we calculate the planet.
     Plan = burnman.Planet('earth_like',
-                          [inner_core, outer_core, lower_mantle, upper_mantle],
-                          potential_temperature=1200, verbose=True)
+                          [inner_core, outer_core, lower_mantle, upper_mantle], verbose=True)
     # Here we compute its state. Go BurnMan Go!
     # (If we were to change composition of one of the layers, we would have to
     # recompute the state)

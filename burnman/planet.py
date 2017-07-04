@@ -167,8 +167,7 @@ class Planet(object):
             self._pressures = pressures
             warnings.warn(
                 "By setting the pressures in Planet it is unlikely to be self-consistent")
-            self._temperatures = self._evaluate_temperature(
-                self._pressures, self.potential_temperature)
+            self._temperatures = self._evaluate_temperature(self._pressures)
 
         if pressure_mode == 'selfconsistent':
             self.pressure_top = pressure_top
@@ -176,8 +175,7 @@ class Planet(object):
             new_press = self.pressure_top + \
                 (self.depths - min(self.depths)) * \
                 2.e5  # initial pressure curve guess
-            temperatures = self._evaluate_temperature(
-                new_press, self.potential_temperature)
+            temperatures = self._evaluate_temperature( new_press)
             # Make it self-consistent!!!
             i = 0
 
@@ -186,8 +184,7 @@ class Planet(object):
                 ref_press = new_press
                 new_grav, new_press = self._evaluate_eos(
                     new_press, temperatures, gravity_bottom, pressure_top)
-                temperatures = self._evaluate_temperature(
-                    new_press, self.potential_temperature)
+                temperatures = self._evaluate_temperature( new_press)
                 rel_err = abs(
                     (max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
@@ -231,13 +228,16 @@ class Planet(object):
                 ['density'], pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end]))
         return np.squeeze(np.hstack(density))
 
-    def _evaluate_temperature(self, pressures, temperature_top):
+    def _evaluate_temperature(self, pressures):
         """
         Returns the temperatures of different layers for given pressures.
         Used by set_state()
         """
         temps = []
+        temperature_top = None
         for layer in self.layers:
+            if temperature_top is None:
+                temperature_top = layer.temperature_top
             temps.extend(layer._evaluate_temperature(
                 pressures[layer.n_start:layer.n_end], temperature_top))
             temperature_top = temps[-1]

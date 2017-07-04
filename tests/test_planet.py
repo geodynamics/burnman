@@ -9,52 +9,64 @@ import warnings
 import burnman
 from burnman import minerals
 from burnman import seismic
-from burnman import planet
+from burnman.planet import Planet
+from burnman.layer import Layer
 from burnman import mineral_helpers as helpers
 
 from util import BurnManTest
+import numpy as np
 
 
 class test_planet(BurnManTest):
 
     def test_planet_1(self):
 
-        core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, 10)
-        LM = burnman.minerals.SLB_2011.mg_bridgmanite()
-        UM = burnman.minerals.SLB_2011.forsterite()
-        mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, UM, LM)
-        mantle = planet.Planet.Layer("mantle", mantle_rock, 6371.e3, 10)
-        myplanet = planet.Planet([core, mantle])
-
+        core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
+        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_temperature_mode('user_defined', temperatures= 300.*np.ones_like(core.depths))
+        
+        mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
+        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_temperature_mode('adiabat', temperature_top = 1200)
+        myplanet = Planet('earth_like',[core, mantle])
+        myplanet.set_state()
+        
         assert(myplanet.get_layer("core") == core)
         assert(myplanet.get_layer_by_radius(2000.e3) == core)
         assert(myplanet.get_layer_by_radius(4000.e3) == mantle)
         assert(myplanet.get_layer_by_radius(5000.e3) == mantle)
 
-        self.assertFloatEqual(myplanet.pressures[0], 438580390453.7, tol=1.e-4)
+        self.assertFloatEqual(myplanet.pressure[-1], 445428905300.0, tol=1.e-4)
 
 
     def test_sort_layers(self):
-        core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 3485e3, 10)
-        LM = burnman.minerals.SLB_2011.mg_bridgmanite()
-        UM = burnman.minerals.SLB_2011.forsterite()
-        mantle_rock = helpers.HelperLowHighPressureRockTransition(25.0e9, UM, LM)
-        mantle = planet.Planet.Layer("mantle", mantle_rock, 6371e3, 10)
-        myplanet = planet.Planet([mantle, core])
-        assert(myplanet.layers == [core, mantle])
+        core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
+        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_temperature_mode('user_defined', temperatures= 300.*np.ones_like(core.depths))
+        
+        mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
+        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_temperature_mode('adiabat', temperature_top = 1200)
+        myplanet = Planet('earth_like',[core, mantle])
+        assert(myplanet.layers == [mantle,core])
 
     def test_temperature(self):
-        core = planet.Planet.Layer("core", burnman.minerals.other.Liquid_Fe_Anderson(), 200.0, 1000.0, 10)
-        mantle_lower = planet.Planet.LayerLinearTemperature("lower mantle", burnman.minerals.SLB_2011.mg_bridgmanite(), 800.0, 1000, 300.0, 10)
-        mantle_upper = planet.Planet.Layer("upper mantle", burnman.minerals.SLB_2011.forsterite(), 1000.0, 400.0, 10)
-        myplanet = planet.Planet([core, mantle_lower, mantle_upper])
+        core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
+        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_temperature_mode('user_defined', temperatures= burnman.geotherm.brown_shankland(core.depths))
+        
+        mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
+        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_temperature_mode('adiabat', temperature_top = 1200)
+        myplanet = Planet('earth_like',[core, mantle])
+        myplanet.set_state()
+        
+        ref = [ 1200.,          1304.56273992,  1397.12842763,  1480.88446903,  1557.96838056,
+           1629.98958458,  1698.27053255,  1763.96944242,  1828.14624527,  1891.79862543,
+           2452.25581395,  2694.29333333,  2902.27777778,  3073.52666667,  3207.49444444,
+           3305.10666667,  3369.93333333,  3433.17333333,  3470.79333333,  3484.        ]
 
-        ref = [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 998.83333333333337,
-               922.22222222222217, 844.44444444444434, 766.66666666666663, 688.88888888888891, 611.11111111111109,
-               533.33333333333326, 455.55555555555543, 377.77777777777771, 300.0, 400.0, 400.0, 400.0, 400.0, 400.0,
-               400.0, 400.0, 400.0, 400.0, 400.0]
-
-        self.assertArraysAlmostEqual(myplanet.temperatures, ref)
+        self.assertArraysAlmostEqual(myplanet.temperature, ref)
 
 
 if __name__ == '__main__':
