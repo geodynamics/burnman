@@ -58,8 +58,6 @@ The computations are consistently formulated in terms of SI units.
 The code documentation including class and function descriptions can be found online at
 http://burnman.readthedocs.io. 
 
-.. _ref-installation:
-
 This software has been designed to allow the end-user a great deal of freedom
 to do whatever calculations they may wish and to add their own modules. 
 The underlying Python classes have been designed to make new endmember, 
@@ -74,6 +72,8 @@ Structure
 ---------
 .. image:: figures/structure.png
 
+
+.. _ref-installation:
 
 Installation
 ------------
