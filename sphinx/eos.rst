@@ -14,6 +14,11 @@ Birch-Murnaghan
 
 .. autoclass:: burnman.eos.BM3
 
+Morse Potential
+---------------
+
+.. autoclass:: burnman.eos.Morse
+	       
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------
 
@@ -34,7 +39,15 @@ Mie-Grüneisen-Debye
 
 Modified Tait
 -------------
+
 .. autoclass:: burnman.eos.MT
+
+De Koker Solid and Liquid Formulations
+--------------------------------------
+
+.. autoclass:: burnman.eos.DKS_S
+
+.. autoclass:: burnman.eos.DKS_L
 
 Cork
 ----
