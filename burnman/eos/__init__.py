@@ -21,6 +21,8 @@ from .cork import CORK
 from .vinet import Vinet
 from .morse_potential import Morse
 from .birch_murnaghan_4th import BM4
+from .dks_liquid import DKS_L
+from .dks_solid import DKS_S
 from .property_modifiers import calculate_property_modifications
 
 from .helper import create
