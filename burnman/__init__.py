@@ -10,16 +10,39 @@ BurnMan
 Introduction
 ------------
 
-BurnMan is an open source mineral physics toolbox written in Python to
-generate physical properties for the Earth and other planets. At its simplest, BurnMan calculates
-the isotropic thermoelastic moduli by solving the equations-of-state for a
-mixture of minerals defined by the user. The user may select from a list of
-minerals applicable included or easily
-define one of their own.
+BurnMan is an open source mineral physics and seismological toolkit 
+which can enable a user to calculate (or fit) the physical and chemical properties
+of endmember minerals, fluids/melts, solid solutions, and composite assemblages. 
+
+Properties which BurnMan can calculate include:
+
+  - the thermodynamic free energies, allowing phase equilibrium calculations,
+    endmember activities, chemical potentials and oxygen (and other) fugacities.
+
+  - entropy, enabling the user to calculate isentropes for a given assemblage.
+
+  - volume, to allow the user to create density profiles.
+
+  - seismic velocities, including Voigt-Reuss-Hill and Hashin-Strikman bounds
+    and averages.
+
+Data and functions are provided to allow the user to compare calculated
+isentropes and seismic velocity profiles to profiles computed for other
+compositions or constrained by seismology. Further classes and functions 
+allow the prediction of physical properties of the Earth 
+and other planets. 
+
+BurnMan is written in the Python language and is run from the command
+line.  This allows the library to be incorporated into other projects.
+BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_ and `NumPy <http://www.numpy.org/>`_, which are widely used Python
+libraries for scientific computation.  `Matplotlib <http://matplotlib.org/>`_ is used to display results
+and produce publication quality figures.  The computations are consistently
+formulated in terms of SI units.
 
 The code documentation including class and function descriptions can be found online at
 http://burnman.readthedocs.io. 
 
+.. _ref-installation:
 Installation
 ------------
 
@@ -113,35 +136,6 @@ Acknowledgement and Support
 
 Overview
 ========
-
-Motivation
-----------
-
-BurnMan is designed to be a general mineral physics and seismological toolkit
-which can enable a user to calculate (or fit) the physical and chemical properties
-of endmember minerals, fluids/melts, solid solutions, and composite assemblages.
-Such properties include:
-
-  - the thermodynamic free energies, allowing phase equilibrium calculations,
-    endmember activities, chemical potentials and oxygen (and other) fugacities.
-
-  - entropy, enabling the user to calculate isentropes for a given assemblage.
-
-  - volume, to allow the user to create density profiles.
-
-  - seismic velocities, including Voigt-Reuss-Hill and Hashin-Strikman bounds
-    and averages.
-
-Data and functions are provided to allow the user to compare calculated
-isentropes and seismic velocity profiles to profiles computed for other
-compositions or constrained by seismology.
-
-BurnMan is written in the Python language and is run from the command
-line.  This allows the library to be incorporated into other projects.
-BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_ and `NumPy <http://www.numpy.org/>`_, which are widely used Python
-libraries for scientific computation.  `Matplotlib <http://matplotlib.org/>`_ is used to display results
-and produce publication quality figures.  The computations are consistently
-formulated in terms of SI units.
 
 Features
 --------

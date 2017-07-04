@@ -1,3 +1,4 @@
+.. _ref-examples:
 Examples
 ********
 
