@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -64,11 +64,12 @@ class SolutionModel(object):
     a solution model for defining how the endmembers in the solid solution
     interact.
 
-    A user wanting a new solution model should define the functions below.
-    In the base class all of these return zero, so if the solution model
-    does not implement them, they essentially have no effect, and
-    then the Gibbs free energy and molar volume of a solid solution are
-    just the weighted arithmetic averages of the different endmember values.
+    A user wanting a new solution model should define the functions included 
+    in the base class. All of the functions in the base class return zero, 
+    so if the user-defined solution model does not implement them, 
+    they essentially have no effect, and the Gibbs free energy and molar 
+    volume of a solid solution will be equal to the weighted arithmetic 
+    averages of the different endmember values.
     """
 
     def __init__(self):
@@ -322,7 +323,7 @@ class IdealSolution (SolutionModel):
 class AsymmetricRegularSolution (IdealSolution):
 
     """
-    Solution model implementing the asymmetric regular solution model formulation (Holland and Powell, 2003)
+    Solution model implementing the asymmetric regular solution model formulation as described in :cite:`HP2003`.
     """
 
     def __init__(self, endmembers, alphas, energy_interaction, volume_interaction=None, entropy_interaction=None):
@@ -416,7 +417,7 @@ class AsymmetricRegularSolution (IdealSolution):
 class SymmetricRegularSolution (AsymmetricRegularSolution):
 
     """
-    Solution model implementing the symmetric regular solution model
+    Solution model implementing the symmetric regular solution model. This is simply a special case of the :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
     """
 
     def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):
@@ -428,7 +429,7 @@ class SymmetricRegularSolution (AsymmetricRegularSolution):
 class SubregularSolution (IdealSolution):
 
     """
-    Solution model implementing the subregular solution model formulation (Helffrich and Wood, 1989)
+    Solution model implementing the subregular solution model formulation as described in :cite:`HW1989`.
     """
 
     def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):

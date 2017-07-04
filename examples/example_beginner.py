@@ -81,8 +81,8 @@ if __name__ == "__main__":
 
     # Now we get an array of temperatures at which we compute
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
-    # geotherm for mapping pressure to temperature.
-    temperature = burnman.geotherm.brown_shankland(pressure)
+    # geotherm for mapping depths to temperature.
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     # This is the step that does the heavy lifting.  burnman.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,

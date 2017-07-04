@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -288,7 +288,7 @@ class SeismicTable(Seismic1DModel):
         return self._lookup(depth, self.table_density)
 
     def depth(self, pressure):
-        if pressure > max(self.table_pressure) or pressure < min(self.table_pressure):
+        if max(pressure) > max(self.table_pressure) or min(pressure) < min(self.table_pressure):
             raise ValueError("Pressure outside range of SeismicTable")
 
         depth = np.interp(pressure, self.table_pressure, self.table_depth)

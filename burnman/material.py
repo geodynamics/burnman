@@ -1,6 +1,6 @@
 from __future__ import print_function
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
@@ -44,13 +44,6 @@ class Material(object):
 
     The user needs to call set_method() (once in the beginning) and set_state()
     before querying the material with unroll() or density().
-
-    Attributes
-    ----------
-    pressure : float
-        The current pressure as set by :func:`~burnman.Material.set_state`. [Pa]
-    temperature : float
-        The current temperature as set by :func:`~burnman.Material.set_state`. [K]
     """
 
     def __init__(self):

@@ -14,6 +14,11 @@ Material Base Class
 .. autoclass:: burnman.material.Material
 
 
+PerpleX Class
+-------------
+
+.. autoclass:: burnman.perplex.PerplexMaterial
+
 Minerals
 --------
 

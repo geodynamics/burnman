@@ -1,0 +1,5 @@
+numpy
+numpydoc
+matplotlib
+scipy
+sphinxcontrib.bibtex

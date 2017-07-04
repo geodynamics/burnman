@@ -54,7 +54,7 @@ if __name__ == "__main__":
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
     # here we use the Brown & Shankland geotherm
-    temperature = burnman.geotherm.brown_shankland(seis_p)
+    temperature = burnman.geotherm.brown_shankland(depths)
 
     # We create one mineral that contains spin transitions
     rock = minerals.Murakami_etal_2012.fe_periclase()

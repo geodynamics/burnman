@@ -6,19 +6,14 @@
 Welcome to BurnMan's documentation!
 ===================================
 
-The code documentation including class and function description can be found online at `burnman.org/current-doc <http://burnman.org/current-doc>`_.
-
 .. automodule:: burnman
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   overview
    background
+   tutorial
    examples
-
-
+   api
+   zreferences
    
-   
-
-

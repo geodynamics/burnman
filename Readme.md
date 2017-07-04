@@ -12,7 +12,7 @@ BurnMan is released under the GNU GPL v2 or newer
 
 Homepage: http://burnman.org
 
-Documentation: http://burnman.org/current-doc
+Documentation: http://burnman.readthedocs.io
 
 Source code: https://github.com/geodynamics/burnman
 

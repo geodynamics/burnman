@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -9,50 +9,50 @@ from . import tools
 from . import seismic
 
 
-def brown_shankland(pressure):
+def brown_shankland(depths):
     """
     Geotherm from :cite:`Brown1981`. NOTE: Valid only above 270 km
 
     Parameters
     ----------
-    pressure : list of floats
-        The list of pressures at which to evaluate the geotherm. :math:`[Pa]`
+    depths : list of floats
+        The list of depths at which to evaluate the geotherm. :math:`[m]`
 
     Returns
     -------
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    temperature = np.empty_like(pressure)
-    for i in range(len(pressure)):
-        depth = seismic.prem_model.depth(pressure[i])
-        if depth < min(table_brown_depth):
-            raise ValueError(
-                "depth smaller than range Brown & Shankland, 1981")
+    
+    assert(min(depths) > min(table_brown_depth))
+    assert(max(depths) < max(table_brown_depth))
+    temperature = np.empty_like(depths)
+    for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(
             table_brown_depth, table_brown_temperature, depth)
     return temperature
 
 
-def anderson(pressure):
+def anderson(depths):
     """
     Geotherm from :cite:`anderson1982earth`.
 
     Parameters
     ----------
-    pressure : list of floats
-        The list of pressures at which to evaluate the geotherm. :math:`[Pa]`
+    depths : list of floats
+        The list of depths at which to evaluate the geotherm. :math:`[m]`
 
     Returns
     -------
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    temperature = np.empty_like(pressure)
-    for i in range(len(pressure)):
-        depth = seismic.prem_model.depth(pressure[i])
+    assert(min(depths) > min(table_anderson_depth))
+    assert(max(depths) < max(table_anderson_depth))
+    temperature = np.empty_like(depths)
+    for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(
-            table_anderson_depth, table_anderson_temperature, depth)
+                table_anderson_depth, table_anderson_temperature, depth)
     return temperature
 
 

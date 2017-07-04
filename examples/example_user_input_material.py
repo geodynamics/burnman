@@ -104,7 +104,7 @@ if __name__ == "__main__":
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
-    temperature = burnman.geotherm.brown_shankland(seis_p)
+    temperature = burnman.geotherm.brown_shankland(depths)
     # The next line is not required here, because the method is set
     # automatically by defining 'equation_of_state' in mineral.params. This
     # shows an alternative way to set the method later, or reset the method to

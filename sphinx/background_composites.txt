@@ -1,4 +1,4 @@
-Calculating Multi-phase Aggregate Properties
+Calculating Multi-phase Composite Properties
 --------------------------------------------
 
 .. _ref-methods-ave:
