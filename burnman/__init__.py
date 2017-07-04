@@ -116,8 +116,8 @@ Contributing to BurnMan
 -----------------------
 
 We welcome the submission of scripts used to create published results. If you 
-have any scripts that you would like to contribute, please contact us by raising an issue
-or making a pull request `(here) <https://github.com/geodynamics/burnman>`_
+have any scripts that you would like to contribute, please contact us at info@burnman.org
+or make a pull request at `https://github.com/geodynamics/burnman <https://github.com/geodynamics/burnman>`_
 
 Acknowledgement and Support
 ---------------------------

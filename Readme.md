@@ -23,8 +23,7 @@ Authors (as of 2015, listed alphabetically by first name):
 * Sanne Cottaar
 * Timo Heister
 
-Contact: Ian Rose 
-ian.rose@berkeley.edu
+Contact the BurnMan team at info@burnman.org with any questions or suggestions.
 
 ## Requirements
 
