@@ -9,32 +9,10 @@ Welcome to BurnMan's documentation!
 .. automodule:: burnman
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   overview
    background
+   tutorial
    examples
-   main
-   materials
-   eos
-   averaging
-   geotherms
-   thermodynamics
-   seismic
-   mineral_database
+   api
    zreferences
-
-The functions in the :doc:`main` operate on :doc:`materials` which can be
-combination of different minerals from :doc:`mineral_database`.
-   
-   
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

@@ -44,13 +44,6 @@ class Material(object):
 
     The user needs to call set_method() (once in the beginning) and set_state()
     before querying the material with unroll() or density().
-
-    Attributes
-    ----------
-    pressure : float
-        The current pressure as set by :func:`~burnman.Material.set_state`. [Pa]
-    temperature : float
-        The current temperature as set by :func:`~burnman.Material.set_state`. [K]
     """
 
     def __init__(self):

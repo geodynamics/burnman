@@ -103,7 +103,7 @@ if __name__ == "__main__":
     plt.ylabel("Shear velocity (km/s)")
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="lower right", prop={'size': 12}, frameon=False)
-    plt.savefig("output_figures/example_fit_data.png")
+    plt.savefig("output_figures/example_fit_data1.png")
     plt.show()
 
     
@@ -138,6 +138,7 @@ if __name__ == "__main__":
     
     # Corner plot
     fig=burnman.nonlinear_fitting.corner_plot(model.popt, model.pcov, params)
+    plt.savefig("output_figures/example_fit_data2.png")
     plt.show()
 
     # Plot models
@@ -151,5 +152,7 @@ if __name__ == "__main__":
     plt.xlim(0., temperatures[-1])
     plt.xlabel('Temperature (K)')
     plt.ylabel('Heat capacity (J/K/mol)')
+    plt.legend(loc="lower right", prop={'size': 12}, frameon=False)
+    plt.savefig("output_figures/example_fit_data3.png")
     plt.show()
     
