@@ -15,6 +15,7 @@ from . import dks_solid
 from . import hp
 from . import cork
 from . import vinet
+from . import morse_potential
 from .equation_of_state import EquationOfState
 
 
@@ -28,6 +29,8 @@ def create(method):
             return slb.SLB2()
         elif method == "vinet":
             return vinet.Vinet()
+        elif method == "morse":
+            return morse_potential.Morse()
         elif method == "mgd2":
             return mgd.MGD2()
         elif method == "mgd3":
