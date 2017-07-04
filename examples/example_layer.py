@@ -9,8 +9,12 @@ example_layer
 
 This example script is building on example_beginner.py.
 In this case we use the layer Class. Instead of computing properties at
-pressures defined by the seismic PREM model, we compute properties at pressures
-self-consistent to the leayr.
+pressures defined by the seismic PREM model (as is done in many examples), 
+we compute properties at pressures self-consistent to the layer.
+Layer can be used to evaluate geophysical parameter, such as
+the Bullen parameter or the Brunt_vasala frequency. Through the 'modified_adiabat'
+temperature setting it allows for inclusions of thermal boundary layers. 
+Layers can also be used to build an entire planet (see example_build_planet.py)
 
 *Uses:*
 
@@ -18,14 +22,12 @@ self-consistent to the leayr.
 * :class:`burnman.layer.Layer`
 * :class:`burnman.composite.Composite`
 * :class:`burnman.seismic.PREM`
-* :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.material.Material.evaluate`
 
 
 *Demonstrates:*
 
 * creating basic layer
-* calculating thermoelastic properties
+* calculating thermoelastic properties with selfconsistent pressures
 * seismic comparison
 """
 from __future__ import absolute_import
@@ -68,12 +70,8 @@ if __name__ == "__main__":
 
     # Here we define the lower mantle as a Layer(). The layer needs various
     # parameters to set a depth array and radius array.
-    lower_mantle = burnman.Layer(
-        name='Lower Mantle',
-        radius_planet=6371.e3,
-        min_depth=750.e3,
-        max_depth=2800.e3,
-        n_slices=20)
+    lower_mantle = burnman.Layer( name='Lower Mantle', radius_planet=6371.e3,
+        min_depth=750.e3, max_depth=2800.e3,  n_slices=20)
     # Here we set the composition of the layer as the above defined 'rock'.
     lower_mantle.set_composition(rock)
 
@@ -82,20 +80,16 @@ if __name__ == "__main__":
     # gravity at the bottom of the layer are given by the PREM.
     
     # Here we use an adiabatic temperature and set the temperature at the top of the layer
-    #lower_mantle.set_temperature_mode(temperature_mode='adiabat',
-    #                       temperature_top=1900.)
-    
-    #Here we choose a user-defined
-    # temperature, given by the Brown & Shankland geotherm
-    lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
+    lower_mantle.set_temperature_mode(temperature_mode='adiabat', temperature_top=1900.)
+    #Alternatively, we choose a user-defined temperature, given by the Brown & Shankland geotherm
+    #lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
                                           temperatures =burnman.geotherm.brown_shankland(depths))
                            
     lower_mantle.set_state(pressure_mode='selfconsistent',
-                               pressure_top=pressure[0],
-                               gravity_bottom=gravity[-1])
+                               pressure_top=pressure[0], gravity_bottom=gravity[-1])
 
        
-    # All the work is done except the plotting!
+    # All the work is done, now we can plot various properties!
     # First, we plot the s-wave speed verses the PREM s-wave speed
     plt.figure(figsize = (10,6))
     plt.subplot(1, 2, 1)
