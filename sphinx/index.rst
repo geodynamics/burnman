@@ -7,12 +7,13 @@ BurnMan: a thermoelastic and thermodynamic toolkit for the Earth and planetary s
 =======================================================================================
 
 
-.. image:: burnjack-small.png
+.. image:: burnjack-bar.png
 	   
 BurnMan is a Python library for computing the thermodynamic and thermoelastic properties
 of geological materials from simple mineral endmembers to complex multilayered planetary interiors.
 
 BurnMan is released under the GNU GPL v2 or newer. It relies heavily on numpy, scipy, and matplotlib.
+
   - Homepage: http://burnman.org
   - Documentation: http://burnman.readthedocs.io
   - Source code: https://github.com/geodynamics/burnman

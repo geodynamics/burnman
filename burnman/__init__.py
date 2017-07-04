@@ -43,6 +43,7 @@ The code documentation including class and function descriptions can be found on
 http://burnman.readthedocs.io. 
 
 .. _ref-installation:
+
 Installation
 ------------
 
