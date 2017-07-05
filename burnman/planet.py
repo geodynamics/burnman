@@ -205,7 +205,7 @@ class Planet(object):
             layer._temperatures = self._temperatures[layer.n_start: layer.n_end]
             layer.gravity_bottom = self._gravity[layer.n_end - 1]
             for l in range(len(layer.depths)):
-                layer.sublayers.append(layer.composition.copy())
+                layer.sublayers.append(layer.material.copy())
                 layer.sublayers[l].set_state(
                     layer._pressures[l], layer._temperatures[l])
 
@@ -224,7 +224,7 @@ class Planet(object):
         """
         density = []
         for layer in self.layers:
-            density.append(layer.composition.evaluate(
+            density.append(layer.material.evaluate(
                 ['density'], pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end]))
         return np.squeeze(np.hstack(density))
 

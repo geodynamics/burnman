@@ -73,7 +73,7 @@ if __name__ == "__main__":
     lower_mantle = burnman.Layer( name='Lower Mantle', radius_planet=6371.e3,
         min_depth=750.e3, max_depth=2800.e3,  n_slices=20)
     # Here we set the composition of the layer as the above defined 'rock'.
-    lower_mantle.set_composition(rock)
+    lower_mantle.set_material(rock)
 
     # Now we set the temperature mode of the layer. , and a
     # self-consistent pressure. The pressure at the top of the layer and

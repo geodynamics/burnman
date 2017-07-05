@@ -69,7 +69,7 @@ if __name__ == "__main__":
     # inner_core
     inner_core = burnman.Layer("inner core", radius_planet=radius_planet,
         max_depth=6371.e3, min_depth=5151.e3, n_slices=10)
-    inner_core.set_composition(burnman.minerals.other.Fe_Dewaele())
+    inner_core.set_material(burnman.minerals.other.Fe_Dewaele())
     
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature with the Brown & Shankland geotherm.
     inner_core.set_temperature_mode( 'user_defined',
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # outer_core
     outer_core = burnman.Layer( "outer core", radius_planet=radius_planet,
         max_depth=5151.e3, min_depth=2891.e3, n_slices=10)
-    outer_core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+    outer_core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature with the Brown & Shankland geotherm.
     outer_core.set_temperature_mode('user_defined',
         burnman.geotherm.brown_shankland(outer_core.depths))
@@ -86,11 +86,11 @@ if __name__ == "__main__":
     # Next the Mantle.
     lower_mantle = burnman.Layer( "lower_mantle", radius_planet=radius_planet,
         max_depth=2891.e3, min_depth=660.e3, n_slices=10)
-    lower_mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+    lower_mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
     lower_mantle.set_temperature_mode('adiabat')
     upper_mantle = burnman.Layer( "upper_mantle", radius_planet=radius_planet,
         max_depth=660e3, min_depth=0., n_slices=10)
-    upper_mantle.set_composition(burnman.minerals.SLB_2011.forsterite())
+    upper_mantle.set_material(burnman.minerals.SLB_2011.forsterite())
     upper_mantle.set_temperature_mode('adiabat', temperature_top =1200.)
 
 

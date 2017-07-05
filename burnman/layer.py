@@ -56,12 +56,12 @@ class Layer(object):
         self._temperatures = None
         self.sublayers = None
 
-    def set_composition(self, composition):
+    def set_material(self, material):
         """
-        Set the composition of a Layer with a Material
+        Set the material of a Layer with a Material
         """
-        assert(isinstance(composition, Material))
-        self.composition = composition
+        assert(isinstance(material, Material))
+        self.material = material
         self.reset()
 
     def set_temperature_mode(self, temperature_mode='adiabat',
@@ -169,7 +169,7 @@ class Layer(object):
 
         self.sublayers = []
         for l in range(len(self.depths)):
-            self.sublayers.append(self.composition.copy())
+            self.sublayers.append(self.material.copy())
             self.sublayers[l].set_state(
                 self._pressures[l], self._temperatures[l])
 
@@ -180,7 +180,7 @@ class Layer(object):
         """
         if self.temperature_mode == 'adiabat' or self.temperature_mode == 'modified_adiabat':
             adiabat = geotherm.adiabatic(
-                pressures, temperature_top, self.composition)
+                pressures, temperature_top, self.material)
         else:
             adiabat = np.zeros_like(self.depths)
         return adiabat + self.usertemperatures
@@ -190,7 +190,7 @@ class Layer(object):
         Returns updated gravity and pressure 
         set_state() loops over this until consistency is achieved.
         """
-        [density] = self.composition.evaluate(
+        [density] = self.material.evaluate(
             ['density'], pressures, temperatures)
         grav = self._compute_gravity(density, gravity_bottom)
         press = self._compute_pressure(density, grav, pressure_top)

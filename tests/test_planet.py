@@ -22,11 +22,11 @@ class test_planet(BurnManTest):
     def test_planet_1(self):
 
         core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
-        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
         core.set_temperature_mode('user_defined', temperatures= 300.*np.ones_like(core.depths))
         
         mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
-        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
         mantle.set_temperature_mode('adiabat', temperature_top = 1200)
         myplanet = Planet('earth_like',[core, mantle])
         myplanet.set_state()
@@ -41,22 +41,22 @@ class test_planet(BurnManTest):
 
     def test_sort_layers(self):
         core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
-        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
         core.set_temperature_mode('user_defined', temperatures= 300.*np.ones_like(core.depths))
         
         mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
-        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
         mantle.set_temperature_mode('adiabat', temperature_top = 1200)
         myplanet = Planet('earth_like',[core, mantle])
         assert(myplanet.layers == [mantle,core])
 
     def test_temperature(self):
         core = Layer("core", radius_planet= 6371.e3, min_depth=2890.e3, max_depth =6371.e3, n_slices= 10)
-        core.set_composition(burnman.minerals.other.Liquid_Fe_Anderson())
+        core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
         core.set_temperature_mode('user_defined', temperatures= burnman.geotherm.brown_shankland(core.depths))
         
         mantle = Layer("mantle", radius_planet= 6371.e3, min_depth=0e3, max_depth =2890.e3,  n_slices= 10)
-        mantle.set_composition(burnman.minerals.SLB_2011.mg_bridgmanite())
+        mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
         mantle.set_temperature_mode('adiabat', temperature_top = 1200)
         myplanet = Planet('earth_like',[core, mantle])
         myplanet.set_state()
