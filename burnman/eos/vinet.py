@@ -1,4 +1,4 @@
-  # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -14,10 +14,6 @@ def bulk_modulus(volume, params):
     compute the bulk modulus as per the
     Vinet equation of state.  Reference bulk
     modulus should be in :math:`[Pa]`.
-    References for this equation of state are :cite:`vinet1986`
-    and :cite:`vinet1987`
-    
-    
     """
 
     x = volume / params['V_0']
@@ -55,6 +51,8 @@ class Vinet(eos.EquationOfState):
 
     """
     Base class for the isothermal Vinet equation of state.
+    References for this equation of state are :cite:`vinet1986`
+    and :cite:`vinet1987`.
     """
 
     def volume(self, pressure, temperature, params):
