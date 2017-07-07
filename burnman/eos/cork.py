@@ -29,9 +29,12 @@ def cork_variables(cork, cork_P, cork_T, temperature):
 class CORK(eos.EquationOfState):
 
     """
-    Base class for a generic modified Tait equation of state.
-    References for this can be found in Huang and Chow (1974)
-    and Holland and Powell (2011; followed here).
+    Class for the CoRK equation of state detailed in :cite:`HP1991`. The
+    CoRK EoS is a simple virial-type extension to the modified Redlich-Kwong 
+    (MRK) equation of state. It was designed to compensate for the tendency of 
+    the MRK equation of state to overestimate volumes at high pressures and 
+    accommodate the volume behaviour of coexisting gas and liquid phases along 
+    the saturation curve.
     """
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):

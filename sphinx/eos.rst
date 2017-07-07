@@ -14,6 +14,13 @@ Birch-Murnaghan
 
 .. autoclass:: burnman.eos.BM3
 
+.. autoclass:: burnman.eos.BM4
+
+Vinet
+-----
+
+.. autoclass:: burnman.eos.Vinet
+
 Morse Potential
 ---------------
 
@@ -49,7 +56,7 @@ De Koker Solid and Liquid Formulations
 
 .. autoclass:: burnman.eos.DKS_L
 
-Cork
+CoRK
 ----
 .. autoclass:: burnman.eos.CORK
 

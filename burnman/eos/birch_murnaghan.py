@@ -194,7 +194,7 @@ class BM2(BirchMurnaghanBase):
 
     """
     Third order Birch Murnaghan isothermal equation of state.
-    This uses the third order expansion for shear modulus.
+    This uses the second order expansion for shear modulus.
     """
 
     def __init__(self):

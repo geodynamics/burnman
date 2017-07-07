@@ -59,9 +59,9 @@ def bulk_modulus(pressure, params):
 class MT(eos.EquationOfState):
 
     """
-    Base class for a generic modified Tait equation of state.
-    References for this can be found in Huang and Chow (1974)
-    and Holland and Powell (2011; followed here).
+    Base class for the generic modified Tait equation of state.
+    References for this can be found in :cite:`HC1974`
+    and :cite:`HP2011` (followed here).
 
     An instance "m" of a Mineral can be assigned this
     equation of state with the command m.set_method('mt')
