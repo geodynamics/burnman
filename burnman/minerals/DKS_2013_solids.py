@@ -7,10 +7,11 @@ DKS_2013_solids
 Solids from de Koker and Stixrude (2013) FPMD simulations
 """
 
-from burnman.mineral import Mineral
-from burnman.solidsolution import SolidSolution
-from burnman.solutionmodel import *
+from ..mineral import Mineral
+from ..solidsolution import SolidSolution
+from ..solutionmodel import *
 
+from ..processchemistry import dictionarize_formula, formula_mass
 
 class stishovite(Mineral):
     def __init__(self):
@@ -20,9 +21,10 @@ class stishovite(Mineral):
         a3 = 2. * p_fit[1] / (9. * K_0 * V_0) * 1.e3
         Kp_0 = 4. + ( a3 / 3. )
         Kdp_0 = ( -143./9. - Kp_0*(Kp_0 - 7.)) / K_0
+        formula = {'Si': 1., 'O': 2.}
         self.params = {
             'name': 'stishovite',
-            'formula': {'Si': 1., 'O': 2.},
+            'formula': formula,
             'equation_of_state': 'dks_s',
             'V_0': V_0, # [m^3/mol]
             'T_0': 0.3000000000E+04, # [K]
@@ -34,7 +36,8 @@ class stishovite(Mineral):
             'n': 2., # called fsn in param file
             'Cv': 0.7794230433E-01 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1389501259E+01,
-            'q_0': 0.1332025550E+01
+            'q_0': 0.1332025550E+01,
+            'molar_mass': formula_mass(formula)
             } 
         Mineral.__init__(self)
 
@@ -46,9 +49,10 @@ class perovskite(Mineral):
         a3 = 2. * p_fit[1] / (9. * K_0 * V_0) * 1.e3
         Kp_0 = 4. + ( a3 / 3. )
         Kdp_0 = ( -143./9. - Kp_0*(Kp_0 - 7.)) / K_0
+        formula = {'Mg': 1., 'Si': 1., 'O': 3.}
         self.params = {
             'name': 'perovskite',
-            'formula': {'Mg': 1., 'Si': 1., 'O': 3.},
+            'formula': formula,
             'equation_of_state': 'dks_s',
             'V_0': V_0, # [m^3/mol]
             'T_0': 0.3000000000E+04, # [K]
@@ -60,7 +64,8 @@ class perovskite(Mineral):
             'n': 2., # called fsn in param file
             'Cv': 0.1338111589E+00 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1893754815E+01,
-            'q_0': 0.1487809730E+01
+            'q_0': 0.1487809730E+01,
+            'molar_mass': formula_mass(formula)
             } 
         Mineral.__init__(self)
 
@@ -72,9 +77,10 @@ class periclase(Mineral):
         a3 = 2. * p_fit[1] / (9. * K_0 * V_0) * 1.e3
         Kp_0 = 4. + ( a3 / 3. )
         Kdp_0 = ( -143./9. - Kp_0*(Kp_0 - 7.)) / K_0
+        formula = {'Mg': 1., 'O': 1.}
         self.params = {
             'name': 'periclase',
-            'formula': {'Mg': 1., 'O': 1.},
+            'formula': formula,
             'equation_of_state': 'dks_s',
             'V_0': V_0, # [m^3/mol]
             'T_0': 0.2000000000E+04, # [K]
@@ -86,7 +92,8 @@ class periclase(Mineral):
             'n': 2., # called fsn in param file
             'Cv': 0.4904715075E-01 * 1e3, # [J/K/mol]
             'grueneisen_0': 0.1412003694E+01,
-            'q_0': 0.6317609916E+00
+            'q_0': 0.6317609916E+00,
+            'molar_mass': formula_mass(formula)
             } 
         Mineral.__init__(self)
 

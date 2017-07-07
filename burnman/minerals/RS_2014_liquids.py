@@ -10,9 +10,9 @@ with the help of David Munoz Ramo.
 """
 
 from burnman import constants
-from burnman.mineral import Mineral
-from burnman.solidsolution import SolidSolution
-from burnman.solutionmodel import *
+from ..mineral import Mineral
+from ..solidsolution import SolidSolution
+from ..solutionmodel import *
 
 from ..processchemistry import dictionarize_formula, formula_mass
 
