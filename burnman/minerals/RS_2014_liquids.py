@@ -14,8 +14,7 @@ from burnman.mineral import Mineral
 from burnman.solidsolution import SolidSolution
 from burnman.solutionmodel import *
 
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
-atomic_masses = read_masses()
+from ..processchemistry import dictionarize_formula, formula_mass
 
 class Fe2SiO4_liquid(Mineral):
     def __init__(self):
@@ -42,6 +41,6 @@ class Fe2SiO4_liquid(Mineral):
             'spin_a': [-0.00011134, 0.00010863],
             'spin_b': [3.53793, -3.81421, 2.83703, -0.676241],
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula, atomic_masses)}
+            'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
 
