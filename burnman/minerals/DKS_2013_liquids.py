@@ -7,9 +7,11 @@ DKS_2013
 Liquids from de Koker and Stixrude (2013) FPMD simulations
 """
 
-from burnman.mineral import Mineral
-from burnman.solidsolution import SolidSolution
-from burnman.solutionmodel import *
+from ..mineral import Mineral
+from ..solidsolution import SolidSolution
+from ..solutionmodel import *
+
+from ..processchemistry import dictionarize_formula, formula_mass
 
 # Vector parsing for DKS liquid equation of state
 def vector_to_array(a, Of, Otheta):
@@ -22,9 +24,10 @@ def vector_to_array(a, Of, Otheta):
 
 class SiO2_liquid(Mineral):
     def __init__(self):
+        formula = {'Si': 1.0 , 'O': 2.0 }
         self.params = {
             'name': 'SiO2_liquid',
-            'formula': {'Si': 1.0 , 'O': 2.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 2.78e-05 ,
             'T_0': 3000.0 ,
@@ -36,7 +39,9 @@ class SiO2_liquid(Mineral):
             'xi': 0.8639433047 ,
             'Tel_0': 5651.204964 ,
             'eta': -0.2783503528 ,
-            'el_V_0': 1e-06
+            'el_V_0': 1e-06,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -44,9 +49,10 @@ class SiO2_liquid(Mineral):
 
 class MgSiO3_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 1.0 , 'Si': 1.0 , 'O': 3.0 }
         self.params = {
             'name': 'MgSiO3_liquid',
-            'formula': {'Mg': 1.0 , 'Si': 1.0 , 'O': 3.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 4.18e-05 ,
             'T_0': 3000.0 ,
@@ -58,7 +64,9 @@ class MgSiO3_liquid(Mineral):
             'xi': -0.08859010337 ,
             'Tel_0': 2194.563521 ,
             'eta': -0.775354875 ,
-            'el_V_0': 3.89008e-05
+            'el_V_0': 3.89008e-05,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -66,9 +74,10 @@ class MgSiO3_liquid(Mineral):
 
 class MgSi2O5_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 1.0 , 'Si': 2.0 , 'O': 5.0 }
         self.params = {
             'name': 'MgSi2O5_liquid',
-            'formula': {'Mg': 1.0 , 'Si': 2.0 , 'O': 5.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 6.75e-05 ,
             'T_0': 3000.0 ,
@@ -80,7 +89,9 @@ class MgSi2O5_liquid(Mineral):
             'xi': 0.7754599642 ,
             'Tel_0': 1699.783718 ,
             'eta': -0.4712864331 ,
-            'el_V_0': 0.0001080643234
+            'el_V_0': 0.0001080643234,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -88,9 +99,10 @@ class MgSi2O5_liquid(Mineral):
 
 class MgSi3O7_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 1.0 , 'Si': 3.0 , 'O': 7.0 }
         self.params = {
             'name': 'MgSi3O7_liquid',
-            'formula': {'Mg': 1.0 , 'Si': 3.0 , 'O': 7.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 9.35e-05 ,
             'T_0': 3000.0 ,
@@ -102,7 +114,9 @@ class MgSi3O7_liquid(Mineral):
             'xi': 0.4506392324 ,
             'Tel_0': 2085.530204 ,
             'eta': -0.4804823168 ,
-            'el_V_0': 0.0001080643234
+            'el_V_0': 0.0001080643234,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -110,9 +124,10 @@ class MgSi3O7_liquid(Mineral):
 
 class MgSi5O11_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 1.0 , 'Si': 5.0 , 'O': 11.0 }
         self.params = {
             'name': 'MgSi5O11_liquid',
-            'formula': {'Mg': 1.0 , 'Si': 5.0 , 'O': 11.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 0.000146 ,
             'T_0': 3000.0 ,
@@ -124,7 +139,9 @@ class MgSi5O11_liquid(Mineral):
             'xi': 0.4033708612 ,
             'Tel_0': 2037.798559 ,
             'eta': -0.6209203711 ,
-            'el_V_0': 0.00015
+            'el_V_0': 0.00015,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -132,9 +149,10 @@ class MgSi5O11_liquid(Mineral):
 
 class Mg2SiO4_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 2.0 , 'Si': 1.0 , 'O': 4.0 }
         self.params = {
             'name': 'Mg2SiO4_liquid',
-            'formula': {'Mg': 2.0 , 'Si': 1.0 , 'O': 4.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 5.84e-05 ,
             'T_0': 3000.0 ,
@@ -146,7 +164,9 @@ class Mg2SiO4_liquid(Mineral):
             'xi': 1.175924196 ,
             'Tel_0': 2228.185561 ,
             'eta': -0.464192202 ,
-            'el_V_0': 5.23613e-05
+            'el_V_0': 5.23613e-05,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -154,9 +174,10 @@ class Mg2SiO4_liquid(Mineral):
 
 class Mg3Si2O7_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 3.0 , 'Si': 2.0 , 'O': 7.0 }
         self.params = {
             'name': 'Mg3Si2O7_liquid',
-            'formula': {'Mg': 3.0 , 'Si': 2.0 , 'O': 7.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 0.0001005 ,
             'T_0': 3000.0 ,
@@ -168,7 +189,9 @@ class Mg3Si2O7_liquid(Mineral):
             'xi': 1.129966677 ,
             'Tel_0': 2230.685379 ,
             'eta': -0.3689626876 ,
-            'el_V_0': 0.0001080643234
+            'el_V_0': 0.0001080643234,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -176,9 +199,10 @@ class Mg3Si2O7_liquid(Mineral):
 
 class Mg5SiO7_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 5.0 , 'Si': 1.0 , 'O': 7.0 }
         self.params = {
             'name': 'Mg5SiO7_liquid',
-            'formula': {'Mg': 5.0 , 'Si': 1.0 , 'O': 7.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 0.0001075 ,
             'T_0': 3000.0 ,
@@ -190,7 +214,9 @@ class Mg5SiO7_liquid(Mineral):
             'xi': 0.2784006205 ,
             'Tel_0': 1662.606581 ,
             'eta': -0.9693629899 ,
-            'el_V_0': 0.0001080643234
+            'el_V_0': 0.0001080643234,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
@@ -198,9 +224,10 @@ class Mg5SiO7_liquid(Mineral):
 
 class MgO_liquid(Mineral):
     def __init__(self):
+        formula = {'Mg': 1.0 , 'O': 1.0 }
         self.params = {
             'name': 'MgO_liquid',
-            'formula': {'Mg': 1.0 , 'O': 1.0 },
+            'formula': formula,
             'equation_of_state': 'dks_l',
             'V_0': 1.646e-05 ,
             'T_0': 3000.0 ,
@@ -212,7 +239,9 @@ class MgO_liquid(Mineral):
             'xi': 0.411459446 ,
             'Tel_0': 1620.106387 ,
             'eta': -0.986457555 ,
-            'el_V_0': 1.620953559e-05
+            'el_V_0': 1.620953559e-05,
+            'n': sum(formula.values()),
+            'molar_mass': formula_mass(formula)
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)

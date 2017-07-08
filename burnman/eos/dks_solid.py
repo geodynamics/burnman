@@ -55,7 +55,7 @@ class DKS_S(eos.EquationOfState):
     Base class for the finite strain solid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
     """
-
+    
     def volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
@@ -179,11 +179,9 @@ class DKS_S(eos.EquationOfState):
         Returns shear modulus. :math:`[Pa]`
         """
         T_0 = params['T_0']
-        debye_T = self._debye_temperature(params['V_0'] / volume, params)
         eta_s = self._isotropic_eta_s(params['V_0'] / volume, params)
 
-        E_th_diff = C_v * (temperature - params['T_0'])
-
+        E_th_diff = params['Cv'] * (temperature - params['T_0'])
         return bm.shear_modulus_third_order(volume, params) - eta_s * (E_th_diff) / volume
 
     def heat_capacity_v(self, pressure, temperature, volume, params):

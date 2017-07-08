@@ -1,3 +1,5 @@
 EoS consistent for SiO2_liquid model: True
 EoS consistent for MgO_liquid model: True
 EoS consistent for Fe2SiO4_liquid model: True
+BURNMAN/burnman/tools.py: UserWarning: Warning, shear modulus is zero. If this mineral is not a liquid, then shear modulus calculations for the DKS_L equation of state have not been implemented.
+  return func(*args)
