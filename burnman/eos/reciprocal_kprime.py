@@ -61,9 +61,11 @@ def bulk_modulus(pressure, params):
 
 def shear_modulus(pressure, params):
     """
-    Shear modulus not currently implemented for this equation of state
+    Returns the shear modulus at a given pressure
     """
-    return 0.
+    G = ( params['G_0']/params['K_0'] * bulk_modulus(pressure, params) -
+          (params['G_0']/params['K_0']*params['Kprime_inf'] - params['Gprime_inf']) * pressure )
+    return G # eq. 78
 
 
 class RKprime(eos.EquationOfState):
@@ -153,16 +155,16 @@ class RKprime(eos.EquationOfState):
         if 'P_0' not in params:
             params['P_0'] = 0.
 
-        # If G and Gprime are not included this is presumably deliberate,
+        # If G and Gprime_inf are not included this is presumably deliberate,
         # as we can model density and bulk modulus just fine without them,
         # so just add them to the dictionary as nans
         if 'G_0' not in params:
             params['G_0'] = float('nan')
-        if 'Gprime_0' not in params:
-            params['Gprime_0'] = float('nan')
+        if 'Gprime_inf' not in params:
+            params['Gprime_inf'] = float('nan')
 
         # Check that all the required keys are in the dictionary
-        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'Kprime_inf', 'G_0', 'Gprime_0']
+        expected_keys = ['V_0', 'K_0', 'Kprime_0', 'Kprime_inf', 'G_0', 'Gprime_inf']
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
@@ -180,6 +182,6 @@ class RKprime(eos.EquationOfState):
             warnings.warn('Unusual value for Kprime_inf', stacklevel=2) # eq. 17
         if params['G_0'] < 0.0 or params['G_0'] > 1.e13:
             warnings.warn('Unusual value for G_0', stacklevel=2)
-        if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
-            warnings.warn('Unusual value for Gprime_0', stacklevel=2)
+        if params['Gprime_inf'] < -5. or params['Gprime_inf'] > 10.:
+            warnings.warn('Unusual value for Gprime_inf', stacklevel=2)
 
