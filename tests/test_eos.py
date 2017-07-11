@@ -70,6 +70,23 @@ class Liquid_Fe_Anderson(burnman.Mineral):
             'molar_mass': 0.055845,
         }
 
+
+class outer_core_rkprime(burnman.Mineral):
+
+    """
+    Stacey and Davis, 2004 PEPI (Table 5)
+    """
+
+    def __init__(self):
+        self.params = {
+            'equation_of_state': 'rkprime',
+            'V_0': 0.055845/6562.54,
+            'K_0': 124.553e9,
+            'Kprime_0': 4.9599,
+            'Kprime_inf': 3.0,
+            'molar_mass': 0.055845,
+        }
+
         
 class periclase_morse(burnman.Mineral):
 
@@ -178,6 +195,20 @@ class eos(BurnManTest):
         pressure = 0.
         temperature = 300.
         eos = burnman.eos.Morse()
+        Volume_test = eos.volume(pressure, temperature, rock.params)
+        self.assertFloatEqual(Volume_test, rock.params['V_0'])
+        Kt_test = eos.isothermal_bulk_modulus(
+            pressure, 300., rock.params['V_0'], rock.params)
+        self.assertFloatEqual(Kt_test, rock.params['K_0'])
+        Density_test = eos.density(rock.params['V_0'], rock.params)
+        self.assertFloatEqual(
+            Density_test, rock.params['molar_mass'] / rock.params['V_0'])
+        
+    def test_reference_values_rkprime(self):
+        rock = outer_core_rkprime()
+        pressure = 0.
+        temperature = 300.
+        eos = burnman.eos.RKprime()
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params['V_0'])
         Kt_test = eos.isothermal_bulk_modulus(

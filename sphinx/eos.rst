@@ -25,6 +25,11 @@ Morse Potential
 ---------------
 
 .. autoclass:: burnman.eos.Morse
+
+Reciprocal K-prime
+------------------
+
+.. autoclass:: burnman.eos.RKprime
 	       
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------

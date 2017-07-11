@@ -16,6 +16,7 @@ from . import hp
 from . import cork
 from . import vinet
 from . import morse_potential
+from . import reciprocal_kprime
 from .equation_of_state import EquationOfState
 
 
@@ -31,6 +32,8 @@ def create(method):
             return vinet.Vinet()
         elif method == "morse":
             return morse_potential.Morse()
+        elif method == "rkprime":
+            return reciprocal_kprime.RKprime()
         elif method == "mgd2":
             return mgd.MGD2()
         elif method == "mgd3":
