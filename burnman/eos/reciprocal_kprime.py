@@ -38,7 +38,7 @@ def _PoverK_from_P(pressure, params):
     """
     args = (pressure, params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
-    return opt.brentq(_delta_PoverK_from_P, -1., 1./params['Kprime_inf'], args=args)
+    return opt.brentq(_delta_PoverK_from_P, 1./(params['Kprime_inf'] - params['Kprime_0']), 1./params['Kprime_inf'], args=args)
 
     
 def _PoverK_from_V(volume, params):
@@ -48,7 +48,7 @@ def _PoverK_from_V(volume, params):
     """
     args = (volume, params['V_0'], params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
-    return opt.brentq(_delta_PoverK_from_V, -1., 1./params['Kprime_inf'], args=args)
+    return opt.brentq(_delta_PoverK_from_V, 1./(params['Kprime_inf'] - params['Kprime_0']), 1./params['Kprime_inf'], args=args)
 
 def bulk_modulus(pressure, params):
     """
@@ -77,6 +77,15 @@ class RKprime(eos.EquationOfState):
     making use of the fact that :math:`K'` typically varies smoothly
     as a function of :math:`P/K`, and is thermodynamically required to
     exceed 5/3 at infinite pressure. 
+
+    It is worth noting that this equation of state rapidly becomes 
+    unstable at negative pressures, so should not be trusted to provide
+    a good *HT-LP* equation of state using a thermal pressure 
+    formulation. The negative root of :math:`dP/dK` 
+    can be found at :math:`K/P = K'_{\infty} - K'_0`, 
+    which corresponds to a bulk modulus of  
+    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}`.
+    
     This equation of state has no temperature dependence. 
     """
 
