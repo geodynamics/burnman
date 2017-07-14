@@ -38,8 +38,10 @@ def _PoverK_from_P(pressure, params):
     """
     args = (pressure, params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
-    return opt.brentq(_delta_PoverK_from_P, 1./(params['Kprime_inf'] - params['Kprime_0']), 1./params['Kprime_inf'], args=args)
-
+    return opt.brentq(_delta_PoverK_from_P,
+                      1./(params['Kprime_inf'] - params['Kprime_0']) + np.finfo(float).eps,
+                      1./params['Kprime_inf'] - np.finfo(float).eps,
+                      args=args)
     
 def _PoverK_from_V(volume, params):
     """
@@ -48,7 +50,10 @@ def _PoverK_from_V(volume, params):
     """
     args = (volume, params['V_0'], params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
-    return opt.brentq(_delta_PoverK_from_V, 1./(params['Kprime_inf'] - params['Kprime_0']), 1./params['Kprime_inf'], args=args)
+    return opt.brentq(_delta_PoverK_from_V,
+                      1./(params['Kprime_inf'] - params['Kprime_0']) + np.finfo(float).eps,
+                      1./params['Kprime_inf'] - np.finfo(float).eps,
+                      args=args)
 
 def bulk_modulus(pressure, params):
     """
