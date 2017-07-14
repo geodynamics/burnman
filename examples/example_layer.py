@@ -27,7 +27,7 @@ Layers can also be used to build an entire planet (see example_build_planet.py)
 *Demonstrates:*
 
 * creating basic layer
-* calculating thermoelastic properties with selfconsistent pressures
+* calculating thermoelastic properties with self-consistent pressures
 * seismic comparison
 """
 from __future__ import absolute_import
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     #lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
     #                                      temperatures =burnman.geotherm.brown_shankland(depths))
                            
-    lower_mantle.set_state(pressure_mode='selfconsistent',
+    lower_mantle.set_state(pressure_mode='self-consistent',
                                pressure_top=pressure[0], gravity_bottom=gravity[-1])
 
        

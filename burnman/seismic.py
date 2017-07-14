@@ -488,20 +488,8 @@ class STW105(SeismicTable):
         self.table_depth = self.earth_radius - self.table_radius
 
         # Voigt averages for Vs and Vp
-        self.table_vs = np.sqrt(
-            (2. *
-             self.table_vsv *
-             self.table_vsv +
-             self.table_vsh *
-             self.table_vsh) /
-            3.)
-        self.table_vp = np.sqrt(
-            (self.table_vpv *
-             self.table_vpv +
-             4. *
-             self.table_vph *
-             self.table_vph) /
-            5.)
+        self.table_vs = np.sqrt((2. *self.table_vsv * self.table_vsv + self.table_vsh * self.table_vsh) / 3.)
+        self.table_vp = np.sqrt((self.table_vpv * self.table_vpv + 4. * self.table_vph * self.table_vph) / 5.)
 
 
 class IASP91(SeismicTable):

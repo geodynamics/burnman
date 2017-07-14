@@ -1,7 +1,47 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
+"""
+example_build_planet
+--------------------
 
+For Earth we have well-constrained one-dimensional density models.  This allows us to
+calculate pressure as a function of depth.  Furthermore, petrologic data and assumptions
+regarding the convective state of the planet allow us to estimate the temperature.
+
+For planets other than Earth we have much less information, and in particular we
+know almost nothing about the pressure and temperature in the interior.  Instead, we tend
+to have measurements of things like mass, radius, and moment-of-inertia.  We would like
+to be able to make a model of the planet's interior that is consistent with those
+measurements.
+
+However, there is a difficulty with this.  In order to know the density of the planetary
+material, we need to know the pressure and temperature.  In order to know the pressure,
+we need to know the gravity profile.  And in order to the the gravity profile, we need
+to know the density.  This is a nonlinear problem which requires us to iterate to find
+a self-consistent solution.
+
+This example allows the user to define layers of planets of known outer radius and self-
+consistently solve for the density, pressure and gravity profiles. The calculation will
+iterate until the difference between central pressure calculations are less than 1e-5.
+The planet class in BurnMan (../burnman/planet.py) allows users to call multiple
+properties of the model planet after calculations, such as the mass of an individual layer,
+the total mass of the planet and the moment if inertia. See planets.py for information
+on each of the parameters which can be called.
+
+*Uses:*
+
+* :doc:`mineral_database`
+* :class:`burnman.planet.Planet`
+* :class: `burnman.layer.Layer`
+
+*Demonstrates:*
+
+* setting up a planet
+* computing its self-consistent state
+* computing various parameters for the planet
+* seismic comparison
+"""
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -20,47 +60,7 @@ import burnman.mineral_helpers as helpers
 
 if __name__ == "__main__":
 
-    '''
-    example_build_planet
-    --------------------
 
-    For Earth we have well-constrained one-dimensional density models.  This allows us to
-    calculate pressure as a function of depth.  Furthermore, petrologic data and assumptions
-    regarding the convective state of the planet allow us to estimate the temperature.
-
-    For planets other than Earth we have much less information, and in particular we
-    know almost nothing about the pressure and temperature in the interior.  Instead, we tend
-    to have measurements of things like mass, radius, and moment-of-inertia.  We would like
-    to be able to make a model of the planet's interior that is consistent with those
-    measurements.
-
-    However, there is a difficulty with this.  In order to know the density of the planetary
-    material, we need to know the pressure and temperature.  In order to know the pressure,
-    we need to know the gravity profile.  And in order to the the gravity profile, we need
-    to know the density.  This is a nonlinear problem which requires us to iterate to find
-    a self-consistent solution.
-
-    This example allows the user to define layers of planets of known outer radius and self-
-    consistently solve for the density, pressure and gravity profiles. The calculation will
-    iterate until the difference between central pressure calculations are less than 1e-5.
-    The planet class in BurnMan (../burnman/planet.py) allows users to call multiple
-    properties of the model planet after calculations, such as the mass of an individual layer,
-    the total mass of the planet and the moment if inertia. See planets.py for information
-    on each of the parameters which can be called.
-
-    *Uses:*
-
-    * :doc:`mineral_database`
-    * :class:`burnman.planet.Planet`
-    * :class: `burnman.layer.Layer`
-    
-    *Demonstrates:*
-    
-    * setting up a planet
-    * computing its self-consistent state
-    * computing various parameters for the planet
-    * seismic comparison
-    '''
 
     # FIRST: we must define the composition of the planet as individual layers.
     # A layer is defined by 4 parameters: Name, min_depth, max_depth,and number of slices within the layer.
@@ -71,17 +71,17 @@ if __name__ == "__main__":
         max_depth=6371.e3, min_depth=5151.e3, n_slices=10)
     inner_core.set_material(burnman.minerals.other.Fe_Dewaele())
     
-    # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature with the Brown & Shankland geotherm.
-    inner_core.set_temperature_mode( 'user_defined',
-        burnman.geotherm.brown_shankland(inner_core.depths))
+    # The minerals that make up our core do not currently implement the thermal equation of state, so we will set the temperature at 300 K.
+    inner_core.set_temperature_mode( 'user-defined',
+        300.*np.ones_like(inner_core.depths))
 
     # outer_core
     outer_core = burnman.Layer( "outer core", radius_planet=radius_planet,
         max_depth=5151.e3, min_depth=2891.e3, n_slices=10)
     outer_core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
-    # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature with the Brown & Shankland geotherm.
-    outer_core.set_temperature_mode('user_defined',
-        burnman.geotherm.brown_shankland(outer_core.depths))
+    # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature at 300 K.
+    outer_core.set_temperature_mode('user-defined',
+        300.*np.ones_like(outer_core.depths))
 
     # Next the Mantle.
     lower_mantle = burnman.Layer( "lower_mantle", radius_planet=radius_planet,

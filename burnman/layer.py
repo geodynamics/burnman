@@ -23,7 +23,13 @@ import matplotlib.pyplot as plt
 
 class Layer(object):
     """
-    A planetary layer class
+    The base class for a planetary layer. The user needs to 
+    1. set_material(), set the material of the layer, either mineral, solid_solution, or composit
+    2. set_temperature_mode(), either predefine, or set an adibat
+    3. set_state(), to set the composition, temperature and pressure of the layer, respecitvely, before properties
+    can be computed. Properties will be returned at the pre-defined depth array, although the evaluate() function
+    can take a new defined depthlist and values are interpolated between these (sufficient sampling of the layer
+    is needed for this to be accurate)
     """
 
     def __init__(self, name=None, radius_planet=None,
@@ -68,12 +74,12 @@ class Layer(object):
                              temperatures=None, temperature_top=None):
         """
         Sets temperature of the layer by user-defined values or as an (modified) adiabat.
-        temperature_mode is 'user_defined','adiabatic', or 'modified_adiabat'
+        temperature_mode is 'user-defined','adiabatic', or 'modified-adiabat'
 
         Parameters
         ----------
         temperature_mode : string
-        This can be set to 'user_defined','adiabatic', or 'modified_adiabat'
+        This can be set to 'user-defined','isothermal','adiabatic', or 'modified-adiabat'
         temperatures : array of float
         The desired fixed temperatures in [K]. Should have same length as defined depths in layer.
         temperature_top : float
@@ -81,40 +87,43 @@ class Layer(object):
         
         Note
         ---------
-        'user_defined' = fixes the temperature with the profile input by the users
+        'user-defined' = fixes the temperature with the profile input by the users
         'adiabat' = self-consistently computes the adiabat when setting the state of the layer
-        'modified_adiabat' = adds the user input array to the adiabat, 
+        'modified-adiabat' = adds the user input array to the adiabat,
             e.g. allows to implement boundary layers
         """
         self.reset()
-        assert(temperature_mode == 'user_defined' or temperature_mode ==
-               'adiabat' or temperature_mode == 'modified_adiabat')
+        assert(temperature_mode == 'user-defined' or temperature_mode ==
+               'isentropic', temperature_mode ==
+               'adiabat' or temperature_mode == 'modified-adiabat')
 
         self.temperature_mode = temperature_mode
 
-        if temperature_mode == 'user_defined' or temperature_mode == 'modified_adiabat':
+#if temperature_mode=='isothermal':
+#            self.usertemperatures =
+        if temperature_mode == 'user-defined' or temperature_mode == 'modified-adiabat':
             assert(len(temperatures) == len(self.depths))
             self.usertemperatures = temperatures
         else:
             self.usertemperatures = np.zeros_like(self.depths)
 
-        if temperature_mode == 'adiabat' or temperature_mode == 'modified_adiabat':
+        if temperature_mode == 'adiabat' or temperature_mode == 'modified-adiabat':
             self.temperature_top = temperature_top
         else:
             self.temperature_top = None
 
-    def set_state( self, pressure_mode='selfconsistent', pressures=None, pressure_top=None,
+    def set_state( self, pressure_mode='self-consistent', pressures=None, pressure_top=None,
             gravity_bottom=None, n_max_iterations=50):
         """
         Sets the pressure and temperature of the layer by user-defined values are in a self-consistent fashion.
-        pressure_mode is 'user_defined' or 'selfconsistent'
+        pressure_mode is 'user-defined' or 'self-consistent'
         
         Parameters
         ----------
         pressure_mode : string
-        This can be set to 'user_defined' or 'selfconsistent'
+        This can be set to 'user-defined' or 'self-consistent'
         pressures : array of floats
-        Pressures (Pa) to set layer to ('user_defined'). This should be the same length as defined depths array for the layer
+        Pressures (Pa) to set layer to ('user-defined'). This should be the same length as defined depths array for the layer
         pressure_top : float
         Pressure (Pa) at the top of the layer. 
         gravity_bottom : float
@@ -123,12 +132,12 @@ class Layer(object):
         Maximum number of iterations to reach self-consistent pressures (default = 50)
         """
         self.reset()
-        assert(pressure_mode == 'user_defined' or pressure_mode == 'selfconsistent')
+        assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
         assert(self.temperature_mode is not None)
 
         self.gravity_bottom = gravity_bottom
 
-        if pressure_mode == 'user_defined':
+        if pressure_mode == 'user-defined':
             assert(len(pressures) == len(self.depths))
             self._pressures = pressures
             warnings.warn(
@@ -136,7 +145,7 @@ class Layer(object):
             self._temperatures = self._evaluate_temperature(
                 self._pressures, self.temperature_top)
 
-        if pressure_mode == 'selfconsistent':
+        if pressure_mode == 'self-consistent':
             self.pressure_top = pressure_top
             ref_press = np.zeros_like(pressures)
             new_press = self.pressure_top + \
@@ -173,12 +182,43 @@ class Layer(object):
             self.sublayers[l].set_state(
                 self._pressures[l], self._temperatures[l])
 
+    def evaluate(self, properties, depthlist=None):
+        """
+        Function that is generally used to evaluate properties
+        across the layer. If depthlist is not defined, valuse are 
+        returned at the internal depthlist.
+        If asking for different depths than the internal depthlist, 
+        values are linearly interpolated.
+        
+        Parameter
+        ---------
+        properties : list of strings
+        List of properties to evaluate
+        depthlist : array of floats
+        Depths to evaluate properties at. If left empty, 
+        internal depth lists are used.
+        
+        Returns
+        -------
+        2D array of requested properties
+        """
+        all = None
+        for prop in properties:
+            oneprop = getattr(layer, prop)
+            if depthlist is not None:
+                oneprop = np.interp(depthlist, self.depths,oneprop)
+            if all is None:
+                all = np.array(oneprop)
+            else:
+                np.append(all, np.array(oneprop), axis=0)
+        return all
+
     def _evaluate_temperature(self, pressures=None, temperature_top=None):
         """
         Returns the temperatures of the layer for given pressures.
         Used by set_state()
         """
-        if self.temperature_mode == 'adiabat' or self.temperature_mode == 'modified_adiabat':
+        if self.temperature_mode == 'adiabat' or self.temperature_mode == 'modified-adiabat':
             adiabat = geotherm.adiabatic(
                 pressures, temperature_top, self.material)
         else:
@@ -269,7 +309,7 @@ class Layer(object):
     @property
     def gravity(self):
         """
-        Returns gravity of the layer [m s^(-2)]
+        Returns gravity profile of the layer [m s^(-2)]
         """
         return self._compute_gravity(self.density, self.gravity_bottom)
 

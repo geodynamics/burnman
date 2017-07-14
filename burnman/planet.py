@@ -131,22 +131,22 @@ class Planet(object):
             if all is None:
                 all = np.array(oneprop)
             else:
-                np.append(all, oneprop, axis=0)
+                np.append(all, np.array(oneprop), axis=0)
         return all
 
-    def set_state( self, pressure_mode='selfconsistent', pressures=None, pressure_top=0.,
+    def set_state( self, pressure_mode='self-consistent', pressures=None, pressure_top=0.,
             gravity_bottom=0., n_max_iterations=50):
         """
         Sets the pressure of the planet by user-defined values are in a self-consistent fashion.
-        pressure_mode is 'user_defined' or 'selfconsistent'.
+        pressure_mode is 'user-defined' or 'self-consistent'.
         The default for the planet is self-consistent, with zero pressure at the surface and zero pressure at the center.
         
         Parameters
         ----------
         pressure_mode : string
-        This can be set to 'user_defined' or 'selfconsistent'
+        This can be set to 'user-defined' or 'self-consistent'
         pressures : array of floats
-        Pressures (Pa) to set layer to ('user_defined'). This should be the same length as defined depths array for the layer
+        Pressures (Pa) to set layer to ('user-defined'). This should be the same length as defined depths array for the layer
         pressure_top : float
         Pressure (Pa) at the top of the layer. 
         gravity_bottom : float
@@ -155,21 +155,21 @@ class Planet(object):
         Maximum number of iterations to reach self-consistent pressures (default = 50)
         """
         
-        assert(pressure_mode == 'user_defined' or pressure_mode == 'selfconsistent')
+        assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
         self.reset()
         for layer in self.layers:
             assert(layer.temperature_mode is not None)
 
         self.gravity_bottom = gravity_bottom
 
-        if pressure_mode == 'user_defined':
+        if pressure_mode == 'user-defined':
             assert(len(pressures) == len(self.depths))
             self._pressures = pressures
             warnings.warn(
                 "By setting the pressures in Planet it is unlikely to be self-consistent")
             self._temperatures = self._evaluate_temperature(self._pressures)
 
-        if pressure_mode == 'selfconsistent':
+        if pressure_mode == 'self-consistent':
             self.pressure_top = pressure_top
             ref_press = np.zeros_like(pressures)
             new_press = self.pressure_top + \
@@ -189,7 +189,7 @@ class Planet(object):
                     (max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
                     print(
-                        "Iteration %i  maximum core pressure error between iterations: %e" %
+                        "Iteration %i  maximum core pressure delta between iterations: %e" %
                         (i, rel_err))
 
                 if rel_err < 1e-5:
