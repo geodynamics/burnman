@@ -89,7 +89,9 @@ class RKprime(eos.EquationOfState):
     formulation. The negative root of :math:`dP/dK` 
     can be found at :math:`K/P = K'_{\infty} - K'_0`, 
     which corresponds to a bulk modulus of  
-    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}`.
+    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}` 
+    and a volume of
+    :math:`V = V_0 ( K'_0 / (K'_0 - K'_{\infty}) )^{K'_0/{K'}^2_{\infty}} \exp{(-1/K'_{\infty})}`.
     
     This equation of state has no temperature dependence. 
     """
