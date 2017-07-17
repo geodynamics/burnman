@@ -3,17 +3,25 @@ Expressions within tolerance of 0.010000
 G = F + PV : True 
 G = H - TS : True 
 G = E - TS + PV : True 
-S = dG/dT  : True 
+S = -dG/dT : True 
 alpha = 1/V dV/dT : True 
 C_p = T dS/dT : True 
 V = dG/dP  : True 
 K_T = -V dP/dV : True 
+C_v = Cp - alpha^2*K_T*V*T : True 
+K_S = K_T*Cp/Cv : True 
+gr = alpha*K_T*V/Cv : True 
+Vphi = np.sqrt(K_S/rho) : True 
+Vp = np.sqrt((K_S + 4G/3)/rho) : True 
+Vs = np.sqrt(G_S/rho) : True 
 All EoS consistency constraints satisfied for 'burnman.minerals.other.liquid_iron'
 Pressure (GPa), Temperature (K), Density (kg/m^3), Grueneisen parameter
-0.0 7019 1811.1 1.7350
-0.2 5500 3240.7 1.9441
-0.2 6000 2927.1 1.8829
-0.2 6500 2489.1 1.8167
-277.4 12643 5787.1 1.5583
-331.5 13015 7582.0 1.5674
-397.1 13417 9705.1 1.5616
+0.0 7019 1811.0 1.7350
+0.2 5500 3253.0 1.9377
+0.2 6000 2932.0 1.8832
+0.2 6500 2490.8 1.8214
+277.4 12643 5816.8 1.5675
+331.5 13015 7654.8 1.5862
+397.1 13417 9826.3 1.5877
+BURNMAN/burnman/tools.py: UserWarning: Warning, shear modulus is zero. If this mineral is not a liquid, then shear modulus calculations for the AA equation of state have not been implemented.
+  return func(*args)
