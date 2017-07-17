@@ -12,11 +12,10 @@ from __future__ import absolute_import
 
 from .. import mineral_helpers as helpers
 from ..mineral import Mineral
-from ..processchemistry import read_masses, dictionarize_formula, formula_mass
+from ..processchemistry import dictionarize_formula, formula_mass
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
-atomic_masses = read_masses()
 
 """
 AA_1994 
@@ -26,7 +25,7 @@ class liquid_iron( Mineral ):
     def __init__(self):
         formula='Fe1.0'
         formula = dictionarize_formula(formula)
-        m = formula_mass(formula, atomic_masses)
+        m = formula_mass(formula)
         rho_0 = 7019.
         V_0 = m/rho_0
         D = 7766.
