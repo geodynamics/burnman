@@ -185,6 +185,14 @@ class Mineral(Material):
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
         G = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume, self.params)
+        if G < np.finfo('float').eps:
+            warnings.formatwarning = lambda msg, *a : 'Warning from file \'{0}\', line {1}:\n{2}\n\n'.format(a[1], a[2], msg)
+            warnings.warn('You are trying to calculate shear modulus for {0} when it is exactly zero. \n'
+                          'If {0} is a liquid, then you can safely ignore this warning, but consider \n'
+                          'calculating bulk modulus or bulk sound rather than Vp or Vs. \n'
+                          'If {0} is not a liquid, then shear modulus calculations for the \n'
+                          'underlying equation of state ({1}) have not been implemented, \n'
+                          'and Vp and Vs estimates will be incorrect.'.format(self.name, self.method.__class__.__name__), stacklevel=1)
         return G
 
     """
