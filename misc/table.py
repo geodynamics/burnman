@@ -33,6 +33,23 @@ if __name__ == "__main__":
             row.append(str(p.params[param] if param in p.params else ""))
         return row
 
+    # Create a dictionary of the equation of state parameters to insert into the table
+    # Equations of state not included in this dictionary will be ignored
+    eos_params = {'hp_tmt': ['V_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'molar_mass', 'n', 'Cp'],
+                  'slb2': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
+                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
+                  'slb3': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
+                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
+                  'mgd2': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
+                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
+                  'mgd3': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
+                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
+                  'cork': ['cork_params', 'cork_T', 'cork_P', 'Cp'],
+                  'dks_s': ['V_0', 'T_0', 'E_0', 'S_0', 'K_0',
+                            'Kprime_0', 'Kdprime_0', 'n', 'Cv', 'grueneisen_0', 'q_0'],
+                  'dks_l': ['V_0', 'T_0', 'O_theta', 'O_f', 'm', 'zeta_0', 'xi', 'Tel_0', 'eta'],
+                  'aa': ['T_0', 'S_0', 'V_0', 'K_S', 'Kprime_S', 'Kprime_prime_S', 'grueneisen_0', 'grueneisen_prime', 'grueneisen_n']}
+
     libs = dir(minerals)
     for l in libs:
 
@@ -61,33 +78,28 @@ if __name__ == "__main__":
                         except:
                             print("Could not create '%s'" % name)
 
-            eos = phasenames[0][1].params['equation_of_state']
-            if eos == 'hp_tmt':
-                params = [
-                    'V_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'molar_mass', 'n', 'Cp']
-            elif eos == 'slb2' or eos == 'slb3' or eos == 'mgd2' or eos == 'mgd3':
-                params = ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
-                          'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0']
-            elif eos == 'cork':
-                params = ['cork_params', 'cork_T', 'cork_P', 'Cp']
-            elif eos == 'dks_s':
-                params = ['V_0', 'T_0', 'E_0', 'S_0', 'K_0',
-                          'Kprime_0', 'Kdprime_0', 'n', 'Cv', 'grueneisen_0', 'q_0']
-            elif eos == 'dks_l':
-                params = ['V_0', 'T_0', 'O_theta', 'O_f', 'm', 'zeta_0', 'xi', 'Tel_0', 'eta']
-                
-            table = [['Name'] + params]
-            tablel = []
+            # The following groups minerals from each module into groups based on eos and
+            # prints a separate table for each eos group.
+            list_eoses = [phasename[1].params['equation_of_state'] for phasename in phasenames]
+            for (eos, params) in eos_params.items():
+                eos_phasenames = [phasenames[i] for i, e in enumerate(list_eoses) if e == eos]
+                if len(eos_phasenames) > 0:
+                    table = []
+                    tablel = []
+                    
+                    table.append(['Name ({0} equation of state)'.format(eos)] + params)
+                    tablel.append([])
+                    
+                    sortedlist = sorted(eos_phasenames, key=lambda x: x[0])
 
-            sortedlist = sorted(phasenames, key=lambda x: x[0])
+                    for (name, p) in sortedlist:
+                        p.set_state(1e9, 300)
+                        row = create_list(name, p)
+                        table.append(row)
+                        tablel.append(row)
 
-            for (name, p) in sortedlist:
-                p.set_state(1e9, 300)
-                row = create_list(name, p)
-                table.append(row)
-                tablel.append(row)
-
-            if (len(sys.argv) == 1):
-                tools.pretty_print_table(table, False)
-            elif sys.argv[1] == "tab":
-                tools.pretty_print_table(table, True)
+                    if (len(sys.argv) == 1):
+                        tools.pretty_print_table(table, False)
+                    elif sys.argv[1] == "tab":
+                        tools.pretty_print_table(table, True)
+                        

@@ -12,13 +12,12 @@ from ..constants import gas_constant
 
 class AA(eos.EquationOfState):
     """
-    Base class for the liquid metal EOS detailed in :cite:`AA1994`.
-
-    This is an :math`E-V-S` equation of state. Internal energy (:math:`E`) is first calculated 
+    Class for the :math`E-V-S` liquid metal EOS detailed in :cite:`AA1994`.
+    Internal energy (:math:`E`) is first calculated 
     along a reference isentrope using a fourth order BM EoS
     (:math:`V_0`, :math:`KS`, :math:`KS'`, :math:`KS''`), 
     which gives volume as a function of pressure, 
-    and the thermodynamic identity:
+    coupled with the thermodynamic identity:
 
     :math:`-\partial E/ \partial V |_S = P`.
 
@@ -225,8 +224,8 @@ class AA(eos.EquationOfState):
 
         delta_S = lambda T, S, V: S - self.entropy(0., T, V, params)
         
-        T0 = brentq(delta_S, temperature*0.99, temperature*1.01, args=(S, volume - 0.5*dV))
-        T1 = brentq(delta_S, temperature*0.99, temperature*1.01, args=(S, volume + 0.5*dV))
+        T0 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume - 0.5*dV))
+        T1 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume + 0.5*dV))
 
         E0 = self.internal_energy(0., T0, volume - 0.5*dV, params)
         E1 = self.internal_energy(0., T1, volume + 0.5*dV, params)
@@ -262,11 +261,11 @@ class AA(eos.EquationOfState):
         Returns isothermal bulk modulus :math:`[Pa]` 
         """
         # K_T = -V * dP/dV
-        delta_V = params['V_0']*1.e-5
-        P0 = self.pressure(temperature, volume-0.5*delta_V, params)
-        P1 = self.pressure(temperature, volume+0.5*delta_V, params)
+        dV = volume*1.e-3
+        P0 = self.pressure(temperature, volume - 0.5*dV, params)
+        P1 = self.pressure(temperature, volume + 0.5*dV, params)
 
-        K_T = -volume*(P1 - P0)/delta_V
+        K_T = -volume*(P1 - P0)/dV
         return K_T
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
@@ -320,9 +319,10 @@ class AA(eos.EquationOfState):
         """
 
         delta_T = 1.
-        delta_V = ( self.volume(pressure, temperature+delta_T, params) - volume )
+        V0 = self.volume(pressure, temperature-0.5*delta_T, params)
+        V1 = self.volume(pressure, temperature+0.5*delta_T, params)
             
-        return (1./volume)*delta_V/delta_T
+        return (1./volume)*(V1 - V0)/delta_T
 
     def gibbs_free_energy( self, pressure, temperature, volume, params):
         """

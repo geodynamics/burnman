@@ -17,11 +17,11 @@ from ..processchemistry import dictionarize_formula, formula_mass
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
 
-"""
-AA_1994 
-Liquid iron equation of state from Anderson and Ahrens (1994)
-"""
+
 class liquid_iron( Mineral ):
+    """
+    Liquid iron equation of state from Anderson and Ahrens (1994)
+    """
     def __init__(self):
         formula='Fe1.0'
         formula = dictionarize_formula(formula)

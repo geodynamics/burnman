@@ -23,5 +23,3 @@ Pressure (GPa), Temperature (K), Density (kg/m^3), Grueneisen parameter
 277.4 12643 5816.8 1.5675
 331.5 13015 7654.8 1.5862
 397.1 13417 9826.3 1.5877
-BURNMAN/burnman/tools.py: UserWarning: Warning, shear modulus is zero. If this mineral is not a liquid, then shear modulus calculations for the AA equation of state have not been implemented.
-  return func(*args)

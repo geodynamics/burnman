@@ -13,7 +13,7 @@ from scipy.optimize import fsolve
 import burnman
 
 liq = burnman.minerals.other.liquid_iron()
-burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=0.01, verbose=True)
+burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-4, verbose=True)
 
 
 # Find heat capacities
@@ -22,7 +22,6 @@ Cvs = np.empty_like(temperatures)
 m = 0.055845
 rhos = np.empty_like(temperatures)
 densities = [5.e3,10.e3, 15.e3]
-#densities = [8.5e3, 9.56e3, 10.81e3, 12.28e3, 14.03e3, 16.14e3, 18.68e3]
 for rho in densities:
     V = m/rho
     for i, T in enumerate(temperatures):

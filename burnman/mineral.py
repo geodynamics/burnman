@@ -185,10 +185,6 @@ class Mineral(Material):
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
         G = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume, self.params)
-        if G < np.finfo('float').eps: 
-            warnings.warn('Warning, shear modulus is zero. '
-                          'If this mineral is not a liquid, then shear modulus calculations '
-                          'for the {0} equation of state have not been implemented.'.format(self.method.__class__.__name__), stacklevel=2)
         return G
 
     """
