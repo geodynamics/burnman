@@ -43,7 +43,7 @@ def morse_potential(VoverV0, params):
     x = (params['Kprime_0']  - 1.)*(1. - np.power(VoverV0, 1./3.))
     return ( 3. * params['K_0'] / (params['Kprime_0']  - 1.) * 
              np.power(VoverV0, -2./3.) *
-             (np.exp(2.*x) - np.exp(x)) )
+             (np.exp(2.*x) - np.exp(x)) ) + params['P_0']
 
 def volume(pressure, params):
     """
@@ -111,8 +111,8 @@ class Morse(eos.EquationOfState):
         x = (params['Kprime_0'] - 1)*(1 - np.power(volume/params['V_0'], 1./3.))
         intPdV = ( 9./2. * params['V_0'] * params['K_0'] /
                    np.power(params['Kprime_0'] - 1., 2.) *
-                   (2.*np.exp(x) - np.exp(2.*x)) )
-        
+                   (2.*np.exp(x) - np.exp(2.*x) - 1.) )
+
         return -intPdV + params['E_0']
     
     def gibbs_free_energy(self, pressure, temperature, volume, params):

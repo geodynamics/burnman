@@ -55,7 +55,7 @@ def birch_murnaghan_fourth(x, params):
     Zeta = (3. / 8.) * ((params['K_0'] * params['Kprime_prime_0']) + params[
         'Kprime_0'] * (params['Kprime_0'] - 7.) + 143. / 9.)
 
-    return 3. * f * pow(1. + 2. * f, 5. / 2.) * params['K_0'] * (1. - (2. * Xi * f) + (4. * Zeta * pow(f, 2.)))
+    return 3. * f * pow(1. + 2. * f, 5. / 2.) * params['K_0'] * (1. - (2. * Xi * f) + (4. * Zeta * pow(f, 2.))) + params['P_0']
 
 
 class BM4(eos.EquationOfState):

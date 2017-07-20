@@ -121,9 +121,10 @@ class MT(eos.EquationOfState):
         # G = int VdP = [PV] - int PdV = E + PV
         a, b, c = tait_constants(params)
 
-        intVdP = params['V_0']*( a/(b*(1. - c))*(np.power(b*(pressure - params['P_0']) + 1.,
-                                                          1. - c)) +
-                                                 (1. - a)*pressure )
+        intVdP = params['V_0']*( a/(b*(1. - c)) *
+                                 (np.power(b*(pressure - params['P_0']) + 1.,
+                                           1. - c) - 1.) +
+                                 (1. - a)*(pressure - params['P_0']))
         
         return intVdP + params['E_0'] + params['V_0']*params['P_0']
     

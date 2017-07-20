@@ -33,7 +33,7 @@ def vinet(x, params):
     """
     eta = (3. / 2.) * (params['Kprime_0'] - 1.)
     return 3. * params['K_0'] * (pow(x, -2. / 3.)) * (1. - (pow(x, 1. / 3.))) \
-        * exp(eta * (1. - pow(x, 1. / 3.)))
+        * exp(eta * (1. - pow(x, 1. / 3.))) + params['P_0']
 
 
 def volume(pressure, params):
@@ -101,7 +101,8 @@ class Vinet(eos.EquationOfState):
 
 
         intPdV = (9.* params['V_0'] * params['K_0'] / (eta*eta) *
-                  (1. - eta*(1. - x))*exp(eta*(1 - x)))
+                  ((1. - eta*(1. - x))*exp(eta*(1. - x)) - 1.))
+
         
         return - intPdV + params['E_0']
     
