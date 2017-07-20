@@ -295,11 +295,6 @@ Murakami_2013.mg_bridgmanite (Murakami_2013.mg_perovskite)  2.445e-05 2.53e+11  
 Murakami_2013.mg_perovskite                                 2.445e-05 2.53e+11      4.1     1.729e+11     1.56        0.1 5  1100.0          1.4 1.4     2.6
 Murakami_2013.periclase                                     1.124e-05 1.61e+11      3.9     1.309e+11     1.92     0.0403 2   773.0          1.5 1.5     2.3
 Murakami_2013.wuestite                                      1.206e-05 1.52e+11      4.9 47000000000.0      0.7     0.0718 2   455.0         1.28 1.5     0.8
-Name (slb3 equation of state)                                                                  V_0       K_0 Kprime_0        G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
-Murakami_etal_2012.fe_periclase_HS_3rd                                                  1.1412e-05 1.591e+11     4.11 1.2935e+11    1.993     0.0469 2   706.0         1.45 1.5    2.54
-Murakami_etal_2012.fe_periclase_LS_3rd                                                  1.1171e-05   1.7e+11      4.0 1.5167e+11    1.754     0.0469 2   706.0         1.45 1.5    2.54
-Murakami_etal_2012.mg_bridgmanite_3rdorder (Murakami_etal_2012.mg_perovskite_3rdorder)   2.445e-05  2.81e+11      4.1 1.7142e+11     1.83        0.1 5  1070.0         1.48 1.4     2.4
-Murakami_etal_2012.mg_perovskite_3rdorder                                                2.445e-05  2.81e+11      4.1 1.7142e+11     1.83        0.1 5  1070.0         1.48 1.4     2.4
 Name (slb2 equation of state)                                                V_0       K_0 Kprime_0        G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
 Murakami_etal_2012.fe_bridgmanite (Murakami_etal_2012.fe_perovskite)  2.4607e-05 2.519e+11     4.01  1.647e+11     1.58      0.102 5  1054.0         1.48 1.4     2.4
 Murakami_etal_2012.fe_periclase_HS                                    1.1412e-05 1.591e+11     4.11 1.0543e+11    1.773      0.047 2   706.0         1.45 1.5    2.54
@@ -308,6 +303,11 @@ Murakami_etal_2012.fe_perovskite                                      2.4607e-05
 Murakami_etal_2012.mg_bridgmanite (Murakami_etal_2012.mg_perovskite)   2.445e-05  2.81e+11      4.1   1.73e+11     1.56        0.1 5  1070.0         1.48 1.4     2.4
 Murakami_etal_2012.mg_periclase                                        1.124e-05  1.61e+11      3.9   1.31e+11     1.92     0.0403 2   773.0          1.5 1.5     3.0
 Murakami_etal_2012.mg_perovskite                                       2.445e-05  2.81e+11      4.1   1.73e+11     1.56        0.1 5  1070.0         1.48 1.4     2.4
+Name (slb3 equation of state)                                                                  V_0       K_0 Kprime_0        G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
+Murakami_etal_2012.fe_periclase_HS_3rd                                                  1.1412e-05 1.591e+11     4.11 1.2935e+11    1.993     0.0469 2   706.0         1.45 1.5    2.54
+Murakami_etal_2012.fe_periclase_LS_3rd                                                  1.1171e-05   1.7e+11      4.0 1.5167e+11    1.754     0.0469 2   706.0         1.45 1.5    2.54
+Murakami_etal_2012.mg_bridgmanite_3rdorder (Murakami_etal_2012.mg_perovskite_3rdorder)   2.445e-05  2.81e+11      4.1 1.7142e+11     1.83        0.1 5  1070.0         1.48 1.4     2.4
+Murakami_etal_2012.mg_perovskite_3rdorder                                                2.445e-05  2.81e+11      4.1 1.7142e+11     1.83        0.1 5  1070.0         1.48 1.4     2.4
 Name (dks_l equation of state)          V_0    T_0 O_theta O_f   m       zeta_0         xi     Tel_0         eta
 RS_2014_liquids.Fe2SiO4_liquid  5.97717e-05 1900.0       1   4 0.6 0.0161350928 0.34431043 1919.3553 0.012706711
 Name (slb3 equation of state)                           V_0      K_0 Kprime_0           G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
@@ -425,6 +425,11 @@ SLB_2011_ZSB_2013.mg_perovskite                                     2.445e-05 2.
 SLB_2011_ZSB_2013.periclase                                         1.124e-05  1.61e+11      3.8      1.31e+11      2.1     0.0403 2   767.0         1.36  1.7     2.8
 SLB_2011_ZSB_2013.stishovite                                        1.402e-05  3.14e+11      3.8       2.2e+11      1.9     0.0601 3  1108.0         1.37  2.8     4.6
 SLB_2011_ZSB_2013.wuestite                                          1.226e-05  1.79e+11      4.9 59000000000.0      1.4     0.0718 2   454.0         1.53  1.7    -0.1
+Name (aa equation of state)     T_0   S_0               V_0       K_S Kprime_S Kprime_prime_S grueneisen_0   grueneisen_prime grueneisen_n
+other.liquid_iron            1811.0 100.0 7.95626157572e-06 1.097e+11    4.661       -4.3e-11        1.735 -2.32787178798e-06        -1.87
+Name (mgd3 equation of state)         V_0       K_0 Kprime_0 G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
+other.Speziale_fe_periclase_HS   2.29e-05 1.575e+11     3.92 nan      nan    0.04567 2     587         1.46 1.2        
+other.Speziale_fe_periclase_LS  2.149e-05  1.86e+11      4.6 nan      nan    0.04567 2   587.0         1.46 1.2        
 Name (slb3 equation of state)                        V_0          K_0 Kprime_0           G_0 Gprime_0 molar_mass   n  Debye_0 grueneisen_0     q_0  eta_s_0
 other.ZSB_2013_fe_perovskite                   2.549e-05     2.72e+11      4.1      1.33e+11      1.4     0.1319   5    871.0         1.57     1.1      2.3
 other.ZSB_2013_mg_perovskite                   2.445e-05    2.505e+11     4.01     1.729e+11     1.74        0.1   5    905.9         1.44    1.09     2.13
@@ -432,8 +437,3 @@ other.fe_perovskite (SLB_2011.fe_perovskite)  2.5485e-05 2.721152e+11     4.14  
 other.mg_perovskite (SLB_2011.mg_perovskite)  2.4445e-05 2.505264e+11     4.14     1.729e+11  1.69037  0.1003887 5.0 905.9412      1.56508 1.10945  2.56536
 other.periclase (SLB_2011.periclase)          1.1244e-05 1.613836e+11  3.84045     1.309e+11   2.1438  0.0403044 2.0 767.0977      1.36127  1.7217  2.81765
 other.wuestite (SLB_2011.wuestite)            1.2264e-05 1.794442e+11   4.9376 59000000000.0  1.44673  0.0718444 2.0 454.1592      1.53047  1.7217 -0.05731
-Name (aa equation of state)     T_0   S_0               V_0       K_S Kprime_S Kprime_prime_S grueneisen_0   grueneisen_prime grueneisen_n
-other.liquid_iron            1811.0 100.0 7.95626157572e-06 1.097e+11    4.661       -4.3e-11        1.735 -2.32787178798e-06        -1.87
-Name (mgd3 equation of state)         V_0       K_0 Kprime_0 G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
-other.Speziale_fe_periclase_HS   2.29e-05 1.575e+11     3.92 nan      nan    0.04567 2     587         1.46 1.2        
-other.Speziale_fe_periclase_LS  2.149e-05  1.86e+11      4.6 nan      nan    0.04567 2   587.0         1.46 1.2        

@@ -81,7 +81,7 @@ if __name__ == "__main__":
             # The following groups minerals from each module into groups based on eos and
             # prints a separate table for each eos group.
             list_eoses = [phasename[1].params['equation_of_state'] for phasename in phasenames]
-            for (eos, params) in eos_params.items():
+            for (eos, params) in sorted(eos_params.items(), key=lambda x: x[0]):
                 eos_phasenames = [phasenames[i] for i, e in enumerate(list_eoses) if e == eos]
                 if len(eos_phasenames) > 0:
                     table = []
