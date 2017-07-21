@@ -47,6 +47,7 @@ class Fe_Dewaele(burnman.Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state': 'vinet',
+            'P_0': 0.,
             'V_0': 6.75e-6,
             'K_0': 163.4e9,
             'Kprime_0': 5.38,
@@ -63,6 +64,7 @@ class Liquid_Fe_Anderson(burnman.Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state': 'bm4',
+            'P_0': 0.,
             'V_0': 7.95626e-6,
             'K_0': 109.7e9,
             'Kprime_0': 4.66,
@@ -101,6 +103,7 @@ class periclase_morse(burnman.Mineral):
             'name': 'Periclase',
             'formula': formula,
             'equation_of_state': 'morse',
+            'P_0': 0.,
             'V_0': 1.1244e-05,
             'K_0': 1.613836e+11,
             'Kprime_0': 3.84045,
@@ -307,6 +310,61 @@ class test_eos_validation(BurnManTest):
             if len(w) == 0:
                 self.fail("Did not catch expected warning K in Gpa")
 
+    def test_reference_energies(self):
+        m = burnman.Mineral(params={'equation_of_state': 'bm3',
+                                    'E_0': 1000.,
+                                    'T_0': 100.,
+                                    'P_0': 1.e10,
+                                    'V_0': 7.95626e-6,
+                                    'K_0': 109.7e9,
+                                    'Kprime_0': 4.66,
+                                    'Kprime_prime_0': -0.043e-9,
+                                    'Kdprime_0': -4.66/100.e9,
+                                    'molar_mass': 0.055845})
+
+        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse']
+
+        energies = []
+        for eos in eoses:
+            m.params['equation_of_state'] = eos
+            burnman.Mineral.__init__(m)
+            m.set_state(m.params['P_0'], m.params['T_0'])
+            energies.append(m.internal_energy)
+        
+        self.assertArraysAlmostEqual(energies, [m.params['E_0']]*len(energies))
+
+            
+    def test_energy_derivatives(self):
+        m = burnman.Mineral(params={'equation_of_state': 'bm3',
+                                    'V_0': 7.95626e-6,
+                                    'K_0': 109.7e9,
+                                    'Kprime_0': 4.66,
+                                    'Kprime_prime_0': -0.043e-9,
+                                    'Kdprime_0': -4.66/100.e9,
+                                    'molar_mass': 0.055845})
+
+        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse']
+
+        calculated = []
+        derivative = []
+        for eos in eoses:
+            m.params['equation_of_state'] = eos
+            burnman.Mineral.__init__(m)
+
+            P_0 = 10.e9
+            dP = 1000.
+            pressures = [P_0 - 0.5*dP, P_0, P_0 + 0.5*dP]
+            temperatures = [0., 0., 0.]
+
+            E, G, H, A, V = m.evaluate(['internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
+            
+            calculated.append(P_0)
+            derivative.append(-(E[2] - E[0])/(V[2] - V[0]))
+            calculated.append(V[1])
+            derivative.append((G[2] - G[0])/dP)
+            
+        self.assertArraysAlmostEqual(calculated, derivative)
+                
 
 if __name__ == '__main__':
     unittest.main()

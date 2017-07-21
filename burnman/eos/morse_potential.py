@@ -43,7 +43,7 @@ def morse_potential(VoverV0, params):
     x = (params['Kprime_0']  - 1.)*(1. - np.power(VoverV0, 1./3.))
     return ( 3. * params['K_0'] / (params['Kprime_0']  - 1.) * 
              np.power(VoverV0, -2./3.) *
-             (np.exp(2.*x) - np.exp(x)) )
+             (np.exp(2.*x) - np.exp(x)) ) + params['P_0']
 
 def volume(pressure, params):
     """
@@ -97,6 +97,30 @@ class Morse(eos.EquationOfState):
         """
         return shear_modulus(volume, params)
 
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        """
+        return 0.
+    
+    def internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        """
+
+        x = (params['Kprime_0'] - 1)*(1 - np.power(volume/params['V_0'], 1./3.))
+        intPdV = ( 9./2. * params['V_0'] * params['K_0'] /
+                   np.power(params['Kprime_0'] - 1., 2.) *
+                   (2.*np.exp(x) - np.exp(2.*x) - 1.) )
+
+        return -intPdV + params['E_0']
+    
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        """
+        return self.internal_energy(pressure, temperature, volume, params) + volume*pressure
+    
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -126,6 +150,8 @@ class Morse(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
 
+        if 'E_0' not in params:
+            params['E_0'] = 0.
         if 'P_0' not in params:
             params['P_0'] = 0.
 

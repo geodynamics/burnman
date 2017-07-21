@@ -33,7 +33,7 @@ def vinet(x, params):
     """
     eta = (3. / 2.) * (params['Kprime_0'] - 1.)
     return 3. * params['K_0'] * (pow(x, -2. / 3.)) * (1. - (pow(x, 1. / 3.))) \
-        * exp(eta * (1. - pow(x, 1. / 3.)))
+        * exp(eta * (1. - pow(x, 1. / 3.))) + params['P_0']
 
 
 def volume(pressure, params):
@@ -52,7 +52,9 @@ class Vinet(eos.EquationOfState):
     """
     Base class for the isothermal Vinet equation of state.
     References for this equation of state are :cite:`vinet1986`
-    and :cite:`vinet1987`.
+    and :cite:`vinet1987`. This equation of state actually 
+    predates Vinet by 55 years :cite:`Rydberg1932`, 
+    and was investigated further by :cite:`Stacey1981`.
     """
 
     def volume(self, pressure, temperature, params):
@@ -83,7 +85,35 @@ class Vinet(eos.EquationOfState):
         Currently not included in the Vinet EOS, so omitted.
         """
         return 0.
+    
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        """
+        return 0.
+    
+    def internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        """
+        x = pow(volume/params['V_0'], 1./3.)
+        eta = (3. / 2.) * (params['Kprime_0'] - 1.)
 
+
+        intPdV = (9.* params['V_0'] * params['K_0'] / (eta*eta) *
+                  ((1. - eta*(1. - x))*exp(eta*(1. - x)) - 1.))
+
+        
+        return - intPdV + params['E_0']
+    
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        """
+        # G = int VdP = [PV] - int PdV = E + PV
+                  
+        return self.internal_energy(pressure, temperature, volume, params) + volume*pressure
+    
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -113,6 +143,12 @@ class Vinet(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
 
+        
+        if 'E_0' not in params:
+            params['E_0'] = 0.
+        if 'P_0' not in params:
+            params['P_0'] = 0.
+            
         # G is not included in the Vinet EOS so we shall set them to NaN's
         if 'G_0' not in params:
             params['G_0'] = float('nan')
