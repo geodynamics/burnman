@@ -220,6 +220,21 @@ class eos(BurnManTest):
         Density_test = eos.density(rock.params['V_0'], rock.params)
         self.assertFloatEqual(
             Density_test, rock.params['molar_mass'] / rock.params['V_0'])
+
+    def test_reference_values_aa(self):
+        rock = minerals.other.liquid_iron()
+        pressure = rock.params['P_0']
+        temperature = rock.params['T_0']
+        eos = burnman.eos.AA()
+        Volume_test = eos.volume(pressure, temperature, rock.params)
+        self.assertFloatEqual(Volume_test, rock.params['V_0'])
+        Ks_test = eos.adiabatic_bulk_modulus(
+            pressure, temperature, rock.params['V_0'], rock.params)
+        self.assertFloatEqual(Ks_test, rock.params['K_S'])
+        Density_test = eos.density(rock.params['V_0'], rock.params)
+        self.assertFloatEqual(
+            Density_test, rock.params['molar_mass'] / rock.params['V_0'])
+        
         
 class test_eos_validation(BurnManTest):
 

@@ -12,10 +12,52 @@ from __future__ import absolute_import
 
 from .. import mineral_helpers as helpers
 from ..mineral import Mineral
+from ..processchemistry import dictionarize_formula, formula_mass
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 
 
+
+class liquid_iron( Mineral ):
+    """
+    Liquid iron equation of state from Anderson and Ahrens (1994)
+    """
+    def __init__(self):
+        formula='Fe1.0'
+        formula = dictionarize_formula(formula)
+        m = formula_mass(formula)
+        rho_0 = 7019.
+        V_0 = m/rho_0
+        D = 7766.
+        Lambda = 1146.
+        self.params = {
+            'name': 'liquid iron',
+            'formula': formula,
+            'equation_of_state': 'aa',
+            'P_0': 1.e5,
+            'T_0': 1811.,
+            'S_0': 100., # to fit
+            'molar_mass': m,
+            'V_0': V_0,
+            'E_0': 0.,
+            'K_S': 109.7e9,
+            'Kprime_S': 4.661,
+            'Kprime_prime_S': -0.043e-9,
+            'grueneisen_0': 1.735,
+            'grueneisen_prime': -0.130/m*1.e-6,
+            'grueneisen_n': -1.870,
+            'a': [248.92*m, 289.48*m],
+            'b': [0.4057*m, -1.1499*m],
+            'Theta': [1747.3, 1.537],
+            'theta': 5000.,
+            'lmda': [-325.23*m, 302.07*m, 30.45*m],
+            'xi_0': 282.67*m,
+            'F': [D/rho_0, Lambda/rho_0],
+            'n': sum(formula.values()),
+            'molar_mass': m}
+        Mineral.__init__(self)
+
+        
 class ZSB_2013_mg_perovskite(Mineral):
 
     def __init__(self):

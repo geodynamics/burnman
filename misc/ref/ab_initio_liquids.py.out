@@ -1,5 +1,27 @@
 EoS consistent for SiO2_liquid model: True
 EoS consistent for MgO_liquid model: True
 EoS consistent for Fe2SiO4_liquid model: True
-BURNMAN/burnman/tools.py: UserWarning: Warning, shear modulus is zero. If this mineral is not a liquid, then shear modulus calculations for the DKS_L equation of state have not been implemented.
-  return func(*args)
+Warning from file 'BURNMAN/burnman/mineral.py', line 195:
+You are trying to calculate shear modulus for SiO2_liquid when it is exactly zero. 
+If SiO2_liquid is a liquid, then you can safely ignore this warning, but consider 
+calculating bulk modulus or bulk sound rather than Vp or Vs. 
+If SiO2_liquid is not a liquid, then shear modulus calculations for the 
+underlying equation of state (DKS_L) have not been implemented, 
+and Vp and Vs estimates will be incorrect.
+
+Warning from file 'BURNMAN/burnman/mineral.py', line 195:
+You are trying to calculate shear modulus for MgO_liquid when it is exactly zero. 
+If MgO_liquid is a liquid, then you can safely ignore this warning, but consider 
+calculating bulk modulus or bulk sound rather than Vp or Vs. 
+If MgO_liquid is not a liquid, then shear modulus calculations for the 
+underlying equation of state (DKS_L) have not been implemented, 
+and Vp and Vs estimates will be incorrect.
+
+Warning from file 'BURNMAN/burnman/mineral.py', line 195:
+You are trying to calculate shear modulus for Fe2SiO4_liquid when it is exactly zero. 
+If Fe2SiO4_liquid is a liquid, then you can safely ignore this warning, but consider 
+calculating bulk modulus or bulk sound rather than Vp or Vs. 
+If Fe2SiO4_liquid is not a liquid, then shear modulus calculations for the 
+underlying equation of state (DKS_L) have not been implemented, 
+and Vp and Vs estimates will be incorrect.
+

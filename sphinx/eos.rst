@@ -61,6 +61,11 @@ De Koker Solid and Liquid Formulations
 
 .. autoclass:: burnman.eos.DKS_L
 
+Anderson and Ahrens (1994)
+--------------------------
+
+.. autoclass:: burnman.eos.AA
+
 CoRK
 ----
 .. autoclass:: burnman.eos.CORK
