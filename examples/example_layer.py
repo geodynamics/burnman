@@ -74,16 +74,15 @@ if __name__ == "__main__":
     # Here we set the composition of the layer as the above defined 'rock'.
     lower_mantle.set_material(rock)
 
-    # Now we set the temperature mode of the layer. , and a
-    # self-consistent pressure. The pressure at the top of the layer and
-    # gravity at the bottom of the layer are given by the PREM.
-    
+    # Now we set the temperature mode of the layer.
     # Here we use an adiabatic temperature and set the temperature at the top of the layer
     lower_mantle.set_temperature_mode(temperature_mode='adiabat', temperature_top=1900.)
     #Alternatively, we choose a user-defined temperature, given by the Brown & Shankland geotherm
     #lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
     #                                      temperatures =burnman.geotherm.brown_shankland(depths))
-                           
+
+    # And we set a self-consistent pressure. The pressure at the top of the layer and
+    # gravity at the bottom of the layer are given by the PREM.
     lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
                                pressure_top=pressure[0], gravity_bottom=gravity[-1])
 
