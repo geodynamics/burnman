@@ -258,18 +258,14 @@ class SeismicTable(Seismic1DModel):
     def pressure(self, depth):
         if len(self.table_pressure) == 0:
             warnings.warn(
-                "Pressure is not given in " +
-                self.__class__.__name__ +
-                " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+                "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
             self._compute_pressure()
         return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
         if len(self.table_gravity) == 0:
             warnings.warn(
-                "Gravity is not given in " +
-                self.__class__.__name__ +
-                " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+                "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
             self._compute_gravity()
         return self._lookup(depth, self.table_gravity)
 

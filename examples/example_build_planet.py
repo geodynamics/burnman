@@ -67,41 +67,39 @@ if __name__ == "__main__":
     # Separately the composition and the temperature_mode need to set.
     radius_planet = 6371.e3
     # inner_core
-    inner_core = burnman.Layer("inner core", radius_planet=radius_planet,
-        max_depth=6371.e3, min_depth=5151.e3, n_slices=10)
+    inner_core = burnman.Layer("inner core", radii = np.linspace(0,1220.e3,10))
     inner_core.set_material(burnman.minerals.other.Fe_Dewaele())
     
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will set the temperature at 300 K.
     inner_core.set_temperature_mode( 'user-defined',
-        300.*np.ones_like(inner_core.depths))
+        300.*np.ones_like(inner_core.radii))
 
     # outer_core
-    outer_core = burnman.Layer( "outer core", radius_planet=radius_planet,
-        max_depth=5151.e3, min_depth=2891.e3, n_slices=10)
+    outer_core = burnman.Layer( "outer core", radii = np.linspace(1220.e3,3480.e3,10))
     outer_core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature at 300 K.
     outer_core.set_temperature_mode('user-defined',
-        300.*np.ones_like(outer_core.depths))
+        300.*np.ones_like(outer_core.radii))
 
     # Next the Mantle.
-    lower_mantle = burnman.Layer( "lower_mantle", radius_planet=radius_planet,
-        max_depth=2891.e3, min_depth=660.e3, n_slices=10)
+    lower_mantle = burnman.Layer( "lower_mantle", radii = np.linspace(3480.e3, 5711.e3, 10))
     lower_mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
     lower_mantle.set_temperature_mode('adiabat')
-    upper_mantle = burnman.Layer( "upper_mantle", radius_planet=radius_planet,
-        max_depth=660e3, min_depth=0., n_slices=10)
+    upper_mantle = burnman.Layer( "upper_mantle", radii = np.linspace(5711.e3, 6371e3, 10))
     upper_mantle.set_material(burnman.minerals.SLB_2011.forsterite())
-    upper_mantle.set_temperature_mode('adiabat', temperature_top =1200.)
+    upper_mantle.set_temperature_mode('adiabat', temperature_top = 1200.)
 
 
 
     # Now we calculate the planet.
     Plan = burnman.Planet('earth_like',
                           [inner_core, outer_core, lower_mantle, upper_mantle], verbose=True)
+    print(Plan)
+    
     # Here we compute its state. Go BurnMan Go!
     # (If we were to change composition of one of the layers, we would have to
     # recompute the state)
-    Plan.set_state()
+    Plan.make()
 
     # Now we output the mass of the planet and moment of inertia
     print()
@@ -114,12 +112,13 @@ if __name__ == "__main__":
               (layer.name, layer.mass / Plan.mass))
     print()
 
+
     # Let's get PREM to compare everything to as we are trying
     # to imitate Earth
     prem = burnman.seismic.PREM()
     premradii = 6371.e3 - prem.internal_depth_list()
-    [premdensity, prempressure, premgravity] = prem.evaluate(
-        ['density', 'pressure', 'gravity'])
+    [premdensity, prempressure, premgravity,premvs,premvp] = prem.evaluate(
+        ['density', 'pressure', 'gravity', 'v_s','v_p'])
 
     # Now let's plot everything up
 

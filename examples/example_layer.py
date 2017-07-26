@@ -70,8 +70,7 @@ if __name__ == "__main__":
 
     # Here we define the lower mantle as a Layer(). The layer needs various
     # parameters to set a depth array and radius array.
-    lower_mantle = burnman.Layer( name='Lower Mantle', radius_planet=6371.e3,
-        min_depth=750.e3, max_depth=2800.e3,  n_slices=20)
+    lower_mantle = burnman.Layer( name='Lower Mantle', radii=6371.e3-depths)
     # Here we set the composition of the layer as the above defined 'rock'.
     lower_mantle.set_material(rock)
 
@@ -85,15 +84,16 @@ if __name__ == "__main__":
     #lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
     #                                      temperatures =burnman.geotherm.brown_shankland(depths))
                            
-    lower_mantle.set_state(pressure_mode='self-consistent',
+    lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
                                pressure_top=pressure[0], gravity_bottom=gravity[-1])
 
-       
+    lower_mantle.make()
+    
     # All the work is done, now we can plot various properties!
     # First, we plot the s-wave speed verses the PREM s-wave speed
     plt.figure(figsize = (10,6))
     plt.subplot(1, 2, 1)
-    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.v_s / 1.e3, color='b', linestyle='-',
+    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.v_s / 1.e3, color='b', linestyle='-',
              marker='o', markerfacecolor='b', markersize=4, label='Vs computed')
     plt.plot(pressure / 1.e9, seis_vs / 1.e3, color='b', linestyle='--',
              marker='o', markerfacecolor='w', markersize=4, label='Vs ref')
@@ -102,25 +102,25 @@ if __name__ == "__main__":
     plt.legend(loc='lower right')
 
     # Next, we plot the p-wave speed verses the PREM p-wave speed
-    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.v_p / 1.e3, color='r', linestyle='-',
+    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.v_p / 1.e3, color='r', linestyle='-',
              marker='o', markerfacecolor='r', markersize=4, label='Vp computed')
     plt.plot(pressure / 1.e9, seis_vp / 1.e3, color='r',
              linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='Vp ref')
 
 
     # Next, we plot the density verses the PREM density
-    plt.plot(lower_mantle.pressure / 1.e9, lower_mantle.density / 1.e3, color='g',
+    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.density / 1.e3, color='g',
              linestyle='-', marker='o', markerfacecolor='g', markersize=4, label='rho computed')
     plt.plot(pressure / 1.e9, seis_rho / 1.e3, color='g',
              linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='rho ref')
     plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
     plt.xlabel("Pressure (GPa)")
-    plt.xlim(min(lower_mantle.pressure) / 1.e9, max(lower_mantle.pressure) / 1.e9)
+    plt.xlim(min(lower_mantle.pressures) / 1.e9, max(lower_mantle.pressures) / 1.e9)
     
     plt.legend()
     
     plt.subplot(2, 2, 2)
-    plt.plot(lower_mantle.pressure / 1e9, lower_mantle.bullen, color='k', linestyle='-',
+    plt.plot(lower_mantle.pressures / 1e9, lower_mantle.bullen, color='k', linestyle='-',
              marker='o', markerfacecolor='k', markersize=4, label='bullen computed')
     plt.plot(pressure / 1.e9, seis_bullen , color='k',
                  linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='bullen ref')
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     # Finally, we plot the used geotherm
     plt.subplot(2, 2, 4)
-    plt.plot(lower_mantle.pressure / 1e9, lower_mantle.temperature, color='k', linestyle='-',
+    plt.plot(lower_mantle.pressures / 1e9, lower_mantle.temperatures, color='k', linestyle='-',
              marker='o', markerfacecolor='k', markersize=4)
     plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
     plt.xlabel("Pressure (GPa)")
