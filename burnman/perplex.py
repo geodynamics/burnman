@@ -12,7 +12,7 @@ from os import rename
 
 
 import numpy as np
-from scipy.interpolate import interp2d 
+from scipy.interpolate import interp2d
 
 from .material import Material, material_property
 from . import eos
@@ -105,26 +105,33 @@ class PerplexMaterial(Material):
         if lines[2][0] != '2':
             raise Exception('This is not a 2D PerpleX table')
 
-        Pmin = float(lines[4][0])*1.e5
-        Pint = float(lines[5][0])*1.e5
-        nP = int(lines[6][0])
+        bounds = [(float(lines[4][0]), float(lines[5][0]), int(lines[6][0])),
+                  (float(lines[8][0]), float(lines[9][0]), int(lines[10][0]))]
+
+        if lines[3][0] == 'P(bar)':
+            Pmin, Pint, nP = bounds[0]
+            Tmin, Tint, nT = bounds[1]
+        else:
+            Pmin, Pint, nP = bounds[1]
+            Tmin, Tint, nT = bounds[0]
+
+        Pmin = Pmin*1.e5 # bar to Pa
+        Pint = Pint*1.e5 # bar to Pa
         Pmax = Pmin + Pint*(nP-1.)
-        pressures = np.linspace(Pmin, Pmax, nP)
-        
-        Tmin = float(lines[8][0])
-        Tint = float(lines[9][0])
-        nT = int(lines[10][0])
         Tmax = Tmin + Tint*(nT-1.)
+        pressures = np.linspace(Pmin, Pmax, nP)
         temperatures = np.linspace(Tmin, Tmax, nT)
-        
         n_properties = int(lines[11][0])
         property_list = lines[12]
         
         # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
-        property_table = np.swapaxes(np.array([[float(string) for string in line]
-                                               for line in lines[13:13+nP*nT]]).reshape(nT, nP, n_properties),
-                                     0, 1)
+        table = np.array([[float(string) for string in line] for line in lines[13:13+nP*nT]])
         
+        if lines[3][0] == 'P(bar)':
+            property_table = np.swapaxes(table.reshape(nT, nP, n_properties), 0, 1)
+        else:
+            property_table = table.reshape(nP, nT, n_properties)
+            
         ordered_property_list = ['rho,kg/m3',
                                  'alpha,1/K',
                                  'beta,1/bar',
@@ -137,25 +144,35 @@ class PerplexMaterial(Material):
                                  'h,J/kg',
                                  'cp,J/K/kg',
                                  'V,J/bar/mol']
-        p_indices = [[i for i, p in enumerate(property_list) if p == ordered_p] for ordered_p in ordered_property_list]
+        p_indices = [i for i, p in enumerate(property_list) for ordered_p in ordered_property_list if p == ordered_p]
 
-        densities = property_table[:,:,p_indices[0]][:,:,0]
-        volumes = 1.e-5 * property_table[:,:,p_indices[11]][:,:,0]
+        # Fill in NaNs
+        properties = {}
+        try: # this works only if pandas is installed
+            import pandas as pd
+            for i, p_idx in enumerate(p_indices):
+                properties[ordered_property_list[i]] = np.array([pd.DataFrame(property_table[:,:,[p_idx]][:,:,0]).interpolate(method='linear', axis=0).values])
+        except:
+            warnings.warn('pandas is not installed on this machine. If the PerpleX tab file contains NaN entries, interpolation may not function correctly')
+            for i, p_idx in enumerate(p_indices):
+                properties[ordered_property_list[i]] = np.array(property_table[:,:,[p_idx]][:,:,0])
+            
+        densities = properties['rho,kg/m3']
+        volumes = 1.e-5 * properties['V,J/bar/mol']
         molar_masses = densities*volumes
         molar_mass = np.mean(molar_masses)
-        
-        property_interpolators = {'rho': interp2d(pressures, temperatures, densities.T),
-                                  'alpha': interp2d(pressures, temperatures, property_table[:,:,p_indices[1]][:,:,0].T),
-                                  'K_T': interp2d(pressures, temperatures, 1.e5 / property_table[:,:,p_indices[2]][:,:,0].T),
-                                  'K_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[3]][:,:,0].T),
-                                  'G_S': interp2d(pressures, temperatures, 1.e5 * property_table[:,:,p_indices[4]][:,:,0].T),
-                                  'bulk_sound_velocity': interp2d(pressures, temperatures, 1.e3*property_table[:,:,p_indices[5]][:,:,0].T),
-                                  'p_wave_velocity': interp2d(pressures, temperatures, 1.e3*property_table[:,:,p_indices[6]][:,:,0].T),
-                                  's_wave_velocity': interp2d(pressures, temperatures, 1.e3*property_table[:,:,p_indices[7]][:,:,0].T),
-                                  'S': interp2d(pressures, temperatures, property_table[:,:,p_indices[8]][:,:,0].T*molar_masses.T),
-                                  'H': interp2d(pressures, temperatures, property_table[:,:,p_indices[9]][:,:,0].T*molar_masses.T),
-                                  'C_p': interp2d(pressures, temperatures, property_table[:,:,p_indices[10]][:,:,0].T*molar_masses.T),
-                                  'V': interp2d(pressures, temperatures, volumes.T)}
+        property_interpolators = {'rho': interp2d(pressures, temperatures, densities.T, bounds_error=True),
+                                  'alpha': interp2d(pressures, temperatures, properties['alpha,1/K'].T, bounds_error=True),
+                                  'K_T': interp2d(pressures, temperatures, 1.e5 / properties['beta,1/bar'].T, bounds_error=True),
+                                  'K_S': interp2d(pressures, temperatures, 1.e5 * properties['Ks,bar'].T, bounds_error=True),
+                                  'G_S': interp2d(pressures, temperatures, 1.e5 * properties['Gs,bar'].T, bounds_error=True),
+                                  'bulk_sound_velocity': interp2d(pressures, temperatures, 1.e3*properties['v0,km/s'].T, bounds_error=True),
+                                  'p_wave_velocity': interp2d(pressures, temperatures, 1.e3*properties['vp,km/s'].T, bounds_error=True),
+                                  's_wave_velocity': interp2d(pressures, temperatures, 1.e3*properties['vs,km/s'].T, bounds_error=True),
+                                  'S': interp2d(pressures, temperatures, properties['s,J/K/kg'].T*molar_masses.T, bounds_error=True),
+                                  'H': interp2d(pressures, temperatures, properties['h,J/kg'].T*molar_masses.T, bounds_error=True),
+                                  'C_p': interp2d(pressures, temperatures, properties['cp,J/K/kg'].T*molar_masses.T, bounds_error=True),
+                                  'V': interp2d(pressures, temperatures, volumes.T, bounds_error=True)}
 
         bounds = [[Pmin, Pmax], [Tmin, Tmax]]
         return property_interpolators, molar_mass, bounds
