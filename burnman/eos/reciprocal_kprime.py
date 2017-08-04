@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 
 import scipy.optimize as opt
+from scipy.integrate import quad
 from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
@@ -101,7 +102,7 @@ class RKprime(eos.EquationOfState):
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
         Kprime_ratio = params['Kprime_0']/params['Kprime_inf']
-        PoverK = _PoverK_from_P(pressure, params)
+        PoverK = _PoverK_from_P(pressure - params['P_0'], params)
         
         V = params['V_0'] * np.exp( Kprime_ratio/params['Kprime_inf'] *
                                     np.log(1. - params['Kprime_inf'] * PoverK) +
@@ -114,9 +115,9 @@ class RKprime(eos.EquationOfState):
         Returns pressure :math:`[Pa]` as a function of volume :math:`[m^3]`.
         """
         PoverK = _PoverK_from_V(volume, params)
-        return ( params['K_0'] * PoverK *
-                 np.power(1. - params['Kprime_inf'] * PoverK,
-                          -params['Kprime_0']/params['Kprime_inf']) )
+        return params['P_0'] + ( params['K_0'] * PoverK *
+                                 np.power(1. - params['Kprime_inf'] * PoverK,
+                                          -params['Kprime_0']/params['Kprime_inf']) )
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """
@@ -137,6 +138,28 @@ class RKprime(eos.EquationOfState):
         """
         return shear_modulus(pressure, params)
 
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        """
+        return 0.
+    
+    def internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        """
+        peval = lambda volume: self.pressure(temperature, volume, params)
+        dE = -quad(peval, params['V_0'], volume)[0]
+        return params['E_0'] + dE
+    
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        """
+        # G = int VdP = [PV] - int PdV = E + PV
+                  
+        return self.internal_energy(pressure, temperature, volume, params) + volume*pressure
+        
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -168,6 +191,8 @@ class RKprime(eos.EquationOfState):
         between 5/3 and :math:`K'_0` :cite:`StaceyDavis2004`.
         """
 
+        if 'E_0' not in params:
+            params['E_0'] = 0.
         if 'P_0' not in params:
             params['P_0'] = 0.
 
