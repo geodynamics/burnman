@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 
 import scipy.optimize as opt
-from scipy.integrate import quad
+from mpmath import gammainc
 from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
@@ -37,7 +37,7 @@ def _PoverK_from_P(pressure, params):
     Calculates the pressure:bulk modulus ratio
     from a given pressure using brentq optimization
     """
-    args = (pressure, params['K_0'],
+    args = ((pressure - params['P_0']), params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
     return opt.brentq(_delta_PoverK_from_P,
                       1./(params['Kprime_inf'] - params['Kprime_0']) + np.finfo(float).eps,
@@ -102,7 +102,7 @@ class RKprime(eos.EquationOfState):
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
         Kprime_ratio = params['Kprime_0']/params['Kprime_inf']
-        PoverK = _PoverK_from_P(pressure - params['P_0'], params)
+        PoverK = _PoverK_from_P(pressure, params)
         
         V = params['V_0'] * np.exp( Kprime_ratio/params['Kprime_inf'] *
                                     np.log(1. - params['Kprime_inf'] * PoverK) +
@@ -143,22 +143,38 @@ class RKprime(eos.EquationOfState):
         Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.
+
+    def _intVdP(self, xi, params):
+        
+        a = params['Kprime_inf']
+        b = (params['Kprime_0']/params['Kprime_inf']/params['Kprime_inf'] -
+             params['Kprime_0']/params['Kprime_inf'] - 1.)
+        c = params['Kprime_0'] - params['Kprime_inf']
+        f = (params['Kprime_0']/params['Kprime_inf'] - 1.)
+        
+        i1 = float( params['V_0'] * params['K_0'] *
+                    np.exp(f / a) * np.power(a, b - 1.) /
+                    np.power(f, b + 2.) *
+                    ( f * params['Kprime_0'] * gammainc( b + 1. ,
+                                                         f * (1./a - xi) ) -
+                      a * c * gammainc( b + 2., f * (1./a - xi) ) ) )
+        
+        return i1
+
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        """
+        # G = E0 + int VdP (when S = 0)
+        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        return params['E_0'] + params['P_0']*params['V_0'] + self._intVdP((pressure - params['P_0'])/K, params) - self._intVdP(0., params) 
     
     def internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
-        peval = lambda volume: self.pressure(temperature, volume, params)
-        dE = -quad(peval, params['V_0'], volume)[0]
-        return params['E_0'] + dE
-    
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
-        """
-        # G = int VdP = [PV] - int PdV = E + PV
-                  
-        return self.internal_energy(pressure, temperature, volume, params) + volume*pressure
+        # E = G - PV (+ TS)
+        return ( self.gibbs_free_energy(pressure, temperature, volume, params) - pressure*volume)
         
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
