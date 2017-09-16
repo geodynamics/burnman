@@ -60,12 +60,8 @@ class test_planet(BurnManTest):
         mantle.set_temperature_mode('adiabat', temperature_top = 1200)
         myplanet = Planet('earth_like',[core, mantle])
         myplanet.make()
-        
-        ref = [ 0.,             0.,             0.,             0.,             0. ,            0.,
-                0.,             0.,             0.,             0. ,         1891.81949144,
-               1828.16862831,  1763.99394829,  1698.29707386 , 1630.01741059,  1557.99610591,
-               1480.9100882,   1397.14929092,  1304.57543674,  1200.        ]
-        self.assertArraysAlmostEqual(myplanet.temperature, ref)
+
+        self.assertArraysAlmostEqual(mantle.S, [mantle.S[-1] for S in mantle.S])
 
 
 if __name__ == '__main__':
