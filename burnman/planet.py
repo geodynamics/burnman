@@ -227,9 +227,7 @@ class Planet(object):
                 rel_err = abs(
                     (max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
-                    print(
-                        "Iteration %i  maximum core pressure delta between iterations: %e" %
-                        (i, rel_err))
+                    print('Iteration {0:0d} maximum relative pressure error: {1:.1e}'.format(i, rel_err))
 
                 if rel_err < self.max_delta:
                     break
