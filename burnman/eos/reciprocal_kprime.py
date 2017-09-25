@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 
 import scipy.optimize as opt
-from mpmath import gammainc
+from scipy.special import gamma, gammainc
 from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
@@ -31,6 +31,25 @@ def _delta_PoverK_from_V(PoverK, V, V_0, K_0, Kprime_0, Kprime_inf):
     return ( np.log( V_0 / V ) +
              Kprime_ratio / Kprime_inf * np.log(1. - Kprime_inf * PoverK) +
              (Kprime_ratio - 1.) * PoverK ) # eq. 61
+
+def _upper_incomplete_gamma(z, a):
+    """
+    An implementation of the non-regularised upper incomplete gamma
+    function. Computed using the relationship with the regularised 
+    lower incomplete gamma function (scipy.special.gammainc). 
+    Uses the recurrence relation wherever z<0.
+    """
+    n = int(-np.floor(z))
+    if n > 0:
+        z = z + n
+        u_gamma = (1. - gammainc(z, a))*gamma(z)
+        
+        for i in range(n):
+            z = z - 1.
+            u_gamma = (u_gamma - np.power(a, z)*np.exp(-a))/z
+        return u_gamma
+    else:
+        return (1. - gammainc(z, a))*gamma(z)
 
 def _PoverK_from_P(pressure, params):
     """
@@ -155,9 +174,9 @@ class RKprime(eos.EquationOfState):
         i1 = float( params['V_0'] * params['K_0'] *
                     np.exp(f / a) * np.power(a, b - 1.) /
                     np.power(f, b + 2.) *
-                    ( f * params['Kprime_0'] * gammainc( b + 1. ,
-                                                         f * (1./a - xi) ) -
-                      a * c * gammainc( b + 2., f * (1./a - xi) ) ) )
+                    ( f * params['Kprime_0'] * _upper_incomplete_gamma( b + 1. ,
+                                                                        f * (1./a - xi) ) -
+                      a * c * _upper_incomplete_gamma( b + 2., f * (1./a - xi) ) ) )
         
         return i1
 
