@@ -108,13 +108,16 @@ class PerplexMaterial(Material):
         bounds = [(float(lines[4][0]), float(lines[5][0]), int(lines[6][0])),
                   (float(lines[8][0]), float(lines[9][0]), int(lines[10][0]))]
 
-        if lines[3][0] == 'P(bar)':
+        if lines[3][0] == 'P(bar)' and lines[7][0] == 'T(K)':
             Pmin, Pint, nP = bounds[0]
             Tmin, Tint, nT = bounds[1]
-        else:
+        elif lines[3][0] == 'T(K)' and lines[7][0] == 'P(bar)':
             Pmin, Pint, nP = bounds[1]
             Tmin, Tint, nT = bounds[0]
-
+        else:
+            raise Exception('This file does not have a recognised PerpleX structure.\n'
+                            'Are the independent variables P(bar) and T(K)?')
+        
         Pmin = Pmin*1.e5 # bar to Pa
         Pint = Pint*1.e5 # bar to Pa
         Pmax = Pmin + Pint*(nP-1.)
