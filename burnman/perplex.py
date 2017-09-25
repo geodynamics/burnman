@@ -12,7 +12,7 @@ from os import rename
 
 
 import numpy as np
-from scipy.interpolate import interp2d
+from scipy.interpolate import interp2d, griddata
 
 from .material import Material, material_property
 from . import eos
@@ -149,16 +149,17 @@ class PerplexMaterial(Material):
                                  'V,J/bar/mol']
         p_indices = [i for i, p in enumerate(property_list) for ordered_p in ordered_property_list if p == ordered_p]
 
-        # Fill in NaNs
         properties = {}
-        try: # this works only if pandas is installed
-            import pandas as pd
-            for i, p_idx in enumerate(p_indices):
-                properties[ordered_property_list[i]] = np.array([pd.DataFrame(property_table[:,:,[p_idx]][:,:,0]).interpolate(method='linear', axis=0).values])
-        except:
-            warnings.warn('pandas is not installed on this machine. If the PerpleX tab file contains NaN entries, interpolation may not function correctly')
-            for i, p_idx in enumerate(p_indices):
-                properties[ordered_property_list[i]] = np.array(property_table[:,:,[p_idx]][:,:,0])
+        for i, p_idx in enumerate(p_indices):
+            # Fill in NaNs as long as they aren't in the corners of the P-T grid
+            a = np.array(property_table[:,:,[p_idx]][:,:,0])
+            x, y = np.indices(a.shape)
+            a[np.isnan(a)] = griddata((x[~np.isnan(a)], y[~np.isnan(a)]), # points we know
+                                      a[~np.isnan(a)],                    # values we know
+                                      (x[np.isnan(a)], y[np.isnan(a)]))
+
+            properties[ordered_property_list[i]] = a
+            
             
         densities = properties['rho,kg/m3']
         volumes = 1.e-5 * properties['V,J/bar/mol']
