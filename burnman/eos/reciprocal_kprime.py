@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 
 import scipy.optimize as opt
+from scipy.special import gamma, gammainc
 from . import equation_of_state as eos
 from ..tools import bracket
 import warnings
@@ -31,12 +32,31 @@ def _delta_PoverK_from_V(PoverK, V, V_0, K_0, Kprime_0, Kprime_inf):
              Kprime_ratio / Kprime_inf * np.log(1. - Kprime_inf * PoverK) +
              (Kprime_ratio - 1.) * PoverK ) # eq. 61
 
+def _upper_incomplete_gamma(z, a):
+    """
+    An implementation of the non-regularised upper incomplete gamma
+    function. Computed using the relationship with the regularised 
+    lower incomplete gamma function (scipy.special.gammainc). 
+    Uses the recurrence relation wherever z<0.
+    """
+    n = int(-np.floor(z))
+    if n > 0:
+        z = z + n
+        u_gamma = (1. - gammainc(z, a))*gamma(z)
+        
+        for i in range(n):
+            z = z - 1.
+            u_gamma = (u_gamma - np.power(a, z)*np.exp(-a))/z
+        return u_gamma
+    else:
+        return (1. - gammainc(z, a))*gamma(z)
+
 def _PoverK_from_P(pressure, params):
     """
     Calculates the pressure:bulk modulus ratio
     from a given pressure using brentq optimization
     """
-    args = (pressure, params['K_0'],
+    args = ((pressure - params['P_0']), params['K_0'],
             params['Kprime_0'], params['Kprime_inf'])
     return opt.brentq(_delta_PoverK_from_P,
                       1./(params['Kprime_inf'] - params['Kprime_0']) + np.finfo(float).eps,
@@ -114,9 +134,9 @@ class RKprime(eos.EquationOfState):
         Returns pressure :math:`[Pa]` as a function of volume :math:`[m^3]`.
         """
         PoverK = _PoverK_from_V(volume, params)
-        return ( params['K_0'] * PoverK *
-                 np.power(1. - params['Kprime_inf'] * PoverK,
-                          -params['Kprime_0']/params['Kprime_inf']) )
+        return params['P_0'] + ( params['K_0'] * PoverK *
+                                 np.power(1. - params['Kprime_inf'] * PoverK,
+                                          -params['Kprime_0']/params['Kprime_inf']) )
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """
@@ -137,6 +157,44 @@ class RKprime(eos.EquationOfState):
         """
         return shear_modulus(pressure, params)
 
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        """
+        return 0.
+
+    def _intVdP(self, xi, params):
+        
+        a = params['Kprime_inf']
+        b = (params['Kprime_0']/params['Kprime_inf']/params['Kprime_inf'] -
+             params['Kprime_0']/params['Kprime_inf'] - 1.)
+        c = params['Kprime_0'] - params['Kprime_inf']
+        f = (params['Kprime_0']/params['Kprime_inf'] - 1.)
+        
+        i1 = float( params['V_0'] * params['K_0'] *
+                    np.exp(f / a) * np.power(a, b - 1.) /
+                    np.power(f, b + 2.) *
+                    ( f * params['Kprime_0'] * _upper_incomplete_gamma( b + 1. ,
+                                                                        f * (1./a - xi) ) -
+                      a * c * _upper_incomplete_gamma( b + 2., f * (1./a - xi) ) ) )
+        
+        return i1
+
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        """
+        # G = E0 + int VdP (when S = 0)
+        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        return params['E_0'] + params['P_0']*params['V_0'] + self._intVdP((pressure - params['P_0'])/K, params) - self._intVdP(0., params) 
+    
+    def internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        """
+        # E = G - PV (+ TS)
+        return ( self.gibbs_free_energy(pressure, temperature, volume, params) - pressure*volume)
+        
     def heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -168,6 +226,8 @@ class RKprime(eos.EquationOfState):
         between 5/3 and :math:`K'_0` :cite:`StaceyDavis2004`.
         """
 
+        if 'E_0' not in params:
+            params['E_0'] = 0.
         if 'P_0' not in params:
             params['P_0'] = 0.
 
