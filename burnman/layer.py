@@ -238,10 +238,11 @@ class Layer(object):
         all = None
         if radlist is None:
             for prop in properties:
-                if hasattr(self.material,prop):
-                    oneprop = np.array([getattr(self.sublayers[i],prop) for i in range(len(self.sublayers))])
-                else:
+                if hasattr(self,prop):
                     oneprop = getattr(self,prop)
+                else:
+                    oneprop = np.array([getattr(self.sublayers[i],prop) for i in range(len(self.sublayers))])
+                
                 if all is None:
                     all = np.array(oneprop)
                 else:

@@ -2,16 +2,16 @@ pressure is not defined for IASP91
 gravity is not defined for IASP91
 density is not defined for IASP91
 BURNMAN/burnman/seismic.py: UserWarning: Pressure is not given in STW105 and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. 
-  warnings.warn("Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+  "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in STW105 and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
-  warnings.warn("Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Pressure is not given in AK135 and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. 
-  warnings.warn("Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+  "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in AK135 and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
-  warnings.warn("Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Pressure is not given in IASP91 and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. 
-  warnings.warn("Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+  "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in IASP91 and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
-  warnings.warn("Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
 BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
-  warnings.warn("Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
