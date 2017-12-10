@@ -35,11 +35,11 @@ def composition_property(func):
 
 
 def file_to_composition_list(fname, unit_type):
-    lines = [line.rstrip('\n').split() for line in open(fname)]
-    n_components = lines[0].index("Comment") - 1
-    components = lines[0][:n_components+1]
-    comments = [line[n_components+1:] for line in lines[1:]]
-    compositions = np.array([map(float, l) for l in zip(*(zip(*lines[1:])[:n_components+1]))])
+    lines = filter(None, [line.rstrip('\n').split() for line in open(fname)])
+    n_components = lines[0].index("Comment")
+    components = lines[0][:n_components]
+    comments = [line[n_components:] for line in lines[1:]]
+    compositions = np.array([map(float, l) for l in zip(*(zip(*lines[1:])[:n_components]))])
     return [Composition(Counter(dict(zip(components, c))), unit_type) for c in compositions], comments
 
     
@@ -163,4 +163,21 @@ class Composition(object):
         atom_compositions = Counter(dict(zip(self.element_list, atom_compositions)))
 
         return self._normalize_to_basis(atom_compositions, 'atomic')
+        
+
+    def print(self, unit_type, significant_figures=1, total=100.):
+        if unit_type == 'weight':
+            print('\nWeight composition')
+            for (key, value) in self.weight_composition.items():
+                print('{0}: {1:0.{sf}f}'.format(key, value*total, sf=significant_figures))
+        elif unit_type == 'molar':
+            print('\nMolar composition')
+            for (key, value) in self.molar_composition.items():
+                print('{0}: {1:0.{sf}f}'.format(key, value*total, sf=significant_figures))
+        elif unit_type == 'atomic':
+            print('\nAtomic composition')
+            for (key, value) in self.atomic_composition.items():
+                print('{0}: {1:0.{sf}f}'.format(key, value*total, sf=significant_figures))
+        else:
+            raise Exception('unit_type not yet implemented. Should be either weight,  molar or atomic.')
         
