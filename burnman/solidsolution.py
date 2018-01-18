@@ -215,7 +215,7 @@ class SolidSolution(Mineral):
         Returns internal energy of the mineral [J]
         Aliased with self.energy
         """
-        return self.molar_helmholtz - self.pressure * self.molar_volume
+        return self.molar_helmholtz + self.temperature * self.molar_entropy
 
     @material_property
     def excess_partial_gibbs(self):
@@ -255,7 +255,7 @@ class SolidSolution(Mineral):
         Returns Helmholtz free energy of the solid solution [J]
         Aliased with self.helmholtz
         """
-        return self.molar_gibbs + self.temperature * self.molar_entropy
+        return self.molar_gibbs - self.pressure * self.molar_volume
 
     @material_property
     def molar_mass(self):
