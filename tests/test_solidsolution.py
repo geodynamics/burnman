@@ -9,6 +9,7 @@ import numpy as np
 
 import burnman
 from burnman.mineral import Mineral
+from burnman.combinedmineral import CombinedMineral
 from burnman.processchemistry import dictionarize_formula, formula_mass
 from util import BurnManTest
 
@@ -55,9 +56,10 @@ class fayalite (Mineral):
             'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
 
+
+made_forsterite = CombinedMineral([forsterite(), forsterite()], [0.5, 0.5])
+
 # One-mineral solid solution
-
-
 class forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -69,8 +71,6 @@ class forsterite_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Two-mineral solid solution
-
-
 class forsterite_forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -83,8 +83,6 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Ideal solid solution
-
-
 class olivine_ideal_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -96,8 +94,6 @@ class olivine_ideal_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Olivine solid solution
-
-
 class olivine_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -109,9 +105,20 @@ class olivine_ss(burnman.SolidSolution):
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
+        
+# Olivine solid solution with combined endmember
+class olivine_ss2(burnman.SolidSolution):
+
+    def __init__(self, molar_fractions=None):
+        self.name = 'Olivine'
+        self.solution_type = 'symmetric'
+        self.endmembers = [[
+            made_forsterite, '[Mg]2SiO4'], [fayalite(), '[Fe]2SiO4']]
+        self.energy_interaction = [[8.4e3]]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
 # Orthopyroxene solid solution
-
-
 class orthopyroxene(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -125,8 +132,6 @@ class orthopyroxene(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site solid solution
-
-
 class two_site_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -139,8 +144,6 @@ class two_site_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site solid solution
-
-
 class two_site_ss_subregular(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -189,6 +192,17 @@ class test_solidsolution(BurnManTest):
         ol_ss.set_state(P, T)
         return fo, ol_ss
 
+    def setup_ol_ss2(self):
+        P = 1.e5
+        T = 1000.
+        fo = forsterite()
+        fo.set_state(P, T)
+
+        ol_ss = olivine_ss2()
+        ol_ss.set_composition([1.0, 0.0])
+        ol_ss.set_state(P, T)
+        return fo, ol_ss
+
     def test_1_gibbs(self):
         fo, fo_ss = self.setup_1min_ss()
         with warnings.catch_warnings(record=True) as w:
@@ -213,6 +227,14 @@ class test_solidsolution(BurnManTest):
 
     def test_ol_gibbs(self):
         fo, fo_ss = self.setup_ol_ss()
+        endmember_properties = [
+            fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr]
+        ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V,
+                         fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr]
+        self.assertArraysAlmostEqual(endmember_properties, ss_properties)
+        
+    def test_ol_gibbs2(self):
+        fo, fo_ss = self.setup_ol_ss2()
         endmember_properties = [
             fo.gibbs, fo.H, fo.S, fo.V, fo.C_p, fo.C_v, fo.alpha, fo.K_T, fo.K_S, fo.gr]
         ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V,
