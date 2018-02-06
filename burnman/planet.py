@@ -46,7 +46,7 @@ class Planet(object):
         self.radii = self.evaluate(['radii'])
         self.n_slices = len(self.radii)
         self.radius_planet = max(self.radii)
-
+        self.volume = 4./3.*np.pi*np.power(self.radius_planet, 3.)
 
         for layer in self.layers:
             layer.n_start = np.where(self.radii == layer.inner_radius)[0][-1]
@@ -67,9 +67,9 @@ class Planet(object):
         """
         Prints details of the planet
         """
-        writing  = 'Planet ' + self.name + ' consists of ' +str(len(self.layers)) +' layers: \n'
+        writing  = '{0} consists of {1} layers:\n'.format(self.name, len(self.layers))
         for layer in self:
-            writing  =  writing + ' Layer ' + layer.name + ' made out of ' + layer.material.name + ' with ' + layer.temperature_mode + ' temperatures \n'
+            writing  =  writing + layer.__str__()
         return writing
 
     def reset(self):
@@ -213,11 +213,11 @@ class Planet(object):
 
             new_press = self.pressure_top + \
                 (-self.radii + max(self.radii)) * \
-                2.e5  # initial pressure curve guess
+                1.e3  # initial pressure curve guess
             temperatures = self._evaluate_temperature( new_press)
+            
             # Make it self-consistent!!!
             i = 0
-
             while i < self.n_max_iterations:
                 i += 1
                 ref_press = new_press
@@ -316,20 +316,21 @@ class Planet(object):
         """
         calculates the mass of the entire planet [kg]
         """
-        mass = 0.0
-        for layer in self.layers:
-            mass += layer.mass
-        return mass
+        return np.sum([layer.mass for layer in self.layers])
 
+    @property
+    def average_density(self):
+        """
+        calculates the average density of the entire planet [kg/m^3]
+        """
+        return self.mass/self.volume
+        
     @property
     def moment_of_inertia(self):
         """
         #Returns the moment of inertia of the planet [kg m^2]
         """
-        moment = 0.0
-        for layer in self.layers:
-            moment += layer.moment_of_inertia
-        return moment
+        return np.sum([layer.moment_of_inertia for layer in self.layers])
 
     @property
     def moment_of_inertia_factor(self):

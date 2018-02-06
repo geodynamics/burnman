@@ -25,7 +25,7 @@ class Layer(object):
     """
     The base class for a planetary layer. The user needs to set the following befor properties can be computed
     1. set_material(), set the material of the layer, e.g. a mineral, solid_solution, or composite
-    2. set_temperature_mode(), either predefine, or set to an adiabat
+    2. set_temperature_mode(), either predefine, or set to an adiabatic profile
     3. set_pressure_mode(), to set the self-consistent pressure (with user-defined option the pressures can be overwritten).
     To set the self-consistent pressure the pressure at the top and the gravity at the bottom of the layer need to be set.
     4. make(), computes the self-consistent part of the layer and starts the settings to compute properties within the layer
@@ -49,16 +49,18 @@ class Layer(object):
         self._temperatures = None
         self.sublayers = None
         self.material = None
-        self.pressure_mode = None
+        self.pressure_mode = 'self-consistent'
         self.temperature_mode = None
  
  
     def __str__(self):
         """
-        Prints details of the Layer
+        Prints details of the layer
         """
-        writing  =  ' Layer ' + self.name + ' made out of ' + str(self.material.name) + ' with ' \
-                        + str(self.temperature_mode) + ' temperatures  and ' + str(self.pressure_mode) + ' pressures \n'
+        writing = 'The {0} is made of {1} with {2} temperatures and {3} pressures\n'.format(self.name,
+                                                                                            self.material.name,
+                                                                                            self.temperature_mode,
+                                                                                            self.pressure_mode)
         return writing
             
             
@@ -80,43 +82,43 @@ class Layer(object):
         self.material = material
         self.reset()
 
-    def set_temperature_mode(self, temperature_mode='adiabat',
+    def set_temperature_mode(self, temperature_mode='adiabatic',
                              temperatures=None, temperature_top=None):
         """
-        Sets temperature of the layer by user-defined values or as an (modified) adiabat.
-        temperature_mode is 'user-defined','adiabatic', or 'modified-adiabat'
+        Sets temperature of the layer by user-defined values or as an (perturbed) adiabatic.
+        temperature_mode is 'user-defined','adiabatic', or 'perturbed-adiabatic'
 
         Parameters
         ----------
         temperature_mode : string
-        This can be set to 'user-defined', 'adiabatic', or 'modified-adiabat'
+        This can be set to 'user-defined', 'adiabatic', or 'perturbed-adiabatic'
         temperatures : array of float
         The desired fixed temperatures in [K]. Should have same length as defined radii in layer.
         temperature_top : float
-        Temperature at the top for an adiabat
+        Temperature at the top for an adiabatic
         
         Note
         ---------
         'user-defined' = fixes the temperature with the profile input by the users
-        'adiabat' = self-consistently computes the adiabat when setting the state of the layer
-        'modified-adiabat' = adds the user input array to the adiabat,
+        'adiabatic' = self-consistently computes the adiabat when setting the state of the layer
+        'perturbed-adiabatic' = adds the user input array to the adiabat,
             e.g. allows to implement boundary layers
         """
         self.reset()
         assert(temperature_mode == 'user-defined'  or temperature_mode ==
-               'adiabat' or temperature_mode == 'modified-adiabat')
+               'adiabatic' or temperature_mode == 'perturbed-adiabatic')
 
         self.temperature_mode = temperature_mode
 
 #if temperature_mode=='isothermal':
 #            self.usertemperatures =
-        if temperature_mode == 'user-defined' or temperature_mode == 'modified-adiabat':
+        if temperature_mode == 'user-defined' or temperature_mode == 'perturbed-adiabatic':
             assert(len(temperatures) == len(self.radii))
             self.usertemperatures = temperatures
         else:
             self.usertemperatures = np.zeros_like(self.radii)
 
-        if temperature_mode == 'adiabat' or temperature_mode == 'modified-adiabat':
+        if temperature_mode == 'adiabatic' or temperature_mode == 'perturbed-adiabatic':
             self.temperature_top = temperature_top
         else:
             self.temperature_top = None
@@ -157,12 +159,14 @@ class Layer(object):
             assert(len(pressures) == len(self.radii))
             self.pressures = pressures
             warnings.warn("By setting the pressures in Layer it is unlikely to be self-consistent")
-        
-        if pressure_mode == 'self-consistent':
+        elif pressure_mode == 'self-consistent':
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
-                          
+        else:
+            raise NotImplementedError('pressure mode \"{0}\"not recognised'.format(pressure_mode))
+            
+            
 
     def make( self):
         """
@@ -181,11 +185,10 @@ class Layer(object):
         if self.pressure_mode == 'user-defined':
             self.temperatures = self._evaluate_temperature(
                 self._pressures, self.temperature_top)
-
-        if self.pressure_mode == 'self-consistent':
+        elif self.pressure_mode == 'self-consistent':
             new_press = self.pressure_top + \
                 (-self.radii + max(self.radii)) * \
-                2.e5  # initial pressure curve guess
+                1.e3  # initial pressure curve guess
             temperatures = self._evaluate_temperature(
                 new_press, self.temperature_top)
             # Make it self-consistent!!!
@@ -208,7 +211,9 @@ class Layer(object):
 
             self.pressures = new_press
             self.temperatures = temperatures
-
+        else:
+            raise NotImplementedError('pressure mode not recognised')
+        
         self.sublayers = []
         for l in range(len(self.radii)):
             self.sublayers.append(self.material.copy())
@@ -270,7 +275,7 @@ class Layer(object):
         Returns the temperatures of the layer for given pressures.
         Used by make()
         """
-        if self.temperature_mode == 'adiabat' or self.temperature_mode == 'modified-adiabat':
+        if self.temperature_mode == 'adiabatic' or self.temperature_mode == 'perturbed-adiabatic':
             adiabat = geotherm.adiabatic(pressures[::-1], temperature_top, self.material)[::-1]
         else:
             adiabat = np.zeros_like(self.radii)
@@ -376,9 +381,14 @@ class Layer(object):
         """
         kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
         phi = self.bulk_sound_velocity * self.bulk_sound_velocity
-        dkappadP = np.gradient(kappa, edge_order=2) / \
-            np.gradient(self.pressures, edge_order=2)
-        dphidr = np.gradient(phi,edge_order=2) / np.gradient(self.radii,edge_order=2) / self.gravity
+        try:
+            dkappadP = np.gradient(kappa, edge_order=2) / \
+                       np.gradient(self.pressures, edge_order=2)
+            dphidr = np.gradient(phi,edge_order=2) / np.gradient(self.radii,edge_order=2) / self.gravity
+        except:
+            dkappadP = np.gradient(kappa) / \
+                       np.gradient(self.pressures)
+            dphidr = np.gradient(phi) / np.gradient(self.radii) / self.gravity
         bullen = dkappadP + dphidr
         return bullen
 

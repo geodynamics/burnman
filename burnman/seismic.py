@@ -300,13 +300,17 @@ class SeismicTable(Seismic1DModel):
         density = self.density(depth)
         phi = v_phi * v_phi
         kappa = phi * density
-        dkappadP = np.gradient(kappa, edge_order=2) / \
-            np.gradient(self.pressure(depth), edge_order=2)
-        dphidz = np.gradient(phi,
-                             edge_order=2) / np.gradient(depth,
-                                                         edge_order=2) / self.gravity(depth)
-        bullen = dkappadP - dphidz
-        return bullen
+        try:
+            dkappadP = np.gradient(kappa, edge_order=2) / \
+                       np.gradient(self.pressure(depth), edge_order=2)
+            dphidz = np.gradient(phi,
+                                 edge_order=2) / np.gradient(depth,
+                                                             edge_order=2) / self.gravity(depth)
+        except:
+            dkappadP = np.gradient(kappa) / np.gradient(self.pressure(depth))
+            dphidz = np.gradient(phi) / np.gradient(depth) / self.gravity(depth)
+            bullen = dkappadP - dphidz
+            return bullen
 
     def depth(self, pressure):
         if max(pressure) > max(
