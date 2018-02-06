@@ -27,7 +27,8 @@ class CombinedMineral(Mineral):
     number of moles of each mineral, and (optionally) a 
     third list containing three floats describing a 
     free energy adjustment which is linear in pressure and temperature 
-    (i.e. a constant energy, entropy and volume adjustment).
+    (i.e. a constant energy [J/mol], entropy [J/K/mol] 
+    and volume adjustment [J/Pa/mol or m^3/mol]).
 
     For example, a crude approximation to a bridgmanite model might be
     bdg = CombinedMineral([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
