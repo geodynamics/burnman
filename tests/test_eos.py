@@ -82,6 +82,7 @@ class outer_core_rkprime(burnman.Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state': 'rkprime',
+            'P_0': 0.,
             'V_0': 0.055845/6562.54,
             'K_0': 124.553e9,
             'Kprime_0': 4.9599,
@@ -333,11 +334,12 @@ class test_eos_validation(BurnManTest):
                                     'V_0': 7.95626e-6,
                                     'K_0': 109.7e9,
                                     'Kprime_0': 4.66,
+                                    'Kprime_inf': 3.00,
                                     'Kprime_prime_0': -0.043e-9,
                                     'Kdprime_0': -4.66/100.e9,
                                     'molar_mass': 0.055845})
 
-        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse']
+        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse', 'rkprime']
 
         energies = []
         for eos in eoses:
@@ -347,18 +349,18 @@ class test_eos_validation(BurnManTest):
             energies.append(m.internal_energy)
         
         self.assertArraysAlmostEqual(energies, [m.params['E_0']]*len(energies))
-
-            
+    
     def test_energy_derivatives(self):
         m = burnman.Mineral(params={'equation_of_state': 'bm3',
                                     'V_0': 7.95626e-6,
                                     'K_0': 109.7e9,
                                     'Kprime_0': 4.66,
+                                    'Kprime_inf': 3.00,
                                     'Kprime_prime_0': -0.043e-9,
                                     'Kdprime_0': -4.66/100.e9,
                                     'molar_mass': 0.055845})
 
-        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse']
+        eoses = ['bm3', 'bm4', 'vinet', 'mt', 'morse', 'rkprime']
 
         calculated = []
         derivative = []

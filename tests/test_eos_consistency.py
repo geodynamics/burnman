@@ -27,6 +27,12 @@ class EosConsistency(BurnManTest):
         self.assertEqual(burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(), P, T),
                          True)
 
+    def test_solution(self):
+        P = 10.e9
+        T = 3000.
+        m = burnman.minerals.SLB_2011.garnet(molar_fractions = [0.2, 0.2, 0.2, 0.2, 0.2])
+        self.assertEqual(burnman.tools.check_eos_consistency(m, P, T),
+                         True)
 
 if __name__ == '__main__':
     unittest.main()
