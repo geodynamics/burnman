@@ -1,17 +1,28 @@
-on iteration 1
-on iteration 2
-on iteration 3
-on iteration 4
-on iteration 5
-on iteration 6
-on iteration 7
-on iteration 8
-on iteration 9
-on iteration 10
-on iteration 11
+Planet earth_like consists of 4 layers: 
+ Layer inner core made out of Fe_Dewaele with user-defined temperatures 
+ Layer outer core made out of Liquid_Fe_Anderson with user-defined temperatures 
+ Layer lower_mantle made out of Mg_Perovskite with adiabat temperatures 
+ Layer upper_mantle made out of Forsterite with adiabat temperatures 
+
+Iteration 1 maximum relative pressure error: 6.7e-01
+Iteration 2 maximum relative pressure error: 3.4e-01
+Iteration 3 maximum relative pressure error: 1.7e-01
+Iteration 4 maximum relative pressure error: 6.8e-02
+Iteration 5 maximum relative pressure error: 2.6e-02
+Iteration 6 maximum relative pressure error: 9.2e-03
+Iteration 7 maximum relative pressure error: 3.2e-03
+Iteration 8 maximum relative pressure error: 1.1e-03
+Iteration 9 maximum relative pressure error: 4.0e-04
+Iteration 10 maximum relative pressure error: 1.4e-04
+Iteration 11 maximum relative pressure error: 4.9e-05
+Iteration 12 maximum relative pressure error: 1.7e-05
+Iteration 13 maximum relative pressure error: 6.1e-06
 
 mass/Earth= 1.028, moment of inertia= 0.320
 inner core mass fraction of planet 0.018
-outer core mass fraction of planet 0.339
-mantle mass fraction of planet 0.642
+outer core mass fraction of planet 0.338
+lower_mantle mass fraction of planet 0.476
+upper_mantle mass fraction of planet 0.167
 
+BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk.  ") 

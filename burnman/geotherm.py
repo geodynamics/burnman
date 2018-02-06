@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 import numpy as np
 import scipy.integrate as integrate
+from scipy.optimize import brentq
 from . import tools
 from . import seismic
 
@@ -24,8 +25,8 @@ def brown_shankland(depths):
         The list of temperatures for each of the pressures. :math:`[K]`
     """
     
-    assert(min(depths) > min(table_brown_depth))
-    assert(max(depths) < max(table_brown_depth))
+    assert(min(depths) >= min(table_brown_depth))
+    assert(max(depths) <= max(table_brown_depth))
     temperature = np.empty_like(depths)
     for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(
@@ -47,8 +48,8 @@ def anderson(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    assert(min(depths) > min(table_anderson_depth))
-    assert(max(depths) < max(table_anderson_depth))
+    assert(min(depths) >= min(table_anderson_depth))
+    assert(max(depths) <= max(table_anderson_depth))
     temperature = np.empty_like(depths)
     for i,depth in enumerate(depths):
         temperature[i] = tools.lookup_and_interpolate(
@@ -60,7 +61,7 @@ def adiabatic(pressures, T0, rock):
     """
     This calculates a geotherm based on an anchor temperature and a rock,
     assuming that the rock's temperature follows an adiabatic gradient with
-    pressure. This amounts to integrating:
+    pressure. A good first guess is provided by integrating:
 
     .. math::
         \\frac{\partial T}{\partial P} = \\frac{ \\gamma  T}{ K_s }
@@ -89,60 +90,24 @@ def adiabatic(pressures, T0, rock):
     temperature: list of floats
         The list of temperatures for each pressure. :math:`[K]`
     """
-    temperatures = integrate.odeint(
-        lambda t, p: dTdP(t, p, rock), T0, pressures)
-    return temperatures.ravel()
+    
+    rock.set_state(pressures[0], T0)
+    S0 = rock.S
 
+    delta_S = lambda T, P, rock, S0: S0 - rock.evaluate(['S'], [P], [T])[0]
 
-def dTdP(temperature, pressure, rock):
-    """
-    ODE to integrate temperature with depth for a composite material
-    Assumes that the minerals exist at a common pressure (Reuss bound, should be good for
-    slow deformations at high temperature), as well as an adiabatic process.  This
-    corresponds to conservation of enthalpy.
-    First consider compression of the composite to a new pressure P+dP.  They all heat up
-    different amounts dT[i], according to their thermoelastic parameters.  Then allow them
-    to equilibrate to a constant temperature dT, conserving heat within the composite.
-    This works out to the formula:
+    temperatures = np.empty_like(pressures)
+    temperatures[0] = T0
+    for i in range(1, len(pressures)):
+        args=(pressures[i], rock, S0)
+        sol = tools.bracket(fn=delta_S,
+                            x0=(temperatures[i-1] +
+                                (rock.gr*temperatures[i-1]/rock.K_S) *
+                                (pressures[i] - pressures[i-1])),
+                            dx=1., args=args)
+        temperatures[i] = brentq(delta_S, sol[0], sol[1], args=args)
 
-    .. math::
-        dT/dP = T*\\frac{\Sigma_i(X[i]*C_{p}[i]*\gamma[i]/K[i])}{\Sigma(X[i]*C_{p}[i])}
-
-    Where :math:`X[i]` is the molar fraction of phase :math:`i`, :math:`C_p` is the specific heat at constant pressure,
-    :math:`\gamma` is the Gruneisen parameter and :math:`K` is the bulk modulus.
-    This function is called by :func:`burnman.geotherm.adiabatic`, and in general
-    it will not be too useful in other contexts.
-
-    Parameters
-    ----------
-
-    pressure : float
-        The pressure at which to evaluate dT/dP. :math:`[Pa]`
-
-    temperature : float
-        The temperature at which to evaluate dT/dP. :math:`[K]`
-
-    rock : :class:`burnman.composite`
-        Material for which we compute dT/dP.
-
-    Returns
-    -------
-        dT/dP : float
-          Adiabatic temperature gradient for the composite at a given temperature and pressure. :math:`[K/Pa]`
-    """
-    top = 0
-    bottom = 0
-    rock.set_state(pressure, temperature)
-    (minerals, fractions) = rock.unroll()
-    for (mineral, fraction) in zip(minerals, fractions):
-        gr = mineral.grueneisen_parameter
-        K_s = mineral.adiabatic_bulk_modulus
-        C_p = mineral.heat_capacity_p
-
-        top += fraction * gr * C_p / K_s
-        bottom += fraction * C_p
-
-    return temperature * top / bottom
+    return temperatures
 
 
 table_brown = tools.read_table("input_geotherm/brown_81.txt")

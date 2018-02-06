@@ -4,7 +4,7 @@ from __future__ import print_function
 # GPL v2 or later.
 
 import numpy as np
-
+from copy import deepcopy
 
 def material_property(func):
     """
@@ -138,6 +138,9 @@ class Material(object):
         It is typically not required for the user to call this function.
         """
         self._cached = {}
+    
+    def copy(self):
+        return deepcopy(self)
 
     def unroll(self):
         """
