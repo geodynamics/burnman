@@ -134,7 +134,7 @@ class Planet(object):
             values = np.empty([len(properties),
                                np.sum([len(layer.radii) for layer in self.layers])])
             for i, prop in enumerate(properties):
-                if prop == 'depths':
+                if prop == 'depth':
                     values[i] = np.array([self.radius_planet - r for layer in self.layers for r in layer.radii])
                 else:
                     j=0
@@ -340,11 +340,11 @@ class Planet(object):
         return moment_factor
 
     @property
-    def depths(self):
+    def depth(self):
         """
-        Returns depths of the layer [m]
+        Returns depth of the layer [m]
         """
-        return self.evaluate(['depths'])
+        return self.evaluate(['depth'])
     
     @property
     def gravity(self):

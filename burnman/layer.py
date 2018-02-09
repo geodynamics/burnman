@@ -38,7 +38,8 @@ class Layer(object):
 
     def __init__(self, name=None, radii=None, verbose=False):
         self.name = name
-        self.radii = np.sort(radii)
+        assert np.all(np.diff(radii) > 0)
+        self.radii = radii
         self.outer_radius = max(self.radii)
         self.inner_radius = min(self.radii)
         self.thickness = self.outer_radius - self.inner_radius
@@ -151,11 +152,13 @@ class Layer(object):
         """
         self.reset()
         assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
-        
         self.pressure_mode= pressure_mode
+        
+        assert(gravity_bottom is not None)
         self.gravity_bottom = gravity_bottom
         
         if pressure_mode == 'user-defined':
+            assert(pressures is not None)
             assert(len(pressures) == len(self.radii))
             self.pressures = pressures
             warnings.warn("By setting the pressures in Layer it is unlikely to be self-consistent")
@@ -184,7 +187,7 @@ class Layer(object):
 
         if self.pressure_mode == 'user-defined':
             self.temperatures = self._evaluate_temperature(
-                self._pressures, self.temperature_top)
+                self.pressures, self.temperature_top)
         elif self.pressure_mode == 'self-consistent':
             new_press = self.pressure_top + \
                 (-self.radii + max(self.radii)) * \
@@ -238,7 +241,7 @@ class Layer(object):
         Radii to evaluate properties at. If left empty,
         internal radii list is used.
         planet_radius : float
-        Planet outer radius. Used only to calculate depths.
+        Planet outer radius. Used only to calculate depth.
         
         Returns
         -------
@@ -249,7 +252,7 @@ class Layer(object):
         if radlist is None:
             values = np.empty([len(properties), len(self.radii)])
             for i, prop in enumerate(properties):
-                if prop == 'depths':
+                if prop == 'depth':
                     values[i] = radius_planet - self.radii
                 else:
                     try:
@@ -264,7 +267,7 @@ class Layer(object):
             temperatures = func_t(radlist)
             values = np.empty([len(properties), len(radlist)])
             for i, prop in enumerate(properties):
-                if prop == 'depths':
+                if prop == 'depth':
                     values[i] = radius_planet - radlist
                 else:
                     try:

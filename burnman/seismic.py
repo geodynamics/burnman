@@ -309,8 +309,8 @@ class SeismicTable(Seismic1DModel):
         except:
             dkappadP = np.gradient(kappa) / np.gradient(self.pressure(depth))
             dphidz = np.gradient(phi) / np.gradient(depth) / self.gravity(depth)
-            bullen = dkappadP - dphidz
-            return bullen
+        bullen = dkappadP - dphidz
+        return bullen
 
     def depth(self, pressure):
         if max(pressure) > max(

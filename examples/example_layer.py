@@ -50,7 +50,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     # This is the first actual work done in this example.  We define
     # composite object and name it "rock".
     rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
@@ -64,7 +63,7 @@ if __name__ == "__main__":
     # We create an array of 20 depths at which we want to evaluate PREM, and then
     # query the seismic model for the pressure, density, P wave speed, S wave
     # speed, and bulk sound velocity at those depths
-    depths = np.linspace(750e3, 2800e3, 20)
+    depths = np.linspace(2800e3, 750e3, 20)
     pressure, gravity, seis_rho, seis_vp, seis_vs, seis_bullen = seismic_model.evaluate(
         ['pressure', 'gravity', 'density', 'v_p', 'v_s', 'bullen'], depths)
 
@@ -84,56 +83,54 @@ if __name__ == "__main__":
     # And we set a self-consistent pressure. The pressure at the top of the layer and
     # gravity at the bottom of the layer are given by the PREM.
     lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
-                               pressure_top=pressure[0], gravity_bottom=gravity[-1])
+                                   pressure_top=pressure[-1], gravity_bottom=gravity[0])
+    # Alternatively, we set a user-defined pressure given by PREM
+    #lower_mantle.set_pressure_mode(pressure_mode='user-defined',
+    #                               pressures = pressure, gravity_bottom=gravity[0])
 
     lower_mantle.make()
     
     # All the work is done, now we can plot various properties!
-    # First, we plot the s-wave speed verses the PREM s-wave speed
-    plt.figure(figsize = (10,6))
-    plt.subplot(1, 2, 1)
-    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.v_s / 1.e3, color='b', linestyle='-',
-             marker='o', markerfacecolor='b', markersize=4, label='Vs computed')
-    plt.plot(pressure / 1.e9, seis_vs / 1.e3, color='b', linestyle='--',
-             marker='o', markerfacecolor='w', markersize=4, label='Vs ref')
-    plt.ylabel("Wave speeds (km/s)  and density (g/cm^3)")
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.legend(loc='lower right')
-
-    # Next, we plot the p-wave speed verses the PREM p-wave speed
-    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.v_p / 1.e3, color='r', linestyle='-',
-             marker='o', markerfacecolor='r', markersize=4, label='Vp computed')
-    plt.plot(pressure / 1.e9, seis_vp / 1.e3, color='r',
-             linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='Vp ref')
-
-
-    # Next, we plot the density verses the PREM density
-    plt.plot(lower_mantle.pressures / 1.e9, lower_mantle.density / 1.e3, color='g',
-             linestyle='-', marker='o', markerfacecolor='g', markersize=4, label='rho computed')
-    plt.plot(pressure / 1.e9, seis_rho / 1.e3, color='g',
-             linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='rho ref')
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.xlabel("Pressure (GPa)")
-    plt.xlim(min(lower_mantle.pressures) / 1.e9, max(lower_mantle.pressures) / 1.e9)
+    fig = plt.figure(figsize = (10,6))
+    ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
     
-    plt.legend()
+    # First, we plot the p-wave speed verses the PREM p-wave speed
+    ax[0].plot(lower_mantle.pressures / 1.e9, lower_mantle.v_p / 1.e3, color='r', linestyle='-',
+               marker='o', markerfacecolor='r', markersize=4, label='V$_P$ (computed)')
+    ax[0].plot(pressure / 1.e9, seis_vp / 1.e3, color='r',
+               linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='V$_P$ (reference)')
+
+    # Next, we plot the s-wave speed verses the PREM s-wave speed
+    ax[0].plot(lower_mantle.pressures / 1.e9, lower_mantle.v_s / 1.e3, color='b', linestyle='-',
+             marker='o', markerfacecolor='b', markersize=4, label='V$_S$ (computed)')
+    ax[0].plot(pressure / 1.e9, seis_vs / 1.e3, color='b', linestyle='--',
+             marker='o', markerfacecolor='w', markersize=4, label='V$_S$ (reference)')
+
+    ax[0].set_ylabel("Wave speeds (km/s)")
     
-    plt.subplot(2, 2, 2)
-    plt.plot(lower_mantle.pressures / 1e9, lower_mantle.bullen, color='k', linestyle='-',
-             marker='o', markerfacecolor='k', markersize=4, label='bullen computed')
-    plt.plot(pressure / 1.e9, seis_bullen , color='k',
-                 linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='bullen ref')
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.legend()
-    plt.ylabel("Bullen parameter")
+    # Next, we plot the density versus the PREM density
+    ax[1].plot(lower_mantle.pressures / 1.e9, lower_mantle.density / 1.e3, color='g',
+             linestyle='-', marker='o', markerfacecolor='g', markersize=4, label='computed')
+    ax[1].plot(pressure / 1.e9, seis_rho / 1.e3, color='g',
+             linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='reference')
+    ax[1].set_ylabel("Density (g/cm$^3$)")
+
+    # And the Bullen parameter
+    ax[2].plot(lower_mantle.pressures / 1e9, lower_mantle.bullen, color='k', linestyle='-',
+             marker='o', markerfacecolor='k', markersize=4, label='computed')
+    ax[2].plot(pressure / 1.e9, seis_bullen , color='k',
+                 linestyle='--', marker='o', markerfacecolor='w', markersize=4, label='reference')
+    ax[2].set_ylabel("Bullen parameter")
 
     # Finally, we plot the used geotherm
-    plt.subplot(2, 2, 4)
-    plt.plot(lower_mantle.pressures / 1e9, lower_mantle.temperatures, color='k', linestyle='-',
-             marker='o', markerfacecolor='k', markersize=4)
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.xlabel("Pressure (GPa)")
-    plt.ylabel("temperature (K)")
+    ax[3].plot(lower_mantle.pressures / 1e9, lower_mantle.temperatures, color='k', linestyle='-',
+             marker='o', markerfacecolor='k', markersize=4, label='used geotherm')
+    ax[3].set_ylabel("Temperature (K)")
 
+    for i in range(4):
+        ax[i].set_xlabel("Pressure (GPa)")
+        ax[i].set_xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+        ax[i].legend(loc='best')
+        
     # At long last, we show the results!  We are done!
     plt.show()
