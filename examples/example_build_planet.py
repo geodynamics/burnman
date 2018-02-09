@@ -116,7 +116,9 @@ if __name__ == '__main__':
 
     
     # Now let's plot everything up
-    plt.style.use('ggplot')
+
+    # Optional prettier plotting
+    # plt.style.use('ggplot')
     
     figure = plt.figure(figsize=(10, 12))
     figure.suptitle(
