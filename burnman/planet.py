@@ -107,16 +107,15 @@ class Planet(object):
             if layer.outer_radius >= radius:
                 return layer
         raise LookupError()
-                
-
-
-
+    
     def evaluate(self, properties, radlist=None):
         """
         Function that is generally used to evaluate properties
         of the different layers and stitch them together. 
-        If asking for different radii than the internal radiilist,
-        values are linearly interpolated.
+        If asking for different radii than the internal radlist,
+        pressure and temperature values are interpolated and the
+        layer material evaluated at those pressures and 
+        temperatures.
         
         Parameter
         ---------
@@ -128,33 +127,32 @@ class Planet(object):
         
         Returns
         -------
-        2D array of requested properties
+        1D or 2D array of requested properties 
+        (1D if only one property was requested)
         """
-        all = None
         if radlist is None:
-            for prop in properties:
-                oneprop = None
-                for layer in self.layers:
-                    if oneprop is None:
-                        oneprop = getattr(layer, prop)
-                    else:
-                        oneprop = np.append(oneprop, getattr(layer, prop))
-                if all is None:
-                    all = np.array(oneprop)
+            values = np.empty([len(properties),
+                               np.sum([len(layer.radii) for layer in self.layers])])
+            for i, prop in enumerate(properties):
+                if prop == 'depths':
+                    values[i] = np.array([self.radius_planet - r for layer in self.layers for r in layer.radii])
                 else:
-                    all = np.vstack((all, np.array(oneprop)))
-                        
-        if radlist is not None:
-            for prop in properties:
-                oneprop = []
-                for r in radlist:
-                    layer = self.get_layer_by_radius(r)
-                    oneprop.append(layer.evaluate([prop],r))
-                if all is None:
-                    all = np.array(oneprop)
-                else:
-                    all = np.vstack((all,np.array(oneprop)))
-        return all
+                    j=0
+                    for layer in self.layers:
+                        vals = getattr(layer, prop)
+                        values[i,j:j + len(vals)] = vals
+                        j += len(vals)
+        else:
+            values = np.empty([len(properties), len(radlist)])
+            l_idx = [i for i, layer in enumerate(self.layers) for r in radlist
+                        if r>=layer.inner_radius and r<=layer.outer_radius]
+            
+            for j, r in enumerate(radlist):
+                values[:,j] = self.layers[l_idx[j]].evaluate(properties, [r], self.radius_planet).T[0]
+                
+        if values.shape[0] == 1:
+            values = values[0]
+        return values
 
     def set_pressure_mode( self, pressure_mode='self-consistent', pressures=None, pressure_top=0.,
               gravity_bottom=0., n_max_iterations=50, max_delta = 1.e-5):
@@ -341,6 +339,13 @@ class Planet(object):
             self.radius_planet / self.radius_planet
         return moment_factor
 
+    @property
+    def depths(self):
+        """
+        Returns depths of the layer [m]
+        """
+        return self.evaluate(['depths'])
+    
     @property
     def gravity(self):
         """

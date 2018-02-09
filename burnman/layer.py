@@ -220,13 +220,15 @@ class Layer(object):
             self.sublayers[l].set_state(
                 self.pressures[l], self.temperatures[l])
 
-    def evaluate(self, properties, radlist=None):
+    def evaluate(self, properties, radlist=None, radius_planet=None):
         """
         Function that is generally used to evaluate properties
         across the layer. If radlist is not defined, valuse are
         returned at the internal radlist.
         If asking for different radii than the internal radlist,
-        values are linearly interpolated.
+        pressure and temperature values are interpolated and the
+        layer material evaluated at those pressures and 
+        temperatures.
         
         Parameter
         ---------
@@ -235,40 +237,43 @@ class Layer(object):
         radlist : array of floats
         Radii to evaluate properties at. If left empty,
         internal radii list is used.
+        planet_radius : float
+        Planet outer radius. Used only to calculate depths.
         
         Returns
         -------
-        2D array of requested properties
+        1D or 2D array of requested properties 
+        (1D if only one property was requested)
         """
-        all = None
+        
         if radlist is None:
-            for prop in properties:
-                if hasattr(self,prop):
-                    oneprop = getattr(self,prop)
+            values = np.empty([len(properties), len(self.radii)])
+            for i, prop in enumerate(properties):
+                if prop == 'depths':
+                    values[i] = radius_planet - self.radii
+                elif hasattr(self,prop):
+                    values[i] = getattr(self,prop)
                 else:
-                    oneprop = np.array([getattr(self.sublayers[i],prop) for i in range(len(self.sublayers))])
-                
-                if all is None:
-                    all = np.array(oneprop)
-                else:
-                    np.append(all, np.array(oneprop), axis=0)
-        if radlist is not None:
+                    values[i]= np.array([getattr(self.sublayers[i],prop)
+                                         for i in range(len(self.sublayers))])   
+        else:
             func_p = interp1d(self.radii,self.pressures)
             pressures = func_p(radlist)
             func_t = interp1d(self.radii,self.temperatures)
             temperatures = func_t(radlist)
-            for prop in properties:
-                if hasattr(self.material,prop):
-                    oneprop=self.material.evaluate([prop],pressures,temperatures)
+            values = np.empty([len(properties), len(radlist)])
+            for i, prop in enumerate(properties):
+                if prop == 'depths':
+                    values[i] = radius_planet - radlist
+                elif hasattr(self.material,prop):
+                    values[i] = self.material.evaluate([prop],pressures,temperatures)
                 else:
                     func_prop = interp1d(self.radii, getattr(self,prop))
-                    oneprop = func_prop(radlist)
-                if all is None:
-                    all = np.array(oneprop)
-                else:
-                    np.append(all, np.array(oneprop), axis=0)
-
-        return all
+                    values[i] = func_prop(radlist)
+                    
+        if values.shape[0] == 1:
+            values = values[0]
+        return values
 
     def _evaluate_temperature(self, pressures=None, temperature_top=None):
         """
