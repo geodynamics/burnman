@@ -251,11 +251,12 @@ class Layer(object):
             for i, prop in enumerate(properties):
                 if prop == 'depths':
                     values[i] = radius_planet - self.radii
-                elif hasattr(self,prop):
-                    values[i] = getattr(self,prop)
                 else:
-                    values[i]= np.array([getattr(self.sublayers[i],prop)
-                                         for i in range(len(self.sublayers))])   
+                    try:
+                        values[i] = getattr(self,prop)
+                    except:
+                        values[i]= np.array([getattr(self.sublayers[i],prop)
+                                             for i in range(len(self.sublayers))])   
         else:
             func_p = interp1d(self.radii,self.pressures)
             pressures = func_p(radlist)
@@ -265,11 +266,12 @@ class Layer(object):
             for i, prop in enumerate(properties):
                 if prop == 'depths':
                     values[i] = radius_planet - radlist
-                elif hasattr(self.material,prop):
-                    values[i] = self.material.evaluate([prop],pressures,temperatures)
                 else:
-                    func_prop = interp1d(self.radii, getattr(self,prop))
-                    values[i] = func_prop(radlist)
+                    try:
+                        values[i] = self.material.evaluate([prop],pressures,temperatures)
+                    except:
+                        func_prop = interp1d(self.radii, getattr(self,prop))
+                        values[i] = func_prop(radlist)
                     
         if values.shape[0] == 1:
             values = values[0]
