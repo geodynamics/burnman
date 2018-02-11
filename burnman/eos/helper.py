@@ -20,7 +20,16 @@ from . import reciprocal_kprime
 from . import aa
 from .equation_of_state import EquationOfState
 
-
+class CombinedMineralMethod(object):
+    """Dummy class because CombinedMineral objects are derived 
+    from a mechanical SolidSolution. 
+    SolidSolution needs a method to call Mineral.set_state(), 
+    but a CombinedMineral should never have a method that
+    is used for solid solutions."""
+    def validate_parameters(self, params):
+        pass
+    pass
+            
 def create(method):
     """
     Creates an instance of an EquationOfState from a string,
@@ -59,6 +68,8 @@ def create(method):
             return dks_liquid.DKS_L()
         elif method == "dks_s":
             return dks_solid.DKS_S()
+        elif method == "combined":
+            return CombinedMineralMethod()
         else:
             raise Exception("unsupported material method " + method)
     elif isinstance(method, EquationOfState):

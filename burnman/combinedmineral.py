@@ -27,7 +27,8 @@ class CombinedMineral(Mineral):
     number of moles of each mineral, and (optionally) a 
     third list containing three floats describing a 
     free energy adjustment which is linear in pressure and temperature 
-    (i.e. a constant energy, entropy and volume adjustment).
+    (i.e. a constant energy [J/mol], entropy [J/K/mol] 
+    and volume adjustment [J/Pa/mol or m^3/mol]).
 
     For example, a crude approximation to a bridgmanite model might be
     bdg = CombinedMineral([per, stv], [1.0, 1.0], [-15.e3, 0., 0.])
@@ -35,14 +36,15 @@ class CombinedMineral(Mineral):
     This class is available as :class:`burnman.CombinedMineral`.
     """
 
-    def __init__(self, mineral_list, molar_amounts, free_energy_adjustment=[]):
+    def __init__(self, mineral_list, molar_amounts, free_energy_adjustment=[], name='User-created endmember'):
         self.mixture = SolidSolution(solution_type='mechanical',
                                      endmembers=[[m, ''] for m in mineral_list],
                                      molar_fractions = molar_amounts)
 
         self.params = {
-            'name': 'User-created endmember',
+            'name': name,
             'formula': self.mixture.formula,
+            'equation_of_state': 'combined',
             'molar_mass': self.mixture.molar_mass,
             'n': sum(self.mixture.formula.values())
         }
@@ -53,22 +55,12 @@ class CombinedMineral(Mineral):
                                                    'delta_S': free_energy_adjustment[1],
                                                    'delta_V': free_energy_adjustment[2]}]]
 
-        Mineral.__init__(self)
         
-        class MadeMemberMethod(object):
-
-            """Dummy class because SolidSolution needs a method to call
-            Mineral.set_state(), but should never have a method that
-            is used for minerals. Note that set_method() below will
-            not change self.method"""
-            pass
-        self.method = MadeMemberMethod()
-
+        Mineral.__init__(self)
 
     def set_state(self, pressure, temperature):
         self.mixture.set_state(pressure, temperature)
         Mineral.set_state(self, pressure, temperature)
-
 
     @material_property
     def molar_gibbs(self):
