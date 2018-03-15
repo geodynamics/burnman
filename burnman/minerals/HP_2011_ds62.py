@@ -5,7 +5,7 @@
 
 """
 HP_2011 (ds-62)
-Minerals from Holland and Powell 2011 and references therein
+Endmember minerals from Holland and Powell 2011 and references therein
 Update to dataset version 6.2
 The values in this document are all in S.I. units,
 unlike those in the original tc-ds62.txt
@@ -16,29 +16,6 @@ from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..solutionmodel import *
 from ..processchemistry import dictionarize_formula, formula_mass
-
-"""
-SOLID SOLUTIONS
-
-N.B. VERY IMPORTANT: The excess entropy term in the regular solution model has the opposite sign to the values in Holland and Powell, 2011. This is consistent with its treatment as an excess entropy term (G=H-T*S+P*V), rather than a thermal correction to the interaction parameter (W=W+T*W_T+P*W_P).
-"""
-
-
-class CFMASO_garnet(SolidSolution):
-
-    def __init__(self, molar_fractions=None):
-        self.name = 'garnet'
-        self.endmembers = [[py(), '[Mg]3[Al]2Si3O12'],
-                           [alm(), '[Fe]3[Al]2Si3O12'],
-                           [gr(), '[Ca]3[Al]2Si3O12'],
-                           [andr(), '[Ca]3[Fe]2Si3O12']]
-        self.solution_type = 'asymmetric'
-        self.alphas = [1.0, 1.0, 2.7, 2.7]
-        self.energy_interaction = [[2.5e3, 31.e3, 53.2e3],
-                                   [5.e3, 37.24e3],
-                                   [2.e3]]
-        SolidSolution.__init__(self, molar_fractions=molar_fractions)
-
 
 """
 ENDMEMBERS
