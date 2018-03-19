@@ -145,6 +145,10 @@ class SolidSolution(Mineral):
 
         # Number of endmembers in the solid solution
         self.n_endmembers = len(self.endmembers)
+        try:
+            self.endmember_names = [mbr[0].name for mbr in self.endmembers]
+        except:
+            pass
 
         # Equation of state
         for i in range(self.n_endmembers):

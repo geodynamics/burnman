@@ -250,8 +250,7 @@ class IdealSolution (SolutionModel):
         self.formulas = [e[1] for e in endmembers]
 
         # Process solid solution chemistry
-        self.solution_formulae, self.n_sites, self.sites, self.n_occupancies, self.endmember_occupancies, self.site_multiplicities = \
-            processchemistry.process_solution_chemistry(self.formulas)
+        processchemistry.process_solution_chemistry(self)
 
         self._calculate_endmember_configurational_entropies()
 

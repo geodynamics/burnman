@@ -11,6 +11,7 @@ from .material import Material, material_property
 from .mineral import Mineral
 from . import averaging_schemes
 from . import chemicalpotentials
+from .solidsolution import SolidSolution
 
 
 def check_pairs(phases, fractions):
@@ -47,7 +48,7 @@ class Composite(Material):
     This class is available as ``burnman.Composite``.
     """
 
-    def __init__(self, phases, fractions=None, fraction_type='molar'):
+    def __init__(self, phases, fractions=None, fraction_type='molar', name='Unnamed composite'):
         """
         Create a composite using a list of phases and their fractions (adding to 1.0).
 
@@ -72,6 +73,17 @@ class Composite(Material):
             self.molar_fractions = None
 
         self.set_averaging_scheme('VoigtReussHill')
+        self.name=name
+        
+    def __str__(self):
+        string='Composite: {0}'.format(self.name)
+        string+='\nPhase and endmember fractions:'
+        for phase, fraction in zip(*self.unroll()):
+            string+='\n  {0}: {1}'.format(phase.name, fraction)
+            if isinstance(phase, SolidSolution):
+               for i in range(phase.n_endmembers): 
+                   string+='\n    {0}: {1}'.format(phase.endmember_names[i], phase.molar_fractions[i])
+        return string
 
     def set_fractions(self, fractions, fraction_type='molar'):
         """
