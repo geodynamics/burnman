@@ -130,6 +130,57 @@ class MGDBase(eos.EquationOfState):
             self._thermal_pressure(temperature, volume, params) - \
             self._thermal_pressure(T_0, volume, params)
 
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
+        """
+        G = self.helmholtz_free_energy(
+            pressure, temperature, volume, params) + pressure * volume
+        return G
+
+    def internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy at the pressure and temperature of the mineral [J/mol]
+        """
+        return self.helmholtz_free_energy(pressure, temperature, volume, params) + \
+            temperature * \
+            self.entropy(pressure, temperature, volume, params)
+
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
+        """
+        Debye_T = self._debye_temperature(params['V_0'] / volume, params)
+        S = debye.entropy(temperature, Debye_T, params['n'])
+        return S
+
+    def enthalpy(self, pressure, temperature, volume, params):
+        """
+        Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
+        """
+
+        return self.helmholtz_free_energy(pressure, temperature, volume, params) + \
+            temperature * self.entropy(pressure, temperature, volume, params) + \
+            pressure * volume
+
+    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
+        """
+        x = params['V_0'] / volume
+        f = 1. / 2. * (pow(x, 2. / 3.) - 1.)
+        b_iikk = 9. * params['K_0']  # EQ 28, SLB2005
+        b_iikkmm = 27. * params['K_0'] * (params['Kprime_0'] - 4.)  # EQ 29, SLB2005
+
+        F_pressure = ( 0.5 * b_iikk * f * f * params['V_0'] +
+                       (1. / 6.) * params['V_0'] * b_iikkmm * f * f * f )
+        
+        Debye_T = self._debye_temperature(params['V_0'] / volume, params)
+        F_thermal = debye.helmholtz_free_energy(temperature, Debye_T, params['n']) - \
+                    debye.helmholtz_free_energy(params['T_0'], Debye_T, params['n'])
+        
+        return params['F_0'] + F_pressure + F_thermal
+    
     # calculate the thermal correction to the shear modulus as a function of
     # V, T
     def _thermal_shear_modulus(self, T, V, params):
@@ -183,6 +234,8 @@ class MGDBase(eos.EquationOfState):
         """
         if 'T_0' not in params:
             params['T_0'] = 300.
+        if 'F_0' not in params:
+            params['F_0'] = 0.
 
         # First, let's check the EoS parameters for Tref
         bm.BirchMurnaghanBase.validate_parameters(

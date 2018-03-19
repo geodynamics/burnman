@@ -22,7 +22,7 @@ class Seismic1DModel(object):
     def __init__(self):
         pass
 
-    def evaluate(self, vars_list, depth_list):
+    def evaluate(self, vars_list, depth_list=None):
         """
         Returns the lists of data for a Seismic1DModel for the depths provided
 
@@ -38,7 +38,8 @@ class Seismic1DModel(object):
         Array of values shapes as (len(vars_list),len(depth_list)).
 
         """
-
+        if depth_list is None:
+            depth_list = self.internal_depth_list()
         values = np.empty((len(vars_list), len(depth_list)))
         for a in range(len(vars_list)):
             values[a, :] = getattr(self, vars_list[a])(depth_list)
@@ -245,7 +246,8 @@ class SeismicTable(Seismic1DModel):
         self.earth_radius = 6371.0e3
 
     def internal_depth_list(self, mindepth=0., maxdepth=1.e10):
-        depths = np.array([self.table_depth[x] for x in range(len(self.table_depth)) if self.table_depth[x] >= mindepth and self.table_depth[x] <= maxdepth])
+        depths = np.array([self.table_depth[x] for x in range(len(
+            self.table_depth)) if self.table_depth[x] >= mindepth and self.table_depth[x] <= maxdepth])
         discontinuities = np.where(depths[1:] - depths[:-1] == 0)[0]
         # Shift values at discontinities by 1 m to simplify evaluating values
         # around these.
@@ -255,14 +257,16 @@ class SeismicTable(Seismic1DModel):
 
     def pressure(self, depth):
         if len(self.table_pressure) == 0:
-                warnings.warn("Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
-                self._compute_pressure()
+            warnings.warn(
+                "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+            self._compute_pressure()
         return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
         if len(self.table_gravity) == 0:
-                warnings.warn("Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
-                self._compute_gravity()
+            warnings.warn(
+                "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+            self._compute_gravity()
         return self._lookup(depth, self.table_gravity)
 
     def v_p(self, depth):
@@ -287,8 +291,31 @@ class SeismicTable(Seismic1DModel):
                 "Density has not been defined for this seismic model")
         return self._lookup(depth, self.table_density)
 
+    def bullen(self, depth):
+        """
+        Returns the Bullen parameter only for significant arrays
+        """
+        assert(len(depth) > 3)
+        v_phi = self.v_phi(depth)
+        density = self.density(depth)
+        phi = v_phi * v_phi
+        kappa = phi * density
+        try:
+            dkappadP = np.gradient(kappa, edge_order=2) / \
+                       np.gradient(self.pressure(depth), edge_order=2)
+            dphidz = np.gradient(phi,
+                                 edge_order=2) / np.gradient(depth,
+                                                             edge_order=2) / self.gravity(depth)
+        except:
+            dkappadP = np.gradient(kappa) / np.gradient(self.pressure(depth))
+            dphidz = np.gradient(phi) / np.gradient(depth) / self.gravity(depth)
+        bullen = dkappadP - dphidz
+        return bullen
+
     def depth(self, pressure):
-        if max(pressure) > max(self.table_pressure) or min(pressure) < min(self.table_pressure):
+        if max(pressure) > max(
+                self.table_pressure) or min(pressure) < min(
+                self.table_pressure):
             raise ValueError("Pressure outside range of SeismicTable")
 
         depth = np.interp(pressure, self.table_pressure, self.table_depth)
@@ -310,7 +337,15 @@ class SeismicTable(Seismic1DModel):
 
         density = self.table_density[::-1]
         radii = self.table_radius[::-1]
-        g = scipy.integrate.cumtrapz(constants.G*4.*np.pi*density*radii*radii, x=radii, initial=0)
+        g = scipy.integrate.cumtrapz(
+            constants.G *
+            4. *
+            np.pi *
+            density *
+            radii *
+            radii,
+            x=radii,
+            initial=0)
         g[1:] = g[1:] / radii[1:] / radii[1:]
 
         self.table_gravity = g[::-1]
@@ -320,11 +355,12 @@ class SeismicTable(Seismic1DModel):
         # the equation for hydrostatic equilibrium  P = rho g z.
         radii = self.table_radius
         density = self.table_density
-        gravity = self.gravity(self.earth_radius-radii)
+        gravity = self.gravity(self.earth_radius - radii)
 
         # convert radii to depths
         depth = self.earth_radius - radii
-        pressure = scipy.integrate.cumtrapz(gravity*density, x=depth, initial=0.)
+        pressure = scipy.integrate.cumtrapz(
+            gravity * density, x=depth, initial=0.)
 
         self.table_pressure = pressure
 
@@ -372,7 +408,12 @@ class Slow(SeismicTable):
         min_radius = self.earth_radius - max(table2[:, 0])
         max_radius = self.earth_radius - min(table2[:, 0])
 
-        table = np.array(list(filter(lambda x: (x[1] >= min_radius and x[1] <= max_radius), table)))
+        table = np.array(
+            list(
+                filter(
+                    lambda x: (
+                        x[1] >= min_radius and x[1] <= max_radius),
+                    table)))
 
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -406,7 +447,12 @@ class Fast(SeismicTable):
         min_radius = self.earth_radius - max(table2[:, 0])
         max_radius = self.earth_radius - min(table2[:, 0])
 
-        table = np.array(list(filter(lambda x: (x[1] >= min_radius and x[1] <= max_radius), table)))
+        table = np.array(
+            list(
+                filter(
+                    lambda x: (
+                        x[1] >= min_radius and x[1] <= max_radius),
+                    table)))
 
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -427,7 +473,8 @@ class STW105(SeismicTable):
 
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table("input_seismic/STW105.txt") # radius, pressure, density, v_p, v_s
+        # radius, pressure, density, v_p, v_s
+        table = tools.read_table("input_seismic/STW105.txt")
         table = np.array(table)
         self.table_radius = table[:, 0][::-1]
         self.table_density = table[:, 1][::-1]
@@ -438,11 +485,11 @@ class STW105(SeismicTable):
         self.table_vph = table[:, 6][::-1]
         self.table_vsh = table[:, 7][::-1]
 
-        self.table_depth = self.earth_radius-self.table_radius
+        self.table_depth = self.earth_radius - self.table_radius
 
         # Voigt averages for Vs and Vp
-        self.table_vs = np.sqrt((2.*self.table_vsv*self.table_vsv+self.table_vsh*self.table_vsh)/3.)
-        self.table_vp = np.sqrt((self.table_vpv*self.table_vpv+4.*self.table_vph*self.table_vph)/5.)
+        self.table_vs = np.sqrt((2. *self.table_vsv * self.table_vsv + self.table_vsh * self.table_vsh) / 3.)
+        self.table_vp = np.sqrt((self.table_vpv * self.table_vpv + 4. * self.table_vph * self.table_vph) / 5.)
 
 
 class IASP91(SeismicTable):
@@ -511,9 +558,9 @@ def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
         corrected Bulk sound velocity in [m/s].
     """
     beta = 0.3  # Matas et al. (2007) page 4
-    Qp  = 3. / 4.*pow((v_p/v_s), 2.)*Qs    # Matas et al. (2007) page 4
+    Qp = 3. / 4. * pow((v_p / v_s), 2.) * Qs    # Matas et al. (2007) page 4
 
-    cot = 1./np.tan(beta*np.pi/2.)
+    cot = 1. / np.tan(beta * np.pi / 2.)
     v_p *= 1. - 1. / 2. * cot * 1. / Qp  # Matas et al. (2007) page 1
     v_s *= 1. - 1. / 2. * cot * 1. / Qs
     v_phi *= 1. - 1. / 2. * cot * 1. / Qphi

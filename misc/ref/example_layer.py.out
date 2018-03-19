@@ -1,0 +1,2 @@
+BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")

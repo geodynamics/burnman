@@ -1,17 +1,28 @@
-on iteration 1
-on iteration 2
-on iteration 3
-on iteration 4
-on iteration 5
-on iteration 6
-on iteration 7
-on iteration 8
-on iteration 9
-on iteration 10
-on iteration 11
+Planet Zog consists of 4 layers:
+The inner core is made of Fe_Dewaele with user-defined temperatures and self-consistent pressures
+The outer core is made of Liquid_Fe_Anderson with user-defined temperatures and self-consistent pressures
+The lower mantle is made of Mg_Perovskite with adiabatic temperatures and self-consistent pressures
+The upper mantle is made of Forsterite with adiabatic temperatures and self-consistent pressures
 
-mass/Earth= 1.028, moment of inertia= 0.320
+Iteration 1 maximum relative pressure error: 9.6e-01
+Iteration 2 maximum relative pressure error: 4.6e-01
+Iteration 3 maximum relative pressure error: 1.8e-01
+Iteration 4 maximum relative pressure error: 6.6e-02
+Iteration 5 maximum relative pressure error: 2.3e-02
+Iteration 6 maximum relative pressure error: 8.3e-03
+Iteration 7 maximum relative pressure error: 2.9e-03
+Iteration 8 maximum relative pressure error: 1.0e-03
+Iteration 9 maximum relative pressure error: 3.6e-04
+Iteration 10 maximum relative pressure error: 1.3e-04
+Iteration 11 maximum relative pressure error: 4.4e-05
+Iteration 12 maximum relative pressure error: 1.5e-05
+Iteration 13 maximum relative pressure error: 5.4e-06
+
+mass/Earth= 1.028, moment of inertia factor= 0.3198
 inner core mass fraction of planet 0.018
-outer core mass fraction of planet 0.339
-mantle mass fraction of planet 0.642
+outer core mass fraction of planet 0.338
+lower mantle mass fraction of planet 0.476
+upper mantle mass fraction of planet 0.167
 
+BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
+  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
