@@ -27,11 +27,11 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     Parameters
     ----------
     F : function
-        The system function F(x).
-        Returns a 1D numpy array.
+        Returns the system function F(x)
+        as a 1D numpy array.
     J : function
-        The Jacobian function J(x).
-        Returns a 2D numpy array.
+        Returns the Jacobian function J(x)
+        as a 2D numpy array.
     guess : 1D numpy array
         Starting guess for the solver.
     tol : float [1.e-6]
@@ -42,8 +42,10 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         Bounds for the damping parameter lambda.
         The upper bound is also the starting value.
     constraints : function
-        The constraints function constraints(x).
-        Returns a 1D numpy array.
+        Returns the LHS of the inequality constraints(x)
+        as a 1D numpy array. The constraints are satisfied if
+        all the elements of the array are less than or equal to
+        zero.
 
     Returns
     -------
@@ -130,7 +132,6 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 x_j = sol.x + lmda*dx  
                 
         F_j = F(x_j)
-
     
         dxbar_j = lu_solve(luJ, -F_j)
         dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
@@ -141,11 +142,9 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
             np.abs(lmda - lmda_bounds[1]) < eps) :               # <- end on a full newton step
             require_posteriori_loop = False                      # <- No need for the a posteriori loop
             converged = True                                     # <- Successful convergence
-        
         else:
             require_posteriori_loop = True
         
-
         # Begin the a posteriori loop
         while require_posteriori_loop and not minimum_lmda:
             # Monotonicity check
@@ -153,8 +152,11 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 dxbar = dxbar_j
                 sol.x = x_j
                 sol.F = F_j
-                sol.n_it += 1
+                sol.F_norm = np.linalg.norm(sol.F, ord=2)
+                
                 require_posteriori_loop = False # return to Newton step
+                sol.n_it += 1 # move to next iteration
+                dxprev = dx # to calculate the next value of h
             else:
                 if np.abs(lmda - lmda_bounds[0]) < eps:
                     minimum_lmda = True
@@ -168,8 +170,6 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 dxbar_j = lu_solve(luJ, -F_j)
                 dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
             
-        dxprev = dx
-        sol.F_norm = np.linalg.norm(sol.F, ord=2)
 
     if not persistent_bound_violation:
         sol.x = x_j + dxbar_j
