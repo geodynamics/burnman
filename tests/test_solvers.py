@@ -17,6 +17,7 @@ class test_solvers(BurnManTest):
                                 [-1., 0.]])
 
         sol = damped_newton_solve(F, J, guess=np.array([-1.2, 1.]))
+        self.assertArraysAlmostEqual(sol.x, [1., 1.])
         assert(sol.success)
 
     def test_dns_freudenstein_roth_2(self):
@@ -27,6 +28,7 @@ class test_solvers(BurnManTest):
         
         # sol = damped_newton_solve(F, J, guess=np.array([0.5, -2.])) # does not converge
         sol = damped_newton_solve(F, J, guess=np.array([10., 10.]))
+        self.assertArraysAlmostEqual(sol.x, [5., 4.])
         assert(sol.success)
 
     def test_dns_powell_badly_scaled_3(self):
@@ -35,6 +37,7 @@ class test_solvers(BurnManTest):
                                 [-np.exp(-x[0]), -np.exp(-x[1])]])
         
         sol = damped_newton_solve(F, J, guess=np.array([0., 1.]))
+        self.assertArraysAlmostEqual(sol.x, [1.09815933e-05, 9.10614674])
         assert(sol.success)
 
     def test_dns_powell_singular_13(self):
@@ -45,6 +48,7 @@ class test_solvers(BurnManTest):
                                 [np.sqrt(10.)*(2.*x[0] - 2.*x[3]), 0., 0., np.sqrt(10.)*(2.*x[3] - 2.*x[0])]])
         
         sol = damped_newton_solve(F, J, guess=np.array([3., -1., 0., 1.]))
+        self.assertArraysAlmostEqual(sol.x + 1., [1., 1., 1., 1.])
         assert(sol.success)
 
 
@@ -66,9 +70,17 @@ class test_solvers(BurnManTest):
                 
             return j[1:-1, 1:-1]
 
-        for n in range(1, 6): # check convergence for several test cases
+        # check convergence for several test cases
+        expected_solutions = [[-0.28077641],
+                              [-0.45328926, -0.38540505],
+                              [-0.52677285, -0.56764891, -0.41031222],
+                              [-0.55457673, -0.63942044, -0.59070079, -0.41526838],
+                              [-0.5648284, -0.66627372, -0.66091704, -0.59505005, -0.41620111]]
+        
+        for n in range(1, 6):
             guess = -1.*np.ones((n))
             sol = damped_newton_solve(F, J, guess=guess)
+            self.assertArraysAlmostEqual(sol.x, expected_solutions[n-1])
             assert(sol.success)
         
 if __name__ == '__main__':
