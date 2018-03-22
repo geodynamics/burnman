@@ -105,12 +105,11 @@ class SolidSolution(Mineral):
                     self.solution_model = SymmetricRegularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'asymmetric':
-                    try:
-                        self.solution_model = AsymmetricRegularSolution(
-                            self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-                    except:
+                    if hasattr(self, 'alphas') == False:
                         raise Exception(
                             "'alphas' attribute missing from solid solution")
+                    self.solution_model = AsymmetricRegularSolution(
+                        self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'subregular':
                     self.solution_model = SubregularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
@@ -161,6 +160,7 @@ class SolidSolution(Mineral):
     def set_composition(self, molar_fractions):
         """
         Set the composition for this solid solution.
+        Resets cached properties
 
         Parameters
         ----------
@@ -173,6 +173,7 @@ class SolidSolution(Mineral):
             assert(sum(molar_fractions) > 0.9999)
             assert(sum(molar_fractions) < 1.0001)
             
+        self.reset()
         self.molar_fractions = molar_fractions
         
     def set_method(self, method):
@@ -240,6 +241,14 @@ class SolidSolution(Mineral):
         Property specific to solid solutions.
         """
         return self.solution_model.excess_gibbs_free_energy(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def hessian(self):
+        """
+        Returns the second compositional derivative of the Gibbs free energy [J]
+        Property specific to solid solutions.
+        """
+        return self.solution_model.hessian(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def molar_gibbs(self):

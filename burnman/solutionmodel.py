@@ -30,12 +30,21 @@ def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, 
                                      constants.gas_constant)
     return normalisation_constants * a
 
+@jit
+def _non_ideal_hessian_fct(phi, molar_fractions, n_endmembers, alpha, W):
+    q = np.eye(n_endmembers) - phi*np.ones((n_endmembers, n_endmembers))
+    sum_pa = np.sum(np.dot(molar_fractions, alpha))
+    hess = np.einsum('m, i, ij, jk, mk->im', -alpha/sum_pa, -alpha, q, W, q)
+    hess += hess.T
+    return hess
 
 @jit
 def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, We, Ws, Wv):
     # -sum(sum(qi.qj.Wij*)
     # equation (2) of Holland and Powell 2003
     q = np.eye(n_endmembers) - phi*np.ones((n_endmembers, n_endmembers))
+    # The following are equivalent to
+    # np.einsum('i, ij, jk, ik->i', -self.alphas, q, self.Wx, q)
     Eint = -alpha * (q.dot(We)*q).sum(-1)
     Sint = -alpha * (q.dot(Ws)*q).sum(-1)
     Vint = -alpha * (q.dot(Wv)*q).sum(-1)
@@ -52,6 +61,17 @@ def logish(x, eps=1.e-5):
     ln = np.where(x<=eps, np.log(eps) - f_eps - f_eps*f_eps/2., 0.)
     ln[mask] = np.log(x[mask])
     return ln
+
+def inverseish(x, eps=1.e-5):
+    """
+    1st order series expansion of 1/x about eps: 2/eps - x/eps/eps
+    Prevents infinities at x=0
+    """
+    mask = x>eps
+    oneoverx = np.where(x<=eps, 2./eps - x/eps/eps, 0.)
+    oneoverx[mask] = 1./x[mask]
+    return oneoverx
+
 
 class SolutionModel(object):
 
@@ -256,6 +276,9 @@ class IdealSolution (SolutionModel):
     def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
         return self._ideal_excess_partial_gibbs(temperature, molar_fractions)
 
+    def hessian(self, pressure, temperature, molar_fractions):
+        return self._ideal_hessian(temperature, molar_fractions)
+
     def _calculate_endmember_configurational_entropies(self):
         S_conf = -constants.gas_constant * (self.site_multiplicities *
                                             self.endmember_occupancies *
@@ -276,6 +299,10 @@ class IdealSolution (SolutionModel):
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
         return constants.gas_constant * temperature * self._log_ideal_activities(molar_fractions)
 
+    def _ideal_hessian(self, temperature, molar_fractions):
+        hessian = constants.gas_constant * temperature * self._log_ideal_activity_derivatives(molar_fractions)
+        return hessian
+
     def _log_ideal_activities(self, molar_fractions):
         site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
         lna = (self.endmember_occupancies * self.site_multiplicities *
@@ -284,6 +311,14 @@ class IdealSolution (SolutionModel):
                                    constants.gas_constant)
 
         return lna + normalisation_constants
+
+    def _log_ideal_activity_derivatives(self, molar_fractions):
+        site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
+        dlnadp = np.einsum('ij, j, mj',
+                           self.endmember_occupancies,
+                           self.site_multiplicities*inverseish(site_occupancies),
+                           self.endmember_occupancies)
+        return dlnadp
 
 
     def _ideal_activities(self, molar_fractions):
@@ -359,6 +394,14 @@ class AsymmetricRegularSolution (IdealSolution):
         non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(
             pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
+
+    def hessian(self, pressure, temperature, molar_fractions):
+        ideal_hessian = IdealSolution._ideal_hessian(self, temperature, molar_fractions)
+        phi = self._phi(molar_fractions)
+        nonideal_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
+                                                  self.n_endmembers, self.alphas,
+                                                  self.We - temperature*self.Ws + pressure*self.Wv)
+        return ideal_hessian + nonideal_hessian
 
     def excess_volume(self, pressure, temperature, molar_fractions):
         phi = self._phi(molar_fractions)
@@ -473,6 +516,9 @@ class SubregularSolution (IdealSolution):
         non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(
             pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
+
+    def hessian(self, pressure, temperature, molar_fractions):
+        raise NotImplementedError
 
     def excess_volume(self, pressure, temperature, molar_fractions):
         V_excess = np.dot(
