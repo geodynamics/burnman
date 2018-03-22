@@ -76,6 +76,7 @@ class Composite(Material):
     def set_fractions(self, fractions, fraction_type='molar'):
         """
         Change the fractions of the phases of this Composite.
+        Resets cached properties
 
         Parameters
         ----------
@@ -94,6 +95,8 @@ class Composite(Material):
 
         for f in fractions:
             assert (f >= -1e-12)
+
+        self.reset()
 
         if abs(total - 1.0) > 1e-12:
             warnings.warn(
