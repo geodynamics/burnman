@@ -5,7 +5,7 @@ from collections import namedtuple
 def damped_newton_solve(F, J, guess, tol=1.e-6,
                         max_iterations=100,
                         lmda_bounds=[1.e-8, 1.],
-                        constraints=lambda x: -1.):
+                        constraints=lambda x: np.array([-1.])):
     """
     Solver for the multivariate nonlinear system F(x)=0 
     with Jacobian J(x) and constraints C(x), using the 
@@ -94,8 +94,10 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
             
     # Begin Newton loop
     sol.n_it = 0
+    n_constraints = len(constraints(sol.x))
     minimum_lmda = False
     converged = False
+    bound_violation = False
     persistent_bound_violation = False
     while (sol.n_it < max_iterations and
            not minimum_lmda and
@@ -111,7 +113,7 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         if sol.n_it > 0:
             h = (lmda * np.linalg.norm((dxbar - dx), ord=2) * np.linalg.norm(dx, ord=2) /
                  (np.linalg.norm(dxprev, ord=2) * np.linalg.norm(dxbar, ord=2)))
-            lmda_j = min(1./h, lmda_bounds[1]) # this is lmda_j^0
+            lmda_j = min(1./(h+eps), lmda_bounds[1]) # this is lmda_j^0
                 
 
         lmda = max(lmda_j, lmda_bounds[0])
@@ -124,13 +126,14 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         c_x_j = constraints(x_j)
         if not np.all(c_x_j < eps): # x allowed to lie on constraints but not in forbidden area
             c_x = constraints(sol.x)
-            if not np.all(c_x < -eps): # terminate if x tries to slide off constraint into disallowed area
-                persistent_bound_violation = True
-                x_j = sol.x
-            else:
-                lmda = lmda * min(c_x / (c_x - c_x_j))
-                x_j = sol.x + lmda*dx  
-                
+            lmda = lmda * min([c_x[i] / (c_x[i] - c_x_j[i]) for i in range(n_constraints) if c_x_j[i]>=eps])
+            x_j = sol.x + lmda*dx
+            if bound_violation:
+                persistent_bound_violation=True
+            bound_violation=True
+        else:
+            bound_violation=False # reset if a violation does not recur
+            
         F_j = F(x_j)
     
         dxbar_j = lu_solve(luJ, -F_j)

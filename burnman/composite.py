@@ -77,6 +77,10 @@ class Composite(Material):
         
     def __str__(self):
         string='Composite: {0}'.format(self.name)
+        try:
+            string += '\n  P, T: {0:.4g} Pa, {1:.4g} K'.format(self.pressure, self.temperature)
+        except:
+            pass
         string+='\nPhase and endmember fractions:'
         for phase, fraction in zip(*self.unroll()):
             string+='\n  {0}: {1}'.format(phase.name, fraction)

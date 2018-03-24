@@ -20,6 +20,31 @@ class test_solvers(BurnManTest):
         self.assertArraysAlmostEqual(sol.x, [1., 1.])
         assert(sol.success)
 
+    def test_dns_rosenbrock_1_w_constraint_violation(self):
+        F = lambda x: np.array([10.*(x[1] - x[0]*x[0]), 1. - x[0]])
+        J = lambda x: np.array([[-20.*x[0], 10.],
+                                [-1., 0.]])
+        C = lambda x: np.array([x[0]])
+
+        sol = damped_newton_solve(F, J, guess=np.array([-1.2, 1.]), constraints=C)
+
+        self.assertFloatEqual(sol.x[0], 0.)
+        assert(sol.code == 2)
+
+    def test_dns_rosenbrock_1_w_temporary_constraint_violation(self):
+        F = lambda x: np.array([10.*(x[1] - x[0]*x[0]), 1. - x[0]])
+        J = lambda x: np.array([[-20.*x[0], 10.],
+                                [-1., 0.]])
+        C = lambda x: np.array([x[0] - 1., -3. - x[1]])
+
+        # Here the solver takes two iterations, the first of which
+        # has a full Newton step which violates the constraints
+        # [1., -3.84]
+        sol = damped_newton_solve(F, J, guess=np.array([-1.2, 1.]), constraints=C)
+
+        # The solution lies on one of the constraints
+        self.assertArraysAlmostEqual(sol.x, [1., 1.])
+
     def test_dns_freudenstein_roth_2(self):
         F = lambda x: np.array([-13. + x[0] + ((5. - x[1])*x[1] - 2.)*x[1],
                                 -29. + x[0] + ((x[1] + 1.)*x[1] - 14.)*x[1]])
@@ -82,6 +107,6 @@ class test_solvers(BurnManTest):
             sol = damped_newton_solve(F, J, guess=guess)
             self.assertArraysAlmostEqual(sol.x, expected_solutions[n-1])
             assert(sol.success)
-        
+
 if __name__ == '__main__':
     unittest.main()
