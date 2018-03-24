@@ -243,12 +243,28 @@ class SolidSolution(Mineral):
         return self.solution_model.excess_gibbs_free_energy(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
-    def hessian(self):
+    def gibbs_hessian(self):
         """
-        Returns the second compositional derivative of the Gibbs free energy [J]
-        Property specific to solid solutions.
+        Returns an array containing the second compositional derivative
+        of the Gibbs free energy [J]. Property specific to solid solutions.
         """
-        return self.solution_model.hessian(self.pressure, self.temperature, self.molar_fractions)
+        return self.solution_model.gibbs_hessian(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def entropy_hessian(self):
+        """
+        Returns an array containing the second compositional derivative
+        of the entropy [J/K]. Property specific to solid solutions.
+        """
+        return self.solution_model.entropy_hessian(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def volume_hessian(self):
+        """
+        Returns an array containing the second compositional derivative
+        of the volume [m^3]. Property specific to solid solutions.
+        """
+        return self.solution_model.volume_hessian(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def molar_gibbs(self):

@@ -300,7 +300,6 @@ class test_solidsolution(BurnManTest):
         ss.set_state(1.e5, 300.)
         E0 = ss.excess_partial_gibbs
         dp = 1.e-8
-        
         H = np.zeros((3, 3))
         for i in range(3):
             f = np.array(f0)
@@ -309,7 +308,7 @@ class test_solidsolution(BurnManTest):
             H[i,:] = (ss.excess_partial_gibbs - E0)/dp
         
         for i in range(3):
-            self.assertArraysAlmostEqual(ss.hessian[i], H[i])
+            self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
 
     def test_subregular(self):
         ss0 = two_site_ss()

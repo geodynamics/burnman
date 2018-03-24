@@ -276,8 +276,16 @@ class IdealSolution (SolutionModel):
     def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
         return self._ideal_excess_partial_gibbs(temperature, molar_fractions)
 
-    def hessian(self, pressure, temperature, molar_fractions):
-        return self._ideal_hessian(temperature, molar_fractions)
+    def gibbs_hessian(self, pressure, temperature, molar_fractions):
+        hess_S = self._ideal_hessian(temperature, molar_fractions)
+        return -temperature*hess_S
+
+    def entropy_hessian(self, pressure, temperature, molar_fractions):
+        hess_S = self._ideal_hessian(temperature, molar_fractions)
+        return hess_S
+
+    def volume_hessian(self, pressure, temperature, molar_fractions):
+        return np.zeros((len(molar_fractions), len(molar_fractions)))
 
     def _calculate_endmember_configurational_entropies(self):
         S_conf = -constants.gas_constant * (self.site_multiplicities *
@@ -299,8 +307,8 @@ class IdealSolution (SolutionModel):
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
         return constants.gas_constant * temperature * self._log_ideal_activities(molar_fractions)
 
-    def _ideal_hessian(self, temperature, molar_fractions):
-        hessian = constants.gas_constant * temperature * self._log_ideal_activity_derivatives(molar_fractions)
+    def _ideal_entropy_hessian(self, temperature, molar_fractions):
+        hessian = -constants.gas_constant * self._log_ideal_activity_derivatives(molar_fractions)
         return hessian
 
     def _log_ideal_activities(self, molar_fractions):
@@ -395,13 +403,28 @@ class AsymmetricRegularSolution (IdealSolution):
             pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
 
-    def hessian(self, pressure, temperature, molar_fractions):
-        ideal_hessian = IdealSolution._ideal_hessian(self, temperature, molar_fractions)
+    def gibbs_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
         phi = self._phi(molar_fractions)
-        nonideal_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
-                                                  self.n_endmembers, self.alphas,
-                                                  self.We - temperature*self.Ws + pressure*self.Wv)
-        return ideal_hessian + nonideal_hessian
+        nonideal_gibbs_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
+                                                        self.n_endmembers, self.alphas,
+                                                        self.We - temperature*self.Ws + pressure*self.Wv)
+
+        return nonideal_gibbs_hessian - temperature*ideal_entropy_hessian
+
+    def entropy_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        phi = self._phi(molar_fractions)
+        nonideal_entropy_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
+                                                          self.n_endmembers, self.alphas,
+                                                          self.Ws)
+        return ideal_entropy_hessian + nonideal_entropy_hessian
+
+    def volume_hessian(self, pressure, temperature, molar_fractions):
+        phi = self._phi(molar_fractions)
+        return _non_ideal_hessian_fct(phi, molar_fractions,
+                                      self.n_endmembers, self.alphas,
+                                      self.Wv)
 
     def excess_volume(self, pressure, temperature, molar_fractions):
         phi = self._phi(molar_fractions)
@@ -517,7 +540,13 @@ class SubregularSolution (IdealSolution):
             pressure, temperature, molar_fractions)
         return ideal_gibbs + non_ideal_gibbs
 
-    def hessian(self, pressure, temperature, molar_fractions):
+    def gibbs_hessian(self, pressure, temperature, molar_fractions):
+        raise NotImplementedError
+
+    def entropy_hessian(self, pressure, temperature, molar_fractions):
+        raise NotImplementedError
+
+    def volume_hessian(self, pressure, temperature, molar_fractions):
         raise NotImplementedError
 
     def excess_volume(self, pressure, temperature, molar_fractions):
