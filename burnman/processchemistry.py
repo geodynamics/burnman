@@ -14,7 +14,13 @@ import numpy as np
 from fractions import Fraction
 from collections import Counter
 import pkgutil
+from string import ascii_uppercase as ucase
+from scipy.optimize import nnls
 
+def simplify_matrix(arr):
+    def f(i,j):
+        return nsimplify(arr[i][j])
+    return Matrix( len(arr), len(arr[0]), f )
 
 def read_masses():
     """
@@ -113,6 +119,37 @@ def dictionarize_site_formula(formula):
 
     return f
 
+def solution_bounds(endmember_occupancies):
+    """
+    Parameters
+    ----------
+    endmember_occupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the number of atoms of each element on each site.
+
+    Returns
+    -------
+    solution_bounds : 2d array of floats
+        An abbreviated version of endmember_occupancies, 
+        where the columns represent the independent compositional 
+        bounds on the solution
+    """
+    # Find bounds for the solution
+    i_sorted =zip(*sorted([(i,
+                            sum([1 for val in endmember_occupancies.T[i]
+                                 if val>1.e-10]))
+                           for i in range(len(endmember_occupancies.T))
+                                          if np.any(endmember_occupancies.T[i] > 1.e-10)],
+                          key=lambda x: x[1]))[0]
+
+    solution_bounds = endmember_occupancies[:,i_sorted[0],np.newaxis]
+    for i in i_sorted[1:]:
+        if np.abs(nnls(solution_bounds, endmember_occupancies.T[i])[1]) > 1.e-10:
+            solution_bounds = np.concatenate((solution_bounds,
+                                              endmember_occupancies[:,i,np.newaxis]),
+                                             axis=1)
+    return solution_bounds
+
 def process_solution_chemistry(solution_model):
     """
     This function parses a class instance with a "formulas"
@@ -145,6 +182,11 @@ def process_solution_chemistry(solution_model):
 
     sites : list of lists of strings
         A list of elements for each site in the solid solution
+
+    site_names : list of strings
+        A list of elements_site pairs in the solid solution, where
+        each distinct site is given by a unique uppercase letter
+        e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B']
 
     n_occupancies : integer
         Sum of the number of possible elements on each of the sites
@@ -248,6 +290,12 @@ def process_solution_chemistry(solution_model):
                     n_element] = list_occupancies[i_mbr][i_site][i_el]
                 site_multiplicities[n_element] = list_multiplicity[i_site]
                 n_element += 1
+
+    # Site names
+    solution_model.site_names = []
+    for i, elements in enumerate(sites):
+        for element in elements:
+            solution_model.site_names.append('{0}_{1}'.format(element, ucase[i]))
 
     # Finally, make attributes for solution model instance:
     solution_model.solution_formulae = solution_formulae
