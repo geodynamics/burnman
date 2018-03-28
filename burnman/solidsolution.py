@@ -225,6 +225,22 @@ class SolidSolution(Mineral):
         Property specific to solid solutions.
         """
         return self.solution_model.excess_partial_gibbs_free_energies(self.pressure, self.temperature, self.molar_fractions)
+    
+    @material_property
+    def excess_partial_volumes(self):
+        """
+        Returns excess partial volumes [m^3]
+        Property specific to solid solutions.
+        """
+        return self.solution_model.excess_partial_volumes(self.pressure, self.temperature, self.molar_fractions)
+    
+    @material_property
+    def excess_partial_entropies(self):
+        """
+        Returns excess partial entropies [J/K]
+        Property specific to solid solutions.
+        """
+        return self.solution_model.excess_partial_entropies(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def partial_gibbs(self):
