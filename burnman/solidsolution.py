@@ -235,6 +235,22 @@ class SolidSolution(Mineral):
         return np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
 
     @material_property
+    def partial_volumes(self):
+        """
+        Returns excess partial volumes [m^3]
+        Property specific to solid solutions.
+        """
+        return np.array([self.endmembers[i][0].molar_volume for i in range(self.n_endmembers)]) + self.excess_partial_volumes
+
+    @material_property
+    def partial_entropies(self):
+        """
+        Returns excess partial entropies [J/K]
+        Property specific to solid solutions.
+        """
+        return np.array([self.endmembers[i][0].molar_entropy for i in range(self.n_endmembers)]) + self.excess_partial_entropies
+
+    @material_property
     def excess_gibbs(self):
         """
         Returns excess gibbs free energy [J]
