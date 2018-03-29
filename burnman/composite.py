@@ -162,7 +162,7 @@ class Composite(Material):
             phase.set_state(pressure, temperature)
 
     def debug_print(self, indent=""):
-        print("%sComposite:" % indent)
+        print("{0}Composite: {1}".format(indent, self.name))
         indent += "  "
         if self.molar_fractions is None:
             for i, phase in enumerate(self.phases):
@@ -189,7 +189,7 @@ class Composite(Material):
         """
         return the name of the composite
         """
-        return "'" + self.__class__.__name__ + "'"
+        return "{0}: {1}".format(self.__class__.__name__, self.name)
 
     @material_property
     def internal_energy(self):

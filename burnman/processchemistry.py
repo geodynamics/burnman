@@ -94,9 +94,9 @@ def dictionarize_site_formula(formula):
         not_in_site = str(filter(None, re.split(r'\]', s[site])))[1]
         not_in_site = not_in_site.replace(mult, '', 1)
         if mult == '':
-            list_multiplicity[site] = 1.0
+            list_multiplicity[site] = Fraction(1.0)
         else:
-            list_multiplicity[site] = mult
+            list_multiplicity[site] = Fraction(mult)
 
         # Loop over elements on a site
         elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
@@ -195,14 +195,19 @@ def process_solution_chemistry(solution_model):
         n_occupancies = 5, with two possible elements on
         Site 1 and three on Site 2
 
-    endmember_occupancies : 2d array of floats
-        A 1D array for each endmember in the solid solution,
-        containing the number of atoms of each element on each site.
-
     site_multiplicities : array of floats
         The number of each site per formula unit
         To simplify computations later, the multiplicities
         are repeated for each element on each site
+
+    endmember_occupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the fraction of atoms of each element on each site.
+
+    endmember_noccupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the number of atoms of each element on each site
+        per mole of endmember.
 
     """
     formulae = solution_model.formulas
@@ -232,9 +237,9 @@ def process_solution_chemistry(solution_model):
 
             mult = re.split('[A-Z][^A-Z]*', site_split[1])[0]
             if mult == '':
-                list_multiplicity[i_site] = 1.0
+                list_multiplicity[i_site] = Fraction(1.0)
             else:
-                list_multiplicity[i_site] = float(mult)
+                list_multiplicity[i_site] = Fraction(mult)
 
             # Loop over elements on a site
             elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
@@ -302,9 +307,9 @@ def process_solution_chemistry(solution_model):
     solution_model.n_sites = n_sites
     solution_model.sites = sites
     solution_model.n_occupancies = n_occupancies
-    solution_model.endmember_occupancies = endmember_occupancies
     solution_model.site_multiplicities = site_multiplicities
-
+    solution_model.endmember_occupancies = endmember_occupancies
+    solution_model.endmember_noccupancies = np.einsum('ij, j->ij', endmember_occupancies, site_multiplicities)
 
 def compositional_array(formulae):
     """

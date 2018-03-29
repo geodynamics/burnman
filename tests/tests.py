@@ -24,6 +24,7 @@ from test_perplex import *
 from test_planet import *
 from test_seismic import *
 from test_solidsolution import *
+from test_solvers import *
 from test_spin import *
 from test_tools import *
 

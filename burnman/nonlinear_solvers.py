@@ -8,28 +8,38 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                         constraints=lambda x: np.array([-1.])):
     """
     Solver for the multivariate nonlinear system F(x)=0 
-    with Jacobian J(x) and constraints C(x), using the 
-    damped affine invariant modification to Newton's method 
-    (Deuflhard, 1974;1975;2004), 
+    with Jacobian J(x), using the damped affine invariant modification
+    to Newton's method (Deuflhard, 1974;1975;2004).
     Here we follow the algorithm as described in Nowak and Weimann (1991):
     [Technical Report TR-91-10, Algorithm B]
 
-    The iteration continues until three conditions are satisfied:
-    all(np.abs(dx (simplified newton step) < tol))
-    all(np.abs(dx (full Newton step) < sqrt(10*tol))) [avoiding pathological behaviour] and
-    lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
+    Inequality constraints are provided by the function constraints(x),
+    which returns a 1D numpy array. The constraints are satisfied if all the
+    returned values are <=0. If any constraints are not satisfied by the current
+    value of lambda, lambda is reduced to satisfy all the constraints.
 
-    Inequality constraints are provided by the function C(x), which returns a 
-    1D numpy array. The constraints are satisfied if the values are <=0.
-    If any constraints are not satisfied by the current value of lambda, 
-    lambda is reduced to satisfy all the constraints.
+    Successful termination of the solver is based on three criteria:
+    - all(np.abs(dx (simplified newton step) < tol))
+    - all(np.abs(dx (full Newton step) < sqrt(10*tol))) [avoiding pathological behaviour] and
+    - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
+
+    If these criteria are not satisfied, iterations continue until one of the following
+    occurs:
+    - the value of lmda is reduced to its minimum value
+      (this happens if the problem is very nonlinear)
+    - successive iterations have descent vectors which violate the constraints
+    - the maximum number of iterations (given by max_iterations) is reached.
+
+    Information on the root (or lack of root) obtained by the solver is provided
+    in the returned namedtuple.
+
 
     Parameters
     ----------
-    F : function
+    F : function of x
         Returns the system function F(x)
         as a 1D numpy array.
-    J : function
+    J : function of x
         Returns the Jacobian function J(x)
         as a 2D numpy array.
     guess : 1D numpy array
@@ -38,11 +48,11 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         Tolerance(s) for termination.
     max_iterations : integer [100]
         Maximum number of iterations for solver.
-    lambda_bounds: function
+    lambda_bounds: function of dx and x
         Returns a tuple of floats (1.e-8, 1.) corresponding
         to the minimum and maximum allowed fractions of the
-        full newton step (dx). A function of dx and x.
-    constraints : function
+        full newton step (dx).
+    constraints : function of x
         Returns the LHS of the inequality constraints(x)
         as a 1D numpy array. The constraints are satisfied if
         all the elements of the array are less than or equal to
