@@ -4,7 +4,7 @@ from collections import namedtuple
 
 def damped_newton_solve(F, J, guess, tol=1.e-6,
                         max_iterations=100,
-                        lmda_bounds=[1.e-8, 1.],
+                        lambda_bounds=lambda dx, x: (1.e-8, 1.),
                         constraints=lambda x: np.array([-1.])):
     """
     Solver for the multivariate nonlinear system F(x)=0 
@@ -38,9 +38,10 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         Tolerance for termination.
     max_iterations : integer [100]
         Maximum number of iterations for solver.
-    lmda_bounds : list of two floats [1.e-8, 1.]
-        Bounds for the damping parameter lambda.
-        The upper bound is also the starting value.
+    lambda_bounds: function
+        Returns a tuple of floats (1.e-8, 1.) corresponding
+        to the minimum and maximum allowed fractions of the
+        full newton step (dx). A function of dx and x.
     constraints : function
         Returns the LHS of the inequality constraints(x)
         as a 1D numpy array. The constraints are satisfied if
@@ -80,18 +81,14 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     # highly nonlinear: [1.e-2, 1.e-4]
     # extremely nonlinear: [1.e-4, 1.e-8]
     eps = 2.*np.finfo(float).eps
-    assert lmda_bounds[1] < 1. + eps, 'The highest upper bound for lmda is 1. (a full Newton step)'
-    assert lmda_bounds[0] > 1.e-8 - eps, 'The lowest lower bound for lmda is 1.e-8 (suitable only for extremely nonlinear systems)'
     assert np.all(constraints(guess) < eps), 'The starting guess is outside the supplied constraints.'
-           
-    lmda_j = lmda_bounds[1] # this is lmda_0_0
 
     sol = namedtuple('Solution', ['x', 'n_it', 'F', 'F_norm', 'J', 'code', 'text', 'success'])
 
     # evaluate system
     sol.x = guess
     sol.F = F(sol.x) 
-            
+
     # Begin Newton loop
     sol.n_it = 0
     n_constraints = len(constraints(sol.x))
@@ -103,18 +100,23 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
            not minimum_lmda and
            not persistent_bound_violation and
            not converged):
-           
+
         sol.J = J(sol.x) # evaluate Jacobian
         luJ = lu_factor(sol.J) # storing the factorisation saves time later
-        dx = lu_solve(luJ, -sol.F) # compute ordinary Newton correction
+        dx = lu_solve(luJ, -sol.F) # compute ordinary Newton step
         dx_norm = np.linalg.norm(dx, ord=2)
+
+        lmda_bounds = lambda_bounds(dx, sol.x)
+        assert lmda_bounds[1] < 1. + eps, 'The highest upper bound for lambda is 1. (a full Newton step)'
+        assert lmda_bounds[0] > 1.e-8 - eps, 'The lowest lower bound for lambda is 1.e-8 (suitable only for extremely nonlinear systems)'
         
         # Calculate a priori damping factor
         if sol.n_it > 0:
             h = (lmda * np.linalg.norm((dxbar - dx), ord=2) * np.linalg.norm(dx, ord=2) /
                  (np.linalg.norm(dxprev, ord=2) * np.linalg.norm(dxbar, ord=2)))
             lmda_j = min(1./(h+eps), lmda_bounds[1]) # this is lmda_j^0
-                
+        else:
+            lmda_j = lmda_bounds[1] # this is lmda_0_0
 
         lmda = max(lmda_j, lmda_bounds[0])
 
@@ -133,21 +135,21 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
             bound_violation=True
         else:
             bound_violation=False # reset if a violation does not recur
-            
+
         F_j = F(x_j)
-    
+
         dxbar_j = lu_solve(luJ, -F_j)
         dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
-        
+
         if (((dxbar_j_norm < tol and                             # <- Success requirements
               dx_norm < np.sqrt(10.*tol)) or                     # <- avoids pathological cases
              dxbar_j_norm < eps) and                             # <- occasionally the simplified newton step finds the exact solution
-            np.abs(lmda - lmda_bounds[1]) < eps) :               # <- end on a full newton step
+            np.abs(lmda - lmda_bounds[1]) < eps) :               # <- end on a maximal newton step
             require_posteriori_loop = False                      # <- No need for the a posteriori loop
             converged = True                                     # <- Successful convergence
         else:
             require_posteriori_loop = True
-        
+
         # Begin the a posteriori loop
         while require_posteriori_loop and not minimum_lmda:
             # Monotonicity check
@@ -156,7 +158,7 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 sol.x = x_j
                 sol.F = F_j
                 sol.F_norm = np.linalg.norm(sol.F, ord=2)
-                
+
                 require_posteriori_loop = False # return to Newton step
                 sol.n_it += 1 # move to next iteration
                 dxprev = dx # to calculate the next value of h
@@ -167,12 +169,12 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 lmda_j = min(lmda_bounds[1], 1./h_j)
                 lmda = min(lmda_j, lmda/2.)
                 lmda = max(lmda, lmda_bounds[0]) # allows a check of monotonicity once at minimum lmda
-            
+
                 x_j = sol.x + lmda*dx # because lmda must be getting smaller, no need to check constraints
                 F_j = F(x_j)
                 dxbar_j = lu_solve(luJ, -F_j)
                 dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
-            
+
 
     if not persistent_bound_violation:
         sol.x = x_j + dxbar_j
@@ -183,16 +185,16 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         if not np.all(c_x < eps): # x allowed to lie on constraints but not in forbidden area
             sol.x -= dxbar_j
             print('Warning: The solution appears to lie just outside the chosen constraints.')
-            
+
     sol.F = F(sol.x)
     sol.res = sol.F
     sol.J = J(sol.x)
-    
+
     sol.success = False
     if converged:
         sol.success = True
         sol.code = 0 
-        sol.text = 'The solution successfully found a root after {0} iterations'.format(sol.n_it)
+        sol.text = 'The solver successfully found a root after {0} iterations'.format(sol.n_it)
     elif minimum_lmda:
         sol.code = 1 
         sol.text = 'The function is too non-linear for lower lambda bound ({0})'.format(lmda_bounds[0])
