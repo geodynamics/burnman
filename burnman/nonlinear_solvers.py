@@ -15,9 +15,9 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     [Technical Report TR-91-10, Algorithm B]
 
     The iteration continues until three conditions are satisfied:
-    ||dx (simplified newton step)|| < tol
-    ||dx (full Newton step)|| < sqrt(10*tol) [avoiding pathological behaviour] and
-    lambda = lambda_max (lambda = 1 for a full Newton step).
+    all(np.abs(dx (simplified newton step) < tol))
+    all(np.abs(dx (full Newton step) < sqrt(10*tol))) [avoiding pathological behaviour] and
+    lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
 
     Inequality constraints are provided by the function C(x), which returns a 
     1D numpy array. The constraints are satisfied if the values are <=0.
@@ -34,8 +34,8 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         as a 2D numpy array.
     guess : 1D numpy array
         Starting guess for the solver.
-    tol : float [1.e-6]
-        Tolerance for termination.
+    tol : float or array of floats [1.e-6]
+        Tolerance(s) for termination.
     max_iterations : integer [100]
         Maximum number of iterations for solver.
     lambda_bounds: function
@@ -82,6 +82,9 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     # extremely nonlinear: [1.e-4, 1.e-8]
     eps = 2.*np.finfo(float).eps
     assert np.all(constraints(guess) < eps), 'The starting guess is outside the supplied constraints.'
+
+    if not isinstance(tol, float):
+        assert len(tol) < len(guess), 'tol must either be a float or an array like guess.'
 
     sol = namedtuple('Solution', ['x', 'n_it', 'F', 'F_norm', 'J', 'code', 'text', 'success'])
 
@@ -141,8 +144,8 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         dxbar_j = lu_solve(luJ, -F_j)
         dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
-        if (((dxbar_j_norm < tol and                             # <- Success requirements
-              dx_norm < np.sqrt(10.*tol)) or                     # <- avoids pathological cases
+        if (((all(np.abs(dxbar_j) < tol) and                     # <- Success requirements
+              all(np.abs(dx) < np.sqrt(10.*tol))) or             # <- avoids pathological cases
              dxbar_j_norm < eps) and                             # <- occasionally the simplified newton step finds the exact solution
             np.abs(lmda - lmda_bounds[1]) < eps) :               # <- end on a maximal newton step
             require_posteriori_loop = False                      # <- No need for the a posteriori loop
