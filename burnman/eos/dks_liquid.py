@@ -480,7 +480,7 @@ class DKS_L(eos.EquationOfState):
         """
         gamma = (self._aK_T(temperature, volume, params)
                  * volume
-                 / self.heat_capacity_v(pressure, temperature, volume, params))
+                 / self.molar_heat_capacity_v(pressure, temperature, volume, params))
         return gamma
 
     def shear_modulus(self, pressure, temperature, volume, params):
@@ -490,7 +490,7 @@ class DKS_L(eos.EquationOfState):
         """
         return 0.
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
@@ -500,11 +500,11 @@ class DKS_L(eos.EquationOfState):
                + self._C_v_mag(temperature, volume, params))
         return C_v
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
         """
-        C_p = (self.heat_capacity_v(pressure,temperature, volume, params)
+        C_p = (self.molar_heat_capacity_v(pressure,temperature, volume, params)
                * ( 1. + temperature 
                    * self.thermal_expansivity(pressure, temperature, volume, params)
                    * self.grueneisen_parameter(pressure, temperature, volume, params) ))
@@ -554,7 +554,7 @@ class DKS_L(eos.EquationOfState):
              + self._F_mag(temperature, volume, params))
         return F
 
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         E = self.helmholtz_free_energy(pressure, temperature, volume, params) + \
             temperature*self.entropy(pressure, temperature, volume, params)
         return E

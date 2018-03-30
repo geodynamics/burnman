@@ -51,7 +51,7 @@ class HP_TMT(eos.EquationOfState):
             pressure, temperature, volume, params)
         K_T = self.isothermal_bulk_modulus(
             pressure, temperature, volume, params)
-        C_V = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         return alpha * K_T * volume / C_V
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
@@ -72,11 +72,11 @@ class HP_TMT(eos.EquationOfState):
         return 0.
 
     # Cv, heat capacity at constant volume
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
         """
-        C_p = self.heat_capacity_p(pressure, temperature, volume, params)
+        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
         V = self.volume(pressure, temperature, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         K_T = self.isothermal_bulk_modulus(
@@ -92,15 +92,15 @@ class HP_TMT(eos.EquationOfState):
         Pth = self.__relative_thermal_pressure(temperature, params)
         psubpth = pressure - params['P_0'] - Pth
 
-        C_V0 = einstein.heat_capacity_v(
+        C_V0 = einstein.molar_heat_capacity_v(
             params['T_0'], params['T_einstein'], params['n'])
-        C_V = einstein.heat_capacity_v(
+        C_V = einstein.molar_heat_capacity_v(
             temperature, params['T_einstein'], params['n'])
         alpha = params['a_0'] * (C_V / C_V0) * 1. / (
             (1. + b * psubpth) * (a + (1. - a) * np.power((1 + b * psubpth), c)))
         return alpha
 
-    def heat_capacity_p0(self, temperature, params):
+    def molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
         Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 2011
@@ -110,14 +110,14 @@ class HP_TMT(eos.EquationOfState):
                 'Cp'][3] * np.power(temperature, -0.5)
         return Cp
 
-    def heat_capacity_p_einstein(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p_einstein(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume, using the C_v and Einstein model [J/K/mol]
         WARNING: Only for comparison with internally self-consistent C_p
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v * (1. + gr * alpha * temperature)
         return C_p
 
@@ -127,8 +127,8 @@ class HP_TMT(eos.EquationOfState):
         temperature [K], and volume [m^3].
         """
         K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
-        C_p = self.heat_capacity_p(pressure, temperature, volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         K_S = K_T * C_p / C_v
         return K_S
 
@@ -162,8 +162,8 @@ class HP_TMT(eos.EquationOfState):
         a, b, c = mt.tait_constants(params)
         Pth = self.__relative_thermal_pressure(temperature, params)
 
-        ksi_over_ksi_0 = einstein.heat_capacity_v(temperature, params['T_einstein'], params[
-                                                  'n']) / einstein.heat_capacity_v(params['T_0'], params['T_einstein'], params['n'])
+        ksi_over_ksi_0 = einstein.molar_heat_capacity_v(temperature, params['T_einstein'], params[
+                                                  'n']) / einstein.molar_heat_capacity_v(params['T_0'], params['T_einstein'], params['n'])
 
         dintVdpdT = (params['V_0'] * params['a_0'] * params['K_0'] * a * ksi_over_ksi_0) * (
             np.power((1. + b * (pressure - params['P_0'] - Pth)), 0. - c) - np.power((1. - b * Pth), 0. - c))
@@ -178,7 +178,7 @@ class HP_TMT(eos.EquationOfState):
         entropy = self.entropy(pressure, temperature, volume, params)
         return gibbs + temperature * entropy
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns the heat capacity [J/K/mol] as a function of pressure [Pa]
         and temperature [K].
@@ -189,8 +189,8 @@ class HP_TMT(eos.EquationOfState):
         n = params['n']
         Pth = self.__relative_thermal_pressure(T, params)
 
-        ksi_over_ksi_0 = einstein.heat_capacity_v(T, T_e, n) \
-                         / einstein.heat_capacity_v(params['T_0'], T_e, n)
+        ksi_over_ksi_0 = einstein.molar_heat_capacity_v(T, T_e, n) \
+                         / einstein.molar_heat_capacity_v(params['T_0'], T_e, n)
 
         dintVdpdT = (params['V_0'] * params['a_0'] * params['K_0'] * a * ksi_over_ksi_0) * (
             np.power((1. + b * (pressure - params['P_0'] - Pth)), 0. - c) - np.power((1. - b * Pth), 0. - c))
@@ -200,14 +200,14 @@ class HP_TMT(eos.EquationOfState):
                  np.power((1. + b * (-Pth)), -1. - c))
 
         x = T_e/T
-        dCv_einstdT = -(einstein.heat_capacity_v(T, T_e, n) *
+        dCv_einstdT = -(einstein.molar_heat_capacity_v(T, T_e, n) *
                         ( 1 - 2./x + 2./(np.exp(x) - 1.) ) * x/T)
 
         dSdT1 = -dintVdpdT * dCv_einstdT \
-                / einstein.heat_capacity_v(T, T_e, n)
+                / einstein.molar_heat_capacity_v(T, T_e, n)
 
         dSdT = dSdT0 + dSdT1
-        return self.heat_capacity_p0(temperature, params) + temperature * dSdT
+        return self.molar_heat_capacity_p0(temperature, params) + temperature * dSdT
 
     def __thermal_pressure(self, T, params):
         """
@@ -226,7 +226,7 @@ class HP_TMT(eos.EquationOfState):
         # freedom provided by their polynomial expression.
 
         E_th = einstein.thermal_energy(T, params['T_einstein'], params['n'])
-        C_V0 = einstein.heat_capacity_v(
+        C_V0 = einstein.molar_heat_capacity_v(
             params['T_0'], params['T_einstein'], params['n'])
         P_th = params['a_0'] * params['K_0'] / C_V0 * E_th
         return P_th
@@ -300,9 +300,9 @@ class HP_TMT(eos.EquationOfState):
         if params['V_0'] < 1.e-7 or params['V_0'] > 1.e-2:
             warnings.warn('Unusual value for V_0', stacklevel=2)
 
-        if self.heat_capacity_p0(params['T_0'], params) < 0.:
+        if self.molar_heat_capacity_p0(params['T_0'], params) < 0.:
             warnings.warn('Negative heat capacity at T_0', stacklevel=2)
-        if self.heat_capacity_p0(2000., params) < 0.:
+        if self.molar_heat_capacity_p0(2000., params) < 0.:
             warnings.warn('Negative heat capacity at 2000K', stacklevel=2)
 
         if params['a_0'] < 0. or params['a_0'] > 1.e-3:

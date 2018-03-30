@@ -142,19 +142,19 @@ class eos(BurnManTest):
                 Density_test, rock.params['molar_mass'] / rock.params['V_0'])
             alpha_test = i.thermal_expansivity(
                 pressure, temperature, rock.params['V_0'], rock.params)
-            Cp_test = i.heat_capacity_p(
+            Cp_test = i.molar_heat_capacity_p(
                 pressure, temperature, rock.params['V_0'], rock.params)
-            Cv_test = i.heat_capacity_v(
+            Cv_test = i.molar_heat_capacity_v(
                 pressure, temperature, rock.params['V_0'], rock.params)
             Grun_test = i.grueneisen_parameter(
                 pressure, temperature, rock.params['V_0'], rock.params)
 
         eoses_thermal = [burnman.eos.SLB2(), burnman.eos.SLB3()]
         for i in eoses_thermal:
-            Cp_test = i.heat_capacity_p(
+            Cp_test = i.molar_heat_capacity_p(
                 pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(Cp_test, 37.076768469502042)
-            Cv_test = i.heat_capacity_v(
+            Cv_test = i.molar_heat_capacity_v(
                 pressure, temperature, rock.params['V_0'], rock.params)
             self.assertFloatEqual(Cv_test, 36.577717628901553)
             alpha_test = i.thermal_expansivity(
@@ -346,7 +346,7 @@ class test_eos_validation(BurnManTest):
             m.params['equation_of_state'] = eos
             burnman.Mineral.__init__(m)
             m.set_state(m.params['P_0'], m.params['T_0'])
-            energies.append(m.internal_energy)
+            energies.append(m.molar_internal_energy)
         
         self.assertArraysAlmostEqual(energies, [m.params['E_0']]*len(energies))
     
@@ -373,7 +373,7 @@ class test_eos_validation(BurnManTest):
             pressures = [P_0 - 0.5*dP, P_0, P_0 + 0.5*dP]
             temperatures = [0., 0., 0.]
 
-            E, G, H, A, V = m.evaluate(['internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
+            E, G, H, A, V = m.evaluate(['molar_internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
             
             calculated.append(P_0)
             derivative.append(-(E[2] - E[0])/(V[2] - V[0]))

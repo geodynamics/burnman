@@ -174,11 +174,11 @@ class composite(BurnManTest):
         self.assertFloatEqual(H3, 0.4 * enthalpy1 + 0.6 * enthalpy2)
 
         # Energy
-        internal_energy1 = mineral1.internal_energy
-        internal_energy2 = mineral2.internal_energy
-        U1 = rock1.internal_energy
-        U2 = rock2.internal_energy
-        U3 = rock3.internal_energy
+        internal_energy1 = mineral1.molar_internal_energy
+        internal_energy2 = mineral2.molar_internal_energy
+        U1 = rock1.molar_internal_energy
+        U2 = rock2.molar_internal_energy
+        U3 = rock3.molar_internal_energy
         self.assertFloatEqual(U1, internal_energy1)
         self.assertFloatEqual(U2, internal_energy2)
         self.assertFloatEqual(
@@ -297,8 +297,8 @@ class composite(BurnManTest):
         self.assertFloatEqual(
             rock1.grueneisen_parameter, min1.params['grueneisen_0'])
         self.assertFloatEqual(rock1.thermal_expansivity, min1.alpha)
-        self.assertFloatEqual(rock1.heat_capacity_v, min1.C_v)
-        self.assertFloatEqual(rock1.heat_capacity_p, min1.C_p)
+        self.assertFloatEqual(rock1.molar_heat_capacity_v, min1.C_v)
+        self.assertFloatEqual(rock1.molar_heat_capacity_p, min1.C_p)
 
 if __name__ == '__main__':
     unittest.main()

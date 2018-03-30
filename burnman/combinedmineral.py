@@ -119,12 +119,12 @@ class CombinedMineral(Mineral):
                 + self._property_modifiers['d2GdPdT']) / self.molar_volume
     
     @material_property
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the solid solution [J/K/mol]
         Aliased with self.C_p
         """
-        return self.mixture.heat_capacity_p - self.temperature * self._property_modifiers['d2GdT2']
+        return self.mixture.molar_heat_capacity_p - self.temperature * self._property_modifiers['d2GdT2']
 
 
     """
@@ -143,7 +143,7 @@ class CombinedMineral(Mineral):
     @material_property
     def formula(self):
         """
-        Returns chemical formula of the solid solution
+        Returns molar chemical formula of the solid solution
         """
         return self.mixture.formula
 
@@ -156,9 +156,9 @@ class CombinedMineral(Mineral):
         return self.molar_mass / self.molar_volume
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
-        Returns internal energy of the mineral [J]
+        Returns molar internal energy of the mineral [J/mol]
         Aliased with self.energy
         """
         return self.molar_gibbs - self.pressure * self.molar_volume + self.temperature * self.molar_entropy
@@ -166,7 +166,7 @@ class CombinedMineral(Mineral):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns Helmholtz free energy of the solid solution [J]
+        Returns molar Helmholtz free energy of the solid solution [J/mol]
         Aliased with self.helmholtz
         """
         return self.molar_gibbs - self.pressure * self.molar_volume
@@ -175,7 +175,7 @@ class CombinedMineral(Mineral):
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpy of the solid solution [J]
+        Returns molar enthalpy of the solid solution [J/mol]
         Aliased with self.H
         """
         return self.molar_gibbs + self.temperature * self.molar_entropy
@@ -190,7 +190,7 @@ class CombinedMineral(Mineral):
         if self.temperature < 1.e-10:
             return self.isothermal_bulk_modulus
         else:
-            return self.isothermal_bulk_modulus * self.heat_capacity_p / self.heat_capacity_v
+            return self.isothermal_bulk_modulus * self.molar_heat_capacity_p / self.molar_heat_capacity_v
         
     @material_property
     def isothermal_compressibility(self):
@@ -243,15 +243,15 @@ class CombinedMineral(Mineral):
             return 0.
         else:
             return self.thermal_expansivity * self.isothermal_bulk_modulus \
-                * self.molar_volume / self.heat_capacity_v
+                * self.molar_volume / self.molar_heat_capacity_v
 
     @material_property
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns heat capacity at constant volume of the solid solution [J/K/mol]
+        Returns molar heat capacity at constant volume of the solid solution [J/K/mol]
         Aliased with self.C_v
         """
-        return self.heat_capacity_p - self.molar_volume * self.temperature \
+        return self.molar_heat_capacity_p - self.molar_volume * self.temperature \
             * self.thermal_expansivity * self.thermal_expansivity \
             * self.isothermal_bulk_modulus
 

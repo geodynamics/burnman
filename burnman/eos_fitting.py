@@ -109,11 +109,11 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             elif flag == 'H':
                 self.m.set_state(P, T)
                 dPdp = 1./((1.-T*self.m.alpha)*self.m.V)
-                dpdT = self.m.heat_capacity_p
+                dpdT = self.m.molar_heat_capacity_p
             elif flag == 'S':
                 self.m.set_state(P, T)
                 dPdp = -1./(self.m.alpha*self.m.V)
-                dpdT = self.m.heat_capacity_p/T
+                dpdT = self.m.molar_heat_capacity_p/T
             elif flag == 'gibbs':
                 self.m.set_state(P, T)
                 dPdp = 1./self.m.V

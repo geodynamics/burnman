@@ -48,7 +48,7 @@ class Debye(BurnManTest):
         test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
             x, rock.params['Debye_0'], rock.params['n'])
         self.assertFloatEqual(test_helmholtz, 0.)
-        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(
+        test_heat_capacity_v = burnman.eos.debye.molar_heat_capacity_v(
             x, rock.params['Debye_0'], rock.params['n'])
         self.assertFloatEqual(test_heat_capacity_v, 0.)
         test_thermal_energy = burnman.eos.debye.thermal_energy(
@@ -61,7 +61,7 @@ class Debye(BurnManTest):
         test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
             x, rock.params['Debye_0'], rock.params['n'])
         self.assertFloatEqual(test_helmholtz, 0.)
-        test_heat_capacity_v = burnman.eos.debye.heat_capacity_v(
+        test_heat_capacity_v = burnman.eos.debye.molar_heat_capacity_v(
             x, rock.params['Debye_0'], rock.params['n'])
         self.assertFloatEqual(test_heat_capacity_v, 0.)
         test_thermal_energy = burnman.eos.debye.thermal_energy(

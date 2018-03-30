@@ -56,7 +56,7 @@ for name, phase, PVT_range, EVT_range in phases:
     energies=np.empty_like(volumes)
     for temperature in temperatures:
         for i, volume in enumerate(volumes):
-            energies[i]=phase.method.internal_energy(0., temperature, volume, phase.params)
+            energies[i]=phase.method.molar_internal_energy(0., temperature, volume, phase.params)
         ax_E.plot(volumes*1e6, energies/1e3, linewidth=2, label='{0:.0f} K'.format(temperature))
 
     ax_E.legend(loc='upper right')

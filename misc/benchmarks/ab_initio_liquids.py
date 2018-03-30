@@ -59,7 +59,7 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
         for j, volume in enumerate(volumes):
             pressures[j]=phase.method.pressure(temperature, volume, phase.params)
             entropies[j]=phase.method._S_el(temperature, volume, phase.params)
-            energies[j]=phase.method.internal_energy(0., temperature, volume, phase.params)
+            energies[j]=phase.method.molar_internal_energy(0., temperature, volume, phase.params)
 
         ax_P.plot(volumes*1.e6, pressures/1.e9, linewidth=2, label='{0:.0f} K'.format(temperature))
         ax_S.plot(volumes*1.e6, entropies/n_atoms/constants.gas_constant, linewidth=2, label='{0:.0f} K'.format(temperature))

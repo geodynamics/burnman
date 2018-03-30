@@ -144,9 +144,9 @@ if __name__ == "__main__":
     # Plot models
     temperatures = np.linspace(200., 2000., 101)
     pressures = np.array([298.15] * len(temperatures))
-    plt.plot(temperatures, per_HP.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
-    plt.plot(temperatures, per_SLB.evaluate(['heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
-    plt.plot(temperatures, per_opt.evaluate(['heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
+    plt.plot(temperatures, per_HP.evaluate(['molar_heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='HP')
+    plt.plot(temperatures, per_SLB.evaluate(['molar_heat_capacity_p'], pressures, temperatures)[0], linestyle='--', label='SLB')
+    plt.plot(temperatures, per_opt.evaluate(['molar_heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
 
     plt.legend(loc='lower right')
     plt.xlim(0., temperatures[-1])

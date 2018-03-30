@@ -77,9 +77,9 @@ class test_model(BurnManTest):
 
     def test_heatstuff1(self):
         m = self.model1()
-        self.assertArraysAlmostEqual(m.heat_capacity_p(), [52.32175110])
+        self.assertArraysAlmostEqual(m.molar_heat_capacity_p(), [52.32175110])
         self.assertArraysAlmostEqual(m.thermal_expansivity(), [2.40018801e-05])
-        self.assertArraysAlmostEqual(m.heat_capacity_v(), [49.3424724])
+        self.assertArraysAlmostEqual(m.molar_heat_capacity_v(), [49.3424724])
 
         # reproduce by hand:
         min = m.rock
@@ -87,22 +87,22 @@ class test_model(BurnManTest):
         self.assertArraysAlmostEqual(
             m.thermal_expansivity(), [min.thermal_expansivity])
         self.assertArraysAlmostEqual(
-            m.heat_capacity_v(), [min.heat_capacity_v])
+            m.molar_heat_capacity_v(), [min.molar_heat_capacity_v])
         self.assertArraysAlmostEqual(
-            m.heat_capacity_p(), [min.heat_capacity_p])
+            m.molar_heat_capacity_p(), [min.molar_heat_capacity_p])
 
     def test_heat2(self):
         m1 = self.model1()
         m2 = self.model2()
         m12 = self.model12()
 
-        self.assertArraysAlmostEqual(m1.heat_capacity_v(), [49.34247236])
-        self.assertArraysAlmostEqual(m2.heat_capacity_v(), [49.3490106])
-        self.assertArraysAlmostEqual(m12.heat_capacity_v(), [49.34770297])
+        self.assertArraysAlmostEqual(m1.molar_heat_capacity_v(), [49.34247236])
+        self.assertArraysAlmostEqual(m2.molar_heat_capacity_v(), [49.3490106])
+        self.assertArraysAlmostEqual(m12.molar_heat_capacity_v(), [49.34770297])
 
-        self.assertArraysAlmostEqual(m1.heat_capacity_p(), [52.32175110])
-        self.assertArraysAlmostEqual(m2.heat_capacity_p(), [52.77694375])
-        self.assertArraysAlmostEqual(m12.heat_capacity_p(), [52.68590522])
+        self.assertArraysAlmostEqual(m1.molar_heat_capacity_p(), [52.32175110])
+        self.assertArraysAlmostEqual(m2.molar_heat_capacity_p(), [52.77694375])
+        self.assertArraysAlmostEqual(m12.molar_heat_capacity_p(), [52.68590522])
 
         self.assertArraysAlmostEqual(m1.thermal_expansivity(), [2.40018801e-5])
         self.assertArraysAlmostEqual(m2.thermal_expansivity(), [2.74743810e-5])

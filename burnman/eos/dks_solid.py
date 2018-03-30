@@ -184,19 +184,19 @@ class DKS_S(eos.EquationOfState):
         E_th_diff = params['Cv'] * (temperature - params['T_0'])
         return bm.shear_modulus_third_order(volume, params) - eta_s * (E_th_diff) / volume
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
         return params['Cv']
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v * (1. + gr * alpha * temperature)
         return C_p
 
@@ -204,7 +204,7 @@ class DKS_S(eos.EquationOfState):
         """
         Returns thermal expansivity. :math:`[1/K]`
         """
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
@@ -218,7 +218,7 @@ class DKS_S(eos.EquationOfState):
             pressure, temperature, volume, params) + pressure * volume
         return G
 
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy at the pressure and temperature of the mineral [J/mol]
         """

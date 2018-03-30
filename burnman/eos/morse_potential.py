@@ -103,7 +103,7 @@ class Morse(eos.EquationOfState):
         """
         return 0.
     
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
@@ -119,15 +119,15 @@ class Morse(eos.EquationOfState):
         """
         Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
-        return self.internal_energy(pressure, temperature, volume, params) + volume*pressure
+        return self.molar_internal_energy(pressure, temperature, volume, params) + volume*pressure
     
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """

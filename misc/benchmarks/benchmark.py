@@ -353,7 +353,7 @@ def check_slb_fig7_txt():
         vol_comp[i] = 100. * (forsterite.molar_volume * 1.e6 - vol[i]) / vol[i]
         alpha_comp[i] = 100. * (
             forsterite.thermal_expansivity / 1.e-5 - alpha[i]) / (alpha[-1])
-        Cp_comp[i] = 100. * (forsterite.heat_capacity_p /
+        Cp_comp[i] = 100. * (forsterite.molar_heat_capacity_p /
                              forsterite.params['molar_mass'] / 1000. - Cp[i]) / (Cp[-1])
         gr_comp[i] = (forsterite.grueneisen_parameter - gr[i]) / gr[i]
         gibbs_comp[i] = 100. * (
@@ -423,7 +423,7 @@ def check_slb_fig7():
         volume[i] = forsterite.molar_volume / forsterite.params['V_0']
         bulk_modulus[i] = forsterite.adiabatic_bulk_modulus / Ks_0
         shear_modulus[i] = forsterite.shear_modulus / forsterite.params['G_0']
-        heat_capacity[i] = forsterite.heat_capacity_p / forsterite.params['n']
+        heat_capacity[i] = forsterite.molar_heat_capacity_p / forsterite.params['n']
 
     # compare with figure 7
     fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig7_vol.png')

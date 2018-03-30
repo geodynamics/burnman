@@ -79,32 +79,32 @@ class MGDBase(eos.EquationOfState):
             raise NotImplementedError("")
 
     # heat capacity at constant volume
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
         """
         Debye_T = self._debye_temperature(params['V_0'] / volume, params)
-        C_v = debye.heat_capacity_v(temperature, Debye_T, params['n'])
+        C_v = debye.molar_heat_capacity_v(temperature, Debye_T, params['n'])
         return C_v
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
         """
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params['V_0'] / volume, params)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
 
     # heat capacity at constant pressure
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params['V_0'] / volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v * (1. + gr * alpha * temperature)
         return C_p
 
@@ -138,7 +138,7 @@ class MGDBase(eos.EquationOfState):
             pressure, temperature, volume, params) + pressure * volume
         return G
 
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy at the pressure and temperature of the mineral [J/mol]
         """

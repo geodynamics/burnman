@@ -104,8 +104,8 @@ class test_endmembers(BurnManTest):
         self.assertFloatEqual(bdg.molar_volume, bdg.params['V_0'])
         self.assertFloatEqual(bdg.shear_modulus, bdg.params['G_0'])
         bdg.set_state(1.e5, 0.)
-        self.assertFloatEqual(bdg.heat_capacity_v, 0.)
-        self.assertFloatEqual(bdg.heat_capacity_p, 0.)
+        self.assertFloatEqual(bdg.molar_heat_capacity_v, 0.)
+        self.assertFloatEqual(bdg.molar_heat_capacity_p, 0.)
         self.assertFloatEqual(bdg.thermal_expansivity, 0.)
         self.assertFloatEqual(
             bdg.isothermal_bulk_modulus, bdg.adiabatic_bulk_modulus)

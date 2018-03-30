@@ -46,8 +46,8 @@ class HelperRockSwitcher(Material):
         return self.current_rock.unroll()
 
     @material_property
-    def internal_energy(self):
-        return self.current_rock.internal_energy
+    def molar_internal_energy(self):
+        return self.current_rock.molar_internal_energy
 
     @material_property
     def molar_gibbs(self):
@@ -118,12 +118,12 @@ class HelperRockSwitcher(Material):
         return self.current_rock.thermal_expansivity
 
     @material_property
-    def heat_capacity_v(self):
-        return self.current_rock.heat_capacity_v
+    def molar_heat_capacity_v(self):
+        return self.current_rock.molar_heat_capacity_v
 
     @material_property
-    def heat_capacity_p(self):
-        return self.current_rock.heat_capacity_p
+    def molar_heat_capacity_p(self):
+        return self.current_rock.molar_heat_capacity_p
 
 
 class HelperLowHighPressureRockTransition(HelperRockSwitcher):

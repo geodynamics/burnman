@@ -134,7 +134,7 @@ def thermal_energy(T, debye_T, n):
 
 
 @jit
-def heat_capacity_v(T, debye_T, n):
+def molar_heat_capacity_v(T, debye_T, n):
     """
     Heat capacity at constant volume.  In J/K/mol
     """

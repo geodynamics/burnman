@@ -176,19 +176,19 @@ class Composite(Material):
         return "'" + self.__class__.__name__ + "'"
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
-        Returns internal energy of the mineral [J]
+        Returns molar internal energy of the mineral [J/mol]
         Aliased with self.energy
         """
-        U = sum(phase.internal_energy * molar_fraction for (
+        U = sum(phase.molar_internal_energy * molar_fraction for (
                 phase, molar_fraction) in zip(self.phases, self.molar_fractions))
         return U
 
     @material_property
     def molar_gibbs(self):
         """
-        Returns Gibbs free energy of the composite [J]
+        Returns molar Gibbs free energy of the composite [J/mol]
         Aliased with self.gibbs
         """
         G = sum(phase.molar_gibbs * molar_fraction for (phase, molar_fraction)
@@ -198,7 +198,7 @@ class Composite(Material):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns Helmholtz free energy of the mineral [J]
+        Returns molar Helmholtz free energy of the mineral [J/mol]
         Aliased with self.helmholtz
         """
         F = sum(phase.molar_helmholtz * molar_fraction for (
@@ -342,7 +342,7 @@ class Composite(Material):
         Returns grueneisen parameter of the composite [unitless]
         Aliased with self.gr
         """
-        return self.thermal_expansivity * self.isothermal_bulk_modulus * self.molar_volume / self.heat_capacity_v
+        return self.thermal_expansivity * self.isothermal_bulk_modulus * self.molar_volume / self.molar_heat_capacity_v
 
     @material_property
     def thermal_expansivity(self):
@@ -356,21 +356,21 @@ class Composite(Material):
         return self.averaging_scheme.average_thermal_expansivity(volumes, alphas)
 
     @material_property
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns heat capacity at constant volume of the composite [J/K/mol]
+        Returns molar_heat capacity at constant volume of the composite [J/K/mol]
         Aliased with self.C_v
         """
-        c_v = np.array([phase.heat_capacity_v for phase in self.phases])
+        c_v = np.array([phase.molar_heat_capacity_v for phase in self.phases])
         return self.averaging_scheme.average_heat_capacity_v(self.molar_fractions, c_v)
 
     @material_property
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         """
-        Returns heat capacity at constant pressure of the composite [J/K/mol]
+        Returns molar heat capacity at constant pressure of the composite [J/K/mol]
         Aliased with self.C_p
         """
-        c_p = np.array([phase.heat_capacity_p for phase in self.phases])
+        c_p = np.array([phase.molar_heat_capacity_p for phase in self.phases])
         return self.averaging_scheme.average_heat_capacity_p(self.molar_fractions, c_p)
 
     def _mass_to_molar_fractions(self, phases, mass_fractions):

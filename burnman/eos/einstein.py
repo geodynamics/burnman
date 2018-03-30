@@ -28,7 +28,7 @@ def thermal_energy(T, einstein_T, n):
     return E_th
 
 
-def heat_capacity_v(T, einstein_T, n):
+def molar_heat_capacity_v(T, einstein_T, n):
     """
     Heat capacity at constant volume.  In J/K/mol
     """

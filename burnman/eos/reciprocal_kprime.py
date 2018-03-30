@@ -188,20 +188,20 @@ class RKprime(eos.EquationOfState):
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         return params['E_0'] + params['P_0']*params['V_0'] + self._intVdP((pressure - params['P_0'])/K, params) - self._intVdP(0., params) 
     
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
         # E = G - PV (+ TS)
         return ( self.gibbs_free_energy(pressure, temperature, volume, params) - pressure*volume)
         
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.e99
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
         """

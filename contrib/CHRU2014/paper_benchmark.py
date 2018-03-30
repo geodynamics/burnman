@@ -99,7 +99,7 @@ def check_slb_fig7_txt():
         vol_comp[i] = 100. * (forsterite.molar_volume * 1.e6 - vol[i]) / vol[i]
         alpha_comp[i] = 100. * (
             forsterite.thermal_expansivity / 1.e-5 - alpha[i]) / (alpha[-1])
-        Cp_comp[i] = 100. * (forsterite.heat_capacity_p /
+        Cp_comp[i] = 100. * (forsterite.molar_heat_capacity_p /
                              forsterite.params['molar_mass'] / 1000. - Cp[i]) / (Cp[-1])
         gr_comp[i] = (forsterite.grueneisen_parameter - gr[i]) / gr[i]
 
