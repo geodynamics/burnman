@@ -20,40 +20,38 @@ except ImportError:
     def jit(fn):
         return fn
 
+
 @jit
 def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, n_occupancies, site_multiplicities, endmember_configurational_entropies):
     site_occupancies = np.dot(molar_fractions, endmember_occupancies)
-    activities = np.empty(shape=(n_endmembers))
-    
-    for e in range(n_endmembers):
-        a = 1.0
-        for occ in range(n_occupancies):
-            if endmember_occupancies[e][occ] > 1e-10:
-                a *= np.power(
-                        site_occupancies[occ], endmember_occupancies[e][occ] * site_multiplicities[occ])
-        normalisation_constant = np.exp(
-            endmember_configurational_entropies[e] / constants.gas_constant)
-        activities[e] = normalisation_constant * a
-    return activities
+    a = np.power(site_occupancies,
+                 endmember_occupancies * site_multiplicities).prod(-1)
+    normalisation_constants = np.exp(endmember_configurational_entropies /
+                                     constants.gas_constant)
+    return normalisation_constants * a
+
 
 @jit
 def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, We, Ws, Wv):
     # -sum(sum(qi.qj.Wij*)
     # equation (2) of Holland and Powell 2003
-    Eint = np.zeros(len(molar_fractions))
-    Sint = np.zeros(len(molar_fractions))
-    Vint = np.zeros(len(molar_fractions))
-    
-    for l in range(n_endmembers):
-        q = -phi
-        q[l] += 1.0
+    q = np.eye(n_endmembers) - phi*np.ones((n_endmembers, n_endmembers))
+    Eint = -alpha * (q.dot(We)*q).sum(-1)
+    Sint = -alpha * (q.dot(Ws)*q).sum(-1)
+    Vint = -alpha * (q.dot(Wv)*q).sum(-1)
 
-        Eint[l] = 0. - alpha[l] * np.dot(q, np.dot(We, q))
-        Sint[l] = 0. - alpha[l] * np.dot(q, np.dot(Ws, q))
-        Vint[l] = 0. - alpha[l] * np.dot(q, np.dot(Wv, q))
-        
     return Eint, Sint, Vint
 
+def logish(x, eps=1.e-5):
+    """
+    2nd order series expansion of log(x) about eps: log(eps) - sum_k=1^infty (f_eps)^k / k
+    Prevents infinities at x=0
+    """
+    f_eps = 1. - x/eps
+    mask = x>eps
+    ln = np.where(x<=eps, np.log(eps) - f_eps - f_eps*f_eps/2., 0.)
+    ln[mask] = np.log(x[mask])
+    return ln
 
 class SolutionModel(object):
 
@@ -259,28 +257,20 @@ class IdealSolution (SolutionModel):
         return self._ideal_excess_partial_gibbs(temperature, molar_fractions)
 
     def _calculate_endmember_configurational_entropies(self):
-        self.endmember_configurational_entropies = np.zeros(
-            shape=(self.n_endmembers))
-        for idx, endmember_occupancy in enumerate(self.endmember_occupancies):
-            for occ in range(self.n_occupancies):
-                if endmember_occupancy[occ] > 1e-10:
-                    self.endmember_configurational_entropies[idx] = \
-                        self.endmember_configurational_entropies[idx] - \
-                        constants.gas_constant * self.site_multiplicities[
-                            occ] * endmember_occupancy[occ] * np.log(endmember_occupancy[occ])
+        S_conf = -constants.gas_constant * (self.site_multiplicities *
+                                            self.endmember_occupancies *
+                                            logish(self.endmember_occupancies)).sum(-1)
+        self.endmember_configurational_entropies = S_conf
+                    
 
     def _endmember_configurational_entropy_contribution(self, molar_fractions):
         return np.dot(molar_fractions, self.endmember_configurational_entropies)
 
     def _configurational_entropy(self, molar_fractions):
         site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        conf_entropy = 0
-        for idx, occupancy in enumerate(site_occupancies):
-            if occupancy > 1e-10:
-                conf_entropy = conf_entropy - constants.gas_constant * \
-                    occupancy * \
-                    self.site_multiplicities[idx] * np.log(occupancy)
-
+        conf_entropy = - constants.gas_constant * (site_occupancies * 
+                                                   self.site_multiplicities *
+                                                   logish(site_occupancies)).sum(-1)
         return conf_entropy
 
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
@@ -288,21 +278,12 @@ class IdealSolution (SolutionModel):
 
     def _log_ideal_activities(self, molar_fractions):
         site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        lna = np.empty(shape=(self.n_endmembers))
+        lna = (self.endmember_occupancies * self.site_multiplicities *
+               logish(site_occupancies)).sum(-1)
+        normalisation_constants = (self.endmember_configurational_entropies /
+                                   constants.gas_constant)
 
-        for e in range(self.n_endmembers):
-            lna[e] = 0.0
-            for occ in range(self.n_occupancies):
-                if self.endmember_occupancies[e][occ] > 1e-10 and site_occupancies[occ] > 1e-10:
-                    lna[e] = lna[e] + self.endmember_occupancies[e][occ] * \
-                        self.site_multiplicities[
-                            occ] * np.log(site_occupancies[occ])
-
-            normalisation_constant = self.endmember_configurational_entropies[
-                e] / constants.gas_constant
-            lna[e] = lna[e] + self.endmember_configurational_entropies[
-                e] / constants.gas_constant
-        return lna
+        return lna + normalisation_constants
 
 
     def _ideal_activities(self, molar_fractions):
@@ -331,37 +312,33 @@ class AsymmetricRegularSolution (IdealSolution):
         self.n_endmembers = len(endmembers)
 
         # Create array of van Laar parameters
-        self.alpha = np.array(alphas)
+        self.alphas = np.array(alphas)
 
         # Create 2D arrays of interaction parameters
-        self.We = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
-        self.Ws = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
-        self.Wv = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
-
-        # setup excess enthalpy interaction matrix
-        for i in range(self.n_endmembers):
-            for j in range(i + 1, self.n_endmembers):
-                self.We[i][j] = 2. * energy_interaction[
-                    i][j - i - 1] / (self.alpha[i] + self.alpha[j])
+        self.We = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
+        self.We[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in energy_interaction
+                                                                for i in row])
 
         if entropy_interaction is not None:
-            for i in range(self.n_endmembers):
-                for j in range(i + 1, self.n_endmembers):
-                    self.Ws[i][j] = 2. * entropy_interaction[
-                        i][j - i - 1] / (self.alpha[i] + self.alpha[j])
+            self.Ws = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
+            self.Ws[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in entropy_interaction
+                                                                        for i in row])
+        else:
+            self.Ws = np.zeros((self.n_endmembers, self.n_endmembers))
 
         if volume_interaction is not None:
-            for i in range(self.n_endmembers):
-                for j in range(i + 1, self.n_endmembers):
-                    self.Wv[i][j] = 2. * volume_interaction[
-                        i][j - i - 1] / (self.alpha[i] + self.alpha[j])
+            self.Wv = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
+            self.Wv[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in volume_interaction
+                                                                        for i in row])
+        else:
+            self.Wv = np.zeros((self.n_endmembers, self.n_endmembers))
+
 
         # initialize ideal solution model
         IdealSolution.__init__(self, endmembers)
 
     def _phi(self, molar_fractions):
-        phi = np.array([self.alpha[i] * molar_fractions[i]
-                       for i in range(self.n_endmembers)])
+        phi = self.alphas*molar_fractions
         phi = np.divide(phi, np.sum(phi))
         return phi
 
@@ -370,7 +347,7 @@ class AsymmetricRegularSolution (IdealSolution):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
         phi = self._phi(molar_fractions)
-        return _non_ideal_interactions_fct(phi, molar_fractions, self.n_endmembers, self.alpha, self.We, self.Ws, self.Wv)
+        return _non_ideal_interactions_fct(phi, molar_fractions, self.n_endmembers, self.alphas, self.We, self.Ws, self.Wv)
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
         Eint, Sint, Vint = self._non_ideal_interactions(molar_fractions)
@@ -385,7 +362,7 @@ class AsymmetricRegularSolution (IdealSolution):
 
     def excess_volume(self, pressure, temperature, molar_fractions):
         phi = self._phi(molar_fractions)
-        V_excess = np.dot(self.alpha.T, molar_fractions) * np.dot(
+        V_excess = np.dot(self.alphas.T, molar_fractions) * np.dot(
             phi.T, np.dot(self.Wv, phi))
         return V_excess
 
@@ -394,13 +371,13 @@ class AsymmetricRegularSolution (IdealSolution):
         S_conf = -constants.gas_constant * \
             np.dot(IdealSolution._log_ideal_activities(
                 self, molar_fractions), molar_fractions)
-        S_excess = np.dot(self.alpha.T, molar_fractions) * np.dot(
+        S_excess = np.dot(self.alphas.T, molar_fractions) * np.dot(
             phi.T, np.dot(self.Ws, phi))
         return S_conf + S_excess
 
     def excess_enthalpy(self, pressure, temperature, molar_fractions):
         phi = self._phi(molar_fractions)
-        E_excess = np.dot(self.alpha.T, molar_fractions) * np.dot(
+        E_excess = np.dot(self.alphas.T, molar_fractions) * np.dot(
             phi.T, np.dot(self.We, phi))
         return E_excess + pressure * self.excess_volume(pressure, temperature, molar_fractions)
 
