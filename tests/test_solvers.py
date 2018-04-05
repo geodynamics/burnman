@@ -27,7 +27,6 @@ class test_solvers(BurnManTest):
         C = lambda x: np.array([x[0]])
 
         sol = damped_newton_solve(F, J, guess=np.array([-1.2, 1.]), constraints=C)
-
         self.assertFloatEqual(sol.x[0], 0.)
         assert(sol.code == 2)
 
@@ -107,6 +106,27 @@ class test_solvers(BurnManTest):
             sol = damped_newton_solve(F, J, guess=guess)
             self.assertArraysAlmostEqual(sol.x, expected_solutions[n-1])
             assert(sol.success)
+
+
+    # This test uses the generalised Rosenbrock function:
+    # f(x, y) = (a - x)^2 + b(y - x^2)^2
+    # solving for f'=0 
+    def test_dns_rosenbrock_generalised(self):
+        a = 1.
+        b = 15. # takes >100 iterations for b>16, ~570 iterations for b=100
+        # this is a tricky root-finding problem when x0 < 0, because the gradient in the descent valley is very small compared to the gradient at the valley edges. Only very small fractions of a full Newton step can be taken if global convergence is to be guaranteed.
+        
+        F = lambda x: np.array([2.*(x[0] - a) + 4.*b*x[0]*(x[0]*x[0] - x[1]),
+                                2.*b*(x[1] - x[0]*x[0])])
+        
+        J = lambda x: np.array([[12.*b*x[0]*x[0] - 4.*b*x[1] + 2., -4.*b*x[0]],
+                                [-4.*b*x[0], 2.*b]])
+        guess = np.array([-1, 1.])
+        sol = damped_newton_solve(F, J, guess=guess,
+                                  max_iterations=600, tol=1.e-15, store_iterates=True)
+
+        self.assertArraysAlmostEqual(sol.x, [a, a*a])
+        assert(sol.success)
 
 if __name__ == '__main__':
     unittest.main()

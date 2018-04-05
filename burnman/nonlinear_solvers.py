@@ -5,7 +5,8 @@ from collections import namedtuple
 def damped_newton_solve(F, J, guess, tol=1.e-6,
                         max_iterations=100,
                         lambda_bounds=lambda dx, x: (1.e-8, 1.),
-                        constraints=lambda x: np.array([-1.])):
+                        constraints=lambda x: np.array([-1.]),
+                        store_iterates=False):
     """
     Solver for the multivariate nonlinear system F(x)=0 
     with Jacobian J(x), using the damped affine invariant modification
@@ -100,9 +101,17 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
 
     sol = namedtuple('Solution', ['x', 'n_it', 'F', 'F_norm', 'J', 'code', 'text', 'success'])
 
+    
     # evaluate system
     sol.x = guess
-    sol.F = F(sol.x) 
+    sol.F = F(sol.x)
+    
+    if store_iterates:
+        sol.iterates = namedtuple('iterates', ['x', 'F', 'lmda'])
+        sol.iterates.x = [sol.x]
+        sol.iterates.F = [sol.F]
+        sol.iterates.lmda = [0.]
+        
 
     # Begin Newton loop
     sol.n_it = 0
@@ -190,6 +199,12 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
 
+            if store_iterates:
+                sol.iterates.x.append(sol.x)
+                sol.iterates.F.append(sol.F)
+                sol.iterates.lmda.append(lmda)
+                
+            
     if not persistent_bound_violation:
         sol.x = x_j + dxbar_j
         # Even if the solver succeeds, there may be a small chance that the solution lies
@@ -204,6 +219,10 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     sol.F_norm = np.linalg.norm(sol.F, ord=2)
     sol.J = J(sol.x)
 
+    if store_iterates:
+        sol.iterates.x = np.array(sol.iterates.x)
+        sol.iterates.F = np.array(sol.iterates.F)
+    
     sol.success = False
     if converged:
         sol.success = True
