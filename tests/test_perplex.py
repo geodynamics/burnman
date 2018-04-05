@@ -25,7 +25,7 @@ class PerpleX(BurnManTest):
         
     def test_grueneisen(self):
 
-        gr, alpha, V, K_S, cp = rock.evaluate(['grueneisen_parameter', 'alpha', 'V', 'adiabatic_bulk_modulus', 'heat_capacity_p'],
+        gr, alpha, V, K_S, cp = rock.evaluate(['grueneisen_parameter', 'alpha', 'V', 'adiabatic_bulk_modulus', 'molar_heat_capacity_p'],
                                               [10.e9, 11.e9], [2000., 2000.])
         self.assertArraysAlmostEqual(gr, alpha*V*K_S/cp)
 

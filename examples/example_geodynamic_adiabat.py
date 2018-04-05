@@ -148,7 +148,7 @@ temperatures = isentrope(rock, pressures, entropy, potential_temperature)
 isentrope = UnivariateSpline(pressures, temperatures)
 
 # Properties can then be calculated along the isentrope
-properties = rock.evaluate(['V', 'rho', 'heat_capacity_p',
+properties = rock.evaluate(['V', 'rho', 'molar_heat_capacity_p',
                             'thermal_expansivity', 'isothermal_compressibility',
                             'p_wave_velocity', 'shear_wave_velocity'],
                            pressures, temperatures)

@@ -398,9 +398,9 @@ class Planet(object):
         return self.temperatures
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
-        Returns the internal energy of the planet.
+        Returns the molar internal energy of the planet.
 
         Notes
         -----
@@ -409,15 +409,15 @@ class Planet(object):
 
         Returns
         -------
-        internal_energy : array of floats
-            The internal energy in [J].
+        molar_internal_energy : array of floats
+            The internal energy in [J/mol].
         """
-        return self.evaluate(['internal_energy'])
+        return self.evaluate(['molar_internal_energy'])
 
     @material_property
     def molar_gibbs(self):
         """
-        Returns the Gibbs free energy of the planet.
+        Returns the molar Gibbs free energy of the planet.
 
         Notes
         -----
@@ -427,14 +427,14 @@ class Planet(object):
         Returns
         -------
         molar_gibbs : array of floats
-            Gibbs free energy in [J].
+            Gibbs free energy in [J/mol].
         """
         return self.evaluate(['molar_gibbs'])
 
     @material_property
     def molar_helmholtz(self):
         """
-        Returns the Helmholtz free energy of the planet.
+        Returns the molar Helmholtz free energy of the planet.
 
         Notes
         -----
@@ -444,7 +444,7 @@ class Planet(object):
         Returns
         -------
         molar_helmholtz : array of floats
-            Helmholtz free energy in [J].
+            Helmholtz free energy in [J/mol].
         """
         return self.evaluate(['molar_helmholtz'])
 
@@ -501,7 +501,7 @@ class Planet(object):
     @material_property
     def molar_entropy(self):
         """
-        Returns entropy of the planet.
+        Returns molar entropy of the planet.
 
         Notes
         -----
@@ -510,15 +510,15 @@ class Planet(object):
 
         Returns
         -------
-        entropy : array of floats
-            Entropy in [J].
+        molar_entropy : array of floats
+            Entropy in [J/mol].
         """
         return self.evaluate(['molar_entropy'])
 
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpy of the planet.
+        Returns molar enthalpy of the planet.
 
         Notes
         -----
@@ -527,8 +527,8 @@ class Planet(object):
 
         Returns
         -------
-        enthalpy : array of floats
-            Enthalpy in [J].
+        molar_enthalpy : array of floats
+            Enthalpy in [J/mol].
         """
         return self.evaluate(['molar_enthalpy'])
 
@@ -704,9 +704,9 @@ class Planet(object):
         return self.evaluate(['thermal_expansivity'])
 
     @material_property
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns heat capacity at constant volume of the planet.
+        Returns molar heat capacity at constant volume of the planet.
 
         Notes
         -----
@@ -715,15 +715,15 @@ class Planet(object):
 
         Returns
         -------
-        heat_capacity_v : array of floats
+        molar_heat_capacity_v : array of floats
             Heat capacity in [J/K/mol].
         """
-        return self.evaluate(['heat_capacity_v'])
+        return self.evaluate(['molar_heat_capacity_v'])
 
     @material_property
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         """
-        Returns heat capacity at constant pressure of the planet.
+        Returns molar heat capacity at constant pressure of the planet.
 
         Notes
         -----
@@ -732,10 +732,10 @@ class Planet(object):
 
         Returns
         -------
-        heat_capacity_p : array of floats
+        molar_heat_capacity_p : array of floats
             Heat capacity in [J/K/mol].
         """
-        return self.evaluate(['heat_capacity_p'])
+        return self.evaluate(['molar_heat_capacity_p'])
 
 #
 # Aliased properties
@@ -751,8 +751,8 @@ class Planet(object):
     
     @property
     def energy(self):
-        """Alias for :func:`~burnman.material.Material.internal_energy`"""
-        return self.internal_energy
+        """Alias for :func:`~burnman.material.Material.molar_internal_energy`"""
+        return self.molar_internal_energy
     
     @property
     def helmholtz(self):
@@ -836,11 +836,11 @@ class Planet(object):
     
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_v`"""
-        return self.heat_capacity_v
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
+        return self.molar_heat_capacity_v
     
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_p`"""
-        return self.heat_capacity_p
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
+        return self.molar_heat_capacity_p
 

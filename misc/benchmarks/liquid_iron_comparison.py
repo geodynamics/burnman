@@ -25,7 +25,7 @@ densities = [5.e3,10.e3, 15.e3]
 for rho in densities:
     V = m/rho
     for i, T in enumerate(temperatures):
-        Cvs[i] = liq.method.heat_capacity_v(0., T, V, liq.params)/burnman.constants.gas_constant
+        Cvs[i] = liq.method.molar_heat_capacity_v(0., T, V, liq.params)/burnman.constants.gas_constant
 
     plt.plot(temperatures, Cvs)
 

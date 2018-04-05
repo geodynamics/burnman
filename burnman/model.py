@@ -85,11 +85,11 @@ class Model(object):
 
         return self.alpha
 
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         self.calc_heat_capacities_()
         return self.c_p
 
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         self.calc_heat_capacities_()
         return self.c_v
 
@@ -111,8 +111,8 @@ class Model(object):
                         e['G'] = mineral.shear_modulus
                         e['rho'] = mineral.molar_mass / mineral.molar_volume
                         e['alpha'] = mineral.thermal_expansivity
-                        e['c_v'] = mineral.heat_capacity_v
-                        e['c_p'] = mineral.heat_capacity_p
+                        e['c_v'] = mineral.molar_heat_capacity_v
+                        e['c_p'] = mineral.molar_heat_capacity_p
                         self.moduli[idx].append(e)
 
     def avg_moduli_(self):

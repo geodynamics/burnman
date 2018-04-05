@@ -227,8 +227,8 @@ class AA(eos.EquationOfState):
         T0 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume - 0.5*dV))
         T1 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume + 0.5*dV))
 
-        E0 = self.internal_energy(0., T0, volume - 0.5*dV, params)
-        E1 = self.internal_energy(0., T1, volume + 0.5*dV, params)
+        E0 = self.molar_internal_energy(0., T0, volume - 0.5*dV, params)
+        E1 = self.molar_internal_energy(0., T1, volume + 0.5*dV, params)
 
         P = -(E1 - E0)/dV # |S
         
@@ -244,12 +244,12 @@ class AA(eos.EquationOfState):
         gr = (params['grueneisen_0'] +
               params['grueneisen_prime'] *
               (np.power(params['V_0']/volume, params['grueneisen_n']) *
-               (self.internal_energy(pressure, temperature, volume, params) -
+               (self.molar_internal_energy(pressure, temperature, volume, params) -
                 params['E_0'])))
         '''
         dT = 1.
-        dE = (self.internal_energy(0., temperature + 0.5*dT, volume, params) -
-              self.internal_energy(0., temperature - 0.5*dT, volume, params))
+        dE = (self.molar_internal_energy(0., temperature + 0.5*dT, volume, params) -
+              self.molar_internal_energy(0., temperature - 0.5*dT, volume, params))
         dP = (self.pressure(temperature + 0.5*dT, volume, params) -
               self.pressure(temperature - 0.5*dT, volume, params))
         gr = volume*dP/dE
@@ -285,7 +285,7 @@ class AA(eos.EquationOfState):
         """
         return 0.
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]` 
         """
@@ -300,14 +300,14 @@ class AA(eos.EquationOfState):
         return C_kin + C_e + C_pot
 
     
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
         """
         
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v*(1. + gr * alpha * temperature)
         
         return C_p
@@ -333,7 +333,7 @@ class AA(eos.EquationOfState):
         return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
             pressure * self.volume( pressure, temperature, params)
 
-    def internal_energy( self, pressure, temperature, volume, params):
+    def molar_internal_energy( self, pressure, temperature, volume, params):
         """
         Returns the internal energy at the pressure and temperature of the mineral [J/mol]
         """
@@ -369,7 +369,7 @@ class AA(eos.EquationOfState):
         E + PV
         """
         
-        return self.internal_energy(pressure, temperature, volume, params) + \
+        return self.molar_internal_energy(pressure, temperature, volume, params) + \
             pressure * self.volume( pressure, temperature, params)
 
     def helmholtz_free_energy( self, pressure, temperature, volume, params):
@@ -377,7 +377,7 @@ class AA(eos.EquationOfState):
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         E - TS
         """
-        return self.internal_energy(pressure, temperature, volume, params) - temperature*self.entropy(pressure, temperature, volume, params)
+        return self.molar_internal_energy(pressure, temperature, volume, params) - temperature*self.entropy(pressure, temperature, volume, params)
 
 
     def validate_parameters(self, params):

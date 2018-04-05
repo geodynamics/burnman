@@ -164,7 +164,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -185,7 +185,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------
@@ -292,7 +292,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def internal_energy(self, pressure, temperature, volume, params):
+    def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Parameters
         ----------

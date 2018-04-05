@@ -72,7 +72,7 @@ class CORK(eos.EquationOfState):
         return 0.
 
     # Cv, heat capacity at constant volume
-    def heat_capacity_v(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
         """
@@ -86,7 +86,7 @@ class CORK(eos.EquationOfState):
         return 0.
 
     # Heat capacity at ambient pressure
-    def heat_capacity_p0(self, temperature, params):
+    def molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
         Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 2011
@@ -96,7 +96,7 @@ class CORK(eos.EquationOfState):
                 'Cp'][3] * np.power(temperature, -0.5)
         return Cp
 
-    def heat_capacity_p(self, pressure, temperature, volume, params):
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
@@ -179,7 +179,7 @@ class CORK(eos.EquationOfState):
         if params['cork_P'] < 1.e4 or params['cork_P'] > 1.e8:
             warnings.warn('Unusual value for cork_P', stacklevel=2)
 
-        if self.heat_capacity_p0(params['T_0'], params) < 0.:
+        if self.molar_heat_capacity_p0(params['T_0'], params) < 0.:
             warnings.warn('Negative heat capacity at T_0', stacklevel=2)
-        if self.heat_capacity_p0(2000., params) < 0.:
+        if self.molar_heat_capacity_p0(2000., params) < 0.:
             warnings.warn('Negative heat capacity at 2000K', stacklevel=2)

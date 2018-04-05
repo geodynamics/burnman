@@ -451,9 +451,9 @@ class Layer(object):
 
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
-        Returns the internal energies across the layer.
+        Returns the molar internal energies across the layer.
 
         Notes
         -----
@@ -462,16 +462,16 @@ class Layer(object):
 
         Returns
         -------
-        internal_energy : array of floats
-            The internal energies in [J] at the predefined radii.
+        molar_internal_energy : array of floats
+            The internal energies in [J/mol] at the predefined radii.
         """
         return np.array(
-            [self.sublayers[i].internal_energy for i in range(len(self.sublayers))])
+            [self.sublayers[i].molar_internal_energy for i in range(len(self.sublayers))])
 
     @material_property
     def molar_gibbs(self):
         """
-        Returns the Gibbs free energies across the layer.
+        Returns the molar Gibbs free energies across the layer.
 
         Notes
         -----
@@ -481,7 +481,7 @@ class Layer(object):
         Returns
         -------
         molar_gibbs : array of floats
-            Gibbs free energies in [J] at the predefined radii.
+            Gibbs free energies in [J/mol] at the predefined radii.
         """
         return np.array(
             [self.sublayers[i].molar_gibbs for i in range(len(self.sublayers))])
@@ -489,7 +489,7 @@ class Layer(object):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns the Helmholtz free energies across the layer.
+        Returns the molar Helmholtz free energies across the layer.
 
         Notes
         -----
@@ -499,7 +499,7 @@ class Layer(object):
         Returns
         -------
         molar_helmholtz : array of floats
-            Helmholtz free energies in [J] at the predefined radii.
+            Helmholtz free energies in [J/mol] at the predefined radii.
         """
         return np.array(
             [self.sublayers[i].molar_helmholtz for i in range(len(self.sublayers))])
@@ -560,7 +560,7 @@ class Layer(object):
     @material_property
     def molar_entropy(self):
         """
-        Returns entropies acroos the layer.
+        Returns molar entropies acroos the layer.
 
         Notes
         -----
@@ -569,8 +569,8 @@ class Layer(object):
 
         Returns
         -------
-        entropy : array of floats
-            Entropies in [J] at the predefined radii.
+        molar_entropy : array of floats
+            Entropies in [J/K/mol] at the predefined radii.
         """
         return np.array(
             [self.sublayers[i].molar_entropy for i in range(len(self.sublayers))])
@@ -578,7 +578,7 @@ class Layer(object):
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpies across the layer.
+        Returns molar enthalpies across the layer.
 
         Notes
         -----
@@ -587,8 +587,8 @@ class Layer(object):
 
         Returns
         -------
-        enthalpy : array of floats
-            Enthalpies in [J] at the predefined radii.
+        molar_enthalpy : array of floats
+            Enthalpies in [J/mol] at the predefined radii.
         """
         return np.array(
             [self.sublayers[i].molar_enthalpy for i in range(len(self.sublayers))])
@@ -775,9 +775,9 @@ class Layer(object):
             [self.sublayers[i].thermal_expansivity for i in range(len(self.sublayers))])
 
     @material_property
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns heat capacity at constant volumes across the layer.
+        Returns molar heat capacity at constant volumes across the layer.
 
         Notes
         -----
@@ -786,16 +786,16 @@ class Layer(object):
 
         Returns
         -------
-        heat_capacity_v : array of floats
+        molar_heat_capacity_v : array of floats
             Heat capacities in [J/K/mol] at the predefined radii.
         """
         return np.array(
-            [self.sublayers[i].heat_capacity_v for i in range(len(self.sublayers))])
+            [self.sublayers[i].molar_heat_capacity_v for i in range(len(self.sublayers))])
 
     @material_property
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         """
-        Returns heat capacity at constant pressures across the layer.
+        Returns molar_heat capacity at constant pressures across the layer.
 
         Notes
         -----
@@ -804,11 +804,11 @@ class Layer(object):
 
         Returns
         -------
-        heat_capacity_p : array of floats
+        molar_heat_capacity_p : array of floats
             Heat capacities in [J/K/mol] at the predefined radii.
         """
         return np.array(
-            [self.sublayers[i].heat_capacity_p for i in range(len(self.sublayers))])
+            [self.sublayers[i].molar_heat_capacity_p for i in range(len(self.sublayers))])
 
 #
 # Aliased properties
@@ -824,8 +824,8 @@ class Layer(object):
     
     @property
     def energy(self):
-        """Alias for :func:`~burnman.layer.Layer.internal_energy`"""
-        return self.internal_energy
+        """Alias for :func:`~burnman.layer.Layer.molar_internal_energy`"""
+        return self.molar_internal_energy
     
     @property
     def helmholtz(self):
@@ -909,11 +909,11 @@ class Layer(object):
     
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_v`"""
-        return self.heat_capacity_v
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
+        return self.molar_heat_capacity_v
     
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_p`"""
-        return self.heat_capacity_p
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
+        return self.molar_heat_capacity_p
 

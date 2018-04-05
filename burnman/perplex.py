@@ -226,8 +226,8 @@ class PerplexMaterial(Material):
         return self._property_interpolators['K_S'](self.pressure, self.temperature)[0]
         
     @material_property
-    @copy_documentation(Material.heat_capacity_p)
-    def heat_capacity_p(self):
+    @copy_documentation(Material.molar_heat_capacity_p)
+    def molar_heat_capacity_p(self):
         return self._property_interpolators['C_p'](self.pressure, self.temperature)[0]
     
     @material_property
@@ -281,8 +281,8 @@ class PerplexMaterial(Material):
         return self._property_interpolators['rho'](self.pressure, self.temperature)[0]
 
     @material_property
-    @copy_documentation(Material.internal_energy)
-    def internal_energy(self):
+    @copy_documentation(Material.molar_internal_energy)
+    def molar_internal_energy(self):
         return self.molar_gibbs - self.pressure * self.molar_volume + self.temperature * self.molar_entropy
 
     @material_property
@@ -301,9 +301,9 @@ class PerplexMaterial(Material):
         return 1. / self.adiabatic_bulk_modulus
     
     @material_property
-    @copy_documentation(Material.heat_capacity_v)
-    def heat_capacity_v(self):
-        return self.heat_capacity_p - self.molar_volume * self.temperature \
+    @copy_documentation(Material.molar_heat_capacity_v)
+    def molar_heat_capacity_v(self):
+        return self.molar_heat_capacity_p - self.molar_volume * self.temperature \
             * self.thermal_expansivity * self.thermal_expansivity \
             * self.isothermal_bulk_modulus
 
@@ -313,5 +313,5 @@ class PerplexMaterial(Material):
         return ( self.thermal_expansivity *
                  self.molar_volume *
                  self.adiabatic_bulk_modulus /
-                 self.heat_capacity_p )
+                 self.molar_heat_capacity_p )
     

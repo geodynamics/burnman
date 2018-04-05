@@ -55,11 +55,11 @@ class test_decorators__material_property(BurnManTest):
         self.assertEqual(
             self.MyCountingMaterial.some_property.__doc__, "my documentation")
 
-        internal_energy_doc = burnman.Material.internal_energy.__doc__
+        internal_energy_doc = burnman.Material.molar_internal_energy.__doc__
         self.assertTrue("internal energy of" in internal_energy_doc)
 
-        self.assertEqual(self.MyCountingMaterial.internal_energy.__doc__,
-                         burnman.Material.internal_energy.__doc__)
+        self.assertEqual(self.MyCountingMaterial.molar_internal_energy.__doc__,
+                         burnman.Material.molar_internal_energy.__doc__)
 
         pressure_doc = burnman.Material.pressure.__doc__
         self.assertTrue("current pressure" in pressure_doc)

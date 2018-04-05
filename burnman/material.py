@@ -240,9 +240,9 @@ class Material(object):
         return self._temperature
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
-        Returns the internal energy of the mineral.
+        Returns the molar internal energy of the mineral.
 
         Notes
         -----
@@ -251,16 +251,16 @@ class Material(object):
 
         Returns
         -------
-        internal_energy : float
-            The internal energy in [J].
+        molar_internal_energy : float
+            The internal energy in [J/mol].
         """
         raise NotImplementedError(
-            "need to implement internal_energy() in derived class!")
+            "need to implement molar_internal_energy() in derived class!")
 
     @material_property
     def molar_gibbs(self):
         """
-        Returns the Gibbs free energy of the mineral.
+        Returns the molar Gibbs free energy of the mineral.
 
         Notes
         -----
@@ -270,7 +270,7 @@ class Material(object):
         Returns
         -------
         molar_gibbs : float
-            Gibbs free energy in [J].
+            Gibbs free energy in [J/mol].
         """
         raise NotImplementedError(
             "need to implement molar_gibbs() in derived class!")
@@ -278,7 +278,7 @@ class Material(object):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns the Helmholtz free energy of the mineral.
+        Returns the molar Helmholtz free energy of the mineral.
 
         Notes
         -----
@@ -288,7 +288,7 @@ class Material(object):
         Returns
         -------
         molar_helmholtz : float
-            Helmholtz free energy in [J].
+            Helmholtz free energy in [J/mol].
         """
         raise NotImplementedError(
             "need to implement molar_helmholtz() in derived class!")
@@ -349,7 +349,7 @@ class Material(object):
     @material_property
     def molar_entropy(self):
         """
-        Returns entropy of the mineral.
+        Returns molar entropy of the mineral.
 
         Notes
         -----
@@ -358,8 +358,8 @@ class Material(object):
 
         Returns
         -------
-        entropy : float
-            Entropy in [J].
+        molar_entropy : float
+            Entropy in [J/K/mol].
         """
         raise NotImplementedError(
             "need to implement molar_entropy() in derived class!")
@@ -367,7 +367,7 @@ class Material(object):
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpy of the mineral.
+        Returns molar enthalpy of the mineral.
 
         Notes
         -----
@@ -376,8 +376,8 @@ class Material(object):
 
         Returns
         -------
-        enthalpy : float
-            Enthalpy in [J].
+        molar_enthalpy : float
+            Enthalpy in [J/mol].
         """
         raise NotImplementedError(
             "need to implement molar_enthalpy() in derived class!")
@@ -564,9 +564,9 @@ class Material(object):
             "need to implement thermal_expansivity() in derived class!")
 
     @material_property
-    def heat_capacity_v(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns heat capacity at constant volume of the mineral.
+        Returns molar heat capacity at constant volume of the mineral.
 
         Notes
         -----
@@ -575,16 +575,16 @@ class Material(object):
 
         Returns
         -------
-        heat_capacity_v : float
+        molar_heat_capacity_v : float
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError(
-            "need to implement heat_capacity_v() in derived class!")
+            "need to implement molar_heat_capacity_v() in derived class!")
 
     @material_property
-    def heat_capacity_p(self):
+    def molar_heat_capacity_p(self):
         """
-        Returns heat capacity at constant pressure of the mineral.
+        Returns molar heat capacity at constant pressure of the mineral.
 
         Notes
         -----
@@ -593,11 +593,11 @@ class Material(object):
 
         Returns
         -------
-        heat_capacity_p : float
+        molar_heat_capacity_p : float
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError(
-            "need to implement heat_capacity_p() in derived class!")
+            "need to implement molar_heat_capacity_p() in derived class!")
 
     #
     # Aliased properties
@@ -613,8 +613,8 @@ class Material(object):
 
     @property
     def energy(self):
-        """Alias for :func:`~burnman.material.Material.internal_energy`"""
-        return self.internal_energy
+        """Alias for :func:`~burnman.material.Material.molar_internal_energy`"""
+        return self.molar_internal_energy
 
     @property
     def helmholtz(self):
@@ -698,10 +698,10 @@ class Material(object):
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_v`"""
-        return self.heat_capacity_v
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
+        return self.molar_heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.material.Material.heat_capacity_p`"""
-        return self.heat_capacity_p
+        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
+        return self.molar_heat_capacity_p

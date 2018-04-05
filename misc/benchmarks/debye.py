@@ -36,7 +36,7 @@ time_old = time.clock() - start
 new = np.empty_like(temperatures)
 start = time.clock()
 for i in range(len(temperatures)):
-    new[i] = burnman.eos.debye.heat_capacity_v(temperatures[i], Debye_T, 1.0)
+    new[i] = burnman.eos.debye.molar_heat_capacity_v(temperatures[i], Debye_T, 1.0)
 time_new = time.clock() - start
 
 print("error %e" % np.linalg.norm((old - new) / new))
@@ -50,7 +50,7 @@ Debye_T = 1000.
 for i in range(len(temperatures)):
     vibrational_energy[i] = burnman.eos.debye.thermal_energy(
         temperatures[i], Debye_T, 1.0)
-    heat_capacity[i] = burnman.eos.debye.heat_capacity_v(
+    heat_capacity[i] = burnman.eos.debye.molar_heat_capacity_v(
         temperatures[i], Debye_T, 1.0)
 
 plt.subplot(121)

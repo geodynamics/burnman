@@ -45,8 +45,8 @@ if __name__ == "__main__":
     H
     S
     V
-    heat_capacity_p
-    heat_capacity_v
+    molar_heat_capacity_p
+    molar_heat_capacity_v
     p_wave_velocity
     s_wave_velocity
     K_T

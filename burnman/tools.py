@@ -587,7 +587,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     expr = ['G = F + PV', 'G = H - TS', 'G = E - TS + PV']
     eq = [[m.gibbs, (m.helmholtz + P*m.V)],
           [m.gibbs, (m.H - T*m.S)],
-          [m.gibbs, (m.internal_energy - T*m.S + P*m.V)]]
+          [m.gibbs, (m.molar_internal_energy - T*m.S + P*m.V)]]
     
     m.set_state(P, T + dT)
     G1 = m.gibbs
@@ -604,7 +604,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     expr.extend(['S = -dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
     eq.extend([[m.S, -(G1 - G0)/dT],
                [m.alpha, (V1 - V0)/dT/m.V],
-               [m.heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
+               [m.molar_heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
     
     # P derivatives
     m.set_state(P + 0.5*dP, T)
@@ -614,9 +614,9 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
 
     
     expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv', 'gr = alpha*K_T*V/Cv'])
-    eq.extend([[m.heat_capacity_v, m.heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
-               [m.K_S, m.K_T*m.heat_capacity_p/m.heat_capacity_v],
-               [m.gr, m.alpha*m.K_T*m.V/m.heat_capacity_v]])
+    eq.extend([[m.molar_heat_capacity_v, m.molar_heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
+               [m.K_S, m.K_T*m.molar_heat_capacity_p/m.molar_heat_capacity_v],
+               [m.gr, m.alpha*m.K_T*m.V/m.molar_heat_capacity_v]])
 
 
     expr.extend(['Vphi = np.sqrt(K_S/rho)', 'Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
