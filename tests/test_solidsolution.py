@@ -131,7 +131,7 @@ class orthopyroxene(burnman.SolidSolution):
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
-# Three-endmember, two site solid solution
+# Three-endmember, two site symmetric solid solution
 class two_site_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -139,6 +139,19 @@ class two_site_ss(burnman.SolidSolution):
         self.solution_type = 'symmetric'
         self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
                            forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+        
+# Three-endmember, two site asymmetric solid solution
+class two_site_ss_asymmetric(burnman.SolidSolution):
+
+    def __init__(self, molar_fractions=None):
+        self.name = 'two_site_ss (asymmetric)'
+        self.solution_type = 'asymmetric'
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
+                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.alphas = [1., 2., 2.]
         self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -279,6 +292,23 @@ class test_solidsolution(BurnManTest):
         ss.set_composition(np.array([0.5, 0.5]))
         self.assertArraysAlmostEqual([ss.molar_mass], [0.5 *
                                      forsterite().params['molar_mass'] + 0.5 * fayalite().params['molar_mass']])
+
+    def test_hessian(self):
+        ss = two_site_ss_asymmetric()
+        f0 = [0.25, 0.35, 0.4]
+        ss.set_composition([0.25, 0.35, 0.4])
+        ss.set_state(1.e5, 300.)
+        E0 = ss.excess_partial_gibbs
+        dp = 1.e-8
+        H = np.zeros((3, 3))
+        for i in range(3):
+            f = np.array(f0)
+            f[i] += dp
+            ss.set_composition(f)
+            H[i,:] = (ss.excess_partial_gibbs - E0)/dp
+        
+        for i in range(3):
+            self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
 
     def test_subregular(self):
         ss0 = two_site_ss()

@@ -105,12 +105,11 @@ class SolidSolution(Mineral):
                     self.solution_model = SymmetricRegularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'asymmetric':
-                    try:
-                        self.solution_model = AsymmetricRegularSolution(
-                            self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-                    except:
+                    if hasattr(self, 'alphas') == False:
                         raise Exception(
                             "'alphas' attribute missing from solid solution")
+                    self.solution_model = AsymmetricRegularSolution(
+                        self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'subregular':
                     self.solution_model = SubregularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
@@ -161,6 +160,7 @@ class SolidSolution(Mineral):
     def set_composition(self, molar_fractions):
         """
         Set the composition for this solid solution.
+        Resets cached properties
 
         Parameters
         ----------
@@ -173,6 +173,7 @@ class SolidSolution(Mineral):
             assert(sum(molar_fractions) > 0.9999)
             assert(sum(molar_fractions) < 1.0001)
             
+        self.reset()
         self.molar_fractions = molar_fractions
         
     def set_method(self, method):
@@ -224,6 +225,22 @@ class SolidSolution(Mineral):
         Property specific to solid solutions.
         """
         return self.solution_model.excess_partial_gibbs_free_energies(self.pressure, self.temperature, self.molar_fractions)
+    
+    @material_property
+    def excess_partial_volumes(self):
+        """
+        Returns excess partial volumes [m^3]
+        Property specific to solid solutions.
+        """
+        return self.solution_model.excess_partial_volumes(self.pressure, self.temperature, self.molar_fractions)
+    
+    @material_property
+    def excess_partial_entropies(self):
+        """
+        Returns excess partial entropies [J/K]
+        Property specific to solid solutions.
+        """
+        return self.solution_model.excess_partial_entropies(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def partial_gibbs(self):
@@ -234,12 +251,52 @@ class SolidSolution(Mineral):
         return np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)]) + self.excess_partial_gibbs
 
     @material_property
+    def partial_volumes(self):
+        """
+        Returns excess partial volumes [m^3]
+        Property specific to solid solutions.
+        """
+        return np.array([self.endmembers[i][0].molar_volume for i in range(self.n_endmembers)]) + self.excess_partial_volumes
+
+    @material_property
+    def partial_entropies(self):
+        """
+        Returns excess partial entropies [J/K]
+        Property specific to solid solutions.
+        """
+        return np.array([self.endmembers[i][0].molar_entropy for i in range(self.n_endmembers)]) + self.excess_partial_entropies
+
+    @material_property
     def excess_gibbs(self):
         """
         Returns molar excess gibbs free energy [J/mol]
         Property specific to solid solutions.
         """
         return self.solution_model.excess_gibbs_free_energy(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def gibbs_hessian(self):
+        """
+        Returns an array containing the second compositional derivative
+        of the Gibbs free energy [J]. Property specific to solid solutions.
+        """
+        return self.solution_model.gibbs_hessian(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def entropy_hessian(self):
+        """
+        Returns an array containing the second compositional derivative
+        of the entropy [J/K]. Property specific to solid solutions.
+        """
+        return self.solution_model.entropy_hessian(self.pressure, self.temperature, self.molar_fractions)
+
+    @material_property
+    def volume_hessian(self):
+        """
+        Returns an array containing the second compositional derivative
+        of the volume [m^3]. Property specific to solid solutions.
+        """
+        return self.solution_model.volume_hessian(self.pressure, self.temperature, self.molar_fractions)
 
     @material_property
     def molar_gibbs(self):
