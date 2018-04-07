@@ -2,25 +2,53 @@ import numpy as np
 from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
 
-def solve_constraint_lagrangian(x_n, J, c_newton, c_A):
-    n_x = len(x_n)
-    n = n_x + len(c_newton)
+def solve_constraint_lagrangian(x, jac_x, c_x, c_prime):
+    """
+    Function which solves the problem
+    minimize || J.dot(x_mod - x) || 
+    subject to C(x_mod) = 0 
+    via the method of Lagrange multipliers.
+
+    Parameters
+    ----------
+    x : 1D numpy array
+        Parameter values at x
+    jac_x : 2D numpy array.
+        The (estimated, approximate or exact)
+        value of the Jacobian J(x)
+    c_x : 1D numpy array
+        Values of the constraints at x
+    c_prime : 2D array of floats
+        The Jacobian of the constraints
+        (A, where A.x + b = 0)
+
+    Returns
+    -------
+    x_mod : 1D numpy array
+        The parameter values which minimizes the L2-norm
+        of any function which has the Jacobian jac_x.
+    lagrange_multipliers : 1D numpy array
+        The multipliers for each of the equality 
+        constraints
+    """
+    n_x = len(x)
+    n = n_x + len(c_x)
     A = np.zeros((n, n))
     b = np.zeros(n)
 
-    JTJ = J.T.dot(J)
+    JTJ = jac_x.T.dot(jac_x)
     A[:n_x,:n_x] = JTJ/np.linalg.norm(JTJ)*n*n # includes scaling
-    A[:n_x,n_x:] = c_A.T
-    A[n_x:,:n_x] = c_A
-    b[n_x:] = c_newton
+    A[:n_x,n_x:] = c_prime.T
+    A[n_x:,:n_x] = c_prime
+    b[n_x:] = c_x
 
 
     luA = lu_factor(A) 
     dx_m = lu_solve(luA, -b) # lu_solve computes the solution of ax = b
     
-    x_mod = x_n + dx_m[:n_x]
+    x_mod = x + dx_m[:n_x]
     lagrange_multipliers = dx_m[n_x:]
-    return x_mod, lagrange_multipliers
+    return (x_mod, lagrange_multipliers)
 
 def damped_newton_solve(F, J, guess, tol=1.e-6,
                         max_iterations=100,
@@ -32,12 +60,18 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
     with Jacobian J(x), using the damped affine invariant modification
     to Newton's method (Deuflhard, 1974;1975;2004).
     Here we follow the algorithm as described in Nowak and Weimann (1991):
-    [Technical Report TR-91-10, Algorithm B]
+    [Technical Report TR-91-10, Algorithm B], modified to accept 
+    linear inequality constraints.
 
     Linear inequality constraints are provided by the arrays constraints_A and 
     constraints_b. The constraints are satisfied if A*x + b <= 0.
     If any constraints are not satisfied by the current
     value of lambda, lambda is reduced to satisfy all the constraints.
+
+    If a current iterate starting point (x_i) lies on one or more constraints 
+    and the Newton step violates one or more of those constraints, then
+    the next step is calculated via the method of Lagrangian multipliers, 
+    minimizing the L2-norm of F(x_i+1) subject to the violated constraints.
 
     Successful termination of the solver is based on three criteria:
     - all(np.abs(dx (simplified newton step) < tol))
@@ -100,7 +134,16 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         text : string
             Description of the solver termination.
         success : bool
-            Solution convergence boolean.
+            Solution convergence boolean. 
+        iterates : namedtuple
+            Only present if store_iterates=True
+            Includes the following attributes:
+            x : list of 1D numpy arrays of floats
+                The parameters for each iteration
+            F : list of 2D numpy arrays of floats
+                The function for each iteration
+            lmda : list of floats
+                The value of the damping parameter for each iteration 
         
     This function is available as ``burnman.damped_newton_solve``.    
     """
