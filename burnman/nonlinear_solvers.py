@@ -64,10 +64,12 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         Includes the following attributes:
         x : 1D numpy array of floats
             The solution vector.
-        res : 1D numpy array of floats
+        F : 1D numpy array of floats
             The evaluated function F(x).
-        res_norm : float 
+        F_norm : float
             Euclidean norm of F(x).
+        J : 2D numpy array of floats
+            The evaluated Jacobian J(x).
         n_it : integer
             Number of iterations.
         code : integer
@@ -170,7 +172,6 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 dxbar = dxbar_j
                 sol.x = x_j
                 sol.F = F_j
-                sol.F_norm = np.linalg.norm(sol.F, ord=2)
 
                 require_posteriori_loop = False # return to Newton step
                 sol.n_it += 1 # move to next iteration
@@ -200,7 +201,7 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
             print('Warning: The solution appears to lie just outside the chosen constraints.')
 
     sol.F = F(sol.x)
-    sol.res = sol.F
+    sol.F_norm = np.linalg.norm(sol.F, ord=2)
     sol.J = J(sol.x)
 
     sol.success = False
