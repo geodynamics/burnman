@@ -321,12 +321,11 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         sol.x = x_j + dxbar_j
         # Even if the solver succeeds, there may be a small chance that the last simplified Newton step
         # shifts the solution just outside the constraints.
-        # If so, print a warning and shift the solution back to the allowed region
+        # If so, shift the solution back to the allowed region
         c_x = constraints(sol.x)
         if not np.all(c_x <= 0.): # x allowed to lie on constraints but not in forbidden area
             sol.x -= dxbar_j
-            print('Warning: The solution appears to lie just outside the chosen constraints.')
-    
+
     sol.F = F(sol.x)
     sol.F_norm = np.linalg.norm(sol.F, ord=2)
     sol.J = J(sol.x)
