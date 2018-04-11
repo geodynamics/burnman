@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.546210.svg)](https://doi.org/10.5281/zenodo.546210)
+
 # BurnMan - a thermoelastic and thermodynamic toolkit for Earth and planetary sciences
 
 <img src="sphinx/burnjack.png" width="256">
