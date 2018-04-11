@@ -205,7 +205,6 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         luJ = lu_factor(sol.J) # storing the factorisation saves time later
         dx = lu_solve(luJ, -sol.F) # compute ordinary Newton step
         dx_norm = np.linalg.norm(dx, ord=2)
-
         lmda_bounds = lambda_bounds(dx, sol.x)
         h = (lmda*np.linalg.norm((dxbar - dx), ord=2) * dx_norm /
              (np.linalg.norm(dxprev, ord=2) * np.linalg.norm(dxbar, ord=2)))
@@ -276,12 +275,11 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
         dxbar_j = lu_solve(luJ, -F_j) # this is the simplified newton step
         dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
-        if (((all(np.abs(dxbar_j) < tol) and                     # <- Success requirements
-              all(np.abs(dx) < np.sqrt(10.*tol))) or             # <- avoids pathological cases
-             dxbar_j_norm < eps) and                             # <- occasionally the simplified newton step finds the exact solution
-            np.abs(lmda - lmda_bounds[1]) < eps) :               # <- end on a maximal newton step
-            require_posteriori_loop = False                      # <- No need for the a posteriori loop
-            converged = True                                     # <- Successful convergence
+        if (all(np.abs(dxbar_j) < tol) and                     # <- Success requirements
+            all(np.abs(dx) < np.sqrt(10.*tol)) and             # <- avoids pathological cases
+            np.abs(lmda - lmda_bounds[1]) < eps) :             # <- end on a maximal newton step
+            require_posteriori_loop = False                    # <- No need for the a posteriori loop
+            converged = True                                   # <- Successful convergence
         else:
             require_posteriori_loop = True
 
@@ -290,7 +288,9 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                and not persistent_bound_violation):
             # Monotonicity check
             # always based on the Newton step, even if on a constraint
-            if dxbar_j_norm <= dx_norm: 
+            if dxbar_j_norm <= dx_norm:
+                if dxbar_j_norm < eps: # <- occasionally the simplified newton step finds the exact solution
+                    converged = True
                 dxbar = dxbar_j
                 sol.x = x_j
                 sol.F = F_j
@@ -310,7 +310,6 @@ def damped_newton_solve(F, J, guess, tol=1.e-6,
                 F_j = F(x_j)
                 dxbar_j = lu_solve(luJ, -F_j)
                 dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
-
 
         if store_iterates:
             sol.iterates.x.append(sol.x)
