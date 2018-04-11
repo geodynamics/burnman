@@ -36,25 +36,37 @@ Contact the BurnMan team at info@burnman.org with any questions or suggestions.
 
 ## Install under Ubuntu
 
-1. Install using apt by opening a terminal window and entering
+1. Clone this repository using git (or download it). To install git, open a terminal window and type
+    `sudo apt-get install git`
+    Then go to the directory into which you want to clone the repository, and type 
+    `git clone https://github.com/geodynamics/burnman.git`
+    Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
+2. Install using apt by opening a terminal window and entering
 `sudo apt-get install python python-scipy python-numpy python-matplotlib` 
-2. Go to the Burnman examples directory and type:
+3. Go to the Burnman examples directory and type:
 ```python example_beginner.py```
 Figures should show up, indicating that it is working.
 
 
 ## Install on a Mac
 
-1. get Xcode
-2. If you don't have Python yet, download it (for free) from
+1. Clone this repository using git (or download it). To install git, open a terminal window and type
+    `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+    `brew doctor`
+    `brew install git`
+    Then go to the directory into which you want to clone the repository, and type 
+    `git clone https://github.com/geodynamics/burnman.git`
+    Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
+2. get Xcode
+3. If you don't have Python yet, download it (for free) from
    python.org/download . Make sure to use either Python 2.7 or Python 3.4+.
    To check your version of python, type the following in a
    terminal: 
      python --version
-3. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
-4. Install the latest Scipy at http://sourceforge.net/projects/scipy/files/
-5. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
-6. Go to the Burnman examples directory and type:
+4. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
+5. Install the latest Scipy at http://sourceforge.net/projects/scipy/files/
+6. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
+7. Go to the Burnman examples directory and type:
 	python example_beginner.py
     Figures should show up, indicating that it is working.
 
@@ -75,15 +87,19 @@ python
 
 ## Install under Windows
 
+1. Clone this repository using git (or download it). git can be downloaded from here: https://gitforwindows.org/
+   There are a number of different ways to use git as installed under windows (command-line, gui). Use your favoured method to 
+   clone the burnman repository: https://github.com/geodynamics/burnman.git. Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
+    
 To get Python 2.7.x (for example) running under Windows:
 
-1. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
-2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
-3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
-4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
-5. Open Python Shell (IDLE Python GUI)
-6. File -- Open -- find one of the example files
-7. Run the module (or press F5)
+2. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
+4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
+5. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
+6. Open Python Shell (IDLE Python GUI)
+7. File -- Open -- find one of the example files
+8. Run the module (or press F5)
 
 ## Start Here
 
