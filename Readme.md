@@ -37,9 +37,13 @@ Contact the BurnMan team at info@burnman.org with any questions or suggestions.
 ## Install under Ubuntu
 
 1. Clone this repository using git (or download it). To install git, open a terminal window and type
+
     `sudo apt-get install git`
+    
     Then go to the directory into which you want to clone the repository, and type 
+    
     `git clone https://github.com/geodynamics/burnman.git`
+    
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. Install using apt by opening a terminal window and entering
 `sudo apt-get install python python-scipy python-numpy python-matplotlib` 
@@ -51,11 +55,17 @@ Figures should show up, indicating that it is working.
 ## Install on a Mac
 
 1. Clone this repository using git (or download it). To install git, open a terminal window and type
+
     `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+    
     `brew doctor`
+    
     `brew install git`
+    
     Then go to the directory into which you want to clone the repository, and type 
+    
     `git clone https://github.com/geodynamics/burnman.git`
+    
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. get Xcode
 3. If you don't have Python yet, download it (for free) from
@@ -87,9 +97,7 @@ python
 
 ## Install under Windows
 
-1. Clone this repository using git (or download it). git can be downloaded from here: https://gitforwindows.org/
-   There are a number of different ways to use git as installed under windows (command-line, gui). Use your favoured method to 
-   clone the burnman repository: https://github.com/geodynamics/burnman.git. Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
+1. Clone this repository using git (or download it). git can be downloaded from here: https://gitforwindows.org/. There are a number of different ways to use git as installed under windows (command-line, gui). Use your favoured method to clone the burnman repository: https://github.com/geodynamics/burnman.git. Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
     
 To get Python 2.7.x (for example) running under Windows:
 
