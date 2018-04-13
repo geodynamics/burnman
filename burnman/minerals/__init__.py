@@ -43,6 +43,7 @@ from . import Matas_etal_2007
 from . import HP_2011_ds62
 from . import HP_2011_fluids
 from . import HHPH_2013
+from . import JH_2015
 
 # Kurnosov et al. 2017
 from . import KMFBZ_2017
