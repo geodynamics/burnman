@@ -1,6 +1,6 @@
 31823705000.0 124629954286.0
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -14,7 +14,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.111111 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -28,7 +28,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.222222 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -42,7 +42,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.333333 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -56,7 +56,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.444444 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -70,7 +70,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.555556 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -84,7 +84,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.666667 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -98,7 +98,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.777778 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -112,7 +112,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.888889 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -126,7 +126,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   1 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -142,7 +142,7 @@ Composite:
 6806.56245823 9720.08418673
 0.666666666667 0.555555555556 0.555555555556
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.556 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -156,7 +156,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.667 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
@@ -170,7 +170,7 @@ Composite:
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
 Calculations are done for:
-Composite:
+Composite: Unnamed composite
   0.556 of
     HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of

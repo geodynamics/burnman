@@ -72,8 +72,9 @@ if __name__ == "__main__":
     colors = ['r', 'k', 'g', 'b', 'y', 'm']
     markers = ['+', 'x', '>', '^', '<', 'v']
 
-    plt.figure(figsize=(12, 10))
-
+    fig = plt.figure(figsize=(12, 10))
+    ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
+    
     for m in range(len(methods)):
         rock.set_method(methods[m])
         temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
@@ -88,41 +89,32 @@ if __name__ == "__main__":
         # (see example_woutput.py)
 
         # plot Vs
-        plt.subplot(2, 2, 1)
-        plt.plot(
-            seis_p / 1.e9, mat_vs_1 / 1.e3, color=colors[m], linestyle='-', marker=markers[m],
-            markerfacecolor=colors[m], markersize=4)
+        ax[0].plot(seis_p / 1.e9, mat_vs_1 / 1.e3,
+                   color=colors[m], linestyle='-', marker=markers[m],
+                   markerfacecolor=colors[m], markersize=4)
 
         # plot Vphi
-        plt.subplot(2, 2, 2)
-        plt.plot(
-            seis_p / 1.e9, mat_vphi_1 / 1.e3, color=colors[m], linestyle='-', marker=markers[m],
-            markerfacecolor=colors[m], markersize=4)
+        ax[1].plot(seis_p / 1.e9, mat_vphi_1 / 1.e3,
+                   color=colors[m], linestyle='-', marker=markers[m],
+                   markerfacecolor=colors[m], markersize=4)
 
         # plot density
-        plt.subplot(2, 2, 3)
-        plt.plot(
-            seis_p / 1.e9, mat_rho_1 / 1.e3, color=colors[m], linestyle='-', marker=markers[m],
-            markerfacecolor=colors[m], markersize=4)
+        ax[2].plot(seis_p / 1.e9, mat_rho_1 / 1.e3,
+                   color=colors[m], linestyle='-', marker=markers[m],
+                   markerfacecolor=colors[m], markersize=4)
 
         # plot temperature
-        plt.subplot(2, 2, 4)
-        plt.plot(
-            seis_p / 1.e9, temperature, color=colors[m], linestyle='-', marker=markers[m],
-            markerfacecolor=colors[m], markersize=4, label=methods[m])
-        plt.legend(loc='upper left')
+        ax[3].plot(seis_p / 1.e9, temperature,
+                   color=colors[m], linestyle='-', marker=markers[m],
+                   markerfacecolor=colors[m], markersize=4, label=methods[m])
+        ax[3].legend(loc='upper left')
 
-    plt.subplot(2, 2, 1)
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Vs (km/s)')
-    plt.subplot(2, 2, 2)
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Vphi (km/s)')
-    plt.subplot(2, 2, 3)
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Density ($\cdot 10^3$ kg/m^3)')
-    plt.subplot(2, 2, 4)
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Temperature (K)')
-    plt.savefig("output_figures/example_compare_all_methods.png")
+    for i in range(4):
+        ax[0].set_xlabel('Pressure (GPa)')
+    
+    ax[0].set_ylabel('Vs (km/s)')
+    ax[1].set_ylabel('Vphi (km/s)')
+    ax[2].set_ylabel('Density ($\cdot 10^3$ kg/m^3)')
+    ax[3].set_ylabel('Temperature (K)')
+    fig.savefig("output_figures/example_compare_all_methods.png")
     plt.show()

@@ -462,14 +462,14 @@ if __name__ == "__main__":
             if (n % i) == 0:
                 return i, int(n/i)
             
-    nj, ni = closest_factors(len(properties_for_confidence_plots))
-
     fig = plt.figure()
+    nj, ni = closest_factors(len(properties_for_confidence_plots))
+    ax = [fig.add_subplot(ni, nj, i+1) for i in range(len(properties_for_confidence_plots))]
+    
     for T in temperature_sections:
         PTVs = np.array([pressures, [T]*len(pressures), per_opt.evaluate(['V'], pressures, [T]*len(pressures))[0]]).T
         
         for i, (material_property, scaling, name) in enumerate(properties_for_confidence_plots):
-            ax = fig.add_subplot(ni, nj, i+1)
             
             # Plot the confidence bands for the various material properties
             cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
@@ -477,24 +477,23 @@ if __name__ == "__main__":
                                                                              confidence_interval=confidence_interval,
                                                                              f=burnman.tools.attribute_function(per_opt, material_property),
                                                                              flag='V')
-            ax.plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} K'.format(T))
-            ax.plot(PTVs[:,0]/1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
-            ax.plot(PTVs[:,0]/1.e9, (cp_bands[1])*scaling, linestyle='--', color='r')
+            ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} K'.format(T))
+            ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
+            ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[1])*scaling, linestyle='--', color='r')
             
-            plt.ylabel(name)
-            plt.xlabel('Pressure (GPa)')
+            ax[i].set_xlabel('Pressure (GPa)')
+            ax[i].set_ylabel(name)
             
-    plt.legend(loc='upper right')
+    ax[i].legend(loc='upper right')
     plt.show()
 
     
     # Finally, let's look at the effect of uncertainties in the equation of state on gibbs free energy at high pressure
     fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
     for T in [298.15, 2000.]:
         temperatures = pressures*0. + T
         PTVs = np.array([pressures, temperatures, per_opt.evaluate(['V'], pressures, temperatures)[0]]).T
-
-        ax = fig.add_subplot(1, 1, 1)
         scaling = 1.e3
         
         # Plot the confidence bands for the gibbs free energy
@@ -504,10 +503,10 @@ if __name__ == "__main__":
                                                                          f=burnman.tools.attribute_function(per_opt, 'gibbs'),
                                                                          flag='V')
         ax.plot(PTVs[:,0]/1.e9, (cp_bands[0] - cp_bands[1])/2/scaling, label='95% confidence half width at {0:.0f} K'.format(T))
-        plt.ylabel('Gibbs free energy uncertainty (kJ/mol)')
-        plt.xlabel('Pressure (GPa)')
-            
-    plt.legend(loc='lower right')
+          
+    ax.set_xlabel('Pressure (GPa)')  
+    ax.set_ylabel('Gibbs free energy uncertainty (kJ/mol)')
+    ax.legend(loc='lower right')
     plt.show()
 
     

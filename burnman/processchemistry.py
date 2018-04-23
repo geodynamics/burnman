@@ -14,7 +14,13 @@ import numpy as np
 from fractions import Fraction
 from collections import Counter
 import pkgutil
+from string import ascii_uppercase as ucase
+from scipy.optimize import nnls
 
+def simplify_matrix(arr):
+    def f(i,j):
+        return nsimplify(arr[i][j])
+    return Matrix( len(arr), len(arr[0]), f )
 
 def read_masses():
     """
@@ -57,10 +63,10 @@ def sum_formulae(formulae, amounts=None):
         amounts = [1. for formula in formulae]
     else:
         assert (len(formulae) == len(amounts))
-        
+
     summed_formula = Counter()
     for i, formula in enumerate(formulae):
-        summed_formula = summed_formula + Counter({element: amounts[i] * n_atoms for (element, n_atoms) in formula.items()})
+        summed_formula.update(Counter({element: amounts[i] * n_atoms for (element, n_atoms) in formula.items()}))
     return summed_formula
 
 def formula_mass(formula):
@@ -88,9 +94,9 @@ def dictionarize_site_formula(formula):
         not_in_site = str(filter(None, re.split(r'\]', s[site])))[1]
         not_in_site = not_in_site.replace(mult, '', 1)
         if mult == '':
-            list_multiplicity[site] = 1.0
+            list_multiplicity[site] = Fraction(1.0)
         else:
-            list_multiplicity[site] = mult
+            list_multiplicity[site] = Fraction(mult)
 
         # Loop over elements on a site
         elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
@@ -113,11 +119,41 @@ def dictionarize_site_formula(formula):
 
     return f
 
-
-def process_solution_chemistry(formulae):
+def solution_bounds(endmember_occupancies):
     """
-    This function parses a set of endmember formulae
-    containing site information, e.g.
+    Parameters
+    ----------
+    endmember_occupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the number of atoms of each element on each site.
+
+    Returns
+    -------
+    solution_bounds : 2d array of floats
+        An abbreviated version of endmember_occupancies, 
+        where the columns represent the independent compositional 
+        bounds on the solution
+    """
+    # Find bounds for the solution
+    i_sorted =zip(*sorted([(i,
+                            sum([1 for val in endmember_occupancies.T[i]
+                                 if val>1.e-10]))
+                           for i in range(len(endmember_occupancies.T))
+                                          if np.any(endmember_occupancies.T[i] > 1.e-10)],
+                          key=lambda x: x[1]))[0]
+
+    solution_bounds = endmember_occupancies[:,i_sorted[0],np.newaxis]
+    for i in i_sorted[1:]:
+        if np.abs(nnls(solution_bounds, endmember_occupancies.T[i])[1]) > 1.e-10:
+            solution_bounds = np.concatenate((solution_bounds,
+                                              endmember_occupancies[:,i,np.newaxis]),
+                                             axis=1)
+    return solution_bounds
+
+def process_solution_chemistry(solution_model):
+    """
+    This function parses a class instance with a "formulas"
+    attribute containing site information, e.g.
 
         [ '[Mg]3[Al]2Si3O12', '[Mg]3[Mg1/2Si1/2]2Si3O12' ]
 
@@ -131,11 +167,12 @@ def process_solution_chemistry(formulae):
 
     Parameters
     ----------
-    formulae : list of strings
-        List of chemical formulae with site information
+    solution_model : instance of class
+        Class must have a "formulas" attribute, containing a
+        list of chemical formulae with site information
 
-    Returns
-    -------
+    Creates attributes
+    ------------------
     solution_formulae : list of dictionaries
         List of endmember formulae is output from site formula strings
 
@@ -146,6 +183,11 @@ def process_solution_chemistry(formulae):
     sites : list of lists of strings
         A list of elements for each site in the solid solution
 
+    site_names : list of strings
+        A list of elements_site pairs in the solid solution, where
+        each distinct site is given by a unique uppercase letter
+        e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B']
+
     n_occupancies : integer
         Sum of the number of possible elements on each of the sites
         in the solid solution.
@@ -153,16 +195,22 @@ def process_solution_chemistry(formulae):
         n_occupancies = 5, with two possible elements on
         Site 1 and three on Site 2
 
-    endmember_occupancies : 2d array of floats
-        A 1D array for each endmember in the solid solution,
-        containing the number of atoms of each element on each site.
-
     site_multiplicities : array of floats
         The number of each site per formula unit
         To simplify computations later, the multiplicities
         are repeated for each element on each site
 
+    endmember_occupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the fraction of atoms of each element on each site.
+
+    endmember_noccupancies : 2d array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the number of atoms of each element on each site
+        per mole of endmember.
+
     """
+    formulae = solution_model.formulas
     n_sites = formulae[0].count('[')
     n_endmembers = len(formulae)
 
@@ -177,29 +225,29 @@ def process_solution_chemistry(formulae):
     n_occupancies = 0
 
     # Number of unique site occupancies (e.g.. Mg on X etc.)
-    for endmember in range(n_endmembers):
+    for i_mbr in range(n_endmembers):
         solution_formula = dict()
         list_occupancies.append([[0] * len(sites[site])
                                 for site in range(n_sites)])
-        s = re.split(r'\[', formulae[endmember])[1:]
+        s = re.split(r'\[', formulae[i_mbr])[1:]
 
-        for site in range(n_sites):
-            site_split = re.split(r'\]', s[site])
+        for i_site, site_string in enumerate(s):
+            site_split = re.split(r'\]', site_string)
             site_occupancy = site_split[0]
 
             mult = re.split('[A-Z][^A-Z]*', site_split[1])[0]
             if mult == '':
-                list_multiplicity[site] = 1.0
+                list_multiplicity[i_site] = Fraction(1.0)
             else:
-                list_multiplicity[site] = float(mult)
+                list_multiplicity[i_site] = Fraction(mult)
 
             # Loop over elements on a site
             elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
 
-            for i in range(len(elements)):
+            for element in elements:
 
                 # Find the element and proportion on the site
-                element_split = re.split('([0-9][^A-Z]*)', elements[i])
+                element_split = re.split('([0-9][^A-Z]*)', element)
                 element_on_site = element_split[0]
                 if len(element_split) == 1:
                     proportion_element_on_site = Fraction(1.0)
@@ -207,18 +255,17 @@ def process_solution_chemistry(formulae):
                     proportion_element_on_site = Fraction(element_split[1])
 
                 solution_formula[element_on_site] = solution_formula.get(
-                    element_on_site, 0.0) + list_multiplicity[site] * proportion_element_on_site
+                    element_on_site, 0.0) + list_multiplicity[i_site] * proportion_element_on_site
 
-                if element_on_site not in sites[site]:
+                if element_on_site not in sites[i_site]:
                     n_occupancies += 1
-                    sites[site].append(element_on_site)
-                    element_index = sites[site].index(element_on_site)
+                    sites[i_site].append(element_on_site)
+                    i_el = sites[i_site].index(element_on_site)
                     for parsed_mbr in range(len(list_occupancies)):
-                        list_occupancies[parsed_mbr][site].append(0)
+                        list_occupancies[parsed_mbr][i_site].append(0)
                 else:
-                    element_index = sites[site].index(element_on_site)
-                list_occupancies[endmember][site][
-                    element_index] = proportion_element_on_site
+                    i_el = sites[i_site].index(element_on_site)
+                list_occupancies[i_mbr][i_site][i_el] = proportion_element_on_site
 
             # Loop over elements after site
             if len(site_split) != 1:
@@ -240,17 +287,29 @@ def process_solution_chemistry(formulae):
     # Site occupancies and multiplicities
     endmember_occupancies = np.empty(shape=(n_endmembers, n_occupancies))
     site_multiplicities = np.empty(shape=(n_occupancies))
-    for endmember in range(n_endmembers):
+    for i_mbr in range(n_endmembers):
         n_element = 0
-        for site in range(n_sites):
-            for element in range(len(list_occupancies[endmember][site])):
-                endmember_occupancies[endmember][
-                    n_element] = list_occupancies[endmember][site][element]
-                site_multiplicities[n_element] = list_multiplicity[site]
+        for i_site in range(n_sites):
+            for i_el in range(len(list_occupancies[i_mbr][i_site])):
+                endmember_occupancies[i_mbr][
+                    n_element] = list_occupancies[i_mbr][i_site][i_el]
+                site_multiplicities[n_element] = list_multiplicity[i_site]
                 n_element += 1
 
-    return solution_formulae, n_sites, sites, n_occupancies, endmember_occupancies, site_multiplicities
+    # Site names
+    solution_model.site_names = []
+    for i, elements in enumerate(sites):
+        for element in elements:
+            solution_model.site_names.append('{0}_{1}'.format(element, ucase[i]))
 
+    # Finally, make attributes for solution model instance:
+    solution_model.solution_formulae = solution_formulae
+    solution_model.n_sites = n_sites
+    solution_model.sites = sites
+    solution_model.n_occupancies = n_occupancies
+    solution_model.site_multiplicities = site_multiplicities
+    solution_model.endmember_occupancies = endmember_occupancies
+    solution_model.endmember_noccupancies = np.einsum('ij, j->ij', endmember_occupancies, site_multiplicities)
 
 def compositional_array(formulae):
     """
