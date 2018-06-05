@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # We create an array of 20 depths at which we want to evaluate PREM, and then
     # query the seismic model for the pressure, density, P wave speed, S wave
     # speed, and bulk sound velocity at those depths
-    depths = np.linspace(2800e3, 750e3, 20)
+    depths = np.linspace(2890e3, 670e3, 20)
     pressure, gravity, seis_rho, seis_vp, seis_vs, seis_bullen = seismic_model.evaluate(
         ['pressure', 'gravity', 'density', 'v_p', 'v_s', 'bullen'], depths)
 
