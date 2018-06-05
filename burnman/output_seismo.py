@@ -22,6 +22,7 @@ from .layer import Layer
 def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_model=None):
     """
     Writing input file for obspy travel time calculations.
+    Note: when using a 1D seismic background model, densities will be output as zeroes, as most 1D models do not have a density model. The tvel format has a column for density, but these aren't needed or used by obspy to compute travel times and ray paths.
     Parameters
     ----------
     planet_or_layer  :  burnman.Planet() or burnman.Layer()
@@ -38,16 +39,13 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
         assert(background_model)
         layer = planet_or_layer
         depths = background_model.internal_depth_list()
-        above_layer = np.where(
-            depths < (np.max(depths) - layer.outer_radius))[-1]
-        below_layer = np.where(
-            depths > (
-                np.max(depths) -
-                layer.inner_radius))[0]
+        above_layer = np.where(depths < (np.max(depths) - layer.outer_radius))[-1]
+        below_layer = np.where( depths > (np.max(depths) -layer.inner_radius))[0]
+        
         data_above = list(zip(depths[above_layer] / 1.e3,
                               background_model.v_p(depths[above_layer]) / 1.e3,
                               background_model.v_s(depths[above_layer]) / 1.e3,
-                              background_model.density(depths[above_layer]) / 1.e3))
+                              np.zeros_like(depths[above_layer])))
         data_layer = list(zip((np.max(depths) -layer.radii)[::- 1] /1.e3,
                               layer.v_p[::-1] /1.e3,
                               layer.v_s[::-1] /1.e3,
@@ -55,7 +53,7 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
         data_below = list(zip(depths[below_layer] / 1.e3,
                               background_model.v_p(depths[below_layer]) / 1.e3,
                               background_model.v_s(depths[below_layer]) / 1.e3,
-                              background_model.density(depths[below_layer]) / 1.e3))
+                              np.zeros_like(depths[below_layer])))
 
         data = data_above + data_layer + data_below
 
