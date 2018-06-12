@@ -52,7 +52,7 @@ def plot_rays_and_times(modelname):
     min_degrees = 60 # minimum distance for ray paths
     max_degrees = 300 # maximum distance for ray paths
     npoints = 9 # number of distances to plot ray paths
-    ref_model = 'prem'
+    ref_model = 'prem' # choice of models available in obpsy, or input an npz file name
     
     # Build a taup_model for Obspy
     obspy.taup.taup_create.build_taup_model(
