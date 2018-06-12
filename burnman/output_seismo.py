@@ -21,8 +21,8 @@ from .layer import Layer
 
 def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_model=None):
     """
-    Writing input file for obspy travel time calculations.
-    Note: when using a 1D seismic background model, densities will be output as zeroes, as most 1D models do not have a density model. The tvel format has a column for density, but these aren't needed or used by obspy to compute travel times and ray paths.
+    Function to write input file for obspy travel time calculations.
+    Note: Because density isn't defined for most 1D seismic models, densities are output as zeroes.  The tvel format has a column for density, but this column is not used by obspy for travel time calculations.
     Parameters
     ----------
     planet_or_layer  :  burnman.Planet() or burnman.Layer()
@@ -33,7 +33,8 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
         1D seismic model to fill in parts of planet (likely to be an earth model) that aren't defined by layer (only need when using Layer())
     """
 
-    assert(isinstance(planet_or_layer, (Planet, Layer)))
+    if not isinstance(planet_or_layer, (Planet, Layer)):
+        raise TypeError("Input must be a Planet() or Layer() ")
 
     if isinstance(planet_or_layer, Layer):
         assert(background_model)
@@ -57,18 +58,12 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
 
         data = data_above + data_layer + data_below
 
-        f = open(filename, 'wb')
-        f.write((layer.name +
-                 ' model from BurnMan between  a radius of ' +
-                 str(layer.inner_radius) +
-                 ' and ' +
-                 str(layer.outer_radius) +
-                 ' km \n').encode('ascii'))
-        f.write((background_model.__class__.__name__ +
-                 ' for the rest of the earth \n').encode('ascii'))
+        with open(filename, 'wb') as f:
+            np.savetxt(f, data, header = layer.name + ' model from BurnMan between  a radius of ' +
+                            str(layer.inner_radius) + ' and ' + str(layer.outer_radius) +' km \n'+
+                       background_model.__class__.__name__ +
+                            ' for the rest of the earth',   fmt='%5.2f', delimiter='\t')
 
-        np.savetxt(f, data, fmt='%5.2f', delimiter='\t')
-        f.close()
 
     if isinstance(planet_or_layer, Planet):
         planet = planet_or_layer
@@ -77,15 +72,11 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
                          planet.v_s[::-1] /1.e3,
                          planet.density[::- 1] / 1.e3))
 
-        f = open(filename, 'wb')
-        f.write((planet.name +
-                 ' model from BurnMan with a radius of ' +
-                 str(planet.radius_planet) +
-                 ' km \n').encode('ascii'))
-        f.write(('Layers of planet are  \n').encode('ascii'))
+        with open(filename, 'wb') as f:
+            np.savetxt(f, data, header = planet.name + ' model from BurnMan with a radius of ' +
+                       str(planet.radius_planet) + ' km \n Layers of planet are ' +
+                       ", ".join(layer.name for layer in planet.layers), fmt='%5.2f', delimiter='\t')
 
-        np.savetxt(f, data, fmt='%5.2f', delimiter='\t')
-        f.close()
 
 
 def write_axisem_input( rock,  min_depth=670.e3, max_depth=2890.e3, T0=1900,

@@ -114,7 +114,7 @@ do
     [ $test == "example_premite_isothermal.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_compare_enstpyro.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_partition_coef.py" ] && echo "  *** skipping $test !" && continue
-
+    [ $test == "example_seismic_trael_times.py" ] && echo "  *** skipping $test !" && continue
     testit $test $fulldir
 done
 cd ..

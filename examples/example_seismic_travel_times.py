@@ -31,6 +31,86 @@ import obspy
 from obspy.taup import TauPyModel
 
 
+
+
+def plot_rays_and_times(modelname):
+    """
+    Calls obspy routines to plot ray paths and travel times for the model built in BurnMan and for a seismic reference model for comparison. 
+    
+    Parameters
+    ----------
+    modelname:
+    Name for BurnMan model (*.tvel file must be present)
+    """
+    
+    
+    # Arrivals to plot, some random examples of phase names to use ("P","S", "PcP", "Sdiff", "SKS", "PKIKP")
+    # Phase naming in obspy.taup is explained at
+    # https://docs.obspy.org/packages/obspy.taup.html
+    phase_list = ["P", "PKP", "PKIKP"]
+    source_depth = 10 # in km
+    min_degrees = 60 # minimum distance for ray paths
+    max_degrees = 300 # maximum distance for ray paths
+    npoints = 9 # number of distances to plot ray paths
+    ref_model = 'prem'
+    
+    # Build a taup_model for Obspy
+    obspy.taup.taup_create.build_taup_model(
+                "./" + modelname + ".tvel", ".")
+
+    # Time to plot some predictions using routines from Obspy
+    plt.figure(figsize=[9, 7])
+    ax = plt.subplot(2, 2, 1)
+    # plotting predicted travel times at all distances
+    obspy.taup.plot_travel_times(
+        ax=ax,
+        model='./' +
+        modelname +
+        '.npz',
+        source_depth=source_depth,
+        phase_list=phase_list,
+        show=False)
+    plt.title(modelname)
+    # plotting the same for PREM for reference
+    ax = plt.subplot(2, 2, 2)
+    obspy.taup.plot_travel_times(
+        ax=ax,
+        model=ref_model,
+        source_depth=source_depth,
+        phase_list=phase_list,
+        show=False)
+    # not sure why the grid dissapears on this subplot, reactivate here...
+    ax.grid()
+    plt.title(ref_model)
+    # plotting predicted ray paths every 30 degrees between 60 and 300
+    # degrees
+    ax = plt.subplot(2, 2, 3, polar=True)
+    obspy.taup.plot_ray_paths(
+        ax=ax,
+        model='./' +
+        modelname +
+        '.npz',
+        source_depth=source_depth,
+        min_degrees=min_degrees,
+        max_degrees=max_degrees,
+        npoints=npoints,
+        phase_list=phase_list,
+        verbose=True,
+        show=False)
+    # plotting the same for PREM for reference
+    ax = plt.subplot(2, 2, 4, polar=True)
+    obspy.taup.plot_ray_paths(
+        ax=ax,
+        model=ref_model,
+        source_depth=source_depth,
+        min_degrees=min_degrees,
+        max_degrees=max_degrees,
+        npoints=npoints,
+        phase_list=phase_list,
+        verbose=True)
+
+
+
 if __name__ == "__main__":
     # Two examples available
     example_layer = True
@@ -79,67 +159,9 @@ if __name__ == "__main__":
             lower_mantle,
             filename=modelname + '.tvel',
             background_model=burnman.seismic.PREM())
-
-        # Build a taup_model for Obspy
-        obspy.taup.taup_create.build_taup_model(
-            "./" + modelname + ".tvel", ".")
-
-        # Arrivals to plot, some random examples of phase names to use ("P","S", "PcP", "Sdiff", "SKS", "PKIKP")
-        # Phase naming in obspy.taup is explained at
-        # https://docs.obspy.org/packages/obspy.taup.html
-        phase_list = ["P", "PKP", "PKIKP"]
-
-        # Time to plot some predictions using routines from Obspy
-        plt.figure(figsize=[9, 7])
-        ax = plt.subplot(2, 2, 1)
-        # plotting predicted travel times at all distances
-        obspy.taup.plot_travel_times(
-            ax=ax,
-            model='./' +
-            modelname +
-            '.npz',
-            source_depth=10,
-            phase_list=phase_list,
-            show=False)
-        plt.title(modelname)
-        # plotting the same for PREM for reference
-        ax = plt.subplot(2, 2, 2)
-        obspy.taup.plot_travel_times(
-            ax=ax,
-            model='prem',
-            source_depth=10,
-            phase_list=phase_list,
-            show=False)
-        # not sure why the grid dissapears on this subplot, reactivate here...
-        ax.grid()
-        plt.title('PREM')
-        # plotting predicted ray paths every 30 degrees between 60 and 300
-        # degrees
-        ax = plt.subplot(2, 2, 3, polar=True)
-        obspy.taup.plot_ray_paths(
-            ax=ax,
-            model='./' +
-            modelname +
-            '.npz',
-            min_degrees=60,
-            max_degrees=300,
-            npoints=9,
-            source_depth=10,
-            phase_list=phase_list,
-            verbose=True,
-            show=False)
-        # plotting the same for PREM for reference
-        ax = plt.subplot(2, 2, 4, polar=True)
-        obspy.taup.plot_ray_paths(
-            ax=ax,
-            model='prem',
-            source_depth=10,
-            min_degrees=60,
-            max_degrees=300,
-            npoints=9,
-            phase_list=phase_list,
-            verbose=True)
-
+        
+        # Plot ray paths and travel times
+        plot_rays_and_times(modelname)
 
     # Second example implementing an entire planet
     if example_planet:
@@ -207,62 +229,6 @@ if __name__ == "__main__":
             filename=modelname + '.tvel',
             background_model=burnman.seismic.PREM())
 
-        # Build a taup_model for Obspy
-        obspy.taup.taup_create.build_taup_model(
-            "./" + modelname + ".tvel", ".")
-
-        # Arrivals to plot, some random examples of phase names to use ("P","S", "PcP", "Sdiff", "SKS", "PKIKP")
-        # Phase naming in obspy.taup is explained at
-        # https://docs.obspy.org/packages/obspy.taup.html
-        phase_list = ["P", "PKP", "PKIKP"]
-
-        # Time to plot some predictions using routines from Obspy
-        plt.figure(figsize=[9, 7])
-        ax = plt.subplot(2, 2, 1)
-        # plotting predicted travel times at all distances
-        obspy.taup.plot_travel_times(
-            ax=ax,
-            model='./' +
-            modelname +
-            '.npz',
-            source_depth=10,
-            phase_list=phase_list,
-            show=False)
-        plt.title(modelname)
-        # plotting the same for PREM for reference
-        ax = plt.subplot(2, 2, 2)
-        obspy.taup.plot_travel_times(
-            ax=ax,
-            model='prem',
-            source_depth=10,
-            phase_list=phase_list,
-            show=False)
-        # not sure why the grid dissapears on this subplot, reactivate here...
-        ax.grid()
-        plt.title('PREM')
-        # plotting predicted ray paths every 30 degrees between 60 and 300
-        # degrees
-        ax = plt.subplot(2, 2, 3, polar=True)
-        obspy.taup.plot_ray_paths(
-            ax=ax,
-            model='./' +
-            modelname +
-            '.npz',
-            min_degrees=60,
-            max_degrees=300,
-            npoints=9,
-            source_depth=10,
-            phase_list=phase_list,
-            verbose=True,
-            show=False)
-        # plotting the same for PREM for reference
-        ax = plt.subplot(2, 2, 4, polar=True)
-        obspy.taup.plot_ray_paths(
-            ax=ax,
-            model='prem',
-            source_depth=10,
-            min_degrees=60,
-            max_degrees=300,
-            npoints=9,
-            phase_list=phase_list,
-            verbose=True)
+            
+        # Plot ray paths and travel times
+        plot_rays_and_times(modelname)

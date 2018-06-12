@@ -45,7 +45,7 @@ class Seismic1DModel(object):
             values[a, :] = getattr(self, vars_list[a])(depth_list)
         return values
 
-    def internal_depth_list(self, mindepth=0., maxdepth=1.e99, shifted_discontinuities = True):
+    def internal_depth_list(self, mindepth=0., maxdepth=1.e99, discontinuity_interval = 1.):
         """
         Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation. The depths can be bounded by the mindepth and maxdepth parameters.
 
@@ -55,8 +55,8 @@ class Seismic1DModel(object):
             Minimum depth value to be returned [m]
         maxdepth
             Maximum depth value to be returned [m]
-        shifted_discontinuities
-            Shift continuities by a m, so there are no two values for each depth
+        discontinuity interval
+            Shift continuities to remove ambigious values for depth, default value = 1 [m]
 
         Returns
         -------
@@ -247,15 +247,14 @@ class SeismicTable(Seismic1DModel):
 
         self.earth_radius = 6371.0e3
 
-    def internal_depth_list(self, mindepth=0., maxdepth=1.e10, shifted_discontinuities=True):
+    def internal_depth_list(self, mindepth=0., maxdepth=1.e10, discontinuity_interval = 1. ):
         depths = np.array([self.table_depth[x] for x in range(len(
             self.table_depth)) if self.table_depth[x] >= mindepth and self.table_depth[x] <= maxdepth])
-        if shifted_discontinuities:
-            discontinuities = np.where(depths[1:] - depths[:-1] == 0)[0]
-            # Shift values at discontinities by 1 m to simplify evaluating values
-            # around these.
-            depths[discontinuities] = depths[discontinuities] - 1.
-            depths[discontinuities + 1] = depths[discontinuities + 1] + 1.
+        discontinuities = np.where(depths[1:] - depths[:-1] == 0)[0]
+        # Shift values at discontinities by 1 m to simplify evaluating values
+        # around these.
+        depths[discontinuities] = depths[discontinuities] - discontinuity_interval
+        depths[discontinuities + 1] = depths[discontinuities + 1] + discontinuity_interval
         return depths
 
     def pressure(self, depth):
