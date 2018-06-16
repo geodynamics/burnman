@@ -47,5 +47,9 @@ from . import JH_2015
 
 # Kurnosov et al. 2017
 from . import KMFBZ_2017
+
+# Irving et al. 2018
+from . import ICL_2018
+
 # Other
 from . import other
