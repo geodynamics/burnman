@@ -1,3 +1,4 @@
+# -*- coding: ascii -*-
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
@@ -7,7 +8,7 @@
 Irving et al. 2018
 ^^^^^^^^^^^^^
 
-Seismically derived EoS parameters for Earth's outer core using normal mode center frequencies. 
+Seismically derived EoS parameters for Earth's outer core using normal mode center frequencies.
 These parameters are derived parameterizing the outer core velocity and density with an equation-of-state, and inverting for K, K', and molar_volume (molar_mass is fixed to 0.05, as sensitivy of the normal modes is only to molar density). The equations-of-state are assumed to capture the isentropic behaviour across the outer core. Potentially, these parameters can be used to represent cores of other planets.
 See:
 Irving, Cottaar, Lekic (2018) Seismically determined elastic parameters for Earth’s outer core, Science Advances
