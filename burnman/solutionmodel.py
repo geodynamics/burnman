@@ -496,7 +496,7 @@ class AsymmetricRegularSolution (IdealSolution):
         ideal_entropies = IdealSolution._ideal_excess_entropies(
             self, temperature, molar_fractions)
         non_ideal_entropies = self._non_ideal_interactions(self.Ws, molar_fractions)
-        return -constants.gas_constant * self._log_ideal_activities(molar_fractions)
+        return ideal_entropies + non_ideal_entropies
 
     def excess_partial_volumes(self, pressure, temperature, molar_fractions):
         return self._non_ideal_interactions(self.Wv, molar_fractions)
