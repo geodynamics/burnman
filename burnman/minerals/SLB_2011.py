@@ -111,8 +111,8 @@ class orthopyroxene(SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'orthopyroxene'
         self.solution_type = 'symmetric'
-        self.endmembers = [[enstatite(), '[Mg][Mg][Si]SiO6'], [ferrosilite(), '[Fe][Fe][Si]SiO6'], [
-                           mg_tschermaks(), '[Mg][Al][Al]SiO6'], [ortho_diopside(), '[Ca][Mg][Si]SiO6']]
+        self.endmembers = [[enstatite(), '[Mg][Mg]SiSiO6'], [ferrosilite(), '[Fe][Fe]SiSiO6'], [
+                           mg_tschermaks(), '[Mg][Al]AlSiO6'], [ortho_diopside(), '[Ca][Mg]SiSiO6']] # Al avoidance, see Figure 3
         self.energy_interaction = [
             [0.0, 0.0, 32.11352e3], [0.0, 0.0], [48.35316e3]]
 
