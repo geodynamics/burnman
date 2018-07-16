@@ -48,9 +48,10 @@ class clinopyroxene(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'clinopyroxene'
-        self.solution_type = 'symmetric'
+        self.solution_type = 'asymmetric'
         self.endmembers = [[diopside(), '[Ca][Mg][Si]2O6'], [hedenbergite(), '[Ca][Fe][Si]2O6'], [
                            clinoenstatite(), '[Mg][Mg][Si]2O6'], [ca_tschermaks(), '[Ca][Al][Si1/2Al1/2]2O6'], [jadeite(), '[Na][Al][Si]2O6']]
+        self.alphas = [1., 1., 1., 3.5, 1.]
         self.energy_interaction = [
             [0., 24.74e3, 26.e3, 24.3e3], [24.74e3, 0., 0.e3], [60.53136e3, 0.0], [10.e3]]
 
@@ -77,7 +78,7 @@ class akimotoite(SolidSolution):
         self.solution_type = 'symmetric'
         self.endmembers = [[mg_akimotoite(), '[Mg][Si]O3'], [
                            fe_akimotoite(), '[Fe][Si]O3'], [corundum(), '[Al][Al]O3']]
-        self.energy_interaction = [[0.0, 66.e3], [66.e3]]
+        self.energy_interaction = [[0.0, 66.e3], [0.e3]]
 
         SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
@@ -146,11 +147,12 @@ class mg_fe_perovskite(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'magnesium silicate perovskite/bridgmanite'
-        self.solution_type = 'symmetric'
+        self.solution_type = 'asymmetric'
         self.endmembers = [[mg_perovskite(), '[Mg][Si]O3'], [
                            fe_perovskite(), '[Fe][Si]O3'], [al_perovskite(), '[Al][Al]O3']]
         self.energy_interaction = [[0.0, 116.0e3], [0.0]]
 
+        self.alphas = [1., 1., 0.39]
         SolidSolution.__init__(self, molar_fractions=molar_fractions)
 
 
