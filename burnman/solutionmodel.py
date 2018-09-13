@@ -46,7 +46,6 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     # The following are equivalent to
     # np.einsum('i, ij, jk, ik->i', -self.alphas, q, self.Wx, q)
     Wint = -alpha * (q.dot(W)*q).sum(-1)
-
     return Wint
 
 def logish(x, eps=1.e-5):
@@ -371,11 +370,11 @@ class IdealSolution (SolutionModel):
         return np.zeros((self.n_endmembers))
 
     def gibbs_hessian(self, pressure, temperature, molar_fractions):
-        hess_S = self._ideal_hessian(temperature, molar_fractions)
+        hess_S = self._ideal_entropy_hessian(temperature, molar_fractions)
         return -temperature*hess_S
 
     def entropy_hessian(self, pressure, temperature, molar_fractions):
-        hess_S = self._ideal_hessian(temperature, molar_fractions)
+        hess_S = self._ideal_entropy_hessian(temperature, molar_fractions)
         return hess_S
 
     def volume_hessian(self, pressure, temperature, molar_fractions):
@@ -389,9 +388,9 @@ class IdealSolution (SolutionModel):
         return conf_entropy
 
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
-        return -temperature*self._ideal_excess_entropies(temperature, molar_fractions)
+        return -temperature*self._ideal_excess_partial_entropies(temperature, molar_fractions)
 
-    def _ideal_excess_entropies(self, temperature, molar_fractions):
+    def _ideal_excess_partial_entropies(self, temperature, molar_fractions):
         return -constants.gas_constant * self._log_ideal_activities(molar_fractions)
 
     def _ideal_entropy_hessian(self, temperature, molar_fractions):
@@ -493,7 +492,7 @@ class AsymmetricRegularSolution (IdealSolution):
         return ideal_gibbs + non_ideal_gibbs
 
     def excess_partial_entropies(self, pressure, temperature, molar_fractions):
-        ideal_entropies = IdealSolution._ideal_excess_entropies(
+        ideal_entropies = IdealSolution._ideal_excess_partial_entropies(
             self, temperature, molar_fractions)
         non_ideal_entropies = self._non_ideal_interactions(self.Ws, molar_fractions)
         return ideal_entropies + non_ideal_entropies
