@@ -48,5 +48,13 @@ class TestRock(BurnManTest):
         self.assertFloatEqual(fr[1], 0.7)
 
 
+import sympy
+
+class TestSympy(BurnManTest):
+    def test(self):
+        x = sympy.symbols('x')
+        self.assertEqual(1, sympy.simplify(sympy.sin(x)**2 + sympy.cos(x)**2))
+
+
 if __name__ == '__main__':
     unittest.main()

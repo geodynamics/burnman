@@ -24,7 +24,7 @@ t=$1
 
 if [ "$t" == "__init__.py" ]
 then
-return
+return 0
 fi
 
 fulldir=$2
@@ -46,6 +46,7 @@ if [ "$ret" -ne 0 ]
 then
   echo "!  $t ... FAIL";
   cat $t.tmp;
+  return 1;
 else
 
   sedthing="s#$fulldir#BURNMAN#g"
@@ -66,6 +67,7 @@ else
   echo "!  $t ... FAIL";
   echo "Check: `pwd`/$t.tmp $fulldir/misc/ref/$t.out";
   eval $diffcmd $t.tmp $fulldir/misc/ref/$t.out | head
+  return 2;
   }
 
 fi
@@ -87,18 +89,18 @@ done
 
 
 cd tests
-$PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 0
+$PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 1
 cd ..
 
 
 cd misc
 echo "gen_doc..."
-$PYTHON gen_doc.py >/dev/null || exit 0
+$PYTHON gen_doc.py >/dev/null || exit 1
 
 cd benchmarks
 for test in `ls *.py`
 do
-    testit $test $fulldir
+    testit $test $fulldir || exit 1
 done
 cd ..
 cd ..
@@ -115,7 +117,7 @@ do
     [ $test == "example_compare_enstpyro.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_partition_coef.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_seismic_travel_times.py" ] && echo "  *** skipping $test !" && continue
-    testit $test $fulldir
+    testit $test $fulldir || exit 1
 done
 cd ..
 
@@ -129,16 +131,16 @@ do
     [ $test == "create_burnman_readable_perplex_table.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
 
-    testit $test $fulldir
+    testit $test $fulldir || exit 1
 done
-testit table.py $fulldir
+testit table.py $fulldir || exit 1
 cd ..
 
 echo "checking contrib/CHRU2014 ..."
 cd contrib/CHRU2014
 for test in `ls *.py`
 do
-    testit $test $fulldir
+    testit $test $fulldir || exit 1
 done
 cd ../..
 
@@ -147,7 +149,7 @@ echo "checking contrib/tutorial/ ..."
 cd contrib/tutorial/
 for test in `ls step*.py`
 do
-testit $test $fulldir
+testit $test $fulldir || exit 1
 done
 cd ../..
 
@@ -156,7 +158,7 @@ echo "checking contrib/CHRU2014/ ..."
 cd contrib/CHRU2014
 for test in `ls *.py`
 do
-testit $test $fulldir
+testit $test $fulldir || exit 1
 done
 cd ../..
 
@@ -164,4 +166,4 @@ cd ../..
 echo "   done"
 
 echo ""
-echo "*** tests done"
+echo "*** ./test.sh done"
