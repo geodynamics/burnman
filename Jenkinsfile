@@ -42,7 +42,7 @@ pipeline
             // 3) in project settings select "add property" "Trigger build on pr comment" with
             //    the phrase ".*/rebuild.*" (without quotes)
             sh '''
-               wget -q -O - https://api.github.com/repos/tjhei/burnman/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
+               wget -q -O - https://api.github.com/repos/geodynamics/burnman/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
                { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
             '''
           }
