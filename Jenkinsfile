@@ -1,4 +1,11 @@
 #!groovy
+//
+// Jenkinsfile to control automated testing using https://jenkins.tjhei.info
+//
+// To run the tests locally, you can execute the following in a burnman working directory:
+//
+// docker run --rm -v "$(pwd):/src" tjhei/burnman:v4 /bin/bash -c "cd /src && ./test.sh"
+
 
 pipeline
 {
