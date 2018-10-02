@@ -87,7 +87,7 @@ class SolidSolution(Mineral):
                 "'endmembers' attribute missing from solid solution")
         
         try:
-            self.endmember_formulae = [mbr[0].params['formula'] for mbr in self.endmembers]
+            self.endmember_formulae = [mbr[0].formula for mbr in self.endmembers]
         except:
             raise Exception("Not all endmembers of this solid solution have a formula in their params dictionary.")
 
