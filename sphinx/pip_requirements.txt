@@ -2,4 +2,5 @@ numpy
 numpydoc
 matplotlib
 scipy
+sympy
 sphinxcontrib.bibtex
