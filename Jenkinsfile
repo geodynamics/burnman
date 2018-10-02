@@ -8,7 +8,7 @@
 //
 // docker run --rm -v "$(pwd):/src" tjhei/burnman:v4 /bin/bash -c "cd /src && ./test.sh"
 //
-// This requires and installation of docker ( https://docs.docker.com/get-started/ )
+// This requires installation of docker ( https://docs.docker.com/get-started/ )
 // and ~ 2GB of images will be downloaded.
 
 pipeline
