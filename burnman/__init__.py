@@ -82,7 +82,7 @@ Requirements
 ^^^^^^^^^^^^
 
   - Python 2.7.x or Python 3.4+
-  - Python modules: NumPy, SciPy, Matplotlib
+  - Python modules: NumPy, SciPy, SymPy, Matplotlib
 
 
 Source code
