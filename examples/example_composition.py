@@ -28,7 +28,6 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from copy import deepcopy
 
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -52,6 +51,7 @@ if __name__ == "__main__":
     forsterite_composition = Composition({'MgO': 1.8,
                                           'FeO': 0.2,
                                           'SiO2': 1.}, 'molar')
+    
     forsterite_composition.print('molar', significant_figures=4,
                                  normalization_component='SiO2', normalization_amount=1.)
     forsterite_composition.print('weight', significant_figures=4,
@@ -63,7 +63,9 @@ if __name__ == "__main__":
     # Let's read in composition data from an example file
     print('\n\n2) Reading compositions from file and renormalizing them:\n')
     compositions, comments = file_to_composition_list('../burnman/data/input_compositions/'
-                                                      'dhz_mineral_compositions.dat', 'weight')
+                                                      'dhz_mineral_compositions.dat',
+                                                      unit_type='weight',
+                                                      normalize=True)
     
     # The hard work has already been done in that one line:
     # each of the compositions is stored as an instance of
@@ -83,8 +85,8 @@ if __name__ == "__main__":
         # Here we just format the weight and molar dictionaries for printing.
         components = composition.weight_composition.keys()
     
-        wf = [float('{0:.3f}'.format(c*100)) for c in composition.weight_composition.values()]
-        mf = [float('{0:.3f}'.format(c*100)) for c in composition.molar_composition.values()]
+        wf = [float('{0:.3f}'.format(composition.weight_composition[c]*100)) for c in components]
+        mf = [float('{0:.3f}'.format(composition.molar_composition[c]*100)) for c in components]
         print('{0}:\n {1}\n {2} (wt %)\n {3} (mol %)\n'.format(name, components, wf, mf))
         
         # By default, the compositions are normalised to 1 g (weight) or
@@ -94,7 +96,7 @@ if __name__ == "__main__":
         # This does not change the molar or weight bases.
         compositions[i].renormalize('atomic', 'O', float(n_O))
         components = composition.atomic_composition.keys()
-        af = [float('{0:.3f}'.format(c)) for c in composition.atomic_composition.values()]
+        af = [float('{0:.3f}'.format(composition.atomic_composition[c])) for c in components]
         print(' {0}\n {1} (atoms, {2} oxygen basis)\n'.format(components, af, float(n_O)))
         
 
