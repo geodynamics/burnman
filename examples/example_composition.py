@@ -83,7 +83,7 @@ if __name__ == "__main__":
         # Each composition has the dictionary attributes
         # "weight_composition", "molar_composition" and "atomic_composition".
         # Here we just format the weight and molar dictionaries for printing.
-        components = composition.weight_composition.keys()
+        components = sorted(composition.weight_composition.keys())
     
         wf = [float('{0:.3f}'.format(composition.weight_composition[c]*100)) for c in components]
         mf = [float('{0:.3f}'.format(composition.molar_composition[c]*100)) for c in components]
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         # atomic composition so that the number of oxygens is equal to n_O.
         # This does not change the molar or weight bases.
         compositions[i].renormalize('atomic', 'O', float(n_O))
-        components = composition.atomic_composition.keys()
+        components = sorted(composition.atomic_composition.keys())
         af = [float('{0:.3f}'.format(composition.atomic_composition[c])) for c in components]
         print(' {0}\n {1} (atoms, {2} oxygen basis)\n'.format(components, af, float(n_O)))
         
@@ -138,9 +138,10 @@ if __name__ == "__main__":
     
     # Let's print out the new atomic composition
     composition.renormalize('atomic', 'total', 8.)
-    v = ['{0:.3f}'.format(v) for v in composition.atomic_composition.values()]
-    print('Atomic composition\n{0}\n{1}\n'.format(composition.atomic_composition.keys(),
-                                                  v))
+    elements = sorted(list(composition.atomic_composition.keys()))
+    v = ['{0:.3f}'.format(composition.atomic_composition[e])
+         for e in elements]
+    print('Atomic composition\n{0}\n{1}\n'.format(elements, v))
     
     # Finally, let's print out the starting composition that we'll use,
     # assuming that we want to start with 2 g of Fe3O4 and SiO2 powder

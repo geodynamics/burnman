@@ -1,14 +1,25 @@
 from __future__ import print_function
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2018 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
-from collections import Counter
+from collections import Counter, OrderedDict
 from scipy.optimize import nnls
-
+    
 from .processchemistry import dictionarize_formula, formula_mass
 
+class OrderedCounter(Counter, OrderedDict):
+    """
+    Counter that remembers the order elements are first encountered
+    """
+
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, OrderedDict(self))
+
+    def __reduce__(self):
+        return self.__class__, (OrderedDict(self),)
+    
 def composition_property(func):
     """
     Decorator @composition_property to be used for cached properties of compositions.
@@ -38,12 +49,12 @@ def file_to_composition_list(fname, unit_type, normalize):
     """
     
     """
-    lines = filter(None, [line.rstrip('\n').split() for line in open(fname)])
+    lines = list(filter(None, [line.rstrip('\n').split() for line in open(fname)]))
     n_components = lines[0].index("Comment")
     components = lines[0][:n_components]
     comments = [line[n_components:] for line in lines[1:]]
-    compositions = np.array([map(float, l) for l in zip(*(zip(*lines[1:])[:n_components]))])
-    return [Composition(Counter(dict(zip(components, c))), unit_type, normalize) for c in compositions], comments
+    compositions = np.array([map(float, l) for l in list(zip(*(list(zip(*lines[1:]))[:n_components])))])
+    return [Composition(OrderedCounter(dict(zip(components, c))), unit_type, normalize) for c in compositions], comments
 
     
 class Composition(object):
@@ -76,7 +87,7 @@ class Composition(object):
 
         self._cached = {}
 
-        n_total = np.sum(composition_dictionary.values())
+        n_total = float(sum(composition_dictionary.values()))
 
         normalized_dictionary = {}
         for k in composition_dictionary.keys():
@@ -96,17 +107,17 @@ class Composition(object):
                                    for c in composition_dictionary.keys()}
         
         # elemental compositions of components
-        self.element_list = Counter()
+        self.element_list = OrderedCounter()
         for component in self.component_formulae.values():
-            self.element_list += Counter({element: n_atoms
+            self.element_list += OrderedCounter({element: n_atoms
                                           for (element, n_atoms) in component.items()})
         self.element_list = list(self.element_list.keys())
         
         if unit_type == 'weight':
             if normalize:
-                self._cached['weight_composition'] = Counter(normalized_dictionary)
+                self._cached['weight_composition'] = OrderedCounter(normalized_dictionary)
             else:
-                self._cached['weight_composition'] = Counter(composition_dictionary)
+                self._cached['weight_composition'] = OrderedCounter(composition_dictionary)
                 
                 mole_total = sum([composition_dictionary[c] /
                                   formula_mass(self.component_formulae[c])
@@ -117,9 +128,9 @@ class Composition(object):
                 
         elif unit_type == 'molar':
             if normalize:
-                self._cached['molar_composition'] = Counter(normalized_dictionary)
+                self._cached['molar_composition'] = OrderedCounter(normalized_dictionary)
             else:
-                self._cached['molar_composition'] = Counter(composition_dictionary)
+                self._cached['molar_composition'] = OrderedCounter(composition_dictionary)
                 
                 weight_total = sum([composition_dictionary[c] *
                                     formula_mass(self.component_formulae[c])
@@ -190,7 +201,7 @@ class Composition(object):
             raise Exception('Unit type not recognised. '
                             'Should be either weight or molar.')
 
-        composition += Counter(composition_dictionary)
+        composition += OrderedCounter(composition_dictionary)
 
         self.__init__(composition, unit_type)
 
@@ -224,12 +235,12 @@ class Composition(object):
                             'Could not find a non-negative least squares solution. '
                             'Can the bulk composition be described with this set of components?')
 
-        composition = Counter(dict(zip(new_component_list, component_amounts)))
+        composition = OrderedCounter(dict(zip(new_component_list, component_amounts)))
         self.__init__(composition, 'molar')
     
     def _normalize_to_basis(self, composition, unit_type):
         if self.normalization_component[unit_type] == 'total':
-            n_orig = np.sum(composition.values())
+            n_orig = float(sum(composition.values()))
         else:
             n_orig = composition[self.normalization_component[unit_type]]
             
@@ -243,9 +254,9 @@ class Composition(object):
         """
         Returns the molar composition as a counter [moles]
         """
-        mole_compositions = Counter({c: self.weight_composition[c] /
-                                     formula_mass(self.component_formulae[c])
-                                     for c in self.weight_composition.keys()})
+        mole_compositions = OrderedCounter({c: self.weight_composition[c] /
+                                            formula_mass(self.component_formulae[c])
+                                            for c in self.weight_composition.keys()})
 
         return self._normalize_to_basis(mole_compositions, 'molar')
 
@@ -254,9 +265,9 @@ class Composition(object):
         """
         Returns the weight composition as a counter [g]
         """
-        weight_compositions = Counter({c: self.molar_composition[c] *
-                                     formula_mass(self.component_formulae[c])
-                                     for c in self.molar_composition.keys()})
+        weight_compositions = OrderedCounter({c: self.molar_composition[c] *
+                                              formula_mass(self.component_formulae[c])
+                                              for c in self.molar_composition.keys()})
 
         return self._normalize_to_basis(weight_compositions, 'weight')
     
@@ -279,7 +290,7 @@ class Composition(object):
                 component_matrix[i][self.element_list.index(element)] = n_atoms
         
         atom_compositions = np.dot(molar_composition_vector, component_matrix)
-        return Counter(dict(zip(self.element_list, atom_compositions)))
+        return OrderedCounter(dict(zip(self.element_list, atom_compositions)))
         
 
     def print(self, unit_type, significant_figures=1,
@@ -307,34 +318,34 @@ class Composition(object):
             print('Weight composition')
             
             if normalization_component == 'total':
-                total_stored = sum(self.weight_composition.values())
+                total_stored = float(sum(self.weight_composition.values()))
             else:
                 total_stored = self.weight_composition[normalization_component]
             f = normalization_amount/total_stored
             
-            for (key, value) in self.weight_composition.items():
+            for (key, value) in sorted(self.weight_composition.items()):
                 print('{0}: {1:0.{sf}f}'.format(key, value*f, sf=significant_figures))
         elif unit_type == 'molar':
             print('Molar composition')
 
             if normalization_component == 'total':
-                total_stored = sum(self.molar_composition.values())
+                total_stored = float(sum(self.molar_composition.values()))
             else:
                 total_stored = self.molar_composition[normalization_component]
             f = normalization_amount/total_stored
             
-            for (key, value) in self.molar_composition.items():
+            for (key, value) in sorted(self.molar_composition.items()):
                 print('{0}: {1:0.{sf}f}'.format(key, value*f, sf=significant_figures))
         elif unit_type == 'atomic':
             print('Atomic composition')
 
             if normalization_component == 'total':
-                total_stored = sum(self.atomic_composition.values())
+                total_stored = float(sum(self.atomic_composition.values()))
             else:
                 total_stored = self.atomic_composition[normalization_component]
             f = normalization_amount/total_stored
             
-            for (key, value) in self.atomic_composition.items():
+            for (key, value) in sorted(self.atomic_composition.items()):
                 print('{0}: {1:0.{sf}f}'.format(key, value*f, sf=significant_figures))
         else:
             raise Exception('unit_type not yet implemented. Should be either weight,  molar or atomic.')
