@@ -255,48 +255,67 @@ class mess(CombinedMineral):
                                  free_energy_adjustment=[-15.e3, 0., 0.15e-5])
 
 
+
+
+def construct_combined_covariance(original_covariance_dictionary,
+                                  combined_mineral_list):
+    """
+    This function takes a dictionary containing a list of endmember_names
+    and a covariance_matrix, and a list of CombinedMineral instances, and creates
+    an updated covariance dictionary containing those CombinedMinerals
+
+    Parameters
+    ----------
+    original_covariance_dictionary : dictionary
+        Contains a list of strings of endmember_names of length n
+        and a 2D numpy array covariance_matrix of shape n x n
+
+    combined_mineral_list : list of instances of :class:`burnman.CombinedMineral`
+        List of minerals to be added to the covariance matrix
+
+    Returns
+    -------
+    cov : dictionary
+        Updated covariance dictionary, with the same keys as the original
+
+    """
+    cov_orig = original_covariance_dictionary
+    
+    # Update names
+    cov = {'endmember_names': copy(cov_orig['endmember_names'])}
+    for c in combined_mineral_list:
+        cov['endmember_names'].append(c.name)
+
+    # Update covariance matrix
+    A = np.identity(len(cov_orig['endmember_names']))
+    for i, indices in enumerate([[cov_orig['endmember_names'].index(name)
+                                  for name in [mbr[0].params['name']
+                                               for mbr in c.mixture.endmembers]]
+                                 for c in combined_mineral_list]):
+        B = np.zeros(len(cov_orig['endmember_names']))
+        B[indices] = combined_mineral_list[i].mixture.molar_fractions
+        A = np.vstack((A, B))
+
+    cov['covariance_matrix'] = A.dot(cov_orig['covariance_matrix']).dot(A.T)
+
+    return cov
+
+
 """
 VARIANCE-COVARIANCE MATRIX
 Derived from HP_2011_ds62, modified to include all the CombinedMinerals
 
 cov is a dictionary containing:
-     - names: a list of endmember names
+     - endmember_names: a list of endmember names
      - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation
 """
-# Create covariance matrix including all of the CombinedMinerals
-
-# List of combined endmembers in this dataset
-combined_endmembers = [cfs(),
-                       crdi(),
-                       cess(),
-                       cen(),
-                       cfm(),
-                       fm(),
-                       odi(),
-                       cren(),
-                       mess()]
-
-
-cov = {'endmember_names': copy(HP_2011_ds62.cov['endmember_names'])}
-
-A = np.identity(len(HP_2011_ds62.cov['endmember_names']))
-
-# Update names
-for c in combined_endmembers:
-    cov['endmember_names'].append(c.name)
-
-
-# Update covariance matrix
-for i, indices in enumerate([[HP_2011_ds62.cov['endmember_names'].index(name)
-                              for name in [mbr[0].params['name']
-                                           for mbr in c.mixture.endmembers]]
-                             for c in combined_endmembers]):
-    B = np.zeros(len(HP_2011_ds62.cov['endmember_names']))
-    B[indices] = combined_endmembers[i].mixture.molar_fractions
-    A = np.vstack((A, B))
-
-cov['covariance_matrix'] = A.dot(HP_2011_ds62.cov['covariance_matrix']).dot(A.T)
-
-del A
-del B
-del combined_endmembers
+cov = construct_combined_covariance(original_covariance_dictionary = HP_2011_ds62.cov,
+                                    combined_mineral_list = [cfs(),
+                                                             crdi(),
+                                                             cess(),
+                                                             cen(),
+                                                             cfm(),
+                                                             fm(),
+                                                             odi(),
+                                                             cren(),
+                                                             mess()])

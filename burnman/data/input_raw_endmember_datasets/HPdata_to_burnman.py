@@ -10,6 +10,15 @@
 
 import sys
 import os.path
+import pprint
+from collections import OrderedDict
+# hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../../../burnman'):
+    sys.path.insert(1, os.path.abspath('../../..'))
+
+import burnman
+from burnman.processchemistry import dictionarize_formula, formula_mass
+
 
 if os.path.isfile('tc-ds62.txt') == False:
     print('This code requires the data file tc-ds62.txt.')
@@ -29,19 +38,40 @@ components = ['Si', 'Ti', 'Al', 'Fe', 'Mg', 'Mn', 'Ca', 'Na',
 class Endmember:
 
     def __init__(self, name, atoms, formula, sites, comp, H, S, V, Cp, a, k, flag, od):
-        self.name = name  # Name of end member
-        self.atoms = atoms  # Number of atoms in the unit formula
-        self.formula = formula
-        self.sites = sites  # Notional number of sites
-        self.comp = comp  # Composition
-        self.H = H  # Enthalpy
-        self.S = S  # Entropy
-        self.V = V  # Volume
-        self.Cp = Cp  # Heat capacity (c0 + c1*T + c2*T**2 + c3*T**(-0.5))
-        self.a = a  # Thermal expansion
-        self.k = k  # Bulk Modulus (and first two derivatives wrt pressure)
-        self.flag = flag
-        self.od = od
+        if flag != -1 and flag != -2 and k[0] > 0:
+            formula = dictionarize_formula(formula)
+            self.params = OrderedDict([('name', name),
+                                       ('formula', formula),
+                                       ('equation_of_state', 'hp_tmt'),
+                                       ('H_0', round(H * 1e3, 10)),
+                                       ('S_0', round(S * 1e3, 10)),
+                                       ('V_0', round(V * 1e-5, 15)),
+                                       ('Cp', [round(Cp[0] * 1e3, 10),
+                                               round(Cp[1] * 1e3, 10),
+                                               round(Cp[2] * 1e3, 10),
+                                               round(Cp[3] * 1e3, 10)]),
+                                       ('a_0', a),
+                                       ('K_0', round(k[0] * 1e8, 10)),
+                                       ('Kprime_0', k[1]),
+                                       ('Kdprime_0', round(k[2] * 1e-8, 15)),
+                                       ('n', sum(formula.values())),
+                                       ('molar_mass', round(formula_mass(formula), 10))])
+        if flag == 1:
+            self.landau_hp = OrderedDict([('P_0', 1e5),
+                                          ('T_0', 298.15),
+                                          ('Tc_0', od[0]),
+                                          ('S_D', round(od[1] * 1e3, 10)),
+                                          ('V_D', round(od[2] * 1e-5, 10))])
+                                        
+        if flag == 2:
+            self.bragg_williams = OrderedDict([('deltaH', round(od[0] * 1e3, 10)),
+                                               ('deltaV', round(od[1] * 1e-5, 15)),
+                                               ('Wh', round(od[2] * 1e3, 10)),
+                                               ('Wv', round(od[3] * 1e-5, 15)),
+                                               ('n', od[4]),
+                                               ('factor', od[5])])
+
+        
 
 
 # Read dataset
@@ -64,8 +94,12 @@ def getmbr(ds, mbr):
                 od = [0]
             else:
                 flag = int(ds[i * 4 + 6][4])
-            endmember = Endmember(mbr, atoms, formula, int(ds[i * 4 + 3][1]), list(map(float, ds[i * 4 + 3][2:(len(ds[i * 4 + 3]) - 1)])), float(ds[i * 4 + 4][0]), float(
-                ds[i * 4 + 4][1]), float(ds[i * 4 + 4][2]), map(float, ds[i * 4 + 5]), float(ds[i * 4 + 6][0]), list(map(float, ds[i * 4 + 6][1:4])), flag, list(map(float, ds[i * 4 + 6][5:])))
+            endmember = Endmember(mbr, atoms, formula, int(ds[i * 4 + 3][1]),
+                                  list(map(float, ds[i * 4 + 3][2:(len(ds[i * 4 + 3]) - 1)])),
+                                  float(ds[i * 4 + 4][0]), float(ds[i * 4 + 4][1]),
+                                  float(ds[i * 4 + 4][2]), map(float, ds[i * 4 + 5]),
+                                  float(ds[i * 4 + 6][0]), list(map(float, ds[i * 4 + 6][1:4])),
+                                  flag, list(map(float, ds[i * 4 + 6][5:])))
             return endmember
 
 with open('HP_2011_ds62.py', 'wb') as outfile:
@@ -87,47 +121,45 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
     outfile.write('"""\n'
                   'ENDMEMBERS\n'
                   '"""\n\n')
-    
+
+    def pprint_ordered_dict(d, leading_string, extra_whitespace=0):
+        whitespace = ' ' * (len(leading_string)+2+extra_whitespace)
+        s = pprint.pformat(d)
+        s = s.replace('), ', ',\n{0}\''.format(whitespace))
+        s = s.replace('\', ', '\': ').replace(' \'(\'', '\'')
+        s = s.replace('OrderedDict([(', leading_string+'{').replace(')])', '}')
+        return s
+        
     formula = '0'
     for i in range(int(ds[0][0])):
         mbr = ds[i * 4 + 3][0]
         M = getmbr(ds, mbr)
         if mbr == 'and':  # change silly abbreviation
             mbr = 'andalusite'
-        if M.flag != -1 and M.flag != -2 and M.k[0] > 0:
+
+        # Print parameters
+        if hasattr(M, 'params'):
             outfile.write('class {0} (Mineral):\n'.format(mbr)+
-                          '    def __init__(self):\n'
-                          '        formula = \'{0}\''.format(M.formula)+'\n'
-                          '        formula = dictionarize_formula(formula)\n'
-                          '        self.params = {{\n'
-                          '            \'name\': \'{0}\','.format(M.name)+'\n'
-                          '            \'formula\': formula,\n'
-                          '            \'equation_of_state\': \'hp_tmt\',\n'
-                          '            \'H_0\': {0},'.format(M.H * 1e3)+'\n'
-                          '            \'S_0\': {0},'.format(M.S * 1e3)+'\n'
-                          '            \'V_0\': {0},'.format(M.V * 1e-5)+'\n'
-                          '            \'Cp\': {0},'.format([round(M.Cp[0] * 1e3, 10), round(M.Cp[1] * 1e3, 10), round(M.Cp[2] * 1e3, 10), round(M.Cp[3] * 1e3, 10)])+'\n'
-                          '            \'a_0\': {0},'.format(M.a)+'\n'
-                          '            \'K_0\': {0},'.format(M.k[0] * 1e8)+'\n'
-                          '            \'Kprime_0\': {0},'.format(M.k[1])+'\n'
-                          '            \'Kdprime_0\': {0},'.format(M.k[2] * 1e-8)+'\n'
-                          '            \'n\': sum(formula.values()),\n'
-                          '            \'molar_mass\': formula_mass(formula)}\n')
-            if M.flag != 0:
-                outfile.write('        self.property_modifiers = [[\n')
-            if M.flag == 1:
-                outfile.write('            \'landau_hp\', {{\'P_0\': 100000.0,\n'
-                              '                          \'T_0\': 298.15,\n'
-                              '                          \'Tc_0\': {0},'.format(M.od[0])+'\n'
-                              '                          \'S_D\': {0},'.format(M.od[1] * 1e3)+'\n'
-                              '                          \'V_D\': {0}}}]]'.format(M.od[2] * 1e-5)+'\n\n')
-            if M.flag == 2:
-                outfile.write('            \'bragg_williams\', {{\'deltaH\': {0},'.format(M.od[0] * 1e3)+'\n'
-                              '                               \'deltaV\': {0},'.format(M.od[1] * 1e-5)+'\n'
-                              '                               \'Wh\': {0},'.format(M.od[2] * 1e3)+'\n'
-                              '                               \'Wv\': {0},'.format(M.od[3] * 1e-5)+'\n'
-                              '                               \'n\': {0},'.format(M.od[4])+'\n'
-                              '                               \'factor\': {0}}}]]'.format(M.od[5])+'\n')
+                          '    def __init__(self):\n')
+
+            s = pprint_ordered_dict(M.params, leading_string = '        self.params = ')
+            s = s.replace('000000.0', 'e6')
+            outfile.write(s)
+            outfile.write('\n')
+                          
+            # Print property modifiers (if they exist)
+            if hasattr(M, 'landau_hp') or hasattr(M, 'bragg_williams'):
+                outfile.write('        self.property_modifiers = [[')
+                if hasattr(M, 'landau_hp'):
+                    s = pprint_ordered_dict(M.landau_hp, leading_string = '\'landau_hp\', ', extra_whitespace = 36)
+                    outfile.write(s)
+                    
+                if hasattr(M, 'bragg_williams'):
+                    s = pprint_ordered_dict(M.bragg_williams, leading_string = '\'bragg_williams\', ', extra_whitespace = 36)
+                    outfile.write(s)
+                    
+                outfile.write(']]\n')
+
             outfile.write('        Mineral.__init__(self)\n\n')
 
 
@@ -152,7 +184,6 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
     
     M = M*1.e6 # (kJ/mol)^2 -> (J/mol)^2
 
-    
     d = {'endmember_names':names,
          'covariance_matrix':M}
     
@@ -161,10 +192,12 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
     import pprint
     pp = pprint.PrettyPrinter(indent=0, width=160, depth=3, stream=outfile)
 
-    outfile.write('\n# Variance-covariance matrix\n'
-                  '# cov is a dictionary containing:\n'
-                  '#     - names: a list of endmember names\n'
-                  '#     - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation\n\n'
+    outfile.write('\"\"\"\n'
+                  'VARIANCE-COVARIANCE MATRIX\n\n'
+                  'cov is a dictionary containing:\n'
+                  '     - names: a list of endmember names\n'
+                  '     - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation\n'
+                  '\"\"\"\n\n'
                   'from numpy import array\n'
                   'cov = ')
     pp.pprint(d)
