@@ -11,6 +11,7 @@ from .material import Material, material_property
 from .mineral import Mineral
 from . import averaging_schemes
 from . import chemicalpotentials
+from .processchemistry import sum_formulae
 from .solidsolution import SolidSolution
 from sympy import Matrix, nsimplify
 import scipy.optimize as opt
@@ -76,19 +77,21 @@ class Composite(Material):
 
         self.set_averaging_scheme('VoigtReussHill')
         self.name=name
+
+        self.print_precision = 4 # number of significant figures used by self.__str__
         
     def __str__(self):
         string='Composite: {0}'.format(self.name)
         try:
-            string += '\n  P, T: {0:.4g} Pa, {1:.4g} K'.format(self.pressure, self.temperature)
+            string += '\n  P, T: {0:.{sf}g} Pa, {1:.{sf}g} K'.format(self.pressure, self.temperature, sf=self.print_precision)
         except:
             pass
         string+='\nPhase and endmember fractions:'
         for phase, fraction in zip(*self.unroll()):
-            string+='\n  {0}: {1}'.format(phase.name, fraction)
+            string+='\n  {0}: {1:0.{sf}f}'.format(phase.name, fraction, sf=self.print_precision)
             if isinstance(phase, SolidSolution):
                for i in range(phase.n_endmembers): 
-                   string+='\n    {0}: {1}'.format(phase.endmember_names[i], phase.molar_fractions[i])
+                   string+='\n    {0}: {1:0.{sf}f}'.format(phase.endmember_names[i], phase.molar_fractions[i], sf=self.print_precision)
         return string
 
     def set_fractions(self, fractions, fraction_type='molar'):
@@ -539,9 +542,16 @@ class Composite(Material):
                 guesses = np.delete(np.array(guesses), excluded_indices, axis=0)
                 mul = np.delete(mul, excluded_indices, axis=0)
                 mul = np.delete(mul, excluded_indices, axis=1)
+
+                cs = lambda E: [{'type': 'ineq',
+                                 'fun': lambda x, eq=eq: eq.dot(baseline_amounts +
+                                                                Snull.T.dot(x))}
+                                for eq in E.T]
                 
-                def fn(x, E, mul):
-                    mbr_amounts = pinv(E.T).dot(sol.x)
+                cons = cs(E)
+        
+                def fn(x, baseline_amounts, Snull, mul):
+                    mbr_amounts = baseline_amounts + Snull.T.dot(x)
                     phase_amounts = np.array([max(1.e-10, v) for v in mul.dot(mbr_amounts)])
 
                     mbr_fractions = mbr_amounts/phase_amounts
@@ -553,11 +563,14 @@ class Composite(Material):
 
                     return np.linalg.norm(mbr_fractions - guessed_fractions)
 
-                solg = opt.minimize(fn, sol.x, args=(E, mul),
-                                    method='SLSQP', bounds=bounds, constraints=cons)
+                baseline_amounts = pinv(E.T).dot(sol.x)
+                Snull = np.array(Matrix(S.T).nullspace()).astype(float)
+                solg = opt.minimize(fn, [0.]*len(Snull), args=(baseline_amounts, Snull, mul),
+                                    method='SLSQP', constraints=cons)
 
                 if solg.success:
                     sol = solg
+                    sol.x = E.T.dot(baseline_amounts + Snull.T.dot(solg.x))
                 else:
                     warnings.warn('Solver failed to minimize the residuals in composition. '
                                   'Falling back to solution ignoring compositional guesses.')
@@ -621,6 +634,13 @@ class Composite(Material):
         else:
             raise Exception("A solution was not found.")
         
+    @material_property
+    def formula(self):
+        """
+        Returns bulk formula of the assemblage
+        """
+        return sum_formulae([self.phases[i].formula for i in range(len(self.phases))],
+                            np.array(self.molar_fractions)*self.n_moles)
 
     @material_property
     def molar_internal_energy(self):

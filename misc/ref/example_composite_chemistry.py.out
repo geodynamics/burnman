@@ -1,0 +1,63 @@
+1) Fitting phase proportions to a bulk composition
+
+Composite: olivine-orthopyroxene mix
+Phase and endmember fractions:
+  olivine: 0.8078
+    Forsterite: 0.9000
+    Fayalite: 0.1000
+  orthopyroxene: 0.1922
+    Enstatite: 0.9000
+    Ferrosilite: 0.1000
+    Mg_Tschermaks: 0.0000
+    Ortho_Diopside: 0.0000
+Total number of moles: 2.008
+Residual: 0.0234
+
+
+2a) Fitting endmember proportions to a natural composition
+
+Composite: Natural garnet (JH2015 endmembers)
+Phase and endmember fractions:
+  garnet (CFMASCrO, low pressure): 1.0000
+    py: 0.0495
+    alm: 0.0651
+    gr: 0.7805
+    andr: 0.1046
+    knor: 0.0004
+Residual: 0.0663
+
+
+2b) Fitting endmember proportions to a natural composition
+(example with negative endmember proportions)
+
+Composite: SLB garnet
+Phase and endmember fractions:
+  garnet: 1.0000
+    Pyrope: -0.5593
+    Almandine: 0.9984
+    Grossular: 0.0016
+    Mg_Majorite: 0.5593
+    Jd_Majorite: 0.0000
+Residual: 0.0177
+
+
+3) Fitting both phase amounts and compositions to a bulk composition
+(in this case, an upper mantle assemblage)
+
+Composite: Upper mantle assemblage
+Phase and endmember fractions:
+  olivine: 0.2423
+    Forsterite: 0.9039
+    Fayalite: 0.0961
+  orthopyroxene: 0.5461
+    Enstatite: 0.8086
+    Ferrosilite: 0.0908
+    Mg_Tschermaks: 0.1006
+    Ortho_Diopside: 0.0000
+  garnet: 0.2116
+    Pyrope: 0.8861
+    Almandine: 0.0758
+    Grossular: 0.0382
+    Mg_Majorite: 0.0000
+    Jd_Majorite: 0.0000
+Residual: 0.0000
