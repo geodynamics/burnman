@@ -257,18 +257,18 @@ class Composite(Material):
                     site_occupancies = np.pad(site_occupancies,
                                               ((0, 0),
                                                (0, ph.solution_model.endmember_occupancies.shape[1])),
-                                              'constant', constant_values=((0, 0), (0, 0)))
+                                              'constant', constant_values=np.array(((0, 0), (0, 0))))
                 
                 site_occupancies = np.vstack((site_occupancies,
                                               np.pad(ph.solution_model.endmember_occupancies,
                                                      ((0, 0), (n_pad,0)),
-                                                     'constant', constant_values=(0., 0.))))
+                                                     'constant', constant_values=np.array((0., 0.)))))
         
             elif isinstance(ph, Mineral):
                 site_occupancies = np.pad(site_occupancies,
                                           ((0, 1), (0, 1)),
                                           'constant',
-                                          constant_values=((0, 0), (0, 0)))
+                                          constant_values=np.array(((0, 0), (0, 0))))
                 site_occupancies[-1,-1] = 1.
             else:
                 raise Exception('Composite includes a phase which is neither an instance of a burnman.Mineral nor a burnman.SolidSolution.')
@@ -633,14 +633,14 @@ class Composite(Material):
             return (endmember_amounts, residuals, rnorm)
         else:
             raise Exception("A solution was not found.")
-        
+
     @material_property
     def formula(self):
         """
-        Returns bulk formula of the assemblage
+        Returns molar formula of the assemblage [atoms/mol]
         """
         return sum_formulae([self.phases[i].formula for i in range(len(self.phases))],
-                            np.array(self.molar_fractions)*self.n_moles)
+                            np.array(self.molar_fractions))
 
     @material_property
     def molar_internal_energy(self):

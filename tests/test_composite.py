@@ -300,5 +300,14 @@ class composite(BurnManTest):
         self.assertFloatEqual(rock1.molar_heat_capacity_v, min1.C_v)
         self.assertFloatEqual(rock1.molar_heat_capacity_p, min1.C_p)
 
+    def test_formula(self):
+        min1 = minerals.SLB_2011.periclase()
+        rock1 = burnman.Composite([min1, min1], [0.5, 0.5])
+        self.assertArraysAlmostEqual(rock1.formula.values(), [1.0, 1.0])
+        min2 = minerals.SLB_2011.mg_perovskite()
+        rock1 = burnman.Composite([min1, min2], [0.5, 0.5])
+        f_values = [rock1.formula['Mg'], rock1.formula['Si'], rock1.formula['O']]
+        self.assertArraysAlmostEqual(f_values, [1., 0.5, 2.])
+
 if __name__ == '__main__':
     unittest.main()
