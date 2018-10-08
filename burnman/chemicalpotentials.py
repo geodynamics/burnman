@@ -75,7 +75,8 @@ def chemical_potentials(assemblage, component_formulae):
     component_compositions = ordered_compositional_array(
         component_formulae, elements)
 
-    p = np.linalg.lstsq(endmember_compositions.T, component_compositions.T)
+    p = np.linalg.lstsq(endmember_compositions.T, component_compositions.T, rcond=-1)
+    # rcond=-1 is old default to silence warning and be compatible with python 2.7
     for idx, error in enumerate(p[1]):
         assert (error < 1e-10), \
             'Component %d not defined by prescribed assemblage' % (idx + 1)
