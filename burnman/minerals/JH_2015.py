@@ -10,13 +10,33 @@ Solid solutions from Jennings and Holland, 2015 and references therein
 The values in this document are all in S.I. units,
 unlike those in the original tc file.
 """
+import inspect
 
 from ..mineral import Mineral
 from ..solidsolution import SolidSolution
 from ..combinedmineral import CombinedMineral
 from ..solutionmodel import *
 from ..processchemistry import dictionarize_formula, formula_mass
-from .HP_2011_ds62 import *
+from copy import copy
+
+"""
+ENDMEMBERS
+
+Direct import from HP_2011_ds62
+"""
+
+from . import HP_2011_ds62
+
+# The next few lines import the classes from HP_2011_ds62,
+# so that they can be read as attributes of JH_2015.
+# This avoids copying the covariance matrix into the JH_2015,
+# as would happen with import HP_2011_ds62
+import sys
+this_module = sys.modules[__name__]
+for m in [m for m in inspect.getmembers(HP_2011_ds62, inspect.isclass)
+          if m[1].__module__ == 'burnman.minerals.HP_2011_ds62']:
+    setattr(this_module, m[0], m[1])
+
 
 """
 SOLID SOLUTIONS
@@ -32,8 +52,8 @@ rather than a thermal correction to the interaction parameter   (W=W_0+T*W_T+P*W
 class ferropericlase(SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'ferropericlase (FM)'
-        self.endmembers = [[per(), '[Mg]O'],
-                           [fper(), '[Fe]O']]
+        self.endmembers = [[HP_2011_ds62.per(), '[Mg]O'],
+                           [HP_2011_ds62.fper(), '[Fe]O']]
         self.solution_type = 'symmetric'
         self.energy_interaction = [[18.e3]]
         SolidSolution.__init__(self, molar_fractions=molar_fractions)
@@ -41,8 +61,8 @@ class ferropericlase(SolidSolution):
 class plagioclase(SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'plagioclase (NCAS)'
-        self.endmembers = [[an(), '[Ca][Al]2Si2O8'],
-                           [abh(), '[Na][Al1/2Si1/2]2Si2O8']] # Al-avoidance model
+        self.endmembers = [[HP_2011_ds62.an(), '[Ca][Al]2Si2O8'],
+                           [HP_2011_ds62.abh(), '[Na][Al1/2Si1/2]2Si2O8']] # Al-avoidance model
         self.solution_type = 'asymmetric'
         self.alphas = [0.39, 1.]
         self.energy_interaction = [[22.4e3]]
@@ -51,12 +71,12 @@ class plagioclase(SolidSolution):
 class clinopyroxene(SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'clinopyroxene (NCFMASCrO)'
-        self.endmembers = [[di(),   '[Mg][Ca][Si]2O6'],
+        self.endmembers = [[HP_2011_ds62.di(),   '[Mg][Ca][Si]2O6'],
                            [cfs(),  '[Fe][Fe][Si]2O6'],
-                           [cats(), '[Al][Ca][Si1/2Al1/2]2O6'],
+                           [HP_2011_ds62.cats(), '[Al][Ca][Si1/2Al1/2]2O6'],
                            [crdi(), '[Cr][Ca][Si1/2Al1/2]2O6'],
                            [cess(), '[Fef][Ca][Si1/2Al1/2]2O6'],
-                           [jd(),   '[Al][Na][Si]2O6'],
+                           [HP_2011_ds62.jd(),   '[Al][Na][Si]2O6'],
                            [cen(),  '[Mg][Mg][Si]2O6'],
                            [cfm(),  '[Mg][Fe][Si]2O6']] # note cfm ordered endmember 
         self.solution_type = 'asymmetric'
@@ -81,28 +101,32 @@ class cfs(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'clinoferrosilite',
-                                 mineral_list = [fs()],
+                                 mineral_list = [HP_2011_ds62.fs()],
                                  molar_amounts = [1.],
                                  free_energy_adjustment=[3.8e3, 3., 0.03e-5])  
 class crdi(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'chromium diopside',
-                                 mineral_list = [cats(), kos(), jd()],
+                                 mineral_list = [HP_2011_ds62.cats(),
+                                                 HP_2011_ds62.kos(),
+                                                 HP_2011_ds62.jd()],
                                  molar_amounts = [1., 1., -1.],
                                  free_energy_adjustment=[-3.e3, 0., 0.])  
 class cess(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'ferric diopside',
-                                 mineral_list = [cats(), acm(), jd()],
+                                 mineral_list = [HP_2011_ds62.cats(),
+                                                 HP_2011_ds62.acm(),
+                                                 HP_2011_ds62.jd()],
                                  molar_amounts = [1., 1., -1.],
                                  free_energy_adjustment=[-6.e3, 0., 0.])  
 class cen(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'clinoenstatite',
-                                 mineral_list = [en()],
+                                 mineral_list = [HP_2011_ds62.en()],
                                  molar_amounts = [1.],
                                  free_energy_adjustment=[3.5e3, 2., 0.048e-5])
 
@@ -110,7 +134,8 @@ class cfm(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'ordered clinoferroenstatite',
-                                 mineral_list = [en(), fs()],
+                                 mineral_list = [HP_2011_ds62.en(),
+                                                 HP_2011_ds62.fs()],
                                  molar_amounts = [0.5, 0.5],
                                  free_energy_adjustment=[-3.e3, 0., 0.])
 
@@ -118,8 +143,8 @@ class olivine(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'olivine (FMS)'
-        self.endmembers = [[fo(), '[Mg]2SiO4'],
-                           [fa(), '[Fe]2SiO4']]
+        self.endmembers = [[HP_2011_ds62.fo(), '[Mg]2SiO4'],
+                           [HP_2011_ds62.fa(), '[Fe]2SiO4']]
         self.solution_type = 'symmetric'
         self.energy_interaction = [[9.e3]]
         SolidSolution.__init__(self, molar_fractions=molar_fractions)
@@ -129,10 +154,10 @@ class spinel(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'disordered spinel (CFMASO)'
-        self.endmembers = [[sp(),   '[Al2/3Mg1/3]3O4'],
-                           [herc(), '[Al2/3Fe1/3]3O4'],
-                           [mt(),   '[Fef2/3Fe1/3]3O4'],
-                           [picr(), '[Cr2/3Mg1/3]3O4']]
+        self.endmembers = [[HP_2011_ds62.sp(),   '[Al2/3Mg1/3]3O4'],
+                           [HP_2011_ds62.herc(), '[Al2/3Fe1/3]3O4'],
+                           [HP_2011_ds62.mt(),   '[Fef2/3Fe1/3]3O4'],
+                           [HP_2011_ds62.picr(), '[Cr2/3Mg1/3]3O4']]
         self.solution_type = 'symmetric'
         self.energy_interaction = [[4.e3, 56.e3, 39.e3],
                                    [32.e3, 27.e3],
@@ -144,11 +169,11 @@ class garnet(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'garnet (CFMASCrO, low pressure)'
-        self.endmembers = [[py(),   '[Mg]3[Al]2Si3O12'],
-                           [alm(),  '[Fe]3[Al]2Si3O12'],
-                           [gr(),   '[Ca]3[Al]2Si3O12'],
-                           [andr(), '[Ca]3[Fef]2Si3O12'],
-                           [knor(), '[Mg]3[Cr]2Si3O12']]
+        self.endmembers = [[HP_2011_ds62.py(),   '[Mg]3[Al]2Si3O12'],
+                           [HP_2011_ds62.alm(),  '[Fe]3[Al]2Si3O12'],
+                           [HP_2011_ds62.gr(),   '[Ca]3[Al]2Si3O12'],
+                           [HP_2011_ds62.andr(), '[Ca]3[Fef]2Si3O12'],
+                           [HP_2011_ds62.knor(), '[Mg]3[Cr]2Si3O12']]
         self.solution_type = 'symmetric'
         self.energy_interaction = [[4.e3, 35.e3, 91.e3, 2.e3],
                                    [4.e3, 60.e3, 6.e3],
@@ -168,11 +193,11 @@ class orthopyroxene(SolidSolution):
 
     def __init__(self, molar_fractions=None):
         self.name = 'orthopyroxene (CFMASCrO)'
-        self.endmembers = [[en(),   '[Mg][Mg][Si]0.5Si1.5O6'],
-                           [fs(),   '[Fe][Fe][Si]0.5Si1.5O6'],
+        self.endmembers = [[HP_2011_ds62.en(),   '[Mg][Mg][Si]0.5Si1.5O6'],
+                           [HP_2011_ds62.fs(),   '[Fe][Fe][Si]0.5Si1.5O6'],
                            [fm(),   '[Fe][Mg][Si]0.5Si1.5O6'], 
                            [odi(),  '[Mg][Ca][Si]0.5Si1.5O6'],
-                           [mgts(), '[Al][Mg][Si1/2Al1/2]0.5Si1.5O6'],
+                           [HP_2011_ds62.mgts(), '[Al][Mg][Si1/2Al1/2]0.5Si1.5O6'],
                            [cren(), '[Cr][Mg][Si1/2Al1/2]0.5Si1.5O6'],
                            [mess(), '[Fef][Mg][Si1/2Al1/2]0.5Si1.5O6']] # fm ordered phase, fake T-site multiplicity
         self.solution_type = 'asymmetric'
@@ -198,21 +223,24 @@ class fm(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'ordered ferroenstatite',
-                                 mineral_list = [en(), fs()],
+                                 mineral_list = [HP_2011_ds62.en(),
+                                                 HP_2011_ds62.fs()],
                                  molar_amounts = [0.5, 0.5],
                                  free_energy_adjustment=[-6.e3, 0., 0.])
 class odi(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'orthodiopside',
-                                 mineral_list = [di()],
+                                 mineral_list = [HP_2011_ds62.di()],
                                  molar_amounts = [1.],
                                  free_energy_adjustment=[-0.1e3, -0.211, 0.005e-5]) # note sign of *entropy* change.
 class cren(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'chromium enstatite',
-                                 mineral_list = [mgts(), kos(), jd()],
+                                 mineral_list = [HP_2011_ds62.mgts(),
+                                                 HP_2011_ds62.kos(),
+                                                 HP_2011_ds62.jd()],
                                  molar_amounts = [1., 1., -1.],
                                  free_energy_adjustment=[3.e3, 0., 0.])
 
@@ -220,8 +248,74 @@ class mess(CombinedMineral):
     def __init__(self):
         CombinedMineral.__init__(self,
                                  name = 'ferrienstatite',
-                                 mineral_list = [mgts(), acm(), jd()],
+                                 mineral_list = [HP_2011_ds62.mgts(),
+                                                 HP_2011_ds62.acm(),
+                                                 HP_2011_ds62.jd()],
                                  molar_amounts = [1., 1., -1.],
                                  free_energy_adjustment=[-15.e3, 0., 0.15e-5])
 
-        
+
+
+
+def construct_combined_covariance(original_covariance_dictionary,
+                                  combined_mineral_list):
+    """
+    This function takes a dictionary containing a list of endmember_names
+    and a covariance_matrix, and a list of CombinedMineral instances, and creates
+    an updated covariance dictionary containing those CombinedMinerals
+
+    Parameters
+    ----------
+    original_covariance_dictionary : dictionary
+        Contains a list of strings of endmember_names of length n
+        and a 2D numpy array covariance_matrix of shape n x n
+
+    combined_mineral_list : list of instances of :class:`burnman.CombinedMineral`
+        List of minerals to be added to the covariance matrix
+
+    Returns
+    -------
+    cov : dictionary
+        Updated covariance dictionary, with the same keys as the original
+
+    """
+    cov_orig = original_covariance_dictionary
+    
+    # Update names
+    cov = {'endmember_names': copy(cov_orig['endmember_names'])}
+    for c in combined_mineral_list:
+        cov['endmember_names'].append(c.name)
+
+    # Update covariance matrix
+    A = np.identity(len(cov_orig['endmember_names']))
+    for i, indices in enumerate([[cov_orig['endmember_names'].index(name)
+                                  for name in [mbr[0].params['name']
+                                               for mbr in c.mixture.endmembers]]
+                                 for c in combined_mineral_list]):
+        B = np.zeros(len(cov_orig['endmember_names']))
+        B[indices] = combined_mineral_list[i].mixture.molar_fractions
+        A = np.vstack((A, B))
+
+    cov['covariance_matrix'] = A.dot(cov_orig['covariance_matrix']).dot(A.T)
+
+    return cov
+
+
+"""
+VARIANCE-COVARIANCE MATRIX
+Derived from HP_2011_ds62, modified to include all the CombinedMinerals
+
+cov is a dictionary containing:
+     - endmember_names: a list of endmember names
+     - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation
+"""
+cov = construct_combined_covariance(original_covariance_dictionary = HP_2011_ds62.cov,
+                                    combined_mineral_list = [cfs(),
+                                                             crdi(),
+                                                             cess(),
+                                                             cen(),
+                                                             cfm(),
+                                                             fm(),
+                                                             odi(),
+                                                             cren(),
+                                                             mess()])

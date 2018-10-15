@@ -10,6 +10,15 @@
 
 import sys
 import os.path
+import pprint
+from collections import OrderedDict
+# hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../../../burnman'):
+    sys.path.insert(1, os.path.abspath('../../..'))
+
+import burnman
+from burnman.processchemistry import dictionarize_formula, formula_mass
+
 
 if os.path.isfile('tc-ds62.txt') == False:
     print('This code requires the data file tc-ds62.txt.')
@@ -29,30 +38,45 @@ components = ['Si', 'Ti', 'Al', 'Fe', 'Mg', 'Mn', 'Ca', 'Na',
 class Endmember:
 
     def __init__(self, name, atoms, formula, sites, comp, H, S, V, Cp, a, k, flag, od):
-        self.name = name  # Name of end member
-        self.atoms = atoms  # Number of atoms in the unit formula
-        self.formula = formula
-        self.sites = sites  # Notional number of sites
-        self.comp = comp  # Composition
-        self.H = H  # Enthalpy
-        self.S = S  # Entropy
-        self.V = V  # Volume
-        self.Cp = Cp  # Heat capacity (c0 + c1*T + c2*T**2 + c3*T**(-0.5))
-        self.a = a  # Thermal expansion
-        self.k = k  # Bulk Modulus (and first two derivatives wrt pressure)
-        self.flag = flag
-        self.od = od
+        if flag != -1 and flag != -2 and k[0] > 0:
+            formula = dictionarize_formula(formula)
+            self.params = OrderedDict([('name', name),
+                                       ('formula', formula),
+                                       ('equation_of_state', 'hp_tmt'),
+                                       ('H_0', round(H * 1e3, 10)),
+                                       ('S_0', round(S * 1e3, 10)),
+                                       ('V_0', round(V * 1e-5, 15)),
+                                       ('Cp', [round(Cp[0] * 1e3, 10),
+                                               round(Cp[1] * 1e3, 10),
+                                               round(Cp[2] * 1e3, 10),
+                                               round(Cp[3] * 1e3, 10)]),
+                                       ('a_0', a),
+                                       ('K_0', round(k[0] * 1e8, 10)),
+                                       ('Kprime_0', k[1]),
+                                       ('Kdprime_0', round(k[2] * 1e-8, 15)),
+                                       ('n', sum(formula.values())),
+                                       ('molar_mass', round(formula_mass(formula), 10))])
+        if flag == 1:
+            self.landau_hp = OrderedDict([('P_0', 1e5),
+                                          ('T_0', 298.15),
+                                          ('Tc_0', od[0]),
+                                          ('S_D', round(od[1] * 1e3, 10)),
+                                          ('V_D', round(od[2] * 1e-5, 10))])
+                                        
+        if flag == 2:
+            self.bragg_williams = OrderedDict([('deltaH', round(od[0] * 1e3, 10)),
+                                               ('deltaV', round(od[1] * 1e-5, 15)),
+                                               ('Wh', round(od[2] * 1e3, 10)),
+                                               ('Wv', round(od[3] * 1e-5, 15)),
+                                               ('n', od[4]),
+                                               ('factor', od[5])])
+
+        
 
 
-def read_dataset(datafile):
-    f = open(datafile, 'r')
-    ds = []
-    for line in f:
-        ds.append(line.split())
-    return ds
-
-ds = read_dataset('tc-ds62.txt')
-
+# Read dataset
+with open('tc-ds62.txt', 'r') as f:
+    ds = [line.split() for line in f]
 
 def getmbr(ds, mbr):
     mbrarray = []
@@ -70,78 +94,112 @@ def getmbr(ds, mbr):
                 od = [0]
             else:
                 flag = int(ds[i * 4 + 6][4])
-            endmember = Endmember(mbr, atoms, formula, int(ds[i * 4 + 3][1]), list(map(float, ds[i * 4 + 3][2:(len(ds[i * 4 + 3]) - 1)])), float(ds[i * 4 + 4][0]), float(
-                ds[i * 4 + 4][1]), float(ds[i * 4 + 4][2]), map(float, ds[i * 4 + 5]), float(ds[i * 4 + 6][0]), list(map(float, ds[i * 4 + 6][1:4])), flag, list(map(float, ds[i * 4 + 6][5:])))
+            endmember = Endmember(mbr, atoms, formula, int(ds[i * 4 + 3][1]),
+                                  list(map(float, ds[i * 4 + 3][2:(len(ds[i * 4 + 3]) - 1)])),
+                                  float(ds[i * 4 + 4][0]), float(ds[i * 4 + 4][1]),
+                                  float(ds[i * 4 + 4][2]), map(float, ds[i * 4 + 5]),
+                                  float(ds[i * 4 + 6][0]), list(map(float, ds[i * 4 + 6][1:4])),
+                                  flag, list(map(float, ds[i * 4 + 6][5:])))
             return endmember
 
-print '# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences'
-print '# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU GPL v2 or later.'
-print ''
-print ''
-print '"""'
-print 'HP_2011 (ds-62)'
-print 'Minerals from Holland and Powell 2011 and references therein'
-print 'Update to dataset version 6.2'
-print 'The values in this document are all in S.I. units,'
-print 'unlike those in the original tc-ds62.txt'
-print 'File autogenerated using HPdata_to_burnman.py'
-print '"""'
-print ''
-print 'from ..mineral import Mineral'
-print 'from ..solidsolution import SolidSolution'
-print 'from ..solutionmodel import *'
-print 'from ..processchemistry import dictionarize_formula, formula_mass'
-print ''
+with open('HP_2011_ds62.py', 'wb') as outfile:
+    outfile.write('# This file is part of BurnMan - a thermoelastic and '
+                  'thermodynamic toolkit for the Earth and Planetary Sciences\n'
+                  '# Copyright (C) 2012 - 2018 by the BurnMan team, '
+                  'released under the GNU \n# GPL v2 or later.\n\n\n'
+                  '"""\n'
+                  'HP_2011 (ds-62)\n'
+                  'Endmember minerals from Holland and Powell 2011 and references therein\n'
+                  'Update to dataset version 6.2\n'
+                  'The values in this document are all in S.I. units,\n'
+                  'unlike those in the original tc-ds62.txt\n'
+                  'File autogenerated using HPdata_to_burnman.py\n'
+                  '"""\n\n'
+                  'from ..mineral import Mineral\n'
+                  'from ..processchemistry import dictionarize_formula, formula_mass\n\n')
 
-solutionfile = 'tc-ds62_solutions.txt'
-with open(solutionfile, 'r') as fin:
-    print fin.read()
-fin.close()
+    outfile.write('"""\n'
+                  'ENDMEMBERS\n'
+                  '"""\n\n')
 
-print '"""'
-print 'ENDMEMBERS'
-print '"""'
-print ''
-formula = '0'
-for i in range(int(ds[0][0])):
-    mbr = ds[i * 4 + 3][0]
-    M = getmbr(ds, mbr)
-    if mbr == 'and':  # change silly abbreviation
-        mbr = 'andalusite'
-    if M.flag != -1 and M.flag != -2 and M.k[0] > 0:
-        print 'class', mbr, '(Mineral):'
-        print '    def __init__(self):'
-        print ''.join(['        formula=\'', M.formula, '\''])
-        print '        formula = dictionarize_formula(formula)'
-        print '        self.params = {'
-        print ''.join(['            \'name\': \'', M.name, '\','])
-        print '            \'formula\': formula,'
-        print '            \'equation_of_state\': \'hp_tmt\','
-        print '            \'H_0\':', M.H * 1e3, ','
-        print '            \'S_0\':', M.S * 1e3, ','
-        print '            \'V_0\':', M.V * 1e-5, ','
-        print '            \'Cp\':', [round(M.Cp[0] * 1e3, 10), round(M.Cp[1] * 1e3, 10), round(M.Cp[2] * 1e3, 10), round(M.Cp[3] * 1e3, 10)], ','
-        print '            \'a_0\':', M.a, ','
-        print '            \'K_0\':', M.k[0] * 1e8, ','
-        print '            \'Kprime_0\':', M.k[1], ','
-        print '            \'Kdprime_0\':', M.k[2] * 1e-8, ','
-        print '            \'n\': sum(formula.values()),'
-        print '            \'molar_mass\': formula_mass(formula)}'
-        if M.flag != 0:
-            print '        self.property_modifiers = [['
-        if M.flag == 1:
-            print '            \'landau_hp\', {\'P_0\':', 1.e5, ','
-            print '                          \'T_0\':', 298.15, ','
-            print '                          \'Tc_0\':', M.od[0], ','
-            print '                          \'S_D\':', M.od[1] * 1e3, ','
-            print '                          \'V_D\':', M.od[2] * 1e-5, '}]]'
-        if M.flag == 2:
-            print '            \'bragg_williams\', {\'deltaH\':', M.od[0] * 1e3, ','
-            print '                               \'deltaV\':', M.od[1] * 1e-5, ','
-            print '                               \'Wh\':', M.od[2] * 1e3, ','
-            print '                               \'Wv\':', M.od[3] * 1e-5, ','
-            print '                               \'n\':', M.od[4], ','
-            print '                               \'factor\':', M.od[5], '}]]'
-        print '        Mineral.__init__(self)'
-        print ''
-print ''
+    def pprint_ordered_dict(d, leading_string, extra_whitespace=0):
+        whitespace = ' ' * (len(leading_string)+2+extra_whitespace)
+        s = pprint.pformat(d)
+        s = s.replace('), ', ',\n{0}\''.format(whitespace))
+        s = s.replace('\', ', '\': ').replace(' \'(\'', '\'')
+        s = s.replace('OrderedDict([(', leading_string+'{').replace(')])', '}')
+        return s
+        
+    formula = '0'
+    for i in range(int(ds[0][0])):
+        mbr = ds[i * 4 + 3][0]
+        M = getmbr(ds, mbr)
+        if mbr == 'and':  # change silly abbreviation
+            mbr = 'andalusite'
+
+        # Print parameters
+        if hasattr(M, 'params'):
+            outfile.write('class {0} (Mineral):\n'.format(mbr)+
+                          '    def __init__(self):\n')
+
+            s = pprint_ordered_dict(M.params, leading_string = '        self.params = ')
+            s = s.replace('000000.0', 'e6')
+            outfile.write(s)
+            outfile.write('\n')
+                          
+            # Print property modifiers (if they exist)
+            if hasattr(M, 'landau_hp') or hasattr(M, 'bragg_williams'):
+                outfile.write('        self.property_modifiers = [[')
+                if hasattr(M, 'landau_hp'):
+                    s = pprint_ordered_dict(M.landau_hp, leading_string = '\'landau_hp\', ', extra_whitespace = 36)
+                    outfile.write(s)
+                    
+                if hasattr(M, 'bragg_williams'):
+                    s = pprint_ordered_dict(M.bragg_williams, leading_string = '\'bragg_williams\', ', extra_whitespace = 36)
+                    outfile.write(s)
+                    
+                outfile.write(']]\n')
+
+            outfile.write('        Mineral.__init__(self)\n\n')
+
+
+    # Process uncertainties
+    import numpy as np
+    n_mbrs = int(ds[0][0])
+    
+    names = []
+    for i in range(n_mbrs):
+        names.append(ds[i*4+3][0])
+        
+    cov = []
+    for i in range(n_mbrs*4+4, len(ds)-2):
+        cov.extend(map(float, ds[i]))
+
+    i_utr = np.triu_indices(n_mbrs)
+    i_ltr = np.tril_indices(n_mbrs)
+    M = np.zeros((n_mbrs, n_mbrs))
+
+    M[i_utr] = cov[1:]
+    M[i_ltr] = M.T[i_ltr]
+    
+    M = M*1.e6 # (kJ/mol)^2 -> (J/mol)^2
+
+    d = {'endmember_names':names,
+         'covariance_matrix':M}
+    
+    np.set_printoptions(threshold='nan')
+  
+    import pprint
+    pp = pprint.PrettyPrinter(indent=0, width=160, depth=3, stream=outfile)
+
+    outfile.write('\"\"\"\n'
+                  'VARIANCE-COVARIANCE MATRIX\n\n'
+                  'cov is a dictionary containing:\n'
+                  '     - names: a list of endmember names\n'
+                  '     - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation\n'
+                  '\"\"\"\n\n'
+                  'from numpy import array\n'
+                  'cov = ')
+    pp.pprint(d)
+
+    outfile.write('\n')
