@@ -18,14 +18,14 @@ Documentation: http://burnman.readthedocs.io
 
 Source code: https://github.com/geodynamics/burnman
 
+Forums: https://community.geodynamics.org/c/burnman
+
 Authors (as of 2015, listed alphabetically by first name):
 * Bob Myhill
 * Cayman Unterborn
 * Ian Rose
 * Sanne Cottaar
 * Timo Heister
-
-Contact the BurnMan team at info@burnman.org with any questions or suggestions.
 
 ## Requirements
 
