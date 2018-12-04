@@ -26,8 +26,7 @@ ENDMEMBERS
 class bcc_iron (Mineral):
 
     def __init__(self):
-        formula = 'Fe1.0'
-        formula = dictionarize_formula(formula)
+        formula = {'Fe': 1.0}
         self.params = {
             'name': 'BCC iron',
             'formula': formula,
@@ -41,18 +40,18 @@ class bcc_iron (Mineral):
             'Kprime_0': 5.16,
             'Kdprime_0': -3.1e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula),
-            'curie_temperature': [1043., 0.0],
-            'magnetic_moment': [2.22, 0.0],
-            'magnetic_structural_parameter': 0.4}
+            'molar_mass': formula_mass(formula)}
+        self.property_modifiers = [
+            ['magnetic_chs', {'structural_parameter': 0.4,
+                              'curie_temperature': [1043., 0.],
+                              'magnetic_moment': [2.22, 0.]}]]
         Mineral.__init__(self)
 
 
 class fcc_iron (Mineral):
 
     def __init__(self):
-        formula = 'Fe1.0'
-        formula = dictionarize_formula(formula)
+        formula = {'Fe': 1.0}
         self.params = {
             'name': 'FCC iron',
             'formula': formula,
@@ -66,8 +65,9 @@ class fcc_iron (Mineral):
             'Kprime_0': 5.2,
             'Kdprime_0': -3.37e-11,
             'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula),
-            'curie_temperature': [201., 0.0],
-            'magnetic_moment': [2.1, 0.0],
-            'magnetic_structural_parameter': 0.28}
+            'molar_mass': formula_mass(formula)}
+        self.property_modifiers = [
+            ['magnetic_chs', {'structural_parameter': 0.28,
+                              'curie_temperature': [201., 0.],
+                              'magnetic_moment': [2.1, 0.]}]]
         Mineral.__init__(self)
