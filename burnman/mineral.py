@@ -277,7 +277,7 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        return self.method.grueneisen_parameter(self.pressure, self.temperature, self.molar_volume, self.params)
+        return self.thermal_expansivity*self.isothermal_bulk_modulus*self.molar_volume/self.molar_heat_capacity_v
     
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
