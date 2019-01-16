@@ -193,12 +193,18 @@ class SolidSolution(Mineral):
             self.endmembers[i][0].set_state(pressure, temperature)
 
     @material_property
+    def endmember_formulae(self):
+        """
+        Returns molar chemical formulae of the endmembers in the solid solution
+        """
+        return [self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)]
+
+    @material_property
     def formula(self):
         """
-        Returns chemical formula of the solid solution
+        Returns molar chemical formula of the solid solution
         """
-        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
-                            self.molar_fractions)
+        return sum_formulae(self.endmember_formulae, self.molar_fractions)
     
     @material_property
     def activities(self):
@@ -324,14 +330,6 @@ class SolidSolution(Mineral):
         Returns molar mass of the solid solution [kg/mol]
         """
         return sum([self.endmembers[i][0].molar_mass * self.molar_fractions[i] for i in range(self.n_endmembers)])
-    
-    @material_property
-    def formula(self):
-        """
-        Returns molar chemical formula of the solid solution
-        """
-        return sum_formulae([self.endmembers[i][0].params['formula'] for i in range(self.n_endmembers)],
-                            self.molar_fractions)
 
     @material_property
     def excess_volume(self):

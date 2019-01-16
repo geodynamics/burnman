@@ -304,6 +304,7 @@ class test_solidsolution(BurnManTest):
         for i in range(3):
             f = np.array(f0)
             f[i] += dp
+            f /= np.sum(f)
             ss.set_composition(f)
             H[i,:] = (ss.excess_partial_gibbs - E0)/dp
         
