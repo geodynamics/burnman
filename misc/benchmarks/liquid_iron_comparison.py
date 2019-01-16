@@ -11,9 +11,12 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from scipy.optimize import fsolve
 import burnman
+import warnings
 
 liq = burnman.minerals.other.liquid_iron()
-burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3, verbose=True)
+
+with warnings.catch_warnings(record=True) as w:
+    burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3, verbose=True)
 
 
 # Find heat capacities

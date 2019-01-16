@@ -1,5 +1,5 @@
 Checking EoS consistency for 'burnman.minerals.other.liquid_iron'
-Expressions within tolerance of 0.00100
+Expressions within tolerance of 0.001000
 G = F + PV : True 
 G = H - TS : True 
 G = E - TS + PV : True 
@@ -23,11 +23,3 @@ Pressure (GPa), Temperature (K), Density (kg/m^3), Grueneisen parameter
 277.4 12643 5816.8 1.5675
 331.5 13015 7654.8 1.5862
 397.1 13417 9826.3 1.5877
-Warning from file 'BURNMAN/burnman/mineral.py', line 195:
-You are trying to calculate shear modulus for liquid iron when it is exactly zero. 
-If liquid iron is a liquid, then you can safely ignore this warning, but consider 
-calculating bulk modulus or bulk sound rather than Vp or Vs. 
-If liquid iron is not a liquid, then shear modulus calculations for the 
-underlying equation of state (AA) have not been implemented, 
-and Vp and Vs estimates will be incorrect.
-
