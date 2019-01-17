@@ -293,23 +293,46 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual([ss.molar_mass], [0.5 *
                                      forsterite().params['molar_mass'] + 0.5 * fayalite().params['molar_mass']])
 
-    def test_hessian(self):
+    def test_asymmetric_model_hessian_one_component_change(self):
         ss = two_site_ss_asymmetric()
-        f0 = [0.25, 0.35, 0.4]
-        ss.set_composition([0.25, 0.35, 0.4])
+        f0 = np.array([0.25, 0.35, 0.4])
         ss.set_state(1.e5, 300.)
-        E0 = ss.excess_partial_gibbs
-        dp = 1.e-8
+        dp = 1.e-6
         H = np.zeros((3, 3))
         for i in range(3):
             f = np.array(f0)
-            f[i] += dp
+            f[i] -= dp/2.
             f /= np.sum(f)
             ss.set_composition(f)
-            H[i,:] = (ss.excess_partial_gibbs - E0)/dp
+            dGdx1 = ss.partial_gibbs
+            
+            f = np.array(f0)
+            f[i] += dp/2.
+            f /= np.sum(f)
+            ss.set_composition(f)
+            dGdx2 = ss.partial_gibbs
         
+            H[i,:] = (dGdx2 - dGdx1)/dp
+
+        ss.set_composition(f0)
         for i in range(3):
             self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
+            
+    def test_asymmetric_model_hessian_multicomponent_change(self):
+        ss = two_site_ss_asymmetric()
+        f0 = [0.25, 0.35, 0.4]
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+        H0 = ss.gibbs_hessian
+
+        df = np.array([2.e-6, -1.5e-6, -0.5e-6])
+        ss.set_composition(f0 - df/2.)
+        dGdx1 = ss.partial_gibbs
+        ss.set_composition(f0 + df/2.)
+        dGdx2 = ss.partial_gibbs
+        
+        for i in range(3):
+            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
     def test_subregular(self):
         ss0 = two_site_ss()
