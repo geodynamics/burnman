@@ -172,6 +172,22 @@ class two_site_ss_subregular(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 
+# Three-endmember, two site solid solution
+class two_site_ss_subregular_asymmetric(burnman.SolidSolution):
+
+    def __init__(self, molar_fractions=None):
+        # Name
+        self.name = 'two_site_ss (subregular symmetric)'
+        self.solution_type = 'subregular'
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
+                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        # Interaction parameters
+        self.energy_interaction = [
+            [[10.e3, -10.e3], [5.e3, 3.e3]], [[-10.e3, -10.e3]]]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
 class test_solidsolution(BurnManTest):
 
     def setup_1min_ss(self):
@@ -318,8 +334,50 @@ class test_solidsolution(BurnManTest):
         for i in range(3):
             self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
             
+    def test_subregular_model_hessian_one_component_change(self):
+        ss = two_site_ss_subregular()
+        f0 = np.array([0.25, 0.35, 0.4])
+        ss.set_state(1.e5, 300.)
+        dp = 1.e-6
+        H = np.zeros((3, 3))
+        for i in range(3):
+            f = np.array(f0)
+            f[i] -= dp/2.
+            f /= np.sum(f)
+            ss.set_composition(f)
+            dGdx1 = ss.partial_gibbs
+            
+            f = np.array(f0)
+            f[i] += dp/2.
+            f /= np.sum(f)
+            ss.set_composition(f)
+            dGdx2 = ss.partial_gibbs
+        
+            H[i,:] = (dGdx2 - dGdx1)/dp
+
+        ss.set_composition(f0)
+        for i in range(3):
+            self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
+            
     def test_asymmetric_model_hessian_multicomponent_change(self):
         ss = two_site_ss_asymmetric()
+        f0 = [0.25, 0.35, 0.4]
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+        H0 = ss.gibbs_hessian
+
+        df = np.array([2.e-6, -1.5e-6, -0.5e-6])
+        ss.set_composition(f0 - df/2.)
+        dGdx1 = ss.partial_gibbs
+        ss.set_composition(f0 + df/2.)
+        dGdx2 = ss.partial_gibbs
+        
+        for i in range(3):
+            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+
+        
+    def test_subregular_model_hessian_multicomponent_change(self):
+        ss = two_site_ss_subregular_asymmetric()
         f0 = [0.25, 0.35, 0.4]
         ss.set_composition(f0)
         ss.set_state(1.e5, 300.)

@@ -48,6 +48,40 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     Wint = -alpha * (q.dot(W)*q).sum(-1)
     return Wint
 
+@jit
+def _non_ideal_hessian_subreg(p, n_endmembers, W):
+    hess = np.zeros((n_endmembers, n_endmembers))
+    for l in range(n_endmembers):
+        for m in range(n_endmembers):
+            for i in range(n_endmembers):
+                for j in range(n_endmembers):
+                    dil = 1. if i==l else 0.
+                    djl = 1. if j==l else 0.
+                    dim = 1. if i==m else 0.
+                    djm = 1. if j==m else 0.
+                    
+
+                    hess[l,m] += W[i,j]*((djl*djm*p[i] - dil*dim*p[j]) +
+                                         (dil*djm + djl*dim) * (p[j] - p[i]) +
+                                         (djl + djm)*(p[i]*(p[i] - 2.*p[j])) -
+                                         (dil + dim)*(p[j]*(p[j] - 2.*p[i])) +
+                                         3.*p[i]*p[j]*(p[j] - p[i]) + 
+                                         (((dil + dim) - p[i]) * 
+                                          ((djl + djm) - p[j]) + p[i]*p[j])/2.)
+    return hess
+
+@jit
+def _non_ideal_interactions_subreg(p, n_endmembers, W):
+    Wint = np.zeros(n_endmembers)
+    for l in range(n_endmembers):
+        for i in range(n_endmembers):
+            for j in range(n_endmembers):
+                dil = 1. if i==l else 0.
+                djl = 1. if j==l else 0.
+                Wint[l] += W[i,j]/2. * ((p[i] - dil)*(p[j] - djl)*(2.*(p[i] - p[j]) - 1.) +
+                                        djl*p[i]*p[i] - dil*p[j]*p[j])
+    return Wint
+
 def logish(x, eps=1.e-5):
     """
     2nd order series expansion of log(x) about eps: log(eps) - sum_k=1^infty (f_eps)^k / k
@@ -583,21 +617,8 @@ class SubregularSolution (IdealSolution):
         IdealSolution.__init__(self, endmembers)
 
     def _non_ideal_function(self, W, molar_fractions):
-        # equation (6') of Helffrich and Wood, 1989
         n = len(molar_fractions)
-        RTlny = np.zeros(n)
-        for l in range(n):
-            val = 0.
-            for i in range(n):
-                if i != l:
-                    val += 0.5 * molar_fractions[i] * (W[l][i] * (1 - molar_fractions[l] + molar_fractions[i] + 2. * molar_fractions[l] * (molar_fractions[l] - molar_fractions[i] - 1)) + W[
-                                                       i][l] * (1. - molar_fractions[l] - molar_fractions[i] - 2. * molar_fractions[l] * (molar_fractions[l] - molar_fractions[i] - 1)))
-                    for j in range(i + 1, n):
-                        if j != l:
-                            val += molar_fractions[i] * molar_fractions[j] * (
-                                W[i][j] * (molar_fractions[i] - molar_fractions[j] - 0.5) + W[j][i] * (molar_fractions[j] - molar_fractions[i] - 0.5))
-            RTlny[l] = val
-        return RTlny
+        return _non_ideal_interactions_subreg(molar_fractions, n, W)
 
     def _non_ideal_interactions(self, molar_fractions):
         # equation (6') of Helffrich and Wood, 1989
@@ -627,14 +648,27 @@ class SubregularSolution (IdealSolution):
         non_ideal_volumes = self._non_ideal_function(self.Wv, molar_fractions)
         return non_ideal_volumes
 
+    
     def gibbs_hessian(self, pressure, temperature, molar_fractions):
-        raise NotImplementedError
+        n = len(molar_fractions)
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_gibbs_hessian = _non_ideal_hessian_subreg(molar_fractions, n,
+                                                           self.We - temperature*self.Ws +
+                                                           pressure*self.Wv)
+
+        return nonideal_gibbs_hessian - temperature*ideal_entropy_hessian
 
     def entropy_hessian(self, pressure, temperature, molar_fractions):
-        raise NotImplementedError
+        n = len(molar_fractions)
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_entropy_hessian = _non_ideal_hessian_subreg(molar_fractions, n,
+                                                             self.Ws)
+        return ideal_entropy_hessian + nonideal_entropy_hessian
 
     def volume_hessian(self, pressure, temperature, molar_fractions):
-        raise NotImplementedError
+        n = len(molar_fractions)
+        return _non_ideal_hessian_subreg(molar_fractions, n,
+                                         self.Wv)
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         if temperature > 1.e-10:
