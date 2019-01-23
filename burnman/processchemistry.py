@@ -16,6 +16,7 @@ from collections import Counter
 import pkgutil
 from string import ascii_uppercase as ucase
 from scipy.optimize import nnls
+from sympy import Matrix, nsimplify
 
 def simplify_matrix(arr):
     def f(i,j):
@@ -245,7 +246,6 @@ def process_solution_chemistry(solution_model):
             elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
 
             for element in elements:
-
                 # Find the element and proportion on the site
                 element_split = re.split('([0-9][^A-Z]*)', element)
                 element_on_site = element_split[0]
@@ -359,3 +359,62 @@ def ordered_compositional_array(formulae, elements):
             formula_array[idx][elements.index(element)] = formula[element]
 
     return formula_array
+
+
+def formula_to_string(formula):
+    """
+    Parameters
+    ----------
+    formula : dictionary or counter
+        Chemical formula
+
+    Returns
+    -------
+    formula_string : string
+        A formula string, with element order based loosely
+        on electronegativity, following the scheme suggested by IUPAC,
+        except that H comes after the Group 16 elements, not before them.
+        If one or more keys in the dictionary are not one of the elements
+        in the periodic table, then they are added at the end of the string.
+    """
+    IUPAC_element_order=['v', 'Og', 'Rn', 'Xe', 'Kr', 'Ar', 'Ne', 'He', # Group 18
+                         'Fr', 'Cs', 'Rb', 'K', 'Na', 'Li', # Group 1 (omitting H)
+                         'Ra', 'Ba', 'Sr', 'Ca', 'Mg', 'Be', # Group 2
+                         'Lr', 'No', 'Md', 'Fm', 'Es', 'Cf', 'Bk', 'Cm',
+                         'Am', 'Pu', 'Np', 'U', 'Pa', 'Th', 'Ac', # Actinides
+                         'Lu', 'Yb', 'Tm', 'Er', 'Ho', 'Dy', 'Tb', 'Gd',
+                         'Eu', 'Sm', 'Pm', 'Nd', 'Pr', 'Ce', 'La', # Lanthanides
+                         'Y', 'Sc', # Group 3
+                         'Rf', 'Hf', 'Zr', 'Ti', # Group 4
+                         'Db', 'Ta', 'Nb', 'V', # Group 5
+                         'Sg', 'W', 'Mo', 'Cr', # Group 6
+                         'Bh', 'Re', 'Tc', 'Mn', # Group 7
+                         'Hs', 'Os', 'Ru', 'Fe', # Group 8
+                         'Mt', 'Ir', 'Rh', 'Co', # Group 9
+                         'Ds', 'Pt', 'Pd', 'Ni', # Group 10
+                         'Rg', 'Au', 'Ag', 'Cu', # Group 11
+                         'Cn', 'Hg', 'Cd', 'Zn', # Group 12
+                         'Nh', 'Tl', 'In', 'Ga', 'Al', 'B', # Group 13
+                         'Fl', 'Pb', 'Sn', 'Ge', 'Si', 'C', # Group 14
+                         'Mc', 'Bi', 'Sb', 'As', 'P', 'N', # Group 15
+                         'Lv', 'Po', 'Te', 'Se', 'S', 'O', # Group 16
+                         'H', # hydrogen
+                         'Ts', 'At', 'I', 'Br', 'Cl', 'F']# Group 17
+
+    formula_string = ''
+    for e in IUPAC_element_order:
+        if e in formula and np.abs(formula[e])>1.e-12:
+            if np.abs(formula[e] - 1.) < 1.e-12:
+                formula_string += e
+            else:
+                formula_string += e + str(nsimplify(formula[e]))
+
+    for e in formula:
+        if e not in IUPAC_element_order:
+            if e in formula and np.abs(formula[e])>1.e-12:
+                if np.abs(formula[e] - 1.) < 1.e-12:
+                    formula_string += e
+                else:
+                    formula_string += e + str(nsimplify(formula[e]))
+
+    return formula_string
