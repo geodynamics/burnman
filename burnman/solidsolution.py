@@ -117,29 +117,6 @@ class SolidSolution(Mineral):
                     raise Exception(
                         "Solution model type " + self.solution_type + "not recognised.")
         else:
-            if hasattr(self, 'energy_interaction') == False:
-                self.energy_interaction = None
-            if hasattr(self, 'volume_interaction') == False:
-                self.volume_interaction = None
-            if hasattr(self, 'entropy_interaction') == False:
-                self.entropy_interaction = None
-
-            if self.solution_type == 'symmetric':
-                self.solution_model = SymmetricRegularSolution(
-                    self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-            elif self.solution_type == 'asymmetric':
-                try:
-                    self.solution_model = AsymmetricRegularSolution(
-                        self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-                except:
-                    raise Exception(
-                        "'alphas' attribute missing from solid solution")
-            elif self.solution_type == 'subregular':
-                self.solution_model = SubregularSolution(
-                    self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
-            else:
-                raise Exception(
-                    "Solution model type " + self.solution_type + "not recognised.")
             self.solution_model = SolutionModel()
 
         # Number of endmembers in the solid solution
