@@ -47,9 +47,29 @@ def composition_property(func):
 
 def file_to_composition_list(fname, unit_type, normalize):
     """
-    
+    Takes an input file with a specific format and returns a list of compositions
+    (and associated comments) contained in that file.
+
+    Parameters
+    ----------
+    fname : string
+        Path to ascii file containing composition data.
+        Lines beginning with a hash are not read.
+        The first read-line of the datafile contains a list of tab or
+        space-separated components (e.g. FeO or SiO2), followed by the word Comment.
+        Following lines are lists of floats with the amounts of each component.
+        After the component amounts, the user can write anything they like
+        in the Comment section.
+    unit_type : 'weight' or 'molar'
+        Specify whether the compositions in the file are given as weight or
+        molar amounts.
+    normalize : boolean
+        If False, absolute numbers of moles/grams of component are stored,
+        otherwise the component amounts of returned compositions will
+        sum to one (until Composition.renormalize() is used).
+
     """
-    lines = list(filter(None, [line.rstrip('\n').split() for line in open(fname)]))
+    lines = list(filter(None, [line.rstrip('\n').split() for line in open(fname) if line[0] != '#']))
     n_components = lines[0].index("Comment")
     components = lines[0][:n_components]
     comments = [line[n_components:] for line in lines[1:]]
@@ -58,7 +78,6 @@ def file_to_composition_list(fname, unit_type, normalize):
 
     
 class Composition(object):
-    
     """
     Class for a composition object, which can be used
     to store, modify and renormalize compositions, 
@@ -75,14 +94,14 @@ class Composition(object):
         Parameters
         ----------
         composition_dictionary : dictionary
-            dictionary of components (given as a string) and their amounts.
+            Dictionary of components (given as a string) and their amounts.
         unit_type : 'weight' or 'molar' (optional, 'weight' as standard)
-            specify whether the input composition is given as weight or 
-            molar amounts
+            Specify whether the input composition is given as weight or
+            molar amounts.
         normalize : boolean
             If False, absolute numbers of moles/grams of component are stored,
             otherwise the component amounts of returned compositions will 
-            sum to one (until Composition.renormalize() is used)
+            sum to one (until Composition.renormalize() is used).
         """
 
         self._cached = {}
@@ -161,7 +180,7 @@ class Composition(object):
         normalization_component: string 
             Component/element on which to renormalize.
             String must either be one of the components/elements
-            already in composite, or have the value 'total'.
+            already in composite, or have the value 'total'
         normalization_amount: float
             Amount of component in the renormalised composition 
         """
