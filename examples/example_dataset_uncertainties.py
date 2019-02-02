@@ -58,17 +58,25 @@ Cov_selected = cov['covariance_matrix'][np.ix_(indices,indices)]
 # quartz + periclase = 0.5*enstatite
 A = np.array([[1., 1., 0.],
               [0., 0., 0.5]])
-Cov_transformed = A.dot(Cov_selected).dot(A.T)
+cov_transformed = A.dot(Cov_selected).dot(A.T)
+
+sigma_x = np.sqrt(cov_transformed[0][0])
+sigma_y = np.sqrt(cov_transformed[1][1])
+corr_xy = cov_transformed[0][1]/sigma_x/sigma_y
+
+print('sigma(q+per) = {0:.2f} J/mol'.format(sigma_x))
+print('sigma(en/2) = {0:.2f} J/mol'.format(sigma_y))
+print('corr(q+per,en/2) = {0:.2f}'.format(corr_xy))
 
 
 # Finally, we plot the covariance matrix
 fig = plt.figure(figsize = (5, 5))
 ax = fig.add_subplot(1, 1, 1)
 
-plot_cov_ellipse(Cov_transformed, [0., 0.], nstd=1., ax=ax)
+plot_cov_ellipse(cov_transformed, [0., 0.], nstd=1., ax=ax)
 
 ax.set_xlim(-500., 500.)
 ax.set_ylim(-500., 500.)
 ax.set_xlabel('$\sigma_{q+per}$ (J/mol MgSiO$_3$)')
-ax.set_ylabel('$\sigma_{en}$ (J/mol MgSiO$_3$)')
+ax.set_ylabel('$\sigma_{en/2}$ (J/mol MgSiO$_3$)')
 plt.show()
