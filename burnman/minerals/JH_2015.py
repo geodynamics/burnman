@@ -301,21 +301,26 @@ def construct_combined_covariance(original_covariance_dictionary,
     return cov
 
 
-"""
-VARIANCE-COVARIANCE MATRIX
-Derived from HP_2011_ds62, modified to include all the CombinedMinerals
-
-cov is a dictionary containing:
-     - endmember_names: a list of endmember names
-     - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation
-"""
-cov = construct_combined_covariance(original_covariance_dictionary = HP_2011_ds62.cov,
-                                    combined_mineral_list = [cfs(),
-                                                             crdi(),
-                                                             cess(),
-                                                             cen(),
-                                                             cfm(),
-                                                             fm(),
-                                                             odi(),
-                                                             cren(),
-                                                             mess()])
+def cov():
+    """
+    A function which returns the variance-covariance matrix of the zero-point energies 
+    of all the endmembers in the dataset. Derived from HP_2011_ds62, modified to include all 
+    the new CombinedMinerals.
+    
+    Returns
+    -------
+    cov : dictionary
+        Dictionary keys are:
+        - endmember_names: a list of endmember names, and 
+        - covariance_matrix: a 2D variance-covariance array for the endmember enthalpies of formation
+    """
+    return construct_combined_covariance(original_covariance_dictionary = HP_2011_ds62.cov(),
+                                         combined_mineral_list = [cfs(),
+                                                                  crdi(),
+                                                                  cess(),
+                                                                  cen(),
+                                                                  cfm(),
+                                                                  fm(),
+                                                                  odi(),
+                                                                  cren(),
+                                                                  mess()])

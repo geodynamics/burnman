@@ -1,0 +1,74 @@
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU
+# GPL v2 or later.
+
+"""
+example_holland_powell_uncertainties
+------------------------------------
+
+This extremely short example script shows how one can visualize
+and manipulate uncertainties in zero-point energies as found in the 
+Holland and Powell dataset.
+
+*Uses:*
+
+* :doc:`mineral_database`
+
+
+*Demonstrates:*
+
+* creating basic layer
+* calculating thermoelastic properties with self-consistent pressures
+* seismic comparison
+"""
+from __future__ import absolute_import
+
+# Here we import standard python modules that are required for
+# usage of BurnMan.
+import os
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+
+# hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../burnman'):
+    sys.path.insert(1, os.path.abspath('..'))
+
+
+# Here we import the relevant modules from BurnMan.
+import burnman
+from burnman.minerals import HP_2011_ds62
+from burnman.nonlinear_fitting import plot_cov_ellipse # for plotting
+
+plt.style.use('ggplot')
+
+# First, we read in the covariance matrix
+cov = HP_2011_ds62.cov()
+
+# Now we can find the desired rows and columns of the covariance matrix
+# by cross-referencing against the list of mineral names
+# (quartz, periclase, enstatite)
+indices = [cov['endmember_names'].index(name) for name in ['q', 'per', 'en']]
+
+# Slice the required rows and columns from the covariance matrix
+Cov_selected = cov['covariance_matrix'][np.ix_(indices,indices)]
+
+# The following line transforms the covariance matrix so that we can look
+# at the uncertainties associated with the endmember reaction
+# quartz + periclase = 0.5*enstatite
+A = np.array([[1., 1., 0.],
+              [0., 0., 0.5]])
+Cov_transformed = A.dot(Cov_selected).dot(A.T)
+
+
+# Finally, we plot the covariance matrix
+fig = plt.figure(figsize = (5, 5))
+ax = fig.add_subplot(1, 1, 1)
+
+plot_cov_ellipse(Cov_transformed, [0., 0.], nstd=1., ax=ax)
+
+ax.set_xlim(-500., 500.)
+ax.set_ylim(-500., 500.)
+ax.set_xlabel('$\sigma_{q+per}$ (J/mol MgSiO$_3$)')
+ax.set_ylabel('$\sigma_{en}$ (J/mol MgSiO$_3$)')
+plt.show()
