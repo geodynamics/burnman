@@ -15,6 +15,7 @@ from scipy.ndimage.filters import gaussian_filter
 from scipy.interpolate import interp2d
 from collections import Counter
 import itertools
+import warnings
 
 from . import constants
 import itertools
@@ -629,8 +630,16 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
 
     if including_shear_properties:
         expr.extend(['Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
-        eq.extend([[m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
-                   [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            eq.extend([[m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
+                       [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+            if len(w) == 1:
+                print(w[0].message)
+                print('\nYou can suppress this message by setting the '
+                      'parameter\nincluding_shear_properties to False '
+                      'when calling check_eos_consistency.\n')
         note = ''
     else:
         note = ' (not including shear properties)'
