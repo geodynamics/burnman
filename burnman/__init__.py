@@ -207,4 +207,4 @@ from . import tools
 from . import nonlinear_fitting
 from . import nonlinear_solvers
 from . import eos_fitting
-from .partitioning import calculate_partition_coefficient, calculate_phase_percents
+from .partitioning import calculate_nakajima_fp_pv_partition_coefficient

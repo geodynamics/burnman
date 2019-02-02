@@ -8,30 +8,22 @@ sys.path.insert(1, os.path.abspath('..'))
 import burnman
 from burnman import minerals
 
-
-# TODO: test composite that changes number of entries
-
 class test(BurnManTest):
 
     def test_simple(self):
-        inp1 = {'Mg': 0.213, 'Fe': 0.0626,
-                'Si': 0.242, 'Ca': 0., 'Al': 0.}  # wt%
-        phase_per, rel_mol_per = burnman.calculate_phase_percents(inp1)
+        bulk_composition = burnman.Composition({'Mg': 0.213, 'Fe': 0.0626,
+                                                'Si': 0.242, 'Ca': 0., 'Al': 0.0},
+                                               unit_type='weight')
 
-        StartP = 23.83  # in GPa
-        EndP = 110.0
-        deltaP = 1.
+        bdg = minerals.SLB_2011.mg_fe_bridgmanite()
+        per = minerals.SLB_2011.ferropericlase()
 
-        # P,T,a,b,frac_mol_pv,frac_mol_mw    =
-        # part_coef_calc(inp2,StartP,EndP,deltaP)
-
-        gt = lambda p: burnman.geotherm.anderson(p)
-        pressure = StartP *1.e9
-        temperature = 2000
-        (a, b) = burnman.calculate_partition_coefficient(
-            pressure, temperature, rel_mol_per, 0.5)
-        self.assertFloatEqual(a, 0.18453519778)
-        self.assertFloatEqual(b, 0.102938439776)
+        pressure = 23.83e9 # Pa
+        temperature = 2000. # K
+        (a, b) = burnman.calculate_nakajima_fp_pv_partition_coefficient(
+            pressure, temperature, bulk_composition.molar_composition, 0.5)
+        self.assertFloatEqual(a, 0.184533288)
+        self.assertFloatEqual(b, 0.102937268)
 
 
 if __name__ == '__main__':
