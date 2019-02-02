@@ -277,8 +277,24 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        return self.thermal_expansivity*self.isothermal_bulk_modulus*self.molar_volume/self.molar_heat_capacity_v
-    
+        eps = np.finfo('float').eps
+        if np.abs(self.molar_heat_capacity_v) > eps:
+            
+            return (self.thermal_expansivity *
+                    self.isothermal_bulk_modulus *
+                    self.molar_volume /
+                    self.molar_heat_capacity_v)
+        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps) and  
+              (np.abs(self._property_modifiers['d2GdP2']) < eps) and
+              (np.abs(self._property_modifiers['dGdP']) < eps) and
+              (np.abs(self._property_modifiers['d2GdT2']) < eps)):
+            
+            return self.method.grueneisen_parameter(self.pressure, self.temperature,
+                                                    self.molar_volume, self.params)
+        else:
+            raise Exception('You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers.')
+                
+            
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
     def molar_heat_capacity_v(self):
