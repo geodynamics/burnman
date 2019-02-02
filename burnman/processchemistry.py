@@ -59,7 +59,7 @@ def dictionarize_formula(formula):
     return f
 
 def sum_formulae(formulae, amounts=None):
-    if amounts == None:
+    if amounts is None:
         amounts = [1. for formula in formulae]
     else:
         assert (len(formulae) == len(amounts))
