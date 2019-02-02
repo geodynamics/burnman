@@ -549,7 +549,8 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     else:
         return x0, x1, f0, f1
 
-def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
+def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
+                          including_shear_properties=True):
     """
     Compute numerical derivatives of the gibbs free energy of a mineral
     under given conditions, and check these values against those provided 
@@ -569,6 +570,10 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
     verbose : boolean
         Decide whether to print information about each
         check
+    including_shear_properties : boolean
+        Decide whether to check shear information,
+        which is pointless for liquids and equations of state
+        without shear modulus parameterizations
 
     Returns
     -------
@@ -619,16 +624,22 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False):
                [m.gr, m.alpha*m.K_T*m.V/m.molar_heat_capacity_v]])
 
 
-    expr.extend(['Vphi = np.sqrt(K_S/rho)', 'Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
-    eq.extend([[m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)],
-               [m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
-               [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+    expr.append('Vphi = np.sqrt(K_S/rho)')
+    eq.append([m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)])
+
+    if including_shear_properties:
+        expr.extend(['Vp = np.sqrt((K_S + 4G/3)/rho)', 'Vs = np.sqrt(G_S/rho)'])
+        eq.extend([[m.p_wave_velocity, np.sqrt((m.K_S + 4.*m.G/3.)/m.rho)],
+                   [m.shear_wave_velocity, np.sqrt(m.G/m.rho)]])
+        note = ''
+    else:
+        note = ' (not including shear properties)'
 
     consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1]) + np.finfo('float').eps for e in eq]
     consistency = np.all(consistencies)
     
     if verbose == True:
-        print('Checking EoS consistency for {0:s}'.format(m.to_string()))
+        print('Checking EoS consistency for {0:s}{1}'.format(m.to_string(), note))
         print('Expressions within tolerance of {0:2f}'.format(tol))
         for i, c in enumerate(consistencies):
             print('{0:10s} : {1:5s}'.format(expr[i], str(c)))
