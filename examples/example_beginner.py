@@ -66,7 +66,9 @@ if __name__ == "__main__":
     # formulation from Stixrude and Lithgow-Bertolloni (2005) will be used.
     rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
                               minerals.SLB_2011.periclase()],
-                             [0.8, 0.2])
+                             [0.8, 0.2], name='Simple lower mantle assemblage')
+
+    print(rock)
 
     # Here we create and load the PREM seismic velocity model, which will be
     # used for comparison with the seismic velocities of the "rock" composite
