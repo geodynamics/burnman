@@ -79,47 +79,6 @@ def formula_mass(formula):
         formula[element] * atomic_masses[element] for element in formula)
     return mass
 
-def dictionarize_site_formula(formula):
-    """
-    A function to take a chemical formula with sites specified
-    by square brackets and return a standard dictionary with
-    element keys and atoms of each element per formula unit as items.
-    """
-    s = re.split(r'\[', formula)[1:]
-    list_multiplicity = np.empty(shape=(len(s)))
-    f = dict()
-
-    for site in range(len(s)):
-        site_occupancy = re.split(r'\]', s[site])[0]
-        mult = re.split('[A-Z][^A-Z]*', re.split(r'\]', s[site])[1])[0]
-        not_in_site = str(filter(None, re.split(r'\]', s[site])))[1]
-        not_in_site = not_in_site.replace(mult, '', 1)
-        if mult == '':
-            list_multiplicity[site] = Fraction(1.0)
-        else:
-            list_multiplicity[site] = Fraction(mult)
-
-        # Loop over elements on a site
-        elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
-        for i in range(len(elements)):
-            element_on_site = re.split('[0-9][^A-Z]*', elements[i])[0]
-            proportion_element_on_site = re.findall(
-                '[0-9][^A-Z]*', elements[i])
-            if len(proportion_element_on_site) == 0:
-                proportion_element_on_site = Fraction(1.0)
-            else:
-                proportion_element_on_site = Fraction(
-                    proportion_element_on_site[0])
-            n_element = float(mult) * proportion_element_on_site
-            f[element_on_site] = f.get(element_on_site, 0.0) + n_element
-
-        # Loop over elements not on a site
-        for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-            element = str(filter(None, re.split(r'(\d+)', enamenumber)))
-            f[element[0]] = f.get(element[0], 0.0) + float(element[1])
-
-    return f
-
 def solution_bounds(endmember_occupancies):
     """
     Parameters
