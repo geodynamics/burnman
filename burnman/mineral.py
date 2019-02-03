@@ -200,6 +200,16 @@ class Mineral(Material):
     Legendre transformations
     or Maxwell relations
     """
+    @material_property
+    def formula(self):
+        """
+        Returns the chemical formula of the Mineral class
+        """
+        if 'formula' in self.params:
+            return self.params['formula']
+        else:
+            raise ValueError(
+                'No formula parameter for mineral {0}.'.format(self.to_string))
 
     @material_property
     @copy_documentation(Material.molar_mass)
@@ -208,7 +218,7 @@ class Mineral(Material):
             return self.params['molar_mass']
         else:
             raise ValueError(
-                "No molar_mass parameter for mineral " + self.to_string + ".")
+                'No molar_mass parameter for mineral {0}.'.format(self.to_string))
 
     @material_property
     @copy_documentation(Material.density)
