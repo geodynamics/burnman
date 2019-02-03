@@ -11,6 +11,7 @@ import burnman
 from burnman.mineral import Mineral
 from burnman.combinedmineral import CombinedMineral
 from burnman.processchemistry import dictionarize_formula, formula_mass
+from burnman.processchemistry import formula_to_string, sum_formulae
 from util import BurnManTest
 
 class forsterite (Mineral):
@@ -423,6 +424,13 @@ class test_solidsolution(BurnManTest):
         opx.set_state(1.e5, 1000.)
         self.assertArraysAlmostEqual(
             opx.activity_coefficients, [np.exp(1.), 1.])
+
+    def test_formula(self):
+        ol = olivine_ideal_ss()
+        ol.set_composition([0.5, 0.5])
+        self.assertEqual(formula_to_string(ol.formula), 'MgFeSiO4')
+        self.assertEqual(formula_to_string(sum_formulae(ol.endmember_formulae,
+                                                        [0.5, 0.5])), 'MgFeSiO4')
 
 if __name__ == '__main__':
     unittest.main()
