@@ -74,19 +74,24 @@ class Composite(Material):
 
         self.set_averaging_scheme('VoigtReussHill')
         self.name=name
+        self.print_precision=4 # number of significant figures used by self.__str__
         
     def __str__(self):
         string='Composite: {0}'.format(self.name)
         try:
-            string += '\n  P, T: {0:.4g} Pa, {1:.4g} K'.format(self.pressure, self.temperature)
+            string += '\n  P, T: {0:.{sf}g} Pa, {1:.{sf}g} K'.format(self.pressure,
+                                                                     self.temperature,
+                                                                     sf=self.print_precision)
         except:
             pass
         string+='\nPhase and endmember fractions:'
         for phase, fraction in zip(*self.unroll()):
-            string+='\n  {0}: {1}'.format(phase.name, fraction)
+            string+='\n  {0}: {1:0.{sf}f}'.format(phase.name, fraction, sf=self.print_precision)
             if isinstance(phase, SolidSolution):
                for i in range(phase.n_endmembers): 
-                   string+='\n    {0}: {1}'.format(phase.endmember_names[i], phase.molar_fractions[i])
+                   string+='\n    {0}: {1:0.{sf}f}'.format(phase.endmember_names[i],
+                                                           phase.molar_fractions[i],
+                                                           sf=self.print_precision)
         return string
 
     def set_fractions(self, fractions, fraction_type='molar'):
