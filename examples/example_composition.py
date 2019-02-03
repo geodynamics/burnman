@@ -4,42 +4,22 @@
 
 
 """
-
 example_composition
 -------------------
 
-This example shows how to create different minerals, how to compute seismic
-velocities, and how to compare them to a seismic reference model.
-
-There are many different ways in BurnMan to combine minerals into a
-composition. Here we present a couple of examples:
-
-1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
-   libraries or from user defined minerals (see example_user_input_material)
-2. Example with three minerals
-3. Using preset solid solutions
-4. Defining your own solid solution
-
-
-To turn a method of mineral creation "on" the first if statement above the
-method must be set to True, with all others set to False.
-
-Note: These minerals can include a spin transition in (Mg,Fe)O, see
-example_spintransition.py for explanation of how to implement this
+This example script demonstrates the use of BurnMan's Composition class.
 
 *Uses:*
 
-* :doc:`mineral_database`
-* :class:`burnman.composite.Composite`
-* :class:`burnman.mineral.Mineral`
-* :class:`burnman.solidsolution.SolidSolution`
+* :class:`burnman.composition.Composition`
 
 *Demonstrates:*
 
-* Different ways to define a composite
-* Using minerals and solid solutions
-* Compare computations to seismic models
-
+* Creating an instance of the Composition class with a molar or weight composition
+* Printing weight, molar, atomic compositions
+* Renormalizing compositions
+* Modifying the independent set of components
+* Modifying compositions by adding and removing components
 """
 from __future__ import absolute_import
 from __future__ import print_function
@@ -48,133 +28,165 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
-from burnman import minerals
+from burnman.processchemistry import dictionarize_formula
+
+# Import the Composition class and a function to read compositions from file
+# The function assumes that the first line is a header of components,
+# followed by the word "Comment"
+# All lines after the first are either molar or weight proportions
+# of the components given in the header, followed by the comment string
+from burnman.composition import file_to_composition_list, Composition
 
 if __name__ == "__main__":
+    print('1) Creating a Composite instance, printing '
+          'molar, weight and weight compositions:\n')
 
-    # To compute seismic velocities and other properties, we need to supply
-    # burnman with a list of minerals (phases) and their molar abundances. Minerals
-    # are classes found in burnman.minerals and are derived from
-    # burnman.minerals.material.
-    # Here are a few ways to define phases and molar_abundances:
-    # Example 1: two simple fixed minerals
-    if True:
-        amount_perovskite = 0.95
-        rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
-                                  minerals.SLB_2011.periclase()],
-                                 [amount_perovskite, 1 - amount_perovskite])
+    print('Olivine (fo90):')
+    forsterite_composition = Composition({'MgO': 1.8,
+                                          'FeO': 0.2,
+                                          'SiO2': 1.}, 'molar')
+    
+    forsterite_composition.print('molar', significant_figures=4,
+                                 normalization_component='SiO2', normalization_amount=1.)
+    forsterite_composition.print('weight', significant_figures=4,
+                                 normalization_component='total', normalization_amount=1.)
+    forsterite_composition.print('atomic', significant_figures=4,
+                                 normalization_component='total', normalization_amount=7.)
 
-    # Example 2: three materials
-    if False:
-        rock = burnman.Composite([minerals.SLB_2011.fe_perovskite(),
-                                  minerals.SLB_2011.periclase(),
-                                  minerals.SLB_2011.stishovite()],
-                                 [0.7, 0.2, 0.1])
+    
+    # Let's read in composition data from an example file
+    print('\n\n2) Reading compositions from file and renormalizing them:\n')
+    compositions, comments = file_to_composition_list('../burnman/data/input_compositions/'
+                                                      'dhz_mineral_compositions.dat',
+                                                      unit_type='weight',
+                                                      normalize=True)
+    
+    # The hard work has already been done in that one line:
+    # each of the compositions is stored as an instance of
+    # the Composition class in a list "compositions", and the
+    # postceding comments in the list "comments".
 
-    # Example 3: Mixing solid solutions
-    if False:
-        # Defining a rock using a predefined solid solution from the mineral
-        # library database.
-        preset_solidsolution = minerals.SLB_2011.mg_fe_perovskite()
-        # The line below is optional to see which endmembers (and in which order) are in the solid solution
-        # print preset_solidsolution.endmembers
-        # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
-        preset_solidsolution.set_composition(
-            [0.9, 0.1, 0.])  # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
-        rock = burnman.Composite(
-            [preset_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
+    # Now, let's print out the information in a useful form
+    for i, composition in enumerate(compositions):
+        # Parsing the comments list
+        # (which in this case contain useful information about the number of
+        # oxygens per formula unit, and the names of the minerals
+        # to which each component corresponds)
+        n_O, name, reference = comments[i]
+        
+        # Each composition has the dictionary attributes
+        # "weight_composition", "molar_composition" and "atomic_composition".
+        # Here we just format the weight and molar dictionaries for printing.
+        components = sorted(composition.weight_composition.keys())
+    
+        wf = [float('{0:.3f}'.format(composition.weight_composition[c]*100)) for c in components]
+        mf = [float('{0:.3f}'.format(composition.molar_composition[c]*100)) for c in components]
+        print('{0}:\n {1}\n {2} (wt %)\n {3} (mol %)\n'.format(name, components, wf, mf))
+        
+        # By default, the compositions are normalised to 1 g (weight) or
+        # 1 mole (of components or atoms). We can change this with the class function
+        # "renormalize". Here we change the number of atoms in the
+        # atomic composition so that the number of oxygens is equal to n_O.
+        # This does not change the molar or weight bases.
+        compositions[i].renormalize('atomic', 'O', float(n_O))
+        components = sorted(composition.atomic_composition.keys())
+        af = [float('{0:.3f}'.format(composition.atomic_composition[c])) for c in components]
+        print(' {0}\n {1} (atoms, {2} oxygen basis)\n'.format(components, af, float(n_O)))
+        
 
-    # Example 4: Defining your own solid solution
-    if False:
-        # Define a new SolidSolution with mg and fe perovskite endmembers
-        new_solidsolution = burnman.SolidSolution(name = 'New Mg-Fe bridgmanite',
-                                                  endmembers = [[minerals.SLB_2011.mg_perovskite(),
-                                                                 '[Mg]SiO3'],
-                                                                [minerals.SLB_2011.fe_perovskite(),
-                                                                 '[Fe]SiO3']],
-                                                  solution_type = 'ideal')
+    # Let's do something a little more complicated.
+    # When we're making a starting mix for petrological experiments,
+    # we often have to add additional components.
+    # For example, we add iron as Fe2O3 even if we want a reduced
+    # oxide starting mix, because FeO is not a stable stoichiometric compound.
 
-        # Set molar fraction of endmembers
-        new_solidsolution.set_composition([0.9, 0.1])
-        rock = burnman.Composite(
-            [new_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
+    # Here we show how to use BurnMan to create such mixes.
+    
+    # We start with a fayalite starting composition
+    print('\n3) Fayalite starting mix calculations:\n')
+    composition = Composition(dictionarize_formula('Fe2SiO4'), 'molar')
+    
+    # The first step is to split the desired starting mix into a set of starting oxides
+    # (alternatively, we could have initialised the
+    # composition with a dictionary of these oxides)
+    composition.change_component_set(['FeO', 'SiO2'])
+    
+    # Let's check the molar composition of this composition
+    composition.print('molar', significant_figures=4, normalization_amount=1.)
+    
+    # Here we modify the bulk composition by adding oxygen to the
+    # starting mix equal to one third the total FeO (on a molar basis)
+    # This is equivalent to adding FeO as Fe2O3 (1/2 Fe2O3 = FeO + 1/2 O)
+    print('')
+    print('FeO doesn\'t exist as a stoichiometric compound, but we can create\n'
+          'a starting mix from hematite powder and then reduce the mix.\n'
+          'Here, we add one half of an oxygen for every FeO '
+          'in the required bulk composition.\n\n'
+          'The modified starting mix')
+    composition.add_components({'O1/2': composition.molar_composition['FeO']},
+                               'molar')
+    
+    # Now we can change the component set again, this time into
+    # the set of compounds that we'll use to make the starting mix
+    composition.change_component_set(['Fe2O3', 'SiO2'])
+    
+    # Let's print out the new atomic composition
+    composition.renormalize('atomic', 'total', 8.)
+    elements = sorted(list(composition.atomic_composition.keys()))
+    v = ['{0:.3f}'.format(composition.atomic_composition[e])
+         for e in elements]
+    print('Atomic composition\n{0}\n{1}\n'.format(elements, v))
+    
+    # Finally, let's print out the starting composition that we'll use,
+    # assuming that we want to start with 2 g of Fe3O4 and SiO2 powder
+    composition.print('weight', significant_figures=4, normalization_amount=2.)
+    composition.renormalize('weight', 'total', 2.)
+    
+    
+    # Now let's do the same, but for carbonated starting mixes and where we
+    # want to add some Fe as Fe57.
+    # Calcium and sodium are typically added as CaCO3 and Na2CO3
+    # even if we don't want carbon in our starting mix.
+    # This is because CaO and Na2O are reactive and hygroscopic
+    # (we don't want an unknown amount of water screwing up our weights).
 
-    # seismic model for comparison:
-    # pick from .prem() .slow() .fast() (see burnman/seismic.py)
-    seismic_model = burnman.seismic.PREM()
-    number_of_points = 20  # set on how many depth slices the computations should be done
-    # we will do our computation and comparison at the following depth values:
-    depths = np.linspace(700e3, 2800e3, number_of_points)
-    # alternatively, we could use the values where prem is defined:
-    # depths = seismic_model.internal_depth_list(mindepth=700.e3,
-    # maxdepth=2800.e3)
-    seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
-        ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
+    print('\n\n4) KLB-1 starting mix calculations (carbonated, Fe57 as metallic):\n')
+    
+    KLB1 = Composition({'SiO2': 39.4,
+                        'Al2O3': 2.0,
+                        'CaO': 3.3,
+                        'MgO': 49.5,
+                        'FeO': 5.2,
+                        'Na2O': 0.26}, 'molar') # from Holland et al., 2013
+    
+    # Now we need to modify the composition so that we can make it from
+    # standard starting materials:
+    
+    # 1) We want to add Ca and Na2O via CaCO3 and Na2CO3.
+    
+    # 2) We want to make a fraction f of total Fe Fe57 (where 1 is 100%)
+    # where the Fe57 is metallic Fe and the Fe(natural) is Fe2O3
+    # Obviously we only want to vary the amount of O2, so
+    # FeO + m O -> f Fe(57) + (1-f)/2 Fe2O3
+    
+    # Therefore m = 3*(1-f)/2 - 1 = 0.5 - 1.5f
+    f = 0.5
+    m = 0.5 - 1.5*f
+    
+    # Here's where we add the (temporary) components
+    CO2_molar = KLB1.molar_composition['CaO'] + KLB1.molar_composition['Na2O']
+    KLB1.add_components(composition_dictionary = {'CO2': CO2_molar,
+                                                  'O': KLB1.molar_composition['FeO']*m},
+                        unit_type = 'molar')
+    
+    # Here's where we change the components:
+    KLB1.change_component_set(['Na2CO3', 'CaCO3', 'Fe', 'Fe2O3', 'MgO', 'Al2O3', 'SiO2'])
+    KLB1.print('weight', significant_figures=4, normalization_amount=1.)
+    
 
-    temperature = burnman.geotherm.brown_shankland(depths)
-
-    print("Calculations are done for:")
-    rock.debug_print()
-
-    mat_rho, mat_vp, mat_vphi, mat_vs, mat_K, mat_G = rock.evaluate(
-        ['density', 'v_p', 'v_phi', 'v_s', 'K_S', 'G'], seis_p, temperature)
-
-    [vs_err, vphi_err, rho_err] = burnman.compare_chifactor(
-        [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho])
-
-    # PLOTTING
-    # plot vs
-    plt.subplot(2, 2, 1)
-    plt.plot(
-        seis_p / 1.e9, mat_vs / 1.e3, color='b', linestyle='-', marker='o',
-        markerfacecolor='b', markersize=4, label='computation')
-    plt.plot(
-        seis_p / 1.e9, seis_vs / 1.e3, color='k', linestyle='-', marker='o',
-        markerfacecolor='k', markersize=4, label='reference')
-    plt.title("Vs (km/s)")
-    plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
-    plt.ylim(5.1, 7.6)
-    plt.legend(loc='lower right')
-    plt.text(40, 7.3, "misfit= %3.3f" % vs_err)
-
-    # plot Vphi
-    plt.subplot(2, 2, 2)
-    plt.plot(
-        seis_p / 1.e9, mat_vphi / 1.e3, color='b', linestyle='-', marker='o',
-        markerfacecolor='b', markersize=4)
-    plt.plot(
-        seis_p / 1.e9, seis_vphi / 1.e3, color='k', linestyle='-', marker='o',
-        markerfacecolor='k', markersize=4)
-    plt.title("Vphi (km/s)")
-    plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
-    plt.ylim(7, 12)
-    plt.text(40, 11.5, "misfit= %3.3f" % vphi_err)
-
-    # plot density
-    plt.subplot(2, 2, 3)
-    plt.plot(
-        seis_p / 1.e9, mat_rho / 1.e3, color='b', linestyle='-', marker='o',
-        markerfacecolor='b', markersize=4)
-    plt.plot(
-        seis_p / 1.e9, seis_rho / 1.e3, color='k', linestyle='-', marker='o',
-        markerfacecolor='k', markersize=4)
-    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
-    plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
-    plt.text(40, 4.3, "misfit= %3.3f" % rho_err)
-    plt.xlabel("Pressure (GPa)")
-
-    # plot geotherm
-    plt.subplot(2, 2, 4)
-    plt.plot(seis_p / 1e9, temperature, color='r', linestyle='-', marker='o',
-             markerfacecolor='r', markersize=4)
-    plt.title("Geotherm (K)")
-    plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
-    plt.xlabel("Pressure (GPa)")
-
-    plt.savefig("output_figures/example_composition.png")
-    plt.show()

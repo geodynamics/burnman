@@ -172,6 +172,7 @@ from __future__ import absolute_import
 from .version import version as __version__
 
 # classes for representing rocks and minerals:
+from .composition import Composition
 from .mineral import Mineral
 from .material import Material
 from .perplex import PerplexMaterial
