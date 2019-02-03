@@ -12,7 +12,7 @@ from .mineral import Mineral
 from . import averaging_schemes
 from . import chemicalpotentials
 from .solidsolution import SolidSolution
-
+from .processchemistry import sum_formulae
 
 def check_pairs(phases, fractions):
         if len(fractions) < 1:
@@ -199,6 +199,13 @@ class Composite(Material):
         """
         return "{0}: {1}".format(self.__class__.__name__, self.name)
 
+    @material_property
+    def formula(self):
+        """
+        Returns molar chemical formula of the composite
+        """
+        return sum_formulae([ph.formula for ph in self.phases], self.molar_fractions)
+    
     @material_property
     def molar_internal_energy(self):
         """

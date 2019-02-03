@@ -256,6 +256,15 @@ class composite(BurnManTest):
         c = burnman.Composite(
             [min1, min1], mass_fractions, fraction_type='mass')
         self.assertArraysAlmostEqual(c.molar_fractions, mass_fractions)
+        
+    def test_formula(self):
+        min1 = minerals.SLB_2005.mg_perovskite()
+        min2 = minerals.SLB_2005.periclase()
+        molar_fractions = [0.5, 0.5]
+        c = burnman.Composite([min1, min2], molar_fractions,
+                              fraction_type='molar')
+        self.assertArraysAlmostEqual([c.formula['Mg'], c.formula['Si'], c.formula['O']],
+                                     [1., 0.5, 2.])
 
     def test_velocities_from_rock(self):
 

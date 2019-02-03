@@ -19,6 +19,7 @@ class stishovite (Mineral):
 
     def __init__(self):
         self.params = {
+            'formula': {'Si': 1., 'O': 2.},
             'equation_of_state': 'slb3',
             'V_0': 14.02e-6,
             'K_0': 314.0e9,
@@ -39,6 +40,7 @@ class periclase (Mineral):
 
     def __init__(self):
         self.params = {
+            'formula': {'Mg': 1., 'O': 1.},
             'equation_of_state': 'slb3',
             'V_0': 11.24e-6,
             'K_0': 161.0e9,
@@ -59,6 +61,7 @@ class wuestite (Mineral):
     def __init__(self):
         self.params = {
             'equation_of_state': 'slb3',
+            'formula': {'Fe': 1., 'O': 1.},
             'V_0': 12.06e-6,
             'K_0': 152.0e9,
             'Kprime_0': 4.9,
@@ -78,6 +81,7 @@ class mg_perovskite(Mineral):
 
     def __init__(self):
         self.params = {
+            'formula': {'Mg': 1., 'Si': 1., 'O': 3.},
             'equation_of_state': 'slb3',
             'V_0': 24.45e-6,
             'K_0': 251.0e9,
@@ -98,6 +102,7 @@ class fe_perovskite(Mineral):
 
     def __init__(self):
         self.params = {
+            'formula': {'Fe': 1., 'Si': 1., 'O': 3.},
             'equation_of_state': 'slb3',
             'V_0': 25.48e-6,
             'K_0': 281.0e9,
