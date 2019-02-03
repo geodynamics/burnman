@@ -13,7 +13,8 @@ from scipy.optimize import fsolve
 import burnman
 
 liq = burnman.minerals.other.liquid_iron()
-burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3, verbose=True)
+burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3,
+                                    verbose=True, including_shear_properties=False)
 
 
 # Find heat capacities

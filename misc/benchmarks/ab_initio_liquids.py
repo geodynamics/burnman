@@ -34,7 +34,8 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
                                                              (MgO_liq, 2., MgO_temperatures,
                                                               MgO_volumes)]):
     print('EoS consistent for {0} model: {1}'.format(phase.name,
-                                                     burnman.tools.check_eos_consistency(phase, tol=1.e-4)))
+                                                     burnman.tools.check_eos_consistency(phase, tol=1.e-4,
+                                                                                         including_shear_properties=False)))
     fig = plt.figure()
     ax_P = fig.add_subplot(1,3,1)
     ax_S = fig.add_subplot(1,3,2)
@@ -77,7 +78,8 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
 fa_liq = burnman.minerals.RS_2014_liquids.Fe2SiO4_liquid()
 
 print('EoS consistent for {0} model: {1}'.format(fa_liq.name,
-                                                 burnman.tools.check_eos_consistency(fa_liq, tol=1.e-4)))
+                                                 burnman.tools.check_eos_consistency(fa_liq, tol=1.e-4,
+                                                                                     including_shear_properties=False)))
 fig = plt.figure()
 ax_P = fig.add_subplot(1, 2, 1)
 ax_hugoniot = fig.add_subplot(1, 2, 2)
