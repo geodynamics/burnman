@@ -629,6 +629,9 @@ SLB_2011_ZSB_2013.mg_perovskite                                     2.445e-05 2.
 SLB_2011_ZSB_2013.periclase                                         1.124e-05  1.61e+11      3.8      1.31e+11      2.1     0.0403 2   767.0         1.36  1.7     2.8
 SLB_2011_ZSB_2013.stishovite                                        1.402e-05  3.14e+11      3.8       2.2e+11      1.9     0.0601 3  1108.0         1.37  2.8     4.6
 SLB_2011_ZSB_2013.wuestite                                          1.226e-05  1.79e+11      4.9 59000000000.0      1.4     0.0718 2   454.0         1.53  1.7    -0.1
+Name (hp_tmt equation of state)                V_0       K_0 Kprime_0 Kdprime_0 molar_mass   n                                     Cp
+Sundman_1991.bcc_iron                     7.09e-06  1.64e+11     5.16  -3.1e-11   0.055845 1.0 [21.09, 0.0101455, -221508.0, 47.1947]
+Sundman_1991.fcc_iron            6.93863394593e-06 1.539e+11      5.2 -3.37e-11   0.055845 1.0 [22.24, 0.0088656, -221517.0, 47.1998]
 Name (aa equation of state)     T_0   S_0               V_0       K_S Kprime_S Kprime_prime_S grueneisen_0   grueneisen_prime grueneisen_n
 other.liquid_iron            1811.0 100.0 7.95626157572e-06 1.097e+11    4.661       -4.3e-11        1.735 -2.32787178798e-06        -1.87
 Name (mgd3 equation of state)         V_0       K_0 Kprime_0 G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
