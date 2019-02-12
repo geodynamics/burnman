@@ -71,8 +71,8 @@ if __name__ == '__main__':
             [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()], [phase_1_fraction, phase_2_fraction])
 
         # Just as in step 1, we want to set which equation of state we use,
-        # then call burnman.velocities_from_rock, which evaluates the
-        # elastic properties and seismic velocities at the predefined
+        # then call rock.evaluate(), which evaluates the
+        # seismic velocities and density at the requested
         # pressures and temperatures
         rock.set_method('slb3')
         density, vphi, vs = rock.evaluate(
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
         # Here we integrate an L2 difference with depth between our calculated seismic
         # profiles and PREM.  We then return those misfits.
-        [vs_err, vphi_err, rho_err] = burnman.compare_l2(
+        [vs_err, vphi_err, rho_err] = burnman.tools.compare_l2(
             depths, [vs, vphi, density], [seis_vs, seis_vphi, seis_rho])
 
         return vs_err, vphi_err, rho_err

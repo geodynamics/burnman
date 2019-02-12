@@ -13,6 +13,7 @@ import numpy as np
 from scipy.optimize import fsolve, curve_fit
 from scipy.ndimage.filters import gaussian_filter
 from scipy.interpolate import interp2d
+import scipy.integrate as integrate
 from collections import Counter
 import itertools
 import warnings

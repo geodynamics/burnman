@@ -157,7 +157,7 @@ if __name__ == "__main__":
         # rest of the planet
         burnman.output_seismo.write_tvel_file(
             lower_mantle,
-            modelname=modelname,
+            filename=modelname+'tvel',
             background_model=burnman.seismic.PREM())
         
         # Plot ray paths and travel times
@@ -226,7 +226,7 @@ if __name__ == "__main__":
         # rest of the planet
         burnman.output_seismo.write_tvel_file(
             planet_zog,
-            modelname=modelname,
+            filename=modelname+'tvel',
             background_model=burnman.seismic.PREM())
 
             

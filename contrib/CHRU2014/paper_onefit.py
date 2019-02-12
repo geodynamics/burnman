@@ -255,7 +255,7 @@ if __name__ == "__main__":
         rock.evaluate(
             ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressure, temperature)
 
-    err_vs, err_vphi, err_rho = burnman.compare_l2(depths / np.mean(depths),
+    err_vs, err_vphi, err_rho = burnman.tooals.compare_l2(depths / np.mean(depths),
                                                    [vs / np.mean(seis_vs),
                                                     vphi / np.mean(seis_vphi),
                                                     rho / np.mean(seis_rho)],

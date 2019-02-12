@@ -410,7 +410,6 @@ class test_solidsolution(BurnManTest):
         ol = olivine_ideal_ss()
         ol.set_composition(np.array([0.5, 0.5]))
         ol.set_state(1.e5, 1000.)
-        print(ol.activities)
         self.assertArraysAlmostEqual(ol.activities, [0.25, 0.25])
 
     def test_activity_coefficients_ideal(self):

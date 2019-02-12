@@ -125,14 +125,9 @@ if __name__ == '__main__':
     # the SLB_2011 mineral library are fit using this model.
     rock.set_method('slb3')
 
-    # Here is the step which does the heavy lifting.  burnman.velocities_from_rock
+    # Here is the step which does the heavy lifting. rock.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,
-    # then calculates the elastic moduli and density of each individual phase.  After that,
-    # it performs elastic averaging on the phases to get a single bulk and shear
-    # modulus for the rock.  This averaging scheme defaults to Voigt-Reuss-Hilli,
-    # but see example_averaging.py for other options.  Finally, it calculates the seismic
-    # wave speeds for the whole rock.  It returns a tuple of density, p-wave velocity
-    # s-wave velocity, bulk sound speed, bulk modulus, and shear modulus.
+    # then calculates each requested material phase averaging over the different    # phases.
     density, vp, vs = rock.evaluate(
         ['density', 'v_p', 'v_s'], pressure, temperature)
 
