@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
     # Here is the step which does the heavy lifting. rock.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,
-    # then calculates each requested material phase averaging over the different    # phases.
+    # then calculates each requested material phase averaging over the different phases.
     density, vp, vs = rock.evaluate(
         ['density', 'v_p', 'v_s'], pressure, temperature)
 

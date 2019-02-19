@@ -271,7 +271,7 @@ class composite(BurnManTest):
         rock = burnman.Composite(
             [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5, 0.5])
 
-        K, G = rock.evaluate(['K_S','G'],[40.e9, ], [2000., ])
+        K, G = rock.evaluate(['K_S','G'],40.e9, 2000.)
         rock.set_state(40.e9, 2000.)
         K2 = rock.K_S
         G2 = rock.G
