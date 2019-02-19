@@ -79,9 +79,9 @@ if True:
     def error(a, b, c):
         mat_vp, mat_vs, mat_rho = calc_velocities(a, b, c)
 
-        vs_err = burnman.l2(depths, mat_vs, seis_vs) / 1e9
-        vp_err = burnman.l2(depths, mat_vp, seis_vp) / 1e9
-        den_err = burnman.l2(depths, mat_rho, seis_rho) / 1e9
+        vs_err = burnman.tools.l2(depths, mat_vs, seis_vs) / 1e9
+        vp_err = burnman.tools.l2(depths, mat_vp, seis_vp) / 1e9
+        den_err = burnman.tools.l2(depths, mat_rho, seis_rho) / 1e9
 
         return vs_err + vp_err + den_err
 

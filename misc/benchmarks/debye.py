@@ -39,7 +39,7 @@ for i in range(len(temperatures)):
     new[i] = burnman.eos.debye.molar_heat_capacity_v(temperatures[i], Debye_T, 1.0)
 time_new = time.clock() - start
 
-print("error {0:.4g}".format(np.linalg.norm((old - new) / new)))
+assert(np.abs(np.linalg.norm((old-new)/new)) < 1.e-7)
 print("time old %g, time new %g" % (time_old, time_new))
 
 

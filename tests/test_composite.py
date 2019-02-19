@@ -266,29 +266,18 @@ class composite(BurnManTest):
         self.assertArraysAlmostEqual([c.formula['Mg'], c.formula['Si'], c.formula['O']],
                                      [1., 0.5, 2.])
 
-    def test_velocities_from_rock(self):
+    def test_evaluate(self):
 
         rock = burnman.Composite(
             [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5, 0.5])
 
-        # Use default averaging schemes
-        _, _, _, _, K, G = burnman.velocities_from_rock(
-            rock, [40.e9, ], [2000., ])
+        K, G = rock.evaluate(['K_S','G'],40.e9, 2000.)
         rock.set_state(40.e9, 2000.)
         K2 = rock.K_S
         G2 = rock.G
         self.assertFloatEqual(K, K2)
         self.assertFloatEqual(G, G2)
 
-        # Now change the averaging schemes
-        _, _, _, _, K, G = burnman.velocities_from_rock(
-            rock, [40.e9, ], [2000., ], averaging_scheme=burnman.averaging_schemes.HashinShtrikmanAverage())
-        rock.set_averaging_scheme('HashinShtrikmanAverage')
-        rock.set_state(40.e9, 2000.)
-        K2 = rock.K_S
-        G2 = rock.G
-        self.assertFloatEqual(K, K2)
-        self.assertFloatEqual(G, G2)
 
     def test_query_properties(self):
         min1 = minerals.SLB_2011.periclase()

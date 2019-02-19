@@ -18,7 +18,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
 * :func:`burnman.material.Material.evaluate`
-* :func:`burnman.main.compare_l2`
+* :func:`burnman.tools.compare_l2`
 
 *Demonstrates:*
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         rock.debug_print()
         # Calculate errors
         [vs_err, vphi_err, rho_err, K_err, G_err] = \
-            burnman.compare_l2(depths, [mat_vs, mat_vphi, mat_rho, mat_K, mat_G], [
+            burnman.tools.compare_l2(depths, [mat_vs, mat_vphi, mat_rho, mat_K, mat_G], [
                                seis_vs, seis_vphi, seis_rho, seis_K, seis_G])
         # Normalize errors
         vs_err = vs_err / np.mean(seis_vs) ** 2.
