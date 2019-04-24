@@ -14,6 +14,7 @@ pipeline {
           agent {
             docker {
               image 'geodynamics/burnman-buildenv-bionic-python2'
+              alwaysPull true
             }
           }
 
@@ -30,6 +31,7 @@ pipeline {
           agent {
             docker {
               image 'geodynamics/burnman-buildenv-bionic-python3'
+              alwaysPull true
             }
           }
 
