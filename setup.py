@@ -8,8 +8,8 @@ metadata = dict(name='burnman',
                 version=versionstuff['version'],
                 description='a thermoelastic and thermodynamic toolkit for Earth and planetary sciences',
                 url='http://burnman.org',
-                author='Ian Rose',
-                author_email='ian.rose@berkeley.edu',
+                author='The BurnMan Team',
+                author_email='bob.myhill@bristol.ac.uk',
                 license='GPL',
                 long_description='BurnMan is a Python library for generating thermodynamic and thermoelastic models of planetary interiors.',
                 packages=['burnman', 'burnman.minerals', 'burnman.eos'],
@@ -25,7 +25,7 @@ metadata = dict(name='burnman',
 # distutils.
 try:
     from setuptools import setup
-    metadata['install_requires'] = ['numpy', 'matplotlib', 'scipy']
+    metadata['install_requires'] = ['numpy', 'matplotlib', 'scipy', 'sympy']
 except ImportError:
     from distutils.core import setup
 
