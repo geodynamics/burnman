@@ -1,0 +1,49 @@
+#!groovy
+
+pipeline {
+  agent none
+
+  options {
+    timeout(time: 2, unit: 'HOURS')
+  }
+
+  stages {
+    stage('Bionic') {
+      parallel {
+        stage('Python 2') {
+          agent {
+            docker {
+              image 'geodynamics/burnman-buildenv-bionic-python2'
+              alwaysPull true
+            }
+          }
+
+          stages {
+            stage('Test (Python 2)') {
+              steps {
+                sh 'PYTHON=python2 ./test.sh'
+              }
+            }
+          }
+        }
+
+        stage('Python 3') {
+          agent {
+            docker {
+              image 'geodynamics/burnman-buildenv-bionic-python3'
+              alwaysPull true
+            }
+          }
+
+          stages {
+            stage('Test (Python 3)') {
+              steps {
+                sh 'PYTHON=python3 ./test.sh'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
