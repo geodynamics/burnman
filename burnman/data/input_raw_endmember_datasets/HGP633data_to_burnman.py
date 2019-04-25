@@ -149,17 +149,18 @@ with open('HGP_2018_ds633.py', 'wb') as outfile:
             outfile.write('\n')
                           
             # Print property modifiers (if they exist)
-            if hasattr(M, 'landau_hp') or hasattr(M, 'bragg_williams'):
+            if hasattr(M, 'landau_hp'):
                 outfile.write('        self.property_modifiers = [[')
-                if hasattr(M, 'landau_hp'):
-                    s = pprint_ordered_dict(M.landau_hp, leading_string = '\'landau_hp\', ', extra_whitespace = 36)
-                    outfile.write(s)
-                    
-                if hasattr(M, 'bragg_williams'):
-                    s = pprint_ordered_dict(M.bragg_williams, leading_string = '\'bragg_williams\', ', extra_whitespace = 36)
-                    outfile.write(s)
-                    
+                s = pprint_ordered_dict(M.landau_hp, leading_string = '\'landau_hp\', ', extra_whitespace = 36)
+                outfile.write(s)
                 outfile.write(']]\n')
+                    
+            if hasattr(M, 'bragg_williams') and M.bragg_williams['factor'] > 0:
+                outfile.write('        self.property_modifiers = [[')
+                s = pprint_ordered_dict(M.bragg_williams, leading_string = '\'bragg_williams\', ', extra_whitespace = 36)
+                outfile.write(s)
+                outfile.write(']]\n')
+                
 
             outfile.write('        Mineral.__init__(self)\n\n')
 
