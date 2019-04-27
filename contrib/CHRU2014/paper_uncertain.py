@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     reorder = [0, 1, 3, 4, 5, 6, 7, 8, 2]
 
-    for i in range(0, len):
+    for i, order_idx in enumerate(reorder):
 
         vsmin = base_vs
         vsmax = base_vs
@@ -99,8 +99,6 @@ if __name__ == "__main__":
         vphimax = base_vphi
 
         testrange = [-1, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 1.0]
-        # testrange = [-1.0, -0.5, -0.1, 0.1, 0.5, 1.0] #this seems to be
-        # enough for now
         for x in testrange:
             print(i, names[i], x)
             uncertain = np.ones(len)
@@ -111,67 +109,57 @@ if __name__ == "__main__":
             vphimin = np.minimum(vphi, vphimin)
             vphimax = np.maximum(vphi, vphimax)
 
-        ax = figure.add_subplot(3, 3, reorder[i] + 1)
-        # plt.subplots_adjust(left=0, bottom=None, right=0, top=None,
-        # wspace=None, hspace=None)
+        ax = figure.add_subplot(3, 3, order_idx + 1)
         plt.subplots_adjust(wspace=0, hspace=0.2)
 
-        plt.plot(seis_p / 1.e9, seis_vs / 1.e3, linestyle="-",
+        ax.plot(seis_p / 1.e9, seis_vs / 1.e3, linestyle="-",
                  color='k', linewidth=2.0, label='PREM')
 
-        plt.plot(
+        ax.plot(
             seis_p / 1.e9, base_vs / 1.e3, color=colors.color(3), dashes=dashstyle2,
-            linewidth=1.5, markersize=6, markerfacecolor='None', label='pv')
+            linewidth=1.5, markersize=6, markerfacecolor='None', label='$V_S$')
 
-        plt.plot(
+        ax.plot(
             seis_p / 1.e9, vsmin / 1.e3, color=colors.color(3), linestyle="-",
-            linewidth=.5, markersize=6, markerfacecolor='None', label='min')
-        plt.plot(
+            linewidth=.5, markersize=6, markerfacecolor='None')
+        ax.plot(
             seis_p / 1.e9, vsmax / 1.e3, color=colors.color(3), linestyle="-",
-            linewidth=.5, markersize=6, markerfacecolor='None', label='max')
+            linewidth=.5, markersize=6, markerfacecolor='None')
 
-        plt.fill_between(seis_p / 1.e9, vsmax / 1.e3, vsmin / 1.e3,
-                         facecolor='#ffbbbb', lw=0, label='asdf', interpolate=False)
-
-        plt.title('Vs %s +/- %d\\%% ' % (names[i], spread[i] * 100))
-        plt.ylim([6.2, 7.6])
+        ax.fill_between(seis_p / 1.e9, vsmax / 1.e3, vsmin / 1.e3,
+                        facecolor='#ffbbbb', lw=0, interpolate=False)
 
         if (reorder[i] % 3 == 0):
-            plt.ylabel('Wave speed (km/s)')
+            ax.set_ylabel('Wave speed (km/s)')
         else:
             ax.yaxis.set_ticklabels([])
 
         if (reorder[i] > 5):
-            plt.xlabel('Pressure (GPa)')
+            ax.set_xlabel('Pressure (GPa)')
         else:
             ax.xaxis.set_ticklabels([])
 
-        # plt.subplot(3,3,reorder[i]+1)#+10
-        plt.plot(seis_p / 1.e9, seis_vphi / 1.e3, linestyle="-",
-                 color='k', linewidth=2.0, label='PREM')
-        plt.plot(
+        ax.plot(seis_p / 1.e9, seis_vphi / 1.e3, linestyle="-",
+                 color='k', linewidth=2.0)
+        ax.plot(
             seis_p / 1.e9, base_vphi / 1.e3, color=colors.color(1), dashes=dashstyle3,
-            linewidth=1.5, markersize=6, markerfacecolor='None', label='pv')
-        plt.plot(
+            linewidth=1.5, markersize=6, markerfacecolor='None', label='$V_\phi$')
+        ax.plot(
             seis_p / 1.e9, vphimin / 1.e3, color=colors.color(1), linestyle="-",
-            linewidth=.5, markersize=6, markerfacecolor='None', label='min')
-        plt.plot(
+            linewidth=.5, markersize=6, markerfacecolor='None')
+        ax.plot(
             seis_p / 1.e9, vphimax / 1.e3, color=colors.color(1), linestyle="-",
-            linewidth=.5, markersize=6, markerfacecolor='None', label='max')
+            linewidth=.5, markersize=6, markerfacecolor='None')
 
-        plt.fill_between(seis_p / 1.e9, vphimax / 1.e3, vphimin / 1.e3,
-                         facecolor='#bbbbff', lw=0, label='asdf', interpolate=False)
+        ax.fill_between(seis_p / 1.e9, vphimax / 1.e3, vphimin / 1.e3,
+                         facecolor='#bbbbff', lw=0, interpolate=False)
 
-        plt.title('%s $\pm %d\\%%$ ' % (names[i], spread[i] * 100))
-        # plt.ylim([8.5,12.])
+        ax.set_title('%s $\pm %d\\%%$ ' % (names[i], spread[i] * 100))
+        ax.set_ylim([6.1, 11.8])
+        ax.set_xlim([30, 130])
 
-        plt.ylim([6.1, 11.8])
-        plt.xlim([30, 130])
-
-        if (reorder[i] == 8):
-            handles, labels = ax.get_legend_handles_labels()
-            plt.legend((handles[0], handles[5], handles[1]), [
-                       'PREM', '$V_\phi$', '$V_S$'], loc='center right', prop=prop)
+        if order_idx == 8:
+            ax.legend(loc='center right', prop=prop)
 
     if "RUNNING_TESTS" not in globals():
         plt.savefig("uncertain.pdf", bbox_inches='tight')
