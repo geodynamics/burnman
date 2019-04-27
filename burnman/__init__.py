@@ -49,10 +49,11 @@ geophysics, and geodynamics. The features of BurnMan include:
   - a series of benchmarks comparing BurnMan output with published data
   - a directory containing user-contributed code from published papers
 
-BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_ and 
-`NumPy <http://www.numpy.org/>`_, which are widely used Python libraries 
-for scientific computation.  `Matplotlib <http://matplotlib.org/>`_ is used 
-to display results and produce publication quality figures.  
+BurnMan makes extensive use of `SciPy <http://www.scipy.org/>`_, 
+`NumPy <http://www.numpy.org/>`_ and `SymPy <http://www.sympy.org/>`_ 
+which are widely used Python libraries for scientific computation. 
+`Matplotlib <http://matplotlib.org/>`_ is used 
+to display results and produce publication quality figures. 
 The computations are consistently formulated in terms of SI units.
 
 The code documentation including class and function descriptions can be found online at
@@ -93,7 +94,7 @@ Install under Ubuntu
 ^^^^^^^^^^^^^^^^^^^^
 
 1. Install dependencies using apt by opening a terminal window and entering
-   ``sudo apt-get install python python-scipy python-numpy python-matplotlib git``
+   ``sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib git``
 2. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
 3. Go to the Burnman examples directory and type:
    ``python example_beginner.py``
@@ -110,6 +111,7 @@ Install on a Mac
    terminal: ``python --version``
 3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
 4. Install the latest Scipy from http://sourceforge.net/projects/scipy/files/
+4. Install the latest Sympy from http://sourceforge.net/projects/sympy/files/
 5. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
 6. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
 7. Go to the Burnman examples directory and type `python example_beginner.py`
@@ -121,9 +123,10 @@ Install under Windows
 To get Python 2.7.x (for example) running under Windows:
 
 1. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
-2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
-3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
-4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
+2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download and install
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download and install
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install
+4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download and install
 5. Download BurnMan from github (https://github.com/geodynamics/burnman)
 6. Open Python Shell (IDLE Python GUI)
 7. File -- Open -- find one of the example files
