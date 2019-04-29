@@ -45,7 +45,7 @@ from burnman import minerals
 import misc.colors as colors
 
 if __name__ == "__main__":
-    figsize = (6, 5)
+    figsize = (8, 6)
     prop = {'size': 12}
     # plt.rc('text', usetex=True)
     plt.rc('font', family='sans-serif')
@@ -104,25 +104,25 @@ if __name__ == "__main__":
         periclasite.evaluate(
             ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
 
-        # Voigt Reuss Hill averaging
+    # Voigt Reuss Hill averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.VoigtReussHill())
     rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = \
         rock.evaluate(
             ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
 
-        # Voigt averaging
+    # Voigt averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.Voigt())
     rho_v, vp_v, vs_v, vphi_v, K_v, G_v = \
         rock.evaluate(
             ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
 
-        # Reuss averaging
+    # Reuss averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.Reuss())
     rho_r, vp_r, vs_r, vphi_r, K_r, G_r = \
         rock.evaluate(
             ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperatures)
 
-        # Upper bound for Hashin-Shtrikman averaging
+    # Upper bound for Hashin-Shtrikman averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanUpper())
     rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = \
         rock.evaluate(
@@ -141,42 +141,39 @@ if __name__ == "__main__":
 
     # plot vs
     ax = figure.add_subplot(1, 1, 1)
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_v / 1.e3, color=colors.color(0), linewidth=2, linestyle='-', marker='^',
         markersize=4, label='Voigt')
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_r / 1.e3, color=colors.color(5), linewidth=2, linestyle='-', marker='v',
         markersize=4, label='Reuss')
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_vrh / 1.e3, color=colors.color(1), linestyle='-', marker='*',
         markersize=6, label='Voigt-Reuss-Hill')
-    plt.fill_between(pressures / 1.e9, vs_hsu / 1.e3, vs_hsl / 1.e3,
-                     facecolor='red', lw=0, label='asdf', interpolate=False)
-
+    ax.fill_between(pressures / 1.e9, vs_hsu / 1.e3, vs_hsl / 1.e3,
+                    facecolor='red', alpha=0.8, label='Hashin-Shtrikman bounds', interpolate=False)
+    
     # plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',\
     #    markersize=4,label='Hashin-Shtrikman')
     # plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
     #    markersize=4)
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_lin / 1.e3, color='k', linewidth=2, linestyle='--',
         markersize=4, label='linear')
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_pv / 1.e3, color=colors.color(2), linewidth=2, linestyle='-', marker='d',
         markersize=4, label='Mg Perovskite')
-    plt.plot(
+    ax.plot(
         pressures / 1.e9, vs_fp / 1.e3, color=colors.color(4), linewidth=2, linestyle='-', marker='x',
-        markersize=6, label=r'W\"ustite')
+        markersize=6, label='Wuestite')
 
-    plt.ylim(3.0, 7.5)
-    plt.xlim(min(pressures) / 1.e9, max(pressures) / 1.e9)
+    ax.set_ylim(3.0, 7.5)
+    ax.set_xlim(min(pressures) / 1.e9, max(pressures) / 1.e9)
+    
+    ax.legend(loc='lower right', ncol=2, prop=prop)
 
-    simArtist = plt.Line2D((0, 1), (0, 0), color='r', lw=5, linestyle='-')
-    handles, labels = ax.get_legend_handles_labels()
-    plt.legend(handles[0:3] + [simArtist] + handles[3:], labels[0:3] + [
-               'Hashin-Shtrikman'] + labels[3:], loc='lower right', ncol=2, prop=prop)
-
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Shear velocity $V_s$ (km/s)')
+    ax.set_xlabel('Pressure (GPa)')
+    ax.set_ylabel('Shear velocity $V_s$ (km/s)')
     if "RUNNING_TESTS" not in globals():
-        plt.savefig("example_averaging.pdf", bbox_inches='tight')
-    plt.show()
+        figure.savefig("example_averaging.pdf", bbox_inches='tight')
+#    plt.show()
