@@ -9,4 +9,6 @@ RUN apt update && \
     python-matplotlib \
     python-numpy \
     python-scipy \
-    python-sympy
+    python-sympy \
+    texlive \
+    texlive-latex-extra
