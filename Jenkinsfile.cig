@@ -25,6 +25,8 @@ pipeline {
               }
             }
           }
+
+          post { always { cleanWs() } }
         }
 
         stage('Python 3') {
@@ -42,10 +44,10 @@ pipeline {
               }
             }
           }
+
+          post { always { cleanWs() } }
         }
       }
     }
   }
-
-  post { always { cleanWs() } }
 }
