@@ -46,7 +46,7 @@ Authors (as of 2015, listed alphabetically by first name):
     
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. Install using apt by opening a terminal window and entering
-`sudo apt-get install python python-scipy python-numpy python-matplotlib` 
+`sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib` 
 3. Go to the Burnman examples directory and type:
 ```python example_beginner.py```
 Figures should show up, indicating that it is working.
@@ -75,14 +75,15 @@ Figures should show up, indicating that it is working.
      python --version
 4. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
 5. Install the latest Scipy at http://sourceforge.net/projects/scipy/files/
-6. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
-7. Go to the Burnman examples directory and type:
+6. Install the latest Scipy at http://sourceforge.net/projects/sympy/files/
+7. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
+8. Go to the Burnman examples directory and type:
 	python example_beginner.py
     Figures should show up, indicating that it is working.
 
 Problems you might run into:
 
-* Installing numpy/scipy/matplotlib for a different python version than the
+* Installing numpy/scipy/sympy/matplotlib for a different python version than the
   one on your computer
 
 * Having matplotlib for 32-bit instead of 64-bit (for me this got fixed by
