@@ -517,7 +517,7 @@ def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
         try: # Only works for recent versions of numpy
             bin_heights, bin_bounds = np.histogram(weighted_residuals,
                                                    bins='auto',
-                                                   normed=1.)
+                                                   density=True)
             n_bins = len(bin_heights)
         except:
             n_bins = 11.
@@ -530,7 +530,7 @@ def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
         bins = np.linspace(dmin, dmax, n_bins)
         bin_heights, bin_bounds = np.histogram(weighted_residuals[mask],
                                                bins=bins,
-                                               normed=1.)
+                                               density=True)
 
         normalisation = float(len(weighted_residuals[mask]))/float(len(weighted_residuals))
         bin_centers = (bin_bounds[:-1] + bin_bounds[1:])/2.
