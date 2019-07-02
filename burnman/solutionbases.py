@@ -15,7 +15,7 @@ from . import CombinedMineral, SolidSolution
 
 from itertools import product as iter_product
 from itertools import combinations
-from scipy.misc import comb
+from scipy.special import comb
 from copy import copy
 from collections import Counter
 
@@ -87,7 +87,7 @@ class SolutionPolytope(object):
 
     @property
     def raw_vertices(self):
-        return self.polytope.get_generators()
+        return self.polytope.get_generators()[:]
 
     @property
     def site_occupancy_limits(self):
@@ -100,9 +100,9 @@ class SolutionPolytope(object):
     @property
     def endmember_occupancies(self):
         if self.return_fractions:
-            v = np.array([map(Fraction, v) for v in self.raw_vertices])
+            v = np.array([[Fraction(value) for value in v] for v in self.raw_vertices])
         else:
-            v = np.array([map(float, v) for v in self.raw_vertices])
+            v = np.array([[float(value) for value in v] for v in self.raw_vertices])
         return v[:,1:]/v[:,0,np.newaxis]
 
 
@@ -127,8 +127,13 @@ class SolutionPolytope(object):
     @property
     def dependent_endmembers_as_independent_endmember_proportions(self):
         ind = self.independent_endmember_occupancies
-        sol = np.linalg.lstsq(ind.T, self.endmember_occupancies.T, rcond=None)[0].round(decimals=12).T
-        #sol = np.array(Matrix(ind.T).pinv_solve(Matrix(self.endmember_occupancies.T)).T)
+        try: # python3
+            sol = np.linalg.lstsq(np.array(ind.T).astype(float),
+                                  np.array(self.endmember_occupancies.T).astype(float),
+                                  rcond=None)[0].round(decimals=12).T
+        except: # python2
+            sol = np.linalg.lstsq(ind.T, self.endmember_occupancies.T, rcond=-1)[0].round(decimals=12).T
+            #sol = np.array(Matrix(ind.T).pinv_solve(Matrix(self.endmember_occupancies.T)).T)
         return sol
 
     def _decompose_polytope_into_endmember_simplices(self, vertices):
@@ -190,7 +195,12 @@ class SolutionPolytope(object):
                 f_occ = occ/(points_per_edge-1)
 
                 ind = self.independent_endmember_occupancies
-                vertices_as_independent_endmember_proportions = np.linalg.lstsq(ind.T, occ.T, rcond=None)[0].round(decimals=12).T
+                try:
+                    vertices_as_independent_endmember_proportions = np.linalg.lstsq(np.array(ind.T).astype(float),
+                                                                                    np.array(occ.T).astype(float),
+                                                                                    rcond=None)[0].round(decimals=12).T
+                except: # for python2
+                    vertices_as_independent_endmember_proportions = np.linalg.lstsq(ind.T, occ.T, rcond=-1)[0].round(decimals=12).T
             else:
                 raise Exception('grid type not recognised. Should be one of independent endmember proportions or site occupancies')
 
@@ -482,7 +492,7 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs = None,
                                    for idx in nonzero_indices],
                                   [vector[idx] for idx in nonzero_indices],
                                   ESV_modifiers[i])
-            mbr.params['formula'] = {key: value for (key, value) in mbr.params['formula'].iteritems()
+            mbr.params['formula'] = {key: value for (key, value) in mbr.params['formula'].items()
                                      if value > 1.e-12}
             endmembers.append([mbr, site_formulae[i]])
 

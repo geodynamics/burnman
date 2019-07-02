@@ -32,6 +32,9 @@ endmember_test = False
 camph_test = False
 solution_model_test = False
 
+def float_array(arr):
+    return np.array([list(map(float, v)) for v in arr])
+
 if grid_test == True:
     # simple coupled binary solution:
     binary_polytope = polytope_from_charge_balance([[1, 2, 3]], 2,
@@ -39,8 +42,7 @@ if grid_test == True:
 
     grid = binary_polytope.grid(points_per_edge = 41, grid_type='site occupancies')
     print(grid[0:10])
-    print(np.array([map(float, ieo)
-                    for ieo in binary_polytope.independent_endmember_occupancies]))
+    print(float_array(binary_polytope.independent_endmember_occupancies))
     print(len(grid))
 
     # simple tetrahedral solution:
@@ -49,8 +51,7 @@ if grid_test == True:
 
     grid = tetrahedral_polytope.grid(points_per_edge = 41)
     print(grid[0:10])
-    print(np.array([map(float, ieo)
-                    for ieo in tetrahedral_polytope.independent_endmember_occupancies]))
+    print(float_array(binary_polytope.independent_endmember_occupancies))
     print(len(grid))
 
     # simple cubical solution:
@@ -59,7 +60,7 @@ if grid_test == True:
 
     grid = cubical_polytope.grid(points_per_edge = 41)
     print(grid[0:10])
-    print(np.array([map(float, ieo) for ieo in cubical_polytope.independent_endmember_occupancies]))
+    print(float_array(binary_polytope.independent_endmember_occupancies))
     print(len(grid))
 
 
@@ -68,8 +69,7 @@ if grid_test == True:
                                                         return_fractions=True)
     grid = bridgmanite_polytope.grid(points_per_edge = 5)
     print(grid)
-    print(np.array([map(float, ieo)
-                    for ieo in bridgmanite_polytope.independent_endmember_occupancies]))
+    print(float_array(binary_polytope.independent_endmember_occupancies))
     print(len(grid))
 
 if limits_and_grid_refinement_test == True:
@@ -105,8 +105,11 @@ if limits_and_grid_refinement_test == True:
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_aspect('equal')
-
+    try: # python2
+        ax.set_aspect('equal')
+    except:
+        pass
+    
     gridded_proportions = cubical_polytope.grid(points_per_edge=3)
     gridded_occupancies = gridded_proportions.dot(e_occ)
     ax.scatter(gridded_occupancies[:,0], gridded_occupancies[:,2], gridded_occupancies[:,4], label='global grid')
