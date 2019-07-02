@@ -82,7 +82,8 @@ class AnisotropicMaterial(Material):
 
     @material_property
     def full_compliance_tensor(self):
-        block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
+        block = np.block([[ np.ones((3, 3)), 2.*np.ones((3, 3))],
+                          [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
         return self._voigt_notation_to_stiffness_tensor(np.divide(self.compliance_tensor, block))
 
     @material_property

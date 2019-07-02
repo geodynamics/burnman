@@ -8,10 +8,11 @@ from os import path
 import numpy as np
 import scipy.optimize as opt
 try:
-    from scipy.misc import factorial
-except ImportError:
-    # scipy's factorial was moved in scipy 1.3.0+
+    # scipy's factorial was moved to special in scipy 1.3.0+
     from scipy.special import factorial
+except ImportError:
+    from scipy.misc import factorial
+
 import warnings
 
 from . import equation_of_state as eos
