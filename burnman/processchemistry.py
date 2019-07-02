@@ -18,11 +18,6 @@ from string import ascii_uppercase as ucase
 from scipy.optimize import nnls
 from sympy import Matrix, nsimplify
 
-def simplify_matrix(arr):
-    def f(i,j):
-        return nsimplify(arr[i][j])
-    return Matrix( len(arr), len(arr[0]), f )
-
 def read_masses():
     """
     A simple function to read a file with a two column list of
@@ -79,36 +74,65 @@ def formula_mass(formula):
         formula[element] * atomic_masses[element] for element in formula)
     return mass
 
-def solution_bounds(endmember_occupancies):
+def convert_formula(formula, to_type='mass', normalize=False):
     """
-    Parameters
-    ----------
-    endmember_occupancies : 2d array of floats
-        A 1D array for each endmember in the solid solution,
-        containing the number of atoms of each element on each site.
-
-    Returns
-    -------
-    solution_bounds : 2d array of floats
-        An abbreviated version of endmember_occupancies, 
-        where the columns represent the independent compositional 
-        bounds on the solution
+    Converts a chemical formula from one type (mass or molar)
+    into the other. Renormalises amounts if normalize=True
     """
-    # Find bounds for the solution
-    i_sorted =zip(*sorted([(i,
-                            sum([1 for val in endmember_occupancies.T[i]
-                                 if val>1.e-10]))
-                           for i in range(len(endmember_occupancies.T))
-                                          if np.any(endmember_occupancies.T[i] > 1.e-10)],
-                          key=lambda x: x[1]))[0]
 
-    solution_bounds = endmember_occupancies[:,i_sorted[0],np.newaxis]
-    for i in i_sorted[1:]:
-        if np.abs(nnls(solution_bounds, endmember_occupancies.T[i])[1]) > 1.e-10:
-            solution_bounds = np.concatenate((solution_bounds,
-                                              endmember_occupancies[:,i,np.newaxis]),
-                                             axis=1)
-    return solution_bounds
+    if to_type == 'mass':
+        f = {element: n_atoms * atomic_masses[element] for (element, n_atoms) in formula.items()}
+    elif to_type == 'molar':
+        f = {element: n_atoms / atomic_masses[element] for (element, n_atoms) in formula.items()}
+    else:
+        raise Exception('Value of parameter to_type not recognised. Should be either "mass" or "molar".')
+
+    if normalize:
+        s = np.sum([n for (element, n) in f.items()])
+        f = {element: n/s for (element, n) in f.items()}
+
+    return f
+    
+def dictionarize_site_formula(formula):
+    """
+    A function to take a chemical formula with sites specified
+    by square brackets and return a standard dictionary with
+    element keys and atoms of each element per formula unit as items.
+    """
+    s = re.split(r'\[', formula)[1:]
+    list_multiplicity = np.empty(shape=(len(s)))
+    f = dict()
+
+    for site in range(len(s)):
+        site_occupancy = re.split(r'\]', s[site])[0]
+        mult = re.split('[A-Z][^A-Z]*', re.split(r'\]', s[site])[1])[0]
+        not_in_site = str(filter(None, re.split(r'\]', s[site])))[1]
+        not_in_site = not_in_site.replace(mult, '', 1)
+        if mult == '':
+            list_multiplicity[site] = Fraction(1.0)
+        else:
+            list_multiplicity[site] = Fraction(mult)
+
+        # Loop over elements on a site
+        elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
+        for i in range(len(elements)):
+            element_on_site = re.split('[0-9][^A-Z]*', elements[i])[0]
+            proportion_element_on_site = re.findall(
+                '[0-9][^A-Z]*', elements[i])
+            if len(proportion_element_on_site) == 0:
+                proportion_element_on_site = Fraction(1.0)
+            else:
+                proportion_element_on_site = Fraction(
+                    proportion_element_on_site[0])
+            n_element = float(mult) * proportion_element_on_site
+            f[element_on_site] = f.get(element_on_site, 0.0) + n_element
+
+        # Loop over elements not on a site
+        for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
+            element = str(filter(None, re.split(r'(\d+)', enamenumber)))
+            f[element[0]] = f.get(element[0], 0.0) + float(element[1])
+
+    return f
 
 def process_solution_chemistry(solution_model):
     """
@@ -269,6 +293,24 @@ def process_solution_chemistry(solution_model):
     solution_model.site_multiplicities = site_multiplicities
     solution_model.endmember_occupancies = endmember_occupancies
     solution_model.endmember_noccupancies = np.einsum('ij, j->ij', endmember_occupancies, site_multiplicities)
+
+def site_occupancies_to_strings(site_names, site_multiplicities, site_occupancies):
+    site_formulae = []
+    for mbr_occupancies in site_occupancies:
+        i=0
+        site_formulae.append('')
+        for site in site_names:
+            amounts = mbr_occupancies[i:i+len(site)]
+            mult = site_multiplicities[i]
+            if np.abs(mult - 1.) < 1.e-12:
+                mult=''
+            else:
+                mult=str(nsimplify(mult))
+            amounts /= sum(amounts)
+            site_formulae[-1] += '['+formula_to_string(dict(zip(site, amounts)))+']'+mult
+            i+=len(site)
+
+    return site_formulae
 
 def compositional_array(formulae):
     """
