@@ -224,8 +224,13 @@ def _bragg_williams_excesses(pressure, temperature, params):
         W = params['Wh'] + pressure * params['Wv']
         H_disord = (params['deltaH']
                     + pressure * params['deltaV'])
-        Q = opt.brentq(reaction_bragg_williams, 0., 1. - 1.e-9,
-                       args=(H_disord, temperature, n, f, W))
+
+        # We can use brentq, but don't let the lower bracket = 0
+        try:
+            Q = opt.brentq(reaction_bragg_williams, 1.e-12, 1. - 1.e-12,
+                           args=(H_disord, temperature, n, f, W))
+        except ValueError:
+            Q = 0.
 
         if f[0] == f[1]:
             # entropy of disordering for 1 atom A
