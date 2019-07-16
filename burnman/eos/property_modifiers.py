@@ -195,18 +195,6 @@ def _bragg_williams_excesses(pressure, temperature, params):
         f = [1., -params['factor']]
 
     # Equation A2-2
-    def lnaord(n, Q):
-        return (np.log(1. + n * Q)
-                + n * np.log(n + Q)
-                - (n + 1.) * np.log(n + 1.))
-
-    def lnadisord(n, Q):
-        return ((1. / (n + 1.)) * np.log(1. + n * Q)
-                + (n / (n + 1.)) * np.log(n * (1. - Q))
-                + (n / (n + 1.)) * np.log(1. - Q)
-                + (n * n / (n + 1.)) * np.log(n + Q)
-                - n * np.log(n))
-
     def flnarxn(n, Q, f):
         return (n / (n + 1.) * (f[0] * np.log(n*(1. - Q))
                                 + f[1] * np.log(1. - Q)
@@ -224,28 +212,21 @@ def _bragg_williams_excesses(pressure, temperature, params):
         W = params['Wh'] + pressure * params['Wv']
         H_disord = (params['deltaH']
                     + pressure * params['deltaV'])
-        Q = opt.brentq(reaction_bragg_williams, 0., 1. - 1.e-9,
-                       args=(H_disord, temperature, n, f, W))
 
-        if f[0] == f[1]:
-            # entropy of disordering for 1 atom A
-            # and n atoms B on n+1 identical sites
-            fac = f[0]
-            deltaS = R * ((1. + n) * np.log(1. + n) - n * np.log(n))
-            gibbs_disorder = H_disord - fac * temperature * deltaS
-            G = ((1. - Q) * (gibbs_disorder
-                             + fac * temperature * R * lnadisord(n, Q))
-                 + fac * Q * (R * temperature * lnaord(n, Q))
-                 + (1. - Q) * Q * W)
+        # We can use brentq, but don't let the lower bracket = 0
+        try:
+            Q = opt.brentq(reaction_bragg_williams, 1.e-12, 1. - 1.e-12,
+                           args=(H_disord, temperature, n, f, W))
+        except ValueError:
+            Q = 0.
 
-        else:
-            S = - R * (((1. + n*Q)*np.log((1. + n * Q)/(n + 1.))
-                        + n * (1. - Q) * np.log(n * (1. - Q) / (n + 1.)))
-                       + f[1] * (n * (1. - Q) * np.log((1. - Q) / (n + 1.))
-                                 + n * (n + Q) * np.log((n + Q) / (n + 1.)))
-                       ) / (n + 1.)
-            G = (1. - Q) * (H_disord) - temperature*S
+        S = - R * (f[0] * ((1. + n*Q)*np.log((1. + n * Q)/(n + 1.))
+                    + n * (1. - Q) * np.log(n * (1. - Q) / (n + 1.)))
+                   + f[1] * (n * (1. - Q) * np.log((1. - Q) / (n + 1.))
+                             + n * (n + Q) * np.log((n + Q) / (n + 1.)))
+                   ) / (n + 1.)
 
+        G = (1. - Q)*H_disord + (1. - Q)*Q*W - temperature*S
         return Q, G
 
     # Calculating partial differentials with respect to P and T
