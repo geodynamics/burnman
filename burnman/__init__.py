@@ -189,7 +189,7 @@ from .mineral_helpers import *
 
 # high level functions
 from .model import Model
-from .equilibrate import equilibrate
+from .equilibration import equilibrate
 
 # mineral library
 from . import minerals
