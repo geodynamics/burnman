@@ -14,6 +14,8 @@ from collections import namedtuple
 
 from .mineral import Mineral
 from .solidsolution import SolidSolution
+# from .solutionbases import feasible_solution_basis_in_component_space
+# from .solutionbases import transform_solution_to_new_basis
 
 from sympy import Matrix, nsimplify
 
@@ -228,6 +230,7 @@ def F(x, assemblage, equality_constraints, prm):
     """
 
     set_compositions_and_state_from_parameters(assemblage, x)
+
     new_endmember_amounts = get_endmember_amounts(assemblage)
 
     n_reactions = len(prm.stoic_nullspace[:, 0])
@@ -291,10 +294,9 @@ def jacobian(x, assemblage, equality_constraints, prm):
                                     assemblage.n_moles
                                     * assemblage.molar_heat_capacity_p / x[1]]
             j = 2
-            for k, mbr_indices in enumerate(prm.indices):
-                n = len(mbr_indices)
+            for k, n in enumerate(prm.endmembers_per_phase):
                 full_hessian[i, j] = assemblage.phases[k].molar_entropy
-                if n > 1:  # for solutions with >1 stable endmember
+                if n > 1:  # for solutions with >1 endmember
                     full_hessian[i, j+1:j+n] = (assemblage.n_moles
                                                 * assemblage.molar_fractions[k]
                                                 * (assemblage.phases[k].partial_entropies[1:]
@@ -306,8 +308,7 @@ def jacobian(x, assemblage, equality_constraints, prm):
                                     * assemblage.molar_volume / assemblage.K_T,
                                     assemblage.n_moles*assemblage.molar_volume]
             j = 2
-            for k, mbr_indices in enumerate(prm.indices):
-                n = len(mbr_indices)
+            for k, n in enumerate(prm.endmembers_per_phase):
                 full_hessian[i, j] = assemblage.phases[k].molar_volume
                 if n > 1:  # for solutions with >1 stable endmember
                     full_hessian[i, j+1:j+n] = (assemblage.n_moles
@@ -471,7 +472,7 @@ def get_equilibration_parameters(assemblage, composition):
 
     prm.n_parameters = len(prm.parameter_names)
     prm.phase_fraction_indices = [i for i in range(len(prm.parameter_names))
-                              if 'x(' in prm.parameter_names[i]]
+                                  if 'x(' in prm.parameter_names[i]]
 
     # Find the bulk composition vector
     prm.bulk_composition_vector = np.array([composition[e]
@@ -617,6 +618,7 @@ def equilibrate(composition, assemblage, equality_constraints,
 
     assemblage.set_state(*initial_state)
     prm.initial_parameters = get_parameters(assemblage)
+    parameters = get_parameters(assemblage)
 
     # Solve the system of equations, loop over input parameters
     sol_list = np.empty(shape=(n_c0, n_c1)+(0,)).tolist()
@@ -644,7 +646,7 @@ def equilibrate(composition, assemblage, equality_constraints,
                                                            equality_constraints,
                                                            prm),
                                       lambda_bounds=lambda dx, x: lambda_bounds(dx, x, prm.endmembers_per_phase),
-                                      guess=prm.initial_parameters,
+                                      guess=parameters,
                                       linear_constraints=(prm.constraint_matrix,
                                                           prm.constraint_vector),
                                       tol=tol,
@@ -680,14 +682,16 @@ def equilibrate(composition, assemblage, equality_constraints,
                 updated_params = False
                 for s in prev_sol:
                     if s.success and not updated_params:
+                        # next guess based on a Newton step
                         dF = F(s.x, assemblage, cs, prm)
                         luJ = lu_factor(s.J)
-                        new_parameters = s.x + lu_solve(luJ, -dF)  # next guess based on a Newton step
-                        c = prm.constraint_matrix.dot(new_parameters) + prm.constraint_vector
-                        if all(c <= 0.):
-                            prm.initial_parameters = new_parameters
-                        else:
-                            prm.initial_parameters = s.x
+                        new_parameters = s.x + lu_solve(luJ, -dF)
+                        c = (prm.constraint_matrix.dot(new_parameters)
+                             + prm.constraint_vector)
+                        if all(c <= 0.):  # accept new guess
+                            parameters = new_parameters
+                        else:  # use the parameters from this step
+                            parameters = s.x
                             exhausted_phases = [assemblage.phases[phase_idx].name
                                                 for phase_idx, v in
                                                 enumerate(new_parameters[prm.phase_fraction_indices]) if v<0.]
@@ -696,7 +700,7 @@ def equilibrate(composition, assemblage, equality_constraints,
 
                         updated_params = True
                 if not updated_params:
-                    prm.initial_parameters = get_parameters(assemblage)
+                    parameters = prm.initial_parameters
 
     # Finally, make dimensions of sol_list equal the input dimensions
     if len(sol_list[0]) == 1:
