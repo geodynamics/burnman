@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
 
-
 import burnman
 from burnman.minerals import JH_2015
 from burnman.solutionbases import transform_solution_to_new_basis
@@ -26,16 +25,18 @@ from burnman.solutionbases import polytope_from_charge_balance, polytope_from_so
 from burnman.solutionbases import site_occupancies_to_strings, generate_complete_basis
 from burnman.processanalyses import compute_and_set_phase_compositions, assemblage_affinity_misfit
 
-grid_test = False
+grid_test = True
 limits_and_grid_refinement_test = True
-endmember_test = False
-camph_test = False
-solution_model_test = False
+endmember_test = True
+camph_test = True
+solution_model_test = True
+
 
 def float_array(arr):
     return np.array([list(map(float, v)) for v in arr])
 
-if grid_test == True:
+
+if grid_test is True:
     # simple coupled binary solution:
     binary_polytope = polytope_from_charge_balance([[1, 2, 3]], 2,
                                                    return_fractions=True)
@@ -72,7 +73,7 @@ if grid_test == True:
     print(float_array(binary_polytope.independent_endmember_occupancies))
     print(len(grid))
 
-if limits_and_grid_refinement_test == True:
+if limits_and_grid_refinement_test is True:
     cubical_polytope = polytope_from_charge_balance([[2,2], [1, 1], [0,0]], 3,
                                                     return_fractions=True)
 
@@ -109,7 +110,7 @@ if limits_and_grid_refinement_test == True:
         ax.set_aspect('equal')
     except:
         pass
-    
+
     gridded_proportions = cubical_polytope.grid(points_per_edge=3)
     gridded_occupancies = gridded_proportions.dot(e_occ)
     ax.scatter(gridded_occupancies[:,0], gridded_occupancies[:,2], gridded_occupancies[:,4], label='global grid')
@@ -123,7 +124,7 @@ if limits_and_grid_refinement_test == True:
     plt.legend()
     plt.show()
 
-if endmember_test == True:
+if endmember_test is True:
     # bridgmanite in FMASO system: Mg Fe Fe3+ Al3+ | Fe3+ Al3+ Si
     bridgmanite_polytope = polytope_from_charge_balance([[2,2,3,3], [3,3,4]], 6,
                                                         return_fractions=False)
@@ -185,7 +186,7 @@ if endmember_test == True:
     print(opx_polytope.independent_endmember_occupancies)
 
 
-if camph_test == True:
+if camph_test is True:
     # Camph from Diener and Powell, 2012
     # A*1    M13*3   M2*2            M4*2          T1*4
     # v Na | Mg Fe | Mg Fe Al Fe3  | Ca Mg Fe Na | Si Al
@@ -212,7 +213,7 @@ if camph_test == True:
                                     [1,0,1,0,0,  0,0,  1,0,0,0,1,  1,  0  ]]) # mrb
 
     print('{0} endmembers: note that the published model has {1} endmembers'.format(n_mbrs, n_published_members))
-    
+
     # Camph from Green et al., 2016; Holland et al., 2018
     # A*1      M13*3   M2*2               M4*2          T1*4    V*2
     # v Na K | Mg Fe | Mg Fe Al Fe3 Ti  | Ca Mg Fe Na | Si Al | OH O
@@ -245,7 +246,7 @@ if camph_test == True:
     print(generate_complete_basis(camph_partial_basis, camph_array)[-n_missing_members:])
 
 
-if solution_model_test == True:
+if solution_model_test is True:
     # Clinopyroxene from Jennings and Holland
     cpx = JH_2015.clinopyroxene()
 
