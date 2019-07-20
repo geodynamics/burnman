@@ -153,7 +153,7 @@ class SolidSolution(Mineral):
             assert(sum(molar_fractions) < 1.0001)
 
         self.reset()
-        self.molar_fractions = molar_fractions
+        self.molar_fractions = np.array(molar_fractions)
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
