@@ -640,18 +640,21 @@ def equilibrate(composition, assemblage, equality_constraints,
             # of the phases in the assemblage:
             # set_compositions_and_state_from_parameters(assemblage,
             #                                           prm.initial_parameters)
-            sol = damped_newton_solve(F=lambda x: F(x, assemblage,
-                                                    equality_constraints, prm),
-                                      J=lambda x: jacobian(x, assemblage,
-                                                           equality_constraints,
-                                                           prm),
-                                      lambda_bounds=lambda dx, x: lambda_bounds(dx, x, prm.endmembers_per_phase),
-                                      guess=parameters,
-                                      linear_constraints=(prm.constraint_matrix,
-                                                          prm.constraint_vector),
-                                      tol=tol,
-                                      store_iterates=store_iterates,
-                                      max_iterations=max_iterations)
+            try:
+                sol = damped_newton_solve(F=lambda x: F(x, assemblage,
+                                                        equality_constraints, prm),
+                                          J=lambda x: jacobian(x, assemblage,
+                                                               equality_constraints,
+                                                               prm),
+                                          lambda_bounds=lambda dx, x: lambda_bounds(dx, x, prm.endmembers_per_phase),
+                                          guess=parameters,
+                                          linear_constraints=(prm.constraint_matrix,
+                                                              prm.constraint_vector),
+                                          tol=tol,
+                                          store_iterates=store_iterates,
+                                          max_iterations=max_iterations)
+            except:
+                pass
 
             if store_assemblage:
                 sol.assemblage = assemblage.copy()

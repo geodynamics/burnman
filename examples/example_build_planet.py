@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # inner_core
     inner_core = burnman.Layer('inner core', radii = np.linspace(0,1220.e3,10))
     inner_core.set_material(burnman.minerals.other.Fe_Dewaele())
-    
+
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will set the temperature at 300 K.
     inner_core.set_temperature_mode('user-defined',
         300.*np.ones_like(inner_core.radii))
@@ -92,16 +92,16 @@ if __name__ == '__main__':
                                 [inner_core, outer_core, lower_mantle, upper_mantle],
                                 verbose=True)
     print(planet_zog)
-    
+
     # Here we compute its state. Go BurnMan Go!
     # (If we were to change composition of one of the layers, we would have to
     # recompute the state)
     planet_zog.make()
-    
+
     # Now we output the mass of the planet and moment of inertia
     print('\nmass/Earth= {0:.3f}, moment of inertia factor= {1:.4f}'.format(planet_zog.mass / 5.97e24,
                                                                           planet_zog.moment_of_inertia_factor))
-    
+
     # And here's the mass of the individual layers:
     for layer in planet_zog.layers:
         print('{0} mass fraction of planet {1:.3f}'.format(layer.name, layer.mass / planet_zog.mass))
@@ -114,13 +114,13 @@ if __name__ == '__main__':
     premdensity, prempressure, premgravity,premvs,premvp = prem.evaluate(
         ['density', 'pressure', 'gravity', 'v_s','v_p'])
 
-    
+
     # Now let's plot everything up
 
     # Optional prettier plotting
     # plt.style.use('ggplot')
-    
-    figure = plt.figure(figsize=(10, 12))
+
+    figure = plt.figure(figsize=(10, 3))
     figure.suptitle(
         '{0} has a mass {1:.3f} times that of Earth,\n'
         'has an average density of {2:.1f} kg/m$^3$,\n'
@@ -131,7 +131,7 @@ if __name__ == '__main__':
             planet_zog.moment_of_inertia_factor),
             fontsize=20)
 
-    ax = [figure.add_subplot(4, 1, i) for i in range(1, 5)]
+    ax = [figure.add_subplot(1, 3, i) for i in range(1, 4)]
 
     ax[0].plot(planet_zog.radii / 1.e3, planet_zog.density / 1.e3, 'k', linewidth=2.,
                label=planet_zog.name)
@@ -153,15 +153,13 @@ if __name__ == '__main__':
     ax[2].set_ylabel('Gravity (m/s$^2)$')
     ax[2].set_ylim(0., max(planet_zog.gravity) + 0.5)
 
-    # Make a subplot showing the calculated temperature profile
-    ax[3].plot(planet_zog.radii / 1.e3, planet_zog.temperature, 'r', linewidth=2.)
-    ax[3].set_ylabel('Temperature ($K$)')
-    ax[3].set_xlabel('Radius (km)')
-    ax[3].set_ylim(0., max(planet_zog.temperature) + 100)
 
     for i in range(3):
-        ax[i].set_xticklabels([])
-    for i in range(4):
+        #ax[i].set_xticklabels([])
+        ax[i].set_xlabel('Radius (km)')
+    for i in range(3):
         ax[i].set_xlim(0., max(planet_zog.radii) / 1.e3)
-    
+
+    figure.tight_layout()
+    figure.savefig('zog.pdf')
     plt.show()
