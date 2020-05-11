@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU 
+# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -3569,13 +3569,13 @@ class sp (Mineral):
                        'Kdprime_0': -2.1e-11,
                        'n': 7.0,
                        'molar_mass': 0.1422656}
-        #negative factors mean that sp and herc are fully ordered at all conditions
-        #self.property_modifiers = [['bragg_williams', {'deltaH': 13930.0, # negative factors mean that sp and herc are fully ordered at all conditions
-        #                                               'deltaV': 0.0,
-        #                                               'Wh': -3600.0,
-        #                                               'Wv': 0.0,
-        #                                               'n': 2.0,
-        #                                               'factor': -0.5}]]
+        # negative factors for sp and herc are special thermocalc flags
+        self.property_modifiers = [['bragg_williams', {'deltaH': 13930.0, # negative factors mean that sp and herc are fully ordered at all conditions
+                                                       'deltaV': 0.0,
+                                                       'Wh': -3600.0,
+                                                       'Wv': 0.0,
+                                                       'n': 2.0,
+                                                       'factor': -0.5}]]
         Mineral.__init__(self)
 
 class herc (Mineral):
@@ -3593,13 +3593,13 @@ class herc (Mineral):
                        'Kdprime_0': -2.1e-11,
                        'n': 7.0,
                        'molar_mass': 0.1738056}
-        #negative factors mean that sp and herc are fully ordered at all conditions
-        #self.property_modifiers = [['bragg_williams', {'deltaH': 13930.0,
-        #                                               'deltaV': 0.0,
-        #                                               'Wh': -3600.0,
-        #                                               'Wv': 0.0,
-        #                                               'n': 2.0,
-        #                                               'factor': -0.5}]]
+        # negative factors for sp and herc are special thermocalc flags
+        self.property_modifiers = [['bragg_williams', {'deltaH': 13930.0,
+                                                       'deltaV': 0.0,
+                                                       'Wh': -3600.0,
+                                                       'Wv': 0.0,
+                                                       'n': 2.0,
+                                                       'factor': -0.5}]]
         Mineral.__init__(self)
 
 class mt (Mineral):
@@ -4174,4 +4174,3 @@ def cov():
 
     from .HGP_2018_ds633_cov import cov
     return cov
-

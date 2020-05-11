@@ -48,23 +48,26 @@ def _landau_excesses(pressure, temperature, params):
         # D[D[a ((x - c - d*y/a)*(1 - x/(c + d*y/a))^0.5 + c/3*(1 - x/(c +
         # d*y/a))^1.5), x], x]
         Q2 = np.sqrt(1. - temperature / Tc)
-        G = ( params['S_D'] *
-              ( (temperature - Tc) * Q2 +
-                params['Tc_0'] * Q2 * Q2 * Q2 / 3.) + G_disordered )
-        dGdP = ( -params['V_D'] * Q2 * (1. + 0.5 * temperature / Tc *
-                                        (1. - params['Tc_0'] / Tc))
-                 + dGdP_disordered )
-        dGdT = ( params['S_D'] * Q2 * (1.5 - 0.5 * params['Tc_0'] / Tc) +
-                 dGdT_disordered )
-        d2GdP2 = ( params['V_D'] * params['V_D'] * temperature /
-                   (params['S_D'] * Tc * Tc * Q2) *
-                   (temperature * (1. + params['Tc_0'] / Tc) / (4. * Tc) +
-                    Q2 * Q2 * (1. - params['Tc_0'] / Tc) - 1.) )
-        d2GdT2 = -params['S_D'] / (Tc * Q2) * (0.75 - 0.25 * params['Tc_0'] / Tc)
-        d2GdPdT = params['V_D'] / (2. * Tc * Q2) \
-                  * (1. + (temperature / (2. * Tc) - Q2 * Q2) * (1. - params['Tc_0'] / Tc))
+        G = (params['S_D']
+             * ((temperature - Tc) * Q2
+                + params['Tc_0'] * Q2 * Q2 * Q2 / 3.) + G_disordered)
+        dGdP = (-params['V_D'] * Q2 * (1. + 0.5 * temperature / Tc
+                                       * (1. - params['Tc_0'] / Tc))
+                + dGdP_disordered)
+        dGdT = (params['S_D'] * Q2 * (1.5 - 0.5 * params['Tc_0'] / Tc)
+                + dGdT_disordered)
+        d2GdP2 = (params['V_D'] * params['V_D'] * temperature
+                  / (params['S_D'] * Tc * Tc * Q2)
+                  * (temperature * (1. + params['Tc_0'] / Tc) / (4. * Tc)
+                     + Q2 * Q2 * (1. - params['Tc_0'] / Tc) - 1.))
+        d2GdT2 = -params['S_D'] / (Tc * Q2) * (0.75 - 0.25 * params['Tc_0']
+                                               / Tc)
+        d2GdPdT = (params['V_D'] / (2. * Tc * Q2)
+                   * (1. + (temperature / (2. * Tc) - Q2 * Q2)
+                      * (1. - params['Tc_0'] / Tc)))
 
     else:
+        Q2 = 0.
         G = G_disordered
         dGdT = dGdT_disordered
         dGdP = dGdP_disordered
@@ -75,7 +78,7 @@ def _landau_excesses(pressure, temperature, params):
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
 
-    return excesses
+    return (excesses, {'Q': np.sqrt(Q2)})
 
 
 def _landau_hp_excesses(pressure, temperature, params):
@@ -113,18 +116,18 @@ def _landau_hp_excesses(pressure, temperature, params):
         Q = 0.
 
     # Gibbs
-    G = params['Tc_0'] * params['S_D'] * (Q_0 * Q_0 - np.power(Q_0, 6.) / 3.) \
-        - params['S_D'] * (Tc * Q * Q - params['Tc_0'] * np.power(Q, 6.) / 3.) \
-        - T * params['S_D'] * (Q_0 * Q_0 - Q * Q) + (
-            P - params['P_0']) * params['V_D'] * Q_0 * Q_0
+    G = (params['Tc_0'] * params['S_D'] * (Q_0 * Q_0 - np.power(Q_0, 6.) / 3.)
+         - params['S_D'] * (Tc * Q * Q - params['Tc_0'] * np.power(Q, 6.) / 3.)
+         - T * params['S_D'] * (Q_0 * Q_0 - Q * Q)
+         + (P - params['P_0']) * params['V_D'] * Q_0 * Q_0)
 
     dGdT = params['S_D'] * (Q * Q - Q_0 * Q_0)
     dGdP = -params['V_D'] * (Q * Q - Q_0 * Q_0)
 
     if Q > 1.e-12:
         d2GdT2 = -params['S_D'] / (2. * params['Tc_0'] * Q * Q)
-        d2GdP2 = -params['V_D'] * params['V_D'] \
-                 / (2. * params['S_D'] * params['Tc_0'] * Q * Q)
+        d2GdP2 = (-params['V_D'] * params['V_D']
+                  / (2. * params['S_D'] * params['Tc_0'] * Q * Q))
         d2GdPdT = params['V_D'] / (2. * params['Tc_0'] * Q * Q)
     else:
         d2GdT2 = 0.
@@ -134,7 +137,7 @@ def _landau_hp_excesses(pressure, temperature, params):
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
 
-    return excesses
+    return (excesses, {'Q': Q})
 
 
 def _linear_excesses(pressure, temperature, params):
@@ -164,7 +167,7 @@ def _linear_excesses(pressure, temperature, params):
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
 
-    return excesses
+    return (excesses, None)
 
 
 def _bragg_williams_excesses(pressure, temperature, params):
@@ -186,36 +189,51 @@ def _bragg_williams_excesses(pressure, temperature, params):
 
     R = gas_constant
     n = params['n']
-    f = params['factor']
-    deltaS = gas_constant * ((1. + n) * np.log(1. + n) - n * np.log(n))
+    if params['factor'] > 0.:
+        f = [params['factor'], params['factor']]
+    else:
+        f = [1., -params['factor']]
 
-    lnxord = lambda n, Q: np.log(1. + n * Q) + n * np.log(n + Q) - (1. + n) * np.log(1. + n)
-    lnxdisord = lambda n, Q: (1. / (1. + n)) * np.log(1. + n * Q) \
-        + (n / (1. + n)) * np.log(1. - Q) \
-        + (n / (1. + n)) * np.log(n * (1. - Q))\
-        + (n * n / (1. + n)) * np.log(n + Q) - n * np.log(n)
+    # Equation A2-2
+    def flnarxn(n, Q, f):
+        return (n / (n + 1.) * (f[0] * np.log(n*(1. - Q))
+                                + f[1] * np.log(1. - Q)
+                                - f[0] * np.log(1. + n*Q)
+                                - f[1] * np.log(n + Q)))
 
-    def reaction_bragg_williams(Q, gibbs_disorder, temperature, n, f, W):
-        if Q > 1.0:
-            Q = 0.9  # A simple catch to make sure the optimisation doesn't fail
-        return gibbs_disorder + (2. * Q - 1.) * W \
-            + f * R * temperature * (lnxdisord(n, Q) - lnxord(n, Q))
+    # Equation A2-4
+    # Can be derived from A2-2 noting that
+    # delta_H + f*R*T*lnarxn = delta_G + f*R*T*(lnadisord - lnaord)
+    def reaction_bragg_williams(Q, delta_H, temperature, n, f, W):
+        return (delta_H + R * temperature * flnarxn(n, Q, f)
+                + (2. * Q - 1.) * W)
 
     def order_gibbs(pressure, temperature, params):
         W = params['Wh'] + pressure * params['Wv']
-        gibbs_disorder = params['deltaH'] - f * \
-            temperature * deltaS + pressure * params['deltaV']
-        Q = opt.fsolve(reaction_bragg_williams, 0.999995,
-                       args=(gibbs_disorder, temperature, n, f, W))[0]
-        G = (1. - Q) * (gibbs_disorder + f * R * temperature * lnxdisord(n, Q)) \
-            + f * Q * (R * temperature * lnxord(n, Q)) + (1. - Q) * Q * W
+        H_disord = (params['deltaH']
+                    + pressure * params['deltaV'])
+
+        # We can use brentq, but don't let the lower bracket = 0
+        try:
+            Q = opt.brentq(reaction_bragg_williams, 1.e-12, 1. - 1.e-12,
+                           args=(H_disord, temperature, n, f, W))
+        except ValueError:
+            Q = 0.
+
+        S = - R * (f[0] * ((1. + n*Q)*np.log((1. + n * Q)/(n + 1.))
+                    + n * (1. - Q) * np.log(n * (1. - Q) / (n + 1.)))
+                   + f[1] * (n * (1. - Q) * np.log((1. - Q) / (n + 1.))
+                             + n * (n + Q) * np.log((n + Q) / (n + 1.)))
+                   ) / (n + 1.)
+
+        G = (1. - Q)*H_disord + (1. - Q)*Q*W - temperature*S
         return Q, G
 
     # Calculating partial differentials with respect to P and T
     # are complicated by the fact that Q changes with P and T
     # Since there's no analytical solution for Q(P, T), we are
     # unfortunately driven to numerical differentiation. Schade.
-    dT = 1.
+    dT = 0.1
     dP = 1000.
 
     Q, G = order_gibbs(pressure, temperature, params)
@@ -237,7 +255,7 @@ def _bragg_williams_excesses(pressure, temperature, params):
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
 
-    return excesses
+    return (excesses, {'Q': Q})
 
 
 def _magnetic_excesses_chs(pressure, temperature, params):
@@ -258,8 +276,9 @@ def _magnetic_excesses_chs(pressure, temperature, params):
         curie_temperature * curie_temperature)
     d2taudPdT = params['curie_temperature'][
         1] / (curie_temperature * curie_temperature)
-    d2taudP2 = 2. * temperature * params['curie_temperature'][1] * params['curie_temperature'][1] \
-        / (curie_temperature * curie_temperature * curie_temperature)
+    d2taudP2 = (2. * temperature * params['curie_temperature'][1]
+                * params['curie_temperature'][1]
+                / (curie_temperature * curie_temperature * curie_temperature))
     magnetic_moment = params['magnetic_moment'][
         0] + pressure * params['magnetic_moment'][1]
     dmagnetic_momentdP = params['magnetic_moment'][1]
@@ -267,31 +286,35 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     A = (518. / 1125.) + (11692. / 15975.) * ((1. / structural_parameter) - 1.)
     if tau < 1:
         f = 1. - (1. / A) * (79. / (140. * structural_parameter * tau)
-                             + (474. / 497.) * (1. / structural_parameter - 1.) * (np.power(tau, 3.) / 6.
-                                                                                   + np.power(
-                                                                                   tau, 9.) / 135.
-                                                                                   + np.power(tau, 15.) / 600.))
+                             + (474. / 497.) * (1. / structural_parameter - 1.)
+                             * (np.power(tau, 3.) / 6.
+                                + np.power(tau, 9.) / 135.
+                                + np.power(tau, 15.) / 600.))
         dfdtau = -(1. / A) * (-79. / (140. * structural_parameter * tau * tau)
-                              + (474. / 497.) * (1. / structural_parameter - 1.) * (tau * tau / 2.
-                                                                                    + np.power(
-                                                                                    tau, 8.) / 15.
-                                                                                    + np.power(tau, 14.) / 40.))
-        d2fdtau2 = -(1. / A) * (2. * 79. / (140. * structural_parameter * np.power(tau, 3.))
-                                + (474. / 497.) * (1. / structural_parameter - 1.) * (tau
-                                                                                      + 8. *
-                                                                                      np.power(
-                                                                                      tau, 7.) / 15.
-                                                                                      + 14. * np.power(tau, 13.) / 40.))
+                              + (474. / 497.) * (1. / structural_parameter
+                                                 - 1.)
+                              * (tau * tau / 2.
+                                 + np.power(tau, 8.) / 15.
+                                 + np.power(tau, 14.) / 40.))
+        d2fdtau2 = -(1. / A) * (2. * 79. / (140. * structural_parameter
+                                            * np.power(tau, 3.))
+                                + (474. / 497.) * (1. / structural_parameter
+                                                   - 1.)
+                                * (tau
+                                   + 8. * np.power(tau, 7.) / 15.
+                                   + 14. * np.power(tau, 13.) / 40.))
 
     else:
-        f = - \
-            (1. / A) * (np.power(tau, -5.) / 10. + np.power(
+        f = - (1. / A) * (np.power(tau, -5.) / 10. + np.power(
                 tau, -15.) / 315. + np.power(tau, -25.) / 1500.)
-        dfdtau = (1. / A) * (np.power(tau, -6.) / 2. +
-                             np.power(tau, -16.) / 21. + np.power(tau, -26.) / 60.)
-        d2fdtau2 = - \
-            (1. / A) * (6. * np.power(tau, -7.) / 2. + 16. *
-                        np.power(tau, -17.) / 21. + 26. * np.power(tau, -27.) / 60.)
+        dfdtau = (1. / A) * (np.power(tau, -6.) / 2.
+                             + np.power(tau, -16.) / 21.
+                             + np.power(tau, -26.)
+                             / 60.)
+        d2fdtau2 = - (1. / A) * (6. * np.power(tau, -7.) / 2. + 16.
+                                 * np.power(tau, -17.) / 21. + 26.
+                                 * np.power(tau, -27.)
+                                 / 60.)
 
     dfdT = dfdtau * dtaudT
     d2fdT2 = d2fdtau2 * dtaudT * dtaudT
@@ -305,20 +328,25 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     d2GdT2 = gas_constant * \
         np.log(magnetic_moment + 1.) * (2. * dfdT + temperature * d2fdT2)
 
-    dGdP = gas_constant * temperature * (f * dmagnetic_momentdP / (magnetic_moment + 1.)
+    dGdP = gas_constant * temperature * (f * dmagnetic_momentdP
+                                         / (magnetic_moment + 1.)
                                          + dfdP * np.log(magnetic_moment + 1.))
-    d2GdP2 = gas_constant * temperature * (-f * np.power(dmagnetic_momentdP / (magnetic_moment + 1.), 2.)
-                                           + 2 * dfdP * dmagnetic_momentdP /
-                                           (magnetic_moment + 1.)
+    d2GdP2 = gas_constant * temperature * (-f * np.power(dmagnetic_momentdP
+                                                         / (magnetic_moment + 1.), 2.)
+                                           + 2 * dfdP * dmagnetic_momentdP
+                                           / (magnetic_moment + 1.)
                                            + d2fdP2 * np.log(magnetic_moment + 1.))
-    d2GdPdT = dGdP / temperature + gas_constant * temperature * np.log(magnetic_moment + 1.) * d2fdPdT \
-        + gas_constant * temperature * \
-        dmagnetic_momentdP / (magnetic_moment + 1.) * dfdT
+    d2GdPdT = dGdP / temperature + (gas_constant * temperature
+                                    * np.log(magnetic_moment + 1.)
+                                    * d2fdPdT
+                                    + gas_constant * temperature
+                                    * dmagnetic_momentdP
+                                    / (magnetic_moment + 1.) * dfdT)
 
     excesses = {'G': G, 'dGdT': dGdT, 'dGdP': dGdP,
                 'd2GdT2': d2GdT2, 'd2GdP2': d2GdP2, 'd2GdPdT': d2GdPdT}
 
-    return excesses
+    return (excesses, None)
 
 
 def calculate_property_modifications(mineral):
@@ -344,6 +372,7 @@ def calculate_property_modifications(mineral):
     """
     excesses = {'G': 0., 'dGdT': 0., 'dGdP': 0.,
                 'd2GdT2': 0., 'd2GdP2': 0., 'd2GdPdT': 0.}
+    mineral.property_modifier_properties = []
     for modifier in mineral.property_modifiers:
         if modifier[0] == 'landau':
             xs_function = _landau_excesses
@@ -356,8 +385,9 @@ def calculate_property_modifications(mineral):
         if modifier[0] == 'magnetic_chs':
             xs_function = _magnetic_excesses_chs
 
-        xs_component = xs_function(
+        xs_component, properties = xs_function(
             mineral.pressure, mineral.temperature, modifier[1])
+        mineral.property_modifier_properties.append(properties)
         for key in xs_component:
             excesses[key] += xs_component[key]
 
