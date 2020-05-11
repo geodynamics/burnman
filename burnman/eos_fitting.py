@@ -117,7 +117,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             elif flag == 'gibbs':
                 self.m.set_state(P, T)
                 dPdp = 1./self.m.V
-                dpdT = -self.S
+                dpdT = -self.m.S
             else:
                 dP = 1.e5
                 dT = 1.
