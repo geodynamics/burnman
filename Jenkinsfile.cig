@@ -1,52 +1,23 @@
 #!groovy
 
 pipeline {
-  agent none
+  agent {
+    docker {
+      image 'geodynamics/burnman-buildenv-bionic-python3'
+      alwaysPull true
+    }
+  }
 
   options {
     timeout(time: 2, unit: 'HOURS')
   }
 
+  post { always { cleanWs() } }
+
   stages {
-    stage('Bionic') {
-      parallel {
-        stage('Python 2') {
-          agent {
-            docker {
-              image 'geodynamics/burnman-buildenv-bionic-python2'
-              alwaysPull true
-            }
-          }
-
-          stages {
-            stage('Test (Python 2)') {
-              steps {
-                sh 'PYTHON=python2 ./test.sh'
-              }
-            }
-          }
-
-          post { always { cleanWs() } }
-        }
-
-        stage('Python 3') {
-          agent {
-            docker {
-              image 'geodynamics/burnman-buildenv-bionic-python3'
-              alwaysPull true
-            }
-          }
-
-          stages {
-            stage('Test (Python 3)') {
-              steps {
-                sh 'PYTHON=python3 ./test.sh'
-              }
-            }
-          }
-
-          post { always { cleanWs() } }
-        }
+    stage('Bionic Python 3') {
+      steps {
+        sh 'PYTHON=python3 ./test.sh'
       }
     }
   }
