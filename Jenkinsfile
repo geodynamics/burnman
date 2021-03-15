@@ -106,20 +106,6 @@ pipeline
 
       stages
       {
-
-        stage('python 2')
-        {
-          steps
-          {
-            timeout(time: 1, unit: 'HOURS')
-            {
-            sh '''#!/bin/bash
-               PYTHON=python ./test.sh
-            '''
-            }
-          }
-        }
-
         stage('python 3')
         {
           steps
