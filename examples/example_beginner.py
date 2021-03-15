@@ -34,15 +34,8 @@ from __future__ import absolute_import
 # usage of BurnMan.  In particular, numpy is used for handling
 # numerical arrays and mathematical operations on them, and
 # matplotlib is used for generating plots of results of calculations
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
 
 # Here we import the relevant modules from BurnMan.  The burnman
 # module imports several of the most important functionalities of
@@ -50,9 +43,11 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 # thermoelastic properties of them.  The minerals module includes
 # the mineral physical parameters for the predefined minerals in
 # BurnMan
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

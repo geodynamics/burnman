@@ -40,24 +40,19 @@ volume in order to create smoothly varying relaxed properties.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
-
 import numpy as np
 import matplotlib.pyplot as plt
 
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from scipy.optimize import fsolve, brentq
 from scipy.integrate import odeint
 from scipy.interpolate import UnivariateSpline
 
+assert burnman_path  # silence pyflakes warning
 
-# Define fitting function to find the temperature along the isentrope
+
+#  Define fitting function to find the temperature along the isentrope
 def isentrope(rock, pressures, entropy, T_guess):
     def _deltaS(T, S, P, rock):
         rock.set_state(P, T)

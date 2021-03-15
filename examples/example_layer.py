@@ -35,20 +35,16 @@ from __future__ import absolute_import
 
 # Here we import standard python modules that are required for
 # usage of BurnMan.
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 
 # Here we import the relevant modules from BurnMan.
 import burnman
 from burnman import minerals
 
+assert burnman_path  # silence pyflakes warning
 import warnings
 
 if __name__ == "__main__":

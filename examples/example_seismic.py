@@ -38,16 +38,13 @@ here shown by importing AK135 :cite:`kennett1995`.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
 
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 
+assert burnman_path  # silence pyflakes warning
 import warnings
 
 if __name__ == "__main__":
