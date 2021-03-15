@@ -5,12 +5,11 @@ import os.path
 import sys
 sys.path.insert(1, os.path.abspath('../..'))
 
-import burnman
 from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
-from burnman import constants
 import numpy as np
 import warnings
+
 
 def p(v1, v2):
     return (v2 - v1) / v1
@@ -22,7 +21,8 @@ filemin = [['SLB2011', '../../burnman/data/input_perplex/fo_SLB2011_params.dat',
 for database, f, mineral in filemin:
     f = open(f, 'r')
     datalines = [line.strip()
-                 for idx, line in enumerate(f.read().split('\n')) if line.strip() and idx > 0]
+                 for idx, line in enumerate(f.read().split('\n'))
+                 if line.strip() and idx > 0]
     data = [list(map(float, "%".join(line.split("%")[:1]).split()))
             for line in datalines]
     P, T, H, S, V, C_p, alpha, beta, rho = list(zip(*data))
@@ -72,7 +72,8 @@ print(variables)
 
 
 perplex_output = [[1., 4.3660, 0.77818E-06, 3222.4],
-                 [50000., 4.2104,  0.67868E-06,   3341.5], [100000., 4.0778, 0.60406E-06,   3450.2]]
+                  [50000., 4.2104,  0.67868E-06,   3341.5],
+                  [100000., 4.0778, 0.60406E-06,   3450.2]]
 T = 298.15
 for P, V, beta, rho in perplex_output:
     fo.set_state(P * 1.e5, T)

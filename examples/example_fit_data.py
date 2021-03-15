@@ -24,7 +24,6 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.optimize as opt
 
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
@@ -71,10 +70,10 @@ if __name__ == "__main__":
     burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     model_vs_2nd_order_correct = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                              pressures, temperatures)[0]
+
     with warnings.catch_warnings(record=True) as w:
         mg_perovskite_test.set_method("bm3")
         print(w[-1].message)
-
     model_vs_2nd_order_incorrect = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                                pressures, temperatures)[0]
     print('')
@@ -88,10 +87,10 @@ if __name__ == "__main__":
     burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     model_vs_3rd_order_correct = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                              pressures, temperatures)[0]
+
     with warnings.catch_warnings(record=True) as w:
         mg_perovskite_test.set_method("bm2")
         print(w[-1].message)
-
     model_vs_3rd_order_incorrect = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                                pressures, temperatures)[0]
     print('')

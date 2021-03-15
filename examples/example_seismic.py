@@ -7,7 +7,8 @@
 example_seismic
 ---------------
 
-Shows the various ways to input seismic models (:math:`V_s, V_p, V_{\phi}, \\rho`) as a
+Shows the various ways to input seismic models
+(:math:`V_s, V_p, V_{\\phi}, \\rho`) as a
 function of depth (or pressure) as well as different velocity model libraries
 available within Burnman:
 
@@ -17,7 +18,9 @@ available within Burnman:
 4. IASP91 :cite:`kennett1991`
 
 This example will first calculate or read in a seismic model and plot the
-model along the defined pressure range. The example also illustrates how to import a seismic model of your choice, here shown by importing AK135 :cite:`kennett1995`.
+model along the defined pressure range. The example also illustrates how to
+import a seismic model of your choice,
+here shown by importing AK135 :cite:`kennett1995`.
 
 *Uses:*
 
@@ -45,7 +48,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 
-import warnings 
+import warnings
 
 if __name__ == "__main__":
 
@@ -64,39 +67,45 @@ if __name__ == "__main__":
         ax = plt.subplot(3, 2, variable_index + 1)
         for model_index in range(len(models)):
 
-                # specify where we want to evaluate, here we map from pressure to depth
-                # 1. format p = np.arange (starting pressure, ending pressure, pressure step) (in Pa)
-                # p = np.arange(1.0e9,360.0e9,1.e9)
-                # depths = np.array([models[model_index].depth(pr) for pr in p])
-                # 2. we could also just specify some depth levels directly like this
-                # depths = np.arange(700e3,2800e3,100e3)
-                # 3. we could also use the data points where the seismic model is specified over a depth range, this will bring out any discontinuities
-                # this is the preferred way to plot seismic discontinuities
-                # correctly
-                depths = models[model_index].internal_depth_list(
-                    mindepth=0, maxdepth=6371e3)
-                # now evaluate everything at the given depths levels (using linear interpolation)
-                # try to get and plot values for given model, if this fails the
-                # variable is likely not defined for that model
-                try:
-                    with warnings.catch_warnings(record=True) as wrn:
-                        values = getattr(models[model_index],
-                                         variables[variable_index])(depths)
-                        if (len(wrn) == 1) or (len(wrn) == 2):
-                            for w in wrn:
-                                print(w.message)
-                        elif len(wrn) > 2:
-                            raise Exception('Unexpected number of warnings')
+            # specify where we want to evaluate, here we map from pressure
+            # to depth
+            # 1. format p = np.arange (starting pressure, ending pressure,
+            # pressure step) (in Pa)
+            # p = np.arange(1.0e9,360.0e9,1.e9)
+            # depths = np.array([models[model_index].depth(pr) for pr in p])
+            # 2. we could also just specify some depth levels directly like
+            # this
+            # depths = np.arange(700e3,2800e3,100e3)
+            # 3. we could also use the data points where the seismic model is
+            # specified over a depth range,
+            # this will bring out any discontinuities
+            # this is the preferred way to plot seismic discontinuities
+            # correctly
+            depths = models[model_index].internal_depth_list(mindepth=0,
+                                                             maxdepth=6371e3)
+            # now evaluate everything at the given depths levels
+            # (using linear interpolation)
+            # try to get and plot values for given model, if this fails the
+            # variable is likely not defined for that model
+            try:
+                with warnings.catch_warnings(record=True) as wrn:
+                    values = getattr(models[model_index],
+                                     variables[variable_index])(depths)
+                    if (len(wrn) == 1) or (len(wrn) == 2):
+                        for w in wrn:
+                            print(w.message)
+                    elif len(wrn) > 2:
+                        raise Exception('Unexpected number of warnings')
 
-                    plt.plot(depths / 1.e3, values, color=colors[model_index],
-                             linestyle='-',
-                             label=models[model_index].__class__.__name__)
-                except ValueError:
-                    # write out warning that the variable failed for given
-                    # model
-                    print(variables[variable_index]
-                          + ' is not defined for '
-                          + models[model_index].__class__.__name__)
+                plt.plot(depths / 1.e3, values, color=colors[model_index],
+                         linestyle='-',
+                         label=models[model_index].__class__.__name__)
+            except ValueError:
+                # write out warning that the variable failed for given
+                # model
+                print(variables[variable_index]
+                      + ' is not defined for '
+                      + models[model_index].__class__.__name__)
 
         plt.title(variables[variable_index])
         box = ax.get_position()
@@ -111,8 +120,11 @@ if __name__ == "__main__":
 
     # Alternatively one is able to evaluate all the variables for a model in a
     # single line
-    pressure, gravity, v_p, v_s, v_phi, density = models[0].evaluate(
-        ['pressure', 'gravity', 'v_p', 'v_s', 'v_phi', 'density'], models[0].internal_depth_list(mindepth=-1.e3, maxdepth=6372.1e3))
+    eval = models[0].evaluate(['pressure', 'gravity',
+                               'v_p', 'v_s', 'v_phi', 'density'],
+                              models[0].internal_depth_list(mindepth=-1.e3,
+                                                            maxdepth=6372.1e3))
+    pressure, gravity, v_p, v_s, v_phi, density = eval
 
     # The following shows how to read in your own model from a file
     # Model needs to be defined with increasing depth and decreasing radius.

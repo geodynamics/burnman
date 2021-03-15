@@ -12,8 +12,8 @@ This script reproduces :cite:`Cottaar2014` Figure 4.
 
 This example demonstrates BurnMan's functionality to fit thermoelastic data to
 both 2nd and 3rd orders using the EoS of the user's choice at 300 K. User's
-must create a file with :math:`P, T` and :math:`V_s`. See input_minphys/ for example input
-files.
+must create a file with :math:`P, T` and :math:`V_s`.
+See input_minphys/ for example input files.
 
 requires:
 - compute seismic velocities
@@ -57,7 +57,8 @@ def calc_shear_velocities(G_0, Gprime_0, mineral, pressures):
 
     shear_velocities = np.empty_like(pressures)
     for i in range(len(pressures)):
-        mineral.set_state(pressures[i], 0.0) # set state with dummy temperature
+        # set state with dummy temperature
+        mineral.set_state(pressures[i], 0.0)
         shear_velocities[i] = mineral.v_s
 
     return shear_velocities
@@ -90,9 +91,14 @@ if __name__ == "__main__":
     mg_perovskite_test.params['molar_mass'] = .10227
 
     # first, do the second-order fit
+    def error_func(mg_perovskite_test, obs_pressures, obs_vs):
+        def func(x):
+            return error(x, mg_perovskite_test, obs_pressures, obs_vs)
+        return func
+
     mg_perovskite_test.set_method("bm2")
-    func = lambda x: error(x, mg_perovskite_test, obs_pressures, obs_vs)
-    sol = opt.fmin(func, guess)
+    sol = opt.fmin(error_func(mg_perovskite_test, obs_pressures, obs_vs),
+                   guess)
     print("2nd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_2nd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
@@ -106,8 +112,8 @@ if __name__ == "__main__":
 
     # now do third-order fit
     mg_perovskite_test.set_method("bm3")
-    func = lambda x: error(x, mg_perovskite_test, obs_pressures, obs_vs)
-    sol = opt.fmin(func, guess)
+    sol = opt.fmin(error_func(mg_perovskite_test, obs_pressures, obs_vs),
+                   guess)
     print("3rd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_3rd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
@@ -119,25 +125,25 @@ if __name__ == "__main__":
     model_vs_3rd_order_incorrect = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
 
-    plt.plot(
-        pressures / 1.e9, model_vs_2nd_order_correct / 1000., color=colors.color(3), linestyle='-',
-        marker='x', markevery=7, linewidth=1.5, label="Correct 2nd order extrapolation")
-    plt.plot(
-        pressures / 1.e9, model_vs_2nd_order_incorrect / 1000., color=colors.color(3), linestyle='--',
-        marker='x', markevery=7, linewidth=1.5, label="2nd order fit, 3rd order extrapolation")
-    plt.plot(
-        pressures / 1.e9, model_vs_3rd_order_correct / 1000., color=colors.color(1),
-        linestyle='-', linewidth=1.5, label="Correct 3rd order extrapolation")
-    plt.plot(
-        pressures / 1.e9, model_vs_3rd_order_incorrect / 1000., color=colors.color(1),
-        linestyle='--', linewidth=1.5, label="3rd order fit, 2nd order extrapolation")
-    plt.scatter(obs_pressures / 1.e9, obs_vs /
-                1000., zorder=1000, marker='o', c='w')
+    plt.plot(pressures / 1.e9, model_vs_2nd_order_correct / 1000.,
+             color=colors.color(3), linestyle='-', marker='x', markevery=7,
+             linewidth=1.5, label="Correct 2nd order extrapolation")
+    plt.plot(pressures / 1.e9, model_vs_2nd_order_incorrect / 1000.,
+             color=colors.color(3), linestyle='--', marker='x', markevery=7,
+             linewidth=1.5, label="2nd order fit, 3rd order extrapolation")
+    plt.plot(pressures / 1.e9, model_vs_3rd_order_correct / 1000.,
+             color=colors.color(1), linestyle='-', linewidth=1.5,
+             label="Correct 3rd order extrapolation")
+    plt.plot(pressures / 1.e9, model_vs_3rd_order_incorrect / 1000.,
+             color=colors.color(1), linestyle='--', linewidth=1.5,
+             label="3rd order fit, 2nd order extrapolation")
+    plt.scatter(obs_pressures / 1.e9, obs_vs / 1000.,
+                zorder=1000, marker='o', c='k')
     plt.ylim([6.7, 8])
     plt.xlim([25., 135.])
     if "RUNNING_TESTS" not in globals():
-        plt.ylabel(
-            r'Shear velocity ${V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
+        plt.ylabel(r'Shear velocity '
+                   r'${V}_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)')
     plt.xlabel("Pressure (GPa)")
     plt.legend(loc="lower right", prop=prop)
     if "RUNNING_TESTS" not in globals():

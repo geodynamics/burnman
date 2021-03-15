@@ -21,7 +21,8 @@ def thermal_energy(T, einstein_T, n):
     Returns thermal energy in J/mol
     """
     if T <= eps:
-        return 3. * n * constants.gas_constant * einstein_T * 0.5  # zero point energy
+        # zero point energy
+        return 3. * n * constants.gas_constant * einstein_T * 0.5
     x = einstein_T / T
     E_th = 3. * n * constants.gas_constant * einstein_T * \
         (0.5 + 1. / (np.exp(x) - 1.0))  # include the zero point energy

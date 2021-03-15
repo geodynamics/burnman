@@ -354,7 +354,7 @@ class test_solidsolution(BurnManTest):
             ss.set_composition(f)
             dGdx2 = ss.partial_gibbs
 
-            H[i,:] = (dGdx2 - dGdx1)/dp
+            H[i, :] = (dGdx2 - dGdx1)/dp
 
         ss.set_composition(f0)
         for i in range(3):
@@ -362,7 +362,7 @@ class test_solidsolution(BurnManTest):
 
     def test_asymmetric_model_hessian_multicomponent_change(self):
         ss = two_site_ss_asymmetric()
-        f0 = [0.25, 0.35, 0.4]
+        f0 = np.array([0.25, 0.35, 0.4])
         ss.set_composition(f0)
         ss.set_state(1.e5, 300.)
         H0 = ss.gibbs_hessian
