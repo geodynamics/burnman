@@ -29,9 +29,9 @@ Authors (as of 2015, listed alphabetically by first name):
 
 ## Requirements
 
-* Python 2.7.x or Python 3.4+
+* Python 3.6+
 * Python modules:
-  NumPy, SciPy, Matplotlib
+  NumPy, SciPy, SymPy, Matplotlib, pycddlib
 
 
 ## Install under Ubuntu
