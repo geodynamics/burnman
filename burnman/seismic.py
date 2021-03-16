@@ -260,14 +260,14 @@ class SeismicTable(Seismic1DModel):
     def pressure(self, depth):
         if len(self.table_pressure) == 0:
             warnings.warn(
-                "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk. ")
+                "Pressure is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk.")
             self._compute_pressure()
         return self._lookup(depth, self.table_pressure)
 
     def gravity(self, depth):
         if len(self.table_gravity) == 0:
             warnings.warn(
-                "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+                "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk.")
             self._compute_gravity()
         return self._lookup(depth, self.table_gravity)
 
@@ -338,19 +338,24 @@ class SeismicTable(Seismic1DModel):
         # model, otherwise values for PREM are used.
 
         density = self.table_density[::-1]
-        radii = self.table_radius[::-1]
-        g = scipy.integrate.cumtrapz(
-            constants.G *
-            4. *
-            np.pi *
-            density *
-            radii *
-            radii,
-            x=radii,
-            initial=0)
-        g[1:] = g[1:] / radii[1:] / radii[1:]
 
-        self.table_gravity = g[::-1]
+        if len(density) > 0:
+            radii = self.table_radius[::-1]
+            g = scipy.integrate.cumtrapz(
+                constants.G *
+                4. *
+                np.pi *
+                density *
+                radii *
+                radii,
+                x=radii,
+                initial=0)
+            g[1:] = g[1:] / radii[1:] / radii[1:]
+
+            self.table_gravity = g[::-1]
+        else:
+            raise ValueError('Density profile is an empty list '
+                             'in this SeismicTable instance.')
 
     def _compute_pressure(self):
         # Calculate the pressure profile based on density and gravity.  This integrates

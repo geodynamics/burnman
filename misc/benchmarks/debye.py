@@ -28,16 +28,16 @@ def old_heat(T, debye_T, n):
 temperatures = np.linspace(100, 5000, 10000)
 Debye_T = 1000.
 old = np.empty_like(temperatures)
-start = time.clock()
+start = time.process_time()
 for i in range(len(temperatures)):
     old[i] = old_heat(temperatures[i], Debye_T, 1.0)
-time_old = time.clock() - start
+time_old = time.process_time() - start
 
 new = np.empty_like(temperatures)
-start = time.clock()
+start = time.process_time()
 for i in range(len(temperatures)):
     new[i] = burnman.eos.debye.molar_heat_capacity_v(temperatures[i], Debye_T, 1.0)
-time_new = time.clock() - start
+time_new = time.process_time() - start
 
 assert(np.abs(np.linalg.norm((old-new)/new)) < 1.e-7)
 print("time old %g, time new %g" % (time_old, time_new))

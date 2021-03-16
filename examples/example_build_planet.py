@@ -58,6 +58,8 @@ import numpy as np
 import burnman
 import burnman.mineral_helpers as helpers
 
+import warnings
+
 if __name__ == '__main__':
     # FIRST: we must define the composition of the planet as individual layers.
     # A layer is defined by 4 parameters: Name, min_depth, max_depth,and number of slices within the layer.
@@ -111,10 +113,12 @@ if __name__ == '__main__':
     # to imitate Earth
     prem = burnman.seismic.PREM()
     premradii = 6371.e3 - prem.internal_depth_list()
-    premdensity, prempressure, premgravity,premvs,premvp = prem.evaluate(
-        ['density', 'pressure', 'gravity', 'v_s','v_p'])
 
-
+    with warnings.catch_warnings(record=True) as w:
+        premdensity, prempressure, premgravity,premvs,premvp = prem.evaluate(
+            ['density', 'pressure', 'gravity', 'v_s','v_p'])
+        print(w[-1].message)
+    
     # Now let's plot everything up
 
     # Optional prettier plotting

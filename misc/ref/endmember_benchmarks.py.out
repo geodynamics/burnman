@@ -37,5 +37,3 @@ Mg_Ringwoodite: -1.020e+06 3.348e+02 3.693e-05 1.770e+02 1.877e-05 2.359e+11 3.8
 Stishovite: -4.479e+05 1.282e+02 1.354e-05 7.610e+01 1.980e-05 3.410e+11 4.437e+03
 Maximum percentage error in SLB database with configurational entropy and landau transition:
 alpha: 4e-02% at 20 GPa and 1673 K for Stishovite
-
-UserWarning: Warning, you are changing the method to MT even though the material is designed to be used with the method HP_TMT.  This does not overwrite any mineral attributes

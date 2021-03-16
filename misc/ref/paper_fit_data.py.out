@@ -2,11 +2,11 @@ Optimization terminated successfully.
          Current function value: 14212.187371
          Iterations: 113
          Function evaluations: 245
-2nd order fit: G =  173.346202394 GPa	G' =  1.52206201609
+2nd order fit: G =  173.34620239353828 GPa	G' =  1.5220620160937355
+Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
 Optimization terminated successfully.
          Current function value: 16309.304196
          Iterations: 117
          Function evaluations: 257
-3rd order fit: G =  168.927042088 GPa	G' =  1.66680648163
-UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method BM2.  This does not overwrite any mineral attributes
-UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes
+3rd order fit: G =  168.92704208800933 GPa	G' =  1.6668064816268249
+Warning, you are changing the method to BM2 even though the material is designed to be used with the method BM3.  This does not overwrite any mineral attributes

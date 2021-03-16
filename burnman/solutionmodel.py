@@ -15,13 +15,12 @@ try:
     import os
     if 'NUMBA_DISABLE_JIT' in os.environ and int(os.environ['NUMBA_DISABLE_JIT']) == 1:
         raise ImportError("NOOOO!")
-    from numba import jit
+    from numba import njit
 except ImportError:
-    def jit(fn):
+    def njit(fn):
         return fn
 
 
-@jit
 def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, n_occupancies, site_multiplicities, endmember_configurational_entropies):
     site_occupancies = np.dot(molar_fractions, endmember_occupancies)
     a = np.power(site_occupancies,
@@ -30,15 +29,15 @@ def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, 
                                      constants.gas_constant)
     return normalisation_constants * a
 
-@jit
+
 def _non_ideal_hessian_fct(phi, molar_fractions, n_endmembers, alpha, W):
     q = np.eye(n_endmembers) - phi*np.ones((n_endmembers, n_endmembers))
-    sum_pa = np.sum(np.dot(molar_fractions, alpha))
+    sum_pa = np.dot(molar_fractions, alpha)
     hess = np.einsum('m, i, ij, jk, mk->im', -alpha/sum_pa, -alpha, q, W, q)
     hess += hess.T
     return hess
 
-@jit
+
 def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     # -sum(sum(qi.qj.Wij*)
     # equation (2) of Holland and Powell 2003
@@ -48,7 +47,7 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     Wint = -alpha * (q.dot(W)*q).sum(-1)
     return Wint
 
-@jit
+@njit
 def _non_ideal_hessian_subreg(p, n_endmembers, W):
     hess = np.zeros((n_endmembers, n_endmembers))
     for l in range(n_endmembers):
@@ -70,7 +69,7 @@ def _non_ideal_hessian_subreg(p, n_endmembers, W):
                                           ((djl + djm) - p[j]) + p[i]*p[j])/2.)
     return hess
 
-@jit
+@njit
 def _non_ideal_interactions_subreg(p, n_endmembers, W):
     Wint = np.zeros(n_endmembers)
     for l in range(n_endmembers):
