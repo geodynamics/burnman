@@ -439,12 +439,13 @@ def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu,
     else:
         mask = [i for i, flg in enumerate(model.flags) if flg == flag]
 
-    cmap.set_under('k')
-    cmap.set_over('k')
+    cmap_cp = copy.copy(cmap)
+    cmap_cp.set_under('k')
+    cmap_cp.set_over('k')
     bounds = np.linspace(-sd_limit, sd_limit, sd_limit*2+1)
-    norm = colors.BoundaryNorm(bounds, cmap.N)
+    norm = colors.BoundaryNorm(bounds, cmap_cp.N)
 
-    im = ax.scatter(model.data[:,plot_axes[0]][mask]*scale_axes[0], model.data[:,plot_axes[1]][mask]*scale_axes[1], c=model.weighted_residuals[mask], cmap=cmap, norm=norm, s=50)
+    im = ax.scatter(model.data[:,plot_axes[0]][mask]*scale_axes[0], model.data[:,plot_axes[1]][mask]*scale_axes[1], c=model.weighted_residuals[mask], cmap=cmap_cp, norm=norm, s=50)
     plt.colorbar(im, ax=ax, label='Misfit (standard deviations)')
 
 
