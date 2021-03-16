@@ -1,0 +1,155 @@
+Endmember occupancies for bridgmanite in the FMASO system
+(i.e. [Mg,Fe,Fe3+,Al3+][Fe3+,Al3+,Si]O3)
+Each of the following lines represents a distinct endmember:
+[[1. 0. 0. 0. 0. 0. 1.]
+ [0. 1. 0. 0. 0. 0. 1.]
+ [0. 0. 1. 0. 0. 1. 0.]
+ [0. 0. 1. 0. 1. 0. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]
+ [0. 0. 0. 1. 0. 1. 0.]]
+Endmember formulae corresponding to these occupancies:
+['[Mg][Si]', '[Fe][Si]', '[Fef][Al]', '[Fef][Fef]', '[Al][Fef]', '[Al][Al]']
+
+Endmember occupancies for two-site pyrope-majorite
+(i.e. Mg3[Mg,Al,Si][Mg,Al,Si]Si3O12)
+Each of the following lines represents a distinct endmember:
+[[1.  0.  0.  0.  0.  1. ]
+ [0.5 0.  0.5 0.  1.  0. ]
+ [0.  1.  0.  0.5 0.  0.5]
+ [0.  1.  0.  0.  1.  0. ]
+ [0.  0.  1.  1.  0.  0. ]]
+A potential set of independent endmember site occupancies:
+[[1.  0.  0.  0.  0.  1. ]
+ [0.  1.  0.  0.5 0.  0.5]
+ [0.5 0.  0.5 0.  1.  0. ]
+ [0.  1.  0.  0.  1.  0. ]]
+Formulae corresponding to these independent endmember occupancies:
+['[Mg][Si]', '[Al][Mg1/2Si1/2]', '[Mg1/2Si1/2][Al]', '[Al][Al]']
+The complete set of endmembers expressed as proportions of the independent endmember set:
+[[ 1. -0. -0.  0.]
+ [ 0. -0.  1.  0.]
+ [ 0.  1.  0. -0.]
+ [-0. -0. -0.  1.]
+ [-1.  2.  2. -2.]]
+
+Independent endmember set for four-site pyrope-majorite
+(i.e. Mg3[Mg,Al,Si]0.5[Mg,Al,Si]0.5[Mg,Al,Si]0.5[Mg,Al,Si]0.5Si3O12):
+['[Mg][Si][Si][Mg]', '[Al][Mg][Mg1/2Si1/2][Si]', '[Mg1/2Si1/2][Si][Al][Mg]', '[Mg][Mg][Si][Si]', '[Mg][Al][Al][Si]', '[Mg][Si][Mg][Si]', '[Mg][Al][Si][Al]', '[Mg1/2Si1/2][Al][Si][Mg]']
+There are 47 endmembers in total, 8 of which are independent.
+
+Independent endmember set for NCFMAS majorite from Holland et al., 2013
+([Mg,Fe,Ca,Na]3[Mg,Fe2+,Al,Si]2Si3O12):
+['[Mg]3[Al]2', '[Na2/3Fe1/3]3[Si]2', '[Na2/3Ca1/3]3[Si]2', '[Na2/3Mg1/3]3[Si]2', '[Mg]3[Mg1/2Si1/2]2', '[Mg]3[Fe1/2Si1/2]2']
+There are 12 endmembers in total, 6 of which are independent.
+
+ A much more complicated example...
+Clinoamphibole from Green et al., 2016; Holland et al., 2018
+Site species:
+A*1      M13*3   M2*2               M4*2          T1*4    V*2
+v Na K | Mg Fe | Mg Fe Al Fe3 Ti  | Ca Mg Fe Na | Si Al | OH O
+The published model has 11 independent endmembers, but the site solution space allows for 12.
+The following endmember is one which was not contained within the original basis:
+['[v][Fe]3[Ti]2[Fe]2[Al]4[OH]2']
+
+
+The SolutionPolytope object can also be used to create a set of equally-spaced pseudocompounds.
+Here are the site-occupancies for the first 10 (out of 41) pseudocompounds for a coupled binary system: [Mg2+, Al3+, Si4+]:
+[[0.     1.     0.    ]
+ [0.0125 0.975  0.0125]
+ [0.025  0.95   0.025 ]
+ [0.0375 0.925  0.0375]
+ [0.05   0.9    0.05  ]
+ [0.0625 0.875  0.0625]
+ [0.075  0.85   0.075 ]
+ [0.0875 0.825  0.0875]
+ [0.1    0.8    0.1   ]
+ [0.1125 0.775  0.1125]]
+The endmembers of this system are:
+[[0.5 0.  0.5]
+ [0.  1.  0. ]]
+
+We can also grid more complex polytopes. Here is a coarse grid for bridgmanite in the FMASO system ([Mg,Fe,Fe3+,Al3+][Fe3+,Al3+,Si]):
+[[0.  0.  0.  1.  0.  1.  0. ]
+ [0.  0.  0.  1.  0.5 0.5 0. ]
+ [0.  0.  0.  1.  1.  0.  0. ]
+ [0.  0.  0.5 0.5 0.  1.  0. ]
+ [0.  0.  0.5 0.5 0.5 0.5 0. ]
+ [0.  0.  0.5 0.5 1.  0.  0. ]
+ [0.  0.  1.  0.  0.  1.  0. ]
+ [0.  0.  1.  0.  0.5 0.5 0. ]
+ [0.  0.  1.  0.  1.  0.  0. ]
+ [0.  0.5 0.  0.5 0.  0.5 0.5]
+ [0.  0.5 0.  0.5 0.5 0.  0.5]
+ [0.  0.5 0.5 0.  0.  0.5 0.5]
+ [0.  0.5 0.5 0.  0.5 0.  0.5]
+ [0.  1.  0.  0.  0.  0.  1. ]
+ [0.5 0.  0.  0.5 0.  0.5 0.5]
+ [0.5 0.  0.  0.5 0.5 0.  0.5]
+ [0.5 0.  0.5 0.  0.  0.5 0.5]
+ [0.5 0.  0.5 0.  0.5 0.  0.5]
+ [0.5 0.5 0.  0.  0.  0.  1. ]
+ [1.  0.  0.  0.  0.  0.  1. ]]
+The endmembers of this system are:
+[[1. 0. 0. 0. 0. 0. 1.]
+ [0. 1. 0. 0. 0. 0. 1.]
+ [0. 0. 1. 0. 0. 1. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]
+ [0. 0. 1. 0. 1. 0. 0.]]
+
+The function also allows the user to grid parts of the polytope.
+Here we plot the pseudocompounds from three different griddings of a simple cubic polytope (for a solution with three sites, no charge balance constraints)
+independent endmember site occupancies:
+[[1. 0. 0. 1. 0. 1.]
+ [0. 1. 1. 0. 1. 0.]
+ [1. 0. 1. 0. 1. 0.]
+ [1. 0. 1. 0. 0. 1.]]
+
+Global endmember proportion limits
+(in form b + A*x > 0; last endmember not included):
+[[ 0.  0.  1.  1.]
+ [ 0.  1.  0.  0.]
+ [ 0.  0.  1.  0.]
+ [ 1.  0. -1. -1.]
+ [ 1.  0. -1.  0.]
+ [ 1. -1.  0.  0.]]
+
+Global site occupancy limits
+(in form b + A*x < 0):
+[[-1.  1.  1.  0.  0.  0.  0.]
+ [-1.  0.  0.  1.  1.  0.  0.]
+ [-1.  0.  0.  0.  0.  1.  1.]
+ [-6.  2.  2.  2.  2.  2.  2.]
+ [ 0.  1.  0.  0.  0.  0.  0.]
+ [ 0.  0.  1.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  0.  0.  0.]
+ [ 0.  0.  0.  0.  1.  0.  0.]
+ [ 0.  0.  0.  0.  0.  1.  0.]
+ [ 0.  0.  0.  0.  0.  0.  1.]]
+
+In this last example, we show how the polytope of an instance of the burnman.SolidSolution class can be found, and also how the independent endmember set of this solution can be changed.
+There are 8 independent endmembers in Jennings and Holland (2015) clinopyroxene and 18 endmembers in total. The site-occupancies for all 18 endmembers are:
+[Mg][Mg][Si]1/2
+[Mg][Fe][Si]1/2
+[Mg][Ca][Si]1/2
+[Al][Ca][Al1/2Si1/2]1/2
+[Al][Fe][Al1/2Si1/2]1/2
+[Al][Mg][Al1/2Si1/2]1/2
+[Cr][Ca][Al1/2Si1/2]1/2
+[Fef][Ca][Al1/2Si1/2]1/2
+[Cr][Fe][Al1/2Si1/2]1/2
+[Cr][Mg][Al1/2Si1/2]1/2
+[Fef][Fe][Al1/2Si1/2]1/2
+[Fef][Mg][Al1/2Si1/2]1/2
+[Fe][Ca][Si]1/2
+[Fe][Fe][Si]1/2
+[Fe][Mg][Si]1/2
+[Al][Na][Si]1/2
+[Cr][Na][Si]1/2
+[Fef][Na][Si]1/2
+
+Transforming to a new basis containing only Fe-diopside and Ca-tschermaks...
+Checking that a 50:50 solution of the two endmembers has the same properties in both solutions:
+Chemical formula: CaFe1/2AlSi3/2O6, CaFe1/2AlSi3/2O6
+Gibbs free energy (J/mol): -3275104.23462, -3275104.23462
+Entropy (J/K/mol): 423.52977, 423.52977
+Volume (cm^3/mol): 66.52267, 66.52267
