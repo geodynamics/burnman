@@ -397,7 +397,7 @@ class SolidSolution(Mineral):
         Aliased with self.G
         """
         G_list = np.fromiter(
-            (e[0].G for e in self.endmembers), dtype=np.float, count=self.n_endmembers)
+            (e[0].G for e in self.endmembers), dtype=float, count=self.n_endmembers)
         return reuss_average_function(self.molar_fractions, G_list)
 
     @material_property

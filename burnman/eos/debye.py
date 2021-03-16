@@ -75,9 +75,9 @@ def debye_fn(x):
     return 3. * sol[0] / pow(x, 3.)
 
 
-eps = np.finfo(np.float).eps
-sqrt_eps = np.sqrt(np.finfo(np.float).eps)
-log_eps = np.log(np.finfo(np.float).eps)
+eps = np.finfo(float).eps
+sqrt_eps = np.sqrt(np.finfo(float).eps)
+log_eps = np.log(np.finfo(float).eps)
 
 
 @jit
