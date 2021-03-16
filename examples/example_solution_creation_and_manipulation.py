@@ -294,54 +294,57 @@ if __name__ == "__main__":
     print('(in form b + A*x < 0):')
     print(cubical_polytope.site_occupancy_limits)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    try:  # python2
-        ax.set_aspect('equal')
-    except NotImplementedError:
+    try:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        try:  # python2
+            ax.set_aspect('equal')
+        except NotImplementedError:
+            pass
+
+        gridded_proportions = cubical_polytope.grid(points_per_edge=3)
+        gridded_occupancies = gridded_proportions.dot(e_occ)
+        ax.scatter(gridded_occupancies[:, 0],
+                   gridded_occupancies[:, 2],
+                   gridded_occupancies[:, 4], label='global grid')
+
+        # limits in terms of the first three independent endmembers
+        endmember_limits = [[-0.1, 1., 0., 0.],  # ABB > 0.1
+                            [-0.1, 0., 1., 0.],  # BAA > 0.1
+                            [-0.1, 0., 0., 1.],  # AAA > 0.1
+                            [0.3, -1., 0., 0.],  # ABB < 0.3
+                            [0.3, 0., -1., 0.],  # BAA < 0.3
+                            [0.3, 0., 0., -1.]]  # AAA < 0.3
+        gridded_proportions = cubical_polytope.grid(points_per_edge=5,
+                                                    grid_type='independent endmember proportions',
+                                                    limits=endmember_limits)
+        gridded_occupancies = gridded_proportions.dot(e_occ)
+        ax.scatter(gridded_occupancies[:, 0],
+                   gridded_occupancies[:, 2],
+                   gridded_occupancies[:, 4],
+                   label='endmember proportion refinement')
+
+        # limits in terms of site occupancies
+        site_limits = [[-0.1, 1., 0., 0., 0., 0., 0.],  # A on Site 1 > 0.1
+                       [-0.1, 0., 0., 1., 0., 0., 0.],  # A on Site 2 > 0.1
+                       [-0.1, 0., 0., 0., 0., 1.,  0.],  # A on Site 3 > 0.1
+                       [0.3, -1., 0., 0., 0., 0., 0.],  # A on Site 1 < 0.3
+                       [0.3, 0., 0., -1., 0., 0., 0.],  # A on Site 2 < 0.3
+                       [0.3, 0., 0., 0., 0., -1., 0.]]  # A on Site 3 < 0.3
+        gridded_occupancies = cubical_polytope.grid(points_per_edge=5,
+                                                    grid_type='site occupancies',
+                                                    limits=site_limits)
+        ax.scatter(gridded_occupancies[:, 0],
+                   gridded_occupancies[:, 2],
+                   gridded_occupancies[:, 4],
+                   label='site occupancy refinement')
+        ax.set_xlabel('p(A,Site 1)')
+        ax.set_ylabel('p(A,Site 2)')
+        ax.set_zlabel('p(A,Site 3)')
+        plt.legend()
+        plt.show()
+    except ValueError:
         pass
-
-    gridded_proportions = cubical_polytope.grid(points_per_edge=3)
-    gridded_occupancies = gridded_proportions.dot(e_occ)
-    ax.scatter(gridded_occupancies[:, 0],
-               gridded_occupancies[:, 2],
-               gridded_occupancies[:, 4], label='global grid')
-
-    # limits in terms of the first three independent endmembers
-    endmember_limits = [[-0.1, 1., 0., 0.],  # ABB > 0.1
-                        [-0.1, 0., 1., 0.],  # BAA > 0.1
-                        [-0.1, 0., 0., 1.],  # AAA > 0.1
-                        [0.3, -1., 0., 0.],  # ABB < 0.3
-                        [0.3, 0., -1., 0.],  # BAA < 0.3
-                        [0.3, 0., 0., -1.]]  # AAA < 0.3
-    gridded_proportions = cubical_polytope.grid(points_per_edge=5,
-                                                grid_type='independent endmember proportions',
-                                                limits=endmember_limits)
-    gridded_occupancies = gridded_proportions.dot(e_occ)
-    ax.scatter(gridded_occupancies[:, 0],
-               gridded_occupancies[:, 2],
-               gridded_occupancies[:, 4],
-               label='endmember proportion refinement')
-
-    # limits in terms of site occupancies
-    site_limits = [[-0.1, 1., 0., 0., 0., 0., 0.],  # A on Site 1 > 0.1
-                   [-0.1, 0., 0., 1., 0., 0., 0.],  # A on Site 2 > 0.1
-                   [-0.1, 0., 0., 0., 0., 1.,  0.],  # A on Site 3 > 0.1
-                   [0.3, -1., 0., 0., 0., 0., 0.],  # A on Site 1 < 0.3
-                   [0.3, 0., 0., -1., 0., 0., 0.],  # A on Site 2 < 0.3
-                   [0.3, 0., 0., 0., 0., -1., 0.]]  # A on Site 3 < 0.3
-    gridded_occupancies = cubical_polytope.grid(points_per_edge=5,
-                                                grid_type='site occupancies',
-                                                limits=site_limits)
-    ax.scatter(gridded_occupancies[:, 0],
-               gridded_occupancies[:, 2],
-               gridded_occupancies[:, 4],
-               label='site occupancy refinement')
-    ax.set_xlabel('p(A,Site 1)')
-    ax.set_ylabel('p(A,Site 2)')
-    ax.set_zlabel('p(A,Site 3)')
-    plt.legend()
-    plt.show()
 
     """
     In this last example, we show how the polytope of an instance of the

@@ -136,7 +136,7 @@ class SolutionPolytope(object):
 
         sol = np.linalg.lstsq(np.array(ind.T).astype(float),
                               np.array(self.endmember_occupancies.T).astype(float),
-                              rcond=None)[0].round(decimals=12).T
+                              rcond=0)[0].round(decimals=12).T
         return sol
 
     def _decompose_polytope_into_endmember_simplices(self, vertices):
