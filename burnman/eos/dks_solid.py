@@ -55,7 +55,7 @@ class DKS_S(eos.EquationOfState):
     Base class for the finite strain solid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
     """
-    
+
     def volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
@@ -233,9 +233,9 @@ class DKS_S(eos.EquationOfState):
         S_0 = params['S_0']
         gruen_0 = params['grueneisen_0']
         q_0 = params['q_0']
-        S_th = params['Cv'] * (np.log(temperature/params['T_0']) + 
+        S_th = params['Cv'] * (np.log(temperature/params['T_0']) +
                                _intgroverVdV(params['V_0'], volume, gruen_0, q_0))
-        
+
         return S_0 + S_th
 
     def enthalpy(self, pressure, temperature, volume, params):
@@ -309,4 +309,3 @@ class DKS_S(eos.EquationOfState):
             warnings.warn('Unusual value for q_0', stacklevel=2)
         if params['eta_s_0'] < -10. or params['eta_s_0'] > 10.:
             warnings.warn('Unusual value for eta_s_0', stacklevel=2)
-

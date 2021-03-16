@@ -245,5 +245,3 @@ class MgO_liquid(Mineral):
             }
         self.params['a'] = vector_to_array(self.params['a'], self.params['O_f'], self.params['O_theta'])*1e3 # [J/mol]
         Mineral.__init__(self)
-
-

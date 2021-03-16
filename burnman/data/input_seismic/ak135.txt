@@ -1,4 +1,4 @@
-#AK135 Kennett, Engdahl & Buland (1995) 
+#AK135 Kennett, Engdahl & Buland (1995)
 #Depth(m) 	 Radius(m) 	 Density(g/m^3) 	 Vp(m/s) 	 Vs(m/s) 	 Qmu 	 Qk
 0.000000e+00	6.371000e+06	1.020000e+03	1.450000e+03	0.000000e+00	0.000000e+00	5.782200e+04
 3.000000e+03	6.368000e+06	1.020000e+03	1.450000e+03	0.000000e+00	0.000000e+00	5.782200e+04

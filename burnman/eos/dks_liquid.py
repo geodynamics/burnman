@@ -23,7 +23,7 @@ from ..tools import bracket
 atomic_masses=read_masses()
 # energy_states should provide the energies and degeneracies of each electronic level in a variety of elements
 
-    
+
 class DKS_L(eos.EquationOfState):
     """
     Base class for the finite strain liquid equation of state detailed
@@ -42,13 +42,13 @@ class DKS_L(eos.EquationOfState):
         return 3./2.*np.log(temperature) \
             + 3./2.*np.log(mass*constants.Boltzmann \
                            /(2*np.pi*constants.Dirac*constants.Dirac)) \
-            
+
     def _F_ig(self, temperature, volume, params):
         """
         The ideal gas contribution to the helmholtz free energy
         Eq. S6, see also eq. 16.72 of Callen., 1985; p. 373
         """
-        
+
         V = volume/constants.Avogadro
         figoverRT=0.
         for element, N in params['formula'].items(): # N is a.p.f.u
@@ -57,13 +57,13 @@ class DKS_L(eos.EquationOfState):
                 figoverRT += -N*(np.log(V) + self._ln_partition_function(mass, temperature) \
                                      + 1.) + N*np.log(N)
         return constants.gas_constant*temperature*figoverRT
-            
+
 
     def _S_ig(self, temperature, volume, params):
         """
         The ideal gas contribution to the entropy
         """
-        
+
         V = volume/constants.Avogadro
         entropy_sum=0.
         for element, N in params['formula'].items(): # N is a.p.f.u
@@ -77,7 +77,7 @@ class DKS_L(eos.EquationOfState):
         """
         The ideal gas contribution to the heat capacity
         """
-        
+
         n_atoms=0
         for element, N in params['formula'].items():
             n_atoms += N
@@ -88,7 +88,7 @@ class DKS_L(eos.EquationOfState):
         The ideal gas contribution to the pressure
         PV = nRT
         """
-        
+
         n_atoms=0
         for element, N in params['formula'].items():
             n_atoms += N
@@ -106,11 +106,11 @@ class DKS_L(eos.EquationOfState):
 
     def _alphaK_T_ig(self, temperature, volume, params):
         """
-        The ideal gas contribution to the product of the 
+        The ideal gas contribution to the product of the
         thermal expansivity and isothermal bulk modulus
         d/dT(nRT/V) = nR/V
         """
-        
+
         n_atoms=0
         for element, N in params['formula'].items():
             n_atoms += N
@@ -119,7 +119,7 @@ class DKS_L(eos.EquationOfState):
     """
     Electronic contributions to thermodynamic properties
     """
-    
+
     def _zeta(self, temperature, volume, params): # eq. S5a, beta in deKoker thesis (3.34)
         return params['zeta_0']*(np.power(volume/params['el_V_0'], params['xi']))
 
@@ -134,7 +134,7 @@ class DKS_L(eos.EquationOfState):
 
     def _Tel(self, temperature, volume, params): # eq. S5b
         return params['Tel_0']*(np.power(volume/params['el_V_0'], params['eta']))
-                            
+
     def _dTeldV(self, temperature, volume, params):
         return params['Tel_0'] * params['eta'] \
             * (np.power(volume/params['el_V_0'], params['eta'])) \
@@ -150,18 +150,18 @@ class DKS_L(eos.EquationOfState):
         return 0.5*(temperature*temperature - temperature_el*temperature_el) \
             - temperature*temperature_el*np.log(temperature/temperature_el)
 
-    def _dgimeldTel(self, temperature_el, temperature, volume, params): 
+    def _dgimeldTel(self, temperature_el, temperature, volume, params):
         return (temperature-temperature_el) - temperature*np.log(temperature/temperature_el)
 
-    def _dgimeldT(self, temperature_el, temperature, volume, params): 
+    def _dgimeldT(self, temperature_el, temperature, volume, params):
         return (temperature-temperature_el) - temperature_el*np.log(temperature/temperature_el)
 
     def _d2gimeldTdTel(self, temperature_el, temperature, volume, params):
         return -np.log(temperature/temperature_el)
-            
+
     def _d2gimeldTel2(self, temperature_el, temperature, volume, params):
         return (temperature/temperature_el)  - 1.
-      
+
     def _F_el(self, temperature, volume, params): # F_el
         temperature_el = self._Tel(temperature, volume, params)
         if temperature < temperature_el:
@@ -179,7 +179,7 @@ class DKS_L(eos.EquationOfState):
             S_el = self._zeta(temperature, volume, params) \
                 * self._dgimeldT(temperature_el, temperature, volume, params)
         return S_el
-        
+
 
     def _P_el(self, temperature, volume, params): # P_el
         temperature_el = self._Tel(temperature, volume, params)
@@ -192,7 +192,7 @@ class DKS_L(eos.EquationOfState):
                 * self._dTeldV(temperature, volume, params) \
                 * self._dgimeldTel(temperature_el, temperature, volume, params)
         return P_el
- 
+
     def _K_T_el(self, temperature, volume, params): # K_T_el
         temperature_el = self._Tel(temperature, volume, params)
         if temperature < temperature_el:
@@ -211,7 +211,7 @@ class DKS_L(eos.EquationOfState):
                                 * self._dTeldV(temperature, volume, params) \
                                 * self._d2gimeldTel2(temperature_el, temperature, volume, params)))
         return K_T_el
-    
+
     def _alphaK_T_el(self, temperature, volume, params): # (alphaK_T)_el
         temperature_el = self._Tel(temperature, volume, params)
         if temperature < temperature_el:
@@ -239,13 +239,13 @@ class DKS_L(eos.EquationOfState):
     """
     Excess (bonding) contributions to thermodynamic properties
     """
-    
+
     # Finite strain
     def _finite_strain(self, temperature, volume, params): # f(V), eq. S3a
-        return (1./2.)*(np.power(params['V_0']/volume, 2./3.) - 1.0)        
+        return (1./2.)*(np.power(params['V_0']/volume, 2./3.) - 1.0)
 
     def _dfdV(self, temperature, volume, params): # f(V), eq. S3a
-        return (-1./3.)*np.power(params['V_0']/volume, 2./3.)/volume  
+        return (-1./3.)*np.power(params['V_0']/volume, 2./3.)/volume
 
     def _d2fdV2(self,temperature, volume, params):
         return (5./9.)*np.power(params['V_0']/volume, 2./3.)/volume/volume
@@ -270,7 +270,7 @@ class DKS_L(eos.EquationOfState):
             ifact=factorial(i, exact=False)
             for j in range(len(params['a'][0])):
                 jfact=factorial(j, exact=False)
-                energy += params['a'][i][j]*np.power(f, i)*np.power(theta, j)/ifact/jfact         
+                energy += params['a'][i][j]*np.power(f, i)*np.power(theta, j)/ifact/jfact
         return energy
 
     def _S_xs(self, temperature, volume, params): # F_xs, eq. 3.18
@@ -282,7 +282,7 @@ class DKS_L(eos.EquationOfState):
             for j in range(len(params['a'][0])):
                 if j > 0:
                     jfact = factorial(j, exact=False)
-                    entropy += j*params['a'][i][j]*np.power(f, i)*np.power(theta, j-1.)/ifact/jfact         
+                    entropy += j*params['a'][i][j]*np.power(f, i)*np.power(theta, j-1.)/ifact/jfact
         return -self._dthetadT(temperature, volume, params)*entropy
 
     def _P_xs(self, temperature, volume, params): # P_xs, eq. 3.17 of de Koker thesis
@@ -307,7 +307,7 @@ class DKS_L(eos.EquationOfState):
                 if i > 0:
                     jfact=factorial(j, exact=False)
                     prefactor = float(i) * params['a'][i][j] \
-                        * np.power(theta, float(j)) / ifact / jfact 
+                        * np.power(theta, float(j)) / ifact / jfact
                     K_ToverV += prefactor*self._d2fdV2(temperature, volume, params) \
                         * np.power(f, float(i-1))
                 if i > 1:
@@ -329,11 +329,11 @@ class DKS_L(eos.EquationOfState):
                         sum_factors += float(i)*float(j)*params['a'][i][j] \
                             * np.power(f, float(i-1)) * np.power(theta, float(j-1)) \
                             / ifact / jfact
-                            
+
         return -self._dfdV(temperature, volume, params) \
             * self._dthetadT(temperature, volume, params) \
             * sum_factors
-            
+
 
     def _C_v_xs(self, temperature, volume, params): # Cv_xs, eq. 3.22 of de Koker thesis
         f = self._finite_strain(temperature, volume, params)
@@ -358,7 +358,7 @@ class DKS_L(eos.EquationOfState):
     Magnetic contributions to thermodynamic properties
     (as found in Ramo and Stixrude, 2014)
     """
-    
+
     def _spin(self, temperature, volume, params):
         S_a = 0.
         S_b = 0.
@@ -369,7 +369,7 @@ class DKS_L(eos.EquationOfState):
             for element, N in params['formula'].items():
                 if element == 'Fe':
                     n_atoms += N
-                    
+
             VoverVx = volume/params['V_0']
             S_a = params['spin_a'][0] + params['spin_a'][1]*VoverVx
             S_b = (params['spin_b'][0]
@@ -378,7 +378,7 @@ class DKS_L(eos.EquationOfState):
                    + params['spin_b'][3]/(np.power(VoverVx, 3.)))
 
             # S = S_a*T + S_b
-            # d(2S + 1)/dV 
+            # d(2S + 1)/dV
             numerator=-2.*(-params['spin_a'][1]*temperature
                            + params['spin_b'][1]/(np.power(VoverVx, 2.))
                            + 2.*params['spin_b'][2]/(np.power(VoverVx, 3.))
@@ -390,14 +390,14 @@ class DKS_L(eos.EquationOfState):
                                + 12.*params['spin_b'][3]/(np.power(VoverVx, 5.)))
                               /np.power(params['V_0'], 2.))
         return S_a, S_b, numerator, numerator_2, n_atoms
-    
-        
+
+
     def _F_mag(self, temperature, volume, params):
         S_a, S_b, numerator, numerator_2, n_atoms = self._spin(temperature, volume, params)
         S = S_a*temperature + S_b
         return -n_atoms*constants.gas_constant*temperature*np.log(2.*S + 1.)
 
-    
+
     def _S_mag(self, temperature, volume, params):
         S_a, S_b, numerator, numerator_2, n_atoms = self._spin(temperature, volume, params)
         S = S_a*temperature + S_b
@@ -416,20 +416,20 @@ class DKS_L(eos.EquationOfState):
         S = S_a*temperature + S_b
         dFdV = numerator/(2.*S + 1.)
         d2FdV2 = numerator_2/(2.*S + 1.) - np.power(dFdV, 2.)
-        
+
         return -volume*n_atoms*constants.gas_constant*temperature*d2FdV2
 
     def _alphaK_T_mag(self, temperature, volume, params): # WARNING: numeric differentiation a.t.m.
         return (self._P_mag(temperature + 0.5, volume, params)
                 - self._P_mag(temperature - 0.5, volume, params))
 
-    
+
     def _C_v_mag(self, temperature, volume, params):
         S_a, S_b, numerator, numerator_2, n_atoms = self._spin(temperature, volume, params)
         S = S_a*temperature + S_b
         return n_atoms * constants.gas_constant * temperature * 4.*S_a*(S_a*temperature + 2.*S_b + 1.)/np.power(2.*S + 1., 2.)
-    
-    
+
+
     def _aK_T(self, temperature, volume, params):
         aK_T =  (self._alphaK_T_ig(temperature, volume, params)
                  + self._alphaK_T_el(temperature, volume, params)
@@ -447,7 +447,7 @@ class DKS_L(eos.EquationOfState):
 
     def volume(self, pressure, temperature, params):
         _delta_pressure = lambda x, pressure, temperature, params: pressure - self.pressure(temperature, x, params)
-        
+
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
         args = (pressure, temperature, params)
@@ -461,7 +461,7 @@ class DKS_L(eos.EquationOfState):
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
-        Returns isothermal bulk modulus :math:`[Pa]` 
+        Returns isothermal bulk modulus :math:`[Pa]`
         """
         K_T = (self._K_T_ig(temperature, volume, params)
                + self._K_T_el(temperature, volume, params)
@@ -471,7 +471,7 @@ class DKS_L(eos.EquationOfState):
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         """
-        Returns adiabatic bulk modulus. :math:`[Pa]` 
+        Returns adiabatic bulk modulus. :math:`[Pa]`
         """
         K_S = (self.isothermal_bulk_modulus(pressure,temperature, volume, params)
                * ( 1. + temperature
@@ -481,7 +481,7 @@ class DKS_L(eos.EquationOfState):
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Returns grueneisen parameter. :math:`[unitless]` 
+        Returns grueneisen parameter. :math:`[unitless]`
         """
         gamma = (self._aK_T(temperature, volume, params)
                  * volume
@@ -490,14 +490,14 @@ class DKS_L(eos.EquationOfState):
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
-        Returns shear modulus. :math:`[Pa]` 
+        Returns shear modulus. :math:`[Pa]`
         Zero for fluids
         """
         return 0.
 
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant volume. :math:`[J/K/mol]` 
+        Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
         C_v = (self._C_v_ig(temperature, volume, params)
                + self._C_v_el(temperature, volume, params)
@@ -507,19 +507,19 @@ class DKS_L(eos.EquationOfState):
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
+        Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
         C_p = (self.molar_heat_capacity_v(pressure,temperature, volume, params)
-               * ( 1. + temperature 
+               * ( 1. + temperature
                    * self.thermal_expansivity(pressure, temperature, volume, params)
                    * self.grueneisen_parameter(pressure, temperature, volume, params) ))
         return C_p
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Returns thermal expansivity. :math:`[1/K]` 
+        Returns thermal expansivity. :math:`[1/K]`
         """
-        alpha = (self._aK_T(temperature, volume, params) 
+        alpha = (self._aK_T(temperature, volume, params)
                  / self.isothermal_bulk_modulus(0., temperature, volume, params))
         return alpha
 
@@ -527,7 +527,7 @@ class DKS_L(eos.EquationOfState):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
-        G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume 
+        G = self.helmholtz_free_energy( pressure, temperature, volume, params) + pressure * volume
         return G
 
     def entropy( self, pressure, temperature, volume, params):
@@ -538,7 +538,7 @@ class DKS_L(eos.EquationOfState):
              + self._S_el(temperature, volume, params)
              + self._S_xs(temperature, volume, params)
              + self._S_mag(temperature, volume, params))
-        return S 
+        return S
 
     def enthalpy( self, pressure, temperature, volume, params):
         """
@@ -568,7 +568,7 @@ class DKS_L(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
-        
+
         # Check that all the required keys are in the dictionary
         expected_keys = ['V_0', 'T_0', 'O_theta', 'O_f', 'm', 'a', 'zeta_0', 'xi', 'Tel_0', 'eta']
         for k in expected_keys:

@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU 
+# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -3679,4 +3679,3 @@ def cov():
 
     from .HP_2011_ds62_cov import cov
     return cov
-

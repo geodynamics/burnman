@@ -19,15 +19,15 @@ from . import constants
 class CombinedMineral(Mineral):
 
     """
-    This is the base class for endmembers constructed from a 
+    This is the base class for endmembers constructed from a
     linear combination of other minerals.
 
-    Instances of this class should be initialised with a 
-    list of Mineral instances, a second list containing the 
-    number of moles of each mineral, and (optionally) a 
-    third list containing three floats describing a 
-    free energy adjustment which is linear in pressure and temperature 
-    (i.e. a constant energy [J/mol], entropy [J/K/mol] 
+    Instances of this class should be initialised with a
+    list of Mineral instances, a second list containing the
+    number of moles of each mineral, and (optionally) a
+    third list containing three floats describing a
+    free energy adjustment which is linear in pressure and temperature
+    (i.e. a constant energy [J/mol], entropy [J/K/mol]
     and volume adjustment [J/Pa/mol or m^3/mol]).
 
     For example, a crude approximation to a bridgmanite model might be
@@ -55,7 +55,7 @@ class CombinedMineral(Mineral):
                                                    'delta_S': free_energy_adjustment[1],
                                                    'delta_V': free_energy_adjustment[2]}]]
 
-        
+
         Mineral.__init__(self)
 
     def set_state(self, pressure, temperature):
@@ -117,7 +117,7 @@ class CombinedMineral(Mineral):
         """
         return ((self.mixture.thermal_expansivity * self._molar_volume_unmodified)
                 + self._property_modifiers['d2GdPdT']) / self.molar_volume
-    
+
     @material_property
     def molar_heat_capacity_p(self):
         """
@@ -139,7 +139,7 @@ class CombinedMineral(Mineral):
         Returns molar mass of the solid solution [kg/mol]
         """
         return self.mixture.molar_mass
-    
+
     @material_property
     def formula(self):
         """
@@ -162,7 +162,7 @@ class CombinedMineral(Mineral):
         Aliased with self.energy
         """
         return self.molar_gibbs - self.pressure * self.molar_volume + self.temperature * self.molar_entropy
-    
+
     @material_property
     def molar_helmholtz(self):
         """
@@ -191,7 +191,7 @@ class CombinedMineral(Mineral):
             return self.isothermal_bulk_modulus
         else:
             return self.isothermal_bulk_modulus * self.molar_heat_capacity_p / self.molar_heat_capacity_v
-        
+
     @material_property
     def isothermal_compressibility(self):
         """
@@ -254,4 +254,3 @@ class CombinedMineral(Mineral):
         return self.molar_heat_capacity_p - self.molar_volume * self.temperature \
             * self.thermal_expansivity * self.thermal_expansivity \
             * self.isothermal_bulk_modulus
-

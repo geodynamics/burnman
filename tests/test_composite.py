@@ -256,7 +256,7 @@ class composite(BurnManTest):
         c = burnman.Composite(
             [min1, min1], mass_fractions, fraction_type='mass')
         self.assertArraysAlmostEqual(c.molar_fractions, mass_fractions)
-        
+
     def test_formula(self):
         min1 = minerals.SLB_2005.mg_perovskite()
         min2 = minerals.SLB_2005.periclase()

@@ -63,10 +63,10 @@ def unit_normalize(a, order=2, axis=-1):
 
 def pretty_print_values(popt, pcov, params):
     """
-    Takes a numpy array of parameters, the corresponding covariance matrix 
-    and a set of parameter names and prints the parameters and 
-    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i])) 
-    in a nice text based format. 
+    Takes a numpy array of parameters, the corresponding covariance matrix
+    and a set of parameter names and prints the parameters and
+    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i]))
+    in a nice text based format.
     """
     for i, p in enumerate(params):
         p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
@@ -76,7 +76,7 @@ def pretty_print_values(popt, pcov, params):
             p_expnt = np.floor(np.log10(np.abs(p_rnd)))
         else:
             p_expnt = 0.
-            
+
         scale = np.power(10., p_expnt)
         nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
         print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
@@ -103,7 +103,7 @@ def pretty_print_table(table, use_tabs=False):
         [('{:<' if i == 0 else '{:>') + str(1 + col_width(table, i)) + '}' for i in range(len(table[0]))])
     for r in table:
         print(frmt.format(*r))
-        
+
 def pretty_plot():
     """
     Makes pretty plots. Overwrites the matplotlib default settings to allow
@@ -555,13 +555,13 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
                           including_shear_properties=True):
     """
     Compute numerical derivatives of the gibbs free energy of a mineral
-    under given conditions, and check these values against those provided 
+    under given conditions, and check these values against those provided
     analytically by the equation of state
 
     Parameters
     ----------
     m : mineral
-        The mineral for which the equation of state 
+        The mineral for which the equation of state
         is to be checked for consistency
     P : float
         The pressure at which to check consistency
@@ -585,7 +585,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
     """
     dT = 1.
     dP = 1000.
-    
+
     m.set_state(P, T)
     G0 = m.gibbs
     S0 = m.S
@@ -595,31 +595,31 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
     eq = [[m.gibbs, (m.helmholtz + P*m.V)],
           [m.gibbs, (m.H - T*m.S)],
           [m.gibbs, (m.molar_internal_energy - T*m.S + P*m.V)]]
-    
+
     m.set_state(P, T + dT)
     G1 = m.gibbs
     S1 = m.S
     V1 = m.V
-    
-    
+
+
     m.set_state(P + dP, T)
     G2 = m.gibbs
     V2 = m.V
-    
+
     # T derivatives
     m.set_state(P, T + 0.5*dT)
     expr.extend(['S = -dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
     eq.extend([[m.S, -(G1 - G0)/dT],
                [m.alpha, (V1 - V0)/dT/m.V],
                [m.molar_heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
-    
+
     # P derivatives
     m.set_state(P + 0.5*dP, T)
     expr.extend(['V = dG/dP', 'K_T = -V dP/dV'])
     eq.extend([[m.V, (G2 - G0)/dP],
                [m.K_T, -0.5*(V2 + V0)*dP/(V2 - V0)]])
 
-    
+
     expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv', 'gr = alpha*K_T*V/Cv'])
     eq.extend([[m.molar_heat_capacity_v, m.molar_heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
                [m.K_S, m.K_T*m.molar_heat_capacity_p/m.molar_heat_capacity_v],
@@ -647,7 +647,7 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
 
     consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1]) + np.finfo('float').eps for e in eq]
     consistency = np.all(consistencies)
-    
+
     if verbose == True:
         print('Checking EoS consistency for {0:s}{1}'.format(m.to_string(), note))
         print('Expressions within tolerance of {0:2f}'.format(tol))
@@ -657,13 +657,13 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
             print('All EoS consistency constraints satisfied for {0:s}'.format(m.to_string()))
         else:
             print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
-            
+
     return consistency
 
 def _pad_ndarray_inverse_mirror(array, padding):
     """
     Pads an ndarray according to an inverse mirror
-    scheme. For example, for a 1D array 
+    scheme. For example, for a 1D array
     [2, 4, 6, 7, 8] padded by 3 cells, we have:
 
      padding  |  original array |  padding
@@ -711,9 +711,9 @@ def smooth_array(array, grid_spacing,
                  gaussian_rms_widths, truncate=4.0,
                  mode='inverse_mirror'):
     """
-    Creates a smoothed array by convolving it with a gaussian filter. 
+    Creates a smoothed array by convolving it with a gaussian filter.
     Grid resolutions and gaussian RMS widths are required for each of
-    the axes of the numpy array. The smoothing is truncated at a 
+    the axes of the numpy array. The smoothing is truncated at a
     user-defined number of standard deviations. The edges of the array
     can be padded in a number of different ways given by the
     'mode' parameter.
@@ -725,10 +725,10 @@ def smooth_array(array, grid_spacing,
     grid_spacing : numpy array of floats
         The spacing of points along each axis
     gaussian_rms_widths : numpy array of floats
-        The Gaussian RMS widths/standard deviations for the 
+        The Gaussian RMS widths/standard deviations for the
         Gaussian convolution.
-    truncate : float (default=4.) 
-        The number of standard deviations at which to truncate 
+    truncate : float (default=4.)
+        The number of standard deviations at which to truncate
         the smoothing.
     mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
         The mode parameter determines how the array borders are handled
@@ -746,7 +746,7 @@ def smooth_array(array, grid_spacing,
     # gaussian_filter works with standard deviations normalised to
     # the grid spacing.
     sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_spacing))
-    
+
     if mode == 'inverse_mirror':
         padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
         padded_array = _pad_ndarray_inverse_mirror(array, padding)
@@ -756,7 +756,7 @@ def smooth_array(array, grid_spacing,
         smoothed_array = smoothed_padded_array[slices]
     else:
         smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
-        
+
     return smoothed_array
 
 
@@ -767,10 +767,10 @@ def interp_smoothed_array_and_derivatives(array,
                                           mode='inverse_mirror',
                                           indexing='xy'):
     """
-    Creates a smoothed array on a regular 2D grid. Smoothing 
-    is achieved using burnman.tools.smooth_array(). 
-    Outputs scipy.interpolate.interp2d() interpolators 
-    which can be used to query the array, or its derivatives in the 
+    Creates a smoothed array on a regular 2D grid. Smoothing
+    is achieved using burnman.tools.smooth_array().
+    Outputs scipy.interpolate.interp2d() interpolators
+    which can be used to query the array, or its derivatives in the
     x- and y- directions.
 
     Parameters
@@ -786,8 +786,8 @@ def interp_smoothed_array_and_derivatives(array,
         The standard deviation for the Gaussian filter along the x axis
     y_stdev : float
         The standard deviation for the Gaussian filter along the x axis
-    truncate : float (optional) 
-        The number of standard deviations at which to truncate 
+    truncate : float (optional)
+        The number of standard deviations at which to truncate
         the smoothing (default = 4.).
     mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
         The mode parameter determines how the array borders are handled
@@ -801,12 +801,12 @@ def interp_smoothed_array_and_derivatives(array,
     Returns
     -------
     interps: tuple of three interp2d functors
-        interpolation functions for the smoothed property and 
+        interpolation functions for the smoothed property and
         the first derivatives with respect to x and y.
 
     """
 
-    
+
     dx = x_values[1] - x_values[0]
     dy = y_values[1] - y_values[0]
 
@@ -826,7 +826,7 @@ def interp_smoothed_array_and_derivatives(array,
 
     else:
         raise Exception('Indexing scheme not recognised. Should be ij or xy.')
-    
+
     dSAdydy, dSAdxdx = np.gradient(smoothed_array)
 
     interps = (interp2d(x_values, y_values, smoothed_array, kind='linear'),
@@ -838,11 +838,11 @@ def interp_smoothed_array_and_derivatives(array,
 
 def attribute_function(m, attributes, powers=[]):
     """
-    Function which returns a function which can be used to 
-    evaluate material properties at a point. This function 
-    allows the user to define the property returned 
-    as a string. The function can itself be passed to another 
-    function 
+    Function which returns a function which can be used to
+    evaluate material properties at a point. This function
+    allows the user to define the property returned
+    as a string. The function can itself be passed to another
+    function
     (such as nonlinear_fitting.confidence_prediction_bands()).
 
     Properties can either be simple attributes (e.g. K_T) or
@@ -856,7 +856,7 @@ def attribute_function(m, attributes, powers=[]):
         The list of material attributes / properties to
         be evaluated in the product
     powers : list of floats
-        The powers to which each attribute should be raised 
+        The powers to which each attribute should be raised
         during evaluation
     Returns
     -------
@@ -881,64 +881,64 @@ def attribute_function(m, attributes, powers=[]):
 def compare_l2(depth, calc, obs):
     """
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
-    
+
     .. math:: math does not work yet...
     \sum_{i=1}^{\\infty} x_{i}
-    
+
     :type depths: array of float
     :param depths: depths. :math:`[m]`
     :type calc: list of arrays of float
     :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
     :type obs: list of arrays of float
     :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
-    
+
     :returns: array of L2 norms of length N
     :rtype: array of floats
     """
     err = []
     for l in range(len(calc)):
         err.append(l2(depth, calc[l], obs[l]))
-    
+
     return err
 
 
 def compare_chifactor(calc, obs):
     """
     Computes the chi factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
-    
-    
+
+
     :type calc: list of arrays of float
     :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
     :type obs: list of arrays of float
     :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
-    
+
     :returns: error array of length N
     :rtype: array of floats
     """
     err = []
     for l in range(len(calc)):
         err.append(chi_factor(calc[l], obs[l]))
-    
+
     return err
 
 
 def l2(x, funca, funcb):
     """
     Computes the L2 norm for one profile(assumed to be linear between points).
-    
+
     :type x: array of float
     :param x: depths :math:`[m]`.
     :type funca: list of arrays of float
     :param funca: array calculated values
     :type funcb: list of arrays of float
     :param funcb: array of values (observed or calculated) to compare to
-    
+
     :returns: L2 norm
     :rtype: array of floats
     """
     diff = np.array(funca - funcb)
     diff = diff * diff
-    
+
     return integrate.trapz(diff, x)
 
 
@@ -951,16 +951,16 @@ def nrmse(x, funca, funcb):
     :param funca: array calculated values
     :type funcb: list of arrays of float
     :param funcb: array of values (observed or calculated) to compare to
-    
+
     :returns: RMS error
     :rtype: array of floats
-    
+
     """
     diff = np.array(funca - funcb)
     diff = diff * diff
     rmse = np.sqrt(np.sum(diff) / x)
     nrmse = rmse / (np.max(funca) - np.min(funca))
-    
+
     return nrmse
 
 
@@ -971,17 +971,16 @@ def chi_factor(calc, obs):
     :param calc: array calculated values
     :type obs: list of arrays of float
     :param obs: array of reference values to compare to
-    
+
     :returns: :math:`\\chi` factor
     :rtype: array of floats
-    
+
     """
-    
+
     err = np.empty_like(calc)
     for i in range(len(calc)):
         err[i] = pow((calc[i] - obs[i]) / (0.01 * np.mean(obs)), 2.)
-    
+
     err_tot = np.sum(err) / len(err)
 
     return err_tot
-

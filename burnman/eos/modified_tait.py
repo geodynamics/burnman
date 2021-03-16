@@ -100,20 +100,20 @@ class MT(eos.EquationOfState):
         Could potentially apply a fixed Poissons ratio as a rough estimate.
         """
         return 0.
-    
+
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.
-    
+
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
-        
+
         return self.gibbs_free_energy(pressure, temperature, volume, params) - volume*pressure
-    
+
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
@@ -125,9 +125,9 @@ class MT(eos.EquationOfState):
                                  (np.power(b*(pressure - params['P_0']) + 1.,
                                            1. - c) - 1.) +
                                  (1. - a)*(pressure - params['P_0']))
-        
+
         return intVdP + params['E_0'] + params['V_0']*params['P_0']
-    
+
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`

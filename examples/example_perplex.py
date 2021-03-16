@@ -7,7 +7,7 @@ example_perplex
 ---------------
 
 This minimal example demonstrates how burnman can be used to read and interrogate
-a PerpleX tab file (as produced by burnman/misc/create_burnman_readable_perplex_table.py 
+a PerpleX tab file (as produced by burnman/misc/create_burnman_readable_perplex_table.py
 It also demonstrates how we can smooth a given property on a given P-T grid.
 
 *Uses:*
@@ -38,7 +38,7 @@ P = 1.e9
 T = 1650.
 rock.set_state(P, T)
 print('P: {0:.1f} GPa, T: {1:.1f} K, density: {2:.1f} kg/m^3'.format(P/1.e9, T, rock.rho))
-                                                                    
+
 pressures = np.linspace(10.e9, 25.e9, 151)
 temperatures = [T] * len(pressures)
 densities = rock.evaluate(['rho'], pressures, temperatures)[0]
@@ -65,4 +65,3 @@ plt.xlabel('Pressure (GPa)')
 plt.ylabel('Entropy (J/K/mol)')
 plt.legend(loc='upper right')
 plt.show()
-

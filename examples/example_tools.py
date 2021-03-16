@@ -32,11 +32,11 @@ def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
 if __name__ == "__main__":
-    
+
     # First, let's check the EoS consistency of SLB_2011 periclase
     burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(), P=10.e9, T=3000., verbose=True)
     print('')
-    
+
     # Next, let's create the Mg2SiO4 phase diagram
     forsterite = burnman.minerals.HP_2011_ds62.fo()
     mg_wadsleyite = burnman.minerals.HP_2011_ds62.mwd()
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     plt.title("Mg2SiO4 phase diagram")
     plt.ylim(0., 30.)
     plt.show()
-    
+
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
     print('Hugoniot calculations')
     pressures = np.linspace(1.e5, 120.e9, 101)

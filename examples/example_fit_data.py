@@ -9,7 +9,7 @@ example_fit_data
 ----------------
 
 This example demonstrates BurnMan's functionality to fit various mineral physics data to
-an EoS of the user's choice. 
+an EoS of the user's choice.
 
 Please note also the separate file example_fit_eos.py, which can be viewed as a more
 advanced example in the same general field.
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     # 1) Fitting shear modulus and its derivative to shear wave velocity data
     print('1) Fitting shear modulus and its derivative to shear wave velocity data\n')
-    
+
     # First, read in the data from file and convert to SI units.
     PTp_data = np.loadtxt('../burnman/data/input_minphys/Murakami_perovskite.txt')
     PTp_data[:,0] = PTp_data[:,0]*1.e9
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                                                 fit_params = ['G_0', 'Gprime_0'],
                                                 data = PTp_data,
                                                 verbose = False)
-    
+
     pressures = np.linspace(1.e5, 150.e9, 101)
     temperatures = pressures*0. + 300.
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     model_vs_2nd_order_incorrect = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                                pressures, temperatures)[0]
     print('')
-    
+
 
     # Fit to the third order Birch-Murnaghan EoS
 
@@ -106,10 +106,10 @@ if __name__ == "__main__":
     plt.savefig("output_figures/example_fit_data1.png")
     plt.show()
 
-    
+
     # 2) Fitting standard enthalpy and heat capacity to enthalpy data
     print('2) Fitting standard enthalpy and heat capacity to enthalpy data\n')
-    
+
     per_SLB = burnman.minerals.SLB_2011.periclase()
     per_HP = burnman.minerals.HP_2011_ds62.per()
     per_opt = burnman.minerals.HP_2011_ds62.per() # this is the mineral we'll optimise
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']
     burnman.tools.pretty_print_values(model.popt, model.pcov, params)
     print('')
-    
+
     # Corner plot
     fig=burnman.nonlinear_fitting.corner_plot(model.popt, model.pcov, params)
     plt.savefig("output_figures/example_fit_data2.png")
@@ -155,4 +155,3 @@ if __name__ == "__main__":
     plt.legend(loc="lower right", prop={'size': 12}, frameon=False)
     plt.savefig("output_figures/example_fit_data3.png")
     plt.show()
-    

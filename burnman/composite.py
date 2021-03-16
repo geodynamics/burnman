@@ -75,7 +75,7 @@ class Composite(Material):
         self.set_averaging_scheme('VoigtReussHill')
         self.name=name
         self.print_precision=4 # number of significant figures used by self.__str__
-        
+
     def __str__(self):
         string='Composite: {0}'.format(self.name)
         try:
@@ -88,7 +88,7 @@ class Composite(Material):
         for phase, fraction in zip(*self.unroll()):
             string+='\n  {0}: {1:0.{sf}f}'.format(phase.name, fraction, sf=self.print_precision)
             if isinstance(phase, SolidSolution):
-               for i in range(phase.n_endmembers): 
+               for i in range(phase.n_endmembers):
                    string+='\n    {0}: {1:0.{sf}f}'.format(phase.endmember_names[i],
                                                            phase.molar_fractions[i],
                                                            sf=self.print_precision)
@@ -205,7 +205,7 @@ class Composite(Material):
         Returns molar chemical formula of the composite
         """
         return sum_formulae([ph.formula for ph in self.phases], self.molar_fractions)
-    
+
     @material_property
     def molar_internal_energy(self):
         """

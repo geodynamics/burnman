@@ -86,10 +86,10 @@ if __name__ == "__main__":
                 if len(eos_phasenames) > 0:
                     table = []
                     tablel = []
-                    
+
                     table.append(['Name ({0} equation of state)'.format(eos)] + params)
                     tablel.append([])
-                    
+
                     sortedlist = sorted(eos_phasenames, key=lambda x: x[0])
 
                     for (name, p) in sortedlist:
@@ -102,4 +102,3 @@ if __name__ == "__main__":
                         tools.pretty_print_table(table, False)
                     elif sys.argv[1] == "tab":
                         tools.pretty_print_table(table, True)
-                        

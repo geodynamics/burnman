@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU 
+# Copyright (C) 2012 - 2019 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -21400,4 +21400,3 @@ cov = {'covariance_matrix': array([[ 2.863000e+05,  1.550000e+04,  3.550000e+04,
                    'HSO3-',
                    'SO42-',
                    'HSO4-']}
-

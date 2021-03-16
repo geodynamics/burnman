@@ -106,7 +106,7 @@ class olivine_ss(burnman.SolidSolution):
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
-        
+
 # Olivine solid solution with combined endmember
 class olivine_ss2(burnman.SolidSolution):
 
@@ -143,7 +143,7 @@ class two_site_ss(burnman.SolidSolution):
         self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
-        
+
 # Three-endmember, two site asymmetric solid solution
 class two_site_ss_asymmetric(burnman.SolidSolution):
 
@@ -262,7 +262,7 @@ class test_solidsolution(BurnManTest):
         ss_properties = [fo_ss.gibbs, fo_ss.H, fo_ss.S, fo_ss.V,
                          fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr]
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
-        
+
     def test_ol_gibbs2(self):
         fo, fo_ss = self.setup_ol_ss2()
         endmember_properties = [
@@ -322,19 +322,19 @@ class test_solidsolution(BurnManTest):
             f /= np.sum(f)
             ss.set_composition(f)
             dGdx1 = ss.partial_gibbs
-            
+
             f = np.array(f0)
             f[i] += dp/2.
             f /= np.sum(f)
             ss.set_composition(f)
             dGdx2 = ss.partial_gibbs
-        
+
             H[i,:] = (dGdx2 - dGdx1)/dp
 
         ss.set_composition(f0)
         for i in range(3):
             self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
-            
+
     def test_subregular_model_hessian_one_component_change(self):
         ss = two_site_ss_subregular()
         f0 = np.array([0.25, 0.35, 0.4])
@@ -347,19 +347,19 @@ class test_solidsolution(BurnManTest):
             f /= np.sum(f)
             ss.set_composition(f)
             dGdx1 = ss.partial_gibbs
-            
+
             f = np.array(f0)
             f[i] += dp/2.
             f /= np.sum(f)
             ss.set_composition(f)
             dGdx2 = ss.partial_gibbs
-        
+
             H[i,:] = (dGdx2 - dGdx1)/dp
 
         ss.set_composition(f0)
         for i in range(3):
             self.assertArraysAlmostEqual(ss.gibbs_hessian[i], H[i])
-            
+
     def test_asymmetric_model_hessian_multicomponent_change(self):
         ss = two_site_ss_asymmetric()
         f0 = [0.25, 0.35, 0.4]
@@ -372,11 +372,11 @@ class test_solidsolution(BurnManTest):
         dGdx1 = ss.partial_gibbs
         ss.set_composition(f0 + df/2.)
         dGdx2 = ss.partial_gibbs
-        
+
         for i in range(3):
             self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
-        
+
     def test_subregular_model_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_asymmetric()
         f0 = [0.25, 0.35, 0.4]
@@ -389,7 +389,7 @@ class test_solidsolution(BurnManTest):
         dGdx1 = ss.partial_gibbs
         ss.set_composition(f0 + df/2.)
         dGdx2 = ss.partial_gibbs
-        
+
         for i in range(3):
             self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 

@@ -30,7 +30,7 @@ class Fe2SiO4_liquid(Mineral):
             'O_f': 4 ,
             'm': 0.6 ,
             'a': np.array([[-4252948.0, 997810.188],
-                           [-599315.125, 12032.8936], 
+                           [-599315.125, 12032.8936],
                            [12572739., 7299239.5],
                            [53442800.0, -26791676.0],
                            [52981912.0, 0.]]), # corrected order
@@ -43,4 +43,3 @@ class Fe2SiO4_liquid(Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
         Mineral.__init__(self)
-

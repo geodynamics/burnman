@@ -42,7 +42,7 @@ def write_tvel_file(planet_or_layer, filename='burnmanmodel.tvel', background_mo
         depths = background_model.internal_depth_list()
         above_layer = np.where(depths < (np.max(depths) - layer.outer_radius))[-1]
         below_layer = np.where( depths > (np.max(depths) -layer.inner_radius))[0]
-        
+
         data_above = list(zip(depths[above_layer] / 1.e3,
                               background_model.v_p(depths[above_layer]) / 1.e3,
                               background_model.v_s(depths[above_layer]) / 1.e3,

@@ -117,7 +117,7 @@ class test_endmembers(BurnManTest):
      bdg.set_state(1.e5, 1000.)
      made_bdg.set_state(1.e5, 1000.)
      self.assertFloatEqual(bdg.S + dS, made_bdg.S)
-     
+
     def test_make_mbr2(self):
      per = burnman.minerals.SLB_2011.periclase()
      stv = burnman.minerals.SLB_2011.stishovite()
@@ -125,13 +125,13 @@ class test_endmembers(BurnManTest):
      made_bdg = CombinedMineral([burnman.minerals.SLB_2011.periclase(),
                                  burnman.minerals.SLB_2011.stishovite()],
                                 [1., 1.], [dE, 0., 0.])
-     
+
      per.set_state(1.e5, 1000.)
      stv.set_state(1.e5, 1000.)
      made_bdg.set_state(1.e5, 1000.)
      self.assertFloatEqual(made_bdg.V, per.V + stv.V)
 
-     
-        
+
+
 if __name__ == '__main__':
     unittest.main()

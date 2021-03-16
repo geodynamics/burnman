@@ -13,7 +13,7 @@ from .material import Material, material_property
 class Planet(object):
     """
     A  class to build (self-consistent) Planets made out of Layers (``burnman.Layer``).
-    By default the planet is set to be self-consistent (with zero pressure at the surface and zero 
+    By default the planet is set to be self-consistent (with zero pressure at the surface and zero
     gravity at the center), but this can be overwritten in the set_pressure_mode().
     Pressure_modes defined in the individual layers will be ignored. If temperature modes are already
     set, the planet will be built upon initialization.
@@ -82,8 +82,8 @@ class Planet(object):
     def get_layer(self, name):
         """
         Returns a layer with a given name
-        
-        Parameter 
+
+        Parameter
         ---------
         name : string
         Given name of a layer
@@ -96,27 +96,27 @@ class Planet(object):
     def get_layer_by_radius(self, radius):
         """
         Returns a layer in which this radius lies
-        
+
         Parameter
         ---------
         radius : float
         radius to evaluate layer at
-        
+
         """
         for layer in self.layers:
             if layer.outer_radius >= radius:
                 return layer
         raise LookupError()
-    
+
     def evaluate(self, properties, radlist=None):
         """
         Function that is generally used to evaluate properties
-        of the different layers and stitch them together. 
+        of the different layers and stitch them together.
         If asking for different radii than the internal radlist,
         pressure and temperature values are interpolated and the
-        layer material evaluated at those pressures and 
+        layer material evaluated at those pressures and
         temperatures.
-        
+
         Parameter
         ---------
         properties : list of strings
@@ -124,10 +124,10 @@ class Planet(object):
         radlist : array of floats
         Radii to evaluate properties at. If left empty,
         internal radius lists are used.
-        
+
         Returns
         -------
-        1D or 2D array of requested properties 
+        1D or 2D array of requested properties
         (1D if only one property was requested)
         """
         if radlist is None:
@@ -146,10 +146,10 @@ class Planet(object):
             values = np.empty([len(properties), len(radlist)])
             l_idx = [i for i, layer in enumerate(self.layers) for r in radlist
                         if r>=layer.inner_radius and r<=layer.outer_radius]
-            
+
             for j, r in enumerate(radlist):
                 values[:,j] = self.layers[l_idx[j]].evaluate(properties, [r], self.radius_planet).T[0]
-                
+
         if values.shape[0] == 1:
             values = values[0]
         return values
@@ -160,7 +160,7 @@ class Planet(object):
         Sets the pressure mode of the planet by user-defined values are in a self-consistent fashion.
         pressure_mode is 'user-defined' or 'self-consistent'.
         The default for the planet is self-consistent, with zero pressure at the surface and zero pressure at the center.
-        
+
         Parameters
         ----------
         pressure_mode : string
@@ -176,11 +176,11 @@ class Planet(object):
         """
         self.reset()
         assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
-        
-        
+
+
         self.pressure_mode = pressure_mode
         self.gravity_bottom = gravity_bottom
- 
+
         if pressure_mode == 'user-defined':
             assert(len(pressures) == len(self.radii))
             self._pressures = pressures
@@ -191,14 +191,14 @@ class Planet(object):
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
-                
-                
+
+
     def make(self):
         """
         This routine needs to be called before evaluating any properties. If pressures and temperatures are self-consistent, they
         are computed across the planet here. Also initializes an array of materials in each Layer to compute properties from.
         """
-        
+
         self.reset()
         for layer in self.layers:
             assert(layer.temperature_mode is not None)
@@ -213,7 +213,7 @@ class Planet(object):
                 (-self.radii + max(self.radii)) * \
                 1.e3  # initial pressure curve guess
             temperatures = self._evaluate_temperature( new_press)
-            
+
             # Make it self-consistent!!!
             i = 0
             while i < self.n_max_iterations:
@@ -322,7 +322,7 @@ class Planet(object):
         calculates the average density of the entire planet [kg/m^3]
         """
         return self.mass/self.volume
-        
+
     @property
     def moment_of_inertia(self):
         """
@@ -345,7 +345,7 @@ class Planet(object):
         Returns depth of the layer [m]
         """
         return self.evaluate(['depth'])
-    
+
     @property
     def gravity(self):
         """
@@ -743,104 +743,103 @@ class Planet(object):
     def P(self):
         """Alias for :func:`~burnman.material.Material.pressure`"""
         return self.pressure
-    
+
     @property
     def T(self):
         """Alias for :func:`~burnman.material.Material.temperature`"""
         return self.temperature
-    
+
     @property
     def energy(self):
         """Alias for :func:`~burnman.material.Material.molar_internal_energy`"""
         return self.molar_internal_energy
-    
+
     @property
     def helmholtz(self):
         """Alias for :func:`~burnman.material.Material.molar_helmholtz`"""
         return self.molar_helmholtz
-    
+
     @property
     def gibbs(self):
         """Alias for :func:`~burnman.material.Material.molar_gibbs`"""
         return self.molar_gibbs
-    
+
     @property
     def V(self):
         """Alias for :func:`~burnman.material.Material.molar_volume`"""
         return self.molar_volume
-    
+
     @property
     def rho(self):
         """Alias for :func:`~burnman.material.Material.density`"""
         return self.density
-    
+
     @property
     def S(self):
         """Alias for :func:`~burnman.material.Material.molar_entropy`"""
         return self.molar_entropy
-    
+
     @property
     def H(self):
         """Alias for :func:`~burnman.material.Material.molar_enthalpy`"""
         return self.molar_enthalpy
-    
+
     @property
     def K_T(self):
         """Alias for :func:`~burnman.material.Material.isothermal_bulk_modulus`"""
         return self.isothermal_bulk_modulus
-    
+
     @property
     def K_S(self):
         """Alias for :func:`~burnman.material.Material.adiabatic_bulk_modulus`"""
         return self.adiabatic_bulk_modulus
-    
+
     @property
     def beta_T(self):
         """Alias for :func:`~burnman.material.Material.isothermal_compressibility`"""
         return self.isothermal_compressibility
-    
+
     @property
     def beta_S(self):
         """Alias for :func:`~burnman.material.Material.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
-    
+
     @property
     def G(self):
         """Alias for :func:`~burnman.material.Material.shear_modulus`"""
         return self.shear_modulus
-    
+
     @property
     def v_p(self):
         """Alias for :func:`~burnman.material.Material.p_wave_velocity`"""
         return self.p_wave_velocity
-    
+
     @property
     def v_phi(self):
         """Alias for :func:`~burnman.material.Material.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
-    
+
     @property
     def v_s(self):
         """Alias for :func:`~burnman.material.Material.shear_wave_velocity`"""
         return self.shear_wave_velocity
-    
+
     @property
     def gr(self):
         """Alias for :func:`~burnman.material.Material.grueneisen_parameter`"""
         return self.grueneisen_parameter
-    
+
     @property
     def alpha(self):
         """Alias for :func:`~burnman.material.Material.thermal_expansivity`"""
         return self.thermal_expansivity
-    
+
     @property
     def C_v(self):
         """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
         return self.molar_heat_capacity_v
-    
+
     @property
     def C_p(self):
         """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
         return self.molar_heat_capacity_p
-

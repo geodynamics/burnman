@@ -1,5 +1,5 @@
 # STW105 or REF from Kustowski, Ekstrm and Dziewonski 2008
-# radius [m] density [kg/m^3] vpv [m/s] vsv [m/s] Qkappa Qmu vph [m/s] vsh [m/s] eta [m/s] 
+# radius [m] density [kg/m^3] vpv [m/s] vsv [m/s] Qkappa Qmu vph [m/s] vsh [m/s] eta [m/s]
       0. 13088.48 11262.20  3667.80   1327.6    104.0 11262.20  3667.80  1.00000
    6824. 13088.47 11262.20  3667.79   1327.6    104.0 11262.20  3667.79  1.00000
   13648. 13088.44 11262.18  3667.78   1327.6    104.0 11262.18  3667.78  1.00000

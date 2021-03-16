@@ -7,7 +7,7 @@ import burnman
 from burnman.mineral import Mineral
 from util import BurnManTest
 from burnman.tools import *
-        
+
 class test_tools(BurnManTest):
 
     def test_eqm_T(self):
@@ -132,7 +132,7 @@ class test_tools(BurnManTest):
         padding = (1,)
         padded_array = burnman.tools._pad_ndarray_inverse_mirror(array, padding)
         self.assertArraysAlmostEqual(padded_array, np.array([0., 1., 2., 3., 5., 7.]))
-        
+
     def test_padding_2D(self):
         array = np.array([[1., 2.], [3., 5.]])
         padding = (1,1)
@@ -142,7 +142,7 @@ class test_tools(BurnManTest):
                                                                   [0., 1., 2., 3.],
                                                                   [1., 3., 5., 7.],
                                                                   [4., 5., 8., 9.]])))
-        
+
     def test_smoothing(self):
         array = np.array([0., 1., 2., 3., 4.])
         smoothed_array = smooth_array(array, [1.], [1.])
@@ -156,7 +156,7 @@ class test_tools(BurnManTest):
                                                               0, 0, indexing='ij')
         self.assertArraysAlmostEqual([f(0., 1.)[0], dfdx(0., 1.)[0], dfdy(0., 1.)[0]],
                                      [array[0][1], 0., 1.])
-        
+
     def test_interp_smoothing_xy(self):
         array = np.array([[0., 1., 2.], [0., 1., 2.], [0., 1., 2.]])
         axis_values = np.array([0., 1., 2.])
@@ -165,7 +165,7 @@ class test_tools(BurnManTest):
                                                               0, 0, indexing='xy')
         self.assertArraysAlmostEqual([f(0., 1.)[0], dfdx(0., 1.)[0], dfdy(0., 1.)[0]],
                                      [array[1][0], 1., 0.])
-        
-        
+
+
 if __name__ == '__main__':
     unittest.main()

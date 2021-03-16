@@ -152,7 +152,7 @@ if __name__ == "__main__":
         markersize=6, label='Voigt-Reuss-Hill')
     ax.fill_between(pressures / 1.e9, vs_hsu / 1.e3, vs_hsl / 1.e3,
                     facecolor='red', alpha=0.8, label='Hashin-Shtrikman bounds', interpolate=False)
-    
+
     # plt.plot(pressures/1.e9,vs_hsu/1.e3,color='r',linestyle='-',\
     #    markersize=4,label='Hashin-Shtrikman')
     # plt.plot(pressures/1.e9,vs_hsl/1.e3,color='r',linestyle='-',marker='x',\
@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
     ax.set_ylim(3.0, 7.5)
     ax.set_xlim(min(pressures) / 1.e9, max(pressures) / 1.e9)
-    
+
     ax.legend(loc='lower right', ncol=2, prop=prop)
 
     ax.set_xlabel('Pressure (GPa)')

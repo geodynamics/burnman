@@ -60,7 +60,7 @@ if __name__ == "__main__":
     T = 1000.
 
     """
-    We can create an instance of a solid solution in two ways. 
+    We can create an instance of a solid solution in two ways.
     We can create a single instance using the SolidSolution constructor
     (here's an example of an ideal pyrope-almandine garnet) ...
     """
@@ -75,11 +75,11 @@ if __name__ == "__main__":
     g1.set_state(P, T)
     gibbs = g1.gibbs
 
-    """ 
-    ... or we can create a class that derives from solid solution 
+    """
+    ... or we can create a class that derives from solid solution
     (so that we can create multiple instances of the same solution)
     """
-    
+
     class mg_fe_garnet(burnman.SolidSolution):
 
         def __init__(self, molar_fractions=None):
@@ -319,11 +319,11 @@ if __name__ == "__main__":
     provides a more flexible way of constructing an asymmetric
     model. Here's a garnet model from Ganguly et al., 1996:
 
-    (N.B. Published excesses are on a 4-oxygen (1-cation) basis, 
+    (N.B. Published excesses are on a 4-oxygen (1-cation) basis,
     so we need to multiply each by 3.)
     '''
     mult = lambda x, n: [[[v*n for v in i] for i in j] for j in x]
-    
+
     g5 = burnman.SolidSolution(name = 'Subregular pyrope-almandine-grossular '
                                'garnet (Ganguly et al., 1996)',
                                solution_type = 'subregular',

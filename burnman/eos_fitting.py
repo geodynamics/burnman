@@ -30,15 +30,15 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
         values for the parameters
 
     flags : string or list of strings
-        Attribute names for the property to be fit for the whole 
+        Attribute names for the property to be fit for the whole
         dataset or each datum individually (e.g. 'V')
 
     data : numpy array of observed P-T-property values
 
     data_covariances : numpy array of P-T-property covariances (optional)
-        If not given, all covariance matrices are chosen 
+        If not given, all covariance matrices are chosen
         such that C00 = 1, otherwise Cij = 0
-        In other words, all data points have equal weight, 
+        In other words, all data points have equal weight,
         with all error in the pressure
 
     Returns
@@ -48,7 +48,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             n_dof : integer
                 Degrees of freedom of the system
             data_mle : 2D numpy array
-                Maximum likelihood estimates of the observed data points 
+                Maximum likelihood estimates of the observed data points
                 on the best-fit curve
             jacobian : 2D numpy array
                 d(weighted_residuals)/d(parameter)
@@ -76,7 +76,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             self.set_params(guessed_params)
             self.delta_params = delta_params
             self.mle_tolerances = mle_tolerances
-            
+
         def set_params(self, param_values):
             i=0
             for param in self.fit_params:
@@ -101,7 +101,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
 
         def normal(self, x, flag):
             P, T, p = x
-            
+
             if flag == 'V':
                 self.m.set_state(P, T)
                 dPdp = -self.m.K_T/self.m.V
@@ -123,11 +123,11 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
                 dT = 1.
                 dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2] - self.function([P-dP, T, 0.], flag)[2])
                 dpdT = (self.function([P, T+dT, 0.], flag)[2] - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
-            dPdT = -dPdp*dpdT    
+            dPdT = -dPdp*dpdT
             n = np.array([-1., dPdT, dPdp])
             return unit_normalize(n)
 
-        
+
     # If only one property flag is given, assume it applies to all data
     if type(flags) is str:
         flags = np.array([flags] * len(data[:,0]))
@@ -142,7 +142,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
                 mle_tolerances[i] = 1. # 1 J
             else:
                 mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, flag)
-        
+
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
     covariances_defined = True
@@ -151,7 +151,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
         data_covariances = np.zeros((len(data[:,0]), len(data[0]), len(data[0])))
         for i in range(len(data_covariances)):
             data_covariances[i][0][0] = 1.
-    
+
     guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
     model = Model(mineral = mineral,
                   data = data,
@@ -176,7 +176,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
                 print('[{0:d}]: {1:.4f} ({2:.1f} s.d. from the model)'.format(idx, probabilities[i], np.abs(model.weighted_residuals[idx])))
             print('You might consider removing them from your fit, '
                   'or increasing the uncertainties in their measured values.\n')
-        
+
     return model
 
 
@@ -184,7 +184,7 @@ def fit_PTV_data(mineral, fit_params, data, data_covariances=[], param_tolerance
     """
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
-        
+
     return fit_PTp_data(mineral=mineral, flags='V',
-                        data=data, data_covariances=data_covariances, 
+                        data=data, data_covariances=data_covariances,
                         fit_params=fit_params, param_tolerance=param_tolerance, max_lm_iterations=max_lm_iterations, verbose=verbose)

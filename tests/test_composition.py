@@ -21,14 +21,14 @@ class composition(BurnManTest):
         c = Composition(c_dict, unit_type='molar', normalize=False)
         self.assertArraysAlmostEqual(c_dict.values(), c.molar_composition.values())
 
-        
+
     def test_molar_normalize(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=True)
 
         self.assertArraysAlmostEqual(np.array(c_dict.values())/sum(c_dict.values()),
                                      c.molar_composition.values())
-        
+
 
     def test_weight_no_normalize(self):
 
@@ -36,7 +36,7 @@ class composition(BurnManTest):
         c = Composition(c_dict, unit_type='weight', normalize=False)
         self.assertArraysAlmostEqual(c_dict.values(), c.weight_composition.values())
 
-        
+
     def test_weight_normalize(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='weight', normalize=True)
@@ -49,7 +49,7 @@ class composition(BurnManTest):
         c = Composition(c_dict, unit_type='molar', normalize=False)
 
         self.assertFloatEqual(sum(c.atomic_composition.values()), 5.)
-        
+
     def test_moles_to_atoms_normalize(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=True)
@@ -60,34 +60,34 @@ class composition(BurnManTest):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=False)
         c.add_components(c_dict, unit_type='molar')
-        
+
         self.assertArraysAlmostEqual(np.array(c_dict.values())*2.,
                                      c.molar_composition.values())
-        
+
     def test_add_component_weight(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='weight', normalize=False)
         c.add_components(c_dict, unit_type='weight')
-        
+
         self.assertArraysAlmostEqual(np.array(c_dict.values())*2.,
                                      c.weight_composition.values())
-        
+
     def test_add_component_mixed(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=False)
         c.add_components(c.weight_composition, unit_type='weight')
-        
+
         self.assertArraysAlmostEqual(np.array(c_dict.values())*2.,
                                      c.molar_composition.values())
-        
+
     def test_add_component_mixed_inv(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='weight', normalize=False)
         c.add_components(c.molar_composition, unit_type='molar')
-        
+
         self.assertArraysAlmostEqual(np.array(c_dict.values())*2.,
                                      c.weight_composition.values())
-        
+
     def test_change_component_set(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=False)

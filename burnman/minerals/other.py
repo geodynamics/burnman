@@ -57,7 +57,7 @@ class liquid_iron( Mineral ):
             'molar_mass': m}
         Mineral.__init__(self)
 
-        
+
 class ZSB_2013_mg_perovskite(Mineral):
 
     def __init__(self):

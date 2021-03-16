@@ -90,7 +90,7 @@ class outer_core_rkprime(burnman.Mineral):
             'molar_mass': 0.055845,
         }
 
-        
+
 class periclase_morse(burnman.Mineral):
 
     """
@@ -110,8 +110,8 @@ class periclase_morse(burnman.Mineral):
             'Kprime_0': 3.84045,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-        
-        
+
+
 
 class eos(BurnManTest):
 
@@ -207,7 +207,7 @@ class eos(BurnManTest):
         Density_test = eos.density(rock.params['V_0'], rock.params)
         self.assertFloatEqual(
             Density_test, rock.params['molar_mass'] / rock.params['V_0'])
-        
+
     def test_reference_values_rkprime(self):
         rock = outer_core_rkprime()
         pressure = 0.
@@ -235,8 +235,8 @@ class eos(BurnManTest):
         Density_test = eos.density(rock.params['V_0'], rock.params)
         self.assertFloatEqual(
             Density_test, rock.params['molar_mass'] / rock.params['V_0'])
-        
-        
+
+
 class test_eos_validation(BurnManTest):
 
     def test_no_shear_error(self):
@@ -347,9 +347,9 @@ class test_eos_validation(BurnManTest):
             burnman.Mineral.__init__(m)
             m.set_state(m.params['P_0'], m.params['T_0'])
             energies.append(m.molar_internal_energy)
-        
+
         self.assertArraysAlmostEqual(energies, [m.params['E_0']]*len(energies))
-    
+
     def test_energy_derivatives(self):
         m = burnman.Mineral(params={'equation_of_state': 'bm3',
                                     'V_0': 7.95626e-6,
@@ -374,14 +374,14 @@ class test_eos_validation(BurnManTest):
             temperatures = [0., 0., 0.]
 
             E, G, H, A, V = m.evaluate(['molar_internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
-            
+
             calculated.append(P_0)
             derivative.append(-(E[2] - E[0])/(V[2] - V[0]))
             calculated.append(V[1])
             derivative.append((G[2] - G[0])/dP)
-            
+
         self.assertArraysAlmostEqual(calculated, derivative)
-                
+
 
 if __name__ == '__main__':
     unittest.main()

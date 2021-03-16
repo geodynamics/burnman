@@ -13,33 +13,33 @@ from .material import Material, material_property
 
 class AnisotropicMaterial(Material):
     """
-    A class that represents an anisotropic elastic material. This class 
+    A class that represents an anisotropic elastic material. This class
     is initialised with a set of elastic constants and a density. It can
-    then be interrogated to find the values of different properties, 
+    then be interrogated to find the values of different properties,
     such as bounds on seismic velocities. There are also several functions
     which can be called to calculate properties along directions oriented
-    with respect to the elastic tensor. Initialization is via a density 
+    with respect to the elastic tensor. Initialization is via a density
     and a full stiffness tensor in Voigt notation
-    
-    See :cite:`Mainprice2011` Geological Society of London Special Publication 
+
+    See :cite:`Mainprice2011` Geological Society of London Special Publication
     and https://materialsproject.org/wiki/index.php/Elasticity_calculations
     for mathematical descriptions of each function.
     """
-        
+
     def __init__(self, rho, cijs):
         self.params = {'rho_0': rho,
                        'stiffness_tensor_0': cijs}
-        
+
         assert self.params['stiffness_tensor_0'].shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
         assert np.allclose(self.params['stiffness_tensor_0'].T,
                            self.params['stiffness_tensor_0']), 'stiffness_tensor must be symmetric'
 
         Material.__init__(self)
-        
+
     def _voigt_index_to_ij(self, m):
         """
-        Returns the ij (or kl) indices of the 
-        stiffness tensor which correspond to those 
+        Returns the ij (or kl) indices of the
+        stiffness tensor which correspond to those
         of the Voigt notation m (or n).
         """
         if m == 3:
@@ -92,7 +92,7 @@ class AnisotropicMaterial(Material):
     @material_property
     def density(self):
         return self.params['rho_0']
-        
+
     @material_property
     def bulk_modulus_voigt(self):
         """
@@ -100,7 +100,7 @@ class AnisotropicMaterial(Material):
         """
         K = np.sum([[self.stiffness_tensor[i][k] for k in range(3)] for i in range(3)])/9.
         return K
-    
+
     @material_property
     def bulk_modulus_reuss(self):
         """
@@ -115,7 +115,7 @@ class AnisotropicMaterial(Material):
         Computes the bulk modulus (Voigt-Reuss-Hill average)
         """
         return 0.5*(self.bulk_modulus_voigt + self.bulk_modulus_reuss)
-    
+
     @material_property
     def shear_modulus_voigt(self):
         """
@@ -127,7 +127,7 @@ class AnisotropicMaterial(Material):
                 self.stiffness_tensor[1][2] +
                 self.stiffness_tensor[2][0] )) / 15.
         return G
-    
+
     @material_property
     def shear_modulus_reuss(self):
         """
@@ -136,10 +136,10 @@ class AnisotropicMaterial(Material):
         beta =  ( np.sum([self.compliance_tensor[i][i] for i in [0, 1, 2]])*4. +
                   np.sum([self.compliance_tensor[i][i] for i in [3, 4, 5]])*3. -
                   ( self.compliance_tensor[0][1] +
-                    self.compliance_tensor[1][2] + 
+                    self.compliance_tensor[1][2] +
                     self.compliance_tensor[2][0])*4. ) / 15.
         return 1./beta
-    
+
     @material_property
     def shear_modulus_vrh(self):
         """
@@ -182,17 +182,17 @@ class AnisotropicMaterial(Material):
 
     def linear_compressibility(self, direction):
         """
-        Computes the linear compressibility in a given direction 
+        Computes the linear compressibility in a given direction
         relative to the stiffness tensor
         """
         direction = unit_normalize(direction)
         Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
         beta = Sijkk.dot(direction).dot(direction)
         return beta
-    
+
     def youngs_modulus(self, direction):
         """
-        Computes the Youngs modulus in a given direction 
+        Computes the Youngs modulus in a given direction
         relative to the stiffness tensor
         """
         direction = unit_normalize(direction)
@@ -202,52 +202,52 @@ class AnisotropicMaterial(Material):
 
     def shear_modulus(self, plane_normal, shear_direction):
         """
-        Computes the shear modulus on a plane in a given 
+        Computes the shear modulus on a plane in a given
         shear direction relative to the stiffness tensor
         """
         plane_normal = unit_normalize(plane_normal)
         shear_direction = unit_normalize(shear_direction)
-        
+
         assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(np.float).eps, 'plane_normal and shear_direction must be orthogonal'
         Sijkl = self.full_compliance_tensor
         G = Sijkl.dot(shear_direction).dot(plane_normal).dot(shear_direction).dot(plane_normal)
         return 0.25/G
-    
+
     def poissons_ratio(self,
                        axial_direction,
                        lateral_direction):
         """
-        Computes the poisson ratio given loading and response 
+        Computes the poisson ratio given loading and response
         directions relative to the stiffness tensor
         """
-        
+
         axial_direction = unit_normalize(axial_direction)
         lateral_direction = unit_normalize(lateral_direction)
         assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(np.float).eps, 'axial_direction and lateral_direction must be orthogonal'
-        
+
         Sijkl = self.full_compliance_tensor
         x = axial_direction
         y = lateral_direction
-        nu = -(Sijkl.dot(y).dot(y).dot(x).dot(x) / 
+        nu = -(Sijkl.dot(y).dot(y).dot(x).dot(x) /
                Sijkl.dot(x).dot(x).dot(x).dot(x) )
         return nu
-    
+
     def wave_velocities(self, propagation_direction):
         """
-        Computes the compressional wave velocity, and two 
+        Computes the compressional wave velocity, and two
         shear wave velocities in a given propagation direction
 
-        Returns two lists, containing the wave speeds and 
+        Returns two lists, containing the wave speeds and
         directions of particle motion relative to the stiffness tensor
         """
         propagation_direction = unit_normalize(propagation_direction)
-        
+
         Tik = self.christoffel_tensor(propagation_direction)
 
         eigenvalues, eigenvectors = np.linalg.eig(Tik)
 
-        idx = eigenvalues.argsort()[::-1]   
-        eigenvalues = np.real(eigenvalues[idx])        
+        idx = eigenvalues.argsort()[::-1]
+        eigenvalues = np.real(eigenvalues[idx])
         eigenvectors = eigenvectors[:,idx]
         velocities = np.sqrt(eigenvalues/self.rho)
 
@@ -260,15 +260,15 @@ def voigt_array_from_cijs(cijs, index_lists):
             C[indices] = cijs[i]
             C[indices[::-1]] = cijs[i]
     return C
-    
+
 class IsotropicMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C12, C44] (i.e. lambda and mu, the Lame parameters)
     """
     def __init__(self, rho, cijs):
-        
+
         assert len(cijs) == 2
         cijs = list(cijs)
         cijs.insert(0, cijs[0] + 2.*cijs[1]) # C11 = C12 + 2C44
@@ -282,11 +282,11 @@ class IsotropicMaterial(AnisotropicMaterial):
 class CubicMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C44]
     """
     def __init__(self, rho, cijs):
-        
+
         assert len(cijs) == 3
         index_lists = [[(0, 0), (1, 1), (2, 2)], # C11
                        [(0, 1), (0, 2), (1, 2)], # C12
@@ -298,14 +298,14 @@ class CubicMaterial(AnisotropicMaterial):
 class HexagonalMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C13, C33, C44]
     """
     def __init__(self, rho, cijs):
         assert len(cijs) == 5
         cijs = list(cijs)
         cijs.append((cijs[0] - cijs[1])/2.) # C66 = (C11-C12)/2.
-        
+
         index_lists = [[(0, 0), (1, 1)], # C11
                        [(0, 1)], # C12
                        [(0, 2), (1, 2)], # C13
@@ -319,7 +319,7 @@ class HexagonalMaterial(AnisotropicMaterial):
 class TetragonalMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C13, C33, C44, C66] or
     [C11, C12, C13, C16, C33, C44, C66]
     """
@@ -347,7 +347,7 @@ class TetragonalMaterial(AnisotropicMaterial):
         else:
             raise Exception('Tetragonal materials should have '
                             'either 6 or 7 independent Cijs')
-            
+
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists))
 
@@ -355,7 +355,7 @@ class TetragonalMaterial(AnisotropicMaterial):
 class RhombohedralMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C13, C14, C33, C44, C66] or
     [C11, C12, C13, C14, C15, C33, C44, C66]
     """
@@ -372,7 +372,7 @@ class RhombohedralMaterial(AnisotropicMaterial):
                            [(2, 2)], # C33
                            [(3, 3), (4, 4)], # C44
                            [(5, 5)]] # C66
-            
+
         elif len(cijs) == 8:
             # Rhombohedral II / Laue class \bar{3}
             cijs.insert(4, -cijs[3]) # C24 = -C14
@@ -387,22 +387,22 @@ class RhombohedralMaterial(AnisotropicMaterial):
                            [(2, 2)], # C33
                            [(3, 3), (4, 4)], # C44
                            [(5, 5)]] # C66
-        
+
         else:
             raise Exception('Rhombohedral materials should have '
                             'either 7 or 8 independent Cijs')
-        
+
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists))
-          
+
 class OrthorhombicMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C13, C22, C23, C33, C44, C55, C66]
     """
     def __init__(self, rho, cijs):
-        
+
         assert len(cijs) == 9
         index_lists = [[(0, 0)], # C11
                        [(0, 1)], # C12
@@ -413,7 +413,7 @@ class OrthorhombicMaterial(AnisotropicMaterial):
                        [(3, 3)], # C44
                        [(4, 4)], # C55
                        [(5, 5)]] # C66
-        
+
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists))
 
@@ -421,11 +421,11 @@ class OrthorhombicMaterial(AnisotropicMaterial):
 class MonoclinicMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [C11, C12, C13, C15, C22, C23, C25, C33, C35, C44, C46, C55, C66]
     """
     def __init__(self, rho, cijs):
-        
+
         assert len(cijs) == 13
         index_lists = [[(0, 0)], # C11
                        [(0, 1)], # C12
@@ -440,20 +440,20 @@ class MonoclinicMaterial(AnisotropicMaterial):
                        [(3, 5)], # C46
                        [(4, 4)], # C55
                        [(5, 5)]] # C66
-        
+
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists))
 
 class TriclinicMaterial(AnisotropicMaterial):
     """
     A class derived from the AnisotropicMaterial base class
-    Initialization takes two input parameters; rho and 
+    Initialization takes two input parameters; rho and
     [Cij, where 1<=i<=6 and i<=j<=6]
     """
     def __init__(self, rho, cijs):
-    
+
         assert len(cijs) == 21
         index_lists=[[(i, j)] for i in range(6) for j in range(i, 6)]
-            
+
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists))

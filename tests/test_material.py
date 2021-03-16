@@ -116,7 +116,7 @@ class test_material_name(BurnManTest):
         m = self.min_with_name()
         Ss = m.evaluate(['S'], np.array([1.e5, 1.e5]), np.array([300., 300.]))
         self.assertEqual(Ss[0].shape, (2,))
-        
+
     def test_evaluate_2Darray(self):
         m = self.min_with_name()
         Ss = m.evaluate(['S'],
@@ -124,6 +124,6 @@ class test_material_name(BurnManTest):
                         np.array([[300., 300., 300], [300., 300., 300]]))
         self.assertEqual(Ss[0].shape, (2, 3))
 
-        
+
 if __name__ == '__main__':
     unittest.main()

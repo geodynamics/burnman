@@ -1,4 +1,4 @@
-#IASP91 Kennett & Engdahl 1991 
+#IASP91 Kennett & Engdahl 1991
 #Depth(m)	Radius(m)	Vp(m/s)	Vs(m/s)
 0.000000e+00	6.371000e+06	5.800000e+03	3.360000e+03
 1.000000e+03	6.370000e+06	5.800000e+03	3.360000e+03

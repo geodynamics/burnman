@@ -174,13 +174,13 @@ class MGDBase(eos.EquationOfState):
 
         F_pressure = ( 0.5 * b_iikk * f * f * params['V_0'] +
                        (1. / 6.) * params['V_0'] * b_iikkmm * f * f * f )
-        
+
         Debye_T = self._debye_temperature(params['V_0'] / volume, params)
         F_thermal = debye.helmholtz_free_energy(temperature, Debye_T, params['n']) - \
                     debye.helmholtz_free_energy(params['T_0'], Debye_T, params['n'])
-        
+
         return params['F_0'] + F_pressure + F_thermal
-    
+
     # calculate the thermal correction to the shear modulus as a function of
     # V, T
     def _thermal_shear_modulus(self, T, V, params):

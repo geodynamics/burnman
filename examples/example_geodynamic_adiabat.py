@@ -77,7 +77,7 @@ def interp_isentrope(interp, pressures, entropy, T_guess):
     def _deltaS(args, S, P):
         T = args[0]
         return interp(P, T)[0] - S
-    
+
     sol = [T_guess]
     temperatures = np.empty_like(pressures)
     for i, P in enumerate(pressures):
@@ -91,18 +91,18 @@ def interp_isentrope(interp, pressures, entropy, T_guess):
 def compute_depth_gravity_profiles(pressures, densities, surface_gravity, outer_radius):
     gravity = [surface_gravity] * len(pressures) # starting guess
     n_gravity_iterations = 5
-    for i in range(n_gravity_iterations):    
+    for i in range(n_gravity_iterations):
         # Integrate the hydrostatic equation
         # Make a spline fit of densities as a function of pressures
         rhofunc = UnivariateSpline(pressures, densities)
         # Make a spline fit of gravity as a function of depth
         gfunc = UnivariateSpline(pressures, gravity)
-        
+
         # integrate the hydrostatic equation
         depths = np.ravel(odeint((lambda p, x: 1./(gfunc(x) * rhofunc(x))), 0.0, pressures))
-        
+
         radii = outer_radius - depths
-        
+
         rhofunc = UnivariateSpline(radii[::-1], densities[::-1])
         poisson = lambda p, x: 4.0 * np.pi * burnman.constants.G * rhofunc(x) * x * x
         gravity = np.ravel(odeint(poisson, surface_gravity*radii[0]*radii[0], radii))
@@ -112,7 +112,7 @@ def compute_depth_gravity_profiles(pressures, densities, surface_gravity, outer_
 
 # BEGIN USER INPUTS
 
-# Declare the rock we want to use 
+# Declare the rock we want to use
 rock=burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
 
 # First we calculate the isentrope at a given potential temperature
@@ -232,12 +232,12 @@ for pressure_stdev in [0., pressure_std_dev]:
     temperature_stdev = ( temperature_smoothing_factor * pressure_stdev *
                           np.max(np.abs( np.gradient(unsmoothed_isentrope_temperatures) )) /
                           (grid_pressures[1] - grid_pressures[0]) )
-    
+
     pp, TT = np.meshgrid(grid_pressures, grid_temperatures)
     mesh_shape = pp.shape
     pp = np.ndarray.flatten(pp)
     TT = np.ndarray.flatten(TT)
-    
+
     # We could compute properties over the whole grid:
     # grid_entropies, grid_volumes = rock.evaluate(['S', 'V'], pp, TT)
     # However, we can save some time by computing only when temperature is close enough
@@ -253,7 +253,7 @@ for pressure_stdev in [0., pressure_std_dev]:
 
     grid_entropies = grid_entropies.reshape(mesh_shape)
     grid_volumes = grid_volumes.reshape(mesh_shape)
-    
+
     # Having defined the grid and calculated unsmoothed properties,
     # we now calculate the smoothed entropy and volume and derivatives with
     # respect to pressure and temperature.
@@ -264,22 +264,22 @@ for pressure_stdev in [0., pressure_std_dev]:
                                                                     y_stdev=temperature_stdev,
                                                                     truncate=truncate)
     interp_smoothed_S, interp_smoothed_dSdP, interp_smoothed_dSdT = S_interps
-    
+
     V_interps = burnman.tools.interp_smoothed_array_and_derivatives(array=grid_volumes,
                                                                     x_values=grid_pressures,
                                                                     y_values=grid_temperatures,
                                                                     x_stdev=pressure_stdev,
                                                                     y_stdev=temperature_stdev,
                                                                     truncate=truncate)
-    
+
     interp_smoothed_V, interp_smoothed_dVdP, interp_smoothed_dVdT = V_interps
 
-    # Now we can calculate and plot the relaxed and smoothed properties along the isentrope 
+    # Now we can calculate and plot the relaxed and smoothed properties along the isentrope
     smoothed_temperatures = interp_isentrope(interp_smoothed_S, pressures, entropy, potential_temperature)
     densities = rock.evaluate(['rho'], pressures, smoothed_temperatures)[0]
     depths, gravity = compute_depth_gravity_profiles(pressures, densities, surface_gravity, outer_radius)
 
-    
+
     dT = 0.1
     Vpsub, Vssub = rock.evaluate(['p_wave_velocity', 'shear_wave_velocity'],
                                  pressures, smoothed_temperatures-dT/2.)
@@ -291,12 +291,12 @@ for pressure_stdev in [0., pressure_std_dev]:
     dVpdT = (Vpadd - Vpsub)/dT
     dVsdT = (Vsadd - Vssub)/dT
 
-    
+
     volumes = np.array([interp_smoothed_V(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
     dSdT = np.array([interp_smoothed_dSdT(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
     dVdT = np.array([interp_smoothed_dVdT(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
     dVdP = np.array([interp_smoothed_dVdP(p, T)[0] for (p, T) in zip(*[pressures, smoothed_temperatures])])
-    
+
     specific_heats_relaxed = smoothed_temperatures * dSdT / rock.params['molar_mass']
     alphas_relaxed = dVdT / volumes
     compressibilities_relaxed = -dVdP / volumes
@@ -305,7 +305,7 @@ for pressure_stdev in [0., pressure_std_dev]:
     print('Specific heat: {0:.2e}, {1:.2e}'.format(np.min(specific_heats_relaxed), np.max(specific_heats_relaxed)))
     print('Thermal expansivity: {0:.2e}, {1:.2e}'.format(np.min(alphas_relaxed), np.max(alphas_relaxed)))
     print('Compressibilities: {0:.2e}, {1:.2e}\n'.format(np.min(compressibilities_relaxed), np.max(compressibilities_relaxed)))
-    
+
     ax_T.plot(x, smoothed_temperatures, label='relaxed, smoothed (P_sd: {0:.1f} GPa)'.format(pressure_stdev/1.e9))
     ax_z.plot(x, depths/1.e3)
     ax_g.plot(x, gravity)

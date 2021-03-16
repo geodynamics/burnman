@@ -8,10 +8,10 @@ example_fit_eos
 ----------------
 
 This example demonstrates BurnMan's functionality to fit data to
-an EoS of the user's choice. 
+an EoS of the user's choice.
 
-The first example deals with simple PVT fitting. 
-The second example illustrates how powerful it can be to 
+The first example deals with simple PVT fitting.
+The second example illustrates how powerful it can be to
 provide non-PVT constraints to the same fitting problem.
 
 teaches:
@@ -34,7 +34,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 
 if __name__ == "__main__":
-    
+
     print('Least squares equation of state fitting\n')
 
     print('1) Fitting to room temperature PV data\n')
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                    [38.45, 42.093, 0.004],
                    [43.37, 41.610, 0.004],
                    [47.49, 41.280, 0.007]])
-    
+
     PTV = np.array([PV.T[0]*1.e9,
                     PV.T[0]*0. + 298.15,
                     burnman.tools.molar_volume_from_unit_cell_volume(PV.T[1], 2.)]).T
@@ -82,11 +82,11 @@ if __name__ == "__main__":
     print('Optimized equation of state for stishovite:')
     burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print('')
-    
+
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, params)
     plt.show()
-        
+
     # Finally, let's plot our equation of state
     T = 298.15
     pressures = np.linspace(1.e5, 60.e9, 101)
@@ -97,18 +97,18 @@ if __name__ == "__main__":
         stv.set_state(P, T)
         PTVs[i] = [P, T, stv.V]
 
-    # Plot the 95% confidence and prediction bands 
+    # Plot the 95% confidence and prediction bands
     cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
                                                                      x_array = PTVs,
                                                                      confidence_interval = 0.95,
                                                                      f=burnman.tools.attribute_function(stv, 'V'),
                                                                      flag='V')
-    
+
     plt.plot(PTVs[:,0]/1.e9, cp_bands[0] * 1.e6, linestyle='--', color='r', label='95% confidence bands')
     plt.plot(PTVs[:,0]/1.e9, cp_bands[1] * 1.e6, linestyle='--', color='r')
     plt.plot(PTVs[:,0]/1.e9, cp_bands[2] * 1.e6, linestyle='--', color='b', label='95% prediction bands')
     plt.plot(PTVs[:,0]/1.e9, cp_bands[3] * 1.e6, linestyle='--', color='b')
-        
+
     plt.plot(PTVs[:,0] / 1.e9, PTVs[:,2] * 1.e6,
              label='Optimized fit for stishovite')
     plt.errorbar(PTV[:,0] / 1.e9, PTV[:,2] * 1.e6,
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     plt.title("Stishovite EoS (room temperature)")
     plt.show()
 
-    
+
     # Plot the 95% confidence and prediction bands for the bulk modulus
     cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model = fitted_eos,
                                                                      x_array = PTVs,
@@ -137,9 +137,9 @@ if __name__ == "__main__":
     plt.legend(loc="upper right")
     plt.title("Stishovite EoS; uncertainty in bulk modulus (room temperature)")
     plt.show()
-    
+
     print('2) Fitting to high pressure PTV data only\n')
-    
+
     # First, let's read in the PVT equation of state data for MgO from Dewaele et al., (2000).
     D2000_T, D2000_Terr, D2000_Pta, D2000_P, D2000_Perr, D2000_V, D2000_Verr = np.loadtxt('../burnman/data/input_fitting/PVT_MgO_Dewaele_et_al_2000.dat', unpack=True)
     D2000_P = D2000_P * 1.e9
@@ -150,14 +150,14 @@ if __name__ == "__main__":
 
     PTV_data = np.array([D2000_P, D2000_T, D2000_V]).T
     nul = 0.*PTV_data[:,0]
-    
+
     Pcov = np.power(D2000_Perr, 2.)
     Tcov = np.power(D2000_Terr, 2.)
     Vcov = np.power(D2000_Verr, 2.)
-    
+
     PTV_covariances = np.array([[Pcov, nul, nul], [nul, Tcov, nul], [nul, nul, Vcov]]).T
 
-    
+
     # Here's where we fit the data
     # We choose to fit to the SLB_2011 equation of state with four parameters (V_0, K_0, K'_0, grueneisen_0)
     per_opt = burnman.minerals.SLB_2011.periclase()
@@ -166,19 +166,19 @@ if __name__ == "__main__":
     fitted_eos = burnman.eos_fitting.fit_PTV_data(mineral = per_opt,
                                                   fit_params = params,
                                                   data = PTV_data,
-                                                  data_covariances = PTV_covariances, 
+                                                  data_covariances = PTV_covariances,
                                                   param_tolerance = param_tolerance,
                                                   verbose = False)
 
-    
+
     # We're done! That wasn't too painful, was it?!
 
-    
+
     # Print the optimized parameters
     print('Optimized equation of state:')
     burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print('')
-    
+
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     plt.show()
@@ -205,7 +205,7 @@ if __name__ == "__main__":
 
     temperatures = np.linspace(200., 1200., 101)
     plt.plot(temperatures, per_opt.evaluate(['molar_heat_capacity_p'], pressures, temperatures)[0], label='Optimised fit')
-    
+
     plt.legend(loc='lower right')
     plt.xlim(0., temperatures[-1])
     plt.xlabel('Temperature (K)')
@@ -217,14 +217,14 @@ if __name__ == "__main__":
           'constraints on all parameters. In this case, we would like to improve our constraints on '
           'grueneisen_0 and q_0.\n\n'
           'How should we improve on this "optimal" PVT fit?\n')
-    
+
 
     # 2) Now let's be a bit more exotic and fit enthalpy *and* PVT data together
 
     print('2) Fitting to PTV *and* PT-enthalpy data\n')
-    
+
     # Create the mineral instance that we'll optimise
-    per_opt = burnman.minerals.SLB_2011.periclase() 
+    per_opt = burnman.minerals.SLB_2011.periclase()
 
     # Let's use some low pressure volume data to supplement the high pressure data:
     H1976_data = np.loadtxt('../burnman/data/input_fitting/Hazen_1976_TV_periclase.dat')
@@ -240,20 +240,20 @@ if __name__ == "__main__":
                          np.concatenate([D2000_T, H1976_T]),
                          np.concatenate([D2000_V, H1976_V])]).T
     nul = 0.*PTV_data[:,0]
-    
+
     Pcov = np.power(np.concatenate([D2000_Perr, H1976_Perr]), 2.)
     Tcov = np.power(np.concatenate([D2000_Terr, H1976_Terr]), 2.)
     Vcov = np.power(np.concatenate([D2000_Verr, H1976_Verr]), 2.)
-    
+
     PTV_covariances = np.array([[Pcov, nul, nul], [nul, Tcov, nul], [nul, nul, Vcov]]).T
 
-    
+
     # Let's load some enthalpy data as extra constraints.
     # We'll use the data that we used in example_fit_data.py:
     TH_data = np.loadtxt('../burnman/data/input_fitting/Victor_Douglas_1963_deltaH_MgO.dat')
     per_opt.set_state(1.e5, 300.)
     per_opt.params['F_0'] = per_opt.params['F_0'] - per_opt.H # necessary to fit the enthalpy relative to 298.15
-    
+
     PTH_data = np.array([TH_data[:,0]*0. + 1.e5, TH_data[:,0], TH_data[:,2]*4.184]).T
     nul = TH_data[:,0]*0.
     PTH_covariances = np.array([[nul, nul, nul], [nul, TH_data[:,1], nul], [nul, nul, np.power(TH_data[:,2]*4.184*0.0004, 2.)]]).T
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     PTp_covariances = np.concatenate([PTH_covariances, PTV_covariances])
 
     V_mask = [i for i, flag in enumerate(flags) if flag == 'V']
-    
+
     # And now we can fit our data!
     fit_params = ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
     fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = per_opt,
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     print('')
 
 
-    
+
     # Create a corner plot of the covariances
     fig=burnman.nonlinear_fitting.corner_plot(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     plt.show()
@@ -306,7 +306,7 @@ if __name__ == "__main__":
 
     print('Hmmm, looks promising. The heat capacities don\'t blow up any more. '
           'Let\'s check the new weighted residuals...\n')
-    
+
     # Plot the new residuals
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -318,7 +318,7 @@ if __name__ == "__main__":
     ax.set_ylabel('Temperature (K)')
     plt.show()
 
-    
+
     # Create a plot of the residuals
     fig, ax = plt.subplots()
     burnman.nonlinear_fitting.plot_residuals(ax=ax,
@@ -353,7 +353,7 @@ if __name__ == "__main__":
     mask = [i for i in range(len(fitted_eos.weighted_residuals)) if i not in indices]
     flags = [flag for i, flag in enumerate(flags) if i not in indices]
     PTp_data = PTp_data[mask]
-    PTp_covariances = PTp_covariances[mask]  
+    PTp_covariances = PTp_covariances[mask]
     fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = per_opt,
                                                   flags = flags,
                                                   fit_params = fit_params,
@@ -390,21 +390,21 @@ if __name__ == "__main__":
                                              weighted_residuals=fitted_eos.weighted_residuals,
                                              flags=fitted_eos.flags)
     plt.show()
-    
+
     print('Hurrah! That looks much better! The patches of positive and negative weighted residuals '
           'in P-T space have completely disappeared, and the weighted residuals are now distributed '
           'more evenly about zero. The uncertainties on all the parameters have got much smaller, '
           'and several have moved outside the previous 1-s.d. uncertainty bounds. '
           'Cool, huh?! Let\'s finish this example by looking at some pretty plots '
           'characterising our optimised equation of state.')
-    
+
     # A plot of the volumes at 1 bar
     temperatures = np.linspace(1., 3000., 101)
     pressures = np.array([1.e5] * 101)
     plt.plot(temperatures, per_HP.evaluate(['V'], pressures, temperatures)[0]*1.e6, linestyle='--', label='HP')
     plt.plot(temperatures, per_SLB.evaluate(['V'], pressures, temperatures)[0]*1.e6, linestyle='--', label='SLB')
     plt.plot(temperatures, per_opt.evaluate(['V'], pressures, temperatures)[0]*1.e6, label='Optimised fit')
-    
+
     DS1997_data = np.loadtxt('../burnman/data/input_fitting/Dubrovinsky_Saxena_1997_TV_periclase.dat')
     plt.errorbar(DS1997_data[:,0], DS1997_data[:,1], yerr=DS1997_data[:,2], linestyle='None', label='Dubrovinsky and Saxena (1997)')
     plt.errorbar(H1976_T, H1976_V*1.e6, yerr=H1976_Verr*1.e6,
@@ -416,32 +416,32 @@ if __name__ == "__main__":
     plt.ylabel('Volume (cm^3/mol)')
     plt.title('Periclase volumes at 1 bar')
     plt.show()
-    
+
     # Here we plot our equation of state, along with the 95% confidence intervals for the volume
     temperature_sections = [298.15, 2000.]
     confidence_interval = 0.95
     flag_mask = [i for i, flag in enumerate(fitted_eos.flags) if flag=='V']
-    
+
     pressures = np.linspace(1.e5, 100.e9, 101)
     for T in temperature_sections:
         PTVs = np.array([pressures, [T]*len(pressures), per_opt.evaluate(['V'], pressures, [T]*len(pressures))[0]]).T
-        
-        # Plot confidence bands on the volumes 
+
+        # Plot confidence bands on the volumes
         cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                          x_array=PTVs,
                                                                          confidence_interval=confidence_interval,
                                                                          f=burnman.tools.attribute_function(per_opt, 'V'),
                                                                          flag='V')
-        
+
         plt.plot(PTVs[:,0] / 1.e9, (cp_bands[0] + cp_bands[1])/2.*1.e6, label='Optimised fit at {0:.0f} K'.format(T))
         plt.plot(PTVs[:,0] / 1.e9, (cp_bands[0])*1.e6, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
         plt.plot(PTVs[:,0] / 1.e9, (cp_bands[1])*1.e6, linestyle='--', color='r')
-        
+
         plt.errorbar(fitted_eos.data[:,0][flag_mask] / 1.e9, fitted_eos.data[:,2][flag_mask]*1.e6,
                      xerr=np.sqrt(fitted_eos.data_covariances.T[0][0][flag_mask]) / 1.e9,
                      yerr=np.sqrt(fitted_eos.data_covariances.T[2][2][flag_mask])*1.e6,
                      linestyle='None', marker='o', label='Data')
-        
+
     plt.plot(fitted_eos.data_mle[:,0][flag_mask] / 1.e9, fitted_eos.data_mle[:,2][flag_mask]*1.e6, marker='o', markersize=2, color='k', linestyle='None', label='Maximum likelihood estimates')
     plt.ylabel('Volume (cm^3/mol)')
     plt.xlabel('Pressure (GPa)')
@@ -455,22 +455,22 @@ if __name__ == "__main__":
                                        ('K_T', 1.e-9, 'Bulk modulus (GPa)'),
                                        ('alpha', 1., 'Thermal expansion (/K)'),
                                        (['alpha', 'K_T'], 1.e-6, 'Thermal pressure (MPa/K)')]
-    
+
     def closest_factors(n):
         d = np.int(np.floor(np.sqrt(n)))
         for i in reversed(range(1, d+1)):
             if (n % i) == 0:
                 return i, int(n/i)
-            
+
     fig = plt.figure()
     nj, ni = closest_factors(len(properties_for_confidence_plots))
     ax = [fig.add_subplot(ni, nj, i+1) for i in range(len(properties_for_confidence_plots))]
-    
+
     for T in temperature_sections:
         PTVs = np.array([pressures, [T]*len(pressures), per_opt.evaluate(['V'], pressures, [T]*len(pressures))[0]]).T
-        
+
         for i, (material_property, scaling, name) in enumerate(properties_for_confidence_plots):
-            
+
             # Plot the confidence bands for the various material properties
             cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                              x_array=PTVs,
@@ -480,14 +480,14 @@ if __name__ == "__main__":
             ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} K'.format(T))
             ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
             ax[i].plot(PTVs[:,0]/1.e9, (cp_bands[1])*scaling, linestyle='--', color='r')
-            
+
             ax[i].set_xlabel('Pressure (GPa)')
             ax[i].set_ylabel(name)
-            
+
     ax[i].legend(loc='upper right')
     plt.show()
 
-    
+
     # Finally, let's look at the effect of uncertainties in the equation of state on gibbs free energy at high pressure
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -495,7 +495,7 @@ if __name__ == "__main__":
         temperatures = pressures*0. + T
         PTVs = np.array([pressures, temperatures, per_opt.evaluate(['V'], pressures, temperatures)[0]]).T
         scaling = 1.e3
-        
+
         # Plot the confidence bands for the gibbs free energy
         cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                          x_array=PTVs,
@@ -503,10 +503,8 @@ if __name__ == "__main__":
                                                                          f=burnman.tools.attribute_function(per_opt, 'gibbs'),
                                                                          flag='V')
         ax.plot(PTVs[:,0]/1.e9, (cp_bands[0] - cp_bands[1])/2/scaling, label='95% confidence half width at {0:.0f} K'.format(T))
-          
-    ax.set_xlabel('Pressure (GPa)')  
+
+    ax.set_xlabel('Pressure (GPa)')
     ax.set_ylabel('Gibbs free energy uncertainty (kJ/mol)')
     ax.legend(loc='lower right')
     plt.show()
-
-    

@@ -38,7 +38,7 @@ class stishovite(Mineral):
             'grueneisen_0': 0.1389501259E+01,
             'q_0': 0.1332025550E+01,
             'molar_mass': formula_mass(formula)
-            } 
+            }
         Mineral.__init__(self)
 
 class perovskite(Mineral):
@@ -66,7 +66,7 @@ class perovskite(Mineral):
             'grueneisen_0': 0.1893754815E+01,
             'q_0': 0.1487809730E+01,
             'molar_mass': formula_mass(formula)
-            } 
+            }
         Mineral.__init__(self)
 
 class periclase(Mineral):
@@ -94,6 +94,5 @@ class periclase(Mineral):
             'grueneisen_0': 0.1412003694E+01,
             'q_0': 0.6317609916E+00,
             'molar_mass': formula_mass(formula)
-            } 
+            }
         Mineral.__init__(self)
-

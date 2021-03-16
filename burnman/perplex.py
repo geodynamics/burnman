@@ -19,22 +19,22 @@ from . import eos
 from .tools import copy_documentation
 
 def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temperatures, pressure_range=None, temperature_range=None):
-    '''  
-    This function uses PerpleX's werami software to output a table file containing the following material properties.            
-    2 - Density (kg/m3)                           
-    4 - Expansivity (1/K, for volume)                               
-    5 - Compressibility (1/bar, for volume)                     
-    10 - Adiabatic bulk modulus (bar)                                
-    11 - Adiabatic shear modulus (bar)                               
-    12 - Sound velocity (km/s)                                       
-    13 - P-wave velocity (Vp, km/s)                                  
-    14 - S-wave velocity (Vs, km/s)                               
-    17 - Entropy (J/K/kg)                                            
-    18 - Enthalpy (J/kg)                                             
-    19 - Heat Capacity (J/K/kg)                              
-    22 - Molar Volume (J/bar)        
     '''
-    
+    This function uses PerpleX's werami software to output a table file containing the following material properties.
+    2 - Density (kg/m3)
+    4 - Expansivity (1/K, for volume)
+    5 - Compressibility (1/bar, for volume)
+    10 - Adiabatic bulk modulus (bar)
+    11 - Adiabatic shear modulus (bar)
+    12 - Sound velocity (km/s)
+    13 - P-wave velocity (Vp, km/s)
+    14 - S-wave velocity (Vs, km/s)
+    17 - Entropy (J/K/kg)
+    18 - Enthalpy (J/kg)
+    19 - Heat Capacity (J/K/kg)
+    22 - Molar Volume (J/bar)
+    '''
+
     print('Working on creating {0}x{1} P-T table file using werami. Please wait.\n'.format(n_pressures, n_temperatures))
 
     try:
@@ -43,7 +43,7 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
     except:
         print('Keeping P-T range the same as the original project range.\n')
         str2 = 'n\n'
-    
+
     stdin='{0:s}\n2\n' \
         '2\nn\n' \
         '4\nn\n' \
@@ -61,7 +61,7 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
         '{1:s}' \
         '{2:d} {3:d}\n' \
         '0'.format(project_name, str2, n_pressures, n_temperatures)
-    
+
 
     p = Popen(werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
     stdout = p.communicate(input=stdin)[0]
@@ -75,9 +75,9 @@ class PerplexMaterial(Material):
     """
     This is the base class for a PerpleX material. States of the material
     can only be queried after setting the pressure and temperature
-    using set_state(). 
+    using set_state().
 
-    Instances of this class are initialised with 
+    Instances of this class are initialised with
     a 2D PerpleX tab file. This file should be in the standard format
     (as output by werami), and should have columns with the following names:
     'rho,kg/m3', 'alpha,1/K', 'beta,1/bar', 'Ks,bar', 'Gs,bar', 'v0,km/s',
@@ -85,7 +85,7 @@ class PerplexMaterial(Material):
     The order of these names is not important.
 
     Properties of the material are determined by linear interpolation from
-    the PerpleX grid. They are all returned in SI units on a molar basis, 
+    the PerpleX grid. They are all returned in SI units on a molar basis,
     even though the PerpleX tab file is not in these units.
 
     This class is available as ``burnman.PerplexMaterial``.
@@ -117,7 +117,7 @@ class PerplexMaterial(Material):
         else:
             raise Exception('This file does not have a recognised PerpleX structure.\n'
                             'Are the independent variables P(bar) and T(K)?')
-        
+
         Pmin = Pmin*1.e5 # bar to Pa
         Pint = Pint*1.e5 # bar to Pa
         Pmax = Pmin + Pint*(nP-1.)
@@ -126,15 +126,15 @@ class PerplexMaterial(Material):
         temperatures = np.linspace(Tmin, Tmax, nT)
         n_properties = int(lines[11][0])
         property_list = lines[12]
-        
+
         # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
         table = np.array([[float(string) for string in line] for line in lines[13:13+nP*nT]])
-        
+
         if lines[3][0] == 'P(bar)':
             property_table = np.swapaxes(table.reshape(nT, nP, n_properties), 0, 1)
         else:
             property_table = table.reshape(nP, nT, n_properties)
-            
+
         ordered_property_list = ['rho,kg/m3',
                                  'alpha,1/K',
                                  'beta,1/bar',
@@ -159,8 +159,8 @@ class PerplexMaterial(Material):
                                       (x[np.isnan(a)], y[np.isnan(a)]))
 
             properties[ordered_property_list[i]] = a
-            
-            
+
+
         densities = properties['rho,kg/m3']
         volumes = 1.e-5 * properties['V,J/bar/mol']
         molar_masses = densities*volumes
@@ -180,10 +180,10 @@ class PerplexMaterial(Material):
 
         bounds = [[Pmin, Pmax], [Tmin, Tmax]]
         return property_interpolators, molar_mass, bounds
-    
+
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
-        
+
         if not np.logical_and(np.all(self.bounds[0][0] <= pressure),
                               np.all(pressure <= self.bounds[0][1])):
             raise ValueError("The set_state pressure ({0:.4f}) is outside the bounds of this rock ({1:.4f}-{2:.4f} GPa)".format(pressure,
@@ -195,7 +195,7 @@ class PerplexMaterial(Material):
                                                                                                                                  self.bounds[1][0],
                                                                                                                                  self.bounds[1][1]))
         Material.set_state(self, pressure, temperature)
-        
+
     """
     Properties by linear interpolation of Perple_X output
     """
@@ -209,7 +209,7 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.molar_enthalpy)
     def molar_enthalpy(self):
         return self._property_interpolators['H'](self.pressure, self.temperature)[0]
-    
+
     @material_property
     @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
@@ -219,17 +219,17 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
         return self._property_interpolators['K_T'](self.pressure, self.temperature)[0]
-    
+
     @material_property
     @copy_documentation(Material.adiabatic_bulk_modulus)
     def adiabatic_bulk_modulus(self):
         return self._property_interpolators['K_S'](self.pressure, self.temperature)[0]
-        
+
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
         return self._property_interpolators['C_p'](self.pressure, self.temperature)[0]
-    
+
     @material_property
     @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
@@ -239,7 +239,7 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
         return self._property_interpolators['G_S'](self.pressure, self.temperature)[0]
-    
+
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
@@ -299,7 +299,7 @@ class PerplexMaterial(Material):
     @copy_documentation(Material.adiabatic_compressibility)
     def adiabatic_compressibility(self):
         return 1. / self.adiabatic_bulk_modulus
-    
+
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
     def molar_heat_capacity_v(self):
@@ -314,4 +314,3 @@ class PerplexMaterial(Material):
                  self.molar_volume *
                  self.adiabatic_bulk_modulus /
                  self.molar_heat_capacity_p )
-    

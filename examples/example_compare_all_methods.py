@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(12, 10))
     ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
-    
+
     for m in range(len(methods)):
         rock.set_method(methods[m])
         temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
     for i in range(4):
         ax[0].set_xlabel('Pressure (GPa)')
-    
+
     ax[0].set_ylabel('Vs (km/s)')
     ax[1].set_ylabel('Vphi (km/s)')
     ax[2].set_ylabel('Density ($\cdot 10^3$ kg/m^3)')
