@@ -31,7 +31,11 @@ Authors (as of 2015, listed alphabetically by first name):
 
 * Python 3.6+
 * Python modules:
-  NumPy, SciPy, SymPy, Matplotlib, pycddlib
+  NumPy, SciPy, SymPy, Matplotlib
+  
+## Optional, needed for some functionality
+
+* pycddlib
 
 
 ## Install under Ubuntu
