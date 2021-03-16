@@ -239,7 +239,7 @@ if __name__ == "__main__":
     # We can also look at the uncertainty in other properties
     # For example, let's look at the uncertainty in P wave velocities, bulk modulus, thermal expansion and thermal pressure
     def closest_factors(n):
-        d = np.int(np.floor(np.sqrt(n)))
+        d = int(np.floor(np.sqrt(n)))
         for i in reversed(range(1, d+1)):
             if (n % i) == 0:
                 return i, int(n/i)
