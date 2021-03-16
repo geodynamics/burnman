@@ -98,7 +98,7 @@ class BM4(eos.EquationOfState):
         Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.
-    
+
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
@@ -114,22 +114,22 @@ class BM4(eos.EquationOfState):
                      params['Kprime_prime_0'] +
                      params['Kprime_0'] *
                      (params['Kprime_0'] - 7.)) + 143./24.
-        
+
         intPdV = (-9./2. * params['V_0'] * params['K_0'] *
                   ((xi1 + 1.)*(x4/4. - x2/2. + 1./4.) -
                    xi1*(x6/6. - x4/4. + 1./12.) +
                    xi2*(x8/8 - x6/2 + 3.*x4/4. - x2/2. + 1./8.)))
-        
+
         return - intPdV + params['E_0']
-    
+
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         # G = int VdP = [PV] - int PdV = E + PV
-                  
+
         return self.molar_internal_energy(pressure, temperature, volume, params) + volume*pressure
-    
+
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`

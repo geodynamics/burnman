@@ -9,7 +9,7 @@ import os.path
 import sys
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
-    
+
 from burnman.perplex import create_perplex_table
 
 parser = argparse.ArgumentParser(description='Call werami to create a burnman-readable tab file.')
@@ -36,4 +36,3 @@ if not hasattr(args, 'temperature_range'):
     args.temperature_range = None
 
 create_perplex_table(args.werami_path, args.project[0], args.outfile[0], args.n_pressures[0], args.n_temperatures[0], args.pressure_range, args.temperature_range)
-

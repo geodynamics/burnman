@@ -26,7 +26,7 @@ if True:
             g.set_state(10.e9+x, 1500.)
             x += g.activities
         print(x)
-    
+
     test_set_state(1)
     if False:
         import cProfile,pstats,StringIO

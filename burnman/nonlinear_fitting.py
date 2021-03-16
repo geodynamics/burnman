@@ -25,7 +25,7 @@ def nonlinear_least_squares_fit(model,
     Function to compute the "best-fit" parameters for a model
     by nonlinear least squares fitting.
 
-    The nonlinear least squares algorithm closely follows the logic in 
+    The nonlinear least squares algorithm closely follows the logic in
     Section 23.1 of Bayesian Probability Theory
     (von der Linden et al., 2014; Cambridge University Press).
 
@@ -33,8 +33,8 @@ def nonlinear_least_squares_fit(model,
     ----------
     model : class instance
         Must have the following attributes:
-            data : 2D numpy array. 
-                Elements of x[i][j] contain the observed position of 
+            data : 2D numpy array.
+                Elements of x[i][j] contain the observed position of
                 data point i
 
             data_covariances : 3D numpy array
@@ -42,8 +42,8 @@ def nonlinear_least_squares_fit(model,
                 of data point i
 
             mle_tolerances : numpy array
-                The iterations to find the maximum likelihood estimator 
-                for each observed data point will stop when mle_tolerances[i] <  
+                The iterations to find the maximum likelihood estimator
+                for each observed data point will stop when mle_tolerances[i] <
                 np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
 
             delta_params : numpy array
@@ -60,15 +60,15 @@ def nonlinear_least_squares_fit(model,
                 Returns value of model function evaluated at x
 
             normal(self, x):
-                Returns value of normal to the model function 
+                Returns value of normal to the model function
                 evaluated at x
 
     lm_damping : float (optional, default: 0)
         Levenberg-Marquardt parameter for least squares minimization
 
     param_tolerance : float (optional, default: 1.e-5)
-        Levenberg-Marquardt iterations are terminated when 
-        the maximum fractional change in any of the parameters 
+        Levenberg-Marquardt iterations are terminated when
+        the maximum fractional change in any of the parameters
         during an iteration drops below this value
 
     max_lm_iterations : integer (optional, default: 100)
@@ -76,14 +76,14 @@ def nonlinear_least_squares_fit(model,
 
     verbose : bool
         Print some information to standard output
-        
+
 
     Attributes added to model
     ----------
     n_dof : integer
         Degrees of freedom of the system
     data_mle : 2D numpy array
-        Maximum likelihood estimates of the observed data points 
+        Maximum likelihood estimates of the observed data points
         on the best-fit curve
     jacobian : 2D numpy array
         d(weighted_residuals)/d(parameter)
@@ -102,14 +102,14 @@ def nonlinear_least_squares_fit(model,
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
-    
+
     def _mle_estimate(x, x_m, cov, flag):
         n = model.normal(x_m, flag)
         var_n = abs_line_project(cov, n)
         d = (x_m - x).dot(n)
         x_mle = x + d*((n.dot(cov)).T)/var_n
         return x_mle, d, var_n
-    
+
     def _find_mle():
         x_mle_arr = np.empty_like(model.data)
         residual_arr = np.empty(n_data)
@@ -118,7 +118,7 @@ def nonlinear_least_squares_fit(model,
             x_mle_arr[i] = model.function(x, flag)
             x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
             delta_x = x_mle_arr[i] - x
-        
+
             while np.linalg.norm(delta_x) > model.mle_tolerances[i]:
                 x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
                 x_mle_arr[i] = model.function(x_mle_est, flag)
@@ -137,7 +137,7 @@ def nonlinear_least_squares_fit(model,
 
             model.set_params(param_values + diag_delta[prm_i])
             x_mle_arr, residual_arr_1, weights_1 = _find_mle()
-            
+
             model.jacobian[:,prm_i] = (residual_arr_1 - residual_arr_0)/(2.*diag_delta[prm_i][prm_i])
         model.set_params(param_values) # reset params
 
@@ -154,14 +154,14 @@ def nonlinear_least_squares_fit(model,
         f_delta_beta = delta_beta/new_params
 
         model.set_params(new_params)
-        
+
         return f_delta_beta
 
     n_data = len(model.data)
     n_params = len(model.get_params())
     n_dimensions = len(model.data[:,0])
     model.dof = n_data - n_params
-    
+
     if not hasattr(model, 'flags'):
         model.flags = [None] * n_data
 
@@ -172,18 +172,18 @@ def nonlinear_least_squares_fit(model,
             print('Iteration {0:d}: {1}. Max change in param: {2}'.format(n_it, model.get_params(), max_f))
         if max_f < param_tolerance:
             break
-        
+
     J = model.jacobian
     r = model.weighted_residuals
     model.WSS = r.dot(r.T)
-        
+
     model.popt = model.get_params()
     model.pcov = np.linalg.inv(J.T.dot(J))*r.dot(r.T)/model.dof
-    
+
     # Estimate the noise variance normal to the curve
     model.goodness_of_fit = model.WSS/model.dof
     model.noise_variance = r.dot(np.diag(1./model.weights)).dot(r.T)/model.dof
-    
+
     if verbose == True:
         if n_it == max_lm_iterations - 1:
             print('Max iterations ({0:d}) reached (param tolerance = {1:1e})'.format(max_lm_iterations, param_tolerance))
@@ -194,17 +194,17 @@ def nonlinear_least_squares_fit(model,
         print('\nParameter covariance matrix:')
         print(model.pcov)
         print('')
-        
-    
+
+
 def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=None):
     """
     This function calculates the confidence and prediction bands of the function f(x)
-    from a best-fit model with uncertainties in its parameters as calculated (for example) 
+    from a best-fit model with uncertainties in its parameters as calculated (for example)
     by the function nonlinear_least_squares_fit().
 
-    The values are calculated via the delta method, which estimates the variance of f 
+    The values are calculated via the delta method, which estimates the variance of f
     evaluated at x as var(f(x)) = df(x)/dB var(B) df(x)/dB
-    where df(x)/dB is the vector of partial derivatives of f(x) with respect to B 
+    where df(x)/dB is the vector of partial derivatives of f(x) with respect to B
 
 
     Parameters
@@ -220,16 +220,16 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
         coordinates at which to evaluate the bounds
 
     confidence_interval : float
-        Probability level of finding the true model (confidence bound) or any new 
-        data point (probability bound). For example, the 95% confidence bounds 
+        Probability level of finding the true model (confidence bound) or any new
+        data point (probability bound). For example, the 95% confidence bounds
         should be calculated using a confidence interval of 0.95.
 
     f : function
-        This is the function defining the variable y=f(x) for which the 
+        This is the function defining the variable y=f(x) for which the
         confidence and prediction bounds are desired
 
     flag : variable type
-        This (optional) flag is passed to model.function to control how the 
+        This (optional) flag is passed to model.function to control how the
         modified position of x is calculated. This value is then used by f(x)
 
     Output
@@ -238,20 +238,20 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
         An element of bounds[i][j] gives the lower and upper confidence (i=0, i=1) and
         prediction (i=2, i=3) bounds for the jth data point.
     """
-    
+
     # Check array dimensions
     n_dimensions = len(model.data[0])
     if len(x_array[0]) != n_dimensions:
         raise Exception('Dimensions of each point must be the same as the total number of dimensions')
 
-        
+
     param_values = model.get_params()
     x_m_0s = np.empty_like(x_array)
     f_m_0s = np.empty_like(x_array[:,0])
     for i, x in enumerate(x_array):
         x_m_0s[i] = model.function(x, flag)
         f_m_0s[i] = f(x)
-            
+
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])
 
@@ -263,21 +263,21 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
             dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j])/diag_delta[i][i]
 
     model.set_params(param_values) # reset params
-    
+
     variance = np.empty(len(x_array))
     for i, Gprime in enumerate(dxdbeta.T):
         variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
 
     critical_value = t.isf(0.5*(confidence_interval + 1.), model.dof)
-        
+
     confidence_half_widths = critical_value*np.sqrt(variance)
     prediction_half_widths = critical_value*np.sqrt(variance + model.noise_variance)
-        
+
     confidence_bound_0 = f_m_0s - confidence_half_widths
     confidence_bound_1 = f_m_0s + confidence_half_widths
     prediction_bound_0 = f_m_0s - prediction_half_widths
     prediction_bound_1 = f_m_0s + prediction_half_widths
-    
+
 
     return np.array([confidence_bound_0, confidence_bound_1,
                      prediction_bound_0, prediction_bound_1])
@@ -289,7 +289,7 @@ def abs_line_project(M, n):
 def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
     """
     Plots an `nstd` sigma error ellipse based on the specified covariance
-    matrix (`cov`). Additional keyword arguments are passed on to the 
+    matrix (`cov`). Additional keyword arguments are passed on to the
     ellipse patch artist.
 
     Parameters
@@ -299,7 +299,7 @@ def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
             sequence of [x0, y0].
         nstd : The radius of the ellipse in numbers of standard deviations.
             Defaults to 2 standard deviations.
-        ax : The axis that the ellipse will be plotted on. Defaults to the 
+        ax : The axis that the ellipse will be plotted on. Defaults to the
             current axis.
         Additional keyword arguments are pass on to the ellipse patch.
 
@@ -314,7 +314,7 @@ def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
 
     if ax is None:
         ax = plt.gca()
-        
+
     vals, vecs = eigsorted(cov)
     theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
 
@@ -332,7 +332,7 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
 
     Parameters
     ----------
-    
+
     popt : numpy array
         Optimized parameters
 
@@ -349,10 +349,10 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
     -------
     fig : matplotlib.pyplot.figure object
 
-    ax_array : list of matplotlib Axes objects 
+    ax_array : list of matplotlib Axes objects
 
     """
-    
+
     if len(pcov[0]) != len(pcov[:,0]):
         raise Exception('Covariance matrices must be square')
 
@@ -360,7 +360,7 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
     if n_params < 2:
         raise Exception('Covariance matrix must be at least 2x2 for a corner plot to be plotted')
 
-    
+
     # ellipse plotting is prone to rounding errors, so we scale the plots here
     scaling = 1./np.power(10., np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
@@ -370,7 +370,7 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
     for i in range(n_params-1):
         for j in range(1, i+1):
             fig.delaxes(ax_array[j-1][i])
-                        
+
         for j in range(i+1, n_params):
             indices = np.array([i, j])
             projected_cov = (pcov*scaling)[indices[:, None], indices]
@@ -388,29 +388,29 @@ def corner_plot(popt, pcov, param_names=[], n_std = 1.):
     if param_names != []:
         for i in range(n_params-1):
             ax_array[n_params-2][i].set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
-            
+
         for j in range(1, n_params):
             ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
-            
+
     return fig, ax_array
 
 
 def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu, plot_axes=[0, 1], scale_axes=[1., 1.]):
     """
-    Creates a plot of the weighted residuals 
+    Creates a plot of the weighted residuals
     The user can choose the projection axes, and scaling to apply to those axes
     The chosen color palette (cmap) is discretised by standard deviation up to a cut off value
     of sd_limit.
 
     Parameters
     ----------
-    
+
     ax : matplotlib Axes object
 
     model : user-defined object
         A model as used by nonlinear_least_squares_fit
-        Must contain the attributes model.data, 
-        model.weighted_residuals and 
+        Must contain the attributes model.data,
+        model.weighted_residuals and
         model.flags (if flag is not None).
 
     flag : string
@@ -418,7 +418,7 @@ def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu,
         Finds matches with model.flags.
 
     sd_limit : float
-        Data with weighted residuals exceeding this 
+        Data with weighted residuals exceeding this
         limit are plotted in black
 
     cmap : matplotlib color palette
@@ -443,7 +443,7 @@ def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu,
     cmap.set_over('k')
     bounds = np.linspace(-sd_limit, sd_limit, sd_limit*2+1)
     norm = colors.BoundaryNorm(bounds, cmap.N)
-    
+
     im = ax.scatter(model.data[:,plot_axes[0]][mask]*scale_axes[0], model.data[:,plot_axes[1]][mask]*scale_axes[1], c=model.weighted_residuals[mask], cmap=cmap, norm=norm, s=50)
     plt.colorbar(im, ax=ax, label='Misfit (standard deviations)')
 
@@ -451,13 +451,13 @@ def weighted_residual_plot(ax, model, flag=None, sd_limit=3, cmap=plt.cm.RdYlBu,
 
 def extreme_values(weighted_residuals, confidence_interval):
     '''
-    This function uses extreme value theory to calculate the number of 
+    This function uses extreme value theory to calculate the number of
     standard deviations away from the mean at which we should expect to bracket
-    *all* of our n data points at a certain confidence level. 
-    
-    It then uses that value to identify which (if any) of the data points 
-    lie outside that region, and calculates the corresponding probabilities 
-    of finding a data point at least that many standard deviations away.  
+    *all* of our n data points at a certain confidence level.
+
+    It then uses that value to identify which (if any) of the data points
+    lie outside that region, and calculates the corresponding probabilities
+    of finding a data point at least that many standard deviations away.
 
 
     Parameters
@@ -468,17 +468,17 @@ def extreme_values(weighted_residuals, confidence_interval):
         variances wr_i = r_i/sqrt(var_i)
 
     confidence_interval : float
-        Probability at which all the weighted residuals lie 
+        Probability at which all the weighted residuals lie
         within the confidence bounds
 
     Returns
     -------
     confidence_bound : float
-        Number of standard deviations at which we should expect to encompass all 
+        Number of standard deviations at which we should expect to encompass all
         data at the user-defined confidence interval.
 
     indices : array of floats
-        Indices of weighted residuals exceeding the confidence_interval 
+        Indices of weighted residuals exceeding the confidence_interval
         defined by the user
 
     probabilities : array of floats
@@ -500,7 +500,7 @@ def extreme_values(weighted_residuals, confidence_interval):
 
     indices = [i for i, r in enumerate(weighted_residuals) if np.abs(r) > confidence_bound]
     probabilities = 1. - np.power(genextreme.sf(np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.) # Convert back to 2-tailed probabilities
-    
+
     return confidence_bound, indices, probabilities
 
 
@@ -512,7 +512,7 @@ def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
     else:
         list_flags = list(set(flags))
 
-    
+
     if n_bins is None:
         try: # Only works for recent versions of numpy
             bin_heights, bin_bounds = np.histogram(weighted_residuals,
@@ -521,7 +521,7 @@ def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
             n_bins = len(bin_heights)
         except:
             n_bins = 11.
-            
+
     mask = [ i for i, f in enumerate(flags) ]
     for flag in list_flags:
         binwidth = np.ptp(weighted_residuals)/n_bins
@@ -541,7 +541,7 @@ def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
 
         x = np.linspace(bin_bounds[0], bin_bounds[-1], 1001)
         ax.plot(x, norm.pdf(x)*normalisation)
-        
+
     ax.set_title('Residual plot versus expected normal distribution')
     ax.set_xlabel('Number of standard deviations from the mean')
     ax.set_ylabel('Probability')

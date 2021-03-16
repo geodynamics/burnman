@@ -60,7 +60,7 @@ for i, P in enumerate(pressures):
 fig1 = mpimg.imread('../../burnman/data/input_figures/AA1994_liq_iron_PTrho_reference_isentrope.png')
 
 plt.imshow(fig1, extent=[0.0, 500., 6., 15.], aspect='auto')
-plt.plot(pressures/1.e9, rhos/1.e3, marker='o', linestyle='None') 
+plt.plot(pressures/1.e9, rhos/1.e3, marker='o', linestyle='None')
 plt.title('1811 K isentrope; AA1994 Figure B1 (1/2)')
 plt.xlabel('Pressure (GPa)')
 plt.ylabel('Density (kg/m^3)')

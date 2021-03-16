@@ -50,7 +50,7 @@ for phase in phases[1:-1]:
         nMg = phase.params['formula']['Mg']
     except:
         nMg = 0.
-        
+
     sum_cations = nSi+nMg
     fSi=nSi/sum_cations
 
@@ -74,9 +74,9 @@ ax_H = fig.add_subplot(1,3,1)
 ax_S = fig.add_subplot(1,3,2)
 ax_V = fig.add_subplot(1,3,3)
 
-ax_H.set_title('Excess Enthalpy') 
+ax_H.set_title('Excess Enthalpy')
 ax_S.set_title('Excess Entropy')
-ax_V.set_title('Excess Volume') 
+ax_V.set_title('Excess Volume')
 
 figH = mpimg.imread('figures/MgO-SiO2_enthalpy_mixing.png')
 figS = mpimg.imread('figures/MgO-SiO2_entropy_mixing.png')
@@ -94,11 +94,9 @@ for (pressure, temperature) in zip(*[pressures, temperatures]):
 
 plt.legend(loc='lower right')
 plt.show()
-    
+
 print('Excess properties of mixing at a 1:1 Mg:Si composition:\n')
 mask = [i for i in range(len(excesses[:,2])) if np.abs(excesses[i][2] - 0.5) < 1.e-12]
 print('P (GPa)   T (K)   H (J/mol)   S (J/K/mol)   V (cm^3/mol)')
 for excess in excesses[mask]:
     print('{0:.0f} {1:.0f} {2:.1e} {3:.1e} {4:.1e}'.format(excess[0]/1.e9, excess[1], excess[3], excess[4], excess[5]))
-
-

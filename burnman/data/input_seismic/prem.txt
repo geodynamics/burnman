@@ -1,5 +1,5 @@
 # PREM (Dziewonski and Anderson, 1981) and QL6 (Durek and Ekstrom, 1996)  (without an ocean)
-#Depth(m)	Radius(m)	Pressure(Pa)	Density(g/m^3)	Vp(m/s)		Vs(m/s)  	Qk  	   	Qmu   
+#Depth(m)	Radius(m)	Pressure(Pa)	Density(g/m^3)	Vp(m/s)		Vs(m/s)  	Qk  	   	Qmu
 0.000000e+00	6.371000e+06	0.000000e+00	2.600000e+03	5.800000e+03	3.200000e+03	1.000000e+05	3.000000e+02
 3.000000e+03	6.368000e+06	2.990000e+07	2.600000e+03	5.800000e+03	3.200000e+03	1.000000e+05	3.000000e+02
 3.000000e+03	6.368000e+06	3.030000e+07	2.600000e+03	5.800000e+03	3.200000e+03	1.000000e+05	3.000000e+02

@@ -13,10 +13,10 @@ from ..constants import gas_constant
 class AA(eos.EquationOfState):
     """
     Class for the :math`E-V-S` liquid metal EOS detailed in :cite:`AA1994`.
-    Internal energy (:math:`E`) is first calculated 
+    Internal energy (:math:`E`) is first calculated
     along a reference isentrope using a fourth order BM EoS
-    (:math:`V_0`, :math:`KS`, :math:`KS'`, :math:`KS''`), 
-    which gives volume as a function of pressure, 
+    (:math:`V_0`, :math:`KS`, :math:`KS'`, :math:`KS''`),
+    which gives volume as a function of pressure,
     coupled with the thermodynamic identity:
 
     :math:`-\partial E/ \partial V |_S = P`.
@@ -28,10 +28,10 @@ class AA(eos.EquationOfState):
     which gives:
 
     :math:`T_S/T_0 = \exp(\int( \gamma/\\rho ) d \\rho)`
-    
-    The thermal effect on internal energy is calculated at constant volume 
-    using expressions for the kinetic, electronic and potential contributions 
-    to the volumetric heat capacity, which can then be integrated with respect 
+
+    The thermal effect on internal energy is calculated at constant volume
+    using expressions for the kinetic, electronic and potential contributions
+    to the volumetric heat capacity, which can then be integrated with respect
     to temperature:
 
     :math:`\partial E/\partial T |_V = C_V`
@@ -39,14 +39,14 @@ class AA(eos.EquationOfState):
     :math:`\partial E/\partial S |_V = T`
 
     We note that :cite:`AA1994` also include a detailed description
-    of the Gruneisen parameter as a function of volume and energy (Equation 15), 
-    and use this to determine the temperature along the principal isentrope 
-    (Equations B1-B10) and the thermal pressure away from that isentrope 
-    (Equation 23). However, this expression is inconsistent with 
-    the equation of state away from the principal isentrope. Here we choose 
+    of the Gruneisen parameter as a function of volume and energy (Equation 15),
+    and use this to determine the temperature along the principal isentrope
+    (Equations B1-B10) and the thermal pressure away from that isentrope
+    (Equation 23). However, this expression is inconsistent with
+    the equation of state away from the principal isentrope. Here we choose
     to calculate the thermal pressure and Grueneisen parameter thus:
 
-    1) As energy and entropy are defined by the equation of state at any 
+    1) As energy and entropy are defined by the equation of state at any
     temperature and volume, pressure can be found by via the expression:
 
     :math:`\partial E/\partial V |_S = P`
@@ -54,8 +54,8 @@ class AA(eos.EquationOfState):
     2) The Grueneisen parameter can now be determined as
     :math:`\gamma = V \partial P/\partial E |_V`
 
-    To reiterate: away from the reference isentrope, the Grueneisen parameter 
-    calculated using these expressions is *not* equal to the 
+    To reiterate: away from the reference isentrope, the Grueneisen parameter
+    calculated using these expressions is *not* equal to the
     (thermodynamically inconsistent) analytical expression given by :cite:`AA1994`.
 
     A final note: the expression for :math:`\Lambda` (Equation 17).
@@ -69,7 +69,7 @@ class AA(eos.EquationOfState):
         Electronic heat capacity functions
         """
         Vfrac = V/params['V_0']
-        
+
         A = params['a'][0] + params['a'][1]*Vfrac # A2
         B = params['b'][0] + params['b'][1]*Vfrac*Vfrac # A3
         Theta = params['Theta'][0]*np.power(Vfrac, -params['Theta'][1]) # A4
@@ -87,7 +87,7 @@ class AA(eos.EquationOfState):
         lmda = (F*(params['lmda'][0] + params['lmda'][1]*rhofrac + params['lmda'][2]*np.power(rhofrac, 0.4))) # this incorrect expression for lmda seems to provide a very close fit to figure 5
 
         return lmda, xi
-    
+
     def _rhofracxksis(self, V, params):
         """
         Functions for the fourth order Birch-Murnaghan equation of state
@@ -98,22 +98,22 @@ class AA(eos.EquationOfState):
         ksi2 = 0.375*(params['K_S']*params['Kprime_prime_S'] +
                       params['Kprime_S']*(params['Kprime_S'] - 7.)) + 143./24. # equation 20
         return rhofrac, x, ksi1, ksi2
-    
+
 
     def _isentropic_temperature(self, V, params):
         """
         Temperature along the reference isentrope
         """
-        
+
         rhofrac, x, ksi1, ksi2 = self._rhofracxksis(V, params)
-        
+
         # equation B6 -- B10
         a1 = ksi2 / 8.
         a2 = ( ksi1 + 3. * ksi2 ) / 6.
         a3 = ( 1. + 2.*ksi1 + 3.*ksi2 ) / 4.
         a4 = (1. + ksi1 + ksi2)/2.
         a5 = (6. + 4.*ksi1 + 3.*ksi2)/24.
-    
+
         # equation B5
         Ts = params['T_0']*np.exp(params['grueneisen_0']*np.log(rhofrac)
                                 + 13.5*params['grueneisen_prime']*params['V_0']*params['K_S'] *
@@ -122,7 +122,7 @@ class AA(eos.EquationOfState):
                                 + (a3/(3*params['grueneisen_n'] + 4.))*(np.power(x,(3*params['grueneisen_n'] + 4.)) - 1.)
                                 - (a4/(3*params['grueneisen_n'] + 2.))*(np.power(x,(3*params['grueneisen_n'] + 2.)) - 1.)
                                 + (a5/(3*params['grueneisen_n'] + 0.))*(np.power(x,(3*params['grueneisen_n'] + 0.)) - 1.)))
-                                
+
         return Ts
 
 
@@ -136,11 +136,11 @@ class AA(eos.EquationOfState):
         x3 = x*x*x
         x5 = x3*x2
         x7 = x5*x2
-    
+
         Ps = ( 1.5*params['K_S'] * (x7 - x5) *
                (1. + ksi1 - ksi1*x2 +
                 ksi2 * (x2 - 1.) * (x2 - 1.)) ) # Eq. 17
-    
+
         return Ps
 
     def _isentropic_energy_change(self, V, params):
@@ -152,7 +152,7 @@ class AA(eos.EquationOfState):
         x4 = x2*x2
         x6 = x4*x2
         x8 = x4*x4
-        
+
         E_S = 4.5*params['V_0']*params['K_S'] * ((ksi1 + 1.) * (x4/4. - x2/2. + 1./4.) -
                                                  ksi1*(x6/6. - x4/4. + 1./12.) +
                                                  ksi2*(x8/8. - x6/2. + 3.*x4/4. - x2/2. + 1./8.)) # Eq. 21
@@ -160,18 +160,18 @@ class AA(eos.EquationOfState):
 
     def _isochoric_energy_change(self, Ts, T, V, params):
         """
-        int Cv dT 
+        int Cv dT
         """
         A, B, Theta = self._ABTheta(V, params)
         lmda, xi = self._lambdaxi(V, params)
-        
+
         E_kin = 1.5*params['n']*gas_constant*(T - Ts)
         E_el = A*(T - Ts - Theta*(np.arctan(T/Theta) - np.arctan(Ts/Theta))) + 5./8*B*(np.power(T, 1.6) - np.power(Ts, 1.6)) # A5
         E_pot = (lmda*(T - Ts) + params['theta']*(xi - lmda)*np.log((params['theta'] + T)/(params['theta'] + Ts))) # A19
 
         return E_kin + E_el + E_pot
 
-    
+
     def volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
@@ -194,18 +194,18 @@ class AA(eos.EquationOfState):
 
         _volume = lambda V, P, T, params: ( P -
                                             self.pressure(T, V, params) )
-        
+
         return brentq(_volume, params['V_0']*0.1, params['V_0']*2., args=(pressure, temperature, params))
 
     def pressure( self, temperature, volume, params):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
         """
-        
+
         '''
         Ts = self._isentropic_temperature(volume, params)
-        
-        
+
+
         dE = self._isochoric_energy_change(Ts, temperature, volume, params)
         E1 = self._isentropic_energy_change(volume, params) - params['E_0']
         E2 = E1 + dE
@@ -223,7 +223,7 @@ class AA(eos.EquationOfState):
         S = self.entropy(0., temperature, volume, params)
 
         delta_S = lambda T, S, V: S - self.entropy(0., T, V, params)
-        
+
         T0 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume - 0.5*dV))
         T1 = brentq(delta_S, temperature*0.97, temperature*1.03, args=(S, volume + 0.5*dV))
 
@@ -231,14 +231,14 @@ class AA(eos.EquationOfState):
         E1 = self.molar_internal_energy(0., T1, volume + 0.5*dV, params)
 
         P = -(E1 - E0)/dV # |S
-        
+
         return P
 
-        
+
 
     def grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Returns grueneisen parameter :math:`[unitless]` 
+        Returns grueneisen parameter :math:`[unitless]`
         """
         '''
         gr = (params['grueneisen_0'] +
@@ -253,12 +253,12 @@ class AA(eos.EquationOfState):
         dP = (self.pressure(temperature + 0.5*dT, volume, params) -
               self.pressure(temperature - 0.5*dT, volume, params))
         gr = volume*dP/dE
-        
+
         return gr
 
     def isothermal_bulk_modulus(self, pressure,temperature, volume, params):
         """
-        Returns isothermal bulk modulus :math:`[Pa]` 
+        Returns isothermal bulk modulus :math:`[Pa]`
         """
         # K_T = -V * dP/dV
         dV = volume*1.e-3
@@ -270,7 +270,7 @@ class AA(eos.EquationOfState):
 
     def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
         """
-        Returns adiabatic bulk modulus. :math:`[Pa]` 
+        Returns adiabatic bulk modulus. :math:`[Pa]`
         """
         K_T=self.isothermal_bulk_modulus(pressure, temperature, volume, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
@@ -280,48 +280,48 @@ class AA(eos.EquationOfState):
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
-        Returns shear modulus. :math:`[Pa]` 
+        Returns shear modulus. :math:`[Pa]`
         Zero for a liquid
         """
         return 0.
 
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant volume. :math:`[J/K/mol]` 
+        Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
 
         A, B, Theta = self._ABTheta(volume, params)
         lmda, xi = self._lambdaxi(volume, params)
-        
+
         C_kin = 1.5*params['n']*gas_constant # HT limit of kinetic contribution (just after equation 29.)
         C_e = A*(1. - (Theta*Theta)/(Theta*Theta + temperature*temperature)) + B*np.power(temperature, 0.6) # Equation A1
         C_pot = (lmda*temperature + xi*params['theta']) / (params['theta'] + temperature) # Equation A15
-        
+
         return C_kin + C_e + C_pot
 
-    
+
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant pressure. :math:`[J/K/mol]` 
+        Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
-        
+
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v*(1. + gr * alpha * temperature)
-        
+
         return C_p
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Returns thermal expansivity. :math:`[1/K]`
-        Currently found by numerical differentiation (1/V * dV/dT) 
+        Currently found by numerical differentiation (1/V * dV/dT)
         """
 
         delta_T = 1.
         V0 = self.volume(pressure, temperature-0.5*delta_T, params)
         V1 = self.volume(pressure, temperature+0.5*delta_T, params)
-            
+
         return (1./volume)*(V1 - V0)/delta_T
 
     def gibbs_free_energy( self, pressure, temperature, volume, params):
@@ -329,7 +329,7 @@ class AA(eos.EquationOfState):
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         E + PV
         """
-        
+
         return self.helmholtz_free_energy( pressure, temperature, volume, params) + \
             pressure * self.volume( pressure, temperature, params)
 
@@ -340,7 +340,7 @@ class AA(eos.EquationOfState):
         Ts = self._isentropic_temperature(volume, params)
         E = (params['E_0'] + self._isentropic_energy_change(volume, params)
                 + self._isochoric_energy_change(Ts, temperature, volume, params))
-            
+
         return E
 
     def entropy( self, pressure, temperature, volume, params):
@@ -359,16 +359,16 @@ class AA(eos.EquationOfState):
             S_el = (A*(np.log(T/Ts) - 0.5*np.log(T*T*(Theta*Theta + Ts*Ts)/(Ts*Ts*(Theta*Theta + T*T)))) + 5./3.*B*(np.power(T, 0.6) - np.power(Ts, 0.6))) # A6
             S_pot = (lmda*np.log((params['theta'] + T)/(params['theta'] + Ts)) + xi*np.log((T*(params['theta'] + Ts))/(Ts*(params['theta'] + T)))) # A20
             Delta_S = S_kin + S_el + S_pot
-        
+
         S = params['S_0'] + Delta_S
-        return S 
+        return S
 
     def enthalpy( self, pressure, temperature, volume, params):
         """
         Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
         E + PV
         """
-        
+
         return self.molar_internal_energy(pressure, temperature, volume, params) + \
             pressure * self.volume( pressure, temperature, params)
 
@@ -385,15 +385,15 @@ class AA(eos.EquationOfState):
         Check for existence and validity of the parameters
         """
 
-        # Now check all the required keys for the 
+        # Now check all the required keys for the
         # thermal part of the EoS are in the dictionary
         expected_keys = ['P_0', 'T_0', 'S_0', 'molar_mass', 'grueneisen_0']
 
-        
+
         for k in expected_keys:
             if k not in params:
                 raise KeyError('params object missing parameter : ' + k)
-        
+
         # Finally, check that the values are reasonable.
         if params['T_0'] < 0.:
             warnings.warn( 'Unusual value for T_0', stacklevel=2 )

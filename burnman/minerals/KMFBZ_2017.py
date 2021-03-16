@@ -5,7 +5,7 @@
 
 """
 from Kurnosov et al.  Nature 2017
-Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from (Al, Fe)-bearing bridgmanite elasticity data." 
+Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from (Al, Fe)-bearing bridgmanite elasticity data."
 Nature 543.7646 (2017): 543-546. doi:10.1038/nature21390
 """
 
@@ -46,7 +46,7 @@ ENDMEMBERS
 """
 
 class mg_si_perovskite (Mineral):
-    
+
     def __init__(self):
         formula = 'MgSiO3'
         formula = dictionarize_formula(formula)
@@ -95,7 +95,7 @@ class fe_si_perovskite (Mineral):
 
 
 class fe_al_perovskite (Mineral):
-    
+
     def __init__(self):
         formula = 'FeAlO3'
         formula = dictionarize_formula(formula)
@@ -114,12 +114,12 @@ class fe_al_perovskite (Mineral):
             'eta_s_0': 2.5,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-    
+
         Mineral.__init__(self)
 
 
 class al_al_perovskite(Mineral):
-    
+
     def __init__(self):
         formula = 'Al2O3'
         formula = dictionarize_formula(formula)
@@ -139,7 +139,7 @@ class al_al_perovskite(Mineral):
             'eta_s_0': 2.5,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-  
+
         Mineral.__init__(self)
 
 
@@ -195,7 +195,7 @@ class wuestite (Mineral):
 
 
 class ca_perovskite (Mineral):
-    
+
     def __init__(self):
         formula = 'CaSiO3'
         formula = dictionarize_formula(formula)
@@ -215,14 +215,14 @@ class ca_perovskite (Mineral):
             'eta_s_0': 1.3,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-        
+
 
         Mineral.__init__(self)
 
 
 
 class hcp_iron (Mineral):
-    
+
     def __init__(self):
         formula = 'Fe'
         formula = dictionarize_formula(formula)
@@ -242,8 +242,8 @@ class hcp_iron (Mineral):
             'eta_s_0': 7,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-        
-        
+
+
         Mineral.__init__(self)
 '''
 Mineral aliases

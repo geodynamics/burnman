@@ -43,7 +43,7 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
     ax_P.set_xlabel('Volume (cm^3/mol)')
     ax_S.set_xlabel('Volume (cm^3/mol)')
     ax_E.set_xlabel('Volume (cm^3/mol)')
-    
+
     ax_P.set_ylabel('Pressure (GPa)')
     ax_S.set_ylabel('Entropy/nR (J)')
     ax_E.set_ylabel('Internal Energy (kJ/mol)')
@@ -51,7 +51,7 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
     ax_P.imshow(mpimg.imread(plots[i][0][0]), extent=plots[i][0][1], aspect='auto')
     ax_S.imshow(mpimg.imread(plots[i][1][0]), extent=plots[i][1][1], aspect='auto')
     ax_E.imshow(mpimg.imread(plots[i][2][0]), extent=plots[i][2][1], aspect='auto')
-    
+
     for temperature in temperatures:
         pressures = np.empty_like(volumes)
         entropies= np.empty_like(volumes)
@@ -65,9 +65,9 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
         ax_P.plot(volumes*1.e6, pressures/1.e9, linewidth=2, label='{0:.0f} K'.format(temperature))
         ax_S.plot(volumes*1.e6, entropies/n_atoms/constants.gas_constant, linewidth=2, label='{0:.0f} K'.format(temperature))
         ax_E.plot(volumes*1.e6, energies/1.e3, linewidth=2, label='{0:.0f} K'.format(temperature))
-        
+
         ax_E.legend(loc='upper right')
-    
+
     fig.canvas.set_window_title(phase.name)
     plt.show()
 
@@ -91,10 +91,10 @@ ax_hugoniot.imshow(mpimg.imread('figures/Fe2SiO4_liquid_hugoniot.png'),
                    extent=[3.5, 7.5, 0, 200], aspect='auto')
 
 pressures = np.linspace(1.e5, 200.e9, 51)
-for T in [3000., 4000., 6000.]: 
+for T in [3000., 4000., 6000.]:
     rhos = fa_liq.evaluate(['rho'], pressures, [T]*len(pressures))[0]
     ax_P.plot(rhos/1.e3, pressures/1.e9, label='{0:.0f} K'.format(T))
-    
+
 ax_P.set_xlabel('Densities (Mg/m^3)')
 ax_P.set_ylabel('Pressures (GPa)')
 ax_hugoniot.set_title('PVT')

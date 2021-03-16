@@ -27,10 +27,10 @@ class test_fitting(BurnManTest):
 
             def set_params(self, param_values):
                 self.params = param_values
-        
+
             def get_params(self):
                 return self.params
-    
+
             def function(self, x, flag):
                 return np.array([x[0], self.params[0]*x[0] + self.params[1]])
 
@@ -43,7 +43,7 @@ class test_fitting(BurnManTest):
         fitted_curve = m(data, cov, guessed_params, delta_params)
         nonlinear_least_squares_fit(model=fitted_curve,
                                     param_tolerance = 1.e-5)
-        
+
         self.assertArraysAlmostEqual([fitted_curve.WSS], [11.8663531941])
 
 
@@ -64,10 +64,10 @@ class test_fitting(BurnManTest):
 
             def set_params(self, param_values):
                 self.params = param_values
-        
+
             def get_params(self):
                 return self.params
-    
+
             def function(self, x, flag):
                 return np.array([x[0],
                                  self.params[0]*x[0]*x[0]*x[0] +
@@ -77,13 +77,13 @@ class test_fitting(BurnManTest):
 
             def normal(self, x, flag):
                 n = np.array([3.*self.params[0]*x[0]*x[0] +
-                              2.*self.params[1]*x[0] + 
+                              2.*self.params[1]*x[0] +
                               1.*self.params[2],
                               -1.])
                 return n/np.linalg.norm(n)
 
         guessed_params = np.array([-1.2e-2, 0.161, -1.15, 6.142])
-        delta_params = np.array([1.e-5, 1.e-5, 1.e-5, 1.e-5]) 
+        delta_params = np.array([1.e-5, 1.e-5, 1.e-5, 1.e-5])
         fitted_curve = m(data, cov, guessed_params, delta_params)
         nonlinear_least_squares_fit(model=fitted_curve,
                                     param_tolerance = 1.e-5)

@@ -48,12 +48,12 @@ class Mineral(Material):
             self.params = params
         elif 'params' not in self.__dict__:
             self.params = {}
-            
+
         if property_modifiers is not None:
-            self.property_modifiers = property_modifiers  
+            self.property_modifiers = property_modifiers
         elif 'property_modifiers' not in self.__dict__:
             self.property_modifiers = []
-            
+
         self.method = None
         if 'equation_of_state' in self.params:
             self.set_method(self.params['equation_of_state'])
@@ -279,22 +279,22 @@ class Mineral(Material):
     def grueneisen_parameter(self):
         eps = np.finfo('float').eps
         if np.abs(self.molar_heat_capacity_v) > eps:
-            
+
             return (self.thermal_expansivity *
                     self.isothermal_bulk_modulus *
                     self.molar_volume /
                     self.molar_heat_capacity_v)
-        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps) and  
+        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps) and
               (np.abs(self._property_modifiers['d2GdP2']) < eps) and
               (np.abs(self._property_modifiers['dGdP']) < eps) and
               (np.abs(self._property_modifiers['d2GdT2']) < eps)):
-            
+
             return self.method.grueneisen_parameter(self.pressure, self.temperature,
                                                     self.molar_volume, self.params)
         else:
             raise Exception('You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers.')
-                
-            
+
+
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
     def molar_heat_capacity_v(self):

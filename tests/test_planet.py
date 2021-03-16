@@ -21,7 +21,7 @@ def make_simple_planet():
     core = Layer("core", np.linspace(0.e3,3480.e3,10))
     core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
     core.set_temperature_mode('user-defined', temperatures= 300.*np.ones_like(core.radii))
-    
+
     mantle = Layer("mantle", np.linspace(3480.e3, 6371.e3, 10))
     mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
     mantle.set_temperature_mode('adiabatic', temperature_top = 1200)
@@ -53,6 +53,6 @@ class test_planet(BurnManTest):
         self.assertFloatEqual(alpha[-2], myplanet.alpha[-2])
         self.assertFloatEqual(rho[-2], myplanet.density[-2])
 
-        
+
 if __name__ == '__main__':
     unittest.main()

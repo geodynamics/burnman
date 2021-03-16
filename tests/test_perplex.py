@@ -16,13 +16,13 @@ from util import BurnManTest
 rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
 
 class PerpleX(BurnManTest):
-        
+
     def test_energies(self):
         P = [10.e9, 11.e9]
         A, G, V = rock.evaluate(['molar_helmholtz', 'molar_gibbs', 'V'],
                                 P, [2000., 2000.])
         self.assertArraysAlmostEqual(A, G - V*P)
-        
+
     def test_grueneisen(self):
 
         gr, alpha, V, K_S, cp = rock.evaluate(['grueneisen_parameter', 'alpha', 'V', 'adiabatic_bulk_modulus', 'molar_heat_capacity_p'],
@@ -38,13 +38,13 @@ class PerpleX(BurnManTest):
             return rock.set_state(np.mean(rock.bounds[0]), rock.bounds[1][0] - 1.)
         def fnHT():
             return rock.set_state(np.mean(rock.bounds[0]), rock.bounds[1][1] + 1.)
-        
+
         with np.errstate(all='ignore'):
             self.assertRaises(Exception, fnLP)
             self.assertRaises(Exception, fnHP)
             self.assertRaises(Exception, fnLT)
             self.assertRaises(Exception, fnHT)
 
-        
+
 if __name__ == '__main__':
     unittest.main()

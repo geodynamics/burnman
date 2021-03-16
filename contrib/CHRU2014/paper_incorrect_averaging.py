@@ -132,7 +132,7 @@ if __name__ == "__main__":
     # define temperatures
     temperature_bs = burnman.geotherm.brown_shankland(depths)
     temperature_an = burnman.geotherm.anderson(depths)
-    
+
     # pure perovskite
     perovskitite = burnman.Composite([perovskite(0.06)], [1.0])
     perovskitite.set_method(method)

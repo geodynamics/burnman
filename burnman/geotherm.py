@@ -24,7 +24,7 @@ def brown_shankland(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    
+
     assert(min(depths) >= min(table_brown_depth))
     assert(max(depths) <= max(table_brown_depth))
     temperature = np.empty_like(depths)
@@ -90,7 +90,7 @@ def adiabatic(pressures, T0, rock):
     temperature: list of floats
         The list of temperatures for each pressure. :math:`[K]`
     """
-    
+
     rock.set_state(pressures[0], T0)
     S0 = rock.S
 

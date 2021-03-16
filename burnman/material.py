@@ -138,7 +138,7 @@ class Material(object):
         It is typically not required for the user to call this function.
         """
         self._cached = {}
-    
+
     def copy(self):
         return deepcopy(self)
 
@@ -190,7 +190,7 @@ class Material(object):
         temperatures = np.array(temperatures)
 
         assert(pressures.shape == temperatures.shape)
-        
+
         output = np.empty((len(vars_list),) + pressures.shape)
         for i, p in np.ndenumerate(pressures):
             self.set_state(p, temperatures[i])

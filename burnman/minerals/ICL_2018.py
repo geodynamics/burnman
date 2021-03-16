@@ -31,7 +31,7 @@ class EPOC_vinet (Mineral):
         Mineral.__init__(self)
 
 class EPOC_bm (Mineral):
-    
+
     def __init__(self):
         self.params = {
             'equation_of_state': 'bm3',

@@ -10,7 +10,7 @@ ANISOTROPIC     T
 # Are the units given in meters and meters per second?
 # Allowed values:
 # m  - velocities in m/s,  density in kg/m^3
-# km - velocities in km/s, density in g/cm^3 
+# km - velocities in km/s, density in g/cm^3
 UNITS           m
 
 # Order of the colums of the model

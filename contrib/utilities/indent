@@ -1,0 +1,76 @@
+#!/bin/bash
+## ---------------------------------------------------------------------
+## This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+## for the Earth and Planetary Sciences
+## Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+## GPL v2 or later.
+## ---------------------------------------------------------------------
+
+
+if test ! -d burnman -o ! -d tests -o ! -d examples ; then
+  echo "*** This script must be run from the top-level directory of BurnMan."
+  exit 1
+fi
+
+
+# collect all source files and process them in batches of 50 files
+# with up to 10 in parallel
+echo "--- Indenting all BurnMan header and source files"
+
+
+# remove execute permission on source files:
+find burnman contrib examples misc tests \( -name '*.py' \) -print | xargs -n 50 -P 10 chmod -x
+
+# convert dos formatted files to unix file format by stripping out
+# carriage returns (15=0x0D):
+dos_to_unix()
+{
+    f=$1
+    tr -d '\015' <$f >$f.tmp
+    diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+    rm -f $f.tmp
+}
+export -f dos_to_unix
+find burnman contrib examples misc tests \( -name '*.py' \) -print | xargs -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {}
+
+
+# Remove trailing whitespace from files
+remove_trailing_whitespace()
+{
+    f=$1
+    # awkward tab replacement because of OSX sed, do not change unless you test it on OSX
+    TAB=$'\t'
+    sed -e "s/[ $TAB]*$//"  $f >$f.tmp
+    diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+    rm -f $f.tmp
+}
+export -f remove_trailing_whitespace
+find burnman contrib examples misc tests \( -name '*.bash' -o -name '*.py' -o -name '*.txt' -o -name '*.tex' \) -print | xargs -n 1 -P 10 -I {} bash -c 'remove_trailing_whitespace "$@"' _ {}
+
+# Ensure only a single newline at end of files
+ensure_single_trailing_newline()
+{
+  f=$1
+
+  # Remove newlines at end of file
+  # Check that the current line only contains newlines
+  # If it doesn't match, print it
+  # If it does match and we're not at the end of the file,
+  # append the next line to the current line and repeat the check
+  # If it does match and we're at the end of the file,
+  # remove the line.
+  sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $f >$f.tmpi
+
+  # Then add a newline to the end of the file
+  # '$' denotes the end of file
+  # 'a\' appends the following text (which in this case is nothing)
+  # on a new line
+  sed -e '$a\' $f.tmpi >$f.tmp
+
+  diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+  rm -f $f.tmp $f.tmpi
+}
+export -f ensure_single_trailing_newline
+find burnman contrib examples misc tests \( -name '*.bash' -o -name '*.py' -o -name '*.txt' -o -name '*.tex' \) -print | xargs -n 1 -P 10 -I {} bash -c 'ensure_single_trailing_newline "$@"' _ {}
+
+exit 0

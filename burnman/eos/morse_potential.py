@@ -13,9 +13,9 @@ import numpy as np
 def bulk_modulus(volume, params):
     """
     Compute the bulk modulus as per the Morse potential
-    equation of state.  
-    Returns bulk modulus in the same units as 
-    the reference bulk modulus.  
+    equation of state.
+    Returns bulk modulus in the same units as
+    the reference bulk modulus.
     Pressure must be in :math:`[Pa]`.
     """
 
@@ -36,19 +36,19 @@ def shear_modulus(volume, params):
 
 def morse_potential(VoverV0, params):
     """
-    Equation for the Morse Potential equation of state, 
-    returns pressure in the same units that are supplied 
+    Equation for the Morse Potential equation of state,
+    returns pressure in the same units that are supplied
     for the reference bulk modulus (params['K_0'])
     """
     x = (params['Kprime_0']  - 1.)*(1. - np.power(VoverV0, 1./3.))
-    return ( 3. * params['K_0'] / (params['Kprime_0']  - 1.) * 
+    return ( 3. * params['K_0'] / (params['Kprime_0']  - 1.) *
              np.power(VoverV0, -2./3.) *
              (np.exp(2.*x) - np.exp(x)) ) + params['P_0']
 
 def volume(pressure, params):
     """
-    Get the Morse Potential volume at a 
-    reference temperature for a given pressure :math:`[Pa]`. 
+    Get the Morse Potential volume at a
+    reference temperature for a given pressure :math:`[Pa]`.
     Returns molar volume in :math:`[m^3]`
     """
     func = lambda V: morse_potential(V / params['V_0'], params) - pressure
@@ -64,9 +64,9 @@ def volume(pressure, params):
 class Morse(eos.EquationOfState):
 
     """
-    Class for the isothermal Morse Potential equation of state 
-    detailed in :cite:`Stacey1981`.  
-    This equation of state has no temperature dependence. 
+    Class for the isothermal Morse Potential equation of state
+    detailed in :cite:`Stacey1981`.
+    This equation of state has no temperature dependence.
     """
 
     def volume(self, pressure, temperature, params):
@@ -102,7 +102,7 @@ class Morse(eos.EquationOfState):
         Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.
-    
+
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
@@ -114,13 +114,13 @@ class Morse(eos.EquationOfState):
                    (2.*np.exp(x) - np.exp(2.*x) - 1.) )
 
         return -intPdV + params['E_0']
-    
+
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return self.molar_internal_energy(pressure, temperature, volume, params) + volume*pressure
-    
+
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -182,4 +182,3 @@ class Morse(eos.EquationOfState):
             warnings.warn('Unusual value for G_0', stacklevel=2)
         if params['Gprime_0'] < -5. or params['Gprime_0'] > 10.:
             warnings.warn('Unusual value for Gprime_0', stacklevel=2)
-

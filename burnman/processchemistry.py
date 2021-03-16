@@ -90,8 +90,8 @@ def solution_bounds(endmember_occupancies):
     Returns
     -------
     solution_bounds : 2d array of floats
-        An abbreviated version of endmember_occupancies, 
-        where the columns represent the independent compositional 
+        An abbreviated version of endmember_occupancies,
+        where the columns represent the independent compositional
         bounds on the solution
     """
     # Find bounds for the solution

@@ -15,7 +15,7 @@ def read_fitting_file(filename):
                 comment_index.append(line.index('#'))
             except ValueError:
                 comment_index.append(len(line))
-                
+
         datalines = [line[0:comment_index[i]] for i, line in enumerate(datalines)]
 
         flags = list(zip(*datalines)[0])

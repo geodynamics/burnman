@@ -7,7 +7,7 @@ example_holland_powell_uncertainties
 ------------------------------------
 
 This extremely short example script shows how one can visualize
-and manipulate uncertainties in zero-point energies as found in the 
+and manipulate uncertainties in zero-point energies as found in the
 Holland and Powell dataset.
 
 *Uses:*

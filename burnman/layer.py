@@ -52,8 +52,8 @@ class Layer(object):
         self.material = None
         self.pressure_mode = 'self-consistent'
         self.temperature_mode = None
- 
- 
+
+
     def __str__(self):
         """
         Prints details of the layer
@@ -63,8 +63,8 @@ class Layer(object):
                                                                                             self.temperature_mode,
                                                                                             self.pressure_mode)
         return writing
-            
-            
+
+
     def reset(self):
         """
         Resets all cached material properties.
@@ -97,7 +97,7 @@ class Layer(object):
         The desired fixed temperatures in [K]. Should have same length as defined radii in layer.
         temperature_top : float
         Temperature at the top for an adiabatic
-        
+
         Note
         ---------
         'user-defined' = fixes the temperature with the profile input by the users
@@ -128,7 +128,7 @@ class Layer(object):
                           pressure_top=None, n_max_iterations=50, max_delta = 1.e-5):
         """
         Sets the pressure mode of the layer, which can either be 'user-defined', or 'self-consistent'.
-        
+
         Parameters
         ----------
         pressure_mode : string
@@ -143,20 +143,20 @@ class Layer(object):
         Maximum number of iterations to reach self-consistent pressures (default = 50)
         max_delta : float
         Relative update to the highest pressure in the layer between iterations to stop iterations (default = 1.e-5)
-        
-        
+
+
         Note
         ---------
-        'user-defined' = fixes the pressures with the profile input by the user in the 'pressures' argument. 
+        'user-defined' = fixes the pressures with the profile input by the user in the 'pressures' argument.
         'self-consistent' = user needs to give gravity_bottom [m/s^2] and pressure_top [Pa] to compute self-consistent pressures.
         """
         self.reset()
         assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
         self.pressure_mode= pressure_mode
-        
+
         assert(gravity_bottom is not None)
         self.gravity_bottom = gravity_bottom
-        
+
         if pressure_mode == 'user-defined':
             assert(pressures is not None)
             assert(len(pressures) == len(self.radii))
@@ -168,8 +168,8 @@ class Layer(object):
             self.max_delta = max_delta
         else:
             raise NotImplementedError('pressure mode \"{0}\"not recognised'.format(pressure_mode))
-            
-            
+
+
 
     def make( self):
         """
@@ -216,7 +216,7 @@ class Layer(object):
             self.temperatures = temperatures
         else:
             raise NotImplementedError('pressure mode not recognised')
-        
+
         self.sublayers = []
         for l in range(len(self.radii)):
             self.sublayers.append(self.material.copy())
@@ -230,9 +230,9 @@ class Layer(object):
         returned at the internal radlist.
         If asking for different radii than the internal radlist,
         pressure and temperature values are interpolated and the
-        layer material evaluated at those pressures and 
+        layer material evaluated at those pressures and
         temperatures.
-        
+
         Parameter
         ---------
         properties : list of strings
@@ -242,13 +242,13 @@ class Layer(object):
         internal radii list is used.
         planet_radius : float
         Planet outer radius. Used only to calculate depth.
-        
+
         Returns
         -------
-        1D or 2D array of requested properties 
+        1D or 2D array of requested properties
         (1D if only one property was requested)
         """
-        
+
         if radlist is None:
             values = np.empty([len(properties), len(self.radii)])
             for i, prop in enumerate(properties):
@@ -259,7 +259,7 @@ class Layer(object):
                         values[i] = getattr(self,prop)
                     except:
                         values[i]= np.array([getattr(self.sublayers[i],prop)
-                                             for i in range(len(self.sublayers))])   
+                                             for i in range(len(self.sublayers))])
         else:
             func_p = interp1d(self.radii,self.pressures)
             pressures = func_p(radlist)
@@ -275,7 +275,7 @@ class Layer(object):
                     except:
                         func_prop = interp1d(self.radii, getattr(self,prop))
                         values[i] = func_prop(radlist)
-                    
+
         if values.shape[0] == 1:
             values = values[0]
         return values
@@ -293,7 +293,7 @@ class Layer(object):
 
     def _evaluate_eos(self, pressures, temperatures, gravity_bottom, pressure_top):
         """
-        Returns updated gravity and pressure 
+        Returns updated gravity and pressure
         make() loops over this until consistency is achieved.
         """
         [density] = self.material.evaluate(
@@ -317,7 +317,7 @@ class Layer(object):
         grav = np.ravel(
             odeint( poisson, gravity_bottom *
                 self.radii[0] * self.radii[0], self.radii))
-        
+
         if self.radii[0] == 0:
             grav[0] = 0
             grav[1:] = grav[1:] / self.radii[1:] / self.radii[1:]
@@ -382,9 +382,9 @@ class Layer(object):
     @property
     def bullen(self):
         """
-        Returns the Bullen parameter across the layer. 
-        The Bullen parameter assess if compression as a function of pressure is 
-        like homogeneous, adiabatic compression. 
+        Returns the Bullen parameter across the layer.
+        The Bullen parameter assess if compression as a function of pressure is
+        like homogeneous, adiabatic compression.
         Bullen parameter =1  , homogeneous, adiabatic compression
         Bullen parameter > 1 , more compressed with pressure, e.g. across phase transitions
         Bullen parameter < 1, less compressed with pressure, e.g. across a boundary layer
@@ -816,104 +816,103 @@ class Layer(object):
     def P(self):
         """Alias for :func:`~burnman.layer.Layer.pressure`"""
         return self.pressure
-    
+
     @property
     def T(self):
         """Alias for :func:`~burnman.layer.Layer.temperature`"""
         return self.temperature
-    
+
     @property
     def energy(self):
         """Alias for :func:`~burnman.layer.Layer.molar_internal_energy`"""
         return self.molar_internal_energy
-    
+
     @property
     def helmholtz(self):
         """Alias for :func:`~burnman.layer.Layer.molar_helmholtz`"""
         return self.molar_helmholtz
-    
+
     @property
     def gibbs(self):
         """Alias for :func:`~burnman.layer.Layer.molar_gibbs`"""
         return self.molar_gibbs
-    
+
     @property
     def V(self):
         """Alias for :func:`~burnman.layer.Layer.molar_volume`"""
         return self.molar_volume
-    
+
     @property
     def rho(self):
         """Alias for :func:`~burnman.layer.Layer.density`"""
         return self.density
-    
+
     @property
     def S(self):
         """Alias for :func:`~burnman.layer.Layer.molar_entropy`"""
         return self.molar_entropy
-    
+
     @property
     def H(self):
         """Alias for :func:`~burnman.layer.Layer.molar_enthalpy`"""
         return self.molar_enthalpy
-    
+
     @property
     def K_T(self):
         """Alias for :func:`~burnman.layer.Layer.isothermal_bulk_modulus`"""
         return self.isothermal_bulk_modulus
-    
+
     @property
     def K_S(self):
         """Alias for :func:`~burnman.layer.Layer.adiabatic_bulk_modulus`"""
         return self.adiabatic_bulk_modulus
-    
+
     @property
     def beta_T(self):
         """Alias for :func:`~burnman.layer.Layer.isothermal_compressibility`"""
         return self.isothermal_compressibility
-    
+
     @property
     def beta_S(self):
         """Alias for :func:`~burnman.layer.Layer.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
-    
+
     @property
     def G(self):
         """Alias for :func:`~burnman.layer.Layer.shear_modulus`"""
         return self.shear_modulus
-    
+
     @property
     def v_p(self):
         """Alias for :func:`~burnman.layer.Layer.p_wave_velocity`"""
         return self.p_wave_velocity
-    
+
     @property
     def v_phi(self):
         """Alias for :func:`~burnman.layer.Layer.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
-    
+
     @property
     def v_s(self):
         """Alias for :func:`~burnman.layer.Layer.shear_wave_velocity`"""
         return self.shear_wave_velocity
-    
+
     @property
     def gr(self):
         """Alias for :func:`~burnman.layer.Layer.grueneisen_parameter`"""
         return self.grueneisen_parameter
-    
+
     @property
     def alpha(self):
         """Alias for :func:`~burnman.layer.Layer.thermal_expansivity`"""
         return self.thermal_expansivity
-    
+
     @property
     def C_v(self):
         """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
         return self.molar_heat_capacity_v
-    
+
     @property
     def C_p(self):
         """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
         return self.molar_heat_capacity_p
-

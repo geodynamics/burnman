@@ -30,10 +30,10 @@ class CORK(eos.EquationOfState):
 
     """
     Class for the CoRK equation of state detailed in :cite:`HP1991`. The
-    CoRK EoS is a simple virial-type extension to the modified Redlich-Kwong 
-    (MRK) equation of state. It was designed to compensate for the tendency of 
-    the MRK equation of state to overestimate volumes at high pressures and 
-    accommodate the volume behaviour of coexisting gas and liquid phases along 
+    CoRK EoS is a simple virial-type extension to the modified Redlich-Kwong
+    (MRK) equation of state. It was designed to compensate for the tendency of
+    the MRK equation of state to overestimate volumes at high pressures and
+    accommodate the volume behaviour of coexisting gas and liquid phases along
     the saturation curve.
     """
 

@@ -30,7 +30,7 @@ class test_solvers(BurnManTest):
                                   linear_constraints=C)
         self.assertFloatEqual(sol.x[0], 0.)
         assert(sol.code == 2)
-        
+
     def test_dns_rosenbrock_1_w_temporary_constraint_violation(self):
         F = lambda x: np.array([10.*(x[1] - x[0]*x[0]), 1. - x[0]])
         J = lambda x: np.array([[-20.*x[0], 10.],
@@ -42,13 +42,13 @@ class test_solvers(BurnManTest):
         sol = damped_newton_solve(F, J, guess=np.array([-1.2, 1.]), linear_constraints=C)
         # The solution lies on one of the constraints
         self.assertArraysAlmostEqual(sol.x, [1., 1.])
-    
+
     def test_dns_freudenstein_roth_2(self):
         F = lambda x: np.array([-13. + x[0] + ((5. - x[1])*x[1] - 2.)*x[1],
                                 -29. + x[0] + ((x[1] + 1.)*x[1] - 14.)*x[1]])
         J = lambda x: np.array([[1., (10. - 3.*x[1])*x[1] - 2.],
                                 [1., (3.*x[1] + 2.)*x[1] - 14.]])
-        
+
         #sol = damped_newton_solve(F, J, guess=np.array([0.5, -2.])) # does not converge
         sol = damped_newton_solve(F, J, guess=np.array([10., 10.]))
         self.assertArraysAlmostEqual(sol.x, [5., 4.])
@@ -58,7 +58,7 @@ class test_solvers(BurnManTest):
         F = lambda x: np.array([1.e4*x[0]*x[1] - 1., np.exp(-x[0]) + np.exp(-x[1]) - 1.0001])
         J = lambda x: np.array([[1.e4*x[1], 1.e4*x[0]],
                                 [-np.exp(-x[0]), -np.exp(-x[1])]])
-        
+
         sol = damped_newton_solve(F, J, guess=np.array([0., 1.]))
         self.assertArraysAlmostEqual(sol.x, [1.09815933e-05, 9.10614674])
         assert(sol.success)
@@ -69,7 +69,7 @@ class test_solvers(BurnManTest):
                                 [0., 0., np.sqrt(5.), -np.sqrt(5.)],
                                 [0., 2.*x[1] - 4.*x[2], 8.*x[2] - 4.*x[1], 0.],
                                 [np.sqrt(10.)*(2.*x[0] - 2.*x[3]), 0., 0., np.sqrt(10.)*(2.*x[3] - 2.*x[0])]])
-        
+
         sol = damped_newton_solve(F, J, guess=np.array([3., -1., 0., 1.]))
         self.assertArraysAlmostEqual(sol.x + 1., [1., 1., 1., 1.])
         assert(sol.success)
@@ -90,7 +90,7 @@ class test_solvers(BurnManTest):
                 j[i,i-1] = -1.
                 j[i,i] = 3. - 4.*xpad[i]
                 j[i,i+1] = -2.
-                
+
             return j[1:-1, 1:-1]
 
         # check convergence for several test cases
@@ -99,7 +99,7 @@ class test_solvers(BurnManTest):
                               [-0.52677285, -0.56764891, -0.41031222],
                               [-0.55457673, -0.63942044, -0.59070079, -0.41526838],
                               [-0.5648284, -0.66627372, -0.66091704, -0.59505005, -0.41620111]]
-        
+
         for n in range(1, 6):
             guess = -1.*np.ones((n))
             sol = damped_newton_solve(F, J, guess=guess)
@@ -109,15 +109,15 @@ class test_solvers(BurnManTest):
 
     # The following tests use the generalised Rosenbrock function:
     # f(x, y) = (a - x)^2 + b(y - x^2)^2
-    # solving for f'=0 
+    # solving for f'=0
     def test_dns_rosenbrock_generalised(self):
         a = 1.
         b = 15. # takes >100 iterations for b>16, ~570 iterations for b=100
         # this is a tricky root-finding problem when x0 < 0, because the gradient in the descent valley is very small compared to the gradient at the valley edges. Only very small fractions of a full Newton step can be taken if global convergence is to be guaranteed.
-        
+
         F = lambda x: np.array([2.*(x[0] - a) + 4.*b*x[0]*(x[0]*x[0] - x[1]),
                                 2.*b*(x[1] - x[0]*x[0])])
-        
+
         J = lambda x: np.array([[12.*b*x[0]*x[0] - 4.*b*x[1] + 2., -4.*b*x[0]],
                                 [-4.*b*x[0], 2.*b]])
         guess = np.array([-1, 1.])
@@ -133,19 +133,19 @@ class test_solvers(BurnManTest):
         # maximize the approach to F=0 (in the L1-norm sense)
         # whilst satisfying all the constraints.
         a = 1.
-        b = 15. 
+        b = 15.
         F = lambda x: np.array([2.*(x[0] - a) + 4.*b*x[0]*(x[0]*x[0] - x[1]),
                                 2.*b*(x[1] - x[0]*x[0])])
-        
+
         J = lambda x: np.array([[12.*b*x[0]*x[0] - 4.*b*x[1] + 2., -4.*b*x[0]],
                                 [-4.*b*x[0], 2.*b]])
 
         C = (np.array([[0., 1.]]), np.array([-1.1]))
-        
+
         guess = np.array([-4, -3.])
         sol = damped_newton_solve(F, J, guess=guess, linear_constraints = C,
                                   max_iterations=100, tol=1.e-15)
-        
+
         self.assertArraysAlmostEqual(sol.x, [a, a*a])
         assert(sol.success)
 
@@ -154,43 +154,43 @@ class test_solvers(BurnManTest):
         # This test is like the one above, except that there are
         # two successive constraints along which the solver must move
         a = 1.
-        b = 15. 
+        b = 15.
         F = lambda x: np.array([2.*(x[0] - a) + 4.*b*x[0]*(x[0]*x[0] - x[1]),
                                 2.*b*(x[1] - x[0]*x[0])])
-        
+
         J = lambda x: np.array([[12.*b*x[0]*x[0] - 4.*b*x[1] + 2., -4.*b*x[0]],
                                 [-4.*b*x[0], 2.*b]])
 
         C = (np.array([[0., 1.], [-1., 1.]]), np.array([-1.1, - 3.5]))
-        
+
         guess = np.array([-4, -3.])
         sol = damped_newton_solve(F, J, guess=guess, linear_constraints = C,
                                   max_iterations=200, tol=1.e-15)
-        
+
         self.assertArraysAlmostEqual(sol.x, [a, a*a])
         assert(sol.success)
-        
+
     def test_dns_rosenbrock_generalised_w_constraint_violation(self):
         # This test is like the one above, except that there are
         # two successive constraints along which the solver must move
         a = 1.
-        b = 15. 
+        b = 15.
         F = lambda x: np.array([2.*(x[0] - a) + 4.*b*x[0]*(x[0]*x[0] - x[1]),
                                 2.*b*(x[1] - x[0]*x[0])])
-        
+
         J = lambda x: np.array([[12.*b*x[0]*x[0] - 4.*b*x[1] + 2., -4.*b*x[0]],
                                 [-4.*b*x[0], 2.*b]])
 
         y_max = 0.6
         C = (np.array([[0., 1.]]), np.array([-y_max]))
-        
+
         guess = np.array([-4, -3.])
         sol = damped_newton_solve(F, J, guess=guess, linear_constraints = C,
                                   max_iterations=200, tol=1.e-15, store_iterates = True)
-        
+
         self.assertFloatEqual(sol.x[1], y_max)
         assert(sol.code == 2)
-        
-    
+
+
 if __name__ == '__main__':
     unittest.main()

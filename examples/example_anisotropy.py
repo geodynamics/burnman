@@ -7,7 +7,7 @@
 example_anisotropy
 ------------------
 
-This example illustrates the basic functions required to convert 
+This example illustrates the basic functions required to convert
 an elastic stiffness tensor into elastic properties.
 
 *Specifically uses:*
@@ -31,7 +31,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
 
 import burnman
-from burnman import anisotropy 
+from burnman import anisotropy
 
 if __name__ == "__main__":
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     except:
         pass
 
-    
+
     # Let's first look at an isotropic material
     # As an example, let's use the lambda (C12), mu (C44) and rho
     # for flow basalt given by Christensen et al. (1980)
@@ -63,17 +63,17 @@ if __name__ == "__main__":
     print('Universal elastic anisotropy: {0:.4f}\n'
           'Isotropic poisson ratio: {1:.4f}\n'.format(basalt.universal_elastic_anisotropy,
                                                       basalt.isotropic_poisson_ratio))
-    
+
     d1 = [1., 0., 0.]
     d2 = [0., 1., 0.]
-    
+
     beta_100 = basalt.linear_compressibility(direction=d1)
     E_100 = basalt.youngs_modulus(direction=d1)
     G_100_010 = basalt.shear_modulus(plane_normal=d1, shear_direction=d2)
     nu_100_010 = basalt.poissons_ratio(axial_direction=d1, lateral_direction=d2)
     wave_speeds, wave_directions = basalt.wave_velocities(propagation_direction=d1)
     Vp, Vs1, Vs2 = wave_speeds
-    
+
     print('Linear compressibility along 100: {0:.3e}\n'
           'Young\'s modulus along 100: {1:.3e}\n'
           'Shear modulus on 100 plane in direction 010: {2:.3e}\n'
@@ -82,8 +82,8 @@ if __name__ == "__main__":
           '{4:.2f}, {5:.2f}, {6:.2f}\n'.format(beta_100, E_100,
                                                G_100_010, nu_100_010,
                                                Vp/1.e3, Vs1/1.e3, Vs2/1.e3))
-    
-    
+
+
     # Now let's look at the properties of an anisotropic material.
     # Here we choose talc, as it is the mineral used as an example
     # in Mainprice et al. (2011)
@@ -117,12 +117,12 @@ if __name__ == "__main__":
         linear compressibility: beta
         Youngs Modulus: E
         """
-        
+
         zeniths = np.linspace(np.pi/2., np.pi, 31)
         azimuths = np.linspace(0., 2.*np.pi, 91)
         Rs = np.sin(zeniths)/(1. - np.cos(zeniths))
         r, theta = np.meshgrid(Rs, azimuths)
-        
+
         vps = np.empty_like(r)
         vs1s = np.empty_like(r)
         vs2s = np.empty_like(r)
@@ -137,7 +137,7 @@ if __name__ == "__main__":
                 vps[i][j] = velocities[0][0]
                 vs1s[i][j] = velocities[0][1]
                 vs2s[i][j] = velocities[0][2]
-                
+
         fig = plt.figure()
         names = ['Vp (km/s)', 'Vs1 (km/s)', 'Vp/Vs1', 'S-wave anisotropy (%)', 'Linear compressibility (GPa$^{-1}$)', 'Youngs Modulus (GPa)']
         items = [vps/1000., vs1s/1000., vps/vs1s, 200.*(vs1s - vs2s)/(vs1s + vs2s), betas*1.e9, Es/1.e9]
@@ -159,15 +159,15 @@ if __name__ == "__main__":
                 spacing = spacing/2.
             elif nt > 8:
                 spacing = spacing*2.
-                
+
             tmin = vmin + (spacing - vmin%spacing)
             tmax = vmax - vmax%spacing
             nt = int((tmax - tmin)/spacing + 1)
-            
+
             ticks = np.linspace(tmin, tmax, nt)
             im.append(ax[i].contourf(theta, r, item, ndivs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax))
             lines = ax[i].contour(theta, r, item, ticks, colors=('black',), linewidths=(1,))
-            
+
             cbar = fig.colorbar(im[i], ax=ax[i], ticks=ticks)
             cbar.add_lines(lines)
 
@@ -176,5 +176,3 @@ if __name__ == "__main__":
         plt.show()
 
     plot_anisotropic_seismic_properties(talc)
-
-

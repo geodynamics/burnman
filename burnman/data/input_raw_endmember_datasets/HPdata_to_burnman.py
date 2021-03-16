@@ -62,7 +62,7 @@ class Endmember:
                                           ('Tc_0', od[0]),
                                           ('S_D', round(od[1] * 1e3, 10)),
                                           ('V_D', round(od[2] * 1e-5, 10))])
-                                        
+
         if flag == 2:
             self.bragg_williams = OrderedDict([('deltaH', round(od[0] * 1e3, 10)),
                                                ('deltaV', round(od[1] * 1e-5, 15)),
@@ -71,7 +71,7 @@ class Endmember:
                                                ('n', od[4]),
                                                ('factor', od[5])])
 
-        
+
 
 
 # Read dataset
@@ -129,7 +129,7 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
         s = s.replace('\', ', '\': ').replace(' \'(\'', '\'')
         s = s.replace('OrderedDict([(', leading_string+'{').replace(')])', '}')
         return s
-        
+
     formula = '0'
     for i in range(int(ds[0][0])):
         mbr = ds[i * 4 + 3][0]
@@ -146,24 +146,24 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
             s = s.replace('000000.0', 'e6')
             outfile.write(s)
             outfile.write('\n')
-                          
+
             # Print property modifiers (if they exist)
             if hasattr(M, 'landau_hp') or hasattr(M, 'bragg_williams'):
                 outfile.write('        self.property_modifiers = [[')
                 if hasattr(M, 'landau_hp'):
                     s = pprint_ordered_dict(M.landau_hp, leading_string = '\'landau_hp\', ', extra_whitespace = 36)
                     outfile.write(s)
-                    
+
                 if hasattr(M, 'bragg_williams'):
                     s = pprint_ordered_dict(M.bragg_williams, leading_string = '\'bragg_williams\', ', extra_whitespace = 36)
                     outfile.write(s)
-                    
+
                 outfile.write(']]\n')
 
             outfile.write('        Mineral.__init__(self)\n\n')
 
 
-    
+
     outfile.write('def cov():\n'
                   '    \"\"\"\n'
                   '    A function which loads and returns the variance-covariance matrix of the\n'
@@ -178,8 +178,8 @@ with open('HP_2011_ds62.py', 'wb') as outfile:
                   '    \"\"\"\n\n'
                   '    from .HP_2011_ds62_cov import cov\n'
                   '    return cov\n\n')
-  
-# Process uncertainties               
+
+# Process uncertainties
 with open('HP_2011_ds62_cov.py', 'wb') as outfile:
 
     outfile.write('# This file is part of BurnMan - a thermoelastic and '
@@ -197,14 +197,14 @@ with open('HP_2011_ds62_cov.py', 'wb') as outfile:
                   'from numpy import array\n\n'
                   'cov = ')
 
-                      
+
     import numpy as np
     n_mbrs = int(ds[0][0])
-    
+
     names = []
     for i in range(n_mbrs):
         names.append(ds[i*4+3][0])
-        
+
     cov = []
     for i in range(n_mbrs*4+4, len(ds)-2):
         cov.extend(map(float, ds[i]))
@@ -215,14 +215,14 @@ with open('HP_2011_ds62_cov.py', 'wb') as outfile:
 
     M[i_utr] = cov[1:]
     M[i_ltr] = M.T[i_ltr]
-    
+
     M = M*1.e6 # (kJ/mol)^2 -> (J/mol)^2
 
     d = {'endmember_names':names,
          'covariance_matrix':M}
-    
+
     np.set_printoptions(threshold='nan')
-  
+
     import pprint
     pp = pprint.PrettyPrinter(indent=0, width=160, depth=3, stream=outfile)
     pp.pprint(d)

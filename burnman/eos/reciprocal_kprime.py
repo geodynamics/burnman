@@ -35,15 +35,15 @@ def _delta_PoverK_from_V(PoverK, V, V_0, K_0, Kprime_0, Kprime_inf):
 def _upper_incomplete_gamma(z, a):
     """
     An implementation of the non-regularised upper incomplete gamma
-    function. Computed using the relationship with the regularised 
-    lower incomplete gamma function (scipy.special.gammainc). 
+    function. Computed using the relationship with the regularised
+    lower incomplete gamma function (scipy.special.gammainc).
     Uses the recurrence relation wherever z<0.
     """
     n = int(-np.floor(z))
     if n > 0:
         z = z + n
         u_gamma = (1. - gammainc(z, a))*gamma(z)
-        
+
         for i in range(n):
             z = z - 1.
             u_gamma = (u_gamma - np.power(a, z)*np.exp(-a))/z
@@ -62,7 +62,7 @@ def _PoverK_from_P(pressure, params):
                       1./(params['Kprime_inf'] - params['Kprime_0']) + np.finfo(float).eps,
                       1./params['Kprime_inf'] - np.finfo(float).eps,
                       args=args)
-    
+
 def _PoverK_from_V(volume, params):
     """
     Calculates the pressure:bulk modulus ratio
@@ -96,24 +96,24 @@ def shear_modulus(pressure, params):
 class RKprime(eos.EquationOfState):
 
     """
-    Class for the isothermal reciprocal K-prime equation of state 
+    Class for the isothermal reciprocal K-prime equation of state
     detailed in :cite:`StaceyDavis2004`.  This equation of state is
-    a development of work by :cite:`Keane1954` and :cite:`Stacey2000`, 
+    a development of work by :cite:`Keane1954` and :cite:`Stacey2000`,
     making use of the fact that :math:`K'` typically varies smoothly
     as a function of :math:`P/K`, and is thermodynamically required to
-    exceed 5/3 at infinite pressure. 
+    exceed 5/3 at infinite pressure.
 
-    It is worth noting that this equation of state rapidly becomes 
+    It is worth noting that this equation of state rapidly becomes
     unstable at negative pressures, so should not be trusted to provide
-    a good *HT-LP* equation of state using a thermal pressure 
-    formulation. The negative root of :math:`dP/dK` 
-    can be found at :math:`K/P = K'_{\infty} - K'_0`, 
-    which corresponds to a bulk modulus of  
-    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}` 
+    a good *HT-LP* equation of state using a thermal pressure
+    formulation. The negative root of :math:`dP/dK`
+    can be found at :math:`K/P = K'_{\infty} - K'_0`,
+    which corresponds to a bulk modulus of
+    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}`
     and a volume of
     :math:`V = V_0 ( K'_0 / (K'_0 - K'_{\infty}) )^{K'_0/{K'}^2_{\infty}} \exp{(-1/K'_{\infty})}`.
-    
-    This equation of state has no temperature dependence. 
+
+    This equation of state has no temperature dependence.
     """
 
     def volume(self, pressure, temperature, params):
@@ -122,7 +122,7 @@ class RKprime(eos.EquationOfState):
         """
         Kprime_ratio = params['Kprime_0']/params['Kprime_inf']
         PoverK = _PoverK_from_P(pressure, params)
-        
+
         V = params['V_0'] * np.exp( Kprime_ratio/params['Kprime_inf'] *
                                     np.log(1. - params['Kprime_inf'] * PoverK) +
                                     (Kprime_ratio - 1.) * PoverK ) # Eq. 61
@@ -164,20 +164,20 @@ class RKprime(eos.EquationOfState):
         return 0.
 
     def _intVdP(self, xi, params):
-        
+
         a = params['Kprime_inf']
         b = (params['Kprime_0']/params['Kprime_inf']/params['Kprime_inf'] -
              params['Kprime_0']/params['Kprime_inf'] - 1.)
         c = params['Kprime_0'] - params['Kprime_inf']
         f = (params['Kprime_0']/params['Kprime_inf'] - 1.)
-        
+
         i1 = float( params['V_0'] * params['K_0'] *
                     np.exp(f / a) * np.power(a, b - 1.) /
                     np.power(f, b + 2.) *
                     ( f * params['Kprime_0'] * _upper_incomplete_gamma( b + 1. ,
                                                                         f * (1./a - xi) ) -
                       a * c * _upper_incomplete_gamma( b + 2., f * (1./a - xi) ) ) )
-        
+
         return i1
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
@@ -186,15 +186,15 @@ class RKprime(eos.EquationOfState):
         """
         # G = E0 + int VdP (when S = 0)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
-        return params['E_0'] + params['P_0']*params['V_0'] + self._intVdP((pressure - params['P_0'])/K, params) - self._intVdP(0., params) 
-    
+        return params['E_0'] + params['P_0']*params['V_0'] + self._intVdP((pressure - params['P_0'])/K, params) - self._intVdP(0., params)
+
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
         # E = G - PV (+ TS)
         return ( self.gibbs_free_energy(pressure, temperature, volume, params) - pressure*volume)
-        
+
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -260,4 +260,3 @@ class RKprime(eos.EquationOfState):
             warnings.warn('Unusual value for G_0', stacklevel=2)
         if params['Gprime_inf'] < -5. or params['Gprime_inf'] > 10.:
             warnings.warn('Unusual value for Gprime_inf', stacklevel=2)
-

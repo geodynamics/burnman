@@ -9,11 +9,11 @@ example_layer
 
 This example script is building on example_beginner.py.
 In this case we use the layer Class. Instead of computing properties at
-pressures defined by the seismic PREM model (as is done in many examples), 
+pressures defined by the seismic PREM model (as is done in many examples),
 we compute properties at pressures self-consistent to the layer.
 Layer can be used to evaluate geophysical parameter, such as
 the Bullen parameter or the Brunt_vasala frequency. Through the 'modified_adiabat'
-temperature setting it allows for inclusions of thermal boundary layers. 
+temperature setting it allows for inclusions of thermal boundary layers.
 Layers can also be used to build an entire planet (see example_build_planet.py)
 
 *Uses:*
@@ -89,11 +89,11 @@ if __name__ == "__main__":
     #                               pressures = pressure, gravity_bottom=gravity[0])
 
     lower_mantle.make()
-    
+
     # All the work is done, now we can plot various properties!
     fig = plt.figure(figsize = (10,6))
     ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
-    
+
     # First, we plot the p-wave speed verses the PREM p-wave speed
     ax[0].plot(lower_mantle.pressures / 1.e9, lower_mantle.v_p / 1.e3, color='r', linestyle='-',
                marker='o', markerfacecolor='r', markersize=4, label='V$_P$ (computed)')
@@ -107,7 +107,7 @@ if __name__ == "__main__":
              marker='o', markerfacecolor='w', markersize=4, label='V$_S$ (reference)')
 
     ax[0].set_ylabel("Wave speeds (km/s)")
-    
+
     # Next, we plot the density versus the PREM density
     ax[1].plot(lower_mantle.pressures / 1.e9, lower_mantle.density / 1.e3, color='g',
              linestyle='-', marker='o', markerfacecolor='g', markersize=4, label='computed')
@@ -131,6 +131,6 @@ if __name__ == "__main__":
         ax[i].set_xlabel("Pressure (GPa)")
         ax[i].set_xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
         ax[i].legend(loc='best')
-        
+
     # At long last, we show the results!  We are done!
     plt.show()

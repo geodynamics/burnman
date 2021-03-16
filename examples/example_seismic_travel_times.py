@@ -35,15 +35,15 @@ from obspy.taup import TauPyModel
 
 def plot_rays_and_times(modelname):
     """
-    Calls obspy routines to plot ray paths and travel times for the model built in BurnMan and for a seismic reference model for comparison. 
-    
+    Calls obspy routines to plot ray paths and travel times for the model built in BurnMan and for a seismic reference model for comparison.
+
     Parameters
     ----------
     modelname:
     Name for BurnMan model (*.tvel file must be present)
     """
-    
-    
+
+
     # Arrivals to plot, some random examples of phase names to use ("P","S", "PcP", "Sdiff", "SKS", "PKIKP")
     # Phase naming in obspy.taup is explained at
     # https://docs.obspy.org/packages/obspy.taup.html
@@ -53,7 +53,7 @@ def plot_rays_and_times(modelname):
     max_degrees = 300 # maximum distance for ray paths
     npoints = 9 # number of distances to plot ray paths
     ref_model = 'prem' # choice of models available in obpsy, or input an npz file name
-    
+
     # Build a taup_model for Obspy
     obspy.taup.taup_create.build_taup_model(
                 "./" + modelname + ".tvel", ".")
@@ -159,7 +159,7 @@ if __name__ == "__main__":
             lower_mantle,
             filename=modelname+'tvel',
             background_model=burnman.seismic.PREM())
-        
+
         # Plot ray paths and travel times
         plot_rays_and_times(modelname)
 
@@ -229,6 +229,6 @@ if __name__ == "__main__":
             filename=modelname+'tvel',
             background_model=burnman.seismic.PREM())
 
-            
+
         # Plot ray paths and travel times
         plot_rays_and_times(modelname)
