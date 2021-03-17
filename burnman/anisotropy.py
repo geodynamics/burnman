@@ -208,7 +208,7 @@ class AnisotropicMaterial(Material):
         plane_normal = unit_normalize(plane_normal)
         shear_direction = unit_normalize(shear_direction)
 
-        assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(np.float).eps, 'plane_normal and shear_direction must be orthogonal'
+        assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(float).eps, 'plane_normal and shear_direction must be orthogonal'
         Sijkl = self.full_compliance_tensor
         G = Sijkl.dot(shear_direction).dot(plane_normal).dot(shear_direction).dot(plane_normal)
         return 0.25/G
@@ -223,7 +223,7 @@ class AnisotropicMaterial(Material):
 
         axial_direction = unit_normalize(axial_direction)
         lateral_direction = unit_normalize(lateral_direction)
-        assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(np.float).eps, 'axial_direction and lateral_direction must be orthogonal'
+        assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(float).eps, 'axial_direction and lateral_direction must be orthogonal'
 
         Sijkl = self.full_compliance_tensor
         x = axial_direction

@@ -457,7 +457,7 @@ if __name__ == "__main__":
                                        (['alpha', 'K_T'], 1.e-6, 'Thermal pressure (MPa/K)')]
 
     def closest_factors(n):
-        d = np.int(np.floor(np.sqrt(n)))
+        d = int(np.floor(np.sqrt(n)))
         for i in reversed(range(1, d+1)):
             if (n % i) == 0:
                 return i, int(n/i)

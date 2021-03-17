@@ -11,7 +11,7 @@ from .. import constants
 Functions for the Einstein model of a solid.
 """
 
-eps = np.finfo(np.float).eps
+eps = np.finfo(float).eps
 
 
 def thermal_energy(T, einstein_T, n):

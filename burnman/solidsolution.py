@@ -153,7 +153,7 @@ class SolidSolution(Mineral):
             assert(sum(molar_fractions) < 1.0001)
 
         self.reset()
-        self.molar_fractions = molar_fractions
+        self.molar_fractions = np.array(molar_fractions)
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
@@ -397,7 +397,7 @@ class SolidSolution(Mineral):
         Aliased with self.G
         """
         G_list = np.fromiter(
-            (e[0].G for e in self.endmembers), dtype=np.float, count=self.n_endmembers)
+            (e[0].G for e in self.endmembers), dtype=float, count=self.n_endmembers)
         return reuss_average_function(self.molar_fractions, G_list)
 
     @material_property

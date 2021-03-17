@@ -35,6 +35,8 @@ import scipy.optimize as opt
 import burnman
 import misc.colors as colors
 
+import warnings
+
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
@@ -94,7 +96,11 @@ if __name__ == "__main__":
     print("2nd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_2nd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
-    mg_perovskite_test.set_method("bm3")
+
+    with warnings.catch_warnings(record=True) as w:
+        mg_perovskite_test.set_method("bm3")
+        print(w[-1].message)
+
     model_vs_2nd_order_incorrect = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
 
@@ -105,7 +111,11 @@ if __name__ == "__main__":
     print("3rd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_3rd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
-    mg_perovskite_test.set_method("bm2")
+
+    with warnings.catch_warnings(record=True) as w:
+        mg_perovskite_test.set_method("bm2")
+        print(w[-1].message)
+
     model_vs_3rd_order_incorrect = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
 

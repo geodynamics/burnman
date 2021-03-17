@@ -10,7 +10,7 @@ from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
 from burnman import constants
 import numpy as np
-
+import warnings
 
 def p(v1, v2):
     return (v2 - v1) / v1
@@ -58,7 +58,12 @@ for database, f, mineral in filemin:
 variables = ['V', 'K_T', 'rho']
 
 fo = HP_2011_ds62.fo()
-fo.set_method('mt')
+
+with warnings.catch_warnings(record=True) as w:
+    fo.set_method('mt')
+    assert len(w) == 1
+    assert issubclass(w[-1].category, UserWarning)
+
 percentage_diff = []
 PT = []
 
@@ -127,4 +132,3 @@ print('Maximum percentage error in SLB database '
       'with configurational entropy and landau transition:')
 print('{0}: {1:.0e}% at {2:.0f} GPa and {3:.0f} K for {4}'.format(variables[j], percentage_diff[i, j],
                                                                   PT[i][0], PT[i][1], mineral_names[i]))
-print('')

@@ -45,6 +45,8 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 
+import warnings 
+
 if __name__ == "__main__":
 
     # List of seismic 1D models
@@ -77,14 +79,24 @@ if __name__ == "__main__":
                 # try to get and plot values for given model, if this fails the
                 # variable is likely not defined for that model
                 try:
-                    values = getattr(models[model_index], variables[variable_index])(depths)
-                    plt.plot(depths / 1.e3, values, color=colors[
-                             model_index], linestyle='-', label=models[model_index].__class__.__name__)
-                except:
+                    with warnings.catch_warnings(record=True) as wrn:
+                        values = getattr(models[model_index],
+                                         variables[variable_index])(depths)
+                        if (len(wrn) == 1) or (len(wrn) == 2):
+                            for w in wrn:
+                                print(w.message)
+                        elif len(wrn) > 2:
+                            raise Exception('Unexpected number of warnings')
+
+                    plt.plot(depths / 1.e3, values, color=colors[model_index],
+                             linestyle='-',
+                             label=models[model_index].__class__.__name__)
+                except ValueError:
                     # write out warning that the variable failed for given
                     # model
-                    print(
-                        variables[variable_index] + ' is not defined for ' + models[model_index].__class__.__name__)
+                    print(variables[variable_index]
+                          + ' is not defined for '
+                          + models[model_index].__class__.__name__)
 
         plt.title(variables[variable_index])
         box = ax.get_position()

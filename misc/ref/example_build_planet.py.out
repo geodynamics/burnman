@@ -24,5 +24,4 @@ outer core mass fraction of planet 0.338
 lower mantle mass fraction of planet 0.476
 upper mantle mass fraction of planet 0.167
 
-BURNMAN/burnman/seismic.py: UserWarning: Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. 
-  "Gravity is not given in " + self.__class__.__name__ + " and is now being computed. This will only work when density is defined for the entire planet.  Use at your own risk. ")
+Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk.

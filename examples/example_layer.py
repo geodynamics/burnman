@@ -48,6 +48,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 import burnman
 from burnman import minerals
 
+import warnings
 
 if __name__ == "__main__":
     # This is the first actual work done in this example.  We define
@@ -64,8 +65,12 @@ if __name__ == "__main__":
     # query the seismic model for the pressure, density, P wave speed, S wave
     # speed, and bulk sound velocity at those depths
     depths = np.linspace(2890e3, 670e3, 20)
-    pressure, gravity, seis_rho, seis_vp, seis_vs, seis_bullen = seismic_model.evaluate(
-        ['pressure', 'gravity', 'density', 'v_p', 'v_s', 'bullen'], depths)
+
+    with warnings.catch_warnings(record=True) as w:
+        eval = seismic_model.evaluate(['pressure', 'gravity', 'density',
+                                       'v_p', 'v_s', 'bullen'], depths)
+        pressure, gravity, seis_rho, seis_vp, seis_vs, seis_bullen = eval
+        print(w[-1].message)
 
     # Here we define the lower mantle as a Layer(). The layer needs various
     # parameters to set a depth array and radius array.

@@ -216,7 +216,7 @@ if __name__ == '__main__':
         0.4, '#bae4b3'), (0.6, '#74c476'), (0.8, '#31a354'), (1.0, '#006d2c')], gamma=0.1)
     c.set_bad('w', alpha=1.0)
     plt.imshow(
-        density_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7,
+        density_hist.transpose(), origin='lower', cmap=c, interpolation='gaussian', alpha=.7,
         aspect=aspect_ratio, extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]])
     plt.plot(pressure / 1.e9, seis_rho / 1.e3, linestyle="--",
              color='g', linewidth=2.0, label='Density')
@@ -227,7 +227,7 @@ if __name__ == '__main__':
         0.4, '#bdd7e7'), (0.6, '#6baed6'), (0.8, '#3182bd'), (1.0, '#08519c')], gamma=0.5)
     c.set_bad('w', alpha=1.0)
     plt.imshow(
-        vs_hist.transpose(), origin='low', cmap=c,  interpolation='gaussian', alpha=.7,
+        vs_hist.transpose(), origin='lower', cmap=c,  interpolation='gaussian', alpha=.7,
         aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]])
     plt.plot(pressure / 1.e9, seis_vs / 1.e3, linestyle="--",
              color='b', linewidth=2.0, label='Vs')
@@ -238,7 +238,7 @@ if __name__ == '__main__':
         0.4, '#fcae91'), (0.6, '#fb6a4a'), (0.8, '#de2d26'), (1.0, '#a50f15')], gamma=0.5)
     c.set_bad('w', alpha=1.0)
     plt.imshow(
-        vphi_hist.transpose(), origin='low', cmap=c, interpolation='gaussian', alpha=.7,
+        vphi_hist.transpose(), origin='lower', cmap=c, interpolation='gaussian', alpha=.7,
         aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]])
     plt.plot(pressure / 1.e9, seis_vphi / 1.e3,
              linestyle="--", color='r', linewidth=2.0, label='Vphi')
