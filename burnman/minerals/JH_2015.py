@@ -11,12 +11,10 @@ The values in this document are all in S.I. units,
 unlike those in the original tc file.
 """
 import inspect
-
-from ..mineral import Mineral
+import numpy as np
 from ..solidsolution import SolidSolution
 from ..combinedmineral import CombinedMineral
 from ..solutionmodel import *
-from ..processchemistry import dictionarize_formula, formula_mass
 from copy import copy
 
 """

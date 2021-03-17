@@ -13,7 +13,8 @@ from . import constants
 # python interpreter
 try:
     import os
-    if 'NUMBA_DISABLE_JIT' in os.environ and int(os.environ['NUMBA_DISABLE_JIT']) == 1:
+    if (('NUMBA_DISABLE_JIT' in os.environ
+         and int(os.environ['NUMBA_DISABLE_JIT']) == 1)):
         raise ImportError("NOOOO!")
     from numba import njit
 except ImportError:
@@ -21,12 +22,14 @@ except ImportError:
         return fn
 
 
-def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers, n_occupancies, site_multiplicities, endmember_configurational_entropies):
+def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers,
+                          n_occupancies, site_multiplicities,
+                          endmember_configurational_entropies):
     site_occupancies = np.dot(molar_fractions, endmember_occupancies)
     a = np.power(site_occupancies,
                  endmember_occupancies * site_multiplicities).prod(-1)
-    normalisation_constants = np.exp(endmember_configurational_entropies /
-                                     constants.gas_constant)
+    normalisation_constants = np.exp(endmember_configurational_entropies
+                                     / constants.gas_constant)
     return normalisation_constants * a
 
 
@@ -47,58 +50,69 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     Wint = -alpha * (q.dot(W)*q).sum(-1)
     return Wint
 
+
 @njit
 def _non_ideal_hessian_subreg(p, n_endmembers, W):
     hess = np.zeros((n_endmembers, n_endmembers))
-    for l in range(n_endmembers):
+    for k in range(n_endmembers):
         for m in range(n_endmembers):
             for i in range(n_endmembers):
                 for j in range(n_endmembers):
-                    dil = 1. if i==l else 0.
-                    djl = 1. if j==l else 0.
-                    dim = 1. if i==m else 0.
-                    djm = 1. if j==m else 0.
+                    dik = 1. if i == k else 0.
+                    djk = 1. if j == k else 0.
+                    dim = 1. if i == m else 0.
+                    djm = 1. if j == m else 0.
 
-
-                    hess[l,m] += W[i,j]*((djl*djm*p[i] - dil*dim*p[j]) +
-                                         (dil*djm + djl*dim) * (p[j] - p[i]) +
-                                         (djl + djm)*(p[i]*(p[i] - 2.*p[j])) -
-                                         (dil + dim)*(p[j]*(p[j] - 2.*p[i])) +
-                                         3.*p[i]*p[j]*(p[j] - p[i]) +
-                                         (((dil + dim) - p[i]) *
-                                          ((djl + djm) - p[j]) + p[i]*p[j])/2.)
+                    hess[k, m] += W[i, j] * ((djk*djm*p[i] - dik*dim*p[j])
+                                             + (dik*djm + djk*dim)
+                                             * (p[j] - p[i])
+                                             + (djk + djm)
+                                             * (p[i]*(p[i] - 2.*p[j]))
+                                             - (dik + dim)
+                                             * (p[j]*(p[j] - 2.*p[i]))
+                                             + 3.*p[i]*p[j]
+                                             * (p[j] - p[i])
+                                             + (((dik + dim) - p[i])
+                                                * ((djk + djm) - p[j])
+                                                + p[i]*p[j])
+                                             / 2.)
     return hess
+
 
 @njit
 def _non_ideal_interactions_subreg(p, n_endmembers, W):
     Wint = np.zeros(n_endmembers)
-    for l in range(n_endmembers):
+    for k in range(n_endmembers):
         for i in range(n_endmembers):
             for j in range(n_endmembers):
-                dil = 1. if i==l else 0.
-                djl = 1. if j==l else 0.
-                Wint[l] += W[i,j]/2. * ((p[i] - dil)*(p[j] - djl)*(2.*(p[i] - p[j]) - 1.) +
-                                        djl*p[i]*p[i] - dil*p[j]*p[j])
+                dik = 1. if i == k else 0.
+                djk = 1. if j == k else 0.
+                Wint[k] += W[i, j]/2. * ((p[i] - dik)*(p[j] - djk)
+                                         * (2.*(p[i] - p[j]) - 1.)
+                                         + djk*p[i]*p[i] - dik*p[j]*p[j])
     return Wint
+
 
 def logish(x, eps=1.e-5):
     """
-    2nd order series expansion of log(x) about eps: log(eps) - sum_k=1^infty (f_eps)^k / k
+    2nd order series expansion of log(x) about eps:
+    log(eps) - sum_k=1^infty (f_eps)^k / k
     Prevents infinities at x=0
     """
     f_eps = 1. - x/eps
-    mask = x>eps
-    ln = np.where(x<=eps, np.log(eps) - f_eps - f_eps*f_eps/2., 0.)
+    mask = x > eps
+    ln = np.where(x <= eps, np.log(eps) - f_eps - f_eps*f_eps/2., 0.)
     ln[mask] = np.log(x[mask])
     return ln
+
 
 def inverseish(x, eps=1.e-5):
     """
     1st order series expansion of 1/x about eps: 2/eps - x/eps/eps
     Prevents infinities at x=0
     """
-    mask = x>eps
-    oneoverx = np.where(x<=eps, 2./eps - x/eps/eps, 0.)
+    mask = x > eps
+    oneoverx = np.where(x <= eps, 2./eps - x/eps/eps, 0.)
     oneoverx[mask] = 1./x[mask]
     return oneoverx
 
@@ -496,21 +510,19 @@ class AsymmetricRegularSolution (IdealSolution):
         else:
             self.Wv = np.zeros((self.n_endmembers, self.n_endmembers))
 
-
         # initialize ideal solution model
         IdealSolution.__init__(self, endmembers)
 
     def _phi(self, molar_fractions):
-        phi = self.alphas*molar_fractions
+        phi = self.alphas * molar_fractions
         phi = np.divide(phi, np.sum(phi))
         return phi
-
 
     def _non_ideal_interactions(self, W, molar_fractions):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
         phi = self._phi(molar_fractions)
-        return _non_ideal_interactions_fct(phi, molar_fractions, self.n_endmembers, self.alphas, W)
+        return _non_ideal_interactions_fct(phi, np.array(molar_fractions), self.n_endmembers, self.alphas, W)
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
         Eint = self._non_ideal_interactions(self.We, molar_fractions)

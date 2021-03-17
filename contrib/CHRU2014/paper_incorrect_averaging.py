@@ -23,9 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman import minerals
 from misc.helper_solid_solution import HelperSolidSolution
-import matplotlib.image as mpimg
 import misc.colors as colors
 
 if __name__ == "__main__":
@@ -100,8 +98,8 @@ if __name__ == "__main__":
                       'eta_s_0': 0.8}
     wustite.set_method(method)
 
-    # in the text for the book chapter a linear relationship in elastic properties
-    # for the solid solutions is assumed...
+    # in the text for the book chapter a linear relationship in
+    # elastic properties for the solid solutions is assumed...
     class ferropericlase(HelperSolidSolution):
 
         def __init__(self, fe_num):
@@ -117,14 +115,12 @@ if __name__ == "__main__":
             HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
     # define the pressures
-    pressure = np.linspace(28.0e9, 129e9, 25.)
-
-
+    pressure = np.linspace(28.0e9, 129e9, 25)
 
     # seismic model for comparison:
+    # pick from .prem() .slow() .fast()
+    # (see burnman/seismic.py)
     seismic_model = burnman.seismic.PREM()
-                                         # pick from .prem() .slow() .fast()
-                                         # (see burnman/seismic.py)
     depths = seismic_model.depth(pressure)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
@@ -169,35 +165,36 @@ if __name__ == "__main__":
     # HERE IS THE STEP WITH THE INCORRECT MIXING ###
     # comment this out to have correct phase averaging, leave it in to have
     # incorrect phase averaging
-    mat_vs_3_wr = 0.5 * \
-        ((0.834 * mat_vs_1 + 0.166 * mat_vs_2) +
-         np.ones_like(mat_vs_1) / (0.834 / mat_vs_1 + 0.166 / mat_vs_2))
-    mat_vs_4_wr = 0.5 * \
-        ((0.92 * mat_vs_1 + 0.08 * mat_vs_2) +
-         np.ones_like(mat_vs_1) / (0.92 / mat_vs_1 + 0.08 / mat_vs_2))
+    mat_vs_3_wr = (0.5 * ((0.834 * mat_vs_1 + 0.166 * mat_vs_2)
+                          + np.ones_like(mat_vs_1)
+                          / (0.834 / mat_vs_1 + 0.166 / mat_vs_2)))
+    mat_vs_4_wr = (0.5 * ((0.92 * mat_vs_1 + 0.08 * mat_vs_2)
+                          + np.ones_like(mat_vs_1)
+                          / (0.92 / mat_vs_1 + 0.08 / mat_vs_2)))
 
     plt.subplot(1, 2, 2)
     plt.ylim(5.2, 7.4)
     plt.xlim(25, 135)
     # fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
     # plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
-    plt.plot(
-        seis_p / 1.e9, seis_vs / 1.e3, color='k', linestyle='-', marker='None',
-        markerfacecolor='w', markersize=4, label='PREM', linewidth=3.0, mew=1.5)
-    plt.plot(
-        seis_p / 1.e9, mat_vs_1 / 1.e3, color=colors.color(3), marker='v', markerfacecolor=colors.color(3),
-        markersize=4, markeredgecolor=colors.color(3), markevery=2, linewidth=1.5, label='perovskite')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_2 / 1.e3, color=colors.color(1), linestyle='-',
-        linewidth=1.5, marker='^', markerfacecolor=colors.color(1), markersize=4,
-        markeredgecolor=colors.color(1), markevery=2, label='periclase')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_4_wr / 1.e3, color=colors.color(4), dashes=dashstyle3,
-        linewidth=1.5, marker='o', markerfacecolor=colors.color(4), markersize=4,
-        markeredgecolor=colors.color(4), markevery=2, label='92\% pv')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_3_wr / 1.e3, color='g', linestyle='-', dashes=dashstyle2,
-        linewidth=1.5, marker='o', markerfacecolor='w', markersize=4, markeredgecolor='g', markevery=2, label='83\% pv')
+    plt.plot(seis_p / 1.e9, seis_vs / 1.e3, color='k', linestyle='-',
+             marker='None', markerfacecolor='w', markersize=4, label='PREM',
+             linewidth=3.0, mew=1.5)
+    plt.plot(seis_p / 1.e9, mat_vs_1 / 1.e3, color=colors.color(3),
+             marker='v', markerfacecolor=colors.color(3), markersize=4,
+             markeredgecolor=colors.color(3), markevery=2, linewidth=1.5,
+             label='perovskite')
+    plt.plot(seis_p / 1.e9, mat_vs_2 / 1.e3, color=colors.color(1),
+             linestyle='-', linewidth=1.5, marker='^',
+             markerfacecolor=colors.color(1), markersize=4,
+             markeredgecolor=colors.color(1), markevery=2, label='periclase')
+    plt.plot(seis_p / 1.e9, mat_vs_4_wr / 1.e3, color=colors.color(4),
+             dashes=dashstyle3, linewidth=1.5, marker='o',
+             markerfacecolor=colors.color(4), markersize=4,
+             markeredgecolor=colors.color(4), markevery=2, label='92\\% pv')
+    plt.plot(seis_p / 1.e9, mat_vs_3_wr / 1.e3, color='g', linestyle='-',
+             dashes=dashstyle2, linewidth=1.5, marker='o', markerfacecolor='w',
+             markersize=4, markeredgecolor='g', markevery=2, label='83\\% pv')
     plt.legend(loc='lower right', prop={'size': 12})
 
     plt.title("Phase average on velocities")
@@ -209,23 +206,25 @@ if __name__ == "__main__":
     plt.xlim(25, 135)
     # fig1 = mpimg.imread('input_figures/murakami_book_chapter.png')
     # plt.imshow(fig1, extent=[25,135,5.0,7.6], aspect='auto')
-    plt.plot(
-        seis_p / 1.e9, seis_vs / 1.e3, color='k', linestyle='-', marker='None',
-        markerfacecolor='w', markersize=4, label='PREM', linewidth=3.0, mew=1.5)
-    plt.plot(
-        seis_p / 1.e9, mat_vs_1 / 1.e3, color=colors.color(3), marker='v', markerfacecolor=colors.color(3),
-        markersize=4, markeredgecolor=colors.color(3), markevery=2, linewidth=1.5, label='perovskite')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_2 / 1.e3, color=colors.color(1), linestyle='-',
-        linewidth=1.5, marker='^', markerfacecolor=colors.color(1), markersize=4,
-        markeredgecolor=colors.color(1), markevery=2, label='periclase')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_4 / 1.e3, color=colors.color(4), dashes=dashstyle3,
-        linewidth=1.5, marker='o', markerfacecolor=colors.color(4), markersize=4,
-        markeredgecolor=colors.color(4), markevery=2, label='92\% pv')
-    plt.plot(
-        seis_p / 1.e9, mat_vs_3 / 1.e3, color='g', linestyle='-', dashes=dashstyle2,
-        linewidth=1.5, marker='o', markerfacecolor='w', markersize=4, markeredgecolor='g', markevery=2, label='83\% pv')
+    plt.plot(seis_p / 1.e9, seis_vs / 1.e3, color='k', linestyle='-',
+             marker='None', markerfacecolor='w', markersize=4,
+             label='PREM', linewidth=3.0, mew=1.5)
+    plt.plot(seis_p / 1.e9, mat_vs_1 / 1.e3, color=colors.color(3),
+             marker='v', markerfacecolor=colors.color(3), markersize=4,
+             markeredgecolor=colors.color(3), markevery=2, linewidth=1.5,
+             label='perovskite')
+    plt.plot(seis_p / 1.e9, mat_vs_2 / 1.e3, color=colors.color(1),
+             linestyle='-', linewidth=1.5, marker='^',
+             markerfacecolor=colors.color(1), markersize=4,
+             markeredgecolor=colors.color(1), markevery=2, label='periclase')
+    plt.plot(seis_p / 1.e9, mat_vs_4 / 1.e3, color=colors.color(4),
+             dashes=dashstyle3, linewidth=1.5, marker='o',
+             markerfacecolor=colors.color(4), markersize=4,
+             markeredgecolor=colors.color(4), markevery=2, label='92\\% pv')
+    plt.plot(seis_p / 1.e9, mat_vs_3 / 1.e3, color='g', linestyle='-',
+             dashes=dashstyle2, linewidth=1.5, marker='o',
+             markerfacecolor='w', markersize=4, markeredgecolor='g',
+             markevery=2, label='83\\% pv')
 
     plt.title(" V.-R.-H. on moduli")
     plt.xlabel("Pressure (GPa)")

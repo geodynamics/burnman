@@ -56,7 +56,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import burnman
-import burnman.mineral_helpers as helpers
 
 import warnings
 
@@ -87,8 +86,6 @@ if __name__ == '__main__':
     upper_mantle.set_material(burnman.minerals.SLB_2011.forsterite())
     upper_mantle.set_temperature_mode('adiabatic', temperature_top = 1200.)
 
-
-
     # Now we calculate the planet.
     planet_zog = burnman.Planet('Planet Zog',
                                 [inner_core, outer_core, lower_mantle, upper_mantle],
@@ -102,7 +99,7 @@ if __name__ == '__main__':
 
     # Now we output the mass of the planet and moment of inertia
     print('\nmass/Earth= {0:.3f}, moment of inertia factor= {1:.4f}'.format(planet_zog.mass / 5.97e24,
-                                                                          planet_zog.moment_of_inertia_factor))
+                                                                            planet_zog.moment_of_inertia_factor))
 
     # And here's the mass of the individual layers:
     for layer in planet_zog.layers:
@@ -115,10 +112,10 @@ if __name__ == '__main__':
     premradii = 6371.e3 - prem.internal_depth_list()
 
     with warnings.catch_warnings(record=True) as w:
-        premdensity, prempressure, premgravity,premvs,premvp = prem.evaluate(
-            ['density', 'pressure', 'gravity', 'v_s','v_p'])
+        eval = prem.evaluate(['density', 'pressure', 'gravity', 'v_s', 'v_p'])
+        premdensity, prempressure, premgravity, premvs, premvp = eval
         print(w[-1].message)
-    
+
     # Now let's plot everything up
 
     # Optional prettier plotting

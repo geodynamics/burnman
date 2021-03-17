@@ -341,15 +341,10 @@ class SeismicTable(Seismic1DModel):
 
         if len(density) > 0:
             radii = self.table_radius[::-1]
-            g = scipy.integrate.cumtrapz(
-                constants.G *
-                4. *
-                np.pi *
-                density *
-                radii *
-                radii,
-                x=radii,
-                initial=0)
+            g = scipy.integrate.cumtrapz(constants.G * 4. * np.pi
+                                         * density * radii * radii,
+                                         x=radii,
+                                         initial=0)
             g[1:] = g[1:] / radii[1:] / radii[1:]
 
             self.table_gravity = g[::-1]
@@ -358,8 +353,8 @@ class SeismicTable(Seismic1DModel):
                              'in this SeismicTable instance.')
 
     def _compute_pressure(self):
-        # Calculate the pressure profile based on density and gravity.  This integrates
-        # the equation for hydrostatic equilibrium  P = rho g z.
+        # Calculate the pressure profile based on density and gravity.
+        # This integrates the equation for hydrostatic equilibrium P = rho g z.
         radii = self.table_radius
         density = self.table_density
         gravity = self.gravity(self.earth_radius - radii)
