@@ -19,16 +19,16 @@ www.axisem.info
 # Imports to be compatible with Python2 and Python3
 from __future__ import absolute_import
 from __future__ import print_function
-import os
-import sys  # Library used to interact with your operating system
+
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
+
 # Import BurnMan
-sys.path.insert(1, os.path.abspath('../'))  # add path to burnman
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals  # import mineral library seperately
 
-
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

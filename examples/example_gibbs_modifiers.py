@@ -51,7 +51,6 @@ from burnman import minerals
 
 assert burnman_path  # silence pyflakes warning
 
-
 if __name__ == "__main__":
 
     # Here we show the interesting features of Landau transitions

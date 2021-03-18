@@ -51,7 +51,6 @@ from scipy.interpolate import UnivariateSpline
 
 assert burnman_path  # silence pyflakes warning
 
-
 #  Define fitting function to find the temperature along the isentrope
 def isentrope(rock, pressures, entropy, T_guess):
     def _deltaS(T, S, P, rock):

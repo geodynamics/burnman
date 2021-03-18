@@ -56,7 +56,6 @@ import warnings
 
 assert burnman_path  # silence pyflakes warning
 
-
 if __name__ == '__main__':
     # FIRST: we must define the composition of the planet as individual layers.
     # A layer is defined by 4 parameters: Name, min_depth, max_depth,and number of slices within the layer.

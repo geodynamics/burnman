@@ -23,15 +23,13 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 
 
 """
-import sys
-import os
 import numpy as np
 
-sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 import matplotlib.pyplot as plt
 
+assert burnman_path  # silence pyflakes warning
 
 rock=burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
 P = 1.e9

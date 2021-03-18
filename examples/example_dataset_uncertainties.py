@@ -36,7 +36,6 @@ from burnman.nonlinear_fitting import plot_cov_ellipse  # for plotting
 
 assert burnman_path  # silence pyflakes warning
 
-
 plt.style.use('ggplot')
 
 # First, we read in the covariance matrix
