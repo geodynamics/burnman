@@ -6,71 +6,14 @@
 from __future__ import absolute_import
 
 import numpy as np
-import cvxpy as cp
-from scipy.linalg import inv, sqrtm
-from collections import Counter
-import warnings
-from .tools import merge_two_dicts
+from .linear_fitting import weighted_constrained_least_squares
 
 
-def weighted_constrained_least_squares(A, b, Cov_b,
-                                       equality_constraints=None,
-                                       inequality_constraints=None):
-    """
-
-    """
-
-    # Create the standard weighted least squares objective function
-    # (https://stats.stackexchange.com/a/333551)
-    n_vars = A.shape[1]
-    m = inv(sqrtm(Cov_b))
-    mA = m@A
-    mb = m@b
-    x = cp.Variable(n_vars)
-    objective = cp.Minimize(cp.sum_squares(mA@x - mb))
-
-    constraints = []
-    if equality_constraints is not None:
-        n_eq_csts = len(equality_constraints[0])
-        constraints = [equality_constraints[0][i]@x
-                       == equality_constraints[1][i]
-                       for i in range(n_eq_csts)]
-
-    if inequality_constraints is not None:
-        n_ineq_csts = len(inequality_constraints[0])
-        constraints.extend([inequality_constraints[0][i]@x
-                            <= inequality_constraints[1][i]
-                            for i in range(n_ineq_csts)])
-
-    # Set up the problem and solve it
-    warns = []
-    prob = cp.Problem(objective, constraints)
-    try:
-        with warnings.catch_warnings(record=True) as w:
-            res = prob.solve(solver=cp.ECOS)
-            popt = np.array([x.value[i] for i in range(len(A.T))])
-            warns.extend(w)
-    except Exception:
-        print('ECOS Solver failed. Trying default solver.')
-        try:
-            with warnings.catch_warnings(record=True) as w:
-                res = prob.solve()
-                popt = np.array([x.value[i] for i in range(len(A.T))])
-                warns.extend(w)
-        except Exception as e:
-            raise Exception(e)
-
-    # Calculate the covariance matrix
-    # (also from https://stats.stackexchange.com/a/333551)
-    inv_Cov_b = np.linalg.inv(Cov_b)
-    pcov = np.linalg.inv(A.T.dot(inv_Cov_b.dot(A)))
-
-    return (popt, pcov, res)
-
-
-def fit_composition_to_solution(fitted_variables,
+def fit_composition_to_solution(solution,
+                                fitted_variables,
                                 variable_values, variable_covariances,
-                                solution):
+                                variable_conversions=None,
+                                normalize=True):
     """
     It is assumed that any elements not in composition were not measured (but may exist in unknown quantities).
     If distinct oxidation states or site occupancies were measured
@@ -83,51 +26,79 @@ def fit_composition_to_solution(fitted_variables,
 
     The composition and associated uncertainties in endmember *amounts*, not proportions. If normalize=True, then the endmember amounts are normalized to a total of one.
     """
+    n_vars = len(fitted_variables)
+    n_mbrs = len(solution.endmembers)
 
-    if type(formulae[0]) is dict or type(formulae[0]) is Counter:
-        stoichiometric_matrix = np.array([[f[e] if e in f else 0. for e in fitted_elements] for f in formulae])
-    else:
-        stoichiometric_matrix = formulae
+    solution_variables = solution.elements
+    solution_variables.extend(solution.solution_model.site_names)
 
-    b = composition
+    solution_matrix = np.hstack((solution.stoichiometric_matrix,
+                                 solution.solution_model.endmember_noccupancies))
 
-    if len(compositional_uncertainties.shape) == 1:
-        b_uncertainties = np.diag(compositional_uncertainties *
-                                  compositional_uncertainties)
-    else:
-        b_uncertainties = compositional_uncertainties
+    n_sol_vars = solution_matrix.shape[1]
 
-    if np.linalg.det(b_uncertainties) < 1.e-30: # ensure uncertainty matrix is not singular
-        #warnings.warn('The compositional covariance matrix for the {0} solution is nearly singular or not positive-definite (determinant = {1}). '
-        #              'This is likely to be because your fitting parameters are not independent. '
-        #              'For now, we increase all diagonal components by 1%. '
-        #              'However, you may wish to redefine your problem.'.format(name, np.linalg.det(b_uncertainties)))
+    if variable_conversions is not None:
+        print(variable_conversions)
+        solution_matrix = np.hstack((solution_matrix,
+                                     np.zeros((solution_matrix.shape[0],
+                                               len(variable_conversions)))))
 
-        b_uncertainties += np.diag(np.diag(b_uncertainties))*0.01
+        for i, (new_var, conversion_dict) in enumerate(variable_conversions.items()):
+            print(new_var, conversion_dict)
+            assert (new_var not in solution_variables)
+            solution_variables.append(new_var)
 
-    endmember_constraints = lambda site_occ: [{'type': 'ineq', 'fun': lambda x, eq=eq: eq.dot(x)}
-                                              for eq in site_occ]
-    cons = endmember_constraints(endmember_site_occupancies.T)    
+            for var in conversion_dict.keys():
+                solution_matrix[:, n_sol_vars+i] += solution_matrix[:, solution_variables.index(var)]
 
-    fn = lambda A, *proportions: A.dot(proportions)
-    popt, pcov = curve_fit(fn, A, b,
-                           p0=np.array([0. for i in range(len(A.T))]),
-                           sigma=b_uncertainties, absolute_sigma=True)
+    # Now, construct A using the fitted variables
+    A = np.zeros((n_vars, solution_matrix.shape[0]))
+    for i, var in enumerate(fitted_variables):
+        A[i, :] = solution_matrix[:, solution_variables.index(var)]
 
-    res = np.sqrt((A.dot(popt) - b).dot(np.linalg.solve(b_uncertainties, A.dot(popt) - b)))
+    b = variable_values
+    Cov_b = variable_covariances
 
-    # Check constraints
-    if any([c['fun'](popt)<0. for c in cons]):
-        warnings.warn('Warning: Simple least squares predicts an unfeasible solution composition for {0} solution. '
-                      'Recalculating with site constraints. The covariance matrix must be treated with caution.'.format(name))
-        fn = lambda x, A, b, b_uncertainties: np.sqrt((A.dot(popt) - b).dot(np.linalg.solve(b_uncertainties, A.dot(popt) - b)))
-        sol = minimize(fn, popt, args=(A, b, b_uncertainties), method='SLSQP',constraints=cons)
-        popt = sol.x
-        res = sol.fun
+    # Define the constraints
+    # Ensure that element abundances / site occupancies
+    # are exactly equal to zero if the user specifies that
+    # they are equal to zero.
+    S, S_index = np.unique(A, axis=0, return_index=True)
+    S = np.array([s for i, s in enumerate(S)
+                  if np.abs(b[S_index[i]]) < 1.e-10
+                  and any(np.abs(s) > 1.e-10)])
+    equality_constraints = [S, np.zeros(len(S))]
+
+    # Ensure all site occupancies are non-negative
+    T = np.array([-t for t in np.unique(solution.solution_model.endmember_occupancies.T, axis=0)
+                  if any(np.abs(t) > 1.e-10)])
+    inequality_constraints = [T, np.zeros(len(T))]
+
+    popt, pcov, res = weighted_constrained_least_squares(A, b, Cov_b,
+                                                         equality_constraints,
+                                                         inequality_constraints)
 
     if normalize:
         sump = sum(popt)
         popt /= sump
-        pcov /= sump*sump
+        pcov /= sump * sump
         res /= sump
+
+    # Convert the variance-covariance matrix from endmember amounts to
+    # endmember proportions
+    dpdx = (np.eye(n_mbrs) - popt).T  # = (1. - p[i] if i == j else -p[i])
+    pcov = dpdx.dot(pcov).dot(dpdx.T)
+    return (popt, pcov, res)
+
+
+def fit_phase_proportions_to_bulk_composition(phase_compositions,
+                                              bulk_composition):
+
+    n_phases = len(phase_compositions[0])
+    inequality_constraints = [-np.eye(n_phases), np.zeros(n_phases)]
+    popt, pcov, res = weighted_constrained_least_squares(phase_compositions,
+                                                         bulk_composition,
+                                                         None,
+                                                         None,
+                                                         inequality_constraints)
     return (popt, pcov, res)

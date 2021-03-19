@@ -12,7 +12,7 @@ from .solutionmodel import SolutionModel
 from .solutionmodel import MechanicalSolution, IdealSolution
 from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from .solutionmodel import SubregularSolution
-from .processchemistry import sum_formulae
+from .processchemistry import sum_formulae, IUPAC_element_order
 from .averaging_schemes import reuss_average_function
 
 
@@ -81,11 +81,16 @@ class SolidSolution(Mineral):
                 "'endmembers' attribute missing from solid solution")
 
         try:
-            self.endmember_formulae = [
-                mbr[0].params['formula'] for mbr in self.endmembers]
-        except KeyError:
-            raise Exception(
-                "Not all endmembers of this solid solution have a formula in their params dictionary.")
+            self.endmember_formulae = [mbr[0].params['formula'] for mbr in self.endmembers]
+            elements = list(set([el for mbr in self.endmembers for el in list(mbr[0].params['formula'].keys())]))
+            # Make
+            self.elements = [el for el in IUPAC_element_order if el in elements]
+            self.stoichiometric_matrix = np.array([[0. if el not in mbr[0].params['formula']
+                                                    else mbr[0].params['formula'][el]
+                                                    for el in self.elements]
+                                                   for mbr in self.endmembers])
+        except:
+            raise Exception("Not all endmembers of this solid solution have a formula in their params dictionary.")
 
         # Set default solution model type
         if hasattr(self, 'solution_type'):
