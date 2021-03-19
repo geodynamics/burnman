@@ -202,6 +202,7 @@ from . import averaging_schemes
 from . import eos
 
 from . import processchemistry
+from . import composition_fitting
 from . import chemicalpotentials
 from . import geotherm
 
