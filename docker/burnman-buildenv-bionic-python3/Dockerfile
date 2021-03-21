@@ -19,3 +19,4 @@ RUN apt update && \
 # requires libgmp3-dev.
 
 RUN pip3 install pycddlib
+RUN pip3 install cvxpy
