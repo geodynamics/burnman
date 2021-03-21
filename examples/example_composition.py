@@ -24,16 +24,7 @@ This example script demonstrates the use of BurnMan's Composition class.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
-import numpy as np
-import matplotlib.pyplot as plt
-
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
+import burnman_path
 from burnman.processchemistry import dictionarize_formula
 
 # Import the Composition class and a function to read compositions from file
@@ -42,6 +33,8 @@ from burnman.processchemistry import dictionarize_formula
 # All lines after the first are either molar or weight proportions
 # of the components given in the header, followed by the comment string
 from burnman.composition import file_to_composition_list, Composition
+
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     print('1) Creating a Composite instance, printing '

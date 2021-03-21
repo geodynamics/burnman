@@ -46,18 +46,15 @@ on each of the parameters which can be called.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
 import matplotlib.pyplot as plt
 import numpy as np
 
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 
 import warnings
+
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == '__main__':
     # FIRST: we must define the composition of the planet as individual layers.

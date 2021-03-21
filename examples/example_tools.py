@@ -17,24 +17,24 @@ This example demonstrates BurnMan's tools, which are currently
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
+
+assert burnman_path  # silence pyflakes warning
+
 
 def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
 
+
 if __name__ == "__main__":
 
     # First, let's check the EoS consistency of SLB_2011 periclase
-    burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(), P=10.e9, T=3000., verbose=True)
+    burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(),
+                                        P=10.e9, T=3000., verbose=True)
     print('')
 
     # Next, let's create the Mg2SiO4 phase diagram

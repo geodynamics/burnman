@@ -24,14 +24,11 @@ need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density a
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os
-import sys
 import numpy as np
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
+
+assert burnman_path  # silence pyflakes warning
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,
