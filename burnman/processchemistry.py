@@ -38,7 +38,40 @@ def read_masses():
     return lookup
 
 
+"""
+atomic_masses is a dictionary of atomic masses
+"""
 atomic_masses = read_masses()
+
+"""
+IUPAC_element_order provides a list of all the elements.
+Element order is based loosely on electronegativity,
+following the scheme suggested by IUPAC, except that H
+comes after the Group 16 elements, not before them.
+"""
+IUPAC_element_order = ['v', 'Og', 'Rn', 'Xe', 'Kr', 'Ar', 'Ne', 'He',  # Group 18
+                       'Fr', 'Cs', 'Rb', 'K', 'Na', 'Li',  # Group 1 (not H)
+                       'Ra', 'Ba', 'Sr', 'Ca', 'Mg', 'Be',  # Group 2
+                       'Lr', 'No', 'Md', 'Fm', 'Es', 'Cf', 'Bk', 'Cm',
+                       'Am', 'Pu', 'Np', 'U', 'Pa', 'Th', 'Ac',  # Actinides
+                       'Lu', 'Yb', 'Tm', 'Er', 'Ho', 'Dy', 'Tb', 'Gd',
+                       'Eu', 'Sm', 'Pm', 'Nd', 'Pr', 'Ce', 'La',  # Lanthanides
+                       'Y', 'Sc',  # Group 3
+                       'Rf', 'Hf', 'Zr', 'Ti',  # Group 4
+                       'Db', 'Ta', 'Nb', 'V',  # Group 5
+                       'Sg', 'W', 'Mo', 'Cr',  # Group 6
+                       'Bh', 'Re', 'Tc', 'Mn',  # Group 7
+                       'Hs', 'Os', 'Ru', 'Fe',  # Group 8
+                       'Mt', 'Ir', 'Rh', 'Co',  # Group 9
+                       'Ds', 'Pt', 'Pd', 'Ni',  # Group 10
+                       'Rg', 'Au', 'Ag', 'Cu',  # Group 11
+                       'Cn', 'Hg', 'Cd', 'Zn',  # Group 12
+                       'Nh', 'Tl', 'In', 'Ga', 'Al', 'B',  # Group 13
+                       'Fl', 'Pb', 'Sn', 'Ge', 'Si', 'C',  # Group 14
+                       'Mc', 'Bi', 'Sb', 'As', 'P', 'N',  # Group 15
+                       'Lv', 'Po', 'Te', 'Se', 'S', 'O',  # Group 16
+                       'H',  # hydrogen
+                       'Ts', 'At', 'I', 'Br', 'Cl', 'F']  # Group 17
 
 
 def dictionarize_formula(formula):
@@ -403,35 +436,11 @@ def formula_to_string(formula):
     Returns
     -------
     formula_string : string
-        A formula string, with element order based loosely
-        on electronegativity, following the scheme suggested by IUPAC,
-        except that H comes after the Group 16 elements, not before them.
+        A formula string, with element order as given in the list
+        IUPAC_element_order.
         If one or more keys in the dictionary are not one of the elements
         in the periodic table, then they are added at the end of the string.
     """
-    IUPAC_element_order = ['v', 'Og', 'Rn', 'Xe', 'Kr', 'Ar', 'Ne', 'He',  # Group 18
-                           'Fr', 'Cs', 'Rb', 'K', 'Na', 'Li',  # Group 1 (omitting H)
-                           'Ra', 'Ba', 'Sr', 'Ca', 'Mg', 'Be',  # Group 2
-                           'Lr', 'No', 'Md', 'Fm', 'Es', 'Cf', 'Bk', 'Cm',
-                           'Am', 'Pu', 'Np', 'U', 'Pa', 'Th', 'Ac',  # Actinides
-                           'Lu', 'Yb', 'Tm', 'Er', 'Ho', 'Dy', 'Tb', 'Gd',
-                           'Eu', 'Sm', 'Pm', 'Nd', 'Pr', 'Ce', 'La',  # Lanthanides
-                           'Y', 'Sc',  # Group 3
-                           'Rf', 'Hf', 'Zr', 'Ti',  # Group 4
-                           'Db', 'Ta', 'Nb', 'V',  # Group 5
-                           'Sg', 'W', 'Mo', 'Cr',  # Group 6
-                           'Bh', 'Re', 'Tc', 'Mn',  # Group 7
-                           'Hs', 'Os', 'Ru', 'Fe',  # Group 8
-                           'Mt', 'Ir', 'Rh', 'Co',  # Group 9
-                           'Ds', 'Pt', 'Pd', 'Ni',  # Group 10
-                           'Rg', 'Au', 'Ag', 'Cu',  # Group 11
-                           'Cn', 'Hg', 'Cd', 'Zn',  # Group 12
-                           'Nh', 'Tl', 'In', 'Ga', 'Al', 'B',  # Group 13
-                           'Fl', 'Pb', 'Sn', 'Ge', 'Si', 'C',  # Group 14
-                           'Mc', 'Bi', 'Sb', 'As', 'P', 'N',  # Group 15
-                           'Lv', 'Po', 'Te', 'Se', 'S', 'O',  # Group 16
-                           'H',  # hydrogen
-                           'Ts', 'At', 'I', 'Br', 'Cl', 'F']  # Group 17
 
     formula_string = ''
     for e in IUPAC_element_order:
