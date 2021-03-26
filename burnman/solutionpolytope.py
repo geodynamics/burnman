@@ -258,7 +258,10 @@ def polytope_from_solution_model(solution_model, return_fractions=False):
     equalities[0, 1:] = 1
 
     if len(nullspace) > 0:
-        equalities[1:, 1:] = nullspace
+        try:
+            equalities[1:, 1:] = nullspace
+        except:
+            equalities[1:, 1:] = nullspace[:, :, 0]
     return SolutionPolytope(equalities, return_fractions)
 
 
@@ -359,6 +362,13 @@ def complete_basis(basis):
         return basis
 
 def decompose_3D_matrix(Wn):
+    """
+    Decomposes a 3D matrix where E = W_ijk p_i p_j p_k
+    into a subregular form where
+    E = G_i p_i + WB_ij (1 - p_j + p_i) / 2 + WT_ijk p_i p_j p_k,
+    and i < j < k.
+    """
+
     n_mbrs = len(Wn)
     # New endmember components
     # Wn_iii needs to be copied, otherwise just a view onto Wn
