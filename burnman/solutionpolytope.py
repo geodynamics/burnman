@@ -358,6 +358,60 @@ def complete_basis(basis):
     else:
         return basis
 
+def decompose_3D_matrix(Wn):
+    n_mbrs = len(Wn)
+    # New endmember components
+    # Wn_iii needs to be copied, otherwise just a view onto Wn
+    new_endmember_excesses = np.copy(np.einsum('iii->i', Wn))
+
+    # Removal of endmember components from 3D representation
+    Wn -= (np.einsum('i, j, k->ijk',
+                     new_endmember_excesses, np.ones(n_mbrs),
+                     np.ones(n_mbrs))
+           + np.einsum('i, j, k->ijk',
+                       np.ones(n_mbrs), new_endmember_excesses,
+                       np.ones(n_mbrs))
+           + np.einsum('i, j, k->ijk',
+                       np.ones(n_mbrs), np.ones(n_mbrs),
+                       new_endmember_excesses))/3.
+
+    # Transformed 2D components
+    # (i=j, i=k, j=k)
+    new_binary_matrix = (np.einsum('jki, jk -> ij', Wn, np.identity(n_mbrs))
+                         + np.einsum('jik, jk -> ij', Wn, np.identity(n_mbrs))
+                         + np.einsum('ijk, jk -> ij', Wn,
+                                     np.identity(n_mbrs))).round(decimals=12)
+
+    # Wb is the 3D matrix corresponding to the terms in the binary matrix,
+    # such that the two following print statements produce the same answer
+    # for a given array of endmember proportions
+    #print(np.einsum('ij, i, j', new_binary_matrix, p, p*p))
+    #print(np.einsum('ijk, i, j, k', Wb, p, p, p))
+    Wb = (np.einsum('ijk, ij->ijk', Wn, np.identity(n_mbrs))
+          + np.einsum('ijk, jk->ijk', Wn, np.identity(n_mbrs))
+          + np.einsum('ijk, ik->ijk', Wn, np.identity(n_mbrs)))
+
+    # Remove binary component from 3D representation
+    # The extra terms are needed because the binary term in the formulation
+    # of a subregular solution model given by
+    # Helffrich and Wood includes ternary components (the sum_k X_k part)..
+    Wn -= Wb + (np.einsum('ij, k', new_binary_matrix, np.ones(n_mbrs))
+                - np.einsum('ij, ik->ijk', new_binary_matrix, np.identity(n_mbrs))
+                - np.einsum('ij, jk->ijk', new_binary_matrix, np.identity(n_mbrs)))/2.
+
+    # Find the 3D components Wijk by adding the elements at
+    # the six equivalent positions in the matrix
+    new_ternary_terms = []
+    for i in range(n_mbrs):
+        for j in range(i+1, n_mbrs):
+            for k in range(j+1, n_mbrs):
+                val = (Wn[i, j, k] + Wn[j, k, i]
+                       + Wn[k, i, j] + Wn[k, j, i]
+                       + Wn[j, i, k] + Wn[i, k, j]).round(decimals=12)
+                if np.abs(val) > 1.e-12:
+                    new_ternary_terms.append([i, j, k, val])
+
+    return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
 
 def _subregular_matrix_conversion(new_basis, binary_matrix,
                                   ternary_terms=None, endmember_excesses=None):
@@ -385,44 +439,9 @@ def _subregular_matrix_conversion(new_basis, binary_matrix,
     A = new_basis.T
     Wn = np.einsum('il, jm, kn, ijk -> lmn', A, A, A, W)
 
-    # New endmember components
-    # Wn_iii needs to be copied, otherwise just a view onto Wn
-    new_endmember_excesses = np.copy(np.einsum('iii->i', Wn))
+    new_endmember_excesses, new_binary_terms, new_ternary_terms = decompose_3D_matrix(Wn)
 
-    # Removal of endmember components from 3D representation
-    Wn -= (np.einsum('i, j, k->ijk',
-                     new_endmember_excesses, np.ones(n_mbrs),
-                     np.ones(n_mbrs))
-           + np.einsum('i, j, k->ijk',
-                       np.ones(n_mbrs), new_endmember_excesses,
-                       np.ones(n_mbrs))
-           + np.einsum('i, j, k->ijk',
-                       np.ones(n_mbrs), np.ones(n_mbrs),
-                       new_endmember_excesses))/3.
-
-    # Transformed 2D components
-    # (i=j, i=k, j=k)
-    new_binary_matrix = (np.einsum('jki, jk -> ij', Wn, np.identity(n_mbrs))
-                         + np.einsum('jik, jk -> ij', Wn, np.identity(n_mbrs))
-                         + np.einsum('ijk, jk -> ij', Wn,
-                                     np.identity(n_mbrs))).round(decimals=12)
-
-    # Removal unitary component from 3D representation
-    Wn -= np.einsum('i, jk -> ijk', np.ones(n_mbrs), new_binary_matrix/2.)
-
-    # Find the 3D components Wijk by adding the elements at
-    # the six equivalent positions in the matrix
-    new_ternary_terms = []
-    for i in range(n_mbrs):
-        for j in range(i+1, n_mbrs):
-            for k in range(j+1, n_mbrs):
-                val = (Wn[i, j, k] + Wn[j, k, i]
-                       + Wn[k, i, j] + Wn[k, j, i]
-                       + Wn[j, i, k] + Wn[i, k, j]).round(decimals=12)
-                if np.abs(val) > 1.e-12:
-                    new_ternary_terms.append([i, j, k, val])
-
-    return (new_binary_matrix, new_ternary_terms, new_endmember_excesses)
+    return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
 
 
 def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
@@ -483,13 +502,13 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
                     for i in range(n_mbrs-1)]
 
         # N.B. initial endmember_excesses are zero
-        We, ternary_e, Emod = _subregular_matrix_conversion(full_basis,
+        Emod, We, ternary_e = _subregular_matrix_conversion(full_basis,
                                                             solution.solution_model.We,
                                                             solution.solution_model.ternary_terms_e)
-        Ws, ternary_s, Smod = _subregular_matrix_conversion(full_basis,
+        Smod, Ws, ternary_s = _subregular_matrix_conversion(full_basis,
                                                             solution.solution_model.Ws,
                                                             solution.solution_model.ternary_terms_s)
-        Wv, ternary_v, Vmod = _subregular_matrix_conversion(full_basis,
+        Vmod, Wv, ternary_v = _subregular_matrix_conversion(full_basis,
                                                             solution.solution_model.Wv,
                                                             solution.solution_model.ternary_terms_v)
 
