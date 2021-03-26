@@ -260,7 +260,7 @@ def polytope_from_solution_model(solution_model, return_fractions=False):
     if len(nullspace) > 0:
         try:
             equalities[1:, 1:] = nullspace
-        except:
+        except ValueError:
             equalities[1:, 1:] = nullspace[:, :, 0]
     return SolutionPolytope(equalities, return_fractions)
 
