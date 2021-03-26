@@ -357,6 +357,33 @@ def process_solution_chemistry(solution_model):
 
 def site_occupancies_to_strings(site_names, site_multiplicities,
                                 site_occupancies):
+    """
+    Converts a list of endmember site occupancies into a list
+    of string representations of those occupancies.
+
+    Parameters
+    ----------
+    site_names : 2d list of strings
+        List of sites, each of which contains a list of the species
+        occupying each site. The total number and order of site-species must
+        be the same as the 2nd dimension of site_occupancies.
+
+    site_multiplicities : list of floats
+        List of floats giving the
+        Must be the same length as site_names
+
+    site_occupancies : 2D list of floats
+        A list of endmember site occupancies.
+        The first dimension loops over the endmembers, and the
+        second dimension loops over the site-species for that endmember.
+
+    Returns
+    -------
+    site_formulae : list of strings
+        A list of strings in standard burnman format.
+        For example, [Mg]3[Al]2 would correspond to the
+        classic two-site pyrope garnet.
+    """
     site_formulae = []
     for mbr_occupancies in site_occupancies:
         i = 0
