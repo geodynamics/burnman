@@ -17,7 +17,7 @@ and manipulation.
 
 * :class:`burnman.solutionpolytope.SolutionPolytope`
 * :func:`burnman.solutionpolytope.polytope_from_charge_balance`
-* :func:`burnman.solutionpolytope.polytope_from_solution_model`
+* :func:`burnman.solutionpolytope.polytope_from_endmember_occupancies`
 * :func:`burnman.solutionpolytope.transform_solution_to_new_basis`
 * :func:`burnman.solutionpolytope.site_occupancies_to_strings`
 * :func:`burnman.solutionpolytope.generate_complete_basis`
@@ -48,7 +48,7 @@ if not os.path.exists('burnman') and os.path.exists('../burnman'):
 
 import burnman
 from burnman.solutionpolytope import polytope_from_charge_balance
-from burnman.solutionpolytope import polytope_from_solution_model
+from burnman.solutionpolytope import polytope_from_endmember_occupancies
 from burnman.solutionpolytope import transform_solution_to_new_basis
 from burnman.solutionpolytope import site_occupancies_to_strings
 from burnman.solutionpolytope import generate_complete_basis
@@ -190,7 +190,7 @@ if __name__ == "__main__":
                                                    [4, 4, 4, 2],
                                                    [16, 12],
                                                    [-2, -4]], 28.,
-                                                  return_fractions=False)
+                                                  return_fractions=True)
     camph_array = camph_polytope.independent_endmember_occupancies
     n_published_members = 11
     n_mbrs = len(camph_array)
@@ -222,11 +222,26 @@ if __name__ == "__main__":
 
     print('The following endmember is one which was not contained '
           'within the original basis:')
-    last_endmember = generate_complete_basis(camph_partial_basis,
-                                             camph_array)[-n_missing_members:]
+    complete_basis = generate_complete_basis(camph_partial_basis, camph_array)
+    last_endmember = complete_basis[-n_missing_members:]
 
     print(site_occupancies_to_strings(site_species, multiplicities,
                                       last_endmember))
+
+    camph_incomplete_polytope = polytope_from_endmember_occupancies(camph_partial_basis)
+
+    print('There are {0} endmembers in the incomplete polytope, '
+          'and {1} in the complete polytope.'.format(len(camph_incomplete_polytope.endmember_occupancies),
+                                                     len(camph_polytope.endmember_occupancies)))
+
+    """
+    One can also list the missing endmembers (change next line to 'if True:' to print these)
+    """
+    if False:
+        for occupancies in camph_polytope.endmember_occupancies:
+            mindiff = np.min(np.sum(np.abs(camph_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
+            if mindiff > 1.e-6:
+                print(occupancies)
 
     """
     The SolutionPolytope object can also be used to create a set of
@@ -357,8 +372,8 @@ if __name__ == "__main__":
           'of this solution can be changed.')
     # Clinopyroxene from Jennings and Holland, 2015
     cpx = JH_2015.clinopyroxene()
-    cpx_polytope = polytope_from_solution_model(cpx.solution_model,
-                                                return_fractions=False)
+    cpx_polytope = polytope_from_endmember_occupancies(cpx.solution_model.endmember_occupancies,
+                                                       return_fractions=False)
 
     n_ind = len(cpx_polytope.independent_endmember_occupancies)
     all_site_occupancies = cpx_polytope.endmember_occupancies
