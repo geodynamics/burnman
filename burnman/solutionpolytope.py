@@ -248,12 +248,15 @@ def polytope_from_charge_balance(charges, charge_total,
     return SolutionPolytope(equalities, return_fractions)
 
 
-def polytope_from_solution_model(solution_model, return_fractions=False):
-    n_sites = len(solution_model.sites)
-    nullspace = np.array(Matrix(solution_model.endmember_occupancies).nullspace(),
+def polytope_from_endmember_occupancies(endmember_occupancies, return_fractions=False):
+
+    n_sites = sum(endmember_occupancies[0])
+    n_occs = endmember_occupancies.shape[1]
+
+    nullspace = np.array(Matrix(endmember_occupancies).nullspace(),
                          dtype=np.float)
 
-    equalities = np.zeros((len(nullspace)+1, solution_model.n_occupancies+1))
+    equalities = np.zeros((len(nullspace)+1, n_occs+1))
     equalities[0, 0] = -n_sites
     equalities[0, 1:] = 1
 
