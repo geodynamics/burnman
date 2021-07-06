@@ -77,6 +77,9 @@ class SimplexGrid(object):
 class SolutionPolytope(object):
     def __init__(self, equalities, return_fractions=False):
         self.return_fractions = return_fractions
+        self.equality_matrix = equalities[:,1:]
+        self.equality_vector = -equalities[:,0]
+
         self.polytope_matrix = cdd.Matrix(equalities, linear=True,
                                           number_type='fraction')
         self.polytope_matrix.rep_type = cdd.RepType.INEQUALITY

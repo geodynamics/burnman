@@ -83,7 +83,7 @@ if __name__ == "__main__":
     print('Endmember formulae corresponding to these occupancies:')
     print(site_occupancies_to_strings([['Mg', 'Fe', 'Fef', 'Al'],
                                        ['Fef', 'Al', 'Si']],
-                                      [1, 1, 1, 1, 1, 1, 1],
+                                      [1, 1],
                                       endmember_occupancies))
 
     """
@@ -113,7 +113,7 @@ if __name__ == "__main__":
           'occupancies:')
     print(site_occupancies_to_strings([['Mg', 'Al', 'Si'],
                                        ['Mg', 'Al', 'Si']],
-                                      [1, 1, 1, 1, 1, 1],
+                                      [1, 1],
                                       ind_occupancies))
 
     print('The complete set of endmembers expressed as proportions of the '
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     occupancies = py_maj_4s_polytope.endmember_occupancies
     ind_occupancies = py_maj_4s_polytope.independent_endmember_occupancies
-    print(site_occupancies_to_strings([['Mg', 'Al', 'Si']]*4, [1]*12,
+    print(site_occupancies_to_strings([['Mg', 'Al', 'Si']]*4, [1]*4,
                                       ind_occupancies))
     print('There are {0} endmembers in total, '
           '{1} of which are independent.'.format(len(occupancies),
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     ind_occupancies = majorite_polytope.independent_endmember_occupancies
     print(site_occupancies_to_strings([['Mg', 'Fe', 'Ca', 'Na'],
                                        ['Mg', 'Fe', 'Al', 'Si']],
-                                      [3, 3, 3, 3, 2, 2, 2, 2],
+                                      [3, 2],
                                       ind_occupancies))
 
     print('There are {0} endmembers in total, '
@@ -177,12 +177,7 @@ if __name__ == "__main__":
                     ['Ca', 'Mg', 'Fe', 'Na'],
                     ['Si', 'Al'],
                     ['OH', 'O']]
-    multiplicities = [1, 1, 1,
-                      3, 3,
-                      2, 2, 2, 2, 2,
-                      2, 2, 2, 2,
-                      4, 4,
-                      2, 2]
+    multiplicities = [1, 3, 2, 2, 4, 2]
 
     camph_polytope = polytope_from_charge_balance([[0, 1, 1],
                                                    [6, 6],
