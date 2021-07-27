@@ -10,8 +10,8 @@ example_solution_creation_and_manipulation
 
 This example script demonstrates how the site-occupancy space of
 a solid solution is mathematically equivalent to a polytope, and how
-this insight can be used to semiautomate solution model creation
-and manipulation.
+this insight can be used to semi-automate the creation and
+manipulation of solution models.
 
 *Uses:*
 
