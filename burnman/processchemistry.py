@@ -355,27 +355,33 @@ def process_solution_chemistry(solution_model):
                                                       site_multiplicities)
 
 
-def site_occupancies_to_strings(site_names, site_multiplicities,
-                                site_occupancies):
+def site_occupancies_to_strings(site_species_names, site_multiplicities,
+                                endmember_occupancies):
     """
     Converts a list of endmember site occupancies into a list
     of string representations of those occupancies.
 
     Parameters
     ----------
-    site_names : 2d list of strings
+    site_species_names : 2D list of strings
+        A list of list of strings, giving the names of the species
+        which reside on each site.
         List of sites, each of which contains a list of the species
-        occupying each site. The total number and order of site-species must
-        be the same as the 2nd dimension of site_occupancies.
+        occupying each site.
 
-    site_multiplicities : list of floats
-        List of floats giving the
-        Must be the same length as site_names
+    site_multiplicities : numpy array of floats
+        List of floats giving the multiplicity of each site
+        Must be either the same length as the number of sites, or
+        the same length as site_species_names
+        (with an implied repetition of the same
+        number for each species on a given site).
 
-    site_occupancies : 2D list of floats
-        A list of endmember site occupancies.
+    endmember_occupancies : 2D numpy array of floats
+        A list of site-species occupancies for each endmember.
         The first dimension loops over the endmembers, and the
-        second dimension loops over the site-species for that endmember.
+        second dimension loops over the site-species occupancies for that endmember.
+        The total number and order of occupancies must
+        be the same as the strings in site_species_names.
 
     Returns
     -------
@@ -384,11 +390,27 @@ def site_occupancies_to_strings(site_names, site_multiplicities,
         For example, [Mg]3[Al]2 would correspond to the
         classic two-site pyrope garnet.
     """
+
+    # Site multiplicities should either be given on a per-site basis,
+    # or a per-species basis
+    if len(site_species_names) == len(site_multiplicities):
+        site_mults = []
+
+        for i, site in enumerate(site_species_names):
+            for species in site:
+                site_mults.append(site_multiplicities[i])
+
+        site_multiplicities = site_mults
+
+    elif len(site_occupancies[0]) != len(site_multiplicities):
+        raise Exception('Site multiplicities should either be given on a per-site basis or a per-species basis')
+
+
     site_formulae = []
-    for mbr_occupancies in site_occupancies:
+    for mbr_occupancies in endmember_occupancies:
         i = 0
         site_formulae.append('')
-        for site in site_names:
+        for site in site_species_names:
             amounts = mbr_occupancies[i:i+len(site)]
             mult = site_multiplicities[i]
             if np.abs(mult - 1.) < 1.e-12:
