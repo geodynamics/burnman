@@ -13,12 +13,12 @@ for (Mg,FeHS,FeLS)O that has a gradual spin transition at finite temperature.
 First, we define the MgO endmember and two endmembers for the
 low and high spin states of FeO. Then we create a regular/symmetric
 solid solution that incorporates all three endmembers.
-The solid solution is contains a method called set_equilibrium_composition,
+The solid solution contains a method called set_equilibrium_composition,
 which calculates the equilibrium proportions of the low and high spin phases
 at the desired bulk composition, pressure and temperature.
 
 In this example, we are neglecting the elastic component of mixing. We are
-also implicitly applying the Bragg-Williams approximation (i.e. we assume
+also implicitly applying the Bragg-Williams approximation (i.e., we assume
 that there is no short-range order by applying interactions that are a
 function only of the average occupancy of species on each distinct site).
 Furthermore, we are using a one site model [Mg,FeHS,FeLS]O that explicitly
@@ -142,11 +142,10 @@ if __name__ == "__main__":
     # In this line, we create our solid solution object
     fper = ferropericlase()
 
-    """
-    Now we loop over a series of pressures at three different temperatures,
-    calculating the equilibrium composition of the solution at each.
-    We fix the bulk composition of the solution to be (Mg0.8Fe0.2)O.
-    """
+
+    # Now we loop over a series of pressures at three different temperatures,
+    # calculating the equilibrium composition of the solution at each.
+    # We fix the bulk composition of the solution to be (Mg0.8Fe0.2)O.
     X_Fe = 0.2
 
     pressures = np.linspace(10.e9, 150.e9, 101)
