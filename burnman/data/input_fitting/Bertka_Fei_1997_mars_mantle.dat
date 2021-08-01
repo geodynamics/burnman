@@ -1,4 +1,4 @@
-SiO2 Al2O3 FeO MgO CaO Na2O sample pressure temperature duration phase sigma_SiO2 sigma_Al2O3 sigma_FeO sigma_MgO sigma_CaO sigma_Na2O
+# SiO2 Al2O3 FeO MgO CaO Na2O sample pressure temperature duration phase sigma_SiO2 sigma_Al2O3 sigma_FeO sigma_MgO sigma_CaO sigma_Na2O
 43.68 3.13 18.71 31.50 2.49 0.50 bulk_composition 0 0 0 bulk 0 0 0 0 0 0
 
 36.37 0.07 22.05 38.51 0.11 0.02 BF-30 2 1100 48 olivine 0.12 0.02 0.17 0.25 0.02 0.01

@@ -15,17 +15,56 @@ def fit_composition_to_solution(solution,
                                 variable_conversions=None,
                                 normalize=True):
     """
-    It is assumed that any elements not in composition were not measured (but may exist in unknown quantities).
-    If distinct oxidation states or site occupancies were measured
-    (by Moessbauer, for example), then formulae should be modified
+    Takes a SolidSolution object and a set of variable names and
+    associates values and covariances and finds the molar fractions of the
+    solution which provide the best fit (in a least-squares sense)
+    to the variable values.
 
-    fitted elements should be a list of strings
-    composition and compositional uncertainties should be given as arrays
-    formulae should either be given as arrays (with columns corresponding to elements) or as dictionaries
-    If the compositional uncertainties can either be sigmas or covariance matrices
+    The fitting applies appropriate non-negativity constraints
+    (i.e. no species can have a negative occupancy on a site).
 
-    The composition and associated uncertainties in endmember *amounts*, not proportions. If normalize=True, then the endmember amounts are normalized to a total of one.
+    Parameters
+    ----------
+    solution : burnman.SolidSolution object
+        The solution to use in the fitting procedure.
+
+    fitted_variables : list of strings
+        A list of the variables used to find the best-fit molar fractions of
+        the solution. These should either be elements such as `Fe',
+        site_species such as `Fef_B' which would correspond to a
+        species labelled Fef on the second site,
+        or user-defined variables which are arithmetic sums of
+        elements and/or site_species defined in `variable_conversions'.
+
+    variable_values : numpy array
+        Numerical values of the fitted variables.
+        These should be given as amounts; they do not need to be normalized.
+
+    variable_covariances : 2D numpy array
+        Covariance matrix of the variables.
+
+    variable_conversions : dictionary of dictionaries or None
+        A dictionary converting any user-defined variables into an
+        arithmetic sum of element and site-species amounts. For example,
+        {'Mg_equal': {'Mg_A': 1., 'Mg_B': -1.}}, coupled with Mg_equal = 0
+        would impose a constraint that the amount of Mg would be equal on
+        the first and second site in the solution.
+
+    normalize : boolean (default: True)
+        If True, normalizes the optimized molar fractions to sum to unity.
+
+    Returns
+    -------
+    popt : numpy array
+        Optimized molar fractions.
+
+    pcov : 2D numpy array
+        Covariance matrix corresponding to the optimized molar fractions.
+
+    res : float
+        The weighted residual of the fitting procedure.
     """
+
     n_vars = len(fitted_variables)
     n_mbrs = len(solution.endmembers)
 
@@ -38,13 +77,11 @@ def fit_composition_to_solution(solution,
     n_sol_vars = solution_matrix.shape[1]
 
     if variable_conversions is not None:
-        print(variable_conversions)
         solution_matrix = np.hstack((solution_matrix,
                                      np.zeros((solution_matrix.shape[0],
                                                len(variable_conversions)))))
 
         for i, (new_var, conversion_dict) in enumerate(variable_conversions.items()):
-            print(new_var, conversion_dict)
             assert (new_var not in solution_variables)
             solution_variables.append(new_var)
 
@@ -93,6 +130,33 @@ def fit_composition_to_solution(solution,
 
 def fit_phase_proportions_to_bulk_composition(phase_compositions,
                                               bulk_composition):
+    """
+    Performs weighted constrained least squares on a set of phase compositions
+    to find the amount of those phases that best-fits a given bulk composition.
+
+    The fitting applies appropriate non-negativity constraints
+    (i.e. no phase can have a negative abundance in the bulk).
+
+    Parameters
+    ----------
+    phase_compositions : 2D numpy array
+        The composition of each phase. Can be in weight or mole amounts.
+
+    bulk_composition : numpy array
+        The bulk composition of the composite.
+        Must be in the same units as the phase compositions.
+
+    Returns
+    -------
+    popt : numpy array
+        Optimized phase amounts.
+
+    pcov : 2D numpy array
+        Covariance matrix corresponding to the optimized phase amounts.
+
+    res : float
+        The weighted residual of the fitting procedure.
+    """
 
     n_phases = len(phase_compositions[0])
     inequality_constraints = [-np.eye(n_phases), np.zeros(n_phases)]

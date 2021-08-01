@@ -208,6 +208,7 @@ from . import geotherm
 
 # miscellaneous
 from . import tools
+from . import linear_fitting
 from . import nonlinear_fitting
 from . import nonlinear_solvers
 from . import eos_fitting
