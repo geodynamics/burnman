@@ -372,6 +372,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
     scaling = np.outer(scaling, scaling)
 
     fig, ax_array = plt.subplots(n_params-1, n_params-1)
+    fig.set_size_inches(3.*(n_params-1), 3.*(n_params-1))
 
     for i in range(n_params-1):
         for j in range(1, i+1):
@@ -398,6 +399,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
         for j in range(1, n_params):
             ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
 
+    fig.tight_layout()
     return fig, ax_array
 
 
