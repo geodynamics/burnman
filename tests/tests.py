@@ -22,6 +22,7 @@ from test_modifiers import *
 from test_partitioning import *
 from test_perplex import *
 from test_planet import *
+from test_processchemistry import *
 from test_seismic import *
 from test_solidsolution import *
 from test_solvers import *
