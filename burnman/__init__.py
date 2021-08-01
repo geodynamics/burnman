@@ -98,7 +98,7 @@ Install under Ubuntu
 2. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
 3. Go to the Burnman examples directory and type:
    ``python example_beginner.py``
-Figures should show up, indicating that it is working.
+   Figures should show up, indicating that it is working.
 
 
 Install on a Mac
@@ -114,7 +114,7 @@ Install on a Mac
 4. Install the latest Sympy from http://sourceforge.net/projects/sympy/files/
 5. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
 6. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
-7. Go to the Burnman examples directory and type `python example_beginner.py`
+7. Go to the Burnman examples directory and type ``python example_beginner.py``
    Figures should show up, indicating that it is working.
 
 Install under Windows
@@ -140,11 +140,12 @@ If you use BurnMan in your work, we ask that you cite the following publications
 
   - Cottaar, S., Heister, T., Myhill, R., Rose, I., and Unterborn, C. (2017):
     BurnMan v0.10.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
-    `(link) <https://doi.org/10.5281/zenodo.546210>`_
+    `(https://doi.org/10.5281/zenodo.546210) <https://doi.org/10.5281/zenodo.546210>`_
 
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
-    Geosystems, 15(4), 1164-1179 `(link) <https://doi.org/10.1002/2013GC005122>`_
+    Geosystems, 15(4), 1164-1179 `(https://doi.org/10.1002/2013GC005122)
+    <https://doi.org/10.1002/2013GC005122>`_
 
 Contributing to BurnMan
 -----------------------

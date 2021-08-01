@@ -6,28 +6,38 @@
 """
 
 HP_2011_fluids
-^^^^^^^^
+^^^^^^^^^^^^^^
 
 Fluids from Holland and Powell 2011 and references therein.
-CORK parameters:
-CHO gases from Holland and Powell, 1991. ["CO2",304.2,0.0738],["CH4",190.6,0.0460],["H2",41.2,0.0211],["CO",132.9,0.0350]
-H2O and S2 from Wikipedia, 2012/10/23. ["H2O",647.096,0.22060],["S2",1314.00,0.21000]
-H2S from ancyclopedia.airliquide.com, 2012/10/23. ["H2S",373.15,0.08937]
+CORK parameters are taken from various sources.
 
-NB: Units for cork[i] in Holland and Powell datasets are
-a = kJ^2/kbar*K^(1/2)/mol^2 -> multiply by 1e-2
-b = kJ/kbar/mol -> multiply by 1e-5
-c = kJ/kbar^1.5/mol -> multiply by 1e-9
-d = kJ/kbar^2/mol -> multiply by 1e-13
+CHO gases from Holland and Powell, 1991:
+  - ["CO2",304.2,0.0738]
+  - ["CH4",190.6,0.0460]
+  - ["H2",41.2,0.0211]
+  - ["CO",132.9,0.0350]
 
-Individual terms are divided through by P, P, P^1.5, P^2, so
-[0][j] -> multiply by 1e6
-[1][j] -> multiply by 1e3
-[2][j] -> multiply by 1e3
-[3][j] -> multiply by 1e3
+H2O and S2 from Wikipedia, 2012/10/23:
+  - ["H2O",647.096,0.22060]
+  - ["S2",1314.00,0.21000]
 
-cork_P: kbar -> multiply by 1e8
+H2S from ancyclopedia.airliquide.com, 2012/10/23:
+  - ["H2S",373.15,0.08937]
+
+NB: Units for cork[i] in Holland and Powell datasets are:
+  - a = kJ^2/kbar*K^(1/2)/mol^2: multiply by 1e-2
+  - b = kJ/kbar/mol: multiply by 1e-5
+  - c = kJ/kbar^1.5/mol: multiply by 1e-9
+  - d = kJ/kbar^2/mol: multiply by 1e-13
+
+Individual terms are divided through by P, P, P^1.5, P^2, so:
+  - [0][j]: multiply by 1e6
+  - [1][j]: multiply by 1e3
+  - [2][j]: multiply by 1e3
+  - [3][j]: multiply by 1e3
+  - cork_P is given in kbar: multiply by 1e8
 """
+
 from __future__ import absolute_import
 
 from ..mineral import Mineral

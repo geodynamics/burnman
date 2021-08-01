@@ -30,7 +30,7 @@ Reciprocal K-prime
 ------------------
 
 .. autoclass:: burnman.eos.RKprime
-	       
+
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------
 
@@ -69,4 +69,3 @@ Anderson and Ahrens (1994)
 CoRK
 ----
 .. autoclass:: burnman.eos.CORK
-

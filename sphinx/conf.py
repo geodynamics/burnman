@@ -13,6 +13,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../examples'))
 
 import burnman
 import burnman.version
@@ -34,16 +35,18 @@ release = burnman.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.mathjax',
-    'numpydoc', 'sphinx.ext.intersphinx', 'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.viewcode', 'sphinxcontrib.bibtex']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
+              'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx',
+              'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
+              'sphinx.ext.viewcode', 'sphinxcontrib.bibtex']
 bibtex_bibfiles = ['ref.bib']
 
 numpydoc_show_class_members = False
 
-autodoc_default_flags = [
-    'members', 'undoc-members', 'show-inheritance', 'inherited-members']
+autodoc_default_options = {'members': True,
+                           'undoc-members': True,
+                           'show-inheritance': True,
+                           'inherited-members': True}
 
 autodoc_member_order = 'bysource'
 
@@ -213,8 +216,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index_pdf', 'BurnMan.tex', u'BurnMan Documentation',
-     u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'manual'),
+    ('index_pdf', 'BurnMan.tex', u'BurnMan Documentation', author, 'manual'),
 ]
 
 
@@ -244,8 +246,7 @@ latex_domain_indices = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'burnman', u'BurnMan Documentation',
-     [u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'], 1)
+    ('index', 'burnman', u'BurnMan Documentation', [author], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -259,7 +260,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'BurnMan', u'BurnMan Documentation',
-     u'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn', 'BurnMan', 'One line description of project.',
+     author, 'BurnMan', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -271,7 +272,6 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
-
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
