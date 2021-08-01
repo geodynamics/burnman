@@ -125,8 +125,6 @@ if __name__ == "__main__":
     temperature_smoothing_factor = 0.5
     truncate = 4.
 
-    save_output = False
-
     # END USER INPUTS
 
     min_grid_pressure = rock.bounds[0][0]
@@ -332,13 +330,13 @@ if __name__ == "__main__":
 
 
     # Finally, here's the ability to output smoothed, relaxed properties for use in ASPECT
-    # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity
-
-    #if save_output == True:
-    #    np.savetxt('isentrope_properties.txt', X=np.array([depths_eq, pressures_eq, smoothed_temperatures,
-    #                                                       densities, gravity, alphas_relaxed,
-    #                                                       specific_heats_relaxed,
-    #                                                       compressibilities_relaxed,
-    #                                                       Vss, Vps, dVsdT, dVpdT]).T,
-    #               header='# This ASPECT-compatible file contains material properties calculated along an isentrope by the BurnMan software.\n# POINTS: {0}\n# depth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (1/K), specific heat (J/K/kg), compressibility (1/Pa), seismic Vs (m/s), seismic Vp (m/s), seismic dVs/dT (m/s/K), seismic dVp/dT (m/s/K)\ndepth\tpressure\ttemperature\tdensity\tgravity\tthermal_expansivity\tspecific_heat\tcompressibility\tseismic_Vs\tseismic_Vp\tseismic_dVs_dT\tseismic_dVp_dT'.format(n_points),
-    #               fmt='%.10e', delimiter='\t', comments='')
+    # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity.
+    # Just change "False" to "True" on the following line.
+    if False:
+        np.savetxt('isentrope_properties.txt', X=np.array([depths_eq, pressures_eq, smoothed_temperatures,
+                                                           densities, gravity, alphas_relaxed,
+                                                           specific_heats_relaxed,
+                                                           compressibilities_relaxed,
+                                                           Vss, Vps, dVsdT, dVpdT]).T,
+                   header='# This ASPECT-compatible file contains material properties calculated along an isentrope by the BurnMan software.\n# POINTS: {0}\n# depth (m), pressure (Pa), temperature (K), density (kg/m^3), gravity (m/s^2), thermal expansivity (1/K), specific heat (J/K/kg), compressibility (1/Pa), seismic Vs (m/s), seismic Vp (m/s), seismic dVs/dT (m/s/K), seismic dVp/dT (m/s/K)\ndepth\tpressure\ttemperature\tdensity\tgravity\tthermal_expansivity\tspecific_heat\tcompressibility\tseismic_Vs\tseismic_Vp\tseismic_dVs_dT\tseismic_dVp_dT'.format(n_points),
+                   fmt='%.10e', delimiter='\t', comments='')
