@@ -63,7 +63,7 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
         '0'.format(project_name, str2, n_pressures, n_temperatures)
 
 
-    p = Popen(werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+    p = Popen(werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
     stdout = p.communicate(input=stdin)[0]
     print(stdout)
     out = [s for s in stdout.split('\n') if "Output has been written to the" in s][0].split()[-1]
@@ -90,8 +90,9 @@ class PerplexMaterial(Material):
 
     This class is available as ``burnman.PerplexMaterial``.
     """
-    def __init__(self, tab_file):
-        self.params = {'name': tab_file}
+    def __init__(self, tab_file, name='Perple_X material'):
+        self.name = name
+        self.params = {'name': name}
         self._property_interpolators, self.params['molar_mass'], self.bounds = self._read_2D_perplex_file(tab_file)
         Material.__init__(self)
 
@@ -158,7 +159,8 @@ class PerplexMaterial(Material):
                                       a[~np.isnan(a)],                    # values we know
                                       (x[np.isnan(a)], y[np.isnan(a)]))
 
-            properties[ordered_property_list[i]] = a
+            # Fill any remaining NaNs with zeros
+            properties[ordered_property_list[i]] = np.nan_to_num(a, 0.)
 
 
         densities = properties['rho,kg/m3']

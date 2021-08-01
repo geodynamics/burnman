@@ -272,7 +272,7 @@ class Planet(object):
         temps = []
         temperature_top = None
         for layer in self.layers[::-1]:
-            if temperature_top is None:
+            if temperature_top is None or layer.temperature_top is not None:
                 temperature_top = layer.temperature_top
             temps.extend(layer._evaluate_temperature((pressures[layer.n_start:layer.n_end]), temperature_top)[::-1])
             temperature_top = temps[-1]
