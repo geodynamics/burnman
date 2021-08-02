@@ -4,5 +4,4 @@ matplotlib
 scipy
 sympy
 sphinxcontrib.bibtex
-pycddlib
 cvxpy

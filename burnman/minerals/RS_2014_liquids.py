@@ -3,8 +3,10 @@
 # Released under GPL v2 or later.
 
 """
-RS_2014
-Liquids from Ramo and Stixrude (2014) FPMD simulations
+RS_2014_liquids
+^^^^^^^^^^^^^^^
+
+Liquids from Ramo and Stixrude (2014) FPMD simulations.
 There are some typos in the article which have been corrected where marked
 with the help of David Munoz Ramo.
 """

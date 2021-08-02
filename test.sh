@@ -85,7 +85,7 @@ echo "*** running test suite..."
 # check for tabs in code:
 for f in `find . -name \*.py | grep -v ipython/`
 do
-    
+
     grep $'\t' -q $f && \
 	echo "ERROR: tabs found in '$f':" && \
 	grep -n $'\t' $f && exit 0
@@ -139,14 +139,6 @@ do
 done
 testit table.py $fulldir || exit 1
 cd ..
-
-echo "checking contrib/CHRU2014 ..."
-cd contrib/CHRU2014
-for test in `ls *.py`
-do
-    testit $test $fulldir || exit 1
-done
-cd ../..
 
 
 echo "checking contrib/tutorial/ ..."

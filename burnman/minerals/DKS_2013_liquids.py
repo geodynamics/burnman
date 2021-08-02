@@ -3,8 +3,10 @@
 # Released under GPL v2 or later.
 
 """
-DKS_2013
-Liquids from de Koker and Stixrude (2013) FPMD simulations
+DKS_2013_liquids
+^^^^^^^^^^^^^^^^
+
+Liquids from de Koker and Stixrude (2013) FPMD simulations.
 """
 
 from ..mineral import Mineral
