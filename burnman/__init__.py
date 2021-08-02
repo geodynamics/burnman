@@ -111,10 +111,10 @@ Install on a Mac
    terminal: ``python --version``
 3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
 4. Install the latest Scipy from http://sourceforge.net/projects/scipy/files/
-4. Install the latest Sympy from http://sourceforge.net/projects/sympy/files/
-5. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
-6. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
-7. Go to the Burnman examples directory and type ``python example_beginner.py``
+5. Install the latest Sympy from http://sourceforge.net/projects/sympy/files/
+6. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
+7. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
+8. Go to the Burnman examples directory and type ``python example_beginner.py``
    Figures should show up, indicating that it is working.
 
 Install under Windows
@@ -125,12 +125,12 @@ To get Python running under Windows:
 1. Download Python from http://www.python.org/ and install
 2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download and install
 3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download and install
-3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install
-4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download and install
-5. Download BurnMan from github (https://github.com/geodynamics/burnman)
-6. Open Python Shell (IDLE Python GUI)
-7. File -- Open -- find one of the example files
-8. Run the module (or press F5)
+4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install
+5. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download and install
+6. Download BurnMan from github (https://github.com/geodynamics/burnman)
+7. Open Python Shell (IDLE Python GUI)
+8. File -- Open -- find one of the example files
+9. Run the module (or press F5)
 
 
 Citing BurnMan
