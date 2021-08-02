@@ -67,9 +67,32 @@ if __name__ == "__main__":
 
 
 
+    # We create an array of 20 depths at which we want to evaluate PREM, and then
+    # query the seismic model for the pressure, density, P wave speed, S wave
+    # speed, and bulk sound velocity at those depths
+    depths = np.linspace(2890e3, 671e3, 20)
+
+
+    # Here we define the lower mantle as a Layer(). .
+    lower_mantle = burnman.Layer( name='Lower Mantle', radii=6371.e3-depths)
+    lower_mantle.set_temperature_mode(temperature_mode='adiabatic', temperature_top=1900.)
+    lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
+                                   pressure_top=2.4e10, gravity_bottom=10.0)
+
+    lower_mantle.set_material(pyrolitic_mantle)
+    lower_mantle.make()
+
+
     # Writing axisem input file
-    burnman.output_seismo.write_axisem_input(pyrolitic_mantle, filename='axisem_pyrolite.txt', plotting=True)
-    burnman.output_seismo.write_axisem_input(chondritic_mantle, filename='axisem_chondrite.txt', plotting=True)
-    # Write mineous input file
-    burnman.output_seismo.write_mineos_input(pyrolitic_mantle, filename='mineos_pyrolite.txt', plotting=True)
-    burnman.output_seismo.write_mineos_input(chondritic_mantle, filename='mineos_chondrite.txt', plotting=True)
+    burnman.output_seismo.write_axisem_input([lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
+    # Write mineos input file
+    burnman.output_seismo.write_mineos_input([lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
+    
+    #change composition
+    lower_mantle.set_material(chondritic_mantle)
+    lower_mantle.make()
+    # Writing axisem input file
+    burnman.output_seismo.write_axisem_input([lower_mantle], modelname='lowermantle_chondritic', plotting=True)
+    # Write mineos input file
+    burnman.output_seismo.write_mineos_input([lower_mantle], modelname='lowermantle_chondritic', plotting=True)
+
