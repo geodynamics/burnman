@@ -186,9 +186,9 @@ def write_axisem_input(layers, modelname='burnmanmodel_foraxisem', axisem_ref = 
 
     if plotting:
         
-        plt.plot(table[:,0] / 1.e3, table[:,2] / 1.e3, color='g', linestyle='-')
-        plt.plot(table[:,0] / 1.e3, table[:,3] / 1.e3, color='b', linestyle='-')
-        plt.plot(table[:,0] / 1.e3, table[:,1] / 1.e3, color='r', linestyle='-')
+        plt.plot(table[:,0] / 1.e3, table[:,2] / 1.e3, color='g', linestyle='-', label = 'V_p')
+        plt.plot(table[:,0] / 1.e3, table[:,3] / 1.e3, color='b', linestyle='-', label = 'V_s')
+        plt.plot(table[:,0] / 1.e3, table[:,1] / 1.e3, color='r', linestyle='-', label = 'density')
         
         plt.title(filename + ' = ' + axisem_ref + ' replaced  between ' +
                   str(layer.inner_radius / 1.e3) + ' and ' + str(layer.outer_radius / 1.e3) + ' km')
@@ -264,9 +264,9 @@ def write_mineos_input(layers, modelname='burnmanmodel_formineos', mineos_ref='m
 
     if plotting:
         
-        plt.plot(table[:,0] / 1.e3, table[:,2] / 1.e3, color='g', linestyle='-')
-        plt.plot(table[:,0] / 1.e3, table[:,3] / 1.e3, color='b', linestyle='-')
-        plt.plot(table[:,0] / 1.e3, table[:,1] / 1.e3, color='r', linestyle='-')
+        plt.plot(table[:,0] / 1.e3, table[:,2] / 1.e3, color='g', linestyle='-', label = 'V_p')
+        plt.plot(table[:,0] / 1.e3, table[:,3] / 1.e3, color='b', linestyle='-', label = 'V_s')
+        plt.plot(table[:,0] / 1.e3, table[:,1] / 1.e3, color='r', linestyle='-', label = 'density')
 
         plt.title(filename + ' = ' + mineos_ref + ' replaced  between ' +
         str(layer.inner_radius / 1.e3) + ' and ' + str(layer.outer_radius / 1.e3) + ' km')
