@@ -13,9 +13,8 @@ Material Base Class
 
 .. autoclass:: burnman.material.Material
 
-
-PerpleX Class
--------------
+Perple_X Class
+--------------
 
 .. autoclass:: burnman.perplex.PerplexMaterial
 
@@ -41,4 +40,3 @@ Composites
 ----------
 
 .. autoclass:: burnman.composite.Composite
-

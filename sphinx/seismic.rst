@@ -7,7 +7,6 @@ Base class for all seismic models
 .. autoclass:: burnman.seismic.Seismic1DModel
 
 
-
 Class for 1D Models
 -------------------
 .. autoclass:: burnman.seismic.SeismicTable
@@ -34,4 +33,3 @@ Attenuation Correction
 -----------------------
 
 .. autofunction:: burnman.seismic.attenuation_correction
-

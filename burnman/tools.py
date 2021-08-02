@@ -882,9 +882,6 @@ def compare_l2(depth, calc, obs):
     """
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
 
-    .. math:: math does not work yet...
-    \sum_{i=1}^{\\infty} x_{i}
-
     :type depths: array of float
     :param depths: depths. :math:`[m]`
     :type calc: list of arrays of float
