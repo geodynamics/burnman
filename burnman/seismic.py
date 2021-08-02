@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -45,7 +46,7 @@ class Seismic1DModel(object):
             values[a, :] = getattr(self, vars_list[a])(depth_list)
         return values
 
-    def internal_depth_list(self, mindepth=0., maxdepth=1.e99, discontinuity_interval = 1.):
+    def internal_depth_list(self, mindepth=0., maxdepth=1.e99, discontinuity_interval=1.):
         """
         Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation. The depths can be bounded by the mindepth and maxdepth parameters.
 
@@ -247,7 +248,7 @@ class SeismicTable(Seismic1DModel):
 
         self.earth_radius = 6371.0e3
 
-    def internal_depth_list(self, mindepth=0., maxdepth=1.e10, discontinuity_interval = 1. ):
+    def internal_depth_list(self, mindepth=0., maxdepth=1.e10, discontinuity_interval=1.):
         depths = np.array([self.table_depth[x] for x in range(len(
             self.table_depth)) if self.table_depth[x] >= mindepth and self.table_depth[x] <= maxdepth])
         discontinuities = np.where(depths[1:] - depths[:-1] == 0)[0]
@@ -490,7 +491,7 @@ class STW105(SeismicTable):
         self.table_depth = self.earth_radius - self.table_radius
 
         # Voigt averages for Vs and Vp
-        self.table_vs = np.sqrt((2. *self.table_vsv * self.table_vsv + self.table_vsh * self.table_vsh) / 3.)
+        self.table_vs = np.sqrt((2. * self.table_vsv * self.table_vsv + self.table_vsh * self.table_vsh) / 3.)
         self.table_vp = np.sqrt((self.table_vpv * self.table_vpv + 4. * self.table_vph * self.table_vph) / 5.)
 
 

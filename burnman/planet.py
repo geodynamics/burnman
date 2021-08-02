@@ -1,14 +1,13 @@
 from __future__ import print_function
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
-from scipy.integrate import odeint
-from scipy.integrate import quad
-from scipy.interpolate import UnivariateSpline
-from burnman import constants
-from .material import Material, material_property
+import warnings
+from .material import material_property
+
 
 class Planet(object):
     """
@@ -19,7 +18,7 @@ class Planet(object):
     set, the planet will be built upon initialization.
     """
 
-    def __init__(self, name, layers, n_max_iterations=50, max_delta = 1.e-5, verbose=False):
+    def __init__(self, name, layers, n_max_iterations=50, max_delta=1.e-5, verbose=False):
         """
         Parameters
         ----------
@@ -36,10 +35,9 @@ class Planet(object):
         self.layers = sorted(layers, key=lambda x: x.inner_radius)
         # assert layers attach to one another
         if len(self.layers) > 1:
-            for l in range(1, len(self.layers)):
-                assert(self.layers[l].inner_radius ==
-                       self.layers[l - 1].outer_radius)
-
+            for i in range(1, len(self.layers)):
+                assert(self.layers[i].inner_radius
+                       == self.layers[i - 1].outer_radius)
 
         self.name = name
 
@@ -53,9 +51,8 @@ class Planet(object):
             layer.n_end = np.where(self.radii == layer.outer_radius)[0][0] + 1
         self._cached = {}
         self.verbose = verbose
-        self.set_pressure_mode(n_max_iterations=n_max_iterations, max_delta = max_delta)
-
-
+        self.set_pressure_mode(
+            n_max_iterations=n_max_iterations, max_delta=max_delta)
 
     def __iter__(self):
         """
@@ -67,9 +64,10 @@ class Planet(object):
         """
         Prints details of the planet
         """
-        writing  = '{0} consists of {1} layers:\n'.format(self.name, len(self.layers))
+        writing = '{0} consists of {1} layers:\n'.format(
+            self.name, len(self.layers))
         for layer in self:
-            writing  =  writing + layer.__str__()
+            writing = writing + layer.__str__()
         return writing
 
     def reset(self):
@@ -135,27 +133,29 @@ class Planet(object):
                                np.sum([len(layer.radii) for layer in self.layers])])
             for i, prop in enumerate(properties):
                 if prop == 'depth':
-                    values[i] = np.array([self.radius_planet - r for layer in self.layers for r in layer.radii])
+                    values[i] = np.array(
+                        [self.radius_planet - r for layer in self.layers for r in layer.radii])
                 else:
-                    j=0
+                    j = 0
                     for layer in self.layers:
                         vals = getattr(layer, prop)
-                        values[i,j:j + len(vals)] = vals
+                        values[i, j:j + len(vals)] = vals
                         j += len(vals)
         else:
             values = np.empty([len(properties), len(radlist)])
             l_idx = [i for i, layer in enumerate(self.layers) for r in radlist
-                        if r>=layer.inner_radius and r<=layer.outer_radius]
+                     if r >= layer.inner_radius and r <= layer.outer_radius]
 
             for j, r in enumerate(radlist):
-                values[:,j] = self.layers[l_idx[j]].evaluate(properties, [r], self.radius_planet).T[0]
+                values[:, j] = self.layers[l_idx[j]].evaluate(
+                    properties, [r], self.radius_planet).T[0]
 
         if values.shape[0] == 1:
             values = values[0]
         return values
 
-    def set_pressure_mode( self, pressure_mode='self-consistent', pressures=None, pressure_top=0.,
-              gravity_bottom=0., n_max_iterations=50, max_delta = 1.e-5):
+    def set_pressure_mode(self, pressure_mode='self-consistent', pressures=None, pressure_top=0.,
+                          gravity_bottom=0., n_max_iterations=50, max_delta=1.e-5):
         """
         Sets the pressure mode of the planet by user-defined values are in a self-consistent fashion.
         pressure_mode is 'user-defined' or 'self-consistent'.
@@ -177,7 +177,6 @@ class Planet(object):
         self.reset()
         assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
 
-
         self.pressure_mode = pressure_mode
         self.gravity_bottom = gravity_bottom
 
@@ -192,7 +191,6 @@ class Planet(object):
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
 
-
     def make(self):
         """
         This routine needs to be called before evaluating any properties. If pressures and temperatures are self-consistent, they
@@ -203,7 +201,6 @@ class Planet(object):
         for layer in self.layers:
             assert(layer.temperature_mode is not None)
 
-
         if self.pressure_mode == 'user-defined':
             self._temperatures = self._evaluate_temperature(self._pressures)
 
@@ -212,7 +209,7 @@ class Planet(object):
             new_press = self.pressure_top + \
                 (-self.radii + max(self.radii)) * \
                 1.e3  # initial pressure curve guess
-            temperatures = self._evaluate_temperature( new_press)
+            temperatures = self._evaluate_temperature(new_press)
 
             # Make it self-consistent!!!
             i = 0
@@ -221,11 +218,12 @@ class Planet(object):
                 ref_press = new_press
                 new_grav, new_press = self._evaluate_eos(
                     new_press, temperatures, self.gravity_bottom, self.pressure_top)
-                temperatures = self._evaluate_temperature( new_press)
+                temperatures = self._evaluate_temperature(new_press)
                 rel_err = abs(
                     (max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
-                    print('Iteration {0:0d} maximum relative pressure error: {1:.1e}'.format(i, rel_err))
+                    print(
+                        'Iteration {0:0d} maximum relative pressure error: {1:.1e}'.format(i, rel_err))
 
                 if rel_err < self.max_delta:
                     break
@@ -240,10 +238,10 @@ class Planet(object):
             layer.temperatures = self.temperatures[layer.n_start: layer.n_end]
             layer.gravity_bottom = self._gravity[layer.n_start - 1]
             layer.pressure_mode = 'set-in-planet'
-            for l in range(len(layer.radii)):
+            for i in range(len(layer.radii)):
                 layer.sublayers.append(layer.material.copy())
-                layer.sublayers[l].set_state(
-                    layer.pressures[l], layer.temperatures[l])
+                layer.sublayers[i].set_state(
+                    layer.pressures[i], layer.temperatures[i])
 
     def _evaluate_eos(self, pressures, temperatures, gravity_bottom, pressure_top):
         """
@@ -274,7 +272,8 @@ class Planet(object):
         for layer in self.layers[::-1]:
             if temperature_top is None or layer.temperature_top is not None:
                 temperature_top = layer.temperature_top
-            temps.extend(layer._evaluate_temperature((pressures[layer.n_start:layer.n_end]), temperature_top)[::-1])
+            temps.extend(layer._evaluate_temperature(
+                (pressures[layer.n_start:layer.n_end]), temperature_top)[::-1])
             temperature_top = temps[-1]
         return np.hstack(np.squeeze(temps))[::-1]
 

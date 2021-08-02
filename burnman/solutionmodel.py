@@ -237,33 +237,8 @@ class SolutionModel(object):
         H_excess : float
             The excess enthalpy of the solution
         """
-        return (self.excess_gibbs_free_energy(pressure, temperature, molar_fractions) +
-                temperature*self.excess_entropy(pressure, temperature, molar_fractions))
-
-    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
-        """
-        Given a list of molar fractions of different phases,
-        compute the excess Gibbs free energy for each endmember of the solution.
-        The base class implementation assumes that the excess gibbs
-        free energy is zero.
-
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
-
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        partial_G_excess : numpy array
-            The excess Gibbs free energy of each endmember
-        """
-        return np.zeros_like(molar_fractions)
+        return (self.excess_gibbs_free_energy(pressure, temperature, molar_fractions)
+                + temperature*self.excess_entropy(pressure, temperature, molar_fractions))
 
     def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
         """
@@ -340,6 +315,7 @@ class SolutionModel(object):
         """
         return np.zeros_like(np.array(molar_fractions))
 
+
 class MechanicalSolution (SolutionModel):
 
     """
@@ -383,7 +359,6 @@ class MechanicalSolution (SolutionModel):
         return np.ones_like(molar_fractions)
 
 
-
 class IdealSolution (SolutionModel):
 
     """
@@ -402,9 +377,9 @@ class IdealSolution (SolutionModel):
         self._calculate_endmember_configurational_entropies()
 
     def _calculate_endmember_configurational_entropies(self):
-        S_conf = -constants.gas_constant * (self.site_multiplicities *
-                                            self.endmember_occupancies *
-                                            logish(self.endmember_occupancies)).sum(-1)
+        S_conf = -constants.gas_constant * (self.site_multiplicities
+                                            * self.endmember_occupancies
+                                            * logish(self.endmember_occupancies)).sum(-1)
         self.endmember_configurational_entropies = S_conf
 
     def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
@@ -429,9 +404,9 @@ class IdealSolution (SolutionModel):
 
     def _configurational_entropy(self, molar_fractions):
         site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        conf_entropy = - constants.gas_constant * (site_occupancies *
-                                                   self.site_multiplicities *
-                                                   logish(site_occupancies)).sum(-1)
+        conf_entropy = - constants.gas_constant * (site_occupancies
+                                                   * self.site_multiplicities
+                                                   * logish(site_occupancies)).sum(-1)
         return conf_entropy
 
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
@@ -446,10 +421,10 @@ class IdealSolution (SolutionModel):
 
     def _log_ideal_activities(self, molar_fractions):
         site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        lna = (self.endmember_occupancies * self.site_multiplicities *
-               logish(site_occupancies)).sum(-1)
-        normalisation_constants = (self.endmember_configurational_entropies /
-                                   constants.gas_constant)
+        lna = (self.endmember_occupancies * self.site_multiplicities
+               * logish(site_occupancies)).sum(-1)
+        normalisation_constants = (self.endmember_configurational_entropies
+                                   / constants.gas_constant)
 
         return lna + normalisation_constants
 
@@ -461,7 +436,6 @@ class IdealSolution (SolutionModel):
                            self.site_multiplicities*inverseish(site_occupancies),
                            self.endmember_occupancies) - n_site_atoms
         return dlnadp
-
 
     def _ideal_activities(self, molar_fractions):
         return _ideal_activities_fct(molar_fractions,
@@ -494,7 +468,7 @@ class AsymmetricRegularSolution (IdealSolution):
         # Create 2D arrays of interaction parameters
         self.We = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
         self.We[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in energy_interaction
-                                                                for i in row])
+                                                                    for i in row])
 
         if entropy_interaction is not None:
             self.Ws = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
@@ -659,13 +633,12 @@ class SubregularSolution (IdealSolution):
         non_ideal_volumes = self._non_ideal_function(self.Wv, molar_fractions)
         return non_ideal_volumes
 
-
     def gibbs_hessian(self, pressure, temperature, molar_fractions):
         n = len(molar_fractions)
         ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
         nonideal_gibbs_hessian = _non_ideal_hessian_subreg(molar_fractions, n,
-                                                           self.We - temperature*self.Ws +
-                                                           pressure*self.Wv)
+                                                           self.We - temperature*self.Ws
+                                                           + pressure*self.Wv)
 
         return nonideal_gibbs_hessian - temperature*ideal_entropy_hessian
 

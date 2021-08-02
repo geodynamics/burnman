@@ -7,10 +7,9 @@ from __future__ import print_function
 
 import operator
 import bisect
-import os
 import pkgutil
 import numpy as np
-from scipy.optimize import fsolve, curve_fit
+from scipy.optimize import fsolve
 from scipy.ndimage.filters import gaussian_filter
 from scipy.interpolate import interp2d
 import scipy.integrate as integrate
@@ -19,7 +18,7 @@ import itertools
 import warnings
 
 from . import constants
-import itertools
+
 
 def copy_documentation(copy_from):
     """
@@ -46,10 +45,15 @@ def copy_documentation(copy_from):
         return wrapper
     return mydecorator
 
-def flatten(l): return flatten(l[0]) + (flatten(l[1:]) if len(l) > 1 else []) if type(l) is list or type(l) is np.ndarray else [l]
+
+def flatten(arr):
+    return (flatten(arr[0]) + (flatten(arr[1:]) if len(arr) > 1 else [])
+            if type(arr) is list or type(arr) is np.ndarray else [arr])
+
 
 def round_to_n(x, xerr, n):
     return round(x, -int(np.floor(np.log10(np.abs(xerr)))) + (n - 1))
+
 
 def unit_normalize(a, order=2, axis=-1):
     """
@@ -58,8 +62,9 @@ def unit_normalize(a, order=2, axis=-1):
     """
     l2 = np.atleast_1d(np.apply_along_axis(np.linalg.norm, axis, a, order))
 
-    l2[l2==0] = 1
+    l2[l2 == 0] = 1
     return a / np.expand_dims(l2, axis)[0][0]
+
 
 def pretty_print_values(popt, pcov, params):
     """
@@ -79,7 +84,8 @@ def pretty_print_values(popt, pcov, params):
 
         scale = np.power(10., p_expnt)
         nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
-        print ('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+        print('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+
 
 def pretty_print_table(table, use_tabs=False):
     """
@@ -104,6 +110,7 @@ def pretty_print_table(table, use_tabs=False):
     for r in table:
         print(frmt.format(*r))
 
+
 def pretty_plot():
     """
     Makes pretty plots. Overwrites the matplotlib default settings to allow
@@ -113,6 +120,7 @@ def pretty_plot():
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = '\\usepackage{relsize}'
     plt.rc('font', family='sanserif')
+
 
 def sort_table(table, col=0):
     """
@@ -430,7 +438,7 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
         List of output phase fractions (of type output_type)
     """
     if input_type == 'volume' or output_type == 'volume':
-        if composite.temperature == None:
+        if composite.temperature is None:
             raise Exception(
                 composite.to_string() + ".set_state(P, T) has not been called, so volume fractions are currently undefined. Exiting.")
 
@@ -452,13 +460,13 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
         total_volume = sum(
             molar_fraction * phase.molar_volume for molar_fraction,
             phase in zip(molar_fractions, composite.phases))
-        output_fractions = [molar_fraction * phase.molar_volume /
-                            total_volume for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+        output_fractions = [molar_fraction * phase.molar_volume
+                            / total_volume for molar_fraction, phase in zip(molar_fractions, composite.phases)]
     elif output_type == 'mass':
         total_mass = sum(molar_fraction * phase.molar_mass for molar_fraction,
                          phase in zip(molar_fractions, composite.phases))
-        output_fractions = [molar_fraction * phase.molar_mass /
-                            total_mass for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+        output_fractions = [molar_fraction * phase.molar_mass
+                            / total_mass for molar_fraction, phase in zip(molar_fractions, composite.phases)]
     elif output_type == 'molar':
         output_fractions = molar_fractions
 
@@ -551,6 +559,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     else:
         return x0, x1, f0, f1
 
+
 def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
                           including_shear_properties=True):
     """
@@ -601,7 +610,6 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
     S1 = m.S
     V1 = m.V
 
-
     m.set_state(P + dP, T)
     G2 = m.gibbs
     V2 = m.V
@@ -619,12 +627,10 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
     eq.extend([[m.V, (G2 - G0)/dP],
                [m.K_T, -0.5*(V2 + V0)*dP/(V2 - V0)]])
 
-
     expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv', 'gr = alpha*K_T*V/Cv'])
     eq.extend([[m.molar_heat_capacity_v, m.molar_heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
                [m.K_S, m.K_T*m.molar_heat_capacity_p/m.molar_heat_capacity_v],
                [m.gr, m.alpha*m.K_T*m.V/m.molar_heat_capacity_v]])
-
 
     expr.append('Vphi = np.sqrt(K_S/rho)')
     eq.append([m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)])
@@ -646,19 +652,20 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
         note = ' (not including shear properties)'
 
     consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1]) + np.finfo('float').eps for e in eq]
-    consistency = np.all(consistencies)
+    eos_is_consistent = np.all(consistencies)
 
-    if verbose == True:
+    if verbose:
         print('Checking EoS consistency for {0:s}{1}'.format(m.to_string(), note))
         print('Expressions within tolerance of {0:2f}'.format(tol))
         for i, c in enumerate(consistencies):
             print('{0:10s} : {1:5s}'.format(expr[i], str(c)))
-        if consistency == True:
+        if eos_is_consistent:
             print('All EoS consistency constraints satisfied for {0:s}'.format(m.to_string()))
         else:
             print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
 
-    return consistency
+    return eos_is_consistent
+
 
 def _pad_ndarray_inverse_mirror(array, padding):
     """
@@ -687,7 +694,7 @@ def _pad_ndarray_inverse_mirror(array, padding):
     padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
 
-    slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+    slices = tuple([slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
     padded_array[slices] = array
 
     padded_array_indices = list(itertools.product(*[range(n + 2*padding[i]) for i, n in enumerate(array.shape)]))
@@ -752,7 +759,7 @@ def smooth_array(array, grid_spacing,
         padded_array = _pad_ndarray_inverse_mirror(array, padding)
         smoothed_padded_array = gaussian_filter(padded_array,
                                                 sigma=sigma)
-        slices = tuple([ slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+        slices = tuple([slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
         smoothed_array = smoothed_padded_array[slices]
     else:
         smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
@@ -806,21 +813,20 @@ def interp_smoothed_array_and_derivatives(array,
 
     """
 
-
     dx = x_values[1] - x_values[0]
     dy = y_values[1] - y_values[0]
 
     if indexing == 'xy':
-        smoothed_array = smooth_array(array = array,
-                                      grid_spacing = np.array([dy, dx]),
-                                      gaussian_rms_widths = np.array([y_stdev, x_stdev]),
+        smoothed_array = smooth_array(array=array,
+                                      grid_spacing=np.array([dy, dx]),
+                                      gaussian_rms_widths=np.array([y_stdev, x_stdev]),
                                       truncate=truncate,
                                       mode=mode)
 
     elif indexing == 'ij':
-        smoothed_array = smooth_array(array = array,
-                                      grid_spacing = np.array([dx, dy]),
-                                      gaussian_rms_widths = np.array([x_stdev, y_stdev]),
+        smoothed_array = smooth_array(array=array,
+                                      grid_spacing=np.array([dx, dy]),
+                                      gaussian_rms_widths=np.array([x_stdev, y_stdev]),
                                       truncate=truncate,
                                       mode=mode).T
 
@@ -868,6 +874,7 @@ def attribute_function(m, attributes, powers=[]):
         attributes = [attributes]
     if powers == []:
         powers = [1. for a in attributes]
+
     def f(x):
         P, T, V = x
         m.set_state(P, T)
@@ -893,8 +900,8 @@ def compare_l2(depth, calc, obs):
     :rtype: array of floats
     """
     err = []
-    for l in range(len(calc)):
-        err.append(l2(depth, calc[l], obs[l]))
+    for i in range(len(calc)):
+        err.append(l2(depth, calc[i], obs[i]))
 
     return err
 
@@ -913,8 +920,8 @@ def compare_chifactor(calc, obs):
     :rtype: array of floats
     """
     err = []
-    for l in range(len(calc)):
-        err.append(chi_factor(calc[l], obs[l]))
+    for i in range(len(calc)):
+        err.append(chi_factor(calc[i], obs[i]))
 
     return err
 

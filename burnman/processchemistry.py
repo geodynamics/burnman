@@ -402,9 +402,9 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
 
         site_multiplicities = site_mults
 
-    elif len(site_occupancies[0]) != len(site_multiplicities):
-        raise Exception('Site multiplicities should either be given on a per-site basis or a per-species basis')
-
+    elif len(endmember_occupancies[0]) != len(site_multiplicities):
+        raise Exception(
+            'Site multiplicities should either be given on a per-site basis or a per-species basis')
 
     site_formulae = []
     for mbr_occupancies in endmember_occupancies:

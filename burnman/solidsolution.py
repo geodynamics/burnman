@@ -6,17 +6,17 @@
 from __future__ import absolute_import
 
 import numpy as np
-import warnings
 
 from .mineral import Mineral, material_property
-from .solutionmodel import *
+from .solutionmodel import SolutionModel
+from .solutionmodel import MechanicalSolution, IdealSolution
+from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
+from .solutionmodel import SubregularSolution
 from .processchemistry import sum_formulae
 from .averaging_schemes import reuss_average_function
-from . import constants
 
 
 class SolidSolution(Mineral):
-
     """
     This is the base class for all solid solutions.
     Site occupancies, endmember activities and the constant
@@ -76,14 +76,16 @@ class SolidSolution(Mineral):
         if endmembers is not None:
             self.endmembers = endmembers
 
-        if hasattr(self, 'endmembers') == False:
+        if hasattr(self, 'endmembers') is False:
             raise Exception(
                 "'endmembers' attribute missing from solid solution")
 
         try:
-            self.endmember_formulae = [mbr[0].params['formula'] for mbr in self.endmembers]
-        except:
-            raise Exception("Not all endmembers of this solid solution have a formula in their params dictionary.")
+            self.endmember_formulae = [
+                mbr[0].params['formula'] for mbr in self.endmembers]
+        except KeyError:
+            raise Exception(
+                "Not all endmembers of this solid solution have a formula in their params dictionary.")
 
         # Set default solution model type
         if hasattr(self, 'solution_type'):
@@ -92,18 +94,18 @@ class SolidSolution(Mineral):
             elif self.solution_type == 'ideal':
                 self.solution_model = IdealSolution(self.endmembers)
             else:
-                if hasattr(self, 'energy_interaction') == False:
+                if hasattr(self, 'energy_interaction') is False:
                     self.energy_interaction = None
-                if hasattr(self, 'volume_interaction') == False:
+                if hasattr(self, 'volume_interaction') is False:
                     self.volume_interaction = None
-                if hasattr(self, 'entropy_interaction') == False:
+                if hasattr(self, 'entropy_interaction') is False:
                     self.entropy_interaction = None
 
                 if self.solution_type == 'symmetric':
                     self.solution_model = SymmetricRegularSolution(
                         self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'asymmetric':
-                    if hasattr(self, 'alphas') == False:
+                    if hasattr(self, 'alphas') is False:
                         raise Exception(
                             "'alphas' attribute missing from solid solution")
                     self.solution_model = AsymmetricRegularSolution(
@@ -121,7 +123,7 @@ class SolidSolution(Mineral):
         self.n_endmembers = len(self.endmembers)
         try:
             self.endmember_names = [mbr[0].name for mbr in self.endmembers]
-        except:
+        except AttributeError:
             pass
 
         # Equation of state
@@ -406,8 +408,8 @@ class SolidSolution(Mineral):
         Returns P wave speed of the solid solution [m/s]
         Aliased with self.v_p
         """
-        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. *
-                        self.shear_modulus) / self.density)
+        return np.sqrt((self.adiabatic_bulk_modulus
+                        + 4. / 3. * self.shear_modulus) / self.density)
 
     @material_property
     def bulk_sound_velocity(self):
