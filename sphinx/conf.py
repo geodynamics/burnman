@@ -21,8 +21,8 @@ import burnman.version
 # -- Project information -----------------------------------------------------
 
 project = 'BurnMan'
-copyright = '2021, Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
-author = 'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
+copyright = '2021, Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn'
+author = 'Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn'
 
 # The short X.Y version.
 version = burnman.version.short_version
