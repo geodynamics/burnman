@@ -50,6 +50,10 @@ autodoc_default_options = {'members': True,
 
 autodoc_member_order = 'bysource'
 
+# We can mock import modules if they will break the build
+# For example, the pycddlib library depends on C modules
+# which can't be installed by readthedocs.
+autodoc_mock_imports = ['pycddlib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
