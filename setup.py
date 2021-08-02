@@ -16,8 +16,9 @@ metadata = dict(name='burnman',
                 package_data={'burnman': ['data/input_*/*']},
                 classifiers=[
                 'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
-                'Programming Language :: Python :: 2.7',
-                'Programming Language :: Python :: 3.4'],
+                'Programming Language :: Python :: 3.6',
+                'Programming Language :: Python :: 3.7',
+                'Programming Language :: Python :: 3.8'],
                 )
 
 # Try to use setuptools in order to check dependencies.
