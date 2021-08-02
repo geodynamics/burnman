@@ -21,8 +21,8 @@ import burnman.version
 # -- Project information -----------------------------------------------------
 
 project = 'BurnMan'
-copyright = '2021, Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
-author = 'Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
+copyright = '2021, Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn'
+author = 'Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn'
 
 # The short X.Y version.
 version = burnman.version.short_version
@@ -185,7 +185,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 % FILL: author list
 % e.g. Author One\\Author Two\\Author Three\\
 % be sure to have a newline (\\) after the final author
-Sanne Cottaar\\Timo Heister\\Robert Myhill\\Ian Rose\\Cayman Unterborn\\
+Robert Myhill\\Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\
 }
 
 {\fontfamily{\sfdefault}\selectfont \href{http://geodynamics.org}{http://geodynamics.org}}
