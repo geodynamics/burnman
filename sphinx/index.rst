@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary sciences
-====================================================================================
+BurnMan |version|: a thermodynamic and geophysics toolkit for the Earth and planetary sciences
+===============================================================================================
 
 
 .. image:: burnjack-bar.png

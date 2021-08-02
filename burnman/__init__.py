@@ -4,8 +4,8 @@
 
 
 """
-Introducing BurnMan
-===================
+Introducing BurnMan |version|
+=============================
 
 Overview
 --------
@@ -82,7 +82,7 @@ Installation
 Requirements
 ^^^^^^^^^^^^
 
-  - Python 2.7.x or Python 3.4+
+  - Python 3.6+
   - Python modules: NumPy, SciPy, SymPy, Matplotlib
 
 
@@ -106,7 +106,7 @@ Install on a Mac
 
 1. get Xcode
 2. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use either Python 2.7 or Python 3.4+.
+   python.org/download . Make sure to use either Python 3.6+.
    To check your version of python, type the following in a
    terminal: ``python --version``
 3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
@@ -120,9 +120,9 @@ Install on a Mac
 Install under Windows
 ^^^^^^^^^^^^^^^^^^^^^
 
-To get Python 2.7.x (for example) running under Windows:
+To get Python running under Windows:
 
-1. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
+1. Download Python from http://www.python.org/ and install
 2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download and install
 3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download and install
 3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install

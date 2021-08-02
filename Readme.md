@@ -32,7 +32,7 @@ Authors (as of 2021):
 * Python 3.6+
 * Python modules:
   NumPy, SciPy, SymPy, Matplotlib
-  
+
 ## Optional, needed for some functionality
 
 * pycddlib
@@ -43,14 +43,14 @@ Authors (as of 2021):
 1. Clone this repository using git (or download it). To install git, open a terminal window and type
 
     `sudo apt-get install git`
-    
-    Then go to the directory into which you want to clone the repository, and type 
-    
+
+    Then go to the directory into which you want to clone the repository, and type
+
     `git clone https://github.com/geodynamics/burnman.git`
-    
+
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. Install using apt by opening a terminal window and entering
-`sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib` 
+`sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib`
 3. Go to the Burnman examples directory and type:
 ```python example_beginner.py```
 Figures should show up, indicating that it is working.
@@ -61,21 +61,21 @@ Figures should show up, indicating that it is working.
 1. Clone this repository using git (or download it). To install git, open a terminal window and type
 
     `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-    
+
     `brew doctor`
-    
+
     `brew install git`
-    
-    Then go to the directory into which you want to clone the repository, and type 
-    
+
+    Then go to the directory into which you want to clone the repository, and type
+
     `git clone https://github.com/geodynamics/burnman.git`
-    
+
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. get Xcode
 3. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use either Python 2.7 or Python 3.4+.
+   python.org/download . Make sure to use a modern version of Python (3.6+).
    To check your version of python, type the following in a
-   terminal: 
+   terminal:
      python --version
 4. Install the latest Numpy version: http://sourceforge.net/projects/numpy/files/NumPy/
 5. Install the latest Scipy at http://sourceforge.net/projects/scipy/files/
@@ -95,7 +95,7 @@ Problems you might run into:
   matching architecture in universal wrapper`. You can check if your python
   distribution is 32 or 64 bit with the following lines:
 ```
-python 
+python
 >>> import platform
 >>> print platform.architecture()
 ```
@@ -103,13 +103,15 @@ python
 ## Install under Windows
 
 1. Clone this repository using git (or download it). git can be downloaded from here: https://gitforwindows.org/. There are a number of different ways to use git as installed under windows (command-line, gui). Use your favoured method to clone the burnman repository: https://github.com/geodynamics/burnman.git. Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
-    
-To get Python 2.7.x (for example) running under Windows:
 
-2. Download Python from http://www.python.org/ and install the version at C:\Python27\; the 32-bit version is recommended
-3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download "numpy-MKL-1.6.2.win32-py2.7.exe" and install
-4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download "scipy-0.10.1.win32-py2.7.exe" and install
-5. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download "matplotlib-1.1.1.win32-py2.7.exe" and install
+To get Python running under Windows:
+
+1. Download Python from http://www.python.org/ and install
+2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download and install
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download and install
+3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install
+4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download and install
+5. Download BurnMan from github (https://github.com/geodynamics/burnman)
 6. Open Python Shell (IDLE Python GUI)
 7. File -- Open -- find one of the example files
 8. Run the module (or press F5)
@@ -126,7 +128,7 @@ possible as well as each of the helpers involved with each example.
    your own).
 2. example_seismic.py (Explains the various seismic models included in
    BurnMan)
-3. example_composition.py (Explains how to create different mineralogical models) 
+3. example_composition.py (Explains how to create different mineralogical models)
 4. example_user_input_materials.py (Explains how to create user-defined
    minerals)
 5. example_averaging.py (Explains how moduli and density are averaged to
@@ -136,18 +138,18 @@ possible as well as each of the helpers involved with each example.
 ## About scripting in Python
 
 Burnman has the advantage of being adaptable and extendable in easy scripts. The downside might be that we do not
-provide a graphical user interface. For those of you who are not familiar  with python, we suspect it will still be 
-relatively easy to adapt the scripts for computations and plotting. 
+provide a graphical user interface. For those of you who are not familiar  with python, we suspect it will still be
+relatively easy to adapt the scripts for computations and plotting.
 Here are some specific features and pitfalls on Python:
 
-* Python uses specific indentation. A script might fail if a code block is not indented correctly. We use four spaces and no tabs, 
+* Python uses specific indentation. A script might fail if a code block is not indented correctly. We use four spaces and no tabs,
   mixing these can give trouble.
 * Indices require square brackets and function or method calls parentheses (mainly different from Matlab).
 * The first index of an array is 0 (e.g. x[0])
-* Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (Python 2.x rounds downward), while 5./3. will give 1.66666666667)
+* Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (Python 3.x rounds downward), while 5./3. will give 1.66666666667)
 
 
-## Examples 
+## Examples
 
 example_beginner
 ----------------
