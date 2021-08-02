@@ -117,11 +117,13 @@ def nonlinear_least_squares_fit(model,
                                                  model.data_covariances,
                                                  model.flags])):
             x_mle_arr[i] = model.function(x, flag)
-            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
+            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(
+                x, x_mle_arr[i], cov, flag)
             delta_x = x_mle_arr[i] - x
 
             while np.linalg.norm(delta_x) > model.mle_tolerances[i]:
-                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(x, x_mle_arr[i], cov, flag)
+                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(
+                    x, x_mle_arr[i], cov, flag)
                 x_mle_arr[i] = model.function(x_mle_est, flag)
                 delta_x = x_mle_arr[i] - x_mle_est
 
@@ -151,7 +153,8 @@ def nonlinear_least_squares_fit(model,
 
         J = model.jacobian  # this the weighted Jacobian
         JTJ = J.T.dot(J)
-        delta_beta = np.linalg.inv(JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(model.weighted_residuals)
+        delta_beta = np.linalg.inv(
+            JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(model.weighted_residuals)
         new_params = model.get_params() - delta_beta
         f_delta_beta = delta_beta/new_params
 
@@ -170,7 +173,8 @@ def nonlinear_least_squares_fit(model,
         f_delta_beta = _update_beta(lm_damping)
         max_f = np.max(np.abs(f_delta_beta))
         if verbose is True:
-            print('Iteration {0:d}: {1}. Max change in param: {2}'.format(n_it, model.get_params(), max_f))
+            print('Iteration {0:d}: {1}. Max change in param: {2}'.format(
+                n_it, model.get_params(), max_f))
         if max_f < param_tolerance:
             break
 
@@ -187,7 +191,8 @@ def nonlinear_least_squares_fit(model,
 
     if verbose is True:
         if n_it == max_lm_iterations - 1:
-            print('Max iterations ({0:d}) reached (param tolerance = {1:1e})'.format(max_lm_iterations, param_tolerance))
+            print('Max iterations ({0:d}) reached (param tolerance = {1:1e})'.format(
+                max_lm_iterations, param_tolerance))
         else:
             print('Converged in {0:d} iterations'.format(n_it))
         print('\nOptimised parameter values:')
@@ -394,10 +399,12 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
 
     if param_names != []:
         for i in range(n_params-1):
-            ax_array[n_params-2][i].set_xlabel('{0:s} (x 10^{1:d})'.format(param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
+            ax_array[n_params-2][i].set_xlabel('{0:s} (x 10^{1:d})'.format(
+                param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
 
         for j in range(1, n_params):
-            ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
+            ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(
+                param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
 
     fig.tight_layout()
     return fig, ax_array
@@ -502,8 +509,10 @@ def extreme_values(weighted_residuals, confidence_interval):
 
     n = len(weighted_residuals)
     mean = norm.isf(1./n)
-    scale = 0.8/np.power(np.log(n), 1./2.)  # good approximation for > 10 data points
-    c = 0.33/np.power(np.log(n), 3./4.)  # good approximation for > 10 data points
+    # good approximation for > 10 data points
+    scale = 0.8/np.power(np.log(n), 1./2.)
+    # good approximation for > 10 data points
+    c = 0.33/np.power(np.log(n), 3./4.)
 
     # We now need a 1-tailed probability from the given confidence_interval
     # p_total = 1. - confidence_interval = p_upper + p_lower - p_upper*p_lower
@@ -513,7 +522,10 @@ def extreme_values(weighted_residuals, confidence_interval):
 
     indices = [i for i, r in enumerate(weighted_residuals)
                if np.abs(r) > confidence_bound]
-    probabilities = 1. - np.power(genextreme.sf(np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.) # Convert back to 2-tailed probabilities
+    # Convert back to 2-tailed probabilities
+    probabilities = 1. - \
+        np.power(genextreme.sf(
+            np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.)
 
     return confidence_bound, indices, probabilities
 

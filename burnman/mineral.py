@@ -84,13 +84,16 @@ class Mineral(Material):
             raise Exception(
                 "Please derive your method from object (see python old style classes)")
 
-        if self.method is not None and type(new_method) is not type(self.method):
+        if ((self.method is not None
+             and isinstance(new_method, type(self.method)) is False)):
 
             # Warn user that they are changing the EoS
-            warnings.warn('Warning, you are changing the method to ' + new_method.__class__.__name__ +
-                          ' even though the material is designed to be used with the method ' +
-                          self.method.__class__.__name__ +
-                          '.  This does not overwrite any mineral attributes', stacklevel=2)
+            warnings.warn('Warning, you are changing the method to '
+                          f'{new_method.__class__.__name__} even though the '
+                          'material is designed to be used with the method '
+                          f'{self.method.__class__.__name__}. '
+                          'This does not overwrite any mineral attributes',
+                          stacklevel=2)
             self.reset()
 
         self.method = new_method
@@ -99,8 +102,8 @@ class Mineral(Material):
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
-            print('Mineral ' + self.to_string() +
-                  ' failed to validate parameters with message : \" ' + e.message + '\"')
+            print(f'Mineral {self.to_string()} failed to validate parameters '
+                  f'with message: \"{e.message}\"')
             raise
 
         # Invalidate the cache upon resetting the method
@@ -168,9 +171,11 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
-        return self.method.molar_heat_capacity_p(self.pressure, self.temperature,
-                                           self.molar_volume, self.params) \
-            - self.temperature * self._property_modifiers['d2GdT2']
+        return (self.method.molar_heat_capacity_p(self.pressure,
+                                                  self.temperature,
+                                                  self.molar_volume,
+                                                  self.params)
+                - self.temperature * self._property_modifiers['d2GdT2'])
 
     @material_property
     @copy_documentation(Material.thermal_expansivity)
@@ -184,9 +189,12 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
-        G = self.method.shear_modulus(self.pressure, self.temperature, self.molar_volume, self.params)
+        G = self.method.shear_modulus(
+            self.pressure, self.temperature, self.molar_volume, self.params)
         if G < np.finfo('float').eps:
-            warnings.formatwarning = lambda msg, *a : 'Warning from file \'{0}\', line {1}:\n{2}\n\n'.format(a[1], a[2], msg)
+            warnings.formatwarning = lambda msg, * \
+                a: 'Warning from file \'{0}\', line {1}:\n{2}\n\n'.format(
+                    a[1], a[2], msg)
             warnings.warn('You are trying to calculate shear modulus for {0} when it is exactly zero. \n'
                           'If {0} is a liquid, then you can safely ignore this warning, but consider \n'
                           'calculating bulk modulus or bulk sound rather than Vp or Vs. \n'
@@ -261,8 +269,8 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
-        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. *
-                        self.shear_modulus) / self.density)
+        return np.sqrt((self.adiabatic_bulk_modulus
+                        + 4. / 3. * self.shear_modulus) / self.density)
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
@@ -280,20 +288,20 @@ class Mineral(Material):
         eps = np.finfo('float').eps
         if np.abs(self.molar_heat_capacity_v) > eps:
 
-            return (self.thermal_expansivity *
-                    self.isothermal_bulk_modulus *
-                    self.molar_volume /
-                    self.molar_heat_capacity_v)
-        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps) and
-              (np.abs(self._property_modifiers['d2GdP2']) < eps) and
-              (np.abs(self._property_modifiers['dGdP']) < eps) and
-              (np.abs(self._property_modifiers['d2GdT2']) < eps)):
+            return (self.thermal_expansivity
+                    * self.isothermal_bulk_modulus
+                    * self.molar_volume
+                    / self.molar_heat_capacity_v)
+        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps)
+              and (np.abs(self._property_modifiers['d2GdP2']) < eps)
+              and (np.abs(self._property_modifiers['dGdP']) < eps)
+              and (np.abs(self._property_modifiers['d2GdT2']) < eps)):
 
             return self.method.grueneisen_parameter(self.pressure, self.temperature,
                                                     self.molar_volume, self.params)
         else:
-            raise Exception('You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers.')
-
+            raise Exception(
+                'You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers.')
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)

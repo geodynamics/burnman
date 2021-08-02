@@ -4,19 +4,17 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import warnings
-
 
 from subprocess import Popen, PIPE, STDOUT
 from os import rename
-
 
 import numpy as np
 from scipy.interpolate import interp2d, griddata
 
 from .material import Material, material_property
-from . import eos
+
 from .tools import copy_documentation
+
 
 def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temperatures, pressure_range=None, temperature_range=None):
     '''
@@ -35,7 +33,8 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
     22 - Molar Volume (J/bar)
     '''
 
-    print('Working on creating {0}x{1} P-T table file using werami. Please wait.\n'.format(n_pressures, n_temperatures))
+    print('Working on creating {0}x{1} P-T table file using werami. Please wait.\n'.format(
+        n_pressures, n_temperatures))
 
     try:
         str2 = 'y\n{0} {1}\n{2} {3}\n'.format(pressure_range[0]/1.e5, pressure_range[1]/1.e5,
@@ -44,7 +43,7 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
         print('Keeping P-T range the same as the original project range.\n')
         str2 = 'n\n'
 
-    stdin='{0:s}\n2\n' \
+    stdin = '{0:s}\n2\n' \
         '2\nn\n' \
         '4\nn\n' \
         '5\nn\n' \
@@ -62,14 +61,16 @@ def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temp
         '{2:d} {3:d}\n' \
         '0'.format(project_name, str2, n_pressures, n_temperatures)
 
-
-    p = Popen(werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+    p = Popen(werami_path, stdout=PIPE, stdin=PIPE,
+              stderr=STDOUT, encoding='utf8')
     stdout = p.communicate(input=stdin)[0]
     print(stdout)
-    out = [s for s in stdout.split('\n') if "Output has been written to the" in s][0].split()[-1]
+    out = [s for s in stdout.split(
+        '\n') if "Output has been written to the" in s][0].split()[-1]
     rename(out, outfile)
     print('Output file renamed to {0:s}'.format(outfile))
     print('Processing complete')
+
 
 class PerplexMaterial(Material):
     """
@@ -90,10 +91,12 @@ class PerplexMaterial(Material):
 
     This class is available as ``burnman.PerplexMaterial``.
     """
+
     def __init__(self, tab_file, name='Perple_X material'):
         self.name = name
         self.params = {'name': name}
-        self._property_interpolators, self.params['molar_mass'], self.bounds = self._read_2D_perplex_file(tab_file)
+        self._property_interpolators, self.params['molar_mass'], self.bounds = self._read_2D_perplex_file(
+            tab_file)
         Material.__init__(self)
 
     def _read_2D_perplex_file(self, filename):
@@ -119,8 +122,8 @@ class PerplexMaterial(Material):
             raise Exception('This file does not have a recognised PerpleX structure.\n'
                             'Are the independent variables P(bar) and T(K)?')
 
-        Pmin = Pmin*1.e5 # bar to Pa
-        Pint = Pint*1.e5 # bar to Pa
+        Pmin = Pmin*1.e5  # bar to Pa
+        Pint = Pint*1.e5  # bar to Pa
         Pmax = Pmin + Pint*(nP-1.)
         Tmax = Tmin + Tint*(nT-1.)
         pressures = np.linspace(Pmin, Pmax, nP)
@@ -129,10 +132,12 @@ class PerplexMaterial(Material):
         property_list = lines[12]
 
         # property_table[i][j][k] returns the kth property at the ith pressure and jth temperature
-        table = np.array([[float(string) for string in line] for line in lines[13:13+nP*nT]])
+        table = np.array([[float(string) for string in line]
+                         for line in lines[13:13+nP*nT]])
 
         if lines[3][0] == 'P(bar)':
-            property_table = np.swapaxes(table.reshape(nT, nP, n_properties), 0, 1)
+            property_table = np.swapaxes(
+                table.reshape(nT, nP, n_properties), 0, 1)
         else:
             property_table = table.reshape(nP, nT, n_properties)
 
@@ -148,20 +153,20 @@ class PerplexMaterial(Material):
                                  'h,J/kg',
                                  'cp,J/K/kg',
                                  'V,J/bar/mol']
-        p_indices = [i for i, p in enumerate(property_list) for ordered_p in ordered_property_list if p == ordered_p]
+        p_indices = [i for i, p in enumerate(
+            property_list) for ordered_p in ordered_property_list if p == ordered_p]
 
         properties = {}
         for i, p_idx in enumerate(p_indices):
             # Fill in NaNs as long as they aren't in the corners of the P-T grid
-            a = np.array(property_table[:,:,[p_idx]][:,:,0])
+            a = np.array(property_table[:, :, [p_idx]][:, :, 0])
             x, y = np.indices(a.shape)
-            a[np.isnan(a)] = griddata((x[~np.isnan(a)], y[~np.isnan(a)]), # points we know
-                                      a[~np.isnan(a)],                    # values we know
+            a[np.isnan(a)] = griddata((x[~np.isnan(a)], y[~np.isnan(a)]),  # points we know
+                                      a[~np.isnan(a)],  # values we know
                                       (x[np.isnan(a)], y[np.isnan(a)]))
 
             # Fill any remaining NaNs with zeros
             properties[ordered_property_list[i]] = np.nan_to_num(a, 0.)
-
 
         densities = properties['rho,kg/m3']
         volumes = 1.e-5 * properties['V,J/bar/mol']
@@ -189,12 +194,14 @@ class PerplexMaterial(Material):
         if not np.logical_and(np.all(self.bounds[0][0] <= pressure),
                               np.all(pressure <= self.bounds[0][1])):
             raise ValueError("The set_state pressure ({0:.4f}) is outside the bounds of this rock ({1:.4f}-{2:.4f} GPa)".format(pressure,
-                                                                                                                                self.bounds[0][0]/1.e9,
+                                                                                                                                self.bounds[
+                                                                                                                                    0][0]/1.e9,
                                                                                                                                 self.bounds[0][1]/1.e9))
         if not np.logical_and(np.all(self.bounds[1][0] <= temperature),
                               np.all(temperature <= self.bounds[1][1])):
             raise ValueError("The set_state temperature ({0:.1f}) is outside the bounds of this rock ({1:.1f}-{2:.1f} K)".format(temperature,
-                                                                                                                                 self.bounds[1][0],
+                                                                                                                                 self.bounds[
+                                                                                                                                     1][0],
                                                                                                                                  self.bounds[1][1]))
         Material.set_state(self, pressure, temperature)
 
@@ -305,14 +312,15 @@ class PerplexMaterial(Material):
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
     def molar_heat_capacity_v(self):
-        return self.molar_heat_capacity_p - self.molar_volume * self.temperature \
-            * self.thermal_expansivity * self.thermal_expansivity \
-            * self.isothermal_bulk_modulus
+        return (self.molar_heat_capacity_p
+                - self.molar_volume * self.temperature
+                * self.thermal_expansivity * self.thermal_expansivity
+                * self.isothermal_bulk_modulus)
 
     @material_property
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        return ( self.thermal_expansivity *
-                 self.molar_volume *
-                 self.adiabatic_bulk_modulus /
-                 self.molar_heat_capacity_p )
+        return (self.thermal_expansivity
+                * self.molar_volume
+                * self.adiabatic_bulk_modulus
+                / self.molar_heat_capacity_p)

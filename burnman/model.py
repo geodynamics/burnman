@@ -98,22 +98,22 @@ class Model(object):
         Internal function to compute the moduli if necessary.
         """
         if self.moduli is None:
-                self.moduli = [[] for p in self.p]
+            self.moduli = [[] for p in self.p]
 
-                for idx in range(len(self.p)):
-                    self.rock.set_state(self.p[idx], self.T[idx])
-                    (minerals, fractions) = self.rock.unroll()
-                    for (mineral, fraction) in zip(minerals, fractions):
-                        e = {}
-                        e['fraction'] = fraction
-                        e['V'] = fraction * mineral.molar_volume
-                        e['K'] = mineral.adiabatic_bulk_modulus
-                        e['G'] = mineral.shear_modulus
-                        e['rho'] = mineral.molar_mass / mineral.molar_volume
-                        e['alpha'] = mineral.thermal_expansivity
-                        e['c_v'] = mineral.molar_heat_capacity_v
-                        e['c_p'] = mineral.molar_heat_capacity_p
-                        self.moduli[idx].append(e)
+            for idx in range(len(self.p)):
+                self.rock.set_state(self.p[idx], self.T[idx])
+                (minerals, fractions) = self.rock.unroll()
+                for (mineral, fraction) in zip(minerals, fractions):
+                    e = {}
+                    e['fraction'] = fraction
+                    e['V'] = fraction * mineral.molar_volume
+                    e['K'] = mineral.adiabatic_bulk_modulus
+                    e['G'] = mineral.shear_modulus
+                    e['rho'] = mineral.molar_mass / mineral.molar_volume
+                    e['alpha'] = mineral.thermal_expansivity
+                    e['c_v'] = mineral.molar_heat_capacity_v
+                    e['c_p'] = mineral.molar_heat_capacity_p
+                    self.moduli[idx].append(e)
 
     def avg_moduli_(self):
         """
