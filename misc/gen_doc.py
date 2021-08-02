@@ -10,7 +10,6 @@ import re
 sys.path.insert(1, os.path.abspath('../examples'))
 
 # order the examples sensibly:
-
 ordered_examples = ['example_beginner.py',
                     'example_geotherms.py',
                     'example_seismic.py',
@@ -21,9 +20,14 @@ ordered_examples = ['example_beginner.py',
                     'example_compare_all_methods.py',
                     'example_optimize_pv.py',
                     'example_fit_data.py',
+                    'example_fit_eos.py',
                     'example_grid.py',
                     'example_chemical_potentials.py',
+                    'example_gibbs_modifiers.py',
                     'example_solid_solution.py',
+                    'example_perplex.py',
+                    'example_geodynamic_adiabat.py',
+                    'example_layer.py',
                     'example_build_planet.py'
                     ]
 
