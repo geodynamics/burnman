@@ -26,6 +26,7 @@ from burnman import minerals  # import mineral library seperately
 
 # This example relies heavily  on the ObsPy, a python seismology toolkit
 import obspy
+from obspy.taup import taup_create
 from obspy.taup import TauPyModel
 
 assert burnman_path  # silence pyflakes warning
@@ -53,7 +54,7 @@ def plot_rays_and_times(modelname):
     ref_model = 'prem' # choice of models available in obpsy, or input an npz file name
 
     # Build a taup_model for Obspy
-    obspy.taup.taup_create.build_taup_model(
+    taup_create.build_taup_model(
                 "./" + modelname + ".tvel", ".")
 
     # Time to plot some predictions using routines from Obspy
@@ -111,7 +112,9 @@ def plot_rays_and_times(modelname):
 
 if __name__ == "__main__":
     # Two examples available
+    # Replaces lower mantle of PREM model with a set composition
     example_layer = True
+    # Builds an earthlike planet
     example_planet = True
 
 
@@ -155,7 +158,7 @@ if __name__ == "__main__":
         # rest of the planet
         burnman.output_seismo.write_tvel_file(
             lower_mantle,
-            filename=modelname+'tvel',
+            modelname=modelname,
             background_model=burnman.seismic.PREM())
 
         # Plot ray paths and travel times
@@ -224,7 +227,7 @@ if __name__ == "__main__":
         # rest of the planet
         burnman.output_seismo.write_tvel_file(
             planet_zog,
-            filename=modelname+'tvel',
+            modelname=modelname,
             background_model=burnman.seismic.PREM())
 
 
