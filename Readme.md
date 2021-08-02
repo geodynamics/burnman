@@ -21,7 +21,7 @@ Source code: https://github.com/geodynamics/burnman
 Forums: https://community.geodynamics.org/c/burnman
 
 Authors (as of 2021):
-* Bob (Robert) Myhill (main contributer)
+* Bob (Robert) Myhill (main contributor)
 * Cayman Unterborn
 * Ian Rose
 * Sanne Cottaar
@@ -477,4 +477,3 @@ Here we show an example that does this, using the planet Mercury as motivation.
 * :doc:`mineral_database`
 * :class:`burnman.composite.Composite`
 * :func:`burnman.material.Material.evaluate`
-
