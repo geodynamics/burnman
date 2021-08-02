@@ -20,8 +20,8 @@ Source code: https://github.com/geodynamics/burnman
 
 Forums: https://community.geodynamics.org/c/burnman
 
-Authors (as of 2015, listed alphabetically by first name):
-* Bob Myhill
+Authors (as of 2021):
+* Bob (Robert) Myhill (main contributer)
 * Cayman Unterborn
 * Ian Rose
 * Sanne Cottaar

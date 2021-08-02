@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'BurnMan'
-copyright = u'2014, Sanne Cottaar, Timo Heister, Robert Myhill, Ian Rose, Cayman Unterborn'
+copyright = u'2014, Robert Myhill, Sanne Cottaar, Timo Heister,  Ian Rose, Cayman Unterborn'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -263,7 +263,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 % FILL: author list
 % e.g. Author One\\Author Two\\Author Three\\
 % be sure to have a newline (\\) after the final author
-Sanne Cottaar\\Timo Heister\\Robert Myhill\\Ian Rose\\Cayman Unterborn\\
+Robert Myhill\\Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\
 }
 
 {\fontfamily{\sfdefault}\selectfont \href{http://geodynamics.org}{http://geodynamics.org}}
