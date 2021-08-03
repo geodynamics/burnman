@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>BurnMan</title>
+  <meta name="description" content="BurnMan - A thermodynamic and geophysics toolkit for the Earth and planetary sciences.">
+  <meta name="author" content="BurnMan Team">
+<style type="text/css">
+body {
+    font-size: 1em;
+    line-height: 1.4;
+}
+html,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 0em 0;
+    padding: 0;
+}
+
+.toplink {
+margin-left: 1em;
+margin-right: 1em;
+}
+
+</style>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-91608185-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<h1>BurnMan</h1>
+<h2>A thermodynamic and geophysics toolkit for the Earth and planetary sciences</h2>
+<p>
+<a class="toplink" href="index.html">Home</a>
+
+<a class="toplink" href="https://community.geodynamics.org/c/burnman">Forum</a>
+
+<a class="toplink" href="download.html">Download</a>
+
+<a class="toplink" href="https://github.com/geodynamics/burnman">Source</a>
+
+<a class="toplink" href="examples.html">Examples</a>
+
+<a class="toplink" href="http://burnman.readthedocs.io/en/latest/">Current Documentation</a>
+
+</p>
+
+<hr>
+
+<p>
+BurnMan is an open source mineral physics toolbox written in Python to
+generate physical properties for the Earth and other planets. At its simplest, BurnMan calculates
+the isotropic thermoelastic moduli by solving the equations-of-state for a
+mixture of minerals defined by the user. The user may select from a list of
+minerals applicable included or easily
+define one of their own.
+</p>
+
+<h3>Features</h3>
+<p>
+<ul>
+<li> extensive mineral database (Holland and Powell, 2011; Stixrude and Lithgow-Bertelloni, 2005; 2011 ).
+<li> form composites of arbitrary combination of minerals
+<li> popular solid solution models(ideal, symmetric, asymmetric, subregular), with class constructors designed to make solid solutions easy to read and create
+<li> easy plotting and comparison of seismic profiles from 1D (and soon) 3D seismic models
+<li> many examples highlighting different features of BurnMan
+<li> different thermoelastic models including Vinet, Birch Murnaghan, Mie-Debye-Grüneisen, Modified Tait)
+<li> tools to fit parameters for equations of state with experimental data not only in P-V-T, but in any thermodynamic property, such as seismic velocities and enthalpies
+<li> tools to calculate chemical activities, potentials and fugacities of mineral assemblages
+<li> different averaging schemes (Reuss, Voigt, VRH, Hashin-Shtrikman)
+<li> different geotherms
+<li> a “Planet” class, which self-consistently calculates gravity profiles, mass, moment of inertia of planets given the chemical and temperature structure of a planet
+<li> potential to propagate uncertainty, both when fitting parameters and when forward modeling
+<li> creates output to be input in software for synthetic seismograms: Mineos (Masters et al. 2014) and AxiSEM (Nissen-Meyer et al. 2014)
+<li> generates smoothed property grids to create 1D adiabatic profiles which can be used by the geodynamics code ASPECT
+<li> extensible: all parts can be replaced by user-written modules if desired
+<li> repository of work published using BurnMan (accepting script submissions from the community)
+</ul>
+</p>
+
+<h3>Citations</h3>
+<p>
+<ul>
+<li>Cottaar, S., Heister, T., Myhill, R., Rose, I., and Unterborn, C. (2016):<br>
+    BurnMan v0.9.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.<br/>
+    <a href="https://doi.org/10.5281/zenodo.546210">https://doi.org/10.5281/zenodo.546210</a>
+
+<li> Cottaar, S., Heister, T., Rose, I., and Unterborn, C:<br>
+     <i>BurnMan - a lower mantle mineral physics toolkit</i><br>
+     Geochemistry, Geophysics, Geosystems 15.4 (2014): 1164-1179.
+     <a href="http://www.math.clemson.edu/~heister/preprints/burnman.pdf">[preprint]</a>
+     <a href="https://doi.org/10.1002/2013GC005122">[DOI]</a>
+
+<li>Cottaar, S., Heister, T., Myhill, R., Rose, I., and Unterborn, C.:<br>
+BurnMan. Technical Reference, www.burnman.org, 2016.
+</ul>
+</p>
+
+<h3>Acknowledgement and Support</h3>
+<p>
+<ul>
+<li>This project was initiated at, and follow-up research support was received through,  <a href="http://www.deep-earth.org/">CIDER</a> (NSF FESD grant 1135452).
+</li>
+<li>The authors are partially supported by the Computational
+Infrastructure for Geodynamics initiative (CIG), through the National
+Science Foundation under Award No. EAR-0949446 and The University of
+California-Davis.
+</li>
+<li>The BurnMan code has been contributed to the Computational Infrastructure for Geodynamics (CIG) and is hosted at <a href="http://geodynamics.org/cig/software/burnman/">geodynamics.org</a>. 
+</li>
+</ul>
+</p>
+
+<h3>Some studies using BurnMan</h3>
+
+<p>
+<ol>
+    <li>Zhang, S., Cottaar, S., Liu, T., Stackhouse, S. and Militzer, B., <b>2016</b>.  <a href="http://www.sciencedirect.com/science/article/pii/S0012821X15007347">High-pressure, temperature elasticity of Fe-and Al-bearing MgSiO 3: Implications for the Earth's lower mantle.</a> <i> Earth and Planetary Science Letters</i>, 434, pp.264-273. </li>
+    <li> Unterborn, C.T., Dismukes, E.E. and Panero, W.R., <b>2016</b>.  <a href="http://iopscience.iop.org/article/10.3847/0004-637X/819/1/32/meta">Scaling the Earth: A Sensitivity Analysis of Terrestrial Exoplanetary Interior Models.</a> <i>E The Astrophysical Journal</i>, 819(1), p.32.</li>
+    <li> Cottaar, S. and Deuss, A., <b>2016</b>. <a href="http://onlinelibrary.wiley.com/doi/10.1002/2015JB012452/full?wol1URL=/doi/10.1002/2015JB012452/full&regionCode=GB-EN&identityKey=f63c53e4-89cb-4265-bded-bd1f12845b16">Large‐scale mantle discontinuity topography beneath Europe: Signature of akimotoite in subducting slabs. </a><i>Journal of Geophysical Research: Solid Earth</i>, 121(1), pp.279-292.</li>
+    <li> Unterborn, C.T. and Panero, W.R., <b>2016</b>. <a href="https://arxiv.org/abs/1604.08309">Effects of Mg/Si on Exoplanetary Refractory Oxygen Budget. </a> <i>arXiv preprint arXiv:1604.08309</i>.</li>
+    <li>Gu, T., Li, M., McCammon, C. and Lee, K.K., <b>2016</b>. <a href="http://www.nature.com/ngeo/journal/v9/n9/full/ngeo2772.html">Redox-induced lower mantle density contrast and effect on mantle structure and primitive oxygen.</a> <i>Nature Geoscience</i>, 9(9), pp.723-727.</li>
+   <li>Myhill, R., Frost, D.J. and Novella, D., <b>2017</b>. <a href="http://www.sciencedirect.com/science/article/pii/S0016703716302708">Hydrous melting and partitioning in and above the mantle transition zone: Insights from water-rich MgO–SiO 2–H 2 O experiments.</a> <i>Geochimica et Cosmochimica Acta</i>, 200, pp.408-421.</li>
+   <li>Shim, S.H., Grocholski, B., Ye, Y., Alp, E.E., Xu, S., Morgan, D., Meng, Y. and Prakapenka, V.B., <b>2017</b>. <a href="http://www.pnas.org/content/early/2017/06/01/1614036114.short">Stability of ferrous-iron-rich bridgmanite under reducing midmantle conditions.</a> <i>Proceedings of the National Academy of Sciences</i>, p.201614036. </li>
+   <li>Ballmer, M.D., Houser, C., Hernlund, J.W., Wentzcovitch, R.M. and Hirose, K., <b>2017</b>. <a href=" https://www.nature.com/ngeo/journal/v10/n3/abs/ngeo2898.html">Persistence of strong silica-enriched domains in the Earth/'s lower mantle.</a> <i>Nature Geoscience</i>, 10(3), pp.236-240. Supplementary Information </li>
+</ol>
+</p>
+
+<h4>Contact</h4>
+
+Please use the <a class="toplink" href="https://community.geodynamics.org/c/burnman">Forum</a>
+if you have questions.
+
+<p style="margin-bottom:10em;"></p>
+
+<hr>
+<small>
+&copy; 2012-2018, the BurnMan team.
+<a href="mailto:info@burnman.org">Contact</a>
+</small>
+
+</body>
+</html>
