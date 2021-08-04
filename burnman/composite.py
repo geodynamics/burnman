@@ -1,18 +1,20 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
+from sympy import Matrix, nsimplify
+from .reductions import independent_row_indices
 import warnings
 
-from .material import Material, material_property
+from .material import Material, material_property, cached_property
 from .mineral import Mineral
 from . import averaging_schemes
 from . import chemicalpotentials
 from .solidsolution import SolidSolution
-from .processchemistry import sum_formulae
+from .processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
 def check_pairs(phases, fractions):
         if len(fractions) < 1:
@@ -426,3 +428,151 @@ class Composite(Material):
         molar_fractions = [mass_fraction / (phase.molar_mass * total_moles)
                            for mass_fraction, phase in zip(mass_fractions, phases)]
         return molar_fractions
+
+    @cached_property
+    def stoichiometric_matrix(self):
+        """
+        An sympy Matrix where each element M[i,j] corresponds
+        to the number of atoms of element[j] in endmember[i].
+        """
+        def f(i, j):
+            e = self.elements[j]
+            if e in self.endmember_formulae[i]:
+                return nsimplify(self.endmember_formulae[i][e])
+            else:
+                return 0
+        return Matrix(len(self.endmember_formulae), len(self.elements), f)
+
+    @cached_property
+    def stoichiometric_array(self):
+        """
+        An array where each element arr[i,j] corresponds
+        to the number of atoms of element[j] in endmember[i].
+        """
+        return np.array(self.stoichiometric_matrix)
+
+    @cached_property
+    def reaction_basis(self):
+        """
+        An array where each element arr[i,j] corresponds
+        to the number of moles of endmember[j] involved in reaction[i].
+        """
+        reaction_basis = np.array(self.stoichiometric_matrix.T.nullspace())
+
+        if len(reaction_basis) == 0:
+            reaction_basis = np.empty((0, len(self.endmember_names)))
+
+        return reaction_basis
+
+    @cached_property
+    def n_reactions(self):
+        """
+        The number of reactions in reaction_basis.
+        """
+        return len(self.reaction_basis[:, 0])
+
+    @cached_property
+    def independent_element_indices(self):
+        """
+        A list of an independent set of element indices. If the amounts of
+        these elements are known (element_amounts),
+        the amounts of the other elements can be
+        inferred by -compositional_null_basis[independent_element_indices].dot(element_amounts)
+        """
+        return sorted(independent_row_indices(self.stoichiometric_matrix.T))
+
+    @cached_property
+    def dependent_element_indices(self):
+        """
+        The element indices not included in the independent list.
+        """
+        return [i for i in range(len(self.elements))
+                if i not in self.independent_element_indices]
+
+    @cached_property
+    def compositional_null_basis(self):
+        """
+        An array N such that N.b = 0 for all bulk compositions that can
+        be produced with a linear sum of the endmembers in the composite.
+        """
+        null_basis = np.array(self.stoichiometric_matrix.nullspace())
+
+        M = null_basis[:,self.dependent_element_indices]
+        assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
+
+        return null_basis
+
+    @cached_property
+    def endmember_formulae(self):
+        """
+        A list of the formulae in the composite.
+        """
+        self._set_endmember_properties()
+        return self.__dict__['endmember_formulae']
+
+    @cached_property
+    def endmember_names(self):
+        """
+        A list of the endmember names contained in the composite.
+        Mineral names are returned as given in Mineral.name.
+        Solution endmember names are given in the format
+        `Mineral.name in SolidSolution.name`.
+        """
+        self._set_endmember_properties()
+        return self.__dict__['endmember_names']
+
+    @cached_property
+    def endmembers_per_phase(self):
+        """
+        A list of integers corresponding to the number of endmembers
+        stored within each phase.
+        """
+        self._set_endmember_properties()
+        return self.__dict__['endmembers_per_phase']
+
+    @cached_property
+    def elements(self):
+        """
+        A list of the elements which could be contained in the composite,
+        returned in the IUPAC element order.
+        """
+        self._set_endmember_properties()
+        return self.__dict__['elements']
+
+    def _set_endmember_properties(self):
+        """
+        Sets endmember_formulae, endmember_names, endmembers_per_phase and
+        elements as properties of the Composite. This helper function
+        is used to set all properties at the same time while still allowing
+        the properties to be stored and documented as individual
+        cached_properties.
+        """
+        endmember_formulae = []
+        endmember_names = []
+        endmembers_per_phase = []
+        for ph_idx, ph in enumerate(self.phases):
+
+            if isinstance(ph, SolidSolution):
+                endmember_formulae.extend(ph.endmember_formulae)
+                endmember_names.extend([name+' in '+ph.name for name in ph.endmember_names])
+                endmembers_per_phase.append(ph.n_endmembers)
+
+            elif isinstance(ph, Mineral):
+                endmember_formulae.append(ph.formula)
+                endmember_names.append(ph.name)
+                endmembers_per_phase.append(1)
+
+            else:
+                raise Exception('Unsupported Material type, can only read'
+                                'burnman.Mineral or burnman.SolidSolution')
+
+        # Populate the stoichiometric matrix
+        keys = []
+        for f in endmember_formulae:
+            keys.extend(f.keys())
+
+        # Save to dict so that we only need to do this once
+        self.__dict__['endmember_formulae'] = endmember_formulae
+        self.__dict__['endmember_names'] = endmember_names
+        self.__dict__['endmembers_per_phase'] = endmembers_per_phase
+        self.__dict__['elements'] = sort_element_list_to_IUPAC_order(set(keys))

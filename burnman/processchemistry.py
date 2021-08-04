@@ -508,3 +508,20 @@ def formula_to_string(formula):
                     formula_string += e + str(nsimplify(formula[e]))
 
     return formula_string
+
+
+def sort_element_list_to_IUPAC_order(element_list):
+    """
+    Parameters
+    ----------
+    element_list : list
+        List of elements
+
+    Returns
+    -------
+    sorted_list : list
+        List of elements sorted into IUPAC order
+    """
+    sorted_list = [e for e in IUPAC_element_order if e in element_list]
+    assert len(sorted_list) == len(element_list)
+    return sorted_list
