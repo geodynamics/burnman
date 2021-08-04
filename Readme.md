@@ -12,7 +12,7 @@ It began as a working-group at the 2012 CIDER workshop in Santa Barbara.
 
 BurnMan is released under the GNU GPL v2 or newer
 
-Homepage: http://burnman.org
+Homepage: https://geodynamics.github.io/burnman/
 
 Documentation: http://burnman.readthedocs.io
 

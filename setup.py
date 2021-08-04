@@ -7,7 +7,7 @@ versionstuff = dict(
 metadata = dict(name='burnman',
                 version=versionstuff['version'],
                 description='a thermoelastic and thermodynamic toolkit for Earth and planetary sciences',
-                url='http://burnman.org',
+                url='https://geodynamics.github.io/burnman/',
                 author='The BurnMan Team',
                 author_email='bob.myhill@bristol.ac.uk',
                 license='GPL',

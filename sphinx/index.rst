@@ -14,7 +14,7 @@ of geological materials from simple mineral endmembers to complex multilayered p
 
 BurnMan is released under the GNU GPL v2 or newer. It relies heavily on numpy, scipy, and matplotlib.
 
- - Homepage: http://burnman.org
+ - Homepage: https://geodynamics.github.io/burnman/
  - Documentation: http://burnman.readthedocs.io
  - Source code: https://github.com/geodynamics/burnman
 
