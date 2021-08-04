@@ -29,7 +29,7 @@ Authors (as of 2021):
 
 ## Requirements
 
-* Python 3.6+
+* Python 3.7+
 * Python modules:
   NumPy, SciPy, SymPy, Matplotlib
 
@@ -73,7 +73,7 @@ Figures should show up, indicating that it is working.
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
 2. get Xcode
 3. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use a modern version of Python (3.6+).
+   python.org/download . Make sure to use a modern version of Python (3.7+).
    To check your version of python, type the following in a
    terminal:
      python --version
