@@ -12,26 +12,26 @@ import warnings
 from .material import Material, material_property, cached_property
 from .mineral import Mineral
 from . import averaging_schemes
-from . import chemicalpotentials
 from .solidsolution import SolidSolution
 from .processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
+
 def check_pairs(phases, fractions):
-        if len(fractions) < 1:
-            raise Exception('ERROR: we need at least one phase')
+    if len(fractions) < 1:
+        raise Exception('ERROR: we need at least one phase')
 
-        if len(phases) != len(fractions):
-            raise Exception(
-                'ERROR: different array lengths for phases and fractions')
+    if len(phases) != len(fractions):
+        raise Exception(
+            'ERROR: different array lengths for phases and fractions')
 
-        total = sum(fractions)
-        if abs(total - 1.0) > 1e-10:
+    total = sum(fractions)
+    if abs(total - 1.0) > 1e-10:
+        raise Exception(
+            'ERROR: list of molar fractions does not add up to one')
+    for p in phases:
+        if not isinstance(p, Mineral):
             raise Exception(
-                'ERROR: list of molar fractions does not add up to one')
-        for p in phases:
-            if not isinstance(p, Mineral):
-                raise Exception(
-                    'ERROR: object of type ''%s'' is not of type Mineral' % (type(p)))
+                'ERROR: object of type ''%s'' is not of type Mineral' % (type(p)))
 
 
 # static composite of minerals/composites
@@ -497,7 +497,7 @@ class Composite(Material):
         """
         null_basis = np.array(self.stoichiometric_matrix.nullspace())
 
-        M = null_basis[:,self.dependent_element_indices]
+        M = null_basis[:, self.dependent_element_indices]
         assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
 
         return null_basis
@@ -554,7 +554,8 @@ class Composite(Material):
 
             if isinstance(ph, SolidSolution):
                 endmember_formulae.extend(ph.endmember_formulae)
-                endmember_names.extend([name+' in '+ph.name for name in ph.endmember_names])
+                endmember_names.extend([name+' in '+ph.name
+                                        for name in ph.endmember_names])
                 endmembers_per_phase.append(ph.n_endmembers)
 
             elif isinstance(ph, Mineral):

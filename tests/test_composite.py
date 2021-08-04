@@ -1,19 +1,16 @@
 from __future__ import absolute_import
+from util import BurnManTest
+import warnings
 import unittest
 import os
 import sys
 sys.path.insert(1, os.path.abspath('..'))
-import warnings
 
 import burnman
 from burnman import minerals
 
-from util import BurnManTest
-
 
 # TODO: test composite that changes number of entries
-
-
 class composite(BurnManTest):
 
     def test_unroll(self):
@@ -271,7 +268,7 @@ class composite(BurnManTest):
         rock = burnman.Composite(
             [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5, 0.5])
 
-        K, G = rock.evaluate(['K_S','G'],40.e9, 2000.)
+        K, G = rock.evaluate(['K_S', 'G'], 40.e9, 2000.)
         rock.set_state(40.e9, 2000.)
         K2 = rock.K_S
         G2 = rock.G
@@ -344,7 +341,7 @@ class composite(BurnManTest):
         self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
         self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3])
         self.assertTrue(rock.n_reactions == 0)
-        
+
     def test_stoichiometric_matrix_reaction(self):
         rock = burnman.Composite([minerals.SLB_2011.mg_fe_olivine(),
                                   minerals.SLB_2011.garnet()])
@@ -378,9 +375,9 @@ class composite(BurnManTest):
         self.assertArraysAlmostEqual(rock.reaction_basis[3],
                                      [0, -1, 0, 0, 0, 1])
         self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
-                                  [-1./2., -1./2., 1, 0])
+                                     [-1./2., -1./2., 1, 0])
         self.assertArraysAlmostEqual(rock.compositional_null_basis[1],
-                                  [-2., -2., 0, 1])
+                                     [-2., -2., 0, 1])
         self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
         self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3])
         self.assertTrue(rock.n_reactions == 4)
