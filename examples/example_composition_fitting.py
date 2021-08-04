@@ -35,7 +35,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
-from collections import OrderedDict
 # hack to allow scripts to be placed in subdirectories next to burnman:
 if not os.path.exists('burnman') and os.path.exists('../burnman'):
     sys.path.insert(1, os.path.abspath('..'))
@@ -66,48 +65,53 @@ if __name__ == "__main__":
 
     print(f'Endmembers: {gt.endmember_names}')
     print(f'Elements: {gt.elements}')
-    print('Stoichiometric matrix:')
-    print(gt.stoichiometric_matrix)
+    print('Stoichiometric array:')
+    print(gt.stoichiometric_array)
     print()
 
     # The variables we are trying to fit are Fe (total), Ca, Mg
     # Cr, Al, Si and Fe3+, all given in mole amounts.
-    fitted_variables = ['Fe', 'Ca', 'Mg', 'Cr', 'Al', 'Si', 'Fe3+']
-    variable_values = np.array([1.1, 2., 0., 0, 1.9, 3., 0.1])
-    variable_covariances = np.eye(7)*0.01*0.01
+    fitted_species = ['Fe', 'Ca', 'Mg', 'Cr', 'Al', 'Si', 'Fe3+']
+    species_amounts = np.array([1.1, 2., 0., 0, 1.9, 3., 0.1])
+    species_covariances = np.eye(7)*0.01*0.01
 
     # Add some noise.
     v_err = np.random.rand(7)
     np.random.seed(100)
-    variable_values = np.random.multivariate_normal(variable_values,
-                                                    variable_covariances)
+    species_amounts = np.random.multivariate_normal(species_amounts,
+                                                    species_covariances)
+
+    print('Observed composition:')
+    for i in range(len(fitted_species)):
+        print(
+            f'{fitted_species[i]}: {species_amounts[i]:.3f} +/- {np.sqrt(species_covariances[i,i]):.3f}')
+    print()
 
     # Fe3+ isn't an element or a site-species of the solution model,
     # so we need to provide the linear conversion from Fe3+ to
     # elements and/or site species. In this case, Fe3+ resides only on
     # the second site, and the JH_2015.gt model has labelled Fe3+ on that
     # site as Fef. Therefore, the conversion is simply Fe3+ = Fef_B.
-    variable_conversions = {'Fe3+': {'Fef_B': 1.}}
+    species_conversions = {'Fe3+': {'Fef_B': 1.}}
 
     # The next line does the heavy lifting
     popt, pcov, res = fit_composition_to_solution(gt,
-                                                  fitted_variables,
-                                                  variable_values,
-                                                  variable_covariances,
-                                                  variable_conversions)
+                                                  fitted_species,
+                                                  species_amounts,
+                                                  species_covariances,
+                                                  species_conversions)
 
     # We can set the composition of gt using the optimized parameters
     gt.set_composition(popt)
 
     # Print the optimized parameters and principal uncertainties
-    print('Molar fractions:')
+    print('Best-fit molar fractions:')
     for i in range(len(popt)):
         print(f'{gt.endmember_names[i]}: '
               f'{gt.molar_fractions[i]:.3f} +/- '
               f'{np.sqrt(pcov[i][i]):.3f}')
     print()
     print(f'Weighted residual: {res:.3f}')
-
 
     """
     Example 2
@@ -132,7 +136,7 @@ if __name__ == "__main__":
     compositions = np.array(data[:6])
 
     # The first row is the bulk composition
-    bulk_composition = compositions[:,0]
+    bulk_composition = compositions[:, 0]
 
     # Load all the data into a dictionary
     data = {column_names[i]: np.array(data[i])
@@ -169,7 +173,7 @@ if __name__ == "__main__":
     # to the provided bulk composition
     for i, sample in enumerate(samples):
         # This line does the heavy lifting
-        popt, pcov, res = fit_phase_proportions_to_bulk_composition(compositions[:,sample_indices[i]],
+        popt, pcov, res = fit_phase_proportions_to_bulk_composition(compositions[:, sample_indices[i]],
                                                                     bulk_composition)
 
         # Fill the correct elements of the weight_proportions
@@ -177,7 +181,8 @@ if __name__ == "__main__":
         sample_phases = [data['phase'][i] for i in sample_indices[i]]
         for j, phase in enumerate(sample_phases):
             weight_proportions[i, phases.index(phase)] = popt[j]
-            weight_proportion_uncertainties[i, phases.index(phase)] = np.sqrt(pcov[j][j])
+            weight_proportion_uncertainties[i, phases.index(
+                phase)] = np.sqrt(pcov[j][j])
 
     # Plot the data
     for i, phase in enumerate(phases):
