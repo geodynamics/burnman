@@ -150,13 +150,13 @@ if __name__ == "__main__":
     rock = burnman.Composite([andalusite, sillimanite, kyanite],
                              name='and-sill-ky assemblage')
 
-    def delta_affinity(x):
+    def delta_affinity_three_polymorphs(x):
         P, T = x
         rock.set_state(P, T)
         return rock.reaction_affinities
 
     print('Equilibrating the rock with fsolve')
-    fsolve(delta_affinity, [1.e9, 1600.])
+    fsolve(delta_affinity_three_polymorphs, [1.e9, 1600.])
 
     print(f'Are we equilibrated now? {rock.equilibrated}')
     print(f'Equilibrium pressure: {rock.pressure/1.e9:.3f} GPa')
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     print('In this example, we find the pressure and composition \n'
           'of wadsleyite which coexists with fo90 at 1600 K.\n')
 
-    def delta_affinity(x, T):
+    def delta_affinity_two_binaries_P_x_Fe_wad(x, T):
         P, x_fe_wad = x
         rock.set_state(P, T)
         wad.set_composition([1. - x_fe_wad, x_fe_wad])
@@ -190,19 +190,12 @@ if __name__ == "__main__":
     print('Equilibrating the rock with fsolve')
     rock.set_fractions([1., 0.])
     ol.set_composition([0.9, 0.1])
-    fsolve(delta_affinity, [13.e9, 0.1], args=(1600.))
+    fsolve(delta_affinity_two_binaries_P_x_Fe_wad, [13.e9, 0.1], args=(1600.))
     print(f'Are we equilibrated now? {rock.equilibrated}')
     print(rock)
 
     print('\nWe could alternatively choose to solve for the compositions of '
           'olivine and wadsleyite at fixed pressure and temperature')
-
-    def delta_affinity(x, P, T):
-        x_fe_ol, x_fe_wad = x
-        rock.set_state(P, T)
-        ol.set_composition([1. - x_fe_ol, x_fe_ol])
-        wad.set_composition([1. - x_fe_wad, x_fe_wad])
-        return rock.reaction_affinities
 
     # First, get the univariant pressure at the Mg-rich end of the binary
     # at a temperature of 1600 K.
@@ -213,11 +206,19 @@ if __name__ == "__main__":
 
     # Now solve for the equilibrium state at a range of pressures
     # less than the univariant pressure
+    def delta_affinity_two_binaries_x_Fe_ol_wad(x, P, T):
+        x_fe_ol, x_fe_wad = x
+        rock.set_state(P, T)
+        ol.set_composition([1. - x_fe_ol, x_fe_ol])
+        wad.set_composition([1. - x_fe_wad, x_fe_wad])
+        return rock.reaction_affinities
+
     pressures = np.linspace(10.e9, fo_mwd.pressure, 21)
     x_fe_ols = np.zeros_like(pressures)
     x_fe_wads = np.zeros_like(pressures)
     for i, P in enumerate(pressures[:-1]):
-        sol = fsolve(delta_affinity, [0.1, 0.1], args=(P, T))
+        sol = fsolve(delta_affinity_two_binaries_x_Fe_ol_wad,
+                     [0.1, 0.1], args=(P, T))
         x_fe_ols[i], x_fe_wads[i] = sol
 
     # Pretty-print the results
