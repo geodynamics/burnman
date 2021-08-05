@@ -5,14 +5,16 @@
 
 BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary sciences
 ====================================================================================
-	   
+
 .. toctree::
    :maxdepth: 4
-	      
+   :glob:
+
    introduction
    background
    tutorial
    examples
    api
+   changes
+   changelog/*
    zreferences
-   
