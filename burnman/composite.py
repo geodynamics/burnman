@@ -413,7 +413,7 @@ class Composite(Material):
         Returns the partial Gibbs energies for all
         the endmember minerals in the Composite
         """
-        partial_gibbs = np.empty(len(self.endmember_names))
+        partial_gibbs = np.empty(self.n_endmembers)
         j = 0
         for i, n_endmembers in enumerate(self.endmembers_per_phase):
             if n_endmembers == 1:
@@ -474,7 +474,7 @@ class Composite(Material):
                 return nsimplify(self.endmember_formulae[i][e])
             else:
                 return 0
-        return Matrix(len(self.endmember_formulae), len(self.elements), f)
+        return Matrix(self.n_endmembers, self.n_elements, f)
 
     @cached_property
     def stoichiometric_array(self):
@@ -495,7 +495,7 @@ class Composite(Material):
                                   dtype=float)
 
         if len(reaction_basis) == 0:
-            reaction_basis = np.empty((0, len(self.endmember_names)))
+            reaction_basis = np.empty((0, self.n_endmembers))
 
         return reaction_basis
 
@@ -543,7 +543,7 @@ class Composite(Material):
         """
         The element indices not included in the independent list.
         """
-        return [i for i in range(len(self.elements))
+        return [i for i in range(self.n_elements)
                 if i not in self.independent_element_indices]
 
     @cached_property
@@ -597,6 +597,21 @@ class Composite(Material):
         """
         self._set_endmember_properties()
         return self.__dict__['elements']
+
+    @cached_property
+    def n_endmembers(self):
+        """
+        Returns the number of endmembers in the composite.
+        """
+        return len(self.endmember_names)
+
+    @cached_property
+    def n_elements(self):
+        """
+        Returns the total number of distinct elements
+        which might be in the composite.
+        """
+        return len(self.elements)
 
     def _set_endmember_properties(self):
         """
