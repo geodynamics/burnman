@@ -27,7 +27,7 @@ from misc.helper_solid_solution import HelperSolidSolution
 import misc.colors as colors
 
 if __name__ == "__main__":
-    plt.figure(dpi=100, figsize=(12, 6))
+    fig = plt.figure(dpi=100, figsize=(12, 6))
     prop = {'size': 12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     plt.title(" V.-R.-H. on moduli")
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Shear Velocity Vs (km/s)")
-    plt.tight_layout()
+    fig.set_tight_layout(True)
     if "RUNNING_TESTS" not in globals():
         plt.savefig("example_incorrect_averaging.pdf", bbox_inches='tight')
     plt.show()

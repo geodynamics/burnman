@@ -99,7 +99,8 @@ if __name__ == "__main__":
                                [low_spin_wuestite, '[Fels]O']]
             self.energy_interaction = [[11.e3, 11.e3],
                                        [11.e3]]
-            burnman.SolidSolution.__init__(self, molar_fractions=molar_fractions)
+            burnman.SolidSolution.__init__(
+                self, molar_fractions=molar_fractions)
 
         def set_equilibrium_composition(self, molar_fraction_FeO):
             """
@@ -142,7 +143,6 @@ if __name__ == "__main__":
     # In this line, we create our solid solution object
     fper = ferropericlase()
 
-
     # Now we loop over a series of pressures at three different temperatures,
     # calculating the equilibrium composition of the solution at each.
     # We fix the bulk composition of the solution to be (Mg0.8Fe0.2)O.
@@ -179,8 +179,10 @@ if __name__ == "__main__":
             volumes_LS[i] = fper.V
 
         # Do some plotting
-        ax[0].fill_between(pressures/1.e9, volumes_HS*1.e6, volumes_LS*1.e6, alpha=0.15, color=color, label=f'{T} K, volume range')
-        ax[0].plot(pressures/1.e9, volumes*1.e6, c=color, linewidth=2, label=f'{T} K, equilibrium volume')
+        ax[0].fill_between(pressures/1.e9, volumes_HS*1.e6, volumes_LS
+                           * 1.e6, alpha=0.15, color=color, label=f'{T} K, volume range')
+        ax[0].plot(pressures/1.e9, volumes*1.e6, c=color,
+                   linewidth=2, label=f'{T} K, equilibrium volume')
 
         ax[1].plot(pressures/1.e9, 1.-p_LS, c=color, label=f'{T} K')
 
@@ -195,5 +197,5 @@ if __name__ == "__main__":
     ax[0].set_ylim(7, 13)
 
     # Tidy the plot and show it
-    fig.tight_layout()
+    fig.set_tight_layout(True)
     plt.show()

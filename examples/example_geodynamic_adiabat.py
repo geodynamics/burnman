@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
 
     ax_T.legend(loc='upper left')
-    fig.tight_layout()
+    fig.set_tight_layout(True)
 
     plt.show()
 

@@ -166,7 +166,7 @@ if __name__ == "__main__":
             cbar = fig.colorbar(im[i], ax=ax[i], ticks=ticks)
             cbar.add_lines(lines)
 
-        plt.tight_layout()
+        fig.set_tight_layout(True)
         plt.savefig("output_figures/example_anisotropy.png")
         plt.show()
 
