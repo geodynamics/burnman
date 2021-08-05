@@ -1,19 +1,16 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
+from util import BurnManTest
 import numpy as np
 
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
+import burnman_path
 import burnman
-from burnman import minerals
 
-from util import BurnManTest
+assert burnman_path  # silence pyflakes warning
 
 # Predefine our rock
 rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
+
 
 class PerpleX(BurnManTest):
 
@@ -32,10 +29,13 @@ class PerpleX(BurnManTest):
     def test_bounds(self):
         def fnLP():
             return rock.set_state(rock.bounds[0][0] - 1., np.mean(rock.bounds[1]))
+
         def fnHP():
             return rock.set_state(rock.bounds[0][1] + 1., np.mean(rock.bounds[1]))
+
         def fnLT():
             return rock.set_state(np.mean(rock.bounds[0]), rock.bounds[1][0] - 1.)
+
         def fnHT():
             return rock.set_state(np.mean(rock.bounds[0]), rock.bounds[1][1] + 1.)
 

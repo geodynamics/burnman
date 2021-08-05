@@ -1,17 +1,16 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
+from util import BurnManTest
+import copy
 import warnings
 
+import burnman_path
 import burnman
 from burnman.mineral import Mineral
 from burnman.processchemistry import dictionarize_formula, formula_mass
 from burnman.combinedmineral import CombinedMineral
-from util import BurnManTest
-import copy
 
+assert burnman_path  # silence pyflakes warning
 
 
 class forsterite (Mineral):
@@ -130,7 +129,6 @@ class test_endmembers(BurnManTest):
      stv.set_state(1.e5, 1000.)
      made_bdg.set_state(1.e5, 1000.)
      self.assertFloatEqual(made_bdg.V, per.V + stv.V)
-
 
 
 if __name__ == '__main__':

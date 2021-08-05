@@ -1,12 +1,11 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
-from burnman import minerals
 from util import BurnManTest
+
+import burnman_path
+import burnman
+
+assert burnman_path  # silence pyflakes warning
 
 
 class min1 (burnman.Mineral):
@@ -98,11 +97,13 @@ class test_model(BurnManTest):
 
         self.assertArraysAlmostEqual(m1.molar_heat_capacity_v(), [49.34247236])
         self.assertArraysAlmostEqual(m2.molar_heat_capacity_v(), [49.3490106])
-        self.assertArraysAlmostEqual(m12.molar_heat_capacity_v(), [49.34770297])
+        self.assertArraysAlmostEqual(
+            m12.molar_heat_capacity_v(), [49.34770297])
 
         self.assertArraysAlmostEqual(m1.molar_heat_capacity_p(), [52.32175110])
         self.assertArraysAlmostEqual(m2.molar_heat_capacity_p(), [52.77694375])
-        self.assertArraysAlmostEqual(m12.molar_heat_capacity_p(), [52.68590522])
+        self.assertArraysAlmostEqual(
+            m12.molar_heat_capacity_p(), [52.68590522])
 
         self.assertArraysAlmostEqual(m1.thermal_expansivity(), [2.40018801e-5])
         self.assertArraysAlmostEqual(m2.thermal_expansivity(), [2.74743810e-5])

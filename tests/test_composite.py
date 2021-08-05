@@ -2,12 +2,12 @@ from __future__ import absolute_import
 from util import BurnManTest
 import warnings
 import unittest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
 
+import burnman_path
 import burnman
 from burnman import minerals
+
+assert burnman_path  # silence pyflakes warning
 
 
 # TODO: test composite that changes number of entries

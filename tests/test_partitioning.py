@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 import unittest
 from util import BurnManTest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
 
+import burnman_path
 import burnman
 from burnman import minerals
+
+assert burnman_path  # silence pyflakes warning
+
 
 class test(BurnManTest):
 
@@ -18,8 +19,8 @@ class test(BurnManTest):
         bdg = minerals.SLB_2011.mg_fe_bridgmanite()
         per = minerals.SLB_2011.ferropericlase()
 
-        pressure = 23.83e9 # Pa
-        temperature = 2000. # K
+        pressure = 23.83e9  # Pa
+        temperature = 2000.  # K
         (a, b) = burnman.calculate_nakajima_fp_pv_partition_coefficient(
             pressure, temperature, bulk_composition.molar_composition, 0.5)
         self.assertFloatEqual(a, 0.184533288)

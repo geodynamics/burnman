@@ -1,18 +1,18 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
+from util import BurnManTest
 import warnings
-sys.path.insert(1, os.path.abspath('..'))
-
 import numpy as np
 
+import burnman_path
 import burnman
 from burnman.mineral import Mineral
 from burnman.combinedmineral import CombinedMineral
 from burnman.processchemistry import dictionarize_formula, formula_mass
 from burnman.processchemistry import formula_to_string, sum_formulae
-from util import BurnManTest
+
+assert burnman_path  # silence pyflakes warning
+
 
 class forsterite (Mineral):
 
@@ -61,6 +61,8 @@ class fayalite (Mineral):
 made_forsterite = CombinedMineral([forsterite(), forsterite()], [0.5, 0.5])
 
 # One-mineral solid solution
+
+
 class forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -72,6 +74,8 @@ class forsterite_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Two-mineral solid solution
+
+
 class forsterite_forsterite_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -84,6 +88,8 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Ideal solid solution
+
+
 class olivine_ideal_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -95,6 +101,8 @@ class olivine_ideal_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Olivine solid solution
+
+
 class olivine_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -120,6 +128,8 @@ class olivine_ss2(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Orthopyroxene solid solution
+
+
 class orthopyroxene(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -133,6 +143,8 @@ class orthopyroxene(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site symmetric solid solution
+
+
 class two_site_ss(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -145,6 +157,8 @@ class two_site_ss(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site asymmetric solid solution
+
+
 class two_site_ss_asymmetric(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -158,6 +172,8 @@ class two_site_ss_asymmetric(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 # Three-endmember, two site solid solution
+
+
 class two_site_ss_subregular(burnman.SolidSolution):
 
     def __init__(self, molar_fractions=None):
@@ -274,7 +290,7 @@ class test_solidsolution(BurnManTest):
     def test_ol_Wh(self):
         ol_ss = olivine_ss()
         H_excess = ol_ss.solution_model.excess_enthalpy(
-            1.e5, 1000., [0.5, 0.5]) # Hxs = Exs if Vxs=0
+            1.e5, 1000., [0.5, 0.5])  # Hxs = Exs if Vxs=0
         We = ol_ss.solution_model.We[0][1]
         self.assertArraysAlmostEqual([We / 4.0], [H_excess])
 
@@ -307,8 +323,8 @@ class test_solidsolution(BurnManTest):
     def test_molar_mass(self):
         ss = olivine_ss()
         ss.set_composition(np.array([0.5, 0.5]))
-        self.assertArraysAlmostEqual([ss.molar_mass], [0.5 *
-                                     forsterite().params['molar_mass'] + 0.5 * fayalite().params['molar_mass']])
+        self.assertArraysAlmostEqual([ss.molar_mass], [0.5
+                                     * forsterite().params['molar_mass'] + 0.5 * fayalite().params['molar_mass']])
 
     def test_asymmetric_model_hessian_one_component_change(self):
         ss = two_site_ss_asymmetric()
@@ -329,7 +345,7 @@ class test_solidsolution(BurnManTest):
             ss.set_composition(f)
             dGdx2 = ss.partial_gibbs
 
-            H[i,:] = (dGdx2 - dGdx1)/dp
+            H[i, :] = (dGdx2 - dGdx1)/dp
 
         ss.set_composition(f0)
         for i in range(3):
@@ -375,7 +391,6 @@ class test_solidsolution(BurnManTest):
 
         for i in range(3):
             self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
-
 
     def test_subregular_model_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_asymmetric()
@@ -431,6 +446,7 @@ class test_solidsolution(BurnManTest):
         self.assertEqual(formula_to_string(ol.formula), 'MgFeSiO4')
         self.assertEqual(formula_to_string(sum_formulae(ol.endmember_formulae,
                                                         [0.5, 0.5])), 'MgFeSiO4')
+
 
 if __name__ == '__main__':
     unittest.main()

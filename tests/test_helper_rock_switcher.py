@@ -1,19 +1,13 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
+from util import BurnManTest
 import numpy as np
+
+import burnman_path
 import burnman
-from burnman import minerals
 from burnman import mineral_helpers
 
-from util import BurnManTest
-
-
+assert burnman_path  # silence pyflakes warning
 
 
 class RockSwitcher(BurnManTest):
@@ -42,8 +36,9 @@ class RockSwitcher(BurnManTest):
             burnman.Mineral.__init__(self)
 
     def test_low_high_switches(self):
-        rock = mineral_helpers.HelperLowHighPressureRockTransition(25e9,self.min_lm, self.min_um)
-        #print rock.to_string()
+        rock = mineral_helpers.HelperLowHighPressureRockTransition(
+            25e9, self.min_lm, self.min_um)
+        # print rock.to_string()
 
         T0 = 1500
         rock.set_state(20e9, T0)
@@ -78,11 +73,13 @@ class RockSwitcher(BurnManTest):
             rock.set_state(p, 300)
             molar_volumes.append(rock.molar_volume)
 
-        self.assertArraysAlmostEqual(molar_volumes, [1.062933864e-05, 2.2478565706e-05, 3.62424836698e-05])
+        self.assertArraysAlmostEqual(
+            molar_volumes, [1.062933864e-05, 2.2478565706e-05, 3.62424836698e-05])
 
     def test_composite(self):
         c1 = burnman.Composite([self.min_other(), self.min_lm], [0.4, 0.6])
-        rock = mineral_helpers.HelperLowHighPressureRockTransition(50e9, c1, self.min_um)
+        rock = mineral_helpers.HelperLowHighPressureRockTransition(
+            50e9, c1, self.min_um)
 
         rock.set_state(40e9, 300)
         assert(rock.current_rock == c1)
@@ -90,7 +87,8 @@ class RockSwitcher(BurnManTest):
         assert(rock.current_rock == self.min_um)
 
     def test_properties(self):
-        rock = mineral_helpers.HelperLowHighPressureRockTransition(25e9,self.min_lm, self.min_um)
+        rock = mineral_helpers.HelperLowHighPressureRockTransition(
+            25e9, self.min_lm, self.min_um)
         vars = ['rho', 'v_p', 'v_s', 'v_phi', 'K_S', 'G']
         output = rock.evaluate(vars, [20e9, 40e9], [300, 300])
 
@@ -98,8 +96,6 @@ class RockSwitcher(BurnManTest):
         output2 = self.min_um.evaluate(vars, [40e9], [300])
         ref = np.concatenate((output1, output2), axis=1)
         assert(np.array_equal(output, ref))
-
-
 
 
 if __name__ == '__main__':

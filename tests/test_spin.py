@@ -1,20 +1,20 @@
 from __future__ import absolute_import
 import unittest
 from util import BurnManTest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
 
-import burnman
+import burnman_path
 from burnman import minerals
+
+assert burnman_path  # silence pyflakes warning
 
 
 class spin_transition(BurnManTest):
 
     def test_new(self):
 
-        mins = [
-            minerals.Murakami_etal_2012.fe_periclase(), minerals.Murakami_etal_2012.fe_periclase_HS(), minerals.Murakami_etal_2012.fe_periclase_LS()]
+        mins = [minerals.Murakami_etal_2012.fe_periclase(),
+                minerals.Murakami_etal_2012.fe_periclase_HS(),
+                minerals.Murakami_etal_2012.fe_periclase_LS()]
         for p in mins:
             p.set_method('slb2')
 
@@ -36,6 +36,7 @@ class spin_transition(BurnManTest):
         self.assertArraysAlmostEqual(m.molar_fractions, [0.0, 1.0])
         m.set_state(70e9, 300)
         self.assertArraysAlmostEqual(m.molar_fractions, [1.0, 0.0])
+
 
 if __name__ == '__main__':
     unittest.main()

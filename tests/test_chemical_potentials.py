@@ -1,15 +1,12 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
+from util import BurnManTest
 
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
+import burnman_path
 import burnman
 from burnman import minerals
 
-from util import BurnManTest
+assert burnman_path  # silence pyflakes warning
 
 
 class ChemicalPotentials(BurnManTest):
@@ -59,6 +56,7 @@ class ChemicalPotentials(BurnManTest):
         relative_fugacity = burnman.chemicalpotentials.relative_fugacity(
             stv, assemblage, assemblage)
         self.assertFloatEqual(1., relative_fugacity)
+
 
 if __name__ == '__main__':
     unittest.main()

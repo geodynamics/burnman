@@ -1,16 +1,11 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
-import burnman
-from burnman import minerals
-from burnman import seismic
-
 from util import BurnManTest
+
+import burnman_path
+import burnman
+
+assert burnman_path  # silence pyflakes warning
 
 
 class test_seismic(BurnManTest):
