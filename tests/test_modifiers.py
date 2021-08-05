@@ -1,14 +1,11 @@
 from __future__ import absolute_import
-
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
-import burnman.eos.property_modifiers as pm
-
 import unittest
 from util import BurnManTest
+
+import burnman_path
+import burnman.eos.property_modifiers as pm
+
+assert burnman_path  # silence pyflakes warning
 
 
 class Modifiers(BurnManTest):
@@ -36,9 +33,11 @@ class Modifiers(BurnManTest):
         landau_excesses_2 = pm._landau_excesses(P, T, landau_params_2)
         landau_hp_excesses = pm._landau_hp_excesses(P, T, landau_hp_params)
         landau_hp_excesses_2 = pm._landau_hp_excesses(P, T, landau_hp_params_2)
-        bragg_williams_excesses = pm._bragg_williams_excesses(P, T, bragg_williams_params)
+        bragg_williams_excesses = pm._bragg_williams_excesses(
+            P, T, bragg_williams_params)
         magnetic_excesses = pm._magnetic_excesses_chs(P, T, magnetic_params)
-        magnetic_excesses_2 = pm._magnetic_excesses_chs(P, T, magnetic_params_2)
+        magnetic_excesses_2 = pm._magnetic_excesses_chs(
+            P, T, magnetic_params_2)
 
         self.assertFloatEqual(linear_excesses[0]['G'],
                               1200. - 5.*T + 1.e-7*P)

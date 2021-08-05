@@ -1,17 +1,15 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
+from util import BurnManTest
 import warnings
 
+import burnman_path
 import burnman
 from burnman import minerals
 from burnman.processchemistry import dictionarize_formula, formula_mass
 
-from util import BurnManTest
+assert burnman_path  # silence pyflakes warning
 
 
 class mypericlase(burnman.Mineral):
@@ -110,7 +108,6 @@ class periclase_morse(burnman.Mineral):
             'Kprime_0': 3.84045,
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
-
 
 
 class eos(BurnManTest):
@@ -373,7 +370,8 @@ class test_eos_validation(BurnManTest):
             pressures = [P_0 - 0.5*dP, P_0, P_0 + 0.5*dP]
             temperatures = [0., 0., 0.]
 
-            E, G, H, A, V = m.evaluate(['molar_internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
+            E, G, H, A, V = m.evaluate(
+                ['molar_internal_energy', 'gibbs', 'H', 'helmholtz', 'V'], pressures, temperatures)
 
             calculated.append(P_0)
             derivative.append(-(E[2] - E[0])/(V[2] - V[0]))

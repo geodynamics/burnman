@@ -1,12 +1,12 @@
 import unittest
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
 from util import BurnManTest
-from burnman.nonlinear_solvers import damped_newton_solve
 import numpy as np
+
+import burnman_path
+from burnman.nonlinear_solvers import damped_newton_solve
+
+assert burnman_path  # silence pyflakes warning
+
 
 class test_solvers(BurnManTest):
     # The following tests are taken from More et al, 1981; doi:10.1145/355934.355936

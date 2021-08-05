@@ -1,14 +1,13 @@
 from __future__ import absolute_import
 import unittest
-import inspect
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
-from burnman import anisotropy
 from util import BurnManTest
 import numpy as np
+
+import burnman_path
+from burnman import anisotropy
+
+assert burnman_path  # silence pyflakes warning
+
 
 class test_anisotropy(BurnManTest):
     def test_isotropic(self):
@@ -27,7 +26,6 @@ class test_anisotropy(BurnManTest):
                    m.universal_elastic_anisotropy + 6., m.isotropic_poisson_ratio,
                    E, Vp, Vs, Vs]
 
-
         d1 = [1., 0., 0.]
         d2 = [0., 1., 0.]
 
@@ -35,7 +33,8 @@ class test_anisotropy(BurnManTest):
         E_100 = m.youngs_modulus(direction=d1)
         G_100_010 = m.shear_modulus(plane_normal=d1, shear_direction=d2)
         nu_100_010 = m.poissons_ratio(axial_direction=d1, lateral_direction=d2)
-        wave_speeds, wave_directions = m.wave_velocities(propagation_direction=d1)
+        wave_speeds, wave_directions = m.wave_velocities(
+            propagation_direction=d1)
         Vp, Vs1, Vs2 = wave_speeds
 
         array_2 = [1./3./beta_100, 1./3./beta_100,
@@ -66,14 +65,18 @@ class test_anisotropy(BurnManTest):
 
     def test_tetragonal_ii(self):
         m = anisotropy.TetragonalMaterial(3000., [1., 2., 3., 4., 5., 6., 7.])
-        self.assertFloatEqual(m.stiffness_tensor[0][5], -m.stiffness_tensor[1][5])
+        self.assertFloatEqual(
+            m.stiffness_tensor[0][5], -m.stiffness_tensor[1][5])
 
     def test_rhombohedral_i(self):
-        m = anisotropy.RhombohedralMaterial(3000., [1., 2., 3., 4., 5., 6., 7.])
-        self.assertFloatEqual(m.stiffness_tensor[0][3], -m.stiffness_tensor[1][3])
+        m = anisotropy.RhombohedralMaterial(
+            3000., [1., 2., 3., 4., 5., 6., 7.])
+        self.assertFloatEqual(
+            m.stiffness_tensor[0][3], -m.stiffness_tensor[1][3])
 
     def test_rhombohedral_ii(self):
-        m = anisotropy.RhombohedralMaterial(3000., [1., 2., 3., 4., 5., 6., 7., 8.])
+        m = anisotropy.RhombohedralMaterial(
+            3000., [1., 2., 3., 4., 5., 6., 7., 8.])
         self.assertArraysAlmostEqual([m.stiffness_tensor[0][3], m.stiffness_tensor[0][4]],
                                      [-m.stiffness_tensor[1][3], -m.stiffness_tensor[1][4]])
 

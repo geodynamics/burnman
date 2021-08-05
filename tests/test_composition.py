@@ -1,16 +1,12 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
+from util import BurnManTest
 import numpy as np
 
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
-import burnman
+import burnman_path
 from burnman.composition import Composition
 
-from util import BurnManTest
+assert burnman_path  # silence pyflakes warning
 
 
 class composition(BurnManTest):
@@ -19,8 +15,8 @@ class composition(BurnManTest):
 
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=False)
-        self.assertArraysAlmostEqual(c_dict.values(), c.molar_composition.values())
-
+        self.assertArraysAlmostEqual(
+            c_dict.values(), c.molar_composition.values())
 
     def test_molar_normalize(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
@@ -29,13 +25,12 @@ class composition(BurnManTest):
         self.assertArraysAlmostEqual(np.array(c_dict.values())/sum(c_dict.values()),
                                      c.molar_composition.values())
 
-
     def test_weight_no_normalize(self):
 
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='weight', normalize=False)
-        self.assertArraysAlmostEqual(c_dict.values(), c.weight_composition.values())
-
+        self.assertArraysAlmostEqual(
+            c_dict.values(), c.weight_composition.values())
 
     def test_weight_normalize(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}
@@ -54,7 +49,6 @@ class composition(BurnManTest):
         c_dict = {'MgO': 1., 'SiO2': 1.}
         c = Composition(c_dict, unit_type='molar', normalize=True)
         self.assertFloatEqual(c.atomic_composition['O'], 0.6)
-
 
     def test_add_component_molar(self):
         c_dict = {'MgO': 1., 'SiO2': 1.}

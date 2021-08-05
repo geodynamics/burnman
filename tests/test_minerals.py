@@ -1,17 +1,16 @@
 from __future__ import absolute_import
 import unittest
+from util import BurnManTest
 import inspect
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
 
+import burnman_path
 import burnman
 from burnman import minerals
-from util import BurnManTest
+
+assert burnman_path  # silence pyflakes warning
+
 
 # Instantiate every mineral in the mineral library
-
-
 class instantiate_minerals(BurnManTest):
 
     def test_instantiate_minerals(self):

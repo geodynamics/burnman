@@ -1,15 +1,11 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
-import burnman
-from burnman import minerals
-
 from util import BurnManTest
+
+import burnman_path
+import burnman
+
+assert burnman_path  # silence pyflakes warning
 
 
 class mypericlase(burnman.Mineral):

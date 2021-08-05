@@ -1,14 +1,14 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
+from util import BurnManTest
 import warnings
-sys.path.insert(1, os.path.abspath('..'))
 
+import burnman_path
 import burnman
 from burnman import minerals
 import burnman.averaging_schemes as avg
-from util import BurnManTest
+
+assert burnman_path  # silence pyflakes warning
 
 
 class mypericlase (burnman.Mineral):

@@ -1,31 +1,26 @@
 from __future__ import absolute_import
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
-import warnings
-
-import burnman
-from burnman import minerals
-from burnman import seismic
-from burnman.planet import Planet
-from burnman.layer import Layer
-from burnman import mineral_helpers as helpers
-
 from util import BurnManTest
 import numpy as np
 
+import burnman_path
+import burnman
+from burnman.planet import Planet
+from burnman.layer import Layer
+
+assert burnman_path  # silence pyflakes warning
+
 
 def make_simple_planet():
-    core = Layer("core", np.linspace(0.e3,3480.e3,10))
+    core = Layer("core", np.linspace(0.e3, 3480.e3, 10))
     core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
-    core.set_temperature_mode('user-defined', temperatures= 300.*np.ones_like(core.radii))
+    core.set_temperature_mode(
+        'user-defined', temperatures=300.*np.ones_like(core.radii))
 
     mantle = Layer("mantle", np.linspace(3480.e3, 6371.e3, 10))
     mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
-    mantle.set_temperature_mode('adiabatic', temperature_top = 1200)
-    myplanet = Planet('earth_like',[core, mantle])
+    mantle.set_temperature_mode('adiabatic', temperature_top=1200)
+    myplanet = Planet('earth_like', [core, mantle])
     myplanet.make()
     return myplanet, core, mantle
 
@@ -45,7 +40,8 @@ class test_planet(BurnManTest):
 
     def test_temperature(self):
         myplanet, core, mantle = make_simple_planet()
-        self.assertArraysAlmostEqual(mantle.S, [mantle.S[-1] for S in mantle.S])
+        self.assertArraysAlmostEqual(
+            mantle.S, [mantle.S[-1] for S in mantle.S])
 
     def test_evaluate(self):
         myplanet, core, mantle = make_simple_planet()

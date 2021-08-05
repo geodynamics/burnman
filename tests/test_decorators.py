@@ -1,16 +1,13 @@
 import unittest
-import os
-import sys
-
-sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
-from burnman.mineral import Mineral
 from util import BurnManTest
-from burnman.tools import *
+
+import burnman_path
+import burnman
 
 from burnman.material import material_property
 from burnman.tools import copy_documentation
+
+assert burnman_path  # silence pyflakes warning
 
 
 class test_decorators__material_property(BurnManTest):
