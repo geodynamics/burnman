@@ -41,7 +41,7 @@ for i, ylabel in enumerate(['$C_p$ (J/K/mol)', '$Q$', '$H$ (kJ/mol)']):
     ax[i].set_xlim(temperatures[0], temperatures[-1])
     ax[i].set_xlabel('T (K)')
     ax[i].set_ylabel(ylabel)
-plt.tight_layout()
+
 plt.show()
 
 
@@ -75,7 +75,7 @@ for i, ylabel in enumerate(['$C_p$ (J/K/mol)', '$Q$', '$H$ (kJ/mol)']):
     ax[i].set_xlim(temperatures[0], temperatures[-1])
     ax[i].set_xlabel('T (K)')
     ax[i].set_ylabel(ylabel)
-plt.tight_layout()
+
 plt.show()
 
 
@@ -123,5 +123,5 @@ for i, ylabel in enumerate(['$C_p$ (J/K/mol)', '$Q$', '$H$ (kJ/mol)']):
     ax[i].set_xlim(temperatures[0], temperatures[-1])
     ax[i].set_xlabel('T (K)')
     ax[i].set_ylabel(ylabel)
-plt.tight_layout()
+
 plt.show()

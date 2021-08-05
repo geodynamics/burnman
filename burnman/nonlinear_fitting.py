@@ -406,7 +406,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
             ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(
                 param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
 
-    fig.tight_layout()
+    fig.set_tight_layout(True)
     return fig, ax_array
 
 

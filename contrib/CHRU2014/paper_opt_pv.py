@@ -43,7 +43,7 @@ import misc.colors as colors
 if __name__ == "__main__":
 
     # figsize=(6,5)
-    plt.figure(dpi=100, figsize=(12, 10))
+    fig = plt.figure(dpi=100, figsize=(12, 10))
     prop = {'size': 12}
     plt.rc('text', usetex=True)
     plt.rcParams['text.latex.preamble'] = r'\usepackage{relsize}'
@@ -230,7 +230,7 @@ if __name__ == "__main__":
 #    plt.savefig("opt_pv_4.pdf",bbox_inches='tight')
 #    plt.show()
 
-    plt.tight_layout()
+    fig.set_tight_layout(True)
     if "RUNNING_TESTS" not in globals():
         plt.savefig("paper_opt_pv.pdf", bbox_inches='tight')
     plt.show()
