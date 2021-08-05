@@ -1,21 +1,94 @@
-Assemblage 1 (endmembers only)
-['Forsterite', 'Enstatite']
+Part I: Making and interrogating composite materials
+Names of endmembers in composite material:
+Mg_Perovskite in magnesium silicate perovskite/bridgmanite
+Fe_Perovskite in magnesium silicate perovskite/bridgmanite
+Al_perovskite in magnesium silicate perovskite/bridgmanite
+Periclase in magnesiowustite/ferropericlase
+Wuestite in magnesiowustite/ferropericlase
+Ca_Perovskite
+Elements which might be in the composite:
+['Ca', 'Mg', 'Fe', 'Al', 'Si', 'O']
+Stoichiometric array:
+Ca    Mg  Fe  Al  Si   O
+0.0  1.0 0.0 0.0 1.0 3.0
+0.0  0.0 1.0 0.0 1.0 3.0
+0.0  0.0 0.0 2.0 0.0 3.0
+0.0  1.0 0.0 0.0 0.0 1.0
+0.0  0.0 1.0 0.0 0.0 1.0
+1.0  0.0 0.0 0.0 1.0 3.0
+Composite composition
+Ca: 0.100
+Mg: 0.786
+Fe: 0.079
+Al: 0.070
+Si: 0.765
+O: 2.600
+Density: 4446.348 kg/m^3
+Entropy: 233.028 J/K/mol
+P-wave velocity: 11.244 km/s
+Part II: Manual equilibration
+Example 1: Reaction in an andalusite-sillimanite rock
 
-Assemblage 2 (with solid solutions), method 1
-['olivine', 'orthopyroxene']
+Isochemical reaction basis for rock
+1.0 and = 1.0 sill
+Are we equilibrated at 1.0 GPa and 600.0 K? False
+Equilibrating the rock with brentq at 600 K
+Are we equilibrated now? True
+Equilibrium pressure: 0.717 GPa
 
-Assemblage 2 (with solid solutions), method 2
-['olivine', 'orthopyroxene']
+Example 2: Reaction in an andalusite-sillimanite-kyanite rock
 
-Assemblage composition when molar phase fractions are [0.8, 0.2]
+Equilibrating the rock with fsolve
+Are we equilibrated now? True
+Equilibrium pressure: 0.431 GPa
+Equilibrium temperature: 809.343 K
 
-Converting between fraction types
-Molar fractions from mass fractions: [0.8477066923291057, 0.15229330767089438]
-Molar fractions from volume fractions: [0.85142846274499095, 0.14857153725500905]
+Example 3: Reaction in an olivine-wadsleyite rock
 
-Chemical potentials for the FMQ buffer at 0.0001 GPa and 1000.0 K
-['fa', 'mt', 'q']
-FeO: -363.397062598 kJ/mol
-SiO2: -981.477728588 kJ/mol
-O2: -534.910093216 kJ/mol
-log10(fO2): -16.4007435989
+There are 2 independent reactions in this rock.
+One possible basis set is:
+1.0 Forsterite in olivine = 1.0 Mg_Wadsleyite in wadsleyite
+1.0 Fayalite in olivine = 1.0 Fe_Wadsleyite in wadsleyite
+The reaction basis can also be returned as a numpy array:
+[[-1.  0.  1.  0.]
+ [ 0. -1.  0.  1.]]
+If there are 2 independent reactions, we need to select 2 unknowns.
+In this example, we find the pressure and composition 
+of wadsleyite which coexists with fo90 at 1600 K.
+
+Equilibrating the rock with fsolve
+Are we equilibrated now? True
+Composite: Olivine-wadsleyite assemblage
+  P, T: 1.301e+10 Pa, 1600 K
+Phase and endmember fractions:
+  olivine: 1.0000
+    Forsterite: 0.9000
+    Fayalite: 0.1000
+  wadsleyite: 0.0000
+    Mg_Wadsleyite: 0.8352
+    Fe_Wadsleyite: 0.1648
+
+We could alternatively choose to solve for the compositions of olivine and wadsleyite at fixed pressure and temperature
+Olivine-wadsleyite equilibria at 1600.0 K:
+Pressure (GPa)  p(Fe2SiO4, ol) p(Fe2SiO4, wad)
+10.000                   0.440           0.673
+10.189                   0.417           0.650
+10.378                   0.395           0.625
+10.567                   0.373           0.599
+10.757                   0.352           0.572
+10.946                   0.331           0.544
+11.135                   0.310           0.515
+11.324                   0.289           0.485
+11.513                   0.268           0.453
+11.702                   0.248           0.420
+11.891                   0.227           0.386
+12.081                   0.207           0.351
+12.270                   0.186           0.315
+12.459                   0.165           0.278
+12.648                   0.143           0.240
+12.837                   0.121           0.202
+13.026                   0.099           0.162
+13.215                   0.075           0.123
+13.405                   0.051           0.082
+13.594                   0.026           0.041
+13.783                   0.000           0.000
