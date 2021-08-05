@@ -1,19 +1,16 @@
 from __future__ import absolute_import
+from util import BurnManTest
+import warnings
 import unittest
 import os
 import sys
 sys.path.insert(1, os.path.abspath('..'))
-import warnings
 
 import burnman
 from burnman import minerals
 
-from util import BurnManTest
-
 
 # TODO: test composite that changes number of entries
-
-
 class composite(BurnManTest):
 
     def test_unroll(self):
@@ -271,13 +268,12 @@ class composite(BurnManTest):
         rock = burnman.Composite(
             [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()], [0.5, 0.5])
 
-        K, G = rock.evaluate(['K_S','G'],40.e9, 2000.)
+        K, G = rock.evaluate(['K_S', 'G'], 40.e9, 2000.)
         rock.set_state(40.e9, 2000.)
         K2 = rock.K_S
         G2 = rock.G
         self.assertFloatEqual(K, K2)
         self.assertFloatEqual(G, G2)
-
 
     def test_query_properties(self):
         min1 = minerals.SLB_2011.periclase()
@@ -297,6 +293,95 @@ class composite(BurnManTest):
         self.assertFloatEqual(rock1.thermal_expansivity, min1.alpha)
         self.assertFloatEqual(rock1.molar_heat_capacity_v, min1.C_v)
         self.assertFloatEqual(rock1.molar_heat_capacity_p, min1.C_p)
+
+    def test_stoichiometric_matrix_single_mineral(self):
+        rock = burnman.Composite([minerals.SLB_2011.quartz()])
+
+        self.assertTrue(len(rock.endmember_names) == 1)
+        self.assertTrue(len(rock.elements) == 2)
+        self.assertTrue(rock.elements[0] == 'Si')
+        self.assertTrue(rock.elements[1] == 'O')
+        self.assertTrue(rock.stoichiometric_matrix.shape == (1, 2))
+        self.assertTrue(rock.reaction_basis.shape[0] == 0)
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
+                                     [-2, 1])
+        self.assertTrue(rock.independent_element_indices[0] == 0)
+        self.assertTrue(rock.dependent_element_indices[0] == 1)
+        self.assertTrue(rock.n_reactions == 0)
+
+    def test_stoichiometric_matrix_two_minerals(self):
+        rock = burnman.Composite([minerals.HP_2011_ds62.andr(),
+                                  minerals.HP_2011_ds62.alm()])
+
+        self.assertTrue(len(rock.endmember_names) == 2)
+        self.assertTrue(len(rock.elements) == 5)
+        self.assertTrue(rock.stoichiometric_matrix.shape == (2, 5))
+        self.assertTrue(rock.reaction_basis.shape[0] == 0)
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
+                                     [4./9., -2./3., 1, 0, 0])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[1],
+                                     [-1./3., -1., 0, 1, 0])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[2],
+                                     [-4./3., -4., 0, 0, 1])
+        self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
+        self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3, 4])
+        self.assertTrue(rock.n_reactions == 0)
+
+    def test_stoichiometric_matrix_binary_solution(self):
+        rock = burnman.Composite([minerals.SLB_2011.mg_fe_olivine()])
+
+        self.assertTrue(len(rock.endmember_names) == 2)
+        self.assertTrue(len(rock.elements) == 4)
+        self.assertTrue(rock.stoichiometric_matrix.shape == (2, 4))
+        self.assertTrue(rock.reaction_basis.shape[0] == 0)
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
+                                     [-1./2., -1./2., 1, 0])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[1],
+                                     [-2., -2., 0, 1])
+        self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
+        self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3])
+        self.assertTrue(rock.n_reactions == 0)
+
+    def test_stoichiometric_matrix_reaction(self):
+        rock = burnman.Composite([minerals.SLB_2011.mg_fe_olivine(),
+                                  minerals.SLB_2011.garnet()])
+
+        self.assertTrue(len(rock.endmember_names) == 7)
+        self.assertTrue(len(rock.elements) == 7)
+        self.assertTrue(rock.stoichiometric_matrix.shape == (7, 7))
+        self.assertArraysAlmostEqual(rock.reaction_basis[0],
+                                     [3./2., -3./2., -1., 1., 0., 0., 0])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
+                                     [-1./2., -1., -1., -1., -3./2., -2., 1.])
+        self.assertArraysAlmostEqual(rock.independent_element_indices,
+                                     [0, 1, 2, 3, 4, 5])
+        self.assertArraysAlmostEqual(rock.dependent_element_indices, [6])
+        self.assertTrue(rock.n_reactions == 1)
+
+    def test_stoichiometric_matrix_reactions(self):
+        rock = burnman.Composite([minerals.SLB_2011.mg_fe_olivine(),
+                                  minerals.SLB_2011.mg_fe_olivine(),
+                                  minerals.SLB_2011.mg_fe_olivine()])
+
+        self.assertTrue(len(rock.endmember_names) == 6)
+        self.assertTrue(len(rock.elements) == 4)
+        self.assertTrue(rock.stoichiometric_matrix.shape == (6, 4))
+        self.assertArraysAlmostEqual(rock.reaction_basis[0],
+                                     [-1, 0, 1, 0, 0, 0])
+        self.assertArraysAlmostEqual(rock.reaction_basis[1],
+                                     [0, -1, 0, 1, 0, 0])
+        self.assertArraysAlmostEqual(rock.reaction_basis[2],
+                                     [-1, 0, 0, 0, 1, 0])
+        self.assertArraysAlmostEqual(rock.reaction_basis[3],
+                                     [0, -1, 0, 0, 0, 1])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[0],
+                                     [-1./2., -1./2., 1, 0])
+        self.assertArraysAlmostEqual(rock.compositional_null_basis[1],
+                                     [-2., -2., 0, 1])
+        self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
+        self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3])
+        self.assertTrue(rock.n_reactions == 4)
+
 
 if __name__ == '__main__':
     unittest.main()
