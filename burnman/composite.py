@@ -75,8 +75,9 @@ class Composite(Material):
             self.molar_fractions = None
 
         self.set_averaging_scheme('VoigtReussHill')
-        self.name=name
-        self.print_precision=4 # number of significant figures used by self.__str__
+        self.name = name
+        self.equilibrium_tolerance = 1.e-3  # J/reaction
+        self.print_precision = 4  # number of significant figures used by self.__str__
 
     def __str__(self):
         string='Composite: {0}'.format(self.name)
@@ -406,6 +407,38 @@ class Composite(Material):
         c_p = np.array([phase.molar_heat_capacity_p for phase in self.phases])
         return self.averaging_scheme.average_heat_capacity_p(self.molar_fractions, c_p)
 
+    @material_property
+    def endmember_partial_gibbs(self):
+        """
+        Returns the partial Gibbs energies for all
+        the endmember minerals in the Composite
+        """
+        partial_gibbs = np.empty(self.n_endmembers)
+        j = 0
+        for i, n_endmembers in enumerate(self.endmembers_per_phase):
+            if n_endmembers == 1:
+                partial_gibbs[j] = self.phases[i].gibbs
+            else:
+                partial_gibbs[j:j+n_endmembers] = self.phases[i].partial_gibbs
+            j += n_endmembers
+        return partial_gibbs
+
+    @material_property
+    def reaction_affinities(self):
+        """
+        Returns the affinities corresponding to each reaction in reaction_basis
+        """
+        return self.reaction_basis.dot(self.endmember_partial_gibbs)
+
+    @material_property
+    def equilibrated(self):
+        """
+        Returns True if the reaction affinities are all zero
+        within a given tolerance given by self.equilibrium_tolerance.
+        """
+        return np.all(np.abs(self.reaction_affinities)
+                      < self.equilibrium_tolerance)
+
     def _mass_to_molar_fractions(self, phases, mass_fractions):
         """
         Converts a set of mass fractions for phases into a set of molar fractions.
@@ -441,7 +474,7 @@ class Composite(Material):
                 return nsimplify(self.endmember_formulae[i][e])
             else:
                 return 0
-        return Matrix(len(self.endmember_formulae), len(self.elements), f)
+        return Matrix(self.n_endmembers, self.n_elements, f)
 
     @cached_property
     def stoichiometric_array(self):
@@ -449,7 +482,7 @@ class Composite(Material):
         An array where each element arr[i,j] corresponds
         to the number of atoms of element[j] in endmember[i].
         """
-        return np.array(self.stoichiometric_matrix)
+        return np.array(self.stoichiometric_matrix).astype(float)
 
     @cached_property
     def reaction_basis(self):
@@ -457,12 +490,36 @@ class Composite(Material):
         An array where each element arr[i,j] corresponds
         to the number of moles of endmember[j] involved in reaction[i].
         """
-        reaction_basis = np.array(self.stoichiometric_matrix.T.nullspace())
+        reaction_basis = np.array([v[:] for v in
+                                   self.stoichiometric_matrix.T.nullspace()],
+                                  dtype=float)
 
         if len(reaction_basis) == 0:
-            reaction_basis = np.empty((0, len(self.endmember_names)))
+            reaction_basis = np.empty((0, self.n_endmembers))
 
         return reaction_basis
+
+    @cached_property
+    def reaction_basis_as_strings(self):
+        """
+        Returns a list of string representations of all the reactions in
+        reaction_basis.
+        """
+        reaction_strings = []
+        for reaction in self.reaction_basis:
+            lhs, rhs = ('', '')
+            for i, coefficient in enumerate(reaction):
+                if coefficient < -1.e-10:
+                    if len(lhs) > 0:
+                        lhs += ' + '
+                    lhs += f'{-coefficient} {self.endmember_names[i]}'
+                if coefficient > 1.e-10:
+                    if len(rhs) > 0:
+                        rhs += ' + '
+                    rhs += f'{coefficient} {self.endmember_names[i]}'
+            reaction_strings.append(f'{lhs} = {rhs}')
+
+        return reaction_strings
 
     @cached_property
     def n_reactions(self):
@@ -486,7 +543,7 @@ class Composite(Material):
         """
         The element indices not included in the independent list.
         """
-        return [i for i in range(len(self.elements))
+        return [i for i in range(self.n_elements)
                 if i not in self.independent_element_indices]
 
     @cached_property
@@ -495,7 +552,9 @@ class Composite(Material):
         An array N such that N.b = 0 for all bulk compositions that can
         be produced with a linear sum of the endmembers in the composite.
         """
-        null_basis = np.array(self.stoichiometric_matrix.nullspace())
+        null_basis = np.array([v[:] for v in
+                               self.stoichiometric_matrix.nullspace()],
+                              dtype=float)
 
         M = null_basis[:, self.dependent_element_indices]
         assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
@@ -538,6 +597,21 @@ class Composite(Material):
         """
         self._set_endmember_properties()
         return self.__dict__['elements']
+
+    @cached_property
+    def n_endmembers(self):
+        """
+        Returns the number of endmembers in the composite.
+        """
+        return len(self.endmember_names)
+
+    @cached_property
+    def n_elements(self):
+        """
+        Returns the total number of distinct elements
+        which might be in the composite.
+        """
+        return len(self.elements)
 
     def _set_endmember_properties(self):
         """
