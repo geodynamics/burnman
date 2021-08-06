@@ -18,6 +18,7 @@ Mineral database
   - :mod:`~burnman.minerals.HP_2011_ds62`
   - :mod:`~burnman.minerals.HP_2011_fluids`
   - :mod:`~burnman.minerals.HHPH_2013`
+  - :mod:`~burnman.minerals.HGP_2018_ds633`
   - :mod:`~burnman.minerals.other`
 """
 from __future__ import absolute_import

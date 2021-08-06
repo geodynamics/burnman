@@ -4,8 +4,8 @@
 
 
 """
-HP_2011 (ds-62)
-^^^^^^^^^^^^^^^
+HP_2011_ds62
+^^^^^^^^^^^^
 
 Endmember minerals from Holland and Powell 2011 and references therein.
 Update to dataset version 6.2.
