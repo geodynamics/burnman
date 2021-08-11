@@ -1,6 +1,6 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.546210.svg)](https://doi.org/10.5281/zenodo.546210)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5155442.svg)](https://doi.org/10.5281/zenodo.5155442)
 
-# BurnMan - a thermoelastic and thermodynamic toolkit for Earth and planetary sciences
+# BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and planetary sciences
 
 <img src="sphinx/burnjack.png" width="256">
 
@@ -12,7 +12,7 @@ It began as a working-group at the 2012 CIDER workshop in Santa Barbara.
 
 BurnMan is released under the GNU GPL v2 or newer
 
-Homepage: http://burnman.org
+Homepage: https://geodynamics.github.io/burnman/
 
 Documentation: http://burnman.readthedocs.io
 

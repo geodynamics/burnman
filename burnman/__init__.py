@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -138,9 +138,9 @@ Citing BurnMan
 
 If you use BurnMan in your work, we ask that you cite the following publications:
 
-  - Cottaar, S., Heister, T., Myhill, R., Rose, I., and Unterborn, C. (2017):
+  - Myhill, R., Cottaar, S., Heister, T., Rose, I., and Unterborn, C. (2021):
     BurnMan v0.10.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
-    `(https://doi.org/10.5281/zenodo.546210) <https://doi.org/10.5281/zenodo.546210>`_
+    `(https://doi.org/10.5281/zenodo.5155442) <https://doi.org/10.5281/zenodo.5155442>`_
 
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
