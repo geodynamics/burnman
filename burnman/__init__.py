@@ -204,7 +204,7 @@ from . import eos
 
 from . import processchemistry
 from . import composition_fitting
-from . import solutionpolytope
+from . import polytope
 from . import chemicalpotentials
 from . import geotherm
 
