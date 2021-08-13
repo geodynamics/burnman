@@ -12,12 +12,12 @@ This script reproduces the tables in Myhill and Connolly (2021).
 
 *Uses:*
 
-* :class:`burnman.solutionpolytope.SolutionPolytope`
-* :func:`burnman.solutionpolytope.polytope_from_charge_balance`
-* :func:`burnman.solutionpolytope.polytope_from_endmember_occupancies`
-* :func:`burnman.solutionpolytope.transform_solution_to_new_basis`
-* :func:`burnman.solutionpolytope.site_occupancies_to_strings`
-* :func:`burnman.solutionpolytope.generate_complete_basis`
+* :class:`burnman.polytope.MaterialPolytope`
+* :func:`burnman.polytope.polytope_from_charge_balance`
+* :func:`burnman.polytope.polytope_from_endmember_occupancies`
+* :func:`burnman.polytope.transform_solution_to_new_basis`
+* :func:`burnman.polytope.site_occupancies_to_strings`
+* :func:`burnman.polytope.generate_complete_basis`
 * :doc:`mineral_database`
 
 
@@ -44,11 +44,11 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.solutionpolytope import polytope_from_charge_balance
-from burnman.solutionpolytope import polytope_from_endmember_occupancies
-from burnman.solutionpolytope import transform_solution_to_new_basis
-from burnman.solutionpolytope import site_occupancies_to_strings
-from burnman.solutionpolytope import generate_complete_basis
+from burnman.polytope import polytope_from_charge_balance
+from burnman.polytope import polytope_from_endmember_occupancies
+from burnman.polytope import transform_solution_to_new_basis
+from burnman.polytope import site_occupancies_to_strings
+from burnman.polytope import generate_complete_basis
 from burnman.minerals import JH_2015
 
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     """
     First, we show how to generate a polytope from a set of species charges
     and total charge. The function we use here is polytope_from_charge_balance.
-    One attribute of the returned SolutionPolytope instance is
+    One attribute of the returned MaterialPolytope instance is
     endmember_occupancies, which is a 2D numpy array of the
     site-species occupancies of each endmember.
 
@@ -80,12 +80,10 @@ if __name__ == "__main__":
     print('Vector b')
     print(CFMS_px_polytope.equality_vector)
 
-
     print('Table 3: Equality constraints for a one-site pyrope-majorite garnet')
 
     MAS_gt_polytope = polytope_from_charge_balance([[4, 6, 8]], 6,
                                                    return_fractions=False)
-
 
     print('Matrix P')
     print(MAS_gt_polytope.equality_matrix)
@@ -104,8 +102,8 @@ if __name__ == "__main__":
     print('Table 4 in formula form (order not preserved)')
     print(site_occupancies_to_strings([['Ca', 'Fe', 'Mg'],
                                        ['Mg', 'Fe']],
-                                       [1, 1],
-                                       CFMS_px_polytope.endmember_occupancies))
+                                      [1, 1],
+                                      CFMS_px_polytope.endmember_occupancies))
 
     print('')
     print('Table 5: The endmember site-occupancy matrix E for a a one-site pyrope-majorite garnet.')
@@ -115,10 +113,8 @@ if __name__ == "__main__":
     print('')
     print('Table 5 in formula form (order not preserved)')
     print(site_occupancies_to_strings([['Mg', 'Al', 'Si']],
-                                       [2],
-                                       MAS_gt_polytope.endmember_occupancies))
-
-
+                                      [2],
+                                      MAS_gt_polytope.endmember_occupancies))
     print('')
 
     # bridgmanite in FMASO system: Mg Fe Fe3+ Al3+ | Fe3+ Al3+ Si
@@ -136,20 +132,17 @@ if __name__ == "__main__":
                                        ['Al', 'Si']],
                                       [1, 1],
                                       bridgmanite_polytope.endmember_occupancies))
-
-
     print('')
 
     print('Table 7: A matrix P and vector b for a two-site FMAS bridgmanite, as constructed from a set of independent endmembers.')
-    bridgmanite_polytope_2 = polytope_from_endmember_occupancies(bridgmanite_polytope.independent_endmember_occupancies)
+    bridgmanite_polytope_2 = polytope_from_endmember_occupancies(
+        bridgmanite_polytope.independent_endmember_occupancies)
 
     print('Matrix P')
     print(bridgmanite_polytope_2.equality_matrix[::-1])
 
     print('Vector b')
     print(bridgmanite_polytope_2.equality_vector[::-1])
-
-
     print('')
     print('Table 8: A matrix P and vector b for a two-site FMAS bridgmanite, as constructed from site constraints.')
 
@@ -158,8 +151,6 @@ if __name__ == "__main__":
 
     print('Vector b')
     print(bridgmanite_polytope.equality_vector)
-
-
     print('')
     print('Table 9 and 10 not reproduced here.')
 
@@ -204,16 +195,25 @@ if __name__ == "__main__":
     which complete the basis:
     """
     camph_partial_basis = np.array([[1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],  # tr
-                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # ts
-                                    [0, 1, 0, 1, 0, 0.5, 0, 0.5, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # parg
-                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0],  # gl
-                                    [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0],  # cumm
-                                    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # grun
-                                    [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # a
-                                    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # b
-                                    [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0],  # mrb
-                                    [0, 0, 1, 1, 0, 0.5, 0, 0.5, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # kprg
-                                    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0.5, 0.5, 0, 1]]) # tts
+                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # ts
+                                    [0, 1, 0, 1, 0, 0.5, 0, 0.5, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # parg
+                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
+                                        0, 0, 1, 1, 0, 1, 0],  # gl
+                                    [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+                                        1, 0, 0, 1, 0, 1, 0],  # cumm
+                                    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+                                        0, 1, 0, 1, 0, 1, 0],  # grun
+                                    [1, 0, 0, 1, 0, 0, 1, 0, 0, 0,
+                                        0, 0, 1, 0, 1, 0, 1, 0],  # a
+                                    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+                                        0, 0, 1, 0, 1, 0, 1, 0],  # b
+                                    [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0,
+                                        0, 0, 1, 1, 0, 1, 0],  # mrb
+                                    [0, 0, 1, 1, 0, 0.5, 0, 0.5, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # kprg
+                                    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0.5, 0.5, 0, 1]])  # tts
 
     complete_basis = generate_complete_basis(camph_partial_basis, camph_array)
     print('One potential set of independent endmembers using the partial set as a starting point is as follows:')
@@ -228,10 +228,10 @@ if __name__ == "__main__":
     camph_incomplete_polytope = polytope_from_endmember_occupancies(camph_partial_basis,
                                                                     return_fractions=False)
 
-
     missing_endmember_occupancies = []
     for occupancies in camph_polytope.endmember_occupancies:
-        mindiff = np.min(np.sum(np.abs(camph_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
+        mindiff = np.min(np.sum(
+            np.abs(camph_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
         if mindiff > 1.e-6:
             missing_endmember_occupancies.append(occupancies)
 
@@ -239,7 +239,8 @@ if __name__ == "__main__":
                                                      missing_endmember_occupancies)
 
     print('The following endmember is also missing, and is the one used to complete the basis in the paper:')
-    print([e_str for e_str in missing_endmembers if e_str == '[v][Fe]3[Al]2[Fe]2[Si]4[O]2'])
+    print([e_str for e_str in missing_endmembers if e_str
+          == '[v][Fe]3[Al]2[Fe]2[Si]4[O]2'])
 
     print('(All the missing endmembers can be printed by setting the print_missing_endmembers variable to True)')
     print_missing_endmembers = False
@@ -253,7 +254,6 @@ if __name__ == "__main__":
     print('Site species:')
     print('M1             M2*2       T1*2    H*2')
     print('Fe Fef Mg Al | Mg Ti Fe | Al Si | OH O')
-
 
     site_species = [['Fe', 'Fef', 'Mg', 'Al'],
                     ['Mg', 'Ti', 'Fe'],
@@ -284,25 +284,25 @@ if __name__ == "__main__":
     reported in the original paper to calculate one of the endmembers
     which complete the basis:
     """
-    bi_partial_basis = np.array([[0,1,0,0,  1,0,0,     1,0,     1,0],
-                                 [0,0,1,0,  0.5,0.5,0, 0.5,0.5, 0,1],
-                                 [0,0,0,1,  1,0,0,     1,0,     1,0],
-                                 [1,0,0,0,  0,0,1,     0.5,0.5, 1,0],
-                                 [0,0,1,0,  1,0,0,     0.5,0.5, 1,0],
-                                 [1,0,0,0,  1,0,0,     0.5,0.5, 1,0]])
+    bi_partial_basis = np.array([[0, 1, 0, 0, 1,   0,   0, 1,   0,   1, 0],
+                                 [0, 0, 1, 0, 0.5, 0.5, 0, 0.5, 0.5, 0, 1],
+                                 [0, 0, 0, 1, 1,   0,   0, 1,   0,   1, 0],
+                                 [1, 0, 0, 0, 0,   0,   1, 0.5, 0.5, 1, 0],
+                                 [0, 0, 1, 0, 1,   0,   0, 0.5, 0.5, 1, 0],
+                                 [1, 0, 0, 0, 1,   0,   0, 0.5, 0.5, 1, 0]])
 
     complete_basis = generate_complete_basis(bi_partial_basis, bi_array)
-    print('One potential set of independent endmembers using the partial set as a starting point is as follows:')
+    print('One potential set of independent endmembers using the partial set '
+          'as a starting point is as follows:')
     print(complete_basis)
-
 
     bi_incomplete_polytope = polytope_from_endmember_occupancies(bi_partial_basis,
                                                                  return_fractions=False)
 
-
     missing_endmember_occupancies = []
     for occupancies in bi_polytope.endmember_occupancies:
-        mindiff = np.min(np.sum(np.abs(bi_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
+        mindiff = np.min(np.sum(
+            np.abs(bi_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
         if mindiff > 1.e-6:
             missing_endmember_occupancies.append(occupancies)
 
@@ -310,7 +310,8 @@ if __name__ == "__main__":
                                                      missing_endmember_occupancies)
 
     print('The following endmember is the one used to complete the basis in the paper:')
-    print([e_str for e_str in missing_endmembers if e_str == '[Fe][Fe]2[Si]2[O1/2OH1/2]2'])
+    print([e_str for e_str in missing_endmembers if e_str
+          == '[Fe][Fe]2[Si]2[O1/2OH1/2]2'])
 
     print('(All the missing endmembers can be printed by setting the print_missing_endmembers variable to True)')
     print_missing_endmembers = False
@@ -441,16 +442,25 @@ if __name__ == "__main__":
     which complete the basis:
     """
     camph_partial_basis = np.array([[1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],  # tr
-                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # ts
-                                    [0, 1, 0, 1, 0, 0.5, 0, 0.5, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # parg
-                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0],  # gl
-                                    [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0],  # cumm
-                                    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # grun
-                                    [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # a
-                                    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],  # b
-                                    [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0],  # mrb
-                                    [0, 0, 1, 1, 0, 0.5, 0, 0.5, 0, 0, 1, 0, 0, 0, 0.5, 0.5, 1, 0],  # kprg
-                                    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0.5, 0.5, 0, 1]]) # tts
+                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # ts
+                                    [0, 1, 0, 1, 0, 0.5, 0, 0.5, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # parg
+                                    [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
+                                        0, 0, 1, 1, 0, 1, 0],  # gl
+                                    [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+                                        1, 0, 0, 1, 0, 1, 0],  # cumm
+                                    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+                                        0, 1, 0, 1, 0, 1, 0],  # grun
+                                    [1, 0, 0, 1, 0, 0, 1, 0, 0, 0,
+                                        0, 0, 1, 0, 1, 0, 1, 0],  # a
+                                    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+                                        0, 0, 1, 0, 1, 0, 1, 0],  # b
+                                    [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0,
+                                        0, 0, 1, 1, 0, 1, 0],  # mrb
+                                    [0, 0, 1, 1, 0, 0.5, 0, 0.5, 0, 0, 1,
+                                        0, 0, 0, 0.5, 0.5, 1, 0],  # kprg
+                                    [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0.5, 0.5, 0, 1]])  # tts
 
     print('The following endmember is one which was not contained '
           'within the original basis:')
@@ -460,7 +470,8 @@ if __name__ == "__main__":
     print(site_occupancies_to_strings(site_species, multiplicities,
                                       last_endmember))
 
-    camph_incomplete_polytope = polytope_from_endmember_occupancies(camph_partial_basis)
+    camph_incomplete_polytope = polytope_from_endmember_occupancies(
+        camph_partial_basis)
 
     print('There are {0} endmembers in the incomplete polytope, '
           'and {1} in the complete polytope.'.format(len(camph_incomplete_polytope.endmember_occupancies),
@@ -471,19 +482,20 @@ if __name__ == "__main__":
     """
     if False:
         for occupancies in camph_polytope.endmember_occupancies:
-            mindiff = np.min(np.sum(np.abs(camph_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
+            mindiff = np.min(np.sum(
+                np.abs(camph_incomplete_polytope.endmember_occupancies - occupancies), axis=1))
             if mindiff > 1.e-6:
                 print(occupancies)
 
     """
-    The SolutionPolytope object can also be used to create a set of
+    The MaterialPolytope object can also be used to create a set of
     equally-spaced "pseudocompounds". This functionality is contained
     within the class function "grid", which can partition the polytope
     based on site occupancies or on proportions of independent endmembers.
     The user can choose the resolution of the grid of pseudocompounds.
     """
 
-    print('\n\nThe SolutionPolytope object can also be used to create '
+    print('\n\nThe MaterialPolytope object can also be used to create '
           'a set of equally-spaced pseudocompounds.')
     # simple coupled binary solution:
     binary_polytope = polytope_from_charge_balance([[1, 2, 3]], 2,
@@ -639,6 +651,8 @@ if __name__ == "__main__":
     old_formula = burnman.processchemistry.formula_to_string(cpx.formula)
     new_formula = burnman.processchemistry.formula_to_string(new_cpx.formula)
     print('Chemical formula: {0}, {1}'.format(old_formula, new_formula))
-    print('Gibbs free energy (J/mol): {0:.5f}, {1:.5f}'.format(cpx.gibbs, new_cpx.gibbs))
+    print(
+        'Gibbs free energy (J/mol): {0:.5f}, {1:.5f}'.format(cpx.gibbs, new_cpx.gibbs))
     print('Entropy (J/K/mol): {0:.5f}, {1:.5f}'.format(cpx.S, new_cpx.S))
-    print('Volume (cm^3/mol): {0:.5f}, {1:.5f}'.format(cpx.V*1.e6, new_cpx.V*1.e6))
+    print(
+        'Volume (cm^3/mol): {0:.5f}, {1:.5f}'.format(cpx.V*1.e6, new_cpx.V*1.e6))

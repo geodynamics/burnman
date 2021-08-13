@@ -20,6 +20,7 @@ from copy import copy
 
 from .reductions import row_reduce
 
+
 class SimplexGrid(object):
     def __init__(self, vertices, points_per_edge):
 
@@ -74,11 +75,11 @@ class SimplexGrid(object):
                     self.vertices-1, exact=True)
 
 
-class SolutionPolytope(object):
+class MaterialPolytope(object):
     def __init__(self, equalities, return_fractions=False):
         self.return_fractions = return_fractions
-        self.equality_matrix = equalities[:,1:]
-        self.equality_vector = -equalities[:,0]
+        self.equality_matrix = equalities[:, 1:]
+        self.equality_vector = -equalities[:, 0]
 
         self.polytope_matrix = cdd.Matrix(equalities, linear=True,
                                           number_type='fraction')
@@ -138,7 +139,8 @@ class SolutionPolytope(object):
         ind = self.independent_endmember_occupancies
 
         sol = np.linalg.lstsq(np.array(ind.T).astype(float),
-                              np.array(self.endmember_occupancies.T).astype(float),
+                              np.array(self.endmember_occupancies.T).astype(
+                                  float),
                               rcond=0)[0].round(decimals=12).T
         return sol
 
@@ -186,33 +188,44 @@ class SolutionPolytope(object):
         """
         if limits is None:
             if grid_type == 'independent endmember proportions':
-                f_occ = self.dependent_endmembers_as_independent_endmember_proportions/(points_per_edge-1)
+                f_occ = self.dependent_endmembers_as_independent_endmember_proportions / \
+                    (points_per_edge-1)
             elif grid_type == 'site occupancies':
                 f_occ = self.endmember_occupancies/(points_per_edge-1)
             else:
-                raise Exception('grid type not recognised. Should be one of independent endmember proportions or site occupancies')
+                raise Exception(
+                    'grid type not recognised. Should be one of independent endmember proportions or site occupancies')
 
-            simplices = self._decompose_polytope_into_endmember_simplices(vertices=self.dependent_endmembers_as_independent_endmember_proportions)
+            simplices = self._decompose_polytope_into_endmember_simplices(
+                vertices=self.dependent_endmembers_as_independent_endmember_proportions)
         else:
             if grid_type == 'independent endmember proportions':
-                ppns = np.array(self.subpolytope_from_independent_endmember_limits(limits).get_generators()[:])[:,1:]
-                last_ppn = np.array([1. - sum(p) for p in ppns]).reshape((len(ppns), 1))
-                vertices_as_independent_endmember_proportions = np.hstack((ppns, last_ppn))
-                f_occ = vertices_as_independent_endmember_proportions/(points_per_edge-1)
+                ppns = np.array(self.subpolytope_from_independent_endmember_limits(
+                    limits).get_generators()[:])[:, 1:]
+                last_ppn = np.array([1. - sum(p)
+                                    for p in ppns]).reshape((len(ppns), 1))
+                vertices_as_independent_endmember_proportions = np.hstack(
+                    (ppns, last_ppn))
+                f_occ = vertices_as_independent_endmember_proportions / \
+                    (points_per_edge-1)
 
             elif grid_type == 'site occupancies':
-                occ = np.array(self.subpolytope_from_site_occupancy_limits(limits).get_generators()[:])[:,1:]
+                occ = np.array(self.subpolytope_from_site_occupancy_limits(
+                    limits).get_generators()[:])[:, 1:]
                 f_occ = occ/(points_per_edge-1)
 
                 ind = self.independent_endmember_occupancies
 
                 vertices_as_independent_endmember_proportions = np.linalg.lstsq(np.array(ind.T).astype(float),
-                                                                                np.array(occ.T).astype(float),
+                                                                                np.array(occ.T).astype(
+                                                                                    float),
                                                                                 rcond=None)[0].round(decimals=12).T
             else:
-                raise Exception('grid type not recognised. Should be one of independent endmember proportions or site occupancies')
+                raise Exception(
+                    'grid type not recognised. Should be one of independent endmember proportions or site occupancies')
 
-            simplices = self._decompose_polytope_into_endmember_simplices(vertices = vertices_as_independent_endmember_proportions)
+            simplices = self._decompose_polytope_into_endmember_simplices(
+                vertices=vertices_as_independent_endmember_proportions)
 
         n_ind = f_occ.shape[1]
         n_simplices = len(simplices)
@@ -248,7 +261,7 @@ def polytope_from_charge_balance(charges, charge_total,
 
     equalities[-1, 0] = -charge_total
     equalities[-1, 1:] = all_charges
-    return SolutionPolytope(equalities, return_fractions)
+    return MaterialPolytope(equalities, return_fractions)
 
 
 def polytope_from_endmember_occupancies(endmember_occupancies, return_fractions=False):
@@ -268,11 +281,12 @@ def polytope_from_endmember_occupancies(endmember_occupancies, return_fractions=
             equalities[1:, 1:] = nullspace
         except ValueError:
             equalities[1:, 1:] = nullspace[:, :, 0]
-    return SolutionPolytope(equalities, return_fractions)
+    return MaterialPolytope(equalities, return_fractions)
 
 
 def independent_row_indices(array):
-    m = Matrix(array.shape[0], array.shape[1], lambda i, j: Rational(array[i,j]).limit_denominator(1000))
+    m = Matrix(array.shape[0], array.shape[1], lambda i,
+               j: Rational(array[i, j]).limit_denominator(1000))
     _, pivots, swaps = row_reduce(m, iszerofunc=lambda x: x.is_zero,
                                   simpfunc=lambda x: Rational(x).limit_denominator(1000))
     indices = np.array(range(len(array)))
@@ -298,15 +312,19 @@ def feasible_solution_basis_in_component_space(solution, components):
     """
 
     # 1) Convert components into a matrix
-    component_array, component_elements = compositional_array([dictionarize_formula(c) for c in components])
+    component_array, component_elements = compositional_array(
+        [dictionarize_formula(c) for c in components])
 
     # 2) Get the full set of endmembers (dependent and otherwise)
-    polytope = polytope_from_solution_model(solution.solution_model)
+    polytope = polytope_from_endmember_occupancies(
+        solution.solution_model.endmember_occupancies)
     dependent_sums = polytope.dependent_endmembers_as_independent_endmember_proportions
 
     # 3) Get the endmember compositional array
-    independent_endmember_array, endmember_elements = compositional_array(solution.endmember_formulae)
-    all_endmember_array = dependent_sums.dot(independent_endmember_array).round(decimals=12)
+    independent_endmember_array, endmember_elements = compositional_array(
+        solution.endmember_formulae)
+    all_endmember_array = dependent_sums.dot(
+        independent_endmember_array).round(decimals=12)
     n_all = len(all_endmember_array)
 
     # 4) Find the endmembers that can be described with
@@ -347,7 +365,8 @@ def feasible_solution_basis_in_component_space(solution, components):
                             element_indexing]
     exist = linear_solutions_exist(component_array, B)
     endmember_indices = possible_endmember_indices[exist]
-    independent_indices = endmember_indices[independent_row_indices(dependent_sums[endmember_indices])]
+    independent_indices = endmember_indices[independent_row_indices(
+        dependent_sums[endmember_indices])]
 
     # 5) Return new basis in terms of proportions of the original endmember set
     return dependent_sums[independent_indices]
@@ -366,6 +385,7 @@ def complete_basis(basis):
                               axis=0)
     else:
         return basis
+
 
 def decompose_3D_matrix(Wn):
     """
@@ -401,8 +421,6 @@ def decompose_3D_matrix(Wn):
     # Wb is the 3D matrix corresponding to the terms in the binary matrix,
     # such that the two following print statements produce the same answer
     # for a given array of endmember proportions
-    #print(np.einsum('ij, i, j', new_binary_matrix, p, p*p))
-    #print(np.einsum('ijk, i, j, k', Wb, p, p, p))
     Wb = (np.einsum('ijk, ij->ijk', Wn, np.identity(n_mbrs))
           + np.einsum('ijk, jk->ijk', Wn, np.identity(n_mbrs))
           + np.einsum('ijk, ik->ijk', Wn, np.identity(n_mbrs)))
@@ -412,7 +430,8 @@ def decompose_3D_matrix(Wn):
     # of a subregular solution model given by
     # Helffrich and Wood includes ternary components (the sum_k X_k part)..
     Wn -= Wb + (np.einsum('ij, k', new_binary_matrix, np.ones(n_mbrs))
-                - np.einsum('ij, ik->ijk', new_binary_matrix, np.identity(n_mbrs))
+                - np.einsum('ij, ik->ijk', new_binary_matrix,
+                            np.identity(n_mbrs))
                 - np.einsum('ij, jk->ijk', new_binary_matrix, np.identity(n_mbrs)))/2.
 
     # Find the 3D components Wijk by adding the elements at
@@ -427,7 +446,8 @@ def decompose_3D_matrix(Wn):
                 if np.abs(val) > 1.e-12:
                     new_ternary_terms.append([i, j, k, val])
 
-    return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
+    return (new_endmember_excesses, new_binary_matrix, new_ternary_terms)
+
 
 def _subregular_matrix_conversion(new_basis, binary_matrix,
                                   ternary_terms=None, endmember_excesses=None):
@@ -455,7 +475,8 @@ def _subregular_matrix_conversion(new_basis, binary_matrix,
     A = new_basis.T
     Wn = np.einsum('il, jm, kn, ijk -> lmn', A, A, A, W)
 
-    new_endmember_excesses, new_binary_terms, new_ternary_terms = decompose_3D_matrix(Wn)
+    new_endmember_excesses, new_binary_terms, new_ternary_terms = decompose_3D_matrix(
+        Wn)
 
     return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
 
@@ -540,7 +561,8 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
                         'implemented.'.format(solution_type))
 
     # Create site formulae
-    new_occupancies = np.array(new_basis).dot(solution.solution_model.endmember_occupancies)
+    new_occupancies = np.array(new_basis).dot(
+        solution.solution_model.endmember_occupancies)
     site_formulae = site_occupancies_to_strings(solution.solution_model.sites,
                                                 solution.solution_model.site_multiplicities,
                                                 new_occupancies)
