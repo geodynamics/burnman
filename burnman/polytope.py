@@ -11,14 +11,17 @@ from sympy import Matrix, Rational
 from fractions import Fraction
 from scipy.optimize import linprog
 from scipy.spatial import Delaunay
-from .processchemistry import dictionarize_formula, compositional_array
-from .processchemistry import site_occupancies_to_strings
-from . import CombinedMineral, SolidSolution
-
+from scipy.linalg import block_diag
 from scipy.special import comb
 from copy import copy
+import logging
+import cvxpy as cp
 
 from .reductions import row_reduce
+from .processchemistry import dictionarize_formula, compositional_array
+from .processchemistry import site_occupancies_to_strings
+from . import CombinedMineral, SolidSolution, Composite
+from .material import cached_property
 
 
 class SimplexGrid(object):
@@ -65,77 +68,119 @@ class SimplexGrid(object):
                 h = self.vertices
 
     def grid(self, generate_type='list'):
+        """
+
+        """
         if generate_type == 'list':
             return list(self.generate(generate_type))
         else:
             return np.array(list(self.generate(generate_type)))
 
     def n_points(self):
+        """
+
+        """
         return comb(self.vertices+self.points_per_edge-2,
                     self.vertices-1, exact=True)
 
 
 class MaterialPolytope(object):
-    def __init__(self, equalities, return_fractions=False):
+    """
+
+    """
+
+    def __init__(self, equalities,
+                 inequalities,
+                 number_type='fraction',
+                 return_fractions=False,
+                 independent_endmember_occupancies=None):
         self.return_fractions = return_fractions
         self.equality_matrix = equalities[:, 1:]
         self.equality_vector = -equalities[:, 0]
 
         self.polytope_matrix = cdd.Matrix(equalities, linear=True,
-                                          number_type='fraction')
+                                          number_type=number_type)
         self.polytope_matrix.rep_type = cdd.RepType.INEQUALITY
-        pos_constraints = np.concatenate((np.zeros((len(equalities[0])-1, 1)),
-                                          np.identity(len(equalities[0]) - 1)),
-                                         axis=1)
-        self.polytope_matrix.extend(pos_constraints, linear=False)
+        self.polytope_matrix.extend(inequalities, linear=False)
         self.polytope = cdd.Polyhedron(self.polytope_matrix)
 
+        if independent_endmember_occupancies is not None:
+            self.independent_endmember_occupancies = independent_endmember_occupancies
+
     def set_return_type(self, return_fractions=False):
+        """
+
+        """
+        try:
+            del self.__dict__['endmember_occupancies']
+        except KeyError:
+            pass
         self.return_fractions = return_fractions
 
-    @property
+    @cached_property
     def raw_vertices(self):
+        """
+
+        """
         return self.polytope.get_generators()[:]
 
-    @property
+    @cached_property
     def site_occupancy_limits(self):
+        """
+
+        """
         return np.array(self.polytope.get_inequalities(), dtype=float)
 
-    @property
+    @cached_property
     def n_endmembers(self):
+        """
+
+        """
         return len(self.raw_vertices)
 
-    @property
+    @cached_property
     def endmember_occupancies(self):
+        """
+
+        """
         if self.return_fractions:
-            v = np.array([[Fraction(value) for value in v]
-                          for v in self.raw_vertices])
+            if self.polytope.number_type == 'fraction':
+                v = np.array([[Fraction(value) for value in v]
+                              for v in self.raw_vertices])
+            else:
+                v = np.array([[Rational(value).limit_denominator(1000000)
+                               for value in v]
+                              for v in self.raw_vertices])
         else:
             v = np.array([[float(value) for value in v]
                           for v in self.raw_vertices])
+
+        if len(v.shape) == 1:
+            raise ValueError("The combined equality and positivity "
+                             "constraints result in a null polytope.")
+
         return v[:, 1:] / v[:, 0, np.newaxis]
 
-    def _independent_row_indices(self, array):
-        m = Matrix(array.shape[0], array.shape[1],
-                   lambda i, j: Rational(array[i, j]).limit_denominator(1000))
-        _, pivots, swaps = row_reduce(m, iszerofunc=lambda x: x.is_zero,
-                                      simpfunc=lambda x: Rational(x).limit_denominator(1000))
-        indices = np.array(range(len(array)))
-        for swap in np.array(swaps):
-            indices[swap] = indices[swap[::-1]]
-        return indices[:len(pivots)]
-
-    @property
+    @cached_property
     def independent_endmember_occupancies(self):
+        """
+
+        """
         arr = self.endmember_occupancies
-        return arr[self._independent_row_indices(arr)]
+        return arr[independent_row_indices(arr)]
 
     def independent_endmember_proportions(self, endmember_occupancies):
+        """
+
+        """
         ind = self.independent_endmember_occupancies
         return np.array(Matrix(ind.T).pinv_solve(Matrix(endmember_occupancies.T)).T)
 
-    @property
+    @cached_property
     def dependent_endmembers_as_independent_endmember_proportions(self):
+        """
+
+        """
         ind = self.independent_endmember_occupancies
 
         sol = np.linalg.lstsq(np.array(ind.T).astype(float),
@@ -145,6 +190,9 @@ class MaterialPolytope(object):
         return sol
 
     def _decompose_polytope_into_endmember_simplices(self, vertices):
+        """
+
+        """
         # Delaunay triangulation only works in dimensions > 1
         # and we remove the nullspace (sum(fractions) = 1)
         if len(vertices) > 2:
@@ -155,7 +203,7 @@ class MaterialPolytope(object):
         else:
             return [[0, 1]]
 
-    @property
+    @cached_property
     def independent_endmember_polytope(self):
         """
         The polytope involves the first n-1 independent endmembers.
@@ -167,17 +215,26 @@ class MaterialPolytope(object):
         M.rep_type = cdd.RepType.GENERATOR
         return cdd.Polyhedron(M)
 
-    @property
+    @cached_property
     def independent_endmember_limits(self):
+        """
+
+        """
         return np.array(self.independent_endmember_polytope.get_inequalities(),
                         dtype=float)
 
     def subpolytope_from_independent_endmember_limits(self, limits):
+        """
+
+        """
         modified_limits = self.independent_endmember_polytope.get_inequalities().copy()
         modified_limits.extend(limits, linear=False)
         return cdd.Polyhedron(modified_limits)
 
     def subpolytope_from_site_occupancy_limits(self, limits):
+        """
+
+        """
         modified_limits = self.polytope_matrix.copy()
         modified_limits.extend(limits, linear=False)
         return cdd.Polyhedron(modified_limits)
@@ -221,8 +278,10 @@ class MaterialPolytope(object):
                                                                                     float),
                                                                                 rcond=None)[0].round(decimals=12).T
             else:
-                raise Exception(
-                    'grid type not recognised. Should be one of independent endmember proportions or site occupancies')
+                raise Exception('grid_type not recognised. '
+                                'Should be one of '
+                                'independent endmember proportions '
+                                'or site occupancies')
 
             simplices = self._decompose_polytope_into_endmember_simplices(
                 vertices=vertices_as_independent_endmember_proportions)
@@ -248,6 +307,9 @@ class MaterialPolytope(object):
 
 def polytope_from_charge_balance(charges, charge_total,
                                  return_fractions=False):
+    """
+
+    """
     n_sites = len(charges)
     all_charges = np.concatenate(charges)
     n_site_elements = len(all_charges)
@@ -261,11 +323,19 @@ def polytope_from_charge_balance(charges, charge_total,
 
     equalities[-1, 0] = -charge_total
     equalities[-1, 1:] = all_charges
-    return MaterialPolytope(equalities, return_fractions)
+
+    pos_constraints = np.concatenate((np.zeros((len(equalities[0])-1, 1)),
+                                      np.identity(len(equalities[0]) - 1)),
+                                     axis=1)
+    return MaterialPolytope(equalities, pos_constraints,
+                            return_fractions=return_fractions)
 
 
-def polytope_from_endmember_occupancies(endmember_occupancies, return_fractions=False):
+def polytope_from_endmember_occupancies(endmember_occupancies,
+                                        return_fractions=False):
+    """
 
+    """
     n_sites = sum(endmember_occupancies[0])
     n_occs = endmember_occupancies.shape[1]
 
@@ -281,12 +351,121 @@ def polytope_from_endmember_occupancies(endmember_occupancies, return_fractions=
             equalities[1:, 1:] = nullspace
         except ValueError:
             equalities[1:, 1:] = nullspace[:, :, 0]
-    return MaterialPolytope(equalities, return_fractions)
+
+    pos_constraints = np.concatenate((np.zeros((len(equalities[0])-1, 1)),
+                                      np.identity(len(equalities[0]) - 1)),
+                                     axis=1)
+
+    return MaterialPolytope(equalities, pos_constraints,
+                            return_fractions=return_fractions,
+                            independent_endmember_occupancies=endmember_occupancies)
+
+
+def polytope_from_composite(composite, composition, return_fractions=False):
+    """
+
+    """
+    c_array = np.empty((composite.n_elements, 1))
+    c_array[:, 0] = [-composition[e] if e in composition else 0.
+                     for e in composite.elements]
+
+    equalities = np.concatenate((c_array, composite.stoichiometric_array.T),
+                                axis=1)
+
+    eoccs = []
+    for i, ph in enumerate(composite.phases):
+        if isinstance(ph, SolidSolution):
+            eoccs.append(ph.solution_model.endmember_occupancies.T)
+        else:
+            eoccs.append(np.ones((1, 1)))
+
+    eoccs = block_diag(*eoccs)
+    inequalities = np.concatenate((np.zeros((len(eoccs), 1)), eoccs),
+                                  axis=1)
+
+    return MaterialPolytope(equalities, inequalities,
+                            number_type='float',
+                            return_fractions=return_fractions)
+
+
+def simplify_composite_with_composition(composite, composition):
+    """
+
+    """
+    polytope = polytope_from_composite(composite, composition,
+                                       return_fractions=True)
+
+    composite_changed = False
+    new_phases = []
+    mbr_amounts = polytope.endmember_occupancies
+    i = 0
+    for i_ph, n_mbrs in enumerate(composite.endmembers_per_phase):
+        ph = composite.phases[i_ph]
+
+        amounts = mbr_amounts[:, i:i+n_mbrs].astype(float)
+        i += n_mbrs
+
+        rank = np.linalg.matrix_rank(amounts, tol=1.e-8)
+
+        if rank < n_mbrs:
+
+            if isinstance(ph, SolidSolution) and rank > 0:
+
+                if len(amounts) > 1:
+                    c_mean = np.mean(amounts, axis=0)
+                else:
+                    c_mean = amounts[0]
+
+                sol_poly = polytope_from_endmember_occupancies(
+                    ph.solution_model.endmember_occupancies)
+
+                dmbrs = sol_poly.dependent_endmembers_as_independent_endmember_proportions
+
+                x = cp.Variable(dmbrs.shape[0])
+                objective = cp.Minimize(cp.sum_squares(x))
+                constraints = [dmbrs.T@x == c_mean, x >= 0]
+
+                prob = cp.Problem(objective, constraints)
+                prob.solve()
+
+                mbr_indices = np.argsort(x.value)[::-1]
+                ind_indices = [i for i in mbr_indices
+                               if x.value[i] > 1.e-6]
+                new_basis = dmbrs[ind_indices]
+
+                if len(new_basis) < ph.n_endmembers:
+                    logging.info(f'Phase {i_ph} ({ph.name}) is '
+                                 'rank-deficient ({rank} < {n_mbrs}). '
+                                 'The transformed solution is described '
+                                 f'using {len(new_basis)} endmembers.')
+
+                    composite_changed = True
+                    soln = transform_solution_to_new_basis(ph, new_basis)
+                    new_phases.append(soln)
+                else:
+                    logging.info('This solution is rank-deficient '
+                                 f'({rank} < {n_mbrs}), '
+                                 'but its composition requires all '
+                                 'independent endmembers.')
+            else:
+                composite_changed = True
+                logging.info(f'Phase {i_ph} ({ph.name}) removed from '
+                             'composite (rank = 0).')
+        else:
+            new_phases.append(ph)
+
+    if composite_changed:
+        return Composite(new_phases)
+    else:
+        return composite
 
 
 def independent_row_indices(array):
-    m = Matrix(array.shape[0], array.shape[1], lambda i,
-               j: Rational(array[i, j]).limit_denominator(1000))
+    """
+
+    """
+    m = Matrix(array.shape[0], array.shape[1],
+               lambda i, j: Rational(array[i, j]).limit_denominator(1000))
     _, pivots, swaps = row_reduce(m, iszerofunc=lambda x: x.is_zero,
                                   simpfunc=lambda x: Rational(x).limit_denominator(1000))
     indices = np.array(range(len(array)))
@@ -296,6 +475,9 @@ def independent_row_indices(array):
 
 
 def generate_complete_basis(incomplete_basis, complete_basis):
+    """
+
+    """
     a = np.concatenate((incomplete_basis, complete_basis))
     return a[independent_row_indices(a)]
 
@@ -373,9 +555,12 @@ def feasible_solution_basis_in_component_space(solution, components):
 
 
 def complete_basis(basis):
+    """
     # Creates a full basis by filling remaining rows with
     # rows of the identity matrix with row indices not
     # in the column pivot list of the basis RREF
+    """
+
     n, m = basis.shape
     if n < m:
         pivots = list(Matrix(basis).rref()[1])
@@ -484,7 +669,9 @@ def _subregular_matrix_conversion(new_basis, binary_matrix,
 def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
                                     solution_name=None, endmember_names=None,
                                     molar_fractions=None):
+    """
 
+    """
     new_basis = np.array(new_basis)
     if n_mbrs is None:
         n_mbrs, n_all_mbrs = new_basis.shape
