@@ -13,11 +13,11 @@ This script reproduces the tables in Myhill and Connolly (2021).
 *Uses:*
 
 * :class:`burnman.polytope.MaterialPolytope`
-* :func:`burnman.polytope.polytope_from_charge_balance`
-* :func:`burnman.polytope.polytope_from_endmember_occupancies`
-* :func:`burnman.polytope.transform_solution_to_new_basis`
-* :func:`burnman.polytope.site_occupancies_to_strings`
 * :func:`burnman.polytope.generate_complete_basis`
+* :func:`burnman.polytopetools.solution_polytope_from_charge_balance`
+* :func:`burnman.polytopetools.solution_polytope_from_endmember_occupancies`
+* :func:`burnman.polytopetools.transform_solution_to_new_basis`
+* :func:`burnman.processchemistry.site_occupancies_to_strings`
 * :doc:`mineral_database`
 
 
@@ -44,11 +44,11 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.polytope import polytope_from_charge_balance
-from burnman.polytope import polytope_from_endmember_occupancies
-from burnman.polytope import transform_solution_to_new_basis
-from burnman.polytope import site_occupancies_to_strings
 from burnman.polytope import generate_complete_basis
+from burnman.polytopetools import solution_polytope_from_charge_balance as polytope_from_charge_balance
+from burnman.polytopetools import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
+from burnman.polytopetools import transform_solution_to_new_basis
+from burnman.processchemistry import site_occupancies_to_strings
 from burnman.minerals import JH_2015
 
 
@@ -351,7 +351,7 @@ if __name__ == "__main__":
 
     print('The complete set of endmembers expressed as proportions of the '
           'independent endmember set:')
-    print(py_maj_2s_polytope.dependent_endmembers_as_independent_endmember_proportions)
+    print(py_maj_2s_polytope.endmembers_as_independent_endmember_proportions)
 
     """
     This majorite can be split into 4 sites, enabling ordering at the
