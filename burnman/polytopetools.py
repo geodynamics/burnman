@@ -12,7 +12,7 @@ from scipy.linalg import block_diag
 import logging
 import cvxpy as cp
 
-from .polytope import MaterialPolytope
+from .polytope import MaterialPolytope, independent_row_indices
 from .processchemistry import site_occupancies_to_strings
 from . import CombinedMineral, SolidSolution, Composite
 
@@ -547,6 +547,9 @@ def simplify_composite_with_composition(composite, composition):
                 ind_indices = [i for i in mbr_indices
                                if x.value[i] > 1.e-6]
                 new_basis = dmbrs[ind_indices]
+
+                # And now reduce the new basis if necessary
+                new_basis = new_basis[independent_row_indices(new_basis)]
 
                 if len(new_basis) < ph.n_endmembers:
                     logging.info(f'Phase {i_ph} ({ph.name}) is '
