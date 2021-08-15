@@ -26,6 +26,7 @@ ordered_examples = ['example_beginner.py',
                     'example_gibbs_modifiers.py',
                     'example_solid_solution.py',
                     'example_perplex.py',
+                    'example_polytopetools.py',
                     'example_geodynamic_adiabat.py',
                     'example_layer.py',
                     'example_build_planet.py'

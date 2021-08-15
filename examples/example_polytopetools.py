@@ -19,8 +19,9 @@ composite polytope.
 * :func:`burnman.polytope.generate_complete_basis`
 * :func:`burnman.polytopetools.solution_polytope_from_charge_balance`
 * :func:`burnman.polytopetools.solution_polytope_from_endmember_occupancies`
-* :func:`burnman.polytopetools.transform_solution_to_new_basis`
 * :func:`burnman.processchemistry.site_occupancies_to_strings`
+* :func:`burnman.polytopetools.composite_polytope_at_constrained_composition`
+* :func:`burnman.polytopetools.simplify_composite_with_composition`
 * :doc:`mineral_database`
 
 
@@ -30,7 +31,7 @@ composite polytope.
 * Interrogation of solution polytopes for endmember site distributions
 * Generation of independent endmember sets from polytopes
 * Completion of an independent endmember set from a partial set
-* Transformation of endmember basis sets
+* Simplifying composites at a given bulk composition
 """
 from __future__ import absolute_import
 import numpy as np
@@ -43,6 +44,7 @@ from burnman.polytopetools import solution_polytope_from_endmember_occupancies
 from burnman.polytopetools import composite_polytope_at_constrained_composition as composite_polytope
 from burnman.polytopetools import simplify_composite_with_composition
 from burnman.processchemistry import site_occupancies_to_strings
+from burnman.processchemistry import formula_to_string
 
 assert burnman_path  # silence pyflakes warning
 
@@ -66,8 +68,10 @@ if __name__ == "__main__":
     """
 
     # bridgmanite in FMASO system: Mg Fe Fe3+ Al3+ | Fe3+ Al3+ Si
-    print('Endmember occupancies for bridgmanite in the FMASO system')
-    print('(i.e. [Mg,Fe,Fe3+,Al3+][Fe3+,Al3+,Si]O3)')
+    print('The polytope tools in BurnMan can be used to calculate '
+          'all potential endmembers in a solid solution.')
+    print('\nEndmember occupancies for bridgmanite in the FMASO system')
+    print('([Mg,Fe,Fe3+,Al3+][Fe3+,Al3+,Si]O3)')
     print('Each of the following lines represents a distinct endmember:')
     bdg_poly = solution_polytope_from_charge_balance([[2, 2, 3, 3],
                                                       [3, 3, 4]], 6,
@@ -92,7 +96,7 @@ if __name__ == "__main__":
     print('(i.e. Mg3[Mg,Al,Si][Mg,Al,Si]Si3O12)')
     print('Each of the following lines represents a distinct endmember:')
     py_maj_poly = solution_polytope_from_charge_balance([[2, 3, 4],
-                                                        [2, 3, 4]], 6,
+                                                         [2, 3, 4]], 6,
                                                         return_fractions=False)
     print(py_maj_poly.endmember_occupancies)
 
@@ -115,55 +119,71 @@ if __name__ == "__main__":
           'independent endmember set:')
     print(py_maj_poly.endmembers_as_independent_endmember_amounts)
 
-    print('HI!')
+    print('\nWe can also create a polytope using the site-species occupancies '
+          'of a set of independent endmembers of a solution. '
+          'Here we do this for the garnet solid solution provided in the '
+          'Stixrude and Lithgow-Bertelloni database.')
+
     gt = SLB_2011.garnet()
+
+    print('Endmember compositions:')
+    for f in gt.endmember_formulae:
+        print(formula_to_string(f))
+
     gt_poly = solution_polytope_from_endmember_occupancies(
         gt.solution_model.endmember_occupancies, return_fractions=True)
 
     assert np.all(np.abs(gt.solution_model.endmember_occupancies
                          - gt_poly.independent_endmember_occupancies) < 1.e-5)
 
+    print('Endmembers as independent endmember amounts:')
     print(gt_poly.endmembers_as_independent_endmember_amounts)
 
-    print(site_occupancies_to_strings(gt.solution_model.sites,
-                                      gt.solution_model.site_multiplicities,
-                                      gt_poly.endmember_occupancies))
+    strs = site_occupancies_to_strings(gt.solution_model.sites,
+                                       gt.solution_model.site_multiplicities,
+                                       gt_poly.endmember_occupancies)
+
+    print('Site occupancies for all endmembers:')
+    for string in strs:
+        print(string)
 
     """
     Part 2: Composites
-
     """
+    print('\n\nComposites are also constrained by linear equalities and '
+          'inequalities. Here, we demonstrate how BurnMan can take a '
+          'composite and a bulk composition, and simplify the composite so '
+          'that it only contains endmembers which can have non-zero '
+          'quantities.')
+
     gt = SLB_2011.garnet()
     ol = SLB_2011.mg_fe_olivine()
-    wad = SLB_2011.mg_fe_wadsleyite()
-    opx = SLB_2011.orthopyroxene()
-    stv = SLB_2011.stishovite()
 
-    ol.set_composition([0.93, 0.07])
-    wad.set_composition([0.93, 0.07])
-    opx.set_composition([0.8, 0.1, 0.05, 0.05])
-    gt.set_composition([0.8, 0.1, 0.05, 0.03, 0.02])
+    assemblage = burnman.Composite([gt, ol])
+    composition = {'Fe': 2, 'Mg': 18, 'Si': 15, 'O': 50}
 
-    assemblage = burnman.Composite([ol, opx, gt, stv], [0.7, 0.3, 0., 0.])
-    composition = {'Na': 0.02, 'Fe': 0.2, 'Mg': 2.0, 'Si': 1.9,
-                   'Ca': 0.2, 'Al': 0.4, 'O': 6.81}
+    print('\nThe starting assemblage includes NCFMAS garnet and FMS olivine.')
+    print(f'Starting composition: {formula_to_string(composition)}')
 
-    assemblage2 = burnman.Composite([ol, wad, stv], [0.7, 0.3, 0.])
-    composition2 = {'Fe': 0.2, 'Mg': 1.8, 'Si': 2., 'O': 6.}
-
-    assemblage3 = burnman.Composite([ol, gt], [0.7, 0.3])
-    composition3 = {'Fe': 0.2, 'Mg': 1.8, 'Si': 2., 'O': 6.}
-
-    assemblage4 = assemblage3
-    composition4 = {'Fe': 3., 'Mg': 1., 'Si': 3.9, 'O': 11.8}
-
-    a, c = (assemblage4, composition4)
-    new_assemblage = simplify_composite_with_composition(a, c)
-    if new_assemblage is not a:
-        print('assemblage simplified')
-    old_polytope = composite_polytope(a, c, return_fractions=True)
-    new_polytope = composite_polytope(new_assemblage, c,
+    new_assemblage = simplify_composite_with_composition(assemblage,
+                                                         composition)
+    if new_assemblage is not assemblage:
+        print('The simplifying function has returned a modified assemblage.')
+    old_polytope = composite_polytope(assemblage, composition,
+                                      return_fractions=True)
+    new_polytope = composite_polytope(new_assemblage, composition,
                                       return_fractions=True)
 
+    print('\nThe old assemblage included endmembers with the '
+          'following compositions:')
+    print([formula_to_string(f) for f in assemblage.endmember_formulae])
+
+    print('Which led to the following extreme vertices satifying '
+          'the bulk compositional constraints:')
     print(old_polytope.endmember_occupancies)
+
+    print('\nThe new assemblage has fewer endmembers, with compositions:')
+    print([formula_to_string(f) for f in new_assemblage.endmember_formulae])
+
+    print('The same vertices now look like this:')
     print(new_polytope.endmember_occupancies)

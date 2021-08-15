@@ -1,0 +1,78 @@
+The polytope tools in BurnMan can be used to calculate all potential endmembers in a solid solution.
+
+Endmember occupancies for bridgmanite in the FMASO system
+([Mg,Fe,Fe3+,Al3+][Fe3+,Al3+,Si]O3)
+Each of the following lines represents a distinct endmember:
+[[1. 0. 0. 0. 0. 0. 1.]
+ [0. 1. 0. 0. 0. 0. 1.]
+ [0. 0. 1. 0. 0. 1. 0.]
+ [0. 0. 1. 0. 1. 0. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]
+ [0. 0. 0. 1. 0. 1. 0.]]
+Endmember formulae corresponding to these occupancies:
+['[Mg][Si]', '[Fe][Si]', '[Fef][Al]', '[Fef][Fef]', '[Al][Fef]', '[Al][Al]']
+
+Endmember occupancies for two-site pyrope-majorite
+(i.e. Mg3[Mg,Al,Si][Mg,Al,Si]Si3O12)
+Each of the following lines represents a distinct endmember:
+[[1.  0.  0.  0.  0.  1. ]
+ [0.5 0.  0.5 0.  1.  0. ]
+ [0.  1.  0.  0.5 0.  0.5]
+ [0.  1.  0.  0.  1.  0. ]
+ [0.  0.  1.  1.  0.  0. ]]
+A potential set of independent endmember site occupancies:
+[[1.  0.  0.  0.  0.  1. ]
+ [0.  1.  0.  0.5 0.  0.5]
+ [0.5 0.  0.5 0.  1.  0. ]
+ [0.  1.  0.  0.  1.  0. ]]
+Formulae corresponding to these independent endmember occupancies:
+['[Mg][Si]', '[Al][Mg1/2Si1/2]', '[Mg1/2Si1/2][Al]', '[Al][Al]']
+The complete set of endmembers expressed as proportions of the independent endmember set:
+[[ 1. -0. -0.  0.]
+ [ 0. -0.  1.  0.]
+ [-0.  1.  0. -0.]
+ [-0. -0.  0.  1.]
+ [-1.  2.  2. -2.]]
+
+We can also create a polytope using the site-species occupancies of a set of independent endmembers of a solution. Here we do this for the garnet solid solution provided in the Stixrude and Lithgow-Bertelloni database.
+Endmember compositions:
+Mg3Al2Si3O12
+Fe3Al2Si3O12
+Ca3Al2Si3O12
+Mg4Si4O12
+Na2Al2Si4O12
+Endmembers as independent endmember amounts:
+[[-0. -0. -0.  1.  0.]
+ [ 1.  0.  0.  0.  0.]
+ [ 0.  1.  0. -0. -0.]
+ [-1.  1.  0.  1. -0.]
+ [ 0.  0.  1. -0.  0.]
+ [-1. -0.  1.  1.  0.]
+ [ 0. -0. -0.  0.  1.]]
+Site occupancies for all endmembers:
+[Mg]3[Mg][Si]
+[Mg]3[Al][Al]
+[Fe]3[Al][Al]
+[Fe]3[Mg][Si]
+[Ca]3[Al][Al]
+[Ca]3[Mg][Si]
+[Na2/3Al1/3]3[Al][Si]
+
+
+Composites are also constrained by linear equalities and inequalities. Here, we demonstrate how BurnMan can take a composite and a bulk composition, and simplify the composite so that it only contains endmembers which can have non-zero quantities.
+
+The starting assemblage includes NCFMAS garnet and FMS olivine.
+Starting composition: Mg18Fe2Si15O50
+The simplifying function has returned a modified assemblage.
+
+The old assemblage included endmembers with the following compositions:
+['Mg3Al2Si3O12', 'Fe3Al2Si3O12', 'Ca3Al2Si3O12', 'Mg4Si4O12', 'Na2Al2Si4O12', 'Mg2SiO4', 'Fe2SiO4']
+Which led to the following extreme vertices satifying the bulk compositional constraints:
+[[-2/3 2/3 0 5/2 0 5 0]
+ [0 0 0 5/2 0 4 1]]
+
+The new assemblage has fewer endmembers, with compositions:
+['Mg4Si4O12', 'MgFe3Si4O12', 'Mg2SiO4', 'Fe2SiO4']
+The same vertices now look like this:
+[[11/6 2/3 5 0]
+ [5/2 0 4 1]]
