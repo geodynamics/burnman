@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     print('The complete set of endmembers expressed as proportions of the '
           'independent endmember set:')
-    print(py_maj_2s_polytope.endmembers_as_independent_endmember_proportions)
+    print(py_maj_2s_polytope.endmembers_as_independent_endmember_amounts)
 
     """
     This majorite can be split into 4 sites, enabling ordering at the
@@ -293,7 +293,7 @@ if __name__ == "__main__":
     (with an implicit equality constraint that the
     independent endmembers must sum to 1)
     or n site occupancies. The global limits can be returned from the polytope
-    via its attributes independent_endmember_limits and site_occupancy_limits
+    via its attributes independent_endmember_limits and limits
     """
 
     print('\nThe function also allows the user to grid parts of the polytope.')
@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
     print('\nGlobal site occupancy limits')
     print('(in form b + A*x < 0):')
-    print(cubical_polytope.site_occupancy_limits)
+    print(cubical_polytope.limits)
 
     try:
         fig = plt.figure()

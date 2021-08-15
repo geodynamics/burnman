@@ -7,14 +7,12 @@ from __future__ import absolute_import
 
 import numpy as np
 from sympy import Matrix
-from scipy.optimize import linprog
 from scipy.linalg import block_diag
 
 import logging
 import cvxpy as cp
 
-from .polytope import MaterialPolytope, independent_row_indices, complete_basis
-from .processchemistry import dictionarize_formula, compositional_array
+from .polytope import MaterialPolytope
 from .processchemistry import site_occupancies_to_strings
 from . import CombinedMineral, SolidSolution, Composite
 
@@ -22,7 +20,30 @@ from . import CombinedMineral, SolidSolution, Composite
 def solution_polytope_from_charge_balance(charges, charge_total,
                                           return_fractions=False):
     """
+    Creates a polytope object from a list of the charges for each species on
+    each site and the total charge for all site-species.
 
+    Parameters
+    ----------
+    charges : 2D list of floats
+        2D list containing the total charge for species j on site i,
+        including the site multiplicity. So, for example,
+        a solution with the site formula [Mg,Fe]3[Mg,Al,Si]2Si3O12 would
+        have the following list: [[6., 6.], [4., 6., 8.]].
+
+    charge_total : float
+        The total charge for all site-species per formula unit.
+        The example given above would have charge_total = 12.
+
+    return_fractions : boolean
+        Determines whether the created polytope object returns its
+        attributes (such as endmember occupancies) as fractions or as floats.
+        Default is False.
+
+    Returns
+    -------
+    polytope : :class:`burnman.polytope.MaterialPolytope` object
+        A polytope object corresponding to the parameters provided.
     """
     n_sites = len(charges)
     all_charges = np.concatenate(charges)
@@ -48,7 +69,29 @@ def solution_polytope_from_charge_balance(charges, charge_total,
 def solution_polytope_from_endmember_occupancies(endmember_occupancies,
                                                  return_fractions=False):
     """
+    Creates a polytope object from a list of independent endmember occupancies.
 
+    Parameters
+    ----------
+    endmember_occupancies : 2D numpy array
+        2D list containing the site-species occupancies j for endmember i.
+        So, for example, a solution with independent endmembers
+        [Mg]3[Al]2Si3O12, [Mg]3[Mg0.5Si0.5]2Si3O12, [Fe]3[Al]2Si3O12
+        might have the following array:
+        [[1., 0., 1., 0., 0.],
+         [1., 0., 0., 0.5, 0.5],
+         [0., 1., 1., 0., 0.]],
+         where the order of site-species is Mg_A, Fe_A, Al_B, Mg_B, Si_B.
+
+    return_fractions : boolean
+        Determines whether the created polytope object returns its
+        attributes (such as endmember occupancies) as fractions or as floats.
+        Default is False.
+
+    Returns
+    -------
+    polytope : :class:`burnman.polytope.MaterialPolytope` object
+        A polytope object corresponding to the parameters provided.
     """
     n_sites = sum(endmember_occupancies[0])
     n_occs = endmember_occupancies.shape[1]
@@ -78,7 +121,27 @@ def solution_polytope_from_endmember_occupancies(endmember_occupancies,
 def composite_polytope_at_constrained_composition(composite, composition,
                                                   return_fractions=False):
     """
+    Creates a polytope object from a Composite object and a composition.
+    This polytope describes the complete set of valid composite
+    endmember amounts that satisfy the compositional constraints.
 
+    Parameters
+    ----------
+    composite : :class:`burnman.Composite` object
+        A composite containing one or more SolidSolution and Mineral objects.
+
+    composition : dictionary
+        A dictionary containing the amounts of each element.
+
+    return_fractions : boolean
+        Determines whether the created polytope object returns its
+        attributes (such as endmember occupancies) as fractions or as floats.
+        Default is False.
+
+    Returns
+    -------
+    polytope : :class:`burnman.polytope.MaterialPolytope` object
+        A polytope object corresponding to the parameters provided.
     """
     c_array = np.empty((composite.n_elements, 1))
     c_array[:, 0] = [-composition[e] if e in composition else 0.
@@ -103,124 +166,68 @@ def composite_polytope_at_constrained_composition(composite, composition,
                             return_fractions=return_fractions)
 
 
-def feasible_solution_basis_in_component_space(solution, components):
+def _decompose_3D_matrix(W):
     """
-    Note that this function finds the extreme endmembers and finds the
-    subset within the components.
-    Thus, starting with a solution with a disordered endmember and then
-    restricting component range may produce a smaller solution than intended.
-    For example, with the endmembers [A] and [A1/2B1/2],
-    the extreme endmembers are [A] and [B].
-    A component space A--AB will result in only endmember [A] being valid!!
-    """
-
-    # 1) Convert components into a matrix
-    component_array, component_elements = compositional_array(
-        [dictionarize_formula(c) for c in components])
-
-    # 2) Get the full set of endmembers (dependent and otherwise)
-    polytope = solution_polytope_from_endmember_occupancies(
-        solution.solution_model.endmember_occupancies)
-    dependent_sums = polytope.endmembers_as_independent_endmember_proportions
-
-    # 3) Get the endmember compositional array
-    independent_endmember_array, endmember_elements = compositional_array(
-        solution.endmember_formulae)
-    all_endmember_array = dependent_sums.dot(
-        independent_endmember_array).round(decimals=12)
-    n_all = len(all_endmember_array)
-
-    # 4) Find the endmembers that can be described with
-    # a linear combination of components
-
-    # 4a) First, add elements to endmember_elements which are in
-    # component_elements
-    for el in component_elements:
-        if el not in endmember_elements:
-            endmember_elements.append(el)
-            all_endmember_array = np.concatenate((all_endmember_array,
-                                                  np.zeros((n_all, 1))),
-                                                 axis=1)
-
-    # 4b) Get rid of endmembers which have elements not in component_elements
-    element_indices_for_removal = [i for i, el in enumerate(endmember_elements)
-                                   if el not in component_elements]
-
-    mbr_indices_to_rm = []
-    for idx in element_indices_for_removal:
-        mbr_indices_to_rm.extend(np.nonzero(all_endmember_array[:, idx])[0])
-    possible_endmember_indices = np.array([i for i in range(n_all)
-                                           if i not in
-                                           np.unique(mbr_indices_to_rm)])
-
-    # 4c) Cross-reference indices of elements
-    n_el = len(component_elements)
-    element_indexing = np.empty(n_el, dtype=int)
-    for i in range(n_el):
-        element_indexing[i] = endmember_elements.index(component_elements[i])
-
-    # 4d) Find independent endmember set
-    def linear_solutions_exist(A, B):
-        return [linprog(np.zeros(len(A)), A_eq=A.T, b_eq=b).success
-                for b in B]
-
-    B = all_endmember_array[possible_endmember_indices[:, None],
-                            element_indexing]
-    exist = linear_solutions_exist(component_array, B)
-    endmember_indices = possible_endmember_indices[exist]
-    independent_indices = endmember_indices[independent_row_indices(
-        dependent_sums[endmember_indices])]
-
-    # 5) Return new basis in terms of proportions of the original endmember set
-    return dependent_sums[independent_indices]
-
-
-def decompose_3D_matrix(Wn):
-    """
-    Decomposes a 3D matrix where E = W_ijk p_i p_j p_k
+    Decomposes a 3D matrix W_ijk where E = W_ijk p_i p_j p_k
     into a subregular form where
     E = G_i p_i + WB_ij (1 - p_j + p_i) / 2 + WT_ijk p_i p_j p_k,
     and i < j < k.
+
+    Parameters
+    ----------
+    W : 3D numpy array
+
+    Returns
+    -------
+    new_endmember_excesses : 1D numpy array
+        The array G_i
+
+    new_binary_matrix : 2D numpy array
+        The upper triangular matrix WB_ij
+
+    new_ternary_terms : list of lists of length 4
+        A list where each item is in the form [i, j, k, WT_ijk]
     """
 
-    n_mbrs = len(Wn)
+    n_mbrs = len(W)
     # New endmember components
-    # Wn_iii needs to be copied, otherwise just a view onto Wn
-    new_endmember_excesses = np.copy(np.einsum('iii->i', Wn))
+    # W_iii needs to be copied, otherwise just a view onto W
+    new_endmember_excesses = np.copy(np.einsum('iii->i', W))
 
     # Removal of endmember components from 3D representation
-    Wn -= (np.einsum('i, j, k->ijk',
-                     new_endmember_excesses, np.ones(n_mbrs),
-                     np.ones(n_mbrs))
-           + np.einsum('i, j, k->ijk',
-                       np.ones(n_mbrs), new_endmember_excesses,
-                       np.ones(n_mbrs))
-           + np.einsum('i, j, k->ijk',
-                       np.ones(n_mbrs), np.ones(n_mbrs),
-                       new_endmember_excesses))/3.
+    W -= (np.einsum('i, j, k->ijk',
+                    new_endmember_excesses, np.ones(n_mbrs),
+                    np.ones(n_mbrs))
+          + np.einsum('i, j, k->ijk',
+                      np.ones(n_mbrs), new_endmember_excesses,
+                      np.ones(n_mbrs))
+          + np.einsum('i, j, k->ijk',
+                      np.ones(n_mbrs), np.ones(n_mbrs),
+                      new_endmember_excesses))/3.
 
     # Transformed 2D components
     # (i=j, i=k, j=k)
-    new_binary_matrix = (np.einsum('jki, jk -> ij', Wn, np.identity(n_mbrs))
-                         + np.einsum('jik, jk -> ij', Wn, np.identity(n_mbrs))
-                         + np.einsum('ijk, jk -> ij', Wn,
+    new_binary_matrix = (np.einsum('jki, jk -> ij', W, np.identity(n_mbrs))
+                         + np.einsum('jik, jk -> ij', W, np.identity(n_mbrs))
+                         + np.einsum('ijk, jk -> ij', W,
                                      np.identity(n_mbrs))).round(decimals=12)
 
     # Wb is the 3D matrix corresponding to the terms in the binary matrix,
     # such that the two following print statements produce the same answer
     # for a given array of endmember proportions
-    Wb = (np.einsum('ijk, ij->ijk', Wn, np.identity(n_mbrs))
-          + np.einsum('ijk, jk->ijk', Wn, np.identity(n_mbrs))
-          + np.einsum('ijk, ik->ijk', Wn, np.identity(n_mbrs)))
+    Wb = (np.einsum('ijk, ij->ijk', W, np.identity(n_mbrs))
+          + np.einsum('ijk, jk->ijk', W, np.identity(n_mbrs))
+          + np.einsum('ijk, ik->ijk', W, np.identity(n_mbrs)))
 
     # Remove binary component from 3D representation
     # The extra terms are needed because the binary term in the formulation
     # of a subregular solution model given by
     # Helffrich and Wood includes ternary components (the sum_k X_k part)..
-    Wn -= Wb + (np.einsum('ij, k', new_binary_matrix, np.ones(n_mbrs))
-                - np.einsum('ij, ik->ijk', new_binary_matrix,
-                            np.identity(n_mbrs))
-                - np.einsum('ij, jk->ijk', new_binary_matrix, np.identity(n_mbrs)))/2.
+    W -= Wb + (np.einsum('ij, k', new_binary_matrix, np.ones(n_mbrs))
+               - np.einsum('ij, ik->ijk',
+                           new_binary_matrix, np.identity(n_mbrs))
+               - np.einsum('ij, jk->ijk',
+                           new_binary_matrix, np.identity(n_mbrs)))/2.
 
     # Find the 3D components Wijk by adding the elements at
     # the six equivalent positions in the matrix
@@ -228,9 +235,9 @@ def decompose_3D_matrix(Wn):
     for i in range(n_mbrs):
         for j in range(i+1, n_mbrs):
             for k in range(j+1, n_mbrs):
-                val = (Wn[i, j, k] + Wn[j, k, i]
-                       + Wn[k, i, j] + Wn[k, j, i]
-                       + Wn[j, i, k] + Wn[i, k, j]).round(decimals=12)
+                val = (W[i, j, k] + W[j, k, i]
+                       + W[k, i, j] + W[k, j, i]
+                       + W[j, i, k] + W[i, k, j]).round(decimals=12)
                 if np.abs(val) > 1.e-12:
                     new_ternary_terms.append([i, j, k, val])
 
@@ -239,6 +246,40 @@ def decompose_3D_matrix(Wn):
 
 def _subregular_matrix_conversion(new_basis, binary_matrix,
                                   ternary_terms=None, endmember_excesses=None):
+    """
+    Converts the arrays reguired to describe a subregular solution
+    from one endmember basis to another.
+
+    The excess nonconfigurational energies of the subregular solution model
+    are described as follows:
+    E = G_i p_i + WB_ij (1 - p_j + p_i) / 2 + WT_ijk p_i p_j p_k,
+    and i < j < k.
+
+    Parameters
+    ----------
+    new_basis : 2D numpy array
+        The new endmember basis, given as amounts of the old endmembers.
+
+    binary_matrix : 2D numpy array
+        The upper triangular matrix WB_ij
+
+    ternary_terms : list of lists of length 4
+        A list where each item is in the form [i, j, k, WT_ijk]
+
+    endmember_excesses : 1D numpy array
+        The array G_i
+
+    Returns
+    -------
+    new_endmember_excesses : 1D numpy array
+        The array G_i
+
+    new_binary_matrix : 2D numpy array
+        The upper triangular matrix WB_ij
+
+    new_ternary_terms : list of lists of length 4
+        A list where each item is in the form [i, j, k, WT_ijk]
+    """
     n_mbrs = len(binary_matrix)
     # Compact 3D representation of original interactions
     W = (np.einsum('i, jk -> ijk', np.ones(n_mbrs), binary_matrix)
@@ -263,17 +304,62 @@ def _subregular_matrix_conversion(new_basis, binary_matrix,
     A = new_basis.T
     Wn = np.einsum('il, jm, kn, ijk -> lmn', A, A, A, W)
 
-    new_endmember_excesses, new_binary_terms, new_ternary_terms = decompose_3D_matrix(
+    new_endmember_excesses, new_binary_terms, new_ternary_terms = _decompose_3D_matrix(
         Wn)
 
     return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
+
+
+def complete_basis(basis):
+    """
+    # Creates a full basis by filling remaining rows with
+    # rows of the identity matrix with row indices not
+    # in the column pivot list of the basis RREF
+    """
+
+    n, m = basis.shape
+    if n < m:
+        pivots = list(Matrix(basis).rref()[1])
+        return np.concatenate((basis,
+                               np.identity(m)[[i for i in range(m)
+                                               if i not in pivots], :]),
+                              axis=0)
+    else:
+        return basis
 
 
 def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
                                     solution_name=None, endmember_names=None,
                                     molar_fractions=None):
     """
+    Transforms a solution model from one endmember basis to another.
+    Returns a new SolidSolution object.
 
+    Parameters
+    ----------
+    solution : :class:`burnman.SolidSolution` object
+        The original solution object.
+
+    new_basis : 2D numpy array
+        The new endmember basis, given as amounts of the old endmembers.
+
+    n_mbrs : float (optional)
+        The number of endmembers in the new solution
+        (defaults to the length of new_basis)
+
+    solution_name : string (optional)
+        A name corresponding to the new solution
+
+    endmember_names : list of strings (optional)
+        A list corresponding to the names of the new endmembers.
+
+    molar_fractions : numpy array (optional)
+        Fractions of the new endmembers in the new solution.
+
+    Returns
+    -------
+    solution : :class:`burnman.SolidSolution` object
+        The transformed solid solution
     """
     new_basis = np.array(new_basis)
     if n_mbrs is None:
@@ -398,30 +484,28 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
         return new_solution
 
 
-def feasible_solution_in_component_space(solution, components,
-                                         solution_name=None,
-                                         endmember_names=None,
-                                         molar_fractions=None):
-    """
-    Note that this function finds the extreme endmembers and
-    finds the subset within the components.
-    Thus, starting with a solution with a disordered endmember and then
-    restricting component range
-    may produce a smaller solution than intended. For example, with the
-    endmembers [A] and [A1/2B1/2], the extreme endmembers are [A] and [B].
-    A component space A--AB will result in only endmember [A] being valid!!
-    """
-    new_basis = feasible_solution_basis_in_component_space(solution,
-                                                           components)
-    return transform_solution_to_new_basis(solution, new_basis,
-                                           solution_name=solution_name,
-                                           endmember_names=endmember_names,
-                                           molar_fractions=molar_fractions)
-
-
 def simplify_composite_with_composition(composite, composition):
     """
+    Takes a composite and a composition, and returns the simplest composite
+    object that spans the solution space at the given composition.
 
+    For example, if the composition is given as {'Mg': 2., 'Si': 1.5, 'O': 5.},
+    and the composite is given as a mix of Mg,Fe olivine and pyroxene
+    solid solutions, this function will return a composite that only contains
+    the Mg-bearing endmembers.
+
+    Parameters
+    ----------
+    composite : :class:`burnman.Composite` object
+        The initial Composite object
+
+    composition : dictionary
+        A dictionary containing the amounts of each element
+
+    Returns
+    -------
+    simple_composite : :class:`burnman.Composite` object
+        The simplified Composite object
     """
     polytope = composite_polytope_at_constrained_composition(composite,
                                                              composition,
@@ -450,7 +534,7 @@ def simplify_composite_with_composition(composite, composition):
 
                 poly = solution_polytope_from_endmember_occupancies(
                     ph.solution_model.endmember_occupancies)
-                dmbrs = poly.endmembers_as_independent_endmember_proportions
+                dmbrs = poly.endmembers_as_independent_endmember_amounts
 
                 x = cp.Variable(dmbrs.shape[0])
                 objective = cp.Minimize(cp.sum_squares(x))

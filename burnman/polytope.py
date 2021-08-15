@@ -19,7 +19,20 @@ from .material import cached_property
 
 def independent_row_indices(array):
     """
+    Returns the indices corresponding to an independent set of rows
+    for a given array. The independent rows are determined from the pivots
+    used during row reduction/Gaussian elimination.
 
+    Parameters
+    ----------
+    array : 2D numpy array of floats
+        The input array
+
+    Returns
+    -------
+    indices : 1D numpy array of integers
+        The indices corresponding to a set of independent rows
+        of the input array.
     """
     m = Matrix(array.shape[0], array.shape[1],
                lambda i, j: Rational(array[i, j]).limit_denominator(1000))
@@ -31,35 +44,51 @@ def independent_row_indices(array):
     return indices[:len(pivots)]
 
 
-def generate_complete_basis(incomplete_basis, complete_basis):
+def generate_complete_basis(incomplete_basis, array):
+    """
+    Given a 2D array with independent rows and a second 2D array that spans a
+    larger space, creates a complete basis for the combined array using all
+    the rows of the first array, followed by any required rows of the
+    second array. So, for example, if the first array is:
+    [[1, 0, 0], [1, 1, 0]] and the second array is:
+    [[1, 0, 0], [0, 1, 0], [0, 0, 1]], the complete basis will be:
+    [[1, 0, 0], [1, 1, 0], [0, 0, 1]].
+
+    Parameters
+    ----------
+    incomplete_basis : 2D numpy array
+        An array containing the basis to be completed.
+
+    array : 2D numpy array
+        An array spanning the full space for which a basis is required.
+
+    Returns
+    -------
+    complete_basis : 2D numpy array
+        An array containing the basis vectors spanning both of the
+        input arrays.
     """
 
-    """
-    a = np.concatenate((incomplete_basis, complete_basis))
+    a = np.concatenate((incomplete_basis, array))
     return a[independent_row_indices(a)]
 
 
-def complete_basis(basis):
-    """
-    # Creates a full basis by filling remaining rows with
-    # rows of the identity matrix with row indices not
-    # in the column pivot list of the basis RREF
-    """
-
-    n, m = basis.shape
-    if n < m:
-        pivots = list(Matrix(basis).rref()[1])
-        return np.concatenate((basis,
-                               np.identity(m)[[i for i in range(m)
-                                               if i not in pivots], :]),
-                              axis=0)
-    else:
-        return basis
-
-
 class SimplexGrid(object):
-    def __init__(self, vertices, points_per_edge):
+    """
+    A class that creates objects that can efficiently generate a set of points
+    that grid a simplex with a user-defined number of vertices. The class
+    contains both a generator method and a grid method. It also contains
+    an n_points attribute that returns the number of points in the gridded
+    simplex.
 
+    This class is available as :class:`burnman.polytope.SimplexGrid`.
+    """
+
+    def __init__(self, vertices, points_per_edge):
+        """
+        Initialize SimplexGrid object with the desired number of vertices
+        and points per edge.
+        """
         assert vertices >= 2, 'need at least two vertices'
         assert points_per_edge >= 2, 'need at least 2 points per edge'
 
@@ -68,10 +97,17 @@ class SimplexGrid(object):
 
     def generate(self, generate_type='list'):
         """
-        Generate the grid points of the simplex in lexicographic order.
+        Generates the grid points of the simplex in lexicographic order.
+
+        Parameters
+        ----------
+        generate_type : 'list' or 'array'
+            Determines whether the generator returns lists or arrays
+            corresponding to each point in the simplex grid.
+
         Returns
         -------
-        generator of ndarrays (int, ndim=1)
+        generator of lists or ndarrays (int, ndim=1)
             Grid points of the simplex.
         """
 
@@ -80,8 +116,7 @@ class SimplexGrid(object):
         elif generate_type == 'array':
             x = np.zeros(self.vertices, dtype=int)
         else:
-            raise Exception('generate should create either lists or '
-                            'arrays of indices')
+            raise Exception('generate_type must be of type list or array.')
 
         x[self.vertices-1] = self.points_per_edge-1
 
@@ -102,16 +137,22 @@ class SimplexGrid(object):
 
     def grid(self, generate_type='list'):
         """
-
+        Returns either a list or a numpy array
+        corresponding the the points in the simplex grid, depending on
+        whether the user chooses 'list' (default) or 'array' as
+        the generate_type parameter.
         """
         if generate_type == 'list':
             return list(self.generate(generate_type))
-        else:
+        elif generate_type == 'array':
             return np.array(list(self.generate(generate_type)))
+        else:
+            raise Exception('generate_type must be of type list or array.')
 
     def n_points(self):
         """
-
+        The number of points corresponding to the number of vertices and
+        points per edge chosen by the user.
         """
         return comb(self.vertices+self.points_per_edge-2,
                     self.vertices-1, exact=True)
@@ -119,7 +160,11 @@ class SimplexGrid(object):
 
 class MaterialPolytope(object):
     """
+    A class that can be instantiated to create pycddlib polytope objects.
+    These objects can be interrogated to provide the vertices satisfying the
+    input constraints.
 
+    This class is available as :class:`burnman.polytope.MaterialPolytope`.
     """
 
     def __init__(self, equalities,
@@ -127,7 +172,29 @@ class MaterialPolytope(object):
                  number_type='fraction',
                  return_fractions=False,
                  independent_endmember_occupancies=None):
-        self.return_fractions = return_fractions
+        """
+        Initialization function for the MaterialPolytope class.
+        Declares basis attributes of the class.
+
+        Parameters
+        ----------
+        equalities: 2D numpy array
+            A numpy array containing all the equalities of the polytope.
+            Each row should evaluate to 0.
+        inequalities: 2D numpy array
+            A numpy array containing all the inequalities of the polytope.
+            Each row should evaluate to <= 0.
+        number_type: 'fraction' or 'float' (default is 'fraction')
+            Whether pycddlib should read the input arrays as
+            fractions or floats.
+        return_fractions : boolean (default is False)
+            Whether the generated polytope object should return fractions or
+            floats.
+        independent_endmember_occupancies : 2D numpy array (or None)
+            If specified, this array provides the independent endmember set
+            against which the dependent endmembers are defined.
+        """
+        self.set_return_type(return_fractions)
         self.equality_matrix = equalities[:, 1:]
         self.equality_vector = -equalities[:, 0]
 
@@ -142,7 +209,14 @@ class MaterialPolytope(object):
 
     def set_return_type(self, return_fractions=False):
         """
+        Sets the return_type for the polytope object. Also deletes the cached
+        endmember_occupancies property.
 
+        Parameters
+        ----------
+        return_fractions : boolean (default is False)
+            Whether the generated polytope object should return fractions or
+            floats.
         """
         try:
             del self.__dict__['endmember_occupancies']
@@ -153,28 +227,31 @@ class MaterialPolytope(object):
     @cached_property
     def raw_vertices(self):
         """
-
+        Returns a list of the vertices of the polytope without any
+        postprocessing. See also endmember_occupancies.
         """
         return self.polytope.get_generators()[:]
 
     @cached_property
-    def site_occupancy_limits(self):
+    def limits(self):
         """
-
+        Return the limits of the polytope (the set of bounding inequalities).
         """
         return np.array(self.polytope.get_inequalities(), dtype=float)
 
     @cached_property
     def n_endmembers(self):
         """
-
+        Return the number of endmembers
+        (the number of vertices of the polytope).
         """
         return len(self.raw_vertices)
 
     @cached_property
     def endmember_occupancies(self):
         """
-
+        Return the endmember occupancies
+        (a processed list of all of the vertex locations).
         """
         if self.return_fractions:
             if self.polytope.number_type == 'fraction':
@@ -197,22 +274,17 @@ class MaterialPolytope(object):
     @cached_property
     def independent_endmember_occupancies(self):
         """
-
+        Return an independent set of endmember occupancies
+        (a linearly-independent set of vertex locations)
         """
         arr = self.endmember_occupancies
         return arr[independent_row_indices(arr)]
 
-    def independent_endmember_proportions(self, endmember_occupancies):
-        """
-
-        """
-        ind = self.independent_endmember_occupancies
-        return np.array(Matrix(ind.T).pinv_solve(Matrix(endmember_occupancies.T)).T)
-
     @cached_property
-    def endmembers_as_independent_endmember_proportions(self):
+    def endmembers_as_independent_endmember_amounts(self):
         """
-
+        Return a list of all the endmembers as a linear sum of
+        the independent endmembers.
         """
         ind = self.independent_endmember_occupancies
 
@@ -222,9 +294,9 @@ class MaterialPolytope(object):
                               rcond=0)[0].round(decimals=12).T
         return sol
 
-    def _decompose_polytope_into_endmember_simplices(self, vertices):
+    def _decompose_vertices_into_simplices(self, vertices):
         """
-
+        Decomposes a set of vertices into simplices by Delaunay triangulation.
         """
         # Delaunay triangulation only works in dimensions > 1
         # and we remove the nullspace (sum(fractions) = 1)
@@ -239,10 +311,12 @@ class MaterialPolytope(object):
     @cached_property
     def independent_endmember_polytope(self):
         """
-        The polytope involves the first n-1 independent endmembers.
-        The last endmember proportion makes the sum equal to one.
+        Returns the polytope expressed in terms of proportions of the
+        independent endmembers. The polytope involves the first
+        n-1 independent endmembers. The last endmember proportion makes
+        the sum equal to one.
         """
-        arr = self.endmembers_as_independent_endmember_proportions
+        arr = self.endmembers_as_independent_endmember_amounts
         arr = np.hstack((np.ones((len(arr), 1)), arr[:, :-1]))
         M = cdd.Matrix(arr, number_type='fraction')
         M.rep_type = cdd.RepType.GENERATOR
@@ -251,14 +325,16 @@ class MaterialPolytope(object):
     @cached_property
     def independent_endmember_limits(self):
         """
-
+        Gets the limits of the polytope as a function of the independent
+        endmembers.
         """
         return np.array(self.independent_endmember_polytope.get_inequalities(),
                         dtype=float)
 
     def subpolytope_from_independent_endmember_limits(self, limits):
         """
-
+        Returns a smaller polytope by applying additional limits to the amounts
+        of the independent endmembers.
         """
         modified_limits = self.independent_endmember_polytope.get_inequalities().copy()
         modified_limits.extend(limits, linear=False)
@@ -266,7 +342,8 @@ class MaterialPolytope(object):
 
     def subpolytope_from_site_occupancy_limits(self, limits):
         """
-
+        Returns a smaller polytope by applying additional limits to the
+        individual site occupancies.
         """
         modified_limits = self.polytope_matrix.copy()
         modified_limits.extend(limits, linear=False)
@@ -275,19 +352,41 @@ class MaterialPolytope(object):
     def grid(self, points_per_edge=2, unique_sorted=True,
              grid_type='independent endmember proportions', limits=None):
         """
+        Create a grid of points which span the polytope.
+
+        Parameters
+        ----------
+        points_per_edge : integer (default is 2)
+            Number of points per edge of the polytope.
+        unique_sorted : boolean (default is True)
+            The gridding is done by splitting the polytope into
+            a set of simplices. This means that points will be duplicated along
+            vertices, faces etc. If unique_sorted is True, this function
+            will sort and make the points unique. This is an expensive
+            operation for large polytopes, and may not always be necessary.
+        grid_type : 'independent endmember proportions' (default) or 'site occupancies'
+            Whether to grid the polytope in terms of
+            independent endmember proportions or site occupancies.
+        limits : 2D numpy array
+            Additional inequalities restricting the gridded area of the polytope.
+        Returns
+        -------
+        points : 2D numpy array
+            A list of points gridding the polytope.
         """
         if limits is None:
             if grid_type == 'independent endmember proportions':
-                f_occ = self.endmembers_as_independent_endmember_proportions / \
-                    (points_per_edge-1)
+                f_occ = (self.endmembers_as_independent_endmember_amounts
+                         / (points_per_edge - 1))
             elif grid_type == 'site occupancies':
                 f_occ = self.endmember_occupancies/(points_per_edge-1)
             else:
-                raise Exception(
-                    'grid type not recognised. Should be one of independent endmember proportions or site occupancies')
+                raise Exception('grid type not recognised. Should be one of '
+                                'independent endmember proportions '
+                                'or site occupancies')
 
-            simplices = self._decompose_polytope_into_endmember_simplices(
-                vertices=self.endmembers_as_independent_endmember_proportions)
+            simplices = self._decompose_vertices_into_simplices(
+                self.endmembers_as_independent_endmember_amounts)
         else:
             if grid_type == 'independent endmember proportions':
                 ppns = np.array(self.subpolytope_from_independent_endmember_limits(
@@ -316,8 +415,8 @@ class MaterialPolytope(object):
                                 'independent endmember proportions '
                                 'or site occupancies')
 
-            simplices = self._decompose_polytope_into_endmember_simplices(
-                vertices=vertices_as_independent_endmember_proportions)
+            simplices = self._decompose_vertices_into_simplices(
+                vertices_as_independent_endmember_proportions)
 
         n_ind = f_occ.shape[1]
         n_simplices = len(simplices)

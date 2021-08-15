@@ -34,7 +34,6 @@ composite polytope.
 """
 from __future__ import absolute_import
 import numpy as np
-import matplotlib.pyplot as plt
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
@@ -114,17 +113,17 @@ if __name__ == "__main__":
 
     print('The complete set of endmembers expressed as proportions of the '
           'independent endmember set:')
-    print(py_maj_poly.endmembers_as_independent_endmember_proportions)
+    print(py_maj_poly.endmembers_as_independent_endmember_amounts)
 
     print('HI!')
     gt = SLB_2011.garnet()
-    gt_poly = solution_polytope_from_endmember_occupancies(gt.solution_model.endmember_occupancies,
-                                                           return_fractions=True)
+    gt_poly = solution_polytope_from_endmember_occupancies(
+        gt.solution_model.endmember_occupancies, return_fractions=True)
 
     assert np.all(np.abs(gt.solution_model.endmember_occupancies
                          - gt_poly.independent_endmember_occupancies) < 1.e-5)
 
-    print(gt_poly.endmembers_as_independent_endmember_proportions)
+    print(gt_poly.endmembers_as_independent_endmember_amounts)
 
     print(site_occupancies_to_strings(gt.solution_model.sites,
                                       gt.solution_model.site_multiplicities,
