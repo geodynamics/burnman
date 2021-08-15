@@ -20,26 +20,26 @@ Each of the following lines represents a distinct endmember:
  [0.  0.  1.  1.  0.  0. ]]
 A potential set of independent endmember site occupancies:
 [[1.  0.  0.  0.  0.  1. ]
- [0.  1.  0.  0.5 0.  0.5]
  [0.5 0.  0.5 0.  1.  0. ]
+ [0.  1.  0.  0.5 0.  0.5]
  [0.  1.  0.  0.  1.  0. ]]
 Formulae corresponding to these independent endmember occupancies:
-['[Mg][Si]', '[Al][Mg1/2Si1/2]', '[Mg1/2Si1/2][Al]', '[Al][Al]']
+['[Mg][Si]', '[Mg1/2Si1/2][Al]', '[Al][Mg1/2Si1/2]', '[Al][Al]']
 The complete set of endmembers expressed as proportions of the independent endmember set:
-[[ 1. -0. -0.  0.]
- [ 0. -0.  1.  0.]
- [ 0.  1.  0. -0.]
- [-0. -0. -0.  1.]
+[[ 1. -0. -0. -0.]
+ [ 0.  1. -0.  0.]
+ [-0.  0.  1. -0.]
+ [-0.  0.  0.  1.]
  [-1.  2.  2. -2.]]
 
 Independent endmember set for four-site pyrope-majorite
 (i.e. Mg3[Mg,Al,Si]0.5[Mg,Al,Si]0.5[Mg,Al,Si]0.5[Mg,Al,Si]0.5Si3O12):
-['[Mg][Si][Si][Mg]', '[Al][Mg][Mg1/2Si1/2][Si]', '[Mg1/2Si1/2][Si][Al][Mg]', '[Mg][Mg][Si][Si]', '[Mg][Al][Al][Si]', '[Mg][Si][Mg][Si]', '[Mg][Al][Si][Al]', '[Mg1/2Si1/2][Al][Si][Mg]']
+['[Mg][Si][Si][Mg]', '[Mg][Al][Si][Al]', '[Mg][Al][Al][Si]', '[Mg][Si][Mg][Si]', '[Mg][Mg][Si][Si]', '[Mg1/2Si1/2][Si][Al][Mg]', '[Mg1/2Si1/2][Al][Si][Mg]', '[Al][Mg][Mg1/2Si1/2][Si]']
 There are 47 endmembers in total, 8 of which are independent.
 
 Independent endmember set for NCFMAS majorite from Holland et al., 2013
 ([Mg,Fe,Ca,Na]3[Mg,Fe2+,Al,Si]2Si3O12):
-['[Mg]3[Al]2', '[Na2/3Fe1/3]3[Si]2', '[Na2/3Ca1/3]3[Si]2', '[Na2/3Mg1/3]3[Si]2', '[Mg]3[Mg1/2Si1/2]2', '[Mg]3[Fe1/2Si1/2]2']
+['[Mg]3[Al]2', '[Mg]3[Fe1/2Si1/2]2', '[Mg]3[Mg1/2Si1/2]2', '[Na2/3Mg1/3]3[Si]2', '[Na2/3Fe1/3]3[Si]2', '[Na2/3Ca1/3]3[Si]2']
 There are 12 endmembers in total, 6 of which are independent.
 
  A much more complicated example...
@@ -94,24 +94,24 @@ The endmembers of this system are:
 [[1. 0. 0. 0. 0. 0. 1.]
  [0. 1. 0. 0. 0. 0. 1.]
  [0. 0. 1. 0. 0. 1. 0.]
- [0. 0. 0. 1. 1. 0. 0.]
- [0. 0. 1. 0. 1. 0. 0.]]
+ [0. 0. 1. 0. 1. 0. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]]
 
 The function also allows the user to grid parts of the polytope.
 Here we plot the pseudocompounds from three different griddings of a simple cubic polytope (for a solution with three sites, no charge balance constraints)
 independent endmember site occupancies:
 [[1. 0. 0. 1. 0. 1.]
- [0. 1. 1. 0. 1. 0.]
  [1. 0. 1. 0. 1. 0.]
- [1. 0. 1. 0. 0. 1.]]
+ [1. 0. 1. 0. 0. 1.]
+ [0. 1. 1. 0. 1. 0.]]
 
 Global endmember proportion limits
 (in form b + A*x > 0; last endmember not included):
-[[ 0.  0.  1.  1.]
+[[ 1. -1.  0. -1.]
  [ 0.  1.  0.  0.]
- [ 0.  0.  1.  0.]
- [ 1.  0. -1. -1.]
- [ 1.  0. -1.  0.]
+ [ 0.  1.  1.  1.]
+ [ 0.  1.  0.  1.]
+ [ 1. -1. -1. -1.]
  [ 1. -1.  0.  0.]]
 
 Global site occupancy limits

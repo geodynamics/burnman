@@ -41,7 +41,7 @@ def independent_row_indices(array):
     indices = np.array(range(len(array)))
     for swap in np.array(swaps):
         indices[swap] = indices[swap[::-1]]
-    return indices[:len(pivots)]
+    return sorted(indices[:len(pivots)])
 
 
 def generate_complete_basis(incomplete_basis, array):

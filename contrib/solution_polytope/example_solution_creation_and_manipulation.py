@@ -305,7 +305,7 @@ if __name__ == "__main__":
 
     e_occ = cubical_polytope.independent_endmember_occupancies.astype(float)
     print('independent endmember site occupancies:')
-    print(e_occ)  # ABB, BAA, AAA, AAB
+    print(e_occ)  # ABB, AAA, AAB, BAA
 
     print('\nGlobal endmember proportion limits')
     print('(in form b + A*x > 0; last endmember not included):')
@@ -329,13 +329,13 @@ if __name__ == "__main__":
                    gridded_occupancies[:, 2],
                    gridded_occupancies[:, 4], label='global grid')
 
-        # limits in terms of the first three independent endmembers
+        # limits in terms of the first three independent endmembers (ABB, AAA, AAB)
         endmember_limits = [[-0.1, 1., 0., 0.],  # ABB > 0.1
-                            [-0.1, 0., 1., 0.],  # BAA > 0.1
-                            [-0.1, 0., 0., 1.],  # AAA > 0.1
+                            [-0.1, 0., 1., 0.],  # AAA > 0.1
+                            [-0.1, 0., 0., 1.],  # AAB > 0.1
                             [0.3, -1., 0., 0.],  # ABB < 0.3
-                            [0.3, 0., -1., 0.],  # BAA < 0.3
-                            [0.3, 0., 0., -1.]]  # AAA < 0.3
+                            [0.3, 0., -1., 0.],  # AAA < 0.3
+                            [0.3, 0., 0., -1.]]  # AAB < 0.3
         gridded_proportions = cubical_polytope.grid(points_per_edge=5,
                                                     grid_type='independent endmember proportions',
                                                     limits=endmember_limits)
