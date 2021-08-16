@@ -185,3 +185,48 @@ plt.ylim(-2., 8.0)
 plt.ylabel("Excess energy of solution (kJ/mol)")
 plt.xlabel("cats fraction")
 plt.show()
+
+
+# Subregular model from Ganguly et al., 1996
+
+mult = lambda x, n: [[[v*n for v in i] for i in j] for j in x]
+
+g5 = burnman.SolidSolution(name = 'Subregular pyrope-almandine-grossular '
+                           'garnet (Ganguly et al., 1996)',
+                           solution_type = 'subregular',
+                           endmembers = [[minerals.HP_2011_ds62.py(),
+                                          '[Mg]3[Al]2Si3O12'],
+                                         [minerals.HP_2011_ds62.alm(),
+                                          '[Fe]3[Al]2Si3O12'],
+                                         [minerals.HP_2011_ds62.gr(),
+                                          '[Ca]3[Al]2Si3O12'],
+                                         [minerals.HP_2011_ds62.spss(),
+                                          '[Mn]3[Al]2Si3O12']],
+                           energy_interaction = mult([[[2117., 695.], [9834., 21627.], [12083., 12083.]],
+                                                      [[6773., 873.], [539., 539.]],
+                                                      [[0., 0.]]], 3.),
+                           volume_interaction = mult([[[0.07e-5, 0.], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
+                                                      [[0.03e-5, 0.], [0.04e-5, 0.01e-5]],
+                                                      [[0., 0.]]], 3.),
+                           entropy_interaction = mult([[[0., 0.], [5.78, 5.78], [7.67, 7.67]],
+                                                       [[1.69, 1.69], [0., 0.]],
+                                                       [[0., 0.]]], 3.))
+
+fig1 = mpimg.imread('figures/Ganguly_1996_Fig_5.png')
+plt.imshow(fig1, extent=[0.0, 1.0, -1000., 5000.], aspect='auto')
+
+g5_excess_enthalpy = np.empty_like(comp)
+for i, c in enumerate(comp):
+    molar_fractions = [1. - c, 0., c, 0.]
+    g5.set_composition(molar_fractions)
+    g5.set_state(1.e5, 298.15)
+    g5_excess_enthalpy[i] = g5.excess_gibbs + 298.15*g5.excess_entropy
+
+plt.plot(comp, g5_excess_enthalpy / 3., 'r-', linewidth=1.,
+         label='Py-Gr excess enthalpy (J/cation-mole)')
+
+plt.title("Asymmetric py-gr join (Ganguly et al., 1996; Figure 5)")
+plt.ylabel("Excess enthalpy of solution (J/cation-mol)")
+plt.xlabel("XCa")
+plt.legend(loc='lower left')
+plt.show()
