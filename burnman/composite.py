@@ -104,12 +104,15 @@ class Composite(Material):
 
         Parameters
         ----------
-        fractions: list of floats
+        fractions: list or numpy array of floats
             molar or mass fraction for each phase.
         fraction_type: 'molar' or 'mass'
             specify whether molar or mass fractions are specified.
         """
         assert(len(self.phases) == len(fractions))
+
+        if isinstance(fractions, list):
+            fractions = np.array(fractions)
 
         try:
             total = sum(fractions)
@@ -117,29 +120,26 @@ class Composite(Material):
             raise Exception(
                 "Since v0.8, burnman.Composite takes an array of Materials, then an array of fractions")
 
-        for f in fractions:
-            assert (f >= -1e-12)
+        assert np.all(fractions >= -1e-12)
 
         self.reset()
 
         if abs(total - 1.0) > 1e-12:
-            warnings.warn(
-                "Warning: list of fractions does not add up to one but %g. Normalizing." % total)
-            corrected_fractions = [fr / total for fr in fractions]
-            fractions = corrected_fractions
+            warnings.warn('Warning: list of fractions does not add '
+                          f'up to one but {total:g}. Normalizing.')
+            fractions /= total
 
         if fraction_type == 'molar':
             molar_fractions = fractions
         elif fraction_type == 'mass':
-            molar_fractions = self._mass_to_molar_fractions(
-                self.phases, fractions)
+            molar_fractions = self._mass_to_molar_fractions(self.phases,
+                                                            fractions)
         else:
-            raise Exception(
-                "Fraction type not recognised. Please use 'molar' or mass")
+            raise Exception("Fraction type not recognised. "
+                            "Please use 'molar' or mass")
 
         # Set minimum value of a molar fraction at 0.0 (rather than -1.e-12)
-        self.molar_fractions = [max(0.0, fraction)
-                                for fraction in molar_fractions]
+        self.molar_fractions = molar_fractions.clip(0.)
 
     def set_method(self, method):
         """
@@ -448,19 +448,17 @@ class Composite(Material):
         phases : list of :class:`burnman.Material`
         The list of phases for which fractions should be converted.
 
-        mass_fractions : list of floats
-        The list of mass fractions of the input phases.
+        mass_fractions : numpy array of floats
+        An array of mass fractions of the input phases.
 
         Returns
         -------
-        molar_fractions : list of floats
-        The list of molar fractions corresponding to the input molar fractions
+        molar_fractions : numpy array of floats
+        An array of molar fractions corresponding to the input molar fractions
         """
-        total_moles = sum(
-            mass_fraction / phase.molar_mass for mass_fraction, phase in zip(mass_fractions, phases))
-        molar_fractions = [mass_fraction / (phase.molar_mass * total_moles)
-                           for mass_fraction, phase in zip(mass_fractions, phases)]
-        return molar_fractions
+        molar_masses = np.array([phase.molar_mass for phase in phases])
+        moles = mass_fractions / molar_masses
+        return moles / sum(moles)
 
     @cached_property
     def stoichiometric_matrix(self):
