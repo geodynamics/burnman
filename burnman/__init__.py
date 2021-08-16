@@ -204,6 +204,7 @@ from . import eos
 
 from . import processchemistry
 from . import composition_fitting
+from . import solutiontools
 from . import polytope
 from . import polytopetools
 from . import chemicalpotentials

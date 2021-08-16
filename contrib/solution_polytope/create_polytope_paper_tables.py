@@ -5,8 +5,8 @@
 
 
 """
-solution_polytope_paper
-----------------
+create_polytope_paper_tables
+----------------------------
 
 This script reproduces the tables in Myhill and Connolly (2021).
 
@@ -16,7 +16,7 @@ This script reproduces the tables in Myhill and Connolly (2021).
 * :func:`burnman.polytope.generate_complete_basis`
 * :func:`burnman.polytopetools.solution_polytope_from_charge_balance`
 * :func:`burnman.polytopetools.solution_polytope_from_endmember_occupancies`
-* :func:`burnman.polytopetools.transform_solution_to_new_basis`
+* :func:`burnman.solutiontools.transform_solution_to_new_basis`
 * :func:`burnman.processchemistry.site_occupancies_to_strings`
 * :doc:`mineral_database`
 
@@ -47,7 +47,7 @@ import burnman
 from burnman.polytope import generate_complete_basis
 from burnman.polytopetools import solution_polytope_from_charge_balance as polytope_from_charge_balance
 from burnman.polytopetools import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
-from burnman.polytopetools import transform_solution_to_new_basis
+from burnman.solutiontools import transform_solution_to_new_basis
 from burnman.processchemistry import site_occupancies_to_strings
 from burnman.minerals import JH_2015
 
