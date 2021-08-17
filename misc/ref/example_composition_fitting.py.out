@@ -1,0 +1,26 @@
+Endmembers: ['py', 'alm', 'gr', 'andr', 'knor']
+Elements: ['Ca', 'Mg', 'Cr', 'Fe', 'Al', 'Si', 'O']
+Stoichiometric array:
+[[0 3 0 0 2 3 12]
+ [0 0 0 3 2 3 12]
+ [3 0 0 0 2 3 12]
+ [3 0 0 2 0 3 12]
+ [0 3 2 0 0 3 12]]
+
+Observed composition:
+Fe: 1.083 +/- 0.010
+Ca: 2.003 +/- 0.010
+Mg: 0.012 +/- 0.010
+Cr: -0.003 +/- 0.010
+Al: 1.910 +/- 0.010
+Si: 3.005 +/- 0.010
+Fe3+: 0.102 +/- 0.010
+
+Best-fit molar fractions:
+py: 0.004 +/- 0.005
+alm: 0.328 +/- 0.003
+gr: 0.619 +/- 0.004
+andr: 0.048 +/- 0.004
+knor: 0.000 +/- 0.004
+
+Weighted residual: 0.519

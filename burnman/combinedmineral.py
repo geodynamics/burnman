@@ -41,6 +41,11 @@ class CombinedMineral(Mineral):
                                      endmembers=[[m, ''] for m in mineral_list],
                                      molar_fractions = molar_amounts)
 
+        # Remove elements from the chemical formula if they have negligible amounts
+        for key, value in list(self.mixture.formula.items()):
+            if np.abs(value) < 1.e-10:
+                self.mixture.formula.pop(key)
+
         self.params = {
             'name': name,
             'formula': self.mixture.formula,

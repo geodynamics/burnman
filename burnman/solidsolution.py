@@ -1,18 +1,20 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 from __future__ import absolute_import
 
 import numpy as np
-
-from .mineral import Mineral, material_property
+from sympy import Matrix, nsimplify
+from .reductions import independent_row_indices
+from .material import material_property, cached_property
+from .mineral import Mineral
 from .solutionmodel import SolutionModel
 from .solutionmodel import MechanicalSolution, IdealSolution
 from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from .solutionmodel import SubregularSolution
-from .processchemistry import sum_formulae
+from .processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
 from .averaging_schemes import reuss_average_function
 
 
@@ -80,13 +82,6 @@ class SolidSolution(Mineral):
             raise Exception(
                 "'endmembers' attribute missing from solid solution")
 
-        try:
-            self.endmember_formulae = [
-                mbr[0].params['formula'] for mbr in self.endmembers]
-        except KeyError:
-            raise Exception(
-                "Not all endmembers of this solid solution have a formula in their params dictionary.")
-
         # Set default solution model type
         if hasattr(self, 'solution_type'):
             if self.solution_type == 'mechanical':
@@ -118,13 +113,6 @@ class SolidSolution(Mineral):
                         "Solution model type " + self.solution_type + "not recognised.")
         else:
             self.solution_model = SolutionModel()
-
-        # Number of endmembers in the solid solution
-        self.n_endmembers = len(self.endmembers)
-        try:
-            self.endmember_names = [mbr[0].name for mbr in self.endmembers]
-        except AttributeError:
-            pass
 
         # Equation of state
         for i in range(self.n_endmembers):
@@ -461,3 +449,109 @@ class SolidSolution(Mineral):
         Aliased with self.C_p
         """
         return sum([self.endmembers[i][0].molar_heat_capacity_p * self.molar_fractions[i] for i in range(self.n_endmembers)])
+
+    @cached_property
+    def stoichiometric_matrix(self):
+        """
+        An sympy Matrix where each element M[i,j] corresponds
+        to the number of atoms of element[j] in endmember[i].
+        """
+        def f(i, j):
+            e = self.elements[j]
+            if e in self.endmember_formulae[i]:
+                return nsimplify(self.endmember_formulae[i][e])
+            else:
+                return 0
+        return Matrix(len(self.endmember_formulae), len(self.elements), f)
+
+    @cached_property
+    def stoichiometric_array(self):
+        """
+        An array where each element arr[i,j] corresponds
+        to the number of atoms of element[j] in endmember[i].
+        """
+        return np.array(self.stoichiometric_matrix)
+
+    @cached_property
+    def reaction_basis(self):
+        """
+        An array where each element arr[i,j] corresponds
+        to the number of moles of endmember[j] involved in reaction[i].
+        """
+        reaction_basis = np.array(self.stoichiometric_matrix.T.nullspace())
+
+        if len(reaction_basis) == 0:
+            reaction_basis = np.empty((0, len(self.endmember_names)))
+
+        return reaction_basis
+
+    @cached_property
+    def n_reactions(self):
+        """
+        The number of reactions in reaction_basis.
+        """
+        return len(self.reaction_basis[:, 0])
+
+    @cached_property
+    def independent_element_indices(self):
+        """
+        A list of an independent set of element indices. If the amounts of
+        these elements are known (element_amounts),
+        the amounts of the other elements can be
+        inferred by -compositional_null_basis[independent_element_indices].dot(element_amounts)
+        """
+        return sorted(independent_row_indices(self.stoichiometric_matrix.T))
+
+    @cached_property
+    def dependent_element_indices(self):
+        """
+        The element indices not included in the independent list.
+        """
+        return [i for i in range(len(self.elements))
+                if i not in self.independent_element_indices]
+
+    @cached_property
+    def compositional_null_basis(self):
+        """
+        An array N such that N.b = 0 for all bulk compositions that can
+        be produced with a linear sum of the endmembers in the solid solution.
+        """
+        null_basis = np.array(self.stoichiometric_matrix.nullspace())
+
+        M = null_basis[:, self.dependent_element_indices]
+        assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
+
+        return null_basis
+
+    @cached_property
+    def endmember_formulae(self):
+        """
+        A list of formulae for all the endmember in the solid solution.
+        """
+        return [mbr[0].params['formula'] for mbr in self.endmembers]
+
+    @cached_property
+    def endmember_names(self):
+        """
+        A list of names for all the endmember in the solid solution.
+        """
+        return [mbr[0].name for mbr in self.endmembers]
+
+    @cached_property
+    def n_endmembers(self):
+        """
+        The number of endmembers in the solid solution.
+        """
+        return len(self.endmembers)
+
+    @cached_property
+    def elements(self):
+        """
+        A list of the elements which could be contained in the solid solution,
+        returned in the IUPAC element order.
+        """
+        keys = []
+        for f in self.endmember_formulae:
+            keys.extend(f.keys())
+
+        return sort_element_list_to_IUPAC_order(set(keys))

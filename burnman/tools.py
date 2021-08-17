@@ -46,6 +46,13 @@ def copy_documentation(copy_from):
     return mydecorator
 
 
+def merge_two_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy."""
+    z = x.copy()
+    z.update(y)
+    return z
+
+
 def flatten(arr):
     return (flatten(arr[0]) + (flatten(arr[1:]) if len(arr) > 1 else [])
             if type(arr) is list or type(arr) is np.ndarray else [arr])

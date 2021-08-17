@@ -1,8 +1,9 @@
 from __future__ import absolute_import
-import unittest
+
 from util import BurnManTest
-import warnings
+import unittest
 import numpy as np
+import warnings
 
 import burnman_path
 import burnman
@@ -446,6 +447,38 @@ class test_solidsolution(BurnManTest):
         self.assertEqual(formula_to_string(ol.formula), 'MgFeSiO4')
         self.assertEqual(formula_to_string(sum_formulae(ol.endmember_formulae,
                                                         [0.5, 0.5])), 'MgFeSiO4')
+
+    def test_stoichiometric_matrix_binary_solution(self):
+        olivine = burnman.minerals.SLB_2011.mg_fe_olivine()
+
+        self.assertTrue(len(olivine.endmember_names) == 2)
+        self.assertTrue(len(olivine.elements) == 4)
+        self.assertTrue(olivine.stoichiometric_matrix.shape == (2, 4))
+        self.assertTrue(olivine.reaction_basis.shape[0] == 0)
+        self.assertArraysAlmostEqual(olivine.compositional_null_basis[0],
+                                     [-1./2., -1./2., 1, 0])
+        self.assertArraysAlmostEqual(olivine.compositional_null_basis[1],
+                                     [-2., -2., 0, 1])
+        self.assertArraysAlmostEqual(
+            olivine.independent_element_indices, [0, 1])
+        self.assertArraysAlmostEqual(olivine.dependent_element_indices, [2, 3])
+        self.assertTrue(olivine.n_reactions == 0)
+
+    def test_stoichiometric_matrix_complex_solution(self):
+        opx = burnman.minerals.JH_2015.orthopyroxene()
+
+        self.assertTrue(len(opx.endmember_names) == 7)
+        self.assertTrue(len(opx.elements) == 7)
+        self.assertTrue(opx.stoichiometric_matrix.shape == (7, 7))
+        self.assertTrue(opx.reaction_basis.shape[0] == 1)
+        self.assertArraysAlmostEqual(opx.compositional_null_basis[0],
+                                     [-3./2., -3./2., -3./2., -3./2., -3./2., -3./2., 1])
+        self.assertArraysAlmostEqual(opx.independent_element_indices,
+                                     [0, 1, 2, 3, 4, 5])
+        self.assertArraysAlmostEqual(opx.dependent_element_indices, [6])
+        self.assertTrue(opx.n_reactions == 1)
+        self.assertArraysAlmostEqual(opx.reaction_basis[0],
+                                     [-1./2., -1./2., 1., 0., 0., 0., 0.])
 
 
 if __name__ == '__main__':

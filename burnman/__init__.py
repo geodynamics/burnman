@@ -82,7 +82,7 @@ Installation
 Requirements
 ^^^^^^^^^^^^
 
-  - Python 3.6+
+  - Python 3.7+
   - Python modules: NumPy, SciPy, SymPy, Matplotlib
 
 
@@ -106,7 +106,7 @@ Install on a Mac
 
 1. get Xcode
 2. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use either Python 3.6+.
+   python.org/download . Make sure to use Python 3.7+.
    To check your version of python, type the following in a
    terminal: ``python --version``
 3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
@@ -202,11 +202,13 @@ from . import averaging_schemes
 from . import eos
 
 from . import processchemistry
+from . import composition_fitting
 from . import chemicalpotentials
 from . import geotherm
 
 # miscellaneous
 from . import tools
+from . import linear_fitting
 from . import nonlinear_fitting
 from . import nonlinear_solvers
 from . import eos_fitting
