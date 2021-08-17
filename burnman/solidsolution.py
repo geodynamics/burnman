@@ -32,6 +32,25 @@ class SolidSolution(Mineral):
     All the solid solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T
     and P derivatives in J/K/mol and m^3/mol.
+
+    The parameters are relevant to all solution models. Please
+    see the documentation for individual models for details about
+    other parameters.
+
+    Parameters
+    ----------
+    name : string
+        Name of the solid solution
+    solution_type : string
+        String determining which SolutionModel to use. One of 'mechanical',
+        'ideal', 'symmetric', 'asymmetric' or 'subregular'.
+    endmembers : list of lists
+        List of endmembers in this solid solution. The first item of each
+        list should be a :class:`burnman.Mineral` object. The second item
+        should be a string with the site formula of the endmember.
+    molar_fractions : numpy array (optional)
+        The molar fractions of each endmember in the solid solution.
+        Can be reset using the set_composition() method.
     """
 
     def __init__(self,
@@ -48,13 +67,6 @@ class SolidSolution(Mineral):
                  molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
-
-        Parameters
-        ----------
-        endmembers: list of :class:`burnman.Mineral`
-            List of endmembers in this solid solution.
-        solution_model: :class:`burnman.SolutionModel`
-            SolutionModel to use.
         """
         Mineral.__init__(self)
 

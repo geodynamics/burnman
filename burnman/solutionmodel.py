@@ -437,10 +437,25 @@ class IdealSolution (SolutionModel):
 class AsymmetricRegularSolution (IdealSolution):
 
     """
-    Solution model implementing the asymmetric regular solution model formulation as described in :cite:`HP2003`.
+    Solution model implementing the asymmetric regular solution model
+    formulation as described in :cite:`HP2003`.
+
+    The excess nonconfigurational Gibbs energy is given by the
+    expression:
+
+    .. math::
+        \\mathcal{G}_{\\textrm{excess}} = \\alpha^T p (\\phi^T W \\phi)
+
+    :math:`\\alpha` is a vector of van Laar parameters governing asymmetry
+    in the excess properties.
+
+    .. math::
+        \\phi_i = \\frac{\\alpha_i p_i}{\\sum_{k=1}^{n} \\alpha_k p_k}, 
+        W_{ij} = \\frac{2 w_{ij}}{\\alpha_i + \\alpha_j} \\textrm{for i<j}
     """
 
-    def __init__(self, endmembers, alphas, energy_interaction, volume_interaction=None, entropy_interaction=None):
+    def __init__(self, endmembers, alphas, energy_interaction,
+                 volume_interaction=None, entropy_interaction=None):
 
         self.n_endmembers = len(endmembers)
 
@@ -538,7 +553,9 @@ class AsymmetricRegularSolution (IdealSolution):
 class SymmetricRegularSolution (AsymmetricRegularSolution):
 
     """
-    Solution model implementing the symmetric regular solution model. This is simply a special case of the :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
+    Solution model implementing the symmetric regular solution model.
+    This is a special case of the
+    :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
     """
 
     def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):
@@ -550,15 +567,59 @@ class SymmetricRegularSolution (AsymmetricRegularSolution):
 class SubregularSolution (IdealSolution):
 
     """
-    Solution model implementing the subregular solution model formulation as described in :cite:`HW1989`.
-    Interaction parameters are inserted into a 3D interaction matrix during initialization to make use of
-    numpy vector algebra.
+    Solution model implementing the subregular solution model formulation
+    as described in :cite:`HW1989`. The excess conconfigurational
+    Gibbs energy is given by the expression:
+
+    .. math::
+        \\mathcal{G}_{\\textrm{excess}} = \\sum_i \\sum_{j > i} (p_i p_j^2
+        W_{ij} + p_j p_i^2 W_{ji} + \\sum_{k > j > i} p_i p_j p_k W_{ijk})
+
+    Interaction parameters are inserted into a 3D interaction matrix during
+    initialization to make use of numpy vector algebra.
+
+    Parameters
+    ----------
+    endmembers : list of lists
+        A list of all the independent endmembers in the solution.
+        The first item of each list gives the Mineral object corresponding
+        to the endmember. The second item gives the site-species formula.
+
+    energy_interaction : list of list of lists
+        The binary endmember interaction energies.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    volume_interaction : list of list of lists
+        The binary endmember interaction volumes.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    entropy_interaction : list of list of lists
+        The binary endmember interaction entropies.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    energy_ternary_terms : list of lists
+        The ternary interaction energies. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
+
+    volume_ternary_terms : list of lists
+        The ternary interaction volumes. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
+
+    entropy_ternary_terms : list of lists
+        The ternary interaction entropies. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
     """
 
     def __init__(self, endmembers, energy_interaction,
                  volume_interaction=None, entropy_interaction=None,
                  energy_ternary_terms=None,
                  volume_ternary_terms=None, entropy_ternary_terms=None):
+        """
+        Initialization function for the SubregularSolution class.
+        """
 
         self.n_endmembers = len(endmembers)
 
