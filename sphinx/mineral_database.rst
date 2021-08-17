@@ -3,7 +3,7 @@ Mineral databases
 
 .. automodule:: burnman.minerals
   :no-inherited-members:
-  
+
 .. automodule::  burnman.minerals.Matas_etal_2007
   :no-inherited-members:
 
@@ -38,6 +38,9 @@ Mineral databases
   :no-inherited-members:
 
 .. automodule::  burnman.minerals.HHPH_2013
+  :no-inherited-members:
+
+.. automodule::  burnman.minerals.HGP_2018_ds633
   :no-inherited-members:
 
 .. automodule::  burnman.minerals.JH_2015
