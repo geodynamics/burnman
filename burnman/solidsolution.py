@@ -41,6 +41,9 @@ class SolidSolution(Mineral):
                  energy_interaction=None,
                  volume_interaction=None,
                  entropy_interaction=None,
+                 energy_ternary_terms=None,
+                 volume_ternary_terms=None,
+                 entropy_ternary_terms=None,
                  alphas=None,
                  molar_fractions=None):
         """
@@ -71,6 +74,12 @@ class SolidSolution(Mineral):
             self.volume_interaction = volume_interaction
         if entropy_interaction is not None:
             self.entropy_interaction = entropy_interaction
+        if energy_ternary_terms is not None:
+            self.energy_ternary_terms = energy_ternary_terms
+        if volume_ternary_terms is not None:
+            self.volume_ternary_terms = volume_ternary_terms
+        if entropy_ternary_terms is not None:
+            self.entropy_ternary_terms = entropy_ternary_terms
         if alphas is not None:
             self.alphas = alphas
         if endmembers is not None:
@@ -111,8 +120,19 @@ class SolidSolution(Mineral):
                     self.solution_model = AsymmetricRegularSolution(
                         self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'subregular':
+                    if hasattr(self, 'energy_ternary_terms') is False:
+                        self.energy_ternary_terms = None
+                    if hasattr(self, 'volume_ternary_terms') is False:
+                        self.volume_ternary_terms = None
+                    if hasattr(self, 'entropy_ternary_terms') is False:
+                        self.entropy_ternary_terms = None
+
                     self.solution_model = SubregularSolution(
-                        self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
+                        self.endmembers,
+                        self.energy_interaction,  self.volume_interaction,
+                        self.entropy_interaction,
+                        self.energy_ternary_terms, self.volume_ternary_terms,
+                        self.entropy_ternary_terms)
                 else:
                     raise Exception(
                         "Solution model type " + self.solution_type + "not recognised.")

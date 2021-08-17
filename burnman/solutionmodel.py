@@ -39,9 +39,9 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
 
 
 def _non_ideal_hessian_subreg(p, n_endmembers, Wijk):
-    I = np.identity(n_endmembers)
-    IIp = np.einsum('il, jm, k->ijklm', I, I, p)
-    Ipp = np.einsum('il, j, k->ijkl', I, p, p)
+    Id = np.identity(n_endmembers)
+    IIp = np.einsum('il, jm, k->ijklm', Id, Id, p)
+    Ipp = np.einsum('il, j, k->ijkl', Id, p, p)
     ppp = np.einsum('i, j, k->ijk', p, p, p)
 
     A = (IIp
@@ -54,7 +54,10 @@ def _non_ideal_hessian_subreg(p, n_endmembers, Wijk):
             + np.transpose(Ipp, axes=[1, 0, 2, 3])
             + np.transpose(Ipp, axes=[2, 1, 0, 3]))
 
-    Asum = A - B[:,:,:,:,None] - B[:,:,:,None,:] + 6.*ppp[:,:,:,None,None]
+    Asum = (A
+            - B[:, :, :, :, None]
+            - B[:, :, :, None, :]
+            + 6.*ppp[:, :, :, None, None])
     hess = np.einsum('ijklm, ijk->lm', Asum, Wijk)
     return hess
 
@@ -552,7 +555,10 @@ class SubregularSolution (IdealSolution):
     numpy vector algebra.
     """
 
-    def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):
+    def __init__(self, endmembers, energy_interaction,
+                 volume_interaction=None, entropy_interaction=None,
+                 energy_ternary_terms=None,
+                 volume_ternary_terms=None, entropy_ternary_terms=None):
 
         self.n_endmembers = len(endmembers)
 
@@ -568,42 +574,54 @@ class SubregularSolution (IdealSolution):
             for j in range(i + 1, self.n_endmembers):
                 w0 = energy_interaction[i][j - i - 1][0]/2.
                 w1 = energy_interaction[i][j - i - 1][1]/2.
-                self.Wijke[:,i,j] += w0
-                self.Wijke[:,j,i] += w1
+                self.Wijke[:, i, j] += w0
+                self.Wijke[:, j, i] += w1
 
-                self.Wijke[i,j,j] += w0
-                self.Wijke[j,i,i] += w1
+                self.Wijke[i, j, j] += w0
+                self.Wijke[j, i, i] += w1
 
-                self.Wijke[i,j,i] -= w0
-                self.Wijke[j,i,j] -= w1
+                self.Wijke[i, j, i] -= w0
+                self.Wijke[j, i, j] -= w1
+
+        if energy_ternary_terms is not None:
+            for (i, j, k, v) in energy_ternary_terms:
+                self.Wijke[i, j, k] += v
 
         if entropy_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
                     w0 = entropy_interaction[i][j - i - 1][0]/2.
                     w1 = entropy_interaction[i][j - i - 1][1]/2.
-                    self.Wijks[:,i,j] += w0
-                    self.Wijks[:,j,i] += w1
+                    self.Wijks[:, i, j] += w0
+                    self.Wijks[:, j, i] += w1
 
-                    self.Wijks[i,j,j] += w0
-                    self.Wijks[j,i,i] += w1
+                    self.Wijks[i, j, j] += w0
+                    self.Wijks[j, i, i] += w1
 
-                    self.Wijks[i,j,i] -= w0
-                    self.Wijks[j,i,j] -= w1
+                    self.Wijks[i, j, i] -= w0
+                    self.Wijks[j, i, j] -= w1
+
+        if entropy_ternary_terms is not None:
+            for (i, j, k, v) in entropy_ternary_terms:
+                self.Wijks[i, j, k] += v
 
         if volume_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
                     w0 = volume_interaction[i][j - i - 1][0]/2.
                     w1 = volume_interaction[i][j - i - 1][1]/2.
-                    self.Wijkv[:,i,j] += w0
-                    self.Wijkv[:,j,i] += w1
+                    self.Wijkv[:, i, j] += w0
+                    self.Wijkv[:, j, i] += w1
 
-                    self.Wijkv[i,j,j] += w0
-                    self.Wijkv[j,i,i] += w1
+                    self.Wijkv[i, j, j] += w0
+                    self.Wijkv[j, i, i] += w1
 
-                    self.Wijkv[i,j,i] -= w0
-                    self.Wijkv[j,i,j] -= w1
+                    self.Wijkv[i, j, i] -= w0
+                    self.Wijkv[j, i, j] -= w1
+
+        if volume_ternary_terms is not None:
+            for (i, j, k, v) in volume_ternary_terms:
+                self.Wijkv[i, j, k] += v
 
         # initialize ideal solution model
         IdealSolution.__init__(self, endmembers)

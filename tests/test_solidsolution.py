@@ -136,8 +136,8 @@ class orthopyroxene(burnman.SolidSolution):
         # Name
         self.name = 'orthopyroxene'
         self.solution_type = 'symmetric'
-        self.endmembers = [[forsterite(), '[Mg][Mg]Si2O6'], [
-                           forsterite(), '[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6']]
+        self.endmembers = [[forsterite(), '[Mg][Mg]Si2O6'],
+                           [forsterite(), '[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6']]
         self.energy_interaction = [[burnman.constants.gas_constant * 1.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -150,8 +150,9 @@ class two_site_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'two_site_ss'
         self.solution_type = 'symmetric'
-        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
-                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],
+                           [forsterite(), '[Fe]3[Al]2Si3O12'],
+                           [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -164,8 +165,9 @@ class two_site_ss_asymmetric(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = 'two_site_ss (asymmetric)'
         self.solution_type = 'asymmetric'
-        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
-                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],
+                           [forsterite(), '[Fe]3[Al]2Si3O12'],
+                           [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         self.alphas = [1., 2., 2.]
         self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
 
@@ -180,11 +182,12 @@ class two_site_ss_subregular(burnman.SolidSolution):
         # Name
         self.name = 'two_site_ss (subregular symmetric)'
         self.solution_type = 'subregular'
-        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
-                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],
+                           [forsterite(), '[Fe]3[Al]2Si3O12'],
+                           [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         # Interaction parameters
-        self.energy_interaction = [
-            [[10.e3, 10.e3], [5.e3, 5.e3]], [[-10.e3, -10.e3]]]
+        self.energy_interaction = [[[10.e3, 10.e3], [5.e3, 5.e3]],
+                                   [[-10.e3, -10.e3]]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -196,11 +199,30 @@ class two_site_ss_subregular_asymmetric(burnman.SolidSolution):
         # Name
         self.name = 'two_site_ss (subregular symmetric)'
         self.solution_type = 'subregular'
-        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'], [
-                           forsterite(), '[Fe]3[Al]2Si3O12'], [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],
+                           [forsterite(), '[Fe]3[Al]2Si3O12'],
+                           [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
         # Interaction parameters
-        self.energy_interaction = [
-            [[10.e3, -10.e3], [5.e3, 3.e3]], [[-10.e3, -10.e3]]]
+        self.energy_interaction = [[[10.e3, -10.e3], [5.e3, 3.e3]],
+                                   [[-10.e3, -10.e3]]]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+# Three-endmember, two site solid solution with ternary term
+class two_site_ss_subregular_ternary(burnman.SolidSolution):
+
+    def __init__(self, molar_fractions=None):
+        # Name
+        self.name = 'two_site_ss (subregular symmetric)'
+        self.solution_type = 'subregular'
+        self.endmembers = [[forsterite(), '[Mg]3[Al]2Si3O12'],
+                           [forsterite(), '[Fe]3[Al]2Si3O12'],
+                           [forsterite(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        # Interaction parameters
+        self.energy_interaction = [[[10.e3, -10.e3], [5.e3, 3.e3]],
+                                   [[-10.e3, -10.e3]]]
+        self.energy_ternary_terms = [[0, 1, 2, 3.e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -394,6 +416,22 @@ class test_solidsolution(BurnManTest):
 
     def test_subregular_model_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_asymmetric()
+        f0 = [0.25, 0.35, 0.4]
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+        H0 = ss.gibbs_hessian
+
+        df = np.array([2.e-6, -1.5e-6, -0.5e-6])
+        ss.set_composition(f0 - df/2.)
+        dGdx1 = ss.partial_gibbs
+        ss.set_composition(f0 + df/2.)
+        dGdx2 = ss.partial_gibbs
+
+        for i in range(3):
+            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+
+    def test_subregular_model_ternary_hessian_multicomponent_change(self):
+        ss = two_site_ss_subregular_ternary()
         f0 = [0.25, 0.35, 0.4]
         ss.set_composition(f0)
         ss.set_state(1.e5, 300.)
