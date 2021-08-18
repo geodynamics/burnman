@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import inspect
 from . import slb
 from . import mie_grueneisen_debye as mgd
+from . import murnaghan
 from . import birch_murnaghan as bm
 from . import birch_murnaghan_4th as bm4
 from . import modified_tait as mt
@@ -20,15 +21,18 @@ from . import reciprocal_kprime
 from . import aa
 from .equation_of_state import EquationOfState
 
+
 class CombinedMineralMethod(object):
     """Dummy class because CombinedMineral objects are derived
     from a mechanical SolidSolution.
     SolidSolution needs a method to call Mineral.set_state(),
     but a CombinedMineral should never have a method that
     is used for solid solutions."""
+
     def validate_parameters(self, params):
         pass
     pass
+
 
 def create(method):
     """
@@ -52,6 +56,8 @@ def create(method):
             return mgd.MGD3()
         elif method == "slb3":
             return slb.SLB3()
+        elif method == "murnaghan":
+            return murnaghan.Murnaghan()
         elif method == "bm2":
             return bm.BM2()
         elif method == "bm3":
@@ -60,6 +66,8 @@ def create(method):
             return bm4.BM4()
         elif method == "mt":
             return mt.MT()
+        elif method == "hp98":
+            return hp.HP98()
         elif method == "hp_tmt":
             return hp.HP_TMT()
         elif method == "cork":
