@@ -9,7 +9,7 @@ import numpy as np
 
 
 def volume(pressure, V_0, K_0, Kprime_0):
-    return V_0 * np.power(1. + pressure * Kprime_0 / K_0, -1./Kprime_0)
+    return V_0 * np.power(1. + (pressure * Kprime_0 / K_0), -1./Kprime_0)
 
 
 def pressure(volume, V_0, K_0, Kprime_0):
@@ -27,11 +27,18 @@ def energy(volume, E_0, V_0, K_0, Kprime_0):
                              + Vrel / Kprime_0 - 1./(Kprime_0 - 1.)))
 
 
+def intVdP(pressure, V_0, K_0, Kprime_0):
+    return (V_0 * K_0
+            * ((np.power(1. + (pressure * Kprime_0 / K_0),
+                         1.-(1./Kprime_0))) - 1.)
+            / (Kprime_0 - 1.))
+
+
 class Murnaghan(eos.EquationOfState):
 
     """
     Base class for the isothermal Murnaghan equation of state,
-    as described in :cite:`murnaghan1944`.
+    as described in :cite:`Murnaghan1944`.
     """
 
     def volume(self, pressure, temperature, params):
@@ -148,5 +155,5 @@ class Murnaghan(eos.EquationOfState):
             warnings.warn('Unusual value for V_0', stacklevel=2)
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
             warnings.warn('Unusual value for K_0', stacklevel=2)
-        if params['Kprime_0'] < -5. or params['Kprime_0'] > 10.:
+        if params['Kprime_0'] < -5. or params['Kprime_0'] > 30.:
             warnings.warn('Unusual value for Kprime_0', stacklevel=2)

@@ -5,6 +5,11 @@ Base class
 ----------
 .. autoclass:: burnman.eos.EquationOfState
 
+Murnaghan
+---------
+
+.. autoclass:: burnman.eos.Murnaghan
+
 Birch-Murnaghan
 ---------------
 
@@ -53,6 +58,13 @@ Modified Tait
 -------------
 
 .. autoclass:: burnman.eos.MT
+
+Holland and Powell Formulations
+-------------------------------
+
+.. autoclass:: burnman.eos.HP_TMT
+
+.. autoclass:: burnman.eos.HP98
 
 De Koker Solid and Liquid Formulations
 --------------------------------------
