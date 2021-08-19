@@ -75,7 +75,8 @@ class Murnaghan(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        Returns the molar entropy :math:`\mathcal{S}` of the mineral.
+        :math:`[J/K/mol]`
         """
         return 0.
 

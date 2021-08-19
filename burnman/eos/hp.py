@@ -18,8 +18,9 @@ from . import einstein
 class HP_TMT(eos.EquationOfState):
 
     """
-    Base class for the Holland and Powell (2011) correction to
-    the generic modified Tait equation of state (class MT).
+    Base class for the thermal equation of state based on
+    the generic modified Tait equation of state (class MT),
+    as described in :cite:`HP2011`.
 
 
     An instance "m" of a Mineral can be assigned this
@@ -76,7 +77,8 @@ class HP_TMT(eos.EquationOfState):
     # Cv, heat capacity at constant volume
     def molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
+        Returns heat capacity at constant volume at the pressure, temperature,
+        and volume [J/K/mol].
         """
         C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
         V = self.volume(pressure, temperature, params)
@@ -87,8 +89,9 @@ class HP_TMT(eos.EquationOfState):
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Returns thermal expansivity at the pressure, temperature, and volume [1/K]
-        Replace -Pth in EQ 13+1 with P-Pth for non-ambient temperature
+        Returns thermal expansivity at the pressure, temperature,
+        and volume [1/K]. This function replaces -Pth in EQ 13+1
+        with P-Pth for non-ambient temperature
         """
         a, b, c = mt.tait_constants(params)
         Pth = self.__relative_thermal_pressure(temperature, params)
@@ -104,8 +107,8 @@ class HP_TMT(eos.EquationOfState):
 
     def molar_heat_capacity_p0(self, temperature, params):
         """
-        Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
-        Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 2011
+        Returns heat capacity at ambient pressure as a function of temperature
+        [J/K/mol]. Cp = a + bT + cT^-2 + dT^-0.5 in :cite:`HP2011`.
         """
         Cp = params['Cp'][0] + params['Cp'][1] * temperature + params['Cp'][2] * \
             np.power(temperature, -2.) + params[
@@ -114,7 +117,8 @@ class HP_TMT(eos.EquationOfState):
 
     def molar_heat_capacity_p_einstein(self, pressure, temperature, volume, params):
         """
-        Returns heat capacity at constant pressure at the pressure, temperature, and volume, using the C_v and Einstein model [J/K/mol]
+        Returns heat capacity at constant pressure at the pressure,
+        temperature, and volume, using the C_v and Einstein model [J/K/mol]
         WARNING: Only for comparison with internally self-consistent C_p
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
@@ -215,7 +219,7 @@ class HP_TMT(eos.EquationOfState):
     def __thermal_pressure(self, T, params):
         """
         Returns thermal pressure [Pa] as a function of T [K]
-        EQ 12 - 1 of Holland and Powell, 2011
+        EQ 12 - 1 of :cite:`HP2011`.
         """
 
         # This is basically the mie-gruneisen equation of state for thermal
@@ -237,7 +241,7 @@ class HP_TMT(eos.EquationOfState):
     def __relative_thermal_pressure(self, T, params):
         """
         Returns relative thermal pressure [Pa] as a function of T-params['T_0'] [K]
-        EQ 12 - 1 of Holland and Powell, 2011
+        EQ 12 - 1 of :cite:`HP2011`.
         """
         return self.__thermal_pressure(T, params) - \
             self.__thermal_pressure(params['T_0'], params)
@@ -320,7 +324,8 @@ class HP_TMT(eos.EquationOfState):
 class HP98(eos.EquationOfState):
 
     """
-    Base class for the Holland and Powell (1998) thermal equation of state.
+    Base class for the thermal equation of state
+    described in :cite:`HP1998`.
 
     An instance "m" of a Mineral can be assigned this
     equation of state with the command m.set_method('hp98')
@@ -418,7 +423,7 @@ class HP98(eos.EquationOfState):
         """
         Returns heat capacity at ambient pressure as a function of temperature
         [J/K/mol]
-        Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 1998
+        Cp = a + bT + cT^-2 + dT^-0.5 in :cite:`HP1998`.
         """
         Cp = (params['Cp'][0]
               + params['Cp'][1] * temperature
@@ -556,9 +561,11 @@ class HP98(eos.EquationOfState):
         # Finally, check that the values are reasonable.
         if params['T_0'] < 0.:
             warnings.warn('Unusual value for T_0', stacklevel=2)
-        if params['G_0'] is not float('nan') and (params['G_0'] < 0. or params['G_0'] > 1.e13):
+        if ((params['G_0'] is not float('nan')
+             and (params['G_0'] < 0. or params['G_0'] > 1.e13))):
             warnings.warn('Unusual value for G_0', stacklevel=2)
-        if params['Gprime_0'] is not float('nan') and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.):
+        if ((params['Gprime_0'] is not float('nan')
+             and (params['Gprime_0'] < -5. or params['Gprime_0'] > 10.))):
             warnings.warn('Unusual value for Gprime_0', stacklevel=2)
 
         # no test for H_0 or S_0 (several HP endmembers have S_0 < 0)
