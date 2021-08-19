@@ -3883,7 +3883,8 @@ class syvL (Mineral):
                        'a_0': 0.000301,
                        'K_0': 5600e6,
                        'Kprime_0': 4.65,
-                       'dKdT_0': -8300000.0,
+                       'Kdprime_0': -8.3e-10,
+                       'dKdT_0': -2e6,
                        'n': 2.0,
                        'molar_mass': 0.0745513}
         Mineral.__init__(self)
@@ -3901,7 +3902,8 @@ class hltL (Mineral):
                        'a_0': 0.000295,
                        'K_0': 6400e6,
                        'Kprime_0': 4.61,
-                       'dKdT_0': -7199999.999999999,
+                       'Kdprime_0': -7.2e-10,
+                       'dKdT_0': -1500000.0,
                        'n': 2.0,
                        'molar_mass': 0.0584428}
         Mineral.__init__(self)
@@ -3919,7 +3921,8 @@ class perL (Mineral):
                        'a_0': 0.000226,
                        'K_0': 36200e6,
                        'Kprime_0': 10.06,
-                       'dKdT_0': -2780000.0,
+                       'Kdprime_0': -2.78e-10,
+                       'dKdT_0': -4100000.0,
                        'n': 2.0,
                        'molar_mass': 0.0403044}
         Mineral.__init__(self)
@@ -3937,7 +3940,8 @@ class limL (Mineral):
                        'a_0': 0.000175,
                        'K_0': 36200e6,
                        'Kprime_0': 10.06,
-                       'dKdT_0': -2780000.0,
+                       'Kdprime_0': -2.78e-10,
+                       'dKdT_0': -4100000.0,
                        'n': 2.0,
                        'molar_mass': 0.0560774}
         Mineral.__init__(self)
@@ -3955,7 +3959,8 @@ class corL (Mineral):
                        'a_0': 7.03e-05,
                        'K_0': 15000e6,
                        'Kprime_0': 6.0,
-                       'dKdT_0': 4e6,
+                       'Kdprime_0': 4e-10,
+                       'dKdT_0': -3500000.0000000005,
                        'n': 5.0,
                        'molar_mass': 0.1019612}
         Mineral.__init__(self)
@@ -3973,7 +3978,8 @@ class qL (Mineral):
                        'a_0': 0.0,
                        'K_0': 22000e6,
                        'Kprime_0': 9.46,
-                       'dKdT_0': -4300000.0,
+                       'Kdprime_0': -4.3e-10,
+                       'dKdT_0': -3500000.0000000005,
                        'n': 3.0,
                        'molar_mass': 0.0600843}
         Mineral.__init__(self)
@@ -3991,7 +3997,8 @@ class h2oL (Mineral):
                        'a_0': 0.000521,
                        'K_0': 5060e6,
                        'Kprime_0': 4.0,
-                       'dKdT_0': -7900000.0,
+                       'Kdprime_0': -7.9e-10,
+                       'dKdT_0': -370000.0,
                        'n': 3.0,
                        'molar_mass': 0.01801528}
         Mineral.__init__(self)
@@ -4009,7 +4016,8 @@ class foL (Mineral):
                        'a_0': 9.2e-05,
                        'K_0': 36200e6,
                        'Kprime_0': 10.06,
-                       'dKdT_0': -2780000.0,
+                       'Kdprime_0': -2.78e-10,
+                       'dKdT_0': -4400000.0,
                        'n': 7.0,
                        'molar_mass': 0.1406931}
         Mineral.__init__(self)
@@ -4027,7 +4035,8 @@ class faL (Mineral):
                        'a_0': 0.0001071,
                        'K_0': 29000e6,
                        'Kprime_0': 10.42,
-                       'dKdT_0': -3590000.0,
+                       'Kdprime_0': -3.59e-10,
+                       'dKdT_0': -5500000.0,
                        'n': 7.0,
                        'molar_mass': 0.2037731}
         Mineral.__init__(self)
@@ -4045,7 +4054,8 @@ class woL (Mineral):
                        'a_0': 6.69e-05,
                        'K_0': 30500e6,
                        'Kprime_0': 9.38,
-                       'dKdT_0': -3080000.0,
+                       'Kdprime_0': -3.08e-10,
+                       'dKdT_0': -2e6,
                        'n': 5.0,
                        'molar_mass': 0.1161617}
         Mineral.__init__(self)
@@ -4063,7 +4073,8 @@ class enL (Mineral):
                        'a_0': 6.81e-05,
                        'K_0': 21800e6,
                        'Kprime_0': 7.2,
-                       'dKdT_0': -3300000.0,
+                       'Kdprime_0': -3.3e-10,
+                       'dKdT_0': -2400000.0,
                        'n': 10.0,
                        'molar_mass': 0.2007774}
         Mineral.__init__(self)
@@ -4081,7 +4092,8 @@ class diL (Mineral):
                        'a_0': 8.51e-05,
                        'K_0': 24900e6,
                        'Kprime_0': 8.04,
-                       'dKdT_0': -3230000.0,
+                       'Kdprime_0': -3.23e-10,
+                       'dKdT_0': -3730000.0,
                        'n': 10.0,
                        'molar_mass': 0.2165504}
         Mineral.__init__(self)
@@ -4099,7 +4111,8 @@ class silL (Mineral):
                        'a_0': 4.08e-05,
                        'K_0': 22000e6,
                        'Kprime_0': 6.36,
-                       'dKdT_0': -2890000.0,
+                       'Kdprime_0': -2.89e-10,
+                       'dKdT_0': -2900000.0,
                        'n': 8.0,
                        'molar_mass': 0.1620455}
         Mineral.__init__(self)
@@ -4117,7 +4130,8 @@ class anL (Mineral):
                        'a_0': 5.14e-05,
                        'K_0': 21000e6,
                        'Kprime_0': 6.38,
-                       'dKdT_0': -3040000.0,
+                       'Kdprime_0': -3.04e-10,
+                       'dKdT_0': -5500000.0,
                        'n': 13.0,
                        'molar_mass': 0.2782072}
         Mineral.__init__(self)
@@ -4135,7 +4149,8 @@ class kspL (Mineral):
                        'a_0': 4.93e-05,
                        'K_0': 17300e6,
                        'Kprime_0': 6.84,
-                       'dKdT_0': -3930000.0,
+                       'Kdprime_0': -3.93e-10,
+                       'dKdT_0': -899999.9999999999,
                        'n': 13.0,
                        'molar_mass': 0.2783315}
         Mineral.__init__(self)
@@ -4153,7 +4168,8 @@ class abL (Mineral):
                        'a_0': 3.37e-05,
                        'K_0': 17600e6,
                        'Kprime_0': 14.35,
-                       'dKdT_0': -8150000.0,
+                       'Kdprime_0': -8.15e-10,
+                       'dKdT_0': -2600000.0,
                        'n': 13.0,
                        'molar_mass': 0.262223}
         Mineral.__init__(self)
@@ -4171,7 +4187,8 @@ class neL (Mineral):
                        'a_0': 0.000137,
                        'K_0': 25000e6,
                        'Kprime_0': 7.37,
-                       'dKdT_0': -2950000.0,
+                       'Kdprime_0': -2.95e-10,
+                       'dKdT_0': -800000.0,
                        'n': 7.0,
                        'molar_mass': 0.1420544}
         Mineral.__init__(self)
@@ -4189,7 +4206,8 @@ class lcL (Mineral):
                        'a_0': 6.7e-05,
                        'K_0': 17500e6,
                        'Kprime_0': 7.0,
-                       'dKdT_0': -3939999.9999999995,
+                       'Kdprime_0': -3.94e-10,
+                       'dKdT_0': -0.0,
                        'n': 10.0,
                        'molar_mass': 0.2182472}
         Mineral.__init__(self)

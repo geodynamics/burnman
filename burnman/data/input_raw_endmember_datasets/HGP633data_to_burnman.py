@@ -91,7 +91,8 @@ class Endmember:
                                        ('a_0', a),
                                        ('K_0', round(k[0] * 1e8, 10)),
                                        ('Kprime_0', k[1]),
-                                       ('dKdT_0', round(k[2] * 1e8, 15)),
+                                       ('Kdprime_0', round(k[2] * 1e-8, 15)),
+                                       ('dKdT_0', round(k[3] * 1e8, 15)),
                                        ('n', sum(formula.values())),
                                        ('molar_mass',
                                         round(formula_mass(formula), 10))])
@@ -112,11 +113,6 @@ def getmbr(ds, mbr):
                 formula = formula + \
                     components[int(ds[i * 4 + 3][j - 1]) - 1] + str(
                         round(float(ds[i * 4 + 3][j]), 10))
-            if mbr.endswith('L'):
-                flag = -2
-                od = [0]
-            else:
-                flag = int(ds[i * 4 + 6][4])
 
             sites = int(ds[i * 4 + 3][1])
             comp = list(map(float, ds[i * 4 + 3][2:(len(ds[i * 4 + 3]) - 1)]))
@@ -127,6 +123,14 @@ def getmbr(ds, mbr):
             a = float(ds[i * 4 + 6][0])
             k = list(map(float, ds[i * 4 + 6][1:4]))
             od = list(map(float, ds[i * 4 + 6][5:]))
+
+            if mbr.endswith('L'):
+                flag = -2
+                od = [0]
+                k.append(float(ds[i * 4 + 6][4]))
+            else:
+                flag = int(ds[i * 4 + 6][4])
+
             endmember = Endmember(mbr, atoms, formula, sites,
                                   comp, H, S, V, Cp, a, k, flag, od)
             return endmember
