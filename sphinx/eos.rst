@@ -93,10 +93,15 @@ Modified Tait
 Holland and Powell Formulations
 -------------------------------
 
-HP_TMT (2011 formulation)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+HP_TMT (2011 solid formulation)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: burnman.eos.HP_TMT
+
+HP_TMTL (2011 liquid formulation)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: burnman.eos.HP_TMTL
 
 HP98 (1998 formulation)
 ^^^^^^^^^^^^^^^^^^^^^^^

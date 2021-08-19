@@ -80,7 +80,7 @@ class Endmember:
             formula = dictionarize_formula(formula)
             self.params = OrderedDict([('name', name),
                                        ('formula', formula),
-                                       ('equation_of_state', 'hp98'),
+                                       ('equation_of_state', 'hp_tmtL'),
                                        ('H_0', round(H * 1e3, 10)),
                                        ('S_0', round(S * 1e3, 10)),
                                        ('V_0', round(V * 1e-5, 15)),

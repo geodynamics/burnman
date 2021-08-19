@@ -70,6 +70,8 @@ def create(method):
             return hp.HP98()
         elif method == "hp_tmt":
             return hp.HP_TMT()
+        elif method == "hp_tmtL":
+            return hp.HP_TMTL()
         elif method == "cork":
             return cork.CORK()
         elif method == "dks_l":

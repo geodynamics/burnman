@@ -4395,7 +4395,7 @@ class syvL (Mineral):
     def __init__(self):
         self.params = {'name': 'syvL',
                        'formula': {'Cl': 1.0, 'K': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -417410.0,
                        'S_0': 94.5,
                        'V_0': 3.822e-05,
@@ -4414,7 +4414,7 @@ class hltL (Mineral):
     def __init__(self):
         self.params = {'name': 'hltL',
                        'formula': {'Cl': 1.0, 'Na': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -392990.0,
                        'S_0': 80.1,
                        'V_0': 2.938e-05,
@@ -4433,7 +4433,7 @@ class perL (Mineral):
     def __init__(self):
         self.params = {'name': 'perL',
                        'formula': {'Mg': 1.0, 'O': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -654190.0,
                        'S_0': -64.3,
                        'V_0': 8.39e-06,
@@ -4452,7 +4452,7 @@ class limL (Mineral):
     def __init__(self):
         self.params = {'name': 'limL',
                        'formula': {'Ca': 1.0, 'O': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -692330.0,
                        'S_0': -47.5,
                        'V_0': 1.303e-05,
@@ -4471,7 +4471,7 @@ class corL (Mineral):
     def __init__(self):
         self.params = {'name': 'corL',
                        'formula': {'Al': 2.0, 'O': 3.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -1632150.0,
                        'S_0': 14.9,
                        'V_0': 3.369e-05,
@@ -4490,7 +4490,7 @@ class eskL (Mineral):
     def __init__(self):
         self.params = {'name': 'eskL',
                        'formula': {'Cr': 2.0, 'O': 3.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -1062180.0,
                        'S_0': 63.3,
                        'V_0': 3.709e-05,
@@ -4509,7 +4509,7 @@ class hemL (Mineral):
     def __init__(self):
         self.params = {'name': 'hemL',
                        'formula': {'Fe': 2.0, 'O': 3.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -875130.0,
                        'S_0': -33.2,
                        'V_0': 3.2208e-05,
@@ -4528,7 +4528,7 @@ class qL (Mineral):
     def __init__(self):
         self.params = {'name': 'qL',
                        'formula': {'O': 2.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -921080.0,
                        'S_0': 16.3,
                        'V_0': 2.73e-05,
@@ -4547,7 +4547,7 @@ class h2oL (Mineral):
     def __init__(self):
         self.params = {'name': 'h2oL',
                        'formula': {'H': 2.0, 'O': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -281650.0,
                        'S_0': 66.6,
                        'V_0': 1.3355e-05,
@@ -4566,7 +4566,7 @@ class foL (Mineral):
     def __init__(self):
         self.params = {'name': 'foL',
                        'formula': {'Mg': 2.0, 'O': 4.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -2237250.0,
                        'S_0': -62.0,
                        'V_0': 4.312e-05,
@@ -4585,7 +4585,7 @@ class faL (Mineral):
     def __init__(self):
         self.params = {'name': 'faL',
                        'formula': {'Fe': 2.0, 'O': 4.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -1462820.0,
                        'S_0': 96.0,
                        'V_0': 4.677e-05,
@@ -4604,7 +4604,7 @@ class woL (Mineral):
     def __init__(self):
         self.params = {'name': 'woL',
                        'formula': {'Ca': 1.0, 'O': 3.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -1642570.0,
                        'S_0': 22.5,
                        'V_0': 3.985e-05,
@@ -4623,7 +4623,7 @@ class enL (Mineral):
     def __init__(self):
         self.params = {'name': 'enL',
                        'formula': {'Mg': 2.0, 'O': 6.0, 'Si': 2.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -3096310.0,
                        'S_0': -4.0,
                        'V_0': 6.984e-05,
@@ -4642,7 +4642,7 @@ class diL (Mineral):
     def __init__(self):
         self.params = {'name': 'diL',
                        'formula': {'Ca': 1.0, 'Mg': 1.0, 'O': 6.0, 'Si': 2.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -3193790.0,
                        'S_0': 42.1,
                        'V_0': 7.288e-05,
@@ -4661,7 +4661,7 @@ class silL (Mineral):
     def __init__(self):
         self.params = {'name': 'silL',
                        'formula': {'Al': 2.0, 'O': 5.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -2593510.0,
                        'S_0': 10.0,
                        'V_0': 6.051e-05,
@@ -4680,7 +4680,7 @@ class anL (Mineral):
     def __init__(self):
         self.params = {'name': 'anL',
                        'formula': {'Al': 2.0, 'Ca': 1.0, 'O': 8.0, 'Si': 2.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -4277920.0,
                        'S_0': 29.0,
                        'V_0': 0.00010014,
@@ -4699,7 +4699,7 @@ class kspL (Mineral):
     def __init__(self):
         self.params = {'name': 'kspL',
                        'formula': {'Al': 1.0, 'K': 1.0, 'O': 8.0, 'Si': 3.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -3985340.0,
                        'S_0': 129.2,
                        'V_0': 0.00011431,
@@ -4718,7 +4718,7 @@ class abL (Mineral):
     def __init__(self):
         self.params = {'name': 'abL',
                        'formula': {'Al': 1.0, 'Na': 1.0, 'O': 8.0, 'Si': 3.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -3925410.0,
                        'S_0': 149.9,
                        'V_0': 0.00010858,
@@ -4737,7 +4737,7 @@ class neL (Mineral):
     def __init__(self):
         self.params = {'name': 'neL',
                        'formula': {'Al': 1.0, 'Na': 1.0, 'O': 4.0, 'Si': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -2117040.0,
                        'S_0': 52.9,
                        'V_0': 5.2e-05,
@@ -4756,7 +4756,7 @@ class lcL (Mineral):
     def __init__(self):
         self.params = {'name': 'lcL',
                        'formula': {'Al': 1.0, 'K': 1.0, 'O': 6.0, 'Si': 2.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -3068560.0,
                        'S_0': 102.0,
                        'V_0': 8.59e-05,
@@ -4775,7 +4775,7 @@ class ruL (Mineral):
     def __init__(self):
         self.params = {'name': 'ruL',
                        'formula': {'O': 2.0, 'Ti': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -944300.0,
                        'S_0': 1.0,
                        'V_0': 1.7032e-05,
@@ -4794,7 +4794,7 @@ class bdyL (Mineral):
     def __init__(self):
         self.params = {'name': 'bdyL',
                        'formula': {'O': 2.0, 'Zr': 1.0},
-                       'equation_of_state': 'hp98',
+                       'equation_of_state': 'hp_tmtL',
                        'H_0': -1031880.0000000001,
                        'S_0': 48.9,
                        'V_0': 1.83e-05,

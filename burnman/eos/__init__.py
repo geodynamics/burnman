@@ -20,6 +20,7 @@ from .mie_grueneisen_debye import MGD2, MGD3
 from .slb import SLB2, SLB3
 from .modified_tait import MT
 from .hp import HP_TMT
+from .hp import HP_TMTL
 from .hp import HP98
 from .cork import CORK
 from .vinet import Vinet
