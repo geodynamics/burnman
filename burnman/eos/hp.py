@@ -335,11 +335,12 @@ class HP_TMTL(eos.EquationOfState):
     """
 
     def _V_T_1bar(self, temperature, params):
-        return params['V_0']*(1. + params['a_0']*(temperature - params['T_0'])
-                              - 20.*params['a_0']*(np.sqrt(temperature)
-                                                   - np.sqrt(params['T_0'])))
+        # Constant thermal expansivity at standard state pressure
+        # (p.348 of HP2011)
+        return params['V_0']*np.exp(params['a_0']*(temperature - params['T_0']))
 
     def _K_T_1bar(self, temperature, params):
+        # Linear bulk modulus dependence as in HP1998 (p.348 of HP2011)
         return params['K_0'] + params['dKdT_0']*(temperature - params['T_0'])
 
     def volume(self, pressure, temperature, params):
@@ -406,8 +407,9 @@ class HP_TMTL(eos.EquationOfState):
         Returns thermal expansivity at the pressure, temperature,
         and volume [1/K]
         """
-        # The derivation of the thermal expansivity is very tedious,
+        # The derivation of the high pressure thermal expansivity is tedious,
         # so here we take a numerical derivative.
+        # TODO Derive and use the analytical derivative.
         dT = 0.1
         self.static_params['V_0'] = self._V_T_1bar(temperature+dT/2., params)
         self.static_params['K_0'] = self._K_T_1bar(temperature+dT/2., params)
@@ -463,8 +465,9 @@ class HP_TMTL(eos.EquationOfState):
         Returns the entropy [J/K/mol] as a function of pressure [Pa]
         and temperature [K].
         """
-        # The derivation of the entropy is very tedious,
+        # The derivation of the entropy is tedious,
         # so here we take a numerical derivative.
+        # TODO Derive and use the analytical derivative.
         dT = 0.1
         G1 = self.gibbs_free_energy(pressure, temperature+dT/2., volume, params)
         G0 = self.gibbs_free_energy(pressure, temperature-dT/2., volume, params)
@@ -487,7 +490,7 @@ class HP_TMTL(eos.EquationOfState):
         """
         # The differentiation is tedious, so for now we just take the
         # numerical derivative of S
-        # TODO calculate the analytical derivative
+        # TODO Derive and use the analytical derivative.
         dT = 0.1
         S1 = self.entropy(pressure, temperature+dT/2., volume, params)
         S0 = self.entropy(pressure, temperature-dT/2., volume, params)

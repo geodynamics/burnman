@@ -1,0 +1,23 @@
+abL Gibbs energy difference (burnman - thermocalc v3.50, J/mol):
+0.0001 GPa, 298.15 K: 0
+0.0001 GPa, 1273.15 K: -0
+0.1 GPa, 298.15 K: 0
+0.1 GPa, 1273.15 K: -0
+10.0 GPa, 298.15 K: -4
+10.0 GPa, 1273.15 K: -5
+
+Checking EoS consistency for 'burnman.minerals.HGP_2018_ds633.abL' (not including shear properties)
+Expressions within tolerance of 0.000100
+G = F + PV : True 
+G = H - TS : True 
+G = E - TS + PV : True 
+S = -dG/dT : True 
+alpha = 1/V dV/dT : True 
+C_p = T dS/dT : True 
+V = dG/dP  : True 
+K_T = -V dP/dV : True 
+C_v = Cp - alpha^2*K_T*V*T : True 
+K_S = K_T*Cp/Cv : True 
+gr = alpha*K_T*V/Cv : True 
+Vphi = np.sqrt(K_S/rho) : True 
+All EoS consistency constraints satisfied for 'burnman.minerals.HGP_2018_ds633.abL'
