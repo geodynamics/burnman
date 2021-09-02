@@ -24,9 +24,9 @@ class.
 * How to initialize a composite object containing minerals and solid solutions
 * How to set state and composition of composite objects
 * How to interrogate composite objects for their
-compositional, thermodynamic and thermoelastic properties.
+  compositional, thermodynamic and thermoelastic properties.
 * How to use the stoichiometric and reaction affinity methods to solve
-simple thermodynamic equilibrium problems.
+  simple thermodynamic equilibrium problems.
 """
 
 from __future__ import absolute_import
