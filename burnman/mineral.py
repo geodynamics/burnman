@@ -139,7 +139,7 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.molar_gibbs)
     def molar_gibbs(self):
-        return self.method.gibbs_free_energy(self.pressure, self.temperature, self.molar_volume, self.params) \
+        return self.method.gibbs_free_energy(self.pressure, self.temperature, self._molar_volume_unmodified, self.params) \
             + self._property_modifiers['G']
 
     @material_property
@@ -155,7 +155,7 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
-        return self.method.entropy(self.pressure, self.temperature, self.molar_volume, self.params) \
+        return self.method.entropy(self.pressure, self.temperature, self._molar_volume_unmodified, self.params) \
             - self._property_modifiers['dGdT']
 
     @material_property
@@ -163,7 +163,7 @@ class Mineral(Material):
     def isothermal_bulk_modulus(self):
         K_T_orig = self.method.isothermal_bulk_modulus(
             self.pressure, self.temperature,
-            self.molar_volume, self.params)
+            self._molar_volume_unmodified, self.params)
 
         return self.molar_volume \
             / ((self._molar_volume_unmodified / K_T_orig) - self._property_modifiers['d2GdP2'])
@@ -173,7 +173,7 @@ class Mineral(Material):
     def molar_heat_capacity_p(self):
         return (self.method.molar_heat_capacity_p(self.pressure,
                                                   self.temperature,
-                                                  self.molar_volume,
+                                                  self._molar_volume_unmodified,
                                                   self.params)
                 - self.temperature * self._property_modifiers['d2GdT2'])
 
@@ -182,7 +182,8 @@ class Mineral(Material):
     def thermal_expansivity(self):
         return (
             (self.method.thermal_expansivity(self.pressure, self.temperature,
-                                             self.molar_volume, self.params)
+                                             self._molar_volume_unmodified,
+                                             self.params)
              * self._molar_volume_unmodified)
             + self._property_modifiers['d2GdPdT']) / self.molar_volume
 
@@ -190,7 +191,8 @@ class Mineral(Material):
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
         G = self.method.shear_modulus(
-            self.pressure, self.temperature, self.molar_volume, self.params)
+            self.pressure, self.temperature, self._molar_volume_unmodified,
+            self.params)
         if G < np.finfo('float').eps:
             warnings.formatwarning = lambda msg, * \
                 a: 'Warning from file \'{0}\', line {1}:\n{2}\n\n'.format(

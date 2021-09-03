@@ -4,6 +4,8 @@ from util import BurnManTest
 
 import burnman_path
 import burnman.eos.property_modifiers as pm
+from burnman.minerals import SLB_2011, HP_2011_ds62
+from burnman.tools import check_eos_consistency
 
 assert burnman_path  # silence pyflakes warning
 
@@ -54,6 +56,21 @@ class Modifiers(BurnManTest):
             gibbs_excesses_output.append(round(excesses[0]['G'], 4))
 
         self.assertArraysAlmostEqual(gibbs_excesses_output, gibbs_excesses)
+
+    def test_modifier_with_pvt_eos(self):
+        qtz = SLB_2011.quartz()
+        assert(check_eos_consistency(qtz, 1.e5, 600.))
+        assert(check_eos_consistency(qtz, 1.e5, 1100.))
+        assert(check_eos_consistency(qtz, 1.e9, 1100.))
+
+    def test_modifier_with_vpt_eos(self):
+        qtz = HP_2011_ds62.q()
+        assert(check_eos_consistency(qtz, 1.e5, 600.,
+                                     including_shear_properties=False))
+        assert(check_eos_consistency(qtz, 1.e5, 1100.,
+                                     including_shear_properties=False))
+        assert(check_eos_consistency(qtz, 1.e9, 1100.,
+                                     including_shear_properties=False))
 
 
 if __name__ == '__main__':
