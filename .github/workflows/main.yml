@@ -1,0 +1,30 @@
+name: test
+
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    name: test
+    runs-on: [ubuntu-20.04]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: setup
+      run: |
+        # pycddlib requires libgmp3-dev
+        sudo apt update && sudo apt install --yes \
+         numdiff \
+         libgmp3-dev \
+         texlive \
+         texlive-latex-extra
+        python -m pip install --upgrade pip
+        pip install matplotlib numpy scipy sympy pycddlib cvxpy
+        python --version
+    - name: test
+      run: |
+        PYTHON=python ./test.sh
