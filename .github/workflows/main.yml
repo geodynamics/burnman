@@ -23,7 +23,8 @@ jobs:
          texlive \
          texlive-latex-extra
         python -m pip install --upgrade pip
-        pip install matplotlib numpy scipy sympy pycddlib cvxpy
+        python -m pip install -r requirements.txt
+        pip install pycddlib # this is optional
         python --version
     - name: test
       run: |
