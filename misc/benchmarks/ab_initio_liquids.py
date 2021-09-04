@@ -68,7 +68,6 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate([(SiO2_liq, 3., SiO2
 
         ax_E.legend(loc='upper right')
 
-    fig.canvas.set_window_title(phase.name)
     plt.show()
 
 
@@ -108,5 +107,4 @@ ax_hugoniot.set_xlabel('Densities (Mg/m^3)')
 ax_hugoniot.set_ylabel('Pressures (GPa)')
 ax_hugoniot.set_title('hugoniot')
 
-fig.canvas.set_window_title(fa_liq.name)
 plt.show()

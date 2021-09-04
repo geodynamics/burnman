@@ -64,5 +64,4 @@ for name, phase, PVT_range, EVT_range in phases:
     ax_E.set_xlabel('Volume (cm^3/mol)')
     ax_E.set_ylabel('Internal energy (kJ/mol)')
 
-    fig.canvas.set_window_title(name)
     plt.show()
