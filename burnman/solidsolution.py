@@ -516,7 +516,8 @@ class SolidSolution(Mineral):
         An array N such that N.b = 0 for all bulk compositions that can
         be produced with a linear sum of the endmembers in the solid solution.
         """
-        null_basis = np.array(self.stoichiometric_matrix.nullspace())
+        null_basis = np.array([v[:] for v in
+                               self.stoichiometric_matrix.nullspace()])
 
         M = null_basis[:, self.dependent_element_indices]
         assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
