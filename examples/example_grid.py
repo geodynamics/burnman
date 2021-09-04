@@ -56,7 +56,7 @@ if __name__ == "__main__":
     # print mat_vs
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
 
     X, Y = np.meshgrid(p / 1e9, T)
 

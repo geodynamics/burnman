@@ -57,11 +57,11 @@ if __name__ == "__main__":
     variables = ['pressure', 'gravity', 'v_p', 'v_s', 'v_phi', 'density']
     units = ['Pa', 'm/s^2', 'm/s', 'm/s', 'm/s', 'kg/m^3', 'Pa', 'm/s^2']
 
-    plt.figure(figsize=(10, 9))
+    fig = plt.figure(figsize=(10, 9))
+    ax = [fig.add_subplot(3, 2, i) for i in range(1, 7)]
 
     # Run through models and variables
     for variable_index in range(len(variables)):
-        ax = plt.subplot(3, 2, variable_index + 1)
         for model_index in range(len(models)):
 
             # specify where we want to evaluate, here we map from pressure
@@ -94,9 +94,10 @@ if __name__ == "__main__":
                     elif len(wrn) > 2:
                         raise Exception('Unexpected number of warnings')
 
-                plt.plot(depths / 1.e3, values, color=colors[model_index],
-                         linestyle='-',
-                         label=models[model_index].__class__.__name__)
+                ax[variable_index].plot(depths / 1.e3, values,
+                                        color=colors[model_index],
+                                        linestyle='-',
+                                        label=models[model_index].__class__.__name__)
             except ValueError:
                 # write out warning that the variable failed for given
                 # model
@@ -104,15 +105,15 @@ if __name__ == "__main__":
                       + ' is not defined for '
                       + models[model_index].__class__.__name__)
 
-        plt.title(variables[variable_index])
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        ax[variable_index].set_title(variables[variable_index])
         if variable_index == 3:
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            ax[variable_index].legend()
         if variable_index > 3:
-            plt.xlabel('depth in km')
-        plt.ylabel(units[variable_index])
-        plt.gca().set_xticks([660, 2891, 5150])
+            ax[variable_index].set_xlabel('depth in km')
+        ax[variable_index].set_ylabel(units[variable_index])
+        ax[variable_index].set_xticks([660, 2891, 5150])
+
+    fig.set_tight_layout(True)
     plt.show()
 
     # Alternatively one is able to evaluate all the variables for a model in a
