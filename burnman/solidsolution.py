@@ -478,7 +478,8 @@ class SolidSolution(Mineral):
         An array where each element arr[i,j] corresponds
         to the number of moles of endmember[j] involved in reaction[i].
         """
-        reaction_basis = np.array(self.stoichiometric_matrix.T.nullspace())
+        reaction_basis = np.array([v[:] for v in
+                                   self.stoichiometric_matrix.T.nullspace()])
 
         if len(reaction_basis) == 0:
             reaction_basis = np.empty((0, len(self.endmember_names)))
