@@ -56,6 +56,24 @@ def bulk_modulus(pressure, params):
     return params['K_0'] * (1. + b * (pressure - params['P_0'])) * (a + (1. - a) * np.power((1. + b * (pressure - params['P_0'])), c))
 
 
+def intVdP(pressure, params):
+    """
+    Returns the integral of VdP for the mineral. :math:`[J]`.
+    EQ 13
+    """
+    a, b, c = tait_constants(params)
+    psubpth = pressure - params['P_0']
+
+    if pressure != params['P_0']:
+        intVdP = ((pressure - params['P_0'])
+                  * params['V_0']
+                  * (1. - a + (a * (1. - np.power((1. + b * (psubpth)), 1. - c))
+                               / (b * (c - 1.)
+                                  * (pressure - params['P_0'])))))
+    else:
+        intVdP = 0.
+    return intVdP
+
 class MT(eos.EquationOfState):
 
     """
@@ -184,7 +202,7 @@ class MT(eos.EquationOfState):
             warnings.warn('Unusual value for V_0', stacklevel=2)
         if params['K_0'] < 1.e9 or params['K_0'] > 1.e13:
             warnings.warn('Unusual value for K_0', stacklevel=2)
-        if params['Kprime_0'] < 0. or params['Kprime_0'] > 10.:
+        if params['Kprime_0'] < 0. or params['Kprime_0'] > 40.:
             warnings.warn('Unusual value for Kprime_0', stacklevel=2)
         if params['G_0'] < 0.0 or params['G_0'] > 1.e13:
             warnings.warn('Unusual value for G_0', stacklevel=2)

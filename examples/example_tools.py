@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
-
+from burnman.tools import invariant_point
 assert burnman_path  # silence pyflakes warning
 
 
@@ -39,15 +39,16 @@ if __name__ == "__main__":
 
     # Next, let's create the Mg2SiO4 phase diagram
     forsterite = burnman.minerals.HP_2011_ds62.fo()
+    liquid = burnman.minerals.HP_2011_ds62.foL()
     mg_wadsleyite = burnman.minerals.HP_2011_ds62.mwd()
     mg_ringwoodite = burnman.minerals.HP_2011_ds62.mrw()
     periclase = burnman.minerals.HP_2011_ds62.per()
     mg_perovskite = burnman.minerals.HP_2011_ds62.mpv()
 
-    temperatures = np.linspace(1000., 2000., 21)
-    pressures_fo_wd = np.empty_like(temperatures)
-    pressures_wd_rw = np.empty_like(temperatures)
-    pressures_rw_perpv = np.empty_like(temperatures)
+    fo_wad_liq = invariant_point([forsterite, mg_wadsleyite], [1., -1.],
+                                 [forsterite, liquid], [1., -1],
+                                 pressure_temperature_initial_guess=[14.e9,
+                                                                     2000.])
 
     # Here's one example where we find the equilibrium temperature:
     P = 14.e9
@@ -58,7 +59,22 @@ if __name__ == "__main__":
           "GPa is reached at", round_to_n(T, T, 4), "K")
     print('')
 
+    # Here we find the equilibrium temperature for forsterite melting
+    pressures = np.linspace(1.e5, fo_wad_liq[0], 11)
+
+    T_fo_melt = np.empty_like(pressures)
+    for i, P in enumerate(pressures):
+        T_fo_melt[i] = burnman.tools.equilibrium_temperature([forsterite,
+                                                              liquid],
+                                                             [1.0, -1.0],
+                                                             P, 2000.)
+
     # Now let's make the whole diagram using equilibrium_pressure
+    temperatures = np.linspace(1000., fo_wad_liq[1], 21)
+    pressures_fo_wd = np.empty_like(temperatures)
+    pressures_wd_rw = np.empty_like(temperatures)
+    pressures_rw_perpv = np.empty_like(temperatures)
+
     for i, T in enumerate(temperatures):
         P = burnman.tools.equilibrium_pressure([forsterite, mg_wadsleyite],
                                                [1.0, -1.0],
@@ -76,12 +92,13 @@ if __name__ == "__main__":
             T)
         pressures_rw_perpv[i] = P
 
+    plt.plot(T_fo_melt, pressures/1.e9, label='fo -> melt')
     plt.plot(temperatures, pressures_fo_wd / 1.e9, label='fo -> wd')
     plt.plot(temperatures, pressures_wd_rw / 1.e9, label='wd -> rw')
     plt.plot(temperatures, pressures_rw_perpv / 1.e9, label='rw -> per + pv')
     plt.xlabel("Temperature (K)")
     plt.ylabel("Pressure (GPa)")
-    plt.legend(loc="lower right")
+    plt.legend()
     plt.title("Mg2SiO4 phase diagram")
     plt.ylim(0., 30.)
     plt.show()
