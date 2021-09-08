@@ -158,6 +158,11 @@ testit $test $fulldir || exit 1
 done
 cd ../..
 
+echo "checking contrib/solution_polytope/ ..."
+cd contrib/solution_polytope/
+testit create_polytope_paper_tables.py $fulldir || exit 1
+testit example_solution_creation_and_manipulation.py $fulldir || exit 1
+cd ../..
 
 echo "   done"
 

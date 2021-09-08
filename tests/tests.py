@@ -2,6 +2,11 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 from util import *
+import sympy
+
+import burnman_path
+import burnman
+from burnman import minerals
 
 from test_anisotropy import *
 from test_averaging import *
@@ -22,6 +27,7 @@ from test_modifiers import *
 from test_partitioning import *
 from test_perplex import *
 from test_planet import *
+from test_polytope import *
 from test_processchemistry import *
 from test_seismic import *
 from test_solidsolution import *
@@ -29,12 +35,7 @@ from test_solvers import *
 from test_spin import *
 from test_tools import *
 
-import os
-import sys
-sys.path.insert(1, os.path.abspath('..'))
-
-import burnman
-from burnman import minerals
+assert burnman_path  # silence pyflakes warning
 
 
 class TestRock(BurnManTest):
@@ -48,8 +49,6 @@ class TestRock(BurnManTest):
         self.assertFloatEqual(fr[0], 0.3)
         self.assertFloatEqual(fr[1], 0.7)
 
-
-import sympy
 
 class TestSympy(BurnManTest):
     def test(self):

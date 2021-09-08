@@ -31,3 +31,9 @@ Subregular solution
 -------------------
 
 .. autoclass:: burnman.solutionmodel.SubregularSolution
+
+
+Solution tools
+==============
+
+.. autofunction:: burnman.solutiontools.transform_solution_to_new_basis

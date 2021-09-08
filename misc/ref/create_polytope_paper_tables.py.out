@@ -1,0 +1,102 @@
+Table 2: Equality constraints for a two-site CFMS clinopyroxene
+
+Matrix P
+[[1. 1. 1. 0. 0.]
+ [0. 0. 0. 1. 1.]
+ [2. 2. 2. 2. 2.]]
+Vector b
+[1. 1. 4.]
+Table 3: Equality constraints for a one-site pyrope-majorite garnet
+Matrix P
+[[1. 1. 1.]
+ [4. 6. 8.]]
+Vector b
+[1. 6.]
+
+Table 4: The endmember site-occupancy matrix E for a two-site CFMS clinopyroxene
+[[1. 0. 0. 0. 1.]
+ [1. 0. 0. 1. 0.]
+ [0. 1. 0. 1. 0.]
+ [0. 1. 0. 0. 1.]
+ [0. 0. 1. 1. 0.]
+ [0. 0. 1. 0. 1.]]
+
+Table 4 in formula form (order not preserved)
+['[Ca][Fe]', '[Ca][Mg]', '[Fe][Mg]', '[Fe][Fe]', '[Mg][Mg]', '[Mg][Fe]']
+
+Table 5: The endmember site-occupancy matrix E for a a one-site pyrope-majorite garnet.
+[[0.5 0.  0.5]
+ [0.  1.  0. ]]
+
+Table 5 in formula form (order not preserved)
+['[Mg1/2Si1/2]2', '[Al]2']
+
+Table 6: The endmember site-occupancy matrix E for a two-site FMAS bridgmanite
+(i.e. [Mg,Fe,Al3+][Al3+,Si]O3)
+[[1. 0. 0. 0. 1.]
+ [0. 1. 0. 0. 1.]
+ [0. 0. 1. 1. 0.]]
+
+Table 6 in formula form (order not preserved)
+['[Mg][Si]', '[Fe][Si]', '[Al][Al]']
+
+Table 7: A matrix P and vector b for a two-site FMAS bridgmanite, as constructed from a set of independent endmembers.
+Matrix P
+[[-1. -1.  0.  0.  1.]
+ [ 0.  0. -1.  1.  0.]
+ [ 1.  1.  1.  1.  1.]]
+Vector b
+[-0. -0.  2.]
+
+Table 8: A matrix P and vector b for a two-site FMAS bridgmanite, as constructed from site constraints.
+Matrix P
+[[1. 1. 1. 0. 0.]
+ [0. 0. 0. 1. 1.]
+ [2. 2. 3. 3. 4.]]
+Vector b
+[1. 1. 6.]
+
+Table 9 and 10 not reproduced here.
+
+Table 11: Independent endmember site-occupancy matrix Eind for a 
+six-site clinoamphibole solution model (Green et al., 2016) including full order-disorder.
+Site species:
+A*1      M13*3   M2*2               M4*2          T1*4    V*2
+v Na K | Mg Fe | Mg Fe Al Fe3 Ti  | Ca Mg Fe Na | Si Al | OH O
+The published model has 11 independent endmembers, but the site solution space allows for 12.
+One potential set of independent endmembers using the partial set as a starting point is as follows:
+[[1.  0.  0.  1.  0.  1.  0.  0.  0.  0.  1.  0.  0.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  1.  0.  0.  0.  1.  0.  0.  1.  0.  0.  0.  0.5 0.5 1.  0. ]
+ [0.  1.  0.  1.  0.  0.5 0.  0.5 0.  0.  1.  0.  0.  0.  0.5 0.5 1.  0. ]
+ [1.  0.  0.  1.  0.  0.  0.  1.  0.  0.  0.  0.  0.  1.  1.  0.  1.  0. ]
+ [1.  0.  0.  1.  0.  1.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  0.  1.  0.  1.  0.  0.  0.  0.  0.  1.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  1.  0.  0.  1.  0.  0.  0.  0.  0.  1.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  0.  1.  1.  0.  0.  0.  0.  0.  0.  1.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  1.  0.  0.  0.  0.  1.  0.  0.  0.  0.  1.  1.  0.  1.  0. ]
+ [0.  0.  1.  1.  0.  0.5 0.  0.5 0.  0.  1.  0.  0.  0.  0.5 0.5 1.  0. ]
+ [1.  0.  0.  1.  0.  0.  0.  0.  0.  1.  1.  0.  0.  0.  0.5 0.5 0.  1. ]
+ [1.  0.  0.  0.  1.  0.  0.  0.  0.  1.  0.  0.  1.  0.  0.  1.  1.  0. ]]
+The last endmember has the following formula (only mixing sites shown):
+['[v][Fe]3[Ti]2[Fe]2[Al]4[OH]2']
+The following endmember is also missing, and is the one used to complete the basis in the paper:
+['[v][Fe]3[Al]2[Fe]2[Si]4[O]2']
+(All the missing endmembers can be printed by setting the print_missing_endmembers variable to True)
+
+Table 12: Independent endmember site-occupancy matrix Eind for a 
+four-site biotite solution model (Tajcmanova et al., 2009) including full order-disorder.
+Site species:
+M1             M2*2       T1*2    H*2
+Fe Fef Mg Al | Mg Ti Fe | Al Si | OH O
+The published model has 6 independent endmembers, but the site solution space allows for 7.
+One potential set of independent endmembers using the partial set as a starting point is as follows:
+[[0.  1.  0.  0.  1.  0.  0.  1.  0.  1.  0. ]
+ [0.  0.  1.  0.  0.5 0.5 0.  0.5 0.5 0.  1. ]
+ [0.  0.  0.  1.  1.  0.  0.  1.  0.  1.  0. ]
+ [1.  0.  0.  0.  0.  0.  1.  0.5 0.5 1.  0. ]
+ [0.  0.  1.  0.  1.  0.  0.  0.5 0.5 1.  0. ]
+ [1.  0.  0.  0.  1.  0.  0.  0.5 0.5 1.  0. ]
+ [1.  0.  0.  0.  0.  0.  1.  0.  1.  0.5 0.5]]
+The following endmember is the one used to complete the basis in the paper:
+['[Fe][Fe]2[Si]2[O1/2OH1/2]2']
+(All the missing endmembers can be printed by setting the print_missing_endmembers variable to True)
