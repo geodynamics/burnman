@@ -39,9 +39,15 @@ If you use BurnMan in your work, we ask that you cite the following publications
 Contributing to BurnMan
 -----------------------
 
-We welcome the submission of scripts used to create published results. If you
-have any scripts that you would like to contribute, please contact us at info@burnman.org
-or make a pull request at `https://github.com/geodynamics/burnman <https://github.com/geodynamics/burnman>`_
+If you would like to contribute bug fixes, new functions or new modules
+to the existing codebase, please contact us at info@burnman.org or make a
+pull request at `https://github.com/geodynamics/burnman <https://github.com/geodynamics/burnman>`_.
+
+BurnMan also includes a contrib directory that contains python and ipython
+scripts used to reproduce published results. We welcome the submission of
+new contributions to this directory. As with the contribution of code,
+please contact us at info@burnman.org or make a pull request at
+`https://github.com/geodynamics/burnman <https://github.com/geodynamics/burnman>`_.
 
 Acknowledgement and Support
 ---------------------------
