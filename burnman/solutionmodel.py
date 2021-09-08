@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -7,19 +7,6 @@ from __future__ import absolute_import
 import numpy as np
 from . import processchemistry
 from . import constants
-
-# Try to import the jit from numba.  If it is
-# not available, just go with the standard
-# python interpreter
-try:
-    import os
-    if (('NUMBA_DISABLE_JIT' in os.environ
-         and int(os.environ['NUMBA_DISABLE_JIT']) == 1)):
-        raise ImportError("NOOOO!")
-    from numba import njit
-except ImportError:
-    def njit(fn):
-        return fn
 
 
 def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers,
@@ -51,45 +38,40 @@ def _non_ideal_interactions_fct(phi, molar_fractions, n_endmembers, alpha, W):
     return Wint
 
 
-@njit
-def _non_ideal_hessian_subreg(p, n_endmembers, W):
-    hess = np.zeros((n_endmembers, n_endmembers))
-    for k in range(n_endmembers):
-        for m in range(n_endmembers):
-            for i in range(n_endmembers):
-                for j in range(n_endmembers):
-                    dik = 1. if i == k else 0.
-                    djk = 1. if j == k else 0.
-                    dim = 1. if i == m else 0.
-                    djm = 1. if j == m else 0.
+def _non_ideal_hessian_subreg(p, n_endmembers, Wijk):
+    Id = np.identity(n_endmembers)
+    IIp = np.einsum('il, jm, k->ijklm', Id, Id, p)
+    Ipp = np.einsum('il, j, k->ijkl', Id, p, p)
+    ppp = np.einsum('i, j, k->ijk', p, p, p)
 
-                    hess[k, m] += W[i, j] * ((djk*djm*p[i] - dik*dim*p[j])
-                                             + (dik*djm + djk*dim)
-                                             * (p[j] - p[i])
-                                             + (djk + djm)
-                                             * (p[i]*(p[i] - 2.*p[j]))
-                                             - (dik + dim)
-                                             * (p[j]*(p[j] - 2.*p[i]))
-                                             + 3.*p[i]*p[j]
-                                             * (p[j] - p[i])
-                                             + (((dik + dim) - p[i])
-                                                * ((djk + djm) - p[j])
-                                                + p[i]*p[j])
-                                             / 2.)
+    A = (IIp
+         + np.transpose(IIp, axes=[0, 2, 1, 3, 4])
+         + np.transpose(IIp, axes=[1, 0, 2, 3, 4])
+         + np.transpose(IIp, axes=[1, 2, 0, 3, 4])
+         + np.transpose(IIp, axes=[2, 1, 0, 3, 4])
+         + np.transpose(IIp, axes=[2, 0, 1, 3, 4]))
+    B = 2.*(Ipp
+            + np.transpose(Ipp, axes=[1, 0, 2, 3])
+            + np.transpose(Ipp, axes=[2, 1, 0, 3]))
+
+    Asum = (A
+            - B[:, :, :, :, None]
+            - B[:, :, :, None, :]
+            + 6.*ppp[:, :, :, None, None])
+    hess = np.einsum('ijklm, ijk->lm', Asum, Wijk)
     return hess
 
 
-@njit
-def _non_ideal_interactions_subreg(p, n_endmembers, W):
-    Wint = np.zeros(n_endmembers)
-    for k in range(n_endmembers):
-        for i in range(n_endmembers):
-            for j in range(n_endmembers):
-                dik = 1. if i == k else 0.
-                djk = 1. if j == k else 0.
-                Wint[k] += W[i, j]/2. * ((p[i] - dik)*(p[j] - djk)
-                                         * (2.*(p[i] - p[j]) - 1.)
-                                         + djk*p[i]*p[i] - dik*p[j]*p[j])
+def _non_ideal_interactions_subreg(p, n_endmembers, Wijk):
+    Aijkl = np.einsum('li, j, k->ijkl', np.identity(n_endmembers), p, p)
+    ppp = np.einsum('i, j, k->ijk', p, p, p)
+
+    Asum = (Aijkl
+            + np.transpose(Aijkl, axes=[1, 0, 2, 3])
+            + np.transpose(Aijkl, axes=[1, 2, 0, 3])
+            - 2*ppp[:, :, :, None])
+
+    Wint = np.einsum('ijk, ijkl->l', Wijk, Asum)
     return Wint
 
 
@@ -455,10 +437,25 @@ class IdealSolution (SolutionModel):
 class AsymmetricRegularSolution (IdealSolution):
 
     """
-    Solution model implementing the asymmetric regular solution model formulation as described in :cite:`HP2003`.
+    Solution model implementing the asymmetric regular solution model
+    formulation as described in :cite:`HP2003`.
+
+    The excess nonconfigurational Gibbs energy is given by the
+    expression:
+
+    .. math::
+        \\mathcal{G}_{\\textrm{excess}} = \\alpha^T p (\\phi^T W \\phi)
+
+    :math:`\\alpha` is a vector of van Laar parameters governing asymmetry
+    in the excess properties.
+
+    .. math::
+        \\phi_i = \\frac{\\alpha_i p_i}{\\sum_{k=1}^{n} \\alpha_k p_k}, 
+        W_{ij} = \\frac{2 w_{ij}}{\\alpha_i + \\alpha_j} \\textrm{for i<j}
     """
 
-    def __init__(self, endmembers, alphas, energy_interaction, volume_interaction=None, entropy_interaction=None):
+    def __init__(self, endmembers, alphas, energy_interaction,
+                 volume_interaction=None, entropy_interaction=None):
 
         self.n_endmembers = len(endmembers)
 
@@ -556,7 +553,9 @@ class AsymmetricRegularSolution (IdealSolution):
 class SymmetricRegularSolution (AsymmetricRegularSolution):
 
     """
-    Solution model implementing the symmetric regular solution model. This is simply a special case of the :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
+    Solution model implementing the symmetric regular solution model.
+    This is a special case of the
+    :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
     """
 
     def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):
@@ -568,48 +567,135 @@ class SymmetricRegularSolution (AsymmetricRegularSolution):
 class SubregularSolution (IdealSolution):
 
     """
-    Solution model implementing the subregular solution model formulation as described in :cite:`HW1989`.
+    Solution model implementing the subregular solution model formulation
+    as described in :cite:`HW1989`. The excess conconfigurational
+    Gibbs energy is given by the expression:
+
+    .. math::
+        \\mathcal{G}_{\\textrm{excess}} = \\sum_i \\sum_{j > i} (p_i p_j^2
+        W_{ij} + p_j p_i^2 W_{ji} + \\sum_{k > j > i} p_i p_j p_k W_{ijk})
+
+    Interaction parameters are inserted into a 3D interaction matrix during
+    initialization to make use of numpy vector algebra.
+
+    Parameters
+    ----------
+    endmembers : list of lists
+        A list of all the independent endmembers in the solution.
+        The first item of each list gives the Mineral object corresponding
+        to the endmember. The second item gives the site-species formula.
+
+    energy_interaction : list of list of lists
+        The binary endmember interaction energies.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    volume_interaction : list of list of lists
+        The binary endmember interaction volumes.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    entropy_interaction : list of list of lists
+        The binary endmember interaction entropies.
+        Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
+        interaction[i, j-i-1, 1] corresponds to W(j,i).
+
+    energy_ternary_terms : list of lists
+        The ternary interaction energies. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
+
+    volume_ternary_terms : list of lists
+        The ternary interaction volumes. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
+
+    entropy_ternary_terms : list of lists
+        The ternary interaction entropies. Each list should contain
+        four entries: the indices i, j, k and the value of the interaction.
     """
 
-    def __init__(self, endmembers, energy_interaction, volume_interaction=None, entropy_interaction=None):
+    def __init__(self, endmembers, energy_interaction,
+                 volume_interaction=None, entropy_interaction=None,
+                 energy_ternary_terms=None,
+                 volume_ternary_terms=None, entropy_ternary_terms=None):
+        """
+        Initialization function for the SubregularSolution class.
+        """
 
         self.n_endmembers = len(endmembers)
 
-        # Create 2D arrays of interaction parameters
-        self.We = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
-        self.Ws = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
-        self.Wv = np.zeros(shape=(self.n_endmembers, self.n_endmembers))
+        # Create 3D arrays of interaction parameters
+        self.Wijke = np.zeros(shape=(self.n_endmembers,
+                                     self.n_endmembers,
+                                     self.n_endmembers))
+        self.Wijks = np.zeros_like(self.Wijke)
+        self.Wijkv = np.zeros_like(self.Wijke)
 
         # setup excess enthalpy interaction matrix
         for i in range(self.n_endmembers):
             for j in range(i + 1, self.n_endmembers):
-                self.We[i][j] = energy_interaction[i][j - i - 1][0]
-                self.We[j][i] = energy_interaction[i][j - i - 1][1]
+                w0 = energy_interaction[i][j - i - 1][0]/2.
+                w1 = energy_interaction[i][j - i - 1][1]/2.
+                self.Wijke[:, i, j] += w0
+                self.Wijke[:, j, i] += w1
+
+                self.Wijke[i, j, j] += w0
+                self.Wijke[j, i, i] += w1
+
+                self.Wijke[i, j, i] -= w0
+                self.Wijke[j, i, j] -= w1
+
+        if energy_ternary_terms is not None:
+            for (i, j, k, v) in energy_ternary_terms:
+                self.Wijke[i, j, k] += v
 
         if entropy_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
-                    self.Ws[i][j] = entropy_interaction[i][j - i - 1][0]
-                    self.Ws[j][i] = entropy_interaction[i][j - i - 1][1]
+                    w0 = entropy_interaction[i][j - i - 1][0]/2.
+                    w1 = entropy_interaction[i][j - i - 1][1]/2.
+                    self.Wijks[:, i, j] += w0
+                    self.Wijks[:, j, i] += w1
+
+                    self.Wijks[i, j, j] += w0
+                    self.Wijks[j, i, i] += w1
+
+                    self.Wijks[i, j, i] -= w0
+                    self.Wijks[j, i, j] -= w1
+
+        if entropy_ternary_terms is not None:
+            for (i, j, k, v) in entropy_ternary_terms:
+                self.Wijks[i, j, k] += v
 
         if volume_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
-                    self.Wv[i][j] = volume_interaction[i][j - i - 1][0]
-                    self.Wv[j][i] = volume_interaction[i][j - i - 1][1]
+                    w0 = volume_interaction[i][j - i - 1][0]/2.
+                    w1 = volume_interaction[i][j - i - 1][1]/2.
+                    self.Wijkv[:, i, j] += w0
+                    self.Wijkv[:, j, i] += w1
+
+                    self.Wijkv[i, j, j] += w0
+                    self.Wijkv[j, i, i] += w1
+
+                    self.Wijkv[i, j, i] -= w0
+                    self.Wijkv[j, i, j] -= w1
+
+        if volume_ternary_terms is not None:
+            for (i, j, k, v) in volume_ternary_terms:
+                self.Wijkv[i, j, k] += v
 
         # initialize ideal solution model
         IdealSolution.__init__(self, endmembers)
 
-    def _non_ideal_function(self, W, molar_fractions):
+    def _non_ideal_function(self, Wijk, molar_fractions):
         n = len(molar_fractions)
-        return _non_ideal_interactions_subreg(molar_fractions, n, W)
+        return _non_ideal_interactions_subreg(molar_fractions, n, Wijk)
 
     def _non_ideal_interactions(self, molar_fractions):
         # equation (6') of Helffrich and Wood, 1989
-        Eint = self._non_ideal_function(self.We, molar_fractions)
-        Sint = self._non_ideal_function(self.Ws, molar_fractions)
-        Vint = self._non_ideal_function(self.Wv, molar_fractions)
+        Eint = self._non_ideal_function(self.Wijke, molar_fractions)
+        Sint = self._non_ideal_function(self.Wijks, molar_fractions)
+        Vint = self._non_ideal_function(self.Wijkv, molar_fractions)
         return Eint, Sint, Vint
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
@@ -626,19 +712,19 @@ class SubregularSolution (IdealSolution):
     def excess_partial_entropies(self, pressure, temperature, molar_fractions):
         ideal_entropies = IdealSolution._ideal_excess_partial_entropies(
             self, temperature, molar_fractions)
-        non_ideal_entropies = self._non_ideal_function(self.Ws, molar_fractions)
+        non_ideal_entropies = self._non_ideal_function(self.Wijks, molar_fractions)
         return ideal_entropies + non_ideal_entropies
 
     def excess_partial_volumes(self, pressure, temperature, molar_fractions):
-        non_ideal_volumes = self._non_ideal_function(self.Wv, molar_fractions)
+        non_ideal_volumes = self._non_ideal_function(self.Wijkv, molar_fractions)
         return non_ideal_volumes
 
     def gibbs_hessian(self, pressure, temperature, molar_fractions):
         n = len(molar_fractions)
         ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
         nonideal_gibbs_hessian = _non_ideal_hessian_subreg(molar_fractions, n,
-                                                           self.We - temperature*self.Ws
-                                                           + pressure*self.Wv)
+                                                           self.Wijke - temperature*self.Wijks
+                                                           + pressure*self.Wijkv)
 
         return nonideal_gibbs_hessian - temperature*ideal_entropy_hessian
 
@@ -646,13 +732,12 @@ class SubregularSolution (IdealSolution):
         n = len(molar_fractions)
         ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
         nonideal_entropy_hessian = _non_ideal_hessian_subreg(molar_fractions, n,
-                                                             self.Ws)
+                                                             self.Wijks)
         return ideal_entropy_hessian + nonideal_entropy_hessian
 
     def volume_hessian(self, pressure, temperature, molar_fractions):
         n = len(molar_fractions)
-        return _non_ideal_hessian_subreg(molar_fractions, n,
-                                         self.Wv)
+        return _non_ideal_hessian_subreg(molar_fractions, n, self.Wijkv)
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         if temperature > 1.e-10:

@@ -344,18 +344,18 @@ if __name__ == "__main__":
                                                            [[1.69, 1.69], [0., 0.]],
                                                            [[0., 0.]]], 3.))
 
-    g5_excess_gibbs = np.empty_like(comp)
+    g5_excess_enthalpy = np.empty_like(comp)
     for i, c in enumerate(comp):
         molar_fractions = [1. - c, 0., c, 0.]
         g5.set_composition(molar_fractions)
         g5.set_state(1.e5, 298.15)
-        g5_excess_gibbs[i] = g5.excess_gibbs
+        g5_excess_enthalpy[i] = g5.excess_gibbs + 298.15*g5.excess_entropy
 
-    plt.plot(comp, g5_excess_gibbs / 3., 'r-', linewidth=1.,
-             label='Py-Gr excess gibbs (J/cation-mole)')
+    plt.plot(comp, g5_excess_enthalpy / 3., 'r-', linewidth=1.,
+             label='Py-Gr excess enthalpy (J/cation-mole)')
 
     plt.title("Asymmetric py-gr join (Ganguly et al., 1996; Figure 5)")
-    plt.ylabel("Excess gibbs free energy of solution (J/cation-mol)")
+    plt.ylabel("Excess enthalpy of solution (J/cation-mol)")
     plt.xlabel("XCa")
     plt.legend(loc='lower left')
     plt.show()

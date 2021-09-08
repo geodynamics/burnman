@@ -35,6 +35,25 @@ class SolidSolution(Mineral):
     All the solid solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T
     and P derivatives in J/K/mol and m^3/mol.
+
+    The parameters are relevant to all solution models. Please
+    see the documentation for individual models for details about
+    other parameters.
+
+    Parameters
+    ----------
+    name : string
+        Name of the solid solution
+    solution_type : string
+        String determining which SolutionModel to use. One of 'mechanical',
+        'ideal', 'symmetric', 'asymmetric' or 'subregular'.
+    endmembers : list of lists
+        List of endmembers in this solid solution. The first item of each
+        list should be a :class:`burnman.Mineral` object. The second item
+        should be a string with the site formula of the endmember.
+    molar_fractions : numpy array (optional)
+        The molar fractions of each endmember in the solid solution.
+        Can be reset using the set_composition() method.
     """
 
     def __init__(self,
@@ -44,17 +63,13 @@ class SolidSolution(Mineral):
                  energy_interaction=None,
                  volume_interaction=None,
                  entropy_interaction=None,
+                 energy_ternary_terms=None,
+                 volume_ternary_terms=None,
+                 entropy_ternary_terms=None,
                  alphas=None,
                  molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
-
-        Parameters
-        ----------
-        endmembers: list of :class:`burnman.Mineral`
-            List of endmembers in this solid solution.
-        solution_model: :class:`burnman.SolutionModel`
-            SolutionModel to use.
         """
         Mineral.__init__(self)
 
@@ -74,6 +89,12 @@ class SolidSolution(Mineral):
             self.volume_interaction = volume_interaction
         if entropy_interaction is not None:
             self.entropy_interaction = entropy_interaction
+        if energy_ternary_terms is not None:
+            self.energy_ternary_terms = energy_ternary_terms
+        if volume_ternary_terms is not None:
+            self.volume_ternary_terms = volume_ternary_terms
+        if entropy_ternary_terms is not None:
+            self.entropy_ternary_terms = entropy_ternary_terms
         if alphas is not None:
             self.alphas = alphas
         if endmembers is not None:
@@ -107,8 +128,19 @@ class SolidSolution(Mineral):
                     self.solution_model = AsymmetricRegularSolution(
                         self.endmembers, self.alphas, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
                 elif self.solution_type == 'subregular':
+                    if hasattr(self, 'energy_ternary_terms') is False:
+                        self.energy_ternary_terms = None
+                    if hasattr(self, 'volume_ternary_terms') is False:
+                        self.volume_ternary_terms = None
+                    if hasattr(self, 'entropy_ternary_terms') is False:
+                        self.entropy_ternary_terms = None
+
                     self.solution_model = SubregularSolution(
-                        self.endmembers, self.energy_interaction, self.volume_interaction, self.entropy_interaction)
+                        self.endmembers,
+                        self.energy_interaction,  self.volume_interaction,
+                        self.entropy_interaction,
+                        self.energy_ternary_terms, self.volume_ternary_terms,
+                        self.entropy_ternary_terms)
                 else:
                     raise Exception(
                         "Solution model type " + self.solution_type + "not recognised.")
