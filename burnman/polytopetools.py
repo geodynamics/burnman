@@ -97,7 +97,7 @@ def solution_polytope_from_endmember_occupancies(endmember_occupancies,
     n_occs = endmember_occupancies.shape[1]
 
     nullspace = np.array(Matrix(endmember_occupancies).nullspace(),
-                         dtype=np.float)
+                         dtype=float)
 
     equalities = np.zeros((len(nullspace)+1, n_occs+1))
     equalities[0, 0] = -n_sites
