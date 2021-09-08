@@ -5,13 +5,76 @@ Examples
 
 BurnMan comes with a large collection of example programs under examples/.
 Below you can find a summary of the different examples.
-They are grouped into :ref:`ref-example-simple` and :ref:`ref-example-advanced`.
-We suggest starting with the :ref:`ref-example-tutorial`
-before moving on to the examples, especially if you are new to using BurnMan.
+They are grouped into three categories: :ref:`ref-example-class`,
+:ref:`ref-example-simple` and :ref:`ref-example-advanced`.
+We suggest starting with :ref:`ref-example-class`, which introduces the main
+class types in BurnMan. The :ref:`ref-example-tutorial` then provides a useful
+introduction to the seismic tools for new users of BurnMan.
 
 Finally, we also include the scripts that were used for all computations and
 figures in the 2014 BurnMan paper in the misc/ folder, see
 :ref:`ref-example-paper`.
+
+
+.. _ref-example-class:
+
+Class examples
+==============
+
+The following is a list of examples that introduce the main classes
+of BurnMan objects:
+  - :mod:`~examples.example_mineral`,
+  - :mod:`~examples.example_gibbs_modifiers`,
+  - :mod:`~examples.example_solid_solution`,
+  - :mod:`~examples.example_composite`,
+  - :mod:`~examples.example_geotherms`, and
+  - :mod:`~examples.example_composition`.
+
+  .. automodule:: examples.example_mineral
+
+  *Resulting figure:*
+
+  .. image:: figures/example_mineral_figure_1.png
+
+  .. automodule:: examples.example_gibbs_modifiers
+
+  *Resulting figures:*
+
+  .. image:: figures/example_gibbs_modifiers_figure_1.png
+
+  .. image:: figures/example_gibbs_modifiers_figure_2.png
+
+  .. image:: figures/example_gibbs_modifiers_figure_3.png
+
+  .. image:: figures/example_gibbs_modifiers_figure_4.png
+
+  .. automodule:: examples.example_solid_solution
+
+  *Resulting figures:*
+
+  .. image:: figures/example_solid_solution_1.png
+
+  .. image:: figures/example_solid_solution_2.png
+
+  .. image:: figures/example_solid_solution_3.png
+
+  .. image:: figures/example_solid_solution_4.png
+
+  .. automodule:: examples.example_composite
+
+  *Resulting figures:*
+
+  .. image:: figures/example_composite_figure_1.png
+
+  .. image:: figures/example_composite_figure_2.png
+
+  .. automodule:: examples.example_geotherms
+
+  *Resulting figure:*
+
+  .. image:: figures/example_geotherm.png
+
+  .. automodule:: examples.example_composition
 
 
 
@@ -23,10 +86,8 @@ Simple Examples
 
 The following is a list of simple examples:
   - :mod:`~examples.example_beginner`,
-  - :mod:`~examples.example_solid_solution`,
-  - :mod:`~examples.example_geotherms`,
   - :mod:`~examples.example_seismic`,
-  - :mod:`~examples.example_composition`,
+  - :mod:`~examples.example_composite_seismic_velocities`,
   - :mod:`~examples.example_averaging`, and
   - :mod:`~examples.example_chemical_potentials`.
 
@@ -36,25 +97,6 @@ The following is a list of simple examples:
 
 .. image:: figures/example_beginner.png
 
-
-.. automodule:: examples.example_solid_solution
-
-*Resulting figures:*
-
-.. image:: figures/example_solid_solution_1.png
-
-.. image:: figures/example_solid_solution_2.png
-
-.. image:: figures/example_solid_solution_3.png
-
-.. image:: figures/example_solid_solution_4.png
-
-.. automodule:: examples.example_geotherms
-
-*Resulting figure:*
-
-.. image:: figures/example_geotherm.png
-
 .. automodule:: examples.example_seismic
 
 *Resulting figures:*
@@ -63,11 +105,11 @@ The following is a list of simple examples:
 
 .. image:: figures/example_seismic2.png
 
-.. automodule:: examples.example_composition
+.. automodule:: examples.example_composite_seismic_velocities
 
 *Resulting figure:*
 
-.. image:: figures/example_composition.png
+.. image:: figures/example_composite_seismic_velocities.png
 
 .. automodule:: examples.example_averaging
 

@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -60,14 +61,12 @@ if __name__ == "__main__":
 
     T = 1500.
     pressures = np.linspace(60.e9, 80.e9, 101)
-    v_ps = np.empty_like(pressures)
-    for i, P in enumerate(pressures):
-        stv.set_state(P, T)
-        v_ps[i] = stv.v_p
+    temperatures = pressures*0. + 1500.
+    v_ps = stv.evaluate(['p_wave_velocity'], pressures, temperatures)[0]
 
     plt.plot(pressures / 1.e9, v_ps / 1.e3, label='stishovite')
     plt.xlabel('P (GPa)')
-    plt.ylabel('V_p (km/s)')
+    plt.ylabel('$V_p$ (km/s)')
     plt.legend(loc="lower right")
     plt.show()
 
@@ -121,101 +120,67 @@ if __name__ == "__main__":
     troilite = lot()
     lot = minerals.HP_2011_ds62.lot()
     tro = minerals.HP_2011_ds62.tro()
-    P = 1.e5
+
     temperatures = np.linspace(300., 1300., 101)
-    C_ps_troilite = np.empty_like(temperatures)
-    C_ps_lot = np.empty_like(temperatures)
-    C_ps_tro = np.empty_like(temperatures)
-    for i, T in enumerate(temperatures):
-        troilite.set_state(P, T)
-        C_ps_troilite[i] = troilite.C_p
-        lot.set_state(P, T)
-        C_ps_lot[i] = lot.C_p
-        tro.set_state(P, T)
-        C_ps_tro[i] = tro.C_p
+    pressures = temperatures*0. + 1.e5
+
+    C_ps_troilite = troilite.evaluate(['C_p'], pressures, temperatures)[0]
+    C_ps_lot = lot.evaluate(['C_p'], pressures, temperatures)[0]
+    C_ps_tro = tro.evaluate(['C_p'], pressures, temperatures)[0]
 
     plt.plot(temperatures, C_ps_lot, 'r--', label='low temperature (HP2011)')
     plt.plot(temperatures, C_ps_tro, 'g--', label='high temperature (HP2011)')
     plt.plot(temperatures, C_ps_troilite, 'b-', label='troilite')
     plt.xlabel('T (K)')
-    plt.ylabel('C_p (J/K/mol)')
+    plt.ylabel('$C_p$ (J/K/mol)')
     plt.legend(loc="lower right")
     plt.show()
 
     # Spinel is a mineral with a Bragg-Williams type model
     sp = minerals.HP_2011_ds62.sp()
-    P = 1.e5
-    temperatures = np.linspace(300., 1300., 101)
-    C_ps = np.empty_like(temperatures)
-    for i, T in enumerate(temperatures):
-        sp.set_state(P, T)
-        C_ps[i] = sp.C_p
-        # print sp._property_modifiers
 
-    plt.plot(temperatures, C_ps, label='spinel')
+    sp2 = minerals.HP_2011_ds62.sp()
+    sp2.property_modifiers = []
+
+    C_ps_sp = sp.evaluate(['C_p'], pressures, temperatures)[0]
+    C_ps_sp2 = sp2.evaluate(['C_p'], pressures, temperatures)[0]
+
+    plt.plot(temperatures, C_ps_sp2, linestyle='--',
+             label='spinel without B-W transition')
+    plt.plot(temperatures, C_ps_sp,
+             label='spinel with B-W transition')
     plt.xlabel('T (K)')
-    plt.ylabel('C_p (J/K/mol)')
+    plt.ylabel('$C_p$ (J/K/mol)')
     plt.legend(loc="lower right")
     plt.show()
 
-    # Wuestite has a Landau-type transition at low temperature,
-    # but we could also choose to simplify things by just having an excess entropy
-    # to estimate the thermal properties at high temperature
-    # Here we ignore the 0 Pa, 0 K gibbs and volume contributions, as the endmember
-    # properties would need refitting too...
-    class wuestite (burnman.Mineral):
+    # The Holland and Powell nepheline model
+    # has a Landau-type transition at low temperature,
+    # but it is also possible to simplify the model by just having an
+    # excess energy, entropy and volume to estimate the
+    # thermal properties at high temperature.
 
-        def __init__(self):
-            formula = 'FeO'
-            formula = dictionarize_formula(formula)
-            self.params = {
-                'name': 'Wuestite',
-                'formula': formula,
-                'equation_of_state': 'slb3',
-                'F_0': -242000.0,
-                'V_0': 1.226e-05,
-                'K_0': 1.79e+11,
-                'Kprime_0': 4.9,
-                'Debye_0': 454.0,
-                'grueneisen_0': 1.53,
-                'q_0': 1.7,
-                'G_0': 59000000000.0,
-                'Gprime_0': 1.4,
-                'eta_s_0': -0.1,
-                'n': sum(formula.values()),
-                'molar_mass': formula_mass(formula)}
+    ne_HP = burnman.minerals.HP_2011_ds62.ne()
+    ne_HP2 = burnman.minerals.HP_2011_ds62.ne()
+    ne_HP2.property_modifiers = []
 
-            self.property_modifiers = [
-                ['linear', {'delta_E': 0., 'delta_S': 12., 'delta_V': 0.}]]
+    ne_HP.set_state(1.e5, 1000.)
+    ne_HP2.set_state(1.e5, 1000.)
 
-            self.uncertainties = {
-                'err_F_0': 1000.0,
-                'err_V_0': 0.0,
-                'err_K_0': 1000000000.0,
-                'err_K_prime_0': 0.2,
-                'err_Debye_0': 21.0,
-                'err_grueneisen_0': 0.13,
-                'err_q_0': 1.0,
-                'err_G_0': 1000000000.0,
-                'err_Gprime_0': 0.1,
-                'err_eta_s_0': 1.0}
-            burnman.Mineral.__init__(self)
+    ne_HP2.property_modifiers = [['linear',
+                                  {'delta_E': (ne_HP.molar_internal_energy
+                                               - ne_HP2.molar_internal_energy),
+                                   'delta_S': ne_HP.S - ne_HP2.S,
+                                   'delta_V': ne_HP.V - ne_HP2.V}]]
 
-    wus = wuestite()
-    wus_HP = burnman.minerals.HP_2011_ds62.fper()
+    temperatures = np.linspace(300., 800., 101)
+    pressures = temperatures*0. + 1.e5
 
-    P = 1.e5
-    temperatures = np.linspace(300., 1300., 101)
-    Ss = np.empty_like(temperatures)
-    Ss_HP = np.empty_like(temperatures)
-    for i, T in enumerate(temperatures):
-        wus.set_state(P, T)
-        Ss[i] = wus.S
-        wus_HP.set_state(P, T)
-        Ss_HP[i] = wus_HP.S
+    Ss_HP = ne_HP.evaluate(['molar_entropy'], pressures, temperatures)[0]
+    Ss_HP2 = ne_HP2.evaluate(['molar_entropy'], pressures, temperatures)[0]
 
-    plt.plot(temperatures, Ss, label='linear')
-    plt.plot(temperatures, Ss_HP, label='HP_2011_ds62')
+    plt.plot(temperatures, Ss_HP, label='nepheline (HP2011)')
+    plt.plot(temperatures, Ss_HP2, label='nepheline (disordered)')
     plt.xlabel('T (K)')
     plt.ylabel('S (J/K/mol)')
     plt.legend(loc="lower right")
