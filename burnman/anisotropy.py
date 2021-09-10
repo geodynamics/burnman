@@ -12,6 +12,14 @@ import matplotlib.pyplot as plt
 from .tools import unit_normalize
 from .material import Material, material_property
 
+try: # numpy.block was new in numpy version 1.13.0.
+    block = np.block([[np.ones((3, 3)), 2.*np.ones((3, 3))],
+                      [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
+except:
+    block = np.array(np.bmat([[[[1.]*3]*3, [[2.]*3]*3],
+                              [[[2.]*3]*3, [[4.]*3]*3]] ))
+voigt_compliance_factors = block
+
 class AnisotropicMaterial(Material):
     """
     A base class for anisotropic elastic materials. The base class
@@ -68,6 +76,9 @@ class AnisotropicMaterial(Material):
                 stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
         return stiffness_tensor
 
+    def _voigt_notation_to_compliance_tensor(self, voigt_notation):
+        return self._voigt_notation_to_stiffness_tensor(np.divide(voigt_notation,
+                                                                  voigt_compliance_factors))
 
     @material_property
     def isentropic_stiffness_tensor(self):
@@ -83,12 +94,7 @@ class AnisotropicMaterial(Material):
 
     @material_property
     def full_isentropic_compliance_tensor(self):
-        try: # numpy.block was new in numpy version 1.13.0.
-            block = np.block([[ np.ones((3, 3)), 2.*np.ones((3, 3))],
-                              [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
-        except:
-            block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
-        return self._voigt_notation_to_stiffness_tensor(np.divide(self.isentropic_compliance_tensor, block))
+        return self._voigt_notation_to_compliance_tensor(self.isentropic_compliance_tensor)
 
     @material_property
     def density(self):

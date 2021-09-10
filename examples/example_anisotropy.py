@@ -48,7 +48,7 @@ if __name__ == "__main__":
     rho = 2.735e3
     basalt = anisotropy.IsotropicMaterial(rho, elastic_constants)
 
-    print('Basalt isotropic isentropic elastic properties:\n')
+    print('Basalt isotropic elastic properties:\n')
     print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(basalt.isentropic_bulk_modulus_reuss,
                                                                 basalt.isentropic_bulk_modulus_vrh,
                                                                 basalt.isentropic_bulk_modulus_voigt))
