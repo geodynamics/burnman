@@ -18,15 +18,15 @@ class test_anisotropy(BurnManTest):
 
         E = G*(3.*l + 2.*G)/(l+G)
         Vp = np.sqrt((m.isentropic_bulk_modulus_reuss
-                      + 4./3.*m.shear_modulus_reuss)/rho)
-        Vs = np.sqrt(m.shear_modulus_reuss/rho)
+                      + 4./3.*m.isentropic_shear_modulus_reuss)/rho)
+        Vs = np.sqrt(m.isentropic_shear_modulus_reuss/rho)
 
         array_1 = [m.isentropic_bulk_modulus_reuss,
                    m.isentropic_bulk_modulus_vrh,
                    m.isentropic_bulk_modulus_voigt,
-                   m.shear_modulus_reuss,
-                   m.shear_modulus_vrh,
-                   m.shear_modulus_voigt,
+                   m.isentropic_shear_modulus_reuss,
+                   m.isentropic_shear_modulus_vrh,
+                   m.isentropic_shear_modulus_voigt,
                    m.isentropic_universal_elastic_anisotropy + 6.,
                    m.isentropic_isotropic_poisson_ratio,
                    E, Vp, Vs, Vs]
@@ -36,7 +36,7 @@ class test_anisotropy(BurnManTest):
 
         beta_100 = m.isentropic_linear_compressibility(direction=d1)
         E_100 = m.isentropic_youngs_modulus(direction=d1)
-        G_100_010 = m.shear_modulus(plane_normal=d1, shear_direction=d2)
+        G_100_010 = m.isentropic_shear_modulus(plane_normal=d1, shear_direction=d2)
         nu_100_010 = m.isentropic_poissons_ratio(axial_direction=d1,
                                                  lateral_direction=d2)
         wave_speeds, wave_directions = m.wave_velocities(propagation_direction=d1)

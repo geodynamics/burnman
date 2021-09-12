@@ -126,9 +126,9 @@ class AnisotropicMaterial(Material):
         return 0.5*(self.isentropic_bulk_modulus_voigt + self.isentropic_bulk_modulus_reuss)
 
     @material_property
-    def shear_modulus_voigt(self):
+    def isentropic_shear_modulus_voigt(self):
         """
-        Computes the shear modulus (Voigt bound)
+        Computes the isentropic shear modulus (Voigt bound)
         """
         G = ( np.sum([self.isentropic_stiffness_tensor[i][i] for i in [0, 1, 2]]) +
               np.sum([self.isentropic_stiffness_tensor[i][i] for i in [3, 4, 5]])*3. -
@@ -138,9 +138,9 @@ class AnisotropicMaterial(Material):
         return G
 
     @material_property
-    def shear_modulus_reuss(self):
+    def isentropic_shear_modulus_reuss(self):
         """
-        Computes the shear modulus (Reuss bound)
+        Computes the isentropic shear modulus (Reuss bound)
         """
         beta =  ( np.sum([self.isentropic_compliance_tensor[i][i] for i in [0, 1, 2]])*4. +
                   np.sum([self.isentropic_compliance_tensor[i][i] for i in [3, 4, 5]])*3. -
@@ -150,18 +150,19 @@ class AnisotropicMaterial(Material):
         return 1./beta
 
     @material_property
-    def shear_modulus_vrh(self):
+    def isentropic_shear_modulus_vrh(self):
         """
         Computes the shear modulus (Voigt-Reuss-Hill average)
         """
-        return 0.5*(self.shear_modulus_voigt + self.shear_modulus_reuss)
+        return 0.5*(self.isentropic_shear_modulus_voigt
+                    + self.isentropic_shear_modulus_reuss)
 
     @material_property
     def isentropic_universal_elastic_anisotropy(self):
         """
         Compute the universal elastic anisotropy
         """
-        return ( 5.*(self.shear_modulus_voigt/self.shear_modulus_reuss) +
+        return ( 5.*(self.isentropic_shear_modulus_voigt/self.isentropic_shear_modulus_reuss) +
                  (self.isentropic_bulk_modulus_voigt/self.isentropic_bulk_modulus_reuss) - 6. )
 
     @material_property
@@ -170,8 +171,10 @@ class AnisotropicMaterial(Material):
         Compute mu, the isotropic Poisson ratio
         (a description of the laterial response to loading)
         """
-        return ( (3.*self.isentropic_bulk_modulus_vrh - 2.*self.shear_modulus_vrh) /
-                 (6.*self.isentropic_bulk_modulus_vrh + 2.*self.shear_modulus_vrh) )
+        return ((3.*self.isentropic_bulk_modulus_vrh
+                 - 2.*self.isentropic_shear_modulus_vrh)
+                / (6.*self.isentropic_bulk_modulus_vrh
+                   + 2.*self.isentropic_shear_modulus_vrh) )
 
     def christoffel_tensor(self, propagation_direction):
         """
@@ -209,9 +212,9 @@ class AnisotropicMaterial(Material):
         S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
         return 1./S
 
-    def shear_modulus(self, plane_normal, shear_direction):
+    def isentropic_shear_modulus(self, plane_normal, shear_direction):
         """
-        Computes the shear modulus on a plane in a given
+        Computes the isentropic shear modulus on a plane in a given
         shear direction relative to the stiffness tensor
         """
         plane_normal = unit_normalize(plane_normal)
