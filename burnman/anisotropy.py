@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -11,15 +12,23 @@ import matplotlib.pyplot as plt
 from .tools import unit_normalize
 from .material import Material, material_property
 
+try: # numpy.block was new in numpy version 1.13.0.
+    block = np.block([[np.ones((3, 3)), 2.*np.ones((3, 3))],
+                      [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
+except:
+    block = np.array(np.bmat([[[[1.]*3]*3, [[2.]*3]*3],
+                              [[[2.]*3]*3, [[4.]*3]*3]] ))
+voigt_compliance_factors = block
+
 class AnisotropicMaterial(Material):
     """
-    A class that represents an anisotropic elastic material. This class
-    is initialised with a set of elastic constants and a density. It can
-    then be interrogated to find the values of different properties,
-    such as bounds on seismic velocities. There are also several functions
-    which can be called to calculate properties along directions oriented
-    with respect to the elastic tensor. Initialization is via a density
-    and a full stiffness tensor in Voigt notation
+    A base class for anisotropic elastic materials. The base class
+    is initialised with a density and a full isentropic stiffness tensor
+    in Voigt notation. It can then be interrogated to find the values of
+    different properties, such as bounds on seismic velocities.
+    There are also several functions which can be called to calculate
+    properties along directions oriented with respect to the isentropic
+    elastic tensor.
 
     See :cite:`Mainprice2011` Geological Society of London Special Publication
     and https://materialsproject.org/wiki/index.php/Elasticity_calculations
@@ -27,12 +36,12 @@ class AnisotropicMaterial(Material):
     """
 
     def __init__(self, rho, cijs):
-        self.params = {'rho_0': rho,
-                       'stiffness_tensor_0': cijs}
 
-        assert self.params['stiffness_tensor_0'].shape == (6, 6), 'stiffness_tensor must be in Voigt notation (6x6)'
-        assert np.allclose(self.params['stiffness_tensor_0'].T,
-                           self.params['stiffness_tensor_0']), 'stiffness_tensor must be symmetric'
+        self._isentropic_stiffness_tensor = cijs
+        self._rho = rho
+
+        assert cijs.shape == (6, 6), 'cijs must be in Voigt notation (6x6)'
+        assert np.allclose(cijs.T, cijs), 'stiffness_tensor must be symmetric'
 
         Material.__init__(self)
 
@@ -67,102 +76,105 @@ class AnisotropicMaterial(Material):
                 stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
         return stiffness_tensor
 
+    def _voigt_notation_to_compliance_tensor(self, voigt_notation):
+        return self._voigt_notation_to_stiffness_tensor(np.divide(voigt_notation,
+                                                                  voigt_compliance_factors))
 
     @material_property
-    def stiffness_tensor(self):
-        return self.params['stiffness_tensor_0']
+    def isentropic_stiffness_tensor(self):
+        return self._isentropic_stiffness_tensor
 
     @material_property
-    def full_stiffness_tensor(self):
-        return self._voigt_notation_to_stiffness_tensor(self.stiffness_tensor)
+    def full_isentropic_stiffness_tensor(self):
+        return self._voigt_notation_to_stiffness_tensor(self.isentropic_stiffness_tensor)
 
     @material_property
-    def compliance_tensor(self):
-        return np.linalg.inv(self.stiffness_tensor)
+    def isentropic_compliance_tensor(self):
+        return np.linalg.inv(self.isentropic_stiffness_tensor)
 
     @material_property
-    def full_compliance_tensor(self):
-        try: # numpy.block was new in numpy version 1.13.0.
-            block = np.block([[ np.ones((3, 3)), 2.*np.ones((3, 3))],
-                              [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
-        except:
-            block = np.array(np.bmat( [[[[1.]*3]*3, [[2.]*3]*3], [[[2.]*3]*3, [[4.]*3]*3]] ))
-        return self._voigt_notation_to_stiffness_tensor(np.divide(self.compliance_tensor, block))
+    def full_isentropic_compliance_tensor(self):
+        return self._voigt_notation_to_compliance_tensor(self.isentropic_compliance_tensor)
 
     @material_property
     def density(self):
-        return self.params['rho_0']
+        return self._rho
 
     @material_property
-    def bulk_modulus_voigt(self):
+    def isentropic_bulk_modulus_voigt(self):
         """
-        Computes the bulk modulus (Voigt bound)
+        Computes the isentropic bulk modulus (Voigt bound)
         """
-        K = np.sum([[self.stiffness_tensor[i][k] for k in range(3)] for i in range(3)])/9.
+        K = np.sum([[self.isentropic_stiffness_tensor[i][k]
+                     for k in range(3)]
+                    for i in range(3)])/9.
         return K
 
     @material_property
-    def bulk_modulus_reuss(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
-        Computes the bulk modulus (Reuss bound)
+        Computes the isentropic bulk modulus (Reuss bound)
         """
-        beta = np.sum([[self.compliance_tensor[i][k] for k in range(3)] for i in range(3)])
+        beta = np.sum([[self.isentropic_compliance_tensor[i][k] for k in range(3)] for i in range(3)])
         return 1./beta
 
     @material_property
-    def bulk_modulus_vrh(self):
+    def isentropic_bulk_modulus_vrh(self):
         """
-        Computes the bulk modulus (Voigt-Reuss-Hill average)
+        Computes the isentropic bulk modulus (Voigt-Reuss-Hill average)
         """
-        return 0.5*(self.bulk_modulus_voigt + self.bulk_modulus_reuss)
+        return 0.5*(self.isentropic_bulk_modulus_voigt + self.isentropic_bulk_modulus_reuss)
 
     @material_property
-    def shear_modulus_voigt(self):
+    def isentropic_shear_modulus_voigt(self):
         """
-        Computes the shear modulus (Voigt bound)
+        Computes the isentropic shear modulus (Voigt bound)
         """
-        G = ( np.sum([self.stiffness_tensor[i][i] for i in [0, 1, 2]]) +
-              np.sum([self.stiffness_tensor[i][i] for i in [3, 4, 5]])*3. -
-              ( self.stiffness_tensor[0][1] +
-                self.stiffness_tensor[1][2] +
-                self.stiffness_tensor[2][0] )) / 15.
+        G = ( np.sum([self.isentropic_stiffness_tensor[i][i] for i in [0, 1, 2]]) +
+              np.sum([self.isentropic_stiffness_tensor[i][i] for i in [3, 4, 5]])*3. -
+              ( self.isentropic_stiffness_tensor[0][1] +
+                self.isentropic_stiffness_tensor[1][2] +
+                self.isentropic_stiffness_tensor[2][0] )) / 15.
         return G
 
     @material_property
-    def shear_modulus_reuss(self):
+    def isentropic_shear_modulus_reuss(self):
         """
-        Computes the shear modulus (Reuss bound)
+        Computes the isentropic shear modulus (Reuss bound)
         """
-        beta =  ( np.sum([self.compliance_tensor[i][i] for i in [0, 1, 2]])*4. +
-                  np.sum([self.compliance_tensor[i][i] for i in [3, 4, 5]])*3. -
-                  ( self.compliance_tensor[0][1] +
-                    self.compliance_tensor[1][2] +
-                    self.compliance_tensor[2][0])*4. ) / 15.
+        beta =  ( np.sum([self.isentropic_compliance_tensor[i][i] for i in [0, 1, 2]])*4. +
+                  np.sum([self.isentropic_compliance_tensor[i][i] for i in [3, 4, 5]])*3. -
+                  ( self.isentropic_compliance_tensor[0][1] +
+                    self.isentropic_compliance_tensor[1][2] +
+                    self.isentropic_compliance_tensor[2][0])*4. ) / 15.
         return 1./beta
 
     @material_property
-    def shear_modulus_vrh(self):
+    def isentropic_shear_modulus_vrh(self):
         """
         Computes the shear modulus (Voigt-Reuss-Hill average)
         """
-        return 0.5*(self.shear_modulus_voigt + self.shear_modulus_reuss)
+        return 0.5*(self.isentropic_shear_modulus_voigt
+                    + self.isentropic_shear_modulus_reuss)
 
     @material_property
-    def universal_elastic_anisotropy(self):
+    def isentropic_universal_elastic_anisotropy(self):
         """
         Compute the universal elastic anisotropy
         """
-        return ( 5.*(self.shear_modulus_voigt/self.shear_modulus_reuss) +
-                 (self.bulk_modulus_voigt/self.bulk_modulus_reuss) - 6. )
+        return ( 5.*(self.isentropic_shear_modulus_voigt/self.isentropic_shear_modulus_reuss) +
+                 (self.isentropic_bulk_modulus_voigt/self.isentropic_bulk_modulus_reuss) - 6. )
 
     @material_property
-    def isotropic_poisson_ratio(self):
+    def isentropic_isotropic_poisson_ratio(self):
         """
         Compute mu, the isotropic Poisson ratio
         (a description of the laterial response to loading)
         """
-        return ( (3.*self.bulk_modulus_vrh - 2.*self.shear_modulus_vrh) /
-                 (6.*self.bulk_modulus_vrh + 2.*self.shear_modulus_vrh) )
+        return ((3.*self.isentropic_bulk_modulus_vrh
+                 - 2.*self.isentropic_shear_modulus_vrh)
+                / (6.*self.isentropic_bulk_modulus_vrh
+                   + 2.*self.isentropic_shear_modulus_vrh) )
 
     def christoffel_tensor(self, propagation_direction):
         """
@@ -173,51 +185,51 @@ class AnisotropicMaterial(Material):
         T_ik = C_ijkl n_j n_l
         """
         propagation_direction = unit_normalize(propagation_direction)
-        Tik = np.tensordot(np.tensordot(self.full_stiffness_tensor,
+        Tik = np.tensordot(np.tensordot(self.full_isentropic_stiffness_tensor,
                                         propagation_direction,
                                         axes=([1],[0])),
                            propagation_direction,
                            axes=([2],[0]))
         return Tik
 
-    def linear_compressibility(self, direction):
+    def isentropic_linear_compressibility(self, direction):
         """
-        Computes the linear compressibility in a given direction
+        Computes the linear isentropic compressibility in a given direction
         relative to the stiffness tensor
         """
         direction = unit_normalize(direction)
-        Sijkk = np.einsum('ijkk', self.full_compliance_tensor)
+        Sijkk = np.einsum('ijkk', self.full_isentropic_compliance_tensor)
         beta = Sijkk.dot(direction).dot(direction)
         return beta
 
-    def youngs_modulus(self, direction):
+    def isentropic_youngs_modulus(self, direction):
         """
-        Computes the Youngs modulus in a given direction
+        Computes the isentropic Youngs modulus in a given direction
         relative to the stiffness tensor
         """
         direction = unit_normalize(direction)
-        Sijkl = self.full_compliance_tensor
+        Sijkl = self.full_isentropic_compliance_tensor
         S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
         return 1./S
 
-    def shear_modulus(self, plane_normal, shear_direction):
+    def isentropic_shear_modulus(self, plane_normal, shear_direction):
         """
-        Computes the shear modulus on a plane in a given
+        Computes the isentropic shear modulus on a plane in a given
         shear direction relative to the stiffness tensor
         """
         plane_normal = unit_normalize(plane_normal)
         shear_direction = unit_normalize(shear_direction)
 
         assert np.abs(plane_normal.dot(shear_direction)) < np.finfo(float).eps, 'plane_normal and shear_direction must be orthogonal'
-        Sijkl = self.full_compliance_tensor
+        Sijkl = self.full_isentropic_compliance_tensor
         G = Sijkl.dot(shear_direction).dot(plane_normal).dot(shear_direction).dot(plane_normal)
         return 0.25/G
 
-    def poissons_ratio(self,
-                       axial_direction,
-                       lateral_direction):
+    def isentropic_poissons_ratio(self,
+                                  axial_direction,
+                                  lateral_direction):
         """
-        Computes the poisson ratio given loading and response
+        Computes the isentropic poisson ratio given loading and response
         directions relative to the stiffness tensor
         """
 
@@ -225,7 +237,7 @@ class AnisotropicMaterial(Material):
         lateral_direction = unit_normalize(lateral_direction)
         assert np.abs(axial_direction.dot(lateral_direction)) < np.finfo(float).eps, 'axial_direction and lateral_direction must be orthogonal'
 
-        Sijkl = self.full_compliance_tensor
+        Sijkl = self.full_isentropic_compliance_tensor
         x = axial_direction
         y = lateral_direction
         nu = -(Sijkl.dot(y).dot(y).dot(x).dot(x) /
@@ -249,11 +261,16 @@ class AnisotropicMaterial(Material):
         idx = eigenvalues.argsort()[::-1]
         eigenvalues = np.real(eigenvalues[idx])
         eigenvectors = eigenvectors[:,idx]
-        velocities = np.sqrt(eigenvalues/self.rho)
+        velocities = np.sqrt(eigenvalues/self.density)
 
         return velocities, eigenvectors
 
 def voigt_array_from_cijs(cijs, index_lists):
+    """
+    Takes a list of cijs and a list of list of tuples corresponding to
+    the positions of each cij in the Voigt form matrix.
+    Note that the indices run from 0--5, not 1--6.
+    """
     C = np.zeros([6, 6])
     for i, index_list in enumerate(index_lists):
         for indices in index_list:

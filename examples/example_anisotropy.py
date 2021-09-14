@@ -49,23 +49,23 @@ if __name__ == "__main__":
     basalt = anisotropy.IsotropicMaterial(rho, elastic_constants)
 
     print('Basalt isotropic elastic properties:\n')
-    print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(basalt.bulk_modulus_reuss,
-                                                                basalt.bulk_modulus_vrh,
-                                                                basalt.bulk_modulus_voigt))
-    print('Shear modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(basalt.shear_modulus_reuss,
-                                                                 basalt.shear_modulus_vrh,
-                                                                 basalt.shear_modulus_voigt))
+    print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(basalt.isentropic_bulk_modulus_reuss,
+                                                                basalt.isentropic_bulk_modulus_vrh,
+                                                                basalt.isentropic_bulk_modulus_voigt))
+    print('Shear modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(basalt.isentropic_shear_modulus_reuss,
+                                                                 basalt.isentropic_shear_modulus_vrh,
+                                                                 basalt.isentropic_shear_modulus_voigt))
     print('Universal elastic anisotropy: {0:.4f}\n'
-          'Isotropic poisson ratio: {1:.4f}\n'.format(basalt.universal_elastic_anisotropy,
-                                                      basalt.isotropic_poisson_ratio))
+          'Isotropic poisson ratio: {1:.4f}\n'.format(basalt.isentropic_universal_elastic_anisotropy,
+                                                      basalt.isentropic_isotropic_poisson_ratio))
 
     d1 = [1., 0., 0.]
     d2 = [0., 1., 0.]
 
-    beta_100 = basalt.linear_compressibility(direction=d1)
-    E_100 = basalt.youngs_modulus(direction=d1)
-    G_100_010 = basalt.shear_modulus(plane_normal=d1, shear_direction=d2)
-    nu_100_010 = basalt.poissons_ratio(axial_direction=d1, lateral_direction=d2)
+    beta_100 = basalt.isentropic_linear_compressibility(direction=d1)
+    E_100 = basalt.isentropic_youngs_modulus(direction=d1)
+    G_100_010 = basalt.isentropic_shear_modulus(plane_normal=d1, shear_direction=d2)
+    nu_100_010 = basalt.isentropic_poissons_ratio(axial_direction=d1, lateral_direction=d2)
     wave_speeds, wave_directions = basalt.wave_velocities(propagation_direction=d1)
     Vp, Vs1, Vs2 = wave_speeds
 
@@ -92,15 +92,15 @@ if __name__ == "__main__":
     talc = anisotropy.TriclinicMaterial(rho, talc_stiffness)
 
     print('Talc elastic properties:\n')
-    print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(talc.bulk_modulus_reuss,
-                                                     talc.bulk_modulus_vrh,
-                                                     talc.bulk_modulus_voigt))
-    print('Shear modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(talc.shear_modulus_reuss,
-                                                     talc.shear_modulus_vrh,
-                                                     talc.shear_modulus_voigt))
+    print('Bulk modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(talc.isentropic_bulk_modulus_reuss,
+                                                     talc.isentropic_bulk_modulus_vrh,
+                                                     talc.isentropic_bulk_modulus_voigt))
+    print('Shear modulus bounds: {0:.3e} {1:.3e} {2:.3e}'.format(talc.isentropic_shear_modulus_reuss,
+                                                     talc.isentropic_shear_modulus_vrh,
+                                                     talc.isentropic_shear_modulus_voigt))
     print('Universal elastic anisotropy: {0:.3f}\n'
-          'Isotropic poisson ratio: {1:.3f}'.format(talc.universal_elastic_anisotropy,
-                                                    talc.isotropic_poisson_ratio))
+          'Isotropic poisson ratio: {1:.3f}'.format(talc.isentropic_universal_elastic_anisotropy,
+                                                    talc.isentropic_isotropic_poisson_ratio))
 
     # Finally, let's make a pretty plot illustrating the anisotropy in talc
     def plot_anisotropic_seismic_properties(mineral):
@@ -127,8 +127,8 @@ if __name__ == "__main__":
             for j, phi in enumerate(zeniths):
                 d = np.array([np.cos(az)*np.sin(phi), np.sin(az)*np.sin(phi), -np.cos(phi)]) # change_hemispheres
                 velocities = mineral.wave_velocities(d)
-                betas[i][j] = mineral.linear_compressibility(d)
-                Es[i][j] = mineral.youngs_modulus(d)
+                betas[i][j] = mineral.isentropic_linear_compressibility(d)
+                Es[i][j] = mineral.isentropic_youngs_modulus(d)
                 vps[i][j] = velocities[0][0]
                 vs1s[i][j] = velocities[0][1]
                 vs2s[i][j] = velocities[0][2]
