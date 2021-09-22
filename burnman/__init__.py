@@ -193,6 +193,8 @@ from .planet import Planet
 from .solutionmodel import SolutionModel
 from .solidsolution import SolidSolution
 from .combinedmineral import CombinedMineral
+from .anisotropy import AnisotropicMaterial
+from .anisotropicmineral import AnisotropicMineral
 from .mineral_helpers import *
 
 # high level functions

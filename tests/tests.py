@@ -9,6 +9,7 @@ import burnman
 from burnman import minerals
 
 from test_anisotropy import *
+from test_anisotropicmineral import *
 from test_averaging import *
 from test_chemical_potentials import *
 from test_composite import *
