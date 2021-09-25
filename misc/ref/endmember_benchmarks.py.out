@@ -34,6 +34,6 @@ Periclase: -2.836e+05 1.014e+02 1.050e-05 5.211e+01 2.818e-05 2.036e+11 3.837e+0
 Wuestite: 7.362e+04 1.409e+02 1.158e-05 5.267e+01 2.581e-05 2.323e+11 6.206e+03
 Mg_Wadsleyite: -1.084e+06 3.416e+02 3.812e-05 1.792e+02 2.287e-05 2.121e+11 3.691e+03
 Mg_Ringwoodite: -1.020e+06 3.348e+02 3.693e-05 1.770e+02 1.877e-05 2.359e+11 3.810e+03
-Stishovite: -4.479e+05 1.282e+02 1.354e-05 7.610e+01 1.980e-05 3.410e+11 4.437e+03
+Stishovite: -4.479e+05 1.281e+02 1.354e-05 7.609e+01 1.979e-05 3.411e+11 4.437e+03
 Maximum percentage error in SLB database with configurational entropy and landau transition:
-alpha: 4e-02% at 20 GPa and 1673 K for Stishovite
+S: 1e-02% at 20 GPa and 1673 K for Stishovite
