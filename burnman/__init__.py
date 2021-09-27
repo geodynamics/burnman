@@ -215,6 +215,7 @@ from . import polytope
 from . import polytopetools
 from . import chemicalpotentials
 from . import geotherm
+from .equilibration import equilibrate
 
 # miscellaneous
 from . import tools

@@ -545,6 +545,13 @@ class Composite(Material):
                 if i not in self.independent_element_indices]
 
     @cached_property
+    def reduced_stoichiometric_array(self):
+        """
+        The stoichiometric array including only the independent elements
+        """
+        return self.stoichiometric_array[:, self.independent_element_indices]
+
+    @cached_property
     def compositional_null_basis(self):
         """
         An array N such that N.b = 0 for all bulk compositions that can
