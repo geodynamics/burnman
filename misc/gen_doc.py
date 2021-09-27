@@ -29,6 +29,7 @@ ordered_examples = ['example_mineral.py',
                     'example_chemical_potentials.py',
                     'example_perplex.py',
                     'example_polytopetools.py',
+                    'example_equilibrate.py',
                     'example_geodynamic_adiabat.py',
                     'example_layer.py',
                     'example_build_planet.py'

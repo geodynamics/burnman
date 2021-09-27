@@ -17,6 +17,7 @@ from test_decorators import *
 from test_endmembers import *
 from test_eos import *
 from test_eos_consistency import *
+from test_equilibration import *
 from test_fitting import *
 from test_geotherm import *
 from test_helper_rock_switcher import *

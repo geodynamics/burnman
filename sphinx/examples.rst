@@ -131,8 +131,9 @@ More Advanced Examples
 Advanced examples:
   - :mod:`~examples.example_spintransition`,
   - :mod:`~examples.example_user_input_material`,
-  - :mod:`~examples.example_optimize_pv`, and
-  - :mod:`~examples.example_compare_all_methods`.
+  - :mod:`~examples.example_optimize_pv`,
+  - :mod:`~examples.example_compare_all_methods`, and
+  - :mod:`~examples.example_equilibrate`.
 
 .. automodule:: examples.example_spintransition
 
@@ -202,6 +203,41 @@ Advanced examples:
 .. image:: figures/example_fit_eos16.png
 
 .. image:: figures/example_fit_eos17.png
+
+
+
+.. automodule:: examples.example_equilibrate
+
+*Resulting figures:*
+
+.. figure:: figures/example_equilibrate_Figure_1_Al2SiO5.png
+
+  The classic aluminosilicate diagram.
+
+.. figure:: figures/example_equilibrate_Figure_2_opx_order.png
+
+  Ordering in two site orthopyroxene.
+
+.. figure:: figures/example_equilibrate_Figure_3_gt_miscibility.png
+
+  Miscibility in the pyrope-grossular garnet system
+
+.. figure:: figures/example_equilibrate_Figure_4_ol_fper.png
+
+  Mg-Fe partitioning between olivine and ferropericlase.
+
+.. figure:: figures/example_equilibrate_Figure_5_lower_mantle.png
+
+  Phase equilibria in the lower mantle.
+
+.. figure:: figures/example_equilibrate_Figure_6_ol_polymorphs.png
+
+  A P-T pseudosection for a composition of Fe0.2Mg1.8SiO4 (fo90).
+
+
+.. raw:: latex
+
+    \clearpage
 
 
 .. _ref-example-paper:

@@ -81,14 +81,15 @@ def calculate_constraints(assemblage):
 
 def get_parameters(assemblage):
     """
-    Gets the parameters vector  for the current equilibrium problem.
+    Gets the parameters vector (x) for the current equilibrium problem.
     These are:
 
       - pressure
       - temperature
-      - absolute amount of each phase
-      - if that phase is a solution with >1 endmember, the mole fractions of
-      the second to the last independent endmember in the solution.
+      - absolute amount of each phase. if a phase is a solution
+        with >1 endmember, the following parameters are the mole fractions
+        of the independent endmembers in the solution, except for the first
+        endmember (as the mole fractions must sum to one).
 
     Parameters
     ----------
@@ -183,7 +184,7 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
 def F(x, assemblage, equality_constraints, reduced_composition_vector):
     """
     Returns a vector of values which are zero at equilibrium.
-    The equations corresponding to the first two vector values depend on the
+    The first two vector values depend on the
     equality_constraints chosen. For example, if
       - eq[i][0] = 'P', F[i] = P - eq[i][1]
       - eq[i][0] = 'T', F[i] = T - eq[i][1]
@@ -250,7 +251,8 @@ def F(x, assemblage, equality_constraints, reduced_composition_vector):
 def jacobian(x, assemblage, equality_constraints):
     """
     The Jacobian of the equilibrium problem (dF/dx).
-    See documentation for F for more details.
+    See documentation for F and get_parameters
+    (which return F and x respectively) for more details.
 
     Parameters
     ----------
@@ -266,18 +268,14 @@ def jacobian(x, assemblage, equality_constraints):
     Returns
     -------
     jacobian : 2D numpy array
-        An array containing the Jacobian for the equilibrium problem
+        An array containing the Jacobian for the equilibrium problem.
     """
     # The solver always calls the Jacobian with the same
     # x parameters as used previously for the root functions
-    # Therefore we don't need to set compositions or state again here
-    # If the next two lines are uncommented, do it anyway.
+    # Therefore we don't need to set compositions or state again here.
 
-    # the jacobian J = dfi/dxj
-
-    # First, we find out the effect of the two constraint parameters on the
-    # pressure and temperature functions:
-    # i.e. dF(i, constraints)/dx[0, 1]
+    # First, we find out the effect of the two constraint parameters F[:2]
+    # on the pressure (x[0]) and temperature (x[1]):
     jacobian = np.zeros((assemblage.n_endmembers+2, assemblage.n_endmembers+2))
     for i, (type_c, eq_c) in enumerate(equality_constraints):
         if type_c == 'P':  # dP/dx
@@ -355,16 +353,30 @@ def jacobian(x, assemblage, equality_constraints):
     dpi_dxj = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
     j = 0
     for i, n in enumerate(assemblage.endmembers_per_phase):
-        # ignore pure phases, as changing the amount of a phase
-        # does not change its molar gibbs free energy
         if n == 1:
+            # changing the amount (p) of a pure phase
+            # does not change its fraction in that phase,
+            # so dfi_dxj remains unchanged
             dpi_dxj[j, j] = 1.
         else:
             comp_hessian[j:j+n, j:j+n] = assemblage.phases[i].gibbs_hessian
-            dfi_dxj[j:j+n, j:j+n] = np.eye(n)
-            dfi_dxj[j, j:j+n] -= 1.  # x[0] = p(phase) and x[1:] = f[1:] - f[0]
 
+            # x[0] = p(phase) and x[1:] = f[1:] - f[0]
+            # Therefore
+            # df[0]/dx[0] = 0
+            # df[0]/dx[1:] = -1
+            # (because changing the fraction of any endmember
+            # depletes the fraction of the first endmember)
+            # df[1:]/dx[1:] = 1 on diagonal, 0 otherwise
+            # (because all other fractions are independent of each other)
+            dfi_dxj[j:j+n, j:j+n] = np.eye(n)
+            dfi_dxj[j, j:j+n] -= 1.
+            # Total amounts of endmembers (p) are the fractions
+            # multiplied by the amounts of their representative phases
             dpi_dxj[j:j+n, j:j+n] = dfi_dxj[j:j+n, j:j+n] * phase_amounts[i]
+            # The derivative of the amount of each endmember with respect
+            # to the amount of each phase is equal to the molar fractions
+            # of the endmembers.
             dpi_dxj[j:j+n, j] = assemblage.phases[i].molar_fractions
         j += n
 
@@ -456,7 +468,7 @@ def phase_fraction_constraints(phase, assemblage, fractions, prm):
     return constraints
 
 
-def phase_composition_constraints(phase, assemblage, constraints):
+def phase_composition_constraints(phase, assemblage, constraints, prm):
     """
     Converts a phase composition constraint into standard linear form
     that can be processed by the root finding problem.
@@ -587,7 +599,9 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
     Parameters
     ----------
     equality_constraints : list
-        A list of equality constraints as provided by the user.
+        A list of equality constraints as provided by the user. For the
+        types of constraints, please see the documentation for the
+        equilibrate function.
 
     assemblage : burnman.Composite
         The assemblage for which equilibrium is to be calculated.
@@ -631,7 +645,8 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
 
             eq_constraint_lists.append(phase_composition_constraints(phase,
                                                                      assemblage,
-                                                                     constraint))
+                                                                     constraint,
+                                                                     prm))
         elif equality_constraints[i][0] == 'X':
             constraint = equality_constraints[i][1]
             if isinstance(constraint[-1], float):
@@ -668,8 +683,8 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
 
 def equilibrate(composition, assemblage, equality_constraints,
                 tol=1.e-3,
-                store_iterates=False, store_assemblage=False,
-                max_iterations=100., verbose=True):
+                store_iterates=False, store_assemblage=True,
+                max_iterations=100., verbose=False):
     """
     A function that equilibrates an assemblage subject to given
     bulk composition and equality constraints by
@@ -686,7 +701,26 @@ def equilibrate(composition, assemblage, equality_constraints,
         The assemblage to be equilibrated
 
     equality_constraints : list
-        A list of equality constraints.
+        A list of equality constraints. Each constraint
+        should have the form: [<constraint type>, <constraint>], where
+        <constraint type> is one of P, T, S, V, X, PT_ellipse,
+        phase_fraction, or phase_composition. The <constraint> object should
+        either be a float or an array of floats for P, T, S, V
+        (representing the desired pressure, temperature,
+        entropy or volume of the material). If the constraint type is X
+        (a generic constraint on the solution vector) then the constraint c is
+        represented by the following equality:
+        np.dot(c[0], x) - c[1]. If the constraint type is
+        PT_ellipse, the equality is given by
+        norm(([P, T] - c[0])/c[1]) - 1.
+        The constraint_type phase_fraction assumes a tuple of the phase object
+        (which must be one of the phases in the burnman.Composite) and a float
+        or vector corresponding to the phase fractions. Finally, a
+        phase_composition constraint has the format (site_names, n, d, v),
+        where n*x/d*x = v and n and d are fixed vectors of site coefficients.
+        So, one could for example choose a constraint
+        ([Mg_A, Fe_A], [1., 0.], [1., 1.], [0.5]) which would
+        correspond to equal amounts Mg and Fe on the A site.
 
     tol : float
         The tolerance for the nonlinear solver.
@@ -744,7 +778,7 @@ def equilibrate(composition, assemblage, equality_constraints,
     # Find the initial state (could be none here)
     initial_state = [assemblage.pressure, assemblage.temperature]
 
-    # Reset initial state if  equality constraints
+    # Reset initial state if equality constraints
     # are related to pressure or temperature
     for i in range(2):
         if eq_constraint_lists[i][0][0] == 'P':

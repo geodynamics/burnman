@@ -1,0 +1,27 @@
+invariant point found at 0.43 GPa, 809.34 K
+Composite: Unnamed composite
+  P, T: 1e+10 Pa, 1621 K
+Phase and endmember fractions:
+  olivine: 0.7818
+    Forsterite: 0.5500
+    Fayalite: 0.4500
+  wadsleyite: 0.2182
+    Mg_Wadsleyite: 0.3208
+    Fe_Wadsleyite: 0.6792
+Composite: Unnamed composite
+  P, T: 1e+10 Pa, 1500 K
+Phase and endmember fractions:
+  olivine: 0.4971
+    Forsterite: 0.9339
+    Fayalite: 0.0661
+  orthopyroxene: 0.2925
+    Enstatite: 0.8640
+    Ferrosilite: 0.0687
+    Mg_Tschermaks: 0.0005
+    Ortho_Diopside: 0.0668
+  garnet: 0.2104
+    Pyrope: 0.4458
+    Almandine: 0.1239
+    Grossular: 0.2607
+    Mg_Majorite: 0.1258
+    Jd_Majorite: 0.0437
