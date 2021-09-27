@@ -60,6 +60,7 @@ with a series of boolean variables. In order of complexity:
 from __future__ import absolute_import
 from __future__ import print_function
 
+from copy import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -107,8 +108,7 @@ if __name__ == "__main__" and run_aluminosilicates:
     equality_constraints = [('phase_fraction', (kyanite, np.array([0.0]))),
                             ('phase_fraction', (sillimanite, np.array([0.0])))]
 
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
     P_inv, T_inv = sol.x[0:2]
     print(f'invariant point found at {P_inv/1e9:.2f} GPa, {T_inv:.2f} K')
 
@@ -130,8 +130,7 @@ if __name__ == "__main__" and run_aluminosilicates:
                                 ('phase_fraction',
                                  (pair[0], np.array([0.0])))]
         sols, prm = equilibrate(composition, assemblage,
-                                equality_constraints,
-                                store_iterates=False)
+                                equality_constraints)
         Ps = np.array([sol.x[0] for sol in sols if sol.success])
         Ts = np.array([sol.x[1] for sol in sols if sol.success])
         plt.plot(Ts, Ps/1.e9)
@@ -216,21 +215,22 @@ if __name__ == "__main__" and run_gt_solvus:
 
     # The assemblage in this case is made of two distinct copies of the
     # SLB_2011 garnet solution.
-    assemblage = burnman.Composite([SLB_2011.garnet(), SLB_2011.garnet()],
-                                   [0.5, 0.5])
-
     # In the bulk composition of interest, there are only
     # two stable endmembers of the solution. Here, we simplify each phase
     # so that it only contains those endmembers
-    assemblage = simplify_composite_with_composition(assemblage,
-                                                     composition)
+    a = burnman.Composite([SLB_2011.garnet()])
+    a = simplify_composite_with_composition(a, composition)
+    py_gr = a.phases[0]
+
+    assemblage = burnman.Composite([py_gr, copy(py_gr)],
+                                   [0.5, 0.5])
 
     # We must set the compositions as distinct so that the equilibrium
     # function approaches the minimum with two distinct compositions,
     # rather than the metastable equilibrium where both phases have
     # the same composition.
-    assemblage.phases[0].set_composition([0.01, 0.99])
-    assemblage.phases[1].set_composition([0.99, 0.01])
+    assemblage.phases[0].set_composition([0.05, 0.95])
+    assemblage.phases[1].set_composition([0.95, 0.05])
 
     # Run the equilibration
     pressure = 1.e5
@@ -273,9 +273,7 @@ if __name__ == "__main__" and run_fper_ol:
 
     composition = {'Mg': 1., 'Fe': 0.5, 'Si': 0.5, 'O': 2.5}
 
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False,
-                           store_assemblage=True)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
 
     for sols in sol:
         PGPa = sols[0].assemblage.pressure / 1.e9
@@ -307,9 +305,7 @@ if __name__ == "__main__" and run_fixed_ol_composition:
                                    0.45)))]
     composition = {'Mg': 1., 'Fe': 1., 'Si': 1., 'O': 4.}
 
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False,
-                           store_assemblage=True)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
 
     print(assemblage)
 
@@ -334,7 +330,7 @@ if __name__ == "__main__" and run_upper_mantle:
     equality_constraints = [('P', 10.e9), ('T', 1500.)]
 
     sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False, max_iterations=20)
+                           max_iterations=20)
     print(assemblage)
 
 if __name__ == "__main__" and run_lower_mantle:
@@ -362,8 +358,7 @@ if __name__ == "__main__" and run_lower_mantle:
     # We start by calculating the assemblage entropy at a reference
     # pressure and temperature.
     equality_constraints = [('P', P0), ('T', T0)]
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
 
     S = np.array([assemblage.molar_entropy*assemblage.n_moles])
 
@@ -373,16 +368,14 @@ if __name__ == "__main__" and run_lower_mantle:
     assemblage.set_state(sol.x[0], sol.x[1])
     equality_constraints = [('S', S),
                             ('phase_fraction', (ppv, np.array([0.])))]
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
     P_ppv_in = assemblage.pressure
     T_ppv_in = assemblage.temperature
 
     assemblage.set_state(sol.x[0], sol.x[1])
     equality_constraints = [('S', S),
                             ('phase_fraction', (bdg, np.array([0.])))]
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
     P_bdg_in = assemblage.pressure
     T_bdg_in = assemblage.temperature
 
@@ -483,8 +476,7 @@ if __name__ == "__main__" and run_olivine_polymorphs:
     equality_constraints = [('phase_fraction', (ol, 0.0)),
                             ('phase_fraction', (rw, 0.0))]
 
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
     Pinv1, Tinv1 = sol.x[0:2]
 
     if sol.code != 0:
@@ -493,8 +485,7 @@ if __name__ == "__main__" and run_olivine_polymorphs:
     assemblage = burnman.Composite([ol, wad, rw])
     equality_constraints = [('phase_fraction', (wad, 0.0)),
                             ('phase_fraction', (rw, 0.0))]
-    sol, prm = equilibrate(composition, assemblage, equality_constraints,
-                           store_iterates=False)
+    sol, prm = equilibrate(composition, assemblage, equality_constraints)
     Pinv2, Tinv2 = sol.x[0:2]
 
     for d in [[np.linspace(T0, Tinv1, 8), [ol, wad, rw], ol, 0.],
