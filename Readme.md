@@ -31,10 +31,11 @@ Authors (as of 2021):
 
 * Python 3.7+
 * Python modules:
-  NumPy, SciPy, SymPy, Matplotlib, cvxpy
+  NumPy, SciPy, SymPy, Matplotlib
 
 ## Optional, needed for some functionality
 
+* cvxpy
 * pycddlib
 
 

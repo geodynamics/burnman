@@ -10,12 +10,16 @@ from sympy import Matrix
 from scipy.linalg import block_diag
 
 import logging
-import cvxpy as cp
-
+import importlib
 from .polytope import MaterialPolytope, independent_row_indices
 from . import SolidSolution, Composite
 from .solutiontools import transform_solution_to_new_basis
 
+try:
+    cp = importlib.import_module('cvxpy')
+except ImportError as err:
+    print(f'Warning: {err}. '
+          'For full functionality of BurnMan, please install cvxpy.')
 
 def solution_polytope_from_charge_balance(charges, charge_total,
                                           return_fractions=False):

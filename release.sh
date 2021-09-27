@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-name="burnman-v0.6"
+name="burnman-v1.0"
 
 rm -rf $name $name.zip
 
