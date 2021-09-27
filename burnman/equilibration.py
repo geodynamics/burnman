@@ -420,7 +420,6 @@ def lambda_bounds(dx, x, endmembers_per_phase):
         # set a step that is marginally smaller
         if x[j] + dx[j] < 0.:
             max_steps[j] = max(x[j]*0.999, 0.001)
-            # max_steps[j] = max(x[j]*0.5, 0.001) # allowed to cut amount by half...
         max_steps[j+1:j+n] = [max(xi*0.99, 0.01) for xi in x[j+1:j+n]]  # maximum compositional step
         j += n
 
