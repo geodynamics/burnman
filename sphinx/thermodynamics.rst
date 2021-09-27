@@ -29,3 +29,11 @@ Chemical potentials
 .. autofunction:: burnman.chemicalpotentials.chemical_potentials
 .. autofunction:: burnman.chemicalpotentials.fugacity
 .. autofunction:: burnman.chemicalpotentials.relative_fugacity
+
+
+.. _ref-equilibrate:
+
+Equilibrium Thermodynamics
+==========================
+
+.. autofunction:: burnman.equilibrate
