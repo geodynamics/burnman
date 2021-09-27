@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -9,6 +10,7 @@ import operator
 import bisect
 import pkgutil
 import numpy as np
+from scipy.linalg import logm
 from scipy.optimize import fsolve
 from scipy.ndimage.filters import gaussian_filter
 from scipy.interpolate import interp2d
@@ -16,6 +18,7 @@ import scipy.integrate as integrate
 from collections import Counter
 import itertools
 import warnings
+import matplotlib.pyplot as plt
 
 from . import constants
 
@@ -672,6 +675,246 @@ def check_eos_consistency(m, P=1.e9, T=300., tol=1.e-4, verbose=False,
             print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
 
     return eos_is_consistent
+
+
+def check_anisotropic_eos_consistency(m, P=1.e9, T=2000.,
+                                      tol=1.e-4, verbose=False):
+    """
+    Compute numerical derivatives of the gibbs free energy of a mineral
+    under given conditions, and check these values against those provided
+    analytically by the equation of state
+
+    Parameters
+    ----------
+    m : mineral
+        The mineral for which the equation of state
+        is to be checked for consistency
+    P : float
+        The pressure at which to check consistency
+    T : float
+        The temperature at which to check consistency
+    tol : float
+        The fractional tolerance for each of the checks
+    verbose : boolean
+        Decide whether to print information about each
+        check
+
+    Returns
+    -------
+    consistency: boolean
+        If all checks pass, returns True
+
+    """
+    dT = 1.
+    dP = 1000.
+
+    m.set_state(P, T)
+    G0 = m.gibbs
+    S0 = m.S
+    V0 = m.V
+
+    expr = ['G = F + PV', 'G = H - TS', 'G = E - TS + PV']
+    eq = [[m.gibbs, (m.helmholtz + P*m.V)],
+          [m.gibbs, (m.H - T*m.S)],
+          [m.gibbs, (m.molar_internal_energy - T*m.S + P*m.V)]]
+
+    m.set_state(P, T + dT)
+    G1 = m.gibbs
+    S1 = m.S
+    V1 = m.V
+
+    m.set_state(P + dP, T)
+    G2 = m.gibbs
+    V2 = m.V
+
+    # T derivatives
+    m.set_state(P, T + 0.5*dT)
+    expr.extend(['S = -dG/dT', 'alpha = 1/V dV/dT', 'C_p = T dS/dT'])
+    eq.extend([[m.S, -(G1 - G0)/dT],
+               [m.alpha, (V1 - V0)/dT/m.V],
+               [m.molar_heat_capacity_p, (T + 0.5*dT)*(S1 - S0)/dT]])
+
+    # P derivatives
+    m.set_state(P + 0.5*dP, T)
+    expr.extend(['V = dG/dP', 'K_T = -V dP/dV'])
+    eq.extend([[m.V, (G2 - G0)/dP],
+               [m.isothermal_bulk_modulus_reuss, -0.5*(V2 + V0)*dP/(V2 - V0)]])
+
+    expr.extend(['C_v = Cp - alpha^2*K_T*V*T', 'K_S = K_T*Cp/Cv'])
+    eq.extend([[m.molar_heat_capacity_v,
+                m.molar_heat_capacity_p - m.alpha*m.alpha*m.K_T*m.V*T],
+               [m.isentropic_bulk_modulus_reuss,
+                m.isothermal_bulk_modulus_reuss
+                * m.molar_heat_capacity_p / m.molar_heat_capacity_v]])
+
+    # Third derivative
+    m.set_state(P + 0.5 * dP, T)
+    b0 = m.isothermal_compressibility_tensor
+    F0 = m.deformation_gradient_tensor
+
+    m.set_state(P + 0.5 * dP, T + dT)
+    b1 = m.isothermal_compressibility_tensor
+    F1 = m.deformation_gradient_tensor
+
+    m.set_state(P, T + 0.5 * dT)
+    a0 = m.thermal_expansivity_tensor
+    F2 = m.deformation_gradient_tensor
+
+    m.set_state(P + dP, T + 0.5 * dT)
+    a1 = m.thermal_expansivity_tensor
+    F3 = m.deformation_gradient_tensor
+
+    m.set_state(P + 0.5 * dP, T + 0.5 * dT)
+
+    beta0 = -(logm(F3) - logm(F2))/dP
+    alpha0 = (logm(F1) - logm(F0))/dT
+
+    Q = m.deformed_coordinate_frame
+    beta1 = m.isothermal_compressibility_tensor
+    alpha1 = m.thermal_expansivity_tensor
+
+    beta1 = np.einsum('mi, nj, ij->mn', Q, Q, beta1)
+    alpha1 = np.einsum('mi, nj, ij->mn', Q, Q, alpha1)
+
+    expr.extend([f'SI = -d(lnm(F))/dP ({i}{j})'
+                 for i in range(3) for j in range(i, 3)])
+    eq.extend([[beta0[i, j], beta1[i, j]]
+               for i in range(3) for j in range(i, 3)])
+
+    expr.extend([f'alpha = d(lnm(F))/dT ({i}{j})'
+                 for i in range(3) for j in range(i, 3)])
+    eq.extend([[alpha0[i, j], alpha1[i, j]]
+               for i in range(3) for j in range(i, 3)])
+
+    expr.extend([f'd(alpha)/dP = -d(beta_T)/dT ({i}{j})'
+                 for i in range(3) for j in range(i, 3)])
+    eq.extend([[(a1[i, j] - a0[i, j])/dP, -(b1[i, j] - b0[i, j])/dT]
+               for i in range(3) for j in range(i, 3)])
+
+    # Consistent isotropic and anisotropic properties
+    expr.extend(['V = det(M)',
+                 'alpha_v = tr(alpha)',
+                 'beta_T = sum(S_T I)',
+                 'beta_S = sum(S_S I)'])
+    eq.extend([[m.V, np.linalg.det(m.cell_vectors)],
+               [m.alpha, np.trace(m.thermal_expansivity_tensor)],
+               [m.beta_T, np.sum(m.isothermal_compliance_tensor[:3,:3])],
+               [m.beta_S, np.sum(m.isentropic_compliance_tensor[:3,:3])]])
+
+    expr.append('Vphi = np.sqrt(K_S/rho)')
+    eq.append([m.bulk_sound_velocity, np.sqrt(m.K_S/m.rho)])
+
+    consistencies = [np.abs(e[0] - e[1]) < np.abs(tol*e[1])
+                     + np.finfo('float').eps for e in eq]
+    eos_is_consistent = np.all(consistencies)
+
+    if verbose:
+        print('Checking EoS consistency for {0:s}'.format(m.to_string()))
+        print('Expressions within tolerance of {0:2f}'.format(tol))
+        for i, c in enumerate(consistencies):
+            print('{0:10s} : {1:5s}'.format(expr[i], str(c)))
+        if eos_is_consistent:
+            print('All EoS consistency constraints satisfied for {0:s}'.format(m.to_string()))
+        else:
+            print('Not satisfied all EoS consistency constraints for {0:s}'.format(m.to_string()))
+
+    return eos_is_consistent
+
+
+def plot_projected_elastic_properties(mineral, plot_types, axes,
+                                      n_zenith=31, n_azimuth=91,
+                                      n_divs=100):
+    """
+    Plot types must be one of:
+    'vp': V$_{P}$ (km/s)
+    'vs1': 'V$_{S1}$ (km/s)
+    'vs2': V$_{S2}$ (km/s)
+    'vp/vs1': V$_{P}$/V$_{S1}$
+    'vp/vs2': V$_{P}$/V$_{S2}$
+    's anisotropy': S-wave anisotropy (%), 200(vs1s - vs2s)/(vs1s + vs2s))
+    'linear compressibility' Linear compressibility (GPa$^{-1}$)
+    'youngs modulus': Youngs Modulus (GPa)
+
+    axes objects must be initialised with projection='polar'
+    """
+
+    assert len(plot_types) == len(axes)
+
+    zeniths = np.linspace(np.pi/2., np.pi, n_zenith)
+    azimuths = np.linspace(0., 2.*np.pi, n_azimuth)
+    Rs = np.sin(zeniths)/(1. - np.cos(zeniths))
+    r, theta = np.meshgrid(Rs, azimuths)
+
+    vps = np.empty_like(r)
+    vs1s = np.empty_like(r)
+    vs2s = np.empty_like(r)
+    betas = np.empty_like(r)
+    Es = np.empty_like(r)
+    for i, az in enumerate(azimuths):
+        for j, phi in enumerate(zeniths):
+            d = np.array([np.cos(az)*np.sin(phi), np.sin(az)*np.sin(phi),
+                          -np.cos(phi)])  # change_hemispheres
+            velocities = mineral.wave_velocities(d)
+            betas[i][j] = mineral.isentropic_linear_compressibility(d)
+            Es[i][j] = mineral.isentropic_youngs_modulus(d)
+            vps[i][j] = velocities[0][0]
+            vs1s[i][j] = velocities[0][1]
+            vs2s[i][j] = velocities[0][2]
+
+    prps = []
+    for type in plot_types:
+        if type == 'vp':
+            prps.append(('V$_{P}$ (km/s)', vps/1000.))
+        elif type == 'vs1':
+            prps.append(('V$_{S1}$ (km/s)', vs1s/1000.))
+        elif type == 'vs2':
+            prps.append(('V$_{S2}$ (km/s)', vs2s/1000.))
+        elif type == 'vp/vs1':
+            prps.append(('V$_{P}$/V$_{S1}$', vps/vs1s))
+        elif type == 'vp/vs2':
+            prps.append(('V$_{P}$/V$_{S2}$', vps/vs2s))
+        elif type == 's anisotropy':
+            prps.append(('S-wave anisotropy (%)',
+                         200.*(vs1s - vs2s)/(vs1s + vs2s)))
+        elif type == 'linear compressibility':
+            prps.append(('Linear compressibility (GPa$^{-1}$)', betas*1.e9))
+        elif type == 'youngs modulus':
+            prps.append(('Youngs Modulus (GPa)', Es/1.e9))
+        else:
+            raise Exception('plot_type not recognised.')
+
+    contour_sets = []
+    ticks = []
+    lines = []
+    for i, prp in enumerate(prps):
+        title, item = prp
+
+        axes[i].set_title(title)
+
+        vmin = np.min(item)
+        vmax = np.max(item)
+        spacing = np.power(10., np.floor(np.log10(vmax - vmin)))
+        nt = int((vmax - vmin - vmax % spacing + vmin % spacing) / spacing)
+        if nt == 1:
+            spacing = spacing/4.
+        elif nt < 4:
+            spacing = spacing/2.
+        elif nt > 8:
+            spacing = spacing*2.
+
+        tmin = vmin + (spacing - vmin % spacing)
+        tmax = vmax - vmax % spacing
+        nt = int((tmax - tmin)/spacing + 1)
+
+        ticks.append(np.linspace(tmin, tmax, nt))
+        contour_sets.append(axes[i].contourf(theta, r, item, n_divs,
+                                             cmap=plt.cm.jet_r,
+                                             vmin=vmin, vmax=vmax))
+        lines.append(axes[i].contour(theta, r, item, ticks[-1],
+                                     colors=('black',), linewidths=(1,)))
+        axes[i].set_yticks([100])
+
+    return contour_sets, ticks, lines
 
 
 def _pad_ndarray_inverse_mirror(array, padding):
