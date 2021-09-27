@@ -9,20 +9,21 @@ example_spintransition_thermal
 ------------------------------
 
 This example illustrates how to create a non-ideal solid solution model
-for (Mg,FeHS,FeLS)O that has a gradual spin transition at finite temperature.
-First, we define the MgO endmember and two endmembers for the
-low and high spin states of FeO. Then we create a regular/symmetric
-solid solution that incorporates all three endmembers.
-The solid solution contains a method called set_equilibrium_composition,
-which calculates the equilibrium proportions of the low and high spin phases
-at the desired bulk composition, pressure and temperature.
+for (Mg,Fe\ :sup:`HS`\ ,Fe\ :sup:`LS`\ )O ferropericlase that has a gradual
+spin transition at finite temperature.
+First, we define the MgO endmember and two endmembers for the low and high spin
+states of FeO. Then we create a regular/symmetric solid solution that
+incorporates all three endmembers. The modified solid solution class
+contains a method called set_equilibrium_composition, which calculates
+the equilibrium proportions of the low and high spin phases at the
+desired bulk composition, pressure and temperature.
 
-In this example, we are neglecting the elastic component of mixing. We are
-also implicitly applying the Bragg-Williams approximation (i.e., we assume
-that there is no short-range order by applying interactions that are a
-function only of the average occupancy of species on each distinct site).
-Furthermore, we are using a one site model [Mg,FeHS,FeLS]O that explicitly
-precludes long range order.
+In this example, we neglect the elastic component of mixing. We
+also implicitly apply the Bragg-Williams approximation (i.e., we assume
+that there is no short-range order by only incorporating interactions that are
+a function of the average occupancy of species on each distinct site).
+Furthermore, the one site model [Mg,Fe\ :sup:`HS`\ ,Fe\ :sup:`LS`\ ]O
+explicitly precludes long range order.
 
 *Specifically uses:*
 
@@ -32,7 +33,7 @@ precludes long range order.
 *Demonstrates:*
 
 * implementation of gradual spin transition in (Mg,Fe)O at a user-defined
-pressure and temperature
+  pressure and temperature
 """
 
 from __future__ import absolute_import

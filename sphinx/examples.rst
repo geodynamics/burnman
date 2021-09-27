@@ -142,6 +142,12 @@ Advanced examples:
 .. image:: figures/example_spintransition.png
 
 
+.. automodule:: examples.example_spintransition_thermal
+
+*Resulting figure:*
+
+.. image:: figures/example_spintransition_thermal.png
+
 .. automodule:: examples.example_user_input_material
 
 .. automodule:: examples.example_optimize_pv

@@ -5,11 +5,16 @@
 
 from __future__ import absolute_import
 
+import importlib
 import numpy as np
-import cvxpy as cp
 from scipy.linalg import inv, sqrtm
 import warnings
 
+try:
+    cp = importlib.import_module('cvxpy')
+except ImportError as err:
+    print(f'Warning: {err}. '
+          'For full functionality of BurnMan, please install cvxpy.')
 
 def weighted_constrained_least_squares(A, b, Cov_b=None,
                                        equality_constraints=None,

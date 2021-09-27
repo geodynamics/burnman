@@ -5,7 +5,7 @@
 
 from __future__ import absolute_import
 
-import cdd
+import importlib
 import numpy as np
 from sympy import Matrix, Rational
 from fractions import Fraction
@@ -16,6 +16,12 @@ from copy import copy
 from .reductions import row_reduce
 from .material import cached_property
 
+
+try:
+    cdd = importlib.import_module('cdd')
+except ImportError as err:
+    print(f'Warning: {err}. '
+          'For full functionality of BurnMan, please install pycddlib.')
 
 def independent_row_indices(array):
     """
