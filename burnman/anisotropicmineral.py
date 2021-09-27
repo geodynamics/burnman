@@ -20,7 +20,7 @@ def cell_parameters_to_vectors(cell_parameters):
     cell_parameters : 1D numpy array
         An array containing the three lengths of the unit cell vectors [m],
         and the three angles [degrees].
-        The first angle :math:`\\alpha` corresponds to the angle between the
+        The first angle (:math:`\\alpha`) corresponds to the angle between the
         second and the third cell vectors, the second (:math:`\\beta`) to the
         angle between the first and third cell vectors, and the third
         (:math:`\\gamma`) to the angle between the first and second vectors.
@@ -29,8 +29,9 @@ def cell_parameters_to_vectors(cell_parameters):
     -------
     M : 2D numpy array
         The three vectors defining the parallelopiped cell [m].
-        This function assumes that the first cell vector is parallel to the
-        x-axis, and the second is perpendicular to the z-axis.
+        This function assumes that the first cell vector is colinear with the
+        x-axis, and the second is perpendicular to the z-axis, and the third is
+        defined in a right-handed sense.
     """
     a, b, c, alpha_deg, beta_deg, gamma_deg = cell_parameters
     alpha = np.radians(alpha_deg)
@@ -46,21 +47,22 @@ def cell_parameters_to_vectors(cell_parameters):
 
 def cell_vectors_to_parameters(M):
     """
-    Converts unit cell vectors to cell parameters. This function assumes that
-    the first cell_vector is parallel to the x-axis, and the
-    second is perpendicular to the z-axis.
+    Converts unit cell vectors to cell parameters.
 
     Parameters
     ----------
     M : 2D numpy array
-        The three vectors defining the parallelopiped cell [m]
+        The three vectors defining the parallelopiped cell [m].
+        This function assumes that the first cell vector is colinear with the
+        x-axis, the second is perpendicular to the z-axis, and the third is
+        defined in a right-handed sense.
 
     Returns
     -------
     cell_parameters : 1D numpy array
         An array containing the three lengths of the unit cell vectors [m],
         and the three angles [degrees].
-        The first angle :math:`\\alpha` corresponds to the angle between the
+        The first angle (:math:`\\alpha`) corresponds to the angle between the
         second and the third cell vectors, the second (:math:`\\beta`) to the
         angle between the first and third cell vectors, and the third
         (:math:`\\gamma`) to the angle between the first and second vectors.
@@ -89,18 +91,20 @@ def cell_vectors_to_parameters(M):
 
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
     """
-    A class implementing the anisotropic mineral equation of state
-    (Myhill, 2021). This class is derived from both Mineral
-    and AnisotropicMaterial, and inherits most of the methods from
-    both classes.
+    A class implementing the anisotropic mineral equation of state described
+    in :cite:`Myhill2021`.
+    This class is derived from both Mineral and AnisotropicMaterial,
+    and inherits most of the methods from these classes.
 
     Instantiation of an AnisotropicMineral takes three arguments;
     a reference Mineral (i.e. a standard isotropic mineral which provides
     volume as a function of pressure and temperature), cell_parameters,
     which give the lengths of the molar cell vectors and the angles between
-    them, and a 4D array of anisotropic parameters which describe the
-    anisotropic behaviour of the mineral. For a description of these
-    parameters, please refer to the code or to the original paper.
+    them (see :func:`~burnman.anisotropicmineral.cell_parameters_to_vectors`),
+    and a 4D array of anisotropic parameters which describe the
+    anisotropic behaviour of the mineral. For a description of the physical
+    meaning of these parameters, please refer to the code
+    or to the original paper.
 
     States of the mineral can only be queried after setting the
     pressure and temperature using set_state().
@@ -271,8 +275,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             The vectors of the cell constructed from one mole of formula units
             after deformation of the mineral from its undeformed state
             (i.e. the state at the reference pressure and temperature).
-            Each vector is given in [m]. See class documentation
-            (above) for the assumed relationships between the cell vectors and
+            Each vector is given in [m]. See the documentation for the function
+            :func:`~burnman.anisotropicmineral.cell_parameters_to_vectors`
+            for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """
         return self.deformation_gradient_tensor.dot(self.cell_vectors_0)
@@ -317,8 +322,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         -------
         cell_vectors : 2D numpy array
             The vectors of the cell constructed from one mole of formula units.
-            Each vector is given in [m]. See class documentation
-            (above) for the assumed relationships between the cell vectors and
+            Each vector is given in [m]. See the documentation for the function
+            :func:`~burnman.anisotropicmineral.cell_parameters_to_vectors`
+            for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """
         if self.orthotropic:
@@ -340,9 +346,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             where the first three floats are the lengths of the vectors in [m]
             defining the cell constructed from one mole of formula units.
             The last three floats are angles between vectors
-            (given in radians).
-            See class documentation (above) for the assumed relationships
-            between the cell vectors and spatial coordinate axes.
+            (given in radians). See the documentation for the function
+            :func:`~burnman.anisotropicmineral.cell_parameters_to_vectors`
+            for the assumed relationships between the cell vectors and
+            spatial coordinate axes.
         """
         return cell_vectors_to_parameters(self.cell_vectors)
 
@@ -547,7 +554,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         -------
         grueneisen_tensor : 2D numpy array
             The grueneisen tensor.
-            This is defined as :cite:`BarronMunn1967` as
+            This is defined by :cite:`BarronMunn1967` as
             :math:`\\mathbb{C}_{\\text{N} ijkl} \\alpha_{kl} V/C_{P}`.
         """
         return (np.einsum('ijkl, kl->ij',
