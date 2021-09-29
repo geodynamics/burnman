@@ -258,8 +258,8 @@ if do_plotting:
                                           (1, 2), (1, 3), (2, 3)])
 
     # Plot thermal expansion figure
-    fig = plt.figure(figsize=(8, 4))
-    ax = [fig.add_subplot(1, 2, i) for i in range(1, 3)]
+    fig = plt.figure(figsize=(4, 8))
+    ax = [fig.add_subplot(2, 1, i) for i in range(1, 3)]
 
     temperatures = np.linspace(10., 1600., 101)
     alphas = np.empty((101,4))

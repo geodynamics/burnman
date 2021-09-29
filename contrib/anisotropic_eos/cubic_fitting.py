@@ -121,8 +121,10 @@ m = make_cubic_mineral_from_parameters(parameters)
 
 m.set_state(1.e5, 300.)
 
-fig = plt.figure(figsize=(8, 8))
-ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
+fig = plt.figure(figsize=(4, 12))
+fig2 = plt.figure(figsize=(4, 4))
+ax = [fig.add_subplot(3, 1, i) for i in range(1, 4)]
+ax.append(fig2.add_subplot(1, 1, 1))
 
 pressures = np.linspace(1.e6, 30.e9, 101)
 G_iso = np.empty_like(pressures)
@@ -184,7 +186,9 @@ for i in range(4):
     ax[i].legend()
 
 fig.set_tight_layout(True)
-fig.savefig('periclase_properties.pdf')
+fig.savefig('periclase_stiffness_tensor.pdf')
+fig2.set_tight_layout(True)
+fig2.savefig('periclase_shear_modulus.pdf')
 plt.show()
 
 fig = plt.figure(figsize=(4, 4))
