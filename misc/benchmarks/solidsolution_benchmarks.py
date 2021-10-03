@@ -1,16 +1,14 @@
 from __future__ import absolute_import
 # Benchmarks for the solid solution class
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
-from burnman.processchemistry import *
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+
+assert burnman_path  # silence pyflakes warning
 
 '''
 Solvus shapes (a proxy for Gibbs free energy checking

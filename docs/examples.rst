@@ -23,6 +23,7 @@ Class examples
 
 The following is a list of examples that introduce the main classes
 of BurnMan objects:
+
   - :mod:`~examples.example_mineral`,
   - :mod:`~examples.example_gibbs_modifiers`,
   - :mod:`~examples.example_solid_solution`,

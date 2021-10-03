@@ -29,19 +29,16 @@ and how to assess goodness of fit.
 """
 from __future__ import absolute_import
 
-import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 from burnman import minerals
 from burnman.composition_fitting import fit_composition_to_solution
 from burnman.composition_fitting import fit_phase_proportions_to_bulk_composition
+
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

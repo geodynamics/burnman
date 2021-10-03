@@ -31,15 +31,15 @@ class instantiate_minerals(BurnManTest):
             # instantiated
             mineral_list = [m for m in member_list if inspect.isclass(m)
                             and issubclass(m, burnman.Mineral)
-                            and m is not burnman.mineral.Mineral
-                            and m is not burnman.solidsolution.SolidSolution
-                            and m is not burnman.combinedmineral.CombinedMineral]
+                            and m is not burnman.Mineral
+                            and m is not burnman.SolidSolution
+                            and m is not burnman.CombinedMineral]
 
             for mineral_ in mineral_list:
                 m = mineral_()  # instantiate
 
                 # Call set_composition if necessary
-                if isinstance(m, burnman.solidsolution.SolidSolution):
+                if isinstance(m, burnman.SolidSolution):
                     m.set_composition([1. / m.n_endmembers] * m.n_endmembers)
 
                 # test that it works

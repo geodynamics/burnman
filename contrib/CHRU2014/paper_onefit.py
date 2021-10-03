@@ -25,7 +25,7 @@ import numpy.random
 import burnman
 import pickle
 from burnman import minerals
-from misc.helper_solid_solution import HelperSolidSolution
+from helper_solid_solution import HelperSolidSolution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate
@@ -88,7 +88,7 @@ def realization_to_array(rock, anchor_t):
             for key in ph.mineral.params:
                 if key != 'equation_of_state' and key != 'F_0' and key != 'T_0' and key != 'P_0':
                     arr.append(ph.mineral.params[key])
-                    names.append(mph.mineral.to_string() + '.' + key)
+                    names.append(ph.mineral.to_string() + '.' + key)
     return arr, names
 
 

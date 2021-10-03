@@ -6,9 +6,8 @@ import warnings
 
 import burnman_path
 import burnman
-from burnman.mineral import Mineral
+from burnman import Mineral, CombinedMineral
 from burnman.processchemistry import dictionarize_formula, formula_mass
-from burnman.combinedmineral import CombinedMineral
 
 assert burnman_path  # silence pyflakes warning
 

@@ -4,4 +4,5 @@ Composites
 Base class
 ----------
 
-.. autoclass:: burnman.composite.Composite
+.. autoclass:: burnman.Composite
+  :noindex:

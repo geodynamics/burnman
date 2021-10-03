@@ -23,7 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from misc.helper_solid_solution import HelperSolidSolution
+from helper_solid_solution import HelperSolidSolution
 import misc.colors as colors
 
 if __name__ == "__main__":

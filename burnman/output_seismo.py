@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -63,7 +64,7 @@ def write_tvel_file(planet_or_layer, modelname='burnmanmodel',
         header = (f'{layer.name}  model from BurnMan between a radius of '
                   f'{str(layer.inner_radius)} and '
                   f'{str(layer.outer_radius)} km \n'
-                  f'{background_model.__class__.__name} '
+                  f'{background_model.__class__.__name__} '
                   f'for the rest of the Earth')
         with open(modelname + '.tvel', 'wb') as f:
             np.savetxt(f, data, header=header, fmt='%5.2f', delimiter='\t')

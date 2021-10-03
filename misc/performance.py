@@ -4,18 +4,15 @@ from __future__ import print_function
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-import os
-import sys
 import numpy as np
 
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
-
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
 import timeit
+
+assert burnman_path  # silence pyflakes warning
 
 if True:
     def test_set_state(runs=10000):

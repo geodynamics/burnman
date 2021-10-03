@@ -4,9 +4,7 @@ from __future__ import absolute_import
 # GPL v2 or later.
 
 
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
+import burnman_path  # adds the local burnman directory to the path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,6 +17,7 @@ import burnman.eos.slb as slb
 import burnman.eos.vinet as vinet
 import matplotlib.image as mpimg
 
+assert burnman_path  # silence pyflakes warning
 
 def check_birch_murnaghan():
     """

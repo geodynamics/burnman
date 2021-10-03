@@ -3,34 +3,35 @@ Solution models
 
 Base class
 ----------
-.. autoclass:: burnman.solidsolution.SolidSolution
-
-.. autoclass:: burnman.solutionmodel.SolutionModel
+.. autoclass:: burnman.SolidSolution
+  :noindex:
+  
+.. autoclass:: burnman.SolutionModel
 
 Mechanical solution
 -------------------
 
-.. autoclass:: burnman.solutionmodel.MechanicalSolution
+.. autoclass:: burnman.material_classes.solutionmodel.MechanicalSolution
 
 Ideal solution
 --------------
 
-.. autoclass:: burnman.solutionmodel.IdealSolution
+.. autoclass:: burnman.material_classes.solutionmodel.IdealSolution
 
 Asymmetric regular solution
 ---------------------------
 
-.. autoclass:: burnman.solutionmodel.AsymmetricRegularSolution
+.. autoclass:: burnman.material_classes.solutionmodel.AsymmetricRegularSolution
 
 Symmetric regular solution
 --------------------------
 
-.. autoclass:: burnman.solutionmodel.SymmetricRegularSolution
+.. autoclass:: burnman.material_classes.solutionmodel.SymmetricRegularSolution
 
 Subregular solution
 -------------------
 
-.. autoclass:: burnman.solutionmodel.SubregularSolution
+.. autoclass:: burnman.material_classes.solutionmodel.SubregularSolution
 
 
 Solution tools

@@ -1,15 +1,14 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
 
+import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.minerals import DKS_2013_solids
-from burnman import constants
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+
+assert burnman_path  # silence pyflakes warning
 
 '''
 SOLIDS
@@ -19,7 +18,7 @@ phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 
           ['perovskite', DKS_2013_solids.perovskite(), [14.5, 27.5, 0, 344], [14.5, 27.5, -3600, -2000]], \
           ['periclase', DKS_2013_solids.periclase(), [6.5, 14, -25, 275], [6.5, 14, -1200, -560]]]
 
-temperatures=[1000., 2000., 3000., 4000., 5000., 6000., 8000.]
+temperatures = [1000., 2000., 3000., 4000., 5000., 6000., 8000.]
 for name, phase, PVT_range, EVT_range in phases:
 
     phase.params['G_0'] = 0. # just for consistency checking

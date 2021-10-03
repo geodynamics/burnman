@@ -1,18 +1,20 @@
 from __future__ import absolute_import
 from __future__ import print_function
 # Benchmarks for the solid solution class
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
+
+import burnman_path  # adds the local burnman directory to the path
 
 from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
 import numpy as np
 import warnings
 
+assert burnman_path  # silence pyflakes warning
+
 
 def p(v1, v2):
     return (v2 - v1) / v1
+
 
 #
 filemin = [['SLB2011', '../../burnman/data/input_perplex/fo_SLB2011_params.dat', SLB_2011.fo()], [

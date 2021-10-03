@@ -1,14 +1,15 @@
 from __future__ import absolute_import
 
 # Benchmarks for the solid solution class
-import os.path
-import sys
+import burnman_path  # adds the local burnman directory to the path
+
 import numpy as np
 import matplotlib.pyplot as plt
-sys.path.insert(1, os.path.abspath('../..'))
 
-from burnman.tools import equilibrium_temperature,check_eos_consistency
+from burnman.tools import equilibrium_temperature, check_eos_consistency
 from burnman.minerals import HGP_2018_ds633
+
+assert burnman_path  # silence pyflakes warning
 
 # Here, we test that burnman outputs the correct properties for
 # albite liquid from the Holland and Powell dataset (v. 6.33, 2018)

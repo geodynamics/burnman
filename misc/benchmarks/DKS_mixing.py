@@ -1,39 +1,34 @@
 from __future__ import absolute_import
 from __future__ import print_function
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
 
-import burnman
-from burnman.minerals import \
-    DKS_2013_liquids, \
-    DKS_2013_solids, \
-    SLB_2011
-from burnman import constants
+import burnman_path  # adds the local burnman directory to the path
+from burnman.minerals import DKS_2013_liquids
 import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+assert burnman_path  # silence pyflakes warning
+
 phases = [DKS_2013_liquids.SiO2_liquid(),
-         DKS_2013_liquids.MgSiO3_liquid(),
-         DKS_2013_liquids.MgSi2O5_liquid(),
-         DKS_2013_liquids.MgSi3O7_liquid(),
-         DKS_2013_liquids.MgSi5O11_liquid(),
-         DKS_2013_liquids.Mg2SiO4_liquid(),
-         DKS_2013_liquids.Mg3Si2O7_liquid(),
-         DKS_2013_liquids.Mg5SiO7_liquid(),
-         DKS_2013_liquids.MgO_liquid()
-         ]
+          DKS_2013_liquids.MgSiO3_liquid(),
+          DKS_2013_liquids.MgSi2O5_liquid(),
+          DKS_2013_liquids.MgSi3O7_liquid(),
+          DKS_2013_liquids.MgSi5O11_liquid(),
+          DKS_2013_liquids.Mg2SiO4_liquid(),
+          DKS_2013_liquids.Mg3Si2O7_liquid(),
+          DKS_2013_liquids.Mg5SiO7_liquid(),
+          DKS_2013_liquids.MgO_liquid()
+          ]
 
 
-pressure = 25.e9 # Pa
-temperature = 3000. # K
+pressure = 25.e9  # Pa
+temperature = 3000.  # K
 
 MgO_liq = DKS_2013_liquids.MgO_liquid()
 SiO2_liq = DKS_2013_liquids.SiO2_liquid()
 
-pressures = np.array(   [0.,    5.,    10.,   25.,   50.,   75.,   100.,  135.])*1.e9
+pressures = np.array([0., 5., 10., 25., 50., 75., 100., 135.])*1.e9
 temperatures = np.array([3000., 3000., 3000., 3000., 4000., 5000., 6000., 6000.])
 
 SiO2_enthalpies, SiO2_entropies, SiO2_volumes = phases[0].evaluate(['H', 'S', 'V'], pressures, temperatures)

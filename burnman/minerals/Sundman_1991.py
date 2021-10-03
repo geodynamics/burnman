@@ -13,9 +13,9 @@ EoS terms for fcc are from an unpublished calibration
 """
 from __future__ import absolute_import
 
-from ..mineral import Mineral
-from ..solidsolution import SolidSolution
-from ..solutionmodel import *
+from ..material_classes.mineral import Mineral
+from ..material_classes.solidsolution import SolidSolution
+from ..material_classes.solutionmodel import *
 from ..processchemistry import dictionarize_formula, formula_mass
 
 """

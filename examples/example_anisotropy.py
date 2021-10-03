@@ -25,7 +25,7 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import burnman_path  # adds the local burnman directory to the path
-from burnman import anisotropy
+from burnman.material_classes import anisotropy
 
 assert burnman_path  # silence pyflakes warning
 

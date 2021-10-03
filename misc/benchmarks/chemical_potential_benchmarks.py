@@ -1,16 +1,16 @@
 from __future__ import absolute_import
 # Benchmarks for the chemical potential functions
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
 
+import burnman_path  # adds the local burnman directory to the path
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman.processchemistry import *
-from burnman.chemicalpotentials import *
+from burnman.processchemistry import dictionarize_formula, formula_mass
+from burnman.chemicalpotentials import fugacity
 import burnman.constants as constants
+
+assert burnman_path  # silence pyflakes warning
 
 
 class Re (burnman.Mineral):

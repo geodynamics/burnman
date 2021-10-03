@@ -3,14 +3,15 @@
 # GPL v2 or later.
 
 
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
+import burnman_path  # adds the local burnman directory to the path
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from scipy.optimize import fsolve
 import burnman
+
+assert burnman_path  # silence pyflakes warning
 
 liq = burnman.minerals.other.liquid_iron()
 burnman.tools.check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3,

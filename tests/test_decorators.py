@@ -4,7 +4,7 @@ from util import BurnManTest
 import burnman_path
 import burnman
 
-from burnman.material import material_property
+from burnman import material_property
 from burnman.tools import copy_documentation
 
 assert burnman_path  # silence pyflakes warning

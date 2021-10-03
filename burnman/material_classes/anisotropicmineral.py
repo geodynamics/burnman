@@ -8,7 +8,7 @@ from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
 from .anisotropy import AnisotropicMaterial, voigt_compliance_factors
-from .tools import copy_documentation
+from ..tools import copy_documentation
 
 
 def cell_parameters_to_vectors(cell_parameters):

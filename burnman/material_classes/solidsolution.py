@@ -8,15 +8,16 @@ from __future__ import absolute_import
 
 import numpy as np
 from sympy import Matrix, nsimplify
-from .reductions import independent_row_indices
 from .material import material_property, cached_property
 from .mineral import Mineral
 from .solutionmodel import SolutionModel
 from .solutionmodel import MechanicalSolution, IdealSolution
 from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from .solutionmodel import SubregularSolution
-from .processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
-from .averaging_schemes import reuss_average_function
+
+from ..reductions import independent_row_indices
+from ..processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..averaging_schemes import reuss_average_function
 
 
 class SolidSolution(Mineral):

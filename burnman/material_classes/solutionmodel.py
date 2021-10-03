@@ -5,8 +5,8 @@
 from __future__ import absolute_import
 
 import numpy as np
-from . import processchemistry
-from . import constants
+from .. import processchemistry
+from .. import constants
 
 
 def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers,
@@ -450,7 +450,7 @@ class AsymmetricRegularSolution (IdealSolution):
     in the excess properties.
 
     .. math::
-        \\phi_i = \\frac{\\alpha_i p_i}{\\sum_{k=1}^{n} \\alpha_k p_k}, 
+        \\phi_i = \\frac{\\alpha_i p_i}{\\sum_{k=1}^{n} \\alpha_k p_k},
         W_{ij} = \\frac{2 w_{ij}}{\\alpha_i + \\alpha_j} \\textrm{for i<j}
     """
 

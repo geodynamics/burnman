@@ -12,8 +12,8 @@ Minerals from Murakami 2013 and references therein.
 """
 from __future__ import absolute_import
 
-from .. import mineral_helpers as helpers
-from ..mineral import Mineral
+from ..material_classes import mineral_helpers as helpers
+from ..material_classes.mineral import Mineral
 
 
 class periclase (Mineral):

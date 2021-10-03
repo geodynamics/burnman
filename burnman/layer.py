@@ -13,9 +13,9 @@ from burnman import geotherm
 import warnings
 
 
-from .material import Material, material_property
-from .mineral import Mineral
-from .composite import Composite
+from .material_classes.material import Material, material_property
+from .material_classes.mineral import Mineral
+from .material_classes.composite import Composite
 from .seismic import Seismic1DModel
 
 import matplotlib.pyplot as plt

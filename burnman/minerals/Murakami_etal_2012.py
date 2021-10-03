@@ -13,8 +13,8 @@ Stixrude & Lithgow-Bertolloni 2005. Some information from personal communication
 
 """
 from __future__ import absolute_import
-from .. import mineral_helpers as helpers
-from ..mineral import Mineral
+from ..material_classes import mineral_helpers as helpers
+from ..material_classes.mineral import Mineral
 
 
 class mg_perovskite(Mineral):

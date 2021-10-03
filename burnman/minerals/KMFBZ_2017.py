@@ -11,9 +11,9 @@ Nature 543.7646 (2017): 543-546. doi:10.1038/nature21390
 
 from __future__ import absolute_import
 
-from ..mineral import Mineral
-from ..solidsolution import SolidSolution
-from ..solutionmodel import *
+from ..material_classes.mineral import Mineral
+from ..material_classes.solidsolution import SolidSolution
+from ..material_classes.solutionmodel import *
 from ..processchemistry import dictionarize_formula, formula_mass
 
 """

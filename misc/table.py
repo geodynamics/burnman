@@ -3,22 +3,23 @@
 # GPL v2 or later.
 
 
-""" Generates a text table with mineral properties. Run 'python table.py latex' to write a tex version of the table to mytable.tex """
+"""
+Generates a text table with mineral properties.
+Run 'python table.py latex' to write a tex version of the table to mytable.tex
+"""
 from __future__ import absolute_import
 from __future__ import print_function
 
-
-import os
 import sys
-# hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
+import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 import inspect
 
 from burnman import minerals
 from burnman import tools
+
+assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 
@@ -61,8 +62,8 @@ if __name__ == "__main__":
         if mineralgroup.__class__.__name__ == "module":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
-                if inspect.isclass(mineral) and mineral != burnman.Mineral and mineral != burnman.combinedmineral.CombinedMineral and issubclass(mineral, burnman.Mineral) \
-                        and not issubclass(mineral, burnman.mineral_helpers.HelperSpinTransition):
+                if inspect.isclass(mineral) and mineral != burnman.Mineral and mineral != burnman.CombinedMineral and issubclass(mineral, burnman.Mineral) \
+                        and not issubclass(mineral, burnman.material_classes.mineral_helpers.HelperSpinTransition):
                     if issubclass(mineral, burnman.SolidSolution):
                         continue
                     # print mineral.__module__ + mineral.__name__

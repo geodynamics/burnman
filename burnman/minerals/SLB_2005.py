@@ -11,8 +11,8 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 from __future__ import absolute_import
-from .. import mineral_helpers as helpers
-from ..mineral import Mineral
+from ..material_classes import mineral_helpers as helpers
+from ..material_classes.mineral import Mineral
 
 
 class stishovite (Mineral):
