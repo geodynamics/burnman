@@ -30,8 +30,8 @@ class AnisotropicMaterial(Material):
     properties along directions oriented with respect to the isentropic
     elastic tensor.
 
-    See :cite:`Mainprice2011` Geological Society of London Special Publication
-    and https://materialsproject.org/wiki/index.php/Elasticity_calculations
+    See :cite:`Mainprice2011`
+    and https://docs.materialsproject.org/methodology/elasticity/
     for mathematical descriptions of each function.
     """
 

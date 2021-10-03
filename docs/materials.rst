@@ -38,14 +38,16 @@ Mineral helpers
 
 .. autoclass:: burnman.material_classes.mineral_helpers.HelperSpinTransition
 
-Anisotropic minerals
-^^^^^^^^^^^^^^^^^^^^
+Anisotropic materials
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: burnman.AnisotropicMaterial
+
+.. autoclass:: burnman.AnisotropicMineral
 
 .. autofunction:: burnman.cell_parameters_to_vectors
 
 .. autofunction:: burnman.cell_vectors_to_parameters
-
-.. autoclass:: burnman.AnisotropicMineral
 
 Composites
 ----------
