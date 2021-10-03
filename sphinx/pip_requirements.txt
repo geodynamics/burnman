@@ -5,3 +5,7 @@ scipy
 sympy
 sphinxcontrib.bibtex
 cvxpy
+
+# ReadTheDocs cannot build pycddlib successfully
+# because it requires gmp.h, installable only via sudo apt-get install.
+# It is therefore not added here. It is mock-imported in conf.py instead.
