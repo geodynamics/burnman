@@ -5,8 +5,8 @@
 
 """
 
-example_composition_fitting
-----------------------
+example_fit_composition
+-----------------------
 
 This example shows how to fit compositional data to a solution model,
 how to partition a bulk composition between phases of known composition,
@@ -14,10 +14,10 @@ and how to assess goodness of fit.
 
 *Uses:*
 
-* :doc:`composition_fitting`
 * :class:`burnman.Composition`
-* :class:`burnman.solidsolution.SolidSolution`
-* :class:`burnman.solutionmodel.SolutionModel`
+* :class:`burnman.SolidSolution`
+* :func:`burnman.composition_fitting.fit_phase_proportions_to_bulk_composition`
+* :func:`burnman.composition_fitting.fit_composition_to_solution`
 
 
 *Demonstrates:*
@@ -188,9 +188,11 @@ if __name__ == "__main__":
                             fmt="none", zorder=2)
         plt.scatter(pressures, weight_proportions[:, i], label=phase, zorder=3)
 
+    plt.title('Phase proportions in the Martian Mantle (Bertka and Fei, 1997)')
     plt.xlim(0., 40.)
     plt.ylim(0., 1.)
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Phase fraction (wt %)')
     plt.legend()
+    plt.savefig('example_fit_composition_Figure_1.png')
     plt.show()

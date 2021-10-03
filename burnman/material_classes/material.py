@@ -83,7 +83,7 @@ class Material(object):
 
     """
     Base class for all materials. The main functionality is unroll() which
-    returns a list of objects of type :class:`~burnman.mineral.Mineral` and their molar
+    returns a list of objects of type :class:`~burnman.Mineral` and their molar
     fractions. This class is available as ``burnman.Material``.
 
     The user needs to call set_method() (once in the beginning) and set_state()
@@ -253,12 +253,12 @@ class Material(object):
     @property
     def pressure(self):
         """
-        Returns current pressure that was set with :func:`~burnman.material.Material.set_state`.
+        Returns current pressure that was set with :func:`~burnman.Material.set_state`.
 
 
         Notes
         -----
-        - Aliased with :func:`~burnman.material.Material.P`.
+        - Aliased with :func:`~burnman.Material.P`.
 
         Returns
         -------
@@ -270,11 +270,11 @@ class Material(object):
     @property
     def temperature(self):
         """
-        Returns current temperature that was set with :func:`~burnman.material.Material.set_state`.
+        Returns current temperature that was set with :func:`~burnman.Material.set_state`.
 
         Notes
         -----
-        - Aliased with :func:`~burnman.material.Material.T`.
+        - Aliased with :func:`~burnman.Material.T`.
 
         Returns
         -------
@@ -291,7 +291,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.energy`.
+        - Aliased with :func:`~burnman.Material.energy`.
 
         Returns
         -------
@@ -309,7 +309,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.gibbs`.
+        - Aliased with :func:`~burnman.Material.gibbs`.
 
         Returns
         -------
@@ -327,7 +327,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.helmholtz`.
+        - Aliased with :func:`~burnman.Material.helmholtz`.
 
         Returns
         -------
@@ -362,7 +362,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.V`.
+        - Aliased with :func:`~burnman.Material.V`.
 
         Returns
         -------
@@ -380,7 +380,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.rho`.
+        - Aliased with :func:`~burnman.Material.rho`.
 
         Returns
         -------
@@ -398,7 +398,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.S`.
+        - Aliased with :func:`~burnman.Material.S`.
 
         Returns
         -------
@@ -416,7 +416,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.H`.
+        - Aliased with :func:`~burnman.Material.H`.
 
         Returns
         -------
@@ -434,7 +434,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.K_T`.
+        - Aliased with :func:`~burnman.Material.K_T`.
 
         Returns
         -------
@@ -452,7 +452,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.K_S`.
+        - Aliased with :func:`~burnman.Material.K_S`.
 
         Returns
         -------
@@ -470,7 +470,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_T`.
+        - Aliased with :func:`~burnman.Material.beta_T`.
 
         Returns
         -------
@@ -489,7 +489,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_S`.
+        - Aliased with :func:`~burnman.Material.beta_S`.
 
         Returns
         -------
@@ -507,7 +507,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_G`.
+        - Aliased with :func:`~burnman.Material.beta_G`.
 
         Returns
         -------
@@ -525,7 +525,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_p`.
+        - Aliased with :func:`~burnman.Material.v_p`.
 
         Returns
         -------
@@ -543,7 +543,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_phi`.
+        - Aliased with :func:`~burnman.Material.v_phi`.
 
         Returns
         -------
@@ -561,7 +561,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_s`.
+        - Aliased with :func:`~burnman.Material.v_s`.
 
         Returns
         -------
@@ -579,7 +579,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.gr`.
+        - Aliased with :func:`~burnman.Material.gr`.
 
         Returns
         -------
@@ -597,7 +597,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.alpha`.
+        - Aliased with :func:`~burnman.Material.alpha`.
 
         Returns
         -------
@@ -615,7 +615,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.C_v`.
+        - Aliased with :func:`~burnman.Material.C_v`.
 
         Returns
         -------
@@ -633,7 +633,7 @@ class Material(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.C_p`.
+        - Aliased with :func:`~burnman.Material.C_p`.
 
         Returns
         -------
@@ -647,105 +647,105 @@ class Material(object):
     # Aliased properties
     @property
     def P(self):
-        """Alias for :func:`~burnman.material.Material.pressure`"""
+        """Alias for :func:`~burnman.Material.pressure`"""
         return self.pressure
 
     @property
     def T(self):
-        """Alias for :func:`~burnman.material.Material.temperature`"""
+        """Alias for :func:`~burnman.Material.temperature`"""
         return self.temperature
 
     @property
     def energy(self):
-        """Alias for :func:`~burnman.material.Material.molar_internal_energy`"""
+        """Alias for :func:`~burnman.Material.molar_internal_energy`"""
         return self.molar_internal_energy
 
     @property
     def helmholtz(self):
-        """Alias for :func:`~burnman.material.Material.molar_helmholtz`"""
+        """Alias for :func:`~burnman.Material.molar_helmholtz`"""
         return self.molar_helmholtz
 
     @property
     def gibbs(self):
-        """Alias for :func:`~burnman.material.Material.molar_gibbs`"""
+        """Alias for :func:`~burnman.Material.molar_gibbs`"""
         return self.molar_gibbs
 
     @property
     def V(self):
-        """Alias for :func:`~burnman.material.Material.molar_volume`"""
+        """Alias for :func:`~burnman.Material.molar_volume`"""
         return self.molar_volume
 
     @property
     def rho(self):
-        """Alias for :func:`~burnman.material.Material.density`"""
+        """Alias for :func:`~burnman.Material.density`"""
         return self.density
 
     @property
     def S(self):
-        """Alias for :func:`~burnman.material.Material.molar_entropy`"""
+        """Alias for :func:`~burnman.Material.molar_entropy`"""
         return self.molar_entropy
 
     @property
     def H(self):
-        """Alias for :func:`~burnman.material.Material.molar_enthalpy`"""
+        """Alias for :func:`~burnman.Material.molar_enthalpy`"""
         return self.molar_enthalpy
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.material.Material.isothermal_bulk_modulus`"""
+        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus`"""
         return self.isothermal_bulk_modulus
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.material.Material.adiabatic_bulk_modulus`"""
+        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus`"""
         return self.adiabatic_bulk_modulus
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.material.Material.isothermal_compressibility`"""
+        """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
         return self.isothermal_compressibility
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.material.Material.adiabatic_compressibility`"""
+        """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
 
     @property
     def G(self):
-        """Alias for :func:`~burnman.material.Material.shear_modulus`"""
+        """Alias for :func:`~burnman.Material.shear_modulus`"""
         return self.shear_modulus
 
     @property
     def v_p(self):
-        """Alias for :func:`~burnman.material.Material.p_wave_velocity`"""
+        """Alias for :func:`~burnman.Material.p_wave_velocity`"""
         return self.p_wave_velocity
 
     @property
     def v_phi(self):
-        """Alias for :func:`~burnman.material.Material.bulk_sound_velocity`"""
+        """Alias for :func:`~burnman.Material.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
 
     @property
     def v_s(self):
-        """Alias for :func:`~burnman.material.Material.shear_wave_velocity`"""
+        """Alias for :func:`~burnman.Material.shear_wave_velocity`"""
         return self.shear_wave_velocity
 
     @property
     def gr(self):
-        """Alias for :func:`~burnman.material.Material.grueneisen_parameter`"""
+        """Alias for :func:`~burnman.Material.grueneisen_parameter`"""
         return self.grueneisen_parameter
 
     @property
     def alpha(self):
-        """Alias for :func:`~burnman.material.Material.thermal_expansivity`"""
+        """Alias for :func:`~burnman.Material.thermal_expansivity`"""
         return self.thermal_expansivity
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
+        """Alias for :func:`~burnman.Material.molar_heat_capacity_v`"""
         return self.molar_heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
+        """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
         return self.molar_heat_capacity_p

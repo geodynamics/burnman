@@ -28,8 +28,8 @@ These solid solutions can potentially deal with:
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.solidsolution.SolidSolution`
-* :class:`burnman.solutionmodel.SolutionModel`
+* :class:`burnman.SolidSolution`
+* :class:`burnman.SolutionModel`
 
 
 *Demonstrates:*

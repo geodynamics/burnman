@@ -14,7 +14,7 @@ need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density a
 *Specifically uses:*
 
 
-* :class:`burnman.mineral.Mineral`
+* :class:`burnman.Mineral`
 
 *Demonstrates:*
 

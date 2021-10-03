@@ -1,11 +1,21 @@
 Solution models
 ===============
 
+SolidSolution objects in Burnman (type :class:`~burnman.SolidSolution`)
+take one of several methods which define the properties of the solution.
+
+.. inheritance-diagram::
+  burnman.material_classes.solutionmodel.MechanicalSolution
+  burnman.material_classes.solutionmodel.IdealSolution
+  burnman.material_classes.solutionmodel.AsymmetricRegularSolution
+  burnman.material_classes.solutionmodel.SymmetricRegularSolution
+  burnman.material_classes.solutionmodel.SubregularSolution
+  
 Base class
 ----------
 .. autoclass:: burnman.SolidSolution
   :noindex:
-  
+
 .. autoclass:: burnman.SolutionModel
 
 Mechanical solution

@@ -54,7 +54,7 @@ with a series of boolean variables. In order of complexity:
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.composite.Composite`
+* :class:`burnman.Composite`
 * :func:`burnman.equilibrate.equilibrate`
 '''
 from __future__ import absolute_import

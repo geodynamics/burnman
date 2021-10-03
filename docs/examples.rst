@@ -28,6 +28,8 @@ of BurnMan objects:
   - :mod:`~examples.example_gibbs_modifiers`,
   - :mod:`~examples.example_solid_solution`,
   - :mod:`~examples.example_composite`,
+  - :mod:`~examples.example_anisotropy`,
+  - :mod:`~examples.example_anisotropic_mineral`,
   - :mod:`~examples.example_geotherms`, and
   - :mod:`~examples.example_composition`.
 
@@ -68,6 +70,22 @@ of BurnMan objects:
   .. image:: figures/example_composite_figure_1.png
 
   .. image:: figures/example_composite_figure_2.png
+
+
+  .. automodule:: examples.example_anisotropy
+
+  *Resulting figure:*
+
+  .. image:: figures/example_anisotropy.png
+
+
+  .. automodule:: examples.example_anisotropic_mineral
+
+  *Resulting figure:*
+
+  .. image:: figures/example_anisotropic_mineral_Figure_1.png
+  .. image:: figures/example_anisotropic_mineral_Figure_2.png
+
 
   .. automodule:: examples.example_geotherms
 
@@ -131,9 +149,13 @@ More Advanced Examples
 
 Advanced examples:
   - :mod:`~examples.example_spintransition`,
+  - :mod:`~examples.example_spintransition_thermal`,
   - :mod:`~examples.example_user_input_material`,
   - :mod:`~examples.example_optimize_pv`,
-  - :mod:`~examples.example_compare_all_methods`, and
+  - :mod:`~examples.example_compare_all_methods`,
+  - :mod:`~examples.example_build_planet`,
+  - :mod:`~examples.example_fit_eos`,,
+  - :mod:`~examples.example_fit_composition`, and
   - :mod:`~examples.example_equilibrate`.
 
 .. automodule:: examples.example_spintransition
@@ -158,26 +180,18 @@ Advanced examples:
 .. image:: figures/example_opt_pv.png
 
 
-.. automodule:: examples.example_build_planet
-
-*Resulting figure:*
-
-.. image:: figures/example_build_planet.png
-
-
 .. automodule:: examples.example_compare_all_methods
 
 *Resulting figure:*
 
 .. image:: figures/example_compare_all_methods.png
 
-.. automodule:: examples.example_anisotropy
+
+.. automodule:: examples.example_build_planet
 
 *Resulting figure:*
 
-.. image:: figures/example_anisotropy.png
-
-
+.. image:: figures/example_build_planet.png
 
 
 .. automodule:: examples.example_fit_data
@@ -190,6 +204,13 @@ Advanced examples:
 
 .. image:: figures/example_fit_data3.png
 
+
+.. automodule:: examples.example_fit_composition
+
+
+*Resulting figure:*
+
+.. image:: figures/example_fit_composition_Figure_1.png
 
 
 .. automodule:: examples.example_fit_eos

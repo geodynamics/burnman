@@ -12,7 +12,7 @@ This example script demonstrates the use of BurnMan's Composition class.
 
 *Uses:*
 
-* :class:`burnman.composition.Composition`
+* :class:`burnman.Composition`
 
 *Demonstrates:*
 
@@ -33,7 +33,8 @@ from burnman.processchemistry import dictionarize_formula
 # followed by the word "Comment"
 # All lines after the first are either molar or weight proportions
 # of the components given in the header, followed by the comment string
-from burnman.composition import file_to_composition_list, Composition
+from burnman import Composition
+from burnman.composition import file_to_composition_list
 
 assert burnman_path  # silence pyflakes warning
 

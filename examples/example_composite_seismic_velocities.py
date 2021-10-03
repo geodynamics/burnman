@@ -30,9 +30,9 @@ example_spintransition.py for explanation of how to implement this
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.composite.Composite`
-* :class:`burnman.mineral.Mineral`
-* :class:`burnman.solidsolution.SolidSolution`
+* :class:`burnman.Composite`
+* :class:`burnman.Mineral`
+* :class:`burnman.SolidSolution`
 
 *Demonstrates:*
 

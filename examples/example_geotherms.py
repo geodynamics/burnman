@@ -22,7 +22,7 @@ These are:
 * :func:`burnman.geotherm.brown_shankland`
 * :func:`burnman.geotherm.anderson`
 * input geotherm file *input_geotherm/example_geotherm.txt* (optional)
-* :class:`burnman.composite.Composite` for adiabat
+* :class:`burnman.Composite` for adiabat
 
 *Demonstrates:*
 

@@ -21,7 +21,7 @@ Layers can also be used to build an entire planet (see example_build_planet.py)
 
 * :doc:`mineral_database`
 * :class:`burnman.layer.Layer`
-* :class:`burnman.composite.Composite`
+* :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
 
 
