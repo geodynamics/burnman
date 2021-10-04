@@ -11,7 +11,7 @@ from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
 
 from .nonlinear_solvers import damped_newton_solve
-from .material_classes.solidsolution import SolidSolution
+from .classes.solidsolution import SolidSolution
 
 
 def calculate_constraints(assemblage):

@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import
 import numpy as np
-from .material_classes.material import Material
+from .classes.material import Material
 from .averaging_schemes import AveragingScheme
 
 

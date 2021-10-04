@@ -183,20 +183,20 @@ from __future__ import absolute_import
 from .version import version as __version__
 
 # classes and associated functions for representing rocks and minerals:
-from .material_classes.material import Material, material_property
-from .material_classes.perplex import PerplexMaterial
-from .material_classes.mineral import Mineral
-from .material_classes.combinedmineral import CombinedMineral
-from .material_classes.solutionmodel import SolutionModel
-from .material_classes.solidsolution import SolidSolution
-from .material_classes.composite import Composite
-from .material_classes.anisotropy import AnisotropicMaterial
-from .material_classes.anisotropicmineral import AnisotropicMineral
-from .material_classes.anisotropicmineral import cell_parameters_to_vectors
-from .material_classes.anisotropicmineral import cell_vectors_to_parameters
-from .material_classes.mineral_helpers import HelperLowHighPressureRockTransition
-from .material_classes.mineral_helpers import HelperSpinTransition
-from .material_classes.mineral_helpers import HelperRockSwitcher
+from .classes.material import Material, material_property
+from .classes.perplex import PerplexMaterial
+from .classes.mineral import Mineral
+from .classes.combinedmineral import CombinedMineral
+from .classes.solutionmodel import SolutionModel
+from .classes.solidsolution import SolidSolution
+from .classes.composite import Composite
+from .classes.anisotropy import AnisotropicMaterial
+from .classes.anisotropicmineral import AnisotropicMineral
+from .classes.anisotropicmineral import cell_parameters_to_vectors
+from .classes.anisotropicmineral import cell_vectors_to_parameters
+from .classes.mineral_helpers import HelperLowHighPressureRockTransition
+from .classes.mineral_helpers import HelperSpinTransition
+from .classes.mineral_helpers import HelperRockSwitcher
 
 # other classes
 from .composition import Composition

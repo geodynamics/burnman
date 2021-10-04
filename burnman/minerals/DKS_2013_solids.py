@@ -10,7 +10,7 @@ DKS_2013_solids
 Solids from de Koker and Stixrude (2013) FPMD simulations
 """
 
-from ..material_classes.mineral import Mineral
+from ..classes.mineral import Mineral
 from ..processchemistry import formula_mass
 
 

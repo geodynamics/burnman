@@ -5,7 +5,7 @@ import numpy as np
 
 import burnman_path
 import burnman
-from burnman.material_classes import mineral_helpers
+from burnman.classes import mineral_helpers
 
 assert burnman_path  # silence pyflakes warning
 

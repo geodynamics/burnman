@@ -5,11 +5,11 @@ SolidSolution objects in Burnman (type :class:`~burnman.SolidSolution`)
 take one of several methods which define the properties of the solution.
 
 .. inheritance-diagram::
-  burnman.material_classes.solutionmodel.MechanicalSolution
-  burnman.material_classes.solutionmodel.IdealSolution
-  burnman.material_classes.solutionmodel.AsymmetricRegularSolution
-  burnman.material_classes.solutionmodel.SymmetricRegularSolution
-  burnman.material_classes.solutionmodel.SubregularSolution
+  burnman.classes.solutionmodel.MechanicalSolution
+  burnman.classes.solutionmodel.IdealSolution
+  burnman.classes.solutionmodel.AsymmetricRegularSolution
+  burnman.classes.solutionmodel.SymmetricRegularSolution
+  burnman.classes.solutionmodel.SubregularSolution
   
 Base class
 ----------
@@ -21,27 +21,27 @@ Base class
 Mechanical solution
 -------------------
 
-.. autoclass:: burnman.material_classes.solutionmodel.MechanicalSolution
+.. autoclass:: burnman.classes.solutionmodel.MechanicalSolution
 
 Ideal solution
 --------------
 
-.. autoclass:: burnman.material_classes.solutionmodel.IdealSolution
+.. autoclass:: burnman.classes.solutionmodel.IdealSolution
 
 Asymmetric regular solution
 ---------------------------
 
-.. autoclass:: burnman.material_classes.solutionmodel.AsymmetricRegularSolution
+.. autoclass:: burnman.classes.solutionmodel.AsymmetricRegularSolution
 
 Symmetric regular solution
 --------------------------
 
-.. autoclass:: burnman.material_classes.solutionmodel.SymmetricRegularSolution
+.. autoclass:: burnman.classes.solutionmodel.SymmetricRegularSolution
 
 Subregular solution
 -------------------
 
-.. autoclass:: burnman.material_classes.solutionmodel.SubregularSolution
+.. autoclass:: burnman.classes.solutionmodel.SubregularSolution
 
 
 Solution tools

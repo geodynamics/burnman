@@ -40,7 +40,7 @@ Individual terms are divided through by P, P, P^1.5, P^2, so:
 
 from __future__ import absolute_import
 
-from ..material_classes.mineral import Mineral
+from ..classes.mineral import Mineral
 from ..processchemistry import dictionarize_formula, formula_mass
 
 

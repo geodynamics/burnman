@@ -13,9 +13,9 @@ with the help of David Munoz Ramo.
 """
 
 from burnman import constants
-from ..material_classes.mineral import Mineral
-from ..material_classes.solidsolution import SolidSolution
-from ..material_classes.solutionmodel import *
+from ..classes.mineral import Mineral
+from ..classes.solidsolution import SolidSolution
+from ..classes.solutionmodel import *
 
 from ..processchemistry import dictionarize_formula, formula_mass
 

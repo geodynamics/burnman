@@ -12,7 +12,7 @@ Liquids from de Koker and Stixrude (2013) FPMD simulations.
 """
 
 import numpy as np
-from ..material_classes.mineral import Mineral
+from ..classes.mineral import Mineral
 from ..processchemistry import formula_mass
 
 

@@ -34,13 +34,13 @@ Composite: Unnamed composite
     'burnman.minerals.Murakami_etal_2012.fe_perovskite'
   0.05 of
     'burnman.minerals.Murakami_etal_2012.fe_periclase_LS'
-BURNMAN/burnman/material_classes/composite.py: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
+BURNMAN/burnman/classes/composite.py: UserWarning: Warning, you are changing the method to BM3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/material_classes/composite.py: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
+BURNMAN/burnman/classes/composite.py: UserWarning: Warning, you are changing the method to BM2 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/material_classes/composite.py: UserWarning: Warning, you are changing the method to MGD3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
+BURNMAN/burnman/classes/composite.py: UserWarning: Warning, you are changing the method to MGD3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/material_classes/composite.py: UserWarning: Warning, you are changing the method to MGD2 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
+BURNMAN/burnman/classes/composite.py: UserWarning: Warning, you are changing the method to MGD2 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
   phase.set_method(method)
-BURNMAN/burnman/material_classes/composite.py: UserWarning: Warning, you are changing the method to SLB3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
+BURNMAN/burnman/classes/composite.py: UserWarning: Warning, you are changing the method to SLB3 even though the material is designed to be used with the method SLB2. This does not overwrite any mineral attributes
   phase.set_method(method)

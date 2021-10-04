@@ -7,7 +7,7 @@ from __future__ import print_function
 import argparse
 import burnman_path  # adds the local burnman directory to the path
 
-from burnman.material_classes.perplex import create_perplex_table
+from burnman.classes.perplex import create_perplex_table
 
 assert burnman_path  # silence pyflakes warning
 

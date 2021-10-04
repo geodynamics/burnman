@@ -36,7 +36,7 @@ Solid solutions
 Mineral helpers
 ^^^^^^^^^^^^^^^
 
-.. autoclass:: burnman.material_classes.mineral_helpers.HelperSpinTransition
+.. autoclass:: burnman.classes.mineral_helpers.HelperSpinTransition
 
 Anisotropic materials
 ^^^^^^^^^^^^^^^^^^^^^

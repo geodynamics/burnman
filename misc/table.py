@@ -63,7 +63,7 @@ if __name__ == "__main__":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
                 if inspect.isclass(mineral) and mineral != burnman.Mineral and mineral != burnman.CombinedMineral and issubclass(mineral, burnman.Mineral) \
-                        and not issubclass(mineral, burnman.material_classes.mineral_helpers.HelperSpinTransition):
+                        and not issubclass(mineral, burnman.classes.mineral_helpers.HelperSpinTransition):
                     if issubclass(mineral, burnman.SolidSolution):
                         continue
                     # print mineral.__module__ + mineral.__name__

@@ -15,8 +15,8 @@ Irving, Cottaar, Lekic (2018) Seismically determined elastic parameters for the 
 """
 from __future__ import absolute_import
 
-from ..material_classes import mineral_helpers as helpers
-from ..material_classes.mineral import Mineral
+from ..classes import mineral_helpers as helpers
+from ..classes.mineral import Mineral
 
 
 class EPOC_vinet (Mineral):

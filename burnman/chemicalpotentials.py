@@ -8,7 +8,7 @@ from scipy.linalg import lu
 
 from .processchemistry import *
 from . import constants
-from .material_classes import solidsolution
+from .classes import solidsolution
 
 # This module computes chemical potentials (partial molar gibbs free
 # energies) for an assemblage based on the Gibbs free energies and

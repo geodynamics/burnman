@@ -14,7 +14,7 @@ from scipy.special import comb
 from copy import copy
 
 from .reductions import row_reduce
-from .material_classes.material import cached_property
+from .classes.material import cached_property
 
 
 try:
