@@ -11,7 +11,7 @@ import numpy as np
 
 from .material import Material, material_property
 from .. import eos
-from ..tools import copy_documentation
+from ..tools.misc import copy_documentation
 
 
 class Mineral(Material):

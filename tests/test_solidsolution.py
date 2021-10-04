@@ -9,8 +9,8 @@ import burnman_path
 import burnman
 from burnman import Mineral
 from burnman import CombinedMineral
-from burnman.processchemistry import dictionarize_formula, formula_mass
-from burnman.processchemistry import formula_to_string, sum_formulae
+from burnman.tools.chemistry import dictionarize_formula, formula_mass
+from burnman.tools.chemistry import formula_to_string, sum_formulae
 
 assert burnman_path  # silence pyflakes warning
 

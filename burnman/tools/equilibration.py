@@ -10,8 +10,8 @@ import numpy as np
 from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
 
-from .nonlinear_solvers import damped_newton_solve
-from .classes.solidsolution import SolidSolution
+from ..optimize.nonlinear_solvers import damped_newton_solve
+from ..classes.solidsolution import SolidSolution
 
 
 def calculate_constraints(assemblage):

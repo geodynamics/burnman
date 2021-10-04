@@ -1,12 +1,13 @@
 from __future__ import absolute_import
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
 import scipy.optimize as opt
 from . import equation_of_state as eos
-from ..tools import bracket
+from ..tools.math import bracket
 import warnings
 
 

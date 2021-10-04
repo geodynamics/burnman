@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -9,7 +10,7 @@ import numpy as np
 from scipy.stats import t, norm, genextreme
 import copy
 
-from .tools import unit_normalize
+from ..tools.math import unit_normalize
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib.patches import Ellipse

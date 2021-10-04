@@ -1,5 +1,6 @@
 from __future__ import print_function
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -7,33 +8,28 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
-from burnman import averaging_schemes
 from burnman import constants
 from burnman import geotherm
 import warnings
 
-
-from .classes.material import Material, material_property
-from .classes.mineral import Mineral
-from .classes.composite import Composite
-from .seismic import Seismic1DModel
-
-import matplotlib.pyplot as plt
+from .material import Material, material_property
 
 
 class Layer(object):
     """
-    The base class for a planetary layer. The user needs to set the following befor properties can be computed
-    1. set_material(), set the material of the layer, e.g. a mineral, solid_solution, or composite
-    2. set_temperature_mode(), either predefine, or set to an adiabatic profile
-    3. set_pressure_mode(), to set the self-consistent pressure (with user-defined option the pressures can be overwritten).
-    To set the self-consistent pressure the pressure at the top and the gravity at the bottom of the layer need to be set.
-    4. make(), computes the self-consistent part of the layer and starts the settings to compute properties within the layer
-    Note that not the entire planet this layer sits in is self-consistent, as the pressure at the top of the layer is a function of the density
+    The base class for a planetary layer. The user needs to set the following before properties can be computed:
+
+    - set_material(), set the material of the layer, e.g. a mineral, solid_solution, or composite
+    - set_temperature_mode(), either predefine, or set to an adiabatic profile
+    - set_pressure_mode(), to set the self-consistent pressure (with user-defined option the pressures can be overwritten).
+      To set the self-consistent pressure the pressure at the top and the gravity at the bottom of the layer need to be set.
+    - make(), computes the self-consistent part of the layer and starts the settings to compute properties within the layer
+
+    Note that the entire planet this layer sits in is not necessarily self-consistent, as the pressure at the top of the layer is a function of the density
     within the layer (through the gravity). Entire planets can be computed self-consistently with the planet class.
     Properties will be returned at the pre-defined radius array, although the evaluate() function
-    can take a new defined depthlist and values are interpolated between these (sufficient sampling of the layer
-    is needed for this to be accurate)
+    can take a newly defined depthlist and values are interpolated between these (sufficient sampling of the layer
+    is needed for this to be accurate).
     """
 
     def __init__(self, name=None, radii=None, verbose=False):
@@ -814,97 +810,97 @@ class Layer(object):
 # Aliased properties
     @property
     def P(self):
-        """Alias for :func:`~burnman.layer.Layer.pressure`"""
+        """Alias for :func:`~burnman.Layer.pressure`"""
         return self.pressure
 
     @property
     def T(self):
-        """Alias for :func:`~burnman.layer.Layer.temperature`"""
+        """Alias for :func:`~burnman.Layer.temperature`"""
         return self.temperature
 
     @property
     def energy(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_internal_energy`"""
+        """Alias for :func:`~burnman.Layer.molar_internal_energy`"""
         return self.molar_internal_energy
 
     @property
     def helmholtz(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_helmholtz`"""
+        """Alias for :func:`~burnman.Layer.molar_helmholtz`"""
         return self.molar_helmholtz
 
     @property
     def gibbs(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_gibbs`"""
+        """Alias for :func:`~burnman.Layer.molar_gibbs`"""
         return self.molar_gibbs
 
     @property
     def V(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_volume`"""
+        """Alias for :func:`~burnman.Layer.molar_volume`"""
         return self.molar_volume
 
     @property
     def rho(self):
-        """Alias for :func:`~burnman.layer.Layer.density`"""
+        """Alias for :func:`~burnman.Layer.density`"""
         return self.density
 
     @property
     def S(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_entropy`"""
+        """Alias for :func:`~burnman.Layer.molar_entropy`"""
         return self.molar_entropy
 
     @property
     def H(self):
-        """Alias for :func:`~burnman.layer.Layer.molar_enthalpy`"""
+        """Alias for :func:`~burnman.Layer.molar_enthalpy`"""
         return self.molar_enthalpy
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.layer.Layer.isothermal_bulk_modulus`"""
+        """Alias for :func:`~burnman.Layer.isothermal_bulk_modulus`"""
         return self.isothermal_bulk_modulus
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.layer.Layer.adiabatic_bulk_modulus`"""
+        """Alias for :func:`~burnman.Layer.adiabatic_bulk_modulus`"""
         return self.adiabatic_bulk_modulus
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.layer.Layer.isothermal_compressibility`"""
+        """Alias for :func:`~burnman.Layer.isothermal_compressibility`"""
         return self.isothermal_compressibility
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.layer.Layer.adiabatic_compressibility`"""
+        """Alias for :func:`~burnman.Layer.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
 
     @property
     def G(self):
-        """Alias for :func:`~burnman.layer.Layer.shear_modulus`"""
+        """Alias for :func:`~burnman.Layer.shear_modulus`"""
         return self.shear_modulus
 
     @property
     def v_p(self):
-        """Alias for :func:`~burnman.layer.Layer.p_wave_velocity`"""
+        """Alias for :func:`~burnman.Layer.p_wave_velocity`"""
         return self.p_wave_velocity
 
     @property
     def v_phi(self):
-        """Alias for :func:`~burnman.layer.Layer.bulk_sound_velocity`"""
+        """Alias for :func:`~burnman.Layer.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
 
     @property
     def v_s(self):
-        """Alias for :func:`~burnman.layer.Layer.shear_wave_velocity`"""
+        """Alias for :func:`~burnman.Layer.shear_wave_velocity`"""
         return self.shear_wave_velocity
 
     @property
     def gr(self):
-        """Alias for :func:`~burnman.layer.Layer.grueneisen_parameter`"""
+        """Alias for :func:`~burnman.Layer.grueneisen_parameter`"""
         return self.grueneisen_parameter
 
     @property
     def alpha(self):
-        """Alias for :func:`~burnman.layer.Layer.thermal_expansivity`"""
+        """Alias for :func:`~burnman.Layer.thermal_expansivity`"""
         return self.thermal_expansivity
 
     @property

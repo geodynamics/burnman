@@ -6,9 +6,9 @@ import numpy as np
 import burnman_path
 from burnman import Composite
 from burnman.minerals import SLB_2011
-from burnman.polytopetools import solution_polytope_from_charge_balance
-from burnman.polytopetools import solution_polytope_from_endmember_occupancies
-from burnman.polytopetools import simplify_composite_with_composition
+from burnman.tools.polytope import solution_polytope_from_charge_balance
+from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
+from burnman.tools.polytope import simplify_composite_with_composition
 
 assert burnman_path  # silence pyflakes warning
 

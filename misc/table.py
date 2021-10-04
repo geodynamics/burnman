@@ -100,6 +100,6 @@ if __name__ == "__main__":
                         tablel.append(row)
 
                     if (len(sys.argv) == 1):
-                        tools.pretty_print_table(table, False)
+                        tools.misc.pretty_print_table(table, False)
                     elif sys.argv[1] == "tab":
-                        tools.pretty_print_table(table, True)
+                        tools.misc.pretty_print_table(table, True)

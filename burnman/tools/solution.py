@@ -8,9 +8,9 @@ from __future__ import absolute_import
 
 import numpy as np
 from sympy import Matrix
-from .classes.combinedmineral import CombinedMineral
-from .classes.solidsolution import SolidSolution
-from .processchemistry import site_occupancies_to_strings
+from ..classes.combinedmineral import CombinedMineral
+from ..classes.solidsolution import SolidSolution
+from .chemistry import site_occupancies_to_strings
 
 
 def _decompose_3D_matrix(W):

@@ -13,7 +13,7 @@ Liquids from de Koker and Stixrude (2013) FPMD simulations.
 
 import numpy as np
 from ..classes.mineral import Mineral
-from ..processchemistry import formula_mass
+from ..tools.chemistry import formula_mass
 
 
 # Vector parsing for DKS liquid equation of state

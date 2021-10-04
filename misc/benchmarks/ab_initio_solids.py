@@ -2,11 +2,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import burnman_path  # adds the local burnman directory to the path
-import burnman
 from burnman.minerals import DKS_2013_solids
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from burnman.tools.eos import check_eos_consistency
 
 assert burnman_path  # silence pyflakes warning
 
@@ -21,10 +21,10 @@ phases = [['stishovite', DKS_2013_solids.stishovite(), [10, 18, -25, 175], [10, 
 temperatures = [1000., 2000., 3000., 4000., 5000., 6000., 8000.]
 for name, phase, PVT_range, EVT_range in phases:
 
-    phase.params['G_0'] = 0. # just for consistency checking
-    phase.params['Gprime_0'] = 1.3 # just for consistency checking
-    phase.params['eta_s_0'] = 0. # just for consistency checking
-    print('EoS consistent for {0} model: {1}'.format(name, burnman.tools.check_eos_consistency(phase, tol=1.e-4)))
+    phase.params['G_0'] = 0.  # just for consistency checking
+    phase.params['Gprime_0'] = 1.3  # just for consistency checking
+    phase.params['eta_s_0'] = 0.  # just for consistency checking
+    print('EoS consistent for {0} model: {1}'.format(name, check_eos_consistency(phase, tol=1.e-4)))
 
     vmin=PVT_range[0]
     vmax=PVT_range[1]

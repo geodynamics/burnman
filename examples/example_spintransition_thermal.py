@@ -47,7 +47,7 @@ import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 from burnman import Mineral, minerals
-from burnman.processchemistry import formula_mass
+from burnman.tools.chemistry import formula_mass
 
 assert burnman_path  # silence pyflakes warning
 

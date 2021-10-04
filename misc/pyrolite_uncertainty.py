@@ -556,7 +556,7 @@ elif whattodo == "plotone":
     rho, vs, vphi = rock.evaluate(
         ['rho', 'v_s', 'v_phi'], pressure, temperature)
 
-    err_vs, err_vphi, err_rho = burnman.tools.compare_l2(
+    err_vs, err_vphi, err_rho = burnman.tools.math.compare_l2(
         depths, [vs, vphi, rho], [seis_vs, seis_vphi, seis_rho])
     error = np.sum(
         [err_rho / np.mean(seis_rho), err_vphi / np.mean(seis_vphi), err_vs / np.mean(seis_vs)])
@@ -640,7 +640,7 @@ elif whattodo == "run" and len(sys.argv) > 2:
                 ['rho', 'v_s', 'v_phi'], pressure, temperature)
 
             # estimate the misfit with the seismic model
-            err_vs, err_vphi, err_rho = burnman.tools.compare_l2(
+            err_vs, err_vphi, err_rho = burnman.tools.math.compare_l2(
                 depths, [vs, vphi, rho], [seis_vs, seis_vphi, seis_rho])
 
             error = np.sum(
@@ -692,7 +692,7 @@ elif whattodo == "error":
     rho, vs, vphi = rock.evaluate(
         ['rho', 'v_s', 'v_phi'], pressure, temperature)
 
-    err_vs, err_vphi, err_rho = burnman.tools.compare_l2(
+    err_vs, err_vphi, err_rho = burnman.tools.math.compare_l2(
         depths, [vs, vphi, rho], [seis_vs, seis_vphi, seis_rho])
     error = np.sum([err_rho, err_vphi, err_vs])
 

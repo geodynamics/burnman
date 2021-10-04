@@ -33,15 +33,15 @@ import burnman
 from burnman import AnisotropicMineral
 
 from tools import print_table_for_mineral_constants
-from burnman.tools import plot_projected_elastic_properties
+from burnman.tools.plot import plot_projected_elastic_properties
 
 assert burnman_path  # silence pyflakes warning
 
 run_fitting = False
 
 formula = 'Mg1.8Fe0.2SiO4'
-formula = burnman.processchemistry.dictionarize_formula(formula)
-formula_mass = burnman.processchemistry.formula_mass(formula)
+formula = burnman.tools.chemistry.dictionarize_formula(formula)
+formula_mass = burnman.tools.chemistry.formula_mass(formula)
 
 # Define the unit cell lengths and unit cell volume.
 # These are taken from Abramson et al., 1997

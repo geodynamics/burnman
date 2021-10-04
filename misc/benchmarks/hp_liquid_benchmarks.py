@@ -6,7 +6,8 @@ import burnman_path  # adds the local burnman directory to the path
 import numpy as np
 import matplotlib.pyplot as plt
 
-from burnman.tools import equilibrium_temperature, check_eos_consistency
+from burnman.tools.chemistry import equilibrium_temperature
+from burnman.tools.eos import check_eos_consistency
 from burnman.minerals import HGP_2018_ds633
 
 assert burnman_path  # silence pyflakes warning

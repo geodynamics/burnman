@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
-        [vs_err, vphi_err, rho_err] = burnman.tools.compare_l2(depths,
+        [vs_err, vphi_err, rho_err] = burnman.tools.math.compare_l2(depths,
                                                                [mat_vs, mat_vphi,
                                                                 mat_rho],
                                                                [seis_vs, seis_vphi, seis_rho])

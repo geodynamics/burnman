@@ -13,7 +13,7 @@ from scipy.interpolate import interp2d, griddata
 
 from .material import Material, material_property
 
-from ..tools import copy_documentation
+from ..tools.misc import copy_documentation
 
 
 def create_perplex_table(werami_path, project_name, outfile, n_pressures, n_temperatures, pressure_range=None, temperature_range=None):

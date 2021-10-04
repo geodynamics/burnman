@@ -5,7 +5,7 @@ from util import BurnManTest
 import burnman_path
 import burnman.eos.property_modifiers as pm
 from burnman.minerals import SLB_2011, HP_2011_ds62
-from burnman.tools import check_eos_consistency
+from burnman.tools.eos import check_eos_consistency
 
 assert burnman_path  # silence pyflakes warning
 

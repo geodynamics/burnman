@@ -13,7 +13,7 @@ from .solidsolution import SolidSolution
 from .solutionmodel import *
 
 from ..averaging_schemes import reuss_average_function
-from ..processchemistry import sum_formulae
+from ..tools.chemistry import sum_formulae
 from .. import constants
 
 

@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -29,6 +30,8 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
+from burnman.tools.misc import attribute_function
+from burnman.tools.misc import pretty_print_values
 from read_data import read_fitting_file
 
 if __name__ == "__main__":
@@ -109,7 +112,7 @@ if __name__ == "__main__":
 
     # Print the optimized parameters
     print('Optimized equation of state:')
-    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print('\nParameters:')
     print(fitted_eos.popt)
     print('\nFull covariance matrix:')
@@ -143,7 +146,7 @@ if __name__ == "__main__":
 
     # Print the optimized parameters
     print('Optimized equation of state:')
-    burnman.tools.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print('\nParameters:')
     print(fitted_eos.popt)
     print('\nFull covariance matrix:')
@@ -192,7 +195,7 @@ if __name__ == "__main__":
                 cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                                  x_array=PTVs,
                                                                                  confidence_interval=confidence_interval,
-                                                                                 f=burnman.tools.attribute_function(mineral, material_property),
+                                                                                 f=attribute_function(mineral, material_property),
                                                                                  flag='V')
 
                 plt.plot(PTVs[:,0] / 1.e9, (cp_bands[0] + cp_bands[1])/2.*scaling, label='Optimised fit at {0:.0f} K'.format(T))
@@ -220,7 +223,7 @@ if __name__ == "__main__":
                 cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                                  x_array=PTVs,
                                                                                  confidence_interval=confidence_interval,
-                                                                                 f=burnman.tools.attribute_function(mineral, material_property),
+                                                                                 f=attribute_function(mineral, material_property),
                                                                                  flag='V')
 
                 plt.plot(PTVs[:,1], (cp_bands[0] + cp_bands[1])/2.*scaling, label='Optimised fit at {0:.0f} GPa'.format(P/1.e9))
@@ -264,7 +267,7 @@ if __name__ == "__main__":
                 cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                                  x_array=PTVs,
                                                                                  confidence_interval=confidence_interval,
-                                                                                 f=burnman.tools.attribute_function(mineral, material_property),
+                                                                                 f=attribute_function(mineral, material_property),
                                                                                  flag='V')
                 ax.plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} K'.format(T))
                 ax.plot(PTVs[:,0]/1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
@@ -290,7 +293,7 @@ if __name__ == "__main__":
                 cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
                                                                                  x_array=PTVs,
                                                                                  confidence_interval=confidence_interval,
-                                                                                 f=burnman.tools.attribute_function(mineral, material_property),
+                                                                                 f=attribute_function(mineral, material_property),
                                                                                  flag='V')
                 ax.plot(PTVs[:,1], (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} GPa'.format(P/1.e9))
                 ax.plot(PTVs[:,1], (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))

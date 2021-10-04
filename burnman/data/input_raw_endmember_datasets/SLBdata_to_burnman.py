@@ -115,7 +115,7 @@ print ''
 print 'from ..mineral import Mineral'
 print 'from ..solidsolution import SolidSolution'
 print 'from ..solutionmodel import *'
-print 'from ..processchemistry import dictionarize_formula, formula_mass'
+print 'from ..tools.chemistry import dictionarize_formula, formula_mass'
 print ''
 
 param_scales = [-1., -1.,  # not numbers, so we won't scale

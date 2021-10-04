@@ -10,8 +10,8 @@ import numpy as np
 import warnings
 import scipy.integrate
 
-from . import tools
-from . import constants
+from ..tools.misc import read_table
+from .. import constants
 
 
 class Seismic1DModel(object):
@@ -377,7 +377,7 @@ class PREM(SeismicTable):
 
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table("input_seismic/prem.txt")
+        table = read_table("input_seismic/prem.txt")
         table = np.array(table)
         self.table_depth = table[:, 0]
         self.table_radius = table[:, 1]
@@ -401,11 +401,11 @@ class Slow(SeismicTable):
         SeismicTable.__init__(self)
 
         # data is: depth radius pressure density V_p V_s Q_K Q_G
-        table = tools.read_table("input_seismic/prem.txt")
+        table = read_table("input_seismic/prem.txt")
         table = np.array(table)
-        table2 = tools.read_table("input_seismic/swave_slow.txt")
+        table2 = read_table("input_seismic/swave_slow.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("input_seismic/pwave_slow.txt")
+        table3 = read_table("input_seismic/pwave_slow.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius - max(table2[:, 0])
@@ -440,11 +440,11 @@ class Fast(SeismicTable):
         SeismicTable.__init__(self)
 
         # data is: radius pressure density V_p V_s Q_K Q_G
-        table = tools.read_table("input_seismic/prem.txt")
+        table = read_table("input_seismic/prem.txt")
         table = np.array(table)
-        table2 = tools.read_table("input_seismic/swave_fast.txt")
+        table2 = read_table("input_seismic/swave_fast.txt")
         table2 = np.array(table2)
-        table3 = tools.read_table("input_seismic/pwave_fast.txt")
+        table3 = read_table("input_seismic/pwave_fast.txt")
         table3 = np.array(table3)
 
         min_radius = self.earth_radius - max(table2[:, 0])
@@ -477,7 +477,7 @@ class STW105(SeismicTable):
     def __init__(self):
         SeismicTable.__init__(self)
         # radius, pressure, density, v_p, v_s
-        table = tools.read_table("input_seismic/STW105.txt")
+        table = read_table("input_seismic/STW105.txt")
         table = np.array(table)
         self.table_radius = table[:, 0][::-1]
         self.table_density = table[:, 1][::-1]
@@ -503,7 +503,7 @@ class IASP91(SeismicTable):
 
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table(
+        table = read_table(
             "input_seismic/iasp91.txt")  # depth, radius, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:, 0]
@@ -520,7 +520,7 @@ class AK135(SeismicTable):
 
     def __init__(self):
         SeismicTable.__init__(self)
-        table = tools.read_table(
+        table = read_table(
             "input_seismic/ak135.txt")  # radius, pressure, density, v_p, v_s
         table = np.array(table)
         self.table_depth = table[:, 0]

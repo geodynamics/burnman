@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -52,20 +53,22 @@ if __name__ == "__main__":
 
     # a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
     # so we can just write our own function
-    my_geotherm_function = lambda p: [1500 + (2500 - 1500) * x / 128e9 for x in p]
+    my_geotherm_function = lambda p: [1500 + (2500 - 1500) * x / 128e9
+                                      for x in p]
     temperature3 = my_geotherm_function(pressures)
 
     # what about a geotherm defined from datapoints given in a file (our
     # inline)?
     table = [[1e9, 1600], [30e9, 1700], [130e9, 2700]]
     # this could also be loaded from a file, just uncomment this
-    # table = burnman.tools.read_table("input_geotherm/example_geotherm.txt")
+    # table = burnman.tools.misc.read_table("input_geotherm/example_geotherm.txt")
 
     table_pressure = np.array(table)[:, 0]
     table_temperature = np.array(table)[:, 1]
 
     my_geotherm_interpolate = lambda p: [np.interp(x, table_pressure,
-                                                    table_temperature) for x in p]
+                                                   table_temperature)
+                                         for x in p]
 
     temperature4 = my_geotherm_interpolate(pressures)
 

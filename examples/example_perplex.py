@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -6,15 +7,16 @@
 example_perplex
 ---------------
 
-This minimal example demonstrates how burnman can be used to read and interrogate
-a PerpleX tab file (as produced by burnman/misc/create_burnman_readable_perplex_table.py
+This minimal example demonstrates how burnman can be used
+to read and interrogate a PerpleX tab file
+(as produced by burnman/misc/create_burnman_readable_perplex_table.py
 It also demonstrates how we can smooth a given property on a given P-T grid.
 
 *Uses:*
 
 * :doc:`PerplexMaterial`
 * :func:`burnman.Material.evaluate`
-* :func:`burnman.tools.smooth_array`
+* :func:`burnman.tools.math.smooth_array`
 
 *Demonstrates:*
 
@@ -24,15 +26,16 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
-import matplotlib.pyplot as plt
+from burnman.tools.math import smooth_array
 
 assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
-    rock=burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
+    rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
     P = 1.e9
     T = 1650.
     rock.set_state(P, T)
@@ -46,17 +49,17 @@ if __name__ == "__main__":
     plt.ylabel('Density (kg/m^3)')
     plt.show()
 
-
     pressures = np.linspace(10.e9, 25.e9, 151)
     temperatures = np.linspace(1600., 1800., 3)
 
     T = 1650.
-    entropies = rock.evaluate(['S'], pressures, np.array([T] * len(pressures)))[0]
+    entropies = rock.evaluate(['S'], pressures,
+                              np.array([T] * len(pressures)))[0]
 
-
-    smoothed_entropies = burnman.tools.smooth_array(array=entropies,
-                                                    grid_spacing=np.array([pressures[1] - pressures[0]]),
-                                                    gaussian_rms_widths = np.array([5.e8]))
+    smoothed_entropies = smooth_array(array=entropies,
+                                      grid_spacing=np.array([pressures[1]
+                                                             - pressures[0]]),
+                                      gaussian_rms_widths=np.array([5.e8]))
 
     plt.plot(pressures/1.e9, entropies, label='entropies')
     plt.plot(pressures/1.e9, smoothed_entropies, label='smoothed entropies')

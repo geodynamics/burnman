@@ -17,18 +17,10 @@ Einstein model
 
 .. automodule:: burnman.eos.einstein
 
-Chemistry parsing
------------------
+Chemistry parsing and thermodynamics
+------------------------------------
 
-.. automodule:: burnman.processchemistry
-
-
-Chemical potentials
--------------------
-
-.. autofunction:: burnman.chemicalpotentials.chemical_potentials
-.. autofunction:: burnman.chemicalpotentials.fugacity
-.. autofunction:: burnman.chemicalpotentials.relative_fugacity
+.. automodule:: burnman.tools.chemistry
 
 
 .. _ref-equilibrate:

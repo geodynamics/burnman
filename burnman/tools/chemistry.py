@@ -5,7 +5,7 @@
 
 # This module provides the functions required to process the
 # standard burnman formula formats.
-# ProcessChemistry returns the number of atoms and molar mass of a compound
+# tools.chemistry returns the number of atoms and molar mass of a compound
 # given its unit formula as an argument.
 # process_solution_chemistry returns information required to calculate
 # solid solution properties from a set of endmember formulae
@@ -13,11 +13,15 @@
 from __future__ import absolute_import
 import re
 import numpy as np
+from scipy.linalg import lu
+from scipy.optimize import fsolve
 from fractions import Fraction
 from collections import Counter
 import pkgutil
 from string import ascii_uppercase as ucase
 from sympy import nsimplify
+
+from .. import constants
 
 
 def read_masses():
@@ -525,3 +529,388 @@ def sort_element_list_to_IUPAC_order(element_list):
     sorted_list = [e for e in IUPAC_element_order if e in element_list]
     assert len(sorted_list) == len(element_list)
     return sorted_list
+
+
+def convert_fractions(composite, phase_fractions, input_type, output_type):
+    """
+    Takes a composite with a set of user defined molar, volume
+    or mass fractions (which do not have to be the fractions
+    currently associated with the composite) and
+    converts the fractions to molar, mass or volume.
+
+    Conversions to and from mass require a molar mass to be
+    defined for all phases. Conversions to and from volume
+    require set_state to have been called for the composite.
+
+    Parameters
+    ----------
+    composite : Composite
+        Composite for which fractions are to be defined.
+
+    phase_fractions : list of floats
+        List of input phase fractions (of type input_type)
+
+    input_type : string
+        Input fraction type: 'molar', 'mass' or 'volume'
+
+    output_type : string
+        Output fraction type: 'molar', 'mass' or 'volume'
+
+    Returns
+    -------
+    output_fractions : list of floats
+        List of output phase fractions (of type output_type)
+    """
+    if input_type == 'volume' or output_type == 'volume':
+        if composite.temperature is None:
+            raise Exception(
+                composite.to_string() + ".set_state(P, T) has not been called, so volume fractions are currently undefined. Exiting.")
+
+    if input_type == 'molar':
+        molar_fractions = phase_fractions
+    if input_type == 'volume':
+        total_moles = sum(
+            volume_fraction / phase.molar_volume for volume_fraction,
+            phase in zip(phase_fractions, composite.phases))
+        molar_fractions = [volume_fraction / (phase.molar_volume * total_moles)
+                           for volume_fraction, phase in zip(phase_fractions, composite.phases)]
+    if input_type == 'mass':
+        total_moles = sum(mass_fraction / phase.molar_mass for mass_fraction,
+                          phase in zip(phase_fractions, composite.phases))
+        molar_fractions = [mass_fraction / (phase.molar_mass * total_moles)
+                           for mass_fraction, phase in zip(phase_fractions, composite.phases)]
+
+    if output_type == 'volume':
+        total_volume = sum(
+            molar_fraction * phase.molar_volume for molar_fraction,
+            phase in zip(molar_fractions, composite.phases))
+        output_fractions = [molar_fraction * phase.molar_volume
+                            / total_volume for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+    elif output_type == 'mass':
+        total_mass = sum(molar_fraction * phase.molar_mass for molar_fraction,
+                         phase in zip(molar_fractions, composite.phases))
+        output_fractions = [molar_fraction * phase.molar_mass
+                            / total_mass for molar_fraction, phase in zip(molar_fractions, composite.phases)]
+    elif output_type == 'molar':
+        output_fractions = molar_fractions
+
+    return output_fractions
+
+
+def chemical_potentials(assemblage, component_formulae):
+    """
+    The compositional space of the components does not have to be a
+    superset of the compositional space of the assemblage. Nor do they have to
+    compose an orthogonal basis.
+
+    The components must each be described by a linear mineral combination
+
+    The mineral compositions must be linearly independent
+
+        Parameters
+        ----------
+        assemblage : list of classes
+            List of material classes
+            set_method and set_state should already have been used
+            the composition of the solid solutions should also have been set
+
+        component_formulae : list of dictionaries
+            List of chemical component formula dictionaries
+            No restriction on length
+
+        Returns
+        -------
+        component_potentials : array of floats
+            Array of chemical potentials of components
+
+    """
+    # Split solid solutions into their respective endmembers
+    # Find the chemical potentials of all the endmembers
+    from ..classes.solidsolution import SolidSolution
+    endmember_list = []
+    endmember_potentials = []
+    for mineral in assemblage:
+        if isinstance(mineral, SolidSolution):
+            for member in mineral.endmembers:
+                endmember_list.append(member[0])
+            for potential in mineral.partial_gibbs:
+                endmember_potentials.append(potential)
+        else:
+            endmember_list.append(mineral)
+            endmember_potentials.append(mineral.gibbs)
+
+    # Make an array of all the endmember formulae
+    endmember_formulae = [endmember.params['formula']
+                          for endmember in endmember_list]
+    endmember_compositions, elements = compositional_array(endmember_formulae)
+
+    pl, u = lu(endmember_compositions, permute_l=True)
+    assert(min(np.dot(np.square(u), np.ones(shape=len(elements)))) > 1e-6), \
+        'Endmember compositions do not form an independent set of basis vectors'
+
+    # Make an array of component formulae with elements in the same order as
+    # the endmember array
+    component_compositions = ordered_compositional_array(
+        component_formulae, elements)
+
+    p = np.linalg.lstsq(endmember_compositions.T, component_compositions.T, rcond=-1)
+    # rcond=-1 is old default to silence warning and be compatible with python 2.7
+    for idx, error in enumerate(p[1]):
+        assert (error < 1e-10), \
+            'Component %d not defined by prescribed assemblage' % (idx + 1)
+
+    # Create an array of endmember proportions which sum to each component
+    # composition
+    endmember_proportions = np.around(p[0], 10).T
+
+    # Calculate the chemical potential of each component
+    component_potentials = np.dot(endmember_proportions, endmember_potentials)
+    return component_potentials
+
+
+def fugacity(standard_material, assemblage):
+    """
+        Parameters
+        ----------
+        standard_material: class
+            Material class
+            set_method and set_state should already have been used
+            material must have a formula as a dictionary parameter
+
+        assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        Returns
+        -------
+        fugacity : float
+            Value of the fugacity of the component with respect to
+            the standard material
+
+    """
+    component_formula = standard_material.params['formula']
+    chemical_potential = chemical_potentials(
+        assemblage, [component_formula])[0]
+
+    fugacity = np.exp((chemical_potential - standard_material.gibbs) / (
+        constants.gas_constant * assemblage[0].temperature))
+    return fugacity
+
+
+def relative_fugacity(standard_material, assemblage, reference_assemblage):
+    """
+        Parameters
+        ----------
+        standard_material: class
+            Material class
+            set_method and set_state should already have been used
+            material must have a formula as a dictionary parameter
+
+        assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        reference_assemblage: list of classes
+            List of material classes
+            set_method and set_state should already have been used
+
+        Returns
+        -------
+        relative_fugacity : float
+            Value of the fugacity of the component in the assemblage
+            with respect to the reference_assemblage
+
+    """
+    component_formula = standard_material.params['formula']
+    chemical_potential = chemical_potentials(
+        assemblage, [component_formula])[0]
+    reference_chemical_potential = chemical_potentials(
+        reference_assemblage, [component_formula])[0]
+
+    relative_fugacity = np.exp((chemical_potential - reference_chemical_potential) / (
+        constants.gas_constant * assemblage[0].temperature))
+    return relative_fugacity
+
+
+def equilibrium_pressure(minerals, stoichiometry, temperature,
+                         pressure_initial_guess=1.e5):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a temperature of interest, compute the
+    equilibrium pressure of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    temperature : float
+        Temperature of interest [K]
+
+    pressure_initial_guess : optional float
+        Initial pressure guess [Pa]
+
+    Returns
+    -------
+    pressure : float
+        The equilibrium pressure of the reaction [Pa]
+    """
+    def eqm(P, T):
+        gibbs = 0.
+        for i, mineral in enumerate(minerals):
+            mineral.set_state(P[0], T)
+            gibbs = gibbs + mineral.gibbs * stoichiometry[i]
+        return gibbs
+
+    pressure = fsolve(eqm, [pressure_initial_guess], args=(temperature))[0]
+
+    return pressure
+
+
+def equilibrium_temperature(minerals, stoichiometry, pressure, temperature_initial_guess=1000.):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a pressure of interest, compute the
+    equilibrium temperature of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    pressure : float
+        Pressure of interest [Pa]
+
+    temperature_initial_guess : optional float
+        Initial temperature guess [K]
+
+    Returns
+    -------
+    temperature : float
+        The equilibrium temperature of the reaction [K]
+    """
+    def eqm(T, P):
+        gibbs = 0.
+        for i, mineral in enumerate(minerals):
+            mineral.set_state(P, T[0])
+            gibbs = gibbs + mineral.gibbs * stoichiometry[i]
+        return gibbs
+
+    temperature = fsolve(eqm, [temperature_initial_guess], args=(pressure))[0]
+
+    return temperature
+
+
+def invariant_point(minerals_r1, stoichiometry_r1,
+                    minerals_r2, stoichiometry_r2,
+                    pressure_temperature_initial_guess=[1.e9, 1000.]):
+    """
+    Given a list of minerals, their reaction stoichiometries
+    and a pressure of interest, compute the
+    equilibrium temperature of the reaction.
+
+    Parameters
+    ----------
+    minerals : list of minerals
+        List of minerals involved in the reaction.
+
+    stoichiometry : list of floats
+        Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol]
+
+    pressure : float
+        Pressure of interest [Pa]
+
+    temperature_initial_guess : optional float
+        Initial temperature guess [K]
+
+    Returns
+    -------
+    temperature : float
+        The equilibrium temperature of the reaction [K]
+    """
+    def eqm(PT):
+        P, T = PT
+        gibbs_r1 = 0.
+        for i, mineral in enumerate(minerals_r1):
+            mineral.set_state(P, T)
+            gibbs_r1 = gibbs_r1 + mineral.gibbs * stoichiometry_r1[i]
+        gibbs_r2 = 0.
+        for i, mineral in enumerate(minerals_r2):
+            mineral.set_state(P, T)
+            gibbs_r2 = gibbs_r2 + mineral.gibbs * stoichiometry_r2[i]
+        return [gibbs_r1, gibbs_r2]
+
+    pressure, temperature = fsolve(eqm, pressure_temperature_initial_guess)
+    return pressure, temperature
+
+
+def hugoniot(mineral, P_ref, T_ref, pressures, reference_mineral=None):
+    """
+    Calculates the temperatures (and volumes) along a Hugoniot
+    as a function of pressure according to the Hugoniot equation
+    U2-U1 = 0.5*(p2 - p1)(V1 - V2) where U and V are the
+    internal energies and volumes (mass or molar) and U = F + TS
+
+
+    Parameters
+    ----------
+    mineral : mineral
+        Mineral for which the Hugoniot is to be calculated.
+
+    P_ref : float
+        Reference pressure [Pa]
+
+    T_ref : float
+        Reference temperature [K]
+
+    pressures : numpy array of floats
+        Set of pressures [Pa] for which the Hugoniot temperature
+        and volume should be calculated
+
+    reference_mineral : mineral
+        Mineral which is stable at the reference conditions
+        Provides an alternative U_0 and V_0 when the reference
+        mineral transforms to the mineral of interest at some
+        (unspecified) pressure.
+
+    Returns
+    -------
+    temperatures : numpy array of floats
+        The Hugoniot temperatures at pressure
+
+    volumes : numpy array of floats
+        The Hugoniot volumes at pressure
+    """
+
+    def Ediff(T, mineral, P, P_ref, U_ref, V_ref):
+        mineral.set_state(P, T[0])
+        U = mineral.helmholtz + T[0] * mineral.S
+        V = mineral.V
+
+        return (U - U_ref) - 0.5 * (P - P_ref) * (V_ref - V)
+
+    if reference_mineral is None:
+        reference_mineral = mineral
+
+    reference_mineral.set_state(P_ref, T_ref)
+    U_ref = reference_mineral.helmholtz + T_ref * reference_mineral.S
+    V_ref = reference_mineral.V
+
+    temperatures = np.empty_like(pressures)
+    volumes = np.empty_like(pressures)
+
+    for i, P in enumerate(pressures):
+        temperatures[i] = fsolve(
+            Ediff, [T_ref], args=(mineral, P, P_ref, U_ref, V_ref))[0]
+        volumes[i] = mineral.V
+
+    return temperatures, volumes

@@ -26,7 +26,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import burnman_path
-from burnman.processchemistry import dictionarize_formula
+from burnman.tools.chemistry import dictionarize_formula
 
 # Import the Composition class and a function to read compositions from file
 # The function assumes that the first line is a header of components,
@@ -34,7 +34,7 @@ from burnman.processchemistry import dictionarize_formula
 # All lines after the first are either molar or weight proportions
 # of the components given in the header, followed by the comment string
 from burnman import Composition
-from burnman.composition import file_to_composition_list
+from burnman.classes.composition import file_to_composition_list
 
 assert burnman_path  # silence pyflakes warning
 

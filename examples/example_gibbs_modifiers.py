@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # Here's a copy of lot (low-temperature troilite) from
     # Holland and Powell (2011), with the Landau transition
     # of tro also included.
-    from burnman.processchemistry import dictionarize_formula, formula_mass
+    from burnman.tools.chemistry import dictionarize_formula, formula_mass
 
     class lot (burnman.Mineral):
 
