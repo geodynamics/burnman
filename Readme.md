@@ -2,7 +2,7 @@
 
 # BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and planetary sciences
 
-<img src="sphinx/burnjack.png" width="256">
+<img src="docs/burnjack.png" width="256">
 
 ## About
 

@@ -20,7 +20,7 @@ fi
 $PYTHON --version
 echo ""
 echo "Version numbers of required modules:"
-$PYTHON -m pip freeze | grep -f sphinx/pip_requirements.txt
+$PYTHON -m pip freeze | grep -f requirements.txt
 echo ""
 
 function testit {
