@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -22,7 +23,11 @@ import matplotlib.pyplot as plt
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
-from burnman.tools import invariant_point
+from burnman.tools.chemistry import equilibrium_pressure
+from burnman.tools.chemistry import equilibrium_temperature
+from burnman.tools.chemistry import invariant_point
+from burnman.tools.chemistry import hugoniot
+from burnman.tools.eos import check_eos_consistency
 assert burnman_path  # silence pyflakes warning
 
 
@@ -33,8 +38,8 @@ def round_to_n(x, xerr, n):
 if __name__ == "__main__":
 
     # First, let's check the EoS consistency of SLB_2011 periclase
-    burnman.tools.check_eos_consistency(burnman.minerals.SLB_2011.periclase(),
-                                        P=10.e9, T=3000., verbose=True)
+    check_eos_consistency(burnman.minerals.SLB_2011.periclase(),
+                          P=10.e9, T=3000., verbose=True)
     print('')
 
     # Next, let's create the Mg2SiO4 phase diagram
@@ -52,8 +57,7 @@ if __name__ == "__main__":
 
     # Here's one example where we find the equilibrium temperature:
     P = 14.e9
-    T = burnman.tools.equilibrium_temperature([forsterite, mg_wadsleyite],
-                                              [1.0, -1.0], P)
+    T = equilibrium_temperature([forsterite, mg_wadsleyite], [1.0, -1.0], P)
     print('Endmember equilibrium calculations')
     print('fo -> wad equilibrium at', P / 1.e9,
           "GPa is reached at", round_to_n(T, T, 4), "K")
@@ -64,10 +68,8 @@ if __name__ == "__main__":
 
     T_fo_melt = np.empty_like(pressures)
     for i, P in enumerate(pressures):
-        T_fo_melt[i] = burnman.tools.equilibrium_temperature([forsterite,
-                                                              liquid],
-                                                             [1.0, -1.0],
-                                                             P, 2000.)
+        T_fo_melt[i] = equilibrium_temperature([forsterite, liquid],
+                                               [1.0, -1.0], P, 2000.)
 
     # Now let's make the whole diagram using equilibrium_pressure
     temperatures = np.linspace(1000., fo_wad_liq[1], 21)
@@ -76,20 +78,16 @@ if __name__ == "__main__":
     pressures_rw_perpv = np.empty_like(temperatures)
 
     for i, T in enumerate(temperatures):
-        P = burnman.tools.equilibrium_pressure([forsterite, mg_wadsleyite],
-                                               [1.0, -1.0],
-                                               T)
+        P = equilibrium_pressure([forsterite, mg_wadsleyite],
+                                 [1.0, -1.0], T)
         pressures_fo_wd[i] = P
 
-        P = burnman.tools.equilibrium_pressure([mg_wadsleyite, mg_ringwoodite],
-                                               [1.0, -1.0],
-                                               T)
+        P = equilibrium_pressure([mg_wadsleyite, mg_ringwoodite],
+                                 [1.0, -1.0], T)
         pressures_wd_rw[i] = P
 
-        P = burnman.tools.equilibrium_pressure(
-            [mg_ringwoodite, periclase, mg_perovskite],
-            [1.0, -1.0, -1.0],
-            T)
+        P = equilibrium_pressure([mg_ringwoodite, periclase, mg_perovskite],
+                                 [1.0, -1.0, -1.0], T)
         pressures_rw_perpv[i] = P
 
     plt.plot(T_fo_melt, pressures/1.e9, label='fo -> melt')
@@ -106,14 +104,12 @@ if __name__ == "__main__":
     # Here's a calculation of the Hugoniot of periclase up to 120 GPa
     print('Hugoniot calculations')
     pressures = np.linspace(1.e5, 120.e9, 101)
-    temperatures, volumes = burnman.tools.hugoniot(
-        periclase, 1.e5, 298.15, pressures)
+    temperatures, volumes = hugoniot(periclase, 1.e5, 298.15, pressures)
     plt.plot(pressures / 1.e9, temperatures, label='298.15 K')
     print('Room temperature Hugoniot temperature at',
           pressures[-1] / 1.e9, 'GPa:', int(temperatures[-1] + 0.5), 'K')
 
-    temperatures, volumes = burnman.tools.hugoniot(
-        periclase, 1.e5, 1000., pressures)
+    temperatures, volumes = hugoniot(periclase, 1.e5, 1000., pressures)
     plt.plot(pressures / 1.e9, temperatures, label='1000 K')
     print('1000 K Hugoniot temperature at',
           pressures[-1] / 1.e9, 'GPa:', int(temperatures[-1] + 0.5), 'K')

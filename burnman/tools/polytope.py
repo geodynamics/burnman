@@ -11,15 +11,17 @@ from scipy.linalg import block_diag
 
 import logging
 import importlib
-from .polytope import MaterialPolytope, independent_row_indices
-from . import SolidSolution, Composite
-from .solutiontools import transform_solution_to_new_basis
+from ..polytope import MaterialPolytope, independent_row_indices
+from ..classes.solidsolution import SolidSolution
+from ..classes.composite import Composite
+from .solution import transform_solution_to_new_basis
 
 try:
     cp = importlib.import_module('cvxpy')
 except ImportError as err:
     print(f'Warning: {err}. '
           'For full functionality of BurnMan, please install cvxpy.')
+
 
 def solution_polytope_from_charge_balance(charges, charge_total,
                                           return_fractions=False):
@@ -83,9 +85,9 @@ def solution_polytope_from_endmember_occupancies(endmember_occupancies,
         [Mg]3[Al]2Si3O12, [Mg]3[Mg0.5Si0.5]2Si3O12, [Fe]3[Al]2Si3O12
         might have the following array:
         [[1., 0., 1., 0., 0.],
-         [1., 0., 0., 0.5, 0.5],
-         [0., 1., 1., 0., 0.]],
-         where the order of site-species is Mg_A, Fe_A, Al_B, Mg_B, Si_B.
+        [1., 0., 0., 0.5, 0.5],
+        [0., 1., 1., 0., 0.]],
+        where the order of site-species is Mg_A, Fe_A, Al_B, Mg_B, Si_B.
 
     return_fractions : boolean
         Determines whether the created polytope object returns its

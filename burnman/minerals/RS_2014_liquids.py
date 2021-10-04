@@ -17,7 +17,7 @@ from ..classes.mineral import Mineral
 from ..classes.solidsolution import SolidSolution
 from ..classes.solutionmodel import *
 
-from ..processchemistry import dictionarize_formula, formula_mass
+from ..tools.chemistry import dictionarize_formula, formula_mass
 
 class Fe2SiO4_liquid(Mineral):
     def __init__(self):

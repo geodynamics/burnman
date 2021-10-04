@@ -81,7 +81,7 @@ if __name__ == "__main__":
     table.extend([list(s) for s in rock.stoichiometric_array])
 
     print('Stoichiometric array:')
-    burnman.tools.pretty_print_table(table)
+    burnman.tools.misc.pretty_print_table(table)
 
     # Before we can interrogate our new composite fully, we must also set
     # the compositions of any solutions, and also set the state of the
@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     # Now we can print the rock:
     print('Composite composition')
-    els = burnman.processchemistry.sort_element_list_to_IUPAC_order(
+    els = burnman.tools.chemistry.sort_element_list_to_IUPAC_order(
         rock.formula.keys())
     for e in els:
         print(f'{e}: {rock.formula[e]:.3f}')
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         table.append([f'{pressures[i]/1.e9:.3f}',
                       f'{x_fe_ols[i]:.3f}',
                       f'{x_fe_wads[i]:.3f}'])
-    burnman.tools.pretty_print_table(table)
+    burnman.tools.misc.pretty_print_table(table)
 
     # Plot the results
     plt.plot(x_fe_ols, pressures/1.e9, label='ol')

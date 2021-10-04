@@ -8,7 +8,9 @@ from __future__ import print_function
 import numpy as np
 
 from . import nonlinear_fitting
-from .tools import flatten, unit_normalize
+from .tools.misc import flatten
+from .tools.math import unit_normalize
+
 
 def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
     """

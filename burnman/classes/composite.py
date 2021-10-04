@@ -12,8 +12,8 @@ from .material import Material, material_property, cached_property
 from .mineral import Mineral
 from .solidsolution import SolidSolution
 
-from ..reductions import independent_row_indices
-from ..processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..tools.reductions import independent_row_indices
+from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
 from .. import averaging_schemes
 
 def check_pairs(phases, fractions):

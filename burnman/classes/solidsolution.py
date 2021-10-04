@@ -15,8 +15,8 @@ from .solutionmodel import MechanicalSolution, IdealSolution
 from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from .solutionmodel import SubregularSolution
 
-from ..reductions import independent_row_indices
-from ..processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..tools.reductions import independent_row_indices
+from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
 from ..averaging_schemes import reuss_average_function
 
 

@@ -3,10 +3,10 @@
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
+"""
+BurnMan object classes
+"""
 
-"""
-Material Classes
-"""
 from __future__ import absolute_import
 
 from . import material

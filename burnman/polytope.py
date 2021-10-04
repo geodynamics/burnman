@@ -13,7 +13,7 @@ from scipy.spatial import Delaunay
 from scipy.special import comb
 from copy import copy
 
-from .reductions import row_reduce
+from .tools.reductions import row_reduce
 from .classes.material import cached_property
 
 

@@ -35,7 +35,7 @@ print ''
 print 'from burnman.mineral import Mineral'
 print 'from burnman.solidsolution import SolidSolution'
 print 'from burnman.solutionmodel import *'
-print 'from burnman.processchemistry import dictionarize_formula, formula_mass'
+print 'from burnman.tools.chemistry import dictionarize_formula, formula_mass'
 print ''
 
 print '"""'

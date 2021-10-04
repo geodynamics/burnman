@@ -21,7 +21,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np  # Library used for general array
-import matplotlib.pyplot as plt  # Library used for plotting
 
 # Import BurnMan
 import burnman_path  # adds the local burnman directory to the path
@@ -82,18 +81,18 @@ if __name__ == "__main__":
     lower_mantle.make()
 
     # Writing axisem input file
-    burnman.output_seismo.write_axisem_input(
+    burnman.tools.output_seismo.write_axisem_input(
         [lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
     # Write mineos input file
-    burnman.output_seismo.write_mineos_input(
+    burnman.tools.output_seismo.write_mineos_input(
         [lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
 
     # change composition
     lower_mantle.set_material(chondritic_mantle)
     lower_mantle.make()
     # Writing axisem input file
-    burnman.output_seismo.write_axisem_input(
+    burnman.tools.output_seismo.write_axisem_input(
         [lower_mantle], modelname='lowermantle_chondritic', plotting=True)
     # Write mineos input file
-    burnman.output_seismo.write_mineos_input(
+    burnman.tools.output_seismo.write_mineos_input(
         [lower_mantle], modelname='lowermantle_chondritic', plotting=True)

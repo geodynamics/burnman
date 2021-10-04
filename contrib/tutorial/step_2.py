@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
         # Here we integrate an L2 difference with depth between our calculated seismic
         # profiles and PREM.  We then return those misfits.
-        [vs_err, vphi_err, rho_err] = burnman.tools.compare_l2(
+        [vs_err, vphi_err, rho_err] = burnman.tools.math.compare_l2(
             depths, [vs, vphi, density], [seis_vs, seis_vphi, seis_rho])
 
         return vs_err, vphi_err, rho_err

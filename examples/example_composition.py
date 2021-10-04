@@ -26,7 +26,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import burnman_path
-from burnman.processchemistry import dictionarize_formula
+from burnman.tools.chemistry import dictionarize_formula
 
 # Import the Composition class and a function to read compositions from file
 # The function assumes that the first line is a header of components,

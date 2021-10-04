@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman.processchemistry import dictionarize_formula, formula_mass
-from burnman.chemicalpotentials import fugacity
+from burnman.tools.chemistry import dictionarize_formula, formula_mass
+from burnman.tools.chemistry import fugacity
 import burnman.constants as constants
 
 assert burnman_path  # silence pyflakes warning
@@ -55,6 +55,7 @@ class ReO2 (burnman.Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
         burnman.Mineral.__init__(self)
+
 
 '''
 Here we find the oxygen fugacity of the FMQ assemblage

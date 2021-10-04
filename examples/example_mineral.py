@@ -48,8 +48,8 @@ import burnman
 from burnman.minerals import HGP_2018_ds633, SLB_2011
 from burnman import CombinedMineral
 
-from burnman.processchemistry import dictionarize_formula, formula_mass
-from burnman.processchemistry import formula_to_string
+from burnman.tools.chemistry import dictionarize_formula, formula_mass
+from burnman.tools.chemistry import formula_to_string
 
 assert burnman_path  # silence pyflakes warning
 

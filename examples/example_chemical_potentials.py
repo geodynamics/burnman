@@ -25,8 +25,7 @@ import matplotlib.pyplot as plt
 import burnman_path  # adds the local burnman directory to the path
 import burnman
 import burnman.constants as constants
-import burnman.processchemistry as processchemistry
-import burnman.chemicalpotentials as chemical_potentials
+from burnman.tools import chemistry
 import burnman.minerals as minerals
 
 assert burnman_path  # silence pyflakes warning
@@ -55,9 +54,9 @@ if __name__ == "__main__":
     '''
 
     component_formulae = ['FeO', 'SiO2', 'O2']
-    component_formulae_dict = [processchemistry.dictionarize_formula(f)
+    component_formulae_dict = [chemistry.dictionarize_formula(f)
                                for f in component_formulae]
-    chem_potentials = chemical_potentials.chemical_potentials(FMQ, component_formulae_dict)
+    chem_potentials = chemistry.chemical_potentials(FMQ, component_formulae_dict)
 
     oxygen = minerals.HP_2011_fluids.O2()
     oxygen.set_state(P, T)
@@ -67,10 +66,10 @@ if __name__ == "__main__":
     for mineral in MH:
         mineral.set_state(P, T)
 
-    print('log10(fO2) at the FMQ buffer:', np.log10(chemical_potentials.fugacity(oxygen, FMQ)))
-    print('log10(fO2) at the mt-hem buffer:', np.log10(chemical_potentials.fugacity(oxygen, MH)))
+    print('log10(fO2) at the FMQ buffer:', np.log10(chemistry.fugacity(oxygen, FMQ)))
+    print('log10(fO2) at the mt-hem buffer:', np.log10(chemistry.fugacity(oxygen, MH)))
 
-    print('Relative log10(fO2):', np.log10(chemical_potentials.relative_fugacity(oxygen, FMQ, MH)))
+    print('Relative log10(fO2):', np.log10(chemistry.relative_fugacity(oxygen, FMQ, MH)))
 
     '''
     Here we find the oxygen fugacity of the
@@ -107,7 +106,7 @@ if __name__ == "__main__":
 
         # The calculated chemical potential and fugacity of O2 at the FMQ
         # buffer
-        log10fO2_FMQ[i] = np.log10(chemical_potentials.fugacity(oxygen, FMQ))
+        log10fO2_FMQ[i] = np.log10(chemistry.fugacity(oxygen, FMQ))
 
     # Plot the FMQ log10(fO2) values
     plt.plot(temperatures, log10fO2_FMQ_ONeill1987,
@@ -124,7 +123,7 @@ if __name__ == "__main__":
 
         def __init__(self):
             formula = 'Re1.0'
-            formula = processchemistry.dictionarize_formula(formula)
+            formula = chemistry.dictionarize_formula(formula)
             self.params = {
                 'name': 'Re',
                 'formula': formula,
@@ -138,14 +137,14 @@ if __name__ == "__main__":
                 'Kprime_0': 4.05,
                 'Kdprime_0': -1.1e-11,
                 'n': sum(formula.values()),
-                'molar_mass': processchemistry.formula_mass(formula)}
+                'molar_mass': chemistry.formula_mass(formula)}
             burnman.Mineral.__init__(self)
 
     class ReO2 (burnman.Mineral):
 
         def __init__(self):
             formula = 'Re1.0O2.0'
-            formula = processchemistry.dictionarize_formula(formula)
+            formula = chemistry.dictionarize_formula(formula)
             self.params = {
                 'name': 'ReO2',
                 'formula': formula,
@@ -159,7 +158,7 @@ if __name__ == "__main__":
                 'Kprime_0': 4.05,
                 'Kdprime_0': -2.25e-11,
                 'n': sum(formula.values()),
-                'molar_mass': processchemistry.formula_mass(formula)}
+                'molar_mass': chemistry.formula_mass(formula)}
             burnman.Mineral.__init__(self)
 
     '''
@@ -192,7 +191,7 @@ if __name__ == "__main__":
         invT[i] = 10000. / (T)
 
         # The chemical potential and fugacity of O2 at the Re-ReO2 buffer
-        log10fO2_ReReO2buffer[i] = np.log10(chemical_potentials.fugacity(oxygen, ReReO2buffer))
+        log10fO2_ReReO2buffer[i] = np.log10(chemistry.fugacity(oxygen, ReReO2buffer))
 
     # Plot the Re-ReO2 log10(fO2) values
     plt.plot(temperatures, log10fO2_Re_PO1994, 'k',

@@ -25,4 +25,4 @@ Base class
 Polytope tools
 --------------
 
-.. automodule:: burnman.polytopetools
+.. automodule:: burnman.tools.polytope

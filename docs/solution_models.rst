@@ -10,7 +10,7 @@ take one of several methods which define the properties of the solution.
   burnman.classes.solutionmodel.AsymmetricRegularSolution
   burnman.classes.solutionmodel.SymmetricRegularSolution
   burnman.classes.solutionmodel.SubregularSolution
-  
+
 Base class
 ----------
 .. autoclass:: burnman.SolidSolution
@@ -47,4 +47,4 @@ Subregular solution
 Solution tools
 ==============
 
-.. autofunction:: burnman.solutiontools.transform_solution_to_new_basis
+.. autofunction:: burnman.tools.solution.transform_solution_to_new_basis

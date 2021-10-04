@@ -7,7 +7,7 @@ import numpy as np
 from collections import Counter, OrderedDict
 from scipy.optimize import nnls
 
-from .processchemistry import dictionarize_formula, formula_mass
+from .tools.chemistry import dictionarize_formula, formula_mass
 
 class OrderedCounter(Counter, OrderedDict):
     """

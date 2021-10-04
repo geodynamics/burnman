@@ -18,7 +18,7 @@ from collections import OrderedDict
 if not os.path.exists('burnman') and os.path.exists('../../../burnman'):
     sys.path.insert(1, os.path.abspath('../../..'))
 
-from burnman.processchemistry import dictionarize_formula, formula_mass
+from burnman.tools.chemistry import dictionarize_formula, formula_mass
 
 
 if not os.path.isfile('tc-ds633.txt'):

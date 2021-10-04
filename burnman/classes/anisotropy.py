@@ -7,18 +7,18 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-from ..tools import unit_normalize
+from ..tools.math import unit_normalize
 from .material import Material, material_property
 
-try: # numpy.block was new in numpy version 1.13.0.
+try:  # numpy.block was new in numpy version 1.13.0.
     block = np.block([[np.ones((3, 3)), 2.*np.ones((3, 3))],
                       [2.*np.ones((3, 3)), 4.*np.ones((3, 3))]])
 except:
     block = np.array(np.bmat([[[[1.]*3]*3, [[2.]*3]*3],
                               [[[2.]*3]*3, [[4.]*3]*3]] ))
 voigt_compliance_factors = block
+
 
 class AnisotropicMaterial(Material):
     """

@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import
 import numpy as np
-from . import constants
+from .. import constants
 
 
 def calculate_nakajima_fp_pv_partition_coefficient(pressure, temperature,

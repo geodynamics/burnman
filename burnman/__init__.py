@@ -209,25 +209,22 @@ from .model import Model
 # mineral library
 from . import minerals
 
-# central user tools
-from . import seismic
-from . import output_seismo
-from . import averaging_schemes
+# central submodules
 from . import eos
+from . import tools
 
-from . import processchemistry
-from . import composition_fitting
-from . import solutiontools
+from . import seismic
+from . import averaging_schemes
+
 from . import polytope
-from . import polytopetools
-from . import chemicalpotentials
 from . import geotherm
-from .equilibration import equilibrate
 
 # miscellaneous
-from . import tools
+from . import composition_fitting
 from . import linear_fitting
 from . import nonlinear_fitting
 from . import nonlinear_solvers
 from . import eos_fitting
-from .partitioning import calculate_nakajima_fp_pv_partition_coefficient
+
+from .tools.partitioning import calculate_nakajima_fp_pv_partition_coefficient
+from .tools.equilibration import equilibrate

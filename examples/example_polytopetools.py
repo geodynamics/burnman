@@ -5,11 +5,11 @@
 
 
 """
-example_polytopetools
+example_tools.polytope
 ---------------------
 
 This example script demonstrates how to use the linear algebra functions
-included in the polytopetools module. In particular, it shows how a
+included in the tools.polytope module. In particular, it shows how a
 user can automatically calculate the endmembers bounding a solution or a
 composite polytope.
 
@@ -17,11 +17,11 @@ composite polytope.
 
 * :class:`burnman.polytope.MaterialPolytope`
 * :func:`burnman.polytope.generate_complete_basis`
-* :func:`burnman.polytopetools.solution_polytope_from_charge_balance`
-* :func:`burnman.polytopetools.solution_polytope_from_endmember_occupancies`
-* :func:`burnman.processchemistry.site_occupancies_to_strings`
-* :func:`burnman.polytopetools.composite_polytope_at_constrained_composition`
-* :func:`burnman.polytopetools.simplify_composite_with_composition`
+* :func:`burnman.tools.polytope.solution_polytope_from_charge_balance`
+* :func:`burnman.tools.polytope.solution_polytope_from_endmember_occupancies`
+* :func:`burnman.tools.chemistry.site_occupancies_to_strings`
+* :func:`burnman.tools.polytope.composite_polytope_at_constrained_composition`
+* :func:`burnman.tools.polytope.simplify_composite_with_composition`
 * :doc:`mineral_database`
 
 
@@ -39,12 +39,12 @@ import numpy as np
 import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.minerals import SLB_2011
-from burnman.polytopetools import solution_polytope_from_charge_balance
-from burnman.polytopetools import solution_polytope_from_endmember_occupancies
-from burnman.polytopetools import composite_polytope_at_constrained_composition as composite_polytope
-from burnman.polytopetools import simplify_composite_with_composition
-from burnman.processchemistry import site_occupancies_to_strings
-from burnman.processchemistry import formula_to_string
+from burnman.tools.polytope import solution_polytope_from_charge_balance
+from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
+from burnman.tools.polytope import composite_polytope_at_constrained_composition as composite_polytope
+from burnman.tools.polytope import simplify_composite_with_composition
+from burnman.tools.chemistry import site_occupancies_to_strings
+from burnman.tools.chemistry import formula_to_string
 
 assert burnman_path  # silence pyflakes warning
 

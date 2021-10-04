@@ -10,8 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pkgutil
 
-from .planet import Planet
-from .layer import Layer
+from ..planet import Planet
+from ..layer import Layer
 
 
 def write_tvel_file(planet_or_layer, modelname='burnmanmodel',

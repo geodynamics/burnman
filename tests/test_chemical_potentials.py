@@ -3,8 +3,11 @@ import unittest
 from util import BurnManTest
 
 import burnman_path
-import burnman
 from burnman import minerals
+
+from burnman.tools.chemistry import chemical_potentials
+from burnman.tools.chemistry import relative_fugacity
+from burnman.tools.chemistry import fugacity
 
 assert burnman_path  # silence pyflakes warning
 
@@ -14,7 +17,6 @@ class ChemicalPotentials(BurnManTest):
     def test_chemical_potentials(self):
         bdg = minerals.SLB_2011.mg_fe_perovskite()
         per = minerals.SLB_2011.periclase()
-        stv = minerals.SLB_2011.stishovite()
 
         assemblage = [bdg, per]
 
@@ -23,8 +25,7 @@ class ChemicalPotentials(BurnManTest):
         for phase in assemblage:
             phase.set_state(25.e9, 2000.)
 
-        mu_SiO2 = burnman.chemicalpotentials.chemical_potentials(
-            assemblage, [{'Si': 1., 'O': 2.}])[0]
+        mu_SiO2 = chemical_potentials(assemblage, [{'Si': 1., 'O': 2.}])[0]
 
         self.assertFloatEqual(bdg.gibbs - per.gibbs, mu_SiO2)
 
@@ -39,8 +40,7 @@ class ChemicalPotentials(BurnManTest):
         for phase in assemblage:
             phase.set_state(25.e9, 2000.)
 
-        fugacity = burnman.chemicalpotentials.fugacity(stv, assemblage)
-        self.assertFloatEqual(1., fugacity)
+        self.assertFloatEqual(1., fugacity(stv, assemblage))
 
     def test_relative_fugacity(self):
         bdg = minerals.SLB_2011.mg_fe_perovskite()
@@ -53,9 +53,8 @@ class ChemicalPotentials(BurnManTest):
         for phase in assemblage:
             phase.set_state(25.e9, 2000.)
 
-        relative_fugacity = burnman.chemicalpotentials.relative_fugacity(
-            stv, assemblage, assemblage)
-        self.assertFloatEqual(1., relative_fugacity)
+        self.assertFloatEqual(1., relative_fugacity(stv, assemblage,
+                                                    assemblage))
 
 
 if __name__ == '__main__':

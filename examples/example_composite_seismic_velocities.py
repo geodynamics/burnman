@@ -123,7 +123,7 @@ if __name__ == "__main__":
     mat_rho, mat_vp, mat_vphi, mat_vs, mat_K, mat_G = rock.evaluate(
         ['density', 'v_p', 'v_phi', 'v_s', 'K_S', 'G'], seis_p, temperature)
 
-    [vs_err, vphi_err, rho_err] = burnman.tools.compare_chifactor(
+    [vs_err, vphi_err, rho_err] = burnman.tools.math.compare_chifactor(
         [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho])
 
     # PLOTTING

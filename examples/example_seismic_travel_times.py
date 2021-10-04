@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
         # Constructing the tvel file for obspy. Here we use PREM to fill in the
         # rest of the planet
-        burnman.output_seismo.write_tvel_file(
+        burnman.tools.output_seismo.write_tvel_file(
             lower_mantle,
             modelname=modelname,
             background_model=burnman.seismic.PREM())
@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
         # Constructing the tvel file for obspy. Here we use PREM to fill in the
         # rest of the planet
-        burnman.output_seismo.write_tvel_file(
+        burnman.tools.output_seismo.write_tvel_file(
             planet_zog,
             modelname=modelname,
             background_model=burnman.seismic.PREM())

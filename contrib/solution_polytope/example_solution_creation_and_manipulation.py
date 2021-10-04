@@ -17,10 +17,10 @@ manipulation of solution models.
 
 * :class:`burnman.polytope.MaterialPolytope`
 * :func:`burnman.polytope.generate_complete_basis`
-* :func:`burnman.polytopetools.solution_polytope_from_charge_balance`
-* :func:`burnman.polytopetools.solution_polytope_from_endmember_occupancies`
-* :func:`burnman.solutiontools.transform_solution_to_new_basis`
-* :func:`burnman.processchemistry.site_occupancies_to_strings`
+* :func:`burnman.tools.polytope.solution_polytope_from_charge_balance`
+* :func:`burnman.tools.polytope.solution_polytope_from_endmember_occupancies`
+* :func:`burnman.tools.solution.transform_solution_to_new_basis`
+* :func:`burnman.tools.chemistry.site_occupancies_to_strings`
 * :doc:`mineral_database`
 
 
@@ -48,10 +48,10 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import burnman
 from burnman.polytope import generate_complete_basis
-from burnman.polytopetools import solution_polytope_from_charge_balance as polytope_from_charge_balance
-from burnman.polytopetools import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
-from burnman.solutiontools import transform_solution_to_new_basis
-from burnman.processchemistry import site_occupancies_to_strings
+from burnman.tools.polytope import solution_polytope_from_charge_balance as polytope_from_charge_balance
+from burnman.tools.polytope import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
+from burnman.tools.solution import transform_solution_to_new_basis
+from burnman.tools.chemistry import site_occupancies_to_strings
 from burnman.minerals import JH_2015
 
 
@@ -410,8 +410,8 @@ if __name__ == "__main__":
 
     print('Checking that a 50:50 solution of the two endmembers has '
           'the same properties in both solutions:')
-    old_formula = burnman.processchemistry.formula_to_string(cpx.formula)
-    new_formula = burnman.processchemistry.formula_to_string(new_cpx.formula)
+    old_formula = burnman.tools.chemistry.formula_to_string(cpx.formula)
+    new_formula = burnman.tools.chemistry.formula_to_string(new_cpx.formula)
     print('Chemical formula: {0}, {1}'.format(old_formula, new_formula))
     print('Gibbs free energy (J/mol): {0:.5f}, {1:.5f}'.format(cpx.gibbs,
                                                                new_cpx.gibbs))

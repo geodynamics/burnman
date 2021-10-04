@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import scipy.optimize as opt
 from scipy.special import gamma, gammainc
 from . import equation_of_state as eos
-from ..tools import bracket
+from ..tools.math import bracket
 import warnings
 import numpy as np
 

@@ -9,19 +9,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
-
 import burnman.eos.birch_murnaghan as bm
 import burnman.eos.birch_murnaghan_4th as bm4
 import burnman.eos.mie_grueneisen_debye as mgd
 import burnman.eos.slb as slb
 import burnman.eos.vinet as vinet
+
+from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
+
 import matplotlib.image as mpimg
 
 assert burnman_path  # silence pyflakes warning
 
+
 def check_birch_murnaghan():
     """
-    Recreates Stixrude and Lithgow-Bertelloni (2005) Figure 1, bulk and shear modulus without thermal corrections
+    Recreates Stixrude and Lithgow-Bertelloni (2005) Figure 1,
+    bulk and shear modulus without thermal corrections
     """
     plt.close()
 
@@ -50,8 +54,8 @@ def check_birch_murnaghan():
             volume[i], test_mineral.params)  # third order is used for the plot we are comparing against
 
     # compare with figure 1
-    plt.plot(pressure / 1.e9, bulk_modulus /
-             1.e9, pressure / 1.e9, shear_modulus / 1.e9)
+    plt.plot(pressure / 1.e9,
+             bulk_modulus / 1.e9, pressure / 1.e9, shear_modulus / 1.e9)
     fig1 = mpimg.imread('../../burnman/data/input_figures/slb_fig1.png')
     plt.imshow(fig1, extent=[0, 140, 0, 800], aspect='auto')
     plt.plot(pressure / 1.e9, bulk_modulus / 1.e9,
@@ -68,7 +72,8 @@ def check_birch_murnaghan():
 
 def check_birch_murnaghan_4th():
     """
-    Recreates the formulation of the 4th order Birch-Murnaghan EOS as in Ahmad and Alkammash, 2012; Figure 1.
+    Recreates the formulation of the 4th order Birch-Murnaghan EOS as in
+    Ahmad and Alkammash, 2012; Figure 1.
     """
     plt.close()
 
@@ -246,7 +251,7 @@ def check_slb_fig3():
     """
     perovskite = burnman.Mineral()
     perovskite.params = {'name': 'perovksite',
-                         'V_0': burnman.tools.molar_volume_from_unit_cell_volume(168.27, 4.),
+                         'V_0': molar_volume_from_unit_cell_volume(168.27, 4.),
                          'grueneisen_0': 1.63,
                          'q_0': 1.7}
 
@@ -352,8 +357,9 @@ def check_slb_fig7_txt():
         vol_comp[i] = 100. * (forsterite.molar_volume * 1.e6 - vol[i]) / vol[i]
         alpha_comp[i] = 100. * (
             forsterite.thermal_expansivity / 1.e-5 - alpha[i]) / (alpha[-1])
-        Cp_comp[i] = 100. * (forsterite.molar_heat_capacity_p /
-                             forsterite.params['molar_mass'] / 1000. - Cp[i]) / (Cp[-1])
+        Cp_comp[i] = 100. * (forsterite.molar_heat_capacity_p
+                             / forsterite.params['molar_mass']
+                             / 1000. - Cp[i]) / (Cp[-1])
         gr_comp[i] = (forsterite.grueneisen_parameter - gr[i]) / gr[i]
         gibbs_comp[i] = 100. * (
             forsterite.molar_gibbs / 1.e6 - gibbs[i]) / gibbs[i]

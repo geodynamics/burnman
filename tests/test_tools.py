@@ -4,10 +4,14 @@ import numpy as np
 
 import burnman_path
 import burnman
-from burnman.tools import equilibrium_temperature, equilibrium_pressure
-from burnman.tools import hugoniot, convert_fractions, bracket
-from burnman.tools import smooth_array
-from burnman.tools import interp_smoothed_array_and_derivatives
+from burnman.tools.chemistry import equilibrium_temperature
+from burnman.tools.chemistry import equilibrium_pressure
+from burnman.tools.chemistry import hugoniot
+from burnman.tools.chemistry import convert_fractions
+from burnman.tools.math import bracket
+from burnman.tools.math import smooth_array
+from burnman.tools.math import interp_smoothed_array_and_derivatives
+from burnman.tools.math import _pad_ndarray_inverse_mirror
 
 assert burnman_path  # silence pyflakes warning
 
@@ -134,16 +138,14 @@ class test_tools(BurnManTest):
     def test_padding_1D(self):
         array = np.array([1., 2., 3., 5.])
         padding = (1,)
-        padded_array = burnman.tools._pad_ndarray_inverse_mirror(
-            array, padding)
+        padded_array = _pad_ndarray_inverse_mirror(array, padding)
         self.assertArraysAlmostEqual(
             padded_array, np.array([0., 1., 2., 3., 5., 7.]))
 
     def test_padding_2D(self):
         array = np.array([[1., 2.], [3., 5.]])
         padding = (1, 1)
-        padded_array = burnman.tools._pad_ndarray_inverse_mirror(
-            array, padding)
+        padded_array = _pad_ndarray_inverse_mirror(array, padding)
         self.assertArraysAlmostEqual(np.ndarray.flatten(padded_array),
                                      np.ndarray.flatten(np.array([[-3., -1., -1., 1.],
                                                                   [0., 1., 2., 3.],

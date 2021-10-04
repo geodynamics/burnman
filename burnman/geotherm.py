@@ -1,13 +1,13 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
 import numpy as np
-import scipy.integrate as integrate
 from scipy.optimize import brentq
-from . import tools
-from . import seismic
+from .tools.misc import read_table, lookup_and_interpolate
+from .tools.math import bracket
 
 
 def brown_shankland(depths):
@@ -28,8 +28,8 @@ def brown_shankland(depths):
     assert(min(depths) >= min(table_brown_depth))
     assert(max(depths) <= max(table_brown_depth))
     temperature = np.empty_like(depths)
-    for i,depth in enumerate(depths):
-        temperature[i] = tools.lookup_and_interpolate(
+    for i, depth in enumerate(depths):
+        temperature[i] = lookup_and_interpolate(
             table_brown_depth, table_brown_temperature, depth)
     return temperature
 
@@ -52,7 +52,7 @@ def anderson(depths):
     assert(max(depths) <= max(table_anderson_depth))
     temperature = np.empty_like(depths)
     for i,depth in enumerate(depths):
-        temperature[i] = tools.lookup_and_interpolate(
+        temperature[i] = lookup_and_interpolate(
                 table_anderson_depth, table_anderson_temperature, depth)
     return temperature
 
@@ -100,20 +100,20 @@ def adiabatic(pressures, T0, rock):
     temperatures[0] = T0
     for i in range(1, len(pressures)):
         args=(pressures[i], rock, S0)
-        sol = tools.bracket(fn=delta_S,
-                            x0=(temperatures[i-1] +
-                                (rock.gr*temperatures[i-1]/rock.K_S) *
-                                (pressures[i] - pressures[i-1])),
-                            dx=1., args=args)
+        sol = bracket(fn=delta_S,
+                      x0=(temperatures[i-1] +
+                          (rock.gr*temperatures[i-1]/rock.K_S) *
+                          (pressures[i] - pressures[i-1])),
+                      dx=1., args=args)
         temperatures[i] = brentq(delta_S, sol[0], sol[1], args=args)
 
     return temperatures
 
 
-table_brown = tools.read_table("input_geotherm/brown_81.txt")
+table_brown = read_table("input_geotherm/brown_81.txt")
 table_brown_depth = np.array(table_brown)[:, 0]
 table_brown_temperature = np.array(table_brown)[:, 1]
 
-table_anderson = tools.read_table("input_geotherm/anderson_82.txt")
+table_anderson = read_table("input_geotherm/anderson_82.txt")
 table_anderson_depth = np.array(table_anderson)[:, 0]
 table_anderson_temperature = np.array(table_anderson)[:, 1]
