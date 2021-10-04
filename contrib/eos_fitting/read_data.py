@@ -18,8 +18,9 @@ def read_fitting_file(filename):
 
         datalines = [line[0:comment_index[i]] for i, line in enumerate(datalines)]
 
-        flags = list(zip(*datalines)[0])
-        values = np.array([map(float, line) for line in zip(*datalines)[1:]]).T
+        flags = list(zip(*datalines))[0]
+        values = np.array([list(map(float, line))
+                           for line in list(zip(*datalines))[1:]]).T
 
         n_rows = len(values[0])
         n_data = len(values[:,0])

@@ -7,6 +7,18 @@
 """
 cubic_fitting
 -------------
+
+This script creates an AnisotropicMineral object corresponding to
+periclase (a cubic mineral). If run_fitting is set to True, the script uses
+experimental data to find the optimal anisotropic parameters.
+If set to False, it uses pre-optimized parameters.
+The data is used only to optimize the anisotropic parameters;
+the isotropic equation of state is taken from
+Stixrude and Lithgow-Bertelloni (2011).
+
+The script ends by making three plots; one with elastic moduli
+at high pressure, one with the corresponding shear moduli,
+and one with the elastic moduli at 1 bar.
 """
 
 from __future__ import absolute_import
@@ -22,6 +34,8 @@ import burnman
 from burnman import AnisotropicMineral
 
 assert burnman_path  # silence pyflakes warning
+
+run_fitting = False
 
 per = burnman.minerals.SLB_2011.periclase()
 per.set_state(1.e5, 300.)
@@ -82,7 +96,6 @@ def make_cubic_mineral_from_parameters(x):
 
 parameters = []
 
-run_fitting = False
 if run_fitting:
     def cubic_misfit(x):
         m = make_cubic_mineral_from_parameters(x)

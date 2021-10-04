@@ -4,7 +4,13 @@
 
 
 """
+eos_fitting
+-----------
 
+This script fits parameters from the the Stixrude and Lithgow-Bertelloni (2005)
+equation of state to experimental periclase data.
+
+It has been designed so that it can easily be modified to fit other data.
 """
 from __future__ import absolute_import
 from __future__ import print_function
@@ -23,7 +29,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from fitting_functions import read_fitting_file
+from read_data import read_fitting_file
 
 if __name__ == "__main__":
 
