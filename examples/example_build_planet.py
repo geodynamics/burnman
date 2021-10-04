@@ -32,8 +32,8 @@ on each of the parameters which can be called.
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.planet.Planet`
-* :class: `burnman.layer.Layer`
+* :class:`burnman.Planet`
+* :class:`burnman.Layer`
 
 *Demonstrates:*
 

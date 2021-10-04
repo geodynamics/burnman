@@ -7,77 +7,21 @@ from __future__ import absolute_import
 
 import importlib
 import numpy as np
-from sympy import Matrix, Rational
+from sympy import Rational
 from fractions import Fraction
 from scipy.spatial import Delaunay
 from scipy.special import comb
 from copy import copy
 
-from .tools.reductions import row_reduce
-from .classes.material import cached_property
+from .material import cached_property
 
+from ..tools.math import independent_row_indices
 
 try:
     cdd = importlib.import_module('cdd')
 except ImportError as err:
     print(f'Warning: {err}. '
           'For full functionality of BurnMan, please install pycddlib.')
-
-
-def independent_row_indices(array):
-    """
-    Returns the indices corresponding to an independent set of rows
-    for a given array. The independent rows are determined from the pivots
-    used during row reduction/Gaussian elimination.
-
-    Parameters
-    ----------
-    array : 2D numpy array of floats
-        The input array
-
-    Returns
-    -------
-    indices : 1D numpy array of integers
-        The indices corresponding to a set of independent rows
-        of the input array.
-    """
-    m = Matrix(array.shape[0], array.shape[1],
-               lambda i, j: Rational(array[i, j]).limit_denominator(1000))
-    _, pivots, swaps = row_reduce(m, iszerofunc=lambda x: x.is_zero,
-                                  simpfunc=lambda x: Rational(x).limit_denominator(1000))
-    indices = np.array(range(len(array)))
-    for swap in np.array(swaps):
-        indices[swap] = indices[swap[::-1]]
-    return sorted(indices[:len(pivots)])
-
-
-def generate_complete_basis(incomplete_basis, array):
-    """
-    Given a 2D array with independent rows and a second 2D array that spans a
-    larger space, creates a complete basis for the combined array using all
-    the rows of the first array, followed by any required rows of the
-    second array. So, for example, if the first array is:
-    [[1, 0, 0], [1, 1, 0]] and the second array is:
-    [[1, 0, 0], [0, 1, 0], [0, 0, 1]], the complete basis will be:
-    [[1, 0, 0], [1, 1, 0], [0, 0, 1]].
-
-    Parameters
-    ----------
-    incomplete_basis : 2D numpy array
-        An array containing the basis to be completed.
-
-    array : 2D numpy array
-        An array spanning the full space for which a basis is required.
-
-    Returns
-    -------
-    complete_basis : 2D numpy array
-        An array containing the basis vectors spanning both of the
-        input arrays.
-    """
-
-    a = np.concatenate((incomplete_basis, array))
-    return a[independent_row_indices(a)]
 
 
 class SimplexGrid(object):

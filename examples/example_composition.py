@@ -34,7 +34,7 @@ from burnman.tools.chemistry import dictionarize_formula
 # All lines after the first are either molar or weight proportions
 # of the components given in the header, followed by the comment string
 from burnman import Composition
-from burnman.composition import file_to_composition_list
+from burnman.classes.composition import file_to_composition_list
 
 assert burnman_path  # silence pyflakes warning
 

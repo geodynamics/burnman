@@ -20,7 +20,7 @@ chemically-relevant operations.
 Base class
 ----------
 
-.. autoclass:: burnman.polytope.MaterialPolytope
+.. autoclass:: burnman.MaterialPolytope
 
 Polytope tools
 --------------

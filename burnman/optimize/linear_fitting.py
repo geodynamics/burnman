@@ -16,6 +16,7 @@ except ImportError as err:
     print(f'Warning: {err}. '
           'For full functionality of BurnMan, please install cvxpy.')
 
+
 def weighted_constrained_least_squares(A, b, Cov_b=None,
                                        equality_constraints=None,
                                        inequality_constraints=None):

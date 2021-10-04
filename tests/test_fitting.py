@@ -4,7 +4,7 @@ import numpy as np
 
 import burnman_path
 import burnman
-from burnman.nonlinear_fitting import nonlinear_least_squares_fit
+from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
 
 assert burnman_path  # silence pyflakes warning
 

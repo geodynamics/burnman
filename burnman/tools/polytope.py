@@ -11,7 +11,7 @@ from scipy.linalg import block_diag
 
 import logging
 import importlib
-from ..polytope import MaterialPolytope, independent_row_indices
+from ..classes.polytope import MaterialPolytope, independent_row_indices
 from ..classes.solidsolution import SolidSolution
 from ..classes.composite import Composite
 from .solution import transform_solution_to_new_basis

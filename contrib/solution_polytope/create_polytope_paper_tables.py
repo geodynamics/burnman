@@ -12,8 +12,8 @@ This script reproduces the tables in Myhill and Connolly (2021).
 
 *Uses:*
 
-* :class:`burnman.polytope.MaterialPolytope`
-* :func:`burnman.polytope.generate_complete_basis`
+* :class:`burnman.MaterialPolytope`
+* :func:`burnman.tools.math.generate_complete_basis`
 * :func:`burnman.tools.polytope.solution_polytope_from_charge_balance`
 * :func:`burnman.tools.polytope.solution_polytope_from_endmember_occupancies`
 * :func:`burnman.tools.solution.transform_solution_to_new_basis`
@@ -44,7 +44,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.polytope import generate_complete_basis
+from burnman.tools.math import generate_complete_basis
 from burnman.tools.polytope import solution_polytope_from_charge_balance as polytope_from_charge_balance
 from burnman.tools.polytope import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
 from burnman.tools.solution import transform_solution_to_new_basis

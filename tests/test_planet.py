@@ -5,8 +5,8 @@ import numpy as np
 
 import burnman_path
 import burnman
-from burnman.planet import Planet
-from burnman.layer import Layer
+from burnman import Planet
+from burnman import Layer
 
 assert burnman_path  # silence pyflakes warning
 

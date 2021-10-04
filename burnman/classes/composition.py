@@ -1,24 +1,15 @@
 from __future__ import print_function
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2018 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
-from collections import Counter, OrderedDict
 from scipy.optimize import nnls
 
-from .tools.chemistry import dictionarize_formula, formula_mass
+from ..tools.chemistry import dictionarize_formula, formula_mass
+from ..tools.misc import OrderedCounter
 
-class OrderedCounter(Counter, OrderedDict):
-    """
-    Counter that remembers the order elements are first encountered
-    """
-
-    def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, OrderedDict(self))
-
-    def __reduce__(self):
-        return self.__class__, (OrderedDict(self),)
 
 def composition_property(func):
     """

@@ -16,8 +16,8 @@ and how to assess goodness of fit.
 
 * :class:`burnman.Composition`
 * :class:`burnman.SolidSolution`
-* :func:`burnman.composition_fitting.fit_phase_proportions_to_bulk_composition`
-* :func:`burnman.composition_fitting.fit_composition_to_solution`
+* :func:`burnman.optimize.composition_fitting.fit_phase_proportions_to_bulk_composition`
+* :func:`burnman.optimize.composition_fitting.fit_composition_to_solution`
 
 
 *Demonstrates:*
@@ -35,8 +35,8 @@ import itertools
 
 import burnman_path  # adds the local burnman directory to the path
 from burnman import minerals
-from burnman.composition_fitting import fit_composition_to_solution
-from burnman.composition_fitting import fit_phase_proportions_to_bulk_composition
+from burnman.optimize.composition_fitting import fit_composition_to_solution
+from burnman.optimize.composition_fitting import fit_phase_proportions_to_bulk_composition
 
 assert burnman_path  # silence pyflakes warning
 

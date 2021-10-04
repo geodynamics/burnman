@@ -9,8 +9,21 @@ from __future__ import print_function
 import operator
 import bisect
 import pkgutil
+from collections import Counter, OrderedDict
 import numpy as np
 from .math import round_to_n, linear_interpol
+
+
+class OrderedCounter(Counter, OrderedDict):
+    """
+    Counter that remembers the order elements are first encountered
+    """
+
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, OrderedDict(self))
+
+    def __reduce__(self):
+        return self.__class__, (OrderedDict(self),)
 
 
 def copy_documentation(copy_from):
