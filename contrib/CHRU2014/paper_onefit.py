@@ -25,13 +25,13 @@ import numpy.random
 import burnman
 import pickle
 from burnman import minerals
-from misc.helper_solid_solution import HelperSolidSolution
+from helper_solid_solution import HelperSolidSolution
 import matplotlib.cm
 import matplotlib.colors
 from scipy import interpolate
 from scipy.stats import norm
 import matplotlib.mlab as mlab
-import misc.colors as colors
+import colors as colors
 
 
 def make_rock():

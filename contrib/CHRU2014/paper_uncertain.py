@@ -24,7 +24,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import burnman
 from burnman import minerals
-import misc.colors as colors
+import colors as colors
 
 
 class my_perovskite(burnman.Mineral):

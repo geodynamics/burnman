@@ -37,8 +37,8 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import burnman
 from burnman import minerals
-from misc.helper_solid_solution import *
-import misc.colors as colors
+from helper_solid_solution import *
+import colors as colors
 
 if __name__ == "__main__":
 
