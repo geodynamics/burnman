@@ -11,25 +11,31 @@ from .material import material_property
 
 class Planet(object):
     """
-    A  class to build (self-consistent) Planets made out of Layers (``burnman.Layer``).
-    By default the planet is set to be self-consistent (with zero pressure at the surface and zero
-    gravity at the center), but this can be overwritten in the set_pressure_mode().
-    Pressure_modes defined in the individual layers will be ignored. If temperature modes are already
-    set, the planet will be built upon initialization.
+    A class to build (self-consistent) Planets made out of Layers
+    (``burnman.Layer``). By default the planet is set to be self-consistent
+    (with zero pressure at the surface and zero gravity at the center),
+    but this can be overwritte using the set_pressure_mode().
+    Pressure_modes defined in the individual layers will be ignored.
+    If temperature modes are already set for each of the layers, when the
+    planet is initialized, the planet will be built immediately.
     """
 
-    def __init__(self, name, layers, n_max_iterations=50, max_delta=1.e-5, verbose=False):
+    def __init__(self, name, layers, n_max_iterations=50,
+                 max_delta=1.e-5, verbose=False):
         """
         Parameters
         ----------
         name : string
-        Name of planet
+            Name of planet
         layers : list of ``burnman.Layer``
-        Layers to build the planet out of (layers are sorted within the planet)
+            Layers to build the planet out of
+            (layers are sorted within the planet)
         n_max_iterations : int
-        Maximum number of iterations to reach self-consistent planet (default = 50)
+            Maximum number of iterations to reach self-consistent planet
+            (default = 50)
         max_delta : float
-        Relative update to the center pressure of the planet between iterations to stop iterations (default = 1.e-5)
+            Relative update to the center pressure of the planet between
+            iterations to stop iterations (default = 1.e-5)
         """
         # sort layers
         self.layers = sorted(layers, key=lambda x: x.inner_radius)
@@ -81,10 +87,10 @@ class Planet(object):
         """
         Returns a layer with a given name
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         name : string
-        Given name of a layer
+            Given name of a layer
         """
         for layer in self.layers:
             if layer.name == name:
@@ -95,10 +101,10 @@ class Planet(object):
         """
         Returns a layer in which this radius lies
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         radius : float
-        radius to evaluate layer at
+            radius at which to evaluate the layer
 
         """
         for layer in self.layers:
@@ -115,26 +121,29 @@ class Planet(object):
         layer material evaluated at those pressures and
         temperatures.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         properties : list of strings
-        List of properties to evaluate
+            List of properties to evaluate
         radlist : array of floats
-        Radii to evaluate properties at. If left empty,
-        internal radius lists are used.
+            Radii to evaluate properties at. If left empty,
+            internal radius lists are used.
 
         Returns
         -------
-        1D or 2D array of requested properties
-        (1D if only one property was requested)
+        properties_array : numpy array
+            1D or 2D array of requested properties
+            (1D if only one property was requested)
         """
         if radlist is None:
             values = np.empty([len(properties),
-                               np.sum([len(layer.radii) for layer in self.layers])])
+                               np.sum([len(layer.radii)
+                                       for layer in self.layers])])
             for i, prop in enumerate(properties):
                 if prop == 'depth':
                     values[i] = np.array(
-                        [self.radius_planet - r for layer in self.layers for r in layer.radii])
+                        [self.radius_planet - r for layer in self.layers
+                         for r in layer.radii])
                 else:
                     j = 0
                     for layer in self.layers:
@@ -154,25 +163,31 @@ class Planet(object):
             values = values[0]
         return values
 
-    def set_pressure_mode(self, pressure_mode='self-consistent', pressures=None, pressure_top=0.,
-                          gravity_bottom=0., n_max_iterations=50, max_delta=1.e-5):
+    def set_pressure_mode(self, pressure_mode='self-consistent',
+                          pressures=None, pressure_top=0.,
+                          gravity_bottom=0., n_max_iterations=50,
+                          max_delta=1.e-5):
         """
-        Sets the pressure mode of the planet by user-defined values are in a self-consistent fashion.
+        Sets the pressure mode of the planet by user-defined values are in a
+        self-consistent fashion.
         pressure_mode is 'user-defined' or 'self-consistent'.
-        The default for the planet is self-consistent, with zero pressure at the surface and zero pressure at the center.
+        The default for the planet is self-consistent, with zero pressure at
+        the surface and zero pressure at the center.
 
         Parameters
         ----------
         pressure_mode : string
-        This can be set to 'user-defined' or 'self-consistent'
+            This can be set to 'user-defined' or 'self-consistent'
         pressures : array of floats
-        Pressures (Pa) to set layer to ('user-defined'). This should be the same length as defined radius array for the layer
+            Pressures (Pa) to set layer to ('user-defined'). This should be the
+            same length as defined radius array for the layer
         pressure_top : float
-        Pressure (Pa) at the top of the layer.
+            Pressure (Pa) at the top of the layer.
         gravity_bottom : float
-        gravity (m/s^2) at the bottom the layer
+            gravity (m/s^2) at the bottom the layer
         n_max_iterations : int
-        Maximum number of iterations to reach self-consistent pressures (default = 50)
+            Maximum number of iterations to reach self-consistent pressures
+            (default = 50)
         """
         self.reset()
         assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
@@ -183,8 +198,8 @@ class Planet(object):
         if pressure_mode == 'user-defined':
             assert(len(pressures) == len(self.radii))
             self._pressures = pressures
-            warnings.warn(
-                "By setting the pressures in Planet it is unlikely to be self-consistent")
+            warnings.warn('User-defined pressures mean that the planet is '
+                          'unlikely to be self-consistent')
 
         if pressure_mode == 'self-consistent':
             self.pressure_top = pressure_top
@@ -216,14 +231,16 @@ class Planet(object):
             while i < self.n_max_iterations:
                 i += 1
                 ref_press = new_press
-                new_grav, new_press = self._evaluate_eos(
-                    new_press, temperatures, self.gravity_bottom, self.pressure_top)
+                new_grav, new_press = self._evaluate_eos(new_press,
+                                                         temperatures,
+                                                         self.gravity_bottom,
+                                                         self.pressure_top)
                 temperatures = self._evaluate_temperature(new_press)
-                rel_err = abs(
-                    (max(ref_press) - max(new_press)) / max(new_press))
+                rel_err = abs((max(ref_press) - max(new_press))
+                              / max(new_press))
                 if self.verbose:
-                    print(
-                        'Iteration {0:0d} maximum relative pressure error: {1:.1e}'.format(i, rel_err))
+                    print(f'Iteration {i:0d} maximum relative pressure error: '
+                          f'{rel_err:.1e}')
 
                 if rel_err < self.max_delta:
                     break
@@ -243,7 +260,8 @@ class Planet(object):
                 layer.sublayers[i].set_state(
                     layer.pressures[i], layer.temperatures[i])
 
-    def _evaluate_eos(self, pressures, temperatures, gravity_bottom, pressure_top):
+    def _evaluate_eos(self, pressures, temperatures,
+                      gravity_bottom, pressure_top):
         """
         Used to update the pressure profile in set_state()
         """
@@ -258,8 +276,9 @@ class Planet(object):
         """
         density = []
         for layer in self.layers:
-            density.append(layer.material.evaluate(
-                ['density'], pressures[layer.n_start:layer.n_end], temperatures[layer.n_start:layer.n_end]))
+            density.append(layer.material.evaluate(['density'],
+                                                   pressures[layer.n_start:layer.n_end],
+                                                   temperatures[layer.n_start:layer.n_end]))
         return np.squeeze(np.hstack(density))
 
     def _evaluate_temperature(self, pressures):
@@ -279,9 +298,9 @@ class Planet(object):
 
     def _compute_gravity(self, density, gravity_bottom):
         """
-        Calculate the gravity of the planet, based on a density profile.  This integrates
-        Poisson's equation in radius, under the assumption that the planet is laterally
-        homogeneous.
+        Calculate the gravity of the planet, based on a density profile.
+        This integrates Poisson's equation in radius, under the assumption
+        that the planet is laterally homogeneous.
         Used to update the gravity profile in _evaluate_eos()
         """
 
@@ -296,15 +315,16 @@ class Planet(object):
 
     def _compute_pressure(self, density, gravity, pressure_top):
         """
-        Calculate the pressure profile based on density and gravity.  This integrates
-        the equation for hydrostatic equilibrium  P = rho g z.
+        Calculate the pressure profile based on density and gravity.
+        This integrates the equation for hydrostatic equilibrium P = rho g z.
         Used to update the pressure profile in _evaluate_eos()
         """
         start_pressure = pressure_top
         press = []
         for layer in self.layers[::-1]:
-            press.extend(layer._compute_pressure(
-                                                 density[layer.n_start: layer.n_end], gravity[layer.n_start: layer.n_end], start_pressure)[::-1])
+            press.extend(layer._compute_pressure(density[layer.n_start:layer.n_end],
+                                                 gravity[layer.n_start: layer.n_end],
+                                                 start_pressure)[::-1])
             start_pressure = press[-1]
         return np.array(press)[::-1]
 
@@ -366,12 +386,10 @@ class Planet(object):
     @property
     def pressure(self):
         """
-        Returns current pressure that was set with :func:`~burnman.Material.set_state`.
+        Returns current pressure that was set with
+        :func:`~burnman.Material.set_state`.
 
-
-        Notes
-        -----
-        - Aliased with :func:`~burnman.Material.P`.
+        Aliased with :func:`~burnman.Material.P`.
 
         Returns
         -------
@@ -383,11 +401,10 @@ class Planet(object):
     @property
     def temperature(self):
         """
-        Returns current temperature that was set with :func:`~burnman.Material.set_state`.
+        Returns current temperature that was set with
+        :func:`~burnman.Material.set_state`.
 
-        Notes
-        -----
-        - Aliased with :func:`~burnman.Material.T`.
+        Aliased with :func:`~burnman.Material.T`.
 
         Returns
         -------
@@ -401,10 +418,8 @@ class Planet(object):
         """
         Returns the molar internal energy of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.energy`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.energy`.
 
         Returns
         -------
@@ -418,10 +433,8 @@ class Planet(object):
         """
         Returns the molar Gibbs free energy of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.gibbs`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.gibbs`.
 
         Returns
         -------
@@ -435,10 +448,8 @@ class Planet(object):
         """
         Returns the molar Helmholtz free energy of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.helmholtz`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.helmholtz`.
 
         Returns
         -------
@@ -452,9 +463,7 @@ class Planet(object):
         """
         Returns molar mass of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
+        Needs to be implemented in derived classes.
 
         Returns
         -------
@@ -468,10 +477,8 @@ class Planet(object):
         """
         Returns molar volume of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.V`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.V`.
 
         Returns
         -------
@@ -485,10 +492,8 @@ class Planet(object):
         """
         Returns the density of this planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.rho`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.rho`.
 
         Returns
         -------
@@ -502,10 +507,8 @@ class Planet(object):
         """
         Returns molar entropy of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.S`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.S`.
 
         Returns
         -------
@@ -519,10 +522,8 @@ class Planet(object):
         """
         Returns molar enthalpy of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.H`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.H`.
 
         Returns
         -------
@@ -536,10 +537,8 @@ class Planet(object):
         """
         Returns isothermal bulk modulus of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.K_T`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.K_T`.
 
         Returns
         -------
@@ -553,10 +552,8 @@ class Planet(object):
         """
         Returns the adiabatic bulk modulus of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.K_S`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.K_S`.
 
         Returns
         -------
@@ -568,12 +565,11 @@ class Planet(object):
     @material_property
     def isothermal_compressibility(self):
         """
-        Returns isothermal compressibility of the planet (or inverse isothermal bulk modulus).
+        Returns isothermal compressibility of the planet
+        (or inverse isothermal bulk modulus).
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.beta_T`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.beta_T`.
 
         Returns
         -------
@@ -585,13 +581,11 @@ class Planet(object):
     @material_property
     def adiabatic_compressibility(self):
         """
-        Returns adiabatic compressibility of the planet (or inverse adiabatic bulk modulus).
+        Returns adiabatic compressibility of the planet
+        (or inverse adiabatic bulk modulus).
 
-
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.beta_S`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.beta_S`.
 
         Returns
         -------
@@ -605,10 +599,8 @@ class Planet(object):
         """
         Returns shear modulus of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.beta_G`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.beta_G`.
 
         Returns
         -------
@@ -622,10 +614,8 @@ class Planet(object):
         """
         Returns P wave speed of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.v_p`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.v_p`.
 
         Returns
         -------
@@ -639,10 +629,8 @@ class Planet(object):
         """
         Returns bulk sound speed of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.v_phi`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.v_phi`.
 
         Returns
         -------
@@ -656,10 +644,8 @@ class Planet(object):
         """
         Returns shear wave speed of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.v_s`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.v_s`.
 
         Returns
         -------
@@ -673,10 +659,8 @@ class Planet(object):
         """
         Returns the grueneisen parameter of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.gr`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.gr`.
 
         Returns
         -------
@@ -690,10 +674,8 @@ class Planet(object):
         """
         Returns thermal expansion coefficient of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.alpha`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.alpha`.
 
         Returns
         -------
@@ -707,10 +689,8 @@ class Planet(object):
         """
         Returns molar heat capacity at constant volume of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.C_v`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.C_v`.
 
         Returns
         -------
@@ -724,10 +704,8 @@ class Planet(object):
         """
         Returns molar heat capacity at constant pressure of the planet.
 
-        Notes
-        -----
-        - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.C_p`.
+        Needs to be implemented in derived classes.
+        Aliased with :func:`~burnman.Material.C_p`.
 
         Returns
         -------

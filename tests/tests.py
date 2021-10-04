@@ -22,9 +22,9 @@ from test_equilibration import *
 from test_fitting import *
 from test_geotherm import *
 from test_helper_rock_switcher import *
+from test_layer import *
 from test_material import *
 from test_minerals import *
-from test_model import *
 from test_modifiers import *
 from test_partitioning import *
 from test_perplex import *
