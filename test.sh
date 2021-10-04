@@ -104,6 +104,7 @@ $PYTHON gen_doc.py >/dev/null || exit 1
 cd benchmarks
 for test in `ls *.py`
 do
+    [ $test == "burnman_path.py" ] && continue
     testit $test $fulldir || exit 1
 done
 cd ..
@@ -118,8 +119,6 @@ for test in `ls example*.py`
 do
     [ $test == "example_inv_murakami.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_premite_isothermal.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "example_compare_enstpyro.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "example_partition_coef.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "example_seismic_travel_times.py" ] && echo "  *** skipping $test !" && continue
     testit $test $fulldir || exit 1
 done
@@ -130,10 +129,10 @@ echo "checking misc/ ..."
 cd misc
 for test in `ls *.py`
 do
+    [ $test == "burnman_path.py" ] && continue
     [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "table.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "create_burnman_readable_perplex_table.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir || exit 1
 done
@@ -145,7 +144,7 @@ echo "checking contrib/tutorial/ ..."
 cd contrib/tutorial/
 for test in `ls step*.py`
 do
-testit $test $fulldir || exit 1
+    testit $test $fulldir || exit 1
 done
 cd ../..
 
@@ -154,7 +153,8 @@ echo "checking contrib/CHRU2014/ ..."
 cd contrib/CHRU2014
 for test in `ls *.py`
 do
-testit $test $fulldir || exit 1
+    [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
+    testit $test $fulldir || exit 1
 done
 cd ../..
 

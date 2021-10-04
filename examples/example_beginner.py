@@ -16,10 +16,10 @@ for visual comparison.
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.composite.Composite`
+* :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.material.Material.evaluate`
+* :func:`burnman.Material.evaluate`
 
 
 *Demonstrates:*

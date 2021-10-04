@@ -1,6 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 """
 RS_2014_liquids
@@ -12,9 +13,9 @@ with the help of David Munoz Ramo.
 """
 
 from burnman import constants
-from ..mineral import Mineral
-from ..solidsolution import SolidSolution
-from ..solutionmodel import *
+from ..classes.mineral import Mineral
+from ..classes.solidsolution import SolidSolution
+from ..classes.solutionmodel import *
 
 from ..processchemistry import dictionarize_formula, formula_mass
 

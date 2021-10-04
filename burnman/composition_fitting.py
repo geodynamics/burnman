@@ -30,11 +30,11 @@ def fit_composition_to_solution(solution,
 
     fitted_variables : list of strings
         A list of the variables used to find the best-fit molar fractions of
-        the solution. These should either be elements such as `Fe',
-        site_species such as `Fef_B' which would correspond to a
+        the solution. These should either be elements such as "Fe",
+        site_species such as "Fef_B" which would correspond to a
         species labelled Fef on the second site,
         or user-defined variables which are arithmetic sums of
-        elements and/or site_species defined in `variable_conversions'.
+        elements and/or site_species defined in "variable_conversions".
 
     variable_values : numpy array
         Numerical values of the fitted variables.

@@ -4,7 +4,7 @@ from util import BurnManTest
 import numpy as np
 
 import burnman_path
-from burnman import anisotropy
+from burnman.classes import anisotropy
 
 assert burnman_path  # silence pyflakes warning
 

@@ -182,20 +182,26 @@ from __future__ import absolute_import
 
 from .version import version as __version__
 
-# classes for representing rocks and minerals:
+# classes and associated functions for representing rocks and minerals:
+from .classes.material import Material, material_property
+from .classes.perplex import PerplexMaterial
+from .classes.mineral import Mineral
+from .classes.combinedmineral import CombinedMineral
+from .classes.solutionmodel import SolutionModel
+from .classes.solidsolution import SolidSolution
+from .classes.composite import Composite
+from .classes.anisotropy import AnisotropicMaterial
+from .classes.anisotropicmineral import AnisotropicMineral
+from .classes.anisotropicmineral import cell_parameters_to_vectors
+from .classes.anisotropicmineral import cell_vectors_to_parameters
+from .classes.mineral_helpers import HelperLowHighPressureRockTransition
+from .classes.mineral_helpers import HelperSpinTransition
+from .classes.mineral_helpers import HelperRockSwitcher
+
+# other classes
 from .composition import Composition
-from .mineral import Mineral
-from .material import Material
-from .perplex import PerplexMaterial
-from .composite import Composite
 from .layer import Layer
 from .planet import Planet
-from .solutionmodel import SolutionModel
-from .solidsolution import SolidSolution
-from .combinedmineral import CombinedMineral
-from .anisotropy import AnisotropicMaterial
-from .anisotropicmineral import AnisotropicMineral
-from .mineral_helpers import *
 
 # high level functions
 from .model import Model
@@ -206,7 +212,6 @@ from . import minerals
 # central user tools
 from . import seismic
 from . import output_seismo
-from . import anisotropy
 from . import averaging_schemes
 from . import eos
 

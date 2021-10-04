@@ -27,7 +27,7 @@ implementations of may equations of state (:doc:`eos`).
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.mineral.Mineral`
+* :class:`burnman.Mineral`
 
 
 *Demonstrates:*

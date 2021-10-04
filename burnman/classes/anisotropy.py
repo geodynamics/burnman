@@ -9,7 +9,7 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .tools import unit_normalize
+from ..tools import unit_normalize
 from .material import Material, material_property
 
 try: # numpy.block was new in numpy version 1.13.0.
@@ -30,8 +30,8 @@ class AnisotropicMaterial(Material):
     properties along directions oriented with respect to the isentropic
     elastic tensor.
 
-    See :cite:`Mainprice2011` Geological Society of London Special Publication
-    and https://materialsproject.org/wiki/index.php/Elasticity_calculations
+    See :cite:`Mainprice2011`
+    and https://docs.materialsproject.org/methodology/elasticity/
     for mathematical descriptions of each function.
     """
 

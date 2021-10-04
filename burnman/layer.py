@@ -13,9 +13,9 @@ from burnman import geotherm
 import warnings
 
 
-from .material import Material, material_property
-from .mineral import Mineral
-from .composite import Composite
+from .classes.material import Material, material_property
+from .classes.mineral import Mineral
+from .classes.composite import Composite
 from .seismic import Seismic1DModel
 
 import matplotlib.pyplot as plt
@@ -419,12 +419,12 @@ class Layer(object):
     @property
     def pressure(self):
         """
-        Returns current pressures across the layer that was set with :func:`~burnman.material.Material.set_state`.
+        Returns current pressures across the layer that was set with :func:`~burnman.Material.set_state`.
 
 
         Notes
         -----
-        - Aliased with :func:`~burnman.material.Material.P`.
+        - Aliased with :func:`~burnman.Material.P`.
 
         Returns
         -------
@@ -436,11 +436,11 @@ class Layer(object):
     @property
     def temperature(self):
         """
-        Returns current temperature  across the layer that was set with :func:`~burnman.material.Material.set_state`.
+        Returns current temperature  across the layer that was set with :func:`~burnman.Material.set_state`.
 
         Notes
         -----
-        - Aliased with :func:`~burnman.material.Material.T`.
+        - Aliased with :func:`~burnman.Material.T`.
 
         Returns
         -------
@@ -458,7 +458,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.energy`.
+        - Aliased with :func:`~burnman.Material.energy`.
 
         Returns
         -------
@@ -476,7 +476,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.gibbs`.
+        - Aliased with :func:`~burnman.Material.gibbs`.
 
         Returns
         -------
@@ -494,7 +494,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.helmholtz`.
+        - Aliased with :func:`~burnman.Material.helmholtz`.
 
         Returns
         -------
@@ -529,7 +529,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.V`.
+        - Aliased with :func:`~burnman.Material.V`.
 
         Returns
         -------
@@ -547,7 +547,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.rho`.
+        - Aliased with :func:`~burnman.Material.rho`.
 
         Returns
         -------
@@ -565,7 +565,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.S`.
+        - Aliased with :func:`~burnman.Material.S`.
 
         Returns
         -------
@@ -583,7 +583,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.H`.
+        - Aliased with :func:`~burnman.Material.H`.
 
         Returns
         -------
@@ -601,7 +601,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.K_T`.
+        - Aliased with :func:`~burnman.Material.K_T`.
 
         Returns
         -------
@@ -619,7 +619,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.K_S`.
+        - Aliased with :func:`~burnman.Material.K_S`.
 
         Returns
         -------
@@ -637,7 +637,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_T`.
+        - Aliased with :func:`~burnman.Material.beta_T`.
 
         Returns
         -------
@@ -656,7 +656,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_S`.
+        - Aliased with :func:`~burnman.Material.beta_S`.
 
         Returns
         -------
@@ -674,7 +674,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.beta_G`.
+        - Aliased with :func:`~burnman.Material.beta_G`.
 
         Returns
         -------
@@ -692,7 +692,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_p`.
+        - Aliased with :func:`~burnman.Material.v_p`.
 
         Returns
         -------
@@ -710,7 +710,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_phi`.
+        - Aliased with :func:`~burnman.Material.v_phi`.
 
         Returns
         -------
@@ -728,7 +728,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.v_s`.
+        - Aliased with :func:`~burnman.Material.v_s`.
 
         Returns
         -------
@@ -746,7 +746,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.gr`.
+        - Aliased with :func:`~burnman.Material.gr`.
 
         Returns
         -------
@@ -764,7 +764,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.alpha`.
+        - Aliased with :func:`~burnman.Material.alpha`.
 
         Returns
         -------
@@ -782,7 +782,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.C_v`.
+        - Aliased with :func:`~burnman.Material.C_v`.
 
         Returns
         -------
@@ -800,7 +800,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.material.Material.C_p`.
+        - Aliased with :func:`~burnman.Material.C_p`.
 
         Returns
         -------
@@ -909,10 +909,10 @@ class Layer(object):
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_v`"""
+        """Alias for :func:`~burnman.Material.molar_heat_capacity_v`"""
         return self.molar_heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.material.Material.molar_heat_capacity_p`"""
+        """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
         return self.molar_heat_capacity_p

@@ -152,7 +152,7 @@ if __name__ == "__main__":
     ax[1].set_ylabel('Relative length change ($10^{4} (x/x_0 - 1)$)')
 
     fig.set_tight_layout(True)
-    fig.savefig('olivine_expansivities.pdf')
+    # fig.savefig('example_anisotropic_mineral_Figure_1.png')
     plt.show()
 
     # Start plotting Cij figure
@@ -186,7 +186,7 @@ if __name__ == "__main__":
         ax[i].legend()
 
     fig.set_tight_layout(True)
-    fig.savefig('olivine_CNijs.pdf')
+    # fig.savefig('example_anisotropic_mineral_Figure_2.png')
     plt.show()
 
     # Finally, we make a pretty plot of various elastic/seismic properties

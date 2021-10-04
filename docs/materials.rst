@@ -2,21 +2,23 @@
 Materials
 =========
 
-Burnman operates on materials (type :class:`~burnman.material.Material`) most prominently in form of minerals (:class:`~burnman.mineral.Mineral`) and composites (:class:`~burnman.composite.Composite`).
+Burnman operates on materials (type :class:`~burnman.Material`)
+most prominently in the form of minerals
+(:class:`~burnman.Mineral`) and composites (:class:`~burnman.Composite`).
 
 
-.. inheritance-diagram:: burnman.Material burnman.Composite burnman.Mineral burnman.solidsolution.SolidSolution burnman.mineral_helpers.HelperSpinTransition
+.. inheritance-diagram:: burnman.Material burnman.Mineral burnman.PerplexMaterial burnman.SolidSolution burnman.Composite burnman.CombinedMineral burnman.AnisotropicMaterial burnman.AnisotropicMineral
 
 
 Material Base Class
 -------------------
 
-.. autoclass:: burnman.material.Material
+.. autoclass:: burnman.Material
 
 Perple_X Class
 --------------
 
-.. autoclass:: burnman.perplex.PerplexMaterial
+.. autoclass:: burnman.PerplexMaterial
 
 Minerals
 --------
@@ -24,28 +26,30 @@ Minerals
 Endmembers
 ^^^^^^^^^^
 
-.. autoclass:: burnman.mineral.Mineral
+.. autoclass:: burnman.Mineral
 
 Solid solutions
 ^^^^^^^^^^^^^^^
 
-.. autoclass:: burnman.solidsolution.SolidSolution
+.. autoclass:: burnman.SolidSolution
 
 Mineral helpers
 ^^^^^^^^^^^^^^^
 
-.. autoclass:: burnman.mineral_helpers.HelperSpinTransition
+.. autoclass:: burnman.classes.mineral_helpers.HelperSpinTransition
 
-Anisotropic minerals
-^^^^^^^^^^^^^^^^^^^^
+Anisotropic materials
+^^^^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: burnman.anisotropicmineral.cell_parameters_to_vectors
+.. autoclass:: burnman.AnisotropicMaterial
 
-.. autofunction:: burnman.anisotropicmineral.cell_vectors_to_parameters
+.. autoclass:: burnman.AnisotropicMineral
 
-.. autoclass:: burnman.anisotropicmineral.AnisotropicMineral
+.. autofunction:: burnman.cell_parameters_to_vectors
+
+.. autofunction:: burnman.cell_vectors_to_parameters
 
 Composites
 ----------
 
-.. autoclass:: burnman.composite.Composite
+.. autoclass:: burnman.Composite

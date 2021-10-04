@@ -24,8 +24,8 @@ volume in order to create smoothly varying relaxed properties.
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.perplex.PerplexMaterial`
-* :func:`burnman.material.Material.evaluate`
+* :class:`burnman.PerplexMaterial`
+* :func:`burnman.Material.evaluate`
 * :func:`burnman.tools.interp_smoothed_array_and_derivatives`
 
 

@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -10,9 +11,8 @@ This module provides several helper minerals/materials.
 from __future__ import absolute_import
 from __future__ import print_function
 
-from .material import Material
-from .composite import Composite
 from .material import Material, material_property
+from .composite import Composite
 
 
 class HelperRockSwitcher(Material):
@@ -151,7 +151,6 @@ class HelperLowHighPressureRockTransition(HelperRockSwitcher):
         indent += "  "
         for r in self.rocks:
             r.debug_print(indent)
-
 
 
 class HelperSpinTransition(Composite):

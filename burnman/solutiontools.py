@@ -8,8 +8,8 @@ from __future__ import absolute_import
 
 import numpy as np
 from sympy import Matrix
-from .combinedmineral import CombinedMineral
-from .solidsolution import SolidSolution
+from .classes.combinedmineral import CombinedMineral
+from .classes.solidsolution import SolidSolution
 from .processchemistry import site_occupancies_to_strings
 
 

@@ -10,8 +10,8 @@ import warnings
 import numpy as np
 
 from .material import Material, material_property
-from . import eos
-from .tools import copy_documentation
+from .. import eos
+from ..tools import copy_documentation
 
 
 class Mineral(Material):

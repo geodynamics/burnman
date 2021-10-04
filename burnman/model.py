@@ -1,11 +1,12 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 from __future__ import absolute_import
 import numpy as np
-from .material import Material
+from .classes.material import Material
 from .averaging_schemes import AveragingScheme
 
 

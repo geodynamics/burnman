@@ -14,7 +14,7 @@ from scipy.special import comb
 from copy import copy
 
 from .reductions import row_reduce
-from .material import cached_property
+from .classes.material import cached_property
 
 
 try:
@@ -22,6 +22,7 @@ try:
 except ImportError as err:
     print(f'Warning: {err}. '
           'For full functionality of BurnMan, please install pycddlib.')
+
 
 def independent_row_indices(array):
     """

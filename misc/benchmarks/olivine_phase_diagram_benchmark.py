@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 # Benchmarks for the chemical potential functions
-import os.path
-import sys
-sys.path.insert(1, os.path.abspath('../..'))
+import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 import numpy as np
@@ -10,9 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from scipy import optimize
 
+assert burnman_path  # silence pyflakes warning
+
 # Equilibrium functions
-
-
 def eqm_P_xMgB(A, B):
     def eqm(arg, T, xMgA):
         P = arg[0]

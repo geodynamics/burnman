@@ -5,20 +5,22 @@
 
 
 """
+
 example_gibbs_modifiers
-----------------
+-----------------------
 
 This example script demonstrates the modifications to
 the gibbs free energy (and derivatives) that can be applied
 as masks over the results from the equations of state.
 
 These modifications currently take the forms:
-- Landau corrections (implementations of Putnis (1992)
+
+* Landau corrections (implementations of Putnis (1992)
   and Holland and Powell (2011)
-- Bragg-Williams corrections
+* Bragg-Williams corrections
   (implementation of Holland and Powell (1996))
-- Linear (a simple delta_E + delta_V*P - delta_S*T
-- Magnetic (Chin, Hertzman and Sundman (1987))
+* Linear (a simple delta_E + delta_V*P - delta_S*T
+* Magnetic (Chin, Hertzman and Sundman (1987))
 
 *Uses:*
 
@@ -29,6 +31,7 @@ These modifications currently take the forms:
 
 * creating a mineral with excess contributions
 * calculating thermodynamic properties
+
 """
 from __future__ import absolute_import
 

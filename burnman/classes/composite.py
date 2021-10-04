@@ -6,15 +6,15 @@ from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
 from sympy import Matrix, nsimplify
-from .reductions import independent_row_indices
 import warnings
 
 from .material import Material, material_property, cached_property
 from .mineral import Mineral
-from . import averaging_schemes
 from .solidsolution import SolidSolution
-from .processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
+from ..reductions import independent_row_indices
+from ..processchemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from .. import averaging_schemes
 
 def check_pairs(phases, fractions):
     if len(fractions) < 1:

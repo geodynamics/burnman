@@ -1,6 +1,7 @@
-# BurnMan - a lower mantle toolkit
-# Copyright (C) 2012, 2013, Heister, T., Unterborn, C., Rose, I. and Cottaar, S.
-# Released under GPL v2 or later.
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# GPL v2 or later.
 
 """
 DKS_2013_solids
@@ -9,11 +10,9 @@ DKS_2013_solids
 Solids from de Koker and Stixrude (2013) FPMD simulations
 """
 
-from ..mineral import Mineral
-from ..solidsolution import SolidSolution
-from ..solutionmodel import *
+from ..classes.mineral import Mineral
+from ..processchemistry import formula_mass
 
-from ..processchemistry import dictionarize_formula, formula_mass
 
 class stishovite(Mineral):
     def __init__(self):
@@ -43,6 +42,7 @@ class stishovite(Mineral):
             }
         Mineral.__init__(self)
 
+
 class perovskite(Mineral):
     def __init__(self):
         p_fit = [0.4067243956E+05, 0.1177159096E+05]
@@ -70,6 +70,7 @@ class perovskite(Mineral):
             'molar_mass': formula_mass(formula)
             }
         Mineral.__init__(self)
+
 
 class periclase(Mineral):
     def __init__(self):

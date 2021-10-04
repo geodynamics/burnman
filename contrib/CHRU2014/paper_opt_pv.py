@@ -36,8 +36,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman import minerals
-from misc.helper_solid_solution import *
+from contrib.CHRU2014.helper_solid_solution import SLB_2011_ZSB_2013_mg_fe_perovskite, other_ferropericlase
 import misc.colors as colors
 
 if __name__ == "__main__":
@@ -72,16 +71,14 @@ if __name__ == "__main__":
     method = 'slb3'
 
     seismic_model = burnman.seismic.PREM()
-                                         # pick from .prem() .slow() .fast()
-                                         # (see burnman/seismic.py)
+    # pick from .prem() .slow() .fast()
+    # (see burnman/seismic.py)
     number_of_points = 20  # set on how many depth slices the computations should be done
     depths = np.linspace(850e3, 2700e3, number_of_points)
     seis_p, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
         ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
 
     print(seis_p[0], seis_p[-1])
-
-
 
     def eval_material(amount_perovskite):
         rock = burnman.Composite([SLB_2011_ZSB_2013_mg_fe_perovskite(0.07),
@@ -101,9 +98,9 @@ if __name__ == "__main__":
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
         [vs_err, vphi_err, rho_err] = burnman.tools.compare_l2(depths,
-                                                         [mat_vs, mat_vphi,
-                                                          mat_rho],
-                                                         [seis_vs, seis_vphi, seis_rho])
+                                                               [mat_vs, mat_vphi,
+                                                                mat_rho],
+                                                               [seis_vs, seis_vphi, seis_rho])
         scale = 2700e3 - 850e3
         return vs_err / scale, vphi_err / scale
 

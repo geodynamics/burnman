@@ -15,9 +15,9 @@ class.
 *Uses:*
 
 * :doc:`mineral_database`
-* :class:`burnman.mineral.Mineral`
-* :class:`burnman.solidsolution.SolidSolution`
-* :class:`burnman.composite.Composite`
+* :class:`burnman.Mineral`
+* :class:`burnman.SolidSolution`
+* :class:`burnman.Composite`
 
 *Demonstrates:*
 

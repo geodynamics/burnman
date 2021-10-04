@@ -1,14 +1,14 @@
-31823705000.0 124629954286.0
+31823705000.0 124629954285.71428
 Calculations are done for:
 Composite: Unnamed composite
   0 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   1 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -16,13 +16,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.111111 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.888889 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -30,13 +30,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.222222 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.777778 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -44,13 +44,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.333333 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.666667 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -58,13 +58,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.444444 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.555556 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -72,13 +72,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.555556 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444444 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -86,13 +86,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.666667 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.333333 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -100,13 +100,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.777778 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.222222 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -114,13 +114,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.888889 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.111111 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -128,29 +128,29 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   1 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
         'burnman.minerals.SLB_2011.wuestite'
-6806.56245823 9720.08418673
-0.666666666667 0.555555555556 0.555555555556
+6806.562458233084 9720.084186731396
+0.6666666666666666 0.5555555555555556 0.5555555555555556
 Calculations are done for:
 Composite: Unnamed composite
   0.556 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -158,13 +158,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.667 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.333 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of
@@ -172,13 +172,13 @@ Composite: Unnamed composite
 Calculations are done for:
 Composite: Unnamed composite
   0.556 of
-    HelperSolidSolution('misc.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.SLB_2011_ZSB_2013_mg_fe_perovskite'):
       0.93 of
         'burnman.minerals.SLB_2011_ZSB_2013.mg_perovskite'
       0.07 of
         'burnman.minerals.SLB_2011_ZSB_2013.fe_perovskite'
   0.444 of
-    HelperSolidSolution('misc.helper_solid_solution.other_ferropericlase'):
+    HelperSolidSolution('contrib.CHRU2014.helper_solid_solution.other_ferropericlase'):
       0.8 of
         'burnman.minerals.SLB_2011.periclase'
       0.2 of

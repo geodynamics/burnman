@@ -5,12 +5,11 @@ from __future__ import print_function
 # GPL v2 or later.
 
 import argparse
-import os.path
-import sys
-if not os.path.exists('burnman') and os.path.exists('../burnman'):
-    sys.path.insert(1, os.path.abspath('..'))
+import burnman_path  # adds the local burnman directory to the path
 
-from burnman.perplex import create_perplex_table
+from burnman.classes.perplex import create_perplex_table
+
+assert burnman_path  # silence pyflakes warning
 
 parser = argparse.ArgumentParser(description='Call werami to create a burnman-readable tab file.')
 

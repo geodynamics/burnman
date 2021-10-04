@@ -14,9 +14,9 @@ unlike those in the original tc file.
 """
 import inspect
 import numpy as np
-from ..solidsolution import SolidSolution
-from ..combinedmineral import CombinedMineral
-from ..solutionmodel import *
+from ..classes.solidsolution import SolidSolution
+from ..classes.combinedmineral import CombinedMineral
+from ..classes.solutionmodel import *
 from copy import copy
 
 """

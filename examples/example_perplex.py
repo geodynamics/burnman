@@ -13,7 +13,7 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 *Uses:*
 
 * :doc:`PerplexMaterial`
-* :func:`burnman.material.Material.evaluate`
+* :func:`burnman.Material.evaluate`
 * :func:`burnman.tools.smooth_array`
 
 *Demonstrates:*

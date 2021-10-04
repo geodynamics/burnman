@@ -1,5 +1,10 @@
 from __future__ import absolute_import
-import numpy as np
+
+import os
+import sys
+# hack to allow scripts to be placed in subdirectories next to burnman:
+if not os.path.exists('burnman') and os.path.exists('../../burnman'):
+    sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
 import burnman.minerals as minerals
@@ -139,8 +144,8 @@ class other_mg_fe_perovskite(HelperSolidSolution):
 class other_ZSB_2013_mg_fe_perovskite(HelperSolidSolution):
 
     def __init__(self, fe_num):
-        endmembers = [
-            other.ZSB_2013_mg_perovskite(), minerals.other.ZSB_2013_fe_perovskite()]
+        endmembers = [minerals.other.ZSB_2013_mg_perovskite(),
+                      minerals.other.ZSB_2013_fe_perovskite()]
         molar_fractions = [1. - fe_num, 0.0 + fe_num]  # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 

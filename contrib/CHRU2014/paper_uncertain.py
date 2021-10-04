@@ -23,7 +23,6 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman import minerals
 import misc.colors as colors
 
 
