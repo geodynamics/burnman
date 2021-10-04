@@ -7,6 +7,18 @@
 """
 orthorhombic_fitting
 --------------------
+
+This script creates an AnisotropicMineral object corresponding to
+San Carlos olivine (an orthorhombic mineral). If run_fitting is set to True,
+the script uses experimental data to find the optimal anisotropic parameters.
+If set to False, it uses pre-optimized parameters.
+The data is used to optimize both the isotropic (volumetric) and
+anisotropic parameters.
+
+The script ends by making three plots; one with the linear and volumetric
+thermal expansivities at 1 bar, one with components of the
+isentropic elastic stiffness tensor at high pressure, and one with
+selected seismic properties at a fixed pressure and temperature.
 """
 
 from __future__ import absolute_import
@@ -24,6 +36,8 @@ from tools import print_table_for_mineral_constants
 from burnman.tools import plot_projected_elastic_properties
 
 assert burnman_path  # silence pyflakes warning
+
+run_fitting = False
 
 formula = 'Mg1.8Fe0.2SiO4'
 formula = burnman.processchemistry.dictionarize_formula(formula)
@@ -128,7 +142,6 @@ def make_orthorhombic_mineral_from_parameters(x):
     m = AnisotropicMineral(ol, ol_cell_parameters, constants)
     return m
 
-run_fitting = False
 sol = []
 if run_fitting:
 
