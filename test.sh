@@ -131,12 +131,12 @@ for test in `ls *.py`
 do
     [ $test == "burnman_path.py" ] && continue
     [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "table.py" ] && echo "  *** skipping $test !" && continue
+    [ $test == "table_mineral_library.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "create_burnman_readable_perplex_table.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir || exit 1
 done
-testit table.py $fulldir || exit 1
+testit table_mineral_library.py $fulldir || exit 1
 cd ..
 
 
