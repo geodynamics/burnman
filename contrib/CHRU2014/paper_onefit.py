@@ -31,7 +31,7 @@ import matplotlib.colors
 from scipy import interpolate
 from scipy.stats import norm
 import matplotlib.mlab as mlab
-import .colors as colors
+import contrib.CHRU2014.colors as colors
 
 
 def make_rock():
