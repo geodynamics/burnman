@@ -1,7 +1,7 @@
 name: test
 
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request, issue_comment]
 
 jobs:
   linux:
@@ -13,6 +13,38 @@ jobs:
         python-versions: [3.7, 3.8, 3.9]
 
     steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-versions }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-versions }}
+    - name: setup
+      run: |
+        # pycddlib requires libgmp3-dev
+        sudo apt update && sudo apt install --yes \
+         numdiff \
+         libgmp3-dev \
+         texlive \
+         texlive-latex-extra
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+        pip install pycddlib # this is optional
+        python --version
+    - name: test
+      run: |
+        PYTHON=python ./test.sh
+
+  linux_pr_comment:
+    name: test_on_PR_comment
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: [ubuntu-20.04]
+
+    strategy:
+      matrix:
+        python-versions: [3.7, 3.8, 3.9]
+
+    steps:
+      if: contains(github.event.comment.body, '/test')
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-versions }}
       uses: actions/setup-python@v2
