@@ -33,7 +33,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import scipy.optimize as opt
 import burnman
-import misc.colors as colors
+import contrib.CHRU2014.colors as colors
 
 import warnings
 

@@ -115,7 +115,7 @@ class Murakami_2013_mg_fe_perovskite(HelperSolidSolution):
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
 
 # This is ferropericlase with the deprecated solid solution setup,
-# although it is still used in some of the /misc/paper* scripts
+# only used for the scripts in this folder
 
 
 class other_ferropericlase(HelperSolidSolution):

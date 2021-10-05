@@ -24,7 +24,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import burnman
 from contrib.CHRU2014.helper_solid_solution import HelperSolidSolution
-import misc.colors as colors
+import contrib.CHRU2014.colors as colors
 
 if __name__ == "__main__":
     fig = plt.figure(dpi=100, figsize=(12, 6))

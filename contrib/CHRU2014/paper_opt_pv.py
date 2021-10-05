@@ -37,7 +37,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
 
 import burnman
 from contrib.CHRU2014.helper_solid_solution import SLB_2011_ZSB_2013_mg_fe_perovskite, other_ferropericlase
-import misc.colors as colors
+import contrib.CHRU2014.colors as colors
 
 if __name__ == "__main__":
 

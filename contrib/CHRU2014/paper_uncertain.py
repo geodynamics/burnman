@@ -23,7 +23,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-import misc.colors as colors
+import contrib.CHRU2014.colors as colors
 
 
 class my_perovskite(burnman.Mineral):
