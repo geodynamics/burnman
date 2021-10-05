@@ -226,5 +226,3 @@ from .optimize import eos_fitting
 
 # Miscellaneous
 from .tools.partitioning import calculate_nakajima_fp_pv_partition_coefficient
-
-from .model import Model

@@ -216,8 +216,12 @@ def process_solution_chemistry(solution_model):
         Class must have a "formulas" attribute, containing a
         list of chemical formulae with site information
 
-    Creates attributes
-    ------------------
+    Returns
+    -------
+    none
+        Nothing is returned from this function, but the solution_model
+        object gains the following attributes.
+
     solution_formulae : list of dictionaries
         List of endmember formulae is output from site formula strings
 
