@@ -1,5 +1,8 @@
 Changelog
 ---------
+Release v1.0.1 (October 6, 2021)
+  - Adds missing optimize submodule.
+
 Release v1.0.0 (October 6, 2021)
   - python 3.7+ compatibility
   - major restructuring of source directory

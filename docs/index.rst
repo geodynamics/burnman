@@ -29,8 +29,8 @@ Citing BurnMan
 If you use BurnMan in your work, we ask that you cite the following publications:
 
  - Myhill, R., Cottaar, S., Heister, T., Rose, I., and Unterborn, C. (2021):
-   BurnMan v1.0.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
-   `(https://doi.org/10.5281/zenodo.5552443) <https://doi.org/10.5281/zenodo.5552443>`_
+   BurnMan v1.0.1 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
+   `(https://doi.org/10.5281/zenodo.5552756) <https://doi.org/10.5281/zenodo.5552756>`_
 
  - Cottaar S., Heister, T., Rose, I., and Unterborn, C., 2014, BurnMan: A
    lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
