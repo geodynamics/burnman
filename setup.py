@@ -13,7 +13,7 @@ metadata = dict(name='burnman',
                 license='GPL',
                 long_description_content_type="text/x-rst",
                 long_description='BurnMan is a Python library for generating thermodynamic and thermoelastic models of planetary interiors.',
-                packages=['burnman', 'burnman.minerals', 'burnman.eos', 'burnman.tools', 'burnman.classes'],
+                packages=['burnman', 'burnman.minerals', 'burnman.eos', 'burnman.tools', 'burnman.classes', 'burnman.optimize'],
                 package_data={'burnman': ['data/input_*/*']},
                 classifiers=[
                 'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
