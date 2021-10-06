@@ -1,5 +1,27 @@
 Changelog
 ---------
+Release v1.0.0 (October 6, 2021)
+  - python 3.7+ compatibility
+  - major restructuring of source directory
+  - documentation overhaul
+  - a new equilibrate function for chemical equilibration of Composite materials.
+  - new composition fitting functions (solution and bulk composition)
+  - new MaterialPolytope class
+  - implementation of melt phases from the the Holland and Powell (2011) and Holland et al. (2018) datasets
+  - ternary terms added to the subregular solution model
+
+Release v0.10.0 (August 2, 2021)
+  - python 3.5+ compatibility
+  - a new Composition class for compositional processing
+  - a new CombinedMineral class
+  - a new AnisotropicMaterial class
+  - new Planet and Layer classes for mass, moment of inertia and seismic velocity calculations
+  - new nonlinear fitting routines and a nonlinear solver
+  - new static equations of state: Morse potential, Reciprocal K-prime
+  - new thermal equations of state: Anderson and Ahrens (metallic iron), de Koker and Stixrude, Ramo and Stixrude (solids and liquids)
+  - a large number of new minerals and solid solutions in the databases
+  - a large number of new examples
+  - updated documentation
 
 Release v0.9.0 (April 25, 2016)
   - major documentation overhaul
@@ -22,11 +44,11 @@ Release v0.9.0 (April 25, 2016)
 Release v0.7 (June 24, 2014)
   - Cleanup and rewrite of the mineral/composite feature
   - online html documentation
-  - Scripts to reproduce the figures from Cottaar, Heister, Rose and 
+  - Scripts to reproduce the figures from Cottaar, Heister, Rose and
     Unterborn (2014) can be found in misc/.
-  - Mineral physical libraries from Murakami (2013) and Zhang et al. 
+  - Mineral physical libraries from Murakami (2013) and Zhang et al.
     (2013) are included.
-  - Pressure-depth conversion following Cammarano (2013) are included. 
+  - Pressure-depth conversion following Cammarano (2013) are included.
 
 Release v0.5 (October 28, 2013)
 
