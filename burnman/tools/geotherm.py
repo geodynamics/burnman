@@ -6,8 +6,8 @@
 from __future__ import absolute_import
 import numpy as np
 from scipy.optimize import brentq
-from .tools.misc import read_table, lookup_and_interpolate
-from .tools.math import bracket
+from ..tools.misc import read_table, lookup_and_interpolate
+from ..tools.math import bracket
 
 
 def brown_shankland(depths):
@@ -51,7 +51,7 @@ def anderson(depths):
     assert(min(depths) >= min(table_anderson_depth))
     assert(max(depths) <= max(table_anderson_depth))
     temperature = np.empty_like(depths)
-    for i,depth in enumerate(depths):
+    for i, depth in enumerate(depths):
         temperature[i] = lookup_and_interpolate(
                 table_anderson_depth, table_anderson_temperature, depth)
     return temperature
@@ -73,7 +73,8 @@ def adiabatic(pressures, T0, rock):
     ----------
 
     pressures : list of floats
-        The list of pressures in :math:`[Pa]` at which to evaluate the geotherm.
+        The list of pressures in :math:`[Pa]` at which
+        to evaluate the geotherm.
 
     T0 : float
         An anchor temperature, corresponding to the temperature of the first
@@ -99,11 +100,11 @@ def adiabatic(pressures, T0, rock):
     temperatures = np.empty_like(pressures)
     temperatures[0] = T0
     for i in range(1, len(pressures)):
-        args=(pressures[i], rock, S0)
+        args = (pressures[i], rock, S0)
         sol = bracket(fn=delta_S,
-                      x0=(temperatures[i-1] +
-                          (rock.gr*temperatures[i-1]/rock.K_S) *
-                          (pressures[i] - pressures[i-1])),
+                      x0=(temperatures[i-1]
+                          + (rock.gr*temperatures[i-1]/rock.K_S)
+                          * (pressures[i] - pressures[i-1])),
                       dx=1., args=args)
         temperatures[i] = brentq(delta_S, sol[0], sol[1], args=args)
 

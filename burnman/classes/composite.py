@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -11,10 +12,11 @@ import warnings
 from .material import Material, material_property, cached_property
 from .mineral import Mineral
 from .solidsolution import SolidSolution
+from . import averaging_schemes
 
 from ..tools.reductions import independent_row_indices
 from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
-from .. import averaging_schemes
+
 
 def check_pairs(phases, fractions):
     if len(fractions) < 1:

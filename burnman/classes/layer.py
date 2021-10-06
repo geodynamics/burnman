@@ -9,7 +9,7 @@ from scipy.integrate import odeint
 from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
 from burnman import constants
-from burnman import geotherm
+from burnman.tools import geotherm
 import warnings
 
 from .material import Material, material_property

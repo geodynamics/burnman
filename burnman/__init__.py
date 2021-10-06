@@ -203,9 +203,7 @@ from .classes.layer import Layer
 from .classes.planet import Planet
 from .classes.polytope import MaterialPolytope
 from .classes import seismic
-
-from . import averaging_schemes
-from . import geotherm
+from .classes import averaging_schemes
 
 # Mineral library
 from . import minerals
@@ -215,7 +213,9 @@ from . import eos
 
 # Tools
 from . import tools
+from .tools import geotherm
 from .tools.equilibration import equilibrate
+from .tools.partitioning import calculate_nakajima_fp_pv_partition_coefficient
 
 # Optimization functions
 from .optimize import composition_fitting
@@ -223,6 +223,3 @@ from .optimize import linear_fitting
 from .optimize import nonlinear_fitting
 from .optimize import nonlinear_solvers
 from .optimize import eos_fitting
-
-# Miscellaneous
-from .tools.partitioning import calculate_nakajima_fp_pv_partition_coefficient
