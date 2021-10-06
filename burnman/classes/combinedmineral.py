@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -11,8 +12,8 @@ import warnings
 from .mineral import Mineral, material_property
 from .solidsolution import SolidSolution
 from .solutionmodel import *
+from .averaging_schemes import reuss_average_function
 
-from ..averaging_schemes import reuss_average_function
 from ..tools.chemistry import sum_formulae
 from .. import constants
 
