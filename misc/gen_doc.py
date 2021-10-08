@@ -35,6 +35,7 @@ ordered_examples = ['example_mineral.py',
                     'example_perplex.py',
                     'example_polytopetools.py',
                     'example_equilibrate.py',
+                    'example_olivine_binary.py',
                     'example_geodynamic_adiabat.py',
                     'example_layer.py',
                     'example_build_planet.py'
@@ -50,5 +51,5 @@ all = os.listdir('../examples/')
 examples = list(filter(lambda k: re.match("^example(.*)\.py$", k), all))
 not_listed = list(filter(lambda x: (x not in ordered_examples), examples))
 
-for l in not_listed:
-    sys.stderr.write("WARNING EXAMPLE NOT LISTED: " + l + "\n")
+for example in not_listed:
+    sys.stderr.write("WARNING EXAMPLE NOT LISTED: " + example + "\n")

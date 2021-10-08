@@ -411,7 +411,6 @@ def jacobian(x, assemblage, equality_constraints,
 
     if len(reduced_free_composition_vectors) > 0:
         jacobian[-reduced_free_composition_vectors.shape[1]:, 2+len(reaction_hessian[0]):] = -reduced_free_composition_vectors.T
-
     return jacobian
 
 
@@ -508,7 +507,7 @@ def phase_composition_constraints(phase, assemblage, constraints, prm):
 
     These are then converted by this function into endmember proportions
     (n'*p/d'*p = v). Because the proportions must add up to zero,
-    we can reexpress this ratio into a linear constraint:
+    we can reexpress this ratio as a linear constraint:
     [(n'[1:] - n'[0]) - v*(d'[1:] - d'[0])]*xi = v*d0 - n0
     which is less easy for a human to understand
     (in terms of chemical constraints), but easier to use as a constraint
