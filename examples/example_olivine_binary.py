@@ -129,6 +129,8 @@ if __name__ == "__main__":
             else:
                 ax[0].plot(x_fe_m1s, pressures/1.e9, color=color)
             ax[0].plot(x_fe_m2s, pressures/1.e9, color=color)
+            ax[0].fill_betweenx(pressures/1.e9, x_fe_m1s, x_fe_m2s,
+                                color=color, alpha=0.2)
             i += 1
 
     ax[0].text(0.1, 6., 'olivine', horizontalalignment='left')

@@ -261,13 +261,11 @@ Advanced examples:
 
 .. figure:: figures/example_equilibrate_Figure_6_ol_polymorphs.png
 
+  A P-T pseudosection for a composition of Fe0.2Mg1.8SiO4 (fo90).
 
 .. raw:: latex
 
     \clearpage
-
-
-  A P-T pseudosection for a composition of Fe0.2Mg1.8SiO4 (fo90).
 
 .. automodule:: examples.example_olivine_binary
 
