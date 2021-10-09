@@ -67,18 +67,32 @@ if __name__ == '__main__':
 
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will set the temperature at 300 K.
     inner_core.set_temperature_mode('user-defined',
-        300.*np.ones_like(inner_core.radii))
+                                    300.*np.ones_like(inner_core.radii))
 
     # outer_core
-    outer_core = burnman.Layer('outer core', radii = np.linspace(1220.e3,3480.e3,10))
+    outer_core = burnman.Layer('outer core', radii=np.linspace(1220.e3,3480.e3,10))
     outer_core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
     # The minerals that make up our core do not currently implement the thermal equation of state, so we will define the temperature at 300 K.
     outer_core.set_temperature_mode('user-defined', 300.*np.ones_like(outer_core.radii))
 
     # Next the Mantle.
-    lower_mantle = burnman.Layer('lower mantle', radii = np.linspace(3480.e3, 5711.e3, 10))
+    lower_mantle_radii = np.linspace(3480.e3, 5711.e3, 101)
+    lower_mantle = burnman.Layer('lower mantle', radii=lower_mantle_radii)
     lower_mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
-    lower_mantle.set_temperature_mode('adiabatic')
+
+    # Here we add a thermal boundary layer perturbation, assuming that the
+    # lower mantle has a Rayleigh number of 1.e7, and that there
+    # is an 840 K jump across the basal thermal boundary layer and a
+    # 0 K jump at the top of the lower mantle.
+    tbl_perturbation = burnman.BoundaryLayerPerturbation(radius_bottom=3480.e3,
+                                                         radius_top=5711.e3,
+                                                         rayleigh_number=1.e7,
+                                                         Delta_T=840.,
+                                                         boundary_layer_ratio=0.)
+
+    lower_mantle_tbl = tbl_perturbation.temperature(lower_mantle_radii)
+    lower_mantle.set_temperature_mode('perturbed-adiabatic',
+                                      temperatures=lower_mantle_tbl)
     upper_mantle = burnman.Layer('upper mantle', radii = np.linspace(5711.e3, 6371e3, 10))
     upper_mantle.set_material(burnman.minerals.SLB_2011.forsterite())
     upper_mantle.set_temperature_mode('adiabatic', temperature_top = 1200.)
@@ -152,7 +166,9 @@ if __name__ == '__main__':
     ax[2].set_ylim(0., max(planet_zog.gravity) + 0.5)
 
     # Make a subplot showing the calculated temperature profile
-    ax[3].plot(planet_zog.radii / 1.e3, planet_zog.temperature, 'r', linewidth=2.)
+    mask = planet_zog.temperature > 301.
+    ax[3].plot(planet_zog.radii[mask] / 1.e3,
+               planet_zog.temperature[mask], 'r', linewidth=2.)
     ax[3].set_ylabel('Temperature ($K$)')
     ax[3].set_xlabel('Radius (km)')
     ax[3].set_ylim(0., max(planet_zog.temperature) + 100)
