@@ -931,9 +931,9 @@ class BoundaryLayerPerturbation(object):
         exponential scale factor is this number to the power of 1/4
         (Ra = c^4).
 
-    Delta_T : float
+    temperature_change : float
         The total difference in potential temperature across the layer [K].
-        Delta_T = (a + b)*exp(c)
+        temperature_change = (a + b)*exp(c)
 
     boundary_layer_ratio : float
         The ratio of the linear scale factors (a/b) corresponding to the
@@ -941,15 +941,17 @@ class BoundaryLayerPerturbation(object):
         greater than 1 implies a larger change in temperature across the
         top boundary than the bottom boundary.
     """
-    def __init__(self, radius_bottom, radius_top, rayleigh_number, Delta_T,
-                 boundary_layer_ratio):
+
+    def __init__(self, radius_bottom, radius_top, rayleigh_number,
+                 temperature_change, boundary_layer_ratio):
         self.r0 = radius_bottom
         self.r1 = radius_top
 
         self.Ra = rayleigh_number
         self.c = np.power(self.Ra, 1./4.)
 
-        self.a = Delta_T / (np.exp(self.c) * (1. + boundary_layer_ratio))
+        self.a = temperature_change / (np.exp(self.c)
+                                       * (1. + boundary_layer_ratio))
         self.b = - boundary_layer_ratio * self.a
 
     def temperature(self, radii):
@@ -966,8 +968,10 @@ class BoundaryLayerPerturbation(object):
         temperature : float or array
             The temperatures at the requested radii.
         """
-        return (self.a * np.exp((radii - self.r1)/(self.r0 - self.r1)*self.c)
-                + self.b * np.exp((radii - self.r0)/(self.r1 - self.r0)*self.c))
+        return (self.a * np.exp((radii - self.r1)
+                                / (self.r0 - self.r1)*self.c)
+                + self.b * np.exp((radii - self.r0)
+                                  / (self.r1 - self.r0)*self.c))
 
     def dTdr(self, radii):
         """
@@ -983,9 +987,11 @@ class BoundaryLayerPerturbation(object):
         dTdr : float or array
             The thermal gradient at the requested radii.
         """
-        return (self.c/(self.r0 - self.r1) *
-                (self.a * np.exp((radii - self.r1)/(self.r0 - self.r1)*self.c)
-                 - self.b * np.exp((radii - self.r0)/(self.r1 - self.r0)*self.c)))
+        return (self.c/(self.r0 - self.r1)
+                * (self.a * np.exp((radii - self.r1)
+                                   / (self.r0 - self.r1)*self.c)
+                   - self.b * np.exp((radii - self.r0)
+                                     / (self.r1 - self.r0)*self.c)))
 
     def set_model_thermal_gradients(self, dTdr_bottom, dTdr_top):
         """

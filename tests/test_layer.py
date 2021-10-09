@@ -88,7 +88,7 @@ class test_layer(BurnManTest):
         p = BoundaryLayerPerturbation(radius_bottom=3480.e3,
                                       radius_top=5711.e3,
                                       rayleigh_number=1.e7,
-                                      Delta_T=840.,
+                                      temperature_change=840.,
                                       boundary_layer_ratio=0.)
 
         Ts = p.temperature(np.array([3480.e3, 5711.e3]))
@@ -98,7 +98,7 @@ class test_layer(BurnManTest):
         p = BoundaryLayerPerturbation(radius_bottom=3480.e3,
                                       radius_top=5711.e3,
                                       rayleigh_number=1.e7,
-                                      Delta_T=1000.,
+                                      temperature_change=1000.,
                                       boundary_layer_ratio=0.25)
 
         Ts = p.temperature(np.array([3480.e3, 5711.e3]))
