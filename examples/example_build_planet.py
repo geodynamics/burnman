@@ -87,7 +87,7 @@ if __name__ == '__main__':
     tbl_perturbation = burnman.BoundaryLayerPerturbation(radius_bottom=3480.e3,
                                                          radius_top=5711.e3,
                                                          rayleigh_number=1.e7,
-                                                         Delta_T=840.,
+                                                         temperature_change=840.,
                                                          boundary_layer_ratio=0.)
 
     lower_mantle_tbl = tbl_perturbation.temperature(lower_mantle_radii)
