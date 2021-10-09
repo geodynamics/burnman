@@ -1,7 +1,7 @@
 Planet Zog consists of 4 layers:
 The inner core is made of Fe_Dewaele with user-defined temperatures and self-consistent pressures
 The outer core is made of Liquid_Fe_Anderson with user-defined temperatures and self-consistent pressures
-The lower mantle is made of Mg_Perovskite with adiabatic temperatures and self-consistent pressures
+The lower mantle is made of Mg_Perovskite with perturbed-adiabatic temperatures and self-consistent pressures
 The upper mantle is made of Forsterite with adiabatic temperatures and self-consistent pressures
 
 Iteration 1 maximum relative pressure error: 9.6e-01
