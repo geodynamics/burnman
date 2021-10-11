@@ -1,9 +1,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from burnman import minerals
-from burnman import Layer, Planet, Mineral, PerplexMaterial
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -12,6 +9,8 @@ from scipy.interpolate import UnivariateSpline
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
+from burnman import minerals
+from burnman import Layer, Planet, Mineral, PerplexMaterial
 
 import warnings
 
@@ -19,8 +18,6 @@ assert burnman_path  # silence pyflakes warning
 
 import urllib.request
 
-from burnman import Layer, Planet, Mineral, PerplexMaterial
-from burnman import minerals
 
 icb_radius = 1220.e3
 inner_core = Layer('inner core', radii=np.linspace(0., icb_radius, 21))
@@ -37,7 +34,6 @@ inner_core_material = Mineral(params=params,
 inner_core.set_material(inner_core_material)
 inner_core.set_temperature_mode('user-defined',
                                 np.nan*np.ones_like(inner_core.radii))
-
 
 cmb_radius = 3480.e3
 outer_core = Layer('outer core', radii=np.linspace(icb_radius, cmb_radius, 21))
@@ -59,18 +55,34 @@ urllib.request.urlretrieve("https://raw.githubusercontent.com/"
                            "pyrolite_perplex_table.dat")
 
 
-lab_radius = 6171.e3
-pyrolite = PerplexMaterial('./pyrolite_perplex_table.dat', name='pyrolite')
-convecting_mantle = Layer('convecting mantle',
-                          radii=np.linspace(cmb_radius, lab_radius, 101))
-convecting_mantle.set_material(pyrolite)
-convecting_mantle.set_temperature_mode('adiabatic')
-
-
+lab_radius = 6041.e3
 moho_radius = 6341.e3
-lab_temperature = 1600.
+lab_temperature = 1600. - 90.
 moho_temperature = 620.
 surface_temperature = 300.
+
+convecting_mantle_radii = np.linspace(cmb_radius, lab_radius, 101)
+pyrolite = PerplexMaterial('./pyrolite_perplex_table.dat', name='pyrolite')
+convecting_mantle = Layer('convecting mantle',
+                          radii=convecting_mantle_radii)
+convecting_mantle.set_material(pyrolite)
+
+# Here we add a thermal boundary layer perturbation, assuming that the
+# lower mantle has a Rayleigh number of 1.e7, and that there
+# is an 840 K jump across the basal thermal boundary layer and an
+# 84 K jump at the top of the lower mantle.
+tbl_perturbation = burnman.BoundaryLayerPerturbation(radius_bottom=cmb_radius,
+                                                     radius_top=lab_radius,
+                                                     rayleigh_number=1.e7,
+                                                     temperature_change=840.+90.,
+                                                     boundary_layer_ratio=90./840.)
+dTdr_top = ((moho_temperature - lab_temperature)
+            / (moho_radius - lab_radius))
+tbl_perturbation.set_model_thermal_gradients(-18.e-3, dTdr_top)
+
+lower_mantle_tbl = tbl_perturbation.temperature(convecting_mantle_radii)
+convecting_mantle.set_temperature_mode('perturbed-adiabatic',
+                                       temperatures=lower_mantle_tbl)
 
 dunite = minerals.SLB_2011.mg_fe_olivine(molar_fractions=[0.915, 0.085])
 lithospheric_mantle = Layer('lithospheric mantle',
