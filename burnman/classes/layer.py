@@ -104,7 +104,13 @@ class Layer(object):
             The desired fixed temperatures in [K].
             Should have same length as defined radii in layer.
         temperature_top : float
-            Temperature at the top for an adiabat.
+            Temperature at the top of the layer. Used if the temperature mode
+            is chosen to be 'adiabatic' or 'perturbed-adiabatic'.
+            If 'perturbed-adiabatic' is chosen as the temperature mode,
+            temperature_top corresponds to the true temperature at the
+            top of the layer, and the reference isentrope at this radius
+            is defined to lie at a temperature of
+            temperature_top - temperatures[-1].
         """
         self.reset()
         assert(temperature_mode == 'user-defined'
@@ -308,7 +314,9 @@ class Layer(object):
         """
         if ((self.temperature_mode == 'adiabatic'
              or self.temperature_mode == 'perturbed-adiabatic')):
-            adiabat = geotherm.adiabatic(pressures[::-1], temperature_top,
+            adiabat = geotherm.adiabatic(pressures[::-1],
+                                         temperature_top
+                                         - self.usertemperatures[-1],
                                          self.material)[::-1]
         else:
             adiabat = np.zeros_like(self.radii)
