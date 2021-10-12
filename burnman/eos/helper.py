@@ -19,6 +19,7 @@ from . import vinet
 from . import morse_potential
 from . import reciprocal_kprime
 from . import aa
+from . import brosh_calphad
 from .equation_of_state import EquationOfState
 
 
@@ -78,6 +79,8 @@ def create(method):
             return dks_liquid.DKS_L()
         elif method == "dks_s":
             return dks_solid.DKS_S()
+        elif method == "brosh_calphad":
+            return brosh_calphad.BroshCalphad()
         elif method == "combined":
             return CombinedMineralMethod()
         else:

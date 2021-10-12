@@ -1,0 +1,24 @@
+0.0001 1.0 0.7457638453925028 0.0003959115927596457
+0.0001 300.0 -0.32959291219958686 0.0002803380200182559
+1.0 1.0 0.5920831526891561 -1.6882014715946525e-05
+0.0001 1000.0 -0.7476791638400755 -0.0004271806888551666
+1.0 1000.0 -1.2944226238760166 -0.0007481539392468761
+3.0 1000.0 -2.559493837543414 -0.0005200049234046489
+10.0 1000.0 -5.329672390209453 -0.0005202957579744094
+40.0 1000.0 -9.573039395705564 1.8224257178012238e-05
+Checking EoS consistency for 'burnman.minerals.SE_2015.liquid_iron' (not including shear properties)
+Expressions within tolerance of 0.000100
+G = F + PV : True 
+G = H - TS : True 
+G = E - TS + PV : True 
+S = -dG/dT : True 
+alpha = 1/V dV/dT : True 
+C_p = T dS/dT : True 
+V = dG/dP  : True 
+K_T = -V dP/dV : True 
+C_v = Cp - alpha^2*K_T*V*T : True 
+K_S = K_T*Cp/Cv : True 
+gr = alpha*K_T*V/Cv : True 
+Vphi = np.sqrt(K_S/rho) : True 
+All EoS consistency constraints satisfied for 'burnman.minerals.SE_2015.liquid_iron'
+FCC-liq equilibrium at 21.0 GPa: 2513 K
