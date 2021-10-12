@@ -19,31 +19,47 @@ icb_radius = 1220.e3
 inner_core = Layer('inner core', radii=np.linspace(0., icb_radius, 21))
 Fe_Dewaele = minerals.other.Fe_Dewaele()
 params = Fe_Dewaele.params
+
+hcp_iron = minerals.SE_2015.hcp_iron()
+params = hcp_iron.params
+
 params['name'] = 'modified solid iron'
 params['formula'] = {'Fe': 1.0}
 inner_core_material = Mineral(params=params,
                               property_modifiers=[['linear',
                                                    {'delta_E': 0.,
                                                     'delta_S': 0.,
-                                                    'delta_V': 3.95e-7}]])
+                                                    'delta_V': 2.45e-7}]])
 
 inner_core.set_material(inner_core_material)
-inner_core.set_temperature_mode('user-defined',
-                                np.nan*np.ones_like(inner_core.radii))
+#inner_core.set_temperature_mode('user-defined',
+#                                np.nan*np.ones_like(inner_core.radii))
+
+inner_core.set_temperature_mode('adiabatic')
 
 cmb_radius = 3480.e3
 outer_core = Layer('outer core', radii=np.linspace(icb_radius, cmb_radius, 21))
 EPOC = minerals.ICL_2018.EPOC_vinet()
 params = EPOC.params
 params['name'] = 'modified EPOC'
+
+
+liq_iron = minerals.SE_2015.liquid_iron()
+params = liq_iron.params
+
+params['name'] = 'modified liquid iron'
+params['formula'] = {'Fe': 1.0}
+
 outer_core_material = Mineral(params=params,
                               property_modifiers=[['linear',
                                                    {'delta_E': 0.,
                                                     'delta_S': 0.,
-                                                    'delta_V': 4.e-8}]])
+                                                    'delta_V': 2.28e-7}]])
 outer_core.set_material(outer_core_material)
-outer_core.set_temperature_mode('user-defined',
-                                np.nan*np.ones_like(outer_core.radii))
+#outer_core.set_temperature_mode('user-defined',
+#                                np.nan*np.ones_like(outer_core.radii))
+
+outer_core.set_temperature_mode('adiabatic')
 
 urllib.request.urlretrieve("https://raw.githubusercontent.com/"
                            "bobmyhill/bobmyhill.github.io/master/"
@@ -134,7 +150,7 @@ ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
 
 bounds = np.array([[layer.radii[0]/1.e3, layer.radii[-1]/1.e3]
                    for layer in planet_zog.layers])
-maxy = [15, 400, 12, 4000]
+maxy = [15, 400, 12, 5000]
 for bound in bounds:
     for i in range(4):
         ax[i].fill_betweenx([0., maxy[i]],
