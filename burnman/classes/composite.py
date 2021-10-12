@@ -562,9 +562,10 @@ class Composite(Material):
         null_basis = np.array([v[:] for v in
                                self.stoichiometric_matrix.nullspace()],
                               dtype=float)
-
-        M = null_basis[:, self.dependent_element_indices]
-        assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
+        if null_basis.shape[0] != 0:
+            M = null_basis[:, self.dependent_element_indices]
+            assert ((M.shape[0] == M.shape[1])
+                    and (M == np.eye(M.shape[0])).all())
 
         return null_basis
 
