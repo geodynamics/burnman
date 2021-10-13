@@ -32,6 +32,21 @@ class mypericlase(burnman.Mineral):
 
 
 class geotherm(BurnManTest):
+    def test_brown_shankland(self):
+        T = burnman.geotherm.brown_shankland([600.e3])
+        self.assertArraysAlmostEqual(T, [1825.])
+
+    def test_anderson(self):
+        T = burnman.geotherm.anderson([621.e3])
+        self.assertArraysAlmostEqual(T, [1805.])
+
+    def test_stacey_continental(self):
+        T = burnman.geotherm.stacey_continental([11.e3, 620.e3])
+        self.assertArraysAlmostEqual(T, [540., 2225])
+
+    def test_stacey_oceanic(self):
+        T = burnman.geotherm.stacey_oceanic([11.e3, 620.e3])
+        self.assertArraysAlmostEqual(T, [550., 2225])
 
     def test_adiabat(self):
         rock = mypericlase()
