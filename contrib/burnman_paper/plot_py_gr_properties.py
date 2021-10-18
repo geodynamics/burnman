@@ -4,10 +4,21 @@ import numpy as np
 
 import burnman_path  # adds the local burnman directory to the path
 from burnman import minerals
-
+from burnman.tools.chemistry import formula_to_string
 assert burnman_path  # silence pyflakes warning
 
 gt = minerals.JH_2015.garnet()
+print(gt.endmember_names)
+
+gt.set_composition([0.4, 0., 0.6, 0., 0.])
+gt.set_state(5.e9, 1000.)
+
+np.set_printoptions(precision=0)
+print(f'Formula: {formula_to_string(gt.formula)}')
+print(f'Molar volume: {gt.V*1.e6:.2f} cm^3/mol')
+print(f'Partial entropies: {gt.partial_entropies}')
+
+
 
 comp = np.linspace(1e-5, 1.-1e-5, 101)
 temperatures = [600., 1000., 1400.]
