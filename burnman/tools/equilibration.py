@@ -407,10 +407,15 @@ def jacobian(x, assemblage, equality_constraints,
     # dfi_dxj converts the endmember hessian to the parameter hessian.
     reaction_hessian = assemblage.reaction_basis.dot(comp_hessian).dot(dfi_dxj)
     bulk_hessian = assemblage.reduced_stoichiometric_array.T.dot(dpi_dxj)
-    jacobian[ic:, 2:2+len(reaction_hessian[0])] = np.concatenate((reaction_hessian, bulk_hessian))
+
+    if reaction_hessian.shape[0] > 0:
+        jacobian[ic:, 2:2+len(reaction_hessian[0])] = np.concatenate((reaction_hessian, bulk_hessian))
+    else:
+        jacobian[ic:, 2:2+len(bulk_hessian[0])] = bulk_hessian
 
     if len(reduced_free_composition_vectors) > 0:
         jacobian[-reduced_free_composition_vectors.shape[1]:, 2+len(reaction_hessian[0]):] = -reduced_free_composition_vectors.T
+
     return jacobian
 
 
