@@ -372,9 +372,10 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
         List of sites, each of which contains a list of the species
         occupying each site.
 
-    site_multiplicities : numpy array of floats
-        List of floats giving the multiplicity of each site
-        Must be either the same length as the number of sites, or
+    site_multiplicities : 1D or 2D numpy array of floats
+        List of floats giving the multiplicity of each site.
+        If 2D, must have the same shape as endmember_occupancies.
+        If 1D, must be either the same length as the number of sites, or
         the same length as site_species_names
         (with an implied repetition of the same
         number for each species on a given site).
@@ -394,28 +395,45 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
         classic two-site pyrope garnet.
     """
 
-    # Site multiplicities should either be given on a per-site basis,
-    # or a per-species basis
-    if len(site_species_names) == len(site_multiplicities):
-        site_mults = []
+    site_multiplicities = np.array(site_multiplicities)
+    endmember_occupancies = np.array(endmember_occupancies)
+    n_endmembers = endmember_occupancies.shape[0]
 
-        for i, site in enumerate(site_species_names):
-            for species in site:
-                site_mults.append(site_multiplicities[i])
+    if len(site_multiplicities.shape) == 1:
+        # Site multiplicities should either be given on a per-site basis,
+        # or a per-species basis
+        if len(site_species_names) == len(site_multiplicities):
+            site_mults = []
 
-        site_multiplicities = site_mults
+            for i, site in enumerate(site_species_names):
+                for species in site:
+                    site_mults.append(site_multiplicities[i])
 
-    elif len(endmember_occupancies[0]) != len(site_multiplicities):
-        raise Exception(
-            'Site multiplicities should either be given on a per-site basis or a per-species basis')
+            site_multiplicities = np.array(site_mults)
+
+        elif len(endmember_occupancies[0]) != len(site_multiplicities):
+            raise Exception('Site multiplicities should either be given '
+                            'on a per-site basis or a per-species basis')
+
+        site_multiplicities = np.einsum('i, j->ij', np.ones(n_endmembers),
+                                        site_multiplicities)
+    elif len(site_multiplicities.shape) == 2:
+        if site_multiplicities.shape != endmember_occupancies.shape:
+            raise Exception('If site_multiplicities is 2D, it should have '
+                            'the same shape as endmember_occupancies. '
+                            'They currently have shapes '
+                            f'{site_multiplicities.shape} and '
+                            f'{endmember_occupancies.shape}.')
+    else:
+        raise Exception('Site multiplicities should either be 1D or 2D.')
 
     site_formulae = []
-    for mbr_occupancies in endmember_occupancies:
+    for i_mbr, mbr_occupancies in enumerate(endmember_occupancies):
         i = 0
         site_formulae.append('')
         for site in site_species_names:
             amounts = mbr_occupancies[i:i+len(site)]
-            mult = site_multiplicities[i]
+            mult = site_multiplicities[i_mbr,i]
             if np.abs(mult - 1.) < 1.e-12:
                 mult = ''
             else:

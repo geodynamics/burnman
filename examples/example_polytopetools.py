@@ -140,7 +140,7 @@ if __name__ == "__main__":
     print(gt_poly.endmembers_as_independent_endmember_amounts)
 
     strs = site_occupancies_to_strings(gt.solution_model.sites,
-                                       gt.solution_model.site_multiplicities,
+                                       gt.solution_model.site_multiplicities[0],
                                        gt_poly.endmember_occupancies)
 
     print('Site occupancies for all endmembers:')

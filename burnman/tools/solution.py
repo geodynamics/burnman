@@ -286,8 +286,10 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
     # Create site formulae
     new_occupancies = np.array(new_basis).dot(
         solution.solution_model.endmember_occupancies)
+    new_multiplicities = np.array(new_basis).dot(
+        solution.solution_model.site_multiplicities)
     site_formulae = site_occupancies_to_strings(solution.solution_model.sites,
-                                                solution.solution_model.site_multiplicities,
+                                                new_multiplicities,
                                                 new_occupancies)
 
     # Create endmembers
