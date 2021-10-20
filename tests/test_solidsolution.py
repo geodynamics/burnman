@@ -11,7 +11,7 @@ from burnman import Mineral
 from burnman import CombinedMineral
 from burnman.tools.chemistry import dictionarize_formula, formula_mass
 from burnman.tools.chemistry import formula_to_string, sum_formulae
-
+from burnman.minerals import HGP_2018_ds633
 assert burnman_path  # silence pyflakes warning
 
 
@@ -228,6 +228,20 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
         burnman.SolidSolution.__init__(self, molar_fractions)
 
 
+# Temkin solution
+class temkin_ss(burnman.SolidSolution):
+
+    def __init__(self, molar_fractions=None):
+        self.name = 'ol-q-water melt (HGP 2018)'
+        self.solution_type = 'ideal'
+        self.endmembers = [[HGP_2018_ds633.foL(), '[Mg]4[Sitet]1[Vac]2'],
+                           [HGP_2018_ds633.faL(), '[Fe]4[Sitet]1[Vac]2'],
+                           [HGP_2018_ds633.qL(), '[]0[Sinet]1[Vac]2'],
+                           [HGP_2018_ds633.h2oL(), '[]0[]0[H]2']]
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
 class test_solidsolution(BurnManTest):
 
     def setup_1min_ss(self):
@@ -412,8 +426,7 @@ class test_solidsolution(BurnManTest):
         ss.set_composition(f0 + df/2.)
         dGdx2 = ss.partial_gibbs
 
-        for i in range(3):
-            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+        self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
     def test_subregular_model_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_asymmetric()
@@ -428,8 +441,7 @@ class test_solidsolution(BurnManTest):
         ss.set_composition(f0 + df/2.)
         dGdx2 = ss.partial_gibbs
 
-        for i in range(3):
-            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+        self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
     def test_subregular_model_ternary_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_ternary()
@@ -444,8 +456,7 @@ class test_solidsolution(BurnManTest):
         ss.set_composition(f0 + df/2.)
         dGdx2 = ss.partial_gibbs
 
-        for i in range(3):
-            self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+        self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
     def test_subregular(self):
         ss0 = two_site_ss()
@@ -517,6 +528,41 @@ class test_solidsolution(BurnManTest):
         self.assertTrue(opx.n_reactions == 1)
         self.assertArraysAlmostEqual(opx.reaction_basis[0],
                                      [-1./2., -1./2., 1., 0., 0., 0., 0.])
+
+    def test_temkin_activities(self):
+        ss = temkin_ss()
+        f0 = np.array([0.25, 0.35, 0.3, 0.1])
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+
+        dGdx = ss.partial_gibbs
+
+        df = 0.0001
+        dGdx2 = np.empty(4)
+        for i, f_mod in enumerate(np.eye(4)*df):
+            ss.set_composition((f0-f_mod/2)/(1. - df/2.))
+            G0 = ss.gibbs * (1. - df/2.)
+            ss.set_composition((f0+f_mod/2)/(1. + df/2.))
+            G1 = ss.gibbs * (1. + df/2.)
+
+            dGdx2[i] = (G1 - G0)/df
+
+        self.assertArraysAlmostEqual(dGdx, dGdx2)
+
+    def test_temkin_hessian(self):
+        ss = temkin_ss()
+        f0 = np.array([0.25, 0.35, 0.3, 0.1])
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+        H0 = ss.gibbs_hessian
+
+        df = np.array([2.e-6, -1.5e-6, -0.6e-6, 0.1e-6])
+        ss.set_composition(f0 - df/2.)
+        dGdx1 = ss.partial_gibbs
+        ss.set_composition(f0 + df/2.)
+        dGdx2 = ss.partial_gibbs
+
+        self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
 
 if __name__ == '__main__':
