@@ -155,8 +155,9 @@ Advanced examples:
   - :mod:`~examples.example_compare_all_methods`,
   - :mod:`~examples.example_build_planet`,
   - :mod:`~examples.example_fit_eos`,,
-  - :mod:`~examples.example_fit_composition`, and
-  - :mod:`~examples.example_equilibrate`.
+  - :mod:`~examples.example_fit_composition`
+  - :mod:`~examples.example_equilibrate`, and
+  - :mod:`~examples.example_olivine_binary`.
 
 .. automodule:: examples.example_spintransition
 
@@ -262,10 +263,17 @@ Advanced examples:
 
   A P-T pseudosection for a composition of Fe0.2Mg1.8SiO4 (fo90).
 
-
 .. raw:: latex
 
     \clearpage
+
+.. automodule:: examples.example_olivine_binary
+
+*Resulting figures:*
+
+.. figure:: figures/example_olivine_binary_Figure_1.png
+
+  The olivine polymorph binary phase diagram according to :cite:`Stixrude2011`.
 
 
 .. _ref-example-paper:
