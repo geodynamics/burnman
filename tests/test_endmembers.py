@@ -109,25 +109,32 @@ class test_endmembers(BurnManTest):
             bdg.isothermal_bulk_modulus, bdg.adiabatic_bulk_modulus)
 
     def test_make_mbr(self):
-     bdg = burnman.minerals.SLB_2011.mg_perovskite()
-     dS = 1.
-     made_bdg = CombinedMineral([bdg, bdg], [2., -1.], [0., dS, 0.])
-     bdg.set_state(1.e5, 1000.)
-     made_bdg.set_state(1.e5, 1000.)
-     self.assertFloatEqual(bdg.S + dS, made_bdg.S)
+        bdg = burnman.minerals.SLB_2011.mg_perovskite()
+        dS = 1.
+        made_bdg = CombinedMineral([bdg, bdg], [2., -1.], [0., dS, 0.])
+        bdg.set_state(1.e5, 1000.)
+        made_bdg.set_state(1.e5, 1000.)
+        self.assertFloatEqual(bdg.S + dS, made_bdg.S)
 
     def test_make_mbr2(self):
-     per = burnman.minerals.SLB_2011.periclase()
-     stv = burnman.minerals.SLB_2011.stishovite()
-     dE = -15000.
-     made_bdg = CombinedMineral([burnman.minerals.SLB_2011.periclase(),
-                                 burnman.minerals.SLB_2011.stishovite()],
-                                [1., 1.], [dE, 0., 0.])
+        per = burnman.minerals.SLB_2011.periclase()
+        stv = burnman.minerals.SLB_2011.stishovite()
+        dE = -15000.
+        made_bdg = CombinedMineral([burnman.minerals.SLB_2011.periclase(),
+                                    burnman.minerals.SLB_2011.stishovite()],
+                                   [1., 1.], [dE, 0., 0.])
 
-     per.set_state(1.e5, 1000.)
-     stv.set_state(1.e5, 1000.)
-     made_bdg.set_state(1.e5, 1000.)
-     self.assertFloatEqual(made_bdg.V, per.V + stv.V)
+        per.set_state(1.e5, 1000.)
+        stv.set_state(1.e5, 1000.)
+        made_bdg.set_state(1.e5, 1000.)
+        self.assertFloatEqual(made_bdg.V, per.V + stv.V)
+
+    def test_brosh_pressure(self):
+        fcc = burnman.minerals.SE_2015.fcc_iron()
+        fcc.set_state(1.e9, 500.)
+        self.assertTrue(abs(fcc.pressure
+                            - fcc.method.pressure(500., fcc.V,
+                                                  fcc.params)) < 1000.)
 
 
 if __name__ == '__main__':

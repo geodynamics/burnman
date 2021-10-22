@@ -46,5 +46,8 @@ Mineral databases
 .. automodule::  burnman.minerals.JH_2015
   :no-inherited-members:
 
+.. automodule::  burnman.minerals.SE_2015
+  :no-inherited-members:
+
 .. automodule::  burnman.minerals.other
   :no-inherited-members:
