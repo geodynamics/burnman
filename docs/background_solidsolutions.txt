@@ -19,16 +19,26 @@ Implemented models
 
 Ideal solid solutions
 """""""""""""""""""""
-A solid solution is not simply a mechanical mixture of its constituent endmembers. The mixing of different elements on sites results in an excess configurational entropy
+A solid solution is not simply a mechanical mixture of its constituent endmembers.
+The mixing of different species on sites results in an excess configurational entropy :math:`S`.
+In Bragg-Williams-type solutions, the entropy only depends on the amounts of
+species on sites, and the site multiplicities.
+
 
 .. math::
-    \mathcal{S}_{\textrm{conf}} = R \ln \prod_s (X_c^s)^{\nu}
+    \mathcal{S}_{\textrm{conf}} = R x_c^s \ln \frac{x_c^s}{\sum_{c^s} x_c^s}
 
 
-where :math:`s` is a site in the lattice :math:`M`, :math:`c` are the cations mixing on site :math:`s` and :math:`\nu` is the number of :math:`s` sites in the formula unit. Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*. From this expression, we can see that
+where :math:`s` is a site in the lattice, :math:`c` are the species mixing on site :math:`s`.
+:math:`x_c^s` is the absolute number of species :math:`c` on site :math:`s` in the lattice; it is calculated by
+multiplying the proportion of the species on the site by the multiplicity of the site per formula unit and the
+number of moles of formula units.
 
-.. math::
-    \alpha_{\textrm{ideal}, i} = \prod_s (X_c^s)^{\nu}
+Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
+In BurnMan, the multiplicities of each site are allowed to vary linearly between endmembers. This is known as a Temkin
+model :cite:`Temkin1945`.
+
+
 
 Symmetric solid solutions
 """""""""""""""""""""""""

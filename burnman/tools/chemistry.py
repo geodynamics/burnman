@@ -244,10 +244,12 @@ def process_solution_chemistry(solution_model):
         n_occupancies = 5, with two possible species on
         Site 1 and three on Site 2
 
-    site_multiplicities : array of floats or 2D array of floats
-        The number of each site per formula unit
+    site_multiplicities : 2D array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the multiplicities of each site per formula unit.
         To simplify computations later, the multiplicities
-        are repeated for each species on each site
+        are repeated for each species on each site, so the shape of
+        this attribute is (n_endmembers, n_site_species).
 
     endmember_occupancies : 2d array of floats
         A 1D array for each endmember in the solid solution,

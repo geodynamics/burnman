@@ -347,9 +347,14 @@ class MechanicalSolution (SolutionModel):
 class IdealSolution (SolutionModel):
 
     """
-    A very simple class representing an ideal solution model.
-    Calculate the excess gibbs free energy and entropy due to configurational
-    entropy, excess volume is equal to zero.
+    A class representing an ideal solution model.
+    Calculates the excess gibbs free energy and entropy due to configurational
+    entropy. Excess internal energy and volume are equal to zero.
+
+    The multiplicity of each type of site in the structure is allowed to
+    change linearly as a function of endmember proportions. This class
+    is therefore equivalent to the entropic part of
+    a Temkin-type model :cite:`Temkin1945`. 
     """
 
     def __init__(self, endmembers):

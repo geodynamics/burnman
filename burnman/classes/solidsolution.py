@@ -257,7 +257,7 @@ class SolidSolution(Mineral):
     @material_property
     def partial_gibbs(self):
         """
-        Returns excess partial molar gibbs free energy [J/mol].
+        Returns endmember partial molar gibbs free energy [J/mol].
         Property specific to solid solutions.
         """
         return (np.array([self.endmembers[i][0].gibbs
@@ -267,7 +267,7 @@ class SolidSolution(Mineral):
     @material_property
     def partial_volumes(self):
         """
-        Returns excess partial volumes [m^3].
+        Returns endmember partial volumes [m^3].
         Property specific to solid solutions.
         """
         return (np.array([self.endmembers[i][0].molar_volume
@@ -277,7 +277,7 @@ class SolidSolution(Mineral):
     @material_property
     def partial_entropies(self):
         """
-        Returns excess partial entropies [J/K].
+        Returns endmember partial entropies [J/K].
         Property specific to solid solutions.
         """
         return (np.array([self.endmembers[i][0].molar_entropy

@@ -529,7 +529,46 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual(opx.reaction_basis[0],
                                      [-1./2., -1./2., 1., 0., 0., 0., 0.])
 
+    def test_temkin_entropies(self):
+        ss = temkin_ss()
+        # '[Mg]4[Sitet]1[Vac]2'],
+        # '[Fe]4[Sitet]1[Vac]2'],
+        # '[]0[Sinet]1[Vac]2'],
+        # '[]0[]0[H]2']]
+        R = burnman.constants.gas_constant
+        ss.set_state(1.e9, 600.)
+
+        S = np.empty((4, 2))
+
+        ss.set_composition([0.5, 0.5, 0., 0.])
+        S[0] = [ss.excess_entropy, -4.*R*np.log(0.5)]
+
+        ss.set_composition([0.5, 0., 0.5, 0.])
+        S[1] = [ss.excess_entropy, -R*np.log(0.5)]
+
+        ss.set_composition([0.25, 0.25, 0.5, 0.])
+        S[2] = [ss.excess_entropy, -3.*R*np.log(0.5)]
+
+        ss.set_composition([0., 0., 0.5, 0.5])
+        S[3] = [ss.excess_entropy, -2.*R*np.log(0.5)]
+
+        self.assertArraysAlmostEqual(S[:,0], S[:,1])
+
+
     def test_temkin_activities(self):
+        ss = temkin_ss()
+        f0 = np.array([0.25, 0.35, 0.3, 0.1])
+        ss.set_composition(f0)
+        ss.set_state(1.e5, 300.)
+
+        S_partial = ss.excess_partial_entropies
+        activities = ss.activities
+
+        self.assertArraysAlmostEqual(np.exp(-S_partial
+                                            / burnman.constants.gas_constant),
+                                     activities)
+
+    def test_temkin_partial_gibbs(self):
         ss = temkin_ss()
         f0 = np.array([0.25, 0.35, 0.3, 0.1])
         ss.set_composition(f0)
@@ -548,6 +587,7 @@ class test_solidsolution(BurnManTest):
             dGdx2[i] = (G1 - G0)/df
 
         self.assertArraysAlmostEqual(dGdx, dGdx2)
+
 
     def test_temkin_hessian(self):
         ss = temkin_ss()
