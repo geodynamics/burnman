@@ -29,6 +29,7 @@ from .reciprocal_kprime import RKprime
 from .dks_liquid import DKS_L
 from .dks_solid import DKS_S
 from .aa import AA
+from .brosh_calphad import BroshCalphad
 
 from .property_modifiers import calculate_property_modifications
 
