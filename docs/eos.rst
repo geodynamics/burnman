@@ -133,6 +133,6 @@ CoRK
 
 
 Brosh et al. (2007)
-----
+-------------------
 
 .. autoclass:: burnman.eos.BroshCalphad
