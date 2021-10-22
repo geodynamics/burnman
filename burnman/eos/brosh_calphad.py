@@ -5,17 +5,20 @@ from __future__ import absolute_import
 # GPL v2 or later.
 
 import numpy as np
-from . import equation_of_state as eos
 import warnings
 import pkgutil
+from scipy.optimize import brentq
 from scipy.special import binom
+
+from . import equation_of_state as eos
 from ..constants import gas_constant
+from ..tools.math import bracket
 
 
 class BroshCalphad(eos.EquationOfState):
     """
     Class for the high pressure CALPHAD equation of state by
-    Brosh et al. (2007).
+    :cite:`Brosh2007`.
     """
 
     def volume(self, pressure, temperature, params):
@@ -49,8 +52,17 @@ class BroshCalphad(eos.EquationOfState):
         return V_c + V_qh + V_th
 
     def pressure(self, temperature, volume, params):
-        return NotImplementedError('Pressure not implemented for '
-                                   'BroshCalphad EoS')
+        def _delta_volume(pressure, temperature, volume):
+            return self.volume(pressure, temperature, params) - volume
+
+        args = (temperature, volume)
+        try:
+            sol = bracket(_delta_volume, 300.e9, 1.e5, args)
+        except ValueError:
+            raise Exception('Cannot find a pressure, perhaps you are outside '
+                            'the range of validity for the equation of state?')
+
+        return brentq(_delta_volume, sol[0], sol[1], args=args)
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """
@@ -312,7 +324,7 @@ class BroshCalphad(eos.EquationOfState):
 
     def calculate_transformed_parameters(self, params):
         """
-        This function calculates the "c" parameters of the Brosh et al. (2007)
+        This function calculates the "c" parameters of the :cite:`Brosh2007`
         equation of state.
         """
         Zs = pkgutil.get_data('burnman',
