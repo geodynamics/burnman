@@ -6,6 +6,8 @@ Layer
 
 .. autoclass:: burnman.Layer
 
+.. autoclass:: burnman.BoundaryLayerPerturbation
+
 
 Planet
 ------

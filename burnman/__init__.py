@@ -199,7 +199,7 @@ from .classes.mineral_helpers import HelperRockSwitcher
 
 # Other classes
 from .classes.composition import Composition
-from .classes.layer import Layer
+from .classes.layer import Layer, BoundaryLayerPerturbation
 from .classes.planet import Planet
 from .classes.polytope import MaterialPolytope
 from .classes import seismic

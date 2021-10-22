@@ -5,7 +5,7 @@ from util import BurnManTest
 import numpy as np
 import burnman_path
 import burnman
-from burnman import Layer
+from burnman import Layer, BoundaryLayerPerturbation
 
 assert burnman_path  # silence pyflakes warning
 
@@ -84,6 +84,30 @@ class test_layer(BurnManTest):
         self.assertArraysAlmostEqual(d[0], d0)
         self.assertArraysAlmostEqual(d[1], d1)
 
+    def test_tbl(self):
+        p = BoundaryLayerPerturbation(radius_bottom=3480.e3,
+                                      radius_top=5711.e3,
+                                      rayleigh_number=1.e7,
+                                      temperature_change=840.,
+                                      boundary_layer_ratio=0.)
+
+        Ts = p.temperature(np.array([3480.e3, 5711.e3]))
+        self.assertArraysAlmostEqual(Ts, [840., 0.])
+
+
+        p = BoundaryLayerPerturbation(radius_bottom=3480.e3,
+                                      radius_top=5711.e3,
+                                      rayleigh_number=1.e7,
+                                      temperature_change=1000.,
+                                      boundary_layer_ratio=0.25)
+
+        Ts = p.temperature(np.array([3480.e3, 5711.e3]))
+        self.assertArraysAlmostEqual(Ts, [800., -200.])
+
+        p.set_model_thermal_gradients(-18./1.e3, -0.6/1.e3)
+
+        dTdrs = p.dTdr(np.array([3480.e3, 5711.e3]))
+        self.assertArraysAlmostEqual(dTdrs, [-18./1.e3, -0.6/1.e3])
 
 if __name__ == '__main__':
     unittest.main()

@@ -8,6 +8,7 @@ import numpy as np
 from scipy.integrate import odeint
 from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
+from scipy.optimize import fsolve
 from burnman import constants
 from burnman.tools import geotherm
 import warnings
@@ -103,7 +104,13 @@ class Layer(object):
             The desired fixed temperatures in [K].
             Should have same length as defined radii in layer.
         temperature_top : float
-            Temperature at the top for an adiabat.
+            Temperature at the top of the layer. Used if the temperature mode
+            is chosen to be 'adiabatic' or 'perturbed-adiabatic'.
+            If 'perturbed-adiabatic' is chosen as the temperature mode,
+            temperature_top corresponds to the true temperature at the
+            top of the layer, and the reference isentrope at this radius
+            is defined to lie at a temperature of
+            temperature_top - temperatures[-1].
         """
         self.reset()
         assert(temperature_mode == 'user-defined'
@@ -307,7 +314,9 @@ class Layer(object):
         """
         if ((self.temperature_mode == 'adiabatic'
              or self.temperature_mode == 'perturbed-adiabatic')):
-            adiabat = geotherm.adiabatic(pressures[::-1], temperature_top,
+            adiabat = geotherm.adiabatic(pressures[::-1],
+                                         temperature_top
+                                         - self.usertemperatures[-1],
                                          self.material)[::-1]
         else:
             adiabat = np.zeros_like(self.radii)
@@ -903,3 +912,115 @@ class Layer(object):
     def C_p(self):
         """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
         return self.molar_heat_capacity_p
+
+
+class BoundaryLayerPerturbation(object):
+    """
+    A class that implements a temperature perturbation model corresponding to a
+    simple thermal boundary layer.
+    The model takes the following form:
+    T = a*exp((r - r1)/(r0 - r1)*c) + b*exp((r - r0)/(r1 - r0)*c)
+    The relationships between the input parameters and a, b and c are
+    given below.
+
+    This model is a simpler version of that proposed
+    by :cite:`Richter1981`.
+
+    Parameters
+    ----------
+    radius_bottom : float
+        The radius at the bottom of the layer (r0) [m].
+
+    radius_top : float
+        The radius at the top of the layer (r1) [m].
+
+    rayleigh_number : float
+        The Rayleigh number of convection within the layer. The
+        exponential scale factor is this number to the power of 1/4
+        (Ra = c^4).
+
+    temperature_change : float
+        The total difference in potential temperature across the layer [K].
+        temperature_change = (a + b)*exp(c)
+
+    boundary_layer_ratio : float
+        The ratio of the linear scale factors (a/b) corresponding to the
+        thermal boundary layers at the top and bottom of the layer. A number
+        greater than 1 implies a larger change in temperature across the
+        top boundary than the bottom boundary.
+    """
+
+    def __init__(self, radius_bottom, radius_top, rayleigh_number,
+                 temperature_change, boundary_layer_ratio):
+        self.r0 = radius_bottom
+        self.r1 = radius_top
+
+        self.Ra = rayleigh_number
+        self.c = np.power(self.Ra, 1./4.)
+
+        self.a = temperature_change / (np.exp(self.c)
+                                       * (1. + boundary_layer_ratio))
+        self.b = - boundary_layer_ratio * self.a
+
+    def temperature(self, radii):
+        """
+        Returns the temperature at one or more radii [K].
+
+        Parameters
+        ----------
+        radii : float or array
+            The radii at which to evaluate the temperature.
+
+        Returns
+        -------
+        temperature : float or array
+            The temperatures at the requested radii.
+        """
+        return (self.a * np.exp((radii - self.r1)
+                                / (self.r0 - self.r1)*self.c)
+                + self.b * np.exp((radii - self.r0)
+                                  / (self.r1 - self.r0)*self.c))
+
+    def dTdr(self, radii):
+        """
+        Returns the thermal gradient at one or more radii [K/m].
+
+        Parameters
+        ----------
+        radii : float or array
+            The radii at which to evaluate the thermal gradients.
+
+        Returns
+        -------
+        dTdr : float or array
+            The thermal gradient at the requested radii.
+        """
+        return (self.c/(self.r0 - self.r1)
+                * (self.a * np.exp((radii - self.r1)
+                                   / (self.r0 - self.r1)*self.c)
+                   - self.b * np.exp((radii - self.r0)
+                                     / (self.r1 - self.r0)*self.c)))
+
+    def set_model_thermal_gradients(self, dTdr_bottom, dTdr_top):
+        """
+        Reparameterizes the model based on the thermal gradients
+        at the bottom and top of the model.
+
+        Parameters
+        ----------
+        dTdr_bottom : float
+            The thermal gradient at the bottom of the model [K/m].
+            Typically negative for a cooling planet.
+
+        dTdr_top : float
+            The thermal gradient at the top of the model [K/m].
+            Typically negative for a cooling planet.
+        """
+        def delta_dTdrs(args, dTdr_bottom, dTdr_top):
+            a, b = args
+            self.a = a
+            self.b = b
+
+            return [dTdr_bottom - self.dTdr(self.r0),
+                    dTdr_top - self.dTdr(self.r1)]
+        fsolve(delta_dTdrs, [self.a, self.b], args=(dTdr_bottom, dTdr_top))
