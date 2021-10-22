@@ -13,7 +13,7 @@ using the equation of state of :cite:`Brosh2007`.
 
 1 bar gibbs free energy coefficients are given in the following order:
 [[T_max, [const, T, T*ln(T), T^(-1), T^(-2), T^(-3), T^(-9),
-          T^2, T^3, T^4, T^7, T^(1/2), ln(T)]]
+T^2, T^3, T^4, T^7, T^(1/2), ln(T)]]
 """
 
 from __future__ import absolute_import

@@ -134,7 +134,7 @@ class test_endmembers(BurnManTest):
         fcc.set_state(1.e9, 500.)
         self.assertTrue(abs(fcc.pressure
                             - fcc.method.pressure(500., fcc.V,
-                                                  fcc.params)) < 10.)
+                                                  fcc.params)) < 1000.)
 
 
 if __name__ == '__main__':

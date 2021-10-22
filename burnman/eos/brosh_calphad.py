@@ -52,17 +52,16 @@ class BroshCalphad(eos.EquationOfState):
         return V_c + V_qh + V_th
 
     def pressure(self, temperature, volume, params):
-        def _delta_volume(pressure, temperature, volume):
-            return self.volume(pressure, temperature, params) - volume
+        def _delta_volume(pressure):
+            return (self.volume(pressure, temperature, params) - volume)
 
-        args = (temperature, volume)
         try:
-            sol = bracket(_delta_volume, 300.e9, 1.e5, args)
+            sol = bracket(_delta_volume, 300.e9, 1.e5, ())
         except ValueError:
             raise Exception('Cannot find a pressure, perhaps you are outside '
                             'the range of validity for the equation of state?')
 
-        return brentq(_delta_volume, sol[0], sol[1], args=args)
+        return brentq(_delta_volume, sol[0], sol[1])
 
     def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
         """

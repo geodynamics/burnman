@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -19,6 +20,7 @@ Mineral database
   - :mod:`~burnman.minerals.HP_2011_fluids`
   - :mod:`~burnman.minerals.HHPH_2013`
   - :mod:`~burnman.minerals.HGP_2018_ds633`
+  - :mod:`~burnman.minerals.SE_2015`
   - :mod:`~burnman.minerals.other`
 """
 from __future__ import absolute_import

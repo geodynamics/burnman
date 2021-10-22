@@ -128,4 +128,11 @@ Anderson and Ahrens (1994)
 
 CoRK
 ----
+
 .. autoclass:: burnman.eos.CORK
+
+
+Brosh et al. (2007)
+----
+
+.. autoclass:: burnman.eos.BroshCalphad
