@@ -57,6 +57,52 @@ def anderson(depths):
     return temperature
 
 
+def stacey_continental(depths):
+    """
+    Continental geotherm from :cite:`stacey1977`.
+
+    Parameters
+    ----------
+    depths : list of floats
+        The list of depths at which to evaluate the geotherm. :math:`[m]`
+
+    Returns
+    -------
+    temperature : list of floats
+        The list of temperatures for each of the pressures. :math:`[K]`
+    """
+    assert(min(depths) >= min(table_stacey_c_depth))
+    assert(max(depths) <= max(table_stacey_c_depth))
+    temperature = np.empty_like(depths)
+    for i, depth in enumerate(depths):
+        temperature[i] = lookup_and_interpolate(
+                table_stacey_c_depth, table_stacey_c_temperature, depth)
+    return temperature
+
+
+def stacey_oceanic(depths):
+    """
+    Oceanic geotherm from :cite:`stacey1977`.
+
+    Parameters
+    ----------
+    depths : list of floats
+        The list of depths at which to evaluate the geotherm. :math:`[m]`
+
+    Returns
+    -------
+    temperature : list of floats
+        The list of temperatures for each of the pressures. :math:`[K]`
+    """
+    assert(min(depths) >= min(table_stacey_o_depth))
+    assert(max(depths) <= max(table_stacey_o_depth))
+    temperature = np.empty_like(depths)
+    for i, depth in enumerate(depths):
+        temperature[i] = lookup_and_interpolate(
+                table_stacey_o_depth, table_stacey_o_temperature, depth)
+    return temperature
+
+
 def adiabatic(pressures, T0, rock):
     """
     This calculates a geotherm based on an anchor temperature and a rock,
@@ -118,3 +164,11 @@ table_brown_temperature = np.array(table_brown)[:, 1]
 table_anderson = read_table("input_geotherm/anderson_82.txt")
 table_anderson_depth = np.array(table_anderson)[:, 0]
 table_anderson_temperature = np.array(table_anderson)[:, 1]
+
+table_stacey_c = read_table("input_geotherm/Stacey_1977_continents.txt")
+table_stacey_c_depth = np.array(table_stacey_c)[:, 0]
+table_stacey_c_temperature = np.array(table_stacey_c)[:, 1]
+
+table_stacey_o = read_table("input_geotherm/Stacey_1977_oceans.txt")
+table_stacey_o_depth = np.array(table_stacey_o)[:, 0]
+table_stacey_o_temperature = np.array(table_stacey_o)[:, 1]
