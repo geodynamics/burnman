@@ -390,7 +390,7 @@ if __name__ == "__main__":
           '{1} endmembers are:'.format(n_ind, n_all))
 
     occs = site_occupancies_to_strings(cpx.solution_model.sites,
-                                       cpx.solution_model.site_multiplicities,
+                                       cpx.solution_model.site_multiplicities[0],
                                        all_site_occupancies)
     for occ in occs:
         print(occ)

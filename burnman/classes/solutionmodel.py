@@ -9,12 +9,15 @@ from ..tools.chemistry import process_solution_chemistry
 from .. import constants
 
 
-def _ideal_activities_fct(molar_fractions, endmember_occupancies, n_endmembers,
+def _ideal_activities_fct(molar_fractions, endmember_noccupancies, n_endmembers,
                           n_occupancies, site_multiplicities,
                           endmember_configurational_entropies):
-    site_occupancies = np.dot(molar_fractions, endmember_occupancies)
-    a = np.power(site_occupancies,
-                 endmember_occupancies * site_multiplicities).prod(-1)
+    site_noccupancies = np.dot(molar_fractions, endmember_noccupancies)
+    site_multiplicities = np.einsum('i, ij', molar_fractions,
+                                    site_multiplicities)
+    site_occupancies = site_noccupancies * inverseish(site_multiplicities)
+
+    a = np.power(site_occupancies, endmember_noccupancies).prod(-1)
     normalisation_constants = np.exp(endmember_configurational_entropies
                                      / constants.gas_constant)
     return normalisation_constants * a
@@ -344,9 +347,14 @@ class MechanicalSolution (SolutionModel):
 class IdealSolution (SolutionModel):
 
     """
-    A very simple class representing an ideal solution model.
-    Calculate the excess gibbs free energy and entropy due to configurational
-    entropy, excess volume is equal to zero.
+    A class representing an ideal solution model.
+    Calculates the excess gibbs free energy and entropy due to configurational
+    entropy. Excess internal energy and volume are equal to zero.
+
+    The multiplicity of each type of site in the structure is allowed to
+    change linearly as a function of endmember proportions. This class
+    is therefore equivalent to the entropic part of
+    a Temkin-type model :cite:`Temkin1945`. 
     """
 
     def __init__(self, endmembers):
@@ -359,16 +367,18 @@ class IdealSolution (SolutionModel):
         self._calculate_endmember_configurational_entropies()
 
     def _calculate_endmember_configurational_entropies(self):
-        S_conf = -constants.gas_constant * (self.site_multiplicities
-                                            * self.endmember_occupancies
-                                            * logish(self.endmember_occupancies)).sum(-1)
+        S_conf = -(constants.gas_constant
+                   * (self.endmember_noccupancies
+                      * logish(self.endmember_occupancies)).sum(-1))
         self.endmember_configurational_entropies = S_conf
 
-    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+    def excess_partial_gibbs_free_energies(self, pressure, temperature,
+                                           molar_fractions):
         return self._ideal_excess_partial_gibbs(temperature, molar_fractions)
 
     def excess_partial_entropies(self, pressure, temperature, molar_fractions):
-        return self._ideal_excess_partial_entropies(temperature, molar_fractions)
+        return self._ideal_excess_partial_entropies(temperature,
+                                                    molar_fractions)
 
     def excess_partial_volumes(self, pressure, temperature, molar_fractions):
         return np.zeros((self.n_endmembers))
@@ -385,10 +395,15 @@ class IdealSolution (SolutionModel):
         return np.zeros((len(molar_fractions), len(molar_fractions)))
 
     def _configurational_entropy(self, molar_fractions):
-        site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        conf_entropy = - constants.gas_constant * (site_occupancies
-                                                   * self.site_multiplicities
-                                                   * logish(site_occupancies)).sum(-1)
+        site_noccupancies = np.einsum('i, ij', molar_fractions,
+                                      self.endmember_noccupancies)
+        site_multiplicities = np.einsum('i, ij', molar_fractions,
+                                        self.site_multiplicities)
+        site_occupancies = (site_noccupancies
+                            * inverseish(site_multiplicities))
+        conf_entropy = -(constants.gas_constant
+                         * (site_noccupancies
+                            * logish(site_occupancies)).sum(-1))
         return conf_entropy
 
     def _ideal_excess_partial_gibbs(self, temperature, molar_fractions):
@@ -402,26 +417,36 @@ class IdealSolution (SolutionModel):
         return hessian
 
     def _log_ideal_activities(self, molar_fractions):
-        site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        lna = (self.endmember_occupancies * self.site_multiplicities
-               * logish(site_occupancies)).sum(-1)
+        site_noccupancies = np.einsum('i, ij', molar_fractions,
+                                      self.endmember_noccupancies)
+        site_multiplicities = np.einsum('i, ij', molar_fractions,
+                                        self.site_multiplicities)
+
+        lna = np.einsum('ij, j->i', self.endmember_noccupancies,
+                        logish(site_noccupancies) - logish(site_multiplicities))
+
         normalisation_constants = (self.endmember_configurational_entropies
                                    / constants.gas_constant)
-
         return lna + normalisation_constants
 
     def _log_ideal_activity_derivatives(self, molar_fractions):
-        site_occupancies = np.dot(molar_fractions, self.endmember_occupancies)
-        n_site_atoms = self.endmember_occupancies[0].dot(self.site_multiplicities)
-        dlnadp = np.einsum('ij, j, mj',
-                           self.endmember_occupancies,
-                           self.site_multiplicities*inverseish(site_occupancies),
-                           self.endmember_occupancies) - n_site_atoms
+        site_noccupancies = np.einsum('i, ij', molar_fractions,
+                                      self.endmember_noccupancies)
+        site_multiplicities = np.einsum('i, ij', molar_fractions,
+                                        self.site_multiplicities)
+
+        dlnadp = (np.einsum('pj, qj, j->pq', self.endmember_noccupancies,
+                            self.endmember_noccupancies,
+                            inverseish(site_noccupancies))
+                  - np.einsum('pj, qj, j->pq', self.endmember_noccupancies,
+                              self.site_multiplicities,
+                              inverseish(site_multiplicities)))
+
         return dlnadp
 
     def _ideal_activities(self, molar_fractions):
         return _ideal_activities_fct(molar_fractions,
-                                     self.endmember_occupancies,
+                                     self.endmember_noccupancies,
                                      self.n_endmembers,
                                      self.n_occupancies,
                                      self.site_multiplicities,

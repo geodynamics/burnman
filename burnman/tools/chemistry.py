@@ -230,32 +230,34 @@ def process_solution_chemistry(solution_model):
         Should be the same for all endmembers.
 
     sites : list of lists of strings
-        A list of elements for each site in the solid solution
+        A list of species for each site in the solid solution
 
     site_names : list of strings
-        A list of elements_site pairs in the solid solution, where
+        A list of species_site pairs in the solid solution, where
         each distinct site is given by a unique uppercase letter
         e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B']
 
     n_occupancies : integer
-        Sum of the number of possible elements on each of the sites
+        Sum of the number of possible species on each of the sites
         in the solid solution.
         Example: A binary solution [[A][B],[B][C1/2D1/2]] would have
-        n_occupancies = 5, with two possible elements on
+        n_occupancies = 5, with two possible species on
         Site 1 and three on Site 2
 
-    site_multiplicities : array of floats
-        The number of each site per formula unit
+    site_multiplicities : 2D array of floats
+        A 1D array for each endmember in the solid solution,
+        containing the multiplicities of each site per formula unit.
         To simplify computations later, the multiplicities
-        are repeated for each element on each site
+        are repeated for each species on each site, so the shape of
+        this attribute is (n_endmembers, n_site_species).
 
     endmember_occupancies : 2d array of floats
         A 1D array for each endmember in the solid solution,
-        containing the fraction of atoms of each element on each site.
+        containing the fraction of atoms of each species on each site.
 
     endmember_noccupancies : 2d array of floats
         A 1D array for each endmember in the solid solution,
-        containing the number of atoms of each element on each site
+        containing the number of atoms of each species on each site
         per mole of endmember.
     """
     formulae = solution_model.formulas
@@ -263,18 +265,18 @@ def process_solution_chemistry(solution_model):
     n_endmembers = len(formulae)
 
     # Check the number of sites is the same for all endmembers
-    for i in range(n_endmembers):
-        assert(formulae[i].count('[') == n_sites)
+    if not np.all(np.array([f.count('[') for f in formulae]) == n_sites):
+        raise Exception('All formulae must have the same '
+                        'number of distinct sites.')
 
-    solution_formulae = []
+    solution_formulae = [{} for i in range(n_endmembers)]
     sites = [[] for i in range(n_sites)]
     list_occupancies = []
-    list_multiplicity = np.empty(shape=(n_sites))
+    list_multiplicities = np.empty(shape=(n_endmembers, n_sites))
     n_occupancies = 0
 
     # Number of unique site occupancies (e.g.. Mg on X etc.)
     for i_mbr in range(n_endmembers):
-        solution_formula = dict()
         list_occupancies.append([[0] * len(sites[site])
                                 for site in range(n_sites)])
         s = re.split(r'\[', formulae[i_mbr])[1:]
@@ -285,80 +287,75 @@ def process_solution_chemistry(solution_model):
 
             mult = re.split('[A-Z][^A-Z]*', site_split[1])[0]
             if mult == '':
-                list_multiplicity[i_site] = Fraction(1.0)
+                list_multiplicities[i_mbr][i_site] = Fraction(1.0)
             else:
-                list_multiplicity[i_site] = Fraction(mult)
+                list_multiplicities[i_mbr][i_site] = Fraction(mult)
 
-            # Loop over elements on a site
-            elements = re.findall('[A-Z][^A-Z]*', site_occupancy)
+            # Loop over species on a site
+            species = re.findall('[A-Z][^A-Z]*', site_occupancy)
 
-            for element in elements:
-                # Find the element and proportion on the site
-                element_split = re.split('([0-9][^A-Z]*)', element)
-                element_on_site = element_split[0]
-                if len(element_split) == 1:
-                    proportion_element_on_site = Fraction(1.0)
+            for sp in species:
+                # Find the species and its proportion on the site
+                species_split = re.split('([0-9][^A-Z]*)', sp)
+                name_of_species = species_split[0]
+                if len(species_split) == 1:
+                    proportion_species_on_site = Fraction(1.0)
                 else:
-                    proportion_element_on_site = Fraction(element_split[1])
+                    proportion_species_on_site = Fraction(species_split[1])
 
-                solution_formula[element_on_site] = solution_formula.get(
-                    element_on_site, 0.0) + (list_multiplicity[i_site]
-                                             * proportion_element_on_site)
+                solution_formulae[i_mbr][name_of_species] = solution_formulae[i_mbr].get(
+                    name_of_species, 0.0) + (list_multiplicities[i_mbr][i_site]
+                                             * proportion_species_on_site)
 
-                if element_on_site not in sites[i_site]:
+                if name_of_species not in sites[i_site]:
                     n_occupancies += 1
-                    sites[i_site].append(element_on_site)
-                    i_el = sites[i_site].index(element_on_site)
+                    sites[i_site].append(name_of_species)
+                    i_el = sites[i_site].index(name_of_species)
                     for parsed_mbr in range(len(list_occupancies)):
                         list_occupancies[parsed_mbr][i_site].append(0)
                 else:
-                    i_el = sites[i_site].index(element_on_site)
-                list_occupancies[i_mbr][i_site][i_el] = proportion_element_on_site
+                    i_el = sites[i_site].index(name_of_species)
+                list_occupancies[i_mbr][i_site][i_el] = proportion_species_on_site
 
-            # Loop over elements after site
+            # Loop over species after site
             if len(site_split) != 1:
                 not_in_site = str(filter(None, site_split[1]))
                 not_in_site = not_in_site.replace(mult, '', 1)
                 for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                    element = list(
-                        filter(None, re.split(r'(\d+)', enamenumber)))
+                    sp = list(filter(None, re.split(r'(\d+)', enamenumber)))
                     # Look up number of atoms of element
-                    if len(element) == 1:
+                    if len(sp) == 1:
                         nel = 1.
                     else:
-                        nel = float(float(element[1]))
-                    solution_formula[element[0]] = solution_formula.get(
-                        element[0], 0.0) + nel
-
-        solution_formulae.append(solution_formula)
+                        nel = float(float(sp[1]))
+                    solution_formulae[i_mbr][sp[0]] = solution_formulae[i_mbr].get(sp[0], 0.0) + nel
 
     # Site occupancies and multiplicities
     endmember_occupancies = np.empty(shape=(n_endmembers, n_occupancies))
-    site_multiplicities = np.empty(shape=(n_occupancies))
+    site_multiplicities = np.empty(shape=(n_endmembers, n_occupancies))
+
     for i_mbr in range(n_endmembers):
-        n_element = 0
+        n_species = 0
         for i_site in range(n_sites):
             for i_el in range(len(list_occupancies[i_mbr][i_site])):
-                endmember_occupancies[i_mbr][
-                    n_element] = list_occupancies[i_mbr][i_site][i_el]
-                site_multiplicities[n_element] = list_multiplicity[i_site]
-                n_element += 1
+                endmember_occupancies[i_mbr][n_species] = list_occupancies[i_mbr][i_site][i_el]
+                site_multiplicities[i_mbr][n_species] = list_multiplicities[i_mbr][i_site]
+                n_species += 1
 
     # Site names
     solution_model.site_names = []
-    for i, elements in enumerate(sites):
-        for element in elements:
-            solution_model.site_names.append('{0}_{1}'.format(element,
-                                                              ucase[i]))
+    for i, species in enumerate(sites):
+        for sp in species:
+            solution_model.site_names.append('{0}_{1}'.format(sp, ucase[i]))
 
     # Finally, make attributes for solution model instance:
     solution_model.solution_formulae = solution_formulae
     solution_model.n_sites = n_sites
     solution_model.sites = sites
-    solution_model.n_occupancies = n_occupancies
     solution_model.site_multiplicities = site_multiplicities
+    solution_model.n_occupancies = n_occupancies
     solution_model.endmember_occupancies = endmember_occupancies
-    solution_model.endmember_noccupancies = np.einsum('ij, j->ij',
+    solution_model.endmember_noccupancies = np.einsum('ij, ij->ij',
                                                       endmember_occupancies,
                                                       site_multiplicities)
 
@@ -377,9 +374,10 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
         List of sites, each of which contains a list of the species
         occupying each site.
 
-    site_multiplicities : numpy array of floats
-        List of floats giving the multiplicity of each site
-        Must be either the same length as the number of sites, or
+    site_multiplicities : 1D or 2D numpy array of floats
+        List of floats giving the multiplicity of each site.
+        If 2D, must have the same shape as endmember_occupancies.
+        If 1D, must be either the same length as the number of sites, or
         the same length as site_species_names
         (with an implied repetition of the same
         number for each species on a given site).
@@ -399,28 +397,45 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
         classic two-site pyrope garnet.
     """
 
-    # Site multiplicities should either be given on a per-site basis,
-    # or a per-species basis
-    if len(site_species_names) == len(site_multiplicities):
-        site_mults = []
+    site_multiplicities = np.array(site_multiplicities)
+    endmember_occupancies = np.array(endmember_occupancies)
+    n_endmembers = endmember_occupancies.shape[0]
 
-        for i, site in enumerate(site_species_names):
-            for species in site:
-                site_mults.append(site_multiplicities[i])
+    if len(site_multiplicities.shape) == 1:
+        # Site multiplicities should either be given on a per-site basis,
+        # or a per-species basis
+        if len(site_species_names) == len(site_multiplicities):
+            site_mults = []
 
-        site_multiplicities = site_mults
+            for i, site in enumerate(site_species_names):
+                for species in site:
+                    site_mults.append(site_multiplicities[i])
 
-    elif len(endmember_occupancies[0]) != len(site_multiplicities):
-        raise Exception(
-            'Site multiplicities should either be given on a per-site basis or a per-species basis')
+            site_multiplicities = np.array(site_mults)
+
+        elif len(endmember_occupancies[0]) != len(site_multiplicities):
+            raise Exception('Site multiplicities should either be given '
+                            'on a per-site basis or a per-species basis')
+
+        site_multiplicities = np.einsum('i, j->ij', np.ones(n_endmembers),
+                                        site_multiplicities)
+    elif len(site_multiplicities.shape) == 2:
+        if site_multiplicities.shape != endmember_occupancies.shape:
+            raise Exception('If site_multiplicities is 2D, it should have '
+                            'the same shape as endmember_occupancies. '
+                            'They currently have shapes '
+                            f'{site_multiplicities.shape} and '
+                            f'{endmember_occupancies.shape}.')
+    else:
+        raise Exception('Site multiplicities should either be 1D or 2D.')
 
     site_formulae = []
-    for mbr_occupancies in endmember_occupancies:
+    for i_mbr, mbr_occupancies in enumerate(endmember_occupancies):
         i = 0
         site_formulae.append('')
         for site in site_species_names:
             amounts = mbr_occupancies[i:i+len(site)]
-            mult = site_multiplicities[i]
+            mult = site_multiplicities[i_mbr,i]
             if np.abs(mult - 1.) < 1.e-12:
                 mult = ''
             else:
