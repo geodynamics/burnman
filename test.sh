@@ -140,8 +140,8 @@ testit table_mineral_library.py $fulldir || exit 1
 cd ..
 
 
-echo "checking contrib/tutorial/ ..."
-cd contrib/tutorial/
+echo "checking contrib/cider_tutorial_2014/ ..."
+cd contrib/cider_tutorial_2014/
 for test in `ls step*.py`
 do
     testit $test $fulldir || exit 1

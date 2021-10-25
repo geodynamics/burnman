@@ -2,10 +2,10 @@
 
 .. _ref-example-tutorial:
 
-Tutorial
-********
+CIDER Tutorial 2014
+*******************
 
-The tutorial for BurnMan currently consists of three separate units:
+The tutorial for BurnMan presented at CIDER 2014 consists of three separate units:
   - :mod:`step 1 <contrib.tutorial.step_1>`,
   - :mod:`step 2 <contrib.tutorial.step_2>`, and
   - :mod:`step 3 <contrib.tutorial.step_3>`.
@@ -35,5 +35,3 @@ Without changing any input, the program should produce the following image showi
 After changing the standard deviations for :math:`K_{0}^{'}` and :math:`G_{0}^{'}` to 0.2, the following figure of velocities for 1000 realizations is produced:
 
 .. image:: figures/tut-step3.png
-
-	   
