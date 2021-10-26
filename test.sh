@@ -78,9 +78,7 @@ fi
 }
 
 
-
-
-echo "*** running test suite..."
+echo "*** checking test suite ..."
 
 # check for tabs in code:
 for f in `find . -name \*.py | grep -v ipython/`
@@ -95,25 +93,29 @@ done
 cd tests
 $PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 1
 cd ..
+echo ""
 
 
-cd misc
-echo "gen_doc..."
-$PYTHON gen_doc.py >/dev/null || exit 1
+echo "*** checking tutorial suite ..."
+# Print the currently installed jupyter kernels
+echo ""
+echo "Checking for jupyter kernels..."
+jupyter kernelspec list
+echo ""
 
-cd benchmarks
-for test in `ls *.py`
+cd tutorial
+for tutorial_notebook in `ls tutorial*.ipynb`
 do
-    [ $test == "burnman_path.py" ] && continue
-    testit $test $fulldir || exit 1
+  tutorial_script="${tutorial_notebook%%.*}.py"
+  jupyter nbconvert --to script $tutorial_notebook --log-level WARN
+  testit $tutorial_script $fulldir || exit 1
+  rm $tutorial_script
 done
 cd ..
-cd ..
+echo ""
 
 
-
-
-echo "checking examples/ ..."
+echo "*** checking examples/ ..."
 cd examples
 for test in `ls example*.py`
 do
@@ -123,10 +125,12 @@ do
     testit $test $fulldir || exit 1
 done
 cd ..
+echo ""
 
 
-echo "checking misc/ ..."
+echo "*** checking misc/ ..."
 cd misc
+
 for test in `ls *.py`
 do
     [ $test == "burnman_path.py" ] && continue
@@ -137,19 +141,29 @@ do
     testit $test $fulldir || exit 1
 done
 testit table_mineral_library.py $fulldir || exit 1
-cd ..
+echo ""
+
+echo "*** checking misc/benchmarks/ ..."
+cd benchmarks
+for test in `ls *.py`
+do
+    [ $test == "burnman_path.py" ] && continue
+    testit $test $fulldir || exit 1
+done
+cd ../..
+echo ""
 
 
-echo "checking contrib/cider_tutorial_2014/ ..."
+echo "*** checking contrib/cider_tutorial_2014/ ..."
 cd contrib/cider_tutorial_2014/
 for test in `ls step*.py`
 do
     testit $test $fulldir || exit 1
 done
 cd ../..
+echo ""
 
-
-echo "checking contrib/CHRU2014/ ..."
+echo "*** checking contrib/CHRU2014/ ..."
 cd contrib/CHRU2014
 for test in `ls *.py`
 do
@@ -157,12 +171,14 @@ do
     testit $test $fulldir || exit 1
 done
 cd ../..
+echo ""
 
-echo "checking contrib/solution_polytope/ ..."
+echo "*** checking contrib/solution_polytope/ ..."
 cd contrib/solution_polytope/
 testit create_polytope_paper_tables.py $fulldir || exit 1
 testit example_solution_creation_and_manipulation.py $fulldir || exit 1
 cd ../..
+echo ""
 
 echo "   done"
 

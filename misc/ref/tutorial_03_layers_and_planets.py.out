@@ -1,0 +1,25 @@
+Iteration 1 maximum relative pressure error: 9.5e-01
+Iteration 2 maximum relative pressure error: 4.8e-01
+Iteration 3 maximum relative pressure error: 2.1e-01
+Iteration 4 maximum relative pressure error: 8.5e-02
+Iteration 5 maximum relative pressure error: 3.4e-02
+Iteration 6 maximum relative pressure error: 1.3e-02
+Iteration 7 maximum relative pressure error: 5.2e-03
+Iteration 8 maximum relative pressure error: 2.0e-03
+Iteration 9 maximum relative pressure error: 7.9e-04
+Iteration 10 maximum relative pressure error: 3.1e-04
+Iteration 11 maximum relative pressure error: 1.2e-04
+Iteration 12 maximum relative pressure error: 4.7e-05
+Iteration 13 maximum relative pressure error: 1.8e-05
+Iteration 14 maximum relative pressure error: 7.1e-06
+mass = 5.962e+24 (Earth = 5.972e+24)
+moment of inertia factor= 0.3307 (Earth = 0.3307)
+Layer mass fractions:
+inner core: 0.016
+outer core: 0.309
+convecting mantle: 0.621
+lithospheric mantle: 0.047
+crust: 0.007
+Writing axisem_zog_silicates.txt ...
+Writing mineos_zog_silicates.txt ...
+Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk.
