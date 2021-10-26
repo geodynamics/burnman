@@ -23,6 +23,9 @@ echo "Version numbers of required modules:"
 $PYTHON -m pip freeze | grep -f requirements.txt
 echo ""
 
+# Print the currently installed jupyter kernels
+jupyter kernelspec list
+
 function testit {
 t=$1
 

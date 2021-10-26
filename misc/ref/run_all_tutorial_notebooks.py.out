@@ -1,0 +1,134 @@
+Running ../tutorial/tutorial_01_material_classes.ipynb
+Text outputs:
+Formula in dictionary form: {'Mg': 2.0, 'Si': 1.0, 'O': 4.0}
+Molar mass: 0.14069 kg
+
+{'name': 'Forsterite', 'formula': {'Mg': 2.0, 'Si': 1.0, 'O': 4.0}, 'equation_of_state': 'slb3', 'F_0': -2055403.0, 'V_0': 4.3603e-05, 'K_0': 127955500000.0, 'Kprime_0': 4.21796, 'Debye_0': 809.1703, 'grueneisen_0': 0.99282, 'q_0': 2.10672, 'G_0': 81600000000.0, 'Gprime_0': 1.46257, 'eta_s_0': 2.29972, 'n': 7.0, 'molar_mass': 0.14069310000000002, 'T_0': 300.0, 'E_0': 0.0, 'P_0': 0.0}
+
+Counter({'O': 6.0, 'Si': 2.0, 'Mg': 1.0, 'Fe': 1.0})
+
+Forsterite (SLB2011)
+Formula: Mg2SiO4
+Gibbs: -2.148e+06 J/mol
+S: 2.747e+02 J/K/mol
+V_p: 8.308e+03 m/s
+
+{'name': 'Quartz', 'formula': {'Si': 1.0, 'O': 2.0}, 'equation_of_state': 'slb3', 'F_0': -858853.4, 'V_0': 2.367003e-05, 'K_0': 49547430000.0, 'Kprime_0': 4.33155, 'Debye_0': 816.3307, 'grueneisen_0': -0.00296, 'q_0': 1.0, 'G_0': 44856170000.0, 'Gprime_0': 0.95315, 'eta_s_0': 2.36469, 'n': 3.0, 'molar_mass': 0.0600843, 'T_0': 300.0, 'E_0': 0.0, 'P_0': 0.0}
+[['landau', {'Tc_0': 847.0, 'S_D': 5.164, 'V_D': 1.222e-06}]]
+
+Bridgmanite composition: {'Mg': 0.8, 'Si': 0.9, 'O': 3.0, 'Fe': 0.1, 'Al': 0.2}
+Bridgmanite volume: 2.315e-05 m
+Bridgmanite endmember partial Gibbs energies:
+   -9.690e+02 kJ/mol
+   -6.868e+02 kJ/mol
+   -1.143e+03 kJ/mol
+
+Assemblage density at 30.0 GPa and 2000.0 K: 4491.0 kg/m^3
+
+Successfully finished running ../tutorial/tutorial_01_material_classes.ipynb
+Running ../tutorial/tutorial_02_composition_class.ipynb
+Text outputs:
+Molar composition
+FeO: 0.1673
+MgO: 2.6834
+SiO2: 1.0000
+Weight composition
+FeO: 0.0667
+MgO: 0.6000
+SiO2: 0.3333
+Atomic composition
+Fe: 0.1346
+Mg: 2.1587
+O: 3.9022
+Si: 0.8045
+
+Weight composition
+Al2O3: 0.0697
+CaCO3: 0.1193
+Fe2O3: 0.1749
+MgO: 0.7620
+Na2CO3: 0.0100
+SiO2: 0.8642
+
+Successfully finished running ../tutorial/tutorial_02_composition_class.ipynb
+Running ../tutorial/tutorial_03_layers_and_planets.ipynb
+Text outputs:
+Retrieving PerpleX table from web.
+
+Loading PerpleX table...
+
+Table loaded successfully, file deleted
+
+Iteration 1 maximum relative pressure error: 9.5e-01
+
+Iteration 2 maximum relative pressure error: 4.8e-01
+
+Iteration 3 maximum relative pressure error: 2.1e-01
+
+Iteration 4 maximum relative pressure error: 8.4e-02
+
+Iteration 5 maximum relative pressure error: 3.3e-02
+
+Iteration 6 maximum relative pressure error: 1.3e-02
+
+Iteration 7 maximum relative pressure error: 5.2e-03
+
+Iteration 8 maximum relative pressure error: 2.0e-03
+
+Iteration 9 maximum relative pressure error: 7.9e-04
+
+Iteration 10 maximum relative pressure error: 3.1e-04
+
+Iteration 11 maximum relative pressure error: 1.2e-04
+
+Iteration 12 maximum relative pressure error: 4.6e-05
+
+Iteration 13 maximum relative pressure error: 1.8e-05
+
+Iteration 14 maximum relative pressure error: 7.0e-06
+
+mass = 5.957e+24 (Earth = 5.972e+24)
+moment of inertia factor= 0.3306 (Earth = 0.3307)
+Layer mass fractions:
+inner core: 0.016
+outer core: 0.309
+convecting mantle: 0.620
+lithospheric mantle: 0.047
+crust: 0.007
+
+Gravity is not given in PREM and is now being computed. This will only work when density is defined for the entire planet. Use at your own risk.
+
+Successfully finished running ../tutorial/tutorial_03_layers_and_planets.ipynb
+Running ../tutorial/tutorial_04_fitting.ipynb
+Text outputs:
+Least squares equation of state fitting
+
+1) Fitting to room temperature PV data
+
+
+Optimized equation of state for stishovite:
+V_0: (1.4003 +/- 0.0009) x 1e-05
+K_0: (3.19 +/- 0.09) x 1e+11
+Kprime_0: (3.9 +/- 0.5) x 1e+00
+
+
+Endmembers: ['py', 'alm', 'gr', 'andr', 'knor']
+Elements: ['Ca', 'Mg', 'Cr', 'Fe', 'Al', 'Si', 'O']
+Stoichiometric matrix:
+Matrix([[0, 3, 0, 0, 2, 3, 12], [0, 0, 0, 3, 2, 3, 12], [3, 0, 0, 0, 2, 3, 12], [3, 0, 0, 2, 0, 3, 12], [0, 3, 2, 0, 0, 3, 12]])
+
+Molar fractions:
+py: 0.004 +/- 0.005
+alm: 0.328 +/- 0.003
+gr: 0.619 +/- 0.004
+andr: 0.048 +/- 0.004
+knor: 0.000 +/- 0.004
+Weighted residual: 0.519
+
+Successfully finished running ../tutorial/tutorial_04_fitting.ipynb
+Running ../tutorial/tutorial_05_equilibrium.ipynb
+Text outputs:
+Successfully finished running ../tutorial/tutorial_05_equilibrium.ipynb
+Running ../tutorial/tutorial_06_seismic_processing.ipynb
+Text outputs:
+Successfully finished running ../tutorial/tutorial_06_seismic_processing.ipynb
