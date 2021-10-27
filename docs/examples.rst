@@ -273,7 +273,7 @@ Advanced examples:
 
 .. figure:: figures/example_olivine_binary_Figure_1.png
 
-  The olivine polymorph binary phase diagram according to :cite:`Stixrude2011`.
+  The olivine polymorph binary phase diagram using the thermodynamic models of Stixrude and Lithgow-Bertelloni (2011).
 
 
 .. _ref-example-paper:

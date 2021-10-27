@@ -14,6 +14,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../examples'))
+sys.path.insert(0, os.path.abspath('../tutorial'))
 
 import burnman
 import burnman.version
@@ -38,7 +39,8 @@ release = burnman.__version__
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
               'sphinx.ext.mathjax', 'numpydoc', 'sphinx.ext.intersphinx',
               'sphinx.ext.ifconfig', 'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.viewcode', 'sphinxcontrib.bibtex']
+              'sphinx.ext.viewcode', 'sphinxcontrib.bibtex',
+              'nbsphinx']
 bibtex_bibfiles = ['ref.bib']
 
 numpydoc_show_class_members = False
