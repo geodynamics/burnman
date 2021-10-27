@@ -7,7 +7,7 @@ So far, we have concentrated on the thermoelastic properties of
 minerals. There are, however, additional thermodynamic properties which are
 required to describe the thermal properties such as the energy,
 entropy and heat capacity.
-These properties are related by the following expressions: 
+These properties are related by the following expressions:
 
 .. math::
     \mathcal{G}= \mathcal{E} - T\mathcal{S} + PV = \mathcal{H} - TS = \mathcal{F} + PV
@@ -23,7 +23,7 @@ HP2011
     \mathcal{H}_{\textrm{1 bar, T}} &= \Delta_f\mathcal{H}_{\textrm{1 bar, 298 K}} + \int_{298}^T C_P~dT, \\
     \mathcal{S}_{\textrm{1 bar, T}} &= \mathcal{S}_{\textrm{1 bar, 298 K}} + \int_{298}^T \frac{C_P}{T}~dT, \\
     \int_{\textrm{1 bar}}^P V(P,T)~dP &= P V_0 \left( 1 - a + \left( a \frac{(1-b P_{th})^{1-c} - (1 + b(P-P_{th}))^{1-c}}{b (c-1) P} \right) \right)
-    :label: gibbs_hp2011  
+    :label: gibbs_hp2011
 
 
 The heat capacity at one bar is given by an empirical polynomial fit to experimental data
@@ -40,7 +40,7 @@ The entropy at high pressure and temperature can be calculated by differentiatin
 Finally, the enthalpy at high pressure and temperature can be calculated
 
 .. math::
-    \mathcal{H}(P,T) = \mathcal{G}(P,T) + T\mathcal{S}(P,T) 
+    \mathcal{H}(P,T) = \mathcal{G}(P,T) + T\mathcal{S}(P,T)
 
 SLB2005
 """""""
@@ -49,7 +49,7 @@ The Debye model yields the Helmholtz free energy and entropy due to lattice vibr
 
 .. math::
     \mathcal{G} &= \mathcal{F} + PV, \\
-    \mathcal{F} &= nRT \left(3 \ln( 1 - e^{-\frac{\theta}{T}}) - \int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau \right), \\	
+    \mathcal{F} &= nRT \left(3 \ln( 1 - e^{-\frac{\theta}{T}}) - \int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau \right), \\
     \mathcal{S} &= nR \left(4 \int_{0}^{\frac{\theta}{T}}\frac{\tau^3}{(e^{\tau}-1)}d\tau - 3 \ln(1-e^{-\frac{\theta}{T}}) \right), \\
     \mathcal{H} &= \mathcal{G} + T\mathcal{S}
 
@@ -105,7 +105,7 @@ the required parameters for that model. A list of parameters for each model is g
 Linear excesses (linear)
 """"""""""""""""""""""""
 A simple linear correction in pressure and temperature. Parameters are 'delta_E', 'delta_S' and 'delta_V'.
-     
+
 .. math::
    \mathcal{G} = \Delta \mathcal{E} - T \Delta \mathcal{S} + P \Delta \mathcal{V}, \\
    \frac{\partial \mathcal{G}}{\partial T} = - \Delta \mathcal{S}, \\
@@ -117,25 +117,23 @@ A simple linear correction in pressure and temperature. Parameters are 'delta_E'
 Tricritical Landau model (landau)
 """""""""""""""""""""""""""""""""
 
-Applies a tricritical Landau correction to the properties 
+Applies a tricritical Landau correction to the properties
 of an endmember which undergoes a displacive phase transition. These
 transitions are not associated with an activation energy, and therefore
 they occur rapidly compared with seismic wave propagation. Parameters are
 'Tc_0', 'S_D' and 'V_D'.
 
-This correction follows :cite:`Putnis1992`, and is done relative to 
-the completely *ordered* state (at 0 K). 
-It therefore differs in implementation from both :cite:`Stixrude2011` and 
-:cite:`HP2011`, who compute properties relative to 
+This correction follows :cite:`Putnis1992`, and is done relative to
+the completely *ordered* state (at 0 K).
+It therefore differs in implementation from both :cite:`Stixrude2011` and
+:cite:`HP2011`, who compute properties relative to
 the completely disordered state and standard states respectively.
 The current implementation is preferred, as the excess
 entropy (and heat capacity) terms are equal to zero at 0 K.
 
-
-
 .. math::
    Tc = Tc_0 + \frac{V_D P}{S_D}
-   
+
 If the temperature is above the critical temperature,
 Q (the order parameter) is equal to zero, and the Gibbs free energy is simply that of the disordered phase:
 
@@ -216,7 +214,7 @@ predicted on the basis of the specifics of order-disorder in the
 mineral, multiplied by some empirical factor. Expressions for the
 excess Gibbs free energy can be found in :cite:`HP1996`. Parameters are
 'deltaH', 'deltaV', 'Wh', 'Wv', 'n' and 'factor'.
-    
+
 Magnetic model (magnetic_chs)
 """""""""""""""""""""""""""""
 

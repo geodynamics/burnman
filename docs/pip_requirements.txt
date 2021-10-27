@@ -4,6 +4,7 @@ matplotlib
 scipy
 sympy
 sphinxcontrib.bibtex
+nbsphinx
 cvxpy
 
 # ReadTheDocs cannot build pycddlib successfully

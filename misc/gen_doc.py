@@ -51,5 +51,7 @@ all = os.listdir('../examples/')
 examples = list(filter(lambda k: re.match("^example(.*)\.py$", k), all))
 not_listed = list(filter(lambda x: (x not in ordered_examples), examples))
 
+sys.stderr.write('The following examples are not included '
+                 'in the automatically generated documentation:\n')
 for example in not_listed:
-    sys.stderr.write("WARNING EXAMPLE NOT LISTED: " + example + "\n")
+    sys.stderr.write(f'   {example}\n')
