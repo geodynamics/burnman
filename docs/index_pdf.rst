@@ -13,6 +13,7 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
    introduction
    background
    tutorial
+   cider_tutorial
    examples
    api
    changes

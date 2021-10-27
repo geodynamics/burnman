@@ -72,6 +72,7 @@ Acknowledgement and Support
   introduction
   background
   tutorial
+  cider_tutorial
   examples
   api
   zreferences
