@@ -8,12 +8,13 @@
 example_chemical_potentials
 ---------------------------
 
-This example shows how to use the chemical potentials library of functions.
+This example shows how to obtain chemical potentials and associated
+properties from an assemblage.
 
 *Demonstrates:*
 
-* How to calculate chemical potentials
-* How to compute fugacities and relative fugacities
+* How to calculate chemical potentials of an assemblage.
+* How to compute fugacities and relative fugacities.
 
 """
 from __future__ import absolute_import
@@ -24,6 +25,7 @@ import matplotlib.pyplot as plt
 
 import burnman_path  # adds the local burnman directory to the path
 import burnman
+from burnman import Composite
 import burnman.constants as constants
 from burnman.tools import chemistry
 import burnman.minerals as minerals
@@ -41,10 +43,9 @@ if __name__ == "__main__":
     fa = minerals.HP_2011_ds62.fa()
     mt = minerals.HP_2011_ds62.mt()
     qtz = minerals.HP_2011_ds62.q()
-    FMQ = [fa, mt, qtz]
 
-    for mineral in FMQ:
-        mineral.set_state(P, T)
+    FMQ = Composite([fa, mt, qtz])
+    FMQ.set_state(P, T)
 
     '''
     Here we find chemical potentials of FeO, SiO2 and O2 for
@@ -56,20 +57,22 @@ if __name__ == "__main__":
     component_formulae = ['FeO', 'SiO2', 'O2']
     component_formulae_dict = [chemistry.dictionarize_formula(f)
                                for f in component_formulae]
-    chem_potentials = chemistry.chemical_potentials(FMQ, component_formulae_dict)
+    chem_potentials = FMQ.chemical_potential(component_formulae_dict)
 
     oxygen = minerals.HP_2011_fluids.O2()
     oxygen.set_state(P, T)
 
     hem = minerals.HP_2011_ds62.hem()
-    MH = [mt, hem]
-    for mineral in MH:
-        mineral.set_state(P, T)
+    MH = Composite([mt, hem])
+    MH.set_state(P, T)
 
-    print('log10(fO2) at the FMQ buffer:', np.log10(chemistry.fugacity(oxygen, FMQ)))
-    print('log10(fO2) at the mt-hem buffer:', np.log10(chemistry.fugacity(oxygen, MH)))
+    print('log10(fO2) at the FMQ buffer:',
+          np.log10(chemistry.fugacity(oxygen, FMQ)))
+    print('log10(fO2) at the mt-hem buffer:',
+          np.log10(chemistry.fugacity(oxygen, MH)))
 
-    print('Relative log10(fO2):', np.log10(chemistry.relative_fugacity(oxygen, FMQ, MH)))
+    print('Relative log10(fO2):',
+          np.log10(chemistry.relative_fugacity({'O': 2.}, FMQ, MH)))
 
     '''
     Here we find the oxygen fugacity of the
@@ -92,15 +95,15 @@ if __name__ == "__main__":
     for i, T in enumerate(temperatures):
         # Set states
         oxygen.set_state(Pr, T)
-        for mineral in FMQ:
-            mineral.set_state(P, T)
+        FMQ.set_state(P, T)
 
         # The chemical potential and fugacity of O2 at the FMQ buffer
         # according to O'Neill, 1987
         muO2_FMQ_ONeill1987 = -587474. + 1584.427 * \
             T - 203.3164 * T * np.log(T) + 0.092710 * T * T
-        log10fO2_FMQ_ONeill1987[i] = np.log10(
-            np.exp((muO2_FMQ_ONeill1987) / (constants.gas_constant * T)))
+        log10fO2_FMQ_ONeill1987[i] = np.log10(np.exp((muO2_FMQ_ONeill1987)
+                                                     / (constants.gas_constant
+                                                        * T)))
 
         invT[i] = 10000. / (T)
 
@@ -169,7 +172,7 @@ if __name__ == "__main__":
     # Mineral and assemblage definitions
     rhenium = Re()
     rheniumIVoxide = ReO2()
-    ReReO2buffer = [rhenium, rheniumIVoxide]
+    ReReO2buffer = Composite([rhenium, rheniumIVoxide])
 
     # Set up arrays
     temperatures = np.linspace(850., 1250., 100)
@@ -179,19 +182,20 @@ if __name__ == "__main__":
     for i, T in enumerate(temperatures):
         # Set states
         oxygen.set_state(Pr, T)
-        for mineral in ReReO2buffer:
-            mineral.set_state(P, T)
+        ReReO2buffer.set_state(P, T)
 
         # The chemical potential and fugacity of O2 at the Re-ReO2 buffer
         # according to Powncesby and O'Neill, 1994
         muO2_Re_PO1994 = -451020 + 297.595 * T - 14.6585 * T * np.log(T)
-        log10fO2_Re_PO1994[i] = np.log10(
-            np.exp((muO2_Re_PO1994) / (constants.gas_constant * T)))
+        log10fO2_Re_PO1994[i] = np.log10(np.exp((muO2_Re_PO1994)
+                                                / (constants.gas_constant
+                                                   * T)))
 
         invT[i] = 10000. / (T)
 
         # The chemical potential and fugacity of O2 at the Re-ReO2 buffer
-        log10fO2_ReReO2buffer[i] = np.log10(chemistry.fugacity(oxygen, ReReO2buffer))
+        log10fO2_ReReO2buffer[i] = np.log10(chemistry.fugacity(oxygen,
+                                                               ReReO2buffer))
 
     # Plot the Re-ReO2 log10(fO2) values
     plt.plot(temperatures, log10fO2_Re_PO1994, 'k',

@@ -7,7 +7,6 @@ from burnman import minerals
 from burnman import Composite
 from burnman import equilibrate
 
-from burnman.tools.chemistry import chemical_potentials
 from burnman.tools.chemistry import relative_fugacity
 from burnman.tools.chemistry import fugacity
 
@@ -20,14 +19,12 @@ class ChemicalPotentials(BurnManTest):
         bdg = minerals.SLB_2011.mg_fe_perovskite()
         per = minerals.SLB_2011.periclase()
 
-        assemblage = [bdg, per]
+        assemblage = Composite([bdg, per])
 
         bdg.set_composition([1.0, 0.0, 0.0])
+        assemblage.set_state(25.e9, 2000.)
 
-        for phase in assemblage:
-            phase.set_state(25.e9, 2000.)
-
-        mu_SiO2 = chemical_potentials(assemblage, [{'Si': 1., 'O': 2.}])[0]
+        mu_SiO2 = assemblage.chemical_potential([{'Si': 1., 'O': 2.}])[0]
 
         self.assertFloatEqual(bdg.gibbs - per.gibbs, mu_SiO2)
 
@@ -35,12 +32,10 @@ class ChemicalPotentials(BurnManTest):
         bdg = minerals.SLB_2011.mg_fe_perovskite()
         stv = minerals.SLB_2011.stishovite()
 
-        assemblage = [bdg, stv]
+        assemblage = Composite([bdg, stv])
 
         bdg.set_composition([1.0, 0.0, 0.0])
-
-        for phase in assemblage:
-            phase.set_state(25.e9, 2000.)
+        assemblage.set_state(25.e9, 2000.)
 
         self.assertFloatEqual(1., fugacity(stv, assemblage))
 
@@ -48,14 +43,14 @@ class ChemicalPotentials(BurnManTest):
         bdg = minerals.SLB_2011.mg_fe_perovskite()
         stv = minerals.SLB_2011.stishovite()
 
-        assemblage = [bdg, stv]
+        assemblage = Composite([bdg, stv])
 
         bdg.set_composition([1.0, 0.0, 0.0])
+        assemblage.set_state(25.e9, 2000.)
 
-        for phase in assemblage:
-            phase.set_state(25.e9, 2000.)
-
-        self.assertFloatEqual(1., relative_fugacity(stv, assemblage,
+        self.assertFloatEqual(1., relative_fugacity({'Si': 1.,
+                                                     'O': 2.},
+                                                    assemblage,
                                                     assemblage))
 
     def test_assemblage_single_mineral_mu(self):
