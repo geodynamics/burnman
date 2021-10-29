@@ -441,6 +441,56 @@ class Composite(Material):
         return np.all(np.abs(self.reaction_affinities)
                       < self.equilibrium_tolerance)
 
+    def chemical_potential(self, components):
+        """
+        Returns the chemical potential of one or more components in
+        a chemically equilibrated composite. Raises an exception if
+        the assemblage is not equilibrated, or if any of the
+        chemical potentials are undefined by the assemblage.
+
+        Parameters
+        ----------
+        components: list of dictionaries
+            List of formulae of the desired components.
+
+        Returns
+        -------
+        chemical_potential: numpy array of floats
+            The chemical potentials of the desired components in the
+            equilibrium composite.
+        """
+        n_components = len(components)
+        if self.equilibrated:
+            # Convert components into matrix form
+            def f(i, j):
+                e = self.elements[j]
+                if e in components[i]:
+                    return nsimplify(components[i][e])
+                else:
+                    return 0
+            b = np.array(Matrix(n_components, self.n_elements, f)).astype(float)
+
+            # Solve to find a set of endmember proportions that
+            # satisfy each of the component formulae
+            p = np.linalg.lstsq(self.stoichiometric_array.T, b.T, rcond=None)
+
+            res = np.abs((self.stoichiometric_array.T.dot(p[0]) - b.T).T)
+            res = np.sum(res, axis=1)
+            # Check that all components can be described by linear sums of
+            # the endmembers
+            if not np.all(res < 1.e-12):
+                bad_indices = np.argwhere(res > 1.e-12)
+
+                raise Exception(f'Components {bad_indices} not defined by '
+                                'prescribed assemblage')
+
+            # Return the chemical potential of each component
+            return np.dot(p[0].T, self.endmember_partial_gibbs)
+
+        else:
+            raise Exception('This composite is not equilibrated, so '
+                            'it cannot have a defined chemical potential.')
+
     def _mass_to_molar_fractions(self, phases, mass_fractions):
         """
         Converts a set of mass fractions for phases into a set of molar fractions.

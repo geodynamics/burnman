@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
+from burnman import Composite
 from burnman.tools.chemistry import dictionarize_formula, formula_mass
 from burnman.tools.chemistry import fugacity
 import burnman.constants as constants
@@ -68,13 +69,13 @@ Here we use room pressure, 100 kPa
 fa = burnman.minerals.HP_2011_ds62.fa()
 mt = burnman.minerals.HP_2011_ds62.mt()
 qtz = burnman.minerals.HP_2011_ds62.q()
-FMQ = [fa, mt, qtz]
+FMQ = Composite([fa, mt, qtz])
 
 oxygen = burnman.minerals.HP_2011_fluids.O2()
 
 rhenium = Re()
 rheniumIVoxide = ReO2()
-ReReO2buffer = [rhenium, rheniumIVoxide]
+ReReO2buffer = Composite([rhenium, rheniumIVoxide])
 
 Pr = 1.e5
 
@@ -86,15 +87,14 @@ invT = np.empty_like(temperatures)
 P = 1.e5
 for i, T in enumerate(temperatures):
     oxygen.set_state(Pr, T)
-    for mineral in FMQ:
-        mineral.set_state(P, T)
-    for mineral in ReReO2buffer:
-        mineral.set_state(P, T)
+    FMQ.set_state(P, T)
+    ReReO2buffer.set_state(P, T)
 
     muO2_FMQ_ONeill1987 = -587474. + 1584.427 * \
         T - 203.3164 * T * np.log(T) + 0.092710 * T * T
-    log10fO2_FMQ_ONeill1987[i] = np.log10(
-        np.exp((muO2_FMQ_ONeill1987) / (constants.gas_constant * T)))
+    log10fO2_FMQ_ONeill1987[i] = np.log10(np.exp((muO2_FMQ_ONeill1987)
+                                                 / (constants.gas_constant
+                                                    * T)))
 
     invT[i] = 10000. / (T)
     log10fO2_FMQ[i] = np.log10(fugacity(oxygen, FMQ))
@@ -112,14 +112,12 @@ log10fO2_ReReO2buffer = np.empty_like(temperatures)
 for i, T in enumerate(temperatures):
 
     oxygen.set_state(Pr, T)
-    for mineral in FMQ:
-        mineral.set_state(P, T)
-    for mineral in ReReO2buffer:
-        mineral.set_state(P, T)
+    FMQ.set_state(P, T)
+    ReReO2buffer.set_state(P, T)
 
     muO2_Re_PO1994 = -451020 + 297.595 * T - 14.6585 * T * np.log(T)
-    log10fO2_Re_PO1994[i] = np.log10(
-        np.exp((muO2_Re_PO1994) / (constants.gas_constant * T)))
+    log10fO2_Re_PO1994[i] = np.log10(np.exp((muO2_Re_PO1994)
+                                            / (constants.gas_constant * T)))
 
     invT[i] = 10000. / (T)
     log10fO2_ReReO2buffer[i] = np.log10(fugacity(oxygen, ReReO2buffer))

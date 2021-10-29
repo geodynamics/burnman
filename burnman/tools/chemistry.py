@@ -616,88 +616,15 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
     return output_fractions
 
 
-def chemical_potentials(assemblage, component_formulae):
-    """
-    The compositional space of the components does not have to be a
-    superset of the compositional space of the assemblage. Nor do they have to
-    compose an orthogonal basis.
-
-    The components must each be described by a linear mineral combination
-
-    The mineral compositions must be linearly independent
-
-        Parameters
-        ----------
-        assemblage : list of classes
-            List of material classes
-            set_method and set_state should already have been used
-            the composition of the solid solutions should also have been set
-
-        component_formulae : list of dictionaries
-            List of chemical component formula dictionaries
-            No restriction on length
-
-        Returns
-        -------
-        component_potentials : array of floats
-            Array of chemical potentials of components
-
-    """
-    # Split solid solutions into their respective endmembers
-    # Find the chemical potentials of all the endmembers
-    from ..classes.solidsolution import SolidSolution
-    endmember_list = []
-    endmember_potentials = []
-    for mineral in assemblage:
-        if isinstance(mineral, SolidSolution):
-            for member in mineral.endmembers:
-                endmember_list.append(member[0])
-            for potential in mineral.partial_gibbs:
-                endmember_potentials.append(potential)
-        else:
-            endmember_list.append(mineral)
-            endmember_potentials.append(mineral.gibbs)
-
-    # Make an array of all the endmember formulae
-    endmember_formulae = [endmember.params['formula']
-                          for endmember in endmember_list]
-    endmember_compositions, elements = compositional_array(endmember_formulae)
-
-    pl, u = lu(endmember_compositions, permute_l=True)
-    assert(min(np.dot(np.square(u), np.ones(shape=len(elements)))) > 1e-6), \
-        'Endmember compositions do not form an independent set of basis vectors'
-
-    # Make an array of component formulae with elements in the same order as
-    # the endmember array
-    component_compositions = ordered_compositional_array(
-        component_formulae, elements)
-
-    p = np.linalg.lstsq(endmember_compositions.T, component_compositions.T, rcond=-1)
-    # rcond=-1 is old default to silence warning and be compatible with python 2.7
-    for idx, error in enumerate(p[1]):
-        assert (error < 1e-10), \
-            'Component %d not defined by prescribed assemblage' % (idx + 1)
-
-    # Create an array of endmember proportions which sum to each component
-    # composition
-    endmember_proportions = np.around(p[0], 10).T
-
-    # Calculate the chemical potential of each component
-    component_potentials = np.dot(endmember_proportions, endmember_potentials)
-    return component_potentials
-
-
 def fugacity(standard_material, assemblage):
     """
         Parameters
         ----------
-        standard_material: class
-            Material class
+        standard_material: burnman.Material object
             set_method and set_state should already have been used
             material must have a formula as a dictionary parameter
 
-        assemblage: list of classes
-            List of material classes
+        assemblage: burnman.Composite object
             set_method and set_state should already have been used
 
         Returns
@@ -708,46 +635,40 @@ def fugacity(standard_material, assemblage):
 
     """
     component_formula = standard_material.params['formula']
-    chemical_potential = chemical_potentials(
-        assemblage, [component_formula])[0]
+    chemical_potential = assemblage.chemical_potential([component_formula])[0]
 
-    fugacity = np.exp((chemical_potential - standard_material.gibbs) / (
-        constants.gas_constant * assemblage[0].temperature))
+    fugacity = np.exp((chemical_potential - standard_material.gibbs)
+                      / (constants.gas_constant * assemblage.temperature))
     return fugacity
 
 
-def relative_fugacity(standard_material, assemblage, reference_assemblage):
+def relative_fugacity(component_formula, assemblage, reference_assemblage):
     """
         Parameters
         ----------
-        standard_material: class
-            Material class
-            set_method and set_state should already have been used
-            material must have a formula as a dictionary parameter
+        component_formula: dictionary
+            Chemical formula for which to compute the relative fugacity.
 
-        assemblage: list of classes
-            List of material classes
-            set_method and set_state should already have been used
+        assemblage: burnman.Composite object
+            set_method and set_state should already have been used.
 
-        reference_assemblage: list of classes
-            List of material classes
-            set_method and set_state should already have been used
+        reference_assemblage: burnman.Composite object
+            set_method and set_state should already have been used.
 
         Returns
         -------
         relative_fugacity : float
             Value of the fugacity of the component in the assemblage
-            with respect to the reference_assemblage
+            with respect to the reference_assemblage.
 
     """
-    component_formula = standard_material.params['formula']
-    chemical_potential = chemical_potentials(
-        assemblage, [component_formula])[0]
-    reference_chemical_potential = chemical_potentials(
-        reference_assemblage, [component_formula])[0]
+    chemical_potential = assemblage.chemical_potential([component_formula])[0]
+    reference_chemical_potential = reference_assemblage.chemical_potential([component_formula])[0]
 
-    relative_fugacity = np.exp((chemical_potential - reference_chemical_potential) / (
-        constants.gas_constant * assemblage[0].temperature))
+    relative_fugacity = np.exp((chemical_potential
+                                - reference_chemical_potential)
+                               / (constants.gas_constant
+                                  * assemblage.temperature))
     return relative_fugacity
 
 
