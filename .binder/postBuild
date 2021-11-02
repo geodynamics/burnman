@@ -1,1 +1,2 @@
 python -m pip install -vvv -e .
+python -m pip install mpl_interactions
