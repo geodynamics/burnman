@@ -19,7 +19,7 @@ BurnMan is released under the GNU GPL v2 or newer. It relies heavily on numpy, s
  - Source code: https://github.com/geodynamics/burnman
 
 If you haven't yet installed BurnMan, you can go straight to :ref:`ref-installation` for detailed
-instructions. After that, you might want to try out our :ref:`ref-example-tutorial` or the other
+instructions. After that, you might want to try out :ref:`ref-example-tutorial` or the other
 :ref:`ref-examples`. Finally, and most importantly, have fun!
 
 
