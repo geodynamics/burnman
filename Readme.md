@@ -39,36 +39,38 @@ Authors (as of 2021):
 * pycddlib
 
 ## Installation
-Installation of BurnMan is mostly platform independent. As long as you know how to use a terminal, you should be able to get set up quickly! The following instructions should help, but let us know if you have any problems.
+Installation of BurnMan is mostly platform independent.
+As long as you know how to use a terminal, the process should be straightforward.
+The following instructions should help, but let us know if you have any problems.
 
 ### Dependencies
 First, make sure you have a sufficiently recent version of python installed on your machine (see above for the latest requirements).  To check your version of python, type the following in a terminal:
     python --version
 If your version is not recent enough, visit https://www.python.org/ to find out how to install a newer version.
 
-Once you have checked your version of python, you should make sure you have installed the python module pip. This module will install BurnMan and should take care of all project dependencies. If you don't have it already, you can install it by opening a terminal window and typing:
+Once you have checked your version of python, you should make sure you have installed the python module pip. We will use this module to install BurnMan. If you don't have it already, you can install it by opening a terminal window and typing:
 
     python -m ensurepip --upgrade
 
-Mac users will also need to have Xcode, which can be installed via the MacStore.
+Mac users will also need to install Xcode, which can be found in the MacStore.
 
 ### Stable version
-If you are only interested in using burnman (rather than developing the software), and you aren't interested in any of the latest developments, you can install the stable version of BurnMan by typing the following into a terminal window:
+If you are only interested in using BurnMan (rather than developing the software), and you aren't interested in any of the latest changes, you can install the stable version by typing the following into a terminal window:
 
     python -m pip install burnman
 
-This method of installation does not give you easy access to all the examples, or the test suite. You can download these from https://github.com/geodynamics/burnman/releases.
+This method of installation does not give you easy access to all the examples, or the test suite. These can be found in the latest release package which can be downloaded from https://github.com/geodynamics/burnman/releases.
 
 ### Development version
-If you want to install the development version of BurnMan (with all the latest features), you will first need to download all the files onto your system. The best way to do this is by using git (a version control system). To install git, follow the instructions at https://git-scm.com/downloads.
+If you want to install the development version of BurnMan (with all the latest features), you will first need to download the source code. The best way to do this is by using git (a version control system). To install git, follow the instructions at https://git-scm.com/downloads.
 
-Then go to the directory into which you want to clone the BurnMan repository, and type
+Then, using a terminal, navigate to the directory into which you want to clone the BurnMan repository, and type
 
     git clone https://github.com/geodynamics/burnman.git
 
 (If you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.)
 
-Once the repository is cloned, navigate to the top-level directory by typing `cd burnman` in the terminal, and then install, either in static mode: `python -m pip install .` or in development mode (if you want to develop or modify the code): `python -m pip install -e .`.
+Once the repository is cloned, navigate to the top-level directory by typing `cd burnman` in the terminal, and then install BurnMan, either in static mode: `python -m pip install .` or in development mode (if you want to develop or modify the code): `python -m pip install -e .`.
 
 ### Checking that the installation worked
 
