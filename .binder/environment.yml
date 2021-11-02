@@ -1,0 +1,14 @@
+# based on https://github.com/jupyterlab-contrib/jupyterlab-vim/blob/master/binder/environment.yml
+name: burnman-binder-demos
+
+channels:
+  - conda-forge
+
+dependencies:
+  # runtime dependencies
+  - python >=3.8,<3.10.0a0
+  - jupyterlab >=3,<4.0.0a0
+  - pip
+  - ipympl
+  - ipywidgets
+  - appmode
