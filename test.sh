@@ -23,6 +23,11 @@ echo "Version numbers of required modules:"
 $PYTHON -m pip freeze | grep -f requirements.txt
 echo ""
 
+# Quietly install burnman in development mode
+echo "Installing BurnMan in development mode ..."
+python -m pip install -q -e .
+echo ""
+
 function testit {
 t=$1
 

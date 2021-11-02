@@ -38,14 +38,12 @@ from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 
 # Here we import the relevant modules from BurnMan.
 import burnman
 from burnman import minerals
 import warnings
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     # This is the first actual work done in this example.  We define

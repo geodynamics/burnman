@@ -3,14 +3,12 @@ from __future__ import print_function
 import unittest
 from util import BurnManTest
 
-import burnman_path
 import burnman
 from burnman import equilibrate
 from burnman.minerals import HP_2011_ds62, SLB_2011
 
 import numpy as np
 
-assert burnman_path  # silence pyflakes warning
 
 
 class equilibration(BurnManTest):

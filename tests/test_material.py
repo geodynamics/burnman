@@ -3,10 +3,8 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 import burnman
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test_material_name(BurnManTest):

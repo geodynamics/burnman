@@ -3,11 +3,9 @@ import unittest
 from util import BurnManTest
 
 import numpy as np
-import burnman_path
 import burnman
 from burnman import Layer, BoundaryLayerPerturbation
 
-assert burnman_path  # silence pyflakes warning
 
 
 class min1 (burnman.Mineral):

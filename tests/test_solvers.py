@@ -2,10 +2,8 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 from burnman.optimize.nonlinear_solvers import damped_newton_solve
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test_solvers(BurnManTest):

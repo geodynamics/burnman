@@ -8,7 +8,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 from burnman import minerals
@@ -18,7 +17,6 @@ import cProfile
 import scipy.stats as sp
 import matplotlib.mlab as mlab
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()

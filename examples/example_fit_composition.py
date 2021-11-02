@@ -33,12 +33,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
-import burnman_path  # adds the local burnman directory to the path
 from burnman import minerals
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 from burnman.optimize.composition_fitting import fit_phase_proportions_to_bulk_composition
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

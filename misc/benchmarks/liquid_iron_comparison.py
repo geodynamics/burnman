@@ -3,7 +3,6 @@
 # GPL v2 or later.
 
 
-import burnman_path  # adds the local burnman directory to the path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +11,6 @@ from scipy.optimize import fsolve
 import burnman
 from burnman.tools.eos import check_eos_consistency
 
-assert burnman_path  # silence pyflakes warning
 
 liq = burnman.minerals.other.liquid_iron()
 check_eos_consistency(liq, P=10.e9, T=7000., tol=1.e-3,

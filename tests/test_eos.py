@@ -4,12 +4,10 @@ import unittest
 from util import BurnManTest
 import warnings
 
-import burnman_path
 import burnman
 from burnman import minerals
 from burnman.tools.chemistry import dictionarize_formula, formula_mass
 
-assert burnman_path  # silence pyflakes warning
 
 
 class mypericlase(burnman.Mineral):

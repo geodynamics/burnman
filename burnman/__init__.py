@@ -77,61 +77,84 @@ Structure
 
 .. _ref-installation:
 
-Installation
-------------
 
 Requirements
-^^^^^^^^^^^^
+------------
 
   - Python 3.7+
   - Python modules: NumPy, SciPy, SymPy, Matplotlib
+  - Optional modules: cvxpy, pycddlib
 
+Installation
+------------
 
-Source code
-^^^^^^^^^^^
-The source code can be found at https://github.com/geodynamics/burnman.
+Installation of BurnMan is mostly platform independent.
+As long as you know how to use a terminal, the process should be straightforward.
+The following instructions should help, but let us know if you have any problems.
 
-Install under Ubuntu
-^^^^^^^^^^^^^^^^^^^^
+Dependencies
+^^^^^^^^^^^^
+First, make sure you have a sufficiently recent version of python installed
+on your machine (see above for the latest requirements).
+To check your version of python, type the following in a terminal:
+    python --version
+If your version is not recent enough, visit https://www.python.org/ to
+find out how to install a newer version.
 
-1. Install dependencies using apt by opening a terminal window and entering
-   ``sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib git``
-2. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
-3. Go to the Burnman examples directory and type:
-   ``python example_beginner.py``
-   Figures should show up, indicating that it is working.
+Once you have checked your version of python, you should make sure you have
+installed the python module pip. We will use this module to install BurnMan.
+If you don't have it already, you can install it by opening a
+terminal window and typing:
 
+    python -m ensurepip --upgrade
 
-Install on a Mac
-^^^^^^^^^^^^^^^^
+Mac users will also need to install Xcode, which can be found in the MacStore.
 
-1. get Xcode
-2. If you don't have Python yet, download it (for free) from
-   python.org/download . Make sure to use Python 3.7+.
-   To check your version of python, type the following in a
-   terminal: ``python --version``
-3. Install the latest Numpy version from http://sourceforge.net/projects/numpy/files/NumPy/
-4. Install the latest Scipy from http://sourceforge.net/projects/scipy/files/
-5. Install the latest Sympy from http://sourceforge.net/projects/sympy/files/
-6. Install the latest Matplotlib from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.1.1/
-7. Clone the BurnMan repository ``git clone https://github.com/geodynamics/burnman.git``
-8. Go to the Burnman examples directory and type ``python example_beginner.py``
-   Figures should show up, indicating that it is working.
+Stable version
+^^^^^^^^^^^^^^
 
-Install under Windows
-^^^^^^^^^^^^^^^^^^^^^
+If you are only interested in using BurnMan
+(rather than developing the software), and you aren't interested in any of the
+latest changes, you can install the stable version by typing
+the following into a terminal window:
 
-To get Python running under Windows:
+    python -m pip install burnman
 
-1. Download Python from http://www.python.org/ and install
-2. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy, download and install
-3. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy, download and install
-4. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#sympy, download and install
-5. Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#matplotlib, download and install
-6. Download BurnMan from github (https://github.com/geodynamics/burnman)
-7. Open Python Shell (IDLE Python GUI)
-8. File -- Open -- find one of the example files
-9. Run the module (or press F5)
+This method of installation does not give you easy access to all the examples,
+or the test suite. These can be found in the latest release package which can
+be downloaded from https://github.com/geodynamics/burnman/releases.
+
+Development version
+^^^^^^^^^^^^^^^^^^^
+If you want to install the development version of BurnMan
+(with all the latest features), you will first need to download the source code.
+The best way to do this is by using git (a version control system).
+To install git, follow the instructions at https://git-scm.com/downloads.
+
+Then, using a terminal, navigate to the directory into which you want to
+clone the BurnMan repository, and type
+
+    git clone https://github.com/geodynamics/burnman.git
+
+(If you don't want to use git, you can download the current master branch
+from https://github.com/geodynamics/burnman/archive/master.zip.)
+
+Once the repository is cloned, navigate to the top-level directory by typing
+`cd burnman` in the terminal, and then install BurnMan, either in static mode:
+`python -m pip install .` or in development mode
+(if you want to develop or modify the code): `python -m pip install -e .`.
+
+Checking that the installation worked
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To check that the installation has worked, you can run the test suite
+(`./test.sh`). This takes a few minutes to run.
+
+A more basic check that BurnMan is installed is to navigate to the Burnman
+examples directory and type:
+
+    python example_beginner.py
+
+If figures show up, BurnMan has been installed.
 
 
 Citing BurnMan

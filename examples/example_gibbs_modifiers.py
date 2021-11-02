@@ -42,7 +42,6 @@ from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 
 # Here we import the relevant modules from BurnMan.  The burnman
 # module imports several of the most important functionalities of
@@ -53,7 +52,6 @@ import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

@@ -21,12 +21,10 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

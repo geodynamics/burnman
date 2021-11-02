@@ -4,7 +4,6 @@ from util import BurnManTest
 from util import *
 import sympy
 
-import burnman_path
 import burnman
 from burnman import minerals
 
@@ -37,7 +36,6 @@ from test_solvers import *
 from test_spin import *
 from test_tools import *
 
-assert burnman_path  # silence pyflakes warning
 
 
 class TestRock(BurnManTest):

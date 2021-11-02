@@ -5,14 +5,12 @@ import unittest
 import numpy as np
 import warnings
 
-import burnman_path
 import burnman
 from burnman import Mineral
 from burnman import CombinedMineral
 from burnman.tools.chemistry import dictionarize_formula, formula_mass
 from burnman.tools.chemistry import formula_to_string, sum_formulae
 from burnman.minerals import HGP_2018_ds633
-assert burnman_path  # silence pyflakes warning
 
 
 class forsterite (Mineral):

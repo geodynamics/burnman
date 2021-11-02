@@ -35,12 +35,10 @@ from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     # we want to evaluate several geotherms at these values

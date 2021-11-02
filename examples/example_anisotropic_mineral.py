@@ -25,13 +25,11 @@ from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
-import burnman_path  # adds the local burnman directory to the path
 from burnman import AnisotropicMineral
 from burnman.minerals import SLB_2011
 from burnman.tools.eos import check_anisotropic_eos_consistency
 from burnman.tools.plot import plot_projected_elastic_properties
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

@@ -21,14 +21,12 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import invariant_point
 from burnman.tools.chemistry import hugoniot
 from burnman.tools.eos import check_eos_consistency
-assert burnman_path  # silence pyflakes warning
 
 
 def round_to_n(x, xerr, n):

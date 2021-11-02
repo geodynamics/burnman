@@ -29,11 +29,9 @@ from __future__ import print_function
 
 import numpy as np
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     # input variables ###

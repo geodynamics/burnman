@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 # Benchmarks for the chemical potential functions
 
-import burnman_path  # adds the local burnman directory to the path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,7 +10,6 @@ from burnman.tools.chemistry import dictionarize_formula, formula_mass
 from burnman.tools.chemistry import fugacity
 import burnman.constants as constants
 
-assert burnman_path  # silence pyflakes warning
 
 
 class Re (burnman.Mineral):

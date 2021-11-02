@@ -3,12 +3,10 @@ import unittest
 from util import BurnManTest
 import warnings
 
-import burnman_path
 import burnman
 from burnman import minerals
 import burnman.classes.averaging_schemes as avg
 
-assert burnman_path  # silence pyflakes warning
 
 
 class mypericlase (burnman.Mineral):

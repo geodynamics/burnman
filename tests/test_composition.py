@@ -3,10 +3,8 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 from burnman.composition import Composition
 
-assert burnman_path  # silence pyflakes warning
 
 
 class composition(BurnManTest):

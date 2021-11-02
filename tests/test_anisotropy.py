@@ -3,10 +3,8 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 from burnman.classes import anisotropy
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test_anisotropy(BurnManTest):

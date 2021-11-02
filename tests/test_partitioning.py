@@ -2,11 +2,9 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 
-import burnman_path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test(BurnManTest):

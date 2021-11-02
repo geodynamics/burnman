@@ -2,7 +2,6 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 import burnman
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
@@ -13,7 +12,6 @@ from burnman.tools.math import smooth_array
 from burnman.tools.math import interp_smoothed_array_and_derivatives
 from burnman.tools.math import _pad_ndarray_inverse_mirror
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test_tools(BurnManTest):

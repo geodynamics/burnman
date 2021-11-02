@@ -43,11 +43,9 @@ import matplotlib.pyplot as plt
 # thermoelastic properties of them.  The minerals module includes
 # the mineral physical parameters for the predefined minerals in
 # BurnMan
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

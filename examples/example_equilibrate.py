@@ -64,13 +64,11 @@ from copy import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path
 import burnman
 from burnman import equilibrate
 from burnman.minerals import HP_2011_ds62, SLB_2011, JH_2015
 from burnman.tools.polytope import simplify_composite_with_composition
 
-assert burnman_path  # silence pyflakes warning
 
 run_aluminosilicates = True
 run_ordering = True
