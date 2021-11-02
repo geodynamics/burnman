@@ -12,3 +12,5 @@ dependencies:
   - ipympl
   - ipywidgets
   - appmode
+  - pip:
+    - mpl-interactions
