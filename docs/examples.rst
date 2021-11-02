@@ -7,9 +7,11 @@ BurnMan comes with a large collection of example programs under examples/.
 Below you can find a summary of the different examples.
 They are grouped into three categories: :ref:`ref-example-class`,
 :ref:`ref-example-simple` and :ref:`ref-example-advanced`.
-We suggest starting with :ref:`ref-example-class`, which introduces the main
-class types in BurnMan. The :ref:`ref-example-tutorial` then provides a useful
-introduction to the seismic tools for new users of BurnMan.
+The :ref:`ref-example-class` introduce the main class types in BurnMan,
+and covers similar ground to :ref:`ref-example-tutorial` but in a little more
+detail. :ref:`ref-example-simple` provides introductions to some of the seismic
+and chemical functions. :ref:`ref-example-advanced` covers functionality
+which is more suited to research projects.
 
 Finally, we also include the scripts that were used for all computations and
 figures in the 2014 BurnMan paper in the misc/ folder, see
