@@ -50,9 +50,10 @@ Authors (as of 2021):
     `git clone https://github.com/geodynamics/burnman.git`
 
     Alternatively, if you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.
-2. Install using apt by opening a terminal window and entering
-`sudo apt-get install python python-scipy python-numpy python-sympy python-matplotlib`
-3. Go to the Burnman examples directory and type:
+2. Install python (if you don't have a recent version) using apt by opening a terminal window and entering
+`sudo apt-get install python`
+3. Install this repository, either in static mode: `python -m pip install .` or in development mode (if you want to develop or modify the code): `python -m pip install -e .`. 
+4. Go to the Burnman examples directory and type:
 ```python example_beginner.py```
 Figures should show up, indicating that it is working.
 

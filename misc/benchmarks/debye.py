@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import burnman_path  # adds the local burnman directory to the path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +9,6 @@ from burnman.eos import debye
 import scipy.integrate
 import time
 
-assert burnman_path  # silence pyflakes warning
 
 
 def old_thermal(T, debye_T, n):

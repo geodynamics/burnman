@@ -3,11 +3,9 @@ from util import BurnManTest
 import warnings
 import unittest
 
-import burnman_path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 
 # TODO: test composite that changes number of entries

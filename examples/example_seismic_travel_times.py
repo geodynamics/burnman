@@ -20,7 +20,6 @@ from __future__ import print_function
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
 # Import BurnMan
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals  # import mineral library seperately
 
@@ -29,7 +28,6 @@ import obspy
 from obspy.taup import taup_create
 from obspy.taup import TauPyModel
 
-assert burnman_path  # silence pyflakes warning
 
 
 def plot_rays_and_times(modelname):

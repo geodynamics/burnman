@@ -1,14 +1,12 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import burnman_path  # adds the local burnman directory to the path
 from burnman.minerals import DKS_2013_liquids
 import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-assert burnman_path  # silence pyflakes warning
 
 phases = [DKS_2013_liquids.SiO2_liquid(),
           DKS_2013_liquids.MgSiO3_liquid(),

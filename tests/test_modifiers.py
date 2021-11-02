@@ -2,12 +2,10 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 
-import burnman_path
 import burnman.eos.property_modifiers as pm
 from burnman.minerals import SLB_2011, HP_2011_ds62
 from burnman.tools.eos import check_eos_consistency
 
-assert burnman_path  # silence pyflakes warning
 
 
 class Modifiers(BurnManTest):

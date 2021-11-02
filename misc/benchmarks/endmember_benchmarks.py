@@ -2,14 +2,12 @@ from __future__ import absolute_import
 from __future__ import print_function
 # Benchmarks for the solid solution class
 
-import burnman_path  # adds the local burnman directory to the path
 
 from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
 import numpy as np
 import warnings
 
-assert burnman_path  # silence pyflakes warning
 
 
 def p(v1, v2):

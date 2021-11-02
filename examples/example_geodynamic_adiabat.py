@@ -46,11 +46,9 @@ from scipy.optimize import fsolve, brentq
 from scipy.integrate import odeint
 from scipy.interpolate import UnivariateSpline
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.tools.math import interp_smoothed_array_and_derivatives
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     #  Define fitting function to find the temperature along the isentrope

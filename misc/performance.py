@@ -6,13 +6,11 @@ from __future__ import print_function
 
 import numpy as np
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman import minerals
 
 import timeit
 
-assert burnman_path  # silence pyflakes warning
 
 if True:
     def test_set_state(runs=10000):

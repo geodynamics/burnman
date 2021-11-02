@@ -3,10 +3,8 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 import burnman
 
-assert burnman_path  # silence pyflakes warning
 
 # Predefine our rock
 rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')

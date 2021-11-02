@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 # Benchmarks for the solid solution class
 
-import burnman_path  # adds the local burnman directory to the path
 
 
 import numpy as np
@@ -19,7 +18,6 @@ from burnman import minerals
 from burnman import equilibrate
 from burnman.tools.eos import check_eos_consistency
 
-assert burnman_path  # silence pyflakes warning
 
 
 fcc = minerals.SE_2015.fcc_iron()

@@ -2,7 +2,6 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 
-import burnman_path
 from burnman import minerals
 from burnman import Composite
 from burnman import equilibrate
@@ -10,7 +9,6 @@ from burnman import equilibrate
 from burnman.tools.chemistry import relative_fugacity
 from burnman.tools.chemistry import fugacity
 
-assert burnman_path  # silence pyflakes warning
 
 
 class ChemicalPotentials(BurnManTest):

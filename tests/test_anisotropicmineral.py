@@ -3,11 +3,9 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 from burnman import AnisotropicMineral
 from burnman.tools.eos import check_anisotropic_eos_consistency
 from burnman.minerals.SLB_2011 import periclase, forsterite
-assert burnman_path  # silence pyflakes warning
 
 
 class test_anisotropic_mineral(BurnManTest):

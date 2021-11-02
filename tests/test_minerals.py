@@ -3,11 +3,9 @@ import unittest
 from util import BurnManTest
 import inspect
 
-import burnman_path
 import burnman
 from burnman import minerals
 
-assert burnman_path  # silence pyflakes warning
 
 
 # Instantiate every mineral in the mineral library

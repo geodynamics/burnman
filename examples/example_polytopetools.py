@@ -36,7 +36,6 @@ composite polytope.
 from __future__ import absolute_import
 import numpy as np
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.minerals import SLB_2011
 from burnman.tools.polytope import solution_polytope_from_charge_balance
@@ -46,7 +45,6 @@ from burnman.tools.polytope import simplify_composite_with_composition
 from burnman.tools.chemistry import site_occupancies_to_strings
 from burnman.tools.chemistry import formula_to_string
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     """

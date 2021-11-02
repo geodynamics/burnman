@@ -28,11 +28,9 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.tools.math import smooth_array
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')

@@ -11,7 +11,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import sys
-import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 import inspect
@@ -19,7 +18,6 @@ import inspect
 from burnman import minerals
 from burnman import tools
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

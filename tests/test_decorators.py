@@ -1,13 +1,11 @@
 import unittest
 from util import BurnManTest
 
-import burnman_path
 import burnman
 
 from burnman import material_property
 from burnman.tools.misc import copy_documentation
 
-assert burnman_path  # silence pyflakes warning
 
 
 class test_decorators__material_property(BurnManTest):

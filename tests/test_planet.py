@@ -3,12 +3,10 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-import burnman_path
 import burnman
 from burnman import Planet
 from burnman import Layer
 
-assert burnman_path  # silence pyflakes warning
 
 
 def make_simple_planet():

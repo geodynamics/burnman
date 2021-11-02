@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 from burnman.minerals import DKS_2013_liquids
 from burnman import constants
@@ -12,7 +11,6 @@ import matplotlib.image as mpimg
 from burnman.tools.eos import check_eos_consistency
 from burnman.tools.chemistry import hugoniot
 
-assert burnman_path  # silence pyflakes warning
 
 SiO2_liq=DKS_2013_liquids.SiO2_liquid()
 MgO_liq=DKS_2013_liquids.MgO_liquid()

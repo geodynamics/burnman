@@ -25,10 +25,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 
-assert burnman_path  # silence pyflakes warning
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,

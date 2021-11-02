@@ -29,12 +29,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-import burnman_path  # adds the local burnman directory to the path
 # Here we import the relevant modules from BurnMan.
 from burnman.minerals import HP_2011_ds62
 from burnman.optimize.nonlinear_fitting import plot_cov_ellipse  # for plotting
 
-assert burnman_path  # silence pyflakes warning
 
 plt.style.use('ggplot')
 

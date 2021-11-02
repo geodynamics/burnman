@@ -4,7 +4,6 @@ from __future__ import absolute_import
 # GPL v2 or later.
 
 
-import burnman_path  # adds the local burnman directory to the path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,7 +18,6 @@ from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 
 import matplotlib.image as mpimg
 
-assert burnman_path  # silence pyflakes warning
 
 
 def check_birch_murnaghan():

@@ -28,12 +28,10 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from tools import print_table_for_mineral_constants
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 
 from burnman import AnisotropicMineral
 
-assert burnman_path  # silence pyflakes warning
 
 run_fitting = False
 

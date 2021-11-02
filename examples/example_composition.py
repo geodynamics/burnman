@@ -25,7 +25,6 @@ This example script demonstrates the use of BurnMan's Composition class.
 from __future__ import absolute_import
 from __future__ import print_function
 
-import burnman_path
 from burnman.tools.chemistry import dictionarize_formula
 
 # Import the Composition class and a function to read compositions from file
@@ -36,7 +35,6 @@ from burnman.tools.chemistry import dictionarize_formula
 from burnman import Composition
 from burnman.classes.composition import file_to_composition_list
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
     print('1) Creating a Composite instance, printing '

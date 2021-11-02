@@ -28,12 +28,10 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path
 import burnman
 from burnman import equilibrate
 from burnman.minerals import SLB_2011
 
-assert burnman_path  # silence pyflakes warning
 
 
 if __name__ == "__main__":

@@ -43,13 +43,11 @@ from scipy.optimize import brentq
 import numpy as np
 import matplotlib.pyplot as plt
 
-import burnman_path  # adds the local burnman directory to the path
 
 import burnman
 from burnman import Mineral, minerals
 from burnman.tools.chemistry import formula_mass
 
-assert burnman_path  # silence pyflakes warning
 
 if __name__ == "__main__":
 

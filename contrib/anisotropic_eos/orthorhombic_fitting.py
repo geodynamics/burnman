@@ -27,7 +27,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-import burnman_path  # adds the local burnman directory to the path
 import burnman
 
 from burnman import AnisotropicMineral
@@ -35,7 +34,6 @@ from burnman import AnisotropicMineral
 from tools import print_table_for_mineral_constants
 from burnman.tools.plot import plot_projected_elastic_properties
 
-assert burnman_path  # silence pyflakes warning
 
 run_fitting = False
 
