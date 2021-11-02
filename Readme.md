@@ -68,13 +68,13 @@ Then go to the directory into which you want to clone the BurnMan repository, an
 
 (If you don't want to use git, you can download the current master branch from https://github.com/geodynamics/burnman/archive/master.zip.)
 
-Once the repository is cloned, navigate to the top-level directory using `cd burnman` in the terminal, and then install, either in static mode: `python -m pip install .` or in development mode (if you want to develop or modify the code): `python -m pip install -e .`.
+Once the repository is cloned, navigate to the top-level directory by typing `cd burnman` in the terminal, and then install, either in static mode: `python -m pip install .` or in development mode (if you want to develop or modify the code): `python -m pip install -e .`.
 
 ### Checking that the installation worked
 
 To check that the installation has worked, you can run the test suite (`./test.sh`). This takes a few minutes to run.
 
-A basic check that BurnMan is installed is to navigate to the Burnman examples directory and type:
+A more basic check that BurnMan is installed is to navigate to the Burnman examples directory and type:
 
     python example_beginner.py
 
