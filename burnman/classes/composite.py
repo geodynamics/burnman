@@ -441,17 +441,62 @@ class Composite(Material):
         return np.all(np.abs(self.reaction_affinities)
                       < self.equilibrium_tolerance)
 
-    def chemical_potential(self, components):
+    def set_components(self, components):
         """
-        Returns the chemical potential of one or more components in
-        a chemically equilibrated composite. Raises an exception if
-        the assemblage is not equilibrated, or if any of the
-        chemical potentials are undefined by the assemblage.
+        Sets the components and components_array attributes of the
+        composite material. The components attribute is a list of dictionaries
+        containing the chemical formulae of the components.
+        The components_array attribute is a 2D numpy array describing the
+        linear transformation between endmember amounts and component amounts.
+
+        The components do not need to be linearly independent, not do they need
+        to form a complete basis set for the composite.
+        However, it must be possible to obtain the composition of each
+        component from a linear sum of the endmember compositions of
+        the composite. For example, if the composite was composed of
+        MgSiO3 and Mg2SiO4, SiO2 would be a valid component, but Si would not.
+        The method raises an exception if any of the chemical potentials are
+        not defined by the assemblage.
 
         Parameters
         ----------
         components: list of dictionaries
-            List of formulae of the desired components.
+            List of formulae of the components.
+        """
+        # Convert components into array form
+        b = np.array([[component[el] if el in component else 0.
+                       for component in components]
+                      for el in self.elements])
+
+        # Solve to find a set of endmember proportions that
+        # satisfy each of the component formulae
+        p = np.linalg.lstsq(self.stoichiometric_array.T, b, rcond=None)
+
+        res = np.abs((self.stoichiometric_array.T.dot(p[0]) - b).T)
+        res = np.sum(res, axis=1)
+        # Check that all components can be described by linear sums of
+        # the endmembers
+        if not np.all(res < 1.e-12):
+            bad_indices = np.argwhere(res > 1.e-12)
+
+            raise Exception(f'Components {bad_indices} not defined by '
+                            'prescribed assemblage')
+
+        self.components = components
+        self.component_array = p[0]
+
+    def chemical_potential(self, components=None):
+        """
+        Returns the chemical potentials of the currently defined components
+        in the composite. Raises an exception if
+        the assemblage is not equilibrated.
+
+        Parameters
+        ----------
+        components: list of dictionaries (optional)
+            List of formulae of the desired components. If not specified,
+            the method uses the components specified by a previous call to
+            set_components.
 
         Returns
         -------
@@ -459,37 +504,15 @@ class Composite(Material):
             The chemical potentials of the desired components in the
             equilibrium composite.
         """
-        n_components = len(components)
-        if self.equilibrated:
-            # Convert components into matrix form
-            def f(i, j):
-                e = self.elements[j]
-                if e in components[i]:
-                    return nsimplify(components[i][e])
-                else:
-                    return 0
-            b = np.array(Matrix(n_components, self.n_elements, f)).astype(float)
-
-            # Solve to find a set of endmember proportions that
-            # satisfy each of the component formulae
-            p = np.linalg.lstsq(self.stoichiometric_array.T, b.T, rcond=None)
-
-            res = np.abs((self.stoichiometric_array.T.dot(p[0]) - b.T).T)
-            res = np.sum(res, axis=1)
-            # Check that all components can be described by linear sums of
-            # the endmembers
-            if not np.all(res < 1.e-12):
-                bad_indices = np.argwhere(res > 1.e-12)
-
-                raise Exception(f'Components {bad_indices} not defined by '
-                                'prescribed assemblage')
-
-            # Return the chemical potential of each component
-            return np.dot(p[0].T, self.endmember_partial_gibbs)
-
-        else:
+        if not self.equilibrated:
             raise Exception('This composite is not equilibrated, so '
                             'it cannot have a defined chemical potential.')
+
+        if components is not None:
+            self.set_components(components)
+
+        # Return the chemical potential of each component
+        return np.dot(self.component_array.T, self.endmember_partial_gibbs)
 
     def _mass_to_molar_fractions(self, phases, mass_fractions):
         """
