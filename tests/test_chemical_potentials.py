@@ -22,7 +22,8 @@ class ChemicalPotentials(BurnManTest):
         bdg.set_composition([1.0, 0.0, 0.0])
         assemblage.set_state(25.e9, 2000.)
 
-        mu_SiO2 = assemblage.chemical_potential([{'Si': 1., 'O': 2.}])[0]
+        assemblage.set_components([{'Si': 1., 'O': 2.}])
+        mu_SiO2 = assemblage.chemical_potential()[0]
 
         self.assertFloatEqual(bdg.gibbs - per.gibbs, mu_SiO2)
 
