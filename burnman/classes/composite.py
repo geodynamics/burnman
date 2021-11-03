@@ -463,22 +463,16 @@ class Composite(Material):
         components: list of dictionaries
             List of formulae of the components.
         """
-        n_components = len(components)
-
-        # Convert components into matrix form
-        def f(i, j):
-            e = self.elements[j]
-            if e in components[i]:
-                return nsimplify(components[i][e])
-            else:
-                return 0
-        b = np.array(Matrix(n_components, self.n_elements, f)).astype(float)
+        # Convert components into array form
+        b = np.array([[component[el] if el in component else 0.
+                       for component in components]
+                      for el in self.elements])
 
         # Solve to find a set of endmember proportions that
         # satisfy each of the component formulae
-        p = np.linalg.lstsq(self.stoichiometric_array.T, b.T, rcond=None)
+        p = np.linalg.lstsq(self.stoichiometric_array.T, b, rcond=None)
 
-        res = np.abs((self.stoichiometric_array.T.dot(p[0]) - b.T).T)
+        res = np.abs((self.stoichiometric_array.T.dot(p[0]) - b).T)
         res = np.sum(res, axis=1)
         # Check that all components can be described by linear sums of
         # the endmembers
