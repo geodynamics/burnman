@@ -28,6 +28,11 @@ echo "Installing BurnMan in development mode ..."
 python -m pip install -q -e .
 echo ""
 
+# Quietly install optional modules after burnman
+echo "Installing optional cvxpy, pycddlib and jupyter modules ..."
+python -m pip install -q cvxpy pycddlib jupyter
+echo ""
+
 function testit {
 t=$1
 

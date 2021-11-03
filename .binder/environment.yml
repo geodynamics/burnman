@@ -16,3 +16,4 @@ dependencies:
     - mpl-interactions
     - pycddlib
     - cvxpy
+    - jupyter

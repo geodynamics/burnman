@@ -27,8 +27,7 @@ metadata = dict(name='burnman',
 # distutils.
 try:
     from setuptools import setup
-    metadata['install_requires'] = ['numpy', 'matplotlib', 'scipy', 'sympy',
-                                    'cvxpy', 'jupyter']
+    metadata['install_requires'] = ['numpy', 'matplotlib', 'scipy', 'sympy']
 except ImportError:
     from distutils.core import setup
 
