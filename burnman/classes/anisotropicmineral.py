@@ -418,7 +418,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             The isothermal stiffness tensor [Pa]
             in standard form (:math:`\\mathbb{C}_{\\text{T} ijkl}`).
         """
-        return self._expand_stiffnesses(self.isothermal_stiffness_tensor)
+        return self._voigt_notation_to_stiffness_tensor(self.isothermal_stiffness_tensor)
 
     @material_property
     def full_isentropic_compliance_tensor(self):
