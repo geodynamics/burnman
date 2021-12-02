@@ -155,7 +155,7 @@ if __name__ == "__main__":
                       for sample in samples]
 
     # Get the run pressures of each experiment
-    pressures = [data['pressure'][indices[0]] for indices in sample_indices]
+    pressures = np.array([data['pressure'][indices[0]] for indices in sample_indices])
 
     # Create empty arrays to store the weight proportions of each phase,
     # and the principal uncertainties (we do not use the covariances here,

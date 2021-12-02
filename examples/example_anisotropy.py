@@ -30,7 +30,6 @@ from burnman.classes import anisotropy
 if __name__ == "__main__":
 
     try:
-        plt.style.use('ggplot')
         plt.rcParams['axes.facecolor'] = 'white'
         plt.rcParams['axes.edgecolor'] = 'black'
         plt.rcParams['figure.figsize'] = 16, 10  # inches
