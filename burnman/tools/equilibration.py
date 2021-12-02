@@ -901,13 +901,13 @@ def equilibrate(composition, assemblage, equality_constraints,
                                   store_iterates=store_iterates,
                                   max_iterations=max_iterations)
 
-        if sol.success:
+        if sol.success and len(assemblage.reaction_affinities) > 0.:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.e-5
             assemblage.equilibrium_tolerance = maxres
 
         if store_assemblage:
             sol.assemblage = assemblage.copy()
-            if sol.success:
+            if sol.success and len(assemblage.reaction_affinities) > 0.:
                 sol.assemblage.equilibrium_tolerance = maxres
 
         if verbose:
