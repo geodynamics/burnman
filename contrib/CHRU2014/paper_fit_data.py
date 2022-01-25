@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     mg_perovskite_test.set_method("bm2")
     sol = opt.fmin(error_func(mg_perovskite_test, obs_pressures, obs_vs),
-                   guess)
+                   guess, disp=False)
     print("2nd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_2nd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # now do third-order fit
     mg_perovskite_test.set_method("bm3")
     sol = opt.fmin(error_func(mg_perovskite_test, obs_pressures, obs_vs),
-                   guess)
+                   guess, disp=False)
     print("3rd order fit: G = ", sol[0] / 1.e9, "GPa\tG' = ", sol[1])
     model_vs_3rd_order_correct = calc_shear_velocities(
         sol[0], sol[1], mg_perovskite_test, pressures)
