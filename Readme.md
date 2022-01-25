@@ -43,6 +43,14 @@ Installation of BurnMan is mostly platform independent.
 As long as you know how to use a terminal, the process should be straightforward.
 The following instructions should help, but let us know if you have any problems.
 
+### Environment management
+We strongly recommend using a python environment manager like conda or pyenv to install
+burnman and its dependencies. This is especially the case for installations on modern Mac systems.
+
+For pyenv, we suggest you select the most recent version of python supported by BurnMan, install all of the dependencies into that environment and set the burnman root directory to use that environment automatically.
+
+For conda, we suggest making a new environment for the burnman installation, install the most recent version of python supported by BurnMan into that environment, and install all of the dependencies into that environment. Remember to activate the environment before installing new dependencies or using BurnMan.
+
 ### Dependencies
 First, make sure you have a sufficiently recent version of python installed on your machine (see above for the latest requirements).  To check your version of python, type the following in a terminal:
     python --version
@@ -74,7 +82,7 @@ Once the repository is cloned, navigate to the top-level directory by typing `cd
 
 ### Checking that the installation worked
 
-To check that the installation has worked, you can run the test suite (`./test.sh`). This takes a few minutes to run.
+To check that the installation has worked, you can run the test suite (`./test.sh`). This takes a few minutes to run. You may find that you need to install some other dependencies (latex, pycddlib) if you don't already have them on your system.
 
 A more basic check that BurnMan is installed is to navigate to the Burnman examples directory and type:
 
