@@ -19,7 +19,8 @@ metadata = dict(name='burnman',
                 'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
                 'Programming Language :: Python :: 3.7',
                 'Programming Language :: Python :: 3.8',
-                'Programming Language :: Python :: 3.9'],
+                'Programming Language :: Python :: 3.9',
+                'Programming Language :: Python :: 3.10'],
                 )
 
 # Try to use setuptools in order to check dependencies.
