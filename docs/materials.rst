@@ -53,3 +53,9 @@ Composites
 ----------
 
 .. autoclass:: burnman.Composite
+
+
+Calibrants
+----------
+
+.. autoclass:: burnman.Calibrant
