@@ -212,6 +212,7 @@ from .classes.combinedmineral import CombinedMineral
 from .classes.solutionmodel import SolutionModel
 from .classes.solidsolution import SolidSolution
 from .classes.composite import Composite
+from .classes.calibrant import Calibrant
 from .classes.anisotropy import AnisotropicMaterial
 from .classes.anisotropicmineral import AnisotropicMineral
 from .classes.anisotropicmineral import cell_parameters_to_vectors
@@ -233,6 +234,9 @@ from . import minerals
 
 # Equations of state
 from . import eos
+
+# Calibrants
+from . import calibrants
 
 # Tools
 from . import tools
