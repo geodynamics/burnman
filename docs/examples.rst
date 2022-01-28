@@ -30,6 +30,7 @@ of BurnMan objects:
   - :mod:`~examples.example_gibbs_modifiers`,
   - :mod:`~examples.example_solid_solution`,
   - :mod:`~examples.example_composite`,
+  - :mod:`~examples.example_calibrants`,
   - :mod:`~examples.example_anisotropy`,
   - :mod:`~examples.example_anisotropic_mineral`,
   - :mod:`~examples.example_geotherms`, and
@@ -72,6 +73,12 @@ of BurnMan objects:
   .. image:: figures/example_composite_figure_1.png
 
   .. image:: figures/example_composite_figure_2.png
+
+
+  .. automodule:: examples.example_mineral
+
+
+  .. automodule:: examples.example_calibrants
 
 
   .. automodule:: examples.example_anisotropy

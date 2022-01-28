@@ -51,3 +51,13 @@ Mineral databases
 
 .. automodule::  burnman.minerals.other
   :no-inherited-members:
+
+
+Calibrant databases
+-------------------
+
+.. automodule:: burnman.calibrants
+  :no-inherited-members:
+
+.. automodule::  burnman.calibrants.Decker_1971
+  :no-inherited-members:
