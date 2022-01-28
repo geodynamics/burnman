@@ -56,5 +56,8 @@ Mineral databases
 Calibrant databases
 -------------------
 
+.. automodule:: burnman.calibrants
+  :no-inherited-members:
+
 .. automodule::  burnman.calibrants.Decker_1971
   :no-inherited-members:

@@ -19,3 +19,4 @@ from . import composite
 from . import anisotropy
 from . import anisotropicmineral
 from . import mineral_helpers
+from . import calibrant

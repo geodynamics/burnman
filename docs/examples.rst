@@ -78,6 +78,9 @@ of BurnMan objects:
   .. automodule:: examples.example_mineral
 
 
+  .. automodule:: examples.example_calibrants
+
+
   .. automodule:: examples.example_anisotropy
 
   *Resulting figure:*
