@@ -156,21 +156,34 @@ def nonlinear_least_squares_fit(model,
         JTJ = J.T.dot(J)
         delta_beta = np.linalg.inv(
             JTJ + lmbda*np.diag(JTJ)).dot(J.T).dot(model.weighted_residuals)
-        new_params = model.get_params() - delta_beta
-        f_delta_beta = delta_beta/new_params
+        old_params = np.copy(model.get_params())
+        new_params = old_params - delta_beta
+        # f_delta_beta = delta_beta/new_params
 
         model.set_params(new_params)
 
+        # set_params may modify the step to satisfy bounds on the problem
+        # We therefore need to get the params before
+        # calculating the fractional change.
+        new_params = model.get_params()
+
+        # In case the new_params object returns a very small value,
+        # modify to avoid a pointless comparison:
+        mod_params = np.where(np.abs(new_params) < param_tolerance,
+                              param_tolerance, new_params)
+        f_delta_beta = (old_params - new_params)/mod_params
         return f_delta_beta
 
     n_data = len(model.data)
-    n_params = len(model.get_params())
+    params = model.get_params()
+    n_params = len(params)
     model.dof = n_data - n_params
 
     if not hasattr(model, 'flags'):
         model.flags = [None] * n_data
 
     for n_it in range(max_lm_iterations):
+        # update the parameters with a LM iteration
         f_delta_beta = _update_beta(lm_damping)
         max_f = np.max(np.abs(f_delta_beta))
         if verbose is True:
