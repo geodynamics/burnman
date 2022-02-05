@@ -118,11 +118,14 @@ class test_fitting(BurnManTest):
 
         PTV = np.empty((len(pressures), 3))
 
-        np.random.seed(10)
         for i in range(len(pressures)):
             fo.set_state(pressures[i], temperatures[i])
-            f = (1. + (np.random.normal() - 0.5)*5.e-4)
-            PTV[i] = [pressures[i], temperatures[i], fo.V*f]
+            PTV[i] = [pressures[i], temperatures[i], fo.V]
+
+        # Modify the lowest and highest pressure points
+        # to artificially reduce the value of K'0
+        PTV[0, 2] *= 1.01
+        PTV[-1, 2] *= 0.99
 
         params = ['V_0', 'K_0', 'Kprime_0']
         bounds = np.array([[0., np.inf], [0., np.inf], [3., 4.]])
@@ -130,7 +133,7 @@ class test_fitting(BurnManTest):
                                                       PTV, bounds=bounds,
                                                       verbose=False)
 
-        self.assertFloatEqual(4., fitted_eos.popt[2])
+        self.assertFloatEqual(3., fitted_eos.popt[2])
 
 
 if __name__ == '__main__':
