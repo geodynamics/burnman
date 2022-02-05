@@ -533,7 +533,7 @@ def extreme_values(weighted_residuals, confidence_interval):
 
 def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
 
-    if flags == []:
+    if flags is []:
         flags = [''] * len(weighted_residuals)
         list_flags = ['']
     else:
