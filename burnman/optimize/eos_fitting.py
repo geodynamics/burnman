@@ -39,13 +39,31 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
         Attribute names for the property to be fit for the whole
         dataset or each datum individually (e.g. 'V')
 
-    data : numpy array of observed P-T-property values
+    data : 2D numpy array of observed X-P-T-property values
 
-    data_covariances : numpy array of P-T-property covariances (optional)
+    data_covariances : 3D numpy array of X-P-T-property covariances (optional)
         If not given, all covariance matrices are chosen
-        such that C00 = 1, otherwise Cij = 0
-        In other words, all data points have equal weight,
-        with all error in the pressure
+        such that all data points have equal weight,
+        with all error in the pressure.
+
+    mle_tolerances : numpy array (optional)
+        Tolerances for termination of the maximum likelihood iterations.
+
+    param_tolerance : float (optional)
+        Fractional tolerance for termination of the nonlinear optimization.
+
+    delta_params : numpy array (optional)
+        Initial values for the change in parameters.
+
+    bounds : 2D numpy array (optional)
+        Minimum and maximum bounds for the parameters. The shape must be
+        (n_parameters, 2).
+
+    max_lm_iterations : integer (default : 50)
+        Maximum number of Levenberg-Marquardt iterations.
+
+    verbose : boolean (default : True)
+        Whether to print detailed information about the optimization to screen.
 
     Returns
     -------
