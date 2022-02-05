@@ -13,7 +13,9 @@ from ..tools.misc import flatten
 from ..tools.math import unit_normalize
 
 
-def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tolerances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
+def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
+                 mle_tolerances=[], param_tolerance=1.e-5,
+                 max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -70,7 +72,8 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
     """
 
     class Model(object):
-        def __init__(self, mineral, data, data_covariances, flags, fit_params, guessed_params, delta_params, mle_tolerances):
+        def __init__(self, mineral, data, data_covariances, flags, fit_params,
+                     guessed_params, delta_params, mle_tolerances):
             self.m = mineral
             self.data = data
             self.data_covariances = data_covariances
@@ -81,7 +84,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             self.mle_tolerances = mle_tolerances
 
         def set_params(self, param_values):
-            i=0
+            i = 0
             for param in self.fit_params:
                 if isinstance(self.m.params[param], float):
                     self.m.params[param] = param_values[i]
@@ -95,7 +98,8 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             params = []
             for i, param in enumerate(self.fit_params):
                 params.append(self.m.params[param])
-            return np.array(flatten([mineral.params[prm] for prm in fit_params]))
+            return np.array(flatten([mineral.params[prm]
+                                     for prm in fit_params]))
 
         def function(self, x, flag):
             P, T, p = x
@@ -124,16 +128,17 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
             else:
                 dP = 1.e5
                 dT = 1.
-                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2] - self.function([P-dP, T, 0.], flag)[2])
-                dpdT = (self.function([P, T+dT, 0.], flag)[2] - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
+                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2]
+                                - self.function([P-dP, T, 0.], flag)[2])
+                dpdT = (self.function([P, T+dT, 0.], flag)[2]
+                        - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
             dPdT = -dPdp*dpdT
             n = np.array([-1., dPdT, dPdp])
             return unit_normalize(n)
 
-
     # If only one property flag is given, assume it applies to all data
     if type(flags) is str:
-        flags = np.array([flags] * len(data[:,0]))
+        flags = np.array([flags] * len(data[:, 0]))
 
     # Apply mle tolerances if they dont exist
     if mle_tolerances == []:
@@ -142,52 +147,68 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[], mle_tole
         mle_tolerances = np.empty(len(flags))
         for i, flag in enumerate(flags):
             if flag in ['gibbs', 'enthalpy', 'H', 'helmholtz']:
-                mle_tolerances[i] = 1. # 1 J
+                mle_tolerances[i] = 1.  # 1 J
             else:
-                mle_tolerances[i] = mle_tolerance_factor*getattr(mineral, flag)
+                mle_tolerances[i] = mle_tolerance_factor * getattr(mineral,
+                                                                   flag)
 
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
     covariances_defined = True
     if data_covariances == []:
         covariances_defined = False
-        data_covariances = np.zeros((len(data[:,0]), len(data[0]), len(data[0])))
+        data_covariances = np.zeros((len(data[:, 0]),
+                                     len(data[0]), len(data[0])))
         for i in range(len(data_covariances)):
             data_covariances[i][0][0] = 1.
 
-    guessed_params = np.array(flatten([mineral.params[prm] for prm in fit_params]))
-    model = Model(mineral = mineral,
-                  data = data,
-                  data_covariances = data_covariances,
-                  flags = flags,
-                  fit_params = fit_params,
-                  guessed_params = guessed_params,
-                  delta_params = guessed_params*1.e-5,
-                  mle_tolerances = mle_tolerances)
+    guessed_params = np.array(flatten([mineral.params[prm]
+                                       for prm in fit_params]))
+    model = Model(mineral=mineral,
+                  data=data,
+                  data_covariances=data_covariances,
+                  flags=flags,
+                  fit_params=fit_params,
+                  guessed_params=guessed_params,
+                  delta_params=guessed_params*1.e-5,
+                  mle_tolerances=mle_tolerances)
 
-    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations = max_lm_iterations, param_tolerance=param_tolerance, verbose=verbose)
+    nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations=max_lm_iterations, param_tolerance=param_tolerance, verbose=verbose)
 
-    if verbose == True and covariances_defined == True:
+    if verbose is True and covariances_defined is True:
         confidence_interval = 0.9
-        confidence_bound, indices, probabilities = nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval)
+        d = nonlinear_fitting.extreme_values(model.weighted_residuals,
+                                             confidence_interval)
+        confidence_bound, indices, probabilities = d
         if indices != []:
-            print('The function nonlinear_fitting.extreme_values(model.weighted_residuals, confidence_interval) '
-                  'has determined that there are {0:d} data points which have residuals which are not '
-                  'expected at the {1:.1f}% confidence level (> {2:.1f} s.d. away from the model fit).\n'
-                  'Their indices and the probabilities of finding such extreme values are:'.format(len(indices), confidence_interval*100., confidence_bound))
+            print('The function nonlinear_fitting.extreme_values'
+                  '(model.weighted_residuals, confidence_interval) '
+                  f'has determined that there are {len(indices):d} data points'
+                  ' which have residuals which are not expected at the '
+                  f'{confidence_interval*100.:.1f}% confidence level '
+                  f'(> {confidence_bound:.1f} s.d. away from the model fit).\n'
+                  'Their indices and the probabilities of finding '
+                  'such extreme values are:')
             for i, idx in enumerate(indices):
-                print('[{0:d}]: {1:.4f} ({2:.1f} s.d. from the model)'.format(idx, probabilities[i], np.abs(model.weighted_residuals[idx])))
+                print(f'[{idx:d}]: {probabilities[i]:.4f} '
+                      f'({np.abs(model.weighted_residuals[idx]):.1f} s.d. '
+                      'from the model)')
             print('You might consider removing them from your fit, '
-                  'or increasing the uncertainties in their measured values.\n')
+                  'or increasing the uncertainties in their '
+                  'measured values.\n')
 
     return model
 
 
-def fit_PTV_data(mineral, fit_params, data, data_covariances=[], param_tolerance=1.e-5, max_lm_iterations=50, verbose=True):
+def fit_PTV_data(mineral, fit_params,
+                 data, data_covariances=[],
+                 param_tolerance=1.e-5, max_lm_iterations=50,
+                 verbose=True):
     """
     A simple alias for the fit_PTp_data for when all the data is volume data
     """
 
     return fit_PTp_data(mineral=mineral, flags='V',
                         data=data, data_covariances=data_covariances,
-                        fit_params=fit_params, param_tolerance=param_tolerance, max_lm_iterations=max_lm_iterations, verbose=verbose)
+                        fit_params=fit_params, param_tolerance=param_tolerance,
+                        max_lm_iterations=max_lm_iterations, verbose=verbose)
