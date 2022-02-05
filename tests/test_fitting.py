@@ -110,6 +110,28 @@ class test_fitting(BurnManTest):
 
         self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
 
+    def test_fit_bounded_PVT_data(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(0.e9, 10.e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params['T_0']
+
+        PTV = np.empty((len(pressures), 3))
+
+        np.random.seed(10)
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            f = (1. + (np.random.normal() - 0.5)*5.e-4)
+            PTV[i] = [pressures[i], temperatures[i], fo.V*f]
+
+        params = ['V_0', 'K_0', 'Kprime_0']
+        bounds = np.array([[0., np.inf], [0., np.inf], [3., 4.]])
+        fitted_eos = burnman.eos_fitting.fit_PTV_data(fo, params,
+                                                      PTV, bounds=bounds,
+                                                      verbose=False)
+
+        self.assertFloatEqual(4., fitted_eos.popt[2])
+
 
 if __name__ == '__main__':
     unittest.main()
