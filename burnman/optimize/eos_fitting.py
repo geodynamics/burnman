@@ -15,6 +15,7 @@ from ..tools.math import unit_normalize
 
 def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
                  mle_tolerances=[], param_tolerance=1.e-5,
+                 delta_params=None, bounds=None,
                  max_lm_iterations=50, verbose=True):
     """
     Given a mineral of any type, a list of fit parameters
@@ -38,13 +39,31 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
         Attribute names for the property to be fit for the whole
         dataset or each datum individually (e.g. 'V')
 
-    data : numpy array of observed P-T-property values
+    data : 2D numpy array of observed X-P-T-property values
 
-    data_covariances : numpy array of P-T-property covariances (optional)
+    data_covariances : 3D numpy array of X-P-T-property covariances (optional)
         If not given, all covariance matrices are chosen
-        such that C00 = 1, otherwise Cij = 0
-        In other words, all data points have equal weight,
-        with all error in the pressure
+        such that all data points have equal weight,
+        with all error in the pressure.
+
+    mle_tolerances : numpy array (optional)
+        Tolerances for termination of the maximum likelihood iterations.
+
+    param_tolerance : float (optional)
+        Fractional tolerance for termination of the nonlinear optimization.
+
+    delta_params : numpy array (optional)
+        Initial values for the change in parameters.
+
+    bounds : 2D numpy array (optional)
+        Minimum and maximum bounds for the parameters. The shape must be
+        (n_parameters, 2).
+
+    max_lm_iterations : integer (default : 50)
+        Maximum number of Levenberg-Marquardt iterations.
+
+    verbose : boolean (default : True)
+        Whether to print detailed information about the optimization to screen.
 
     Returns
     -------
@@ -73,18 +92,27 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
 
     class Model(object):
         def __init__(self, mineral, data, data_covariances, flags, fit_params,
-                     guessed_params, delta_params, mle_tolerances):
+                     mle_tolerances, delta_params=None, bounds=None):
             self.m = mineral
             self.data = data
             self.data_covariances = data_covariances
             self.flags = flags
             self.fit_params = fit_params
-            self.set_params(guessed_params)
-            self.delta_params = delta_params
             self.mle_tolerances = mle_tolerances
+            if delta_params is None:
+                self.delta_params = self.get_params()*1.e-5 + 1.e-10
+            else:
+                self.delta_params = delta_params
+            self.bounds = bounds
 
         def set_params(self, param_values):
             i = 0
+
+            if self.bounds is not None:
+                param_values = np.clip(param_values,
+                                       self.bounds[:, 0],
+                                       self.bounds[:, 1])
+
             for param in self.fit_params:
                 if isinstance(self.m.params[param], float):
                     self.m.params[param] = param_values[i]
@@ -162,16 +190,14 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
         for i in range(len(data_covariances)):
             data_covariances[i][0][0] = 1.
 
-    guessed_params = np.array(flatten([mineral.params[prm]
-                                       for prm in fit_params]))
     model = Model(mineral=mineral,
                   data=data,
                   data_covariances=data_covariances,
                   flags=flags,
                   fit_params=fit_params,
-                  guessed_params=guessed_params,
-                  delta_params=guessed_params*1.e-5,
-                  mle_tolerances=mle_tolerances)
+                  delta_params=delta_params,
+                  mle_tolerances=mle_tolerances,
+                  bounds=bounds)
 
     nonlinear_fitting.nonlinear_least_squares_fit(model, max_lm_iterations=max_lm_iterations, param_tolerance=param_tolerance, verbose=verbose)
 
@@ -202,6 +228,7 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
 
 def fit_PTV_data(mineral, fit_params,
                  data, data_covariances=[],
+                 delta_params=None, bounds=None,
                  param_tolerance=1.e-5, max_lm_iterations=50,
                  verbose=True):
     """
@@ -211,4 +238,5 @@ def fit_PTV_data(mineral, fit_params,
     return fit_PTp_data(mineral=mineral, flags='V',
                         data=data, data_covariances=data_covariances,
                         fit_params=fit_params, param_tolerance=param_tolerance,
+                        delta_params=delta_params, bounds=bounds,
                         max_lm_iterations=max_lm_iterations, verbose=verbose)
