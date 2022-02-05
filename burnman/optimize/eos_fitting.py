@@ -246,13 +246,10 @@ def fit_PTV_data(mineral, fit_params,
                         max_lm_iterations=max_lm_iterations, verbose=verbose)
 
 
-def fit_XPTp_data(solution, fit_params, flags, data,
-                  data_covariances=[],
-                  mle_tolerances=[],
-                  delta_params=None,
-                  param_tolerance=1.e-5,
-                  max_lm_iterations=50,
-                  verbose=True):
+def fit_XPTp_data(solution, fit_params, flags, data, data_covariances=[],
+                  mle_tolerances=[], param_tolerance=1.e-5,
+                  delta_params=None, bounds=None,
+                  max_lm_iterations=50, verbose=True):
     """
     Given a symmetric solution, a list of fit parameters
     and a set of P-T-property points and (optional) uncertainties,
@@ -290,6 +287,25 @@ def fit_XPTp_data(solution, fit_params, flags, data,
         such that all data points have equal weight,
         with all error in the pressure.
 
+    mle_tolerances : numpy array (optional)
+        Tolerances for termination of the maximum likelihood iterations.
+
+    param_tolerance : float (optional)
+        Fractional tolerance for termination of the nonlinear optimization.
+
+    delta_params : numpy array (optional)
+        Initial values for the change in parameters.
+
+    bounds : 2D numpy array (optional)
+        Minimum and maximum bounds for the parameters. The shape must be
+        (n_parameters, 2).
+
+    max_lm_iterations : integer (default : 50)
+        Maximum number of Levenberg-Marquardt iterations.
+
+    verbose : boolean (default : True)
+        Whether to print detailed information about the optimization to screen.
+
     Returns
     -------
     model : instance of fitted model
@@ -321,7 +337,7 @@ def fit_XPTp_data(solution, fit_params, flags, data,
 
     class Model(object):
         def __init__(self, solution, data, data_covariances, flags, fit_params,
-                     mle_tolerances, delta_params=None):
+                     mle_tolerances, delta_params=None, bounds=None):
             self.m = solution
             self.data = data
             self.data_covariances = data_covariances
@@ -338,6 +354,9 @@ def fit_XPTp_data(solution, fit_params, flags, data,
             self.mle_tolerances = mle_tolerances
             if delta_params is None:
                 self.delta_params = self.get_params()*1.e-5 + 1.e-10
+            else:
+                self.delta_params = delta_params
+            self.bounds = bounds
 
         def set_params(self, param_values):
             # fit_params is a list of lists
@@ -347,6 +366,12 @@ def fit_XPTp_data(solution, fit_params, flags, data,
             # numbers, and the third should be the interaction parameter type
             # (E, S or V).
             i = 0
+
+            if self.bounds is not None:
+                param_values = np.clip(param_values,
+                                       self.bounds[:, 0],
+                                       self.bounds[:, 1])
+
             for param in self.fit_params:
                 value = param_values[i]
                 if len(param) == 2:
@@ -477,7 +502,8 @@ def fit_XPTp_data(solution, fit_params, flags, data,
                   flags=flags,
                   fit_params=fit_params,
                   mle_tolerances=mle_tolerances,
-                  delta_params=delta_params)
+                  delta_params=delta_params,
+                  bounds=bounds)
 
     nonlinear_least_squares_fit(model,
                                 max_lm_iterations=max_lm_iterations,

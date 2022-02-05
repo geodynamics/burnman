@@ -34,12 +34,27 @@ if __name__ == "__main__":
     # Fit parameters
     fit_params = [['V_0', 0],
                   ['V_0', 1],
+                  ['K_0', 0],
+                  ['K_0', 1],
+                  ['Kprime_0', 0],
+                  ['Kprime_0', 1],
                   ['V', 0, 1]]
+
+    delta_params = np.array([1.e-8, 1.e-8, 1.e7, 1.e7, 1.e-1, 1.e-1, 1.e-8])
+    bounds = np.array([[0, np.inf],
+                       [0, np.inf],
+                       [0, np.inf],
+                       [0, np.inf],
+                       [3.5, 6.],
+                       [3.5, 6.],
+                       [-np.inf, np.inf]])
 
     # make up some data
     n_data = 100
     data = []
     data_covariances = []
+
+    f_Verror = 1.e-3
 
     random.seed(10)
     for i in range(n_data):
@@ -49,17 +64,17 @@ if __name__ == "__main__":
         X = [1.-x_fa, x_fa]
         solution.set_composition(X)
         solution.set_state(P, T)
-        f = (1. + (random.normal() - 0.5)*1.e-2)
+        f = (1. + (random.normal() - 0.5)*f_Verror)
         V = solution.V * f
 
         data.append([1.-x_fa, x_fa, P, T, V])
         data_covariances.append(np.zeros((5, 5)))
-        data_covariances[-1][4, 4] = np.power(solution.V*1.e-2, 2.)
+        data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
 
     # add one awful data point based on the last one
-    data.append([1.-x_fa, x_fa, P, T, V + 2.e-6])
+    data.append([1.-x_fa, x_fa, P, T, V + 2.e-7])
     data_covariances.append(np.zeros((5, 5)))
-    data_covariances[-1][4, 4] = np.power(solution.V*1.e-2, 2.)
+    data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
 
     data = np.array(data)
     data_covariances = np.array(data_covariances)
@@ -68,7 +83,7 @@ if __name__ == "__main__":
 
     confidence_interval = 0.95
     remove_outliers = True
-    good_data_confidence_interval = 0.9
+    good_data_confidence_interval = 0.99
     param_tolerance = 1.e-5
 
     properties_for_data_comparison_plots = [('V', 1.e6, 'Volume (cm^3/mol)')]
@@ -79,6 +94,8 @@ if __name__ == "__main__":
                                fit_params=fit_params,
                                data=data,
                                data_covariances=data_covariances,
+                               delta_params=delta_params,
+                               bounds=bounds,
                                param_tolerance=param_tolerance,
                                verbose=False)
 
