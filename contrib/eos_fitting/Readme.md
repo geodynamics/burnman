@@ -22,8 +22,3 @@ test.dat
 A file containing experimental data on the enthalpy and volume of
 periclase, taken from Victor and Douglas (1963), Hazen (1976) and
 Dewaele et al. (2000). Full references given at the end of that file.
-
-eos_fitting_solution.py
------------------------
-An example script that fits the properties of a solution, rather than
-an endmember mineral.

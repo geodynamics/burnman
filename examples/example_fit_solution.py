@@ -5,13 +5,20 @@
 
 
 """
-eos_fitting_solution
+example_fit_solution
 --------------------
 
-This script fits parameters from the the Stixrude and Lithgow-Bertelloni (2011)
-equation of state for solid solutions to mocked-up olivine volume data.
-"""
+This example demonstrates BurnMan's functionality to fit data
+on solutions to a solution model and equations of state
+of the user's choice.
 
+The example in this file deals with simple PVT fitting,
+but could easily be extended to fitting of other data.
+
+teaches:
+- least squares fitting for solution data
+
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import random
@@ -20,18 +27,38 @@ import burnman
 from burnman.tools.misc import pretty_print_values
 from burnman.optimize.eos_fitting import fit_XPTp_data
 from burnman.optimize.nonlinear_fitting import plot_residuals, extreme_values
-from burnman.optimize.nonlinear_fitting import corner_plot, weighted_residual_plot
+from burnman.optimize.nonlinear_fitting import corner_plot
+from burnman.optimize.nonlinear_fitting import weighted_residual_plot
+
 
 if __name__ == "__main__":
 
-    # Solution to optimise
-    # (along with tweaks to initial properties if necessary)
+    # Set np.array printing precision to be low
+    # (for more readable covariance matrices)
+    np.set_printoptions(precision=1)
+
+    # First, let's create a solution to optimise.
+    # In this case, we choose a solution model that exists in
+    # the BurnMan repository; the Mg-Fe olivine from
+    # the Stixrude and Lithgow-Bertelloni dataset
     solution = burnman.minerals.SLB_2011.mg_fe_olivine()
     solution.set_state(1.e5, 300.)
 
+    print('Names of endmembers in the olivine solution:')
     print(solution.endmember_names)
+    print('')
 
-    # Fit parameters
+    # Fit parameters are provided via a list of lists.
+    # The first element of each list is a string that corresponds
+    # either to one of the keys in an endmember parameter dictionary,
+    # or to an excess property for a binary join in the solution.
+    # The next parameters correspond to the indices of the endmembers
+    # to which the parameter corresponds.
+
+    # Here, we choose to fit he standard state volume, isothermal
+    # bulk modulus and its first derivative for both endmembers.
+    # Endmember 0 is forsterite, and Endmember 1 is fayalite.
+    # We also choose to fit the excess volume on the binary join.
     fit_params = [['V_0', 0],
                   ['V_0', 1],
                   ['K_0', 0],
@@ -40,22 +67,23 @@ if __name__ == "__main__":
                   ['Kprime_0', 1],
                   ['V', 0, 1]]
 
-    delta_params = np.array([1.e-8, 1.e-8, 1.e7, 1.e7, 1.e-1, 1.e-1, 1.e-8])
-    bounds = np.array([[0, np.inf],
-                       [0, np.inf],
-                       [0, np.inf],
-                       [0, np.inf],
-                       [3.5, 6.],
-                       [3.5, 6.],
-                       [-np.inf, np.inf]])
-
-    # make up some data
+    # Next, we make some synthetic data
     n_data = 100
     data = []
     data_covariances = []
 
+    # All of the data is volume data, so we declare a single
+    # flag. For data of different types, you can also pass a
+    # list of flags to the solver.
+    flags = 'V'
+
+    # For this example, we add some Gaussian noise
+    # to the volumes of olivines on the binary between
+    # 0-10 GPa and 300-1300 K
     f_Verror = 1.e-3
 
+    # Choose a specific seed for the random number generator
+    # so that this example is reproducible.
     random.seed(10)
     for i in range(n_data):
         x_fa = random.random()
@@ -71,23 +99,41 @@ if __name__ == "__main__":
         data_covariances.append(np.zeros((5, 5)))
         data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
 
-    # add one awful data point based on the last one
-    data.append([1.-x_fa, x_fa, P, T, V + 2.e-7])
+    # Here, we add one awful data point in the middle of the domain
+    # We do this to demonstrate the semi-automatic removal of bad data
+    # using extreme value theory.
+    solution.set_composition([0.5, 0.5])
+    solution.set_state(5.e9, 800.)
+    data.append([0.5, 0.5, 5.e9, 800., solution.V + 3.e-7])
     data_covariances.append(np.zeros((5, 5)))
     data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
 
     data = np.array(data)
     data_covariances = np.array(data_covariances)
-    param_tolerance = 1.e-8
-    flags = 'V'
 
+    # Finally, we choose some initial step sizes for the optimizer.
+    delta_params = np.array([1.e-8, 1.e-8, 1.e7, 1.e7, 1.e-1, 1.e-1, 1.e-8])
+
+    # And some bounds. For this example the bounds are not necessary,
+    # but if the data is somewhat shaky it can be useful to provide some
+    # guidance for the least squares minimizer.
+    bounds = np.array([[0, np.inf],
+                       [0, np.inf],
+                       [0, np.inf],
+                       [0, np.inf],
+                       [3.5, 6.],
+                       [3.5, 6.],
+                       [-np.inf, np.inf]])
+
+    param_tolerance = 1.e-5
+
+    # Finally, some post-processing options
     confidence_interval = 0.95
     remove_outliers = True
     good_data_confidence_interval = 0.99
-    param_tolerance = 1.e-5
-
     properties_for_data_comparison_plots = [('V', 1.e6, 'Volume (cm^3/mol)')]
 
+    # The following line fits the parameters to the data we defined above.
     print('Starting to fit user-defined data. Please be patient.')
     fitted_eos = fit_XPTp_data(solution=solution,
                                flags=flags,
