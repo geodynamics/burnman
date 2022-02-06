@@ -126,6 +126,6 @@ coding novices. For those of you who have little experience with Python,
 here are some specific features and pitfalls of the language:
 
 * Python uses specific indentation. A script might fail if a code block is not indented correctly. We use four spaces and no tabs. Mixing spaces and tabs can cause trouble.
-* Indices require square brackets and function or method calls require parentheses (different from Matlab).
+* Indices should be given inside square brackets and function or method call arguments inside parentheses (different from Matlab).
 * The first index of an array or list is 0 (e.g. x[0]), not 1.
-* Put dots after numbers to make them floats instead of integers (e.g. 5/3 will give 1 (Python 3.x rounds downward), while 5./3. will give 1.66666666667)
+* Put dots after numbers to make them floats instead of integers.
