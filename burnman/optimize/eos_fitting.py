@@ -169,6 +169,10 @@ def fit_PTp_data(mineral, fit_params, flags, data, data_covariances=[],
     if type(flags) is str:
         flags = np.array([flags] * len(data[:, 0]))
 
+    if len(flags) != len(data):
+        raise Exception(f'The number of flags (n = {len(flags)}) must be equal '
+                        f'to the number of data (n = {len(data)}).')
+
     # Apply mle tolerances if they dont exist
     if mle_tolerances == []:
         mineral.set_state(1.e5, 300.)
@@ -460,10 +464,19 @@ def fit_XPTp_data(solution, fit_params, flags, data, data_covariances=[],
             else:
                 dP = 1.e5
                 dT = 1.
-                dPdp = (2.*dP)/(self.function([P+dP, T, 0.], flag)[2]
-                                - self.function([P-dP, T, 0.], flag)[2])
-                dpdT = (self.function([P, T+dT, 0.], flag)[2]
-                        - self.function([P, T-dT, 0.], flag)[2])/(2.*dT)
+                xP0 = np.copy(x)
+                xP1 = np.copy(x)
+                xT0 = np.copy(x)
+                xT1 = np.copy(x)
+                xP0[-3] = xP1[-3] - dP
+                xP1[-3] = xP1[-3] + dP
+                xT0[-2] = xP1[-2] - dT
+                xT1[-2] = xP1[-2] + dT
+
+                dPdp = (2.*dP)/(self.function(xP1, flag)[2]
+                                - self.function(xP0, flag)[2])
+                dpdT = (self.function(xT1, flag)[2]
+                        - self.function(xT0, flag)[2])/(2.*dT)
             dPdT = -dPdp*dpdT
             n = np.zeros(len(x))
             n[-3:] = np.array([-1., dPdT, dPdp])
@@ -472,6 +485,10 @@ def fit_XPTp_data(solution, fit_params, flags, data, data_covariances=[],
     # If only one property flag is given, assume it applies to all data
     if type(flags) is str:
         flags = np.array([flags] * len(data[:, 0]))
+
+    if len(flags) != len(data):
+        raise Exception(f'The number of flags (n = {len(flags)}) must be equal '
+                        f'to the number of data (n = {len(data)}).')
 
     # Apply mle tolerances if they dont exist
     if mle_tolerances == []:
