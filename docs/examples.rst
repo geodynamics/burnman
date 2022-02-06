@@ -163,8 +163,10 @@ Advanced examples:
   - :mod:`~examples.example_optimize_pv`,
   - :mod:`~examples.example_compare_all_methods`,
   - :mod:`~examples.example_build_planet`,
-  - :mod:`~examples.example_fit_eos`,,
-  - :mod:`~examples.example_fit_composition`
+  - :mod:`~examples.example_fit_composition`,
+  - :mod:`~examples.example_fit_data`,
+  - :mod:`~examples.example_fit_eos`,
+  - :mod:`~examples.example_fit_solution`,
   - :mod:`~examples.example_equilibrate`, and
   - :mod:`~examples.example_olivine_binary`.
 
@@ -204,6 +206,14 @@ Advanced examples:
 .. image:: figures/example_build_planet.png
 
 
+.. automodule:: examples.example_fit_composition
+
+
+*Resulting figure:*
+
+.. image:: figures/example_fit_composition_Figure_1.png
+
+
 .. automodule:: examples.example_fit_data
 
 *Resulting figures:*
@@ -213,14 +223,6 @@ Advanced examples:
 .. image:: figures/example_fit_data2.png
 
 .. image:: figures/example_fit_data3.png
-
-
-.. automodule:: examples.example_fit_composition
-
-
-*Resulting figure:*
-
-.. image:: figures/example_fit_composition_Figure_1.png
 
 
 .. automodule:: examples.example_fit_eos
@@ -242,6 +244,20 @@ Advanced examples:
 
 .. image:: figures/example_fit_eos17.png
 
+
+
+.. automodule:: examples.example_fit_solution
+
+
+*Resulting figures:*
+
+.. image:: figures/example_fit_solution_01.png
+
+.. image:: figures/example_fit_solution_02.png
+
+.. image:: figures/example_fit_solution_03.png
+
+.. image:: figures/example_fit_solution_04.png
 
 
 .. automodule:: examples.example_equilibrate

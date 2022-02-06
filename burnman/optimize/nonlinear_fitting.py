@@ -205,8 +205,8 @@ def nonlinear_least_squares_fit(model,
 
     if verbose is True:
         if n_it == max_lm_iterations - 1:
-            print('Max iterations ({0:d}) reached (param tolerance = {1:1e})'.format(
-                max_lm_iterations, param_tolerance))
+            print(f'Max iterations ({max_lm_iterations:d}) reached '
+                  f'(param tolerance = {param_tolerance:1e})')
         else:
             print('Converged in {0:d} iterations'.format(n_it))
         print('\nOptimised parameter values:')
@@ -374,7 +374,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
     -------
     fig : matplotlib.pyplot.figure object
 
-    ax_array : list of matplotlib Axes objects
+    ax : list of matplotlib Axes objects
 
     """
 
@@ -390,38 +390,48 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.):
     scaling = 1./np.power(10., np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
 
-    fig, ax_array = plt.subplots(n_params-1, n_params-1)
+    fig, ax = plt.subplots(n_params-1, n_params-1)
     fig.set_size_inches(3.*(n_params-1), 3.*(n_params-1))
 
-    for i in range(n_params-1):
-        for j in range(1, i+1):
-            fig.delaxes(ax_array[j-1][i])
+    for j in range(n_params-1):
+        for i in range(j):
+            fig.delaxes(ax[i][j])
 
-        for j in range(i+1, n_params):
-            indices = np.array([i, j])
+        for i in range(j, n_params-1):
+            ax[i][j].get_xaxis().get_major_formatter().set_useOffset(False)
+            ax[i][j].get_yaxis().get_major_formatter().set_useOffset(False)
+            ax[i][j].set_box_aspect(1)
+
+            if j > 0:
+                ax[i][j].get_yaxis().set_visible(False)
+            if i < n_params - 2:
+                ax[i][j].get_xaxis().set_visible(False)
+
+            indices = np.array([j, i+1])
             projected_cov = (pcov*scaling)[indices[:, None], indices]
 
-            scaled_pos = np.array([popt[i]*np.sqrt(scaling[i][i]),
-                                   popt[j]*np.sqrt(scaling[j][j])])
+            scaled_pos = np.array([popt[j]*np.sqrt(scaling[j][j]),
+                                   popt[i+1]*np.sqrt(scaling[i+1][i+1])])
 
             plot_cov_ellipse(cov=projected_cov, pos=scaled_pos,
-                             nstd=n_std, ax=ax_array[j-1][i], color='grey')
+                             nstd=n_std, ax=ax[i][j], color='grey')
             maxx = 1.5*n_std*np.sqrt(projected_cov[0][0])
             maxy = 1.5*n_std*np.sqrt(projected_cov[1][1])
-            ax_array[j-1][i].set_xlim(scaled_pos[0]-maxx, scaled_pos[0]+maxx)
-            ax_array[j-1][i].set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
+            ax[i][j].set_xlim(scaled_pos[0]-maxx, scaled_pos[0]+maxx)
+            ax[i][j].set_ylim(scaled_pos[1]-maxy, scaled_pos[1]+maxy)
 
     if param_names != []:
         for i in range(n_params-1):
-            ax_array[n_params-2][i].set_xlabel('{0:s} (x 10^{1:d})'.format(
+            ax[n_params-2][i].set_xlabel('{0:s} (x $10^{{{1:d}}}$)'.format(
                 param_names[i], -int(np.log10(np.sqrt(scaling[i][i])))))
 
         for j in range(1, n_params):
-            ax_array[j-1][0].set_ylabel('{0:s} (x 10^{1:d})'.format(
+            ax[j-1][0].set_ylabel('{0:s} (x $10^{{{1:d}}}$)'.format(
                 param_names[j], -int(np.log10(np.sqrt(scaling[j][j])))))
 
     fig.set_tight_layout(True)
-    return fig, ax_array
+
+    return fig, ax
 
 
 def weighted_residual_plot(ax, model, flag=None, sd_limit=3,
@@ -537,9 +547,9 @@ def extreme_values(weighted_residuals, confidence_interval):
     indices = [i for i, r in enumerate(weighted_residuals)
                if np.abs(r) > confidence_bound]
     # Convert back to 2-tailed probabilities
-    probabilities = 1. - \
-        np.power(genextreme.sf(
-            np.abs(weighted_residuals[indices]), c, loc=mean, scale=scale) - 1., 2.)
+    probabilities = (1.
+                     - np.power(genextreme.sf(np.abs(weighted_residuals[indices]),
+                                              c, loc=mean, scale=scale) - 1., 2.))
 
     return confidence_bound, indices, probabilities
 
