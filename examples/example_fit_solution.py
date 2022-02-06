@@ -8,12 +8,13 @@
 example_fit_solution
 --------------------
 
-This example demonstrates BurnMan's functionality to fit data
-on solutions to a solution model and equations of state
-of the user's choice.
+This example demonstrates how to fit parameters
+for solution models using a range of compositionally-variable
+experimental data.
 
-The example in this file deals with simple PVT fitting,
-but could easily be extended to fitting of other data.
+The example in this file deals with finding optimized parameters
+for the forsterite-fayalite binary using a mixture of volume
+and seismic velocity data.
 
 teaches:
 - least squares fitting for solution data
@@ -65,21 +66,21 @@ if __name__ == "__main__":
                   ['K_0', 1],
                   ['Kprime_0', 0],
                   ['Kprime_0', 1],
+                  ['G_0', 0],
+                  ['G_0', 1],
                   ['V', 0, 1]]
 
     # Next, we make some synthetic data
     n_data = 100
     data = []
     data_covariances = []
-
-    # All of the data is volume data, so we declare a single
-    # flag. For data of different types, you can also pass a
-    # list of flags to the solver.
-    flags = 'V'
+    flags = []
 
     # For this example, we add some Gaussian noise
     # to the volumes of olivines on the binary between
-    # 0-10 GPa and 300-1300 K
+    # 0-10 GPa and 300-1300 K.
+    # Here 1 standard deviation is set as 0.1% of the
+    # volume at P and T
     f_Verror = 1.e-3
 
     # Choose a specific seed for the random number generator
@@ -98,6 +99,7 @@ if __name__ == "__main__":
         data.append([1.-x_fa, x_fa, P, T, V])
         data_covariances.append(np.zeros((5, 5)))
         data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
+        flags.append('V')
 
     # Here, we add one awful data point in the middle of the domain
     # We do this to demonstrate the semi-automatic removal of bad data
@@ -107,12 +109,38 @@ if __name__ == "__main__":
     data.append([0.5, 0.5, 5.e9, 800., solution.V + 3.e-7])
     data_covariances.append(np.zeros((5, 5)))
     data_covariances[-1][4, 4] = np.power(solution.V*f_Verror, 2.)
+    flags.append('V')
+
+    # Now create some velocity data, again adding
+    # some Gaussian noise.
+    # Here 1 standard deviation is set as 1% of the
+    # P wave velocity at P and T
+    n_data = 20
+    f_Vperror = 1.e-2
+
+    for i in range(n_data):
+        x_fa = random.random()
+        P = random.random() * 1.e10
+        T = random.random() * 1000. + 300.
+        X = [1.-x_fa, x_fa]
+        solution.set_composition(X)
+        solution.set_state(P, T)
+        f = (1. + (random.normal() - 0.5)*f_Vperror)
+        Vp = solution.p_wave_velocity * f
+
+        data.append([1.-x_fa, x_fa, P, T, Vp])
+        data_covariances.append(np.zeros((5, 5)))
+        data_covariances[-1][4, 4] = np.power(solution.p_wave_velocity
+                                              * f_Vperror, 2.)
+        flags.append('p_wave_velocity')
 
     data = np.array(data)
     data_covariances = np.array(data_covariances)
+    flags = np.array(flags)
 
-    # Finally, we choose some initial step sizes for the optimizer.
-    delta_params = np.array([1.e-8, 1.e-8, 1.e7, 1.e7, 1.e-1, 1.e-1, 1.e-8])
+    # Here are some (optional) initial step sizes for the optimizer.
+    delta_params = np.array([1.e-8, 1.e-8, 1.e7, 1.e7,
+                             1.e-1, 1.e-1, 1.e-1, 1.e-1, 1.e-8])
 
     # And some bounds. For this example the bounds are not necessary,
     # but if the data is somewhat shaky it can be useful to provide some
@@ -123,6 +151,8 @@ if __name__ == "__main__":
                        [0, np.inf],
                        [3.5, 6.],
                        [3.5, 6.],
+                       [0, np.inf],
+                       [0, np.inf],
                        [-np.inf, np.inf]])
 
     param_tolerance = 1.e-5
@@ -131,7 +161,9 @@ if __name__ == "__main__":
     confidence_interval = 0.95
     remove_outliers = True
     good_data_confidence_interval = 0.99
-    properties_for_data_comparison_plots = [('V', 1.e6, 'Volume (cm^3/mol)')]
+    properties_for_data_comparison_plots = [('V', 1.e6, 'Volume (cm^3/mol)'),
+                                            ('p_wave_velocity', 1.e-3,
+                                             '$V_P$ (km/s)')]
 
     # The following line fits the parameters to the data we defined above.
     print('Starting to fit user-defined data. Please be patient.')
@@ -177,6 +209,7 @@ if __name__ == "__main__":
         mask = [i for i in range(len(fitted_eos.weighted_residuals))
                 if i not in indices]
         data = data[mask]
+        flags = flags[mask]
         data_covariances = data_covariances[mask]
         fitted_eos = fit_XPTp_data(solution=solution,
                                    flags=flags,

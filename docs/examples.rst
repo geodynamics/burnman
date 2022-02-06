@@ -251,13 +251,25 @@ Advanced examples:
 
 *Resulting figures:*
 
-.. image:: figures/example_fit_solution_01.png
+.. figure:: figures/example_fit_solution_01.png
 
-.. image:: figures/example_fit_solution_02.png
+  Data residuals relative to the model fitted using all the provided data.
 
-.. image:: figures/example_fit_solution_03.png
+.. figure:: figures/example_fit_solution_02.png
 
-.. image:: figures/example_fit_solution_04.png
+  Data residuals relative to the model fitted using the provided data after semi-automatic removal of spurious data.
+
+.. figure:: figures/example_fit_solution_03.png
+
+  The variance-covariance matrix of the optimized parameters shown as a corner plot.
+
+.. figure:: figures/example_fit_solution_04.png
+
+  A P-T plot showing the weighted residuals of each piece of volume data.
+
+.. figure:: figures/example_fit_solution_05.png
+
+  A P-T plot showing the weighted residuals of each piece of P-wave velocity data.
 
 
 .. automodule:: examples.example_equilibrate
