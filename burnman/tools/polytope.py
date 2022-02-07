@@ -12,7 +12,7 @@ from scipy.linalg import block_diag
 import logging
 import importlib
 from ..classes.polytope import MaterialPolytope, independent_row_indices
-from ..classes.solidsolution import SolidSolution
+from ..classes.solution import Solution
 from ..classes.composite import Composite
 from .solution import transform_solution_to_new_basis
 
@@ -134,7 +134,7 @@ def composite_polytope_at_constrained_composition(composite, composition,
     Parameters
     ----------
     composite : :class:`burnman.Composite` object
-        A composite containing one or more SolidSolution and Mineral objects.
+        A composite containing one or more Solution and Mineral objects.
 
     composition : dictionary
         A dictionary containing the amounts of each element.
@@ -158,7 +158,7 @@ def composite_polytope_at_constrained_composition(composite, composition,
 
     eoccs = []
     for i, ph in enumerate(composite.phases):
-        if isinstance(ph, SolidSolution):
+        if isinstance(ph, Solution):
             eoccs.append(ph.solution_model.endmember_occupancies.T)
         else:
             eoccs.append(np.ones((1, 1)))
@@ -179,7 +179,7 @@ def simplify_composite_with_composition(composite, composition):
 
     For example, if the composition is given as {'Mg': 2., 'Si': 1.5, 'O': 5.},
     and the composite is given as a mix of Mg,Fe olivine and pyroxene
-    solid solutions, this function will return a composite that only contains
+    solutions, this function will return a composite that only contains
     the Mg-bearing endmembers.
 
     Parameters
@@ -213,7 +213,7 @@ def simplify_composite_with_composition(composite, composition):
 
         if rank < n_mbrs:
 
-            if isinstance(ph, SolidSolution) and rank > 0:
+            if isinstance(ph, Solution) and rank > 0:
 
                 if len(amounts) > 1:
                     c_mean = np.mean(amounts, axis=0)

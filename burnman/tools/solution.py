@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -9,7 +9,7 @@ from __future__ import absolute_import
 import numpy as np
 from sympy import Matrix
 from ..classes.combinedmineral import CombinedMineral
-from ..classes.solidsolution import SolidSolution
+from ..classes.solution import Solution
 from .chemistry import site_occupancies_to_strings
 
 
@@ -180,11 +180,11 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
                                     molar_fractions=None):
     """
     Transforms a solution model from one endmember basis to another.
-    Returns a new SolidSolution object.
+    Returns a new Solution object.
 
     Parameters
     ----------
-    solution : :class:`burnman.SolidSolution` object
+    solution : :class:`burnman.Solution` object
         The original solution object.
 
     new_basis : 2D numpy array
@@ -205,8 +205,8 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
 
     Returns
     -------
-    solution : :class:`burnman.SolidSolution` object
-        The transformed solid solution
+    solution : :class:`burnman.Solution` object
+        The transformed solution
     """
     new_basis = np.array(new_basis)
     if n_mbrs is None:
@@ -320,14 +320,14 @@ def transform_solution_to_new_basis(solution, new_basis, n_mbrs=None,
         endmembers[0][0].basis = new_basis
         return endmembers[0][0]
     else:
-        new_solution = SolidSolution(name=name,
-                                     solution_type=solution_type,
-                                     endmembers=endmembers,
-                                     energy_interaction=energy_interaction,
-                                     volume_interaction=volume_interaction,
-                                     entropy_interaction=entropy_interaction,
-                                     alphas=alphas,
-                                     molar_fractions=molar_fractions)
+        new_solution = Solution(name=name,
+                                solution_type=solution_type,
+                                endmembers=endmembers,
+                                energy_interaction=energy_interaction,
+                                volume_interaction=volume_interaction,
+                                entropy_interaction=entropy_interaction,
+                                alphas=alphas,
+                                molar_fractions=molar_fractions)
         new_solution.parent = solution
         new_solution.basis = new_basis
         return new_solution

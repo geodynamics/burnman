@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -20,20 +20,20 @@ from ..tools.reductions import independent_row_indices
 from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
 
-class SolidSolution(Mineral):
+class Solution(Mineral):
     """
-    This is the base class for all solid solutions.
+    This is the base class for all solutions.
     Site occupancies, endmember activities and the constant
     and pressure and temperature dependencies of the excess
-    properties can be queried after using set_composition()
-    States of the solid solution can only be queried after setting
+    properties can be queried after using set_composition().
+    States of the solution can only be queried after setting
     the pressure, temperature and composition using set_state().
 
-    This class is available as :class:`burnman.SolidSolution`.
+    This class is available as :class:`burnman.Solution`.
     It uses an instance of :class:`burnman.SolutionModel` to
     calculate interaction terms between endmembers.
 
-    All the solid solution parameters are expected to be in SI units.  This
+    All the solution parameters are expected to be in SI units.  This
     means that the interaction parameters should be in J/mol, with the T
     and P derivatives in J/K/mol and m^3/mol.
 
@@ -44,16 +44,16 @@ class SolidSolution(Mineral):
     Parameters
     ----------
     name : string
-        Name of the solid solution
+        Name of the solution
     solution_type : string
         String determining which SolutionModel to use. One of 'mechanical',
         'ideal', 'symmetric', 'asymmetric' or 'subregular'.
     endmembers : list of lists
-        List of endmembers in this solid solution. The first item of each
+        List of endmembers in this solution. The first item of each
         list should be a :class:`burnman.Mineral` object. The second item
         should be a string with the site formula of the endmember.
     molar_fractions : numpy array (optional)
-        The molar fractions of each endmember in the solid solution.
+        The molar fractions of each endmember in the solution.
         Can be reset using the set_composition() method.
     """
 
@@ -74,9 +74,9 @@ class SolidSolution(Mineral):
         """
         Mineral.__init__(self)
 
-        # SolidSolution needs a method attribute to call Mineral.set_state().
+        # Solution needs a method attribute to call Mineral.set_state().
         # Note that set_method() below will not change self.method
-        self.method = 'SolidSolutionMethod'
+        self.method = 'SolutionMethod'
 
         if name is not None:
             self.name = name
@@ -103,7 +103,7 @@ class SolidSolution(Mineral):
 
         if hasattr(self, 'endmembers') is False:
             raise Exception("'endmembers' attribute missing "
-                            "from solid solution")
+                            "from solution")
 
         # Set default solution model type
         if hasattr(self, 'solution_type'):
@@ -126,7 +126,7 @@ class SolidSolution(Mineral):
                 elif self.solution_type == 'asymmetric':
                     if hasattr(self, 'alphas') is False:
                         raise Exception(
-                            "'alphas' attribute missing from solid solution")
+                            "'alphas' attribute missing from solution")
                     self.solution_model = AsymmetricRegularSolution(
                         self.endmembers, self.alphas, self.energy_interaction,
                         self.volume_interaction, self.entropy_interaction)
@@ -164,7 +164,7 @@ class SolidSolution(Mineral):
 
     def set_composition(self, molar_fractions):
         """
-        Set the composition for this solid solution.
+        Set the composition for this solution.
         Resets cached properties.
 
         Parameters
@@ -196,7 +196,7 @@ class SolidSolution(Mineral):
     @material_property
     def formula(self):
         """
-        Returns molar chemical formula of the solid solution.
+        Returns molar chemical formula of the solution.
         """
         return sum_formulae(self.endmember_formulae, self.molar_fractions)
 
@@ -230,7 +230,7 @@ class SolidSolution(Mineral):
     def excess_partial_gibbs(self):
         """
         Returns excess partial molar gibbs free energy [J/mol].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_partial_gibbs_free_energies(self.pressure, self.temperature, self.molar_fractions)
 
@@ -238,7 +238,7 @@ class SolidSolution(Mineral):
     def excess_partial_volumes(self):
         """
         Returns excess partial volumes [m^3].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_partial_volumes(self.pressure,
                                                           self.temperature,
@@ -248,7 +248,7 @@ class SolidSolution(Mineral):
     def excess_partial_entropies(self):
         """
         Returns excess partial entropies [J/K].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_partial_entropies(self.pressure,
                                                             self.temperature,
@@ -258,7 +258,7 @@ class SolidSolution(Mineral):
     def partial_gibbs(self):
         """
         Returns endmember partial molar gibbs free energy [J/mol].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return (np.array([self.endmembers[i][0].gibbs
                           for i in range(self.n_endmembers)])
@@ -268,7 +268,7 @@ class SolidSolution(Mineral):
     def partial_volumes(self):
         """
         Returns endmember partial volumes [m^3].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return (np.array([self.endmembers[i][0].molar_volume
                           for i in range(self.n_endmembers)])
@@ -278,7 +278,7 @@ class SolidSolution(Mineral):
     def partial_entropies(self):
         """
         Returns endmember partial entropies [J/K].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return (np.array([self.endmembers[i][0].molar_entropy
                           for i in range(self.n_endmembers)])
@@ -288,7 +288,7 @@ class SolidSolution(Mineral):
     def excess_gibbs(self):
         """
         Returns molar excess gibbs free energy [J/mol].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_gibbs_free_energy(self.pressure,
                                                             self.temperature,
@@ -298,7 +298,7 @@ class SolidSolution(Mineral):
     def gibbs_hessian(self):
         """
         Returns an array containing the second compositional derivative
-        of the Gibbs free energy [J]. Property specific to solid solutions.
+        of the Gibbs free energy [J]. Property specific to solutions.
         """
         return self.solution_model.gibbs_hessian(self.pressure,
                                                  self.temperature,
@@ -308,7 +308,7 @@ class SolidSolution(Mineral):
     def entropy_hessian(self):
         """
         Returns an array containing the second compositional derivative
-        of the entropy [J/K]. Property specific to solid solutions.
+        of the entropy [J/K]. Property specific to solutions.
         """
         return self.solution_model.entropy_hessian(self.pressure,
                                                    self.temperature,
@@ -318,7 +318,7 @@ class SolidSolution(Mineral):
     def volume_hessian(self):
         """
         Returns an array containing the second compositional derivative
-        of the volume [m^3]. Property specific to solid solutions.
+        of the volume [m^3]. Property specific to solutions.
         """
         return self.solution_model.volume_hessian(self.pressure,
                                                   self.temperature,
@@ -327,7 +327,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_gibbs(self):
         """
-        Returns molar Gibbs free energy of the solid solution [J/mol].
+        Returns molar Gibbs free energy of the solution [J/mol].
         Aliased with self.gibbs.
         """
         return sum([self.endmembers[i][0].gibbs * self.molar_fractions[i]
@@ -336,7 +336,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_helmholtz(self):
         """
-        Returns molar Helmholtz free energy of the solid solution [J/mol].
+        Returns molar Helmholtz free energy of the solution [J/mol].
         Aliased with self.helmholtz.
         """
         return self.molar_gibbs - self.pressure * self.molar_volume
@@ -344,7 +344,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_mass(self):
         """
-        Returns molar mass of the solid solution [kg/mol].
+        Returns molar mass of the solution [kg/mol].
         """
         return sum([self.endmembers[i][0].molar_mass
                     * self.molar_fractions[i]
@@ -353,8 +353,8 @@ class SolidSolution(Mineral):
     @material_property
     def excess_volume(self):
         """
-        Returns excess molar volume of the solid solution [m^3/mol].
-        Specific property for solid solutions.
+        Returns excess molar volume of the solution [m^3/mol].
+        Specific property for solutions.
         """
         return self.solution_model.excess_volume(self.pressure,
                                                  self.temperature,
@@ -363,7 +363,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_volume(self):
         """
-        Returns molar volume of the solid solution [m^3/mol].
+        Returns molar volume of the solution [m^3/mol].
         Aliased with self.V.
         """
         return sum([self.endmembers[i][0].molar_volume
@@ -373,7 +373,7 @@ class SolidSolution(Mineral):
     @material_property
     def density(self):
         """
-        Returns density of the solid solution [kg/m^3].
+        Returns density of the solution [kg/m^3].
         Aliased with self.rho.
         """
         return self.molar_mass / self.molar_volume
@@ -382,7 +382,7 @@ class SolidSolution(Mineral):
     def excess_entropy(self):
         """
         Returns excess molar entropy [J/K/mol].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_entropy(self.pressure,
                                                   self.temperature,
@@ -391,7 +391,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_entropy(self):
         """
-        Returns molar entropy of the solid solution [J/K/mol].
+        Returns molar entropy of the solution [J/K/mol].
         Aliased with self.S.
         """
         return sum([self.endmembers[i][0].S * self.molar_fractions[i]
@@ -401,7 +401,7 @@ class SolidSolution(Mineral):
     def excess_enthalpy(self):
         """
         Returns excess molar enthalpy [J/mol].
-        Property specific to solid solutions.
+        Property specific to solutions.
         """
         return self.solution_model.excess_enthalpy(self.pressure,
                                                    self.temperature,
@@ -410,7 +410,7 @@ class SolidSolution(Mineral):
     @material_property
     def molar_enthalpy(self):
         """
-        Returns molar enthalpy of the solid solution [J/mol].
+        Returns molar enthalpy of the solution [J/mol].
         Aliased with self.H.
         """
         return sum([self.endmembers[i][0].H * self.molar_fractions[i]
@@ -419,7 +419,7 @@ class SolidSolution(Mineral):
     @material_property
     def isothermal_bulk_modulus(self):
         """
-        Returns isothermal bulk modulus of the solid solution [Pa].
+        Returns isothermal bulk modulus of the solution [Pa].
         Aliased with self.K_T.
         """
         return self.V * 1. / (sum([self.endmembers[i][0].V
@@ -430,7 +430,7 @@ class SolidSolution(Mineral):
     @material_property
     def adiabatic_bulk_modulus(self):
         """
-        Returns adiabatic bulk modulus of the solid solution [Pa].
+        Returns adiabatic bulk modulus of the solution [Pa].
         Aliased with self.K_S.
         """
         if self.temperature < 1e-10:
@@ -442,7 +442,7 @@ class SolidSolution(Mineral):
     @material_property
     def isothermal_compressibility(self):
         """
-        Returns isothermal compressibility of the solid solution.
+        Returns isothermal compressibility of the solution.
         (or inverse isothermal bulk modulus) [1/Pa].
         Aliased with self.K_T.
         """
@@ -451,7 +451,7 @@ class SolidSolution(Mineral):
     @material_property
     def adiabatic_compressibility(self):
         """
-        Returns adiabatic compressibility of the solid solution.
+        Returns adiabatic compressibility of the solution.
         (or inverse adiabatic bulk modulus) [1/Pa].
         Aliased with self.K_S.
         """
@@ -460,7 +460,7 @@ class SolidSolution(Mineral):
     @material_property
     def shear_modulus(self):
         """
-        Returns shear modulus of the solid solution [Pa].
+        Returns shear modulus of the solution [Pa].
         Aliased with self.G.
         """
         G_list = np.fromiter((e[0].G for e in self.endmembers), dtype=float,
@@ -470,7 +470,7 @@ class SolidSolution(Mineral):
     @material_property
     def p_wave_velocity(self):
         """
-        Returns P wave speed of the solid solution [m/s].
+        Returns P wave speed of the solution [m/s].
         Aliased with self.v_p.
         """
         return np.sqrt((self.adiabatic_bulk_modulus
@@ -479,7 +479,7 @@ class SolidSolution(Mineral):
     @material_property
     def bulk_sound_velocity(self):
         """
-        Returns bulk sound speed of the solid solution [m/s].
+        Returns bulk sound speed of the solution [m/s].
         Aliased with self.v_phi.
         """
         return np.sqrt(self.adiabatic_bulk_modulus / self.density)
@@ -487,7 +487,7 @@ class SolidSolution(Mineral):
     @material_property
     def shear_wave_velocity(self):
         """
-        Returns shear wave speed of the solid solution [m/s].
+        Returns shear wave speed of the solution [m/s].
         Aliased with self.v_s.
         """
         return np.sqrt(self.shear_modulus / self.density)
@@ -495,7 +495,7 @@ class SolidSolution(Mineral):
     @material_property
     def grueneisen_parameter(self):
         """
-        Returns grueneisen parameter of the solid solution [unitless].
+        Returns grueneisen parameter of the solution [unitless].
         Aliased with self.gr.
         """
         if self.temperature < 1e-10:
@@ -508,7 +508,7 @@ class SolidSolution(Mineral):
     def thermal_expansivity(self):
         """
         Returns thermal expansion coefficient (alpha)
-        of the solid solution [1/K].
+        of the solution [1/K].
         Aliased with self.alpha.
         """
         return (1. / self.V) * sum([self.endmembers[i][0].alpha
@@ -520,7 +520,7 @@ class SolidSolution(Mineral):
     def molar_heat_capacity_v(self):
         """
         Returns molar heat capacity at constant volume of the
-        solid solution [J/K/mol].
+        solution [J/K/mol].
         Aliased with self.C_v.
         """
         return (self.molar_heat_capacity_p
@@ -532,7 +532,7 @@ class SolidSolution(Mineral):
     def molar_heat_capacity_p(self):
         """
         Returns molar heat capacity at constant pressure
-        of the solid solution [J/K/mol].
+        of the solution [J/K/mol].
         Aliased with self.C_p.
         """
         return sum([self.endmembers[i][0].molar_heat_capacity_p
@@ -604,7 +604,7 @@ class SolidSolution(Mineral):
     def compositional_null_basis(self):
         """
         An array N such that N.b = 0 for all bulk compositions that can
-        be produced with a linear sum of the endmembers in the solid solution.
+        be produced with a linear sum of the endmembers in the solution.
         """
         null_basis = np.array([v[:] for v in
                                self.stoichiometric_matrix.nullspace()])
@@ -617,28 +617,28 @@ class SolidSolution(Mineral):
     @cached_property
     def endmember_formulae(self):
         """
-        A list of formulae for all the endmember in the solid solution.
+        A list of formulae for all the endmember in the solution.
         """
         return [mbr[0].params['formula'] for mbr in self.endmembers]
 
     @cached_property
     def endmember_names(self):
         """
-        A list of names for all the endmember in the solid solution.
+        A list of names for all the endmember in the solution.
         """
         return [mbr[0].name for mbr in self.endmembers]
 
     @cached_property
     def n_endmembers(self):
         """
-        The number of endmembers in the solid solution.
+        The number of endmembers in the solution.
         """
         return len(self.endmembers)
 
     @cached_property
     def elements(self):
         """
-        A list of the elements which could be contained in the solid solution,
+        A list of the elements which could be contained in the solution,
         returned in the IUPAC element order.
         """
         keys = []
@@ -646,3 +646,6 @@ class SolidSolution(Mineral):
             keys.extend(f.keys())
 
         return sort_element_list_to_IUPAC_order(set(keys))
+
+
+SolidSolution = Solution

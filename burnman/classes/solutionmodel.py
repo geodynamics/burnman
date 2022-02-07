@@ -106,16 +106,16 @@ class SolutionModel(object):
 
     """
     This is the base class for a solution model,  intended for use
-    in defining solid solutions and performing thermodynamic calculations
-    on them.  All minerals of type :class:`burnman.SolidSolution` use
-    a solution model for defining how the endmembers in the solid solution
+    in defining solutions and performing thermodynamic calculations
+    on them.  All minerals of type :class:`burnman.Solution` use
+    a solution model for defining how the endmembers in the solution
     interact.
 
     A user wanting a new solution model should define the functions included
     in the base class. All of the functions in the base class return zero,
     so if the user-defined solution model does not implement them,
     they essentially have no effect, and the Gibbs free energy and molar
-    volume of a solid solution will be equal to the weighted arithmetic
+    volume of a solution will be equal to the weighted arithmetic
     averages of the different endmember values.
     """
 
@@ -361,7 +361,7 @@ class IdealSolution (SolutionModel):
         self.n_endmembers = len(endmembers)
         self.formulas = [e[1] for e in endmembers]
 
-        # Process solid solution chemistry
+        # Process solution chemistry
         process_solution_chemistry(self)
 
         self._calculate_endmember_configurational_entropies()

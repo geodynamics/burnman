@@ -11,7 +11,7 @@ import warnings
 
 from .material import Material, material_property, cached_property
 from .mineral import Mineral
-from .solidsolution import SolidSolution
+from .solution import Solution
 from . import averaging_schemes
 
 from ..tools.reductions import independent_row_indices
@@ -92,7 +92,7 @@ class Composite(Material):
         string+='\nPhase and endmember fractions:'
         for phase, fraction in zip(*self.unroll()):
             string+='\n  {0}: {1:0.{sf}f}'.format(phase.name, fraction, sf=self.print_precision)
-            if isinstance(phase, SolidSolution):
+            if isinstance(phase, Solution):
                for i in range(phase.n_endmembers):
                    string+='\n    {0}: {1:0.{sf}f}'.format(phase.endmember_names[i],
                                                            phase.molar_fractions[i],
@@ -656,7 +656,7 @@ class Composite(Material):
         A list of the endmember names contained in the composite.
         Mineral names are returned as given in Mineral.name.
         Solution endmember names are given in the format
-        `Mineral.name in SolidSolution.name`.
+        `Mineral.name in Solution.name`.
         """
         self._set_endmember_properties()
         return self.__dict__['endmember_names']
@@ -707,7 +707,7 @@ class Composite(Material):
         endmembers_per_phase = []
         for ph_idx, ph in enumerate(self.phases):
 
-            if isinstance(ph, SolidSolution):
+            if isinstance(ph, Solution):
                 endmember_formulae.extend(ph.endmember_formulae)
                 endmember_names.extend([name+' in '+ph.name
                                         for name in ph.endmember_names])
@@ -720,7 +720,7 @@ class Composite(Material):
 
             else:
                 raise Exception('Unsupported Material type, can only read'
-                                'burnman.Mineral or burnman.SolidSolution')
+                                'burnman.Mineral or burnman.Solution')
 
         # Populate the stoichiometric matrix
         keys = []

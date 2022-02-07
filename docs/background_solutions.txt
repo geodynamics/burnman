@@ -1,14 +1,21 @@
-.. _ref-methods-solid-solutions:
+.. _ref-methods-solutions:
 
-Calculating Solid Solution Properties
--------------------------------------
-Many minerals can exist over a finite region of composition space. These spaces are bounded by endmembers (which may themselves not be stable), and each individual mineral can then be described as a solid solution of those endmembers. At an atomic level, different elements substitute for one another on distinct crystallographic sites in the structure. For example, low pressure silicate garnets have two distinct sites on which mixing takes place; a dodecahedral site (of which there are three per unit cell on an eight-cation basis) and octahedral site (of which there are two per unit cell). A third tetrahedral cation site (three per unit cell) is usually assumed to be occupied solely by silicon, and therefore can be ignored in solid solution calculations. The chemical formula of many low pressure garnets exist within the solid solution:
+Calculating Solution Properties
+-------------------------------
+Many phases (whether minerals, melts, fluids or gases) can exist over a finite region of composition space.
+These spaces are bounded by endmembers (which may themselves not be stable), and each phase can then be described
+as a solution of those endmembers. In a solid solution, different elements substitute for one another on distinct
+crystallographic sites in the structure. For example, low pressure silicate garnets have two distinct sites on
+which mixing takes place; a dodecahedral site (of which there are three per unit cell on an eight-cation basis)
+and octahedral site (of which there are two per unit cell). A third tetrahedral cation site (three per unit cell)
+is usually assumed to be occupied solely by silicon, and therefore can be ignored in solution calculations.
+The chemical formula of many low pressure garnets exist within the solution:
 
 .. math::
     \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
 
 
-We typically calculate solid solution properties by appropriate differentiation of the Gibbs Free energy, where
+We typically calculate solution properties by appropriate differentiation of the Gibbs energy, where
 
 .. math::
     \mathcal{G} = \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)\\
@@ -17,10 +24,10 @@ We typically calculate solid solution properties by appropriate differentiation 
 Implemented models
 ^^^^^^^^^^^^^^^^^^
 
-Ideal solid solutions
-"""""""""""""""""""""
-A solid solution is not simply a mechanical mixture of its constituent endmembers.
-The mixing of different species on sites results in an excess configurational entropy :math:`S`.
+Ideal solutions
+"""""""""""""""
+A solution is not simply a mechanical mixture of its constituent endmembers.
+The mixing of different species results in an excess configurational entropy :math:`S`.
 In Bragg-Williams-type solutions, the entropy only depends on the amounts of
 species on sites, and the site multiplicities.
 
@@ -34,25 +41,25 @@ where :math:`s` is a site in the lattice, :math:`c` are the species mixing on si
 multiplying the proportion of the species on the site by the multiplicity of the site per formula unit and the
 number of moles of formula units.
 
-Solid solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*.
-In BurnMan, the multiplicities of each site are allowed to vary linearly between endmembers. This is known as a Temkin
+Solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*, because
+the enthalpy of mixing is zero. In BurnMan, the multiplicities of each site are allowed to vary linearly between endmembers. This is known as a Temkin
 model :cite:`Temkin1945`.
 
 
 
-Symmetric solid solutions
-"""""""""""""""""""""""""
-Many real minerals are not well approximated as ideal solid solutions. Deviations are the result of elastic and chemical interactions between ions with different physical and chemical characteristics. Regular (symmetric) solid solution models are designed to account for the simplest form of deviations from ideality, by allowing the addition of excess enthalpies, non-configurational entropies and volumes to the ideal solution model. These excess terms have the matrix form :cite:`DPWH2007`
+Symmetric solutions
+"""""""""""""""""""
+Many real phases are not well approximated as ideal solutions. Deviations are the result of elastic and chemical interactions between ions with different physical and chemical characteristics. Regular (symmetric) solution models account for the simplest form of deviations from ideality by incorporating terms describing excess enthalpies, non-configurational entropies and volumes relative to the ideal solution model. These excess terms have the matrix form :cite:`DPWH2007`
 
 .. math::
     \mathcal{G}_{\textrm{excess}} = RT \ln \gamma = p^T W p
 
 where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers and :math:`W` is a strictly upper-triangular matrix of interaction terms between endmembers. Excesses within binary systems (:math:`i`-:math:`j`) have a quadratic form and a maximum of :math:`W_{ij}/4` half-way between the two endmembers.
 
-Asymmetric solid solutions
-""""""""""""""""""""""""""
+Asymmetric solutions
+""""""""""""""""""""
 
-Some solid solutions exhibit asymmetric excess terms. These can be accounted for with an asymmetric solid solution :cite:`DPWH2007`
+Some solutions exhibit asymmetric excess terms. These can be accounted for with an asymmetric solution :cite:`DPWH2007`
 
 .. math::
     \mathcal{G}_{\textrm{excess}} = \alpha^T p (\phi^T W \phi)
@@ -67,8 +74,8 @@ Some solid solutions exhibit asymmetric excess terms. These can be accounted for
 The :math:`w_{ij}` terms are a set of interaction terms between endmembers :math:`i` and :math:`j`. If all the :math:`\alpha` terms are equal to unity, a non-zero :math:`w` yields an excess with a quadratic form and a maximum of :math:`w/4` half-way between the two endmembers.
 
 
-Subregular solid solutions
-""""""""""""""""""""""""""
+Subregular solutions
+""""""""""""""""""""
 An alternative way to create asymmetric solution models is to expand each binary term as a cubic expression :cite:`HW1989`. In this case,
 
 .. math::
@@ -80,7 +87,7 @@ Note the similarity with the symmetric solution model, the primary difference be
 
 Thermodynamic and thermoelastic properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-From the preceeding equations, we can define the thermodynamic potentials of solid solutions:
+From the preceeding equations, we can define the thermodynamic potentials of solutions:
 
 .. math::
     \mathcal{G}_{\textrm{SS}} &= \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)\\
@@ -106,9 +113,9 @@ Making the approximation that the excess entropy has no temperature dependence
 Including order-disorder
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Order-disorder can be treated trivially with solid solutions. The only difference between mixing between ordered and disordered endmembers is that disordered endmembers have a non-zero configurational entropy, which must be accounted for when calculating the excess entropy within a solid solution.
+Order-disorder can be treated trivially with solutions. The only difference between mixing between ordered and disordered endmembers is that disordered endmembers have a non-zero configurational entropy, which must be accounted for when calculating the excess entropy within a solution.
 
 Including spin transitions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The regular solid solution formalism should provide an elegant way to model spin transitions in phases such as periclase and bridgmanite. High and low spin iron can be treated as different elements, providing distinct endmembers and an excess configurational entropy. Further excess terms can be added as necessary.
+The regular solution formalism should provide an elegant way to model spin transitions in phases such as periclase and bridgmanite. High and low spin iron can be treated as different elements, providing distinct endmembers and an excess configurational entropy. Further excess terms can be added as necessary.

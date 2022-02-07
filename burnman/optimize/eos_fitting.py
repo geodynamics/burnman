@@ -263,7 +263,7 @@ def fit_XPTp_data(solution, fit_params, flags, data, data_covariances=[],
 
     Parameters
     ----------
-    solution : SolidSolution
+    solution : Solution
         Solution for which the parameters should be optimized.
 
     fit_params : list of lists

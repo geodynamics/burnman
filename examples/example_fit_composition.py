@@ -15,7 +15,7 @@ and how to assess goodness of fit.
 *Uses:*
 
 * :class:`burnman.Composition`
-* :class:`burnman.SolidSolution`
+* :class:`burnman.Solution`
 * :func:`burnman.optimize.composition_fitting.fit_phase_proportions_to_bulk_composition`
 * :func:`burnman.optimize.composition_fitting.fit_composition_to_solution`
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     """
     Example 1
     ---------
-    Fitting single-phase EPMA data to a solid solution model
+    Fitting single-phase EPMA data to a solution model
 
     The following example takes a set of variables
     (either elements such as "Fe", site_species such as "Fef_B",
@@ -192,5 +192,5 @@ if __name__ == "__main__":
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Phase fraction (wt %)')
     plt.legend()
-    plt.savefig('example_fit_composition_Figure_1.png')
+    # plt.savefig('example_fit_composition_Figure_1.png')
     plt.show()

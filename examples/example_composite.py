@@ -16,12 +16,12 @@ class.
 
 * :doc:`mineral_database`
 * :class:`burnman.Mineral`
-* :class:`burnman.SolidSolution`
+* :class:`burnman.Solution`
 * :class:`burnman.Composite`
 
 *Demonstrates:*
 
-* How to initialize a composite object containing minerals and solid solutions
+* How to initialize a composite object containing minerals and solutions
 * How to set state and composition of composite objects
 * How to interrogate composite objects for their
   compositional, thermodynamic and thermoelastic properties.
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # In BurnMan, composite materials are those made up of a mechanical
     # mixture of other materials. Those materials could be minerals,
-    # solid solutions or other composites.
+    # solutions or other composites.
 
     # Initialising a composite material is easy; first initialise all the
     # material objects you want to add to the composite, and then call the

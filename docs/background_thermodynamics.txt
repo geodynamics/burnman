@@ -208,9 +208,9 @@ the order parameter exceeds zero. Then
 
 Bragg-Williams model (bragg_williams)
 """""""""""""""""""""""""""""""""""""
-The Bragg-Williams model is essentially a symmetric solid solution
-model between endmembers, with an excess configurational entropy term
-predicted on the basis of the specifics of order-disorder in the
+The Bragg-Williams model is a symmetric solution
+model between endmembers with an excess configurational entropy term
+determined by the specifics of order-disorder in the
 mineral, multiplied by some empirical factor. Expressions for the
 excess Gibbs free energy can be found in :cite:`HP1996`. Parameters are
 'deltaH', 'deltaV', 'Wh', 'Wv', 'n' and 'factor'.

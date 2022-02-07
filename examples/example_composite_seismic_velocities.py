@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -17,8 +18,8 @@ composition. Here we present a couple of examples:
 1. Two minerals mixed in simple mole fractions. Can be chosen from the BurnMan
    libraries or from user defined minerals (see example_user_input_material)
 2. Example with three minerals
-3. Using preset solid solutions
-4. Defining your own solid solution
+3. Using preset solutions
+4. Defining your own solution
 
 
 To turn a method of mineral creation "on" the first if statement above the
@@ -32,12 +33,12 @@ example_spintransition.py for explanation of how to implement this
 * :doc:`mineral_database`
 * :class:`burnman.Composite`
 * :class:`burnman.Mineral`
-* :class:`burnman.SolidSolution`
+* :class:`burnman.Solution`
 
 *Demonstrates:*
 
 * Different ways to define a composite
-* Using minerals and solid solutions
+* Using minerals and solutions
 * Compare computations to seismic models
 
 """
@@ -55,8 +56,8 @@ from burnman import minerals
 if __name__ == "__main__":
 
     # To compute seismic velocities and other properties, we need to supply
-    # burnman with a list of minerals (phases) and their molar abundances. Minerals
-    # are classes found in burnman.minerals and are derived from
+    # burnman with a list of minerals (phases) and their molar abundances.
+    # Minerals are classes found in burnman.minerals and are derived from
     # burnman.minerals.material.
     # Here are a few ways to define phases and molar_abundances:
     # Example 1: two simple fixed minerals
@@ -73,38 +74,41 @@ if __name__ == "__main__":
                                   minerals.SLB_2011.stishovite()],
                                  [0.7, 0.2, 0.1])
 
-    # Example 3: Mixing solid solutions
+    # Example 3: Mixing solutions
     if False:
-        # Defining a rock using a predefined solid solution from the mineral
+        # Defining a rock using a predefined solution from the mineral
         # library database.
-        preset_solidsolution = minerals.SLB_2011.mg_fe_perovskite()
-        # The line below is optional to see which endmembers (and in which order) are in the solid solution
-        # print preset_solidsolution.endmembers
+        preset_solution = minerals.SLB_2011.mg_fe_perovskite()
+        # The line below is optional to see which endmembers
+        # (and in which order) are in the solution
+        # print preset_solution.endmembers
         # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
-        preset_solidsolution.set_composition(
-            [0.9, 0.1, 0.])  # Set molar_fraction of mg_perovskite, fe_perovskite and al_perovskite
-        rock = burnman.Composite(
-            [preset_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
+        preset_solution.set_composition([0.9, 0.1, 0.])
+        rock = burnman.Composite([preset_solution,
+                                  minerals.SLB_2011.periclase()],
+                                 [0.8, 0.2])
 
-    # Example 4: Defining your own solid solution
+    # Example 4: Defining your own solution
     if False:
-        # Define a new SolidSolution with mg and fe perovskite endmembers
-        new_solidsolution = burnman.SolidSolution(name = 'New Mg-Fe bridgmanite',
-                                                  endmembers = [[minerals.SLB_2011.mg_perovskite(),
-                                                                 '[Mg]SiO3'],
-                                                                [minerals.SLB_2011.fe_perovskite(),
-                                                                 '[Fe]SiO3']],
-                                                  solution_type = 'ideal')
+        # Define a new Solution with mg and fe perovskite endmembers
+        mpv = minerals.SLB_2011.mg_perovskite()
+        fpv = minerals.SLB_2011.fe_perovskite()
+        new_solution = burnman.Solution(name='New Mg-Fe bridgmanite',
+                                        endmembers=[[mpv, '[Mg]SiO3'],
+                                                    [fpv, '[Fe]SiO3']],
+                                        solution_type='ideal')
 
         # Set molar fraction of endmembers
-        new_solidsolution.set_composition([0.9, 0.1])
-        rock = burnman.Composite(
-            [new_solidsolution, minerals.SLB_2011.periclase()], [0.8, 0.2])
+        new_solution.set_composition([0.9, 0.1])
+        rock = burnman.Composite([new_solution,
+                                  minerals.SLB_2011.periclase()],
+                                 [0.8, 0.2])
 
     # seismic model for comparison:
     # pick from .prem() .slow() .fast() (see burnman/seismic.py)
     seismic_model = burnman.seismic.PREM()
-    number_of_points = 20  # set on how many depth slices the computations should be done
+    # set on how many depth slices the computations should be done
+    number_of_points = 20
     # we will do our computation and comparison at the following depth values:
     depths = np.linspace(700e3, 2800e3, number_of_points)
     # alternatively, we could use the values where prem is defined:
@@ -160,7 +164,7 @@ if __name__ == "__main__":
     plt.plot(
         seis_p / 1.e9, seis_rho / 1.e3, color='k', linestyle='-', marker='o',
         markerfacecolor='k', markersize=4)
-    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
+    plt.title("density ($\\cdot 10^3$ kg/m$^3$)")
     plt.xlim(min(seis_p) / 1.e9, max(seis_p) / 1.e9)
     plt.text(40, 4.3, "misfit= %3.3f" % rho_err)
     plt.xlabel("Pressure (GPa)")

@@ -8,12 +8,11 @@
 # tools.chemistry returns the number of atoms and molar mass of a compound
 # given its unit formula as an argument.
 # process_solution_chemistry returns information required to calculate
-# solid solution properties from a set of endmember formulae
+# solution properties from a set of endmember formulae
 
 from __future__ import absolute_import
 import re
 import numpy as np
-from scipy.linalg import lu
 from scipy.optimize import fsolve
 from fractions import Fraction
 from collections import Counter
@@ -226,37 +225,37 @@ def process_solution_chemistry(solution_model):
         List of endmember formulae is output from site formula strings
 
     n_sites : integer
-        Number of sites in the solid solution.
+        Number of sites in the solution.
         Should be the same for all endmembers.
 
     sites : list of lists of strings
-        A list of species for each site in the solid solution
+        A list of species for each site in the solution
 
     site_names : list of strings
-        A list of species_site pairs in the solid solution, where
+        A list of species_site pairs in the solution, where
         each distinct site is given by a unique uppercase letter
         e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B']
 
     n_occupancies : integer
         Sum of the number of possible species on each of the sites
-        in the solid solution.
+        in the solution.
         Example: A binary solution [[A][B],[B][C1/2D1/2]] would have
         n_occupancies = 5, with two possible species on
         Site 1 and three on Site 2
 
     site_multiplicities : 2D array of floats
-        A 1D array for each endmember in the solid solution,
+        A 1D array for each endmember in the solution,
         containing the multiplicities of each site per formula unit.
         To simplify computations later, the multiplicities
         are repeated for each species on each site, so the shape of
         this attribute is (n_endmembers, n_site_species).
 
     endmember_occupancies : 2d array of floats
-        A 1D array for each endmember in the solid solution,
+        A 1D array for each endmember in the solution,
         containing the fraction of atoms of each species on each site.
 
     endmember_noccupancies : 2d array of floats
-        A 1D array for each endmember in the solid solution,
+        A 1D array for each endmember in the solution,
         containing the number of atoms of each species on each site
         per mole of endmember.
     """

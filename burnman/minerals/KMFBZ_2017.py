@@ -1,19 +1,20 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 """
 from Kurnosov et al.  Nature 2017
-Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from (Al, Fe)-bearing bridgmanite elasticity data."
+Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from
+(Al, Fe)-bearing bridgmanite elasticity data."
 Nature 543.7646 (2017): 543-546. doi:10.1038/nature21390
 """
 
 from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
-from ..classes.solidsolution import SolidSolution
-from ..classes.solutionmodel import *
+from ..classes.solution import Solution
 from ..tools.chemistry import dictionarize_formula, formula_mass
 
 """
@@ -21,7 +22,7 @@ SOLID SOLUTIONS
 """
 
 
-class bridgmanite(SolidSolution):
+class bridgmanite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = 'bridgmanite/perovskite'
         self.solution_type = 'ideal'
@@ -29,9 +30,10 @@ class bridgmanite(SolidSolution):
                            [fe_si_perovskite(), '[Fe][Si]O3'],
                            [al_al_perovskite(), '[Al][Al]O3'],
                            [fe_al_perovskite(), '[Fe][Al]O3']]
-        SolidSolution.__init__(self, molar_fractions=molar_fractions)
+        Solution.__init__(self, molar_fractions=molar_fractions)
 
-class ferropericlase(SolidSolution):
+
+class ferropericlase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = 'magnesiowustite/ferropericlase'
         self.solution_type = 'symmetric'
@@ -39,11 +41,13 @@ class ferropericlase(SolidSolution):
                            [wuestite(), '[Fe]O']]
         self.energy_interaction = [[13.e3]]
 
-        SolidSolution.__init__(self, molar_fractions=molar_fractions)
+        Solution.__init__(self, molar_fractions=molar_fractions)
+
 
 """
 ENDMEMBERS
 """
+
 
 class mg_si_perovskite (Mineral):
 
@@ -68,6 +72,7 @@ class mg_si_perovskite (Mineral):
             'molar_mass': formula_mass(formula)}
 
         Mineral.__init__(self)
+
 
 class fe_si_perovskite (Mineral):
 
@@ -193,7 +198,6 @@ class wuestite (Mineral):
         Mineral.__init__(self)
 
 
-
 class ca_perovskite (Mineral):
 
     def __init__(self):
@@ -216,9 +220,7 @@ class ca_perovskite (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
 
-
         Mineral.__init__(self)
-
 
 
 class hcp_iron (Mineral):
@@ -243,9 +245,10 @@ class hcp_iron (Mineral):
             'n': sum(formula.values()),
             'molar_mass': formula_mass(formula)}
 
-
         Mineral.__init__(self)
+
+
 '''
 Mineral aliases
 '''
-perovskite=bridgmanite
+perovskite = bridgmanite

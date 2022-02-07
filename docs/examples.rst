@@ -28,7 +28,7 @@ of BurnMan objects:
 
   - :mod:`~examples.example_mineral`,
   - :mod:`~examples.example_gibbs_modifiers`,
-  - :mod:`~examples.example_solid_solution`,
+  - :mod:`~examples.example_solution`,
   - :mod:`~examples.example_composite`,
   - :mod:`~examples.example_calibrants`,
   - :mod:`~examples.example_anisotropy`,
@@ -54,17 +54,17 @@ of BurnMan objects:
 
   .. image:: figures/example_gibbs_modifiers_figure_4.png
 
-  .. automodule:: examples.example_solid_solution
+  .. automodule:: examples.example_solution
 
   *Resulting figures:*
 
-  .. image:: figures/example_solid_solution_1.png
+  .. image:: figures/example_solution_1.png
 
-  .. image:: figures/example_solid_solution_2.png
+  .. image:: figures/example_solution_2.png
 
-  .. image:: figures/example_solid_solution_3.png
+  .. image:: figures/example_solution_3.png
 
-  .. image:: figures/example_solid_solution_4.png
+  .. image:: figures/example_solution_4.png
 
   .. automodule:: examples.example_composite
 
