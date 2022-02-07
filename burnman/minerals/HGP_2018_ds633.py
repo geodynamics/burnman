@@ -17,7 +17,7 @@ HGP633data_to_burnman.py.
 """
 
 from ..classes.mineral import Mineral
-from ..classes.solidsolution import SolidSolution
+from ..classes.solution import Solution
 from ..classes.combinedmineral import CombinedMineral
 
 """
@@ -5053,7 +5053,7 @@ def make_melt_class(selected_endmembers):
 
     Returns
     -------
-    melt_class: SolidSolution class
+    melt_class: Solution class
         Melt class spanning the specified endmembers.
     """
     endmembers = [[mbr, site_formulae[mbr.name]]
@@ -5069,7 +5069,7 @@ def make_melt_class(selected_endmembers):
            for j in range(i+1, len(selected_endmembers))]
           for i in range(len(selected_endmembers))]
 
-    class silicate_melt(SolidSolution):
+    class silicate_melt(Solution):
 
         def __init__(self, molar_fractions=None):
             self.name = 'Holland et al. (2018) melt model'
@@ -5079,7 +5079,7 @@ def make_melt_class(selected_endmembers):
             self.volume_interaction = Wv
             self.alphas = alphas
 
-            SolidSolution.__init__(self, molar_fractions=molar_fractions)
+            Solution.__init__(self, molar_fractions=molar_fractions)
 
     return silicate_melt
 

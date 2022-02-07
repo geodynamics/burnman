@@ -13,7 +13,7 @@ Overview
 
 BurnMan is an open source mineral physics and seismological toolkit written in Python
 which can enable a user to calculate (or fit) the physical and chemical properties
-of endmember minerals, fluids/melts, solid solutions, and composite assemblages.
+of endmember minerals, fluids/melts, solutions, and composite assemblages.
 
 Properties which BurnMan can calculate include:
 
@@ -63,7 +63,7 @@ http://burnman.readthedocs.io.
 This software has been designed to allow the end-user a great deal of freedom
 to do whatever calculations they may wish and to add their own modules.
 The underlying Python classes have been designed to make new endmember,
-solid solution and composite models easy to read and create.
+solution and composite models easy to read and create.
 We have endeavoured to provide examples and benchmarks which cover the
 most popular uses of the software, some of which are included in the figure below.
 This list is certainly not exhaustive, and we will definitely have missed interesting
@@ -210,7 +210,7 @@ from .classes.perplex import PerplexMaterial
 from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
 from .classes.solutionmodel import SolutionModel
-from .classes.solidsolution import SolidSolution
+from .classes.solution import Solution, SolidSolution
 from .classes.composite import Composite
 from .classes.calibrant import Calibrant
 from .classes.anisotropy import AnisotropicMaterial

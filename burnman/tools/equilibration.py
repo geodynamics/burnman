@@ -11,7 +11,7 @@ from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
 
 from ..optimize.nonlinear_solvers import damped_newton_solve
-from ..classes.solidsolution import SolidSolution
+from ..classes.solution import Solution
 
 
 def calculate_constraints(assemblage, n_free_compositional_vectors):
@@ -115,7 +115,7 @@ def get_parameters(assemblage, n_free_compositional_vectors=0):
     j = 2
     for i, ph in enumerate(assemblage.phases):
         params[j] = n_moles_phase[i]
-        if isinstance(ph, SolidSolution):
+        if isinstance(ph, Solution):
             params[j+1:j+assemblage.endmembers_per_phase[i]] = assemblage.phases[i].molar_fractions[1:]
         j += assemblage.endmembers_per_phase[i]
 
@@ -140,7 +140,7 @@ def get_endmember_amounts(assemblage):
     amounts = np.empty(assemblage.n_endmembers)
     j = 0
     for i, ph in enumerate(assemblage.phases):
-        if isinstance(ph, SolidSolution):
+        if isinstance(ph, Solution):
             amounts[j:j+assemblage.endmembers_per_phase[i]] = phase_amounts[i] * assemblage.phases[i].molar_fractions
         else:
             amounts[j] = phase_amounts[i]
@@ -167,7 +167,7 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     phase_amounts = np.zeros(len(assemblage.phases))
     for phase_idx, ph in enumerate(assemblage.phases):
         phase_amounts[phase_idx] = parameters[i]
-        if isinstance(ph, SolidSolution):
+        if isinstance(ph, Solution):
             n_mbrs = len(ph.endmembers)
             f = [0.]*n_mbrs
             f[1:] = parameters[i+1:i+n_mbrs]
@@ -354,7 +354,7 @@ def jacobian(x, assemblage, equality_constraints,
         if n == 1:  # for endmembers
             partial_volumes_vector[j] = assemblage.phases[i].molar_volume
             partial_entropies_vector[j] = assemblage.phases[i].molar_entropy
-        else:  # for solid solutions
+        else:  # for solutions
             partial_volumes_vector[j:j+n] = assemblage.phases[i].partial_volumes
             partial_entropies_vector[j:j+n] = assemblage.phases[i].partial_entropies
         j += n
@@ -468,7 +468,7 @@ def phase_fraction_constraints(phase, assemblage, fractions, prm):
 
     Parameters
     ----------
-    phase : burnman.SolidSolution or burnman.Mineral
+    phase : burnman.Solution or burnman.Mineral
         The phase for which the fraction is to be constrained
 
     assemblage : burnman.Composite
@@ -520,7 +520,7 @@ def phase_composition_constraints(phase, assemblage, constraints, prm):
 
     Parameters
     ----------
-    phase : burnman.SolidSolution
+    phase : burnman.Solution
         The phase for which the composition is to be constrained
 
     assemblage : burnman.Composite
@@ -807,7 +807,7 @@ def equilibrate(composition, assemblage, equality_constraints,
         correspond to phase amounts).
     """
     for ph in assemblage.phases:
-        if isinstance(ph, SolidSolution) and not hasattr(ph, 'molar_fractions'):
+        if isinstance(ph, Solution) and not hasattr(ph, 'molar_fractions'):
             raise Exception(f'set_composition for solution {ph} before running equilibrate.')
 
     if assemblage.molar_fractions is None:

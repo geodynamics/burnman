@@ -15,7 +15,7 @@ def fit_composition_to_solution(solution,
                                 variable_conversions=None,
                                 normalize=True):
     """
-    Takes a SolidSolution object and a set of variable names and
+    Takes a Solution object and a set of variable names and
     associates values and covariances and finds the molar fractions of the
     solution which provide the best fit (in a least-squares sense)
     to the variable values.
@@ -25,7 +25,7 @@ def fit_composition_to_solution(solution,
 
     Parameters
     ----------
-    solution : burnman.SolidSolution object
+    solution : burnman.Solution object
         The solution to use in the fitting procedure.
 
     fitted_variables : list of strings

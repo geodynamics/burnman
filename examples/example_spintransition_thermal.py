@@ -8,12 +8,12 @@
 example_spintransition_thermal
 ------------------------------
 
-This example illustrates how to create a non-ideal solid solution model
+This example illustrates how to create a non-ideal solution model
 for (Mg,Fe\ :sup:`HS`\ ,Fe\ :sup:`LS`\ )O ferropericlase that has a gradual
 spin transition at finite temperature.
 First, we define the MgO endmember and two endmembers for the low and high spin
-states of FeO. Then we create a regular/symmetric solid solution that
-incorporates all three endmembers. The modified solid solution class
+states of FeO. Then we create a regular/symmetric solution that
+incorporates all three endmembers. The modified solution class
 contains a method called set_equilibrium_composition, which calculates
 the equilibrium proportions of the low and high spin phases at the
 desired bulk composition, pressure and temperature.
@@ -28,7 +28,7 @@ explicitly precludes long range order.
 *Specifically uses:*
 
 * :func:`burnman.Mineral`
-* :func:`burnman.SolidSolution`
+* :func:`burnman.Solution`
 
 *Demonstrates:*
 
@@ -75,16 +75,16 @@ if __name__ == "__main__":
                                                   'delta_V': -1.09e-6}])
 
     """
-    Now, we create a class derived from SolidSolution that contains an
+    Now, we create a class derived from Solution that contains an
     additional method called set_equilibrium_composition. This method
     finds the proportions of high and low spin wuestite that satisfy
     the provided bulk composition constraint and also ensure that the
     chemical potentials of high and low spin wuestite are equal
     (i.e. that the phase is in internal equilibrium).
     """
-    class ferropericlase(burnman.SolidSolution):
+    class ferropericlase(burnman.Solution):
         """
-        Solid solution class for ferropericlase
+        Solution class for ferropericlase
         that includes a new method "set_equilibrium_composition"
         that finds the equilibrium distribution of high spin and low spin iron
         at the current state.
@@ -98,8 +98,8 @@ if __name__ == "__main__":
                                [low_spin_wuestite, '[Fels]O']]
             self.energy_interaction = [[11.e3, 11.e3],
                                        [11.e3]]
-            burnman.SolidSolution.__init__(
-                self, molar_fractions=molar_fractions)
+            burnman.Solution.__init__(self,
+                                      molar_fractions=molar_fractions)
 
         def set_equilibrium_composition(self, molar_fraction_FeO):
             """
@@ -139,7 +139,7 @@ if __name__ == "__main__":
                                   molar_fraction_FeO*(1. - p_LS),
                                   molar_fraction_FeO*p_LS])
 
-    # In this line, we create our solid solution object
+    # In this line, we create our solution object
     fper = ferropericlase()
 
     # Now we loop over a series of pressures at three different temperatures,

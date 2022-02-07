@@ -14,7 +14,7 @@ from . import perplex
 from . import mineral
 from . import combinedmineral
 from . import solutionmodel
-from . import solidsolution
+from . import solution
 from . import composite
 from . import anisotropy
 from . import anisotropicmineral

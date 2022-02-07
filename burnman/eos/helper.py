@@ -25,10 +25,10 @@ from .equation_of_state import EquationOfState
 
 class CombinedMineralMethod(object):
     """Dummy class because CombinedMineral objects are derived
-    from a mechanical SolidSolution.
-    SolidSolution needs a method to call Mineral.set_state(),
+    from a mechanical Solution.
+    Solution needs a method to call Mineral.set_state(),
     but a CombinedMineral should never have a method that
-    is used for solid solutions."""
+    is used for solutions."""
 
     def validate_parameters(self, params):
         pass

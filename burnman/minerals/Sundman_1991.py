@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -14,9 +15,7 @@ EoS terms for fcc are from an unpublished calibration
 from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
-from ..classes.solidsolution import SolidSolution
-from ..classes.solutionmodel import *
-from ..tools.chemistry import dictionarize_formula, formula_mass
+from ..tools.chemistry import formula_mass
 
 """
 ENDMEMBERS

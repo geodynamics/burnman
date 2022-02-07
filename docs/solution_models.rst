@@ -1,7 +1,7 @@
 Solution models
 ===============
 
-SolidSolution objects in Burnman (type :class:`~burnman.SolidSolution`)
+Solution objects in Burnman (type :class:`~burnman.Solution`, alias :class:`~burnman.SolidSolution`)
 take one of several methods which define the properties of the solution.
 
 .. inheritance-diagram::
@@ -13,7 +13,7 @@ take one of several methods which define the properties of the solution.
 
 Base class
 ----------
-.. autoclass:: burnman.SolidSolution
+.. autoclass:: burnman.Solution
   :noindex:
 
 .. autoclass:: burnman.SolutionModel
