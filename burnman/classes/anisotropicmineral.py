@@ -8,9 +8,9 @@ from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
 from .anisotropy import AnisotropicMaterial, voigt_compliance_factors
-from ..tools.misc import copy_documentation
-from ..tools.unitcell import cell_parameters_to_vectors
-from ..tools.unitcell import cell_vectors_to_parameters
+from ..utils.misc import copy_documentation
+from ..utils.unitcell import cell_parameters_to_vectors
+from ..utils.unitcell import cell_vectors_to_parameters
 
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
     """
@@ -23,7 +23,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     a reference Mineral (i.e. a standard isotropic mineral which provides
     volume as a function of pressure and temperature), cell_parameters,
     which give the lengths of the molar cell vectors and the angles between
-    them (see :func:`~burnman.tools.unitcell.cell_parameters_to_vectors`),
+    them (see :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`),
     and a 4D array of anisotropic parameters which describe the
     anisotropic behaviour of the mineral. For a description of the physical
     meaning of these parameters, please refer to the code
@@ -199,7 +199,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             after deformation of the mineral from its undeformed state
             (i.e. the state at the reference pressure and temperature).
             Each vector is given in [m]. See the documentation for the function
-            :func:`~burnman.tools.unitcell.cell_parameters_to_vectors`
+            :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """
@@ -246,7 +246,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         cell_vectors : 2D numpy array
             The vectors of the cell constructed from one mole of formula units.
             Each vector is given in [m]. See the documentation for the function
-            :func:`~burnman.tools.unitcell.cell_parameters_to_vectors`
+            :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """
@@ -270,7 +270,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             defining the cell constructed from one mole of formula units.
             The last three floats are angles between vectors
             (given in radians). See the documentation for the function
-            :func:`~burnman.tools.unitcell.cell_parameters_to_vectors`
+            :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """

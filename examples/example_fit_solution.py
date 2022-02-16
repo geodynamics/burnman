@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from numpy import random
 
 import burnman
-from burnman.tools.misc import pretty_print_values
+from burnman.utils.misc import pretty_print_values
 from burnman.optimize.eos_fitting import fit_XPTp_data
 from burnman.optimize.nonlinear_fitting import plot_residuals, extreme_values
 from burnman.optimize.nonlinear_fitting import corner_plot

@@ -4,7 +4,7 @@ from util import BurnManTest
 import burnman
 
 from burnman import material_property
-from burnman.tools.misc import copy_documentation
+from burnman.utils.misc import copy_documentation
 
 
 

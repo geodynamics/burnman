@@ -10,7 +10,7 @@ from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
 from scipy.optimize import fsolve
 from burnman import constants
-from burnman.tools import geotherm
+from burnman.utils import geotherm
 import warnings
 
 from .material import Material, material_property

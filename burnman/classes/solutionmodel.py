@@ -5,7 +5,7 @@
 from __future__ import absolute_import
 
 import numpy as np
-from ..tools.chemistry import process_solution_chemistry
+from ..utils.chemistry import process_solution_chemistry
 from .. import constants
 
 

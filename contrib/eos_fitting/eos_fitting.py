@@ -30,8 +30,8 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.tools.misc import attribute_function
-from burnman.tools.misc import pretty_print_values
+from burnman.utils.misc import attribute_function
+from burnman.utils.misc import pretty_print_values
 from read_data import read_fitting_file
 
 if __name__ == "__main__":

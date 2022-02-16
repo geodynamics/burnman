@@ -7,7 +7,6 @@ import burnman
 from burnman.tools.eos import check_eos_consistency
 
 
-
 class EosConsistency(BurnManTest):
 
     def test_HP(self):

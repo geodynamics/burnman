@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import numpy as np
 import scipy.optimize as opt
 from . import equation_of_state as eos
-from ..tools.math import bracket
+from ..utils.math import bracket
 import warnings
 
 

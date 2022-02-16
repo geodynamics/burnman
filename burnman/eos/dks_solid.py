@@ -22,7 +22,7 @@ except ImportError:
 from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
-from ..tools.math import bracket
+from ..utils.math import bracket
 
 
 @jit

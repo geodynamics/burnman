@@ -113,7 +113,7 @@ if __name__ == "__main__":
         rock.evaluate(['density', 'v_s', 'v_phi'], seis_p, temperature)
 
     [vs_err, vphi_err, rho_err] = \
-        burnman.tools.math.compare_chifactor(
+        burnman.utils.math.compare_chifactor(
             [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho])
 
     print(vs_err, vphi_err, rho_err)

@@ -16,7 +16,7 @@ import burnman
 import inspect
 
 from burnman import minerals
-from burnman import tools
+from burnman import utils
 
 
 if __name__ == "__main__":
@@ -98,6 +98,6 @@ if __name__ == "__main__":
                         tablel.append(row)
 
                     if (len(sys.argv) == 1):
-                        tools.misc.pretty_print_table(table, False)
+                        utils.misc.pretty_print_table(table, False)
                     elif sys.argv[1] == "tab":
-                        tools.misc.pretty_print_table(table, True)
+                        utils.misc.pretty_print_table(table, True)

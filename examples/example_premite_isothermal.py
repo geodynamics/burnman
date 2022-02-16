@@ -53,9 +53,9 @@ def calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime):
 def error(ref_rho, K_0, K_prime, G_0, G_prime):
     rho, vphi, vs = calc_velocities(ref_rho, K_0, K_prime, G_0, G_prime)
 
-    vphi_chi = burnman.tools.math.chi_factor(vphi, seis_vphi)
-    vs_chi = burnman.tools.math.chi_factor(vs, seis_vs)
-    rho_chi = burnman.tools.math.chi_factor(rho, seis_rho)
+    vphi_chi = burnman.utils.math.chi_factor(vphi, seis_vphi)
+    vs_chi = burnman.utils.math.chi_factor(vs, seis_vs)
+    rho_chi = burnman.utils.math.chi_factor(rho, seis_rho)
 
     return rho_chi + vphi_chi + vs_chi
 

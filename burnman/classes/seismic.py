@@ -10,7 +10,7 @@ import numpy as np
 import warnings
 import scipy.integrate
 
-from ..tools.misc import read_table
+from ..utils.misc import read_table
 from .. import constants
 
 

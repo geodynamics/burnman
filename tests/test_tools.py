@@ -6,11 +6,11 @@ import burnman
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import hugoniot
-from burnman.tools.chemistry import convert_fractions
-from burnman.tools.math import bracket
-from burnman.tools.math import smooth_array
-from burnman.tools.math import interp_smoothed_array_and_derivatives
-from burnman.tools.math import _pad_ndarray_inverse_mirror
+from burnman.utils.chemistry import convert_fractions
+from burnman.utils.math import bracket
+from burnman.utils.math import smooth_array
+from burnman.utils.math import interp_smoothed_array_and_derivatives
+from burnman.utils.math import _pad_ndarray_inverse_mirror
 
 
 

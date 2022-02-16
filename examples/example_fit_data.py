@@ -62,7 +62,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm2")
     fitted_eos = best_fit()
     print('2nd order fit:')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    burnman.utils.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     model_vs_2nd_order_correct = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                              pressures, temperatures)[0]
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     mg_perovskite_test.set_method("bm3")
     fitted_eos = best_fit()
     print('3rd order fit:')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    burnman.utils.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     model_vs_3rd_order_correct = mg_perovskite_test.evaluate(['shear_wave_velocity'],
                                                              pressures, temperatures)[0]
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     print('Optimised values:')
     params = ['H_0', 'Cp_a', 'Cp_b', 'Cp_c', 'Cp_d']
-    burnman.tools.misc.pretty_print_values(model.popt, model.pcov, params)
+    burnman.utils.misc.pretty_print_values(model.popt, model.pcov, params)
     print('')
 
     # Corner plot

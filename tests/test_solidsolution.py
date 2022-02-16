@@ -8,8 +8,8 @@ import warnings
 import burnman
 from burnman import Mineral
 from burnman import CombinedMineral
-from burnman.tools.chemistry import dictionarize_formula, formula_mass
-from burnman.tools.chemistry import formula_to_string, sum_formulae
+from burnman.utils.chemistry import dictionarize_formula, formula_mass
+from burnman.utils.chemistry import formula_to_string, sum_formulae
 from burnman.minerals import HGP_2018_ds633
 
 

@@ -14,7 +14,7 @@ with the help of David Munoz Ramo.
 
 import numpy as np
 from ..classes.mineral import Mineral
-from ..tools.chemistry import dictionarize_formula, formula_mass
+from ..utils.chemistry import dictionarize_formula, formula_mass
 
 class Fe2SiO4_liquid(Mineral):
     def __init__(self):

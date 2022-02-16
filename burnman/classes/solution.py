@@ -16,8 +16,8 @@ from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from .solutionmodel import SubregularSolution
 from .averaging_schemes import reuss_average_function
 
-from ..tools.reductions import independent_row_indices
-from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..utils.reductions import independent_row_indices
+from ..utils.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
 
 class Solution(Mineral):

@@ -130,7 +130,7 @@ if __name__ == "__main__":
         def __init__(self):
             burnman.seismic.SeismicTable.__init__(self)
             # In format: radius, pressure, density, v_p, v_s
-            table = burnman.tools.misc.read_table(
+            table = burnman.utils.misc.read_table(
                 "input_seismic/ak135_lowermantle.txt")
             table = np.array(table)
             self.table_radius = table[:, 0][::-1]

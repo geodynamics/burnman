@@ -27,9 +27,9 @@ import matplotlib.pyplot as plt
 
 import burnman
 
-from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
-from burnman.tools.misc import attribute_function
-
+from burnman.utils.unitcell import molar_volume_from_unit_cell_volume
+from burnman.utils.misc import attribute_function
+from burnman.utils.misc import pretty_print_values
 
 if __name__ == "__main__":
 
@@ -84,8 +84,8 @@ if __name__ == "__main__":
 
     # Print the optimized parameters
     print('Optimized equation of state for stishovite:')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
-                                           fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
+                        fitted_eos.fit_params)
     print('')
 
     # Create a corner plot of the covariances
@@ -178,8 +178,8 @@ if __name__ == "__main__":
     # We're done! That wasn't too painful, was it?!
     # Print the optimized parameters
     print('Optimized equation of state:')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
-                                           fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
+                        fitted_eos.fit_params)
     print('')
 
     # Create a corner plot of the covariances
@@ -281,7 +281,8 @@ if __name__ == "__main__":
 
     # Print the optimized parameters
     print('Optimized equation of state:')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
+                        fitted_eos.fit_params)
     print('')
 
     # Create a corner plot of the covariances
@@ -362,8 +363,8 @@ if __name__ == "__main__":
 
     # Print the optimized parameters
     print('Optimized equation of state (outliers removed):')
-    burnman.tools.misc.pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
-                                           fitted_eos.fit_params)
+    pretty_print_values(fitted_eos.popt, fitted_eos.pcov,
+                        fitted_eos.fit_params)
     print('\nGoodness of fit:')
     print(fitted_eos.goodness_of_fit)
     print('\n')

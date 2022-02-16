@@ -47,8 +47,8 @@ import burnman
 from burnman.minerals import HGP_2018_ds633, SLB_2011
 from burnman import CombinedMineral
 
-from burnman.tools.chemistry import dictionarize_formula, formula_mass
-from burnman.tools.chemistry import formula_to_string
+from burnman.utils.chemistry import dictionarize_formula, formula_mass
+from burnman.utils.chemistry import formula_to_string
 
 
 if __name__ == "__main__":

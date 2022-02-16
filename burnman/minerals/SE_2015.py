@@ -19,7 +19,7 @@ T^2, T^3, T^4, T^7, T^(1/2), ln(T)]]
 from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
-from ..tools.chemistry import formula_mass
+from ..utils.chemistry import formula_mass
 
 
 class bcc_iron(Mineral):
