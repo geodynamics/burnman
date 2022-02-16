@@ -6,7 +6,6 @@ import numpy as np
 import burnman
 
 
-
 class test_material_name(BurnManTest):
 
     """ test Material.name and that we can edit and override it in Mineral"""
@@ -120,6 +119,20 @@ class test_material_name(BurnManTest):
                         np.array([[1.e5, 1.e5, 1.e5], [1.e5, 1.e5, 1.e5]]),
                         np.array([[300., 300., 300], [300., 300., 300]]))
         self.assertEqual(Ss[0].shape, (2, 3))
+
+    def test_set_state_with_volume(self):
+        m = self.min_with_name()
+        P0 = 6.e9,
+        T0 = 1000.
+        T1 = 298.15
+
+        m.set_state(P0, T0)
+        V = m.V
+        m.set_state_with_volume(V, T1)
+        P1 = m.pressure
+        m.set_state(P0, T0)  # forget new state
+        m.set_state(P1, T1)  # return to new state
+        self.assertFloatEqual(V, m.V)
 
 
 if __name__ == '__main__':

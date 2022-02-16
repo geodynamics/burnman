@@ -5,7 +5,8 @@ from __future__ import print_function
 
 import numpy as np
 from copy import deepcopy
-
+from ..utils.math import bracket
+from scipy.optimize import brentq
 
 # TODO: When we require Python 3.8+, replace with
 # functools.cached_property decorator
@@ -174,6 +175,44 @@ class Material(object):
 
         self._pressure = pressure
         self._temperature = temperature
+
+    def set_state_with_volume(self, volume, temperature,
+                              pressure_guesses=[0.e9, 10.e9]):
+        """
+        This function acts similarly to set_state, but takes volume and
+        temperature as input to find the pressure. In order to ensure
+        self-consistency, this function does not use any pressure functions
+        from the material classes, but instead finds the pressure using the
+        brentq root-finding method.
+
+        Parameters
+        ----------
+        volume : float
+            The desired molar volume of the mineral [m^3].
+        temperature : float
+            The desired temperature of the mineral [K].
+        pressure_guesses : list of floats (default: [5.e9, 10.e9])
+            The initial low and high guesses for bracketing of
+            the pressure [Pa].
+            These guesses should preferably bound the correct pressure,
+            but do not need to do so. More importantly,
+            they should not lie outside the valid region of
+            the equation of state.
+        """
+        def _delta_volume(pressure, volume, temperature):
+            self.set_state(pressure, temperature)
+            return volume - self.molar_volume
+
+        # we need to have a sign change in [a,b] to find a zero.
+        args = (volume, temperature)
+        try:
+            sol = bracket(_delta_volume,
+                          pressure_guesses[0], pressure_guesses[1], args)
+        except ValueError:
+            raise Exception('Cannot find a pressure, perhaps the volume or starting pressures '
+                            'are outside the range of validity for the equation of state?')
+        pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
+        self.set_state(pressure, temperature)
 
     def reset(self):
         """

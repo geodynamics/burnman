@@ -322,6 +322,22 @@ class test_solidsolution(BurnManTest):
                          fo_ss.C_p, fo_ss.C_v, fo_ss.alpha, fo_ss.K_T, fo_ss.K_S, fo_ss.gr]
         self.assertArraysAlmostEqual(endmember_properties, ss_properties)
 
+    def test_set_state_with_volume(self):
+        m = olivine_ss()
+        m.set_composition([0.5, 0.5])
+
+        P0 = 6.e9
+        T0 = 1000.
+        T1 = 298.15
+
+        m.set_state(P0, T0)
+        V = m.V
+        m.set_state_with_volume(V, T1)
+        P1 = m.pressure
+        m.set_state(P0, T0)  # forget new state
+        m.set_state(P1, T1)  # return to new state
+        self.assertFloatEqual(V, m.V)
+
     def test_ol_Wh(self):
         ol_ss = olivine_ss()
         H_excess = ol_ss.solution_model.excess_enthalpy(
