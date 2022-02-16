@@ -6,8 +6,7 @@ import warnings
 
 import burnman
 from burnman import minerals
-from burnman.tools.chemistry import dictionarize_formula, formula_mass
-
+from burnman.utils.chemistry import dictionarize_formula, formula_mass
 
 
 class mypericlase(burnman.Mineral):

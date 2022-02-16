@@ -17,8 +17,8 @@ import warnings
 
 from . import equation_of_state as eos
 from .. import constants as constants
-from ..tools.chemistry import read_masses
-from ..tools.math import bracket
+from ..utils.chemistry import read_masses
+from ..utils.math import bracket
 
 atomic_masses=read_masses()
 # energy_states should provide the energies and degeneracies of each electronic level in a variety of elements

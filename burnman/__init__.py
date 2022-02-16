@@ -204,6 +204,10 @@ Acknowledgement and Support
 from __future__ import absolute_import
 from .version import version as __version__
 
+# Low level utility functions
+from . import utils
+from .utils import geotherm
+
 # Classes and associated functions for representing rocks and minerals:
 from .classes.material import Material, material_property
 from .classes.perplex import PerplexMaterial
@@ -238,9 +242,8 @@ from . import eos
 # Calibrants
 from . import calibrants
 
-# Tools
+# High level tools
 from . import tools
-from .tools import geotherm
 from .tools.equilibration import equilibrate
 from .tools.partitioning import calculate_nakajima_fp_pv_partition_coefficient
 

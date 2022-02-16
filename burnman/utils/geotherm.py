@@ -6,8 +6,8 @@
 from __future__ import absolute_import
 import numpy as np
 from scipy.optimize import brentq
-from ..tools.misc import read_table, lookup_and_interpolate
-from ..tools.math import bracket
+from ..utils.misc import read_table, lookup_and_interpolate
+from ..utils.math import bracket
 
 
 def brown_shankland(depths):

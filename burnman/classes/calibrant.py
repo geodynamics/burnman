@@ -5,7 +5,7 @@
 
 import numpy as np
 import scipy.optimize as opt
-from ..tools.math import bracket
+from ..utils.math import bracket
 
 
 class Calibrant(object):

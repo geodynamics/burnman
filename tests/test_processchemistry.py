@@ -3,11 +3,11 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-from burnman.tools.chemistry import dictionarize_formula
-from burnman.tools.chemistry import sum_formulae
-from burnman.tools.chemistry import formula_mass
-from burnman.tools.chemistry import convert_formula
-from burnman.tools.chemistry import site_occupancies_to_strings
+from burnman.utils.chemistry import dictionarize_formula
+from burnman.utils.chemistry import sum_formulae
+from burnman.utils.chemistry import formula_mass
+from burnman.utils.chemistry import convert_formula
+from burnman.utils.chemistry import site_occupancies_to_strings
 
 
 

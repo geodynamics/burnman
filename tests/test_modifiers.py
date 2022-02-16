@@ -7,7 +7,6 @@ from burnman.minerals import SLB_2011, HP_2011_ds62
 from burnman.tools.eos import check_eos_consistency
 
 
-
 class Modifiers(BurnManTest):
 
     def test_excess_functions(self):

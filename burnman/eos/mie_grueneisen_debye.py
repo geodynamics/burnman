@@ -12,7 +12,7 @@ from . import equation_of_state as eos
 from . import birch_murnaghan as bm
 from . import debye
 from .. import constants
-from ..tools.math import bracket
+from ..utils.math import bracket
 
 
 class MGDBase(eos.EquationOfState):

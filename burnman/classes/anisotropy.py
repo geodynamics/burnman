@@ -8,7 +8,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ..tools.math import unit_normalize
+from ..utils.math import unit_normalize
 from .material import Material, material_property
 
 try:  # numpy.block was new in numpy version 1.13.0.

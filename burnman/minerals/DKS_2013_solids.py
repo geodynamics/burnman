@@ -11,7 +11,7 @@ Solids from de Koker and Stixrude (2013) FPMD simulations
 """
 
 from ..classes.mineral import Mineral
-from ..tools.chemistry import formula_mass
+from ..utils.chemistry import formula_mass
 
 
 class stishovite(Mineral):

@@ -9,8 +9,8 @@ from __future__ import print_function
 import numpy as np
 
 from . import nonlinear_fitting
-from ..tools.misc import flatten
-from ..tools.math import unit_normalize
+from ..utils.misc import flatten
+from ..utils.math import unit_normalize
 from .nonlinear_fitting import nonlinear_least_squares_fit
 
 

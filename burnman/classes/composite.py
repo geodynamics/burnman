@@ -14,8 +14,8 @@ from .mineral import Mineral
 from .solution import Solution
 from . import averaging_schemes
 
-from ..tools.reductions import independent_row_indices
-from ..tools.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..utils.reductions import independent_row_indices
+from ..utils.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
 
 
 def check_pairs(phases, fractions):

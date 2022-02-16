@@ -26,7 +26,7 @@ volume in order to create smoothly varying relaxed properties.
 * :doc:`mineral_database`
 * :class:`burnman.PerplexMaterial`
 * :func:`burnman.Material.evaluate`
-* :func:`burnman.tools.math.interp_smoothed_array_and_derivatives`
+* :func:`burnman.utils.math.interp_smoothed_array_and_derivatives`
 
 
 *Demonstrates:*
@@ -47,7 +47,7 @@ from scipy.integrate import odeint
 from scipy.interpolate import UnivariateSpline
 
 import burnman
-from burnman.tools.math import interp_smoothed_array_and_derivatives
+from burnman.utils.math import interp_smoothed_array_and_derivatives
 
 
 if __name__ == "__main__":

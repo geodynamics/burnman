@@ -46,7 +46,7 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import Mineral, minerals
-from burnman.tools.chemistry import formula_mass
+from burnman.utils.chemistry import formula_mass
 
 
 if __name__ == "__main__":

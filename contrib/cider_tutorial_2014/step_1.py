@@ -148,9 +148,10 @@ if __name__ == '__main__':
 
     """
 
-    # All the work is done except the plotting!  Here we want to plot the seismic wave
-    # speeds and the density against PREM using the matplotlib plotting tools.  We make
-    # a 2x2 array of plots.  The fourth subplot plots the geotherm used for
+    # All the work is done except the plotting!
+    # Here we want to plot the seismic wave speeds and the density
+    # against PREM using the matplotlib plotting tools. We make a 2x2 array
+    # of plots. The fourth subplot plots the geotherm used for
     # this calculation.
 
     # First, we plot the s-wave speed verses the PREM s-wave speed

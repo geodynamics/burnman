@@ -10,7 +10,7 @@ import numpy as np
 from scipy.stats import t, norm, genextreme
 import copy
 
-from ..tools.math import unit_normalize
+from ..utils.math import unit_normalize
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from matplotlib.patches import Ellipse

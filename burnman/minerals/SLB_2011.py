@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from ..classes.mineral import Mineral
 from ..classes.solution import Solution
 from ..classes.solutionmodel import *
-from ..tools.chemistry import dictionarize_formula, formula_mass
+from ..utils.chemistry import dictionarize_formula, formula_mass
 
 '''
 SOLID SOLUTIONS

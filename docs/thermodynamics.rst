@@ -20,6 +20,8 @@ Einstein model
 Chemistry parsing and thermodynamics
 ------------------------------------
 
+.. automodule:: burnman.utils.chemistry
+
 .. automodule:: burnman.tools.chemistry
 
 

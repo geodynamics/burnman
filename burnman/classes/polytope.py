@@ -15,7 +15,7 @@ from copy import copy
 
 from .material import cached_property
 
-from ..tools.math import independent_row_indices
+from ..utils.math import independent_row_indices
 
 try:
     cdd = importlib.import_module('cdd')

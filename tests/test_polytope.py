@@ -10,7 +10,6 @@ from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
 from burnman.tools.polytope import simplify_composite_with_composition
 
 
-
 class polytope(BurnManTest):
 
     def test_polytope_from_charge_balance(self):

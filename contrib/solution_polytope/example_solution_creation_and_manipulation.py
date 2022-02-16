@@ -16,7 +16,7 @@ manipulation of solution models.
 *Uses:*
 
 * :class:`burnman.MaterialPolytope`
-* :func:`burnman.tools.math.generate_complete_basis`
+* :func:`burnman.utils.math.generate_complete_basis`
 * :func:`burnman.tools.polytope.solution_polytope_from_charge_balance`
 * :func:`burnman.tools.polytope.solution_polytope_from_endmember_occupancies`
 * :func:`burnman.tools.solution.transform_solution_to_new_basis`
@@ -47,7 +47,7 @@ if not os.path.exists('burnman') and os.path.exists('../../burnman'):
     sys.path.insert(1, os.path.abspath('../..'))
 
 import burnman
-from burnman.tools.math import generate_complete_basis
+from burnman.utils.math import generate_complete_basis
 from burnman.tools.polytope import solution_polytope_from_charge_balance as polytope_from_charge_balance
 from burnman.tools.polytope import solution_polytope_from_endmember_occupancies as polytope_from_endmember_occupancies
 from burnman.tools.solution import transform_solution_to_new_basis
@@ -410,8 +410,8 @@ if __name__ == "__main__":
 
     print('Checking that a 50:50 solution of the two endmembers has '
           'the same properties in both solutions:')
-    old_formula = burnman.tools.chemistry.formula_to_string(cpx.formula)
-    new_formula = burnman.tools.chemistry.formula_to_string(new_cpx.formula)
+    old_formula = burnman.utils.chemistry.formula_to_string(cpx.formula)
+    new_formula = burnman.utils.chemistry.formula_to_string(new_cpx.formula)
     print('Chemical formula: {0}, {1}'.format(old_formula, new_formula))
     print('Gibbs free energy (J/mol): {0:.5f}, {1:.5f}'.format(cpx.gibbs,
                                                                new_cpx.gibbs))

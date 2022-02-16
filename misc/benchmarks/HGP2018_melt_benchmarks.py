@@ -16,9 +16,8 @@ the CMS and MS systems.
 from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
-from burnman import CombinedMineral, SolidSolution, Composite
+from burnman import Composite
 from burnman.minerals import HGP_2018_ds633
-from burnman.tools.chemistry import formula_to_string
 from burnman import equilibrate
 
 if __name__ == "__main__":
@@ -54,7 +53,6 @@ if __name__ == "__main__":
     plt.xlabel('Pressure (GPa)')
     plt.ylabel('Temperature (K))')
     plt.show()
-
 
     liq = HGP_2018_ds633.MS_melt()
     per = HGP_2018_ds633.per()
@@ -105,7 +103,8 @@ if __name__ == "__main__":
             equality_constraints = [['P', 1.e5],
                                     ['phase_fraction', (phase, 0.)]]
 
-            sol, prm = equilibrate(composition, assemblage, equality_constraints)
+            sol, prm = equilibrate(composition, assemblage,
+                                   equality_constraints)
 
             Ts[i] = sol.assemblage.temperature
 

@@ -16,7 +16,7 @@ It also demonstrates how we can smooth a given property on a given P-T grid.
 
 * :doc:`PerplexMaterial`
 * :func:`burnman.Material.evaluate`
-* :func:`burnman.tools.math.smooth_array`
+* :func:`burnman.utils.math.smooth_array`
 
 *Demonstrates:*
 
@@ -29,7 +29,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman.tools.math import smooth_array
+from burnman.utils.math import smooth_array
 
 
 if __name__ == "__main__":

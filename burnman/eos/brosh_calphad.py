@@ -12,7 +12,7 @@ from scipy.special import binom
 
 from . import equation_of_state as eos
 from ..constants import gas_constant
-from ..tools.math import bracket
+from ..utils.math import bracket
 
 
 class BroshCalphad(eos.EquationOfState):

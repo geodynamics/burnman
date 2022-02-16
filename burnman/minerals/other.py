@@ -12,7 +12,7 @@ from __future__ import absolute_import
 
 from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
-from ..tools.chemistry import dictionarize_formula, formula_mass
+from ..utils.chemistry import dictionarize_formula, formula_mass
 
 from .SLB_2011 import periclase, wuestite, mg_perovskite, fe_perovskite
 

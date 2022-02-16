@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # inline)?
     table = [[1e9, 1600], [30e9, 1700], [130e9, 2700]]
     # this could also be loaded from a file, just uncomment this
-    # table = burnman.tools.misc.read_table("input_geotherm/example_geotherm.txt")
+    # table = burnman.utils.misc.read_table("input_geotherm/example_geotherm.txt")
 
     table_pressure = np.array(table)[:, 0]
     table_temperature = np.array(table)[:, 1]

@@ -6,8 +6,7 @@ import warnings
 
 import burnman
 from burnman import Mineral, CombinedMineral
-from burnman.tools.chemistry import dictionarize_formula, formula_mass
-
+from burnman.utils.chemistry import dictionarize_formula, formula_mass
 
 
 class forsterite (Mineral):

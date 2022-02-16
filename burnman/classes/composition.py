@@ -7,8 +7,8 @@ from __future__ import print_function
 import numpy as np
 from scipy.optimize import nnls
 
-from ..tools.chemistry import dictionarize_formula, formula_mass
-from ..tools.misc import OrderedCounter
+from ..utils.chemistry import dictionarize_formula, formula_mass
+from ..utils.misc import OrderedCounter
 
 
 def composition_property(func):

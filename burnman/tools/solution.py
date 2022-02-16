@@ -10,7 +10,7 @@ import numpy as np
 from sympy import Matrix
 from ..classes.combinedmineral import CombinedMineral
 from ..classes.solution import Solution
-from .chemistry import site_occupancies_to_strings
+from ..utils.chemistry import site_occupancies_to_strings
 
 
 def _decompose_3D_matrix(W):

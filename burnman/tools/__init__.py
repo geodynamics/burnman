@@ -6,6 +6,12 @@
 
 """
 Tools
+-----
+
+The tools submodule of BurnMan is designed to provide high level
+functions that use other BurnMan submodules.
+It does not contain any functions that are required by the core
+BurnMan modules.
 """
 
 from __future__ import absolute_import
@@ -13,12 +19,9 @@ from __future__ import absolute_import
 from . import chemistry
 from . import eos
 from . import equilibration
-from . import math
-from . import misc
 from . import output_seismo
 from . import partitioning
-from . import polytope
 from . import plot
-from . import reductions
+from . import polytope
 from . import solution
 from . import unitcell
