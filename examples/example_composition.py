@@ -16,7 +16,8 @@ This example script demonstrates the use of BurnMan's Composition class.
 
 *Demonstrates:*
 
-* Creating an instance of the Composition class with a molar or weight composition
+* Creating an instance of the Composition class with a molar
+  or weight composition
 * Printing weight, molar, atomic compositions
 * Renormalizing compositions
 * Modifying the independent set of components
@@ -45,19 +46,29 @@ if __name__ == "__main__":
                                           'FeO': 0.2,
                                           'SiO2': 1.}, 'molar')
 
-    forsterite_composition.print('molar', significant_figures=4,
-                                 normalization_component='SiO2', normalization_amount=1.)
+    # The composition class has a pretty-print method called print.
+    # It can output the currently stored composition in
+    # absolute moles, mass (weight) or atoms:
+    forsterite_composition.print('molar', significant_figures=4)
+
+    # Alternatively, the amount can be normalized to a desired total
+    # or amount of a given component / element.
+    # The print method does not renormalize the composition itself,
+    # only the printed values:
     forsterite_composition.print('weight', significant_figures=4,
-                                 normalization_component='total', normalization_amount=1.)
+                                 normalization_component='total',
+                                 normalization_amount=1.)
     forsterite_composition.print('atomic', significant_figures=4,
-                                 normalization_component='total', normalization_amount=7.)
+                                 normalization_component='total',
+                                 normalization_amount=7.)
 
     # Let's read in composition data from an example file
     print('\n\n2) Reading compositions from file and renormalizing them:\n')
-    compositions, comments = file_to_composition_list('../burnman/data/input_compositions/'
-                                                      'dhz_mineral_compositions.dat',
-                                                      unit_type='weight',
-                                                      normalize=True)
+    d = file_to_composition_list('../burnman/data/input_compositions/'
+                                 'dhz_mineral_compositions.dat',
+                                 unit_type='weight',
+                                 normalize=True)
+    compositions, comments = d
 
     # The hard work has already been done in that one line:
     # each of the compositions is stored as an instance of
@@ -76,21 +87,22 @@ if __name__ == "__main__":
         # "weight_composition", "molar_composition" and "atomic_composition".
         # Here we just format the weight and molar dictionaries for printing.
         components = sorted(composition.weight_composition.keys())
-
-        wf = [float('{0:.3f}'.format(composition.weight_composition[c]*100))
+        composition.renormalize('weight', 'total', 100.)
+        wf = [float('{0:.3f}'.format(composition.weight_composition[c]))
               for c in components]
-        mf = [float('{0:.3f}'.format(composition.molar_composition[c]*100))
+        composition.renormalize('molar', 'total', 100.)
+        mf = [float('{0:.3f}'.format(composition.molar_composition[c]))
               for c in components]
         print('{0}:\n {1}\n {2} (wt %)\n {3} (mol %)\n'.format(name,
                                                                components,
                                                                wf, mf))
 
-        # By default, the compositions are normalised to 1 g (weight) or
-        # 1 mole (of components or atoms).
-        # We can change this with the class function "renormalize".
-        # Here we change the number of atoms in the
-        # atomic composition so that the number of oxygens is equal to n_O.
-        # This does not change the molar or weight bases.
+        # In the above, we used the renormalize method to renormalize
+        # the composition object to 100 kg or 100 moles total.
+
+        # We can also renormalize to a given amount of
+        # a component or element. We now renormalize
+        # so that the number of oxygens is equal to n_O.
         compositions[i].renormalize('atomic', 'O', float(n_O))
         components = sorted(composition.atomic_composition.keys())
         af = [float('{0:.3f}'.format(composition.atomic_composition[c]))
@@ -110,18 +122,20 @@ if __name__ == "__main__":
     print('\n3) Fayalite starting mix calculations:\n')
     composition = Composition(dictionarize_formula('Fe2SiO4'), 'molar')
 
-    # The first step is to split the desired starting mix into a set of
-    # starting oxides
-    # (alternatively, we could have initialised the
+    # The composition currently has the elements Fe, Si and O as
+    # distinct components. First, we change this component set into a
+    # set of starting oxides
+    # (alternatively, we could have directly initialized the
     # composition with a dictionary of these oxides)
     composition.change_component_set(['FeO', 'SiO2'])
 
     # Let's check the molar composition of this composition
     composition.print('molar', significant_figures=4, normalization_amount=1.)
 
-    # Here we modify the bulk composition by adding oxygen to the
+    # Now we modify the bulk composition by adding oxygen to the
     # starting mix equal to one third the total FeO (on a molar basis)
-    # This is equivalent to adding FeO as Fe2O3 (1/2 Fe2O3 = FeO + 1/2 O)
+    # This is equivalent to converting all the FeO into Fe2O3
+    # (1/2 Fe2O3 = FeO + 1/2 O)
     print('')
     print('FeO doesn\'t exist as a stoichiometric compound, '
           'but we can create\n'
@@ -144,14 +158,14 @@ if __name__ == "__main__":
     print('Atomic composition\n{0}\n{1}\n'.format(elements, v))
 
     # Finally, let's print out the starting composition that we'll use,
-    # assuming that we want to start with 2 g of Fe3O4 and SiO2 powder
+    # assuming that we want to start with 2 g of Fe2O3 and SiO2 powder
     composition.print('weight', significant_figures=4, normalization_amount=2.)
     composition.renormalize('weight', 'total', 2.)
 
-    # Now let's do the same, but for carbonated starting mixes and where we
-    # want to add some Fe as Fe57.
+    # Now let's do something similar, but for a more complicated
+    # starting mix involving calcium and sodium.
     # Calcium and sodium are typically added as CaCO3 and Na2CO3
-    # even if we don't want carbon in our starting mix.
+    # even if we don't want carbonate in our starting mix.
     # This is because CaO and Na2O are reactive and hygroscopic
     # (we don't want an unknown amount of water screwing up our weights).
 
@@ -168,21 +182,23 @@ if __name__ == "__main__":
     # Now we need to modify the composition so that we can make it from
     # standard starting materials:
 
-    # 1) We want to add Ca and Na2O via CaCO3 and Na2CO3.
+    # 1) We want to add calcium and sodium as CaCO3 and Na2CO3.
 
-    # 2) We want to make a fraction f of total Fe Fe57 (where 1 is 100%)
-    # where the Fe57 is metallic Fe and the Fe(natural) is Fe2O3
-    # Obviously we only want to vary the amount of O2, so
+    # 2) We want to make a fraction f of total iron Fe^{57},
+    # where the Fe57 is added as metallic Fe and the Fe(natural) is Fe2O3
+    # We want to retain the correct total amount of iron, but we are free
+    # to vary the amount of oxygen, so
     # FeO + m O -> f Fe(57) + (1-f)/2 Fe2O3
 
     # Therefore m = 3*(1-f)/2 - 1 = 0.5 - 1.5f
     f = 0.5
     m = 0.5 - 1.5*f
 
-    # Here's where we add the (temporary) components
+    # Here's where we add the carbonate and oxygen
     CO2_molar = KLB1.molar_composition['CaO'] + KLB1.molar_composition['Na2O']
+    O_molar = KLB1.molar_composition['FeO']*m
     KLB1.add_components(composition_dictionary={'CO2': CO2_molar,
-                                                'O': KLB1.molar_composition['FeO']*m},
+                                                'O': O_molar},
                         unit_type='molar')
 
     # Here's where we change the components:
