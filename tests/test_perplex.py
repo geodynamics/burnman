@@ -1,13 +1,13 @@
 from __future__ import absolute_import
+import os
 import unittest
 from util import BurnManTest
 import numpy as np
-
 import burnman
 
-
 # Predefine our rock
-rock = burnman.PerplexMaterial('../burnman/data/input_perplex/in23_1.tab')
+path = os.path.dirname(os.path.abspath(__file__))
+rock = burnman.PerplexMaterial(f'{path}/../burnman/data/input_perplex/in23_1.tab')
 
 
 class PerpleX(BurnManTest):

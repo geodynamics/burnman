@@ -100,9 +100,7 @@ do
 done
 
 
-cd tests
-$PYTHON tests.py || (echo "ERROR: unittests failed"; exit 1) || exit 1
-cd ..
+$PYTHON -m unittest discover ./tests || (echo "ERROR: unittests failed"; exit 1) || exit 1
 echo ""
 
 
