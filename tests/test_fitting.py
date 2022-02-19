@@ -1,3 +1,4 @@
+import os
 import unittest
 from util import BurnManTest
 import numpy as np
@@ -5,14 +6,16 @@ import numpy as np
 import burnman
 from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
 
+path = os.path.dirname(os.path.abspath(__file__))
 
 
 class test_fitting(BurnManTest):
 
     def test_linear_fit(self):
         # Test from Neri et al. (Meas. Sci. Technol. 1 (1990) 1007-1010.)
-        i, x, Wx, y, Wy = np.loadtxt(
-            '../burnman/data/input_fitting/Pearson_York.dat', unpack=True)
+        i, x, Wx, y, Wy = np.loadtxt(f'{path}/../burnman/data/'
+                                     'input_fitting/Pearson_York.dat',
+                                     unpack=True)
 
         data = np.array([x, y]).T
         cov = np.array([[1./Wx, 0.*Wx], [0.*Wy, 1./Wy]]).T
@@ -50,8 +53,8 @@ class test_fitting(BurnManTest):
 
     def test_polynomial_fit(self):
         # Test from Neri et al. (Meas. Sci. Technol. 1 (1990) 1007-1010.)
-        i, x, Wx, y, Wy = np.loadtxt(
-            '../burnman/data/input_fitting/Pearson_York.dat', unpack=True)
+        i, x, Wx, y, Wy = np.loadtxt(f'{path}/../burnman/data/'
+                                     'input_fitting/Pearson_York.dat', unpack=True)
 
         data = np.array([x, y]).T
         cov = np.array([[1./Wx, 0.*Wx], [0.*Wy, 1./Wy]]).T
