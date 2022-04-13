@@ -5,7 +5,7 @@ def print_table_for_mineral_constants(mineral, indices):
 
     constants = []
     for (i, j) in indices:
-        constants.append(mineral.c[i-1, j-1, :, :])
+        constants.append(mineral.anisotropic_params['c'][i-1, j-1, :, :])
 
     constants = np.array(constants)
 

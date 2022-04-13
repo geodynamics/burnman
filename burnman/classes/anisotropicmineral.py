@@ -19,15 +19,26 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     This class is derived from both Mineral and AnisotropicMaterial,
     and inherits most of the methods from these classes.
 
-    Instantiation of an AnisotropicMineral takes three arguments;
+    Instantiation of an AnisotropicMineral takes three required arguments;
     a reference Mineral (i.e. a standard isotropic mineral which provides
     volume as a function of pressure and temperature), cell_parameters,
     which give the lengths of the molar cell vectors and the angles between
     them (see :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`),
-    and a 4D array of anisotropic parameters which describe the
-    anisotropic behaviour of the mineral. For a description of the physical
-    meaning of these parameters, please refer to the code
+    and an anisotropic parameters object, which should be either a
+    4D array of anisotropic parameters or a dictionary of parameters which
+    describe the anisotropic behaviour of the mineral.
+    For a description of the physical meaning of the parameters in the
+    4D array, please refer to the code
     or to the original paper.
+
+    If the user chooses to define their parameters as a dictionary,
+    they must also provide a function to the psi_function argument
+    that describes how to compute the tensors Psi, dPsidf and dPsidPth
+    (in Voigt form). The function arguments should be f, Pth and params,
+    in that order. The output variables Psi, dPsidf and dPsidth
+    must be returned in that order in a tuple. The user should
+    also explicitly state whether the material is orthotropic or not
+    by supplying a boolean to the orthotropic argument.
 
     States of the mineral can only be queried after setting the
     pressure and temperature using set_state().
@@ -52,47 +63,22 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     """
 
     def __init__(self, isotropic_mineral, cell_parameters,
-                 anisotropic_parameters):
+                 anisotropic_parameters,
+                 psi_function=None, orthotropic=None):
 
-        if not np.all(anisotropic_parameters[:, :, 0, 0] == 0):
-            raise Exception("anisotropic_parameters_pqmn should be set to "
-                            "zero for all m = n = 0")
+        if psi_function is None:
+            self.check_standard_parameters(anisotropic_parameters)
+            self.anisotropic_params = {'c': anisotropic_parameters}
+            self.psi_function = self.standard_psi_function
+        else:
+            if not isinstance(orthotropic, bool):
+                raise Exception('If the Psi function is provided, '
+                                'you must specify whether your material is '
+                                'orthotropic as a boolean.')
+            self.orthotropic = orthotropic
+            self.anisotropic_params = anisotropic_parameters
+            self.psi_function = psi_function
 
-        sum_ijij_block = np.sum(anisotropic_parameters[:3, :3, :, :],
-                                axis=(0, 1))
-
-        if np.abs(sum_ijij_block[1, 0] - 1.) > 1.e-5:
-            raise Exception('The sum of the upper 3x3 pq-block of '
-                            'anisotropic_parameters_pqmn must equal '
-                            '1 for m=1, n=0 for consistency with the volume. '
-                            f'Value is {sum_ijij_block[1, 0]}')
-
-        for m in range(2, len(sum_ijij_block)):
-            if np.abs(sum_ijij_block[m, 0]) > 1.e-10:
-                raise Exception('The sum of the upper 3x3 pq-block of '
-                                'anisotropic_parameters_pqmn must equal 0 for'
-                                f'm={m}, n=0 for consistency with the volume. '
-                                f'Value is {sum_ijij_block[m, 0]}')
-
-        for m in range(len(sum_ijij_block)):
-            for n in range(1, len(sum_ijij_block[0])):
-                if np.abs(sum_ijij_block[m, n]) > 1.e-10:
-                    raise Exception('The sum of the upper 3x3 pq-block of '
-                                    'anisotropic_parameters_pqmn must equal '
-                                    f'0 for m={m}, n={n} for '
-                                    'consistency with the volume. '
-                                    f'Value is {sum_ijij_block[m, n]}')
-
-        if cond(anisotropic_parameters[:, :, 1, 0]) > 1/np.finfo(float).eps:
-            raise Exception('anisotropic_parameters[:, :, 1, 0] is singular')
-
-        sum_lower_left_block = np.sum(anisotropic_parameters[3:, :3, :, :],
-                                      axis=1)
-
-        self.orthotropic = True
-        for i, s in enumerate(sum_lower_left_block):
-            if not np.all(np.abs(s) < 1.e-10):
-                self.orthotropic = False
 
         self.cell_vectors_0 = cell_parameters_to_vectors(cell_parameters)
 
@@ -104,13 +90,33 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                             'with the volume. Suggest multiplying each '
                             f'by {factor}.')
 
-        self.c = anisotropic_parameters
-
         if 'name' in isotropic_mineral.params:
             self.name = isotropic_mineral.params['name']
 
         Mineral.__init__(self, isotropic_mineral.params,
                          isotropic_mineral.property_modifiers)
+
+    def standard_psi_function(self, f, Pth, params):
+        # Compute Psi, dPsidPth, dPsidf, needed by most anisotropic properties
+        c = params['c']
+        ns = np.arange(c.shape[-1])
+        x = c[:, :, 0, :] + c[:, :, 1, :]*f
+        dPsidf = c[:, :, 1, :]
+
+        for i in list(range(2, c.shape[2])):
+            # non-intuitively, the += operator doesn't simply add in-place,
+            # so here we overwrite the arrays with new ones
+            x = x + c[:, :, i, :]*np.power(f, float(i))/float(i)
+            dPsidf = dPsidf + c[:, :, i, :] * np.power(f, float(i)-1.)
+
+        Psi = np.einsum('ikn, n->ik', x, np.power(Pth, ns))
+
+        dPsidPth = np.einsum('ikn, n->ik',
+                             x[:, :, 1:],
+                             ns[1:]*np.power(Pth, ns[1:]-1))
+
+        dPsidf = np.einsum('ikn, n->ik', dPsidf, np.power(Pth, ns))
+        return (Psi, dPsidf, dPsidPth)
 
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
@@ -137,28 +143,18 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         V_0 = self.params['V_0']
         Vrel = V/V_0
         f = np.log(Vrel)
+        self._Vrel = Vrel
+        self._f = f
 
         Pth = pressure - self.method.pressure(self.params['T_0'], self.V,
                                               self.params)
 
-        # Compute X, dXdPth, dXdf, needed by most anisotropic properties
-        ns = np.arange(self.c.shape[-1])
-        x = self.c[:, :, 0, :] + self.c[:, :, 1, :]*f
-        dxdf = self.c[:, :, 1, :]
+        out = self.psi_function(f, Pth, self.anisotropic_params)
 
-        for i in list(range(2, self.c.shape[2])):
-            # non-intuitively, the += operator doesn't simply add in-place,
-            # so here we overwrite the arrays with new ones
-            x = x + self.c[:, :, i, :]*np.power(f, float(i))/float(i)
-            dxdf = dxdf + self.c[:, :, i, :] * np.power(f, float(i)-1.)
+        self.Psi_Voigt = out[0]
+        self.dPsidf_Voigt = out[1]
+        self.dPsidPth_Voigt = out[2]
 
-        self._Vrel = Vrel
-        self._f = f
-        self.X_Voigt = np.einsum('ikn, n->ik', x, np.power(Pth, ns))
-        self.dXdPth_Voigt = np.einsum('ikn, n->ik',
-                                      x[:, :, 1:],
-                                      ns[1:]*np.power(Pth, ns[1:]-1))
-        self.dXdf_Voigt = np.einsum('ikn, n->ik', dxdf, np.power(Pth, ns))
 
     def _contract_compliances(self, compliances):
         """
@@ -185,8 +181,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             mineral from its undeformed state
             (i.e. the state at the reference pressure and temperature).
         """
-        X_full = self._voigt_notation_to_compliance_tensor(self.X_Voigt)
-        F = expm(np.einsum('ijkl, kl', X_full, np.eye(3)))
+        Psi_full = self._voigt_notation_to_compliance_tensor(self.Psi_Voigt)
+        F = expm(np.einsum('ijkl, kl', Psi_full, np.eye(3)))
         return F
 
     @material_property
@@ -354,7 +350,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in Voigt form (:math:`\\mathbb{S}_{\\text{T} pq}`).
         """
         S_T = (self.isothermal_compressibility_reuss
-               * (self.dXdf_Voigt + self.dXdPth_Voigt * self.dPthdf))
+               * (self.dPsidf_Voigt + self.dPsidPth_Voigt * self.dPthdf))
         if self.orthotropic:
             return S_T
         else:
@@ -371,8 +367,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         thermal_expansivity_tensor : 2D numpy array
             The tensor of thermal expansivities [1/K].
         """
-        a = self.alpha * (self.dXdf_Voigt
-                          + self.dXdPth_Voigt
+        a = self.alpha * (self.dPsidf_Voigt
+                          + self.dPsidPth_Voigt
                           * (self.dPthdf
                              + 1./self.isothermal_compressibility_reuss))
         alpha = np.einsum('ijkl, kl',
@@ -391,7 +387,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Returns
         -------
-        isothermak_stiffness_tensor : 2D numpy array
+        isothermal_stiffness_tensor : 2D numpy array
             The isothermal stiffness tensor [Pa]
             in Voigt form (:math:`\\mathbb{C}_{\\text{T} pq}`).
         """
@@ -402,7 +398,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Returns
         -------
-        full_isothermak_stiffness_tensor : 4D numpy array
+        full_isothermal_stiffness_tensor : 4D numpy array
             The isothermal compliance tensor [1/Pa]
             in standard form (:math:`\\mathbb{S}_{\\text{T} ijkl}`).
         """
@@ -414,7 +410,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Returns
         -------
-        full_isothermak_stiffness_tensor : 4D numpy array
+        full_isothermal_stiffness_tensor : 4D numpy array
             The isothermal stiffness tensor [Pa]
             in standard form (:math:`\\mathbb{C}_{\\text{T} ijkl}`).
         """
@@ -425,7 +421,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Returns
         -------
-        full_isothermak_stiffness_tensor : 4D numpy array
+        full_isentropic_stiffness_tensor : 4D numpy array
             The isentropic compliance tensor [1/Pa]
             in standard form (:math:`\\mathbb{S}_{\\text{N} ijkl}`).
         """
@@ -520,3 +516,45 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         return np.einsum('ijkl, kl->ij',
                          self.full_isentropic_compliance_tensor,
                          np.eye(3))
+
+    def check_standard_parameters(self, anisotropic_parameters):
+
+        if not np.all(anisotropic_parameters[:, :, 0, 0] == 0):
+            raise Exception("anisotropic_parameters_pqmn should be set to "
+                            "zero for all m = n = 0")
+
+        sum_ijij_block = np.sum(anisotropic_parameters[:3, :3, :, :],
+                                axis=(0, 1))
+
+        if np.abs(sum_ijij_block[1, 0] - 1.) > 1.e-5:
+            raise Exception('The sum of the upper 3x3 pq-block of '
+                            'anisotropic_parameters_pqmn must equal '
+                            '1 for m=1, n=0 for consistency with the volume. '
+                            f'Value is {sum_ijij_block[1, 0]}')
+
+        for m in range(2, len(sum_ijij_block)):
+            if np.abs(sum_ijij_block[m, 0]) > 1.e-10:
+                raise Exception('The sum of the upper 3x3 pq-block of '
+                                'anisotropic_parameters_pqmn must equal 0 for'
+                                f'm={m}, n=0 for consistency with the volume. '
+                                f'Value is {sum_ijij_block[m, 0]}')
+
+        for m in range(len(sum_ijij_block)):
+            for n in range(1, len(sum_ijij_block[0])):
+                if np.abs(sum_ijij_block[m, n]) > 1.e-10:
+                    raise Exception('The sum of the upper 3x3 pq-block of '
+                                    'anisotropic_parameters_pqmn must equal '
+                                    f'0 for m={m}, n={n} for '
+                                    'consistency with the volume. '
+                                    f'Value is {sum_ijij_block[m, n]}')
+
+        if cond(anisotropic_parameters[:, :, 1, 0]) > 1/np.finfo(float).eps:
+            raise Exception('anisotropic_parameters[:, :, 1, 0] is singular')
+
+        sum_lower_left_block = np.sum(anisotropic_parameters[3:, :3, :, :],
+                                      axis=1)
+
+        self.orthotropic = True
+        for i, s in enumerate(sum_lower_left_block):
+            if not np.all(np.abs(s) < 1.e-10):
+                self.orthotropic = False
