@@ -234,6 +234,25 @@ def check_anisotropic_eos_consistency(m, P=1.e9, T=2000.,
     eq.extend([[(a1[i, j] - a0[i, j])/dP, -(b1[i, j] - b0[i, j])/dT]
                for i in range(3) for j in range(i, 3)])
 
+    # Consistent Phi
+    expr.extend(['dPsidf_Voigt[:3,:3] == 1'])
+    eq.extend([[np.sum(m.dPsidf_Voigt[:3,:3]), 1.]])
+
+    # Consistent inverses
+    expr.extend([f'S_T = inv(C_T) ({i}{j})'
+                 for i in range(6) for j in range(i, 6)])
+    S_T = m.isothermal_compliance_tensor
+    S_T2 = np.linalg.inv(m.isothermal_stiffness_tensor)
+    eq.extend([[S_T[i,j], S_T2[i,j]]
+               for i in range(6) for j in range(i, 6)])
+
+    expr.extend([f'S_N = inv(C_N) ({i}{j})'
+                 for i in range(6) for j in range(i, 6)])
+    S_N = m.isentropic_compliance_tensor
+    S_N2 = np.linalg.inv(m.isentropic_stiffness_tensor)
+    eq.extend([[S_N[i,j], S_N2[i,j]]
+               for i in range(6) for j in range(i, 6)])
+
     # Consistent isotropic and anisotropic properties
     expr.extend(['V = det(M)',
                  'alpha_v = tr(alpha)',
