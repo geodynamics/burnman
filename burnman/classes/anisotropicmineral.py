@@ -12,6 +12,7 @@ from ..utils.misc import copy_documentation
 from ..utils.unitcell import cell_parameters_to_vectors
 from ..utils.unitcell import cell_vectors_to_parameters
 
+
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
     """
     A class implementing the anisotropic mineral equation of state described
@@ -78,7 +79,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             self.orthotropic = orthotropic
             self.anisotropic_params = anisotropic_parameters
             self.psi_function = psi_function
-
 
         self.cell_vectors_0 = cell_parameters_to_vectors(cell_parameters)
 
@@ -154,7 +154,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self.Psi_Voigt = out[0]
         self.dPsidf_Voigt = out[1]
         self.dPsidPth_Voigt = out[2]
-
 
     def _contract_compliances(self, compliances):
         """
@@ -414,7 +413,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             The isothermal stiffness tensor [Pa]
             in standard form (:math:`\\mathbb{C}_{\\text{T} ijkl}`).
         """
-        return self._voigt_notation_to_stiffness_tensor(self.isothermal_stiffness_tensor)
+        CT = self.isothermal_stiffness_tensor
+        return self._voigt_notation_to_stiffness_tensor(CT)
 
     @material_property
     def full_isentropic_compliance_tensor(self):
@@ -516,6 +516,43 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         return np.einsum('ijkl, kl->ij',
                          self.full_isentropic_compliance_tensor,
                          np.eye(3))
+
+    @material_property
+    def thermal_stress_tensor(self):
+        """
+        Returns
+        -------
+        thermal stress : 2D numpy array
+            The change in stress with temperature at constant strain.
+        """
+        pi = np.einsum('ijkl, kl', self.full_isothermal_stiffness_tensor,
+                       self.thermal_expansivity_tensor)
+        return pi
+
+    @material_property
+    def molar_isometric_heat_capacity(self):
+        """
+        Returns
+        -------
+        molar_isometric_heat_capacity : float
+            The molar heat capacity at constant strain.
+        """
+
+        pi = self.thermal_stress_tensor
+        pipiV = np.einsum('ij, kl -> ijkl', pi, pi)*self.V
+        indices = np.where(np.abs(pipiV) > 1.e-5)
+        values = ((self.full_isentropic_stiffness_tensor
+                   - self.full_isothermal_stiffness_tensor)[indices]
+                  / pipiV[indices])
+        if not np.allclose(values, np.ones_like(values)*values[0],
+                           rtol=1.e-5):
+            raise Exception('Could not calculate the molar heat '
+                            'capacity at constant strain. '
+                            'There is an inconsistency in the '
+                            'equation of state.')
+        C_isometric = self.temperature/values[0]
+
+        return C_isometric
 
     def check_standard_parameters(self, anisotropic_parameters):
 
