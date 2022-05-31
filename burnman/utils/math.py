@@ -471,5 +471,37 @@ def generate_complete_basis(incomplete_basis, array):
         input arrays.
     """
 
+    incomplete_rank = np.linalg.matrix_rank(incomplete_basis)
+    if incomplete_rank < len(incomplete_basis):
+        raise Exception('The incomplete basis is rank-deficient. '
+                        'Remove one or more endmembers.')
+
     a = np.concatenate((incomplete_basis, array))
-    return a[independent_row_indices(a)]
+    complete_basis = np.array(a[independent_row_indices(a)],
+                              dtype=float)
+
+    # Store the rank of the matrix for later comparison
+    len_basis = np.linalg.matrix_rank(complete_basis)
+
+    # This next step ensures that all of the original
+    # rows are contained in the new basis in their original order
+    c = np.linalg.lstsq(np.array(complete_basis).astype(float).T,
+                        np.array(incomplete_basis).astype(float).T,
+                        rcond=None)[0].T
+
+    for row in np.eye(len(c[0])):
+        old_rank = np.linalg.matrix_rank(c.T)
+        c2 = np.concatenate((c, [row]))
+        new_rank = np.linalg.matrix_rank(c2.T)
+
+        if new_rank > old_rank:
+            c = c2
+
+    complete_basis = c.dot(complete_basis)
+
+    # Check that the matrix rank has not changed
+    if len_basis != np.linalg.matrix_rank(complete_basis):
+        raise Exception('Basis length changed during conversion. '
+                        'Report this bug to developers.')
+
+    return complete_basis.round(decimals=12) + 0.
