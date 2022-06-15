@@ -37,10 +37,17 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
 
 
 @jit
-def _delta_pressure(x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm):
+def _delta_pressure(x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii,
+                    a2_iikk, b_iikk, b_iikkmm):
 
     f = 0.5 * (pow(V_0 / x, 2. / 3.) - 1.)
-    debye_temperature = Debye_0 * np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
+    nu_o_nu0_sq = 1. + a1_ii * f + 1. / 2. * a2_iikk * f * f
+    if nu_o_nu0_sq > 0.:
+        debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)
+    else:
+        raise Exception(f'This volume (V = {x/V_0:.2f}*V_0) exceeds the '
+                        'valid range of the thermal '
+                        'part of the slb equation of state.')
     E_th = debye.thermal_energy(
         temperature, debye_temperature, n)  # thermal energy at temperature T
     E_th_ref = debye.thermal_energy(
@@ -70,7 +77,13 @@ class SLBBase(eos.EquationOfState):
         a1_ii = 6. * params['grueneisen_0']  # EQ 47
         a2_iikk = -12. * params['grueneisen_0'] + 36. * pow(
             params['grueneisen_0'], 2.) - 18. * params['q_0'] * params['grueneisen_0']  # EQ 47
-        return params['Debye_0'] * np.sqrt(1. + a1_ii * f + 1. / 2. * a2_iikk * f * f)
+        nu_o_nu0_sq = 1. + a1_ii * f + 1. / 2. * a2_iikk * f * f
+        if nu_o_nu0_sq > 0.:
+            return params['Debye_0'] * np.sqrt(nu_o_nu0_sq)
+        else:
+            raise Exception(f'This volume (V = {1./x:.2f}*V_0) exceeds the '
+                            'valid range of the thermal '
+                            'part of the slb equation of state.')
 
     def volume_dependent_q(self, x, params):
         """
@@ -83,7 +96,8 @@ class SLBBase(eos.EquationOfState):
             params['grueneisen_0'], 2.) - 18. * params['q_0'] * params['grueneisen_0']  # EQ 47
         nu_o_nu0_sq = 1. + a1_ii * f + (1. / 2.) * a2_iikk * f * f  # EQ 41
         gr = 1. / 6. / nu_o_nu0_sq * (2. * f + 1.) * (a1_ii + a2_iikk * f)
-        if np.abs(params['grueneisen_0']) < 1.e-10:  # avoids divide by zero if grueneisen_0 = 0.
+        # avoids divide by zero if grueneisen_0 = 0.
+        if np.abs(params['grueneisen_0']) < 1.e-10:
             q = 1. / 9. * (18. * gr - 6.)
         else:
             q = 1. / 9. * \
