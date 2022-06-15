@@ -166,22 +166,32 @@ def _pad_ndarray_inverse_mirror(array, padding):
     padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
 
-    slices = tuple([slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+    slices = tuple([slice(padding[i], padding[i] + l)
+                    for i, l in enumerate(array.shape)])
     padded_array[slices] = array
 
-    padded_array_indices = list(itertools.product(*[range(n + 2*padding[i]) for i, n in enumerate(array.shape)]))
-    inserted_indices = list(itertools.product(*[range(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]))
+    padded_array_indices = list(itertools.product(*[range(n + 2*padding[i])
+                                                    for i, n
+                                                    in enumerate(array.shape)]))
+    inserted_indices = list(itertools.product(*[range(padding[i], padding[i] + l)
+                                                for i, l
+                                                in enumerate(array.shape)]))
     padded_array_indices.extend(inserted_indices)
 
     counter = Counter(padded_array_indices)
     keys = list(counter.keys())
-    padded_indices = [keys[i] for i, value in enumerate(counter.values()) if value == 1]
-    edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]), padded_array.shape[dimension] - padding[dimension] - 1])
+    padded_indices = [keys[i] for i, value in enumerate(counter.values())
+                      if value == 1]
+    edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]),
+                                         padded_array.shape[dimension] - padding[dimension] - 1])
                                  for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
-    mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j] for j in range(len(array.shape))]) for i in range(len(padded_indices))])
+    mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j]
+                                   for j in range(len(array.shape))])
+                            for i in range(len(padded_indices))])
 
     for i, idx in enumerate(padded_indices):
-        padded_array[idx] = 2.*padded_array[edge_indices[i]] - padded_array[mirror_indices[i]]
+        padded_array[idx] = (2.*padded_array[edge_indices[i]]
+                             - padded_array[mirror_indices[i]])
 
     return padded_array
 
@@ -231,7 +241,8 @@ def smooth_array(array, grid_spacing,
         padded_array = _pad_ndarray_inverse_mirror(array, padding)
         smoothed_padded_array = gaussian_filter(padded_array,
                                                 sigma=sigma)
-        slices = tuple([slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)])
+        slices = tuple([slice(padding[i], padding[i] + l)
+                        for i, l in enumerate(array.shape)])
         smoothed_array = smoothed_padded_array[slices]
     else:
         smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
@@ -291,14 +302,16 @@ def interp_smoothed_array_and_derivatives(array,
     if indexing == 'xy':
         smoothed_array = smooth_array(array=array,
                                       grid_spacing=np.array([dy, dx]),
-                                      gaussian_rms_widths=np.array([y_stdev, x_stdev]),
+                                      gaussian_rms_widths=np.array([y_stdev,
+                                                                    x_stdev]),
                                       truncate=truncate,
                                       mode=mode)
 
     elif indexing == 'ij':
         smoothed_array = smooth_array(array=array,
                                       grid_spacing=np.array([dx, dy]),
-                                      gaussian_rms_widths=np.array([x_stdev, y_stdev]),
+                                      gaussian_rms_widths=np.array([x_stdev,
+                                                                    y_stdev]),
                                       truncate=truncate,
                                       mode=mode).T
 
@@ -446,6 +459,16 @@ def independent_row_indices(array):
     return sorted(indices[:len(pivots)])
 
 
+def array_to_rational_matrix(array):
+    """
+    Converts a numpy array into a sympy matrix
+    filled with rationals
+    """
+    return Matrix([[Rational(v).limit_denominator(1000)
+                    for v in row]
+                   for row in array])
+
+
 def generate_complete_basis(incomplete_basis, array):
     """
     Given a 2D array with independent rows and a second 2D array that spans a
@@ -471,5 +494,37 @@ def generate_complete_basis(incomplete_basis, array):
         input arrays.
     """
 
+    incomplete_rank = array_to_rational_matrix(incomplete_basis).rank()
+    if incomplete_rank < len(incomplete_basis):
+        raise Exception('The incomplete basis is rank-deficient. '
+                        'Remove one or more endmembers.')
+
     a = np.concatenate((incomplete_basis, array))
-    return a[independent_row_indices(a)]
+    complete_basis = np.array(a[independent_row_indices(a)],
+                              dtype=float)
+
+    # Store the rank of the matrix for later comparison
+    len_basis = array_to_rational_matrix(complete_basis).rank()
+
+    # This next step ensures that all of the original
+    # rows are contained in the new basis in their original order
+    c = np.linalg.lstsq(np.array(complete_basis).astype(float).T,
+                        np.array(incomplete_basis).astype(float).T,
+                        rcond=None)[0].T
+
+    for row in np.eye(len(c[0])):
+        old_rank = array_to_rational_matrix(c).rank()
+        c2 = np.concatenate((c, [row]))
+        new_rank = array_to_rational_matrix(c2).rank()
+
+        if new_rank > old_rank:
+            c = c2
+
+    complete_basis = c.dot(complete_basis)
+
+    # Check that the matrix rank has not changed
+    if len_basis != array_to_rational_matrix(complete_basis).rank():
+        raise Exception('Basis length changed during conversion. '
+                        'Report this bug to developers.')
+
+    return complete_basis.round(decimals=12) + 0.

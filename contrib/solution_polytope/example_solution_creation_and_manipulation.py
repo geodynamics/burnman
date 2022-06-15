@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     print('The complete set of endmembers expressed as proportions of the '
           'independent endmember set:')
-    print(py_maj_2s_polytope.endmembers_as_independent_endmember_amounts)
+    print(py_maj_2s_polytope.endmembers_as_independent_endmember_amounts + 0.)
 
     """
     This majorite can be split into 4 sites, enabling ordering at the

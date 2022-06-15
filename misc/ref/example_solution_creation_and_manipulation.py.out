@@ -26,10 +26,10 @@ A potential set of independent endmember site occupancies:
 Formulae corresponding to these independent endmember occupancies:
 ['[Mg][Si]', '[Mg1/2Si1/2][Al]', '[Al][Mg1/2Si1/2]', '[Al][Al]']
 The complete set of endmembers expressed as proportions of the independent endmember set:
-[[ 1. -0. -0. -0.]
- [ 0.  1. -0.  0.]
- [-0.  0.  1. -0.]
- [-0.  0.  0.  1.]
+[[ 1.  0.  0.  0.]
+ [ 0.  1.  0.  0.]
+ [ 0.  0.  1.  0.]
+ [ 0.  0.  0.  1.]
  [-1.  2.  2. -2.]]
 
 Independent endmember set for four-site pyrope-majorite
