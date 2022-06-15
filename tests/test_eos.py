@@ -3,6 +3,7 @@ from __future__ import print_function
 import unittest
 from util import BurnManTest
 import warnings
+import numpy as np
 
 import burnman
 from burnman import minerals
@@ -376,6 +377,16 @@ class test_eos_validation(BurnManTest):
             derivative.append((G[2] - G[0])/dP)
 
         self.assertArraysAlmostEqual(calculated, derivative)
+
+    def test_slb_failure(self):
+        m = mypericlase()
+        burnman.Mineral.__init__(m)
+
+        def fn():
+            m.set_state_with_volume(m.params['V_0']*2., 300.)
+
+        with np.errstate(all='ignore'):
+            self.assertRaises(Exception, fn)
 
 
 if __name__ == '__main__':
