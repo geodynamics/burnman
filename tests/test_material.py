@@ -122,7 +122,7 @@ class test_material_name(BurnManTest):
 
     def test_set_state_with_volume(self):
         m = self.min_with_name()
-        P0 = 6.e9,
+        P0 = 6.e9
         T0 = 1000.
         T1 = 298.15
 
