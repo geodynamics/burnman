@@ -11,12 +11,6 @@ Unit cell
 .. automodule:: burnman.utils.unitcell
 
 
-Plotting
---------
-
-.. automodule:: burnman.utils.plot
-
-
 
 Mathematical
 ------------
@@ -35,6 +29,12 @@ Tools
 
 Burnman has a number of high-level tools to help achieve common goals.
 Several of these have already been described in previous sections.
+
+
+Plotting
+--------
+
+.. automodule:: burnman.tools.plot
 
 
 Output for seismology

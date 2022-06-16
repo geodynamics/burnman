@@ -7,7 +7,16 @@ most prominently in the form of minerals
 (:class:`~burnman.Mineral`) and composites (:class:`~burnman.Composite`).
 
 
-.. inheritance-diagram:: burnman.Material burnman.Mineral burnman.PerplexMaterial burnman.Solution burnman.Composite burnman.CombinedMineral burnman.AnisotropicMaterial burnman.AnisotropicMineral
+.. inheritance-diagram::
+  burnman.Material
+  burnman.Mineral
+  burnman.PerplexMaterial
+  burnman.Solution
+  burnman.ElasticSolution
+  burnman.Composite
+  burnman.CombinedMineral
+  burnman.AnisotropicMaterial
+  burnman.AnisotropicMineral
 
 
 Material Base Class
@@ -29,11 +38,16 @@ Endmembers
 .. autoclass:: burnman.Mineral
 
 Solutions
-^^^^^^^^^^^^^^^
+^^^^^^^^^
 
 .. autoclass:: burnman.Solution
 
 .. autoclass:: burnman.SolidSolution
+  :no-inherited-members:
+
+.. autoclass:: burnman.ElasticSolution
+
+.. autoclass:: burnman.ElasticSolidSolution
   :no-inherited-members:
 
 Mineral helpers

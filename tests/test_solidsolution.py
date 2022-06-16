@@ -221,6 +221,8 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
         # Interaction parameters
         self.energy_interaction = [[[10.e3, -10.e3], [5.e3, 3.e3]],
                                    [[-10.e3, -10.e3]]]
+        self.entropy_interaction = [[[1., -2.], [0., 1.]],
+                                    [[0., 0.]]]
         self.energy_ternary_terms = [[0, 1, 2, 3.e3]]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -457,6 +459,26 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
+    def test_subregular_model_ternary_partial_entropy_multicomponent_change(self):
+        ss = two_site_ss_subregular_ternary()
+        f0 = np.array([0.25, 0.35, 0.4])
+        ss.set_composition(f0)
+        ss.set_state(1.e9, 1000.)
+
+        dSdx = ss.partial_entropies
+
+        df = 0.0001
+        dSdx2 = np.empty(3)
+        for i, f_mod in enumerate(np.eye(3)*df):
+            ss.set_composition((f0-f_mod/2)/(1. - df/2.))
+            S0 = ss.S * (1. - df/2.)
+            ss.set_composition((f0+f_mod/2)/(1. + df/2.))
+            S1 = ss.S * (1. + df/2.)
+
+            dSdx2[i] = (S1 - S0)/df
+
+        self.assertArraysAlmostEqual(dSdx, dSdx2)
+
     def test_subregular_model_ternary_hessian_multicomponent_change(self):
         ss = two_site_ss_subregular_ternary()
         f0 = [0.25, 0.35, 0.4]
@@ -566,8 +588,7 @@ class test_solidsolution(BurnManTest):
         ss.set_composition([0., 0., 0.5, 0.5])
         S[3] = [ss.excess_entropy, -2.*R*np.log(0.5)]
 
-        self.assertArraysAlmostEqual(S[:,0], S[:,1])
-
+        self.assertArraysAlmostEqual(S[:, 0], S[:, 1])
 
     def test_temkin_activities(self):
         ss = temkin_ss()
@@ -601,7 +622,6 @@ class test_solidsolution(BurnManTest):
             dGdx2[i] = (G1 - G0)/df
 
         self.assertArraysAlmostEqual(dGdx, dGdx2)
-
 
     def test_temkin_hessian(self):
         ss = temkin_ss()

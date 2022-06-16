@@ -15,6 +15,8 @@ from . import mineral
 from . import combinedmineral
 from . import solutionmodel
 from . import solution
+from . import elasticsolutionmodel
+from . import elasticsolution
 from . import composite
 from . import anisotropy
 from . import anisotropicmineral
