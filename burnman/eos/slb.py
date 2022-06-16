@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -42,12 +43,7 @@ def _delta_pressure(x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii,
 
     f = 0.5 * (pow(V_0 / x, 2. / 3.) - 1.)
     nu_o_nu0_sq = 1. + a1_ii * f + 1. / 2. * a2_iikk * f * f
-    if nu_o_nu0_sq > 0.:
-        debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)
-    else:
-        raise Exception(f'This volume (V = {x/V_0:.2f}*V_0) exceeds the '
-                        'valid range of the thermal '
-                        'part of the slb equation of state.')
+    debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)
     E_th = debye.thermal_energy(
         temperature, debye_temperature, n)  # thermal energy at temperature T
     E_th_ref = debye.thermal_energy(
@@ -139,30 +135,66 @@ class SLBBase(eos.EquationOfState):
         T_0 = params['T_0']
         Debye_0 = params['Debye_0']
         V_0 = params['V_0']
+        dV = 1.e-2 * params['V_0']
         n = params['n']
 
         a1_ii = 6. * params['grueneisen_0']  # EQ 47
-        a2_iikk = -12. * params['grueneisen_0'] + 36. * pow(
-            params['grueneisen_0'], 2.) - 18. * params['q_0'] * params['grueneisen_0']  # EQ 47
+        a2_iikk = (-12. * params['grueneisen_0']
+                   + 36. * pow(params['grueneisen_0'], 2.)
+                   - 18. * params['q_0'] * params['grueneisen_0'])  # EQ 47
 
         b_iikk = 9. * params['K_0']  # EQ 28
         b_iikkmm = 27. * params['K_0'] * (params['Kprime_0'] - 4.)  # EQ 29z
 
-        # we need to have a sign change in [a,b] to find a zero. Let us start with a
-        # conservative guess:
+        # Finding the volume at a given pressure requires a
+        # root-finding scheme. Here we use brentq to find the root.
+
+        # Root-finding using brentq requires bounds to be specified.
+        # We do this using a bracketing function.
         args = (pressure, temperature, V_0, T_0,
                 Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm)
+
         try:
-            sol = bracket(_delta_pressure, params[
-                          'V_0'], 1.e-2 * params['V_0'], args)
-        except ValueError:
-            raise Exception(
-                'Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?')
+            # The first attempt to find a bracket for
+            # root finding uses V_0 as a starting point
+            sol = bracket(_delta_pressure, V_0, dV, args)
+        except Exception:
+            # At high temperature, the naive bracketing above may
+            # try a volume guess that exceeds the point at which the
+            # bulk modulus goes negative at that temperature.
+            # In this case, we try a more nuanced approach by
+            # first finding the volume at which the bulk modulus goes
+            # negative, and then either (a) raising an exception if the
+            # desired pressure is less than the pressure at that volume,
+            # or (b) using that pressure to create a better bracket for
+            # brentq.
+            def _K_T(V, T, params):
+                return self.isothermal_bulk_modulus(0., T, V, params)
+
+            sol_K_T = bracket(_K_T, V_0, dV,
+                              args=(temperature, params))
+            V_crit = opt.brentq(_K_T, sol_K_T[0], sol_K_T[1],
+                                args=(temperature, params))
+            P_min = self.pressure(temperature, V_crit, params)
+            if P_min > pressure:
+                raise Exception('The desired pressure is not achievable '
+                                'at this temperature. The minimum pressure '
+                                f'achievable is {P_min:.2e} Pa.')
+            else:
+                try:
+                    sol = bracket(_delta_pressure, V_crit - dV,
+                                  dV, args)
+                except Exception:
+                    raise Exception('Cannot find a volume, perhaps you are '
+                                    'outside of the range of validity for '
+                                    'the equation of state?')
+
         return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
 
     def pressure(self, temperature, volume, params):
         """
-        Returns the pressure of the mineral at a given temperature and volume [Pa]
+        Returns the pressure of the mineral at a given temperature and volume
+        [Pa]
         """
         debye_T = self._debye_temperature(params['V_0'] / volume, params)
         gr = self.grueneisen_parameter(
