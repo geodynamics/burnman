@@ -215,6 +215,8 @@ from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
 from .classes.solutionmodel import SolutionModel
 from .classes.solution import Solution, SolidSolution
+from .classes.elasticsolutionmodel import ElasticSolutionModel
+from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution
 from .classes.composite import Composite
 from .classes.calibrant import Calibrant
 from .classes.anisotropy import AnisotropicMaterial
