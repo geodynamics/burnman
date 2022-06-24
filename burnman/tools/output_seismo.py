@@ -21,6 +21,7 @@ def write_tvel_file(planet_or_layer, modelname='burnmanmodel',
     Note: Because density isn't defined for most 1D seismic models, densities
     are output as zeroes.  The tvel format has a column for density,
     but this column is not used by obspy for travel time calculations.
+
     Parameters
     ----------
     planet_or_layer  :  burnman.Planet() or burnman.Layer()
@@ -89,10 +90,11 @@ def write_axisem_input(layers, modelname='burnmanmodel_foraxisem',
                        plotting=False):
     """
     Writing velocities and densities to AXISEM (www.axisem.info) input file.
-    The input can be a single layer, or a list of layers taken from a planet (planet.layers).
-    Currently this function will implement explicit discontinuities between layers in the seismic model.
+    The input can be a single layer, or a list of layers taken from a planet
+    (planet.layers).
+    Currently this function will implement explicit discontinuities between
+    layers in the seismic model.
     Currently this function is only set for Earth.
-
 
     Parameters
     ----------
@@ -101,9 +103,11 @@ def write_axisem_input(layers, modelname='burnmanmodel_foraxisem',
     modelname : string
         Name of model, appears in name of output file
     axisem_ref : string
-        Reference file, used to copy the header and for the rest of the planet, in the case of a Layer(), default = 'axisem_prem_ani_noocean.txt'
+        Reference file, used to copy the header and for the rest of the planet,
+        in the case of a Layer(), default = 'axisem_prem_ani_noocean.txt'
     plotting: Boolean
-        True means plot of the old model and replaced model will be shown (default = False)
+        True means plot of the old model and replaced model will be shown
+        (default = False)
     """
 
     if not isinstance(layers[0], Layer):
@@ -112,7 +116,8 @@ def write_axisem_input(layers, modelname='burnmanmodel_foraxisem',
     datastream = pkgutil.get_data(
         'burnman', 'data/input_seismic/' + axisem_ref)
     lines = [line.strip()
-             for line in datastream.decode('ascii').split('\n') if line.strip()]
+             for line in datastream.decode('ascii').split('\n')
+             if line.strip()]
     table = []
     for line in lines[18:]:
         numbers = np.fromstring(line, sep=' ')
@@ -148,14 +153,15 @@ def write_axisem_input(layers, modelname='burnmanmodel_foraxisem',
             table = np.insert(table, i_max, None, axis=0)
             table[i_max, 0] = layer.inner_radius
 
-        layer_vp, layer_vs, layer_density = layer.evaluate(
-            ['v_p', 'v_s', 'density'], radlist=table[i_min:i_max, 0], radius_planet=np.max(table[:, 0]))
+        lvp, lvs, lrho = layer.evaluate(['v_p', 'v_s', 'density'],
+                                        radlist=table[i_min:i_max, 0],
+                                        radius_planet=np.max(table[:, 0]))
 
-        table[i_min:i_max, 2] = layer_vp
-        table[i_min:i_max, 6] = layer_vp
-        table[i_min:i_max, 3] = layer_vs
-        table[i_min:i_max, 7] = layer_vs
-        table[i_min:i_max, 1] = layer_density
+        table[i_min:i_max, 2] = lvp
+        table[i_min:i_max, 6] = lvp
+        table[i_min:i_max, 3] = lvs
+        table[i_min:i_max, 7] = lvs
+        table[i_min:i_max, 1] = lrho
 
     # WRITE OUT FILE
     filename = 'axisem_' + modelname + '.txt'
@@ -203,10 +209,9 @@ def write_mineos_input(layers, modelname='burnmanmodel_formineos',
     """
     Writing velocities and densities to
     Mineos (https://geodynamics.org/cig/software/mineos/) input file
-    Note:
-        - Currently, this function only honors the discontinuities already
-        in the synthetic input file, so it is best to only replace
-        certain layers with burnman values
+    Note: currently, this function only honors the discontinuities already
+    in the synthetic input file, so it is best to only replace
+    certain layers with burnman values
 
     Parameters
     ----------
@@ -230,7 +235,8 @@ def write_mineos_input(layers, modelname='burnmanmodel_formineos',
     datastream = pkgutil.get_data(
         'burnman', 'data/input_seismic/' + mineos_ref)
     lines = [line.strip()
-             for line in datastream.decode('ascii').split('\n') if line.strip()]
+             for line in datastream.decode('ascii').split('\n')
+             if line.strip()]
     table = []
     for line in lines[3:]:
         numbers = np.fromstring(line, sep=' ')
@@ -257,14 +263,15 @@ def write_mineos_input(layers, modelname='burnmanmodel_formineos',
         if table[i_max, 0] - layer.outer_radius > 0:
             table[i_max, 0] = layer.outer_radius
 
-        layer_vp, layer_vs, layer_density = layer.evaluate(
-            ['v_p', 'v_s', 'density'], radlist=table[i_min:i_max, 0], radius_planet=np.max(table[:, 0]))
+        lvp, lvs, lrho = layer.evaluate(['v_p', 'v_s', 'density'],
+                                        radlist=table[i_min:i_max, 0],
+                                        radius_planet=np.max(table[:, 0]))
 
-        table[i_min:i_max, 2] = layer_vp
-        table[i_min:i_max, 6] = layer_vp
-        table[i_min:i_max, 3] = layer_vs
-        table[i_min:i_max, 7] = layer_vs
-        table[i_min:i_max, 1] = layer_density
+        table[i_min:i_max, 2] = lvp
+        table[i_min:i_max, 6] = lvp
+        table[i_min:i_max, 3] = lvs
+        table[i_min:i_max, 7] = lvs
+        table[i_min:i_max, 1] = lrho
 
     # WRITE OUT FILE
     filename = 'mineos_' + modelname + '.txt'
