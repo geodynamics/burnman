@@ -16,7 +16,7 @@ from ..utils.unitcell import cell_vectors_to_parameters
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
     """
     A class implementing the anisotropic mineral equation of state described
-    in :cite:`Myhill2021`.
+    in :cite:`Myhill2022`.
     This class is derived from both Mineral and AnisotropicMaterial,
     and inherits most of the methods from these classes.
 
