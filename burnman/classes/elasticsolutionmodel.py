@@ -750,9 +750,9 @@ class ElasticFunctionSolution (ElasticIdealSolution):
         def partial_pressures(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return ag.jacobian(self._non_ideal_excess_partial_helmholtz,
-                                   argnum=0)(volume, temperature,
-                                             molar_amounts)
+                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz,
+                                    argnum=0)(volume, temperature,
+                                              molar_amounts)
 
         self.excess_partial_pressures = partial_pressures
 

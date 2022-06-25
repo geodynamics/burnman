@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from util import BurnManTest
 import unittest
 import numpy as np
-import warnings
 
 import burnman
 from burnman.utils.chemistry import formula_to_string, sum_formulae
@@ -68,6 +67,25 @@ class garnet_ss(burnman.ElasticSolution):
         burnman.ElasticSolution.__init__(self, molar_fractions)
 
 
+def garnet_helmholtz_function(volume, temperature, molar_amounts):
+    n_moles = sum(molar_amounts)
+    molar_fractions = molar_amounts / n_moles
+    return n_moles * ((8.4e3 + 10.e9*volume)
+                      * molar_fractions[0]*molar_fractions[1])
+
+
+class garnet_ss_function(burnman.ElasticSolution):
+    # Three-endmember, two site symmetric solid solution
+    def __init__(self, molar_fractions=None):
+        self.name = 'two_site_ss'
+        self.solution_type = 'function'
+        self.endmembers = [[pyrope(), '[Mg]3[Al]2Si3O12'],
+                           [grossular(), '[Ca]3[Al]2Si3O12']]
+        self.excess_helmholtz_function = garnet_helmholtz_function
+
+        burnman.ElasticSolution.__init__(self, molar_fractions)
+
+
 class orthopyroxene(burnman.ElasticSolution):
     # Orthopyroxene solid solution
     def __init__(self, molar_fractions=None):
@@ -99,6 +117,7 @@ def ss_helmholtz_function(volume, temperature, molar_amounts):
     return n_moles * (10.0e3*molar_fractions[0]*molar_fractions[1] +
                       5.0e3*molar_fractions[0]*molar_fractions[2] +
                       -10.0e3*molar_fractions[1]*molar_fractions[2])
+
 
 class two_site_ss_function(burnman.ElasticSolution):
     # Three-endmember, two site symmetric solid solution
@@ -304,6 +323,24 @@ class test_ElasticSolution(BurnManTest):
         self.assertArraysAlmostEqual([ss.molar_mass],
                                      [0.5 * pyrope().params['molar_mass']
                                       + 0.5 * grossular().params['molar_mass']])
+
+    def test_subregular_model_ternary_volume(self):
+        ss = two_site_ss_subregular_ternary()
+        f0 = np.array([0.25, 0.35, 0.4])
+        ss.set_composition(f0)
+
+        P = 1.e9
+        T = 1000.
+        dP = 1000.
+        ss.set_state(P, T)
+
+        V = ss.V
+        ss.set_state(P + dP/2., T)
+        G1 = ss.gibbs
+        ss.set_state(P - dP/2., T)
+        G0 = ss.gibbs
+
+        self.assertFloatEqual(V, (G1 - G0)/dP)
 
     def test_subregular_model_ternary_partial_gibbs_multicomponent_change(self):
         ss = two_site_ss_subregular_ternary()
@@ -516,6 +553,32 @@ class test_ElasticSolution(BurnManTest):
                                      ss[1].activities)
         self.assertArraysAlmostEqual(ss[0].activity_coefficients,
                                      ss[1].activity_coefficients)
+
+    def test_function_solution_p_t_derivatives(self):
+        ss = garnet_ss_function()
+        f0 = np.array([0.6, 0.4])
+        ss.set_composition(f0)
+
+        P = 1.e9
+        T = 1000.
+        ss.set_state(P, T)
+
+        V = ss.V
+        S = ss.S
+
+        dP = 1000.
+        ss.set_state(P + dP/2., T)
+        G1 = ss.gibbs
+        ss.set_state(P - dP/2., T)
+        G0 = ss.gibbs
+        self.assertFloatEqual(V, (G1 - G0)/dP)
+
+        dT = 1.
+        ss.set_state(P, T + dT/2.)
+        G1 = ss.gibbs
+        ss.set_state(P, T - dT/2.)
+        G0 = ss.gibbs
+        self.assertFloatEqual(S, -(G1 - G0)/dT)
 
 
 if __name__ == '__main__':
