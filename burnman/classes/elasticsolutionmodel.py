@@ -5,6 +5,8 @@
 
 from __future__ import absolute_import
 
+import importlib
+import warnings
 import numpy as np
 from ..utils.chemistry import process_solution_chemistry
 from .solutionmodel import _ideal_activities_fct
@@ -13,6 +15,12 @@ from .solutionmodel import _non_ideal_hessian_subreg
 from .solutionmodel import _non_ideal_interactions_subreg
 from .solutionmodel import logish, inverseish
 from .. import constants
+
+try:
+    ag = importlib.import_module('autograd')
+except ImportError as err:
+    print(f'Warning: {err}. '
+          'For full functionality of BurnMan, please install autograd.')
 
 
 class ElasticSolutionModel(object):
@@ -690,3 +698,94 @@ class ElasticSubregularSolution (ElasticIdealSolution):
     def pressure_hessian(self, volume, temperature, molar_fractions):
         n = len(molar_fractions)
         return _non_ideal_hessian_subreg(molar_fractions, n, self.Wijkp)
+
+
+class ElasticFunctionSolution (ElasticIdealSolution):
+    """
+    Solution model implementing a generalized elastic solution model.
+    The extensive excess nonconfigurational Helmholtz energy is
+    provided as a function by the user.
+
+    Derivatives are calculated using the autograd module,
+    and so the user-defined excess Helmholtz energy function
+    should be defined using autograd-friendly expressions.
+
+    Parameters
+    ----------
+    endmembers : list of lists
+        A list of all the independent endmembers in the solution.
+        The first item of each list gives the Mineral object corresponding
+        to the endmember. The second item gives the site-species formula.
+
+    excess_helmholtz_function : function
+        The nonconfigurational Helmholtz energy function with arguments
+        volume, temperature and molar_amounts, in that order.
+        Note that the function must be extensive; if the molar amounts
+        are doubled, the Helmholtz energy must also double.
+    """
+
+    def __init__(self, endmembers, excess_helmholtz_function):
+        """
+        Initialization function for the GeneralSolution class.
+        """
+
+        # initialize ideal solution model
+        ElasticIdealSolution.__init__(self, endmembers)
+
+        self.n_endmembers = len(endmembers)
+        self._excess_helmholtz_function = excess_helmholtz_function
+
+        partial_helmholtz = ag.jacobian(self._helmholtz, argnum=2)
+        self.excess_partial_helmholtz_energies = partial_helmholtz
+
+        def partial_entropies(volume, temperature, molar_amounts):
+            return -ag.jacobian(partial_helmholtz, argnum=1)(volume,
+                                                             temperature,
+                                                             molar_amounts)
+
+        self.excess_partial_entropies = partial_entropies
+
+        def partial_pressures(volume, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return -ag.jacobian(partial_helmholtz, argnum=0)(volume,
+                                                                 temperature,
+                                                                 molar_amounts)
+
+        self.excess_partial_pressures = partial_pressures
+
+        self.helmholtz_hessian = ag.jacobian(partial_helmholtz, argnum=2)
+        self.entropy_hessian = ag.jacobian(partial_entropies, argnum=2)
+
+        def pressure_hess(volume, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return ag.jacobian(partial_pressures, argnum=2)(volume,
+                                                                temperature,
+                                                                molar_amounts)
+
+        self.pressure_hessian = pressure_hess
+
+    def _helmholtz(self, volume, temperature, molar_amounts):
+        F = (self._excess_helmholtz_function(volume, temperature,
+                                             molar_amounts)
+             + self._ideal_helmholtz(molar_amounts, temperature))
+        return F
+
+    def _ideal_helmholtz(self, molar_amounts, temperature):
+        n_moles = ag.numpy.sum(molar_amounts)
+        molar_fractions = molar_amounts / n_moles
+        site_noccupancies = ag.numpy.einsum('i, ij', molar_fractions,
+                                            self.endmember_noccupancies)
+        site_multiplicities = ag.numpy.einsum('i, ij', molar_fractions,
+                                              self.site_multiplicities)
+
+        lna = ag.numpy.einsum('ij, j->i', self.endmember_noccupancies,
+                              ag.numpy.log(site_noccupancies)
+                              - ag.numpy.log(site_multiplicities))
+
+        S_conf_mbr = self.endmember_configurational_entropies
+        molar_helmholtz = temperature * (constants.gas_constant * lna
+                                         + S_conf_mbr)
+
+        return ag.numpy.einsum('i, i', molar_amounts, molar_helmholtz)

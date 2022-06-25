@@ -93,6 +93,26 @@ class two_site_ss(burnman.ElasticSolution):
         burnman.ElasticSolution.__init__(self, molar_fractions)
 
 
+def ss_helmholtz_function(volume, temperature, molar_amounts):
+    n_moles = sum(molar_amounts)
+    molar_fractions = molar_amounts / n_moles
+    return n_moles * (10.0e3*molar_fractions[0]*molar_fractions[1] +
+                      5.0e3*molar_fractions[0]*molar_fractions[2] +
+                      -10.0e3*molar_fractions[1]*molar_fractions[2])
+
+class two_site_ss_function(burnman.ElasticSolution):
+    # Three-endmember, two site symmetric solid solution
+    def __init__(self, molar_fractions=None):
+        self.name = 'two_site_ss'
+        self.solution_type = 'function'
+        self.endmembers = [[pyrope(), '[Mg]3[Al]2Si3O12'],
+                           [pyrope(), '[Fe]3[Al]2Si3O12'],
+                           [pyrope(), '[Mg]3[Mg1/2Si1/2]2Si3O12']]
+        self.excess_helmholtz_function = ss_helmholtz_function
+
+        burnman.ElasticSolution.__init__(self, molar_fractions)
+
+
 class two_site_ss_asymmetric(burnman.ElasticSolution):
     # Three-endmember, two site asymmetric solid solution
     def __init__(self, molar_fractions=None):
@@ -462,6 +482,23 @@ class test_ElasticSolution(BurnManTest):
             dGdx2[i] = (G1 - G0)/df
 
         self.assertArraysAlmostEqual(dGdx, dGdx2)
+
+    def test_function_solution(self):
+        ss = [two_site_ss(), two_site_ss_function()]
+        for s in ss:
+            s.set_state(1.e5, 300.)
+            s.set_composition([0.2, 0.3, 0.5])
+
+        self.assertArraysAlmostEqual(ss[0].partial_gibbs,
+                                     ss[1].partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_entropies,
+                                     ss[1].partial_entropies)
+        self.assertArraysAlmostEqual(ss[0].partial_volumes,
+                                     ss[1].partial_volumes)
+        self.assertArraysAlmostEqual(ss[0].activities,
+                                     ss[1].activities)
+        self.assertArraysAlmostEqual(ss[0].activity_coefficients,
+                                     ss[1].activity_coefficients)
 
 
 if __name__ == '__main__':

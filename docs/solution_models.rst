@@ -35,6 +35,7 @@ classes both accept several methods which define the properties of the solution.
   burnman.classes.elasticsolutionmodel.ElasticAsymmetricRegularSolution
   burnman.classes.elasticsolutionmodel.ElasticSymmetricRegularSolution
   burnman.classes.elasticsolutionmodel.ElasticSubregularSolution
+  burnman.classes.elasticsolutionmodel.ElasticFunctionSolution
 
 Base classes
 ------------
@@ -87,6 +88,8 @@ Function solution
 -----------------
 
 .. autoclass:: burnman.classes.solutionmodel.FunctionSolution
+
+.. autoclass:: burnman.classes.elasticsolutionmodel.ElasticFunctionSolution
 
 
 Solution tools
