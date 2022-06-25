@@ -699,6 +699,31 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual(ss[0].activity_coefficients,
                                      ss[1].activity_coefficients)
 
+    def test_function_solution_low_proportions(self):
+        ss = [ppv_symmetric(), ppv_function()]
+        for s in ss:
+            s.set_state(1.e5, 300.)
+            s.set_composition([0.0, 0.5, 0.5])
+
+        self.assertArraysAlmostEqual(ss[0].excess_partial_gibbs,
+                                     ss[1].excess_partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_gibbs,
+                                     ss[1].partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_entropies,
+                                     ss[1].partial_entropies)
+        self.assertArraysAlmostEqual(ss[0].partial_volumes,
+                                     ss[1].partial_volumes)
+        self.assertArraysAlmostEqual(ss[0].gibbs_hessian.flatten(),
+                                     ss[1].gibbs_hessian.flatten())
+        self.assertArraysAlmostEqual(ss[0].entropy_hessian.flatten(),
+                                     ss[1].entropy_hessian.flatten(),
+                                     tol_zero=1.e-12)
+        self.assertArraysAlmostEqual(ss[0].volume_hessian.flatten(),
+                                     ss[1].volume_hessian.flatten())
+        self.assertArraysAlmostEqual(ss[0].activities,
+                                     ss[1].activities)
+        self.assertArraysAlmostEqual(ss[0].activity_coefficients,
+                                     ss[1].activity_coefficients)
 
 if __name__ == '__main__':
     unittest.main()
