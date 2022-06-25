@@ -21,6 +21,7 @@ from .elasticsolutionmodel import ElasticIdealSolution
 from .elasticsolutionmodel import ElasticSymmetricRegularSolution
 from .elasticsolutionmodel import ElasticAsymmetricRegularSolution
 from .elasticsolutionmodel import ElasticSubregularSolution
+from .elasticsolutionmodel import ElasticFunctionSolution
 from .averaging_schemes import reuss_average_function
 
 from ..utils.math import bracket
@@ -77,6 +78,7 @@ class ElasticSolution(Mineral):
                  pressure_ternary_terms=None,
                  entropy_ternary_terms=None,
                  alphas=None,
+                 excess_helmholtz_function=None,
                  molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
@@ -109,6 +111,8 @@ class ElasticSolution(Mineral):
             self.alphas = alphas
         if endmembers is not None:
             self.endmembers = endmembers
+        if excess_helmholtz_function is not None:
+            self.excess_helmholtz_function = excess_helmholtz_function
 
         if hasattr(self, 'endmembers') is False:
             raise Exception("'endmembers' attribute missing "
@@ -154,6 +158,9 @@ class ElasticSolution(Mineral):
                         self.entropy_interaction,
                         self.energy_ternary_terms, self.pressure_ternary_terms,
                         self.entropy_ternary_terms)
+                elif self.solution_type == 'function':
+                    self.solution_model = ElasticFunctionSolution(self.endmembers,
+                                                                  self.excess_helmholtz_function)
                 else:
                     raise Exception("Solution model type "
                                     + self.solution_type + "not recognised.")
