@@ -29,6 +29,7 @@ classes both accept several methods which define the properties of the solution.
   burnman.classes.solutionmodel.AsymmetricRegularSolution
   burnman.classes.solutionmodel.SymmetricRegularSolution
   burnman.classes.solutionmodel.SubregularSolution
+  burnman.classes.solutionmodel.FunctionSolution
   burnman.classes.elasticsolutionmodel.ElasticMechanicalSolution
   burnman.classes.elasticsolutionmodel.ElasticIdealSolution
   burnman.classes.elasticsolutionmodel.ElasticAsymmetricRegularSolution
@@ -81,6 +82,11 @@ Subregular solution
 .. autoclass:: burnman.classes.solutionmodel.SubregularSolution
 
 .. autoclass:: burnman.classes.elasticsolutionmodel.ElasticSubregularSolution
+
+Function solution
+-----------------
+
+.. autoclass:: burnman.classes.solutionmodel.FunctionSolution
 
 
 Solution tools

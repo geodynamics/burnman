@@ -13,7 +13,7 @@ from .mineral import Mineral
 from .solutionmodel import SolutionModel
 from .solutionmodel import MechanicalSolution, IdealSolution
 from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
-from .solutionmodel import SubregularSolution
+from .solutionmodel import SubregularSolution, FunctionSolution
 from .averaging_schemes import reuss_average_function
 
 from ..utils.reductions import independent_row_indices
@@ -68,6 +68,7 @@ class Solution(Mineral):
                  volume_ternary_terms=None,
                  entropy_ternary_terms=None,
                  alphas=None,
+                 excess_gibbs_function=None,
                  molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
@@ -100,6 +101,8 @@ class Solution(Mineral):
             self.alphas = alphas
         if endmembers is not None:
             self.endmembers = endmembers
+        if excess_gibbs_function is not None:
+            self.excess_gibbs_function = excess_gibbs_function
 
         if hasattr(self, 'endmembers') is False:
             raise Exception("'endmembers' attribute missing "
@@ -144,6 +147,9 @@ class Solution(Mineral):
                         self.entropy_interaction,
                         self.energy_ternary_terms, self.volume_ternary_terms,
                         self.entropy_ternary_terms)
+                elif self.solution_type == 'function':
+                    self.solution_model = FunctionSolution(self.endmembers,
+                                                           self.excess_gibbs_function)
                 else:
                     raise Exception("Solution model type "
                                     + self.solution_type + "not recognised.")

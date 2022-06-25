@@ -29,8 +29,8 @@ $PYTHON -m pip install -q -e .
 echo ""
 
 # Quietly install optional modules after burnman
-echo "Installing optional cvxpy, pycddlib and jupyter modules ..."
-$PYTHON -m pip install -q cvxpy pycddlib jupyter
+echo "Installing optional cvxpy, pycddlib, autograd and jupyter modules ..."
+$PYTHON -m pip install -q cvxpy pycddlib autograd jupyter
 echo ""
 
 function testit {
