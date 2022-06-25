@@ -254,7 +254,8 @@ class ElasticSolution(Mineral):
         Returns a list of endmember activity coefficients
         (gamma = activity / ideal activity) [unitless].
         """
-        return self.activities / IdealSolution._ideal_activities(self.solution_model, self.molar_fractions)
+        return np.exp(np.log(self.activities)
+                      - IdealSolution._log_ideal_activities(self.solution_model, self.molar_fractions))
 
     @material_property
     def molar_internal_energy(self):

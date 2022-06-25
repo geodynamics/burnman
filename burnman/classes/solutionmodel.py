@@ -857,28 +857,38 @@ class FunctionSolution (IdealSolution):
         self.n_endmembers = len(endmembers)
         self._excess_gibbs_function = excess_gibbs_function
 
-        partial_gibbs = ag.jacobian(self._gibbs, argnum=2)
-        self.excess_partial_gibbs_free_energies = partial_gibbs
         self._non_ideal_excess_partial_gibbs = ag.jacobian(excess_gibbs_function,
                                                            argnum=2)
 
         def partial_entropies(pressure, temperature, molar_amounts):
-            return -ag.jacobian(partial_gibbs, argnum=1)(pressure, temperature,
-                                                         molar_amounts)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return -ag.jacobian(self._non_ideal_excess_partial_gibbs,
+                                    argnum=1)(pressure, temperature,
+                                              molar_amounts)
 
-        self.excess_partial_entropies = partial_entropies
+        self._non_ideal_excess_partial_entropies = partial_entropies
 
         def partial_volumes(pressure, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return ag.jacobian(partial_gibbs, argnum=0)(pressure,
-                                                            temperature,
-                                                            molar_amounts)
+                return ag.jacobian(self._non_ideal_excess_partial_gibbs,
+                                   argnum=0)(pressure, temperature,
+                                             molar_amounts)
 
         self.excess_partial_volumes = partial_volumes
 
-        self.gibbs_hessian = ag.jacobian(partial_gibbs, argnum=2)
-        self.entropy_hessian = ag.jacobian(partial_entropies, argnum=2)
+        self._non_ideal_gibbs_hessian = ag.jacobian(self._non_ideal_excess_partial_gibbs,
+                                                    argnum=2)
+
+        def entropy_hess(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return ag.jacobian(partial_entropies, argnum=2)(pressure,
+                                                                temperature,
+                                                                molar_amounts)
+
+        self._non_ideal_entropy_hessian = entropy_hess
 
         def volume_hess(pressure, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
@@ -889,27 +899,32 @@ class FunctionSolution (IdealSolution):
 
         self.volume_hessian = volume_hess
 
-    def _gibbs(self, pressure, temperature, molar_amounts):
-        g = (self._excess_gibbs_function(pressure, temperature, molar_amounts)
-             + self._ideal_gibbs(molar_amounts, temperature))
-        return g
+    def excess_partial_gibbs_free_energies(self, pressure, temperature, molar_fractions):
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs(
+            self, temperature, molar_fractions)
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(
+            pressure, temperature, molar_fractions)
+        return ideal_gibbs + non_ideal_gibbs
 
-    def _ideal_gibbs(self, molar_amounts, temperature):
-        n_moles = ag.numpy.sum(molar_amounts)
-        molar_fractions = molar_amounts / n_moles
-        site_noccupancies = ag.numpy.einsum('i, ij', molar_fractions,
-                                            self.endmember_noccupancies)
-        site_multiplicities = ag.numpy.einsum('i, ij', molar_fractions,
-                                              self.site_multiplicities)
+    def excess_partial_entropies(self, pressure, temperature, molar_fractions):
+        ideal_entropies = IdealSolution._ideal_excess_partial_entropies(
+            self, temperature, molar_fractions)
+        non_ideal_entropies = self._non_ideal_excess_partial_entropies(
+            pressure, temperature, molar_fractions)
+        return ideal_entropies + non_ideal_entropies
 
-        lna = ag.numpy.einsum('ij, j->i', self.endmember_noccupancies,
-                              ag.numpy.log(site_noccupancies)
-                              - ag.numpy.log(site_multiplicities))
+    def gibbs_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_gibbs_hessian = self._non_ideal_gibbs_hessian(
+            pressure, temperature, molar_fractions)
 
-        S_conf_mbr = self.endmember_configurational_entropies
-        molar_gibbs = temperature * (constants.gas_constant * lna + S_conf_mbr)
+        return nonideal_gibbs_hessian - temperature*ideal_entropy_hessian
 
-        return ag.numpy.einsum('i, i', molar_amounts, molar_gibbs)
+    def entropy_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_entropy_hessian = self._non_ideal_entropy_hessian(
+            pressure, temperature, molar_fractions)
+        return ideal_entropy_hessian + nonideal_entropy_hessian
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         if temperature > 1.e-10:

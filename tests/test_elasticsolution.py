@@ -500,6 +500,23 @@ class test_ElasticSolution(BurnManTest):
         self.assertArraysAlmostEqual(ss[0].activity_coefficients,
                                      ss[1].activity_coefficients)
 
+    def test_function_solution_low_proportions(self):
+        ss = [two_site_ss(), two_site_ss_function()]
+        for s in ss:
+            s.set_state(1.e5, 300.)
+            s.set_composition([0.5, 0.0, 0.5])
+
+        self.assertArraysAlmostEqual(ss[0].partial_gibbs,
+                                     ss[1].partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_entropies,
+                                     ss[1].partial_entropies)
+        self.assertArraysAlmostEqual(ss[0].partial_volumes,
+                                     ss[1].partial_volumes)
+        self.assertArraysAlmostEqual(ss[0].activities,
+                                     ss[1].activities)
+        self.assertArraysAlmostEqual(ss[0].activity_coefficients,
+                                     ss[1].activity_coefficients)
+
 
 if __name__ == '__main__':
     unittest.main()

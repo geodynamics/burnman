@@ -735,27 +735,38 @@ class ElasticFunctionSolution (ElasticIdealSolution):
         self.n_endmembers = len(endmembers)
         self._excess_helmholtz_function = excess_helmholtz_function
 
-        partial_helmholtz = ag.jacobian(self._helmholtz, argnum=2)
-        self.excess_partial_helmholtz_energies = partial_helmholtz
+        self._non_ideal_excess_partial_helmholtz = ag.jacobian(excess_helmholtz_function,
+                                                               argnum=2)
 
         def partial_entropies(volume, temperature, molar_amounts):
-            return -ag.jacobian(partial_helmholtz, argnum=1)(volume,
-                                                             temperature,
-                                                             molar_amounts)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz,
+                                    argnum=1)(volume, temperature,
+                                              molar_amounts)
 
-        self.excess_partial_entropies = partial_entropies
+        self._non_ideal_excess_partial_entropies = partial_entropies
 
         def partial_pressures(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return -ag.jacobian(partial_helmholtz, argnum=0)(volume,
-                                                                 temperature,
-                                                                 molar_amounts)
+                return ag.jacobian(self._non_ideal_excess_partial_helmholtz,
+                                   argnum=0)(volume, temperature,
+                                             molar_amounts)
 
         self.excess_partial_pressures = partial_pressures
 
-        self.helmholtz_hessian = ag.jacobian(partial_helmholtz, argnum=2)
-        self.entropy_hessian = ag.jacobian(partial_entropies, argnum=2)
+        self._non_ideal_helmholtz_hessian = ag.jacobian(self._non_ideal_excess_partial_helmholtz,
+                                                        argnum=2)
+
+        def entropy_hess(volume, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return ag.jacobian(partial_entropies, argnum=2)(volume,
+                                                                temperature,
+                                                                molar_amounts)
+
+        self._non_ideal_entropy_hessian = entropy_hess
 
         def pressure_hess(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
@@ -766,26 +777,32 @@ class ElasticFunctionSolution (ElasticIdealSolution):
 
         self.pressure_hessian = pressure_hess
 
-    def _helmholtz(self, volume, temperature, molar_amounts):
-        F = (self._excess_helmholtz_function(volume, temperature,
-                                             molar_amounts)
-             + self._ideal_helmholtz(molar_amounts, temperature))
-        return F
+    def excess_partial_helmholtz_energies(self, volume, temperature,
+                                          molar_fractions):
+        ideal_helmholtz = ElasticIdealSolution._ideal_excess_partial_helmholtz(
+            self, temperature, molar_fractions)
+        non_ideal_helmholtz = self._non_ideal_excess_partial_helmholtz(
+            volume, temperature, molar_fractions)
+        return ideal_helmholtz + non_ideal_helmholtz
 
-    def _ideal_helmholtz(self, molar_amounts, temperature):
-        n_moles = ag.numpy.sum(molar_amounts)
-        molar_fractions = molar_amounts / n_moles
-        site_noccupancies = ag.numpy.einsum('i, ij', molar_fractions,
-                                            self.endmember_noccupancies)
-        site_multiplicities = ag.numpy.einsum('i, ij', molar_fractions,
-                                              self.site_multiplicities)
+    def excess_partial_entropies(self, volume, temperature, molar_fractions):
+        ideal_entropies = ElasticIdealSolution._ideal_excess_partial_entropies(
+            self, temperature, molar_fractions)
+        non_ideal_entropies = self._non_ideal_excess_partial_entropies(
+            volume, temperature, molar_fractions)
+        return ideal_entropies + non_ideal_entropies
 
-        lna = ag.numpy.einsum('ij, j->i', self.endmember_noccupancies,
-                              ag.numpy.log(site_noccupancies)
-                              - ag.numpy.log(site_multiplicities))
+    def helmholtz_hessian(self, volume, temperature,
+                          molar_fractions):
+        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_helmholtz_hessian = self._non_ideal_helmholtz_hessian(
+            volume, temperature, molar_fractions)
 
-        S_conf_mbr = self.endmember_configurational_entropies
-        molar_helmholtz = temperature * (constants.gas_constant * lna
-                                         + S_conf_mbr)
+        return nonideal_helmholtz_hessian - temperature*ideal_entropy_hessian
 
-        return ag.numpy.einsum('i, i', molar_amounts, molar_helmholtz)
+    def entropy_hessian(self, volume, temperature,
+                        molar_fractions):
+        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+        nonideal_entropy_hessian = self._non_ideal_entropy_hessian(
+            volume, temperature, molar_fractions)
+        return ideal_entropy_hessian + nonideal_entropy_hessian
