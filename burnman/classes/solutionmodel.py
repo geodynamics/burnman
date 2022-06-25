@@ -1,13 +1,21 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
 
+import importlib
 import numpy as np
 from ..utils.chemistry import process_solution_chemistry
 from .. import constants
+import warnings
+
+try:
+    ag = importlib.import_module('autograd')
+except ImportError as err:
+    print(f'Warning: {err}. '
+          'For full functionality of BurnMan, please install autograd.')
 
 
 def _ideal_activities_fct(molar_fractions, endmember_noccupancies,
@@ -625,7 +633,7 @@ class SubregularSolution (IdealSolution):
 
     """
     Solution model implementing the subregular solution model formulation
-    as described in :cite:`HW1989`. The excess conconfigurational
+    as described in :cite:`HW1989`. The excess nonconfigurational
     Gibbs energy is given by the expression:
 
     .. math::
@@ -797,6 +805,111 @@ class SubregularSolution (IdealSolution):
     def volume_hessian(self, pressure, temperature, molar_fractions):
         n = len(molar_fractions)
         return _non_ideal_hessian_subreg(molar_fractions, n, self.Wijkv)
+
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        if temperature > 1.e-10:
+            return np.exp(self._non_ideal_excess_partial_gibbs(pressure,
+                                                               temperature,
+                                                               molar_fractions)
+                          / (constants.gas_constant * temperature))
+        else:
+            raise Exception("Activity coefficients not defined at 0 K.")
+
+    def activities(self, pressure, temperature, molar_fractions):
+        return (IdealSolution.activities(self, pressure, temperature,
+                                         molar_fractions)
+                * self.activity_coefficients(pressure, temperature,
+                                             molar_fractions))
+
+
+class FunctionSolution (IdealSolution):
+    """
+    Solution model implementing a generalized solution model.
+    The extensive excess nonconfigurational Gibbs energy is
+    provided as a function by the user.
+
+    Derivatives are calculated using the autograd module,
+    and so the user-defined excess Gibbs energy function
+    should be defined using autograd-friendly expressions.
+
+    Parameters
+    ----------
+    endmembers : list of lists
+        A list of all the independent endmembers in the solution.
+        The first item of each list gives the Mineral object corresponding
+        to the endmember. The second item gives the site-species formula.
+
+    excess_gibbs_function : function
+        The nonconfigurational Gibbs energy function with arguments
+        pressure, temperature and molar_amounts, in that order.
+        Note that the function must be extensive; if the molar amounts
+        are doubled, the Gibbs energy must also double.
+    """
+
+    def __init__(self, endmembers, excess_gibbs_function):
+        """
+        Initialization function for the GeneralSolution class.
+        """
+
+        # initialize ideal solution model
+        IdealSolution.__init__(self, endmembers)
+
+        self.n_endmembers = len(endmembers)
+        self._excess_gibbs_function = excess_gibbs_function
+
+        partial_gibbs = ag.jacobian(self._gibbs, argnum=2)
+        self.excess_partial_gibbs_free_energies = partial_gibbs
+        self._non_ideal_excess_partial_gibbs = ag.jacobian(excess_gibbs_function,
+                                                           argnum=2)
+
+        def partial_entropies(pressure, temperature, molar_amounts):
+            return -ag.jacobian(partial_gibbs, argnum=1)(pressure, temperature,
+                                                         molar_amounts)
+
+        self.excess_partial_entropies = partial_entropies
+
+        def partial_volumes(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return ag.jacobian(partial_gibbs, argnum=0)(pressure,
+                                                            temperature,
+                                                            molar_amounts)
+
+        self.excess_partial_volumes = partial_volumes
+
+        self.gibbs_hessian = ag.jacobian(partial_gibbs, argnum=2)
+        self.entropy_hessian = ag.jacobian(partial_entropies, argnum=2)
+
+        def volume_hess(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                return ag.jacobian(partial_volumes, argnum=2)(pressure,
+                                                              temperature,
+                                                              molar_amounts)
+
+        self.volume_hessian = volume_hess
+
+    def _gibbs(self, pressure, temperature, molar_amounts):
+        g = (self._excess_gibbs_function(pressure, temperature, molar_amounts)
+             + self._ideal_gibbs(molar_amounts, temperature))
+        return g
+
+    def _ideal_gibbs(self, molar_amounts, temperature):
+        n_moles = ag.numpy.sum(molar_amounts)
+        molar_fractions = molar_amounts / n_moles
+        site_noccupancies = ag.numpy.einsum('i, ij', molar_fractions,
+                                            self.endmember_noccupancies)
+        site_multiplicities = ag.numpy.einsum('i, ij', molar_fractions,
+                                              self.site_multiplicities)
+
+        lna = ag.numpy.einsum('ij, j->i', self.endmember_noccupancies,
+                              ag.numpy.log(site_noccupancies)
+                              - ag.numpy.log(site_multiplicities))
+
+        S_conf_mbr = self.endmember_configurational_entropies
+        molar_gibbs = temperature * (constants.gas_constant * lna + S_conf_mbr)
+
+        return ag.numpy.einsum('i, i', molar_amounts, molar_gibbs)
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         if temperature > 1.e-10:

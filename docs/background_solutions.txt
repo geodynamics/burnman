@@ -85,6 +85,13 @@ Note the similarity with the symmetric solution model, the primary difference be
 
 
 
+Arbitrary solutions
+"""""""""""""""""""
+
+BurnMan also allows the user to define their own excess Gibbs energy function for a solution model.
+
+
+
 Thermodynamic and thermoelastic properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 From the preceeding equations, we can define the thermodynamic potentials of solutions:

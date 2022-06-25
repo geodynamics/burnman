@@ -11,6 +11,9 @@ from burnman import CombinedMineral
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.utils.chemistry import formula_to_string, sum_formulae
 from burnman.minerals import HGP_2018_ds633
+from burnman.minerals.SLB_2011 import mg_post_perovskite
+from burnman.minerals.SLB_2011 import fe_post_perovskite
+from burnman.minerals.SLB_2011 import al_post_perovskite
 
 
 class forsterite (Mineral):
@@ -240,6 +243,38 @@ class temkin_ss(burnman.SolidSolution):
                            [HGP_2018_ds633.h2oL(), '[]0[]0[H]2']]
 
         burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+class ppv_symmetric(burnman.Solution):
+
+    def __init__(self, molar_fractions=None):
+        self.name = 'post-perovskite/bridgmanite'
+        self.solution_type = 'symmetric'
+        self.endmembers = [[mg_post_perovskite(), '[Mg][Si]O3'],
+                           [fe_post_perovskite(), '[Fe][Si]O3'],
+                           [al_post_perovskite(), '[Al][Al]O3']]
+        self.energy_interaction = [[0.0, 60.0e3], [0.0]]
+
+        burnman.Solution.__init__(self, molar_fractions=molar_fractions)
+
+
+def excess_gibbs_function_ppv(pressure, temperature, molar_amounts):
+    n_moles = sum(molar_amounts)
+    molar_fractions = molar_amounts / n_moles
+    return n_moles * 60.0e3*molar_fractions[0]*molar_fractions[2]
+
+
+class ppv_function(burnman.Solution):
+
+    def __init__(self, molar_fractions=None):
+        self.name = 'post-perovskite/bridgmanite'
+        self.solution_type = 'function'
+        self.endmembers = [[mg_post_perovskite(), '[Mg][Si]O3'],
+                           [fe_post_perovskite(), '[Fe][Si]O3'],
+                           [al_post_perovskite(), '[Al][Al]O3']]
+        self.excess_gibbs_function = excess_gibbs_function_ppv
+
+        burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class test_solidsolution(BurnManTest):
@@ -637,6 +672,32 @@ class test_solidsolution(BurnManTest):
         dGdx2 = ss.partial_gibbs
 
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+
+    def test_function_solution(self):
+        ss = [ppv_symmetric(), ppv_function()]
+        for s in ss:
+            s.set_state(1.e5, 300.)
+            s.set_composition([0.2, 0.3, 0.5])
+
+        self.assertArraysAlmostEqual(ss[0].excess_partial_gibbs,
+                                     ss[1].excess_partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_gibbs,
+                                     ss[1].partial_gibbs)
+        self.assertArraysAlmostEqual(ss[0].partial_entropies,
+                                     ss[1].partial_entropies)
+        self.assertArraysAlmostEqual(ss[0].partial_volumes,
+                                     ss[1].partial_volumes)
+        self.assertArraysAlmostEqual(ss[0].gibbs_hessian.flatten(),
+                                     ss[1].gibbs_hessian.flatten())
+        self.assertArraysAlmostEqual(ss[0].entropy_hessian.flatten(),
+                                     ss[1].entropy_hessian.flatten(),
+                                     tol_zero=1.e-12)
+        self.assertArraysAlmostEqual(ss[0].volume_hessian.flatten(),
+                                     ss[1].volume_hessian.flatten())
+        self.assertArraysAlmostEqual(ss[0].activities,
+                                     ss[1].activities)
+        self.assertArraysAlmostEqual(ss[0].activity_coefficients,
+                                     ss[1].activity_coefficients)
 
 
 if __name__ == '__main__':

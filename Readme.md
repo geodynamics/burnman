@@ -37,6 +37,7 @@ Authors (as of 2021):
 
 * cvxpy
 * pycddlib
+* autograd
 
 ## Installation
 Installation of BurnMan is mostly platform independent.
