@@ -22,8 +22,10 @@ authors:
   - name: Cayman Unterborn
     affiliation: 5
   - name: Juliane Dannberg
+    orcid: 0000-0003-0357-7115
     affiliation: 6
   - name: Rene Gassmoeller
+    orcid: 0000-0001-7098-8198
     affiliation: 6
 affiliations:
  - name: University of Bristol, UK
@@ -55,15 +57,15 @@ made up of one or more phases; phases are solutions of more than one endmember
 and endmembers are usually mixtures of more than one atom / oxide. The
 properties of the endmember building blocks at different pressures and
 temperatures can be provided by a wide array of different equations of state.
-The averaging those properties within solutions and composite materials
+The averaging of those properties within solutions and composite materials
 can also be achieved in several different ways.
 
 # Statement of need
-Earth Scientists are interested in a number of different properties,
+Earth Scientists are interested in a number of different material properties,
 including seismic velocities, heat capacities and density as a function of
 pressure and temperature. Many of these properties are connected to each
 other by physical laws. Building up models of
-these phases and checking them can be time-consuming and prone to error,
+individual phases to compute these properties and checking them can be time-consuming and prone to error,
 and so it is desirable to have well-tested and benchmarked software that
 provides convenient functions to calculate the properties of complex
 composite materials, and to fit new models.
