@@ -79,16 +79,11 @@ are not accessible using existing codes.
 When `BurnMan` was first released [@Cottaar:2014], its focus was on
 the seismic properties of the lower mantle, using a single endmember mineral
 database [@Stixrude:2011] as a foundation. Since then,
-its scope has expanded considerably. Some workflows of the current code
-are provided in \autoref{fig:workflows}. 
-
-![Some possible BurnMan workflows. Input/output shown as ellipses, functions as
-rectangles and classes as diamonds.\label{fig:workflows}](figures/workflows.png)
-
+its scope has expanded considerably. 
 `BurnMan` now contains equations of state
 for minerals and melts from several published datasets. A model for anisotropy
 has recently been added. Several solution model formulations are included
-(\autoref{fig:garnetsolution}),
+(with one example model shown in \autoref{fig:garnetsolution}),
 and a composite material model that allows several seismic averaging schemes.
 
 
@@ -109,7 +104,7 @@ planet builder in `BurnMan` is shown in \autoref{fig:zog}.
 
 ![A 1D profile through Planet Zog, a planet much like Earth, with an
 inner and outer core, convecting mantle (with thermal boundary layers),
-depleted lithospheric mantle and crust. Zog has the same mass (5.972e+24)
+depleted lithospheric mantle and crust. Zog has the same mass (5.972e+24 kg)
 and moment of inertia factor (0.3307) as Earth. Properties calculated
 self-consistently using BurnMan. The computed geotherm is compared to
 several from the literature
