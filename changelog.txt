@@ -1,5 +1,18 @@
 Changelog
 ---------
+Release v1.1.0 (September 14, 2022)
+  - the equilibrate function now solves problems where the bulk composition is allowed to vary
+  - the solution model formulation has been updated to allow site multiplicities to vary linearly with endmember proportions (as in a Temkin model)
+  - a new BoundaryLayerPerturbation class has been implemented to enable thermal perturbations to be added to planetary layers
+  - a new equation of state, BroshCalphad has been implemented, following Brosh et al. (2007)
+  - the Composite class now has a chemical_potential method
+  - a new Calibrant class, that enables users to calculate pressure/volume as a function of volume/pressure and temperature, also allowing propagation of uncertainties
+  - a new eos fitting function, fit_XPTp_data, that enables fitting of solution model parameters to experimental data
+  - Material classes now have a method called set_state_with_volume
+  - a new ElasticSolution class that defines excess solution properties as a function of the volume and temperature of the endmembers, rather than pressure and temperature
+  - excess properties of solution models can now be defined using a function, rather than by hardwired functional forms
+
+
 Release v1.0.1 (October 6, 2021)
   - Adds missing optimize submodule.
 
