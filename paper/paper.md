@@ -189,7 +189,7 @@ Quentin Williams, Wendy Panero, and Wolfgang Bangerth for helpful discussions.
 BurnMan was initiated at, and follow-up research support was received through,
 CIDER (NSF FESD grant 1135452). The authors have been supported by the
 Computational Infrastructure for Geodynamics initiative (CIG),
-through the National Science Foundation (U.S.) under Award No. EAR-0949446.
+through the National Science Foundation (U.S.) under Award No. EAR-0949446 and EAR-1550901.
 They have also received support from The University of California-Davis.
 
 Robert Myhill was supported by the Science and Technologies Funding Council
