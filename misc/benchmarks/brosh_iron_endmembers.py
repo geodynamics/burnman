@@ -41,7 +41,7 @@ for (m, P, T, G, V) in calib:
     assert(m.gibbs - G < 20.)
     # assert that the volumes are within 0.01 % of each other
     assert((m.V*1.e6 - V)/V < 1.e-4)
-    print(P/1.e9, T, m.gibbs - G, m.V*1.e6 - V)
+    print(f'{P/1.e9}, {T}, {m.gibbs - G:.1f}, {m.V*1.e6 - V:.1e}')
 
 check_eos_consistency(liq, P=1.e10, T=2000., tol=1.e-4, verbose=True,
                       including_shear_properties=False)
