@@ -1,5 +1,5 @@
 ---
-title: BurnMan -- a Python toolkit for planetary geophysics, geochemistry and thermodynamics'
+title: BurnMan -- a Python toolkit for planetary geophysics, geochemistry and thermodynamics
 tags:
   - Python
   - planetary
@@ -100,7 +100,7 @@ The `BurnMan` project can be found at
 
 # Statement of need
 Earth Scientists are interested in a number of different material properties,
-including seismic velocities, heat capacities and density as a function of
+including seismic velocities, heat capacities and densities as functions of
 pressure and temperature. Many of these properties are connected to each
 other by physical laws. Building models of individual phases to compute
 these properties and checking them can be time-consuming and prone to error,
@@ -118,7 +118,7 @@ mineral database [@Stixrude:2011] as a foundation. Since then,
 its scope has expanded considerably. `BurnMan` now contains equations
 of state for minerals and melts from several published datasets.
 A common set of methods for all equations of state allows easy
-of access to many thermodynamic properties
+access to many thermodynamic properties
 (e.g. \autoref{fig:qtzproperties}).
 
 ![Heat capacity and bulk sound velocities of quartz through the alpha-beta
@@ -166,7 +166,7 @@ Zog has the same mass (5.972e+24 kg) and moment of inertia factor
 profiles satisfy hydrostatic equilibrium, and allows different layers
 to have different thermal profiles, including an isentropic profile
 with thermal boundary layers
-(shown here for the upper and lower mantles and for the core).
+(shown here for the upper mantle, lower mantle and for the core).
 The computed geotherm is compared to several from the literature
 [@Stacey:1977;@Brown:1981;@Anderson:1982;@Alfe:2007;@Anzellini:2013].
 The other properties are compared to the PREM [@Dziewonski:1981].
@@ -174,7 +174,7 @@ The other properties are compared to the PREM [@Dziewonski:1981].
 
 `BurnMan` also provides many utility classes and functions, including
 those required to undertake bulk and phase chemical calculations,
-to aid preparation and analysis of experiments.
+to aid preparation and analysis of laboratory experiments.
 An example that uses bulk and phase compositions from samples
 to estimate phase proportions is shown in \autoref{fig:mars_fit}.
 
@@ -191,8 +191,9 @@ TheriakDomino [@deCapitani:2010],
 HeFESTo [@Stixrude:2022] and
 FactSAGE [@Bale:2002].
 Instead, it provides two methods to deal with the problem of
-thermodynamic equilibrium: (1) reading in a P-T table of precalculated
-properties into a Material class, and (2) a function (`burnman.equilibrate`)
+thermodynamic equilibrium: (1) reading in a pressure-temperature table
+of precalculated properties into a Material class,
+and (2) an equilibrate function
 that chemically equilibrates a known assemblage under constraints
 (two or three choices from fixed pressure, temperature, entropy, volume,
 phase proportions and compositions).
@@ -227,7 +228,7 @@ and to provide input for geodynamic simulations
 BurnMan was initiated at, and follow-up research support was received through,
 CIDER (NSF FESD grant 1135452). The authors have been supported by the
 Computational Infrastructure for Geodynamics initiative (CIG),
-through the National Science Foundation (U.S.) under Award No. EAR-0949446 and EAR-1550901.
+through the National Science Foundation (U.S.) under Award No. EAR-0949446.
 They have also received support from The University of California-Davis.
 
 Robert Myhill was supported by the Science and Technologies Funding Council
@@ -245,6 +246,11 @@ OAC-1835452, by the Computational Infrastructure in Geodynamics initiative
 (CIG), through the NSF under Award EAR- 0949446 and EAR-1550901 and
 The University of California – Davis, and by Technical Data Analysis, Inc.
 through US Navy SBIR N16A-T003.
+
+Rene Gassmoeller and Juliane Dannberg were supported by NSF Awards
+EAR-1925677 and EAR-2054605, and by the Computational Infrastructure for
+Geodynamics (CIG) through the NSF under Award EAR-0949446 and EAR-1550901
+and the University of California – Davis.
 
 The BurnMan code has been contributed to the Computational Infrastructure
 for Geodynamics (CIG) and is hosted at geodynamics.org.
