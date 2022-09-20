@@ -20,6 +20,7 @@ authors:
   - name: Ian Rose
     affiliation: 4
   - name: Cayman Unterborn
+    orcid: 0000-0001-8991-3110
     affiliation: 5
   - name: Juliane Dannberg
     orcid: 0000-0003-0357-7115
@@ -40,7 +41,7 @@ affiliations:
    index: 5
  - name: University of Florida, USA
    index: 6
-date: 13 September 2022
+date: 20 September 2022
 bibliography: paper.bib
 
 
@@ -161,6 +162,7 @@ on both the volume and the bulk modulus.
 inner and outer core (blue and orange layers),
 isentropic convecting lower and upper mantle (green and red), and a
 depleted lithosphere (lilac) split into mantle and crust.
+The mineralogy/composition of each layer is chosen by the user.
 Zog has the same mass (5.972e+24 kg) and moment of inertia factor
 (0.3307) as Earth. `BurnMan` ensures that the gravity and pressure
 profiles satisfy hydrostatic equilibrium, and allows different layers
@@ -185,14 +187,15 @@ run products are consistent with the reported starting composition.
 \label{fig:mars_fit}](figures/fit_mars_experiments.png)
 
 `BurnMan` does not attempt to replicate Gibbs minimization codes,
-of which there are many, including PerpleX [@Connolly:2009],
+of which there are many, such as PerpleX [@Connolly:2009],
 MageMin [@Riel:2022],
 TheriakDomino [@deCapitani:2010],
 HeFESTo [@Stixrude:2022] and
 FactSAGE [@Bale:2002].
 Instead, it provides two methods to deal with the problem of
 thermodynamic equilibrium: (1) reading in a pressure-temperature table
-of precalculated properties into a Material class,
+of precalculated properties into a Material class
+(from which derivative properties can be calculated),
 and (2) an equilibrate function
 that chemically equilibrates a known assemblage under constraints
 (two or three choices from fixed pressure, temperature, entropy, volume,
