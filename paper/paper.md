@@ -137,8 +137,9 @@ via a Landau-type model.
 Several other object classes in `BurnMan` build on the endmember
 equations of state. Several solution model formulations are included
 (with one example model shown in \autoref{fig:garnetsolution}),
-including methods to convert from one endmember basis to another
-[@Myhill:2021]. A composite material model
+including both Gibbs and Helmholtz formulations [@Myhill:2018].
+Functions are also provided to convert solution models from one
+endmember basis to another [@Myhill:2021]. A composite material model
 allows calculation of the properties of assemblages of several phases
 and includes several seismic averaging schemes.
 
