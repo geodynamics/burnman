@@ -33,7 +33,7 @@ affiliations:
    index: 1
  - name: University of Cambridge, UK
    index: 2
- - name: University of Utah, USA
+ - name: Clemson University, USA
    index: 3
  - name: Independent Researcher, USA
    index: 4
@@ -61,7 +61,8 @@ temperatures can be provided by a wide array of different equations of state.
 The averaging of the endmember properties within solutions and composite
 materials can also be achieved in several different ways.
 
-`BurnMan` is an open source, extensible mineral physics toolbox designed to
+`BurnMan` is an open source, extensible mineral physics toolbox designed
+written in Python to
 calculate the physical properties of natural materials
 within the Earth and other planets. The toolbox has a class-based, modular
 design that allows users to calculate many low-level properties that
@@ -85,7 +86,7 @@ and enthalpies
 * a "Planet" class, which self-consistently calculates gravity profiles,
 mass, moment of inertia and temperature structure of planets given
 appropriate chemical and dynamic constraints
-* published geotherms
+* several geotherms from the literature
 * a set of high-level functions which create files readable by
 seismological and geodynamic software, including: Mineos [@Masters:2011],
 AxiSEM [@NissenMeyer:2014] and
@@ -227,7 +228,7 @@ of exoplanets [@Unterborn:2016;@Unterborn:2019],
 and to provide input for geodynamic simulations
 [@Heister:2017;@Dannberg:2021].
 
-# Acknowledgements
+# Acknowledgments
 BurnMan was initiated at, and follow-up research support was received through,
 CIDER (NSF FESD grant 1135452). The authors have been supported by the
 Computational Infrastructure for Geodynamics initiative (CIG),
@@ -244,11 +245,10 @@ Sanne Cottaar has received funding from the European Research Council (ERC)
 under the European Union's Horizon 2020 research and innovation programme
 (ZoomDeep; Award No. 804071). This funding covered collaborative visits.
 
-Timo Heister was partially supported by NSF Award DMS-1522191, DMS-1820958,
-OAC-1835452, by the Computational Infrastructure in Geodynamics initiative
-(CIG), through the NSF under Award EAR- 0949446 and EAR-1550901 and
-The University of California – Davis, and by Technical Data Analysis, Inc.
-through US Navy SBIR N16A-T003.
+Timo Heister was partially supported by NSF Award DMS-2028346,
+OAC-2015848, EAR-1925575, and by the Computational Infrastructure in
+Geodynamics initiative (CIG), through the NSF under Award EAR-0949446
+and EAR-1550901 and The University of California -- Davis.
 
 Rene Gassmoeller and Juliane Dannberg were supported by NSF Awards
 EAR-1925677 and EAR-2054605, and by the Computational Infrastructure for
