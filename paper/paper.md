@@ -59,12 +59,16 @@ endmember and endmembers are usually mixtures of more than one element.
 The properties of the endmember building blocks at different pressures and
 temperatures can be provided by a wide array of different equations of state.
 The averaging of the endmember properties within solutions and composite
-materials can also be achieved in several different ways.
+materials can also be achieved in several different ways. Once calculated,
+the physical properties of composite materials can be used in many
+different ways.
 
-`BurnMan` is an open source, extensible mineral physics toolbox designed
-written in Python to
-calculate the physical properties of natural materials
-within the Earth and other planets. The toolbox has a class-based, modular
+
+`BurnMan` is an open source, extensible mineral physics Python module
+written in Python to provide a well-tested, benchmarked toolbox that
+is able to use several different methods to calculate the
+physical properties of natural materials.
+The toolbox has a class-based, modular
 design that allows users to calculate many low-level properties that
 are not accessible using existing codes, and to combine various tools in
 novel, creative ways. The module includes:
@@ -105,13 +109,14 @@ Earth Scientists are interested in a number of different material properties,
 including seismic velocities, heat capacities and densities as functions of
 pressure and temperature. Many of these properties are connected to each
 other by physical laws. Building models of individual phases to compute
-these properties and checking them can be time-consuming and prone to error,
+these properties can be time-consuming and prone to error,
 so it is desirable to have well-tested and benchmarked software that
 provides convenient functions to calculate the properties of complex
-composite materials, and to fit new models.
-Furthermore, there are many common workflows that require physical properties
-as input, or refine material parameters to fit experimentally-determined
-physical properties. These are the needs satisfied by the `BurnMan` module.
+composite materials from existing models, and to parameterize
+new models from experimental data.
+Furthermore, there are many common scientific workflows that require
+physical properties as input.
+These are the needs satisfied by the `BurnMan` module.
 
 # The BurnMan project
 When `BurnMan` was first released [@Cottaar:2014], its focus was on
@@ -121,15 +126,16 @@ its scope has expanded considerably. `BurnMan` now contains equations
 of state for minerals and melts from several published datasets.
 A common set of methods for all equations of state allows easy
 access to many thermodynamic properties
-(e.g. \autoref{fig:qtzproperties}).
+(e.g. \autoref{fig:qtzproperties}), including anisotropic properties
+[@Myhill:2022].
 
 ![Heat capacity and bulk sound velocities of quartz through the alpha-beta
 quartz transition as found in [@Stixrude:2011]. This transition is modelled
 via a Landau-type model.
 \label{fig:qtzproperties}](figures/quartz_properties.png)
 
-An extension to anisotropic properties has recently been added
-[@Myhill:2022]. Several solution model formulations are included
+Several other object classes in `BurnMan` build on the endmember
+equations of state. Several solution model formulations are included
 (with one example model shown in \autoref{fig:garnetsolution}),
 including methods to convert from one endmember basis to another
 [@Myhill:2021]. A composite material model
@@ -143,13 +149,13 @@ Gibbs minimization, while the endmember activities can be used to
 determine equilibrium via the equilibrium relations [@Holland:1998].
 \label{fig:garnetsolution}](figures/mg_ca_gt_properties.png)
 
-`BurnMan` includes many higher level functions that build on
+`BurnMan` includes many higher level functions that use
 its material model classes. These include functions to
-fit thermodynamic models for both endmembers
+fit thermodynamic models for endmembers
 and solutions including full error propagation (\autoref{fig:fit}),
 construction of self-consistent planetary models (\autoref{fig:zog})
 and the calculation of seismic properties. Tools are provided to
-compare the seismic predictions with published seismic models of
+compare calculated seismic properties with published seismic models of
 the Earth, and to produce input files to compute synthetic
 seismic data using other codes, including
 AxiSEM [@NissenMeyer:2014] and Mineos [@Woodhouse:1988;@Masters:2011].
@@ -202,7 +208,7 @@ that chemically equilibrates a known assemblage under constraints
 (two or three choices from fixed pressure, temperature, entropy, volume,
 phase proportions and compositions).
 An example is shown in \autoref{fig:eqm}.
-The equilibrate function is similar to that implemented in ThermoCalc
+The equilibrate function is similar to that implemented in THERMOCALC
 [@Holland:1998].
 
 ![The olivine phase diagram at three different temperatures as computed
@@ -213,10 +219,10 @@ are taken from the literature [@Stixrude:2011].
 The features used in `BurnMan` are documented in the codebase
 (\url{https://github.com/geodynamics/burnman}), and in the
 manual (\url{https://burnman.readthedocs.io}). A Jupyter notebook tutorial
-(available at \url{https://geodynamics.github.io/burnman/#download})
+(available at \url{https://geodynamics.github.io/burnman/#try})
 introduces some of the core functionality, including demonstrations that
-create the figures presented here. More features are investigated
-in the extensive set of examples.
+recreate the figures presented here. More features are investigated
+in the extensive set of examples bundled with the source code.
 
 # Past and ongoing research projects
 In addition to mantle studies
