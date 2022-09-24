@@ -1,4 +1,5 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7080174.svg)](https://doi.org/10.5281/zenodo.7080174)
+[![status](https://joss.theoj.org/papers/b9b95117098cf85598bb01dadbe62ee2/status.svg)](https://joss.theoj.org/papers/b9b95117098cf85598bb01dadbe62ee2)
 
 # BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and planetary sciences
 
