@@ -6,12 +6,13 @@ import burnman
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import hugoniot
+from burnman.tools.chemistry import reactions_from_stoichiometric_matrix
+from burnman.tools.chemistry import reactions_from_formulae
 from burnman.utils.chemistry import convert_fractions
 from burnman.utils.math import bracket
 from burnman.utils.math import smooth_array
 from burnman.utils.math import interp_smoothed_array_and_derivatives
 from burnman.utils.math import _pad_ndarray_inverse_mirror
-
 
 
 class test_tools(BurnManTest):
@@ -173,6 +174,20 @@ class test_tools(BurnManTest):
         self.assertArraysAlmostEqual([f(0., 1.)[0], dfdx(0., 1.)[0], dfdy(0., 1.)[0]],
                                      [array[1][0], 1., 0.])
 
+    def test_n_reactions_from_stoichiometry(self):
+        M = np.array([[1., 0.],
+                      [0., 1.],
+                      [1., 1.],
+                      [1., 1.]])
+        R = reactions_from_stoichiometric_matrix(M)
+        self.assertTrue(len(R) == 6.)
+
+    def test_reactions_from_formulae(self):
+        formulae = ['MgO', 'FeO', 'Fe2Si2O6', 'Fe2SiO4']
+        compound_names = ['per', 'fper', 'fs', 'fa']
+        R = sorted(reactions_from_formulae(formulae, compound_names,
+                                           return_strings=True))
+        self.assertTrue(R[0] == '2 fa = 2 fper + 1 fs')
 
 if __name__ == '__main__':
     unittest.main()

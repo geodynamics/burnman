@@ -610,3 +610,40 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
         output_fractions = molar_fractions
 
     return output_fractions
+
+
+def reaction_matrix_as_strings(reaction_matrix, compound_names):
+    """
+    Returns a list of string representations of all the reactions in
+    reaction_matrix.
+
+
+    Parameters
+    ----------
+    reaction_matrix : 2D numpy array
+        Matrix of stoichiometric amounts
+        of each compound j in reaction i
+
+    compound_names : list of strings
+        List of compound names
+
+    Returns
+    -------
+    reaction_strings : list of strings
+        List of strings corresponding to each reaction
+    """
+    reaction_strings = []
+    for reaction in reaction_matrix:
+        lhs, rhs = ('', '')
+        for i, coefficient in enumerate(reaction):
+            if coefficient < -1.e-10:
+                if len(lhs) > 0:
+                    lhs += ' + '
+                lhs += f'{-coefficient} {compound_names[i]}'
+            if coefficient > 1.e-10:
+                if len(rhs) > 0:
+                    rhs += ' + '
+                rhs += f'{coefficient} {compound_names[i]}'
+        reaction_strings.append(f'{lhs} = {rhs}')
+
+    return reaction_strings
