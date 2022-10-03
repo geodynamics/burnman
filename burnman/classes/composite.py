@@ -16,6 +16,7 @@ from . import averaging_schemes
 
 from ..utils.reductions import independent_row_indices
 from ..utils.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..utils.chemistry import reaction_matrix_as_strings
 
 
 def check_pairs(phases, fractions):
@@ -578,21 +579,7 @@ class Composite(Material):
         Returns a list of string representations of all the reactions in
         reaction_basis.
         """
-        reaction_strings = []
-        for reaction in self.reaction_basis:
-            lhs, rhs = ('', '')
-            for i, coefficient in enumerate(reaction):
-                if coefficient < -1.e-10:
-                    if len(lhs) > 0:
-                        lhs += ' + '
-                    lhs += f'{-coefficient} {self.endmember_names[i]}'
-                if coefficient > 1.e-10:
-                    if len(rhs) > 0:
-                        rhs += ' + '
-                    rhs += f'{coefficient} {self.endmember_names[i]}'
-            reaction_strings.append(f'{lhs} = {rhs}')
-
-        return reaction_strings
+        return reaction_matrix_as_strings(self.reaction_basis, self.endmember_names)
 
     @cached_property
     def n_reactions(self):

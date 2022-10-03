@@ -8,12 +8,17 @@
 from __future__ import absolute_import
 import numpy as np
 from scipy.optimize import fsolve
+import itertools
+from sympy import Rational
 
 from .. import constants
 
 # Import common lower level functions for backwards compatibility
+from ..classes.polytope import MaterialPolytope
 from ..utils.chemistry import dictionarize_formula, formula_mass
 from ..utils.chemistry import formula_to_string, site_occupancies_to_strings
+from ..utils.chemistry import compositional_array
+from ..utils.chemistry import reaction_matrix_as_strings
 
 def fugacity(standard_material, assemblage):
     """
@@ -253,3 +258,89 @@ def hugoniot(mineral, P_ref, T_ref, pressures, reference_mineral=None):
         volumes[i] = mineral.V
 
     return temperatures, volumes
+
+
+def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
+    """
+    Returns a list of all the balanced reactions between compounds
+    of fixed chemical composition. Includes both the forward and
+    reverse reactions
+    (so there will always be an even number of reactions).
+
+    Parameters
+    ----------
+    stoichiometric_matrix : 2D numpy array
+        An array of the stoichiometric (molar) amounts of
+        component j in compound i.
+
+    Returns
+    -------
+    reactions : 2D numpy array
+        An array of the stoichiometric (molar) amounts of
+        compound j in reaction i.
+    """
+    n_components = len(stoichiometric_matrix[0])
+
+    equalities = np.concatenate(([np.zeros(n_components)],
+                                 stoichiometric_matrix)).T
+
+    polys = [MaterialPolytope(equalities, np.diag(v))
+             for v in itertools.product(*[[-1, 1]]*len(equalities[0]))]
+    reactions = []
+    for p in polys:
+        v = np.array([[value for value in v]
+                      for v in p.raw_vertices])
+
+        if v is not []:
+            reactions.extend(v)
+
+    reactions = np.unique(np.array(reactions, dtype=float), axis=0)
+
+    reactions = np.array([[Rational(value).limit_denominator(1000000)
+                           for value in v]
+                          for v in reactions])
+
+    assert(np.max(reactions[:-1, 0]) == 0)
+    assert(np.max(reactions[-1, 1:]) == 0)
+    reactions = reactions[:-1, 1:]
+    return reactions
+
+
+def reactions_from_formulae(formulae, compound_names,
+                            return_strings=True):
+    """
+    Returns a list of all the balanced reactions between compounds
+    of fixed chemical composition. Includes both the forward and
+    reverse reactions
+    (so there will always be an even number of reactions).
+
+    Parameters
+    ----------
+    formulae : list of dictionaries or list of strings
+        List of the chemical formulae, either as strings or
+        as a list of dictionaries of elements.
+
+    compound_names : list of strings
+        List of the compound names in the formula list
+
+    return_strings : boolean
+        Whether to return the reactions as strings or array.
+
+    Returns
+    -------
+    reactions : 2D numpy array or list of strings
+        Either a 2D array of the stoichiometric (molar) amounts of
+        compound j in reaction i, or a list of strings.
+        The parameter compound_names is only used if strings
+        are requested.
+    """
+    if isinstance(formulae[0], str):
+        dict_formulae = [dictionarize_formula(f) for f in formulae]
+    else:
+        dict_formulae = formulae
+    stoichiometric_matrix, elements = compositional_array(dict_formulae)
+    R = reactions_from_stoichiometric_matrix(stoichiometric_matrix)
+    if return_strings:
+        return reaction_matrix_as_strings(R, compound_names)
+    else:
+        return R
