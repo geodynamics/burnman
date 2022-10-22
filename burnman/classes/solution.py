@@ -10,10 +10,8 @@ import numpy as np
 from sympy import Matrix, nsimplify
 from .material import material_property, cached_property
 from .mineral import Mineral
-from .solutionmodel import SolutionModel
-from .solutionmodel import MechanicalSolution, IdealSolution
-from .solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
-from .solutionmodel import SubregularSolution, FunctionSolution
+from .solutionmodel import MechanicalSolution
+from .solutionmodel import PolynomialSolution
 from .averaging_schemes import reuss_average_function
 
 from ..utils.reductions import independent_row_indices
@@ -67,11 +65,6 @@ class Solution(Mineral):
         if solution_model is not None:
             self.solution_model = solution_model
 
-        if isinstance(solution_model, MechanicalSolution):
-            self.solution_type = "mechanical"
-        else:
-            self.solution_type = "chemical"
-
         # Equation of state
         for i in range(self.n_endmembers):
             self.solution_model.endmembers[i][0].set_method(
@@ -98,9 +91,12 @@ class Solution(Mineral):
         """
         assert len(self.solution_model.endmembers) == len(molar_fractions)
 
-        if self.solution_type != "mechanical":
+        if type(self.solution_model) != MechanicalSolution:
             assert sum(molar_fractions) > 0.9999
             assert sum(molar_fractions) < 1.0001
+
+        if type(self.solution_model) == PolynomialSolution:
+            self.solution_model.set_composition(molar_fractions)
 
         self.reset()
         self.molar_fractions = np.array(molar_fractions)
@@ -112,6 +108,9 @@ class Solution(Mineral):
         self.reset()
 
     def set_state(self, pressure, temperature):
+
+        if type(self.solution_model) == PolynomialSolution:
+            self.solution_model.set_state(pressure, temperature)
 
         Mineral.set_state(self, pressure, temperature)
         for i in range(self.n_endmembers):
@@ -411,6 +410,7 @@ class Solution(Mineral):
                         for i in range(self.n_endmembers)
                     ]
                 )
+                + self.solution_model.VoverKT_excess()
             )
         )
 
@@ -510,13 +510,16 @@ class Solution(Mineral):
         of the solution [1/K].
         Aliased with self.alpha.
         """
-        return (1.0 / self.V) * sum(
-            [
-                self.solution_model.endmembers[i][0].alpha
-                * self.solution_model.endmembers[i][0].V
-                * self.molar_fractions[i]
-                for i in range(self.n_endmembers)
-            ]
+        return (1.0 / self.V) * (
+            sum(
+                [
+                    self.solution_model.endmembers[i][0].alpha
+                    * self.solution_model.endmembers[i][0].V
+                    * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.solution_model.alphaV_excess()
         )
 
     @material_property
@@ -542,12 +545,15 @@ class Solution(Mineral):
         of the solution [J/K/mol].
         Aliased with self.C_p.
         """
-        return sum(
-            [
-                self.solution_model.endmembers[i][0].molar_heat_capacity_p
-                * self.molar_fractions[i]
-                for i in range(self.n_endmembers)
-            ]
+        return (
+            sum(
+                [
+                    self.solution_model.endmembers[i][0].molar_heat_capacity_p
+                    * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.solution_model.Cp_excess()
         )
 
     @cached_property

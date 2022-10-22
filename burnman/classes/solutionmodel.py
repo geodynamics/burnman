@@ -10,6 +10,10 @@ import numpy as np
 from ..utils.chemistry import process_solution_chemistry
 from .. import constants
 import warnings
+import sparse
+import string
+from copy import deepcopy
+from .material import material_property, cached_property
 
 try:
     ag = importlib.import_module("autograd")
@@ -334,6 +338,27 @@ class SolutionModel(object):
         """
         return np.zeros_like(np.array(molar_fractions))
 
+    def Cp_excess(self):
+        """
+        Returns the excess heat capacity of the solution model
+        at its current state
+        """
+        return 0.0
+
+    def alphaV_excess(self):
+        """
+        Returns the excess alpha*V of the solution model
+        at its current state
+        """
+        return 0.0
+
+    def VoverKT_excess(self):
+        """
+        Returns the excess V/K_T of the solution model
+        at its current state
+        """
+        return 0.0
+
 
 class MechanicalSolution(SolutionModel):
 
@@ -476,7 +501,6 @@ class IdealSolution(SolutionModel):
             self.endmember_noccupancies,
             logish(site_noccupancies) - logish(site_multiplicities),
         )
-
         normalisation_constants = (
             self.endmember_configurational_entropies / constants.gas_constant
         )
@@ -1021,6 +1045,456 @@ class FunctionSolution(IdealSolution):
             pressure, temperature, molar_fractions
         )
         return ideal_entropy_hessian + nonideal_entropy_hessian
+
+    def activity_coefficients(self, pressure, temperature, molar_fractions):
+        if temperature > 1.0e-10:
+            return np.exp(
+                self._non_ideal_excess_partial_gibbs(
+                    pressure, temperature, molar_fractions
+                )
+                / (constants.gas_constant * temperature)
+            )
+        else:
+            raise Exception("Activity coefficients not defined at 0 K.")
+
+    def activities(self, pressure, temperature, molar_fractions):
+        return IdealSolution.activities(
+            self, pressure, temperature, molar_fractions
+        ) * self.activity_coefficients(pressure, temperature, molar_fractions)
+
+
+class PolynomialSolution(IdealSolution):
+    """
+    Solution model implementing a general polynomial solution model.
+
+    Parameters
+    ----------
+    endmembers : list of lists
+        A list of all the independent endmembers in the solution.
+        The first item of each list gives the Mineral object corresponding
+        to the endmember. The second item gives the site-species formula.
+
+    ESV_interactions : list of lists
+        A list containing lists where the first three elements are
+        energy, entropy and volume interactions and the rest of the elements
+        are indices of the transformed endmembers to which those
+        interactions correspond.
+        For example, [2., 0., 0., 0, 1, 1] would correspond to an interaction
+        of 2*p'[0]*p'[1]*p'[1].
+
+    interaction_endmembers : list of burnman.Mineral objects
+        A list of minerals involved in the interaction terms.
+
+    endmember_coefficients_and_interactions : list of lists
+        A list containing lists where the first n elements are
+        coefficients for each of the interaction_endmembers and the
+        rest of the elements are indices of the transformed
+        endmembers
+        to which those interactions correspond.
+        For example, [1., 0., -1., 0, 1, 1] would correspond to an interaction
+        of (mbr[0].gibbs - mbr[2].gibbs)*p'[0]*p'[1]*p'[1].
+
+    transformation_matrix : 2D numpy array
+        The interactions for a given solution may be most compactly expressed
+        not as a polynomial function of the proportions of the
+        endmembers, but a polynomial function of a
+        linearly transformed set. This parameter is a square numpy array A,
+        where p'i = A_ij p_j
+
+    """
+
+    def __init__(
+        self,
+        endmembers,
+        ESV_interactions=None,
+        interaction_endmembers=[],
+        endmember_coefficients_and_interactions=None,
+        transformation_matrix=None,
+    ):
+
+        # initialize ideal solution model
+        IdealSolution.__init__(self, endmembers)
+
+        self.n_endmembers = len(endmembers)
+        self.endmembers = endmembers
+
+        self.W_ESV = None
+        if ESV_interactions is not None:
+            self.W_ESV = self.make_interaction_arrays(ESV_interactions)
+
+        self.n_interaction_endmembers = len(interaction_endmembers)
+        self.interaction_endmembers = interaction_endmembers
+
+        self.W_mbr = None
+        if self.n_interaction_endmembers > 0:
+            self.W_mbr = self.make_endmember_interaction_arrays(
+                endmember_coefficients_and_interactions
+            )
+
+        self.transformation_matrix = transformation_matrix
+        self.reset()
+
+    def reset(self):
+        """
+        Resets all cached material properties.
+        It is typically not required for the user to call this function.
+        """
+        self._cached = {}
+
+    def set_composition(self, molar_fractions):
+        """
+        Resets all cached material properties.
+        It is typically not required for the user to call this function.
+        """
+        self.reset()
+        self.molar_fractions = molar_fractions
+
+    def set_state(self, pressure, temperature):
+        """
+        Sets the states for the interaction endmembers.
+        It is typically not required for the user to call this function.
+        """
+        for mbr in self.interaction_endmembers:
+            mbr.set_state(pressure, temperature)
+
+    def make_interaction_arrays(self, Ws):
+        n_Ws = len(Ws)
+        for i, W in enumerate(Ws):
+            if not all(W[i] <= W[i + 1] for i in range(3, len(W) - 1)):
+                raise Exception(
+                    f"Interaction parameter {i+1}/{n_Ws} must be upper triangular (i<=j<=k<=...<=z)"
+                )
+            if not W[3] < W[-1]:
+                raise Exception(
+                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the first diagonal (i=j=k=...=z)"
+                )
+
+        W_arrays = []
+
+        dims = sorted(list(set([len(W) - 3 for W in Ws])))
+        for dim in dims:
+            coords = [
+                [0, *W[3:]] for W in Ws if len(W) == dim + 3 and np.abs(W[0]) > 1.0e-10
+            ]
+            coords.extend(
+                [
+                    [1, *W[3:]]
+                    for W in Ws
+                    if len(W) == dim + 3 and np.abs(W[1]) > 1.0e-10
+                ]
+            )
+            coords.extend(
+                [
+                    [2, *W[3:]]
+                    for W in Ws
+                    if len(W) == dim + 3 and np.abs(W[2]) > 1.0e-10
+                ]
+            )
+            coords = list(zip(*coords))
+
+            data = [W[0] for W in Ws if len(W) == dim + 3 and np.abs(W[0]) > 1.0e-10]
+            data.extend(
+                [W[1] for W in Ws if len(W) == dim + 3 and np.abs(W[1]) > 1.0e-10]
+            )
+            data.extend(
+                [W[2] for W in Ws if len(W) == dim + 3 and np.abs(W[2]) > 1.0e-10]
+            )
+
+            shape = [3]  # First dimension is for E, S, V
+            shape.extend([self.n_endmembers for i in range(dim)])
+
+            shape = tuple(shape)
+            s = sparse.COO(coords, data, shape=shape).todense()
+            W_arrays.append((dim, s))
+        return W_arrays
+
+    def make_endmember_interaction_arrays(self, Ws):
+        n_Ws = len(Ws)
+        n_int = self.n_interaction_endmembers
+        for i, W in enumerate(Ws):
+            if not all(W[i] <= W[i + 1] for i in range(n_int, len(W) - 1)):
+                raise Exception(
+                    f"Interaction parameter {i+1}/{n_Ws} must be upper triangular (i<=j<=k<=...<=z)"
+                )
+            if not W[n_int] < W[-1]:
+                raise Exception(
+                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the first diagonal (i=j=k=...=z)"
+                )
+
+        W_arrays = []
+
+        dims = sorted(list(set([len(W) - n_int for W in Ws])))
+        for dim in dims:
+            coords = []
+            data = []
+            for i in range(n_int):
+                coords.extend(
+                    [
+                        [i, *W[n_int:]]
+                        for W in Ws
+                        if len(W) == dim + n_int and np.abs(W[i]) > 1.0e-10
+                    ]
+                )
+                data.extend(
+                    [
+                        W[i]
+                        for W in Ws
+                        if len(W) == dim + n_int and np.abs(W[i]) > 1.0e-10
+                    ]
+                )
+
+            coords = list(zip(*coords))
+
+            shape = [n_int]  # First dimension is for the excess_endmembers
+            shape.extend([self.n_endmembers for i in range(dim)])
+
+            shape = tuple(shape)
+            s = sparse.COO(coords, data, shape=shape).todense()
+            W_arrays.append((dim, s))
+        return W_arrays
+
+    def transform_scalar_list(self, x, A):
+        if A is not None:
+            return A.dot(x)
+        else:
+            return x
+
+    def transform_gradient_list(self, W, A):
+        if A is not None:
+            return np.einsum("ij, jk->ik", W, A)
+        else:
+            return W
+
+    def transform_hessian_list(self, W, A):
+        if A is not None:
+            return np.einsum("ki, mij, lj->mkl", A, W, A)
+        else:
+            return W
+
+    def W_dots_x(self, dim, W_array, x):
+        if dim == 0:
+            return W_array
+        else:
+            ESVdim = [W_array]
+            ESVdim.extend([x for i in range(dim)])
+            strng = string.ascii_lowercase[: W_array.ndim]
+            strng2 = ", ".join(strng[-dim:])
+            strng += f", {strng2}"
+            return np.einsum(strng, *ESVdim)
+
+    def rolled_array(self, W, istart):
+        W_array_rolled = deepcopy(W)
+        dim = len(W.shape) - 1
+
+        W_roll = deepcopy(W)
+        for i in range(dim - istart):
+            W_roll = np.moveaxis(W_roll, istart, -1)
+            W_array_rolled += W_roll
+        return W_array_rolled
+
+    def get_scalar_list(self, x, W_arrays, A):
+        xp = self.transform_scalar_list(x, A)
+        xp_total = np.sum(xp)
+        ESV = np.zeros(W_arrays[0][-1].shape[0])
+        for (dim, W_array) in W_arrays:
+            ESV += self.W_dots_x(dim, W_array, xp) / np.power(xp_total, dim - 1.0)
+        return ESV
+
+    def get_gradient_list(self, x, W_arrays, A):
+        xp = self.transform_scalar_list(x, A)
+        xp_total = np.sum(xp)
+
+        dESVdx = np.zeros(W_arrays[0][-1].shape[:2])
+
+        for (dim, W_array) in W_arrays:
+            dESVdx += (
+                -(dim - 1)
+                / np.power(xp_total, dim)
+                * self.W_dots_x(dim, W_array, xp)[:, np.newaxis]
+            )
+
+            W_array_rolled = self.rolled_array(W_array, 1)
+            dESVdx += self.W_dots_x(dim - 1, W_array_rolled, xp) / np.power(
+                xp_total, dim - 1.0
+            )
+        return self.transform_gradient_list(dESVdx, A)
+
+    def get_hessian_list(self, x, W_arrays, A):
+        xp = self.transform_scalar_list(x, A)
+        xp_total = np.sum(xp)
+
+        d2ESVdx2 = np.zeros(W_arrays[0][-1].shape[:3])
+
+        for (dim, W_array) in W_arrays:
+            d2ESVdx2 += (
+                (dim - 1)
+                * dim
+                / np.power(xp_total, dim + 1)
+                * self.W_dots_x(dim, W_array, xp)[:, np.newaxis, np.newaxis]
+            )
+
+            W_array_rolled = self.rolled_array(W_array, 1)
+
+            f = self.W_dots_x(dim - 1, W_array_rolled, xp)
+            h = f[:, np.newaxis, :] + f[:, :, np.newaxis]
+
+            d2ESVdx2 += -(dim - 1) / np.power(xp_total, dim) * h
+
+            W_array_rolled_2 = self.rolled_array(W_array_rolled, 2)
+            g = self.W_dots_x(dim - 2, W_array_rolled_2, xp)
+
+            d2ESVdx2 += g / np.power(xp_total, dim - 1.0)
+
+        return self.transform_hessian_list(d2ESVdx2, A)
+
+    @material_property
+    def ESV_scalar_list(self):
+        if self.W_ESV is None:
+            return np.zeros((3))
+        else:
+            return self.get_scalar_list(
+                self.molar_fractions, self.W_ESV, self.transformation_matrix
+            )
+
+    @material_property
+    def ESV_gradient_list(self):
+        if self.W_ESV is None:
+            return np.zeros((3, self.n_endmembers))
+        else:
+            return self.get_gradient_list(
+                self.molar_fractions, self.W_ESV, self.transformation_matrix
+            )
+
+    @material_property
+    def ESV_hessian_list(self):
+        if self.W_ESV is None:
+            return np.zeros((3, self.n_endmembers, self.n_endmembers))
+        else:
+            return self.get_hessian_list(
+                self.molar_fractions, self.W_ESV, self.transformation_matrix
+            )
+
+    @material_property
+    def mbr_scalar_list(self):
+        if self.W_mbr is None:
+            return np.zeros((0))
+        else:
+            return self.get_scalar_list(
+                self.molar_fractions, self.W_mbr, self.transformation_matrix
+            )
+
+    @material_property
+    def mbr_gradient_list(self):
+        if self.W_mbr is None:
+            return np.zeros((0, self.n_endmembers))
+        else:
+            return self.get_gradient_list(
+                self.molar_fractions, self.W_mbr, self.transformation_matrix
+            )
+
+    @material_property
+    def mbr_hessian_list(self):
+        if self.W_mbr is None:
+            return np.zeros((0, self.n_endmembers, self.n_endmembers))
+        else:
+            return self.get_hessian_list(
+                self.molar_fractions, self.W_mbr, self.transformation_matrix
+            )
+
+    def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
+        dEdx, dSdx, dVdx = self.ESV_gradient_list
+        mbr_gradients = self.mbr_gradient_list
+        mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
+        gibbs = dEdx - temperature * dSdx + pressure * dVdx
+        gibbs += np.einsum("i, ij->j", mbr_gibbs, mbr_gradients)
+        return gibbs
+
+    def excess_partial_gibbs_free_energies(
+        self, pressure, temperature, molar_fractions
+    ):
+        ideal_gibbs = IdealSolution._ideal_excess_partial_gibbs(
+            self, temperature, molar_fractions
+        )
+        non_ideal_gibbs = self._non_ideal_excess_partial_gibbs(
+            pressure, temperature, molar_fractions
+        )
+        return ideal_gibbs + non_ideal_gibbs
+
+    def excess_partial_entropies(self, pressure, temperature, molar_fractions):
+        ideal_entropies = IdealSolution._ideal_excess_partial_entropies(
+            self, temperature, molar_fractions
+        )
+
+        dSdx = self.ESV_gradient_list[1]
+        mbr_gradients = self.mbr_gradient_list
+        mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
+
+        non_ideal_entropies = dSdx + np.einsum("i, ij->j", mbr_entropies, mbr_gradients)
+        return ideal_entropies + non_ideal_entropies
+
+    def excess_partial_volumes(self, pressure, temperature, molar_fractions):
+        dVdx = self.ESV_gradient_list[2]
+        mbr_gradients = self.mbr_gradient_list
+        mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
+
+        return dVdx + np.einsum("i, ij->j", mbr_volumes, mbr_gradients)
+
+    def gibbs_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(
+            self, temperature, molar_fractions
+        )
+
+        d2Edx2, d2Sdx2, d2Vdx2 = self.ESV_hessian_list
+        mbr_hessian = self.mbr_hessian_list
+        mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
+
+        d2Gdx2 = d2Edx2 - temperature * d2Sdx2 + pressure * d2Vdx2
+        d2Gdx2 += np.einsum("i, ijk->jk", mbr_gibbs, mbr_hessian)
+
+        return d2Gdx2 - temperature * ideal_entropy_hessian
+
+    def entropy_hessian(self, pressure, temperature, molar_fractions):
+        ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(
+            self, temperature, molar_fractions
+        )
+
+        d2Sdx2 = self.ESV_hessian_list[1]
+        mbr_hessian = self.mbr_hessian_list
+        mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
+
+        d2Sdx2 += np.einsum("i, ijk->jk", mbr_entropies, mbr_hessian)
+
+        return d2Sdx2 + ideal_entropy_hessian
+
+    def volume_hessian(self, pressure, temperature, molar_fractions):
+        d2Vdx2 = self.ESV_hessian_list[2]
+        mbr_hessian = self.mbr_hessian_list
+        mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
+
+        d2Vdx2 += np.einsum("i, ijk->jk", mbr_volumes, mbr_hessian)
+
+        return d2Vdx2
+
+    def Cp_excess(self):
+        mbr_scalar = self.mbr_scalar_list
+        mbr_Cp = np.array(
+            [mbr.molar_heat_capacity_p for mbr in self.interaction_endmembers]
+        )
+        return np.einsum("i, i", mbr_scalar, mbr_Cp)
+
+    def alphaV_excess(self):
+        mbr_scalar = self.mbr_scalar_list
+        mbr_d2gibbsdpdt = np.array(
+            [mbr.alpha * mbr.V for mbr in self.interaction_endmembers]
+        )
+        return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdt)
+
+    def VoverKT_excess(self):
+        mbr_scalar = self.mbr_scalar_list
+        mbr_d2gibbsdpdp = np.array(
+            [mbr.V / mbr.K_T for mbr in self.interaction_endmembers]
+        )
+        return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdp)
 
     def activity_coefficients(self, pressure, temperature, molar_fractions):
         if temperature > 1.0e-10:
