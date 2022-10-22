@@ -44,7 +44,7 @@ metadata = dict(
 try:
     from setuptools import setup
 
-    metadata["install_requires"] = ["numpy", "matplotlib", "scipy", "sympy"]
+    metadata["install_requires"] = ["numpy", "matplotlib", "scipy", "sympy", "sparse"]
 except ImportError:
     from distutils.core import setup
 
