@@ -10,6 +10,12 @@ import numpy as np
 from sympy import Matrix
 from ..classes.combinedmineral import CombinedMineral
 from ..classes.solution import Solution
+from ..classes.solutionmodel import (
+    IdealSolution,
+    SymmetricRegularSolution,
+    AsymmetricRegularSolution,
+    SubregularSolution,
+)
 from ..utils.chemistry import site_occupancies_to_strings
 
 
@@ -246,12 +252,17 @@ def transform_solution_to_new_basis(
     else:
         name = solution_name
 
-    solution_type = solution.solution_type
-    if solution_type == "ideal":
+    solution_model = solution.solution_model
+
+    # Use type here to avoid inheritance problems
+    solution_type = type(solution_model)
+    if solution_type == IdealSolution:
         ESV_modifiers = [[0.0, 0.0, 0.0] for v in new_basis]
 
-    elif solution_type == "asymmetric" or solution_type == "symmetric":
-
+    if (
+        solution_type == AsymmetricRegularSolution
+        or solution_type == SymmetricRegularSolution
+    ):
         A = complete_basis(new_basis).T
 
         old_alphas = solution.solution_model.alphas
@@ -285,7 +296,7 @@ def transform_solution_to_new_basis(
             for i in range(n_mbrs)
         ]
 
-    elif solution_type == "subregular":
+    elif solution_type == SubregularSolution:
         full_basis = complete_basis(new_basis)
 
         def new_interactions(W, n_mbrs):
@@ -320,7 +331,7 @@ def transform_solution_to_new_basis(
     else:
         raise Exception(
             "The function to change basis for the "
-            "{0} solution model has not yet been "
+            "{0} solution type has not yet been "
             "implemented.".format(solution_type)
         )
 
@@ -341,11 +352,11 @@ def transform_solution_to_new_basis(
         nonzero_indices = np.nonzero(vector)[0]
         if len(nonzero_indices) == 1:
             endmembers.append(
-                [solution.endmembers[nonzero_indices[0]][0], site_formulae[i]]
+                [solution_model.endmembers[nonzero_indices[0]][0], site_formulae[i]]
             )
         else:
             mbr = CombinedMineral(
-                [solution.endmembers[idx][0] for idx in nonzero_indices],
+                [solution_model.endmembers[idx][0] for idx in nonzero_indices],
                 [vector[idx] for idx in nonzero_indices],
                 ESV_modifiers[i],
             )
@@ -367,14 +378,29 @@ def transform_solution_to_new_basis(
         endmembers[0][0].basis = new_basis
         return endmembers[0][0]
     else:
+        if solution_type == IdealSolution:
+            new_solution_model = IdealSolution(endmembers=endmembers)
+        elif (
+            solution_type == SymmetricRegularSolution
+            or solution_type == SubregularSolution
+        ):
+            new_solution_model = type(solution_model)(
+                endmembers=endmembers,
+                energy_interaction=energy_interaction,
+                volume_interaction=volume_interaction,
+                entropy_interaction=entropy_interaction,
+            )
+        else:
+            new_solution_model = type(solution_model)(
+                endmembers=endmembers,
+                energy_interaction=energy_interaction,
+                volume_interaction=volume_interaction,
+                entropy_interaction=entropy_interaction,
+                alphas=alphas,
+            )
         new_solution = Solution(
             name=name,
-            solution_type=solution_type,
-            endmembers=endmembers,
-            energy_interaction=energy_interaction,
-            volume_interaction=volume_interaction,
-            entropy_interaction=entropy_interaction,
-            alphas=alphas,
+            solution_model=new_solution_model,
             molar_fractions=molar_fractions,
         )
         new_solution.parent = solution

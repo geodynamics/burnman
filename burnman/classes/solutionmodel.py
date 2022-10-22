@@ -347,6 +347,7 @@ class MechanicalSolution(SolutionModel):
     """
 
     def __init__(self, endmembers):
+        self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
         self.formulas = [e[1] for e in endmembers]
 
@@ -394,6 +395,7 @@ class IdealSolution(SolutionModel):
     """
 
     def __init__(self, endmembers):
+        self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
         self.formulas = [e[1] for e in endmembers]
 

@@ -8,6 +8,11 @@ import warnings
 import burnman
 from burnman import Mineral
 from burnman import CombinedMineral
+from burnman.classes.solutionmodel import IdealSolution
+from burnman.classes.solutionmodel import SymmetricRegularSolution
+from burnman.classes.solutionmodel import SubregularSolution
+from burnman.classes.solutionmodel import AsymmetricRegularSolution
+from burnman.classes.solutionmodel import FunctionSolution
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.utils.chemistry import formula_to_string, sum_formulae
 from burnman.minerals import HGP_2018_ds633
@@ -68,9 +73,9 @@ made_forsterite = CombinedMineral([forsterite(), forsterite()], [0.5, 0.5])
 class forsterite_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Dummy solid solution"
-        self.solution_type = "symmetric"
-        self.endmembers = [[forsterite(), "[Mg]2SiO4"]]
-        self.energy_interaction = []
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[forsterite(), "[Mg]2SiO4"]], energy_interaction=[]
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -81,9 +86,10 @@ class forsterite_ss(burnman.SolidSolution):
 class forsterite_forsterite_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Fo-Fo solid solution"
-        self.solution_type = "symmetric"
-        self.endmembers = [[forsterite(), "[Mg]2SiO4"], [forsterite(), "[Mg]2SiO4"]]
-        self.energy_interaction = [[0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[forsterite(), "[Mg]2SiO4"], [forsterite(), "[Mg]2SiO4"]],
+            energy_interaction=[[0.0]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -94,8 +100,9 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
 class olivine_ideal_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Fo-Fo solid solution"
-        self.solution_type = "ideal"
-        self.endmembers = [[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]]
+        self.solution_model = IdealSolution(
+            endmembers=[[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]]
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -106,9 +113,10 @@ class olivine_ideal_ss(burnman.SolidSolution):
 class olivine_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Olivine"
-        self.solution_type = "symmetric"
-        self.endmembers = [[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]]
-        self.energy_interaction = [[8.4e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]],
+            energy_interaction=[[8.4e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -117,9 +125,10 @@ class olivine_ss(burnman.SolidSolution):
 class olivine_ss2(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Olivine"
-        self.solution_type = "symmetric"
-        self.endmembers = [[made_forsterite, "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]]
-        self.energy_interaction = [[8.4e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[made_forsterite, "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]],
+            energy_interaction=[[8.4e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -131,12 +140,13 @@ class orthopyroxene(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [forsterite(), "[Mg][Mg]Si2O6"],
-            [forsterite(), "[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6"],
-        ]
-        self.energy_interaction = [[burnman.constants.gas_constant * 1.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [forsterite(), "[Mg][Mg]Si2O6"],
+                [forsterite(), "[Mg1/2Al1/2][Mg1/2Al1/2]AlSiO6"],
+            ],
+            energy_interaction=[[burnman.constants.gas_constant * 1.0e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -147,13 +157,14 @@ class orthopyroxene(burnman.SolidSolution):
 class two_site_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "two_site_ss"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [forsterite(), "[Mg]3[Al]2Si3O12"],
-            [forsterite(), "[Fe]3[Al]2Si3O12"],
-            [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ]
-        self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            energy_interaction=[[10.0e3, 5.0e3], [-10.0e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -164,14 +175,15 @@ class two_site_ss(burnman.SolidSolution):
 class two_site_ss_asymmetric(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "two_site_ss (asymmetric)"
-        self.solution_type = "asymmetric"
-        self.endmembers = [
-            [forsterite(), "[Mg]3[Al]2Si3O12"],
-            [forsterite(), "[Fe]3[Al]2Si3O12"],
-            [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ]
-        self.alphas = [1.0, 2.0, 2.0]
-        self.energy_interaction = [[10.0e3, 5.0e3], [-10.0e3]]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            alphas=[1.0, 2.0, 2.0],
+            energy_interaction=[[10.0e3, 5.0e3], [-10.0e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -183,17 +195,17 @@ class two_site_ss_subregular(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = "two_site_ss (subregular symmetric)"
-        self.solution_type = "subregular"
-        self.endmembers = [
-            [forsterite(), "[Mg]3[Al]2Si3O12"],
-            [forsterite(), "[Fe]3[Al]2Si3O12"],
-            [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ]
-        # Interaction parameters
-        self.energy_interaction = [
-            [[10.0e3, 10.0e3], [5.0e3, 5.0e3]],
-            [[-10.0e3, -10.0e3]],
-        ]
+        self.solution_model = SubregularSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            energy_interaction=[
+                [[10.0e3, 10.0e3], [5.0e3, 5.0e3]],
+                [[-10.0e3, -10.0e3]],
+            ],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -203,17 +215,17 @@ class two_site_ss_subregular_asymmetric(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = "two_site_ss (subregular symmetric)"
-        self.solution_type = "subregular"
-        self.endmembers = [
-            [forsterite(), "[Mg]3[Al]2Si3O12"],
-            [forsterite(), "[Fe]3[Al]2Si3O12"],
-            [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ]
-        # Interaction parameters
-        self.energy_interaction = [
-            [[10.0e3, -10.0e3], [5.0e3, 3.0e3]],
-            [[-10.0e3, -10.0e3]],
-        ]
+        self.solution_model = SubregularSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            energy_interaction=[
+                [[10.0e3, -10.0e3], [5.0e3, 3.0e3]],
+                [[-10.0e3, -10.0e3]],
+            ],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -223,19 +235,19 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
         self.name = "two_site_ss (subregular symmetric)"
-        self.solution_type = "subregular"
-        self.endmembers = [
-            [forsterite(), "[Mg]3[Al]2Si3O12"],
-            [forsterite(), "[Fe]3[Al]2Si3O12"],
-            [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ]
-        # Interaction parameters
-        self.energy_interaction = [
-            [[10.0e3, -10.0e3], [5.0e3, 3.0e3]],
-            [[-10.0e3, -10.0e3]],
-        ]
-        self.entropy_interaction = [[[1.0, -2.0], [0.0, 1.0]], [[0.0, 0.0]]]
-        self.energy_ternary_terms = [[0, 1, 2, 3.0e3]]
+        self.solution_model = SubregularSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            energy_interaction=[
+                [[10.0e3, -10.0e3], [5.0e3, 3.0e3]],
+                [[-10.0e3, -10.0e3]],
+            ],
+            entropy_interaction=[[[1.0, -2.0], [0.0, 1.0]], [[0.0, 0.0]]],
+            energy_ternary_terms=[[0, 1, 2, 3.0e3]],
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -244,13 +256,14 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
 class temkin_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "ol-q-water melt (HGP 2018)"
-        self.solution_type = "ideal"
-        self.endmembers = [
-            [HGP_2018_ds633.foL(), "[Mg]4[Sitet]1[Vac]2"],
-            [HGP_2018_ds633.faL(), "[Fe]4[Sitet]1[Vac]2"],
-            [HGP_2018_ds633.qL(), "[]0[Sinet]1[Vac]2"],
-            [HGP_2018_ds633.h2oL(), "[]0[]0[H]2"],
-        ]
+        self.solution_model = IdealSolution(
+            endmembers=[
+                [HGP_2018_ds633.foL(), "[Mg]4[Sitet]1[Vac]2"],
+                [HGP_2018_ds633.faL(), "[Fe]4[Sitet]1[Vac]2"],
+                [HGP_2018_ds633.qL(), "[]0[Sinet]1[Vac]2"],
+                [HGP_2018_ds633.h2oL(), "[]0[]0[H]2"],
+            ]
+        )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
 
@@ -258,13 +271,14 @@ class temkin_ss(burnman.SolidSolution):
 class ppv_symmetric(burnman.Solution):
     def __init__(self, molar_fractions=None):
         self.name = "post-perovskite/bridgmanite"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [mg_post_perovskite(), "[Mg][Si]O3"],
-            [fe_post_perovskite(), "[Fe][Si]O3"],
-            [al_post_perovskite(), "[Al][Al]O3"],
-        ]
-        self.energy_interaction = [[0.0, 60.0e3], [0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [mg_post_perovskite(), "[Mg][Si]O3"],
+                [fe_post_perovskite(), "[Fe][Si]O3"],
+                [al_post_perovskite(), "[Al][Al]O3"],
+            ],
+            energy_interaction=[[0.0, 60.0e3], [0.0]],
+        )
 
         burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -278,13 +292,14 @@ def excess_gibbs_function_ppv(pressure, temperature, molar_amounts):
 class ppv_function(burnman.Solution):
     def __init__(self, molar_fractions=None):
         self.name = "post-perovskite/bridgmanite"
-        self.solution_type = "function"
-        self.endmembers = [
-            [mg_post_perovskite(), "[Mg][Si]O3"],
-            [fe_post_perovskite(), "[Fe][Si]O3"],
-            [al_post_perovskite(), "[Al][Al]O3"],
-        ]
-        self.excess_gibbs_function = excess_gibbs_function_ppv
+        self.solution_model = FunctionSolution(
+            endmembers=[
+                [mg_post_perovskite(), "[Mg][Si]O3"],
+                [fe_post_perovskite(), "[Fe][Si]O3"],
+                [al_post_perovskite(), "[Al][Al]O3"],
+            ],
+            excess_gibbs_function=excess_gibbs_function_ppv,
+        )
 
         burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 

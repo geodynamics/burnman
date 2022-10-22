@@ -2,6 +2,8 @@ import burnman
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman import minerals
+from burnman.classes.elasticsolutionmodel import ElasticSymmetricRegularSolution
+from burnman.classes.solutionmodel import SubregularSolution
 
 """
 
@@ -63,14 +65,15 @@ if __name__ == "__main__":
     """
     gt_F = burnman.ElasticSolution(
         name="Garnet",
-        solution_type="symmetric",
-        endmembers=[
-            [minerals.SLB_2011.pyrope(), "[Mg]3[Al]2Si3O12"],
-            [minerals.SLB_2011.grossular(), "[Ca]3[Al]2Si3O12"],
-        ],
-        energy_interaction=[[-60.0e3]],
-        entropy_interaction=[[0.0]],
-        pressure_interaction=[[0.0e9]],
+        solution_model=ElasticSymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.pyrope(), "[Mg]3[Al]2Si3O12"],
+                [minerals.SLB_2011.grossular(), "[Ca]3[Al]2Si3O12"],
+            ],
+            energy_interaction=[[-60.0e3]],
+            entropy_interaction=[[0.0]],
+            pressure_interaction=[[0.0e9]],
+        ),
     )
 
     """
@@ -84,14 +87,15 @@ if __name__ == "__main__":
 
     gt_G = burnman.Solution(
         name="Subregular pyrope-almandine-grossular " "garnet (Ganguly et al., 1996)",
-        solution_type="subregular",
-        endmembers=[
-            [minerals.SLB_2011.pyrope(), "[Mg]3[Al]2Si3O12"],
-            [minerals.SLB_2011.grossular(), "[Ca]3[Al]2Si3O12"],
-        ],
-        energy_interaction=mult([[[9834.0, 21627.0]]], 3.0),
-        volume_interaction=mult([[[0.058e-5, 0.012e-5]]], 3.0),
-        entropy_interaction=mult([[[5.78, 5.78]]], 3.0),
+        solution_model=SubregularSolution(
+            endmembers=[
+                [minerals.SLB_2011.pyrope(), "[Mg]3[Al]2Si3O12"],
+                [minerals.SLB_2011.grossular(), "[Ca]3[Al]2Si3O12"],
+            ],
+            energy_interaction=mult([[[9834.0, 21627.0]]], 3.0),
+            volume_interaction=mult([[[0.058e-5, 0.012e-5]]], 3.0),
+            entropy_interaction=mult([[[5.78, 5.78]]], 3.0),
+        ),
     )
 
     """

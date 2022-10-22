@@ -16,6 +16,7 @@ unlike those in the original tc file.
 import inspect
 import numpy as np
 from ..classes.solution import Solution
+from ..classes.solutionmodel import SymmetricRegularSolution, AsymmetricRegularSolution
 from ..classes.combinedmineral import CombinedMineral
 from copy import copy
 
@@ -59,61 +60,65 @@ interaction parameter (W=W_0+T*W_T+P*W_P).
 class ferropericlase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "ferropericlase (FM)"
-        self.endmembers = [
-            [HP_2011_ds62.per(), "[Mg]O"],
-            [HP_2011_ds62.fper(), "[Fe]O"],
-        ]
-        self.solution_type = "symmetric"
-        self.energy_interaction = [[18.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.per(), "[Mg]O"],
+                [HP_2011_ds62.fper(), "[Fe]O"],
+            ],
+            energy_interaction=[[18.0e3]],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class plagioclase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "plagioclase (NCAS)"
-        self.endmembers = [
-            [HP_2011_ds62.an(), "[Ca][Al]2Si2O8"],
-            [HP_2011_ds62.abh(), "[Na][Al1/2Si1/2]2Si2O8"],
-        ]  # Al-avoidance model
-        self.solution_type = "asymmetric"
-        self.alphas = [0.39, 1.0]
-        self.energy_interaction = [[22.4e3]]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.an(), "[Ca][Al]2Si2O8"],
+                [HP_2011_ds62.abh(), "[Na][Al1/2Si1/2]2Si2O8"],
+            ],  # Al-avoidance model
+            alphas=[0.39, 1.0],
+            energy_interaction=[[22.4e3]],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class clinopyroxene(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "clinopyroxene (NCFMASCrO)"
-        self.endmembers = [
-            [HP_2011_ds62.di(), "[Mg][Ca][Si]1/2O6"],
-            [cfs(), "[Fe][Fe][Si]1/2O6"],
-            [HP_2011_ds62.cats(), "[Al][Ca][Si1/2Al1/2]1/2O6"],
-            [crdi(), "[Cr][Ca][Si1/2Al1/2]1/2O6"],
-            [cess(), "[Fef][Ca][Si1/2Al1/2]1/2O6"],
-            [HP_2011_ds62.jd(), "[Al][Na][Si]1/2O6"],
-            [cen(), "[Mg][Mg][Si]1/2O6"],
-            [cfm(), "[Mg][Fe][Si]1/2O6"],
-        ]  # note cfm ordered endmember
-        self.solution_type = "asymmetric"
-        self.alphas = [1.2, 1.0, 1.9, 1.9, 1.9, 1.2, 1.0, 1.0]
-        self.energy_interaction = [
-            [20.0e3, 12.3e3, 8.0e3, 8.0e3, 26.0e3, 29.8e3, 18.0e3],
-            [25.0e3, 34.0e3, 34.0e3, 24.0e3, 7.0e3, 4.0e3],
-            [2.0e3, 2.0e3, 6.0e3, 45.7e3, 27.0e3],
-            [2.0e3, 3.0e3, 48.0e3, 36.0e3],
-            [3.0e3, 58.0e3, 36.0e3],
-            [40.0e3, 40.0e3],
-            [4.0e3],
-        ]
-        self.volume_interaction = [
-            [0.0, -0.1e-5, 0.0, 0.0, 0.0, -0.03e-5, 0.0],
-            [-0.1e-5, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, -0.29e-5, -0.1e-5],
-            [0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0],
-            [0.0],
-        ]
+
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.di(), "[Mg][Ca][Si]1/2O6"],
+                [cfs(), "[Fe][Fe][Si]1/2O6"],
+                [HP_2011_ds62.cats(), "[Al][Ca][Si1/2Al1/2]1/2O6"],
+                [crdi(), "[Cr][Ca][Si1/2Al1/2]1/2O6"],
+                [cess(), "[Fef][Ca][Si1/2Al1/2]1/2O6"],
+                [HP_2011_ds62.jd(), "[Al][Na][Si]1/2O6"],
+                [cen(), "[Mg][Mg][Si]1/2O6"],
+                [cfm(), "[Mg][Fe][Si]1/2O6"],
+            ],  # note cfm ordered endmember
+            alphas=[1.2, 1.0, 1.9, 1.9, 1.9, 1.2, 1.0, 1.0],
+            energy_interaction=[
+                [20.0e3, 12.3e3, 8.0e3, 8.0e3, 26.0e3, 29.8e3, 18.0e3],
+                [25.0e3, 34.0e3, 34.0e3, 24.0e3, 7.0e3, 4.0e3],
+                [2.0e3, 2.0e3, 6.0e3, 45.7e3, 27.0e3],
+                [2.0e3, 3.0e3, 48.0e3, 36.0e3],
+                [3.0e3, 58.0e3, 36.0e3],
+                [40.0e3, 40.0e3],
+                [4.0e3],
+            ],
+            volume_interaction=[
+                [0.0, -0.1e-5, 0.0, 0.0, 0.0, -0.03e-5, 0.0],
+                [-0.1e-5, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, -0.29e-5, -0.1e-5],
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0],
+                [0.0, 0.0],
+                [0.0],
+            ],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
@@ -175,91 +180,96 @@ class cfm(CombinedMineral):
 class olivine(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "olivine (FMS)"
-        self.endmembers = [
-            [HP_2011_ds62.fo(), "[Mg]2SiO4"],
-            [HP_2011_ds62.fa(), "[Fe]2SiO4"],
-        ]
-        self.solution_type = "symmetric"
-        self.energy_interaction = [[9.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.fo(), "[Mg]2SiO4"],
+                [HP_2011_ds62.fa(), "[Fe]2SiO4"],
+            ],
+            energy_interaction=[[9.0e3]],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class spinel(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "disordered spinel (CFMASO)"
-        self.endmembers = [
-            [HP_2011_ds62.sp(), "[Al2/3Mg1/3]3O4"],
-            [HP_2011_ds62.herc(), "[Al2/3Fe1/3]3O4"],
-            [HP_2011_ds62.mt(), "[Fef2/3Fe1/3]3O4"],
-            [HP_2011_ds62.picr(), "[Cr2/3Mg1/3]3O4"],
-        ]
-        self.solution_type = "symmetric"
-        self.energy_interaction = [[4.0e3, 56.0e3, 39.0e3], [32.0e3, 27.0e3], [36.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.sp(), "[Al2/3Mg1/3]3O4"],
+                [HP_2011_ds62.herc(), "[Al2/3Fe1/3]3O4"],
+                [HP_2011_ds62.mt(), "[Fef2/3Fe1/3]3O4"],
+                [HP_2011_ds62.picr(), "[Cr2/3Mg1/3]3O4"],
+            ],
+            energy_interaction=[[4.0e3, 56.0e3, 39.0e3], [32.0e3, 27.0e3], [36.0e3]],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class garnet(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "garnet (CFMASCrO, low pressure)"
-        self.endmembers = [
-            [HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-            [HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
-            [HP_2011_ds62.andr(), "[Ca]3[Fef]2Si3O12"],
-            [HP_2011_ds62.knor(), "[Mg]3[Cr]2Si3O12"],
-        ]
-        self.solution_type = "symmetric"
-        self.energy_interaction = [
-            [4.0e3, 35.0e3, 91.0e3, 2.0e3],
-            [4.0e3, 60.0e3, 6.0e3],
-            [2.0e3, 47.0e3],
-            [101.0e3],
-        ]
-        self.entropy_interaction = [
-            [0.0, 0.0, -1.7, 0.0],
-            [0.0, -1.7, 0.0],
-            [0.0, 33.8],
-            [32.1],
-        ]  # note huge entropy additions! (and sign change from a + bT + cP format)
-        self.volume_interaction = [
-            [0.1e-5, 0.1e-5, 0.032e-5, 0.0],
-            [0.1e-5, 0.032e-5, 0.01e-5],
-            [0.0, 0.221e-5],
-            [0.153e-5],
-        ]
+
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+                [HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
+                [HP_2011_ds62.andr(), "[Ca]3[Fef]2Si3O12"],
+                [HP_2011_ds62.knor(), "[Mg]3[Cr]2Si3O12"],
+            ],
+            energy_interaction=[
+                [4.0e3, 35.0e3, 91.0e3, 2.0e3],
+                [4.0e3, 60.0e3, 6.0e3],
+                [2.0e3, 47.0e3],
+                [101.0e3],
+            ],
+            entropy_interaction=[
+                [0.0, 0.0, -1.7, 0.0],
+                [0.0, -1.7, 0.0],
+                [0.0, 33.8],
+                [32.1],
+            ],  # note huge entropy additions! (and sign change from a + bT + cP format)
+            volume_interaction=[
+                [0.1e-5, 0.1e-5, 0.032e-5, 0.0],
+                [0.1e-5, 0.032e-5, 0.01e-5],
+                [0.0, 0.221e-5],
+                [0.153e-5],
+            ],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class orthopyroxene(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "orthopyroxene (CFMASCrO)"
-        self.endmembers = [
-            [HP_2011_ds62.en(), "[Mg][Mg][Si]0.5Si1.5O6"],
-            [HP_2011_ds62.fs(), "[Fe][Fe][Si]0.5Si1.5O6"],
-            [fm(), "[Fe][Mg][Si]0.5Si1.5O6"],
-            [odi(), "[Mg][Ca][Si]0.5Si1.5O6"],
-            [HP_2011_ds62.mgts(), "[Al][Mg][Si1/2Al1/2]0.5Si1.5O6"],
-            [cren(), "[Cr][Mg][Si1/2Al1/2]0.5Si1.5O6"],
-            [mess(), "[Fef][Mg][Si1/2Al1/2]0.5Si1.5O6"],
-        ]  # fm ordered phase, fake T-site multiplicity
-        self.solution_type = "asymmetric"
-        self.alphas = [1.0, 1.0, 1.0, 1.2, 1.0, 1.0, 1.0]
-        self.energy_interaction = [
-            [5.2e3, 4.0e3, 32.2e3, 13.0e3, 8.0e3, 8.0e3],
-            [4.0e3, 24.0e3, 7.0e3, 10.0e3, 10.0e3],
-            [18.0e3, 2.0e3, 12.0e3, 12.0e3],
-            [75.4e3, 30.0e3, 30.0e3],
-            [2.0e3, 2.0e3],
-            [2.0e3],
-        ]
-        self.volume_interaction = [
-            [0.0, 0.0, 0.12e-5, -0.15e-5, 0.0, 0.0],
-            [0.0, 0.0, -0.15e-5, 0.0, 0.0],
-            [0.0, -0.15e-5, 0.0, 0.0],
-            [-0.94e-5, 0.0, 0.0],
-            [0.0, 0.0],
-            [0.0],
-        ]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [HP_2011_ds62.en(), "[Mg][Mg][Si]0.5Si1.5O6"],
+                [HP_2011_ds62.fs(), "[Fe][Fe][Si]0.5Si1.5O6"],
+                [fm(), "[Fe][Mg][Si]0.5Si1.5O6"],
+                [odi(), "[Mg][Ca][Si]0.5Si1.5O6"],
+                [HP_2011_ds62.mgts(), "[Al][Mg][Si1/2Al1/2]0.5Si1.5O6"],
+                [cren(), "[Cr][Mg][Si1/2Al1/2]0.5Si1.5O6"],
+                [mess(), "[Fef][Mg][Si1/2Al1/2]0.5Si1.5O6"],
+            ],  # fm ordered phase, fake T-site multiplicity
+            alphas=[1.0, 1.0, 1.0, 1.2, 1.0, 1.0, 1.0],
+            energy_interaction=[
+                [5.2e3, 4.0e3, 32.2e3, 13.0e3, 8.0e3, 8.0e3],
+                [4.0e3, 24.0e3, 7.0e3, 10.0e3, 10.0e3],
+                [18.0e3, 2.0e3, 12.0e3, 12.0e3],
+                [75.4e3, 30.0e3, 30.0e3],
+                [2.0e3, 2.0e3],
+                [2.0e3],
+            ],
+            volume_interaction=[
+                [0.0, 0.0, 0.12e-5, -0.15e-5, 0.0, 0.0],
+                [0.0, 0.0, -0.15e-5, 0.0, 0.0],
+                [0.0, -0.15e-5, 0.0, 0.0],
+                [-0.94e-5, 0.0, 0.0],
+                [0.0, 0.0],
+                [0.0],
+            ],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 

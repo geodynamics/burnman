@@ -46,6 +46,7 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import Mineral, minerals
+from burnman.classes.solutionmodel import SymmetricRegularSolution
 from burnman.utils.chemistry import formula_mass
 
 
@@ -99,13 +100,14 @@ if __name__ == "__main__":
 
         def __init__(self, molar_fractions=None):
             self.name = "ferropericlase"
-            self.solution_type = "symmetric"
-            self.endmembers = [
-                [periclase, "[Mg]O"],
-                [high_spin_wuestite, "[Fehs]O"],
-                [low_spin_wuestite, "[Fels]O"],
-            ]
-            self.energy_interaction = [[11.0e3, 11.0e3], [11.0e3]]
+            self.solution_model = SymmetricRegularSolution(
+                endmembers=[
+                    [periclase, "[Mg]O"],
+                    [high_spin_wuestite, "[Fehs]O"],
+                    [low_spin_wuestite, "[Fels]O"],
+                ],
+                energy_interaction=[[11.0e3, 11.0e3], [11.0e3]],
+            )
             burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 
         def set_equilibrium_composition(self, molar_fraction_FeO):

@@ -18,6 +18,7 @@ HGP633data_to_burnman.py.
 
 from ..classes.mineral import Mineral
 from ..classes.solution import Solution
+from ..classes.solutionmodel import AsymmetricRegularSolution
 from ..classes.combinedmineral import CombinedMineral
 
 """
@@ -5894,11 +5895,12 @@ def make_melt_class(selected_endmembers):
     class silicate_melt(Solution):
         def __init__(self, molar_fractions=None):
             self.name = "Holland et al. (2018) melt model"
-            self.solution_type = "asymmetric"
-            self.endmembers = endmembers
-            self.energy_interaction = We
-            self.volume_interaction = Wv
-            self.alphas = alphas
+            self.solution_model = AsymmetricRegularSolution(
+                endmembers=endmembers,
+                energy_interaction=We,
+                volume_interaction=Wv,
+                alphas=alphas,
+            )
 
             Solution.__init__(self, molar_fractions=molar_fractions)
 
