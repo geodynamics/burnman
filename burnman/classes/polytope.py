@@ -18,10 +18,12 @@ from .material import cached_property
 from ..utils.math import independent_row_indices
 
 try:
-    cdd = importlib.import_module('cdd')
+    cdd = importlib.import_module("cdd")
 except ImportError as err:
-    print(f'Warning: {err}. '
-          'For full functionality of BurnMan, please install pycddlib.')
+    print(
+        f"Warning: {err}. "
+        "For full functionality of BurnMan, please install pycddlib."
+    )
 
 
 class SimplexGrid(object):
@@ -40,13 +42,13 @@ class SimplexGrid(object):
         Initialize SimplexGrid object with the desired number of vertices
         and points per edge.
         """
-        assert vertices >= 2, 'need at least two vertices'
-        assert points_per_edge >= 2, 'need at least 2 points per edge'
+        assert vertices >= 2, "need at least two vertices"
+        assert points_per_edge >= 2, "need at least 2 points per edge"
 
         self.vertices = vertices
         self.points_per_edge = points_per_edge
 
-    def generate(self, generate_type='list'):
+    def generate(self, generate_type="list"):
         """
         Generates the grid points of the simplex in lexicographic order.
 
@@ -62,14 +64,14 @@ class SimplexGrid(object):
             Grid points of the simplex.
         """
 
-        if generate_type == 'list':
-            x = [0]*self.vertices
-        elif generate_type == 'array':
+        if generate_type == "list":
+            x = [0] * self.vertices
+        elif generate_type == "array":
             x = np.zeros(self.vertices, dtype=int)
         else:
-            raise Exception('generate_type must be of type list or array.')
+            raise Exception("generate_type must be of type list or array.")
 
-        x[self.vertices-1] = self.points_per_edge-1
+        x[self.vertices - 1] = self.points_per_edge - 1
 
         h = self.vertices
         while True:
@@ -81,32 +83,33 @@ class SimplexGrid(object):
 
             val = x[h]
             x[h] = 0
-            x[self.vertices-1] = val - 1
-            x[h-1] += 1
+            x[self.vertices - 1] = val - 1
+            x[h - 1] += 1
             if val != 1:
                 h = self.vertices
 
-    def grid(self, generate_type='list'):
+    def grid(self, generate_type="list"):
         """
         Returns either a list or a numpy array
         corresponding the the points in the simplex grid, depending on
         whether the user chooses 'list' (default) or 'array' as
         the generate_type parameter.
         """
-        if generate_type == 'list':
+        if generate_type == "list":
             return list(self.generate(generate_type))
-        elif generate_type == 'array':
+        elif generate_type == "array":
             return np.array(list(self.generate(generate_type)))
         else:
-            raise Exception('generate_type must be of type list or array.')
+            raise Exception("generate_type must be of type list or array.")
 
     def n_points(self):
         """
         The number of points corresponding to the number of vertices and
         points per edge chosen by the user.
         """
-        return comb(self.vertices+self.points_per_edge-2,
-                    self.vertices-1, exact=True)
+        return comb(
+            self.vertices + self.points_per_edge - 2, self.vertices - 1, exact=True
+        )
 
 
 class MaterialPolytope(object):
@@ -118,11 +121,14 @@ class MaterialPolytope(object):
     This class is available as :class:`burnman.polytope.MaterialPolytope`.
     """
 
-    def __init__(self, equalities,
-                 inequalities,
-                 number_type='fraction',
-                 return_fractions=False,
-                 independent_endmember_occupancies=None):
+    def __init__(
+        self,
+        equalities,
+        inequalities,
+        number_type="fraction",
+        return_fractions=False,
+        independent_endmember_occupancies=None,
+    ):
         """
         Initialization function for the MaterialPolytope class.
         Declares basis attributes of the class.
@@ -149,8 +155,9 @@ class MaterialPolytope(object):
         self.equality_matrix = equalities[:, 1:]
         self.equality_vector = -equalities[:, 0]
 
-        self.polytope_matrix = cdd.Matrix(equalities, linear=True,
-                                          number_type=number_type)
+        self.polytope_matrix = cdd.Matrix(
+            equalities, linear=True, number_type=number_type
+        )
         self.polytope_matrix.rep_type = cdd.RepType.INEQUALITY
         self.polytope_matrix.extend(inequalities, linear=False)
         self.polytope = cdd.Polyhedron(self.polytope_matrix)
@@ -170,7 +177,7 @@ class MaterialPolytope(object):
             floats.
         """
         try:
-            del self.__dict__['endmember_occupancies']
+            del self.__dict__["endmember_occupancies"]
         except KeyError:
             pass
         self.return_fractions = return_fractions
@@ -205,20 +212,25 @@ class MaterialPolytope(object):
         (a processed list of all of the vertex locations).
         """
         if self.return_fractions:
-            if self.polytope.number_type == 'fraction':
-                v = np.array([[Fraction(value) for value in v]
-                              for v in self.raw_vertices])
+            if self.polytope.number_type == "fraction":
+                v = np.array(
+                    [[Fraction(value) for value in v] for v in self.raw_vertices]
+                )
             else:
-                v = np.array([[Rational(value).limit_denominator(1000000)
-                               for value in v]
-                              for v in self.raw_vertices])
+                v = np.array(
+                    [
+                        [Rational(value).limit_denominator(1000000) for value in v]
+                        for v in self.raw_vertices
+                    ]
+                )
         else:
-            v = np.array([[float(value) for value in v]
-                          for v in self.raw_vertices])
+            v = np.array([[float(value) for value in v] for v in self.raw_vertices])
 
         if len(v.shape) == 1:
-            raise ValueError("The combined equality and positivity "
-                             "constraints result in a null polytope.")
+            raise ValueError(
+                "The combined equality and positivity "
+                "constraints result in a null polytope."
+            )
 
         return v[:, 1:] / v[:, 0, np.newaxis]
 
@@ -239,10 +251,15 @@ class MaterialPolytope(object):
         """
         ind = self.independent_endmember_occupancies
 
-        sol = np.linalg.lstsq(np.array(ind.T).astype(float),
-                              np.array(self.endmember_occupancies.T).astype(
-                                  float),
-                              rcond=0)[0].round(decimals=12).T
+        sol = (
+            np.linalg.lstsq(
+                np.array(ind.T).astype(float),
+                np.array(self.endmember_occupancies.T).astype(float),
+                rcond=0,
+            )[0]
+            .round(decimals=12)
+            .T
+        )
         return sol
 
     def _decompose_vertices_into_simplices(self, vertices):
@@ -252,8 +269,9 @@ class MaterialPolytope(object):
         # Delaunay triangulation only works in dimensions > 1
         # and we remove the nullspace (sum(fractions) = 1)
         if len(vertices) > 2:
-            nulls = np.repeat(vertices[:, -1],
-                              vertices.shape[1]).reshape(vertices.shape)
+            nulls = np.repeat(vertices[:, -1], vertices.shape[1]).reshape(
+                vertices.shape
+            )
             tri = Delaunay((vertices - nulls)[:, :-1])
             return tri.simplices
         else:
@@ -269,7 +287,7 @@ class MaterialPolytope(object):
         """
         arr = self.endmembers_as_independent_endmember_amounts
         arr = np.hstack((np.ones((len(arr), 1)), arr[:, :-1]))
-        M = cdd.Matrix(arr, number_type='fraction')
+        M = cdd.Matrix(arr, number_type="fraction")
         M.rep_type = cdd.RepType.GENERATOR
         return cdd.Polyhedron(M)
 
@@ -279,8 +297,9 @@ class MaterialPolytope(object):
         Gets the limits of the polytope as a function of the independent
         endmembers.
         """
-        return np.array(self.independent_endmember_polytope.get_inequalities(),
-                        dtype=float)
+        return np.array(
+            self.independent_endmember_polytope.get_inequalities(), dtype=float
+        )
 
     def subpolytope_from_independent_endmember_limits(self, limits):
         """
@@ -300,8 +319,13 @@ class MaterialPolytope(object):
         modified_limits.extend(limits, linear=False)
         return cdd.Polyhedron(modified_limits)
 
-    def grid(self, points_per_edge=2, unique_sorted=True,
-             grid_type='independent endmember proportions', limits=None):
+    def grid(
+        self,
+        points_per_edge=2,
+        unique_sorted=True,
+        grid_type="independent endmember proportions",
+        limits=None,
+    ):
         """
         Create a grid of points which span the polytope.
 
@@ -326,61 +350,82 @@ class MaterialPolytope(object):
             A list of points gridding the polytope.
         """
         if limits is None:
-            if grid_type == 'independent endmember proportions':
-                f_occ = (self.endmembers_as_independent_endmember_amounts
-                         / (points_per_edge - 1))
-            elif grid_type == 'site occupancies':
-                f_occ = self.endmember_occupancies/(points_per_edge-1)
+            if grid_type == "independent endmember proportions":
+                f_occ = self.endmembers_as_independent_endmember_amounts / (
+                    points_per_edge - 1
+                )
+            elif grid_type == "site occupancies":
+                f_occ = self.endmember_occupancies / (points_per_edge - 1)
             else:
-                raise Exception('grid type not recognised. Should be one of '
-                                'independent endmember proportions '
-                                'or site occupancies')
+                raise Exception(
+                    "grid type not recognised. Should be one of "
+                    "independent endmember proportions "
+                    "or site occupancies"
+                )
 
             simplices = self._decompose_vertices_into_simplices(
-                self.endmembers_as_independent_endmember_amounts)
+                self.endmembers_as_independent_endmember_amounts
+            )
         else:
-            if grid_type == 'independent endmember proportions':
-                ppns = np.array(self.subpolytope_from_independent_endmember_limits(
-                    limits).get_generators()[:])[:, 1:]
-                last_ppn = np.array([1. - sum(p)
-                                    for p in ppns]).reshape((len(ppns), 1))
+            if grid_type == "independent endmember proportions":
+                ppns = np.array(
+                    self.subpolytope_from_independent_endmember_limits(
+                        limits
+                    ).get_generators()[:]
+                )[:, 1:]
+                last_ppn = np.array([1.0 - sum(p) for p in ppns]).reshape(
+                    (len(ppns), 1)
+                )
                 vertices_as_independent_endmember_proportions = np.hstack(
-                    (ppns, last_ppn))
-                f_occ = vertices_as_independent_endmember_proportions / \
-                    (points_per_edge-1)
+                    (ppns, last_ppn)
+                )
+                f_occ = vertices_as_independent_endmember_proportions / (
+                    points_per_edge - 1
+                )
 
-            elif grid_type == 'site occupancies':
-                occ = np.array(self.subpolytope_from_site_occupancy_limits(
-                    limits).get_generators()[:])[:, 1:]
-                f_occ = occ/(points_per_edge-1)
+            elif grid_type == "site occupancies":
+                occ = np.array(
+                    self.subpolytope_from_site_occupancy_limits(
+                        limits
+                    ).get_generators()[:]
+                )[:, 1:]
+                f_occ = occ / (points_per_edge - 1)
 
                 ind = self.independent_endmember_occupancies
 
-                vertices_as_independent_endmember_proportions = np.linalg.lstsq(np.array(ind.T).astype(float),
-                                                                                np.array(occ.T).astype(
-                                                                                    float),
-                                                                                rcond=None)[0].round(decimals=12).T
+                vertices_as_independent_endmember_proportions = (
+                    np.linalg.lstsq(
+                        np.array(ind.T).astype(float),
+                        np.array(occ.T).astype(float),
+                        rcond=None,
+                    )[0]
+                    .round(decimals=12)
+                    .T
+                )
             else:
-                raise Exception('grid_type not recognised. '
-                                'Should be one of '
-                                'independent endmember proportions '
-                                'or site occupancies')
+                raise Exception(
+                    "grid_type not recognised. "
+                    "Should be one of "
+                    "independent endmember proportions "
+                    "or site occupancies"
+                )
 
             simplices = self._decompose_vertices_into_simplices(
-                vertices_as_independent_endmember_proportions)
+                vertices_as_independent_endmember_proportions
+            )
 
         n_ind = f_occ.shape[1]
         n_simplices = len(simplices)
         dim = len(simplices[0])
         simplex_grid = SimplexGrid(dim, points_per_edge)
-        grid = simplex_grid.grid('array')
+        grid = simplex_grid.grid("array")
         points_per_simplex = simplex_grid.n_points()
-        n_points = n_simplices*points_per_simplex
+        n_points = n_simplices * points_per_simplex
 
         points = np.empty((n_points, n_ind))
         idx = 0
         for i in range(0, n_simplices):
-            points[idx:idx+points_per_simplex] = grid.dot(f_occ[simplices[i]])
+            points[idx : idx + points_per_simplex] = grid.dot(f_occ[simplices[i]])
             idx += points_per_simplex
 
         if unique_sorted:

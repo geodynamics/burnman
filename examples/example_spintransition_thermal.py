@@ -69,10 +69,16 @@ if __name__ == "__main__":
     approximately with the experimental data reported by Solomatova et al. (2016).
     """
     low_spin_wuestite = burnman.minerals.SLB_2011.wuestite()
-    low_spin_wuestite.property_modifiers.append(['linear',
-                                                 {'delta_E': 35000.,
-                                                  'delta_S': -burnman.constants.gas_constant*np.log(5),
-                                                  'delta_V': -1.09e-6}])
+    low_spin_wuestite.property_modifiers.append(
+        [
+            "linear",
+            {
+                "delta_E": 35000.0,
+                "delta_S": -burnman.constants.gas_constant * np.log(5),
+                "delta_V": -1.09e-6,
+            },
+        ]
+    )
 
     """
     Now, we create a class derived from Solution that contains an
@@ -82,6 +88,7 @@ if __name__ == "__main__":
     chemical potentials of high and low spin wuestite are equal
     (i.e. that the phase is in internal equilibrium).
     """
+
     class ferropericlase(burnman.Solution):
         """
         Solution class for ferropericlase
@@ -91,15 +98,15 @@ if __name__ == "__main__":
         """
 
         def __init__(self, molar_fractions=None):
-            self.name = 'ferropericlase'
-            self.solution_type = 'symmetric'
-            self.endmembers = [[periclase, '[Mg]O'],
-                               [high_spin_wuestite, '[Fehs]O'],
-                               [low_spin_wuestite, '[Fels]O']]
-            self.energy_interaction = [[11.e3, 11.e3],
-                                       [11.e3]]
-            burnman.Solution.__init__(self,
-                                      molar_fractions=molar_fractions)
+            self.name = "ferropericlase"
+            self.solution_type = "symmetric"
+            self.endmembers = [
+                [periclase, "[Mg]O"],
+                [high_spin_wuestite, "[Fehs]O"],
+                [low_spin_wuestite, "[Fels]O"],
+            ]
+            self.energy_interaction = [[11.0e3, 11.0e3], [11.0e3]]
+            burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 
         def set_equilibrium_composition(self, molar_fraction_FeO):
             """
@@ -107,15 +114,20 @@ if __name__ == "__main__":
             the three endmembers of the solution for a given bulk composition
             at the current state (pressure and temperature) of the solution.
             """
+
             def delta_mu(p_LS):
                 """
                 This function calculates the difference between the
                 partial gibbs energies of high and low spin FeO for a
                 given proportion of low spin FeO.
                 """
-                self.set_composition([1. - molar_fraction_FeO,
-                                      molar_fraction_FeO*(1. - p_LS),
-                                      molar_fraction_FeO*p_LS])
+                self.set_composition(
+                    [
+                        1.0 - molar_fraction_FeO,
+                        molar_fraction_FeO * (1.0 - p_LS),
+                        molar_fraction_FeO * p_LS,
+                    ]
+                )
                 return self.partial_gibbs[1] - self.partial_gibbs[2]
 
             # Try to find the equilibrium proportion of low spin iron
@@ -123,21 +135,27 @@ if __name__ == "__main__":
             # equilibrium proportion is exactly 0 or 1,
             # in which case we find out which is more stable.
             try:
-                p_LS = brentq(delta_mu, 0., 1.)
+                p_LS = brentq(delta_mu, 0.0, 1.0)
             except ValueError:
-                self.set_composition([1. - molar_fraction_FeO,
-                                      molar_fraction_FeO, 0.])
+                self.set_composition(
+                    [1.0 - molar_fraction_FeO, molar_fraction_FeO, 0.0]
+                )
                 G0 = self.gibbs
-                self.set_composition([1. - molar_fraction_FeO, 0.,
-                                      molar_fraction_FeO])
+                self.set_composition(
+                    [1.0 - molar_fraction_FeO, 0.0, molar_fraction_FeO]
+                )
                 G1 = self.gibbs
-                p_LS = 0. if G0 < G1 else 1.
+                p_LS = 0.0 if G0 < G1 else 1.0
 
             # finally, set the equilibrium composition that we have
             # just calculated
-            self.set_composition([1. - molar_fraction_FeO,
-                                  molar_fraction_FeO*(1. - p_LS),
-                                  molar_fraction_FeO*p_LS])
+            self.set_composition(
+                [
+                    1.0 - molar_fraction_FeO,
+                    molar_fraction_FeO * (1.0 - p_LS),
+                    molar_fraction_FeO * p_LS,
+                ]
+            )
 
     # In this line, we create our solution object
     fper = ferropericlase()
@@ -147,7 +165,7 @@ if __name__ == "__main__":
     # We fix the bulk composition of the solution to be (Mg0.8Fe0.2)O.
     X_Fe = 0.2
 
-    pressures = np.linspace(10.e9, 150.e9, 101)
+    pressures = np.linspace(10.0e9, 150.0e9, 101)
     volumes = np.empty_like(pressures)
     volumes_HS = np.empty_like(pressures)
     volumes_LS = np.empty_like(pressures)
@@ -156,9 +174,7 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(8, 4))
     ax = [fig.add_subplot(1, 2, i) for i in range(1, 3)]
 
-    for T, color in [[300., 'blue'],
-                     [1800., 'purple'],
-                     [3300., 'red']]:
+    for T, color in [[300.0, "blue"], [1800.0, "purple"], [3300.0, "red"]]:
         for i, P in enumerate(pressures):
 
             # Calculate and store the equilibrium volume and proportion of
@@ -167,31 +183,43 @@ if __name__ == "__main__":
             fper.set_equilibrium_composition(X_Fe)
 
             volumes[i] = fper.V
-            p_LS[i] = (fper.molar_fractions[2]
-                       / (fper.molar_fractions[1]+fper.molar_fractions[2]))
+            p_LS[i] = fper.molar_fractions[2] / (
+                fper.molar_fractions[1] + fper.molar_fractions[2]
+            )
 
             # Also calculate and store the volumes if all iron were in the
             # high or low spin state
-            fper.set_composition([1.-X_Fe, X_Fe, 0.])
+            fper.set_composition([1.0 - X_Fe, X_Fe, 0.0])
             volumes_HS[i] = fper.V
-            fper.set_composition([1.-X_Fe, 0., X_Fe])
+            fper.set_composition([1.0 - X_Fe, 0.0, X_Fe])
             volumes_LS[i] = fper.V
 
         # Do some plotting
-        ax[0].fill_between(pressures/1.e9, volumes_HS*1.e6, volumes_LS
-                           * 1.e6, alpha=0.15, color=color, label=f'{T} K, volume range')
-        ax[0].plot(pressures/1.e9, volumes*1.e6, c=color,
-                   linewidth=2, label=f'{T} K, equilibrium volume')
+        ax[0].fill_between(
+            pressures / 1.0e9,
+            volumes_HS * 1.0e6,
+            volumes_LS * 1.0e6,
+            alpha=0.15,
+            color=color,
+            label=f"{T} K, volume range",
+        )
+        ax[0].plot(
+            pressures / 1.0e9,
+            volumes * 1.0e6,
+            c=color,
+            linewidth=2,
+            label=f"{T} K, equilibrium volume",
+        )
 
-        ax[1].plot(pressures/1.e9, 1.-p_LS, c=color, label=f'{T} K')
+        ax[1].plot(pressures / 1.0e9, 1.0 - p_LS, c=color, label=f"{T} K")
 
     # Add legends and axis titles to the plot
     for i in range(2):
         ax[i].legend()
-        ax[i].set_xlabel('Pressure (GPa)')
+        ax[i].set_xlabel("Pressure (GPa)")
 
-    ax[0].set_ylabel('Volume (cm$^3$/mol)')
-    ax[1].set_ylabel('High spin fraction')
+    ax[0].set_ylabel("Volume (cm$^3$/mol)")
+    ax[1].set_ylabel("High spin fraction")
 
     ax[0].set_ylim(7, 13)
 

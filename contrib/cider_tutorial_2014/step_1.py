@@ -44,8 +44,9 @@ import matplotlib.pyplot as plt
 # hack to allow scripts to be placed in subdirectories next to burnman:
 import os
 import sys
-if not os.path.exists('burnman') and os.path.exists('../../burnman'):
-    sys.path.insert(1, os.path.abspath('../../'))
+
+if not os.path.exists("burnman") and os.path.exists("../../burnman"):
+    sys.path.insert(1, os.path.abspath("../../"))
 
 # Here we import the relevant modules from BurnMan.  The burnman
 # module imports several of the most important functionalities of
@@ -57,7 +58,7 @@ import burnman
 from burnman import minerals
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     Part (1) --- Defining the pressures and temperatures.
     We get the pressures from the PREM density model for a list of
@@ -75,11 +76,12 @@ if __name__ == '__main__':
     # query the seismic model for the pressure, density, P wave speed, S wave
     # speed, and bulk sound velocity at those depths
     n_depths = 20
-    min_depth = 850.e3
-    max_depth = 2800.e3
+    min_depth = 850.0e3
+    max_depth = 2800.0e3
     depths = np.linspace(min_depth, max_depth, n_depths)
     pressure, seis_rho, seis_vp, seis_vs = seismic_model.evaluate(
-        ['pressure', 'density', 'v_p', 'v_s'], depths)
+        ["pressure", "density", "v_p", "v_s"], depths
+    )
 
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
@@ -113,7 +115,9 @@ if __name__ == '__main__':
     phase_1_fraction = 0.5
     phase_2_fraction = 1.0 - phase_1_fraction
     rock = burnman.Composite(
-        [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()], [phase_1_fraction, phase_2_fraction])
+        [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()],
+        [phase_1_fraction, phase_2_fraction],
+    )
 
     # ---------------------------------------------------------#
     # ---------------------------------------------------------#
@@ -123,13 +127,12 @@ if __name__ == '__main__':
     # its thermoelastic calculations. In general, we recommend the 'slb3'
     # equation of state as the most self-consistent model.  The parameters from
     # the SLB_2011 mineral library are fit using this model.
-    rock.set_method('slb3')
+    rock.set_method("slb3")
 
     # Here is the step which does the heavy lifting. rock.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,
     # then calculates each requested material phase averaging over the different phases.
-    density, vp, vs = rock.evaluate(
-        ['density', 'v_p', 'v_s'], pressure, temperature)
+    density, vp, vs = rock.evaluate(["density", "v_p", "v_s"], pressure, temperature)
 
     """
     Part (3) --- Plotting and comparison
@@ -156,40 +159,91 @@ if __name__ == '__main__':
 
     # First, we plot the s-wave speed verses the PREM s-wave speed
     plt.subplot(2, 2, 1)
-    plt.plot(pressure / 1.e9, vs / 1.e3, color='b', linestyle='-',
-             marker='o', markerfacecolor='b', markersize=4, label='computation')
-    plt.plot(pressure / 1.e9, seis_vs / 1.e3, color='k', linestyle='-',
-             marker='o', markerfacecolor='k', markersize=4, label='PREM')
+    plt.plot(
+        pressure / 1.0e9,
+        vs / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+        label="computation",
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vs / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+        label="PREM",
+    )
     plt.title("S wave speed (km/s)")
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.legend(loc='lower right')
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
+    plt.legend(loc="lower right")
     plt.ylim(5, 8.0)
 
     # Next, we plot the p-wave speed verses the PREM p-wave speed
     plt.subplot(2, 2, 2)
-    plt.plot(pressure / 1.e9, vp / 1.e3, color='b', linestyle='-',
-             marker='o', markerfacecolor='b', markersize=4)
-    plt.plot(pressure / 1.e9, seis_vp / 1.e3, color='k',
-             linestyle='-', marker='o', markerfacecolor='k', markersize=4)
+    plt.plot(
+        pressure / 1.0e9,
+        vp / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vp / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+    )
     plt.title("P wave speed (km/s)")
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.ylim(10, 16)
 
     # Next, we plot the density verses the PREM density
     plt.subplot(2, 2, 3)
-    plt.plot(pressure / 1.e9, density / 1.e3, color='b',
-             linestyle='-', marker='o', markerfacecolor='b', markersize=4)
-    plt.plot(pressure / 1.e9, seis_rho / 1.e3, color='k',
-             linestyle='-', marker='o', markerfacecolor='k', markersize=4)
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.plot(
+        pressure / 1.0e9,
+        density / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_rho / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+    )
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.xlabel("Pressure (GPa)")
     plt.title("density ($\cdot 10^3$ kg/m$^3$)")
 
     # Finally, we plot the goetherm used
     plt.subplot(2, 2, 4)
-    plt.plot(pressure / 1e9, temperature, color='r', linestyle='-',
-             marker='o', markerfacecolor='r', markersize=4)
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.plot(
+        pressure / 1e9,
+        temperature,
+        color="r",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="r",
+        markersize=4,
+    )
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.xlabel("Pressure (GPa)")
     plt.title("temperature (K)")
 

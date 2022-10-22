@@ -17,10 +17,12 @@ from .solutionmodel import logish, inverseish
 from .. import constants
 
 try:
-    ag = importlib.import_module('autograd')
+    ag = importlib.import_module("autograd")
 except ImportError as err:
-    print(f'Warning: {err}. '
-          'For full functionality of BurnMan, please install autograd.')
+    print(
+        f"Warning: {err}. "
+        "For full functionality of BurnMan, please install autograd."
+    )
 
 
 class ElasticSolutionModel(object):
@@ -69,10 +71,12 @@ class ElasticSolutionModel(object):
         F_excess : float
             The excess Helmholtz energy
         """
-        return np.dot(np.array(molar_fractions),
-                      self.excess_partial_helmholtz_energies(volume,
-                                                             temperature,
-                                                             molar_fractions))
+        return np.dot(
+            np.array(molar_fractions),
+            self.excess_partial_helmholtz_energies(
+                volume, temperature, molar_fractions
+            ),
+        )
 
     def excess_pressure(self, volume, temperature, molar_fractions):
         """
@@ -96,9 +100,10 @@ class ElasticSolutionModel(object):
         P_excess : float
             The excess pressure of the solution
         """
-        return np.dot(molar_fractions,
-                      self.excess_partial_pressures(volume, temperature,
-                                                    molar_fractions))
+        return np.dot(
+            molar_fractions,
+            self.excess_partial_pressures(volume, temperature, molar_fractions),
+        )
 
     def excess_entropy(self, volume, temperature, molar_fractions):
         """
@@ -122,9 +127,10 @@ class ElasticSolutionModel(object):
         S_excess : float
             The excess entropy of the solution
         """
-        return np.dot(molar_fractions,
-                      self.excess_partial_entropies(volume, temperature,
-                                                    molar_fractions))
+        return np.dot(
+            molar_fractions,
+            self.excess_partial_entropies(volume, temperature, molar_fractions),
+        )
 
     def excess_enthalpy(self, volume, temperature, molar_fractions):
         """
@@ -148,15 +154,13 @@ class ElasticSolutionModel(object):
         H_excess : float
             The excess enthalpy of the solution
         """
-        return (self.excess_helmholtz_energy(volume, temperature,
-                                             molar_fractions)
-                + temperature *
-                self.excess_entropy(volume, temperature, molar_fractions)
-                - volume*self.excess_pressure(volume, temperature,
-                                              molar_fractions))
+        return (
+            self.excess_helmholtz_energy(volume, temperature, molar_fractions)
+            + temperature * self.excess_entropy(volume, temperature, molar_fractions)
+            - volume * self.excess_pressure(volume, temperature, molar_fractions)
+        )
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         """
         Given a list of molar fractions of different phases,
         compute the excess Helmholtz energy for each endmember of the solution.
@@ -232,7 +236,7 @@ class ElasticSolutionModel(object):
         return np.zeros_like(np.array(molar_fractions))
 
 
-class ElasticMechanicalSolution (ElasticSolutionModel):
+class ElasticMechanicalSolution(ElasticSolutionModel):
 
     """
     An extremely simple class representing a mechanical solution model.
@@ -248,16 +252,15 @@ class ElasticMechanicalSolution (ElasticSolutionModel):
         self.formulas = [e[1] for e in endmembers]
 
     def excess_helmholtz_energy(self, volume, temperature, molar_fractions):
-        return 0.
+        return 0.0
 
     def excess_pressure(self, volume, temperature, molar_fractions):
-        return 0.
+        return 0.0
 
     def excess_entropy(self, volume, temperature, molar_fractions):
-        return 0.
+        return 0.0
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         return np.zeros_like(molar_fractions)
 
     def excess_partial_pressures(self, volume, temperature, molar_fractions):
@@ -267,7 +270,7 @@ class ElasticMechanicalSolution (ElasticSolutionModel):
         return np.zeros_like(molar_fractions)
 
 
-class ElasticIdealSolution (ElasticSolutionModel):
+class ElasticIdealSolution(ElasticSolutionModel):
 
     """
     A class representing an ideal solution model.
@@ -290,26 +293,24 @@ class ElasticIdealSolution (ElasticSolutionModel):
         self._calculate_endmember_configurational_entropies()
 
     def _calculate_endmember_configurational_entropies(self):
-        S_conf = -(constants.gas_constant
-                   * (self.endmember_noccupancies
-                      * logish(self.endmember_occupancies)).sum(-1))
+        S_conf = -(
+            constants.gas_constant
+            * (self.endmember_noccupancies * logish(self.endmember_occupancies)).sum(-1)
+        )
         self.endmember_configurational_entropies = S_conf
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
-        return self._ideal_excess_partial_helmholtz(temperature,
-                                                    molar_fractions)
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
+        return self._ideal_excess_partial_helmholtz(temperature, molar_fractions)
 
     def excess_partial_entropies(self, volume, temperature, molar_fractions):
-        return self._ideal_excess_partial_entropies(temperature,
-                                                    molar_fractions)
+        return self._ideal_excess_partial_entropies(temperature, molar_fractions)
 
     def excess_partial_pressures(self, volume, temperature, molar_fractions):
         return np.zeros((self.n_endmembers))
 
     def helmholtz_hessian(self, volume, temperature, molar_fractions):
         hess_S = self._ideal_entropy_hessian(temperature, molar_fractions)
-        return -temperature*hess_S
+        return -temperature * hess_S
 
     def entropy_hessian(self, volume, temperature, molar_fractions):
         hess_S = self._ideal_entropy_hessian(temperature, molar_fractions)
@@ -319,70 +320,87 @@ class ElasticIdealSolution (ElasticSolutionModel):
         return np.zeros((len(molar_fractions), len(molar_fractions)))
 
     def _configurational_entropy(self, molar_fractions):
-        site_noccupancies = np.einsum('i, ij', molar_fractions,
-                                      self.endmember_noccupancies)
-        site_multiplicities = np.einsum('i, ij', molar_fractions,
-                                        self.site_multiplicities)
-        site_occupancies = (site_noccupancies
-                            * inverseish(site_multiplicities))
-        conf_entropy = -(constants.gas_constant
-                         * (site_noccupancies
-                            * logish(site_occupancies)).sum(-1))
+        site_noccupancies = np.einsum(
+            "i, ij", molar_fractions, self.endmember_noccupancies
+        )
+        site_multiplicities = np.einsum(
+            "i, ij", molar_fractions, self.site_multiplicities
+        )
+        site_occupancies = site_noccupancies * inverseish(site_multiplicities)
+        conf_entropy = -(
+            constants.gas_constant
+            * (site_noccupancies * logish(site_occupancies)).sum(-1)
+        )
         return conf_entropy
 
     def _ideal_excess_partial_helmholtz(self, temperature, molar_fractions):
-        return -(temperature
-                 * self._ideal_excess_partial_entropies(temperature,
-                                                        molar_fractions))
+        return -(
+            temperature
+            * self._ideal_excess_partial_entropies(temperature, molar_fractions)
+        )
 
     def _ideal_excess_partial_entropies(self, temperature, molar_fractions):
-        return -(constants.gas_constant
-                 * self._log_ideal_activities(molar_fractions))
+        return -(constants.gas_constant * self._log_ideal_activities(molar_fractions))
 
     def _ideal_entropy_hessian(self, temperature, molar_fractions):
-        hessian = -constants.gas_constant * \
-            self._log_ideal_activity_derivatives(molar_fractions)
+        hessian = -constants.gas_constant * self._log_ideal_activity_derivatives(
+            molar_fractions
+        )
         return hessian
 
     def _log_ideal_activities(self, molar_fractions):
-        site_noccupancies = np.einsum('i, ij', molar_fractions,
-                                      self.endmember_noccupancies)
-        site_multiplicities = np.einsum('i, ij', molar_fractions,
-                                        self.site_multiplicities)
+        site_noccupancies = np.einsum(
+            "i, ij", molar_fractions, self.endmember_noccupancies
+        )
+        site_multiplicities = np.einsum(
+            "i, ij", molar_fractions, self.site_multiplicities
+        )
 
-        lna = np.einsum('ij, j->i', self.endmember_noccupancies,
-                        logish(site_noccupancies)
-                        - logish(site_multiplicities))
+        lna = np.einsum(
+            "ij, j->i",
+            self.endmember_noccupancies,
+            logish(site_noccupancies) - logish(site_multiplicities),
+        )
 
-        normalisation_constants = (self.endmember_configurational_entropies
-                                   / constants.gas_constant)
+        normalisation_constants = (
+            self.endmember_configurational_entropies / constants.gas_constant
+        )
         return lna + normalisation_constants
 
     def _log_ideal_activity_derivatives(self, molar_fractions):
-        site_noccupancies = np.einsum('i, ij', molar_fractions,
-                                      self.endmember_noccupancies)
-        site_multiplicities = np.einsum('i, ij', molar_fractions,
-                                        self.site_multiplicities)
+        site_noccupancies = np.einsum(
+            "i, ij", molar_fractions, self.endmember_noccupancies
+        )
+        site_multiplicities = np.einsum(
+            "i, ij", molar_fractions, self.site_multiplicities
+        )
 
-        dlnadp = (np.einsum('pj, qj, j->pq', self.endmember_noccupancies,
-                            self.endmember_noccupancies,
-                            inverseish(site_noccupancies))
-                  - np.einsum('pj, qj, j->pq', self.endmember_noccupancies,
-                              self.site_multiplicities,
-                              inverseish(site_multiplicities)))
+        dlnadp = np.einsum(
+            "pj, qj, j->pq",
+            self.endmember_noccupancies,
+            self.endmember_noccupancies,
+            inverseish(site_noccupancies),
+        ) - np.einsum(
+            "pj, qj, j->pq",
+            self.endmember_noccupancies,
+            self.site_multiplicities,
+            inverseish(site_multiplicities),
+        )
 
         return dlnadp
 
     def _ideal_activities(self, molar_fractions):
-        return _ideal_activities_fct(molar_fractions,
-                                     self.endmember_noccupancies,
-                                     self.n_endmembers,
-                                     self.n_occupancies,
-                                     self.site_multiplicities,
-                                     self.endmember_configurational_entropies)
+        return _ideal_activities_fct(
+            molar_fractions,
+            self.endmember_noccupancies,
+            self.n_endmembers,
+            self.n_occupancies,
+            self.site_multiplicities,
+            self.endmember_configurational_entropies,
+        )
 
 
-class ElasticAsymmetricRegularSolution (ElasticIdealSolution):
+class ElasticAsymmetricRegularSolution(ElasticIdealSolution):
 
     """
     Solution model implementing the asymmetric regular solution model
@@ -402,8 +420,14 @@ class ElasticAsymmetricRegularSolution (ElasticIdealSolution):
         W_{ij} = \\frac{2 w_{ij}}{\\alpha_i + \\alpha_j} \\textrm{for i<j}
     """
 
-    def __init__(self, endmembers, alphas, energy_interaction,
-                 pressure_interaction=None, entropy_interaction=None):
+    def __init__(
+        self,
+        endmembers,
+        alphas,
+        energy_interaction,
+        pressure_interaction=None,
+        entropy_interaction=None,
+    ):
 
         self.n_endmembers = len(endmembers)
 
@@ -411,23 +435,24 @@ class ElasticAsymmetricRegularSolution (ElasticIdealSolution):
         self.alphas = np.array(alphas)
 
         # Create 2D arrays of interaction parameters
-        self.We = np.triu(2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
-        self.We[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in energy_interaction
-                                                                    for i in row])
+        self.We = np.triu(2.0 / (self.alphas[:, np.newaxis] + self.alphas), 1)
+        self.We[np.triu_indices(self.n_endmembers, 1)] *= np.array(
+            [i for row in energy_interaction for i in row]
+        )
 
         if entropy_interaction is not None:
-            self.Ws = np.triu(
-                2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
-            self.Ws[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in entropy_interaction
-                                                                        for i in row])
+            self.Ws = np.triu(2.0 / (self.alphas[:, np.newaxis] + self.alphas), 1)
+            self.Ws[np.triu_indices(self.n_endmembers, 1)] *= np.array(
+                [i for row in entropy_interaction for i in row]
+            )
         else:
             self.Ws = np.zeros((self.n_endmembers, self.n_endmembers))
 
         if pressure_interaction is not None:
-            self.Wp = np.triu(
-                2. / (self.alphas[:, np.newaxis] + self.alphas), 1)
-            self.Wp[np.triu_indices(self.n_endmembers, 1)] *= np.array([i for row in pressure_interaction
-                                                                        for i in row])
+            self.Wp = np.triu(2.0 / (self.alphas[:, np.newaxis] + self.alphas), 1)
+            self.Wp[np.triu_indices(self.n_endmembers, 1)] *= np.array(
+                [i for row in pressure_interaction for i in row]
+            )
         else:
             self.Wp = np.zeros((self.n_endmembers, self.n_endmembers))
 
@@ -443,30 +468,30 @@ class ElasticAsymmetricRegularSolution (ElasticIdealSolution):
         # -sum(sum(qi.qj.Wij*)
         # equation (2) of Holland and Powell 2003
         phi = self._phi(molar_fractions)
-        return _non_ideal_interactions_fct(phi, np.array(molar_fractions),
-                                           self.n_endmembers,
-                                           self.alphas, W)
+        return _non_ideal_interactions_fct(
+            phi, np.array(molar_fractions), self.n_endmembers, self.alphas, W
+        )
 
-    def _non_ideal_excess_partial_helmholtz(self, volume, temperature,
-                                            molar_fractions):
+    def _non_ideal_excess_partial_helmholtz(self, volume, temperature, molar_fractions):
         Eint = self._non_ideal_interactions(self.We, molar_fractions)
         Sint = self._non_ideal_interactions(self.Ws, molar_fractions)
         Pint = self._non_ideal_interactions(self.Wp, molar_fractions)
         return Eint - temperature * Sint - volume * Pint
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         ideal_helmholtz = ElasticIdealSolution._ideal_excess_partial_helmholtz(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         non_ideal_helmholtz = self._non_ideal_excess_partial_helmholtz(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
         return ideal_helmholtz + non_ideal_helmholtz
 
     def excess_partial_entropies(self, volume, temperature, molar_fractions):
         ideal_entropies = ElasticIdealSolution._ideal_excess_partial_entropies(
-            self, temperature, molar_fractions)
-        non_ideal_entropies = self._non_ideal_interactions(
-            self.Ws, molar_fractions)
+            self, temperature, molar_fractions
+        )
+        non_ideal_entropies = self._non_ideal_interactions(self.Ws, molar_fractions)
         return ideal_entropies + non_ideal_entropies
 
     def excess_partial_pressures(self, volume, temperature, molar_fractions):
@@ -474,31 +499,37 @@ class ElasticAsymmetricRegularSolution (ElasticIdealSolution):
 
     def helmholtz_hessian(self, volume, temperature, molar_fractions):
         ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         phi = self._phi(molar_fractions)
-        nonideal_helmholtz_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
-                                                            self.n_endmembers, self.alphas,
-                                                            self.We - temperature*self.Ws - volume*self.Wp)
+        nonideal_helmholtz_hessian = _non_ideal_hessian_fct(
+            phi,
+            molar_fractions,
+            self.n_endmembers,
+            self.alphas,
+            self.We - temperature * self.Ws - volume * self.Wp,
+        )
 
-        return nonideal_helmholtz_hessian - temperature*ideal_entropy_hessian
+        return nonideal_helmholtz_hessian - temperature * ideal_entropy_hessian
 
     def entropy_hessian(self, volume, temperature, molar_fractions):
         ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         phi = self._phi(molar_fractions)
-        nonideal_entropy_hessian = _non_ideal_hessian_fct(phi, molar_fractions,
-                                                          self.n_endmembers, self.alphas,
-                                                          self.Ws)
+        nonideal_entropy_hessian = _non_ideal_hessian_fct(
+            phi, molar_fractions, self.n_endmembers, self.alphas, self.Ws
+        )
         return ideal_entropy_hessian + nonideal_entropy_hessian
 
     def pressure_hessian(self, volume, temperature, molar_fractions):
         phi = self._phi(molar_fractions)
-        return _non_ideal_hessian_fct(phi, molar_fractions,
-                                      self.n_endmembers, self.alphas,
-                                      self.Wp)
+        return _non_ideal_hessian_fct(
+            phi, molar_fractions, self.n_endmembers, self.alphas, self.Wp
+        )
 
 
-class ElasticSymmetricRegularSolution (ElasticAsymmetricRegularSolution):
+class ElasticSymmetricRegularSolution(ElasticAsymmetricRegularSolution):
 
     """
     Solution model implementing the symmetric regular solution model.
@@ -506,17 +537,25 @@ class ElasticSymmetricRegularSolution (ElasticAsymmetricRegularSolution):
     :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
     """
 
-    def __init__(self, endmembers, energy_interaction,
-                 pressure_interaction=None,
-                 entropy_interaction=None):
+    def __init__(
+        self,
+        endmembers,
+        energy_interaction,
+        pressure_interaction=None,
+        entropy_interaction=None,
+    ):
         alphas = np.ones(len(endmembers))
-        ElasticAsymmetricRegularSolution.__init__(self, endmembers, alphas,
-                                                  energy_interaction,
-                                                  pressure_interaction,
-                                                  entropy_interaction)
+        ElasticAsymmetricRegularSolution.__init__(
+            self,
+            endmembers,
+            alphas,
+            energy_interaction,
+            pressure_interaction,
+            entropy_interaction,
+        )
 
 
-class ElasticSubregularSolution (ElasticIdealSolution):
+class ElasticSubregularSolution(ElasticIdealSolution):
 
     """
     Solution model implementing the subregular solution model formulation
@@ -565,10 +604,16 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         four entries: the indices i, j, k and the value of the interaction.
     """
 
-    def __init__(self, endmembers, energy_interaction,
-                 pressure_interaction=None, entropy_interaction=None,
-                 energy_ternary_terms=None,
-                 pressure_ternary_terms=None, entropy_ternary_terms=None):
+    def __init__(
+        self,
+        endmembers,
+        energy_interaction,
+        pressure_interaction=None,
+        entropy_interaction=None,
+        energy_ternary_terms=None,
+        pressure_ternary_terms=None,
+        entropy_ternary_terms=None,
+    ):
         """
         Initialization function for the SubregularSolution class.
         """
@@ -576,17 +621,17 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         self.n_endmembers = len(endmembers)
 
         # Create 3D arrays of interaction parameters
-        self.Wijke = np.zeros(shape=(self.n_endmembers,
-                                     self.n_endmembers,
-                                     self.n_endmembers))
+        self.Wijke = np.zeros(
+            shape=(self.n_endmembers, self.n_endmembers, self.n_endmembers)
+        )
         self.Wijks = np.zeros_like(self.Wijke)
         self.Wijkp = np.zeros_like(self.Wijke)
 
         # setup excess enthalpy interaction matrix
         for i in range(self.n_endmembers):
             for j in range(i + 1, self.n_endmembers):
-                w0 = energy_interaction[i][j - i - 1][0]/2.
-                w1 = energy_interaction[i][j - i - 1][1]/2.
+                w0 = energy_interaction[i][j - i - 1][0] / 2.0
+                w1 = energy_interaction[i][j - i - 1][1] / 2.0
                 self.Wijke[:, i, j] += w0
                 self.Wijke[:, j, i] += w1
 
@@ -603,8 +648,8 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         if entropy_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
-                    w0 = entropy_interaction[i][j - i - 1][0]/2.
-                    w1 = entropy_interaction[i][j - i - 1][1]/2.
+                    w0 = entropy_interaction[i][j - i - 1][0] / 2.0
+                    w1 = entropy_interaction[i][j - i - 1][1] / 2.0
                     self.Wijks[:, i, j] += w0
                     self.Wijks[:, j, i] += w1
 
@@ -621,8 +666,8 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         if pressure_interaction is not None:
             for i in range(self.n_endmembers):
                 for j in range(i + 1, self.n_endmembers):
-                    w0 = pressure_interaction[i][j - i - 1][0]/2.
-                    w1 = pressure_interaction[i][j - i - 1][1]/2.
+                    w0 = pressure_interaction[i][j - i - 1][0] / 2.0
+                    w1 = pressure_interaction[i][j - i - 1][1] / 2.0
                     self.Wijkp[:, i, j] += w0
                     self.Wijkp[:, j, i] += w1
 
@@ -650,49 +695,51 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         Pint = self._non_ideal_function(self.Wijkp, molar_fractions)
         return Eint, Sint, Pint
 
-    def _non_ideal_excess_partial_helmholtz(self, volume, temperature,
-                                            molar_fractions):
+    def _non_ideal_excess_partial_helmholtz(self, volume, temperature, molar_fractions):
         Eint, Sint, Pint = self._non_ideal_interactions(molar_fractions)
         return Eint - temperature * Sint - volume * Pint
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         ideal_helmholtz = ElasticIdealSolution._ideal_excess_partial_helmholtz(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         non_ideal_helmholtz = self._non_ideal_excess_partial_helmholtz(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
         return ideal_helmholtz + non_ideal_helmholtz
 
     def excess_partial_entropies(self, volume, temperature, molar_fractions):
         ideal_entropies = ElasticIdealSolution._ideal_excess_partial_entropies(
-            self, temperature, molar_fractions)
-        non_ideal_entropies = self._non_ideal_function(
-            self.Wijks, molar_fractions)
+            self, temperature, molar_fractions
+        )
+        non_ideal_entropies = self._non_ideal_function(self.Wijks, molar_fractions)
         return ideal_entropies + non_ideal_entropies
 
     def excess_partial_pressures(self, volume, temperature, molar_fractions):
-        non_ideal_pressures = self._non_ideal_function(
-            self.Wijkp, molar_fractions)
+        non_ideal_pressures = self._non_ideal_function(self.Wijkp, molar_fractions)
         return non_ideal_pressures
 
     def helmholtz_hessian(self, volume, temperature, molar_fractions):
         n = len(molar_fractions)
         ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
-            self, temperature, molar_fractions)
-        nonideal_helmholtz_hessian = _non_ideal_hessian_subreg(molar_fractions,
-                                                               n,
-                                                               self.Wijke - temperature*self.Wijks
-                                                               - volume*self.Wijkp)
+            self, temperature, molar_fractions
+        )
+        nonideal_helmholtz_hessian = _non_ideal_hessian_subreg(
+            molar_fractions,
+            n,
+            self.Wijke - temperature * self.Wijks - volume * self.Wijkp,
+        )
 
-        return nonideal_helmholtz_hessian - temperature*ideal_entropy_hessian
+        return nonideal_helmholtz_hessian - temperature * ideal_entropy_hessian
 
     def entropy_hessian(self, volume, temperature, molar_fractions):
         n = len(molar_fractions)
         ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
-            self, temperature, molar_fractions)
-        nonideal_entropy_hessian = _non_ideal_hessian_subreg(molar_fractions,
-                                                             n,
-                                                             self.Wijks)
+            self, temperature, molar_fractions
+        )
+        nonideal_entropy_hessian = _non_ideal_hessian_subreg(
+            molar_fractions, n, self.Wijks
+        )
         return ideal_entropy_hessian + nonideal_entropy_hessian
 
     def pressure_hessian(self, volume, temperature, molar_fractions):
@@ -700,7 +747,7 @@ class ElasticSubregularSolution (ElasticIdealSolution):
         return _non_ideal_hessian_subreg(molar_fractions, n, self.Wijkp)
 
 
-class ElasticFunctionSolution (ElasticIdealSolution):
+class ElasticFunctionSolution(ElasticIdealSolution):
     """
     Solution model implementing a generalized elastic solution model.
     The extensive excess nonconfigurational Helmholtz energy is
@@ -735,74 +782,83 @@ class ElasticFunctionSolution (ElasticIdealSolution):
         self.n_endmembers = len(endmembers)
         self._excess_helmholtz_function = excess_helmholtz_function
 
-        self._non_ideal_excess_partial_helmholtz = ag.jacobian(excess_helmholtz_function,
-                                                               argnum=2)
+        self._non_ideal_excess_partial_helmholtz = ag.jacobian(
+            excess_helmholtz_function, argnum=2
+        )
 
         def partial_entropies(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz,
-                                    argnum=1)(volume, temperature,
-                                              molar_amounts)
+                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz, argnum=1)(
+                    volume, temperature, molar_amounts
+                )
 
         self._non_ideal_excess_partial_entropies = partial_entropies
 
         def partial_pressures(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz,
-                                    argnum=0)(volume, temperature,
-                                              molar_amounts)
+                return -ag.jacobian(self._non_ideal_excess_partial_helmholtz, argnum=0)(
+                    volume, temperature, molar_amounts
+                )
 
         self.excess_partial_pressures = partial_pressures
 
-        self._non_ideal_helmholtz_hessian = ag.jacobian(self._non_ideal_excess_partial_helmholtz,
-                                                        argnum=2)
+        self._non_ideal_helmholtz_hessian = ag.jacobian(
+            self._non_ideal_excess_partial_helmholtz, argnum=2
+        )
 
         def entropy_hess(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return ag.jacobian(partial_entropies, argnum=2)(volume,
-                                                                temperature,
-                                                                molar_amounts)
+                return ag.jacobian(partial_entropies, argnum=2)(
+                    volume, temperature, molar_amounts
+                )
 
         self._non_ideal_entropy_hessian = entropy_hess
 
         def pressure_hess(volume, temperature, molar_amounts):
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                return ag.jacobian(partial_pressures, argnum=2)(volume,
-                                                                temperature,
-                                                                molar_amounts)
+                return ag.jacobian(partial_pressures, argnum=2)(
+                    volume, temperature, molar_amounts
+                )
 
         self.pressure_hessian = pressure_hess
 
-    def excess_partial_helmholtz_energies(self, volume, temperature,
-                                          molar_fractions):
+    def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         ideal_helmholtz = ElasticIdealSolution._ideal_excess_partial_helmholtz(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         non_ideal_helmholtz = self._non_ideal_excess_partial_helmholtz(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
         return ideal_helmholtz + non_ideal_helmholtz
 
     def excess_partial_entropies(self, volume, temperature, molar_fractions):
         ideal_entropies = ElasticIdealSolution._ideal_excess_partial_entropies(
-            self, temperature, molar_fractions)
+            self, temperature, molar_fractions
+        )
         non_ideal_entropies = self._non_ideal_excess_partial_entropies(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
         return ideal_entropies + non_ideal_entropies
 
-    def helmholtz_hessian(self, volume, temperature,
-                          molar_fractions):
-        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+    def helmholtz_hessian(self, volume, temperature, molar_fractions):
+        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
+            self, temperature, molar_fractions
+        )
         nonideal_helmholtz_hessian = self._non_ideal_helmholtz_hessian(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
 
-        return nonideal_helmholtz_hessian - temperature*ideal_entropy_hessian
+        return nonideal_helmholtz_hessian - temperature * ideal_entropy_hessian
 
-    def entropy_hessian(self, volume, temperature,
-                        molar_fractions):
-        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(self, temperature, molar_fractions)
+    def entropy_hessian(self, volume, temperature, molar_fractions):
+        ideal_entropy_hessian = ElasticIdealSolution._ideal_entropy_hessian(
+            self, temperature, molar_fractions
+        )
         nonideal_entropy_hessian = self._non_ideal_entropy_hessian(
-            volume, temperature, molar_fractions)
+            volume, temperature, molar_fractions
+        )
         return ideal_entropy_hessian + nonideal_entropy_hessian

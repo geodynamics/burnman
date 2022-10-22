@@ -38,9 +38,13 @@ if __name__ == "__main__":
     # Input composition.
 
     amount_perovskite = 0.95
-    rock = burnman.Composite([minerals.Murakami_etal_2012.fe_perovskite(),
-                              minerals.Murakami_etal_2012.fe_periclase_LS()],
-                             [amount_perovskite, 1.0 - amount_perovskite])
+    rock = burnman.Composite(
+        [
+            minerals.Murakami_etal_2012.fe_perovskite(),
+            minerals.Murakami_etal_2012.fe_periclase_LS(),
+        ],
+        [amount_perovskite, 1.0 - amount_perovskite],
+    )
 
     # (min pressure, max pressure, pressure step)
     seis_p = np.arange(25e9, 125e9, 5e9)
@@ -64,9 +68,9 @@ if __name__ == "__main__":
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
 
-    methods = ['bm3', 'bm2', 'mgd3', 'mgd2', 'slb3', 'slb2']
-    colors = ['r', 'k', 'g', 'b', 'y', 'm']
-    markers = ['+', 'x', '>', '^', '<', 'v']
+    methods = ["bm3", "bm2", "mgd3", "mgd2", "slb3", "slb2"]
+    colors = ["r", "k", "g", "b", "y", "m"]
+    markers = ["+", "x", ">", "^", "<", "v"]
 
     fig = plt.figure(figsize=(12, 10))
     ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
@@ -78,39 +82,65 @@ if __name__ == "__main__":
         print("Calculations are done for:")
         rock.debug_print()
 
-        mat_rho_1, mat_vs_1, mat_vphi_1 = \
-            rock.evaluate(['density', 'v_s', 'v_phi'], seis_p, temperature)
+        mat_rho_1, mat_vs_1, mat_vphi_1 = rock.evaluate(
+            ["density", "v_s", "v_phi"], seis_p, temperature
+        )
 
         # Now let's plot the comparison. You can conversely just output to a data file
         # (see example_woutput.py)
 
         # plot Vs
-        ax[0].plot(seis_p / 1.e9, mat_vs_1 / 1.e3,
-                   color=colors[m], linestyle='-', marker=markers[m],
-                   markerfacecolor=colors[m], markersize=4)
+        ax[0].plot(
+            seis_p / 1.0e9,
+            mat_vs_1 / 1.0e3,
+            color=colors[m],
+            linestyle="-",
+            marker=markers[m],
+            markerfacecolor=colors[m],
+            markersize=4,
+        )
 
         # plot Vphi
-        ax[1].plot(seis_p / 1.e9, mat_vphi_1 / 1.e3,
-                   color=colors[m], linestyle='-', marker=markers[m],
-                   markerfacecolor=colors[m], markersize=4)
+        ax[1].plot(
+            seis_p / 1.0e9,
+            mat_vphi_1 / 1.0e3,
+            color=colors[m],
+            linestyle="-",
+            marker=markers[m],
+            markerfacecolor=colors[m],
+            markersize=4,
+        )
 
         # plot density
-        ax[2].plot(seis_p / 1.e9, mat_rho_1 / 1.e3,
-                   color=colors[m], linestyle='-', marker=markers[m],
-                   markerfacecolor=colors[m], markersize=4)
+        ax[2].plot(
+            seis_p / 1.0e9,
+            mat_rho_1 / 1.0e3,
+            color=colors[m],
+            linestyle="-",
+            marker=markers[m],
+            markerfacecolor=colors[m],
+            markersize=4,
+        )
 
         # plot temperature
-        ax[3].plot(seis_p / 1.e9, temperature,
-                   color=colors[m], linestyle='-', marker=markers[m],
-                   markerfacecolor=colors[m], markersize=4, label=methods[m])
-        ax[3].legend(loc='upper left')
+        ax[3].plot(
+            seis_p / 1.0e9,
+            temperature,
+            color=colors[m],
+            linestyle="-",
+            marker=markers[m],
+            markerfacecolor=colors[m],
+            markersize=4,
+            label=methods[m],
+        )
+        ax[3].legend(loc="upper left")
 
     for i in range(4):
-        ax[0].set_xlabel('Pressure (GPa)')
+        ax[0].set_xlabel("Pressure (GPa)")
 
-    ax[0].set_ylabel('Vs (km/s)')
-    ax[1].set_ylabel('Vphi (km/s)')
-    ax[2].set_ylabel('Density ($\cdot 10^3$ kg/m^3)')
-    ax[3].set_ylabel('Temperature (K)')
+    ax[0].set_ylabel("Vs (km/s)")
+    ax[1].set_ylabel("Vphi (km/s)")
+    ax[2].set_ylabel("Density ($\cdot 10^3$ kg/m^3)")
+    ax[3].set_ylabel("Temperature (K)")
     fig.savefig("output_figures/example_compare_all_methods.png")
     plt.show()

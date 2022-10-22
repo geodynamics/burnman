@@ -34,7 +34,7 @@ from burnman.minerals import HP_2011_ds62
 from burnman.optimize.nonlinear_fitting import plot_cov_ellipse  # for plotting
 
 
-plt.style.use('ggplot')
+plt.style.use("ggplot")
 
 # First, we read in the covariance matrix
 cov = HP_2011_ds62.cov()
@@ -42,35 +42,34 @@ cov = HP_2011_ds62.cov()
 # Now we can find the desired rows and columns of the covariance matrix
 # by cross-referencing against the list of mineral names
 # (quartz, periclase, enstatite)
-indices = [cov['endmember_names'].index(name) for name in ['q', 'per', 'en']]
+indices = [cov["endmember_names"].index(name) for name in ["q", "per", "en"]]
 
 # Slice the required rows and columns from the covariance matrix
-Cov_selected = cov['covariance_matrix'][np.ix_(indices,indices)]
+Cov_selected = cov["covariance_matrix"][np.ix_(indices, indices)]
 
 # The following line transforms the covariance matrix so that we can look
 # at the uncertainties associated with the endmember reaction
 # quartz + periclase = 0.5*enstatite
-A = np.array([[1., 1., 0.],
-              [0., 0., 0.5]])
+A = np.array([[1.0, 1.0, 0.0], [0.0, 0.0, 0.5]])
 cov_transformed = A.dot(Cov_selected).dot(A.T)
 
 sigma_x = np.sqrt(cov_transformed[0][0])
 sigma_y = np.sqrt(cov_transformed[1][1])
-corr_xy = cov_transformed[0][1]/sigma_x/sigma_y
+corr_xy = cov_transformed[0][1] / sigma_x / sigma_y
 
-print('sigma(q+per) = {0:.2f} J/mol'.format(sigma_x))
-print('sigma(en/2) = {0:.2f} J/mol'.format(sigma_y))
-print('corr(q+per,en/2) = {0:.2f}'.format(corr_xy))
+print("sigma(q+per) = {0:.2f} J/mol".format(sigma_x))
+print("sigma(en/2) = {0:.2f} J/mol".format(sigma_y))
+print("corr(q+per,en/2) = {0:.2f}".format(corr_xy))
 
 
 # Finally, we plot the covariance matrix
-fig = plt.figure(figsize = (5, 5))
+fig = plt.figure(figsize=(5, 5))
 ax = fig.add_subplot(1, 1, 1)
 
-plot_cov_ellipse(cov_transformed, [0., 0.], nstd=1., ax=ax)
+plot_cov_ellipse(cov_transformed, [0.0, 0.0], nstd=1.0, ax=ax)
 
-ax.set_xlim(-500., 500.)
-ax.set_ylim(-500., 500.)
-ax.set_xlabel('$\sigma_{q+per}$ (J/mol MgSiO$_3$)')
-ax.set_ylabel('$\sigma_{en/2}$ (J/mol MgSiO$_3$)')
+ax.set_xlim(-500.0, 500.0)
+ax.set_ylim(-500.0, 500.0)
+ax.set_xlabel("$\sigma_{q+per}$ (J/mol MgSiO$_3$)")
+ax.set_ylabel("$\sigma_{en/2}$ (J/mol MgSiO$_3$)")
 plt.show()

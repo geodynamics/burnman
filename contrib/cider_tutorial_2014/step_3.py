@@ -48,15 +48,16 @@ from matplotlib.colors import LinearSegmentedColormap
 # hack to allow scripts to be placed in subdirectories next to burnman:
 import os
 import sys
-if not os.path.exists('burnman') and os.path.exists('../../burnman'):
-    sys.path.insert(1, os.path.abspath('../..'))
+
+if not os.path.exists("burnman") and os.path.exists("../../burnman"):
+    sys.path.insert(1, os.path.abspath("../.."))
 
 # The BurnMan imports, however, are the same.
 import burnman
 from burnman import minerals
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     Here we define a function realize_mineral() which takes a mineral
     as a paramter, perturbs its :math:`K_{0}^{'}` and :math:`G_{0}^{'}`
@@ -76,10 +77,12 @@ if __name__ == '__main__':
 
         # Perturb the G' and K' values by a random number drawn from a normal
         # distribution
-        mineral.params['Kprime_0'] = mineral.params[
-            'Kprime_0'] + numpy.random.normal(scale=K_prime_std_dev)
-        mineral.params['Gprime_0'] = mineral.params[
-            'Gprime_0'] + numpy.random.normal(scale=G_prime_std_dev)
+        mineral.params["Kprime_0"] = mineral.params["Kprime_0"] + numpy.random.normal(
+            scale=K_prime_std_dev
+        )
+        mineral.params["Gprime_0"] = mineral.params["Gprime_0"] + numpy.random.normal(
+            scale=G_prime_std_dev
+        )
 
     """
     Here we define a function realize_rock(), which creates the realization of
@@ -104,8 +107,9 @@ if __name__ == '__main__':
 
         # Set up the rock with the now-perturbed mineral phases
         mantle_rock = burnman.Composite(
-            [phase_1, phase_2], [phase_1_fraction, phase_2_fraction])
-        mantle_rock.set_method('slb3')
+            [phase_1, phase_2], [phase_1_fraction, phase_2_fraction]
+        )
+        mantle_rock.set_method("slb3")
 
         # Give back the realization of the rock with the perturbed phases.
         return mantle_rock
@@ -113,14 +117,14 @@ if __name__ == '__main__':
     # Again, we set up the seismic model and ask for its properties
     # in the lower mantle.  Basically the same thing as in steps 1 and 2.
     seismic_model = burnman.seismic.PREM()
-    min_depth = 850.e3
-    max_depth = 2800.e3
+    min_depth = 850.0e3
+    max_depth = 2800.0e3
     n_depths = 10
     depths = np.linspace(min_depth, max_depth, n_depths)
     pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(
-        ['pressure', 'density', 'v_phi', 'v_s'], depths)
-    pressures_sampled = np.linspace(
-        pressure[0], pressure[-1], 20 * len(pressure))
+        ["pressure", "density", "v_phi", "v_s"], depths
+    )
+    pressures_sampled = np.linspace(pressure[0], pressure[-1], 20 * len(pressure))
 
     temperature = burnman.geotherm.brown_shankland(depths)
 
@@ -130,7 +134,7 @@ if __name__ == '__main__':
     """
 
     n_realizations = 1000
-    outfile = open('uncertainty.dat', 'wb')
+    outfile = open("uncertainty.dat", "wb")
 
     for i in range(n_realizations):
 
@@ -141,7 +145,8 @@ if __name__ == '__main__':
 
             # Calculate the wavespeed profiles, just as before.
             rho, vphi, vs = rock.evaluate(
-                ['rho', 'v_phi', 'v_s'], pressure, temperature)
+                ["rho", "v_phi", "v_s"], pressure, temperature
+            )
 
             # This block of code interpolates the resulting densities and
             # wavespeeds to a higher resolution line
@@ -157,7 +162,7 @@ if __name__ == '__main__':
 
             # Save the output to a file
             data = list(zip(pressure_list, vs_list, vphi_list, density_list))
-            np.savetxt(outfile, data, fmt='%.10e', delimiter='\t')
+            np.savetxt(outfile, data, fmt="%.10e", delimiter="\t")
 
         # It is possible for the Birch-Murnaghan equation of state to go
         # unstable for some values of the parameters, which can make it fail.
@@ -181,7 +186,7 @@ if __name__ == '__main__':
 
     # Read in the data from uncertainty.dat
     outfile.close()
-    data = np.loadtxt('uncertainty.dat')
+    data = np.loadtxt("uncertainty.dat")
     pressure_list = data[:, 0]
     vs_list = data[:, 1]
     vphi_list = data[:, 2]
@@ -189,18 +194,21 @@ if __name__ == '__main__':
 
     # Create 2D histograms showing the spread of the data
     density_hist, rho_xedge, rho_yedge = np.histogram2d(
-        pressure_list, density_list, bins=len(pressures_sampled), normed=True)
+        pressure_list, density_list, bins=len(pressures_sampled), normed=True
+    )
     vs_hist, vs_xedge, vs_yedge = np.histogram2d(
-        pressure_list, vs_list, bins=len(pressures_sampled), normed=True)
+        pressure_list, vs_list, bins=len(pressures_sampled), normed=True
+    )
     vphi_hist, vphi_xedge, vphi_yedge = np.histogram2d(
-        pressure_list, vphi_list, bins=len(pressures_sampled), normed=True)
+        pressure_list, vphi_list, bins=len(pressures_sampled), normed=True
+    )
 
-    vs_xedge /= 1.e9
-    vphi_xedge /= 1.e9
-    rho_xedge /= 1.e9
-    vs_yedge /= 1.e3
-    vphi_yedge /= 1.e3
-    rho_yedge /= 1.e3
+    vs_xedge /= 1.0e9
+    vphi_xedge /= 1.0e9
+    rho_xedge /= 1.0e9
+    vs_yedge /= 1.0e3
+    vphi_yedge /= 1.0e3
+    rho_yedge /= 1.0e3
 
     left_edge = min(vs_xedge[0], vphi_xedge[0], rho_xedge[0])
     right_edge = max(vs_xedge[-1], vphi_xedge[-1], rho_xedge[-1])
@@ -211,64 +219,111 @@ if __name__ == '__main__':
     # Mess with gamma to change intensity of colormaps near the edges
     gamma = 0.5
 
-    plt.subplot(111, aspect='equal')
+    plt.subplot(111, aspect="equal")
     plt.xlim(left_edge, right_edge)
     plt.ylim(bottom_edge, top_edge)
-    plt.xlabel('Pressure (GPa)')
-    plt.ylabel('Wave Speed (km/s)')
+    plt.xlabel("Pressure (GPa)")
+    plt.ylabel("Wave Speed (km/s)")
 
     # plot density
     density_hist = ma.masked_where(density_hist <= 0.0, density_hist)
-    c = LinearSegmentedColormap.from_list('vphi', [(0, '#ffffff'),
-                                                   (0.2, '#edf8e9'),
-                                                   (0.4, '#bae4b3'),
-                                                   (0.6, '#74c476'),
-                                                   (0.8, '#31a354'),
-                                                   (1.0, '#006d2c')],
-                                          gamma=0.1)
-    c.set_bad('w', alpha=1.0)
-    plt.imshow(density_hist.transpose(), origin='lower', cmap=c,
-               interpolation='gaussian', alpha=.7,
-               aspect=aspect_ratio,
-               extent=[rho_xedge[0], rho_xedge[-1],
-                       rho_yedge[0], rho_yedge[-1]])
-    plt.plot(pressure / 1.e9, seis_rho / 1.e3, linestyle="--",
-             color='g', linewidth=2.0, label='Density')
+    c = LinearSegmentedColormap.from_list(
+        "vphi",
+        [
+            (0, "#ffffff"),
+            (0.2, "#edf8e9"),
+            (0.4, "#bae4b3"),
+            (0.6, "#74c476"),
+            (0.8, "#31a354"),
+            (1.0, "#006d2c"),
+        ],
+        gamma=0.1,
+    )
+    c.set_bad("w", alpha=1.0)
+    plt.imshow(
+        density_hist.transpose(),
+        origin="lower",
+        cmap=c,
+        interpolation="gaussian",
+        alpha=0.7,
+        aspect=aspect_ratio,
+        extent=[rho_xedge[0], rho_xedge[-1], rho_yedge[0], rho_yedge[-1]],
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_rho / 1.0e3,
+        linestyle="--",
+        color="g",
+        linewidth=2.0,
+        label="Density",
+    )
 
     # plot v_s
     vs_hist = ma.masked_where(vs_hist <= 0.0, vs_hist)
-    c = LinearSegmentedColormap.from_list('vphi', [(0, '#ffffff'),
-                                                   (0.2, '#eff3ff'),
-                                                   (0.4, '#bdd7e7'),
-                                                   (0.6, '#6baed6'),
-                                                   (0.8, '#3182bd'),
-                                                   (1.0, '#08519c')],
-                                          gamma=0.5)
-    c.set_bad('w', alpha=1.0)
-    plt.imshow(vs_hist.transpose(), origin='lower', cmap=c,
-               interpolation='gaussian', alpha=.7,
-               aspect=aspect_ratio, extent=[vs_xedge[0], vs_xedge[-1],
-                                            vs_yedge[0], vs_yedge[-1]])
-    plt.plot(pressure / 1.e9, seis_vs / 1.e3, linestyle="--",
-             color='b', linewidth=2.0, label='Vs')
+    c = LinearSegmentedColormap.from_list(
+        "vphi",
+        [
+            (0, "#ffffff"),
+            (0.2, "#eff3ff"),
+            (0.4, "#bdd7e7"),
+            (0.6, "#6baed6"),
+            (0.8, "#3182bd"),
+            (1.0, "#08519c"),
+        ],
+        gamma=0.5,
+    )
+    c.set_bad("w", alpha=1.0)
+    plt.imshow(
+        vs_hist.transpose(),
+        origin="lower",
+        cmap=c,
+        interpolation="gaussian",
+        alpha=0.7,
+        aspect=aspect_ratio,
+        extent=[vs_xedge[0], vs_xedge[-1], vs_yedge[0], vs_yedge[-1]],
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vs / 1.0e3,
+        linestyle="--",
+        color="b",
+        linewidth=2.0,
+        label="Vs",
+    )
 
     # plot v_phi
     vphi_hist = ma.masked_where(vphi_hist <= 0.0, vphi_hist)
-    c = LinearSegmentedColormap.from_list('vphi', [(0, '#ffffff'),
-                                                   (0.2, '#fee5d9'),
-                                                   (0.4, '#fcae91'),
-                                                   (0.6, '#fb6a4a'),
-                                                   (0.8, '#de2d26'),
-                                                   (1.0, '#a50f15')],
-                                          gamma=0.5)
-    c.set_bad('w', alpha=1.0)
-    plt.imshow(vphi_hist.transpose(), origin='lower', cmap=c,
-               interpolation='gaussian', alpha=.7,
-               aspect=aspect_ratio, extent=[vphi_xedge[0], vphi_xedge[-1],
-                                            vphi_yedge[0], vphi_yedge[-1]])
-    plt.plot(pressure / 1.e9, seis_vphi / 1.e3,
-             linestyle="--", color='r', linewidth=2.0, label='Vphi')
+    c = LinearSegmentedColormap.from_list(
+        "vphi",
+        [
+            (0, "#ffffff"),
+            (0.2, "#fee5d9"),
+            (0.4, "#fcae91"),
+            (0.6, "#fb6a4a"),
+            (0.8, "#de2d26"),
+            (1.0, "#a50f15"),
+        ],
+        gamma=0.5,
+    )
+    c.set_bad("w", alpha=1.0)
+    plt.imshow(
+        vphi_hist.transpose(),
+        origin="lower",
+        cmap=c,
+        interpolation="gaussian",
+        alpha=0.7,
+        aspect=aspect_ratio,
+        extent=[vphi_xedge[0], vphi_xedge[-1], vphi_yedge[0], vphi_yedge[-1]],
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vphi / 1.0e3,
+        linestyle="--",
+        color="r",
+        linewidth=2.0,
+        label="Vphi",
+    )
 
-    plt.legend(loc='lower right')
+    plt.legend(loc="lower right")
 
     plt.show()

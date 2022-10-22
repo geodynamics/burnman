@@ -57,9 +57,11 @@ if __name__ == "__main__":
     # the list given to burnman.composite
     # For the preset minerals from the SLB_2011, the equation of state
     # formulation from Stixrude and Lithgow-Bertolloni (2005) will be used.
-    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
-                              minerals.SLB_2011.periclase()],
-                             [0.8, 0.2], name='Simple lower mantle assemblage')
+    rock = burnman.Composite(
+        [minerals.SLB_2011.mg_perovskite(), minerals.SLB_2011.periclase()],
+        [0.8, 0.2],
+        name="Simple lower mantle assemblage",
+    )
 
     print(rock)
 
@@ -72,7 +74,8 @@ if __name__ == "__main__":
     # speed, and bulk sound velocity at those depths
     depths = np.linspace(750e3, 2800e3, 20)
     pressure, seis_rho, seis_vp, seis_vs, seis_vphi = seismic_model.evaluate(
-        ['pressure', 'density', 'v_p', 'v_s', 'v_phi'], depths)
+        ["pressure", "density", "v_p", "v_s", "v_phi"], depths
+    )
 
     # Now we get an array of temperatures at which we compute
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
@@ -86,7 +89,8 @@ if __name__ == "__main__":
     # of Voigt-Reuss-Hill is used (this can be changes with set_averaging
     # scheme)
     density, vp, vs, vphi = rock.evaluate(
-        ['density', 'v_p', 'v_s', 'v_phi'], pressure, temperature)
+        ["density", "v_p", "v_s", "v_phi"], pressure, temperature
+    )
 
     # All the work is done except the plotting!  Here we want to plot the seismic wave
     # speeds and the density against PREM using the matplotlib plotting tools.  We make
@@ -94,40 +98,91 @@ if __name__ == "__main__":
     # this calculation.
     # First, we plot the s-wave speed verses the PREM s-wave speed
     plt.subplot(2, 2, 1)
-    plt.plot(pressure / 1.e9, vs / 1.e3, color='b', linestyle='-',
-             marker='o', markerfacecolor='b', markersize=4, label='computation')
-    plt.plot(pressure / 1.e9, seis_vs / 1.e3, color='k', linestyle='-',
-             marker='o', markerfacecolor='k', markersize=4, label='reference')
+    plt.plot(
+        pressure / 1.0e9,
+        vs / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+        label="computation",
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vs / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+        label="reference",
+    )
     plt.title("S wave speed (km/s)")
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
-    plt.legend(loc='lower right')
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
+    plt.legend(loc="lower right")
     plt.ylim(5, 8.0)
 
     # Next, we plot the p-wave speed verses the PREM p-wave speed
     plt.subplot(2, 2, 2)
-    plt.plot(pressure / 1.e9, vp / 1.e3, color='b', linestyle='-',
-             marker='o', markerfacecolor='b', markersize=4)
-    plt.plot(pressure / 1.e9, seis_vp / 1.e3, color='k',
-             linestyle='-', marker='o', markerfacecolor='k', markersize=4)
+    plt.plot(
+        pressure / 1.0e9,
+        vp / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_vp / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+    )
     plt.title("P wave speed (km/s)")
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.ylim(10, 16)
 
     # Next, we plot the density verses the PREM density
     plt.subplot(2, 2, 3)
-    plt.plot(pressure / 1.e9, density / 1.e3, color='b',
-             linestyle='-', marker='o', markerfacecolor='b', markersize=4)
-    plt.plot(pressure / 1.e9, seis_rho / 1.e3, color='k',
-             linestyle='-', marker='o', markerfacecolor='k', markersize=4)
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.plot(
+        pressure / 1.0e9,
+        density / 1.0e3,
+        color="b",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="b",
+        markersize=4,
+    )
+    plt.plot(
+        pressure / 1.0e9,
+        seis_rho / 1.0e3,
+        color="k",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="k",
+        markersize=4,
+    )
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.xlabel("Pressure (GPa)")
     plt.title("density (kg/m^3)")
 
     # Finally, we plot the used geotherm
     plt.subplot(2, 2, 4)
-    plt.plot(pressure / 1e9, temperature, color='r', linestyle='-',
-             marker='o', markerfacecolor='r', markersize=4)
-    plt.xlim(min(pressure) / 1.e9, max(pressure) / 1.e9)
+    plt.plot(
+        pressure / 1e9,
+        temperature,
+        color="r",
+        linestyle="-",
+        marker="o",
+        markerfacecolor="r",
+        markersize=4,
+    )
+    plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.xlabel("Pressure (GPa)")
     plt.title("temperature (K)")
 

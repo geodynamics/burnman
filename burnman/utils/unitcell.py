@@ -26,7 +26,7 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     V : float
         Volume [m^3/mol]
     """
-    V = unit_cell_v * constants.Avogadro / 1.e30 / z
+    V = unit_cell_v * constants.Avogadro / 1.0e30 / z
     return V
 
 
@@ -57,10 +57,14 @@ def cell_parameters_to_vectors(cell_parameters):
     beta = np.radians(beta_deg)
     gamma = np.radians(gamma_deg)
 
-    n2 = (np.cos(alpha)-np.cos(gamma)*np.cos(beta))/np.sin(gamma)
-    M = np.array([[a, 0, 0],
-                  [b*np.cos(gamma), b*np.sin(gamma), 0],
-                  [c*np.cos(beta), c*n2, c*np.sqrt(np.sin(beta)**2-n2**2)]])
+    n2 = (np.cos(alpha) - np.cos(gamma) * np.cos(beta)) / np.sin(gamma)
+    M = np.array(
+        [
+            [a, 0, 0],
+            [b * np.cos(gamma), b * np.sin(gamma), 0],
+            [c * np.cos(beta), c * n2, c * np.sqrt(np.sin(beta) ** 2 - n2**2)],
+        ]
+    )
     return M
 
 
@@ -92,14 +96,14 @@ def cell_vectors_to_parameters(M):
     assert M[1, 2] == 0
 
     a = M[0, 0]
-    b = np.sqrt(np.power(M[1, 0], 2.) + np.power(M[1, 1], 2.))
-    c = (np.sqrt(np.power(M[2, 0], 2.)
-                 + np.power(M[2, 1], 2.)
-                 + np.power(M[2, 2], 2.)))
+    b = np.sqrt(np.power(M[1, 0], 2.0) + np.power(M[1, 1], 2.0))
+    c = np.sqrt(
+        np.power(M[2, 0], 2.0) + np.power(M[2, 1], 2.0) + np.power(M[2, 2], 2.0)
+    )
 
     gamma = np.arccos(M[1, 0] / b)
     beta = np.arccos(M[2, 0] / c)
-    alpha = np.arccos(M[2, 1]/c*np.sin(gamma) + np.cos(gamma)*np.cos(beta))
+    alpha = np.arccos(M[2, 1] / c * np.sin(gamma) + np.cos(gamma) * np.cos(beta))
 
     gamma_deg = np.degrees(gamma)
     beta_deg = np.degrees(beta)

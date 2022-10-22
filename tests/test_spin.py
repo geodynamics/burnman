@@ -5,16 +5,16 @@ from util import BurnManTest
 from burnman import minerals
 
 
-
 class spin_transition(BurnManTest):
-
     def test_new(self):
 
-        mins = [minerals.Murakami_etal_2012.fe_periclase(),
-                minerals.Murakami_etal_2012.fe_periclase_HS(),
-                minerals.Murakami_etal_2012.fe_periclase_LS()]
+        mins = [
+            minerals.Murakami_etal_2012.fe_periclase(),
+            minerals.Murakami_etal_2012.fe_periclase_HS(),
+            minerals.Murakami_etal_2012.fe_periclase_LS(),
+        ]
         for p in mins:
-            p.set_method('slb2')
+            p.set_method("slb2")
 
         # print "HS regime: (on/high/low)"
         for p in mins:
@@ -36,5 +36,5 @@ class spin_transition(BurnManTest):
         self.assertArraysAlmostEqual(m.molar_fractions, [1.0, 0.0])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

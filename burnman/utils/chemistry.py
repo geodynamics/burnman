@@ -25,11 +25,10 @@ def read_masses():
     A simple function to read a file with a two column list of
     elements and their masses into a dictionary
     """
-    datastream = pkgutil.get_data(
-        'burnman', 'data/input_masses/atomic_masses.dat')
-    datalines = [line.strip()
-                 for line in datastream.decode('ascii').split('\n')
-                 if line.strip()]
+    datastream = pkgutil.get_data("burnman", "data/input_masses/atomic_masses.dat")
+    datalines = [
+        line.strip() for line in datastream.decode("ascii").split("\n") if line.strip()
+    ]
     lookup = dict()
     for line in datalines:
         data = "%".join(line.split("%")[:1]).split()
@@ -49,29 +48,127 @@ Element order is based loosely on electronegativity,
 following the scheme suggested by IUPAC, except that H
 comes after the Group 16 elements, not before them.
 """
-IUPAC_element_order = ['v', 'Og', 'Rn', 'Xe', 'Kr', 'Ar', 'Ne', 'He',  # Group 18
-                       'Fr', 'Cs', 'Rb', 'K', 'Na', 'Li',  # Group 1 (not H)
-                       'Ra', 'Ba', 'Sr', 'Ca', 'Mg', 'Be',  # Group 2
-                       'Lr', 'No', 'Md', 'Fm', 'Es', 'Cf', 'Bk', 'Cm',
-                       'Am', 'Pu', 'Np', 'U', 'Pa', 'Th', 'Ac',  # Actinides
-                       'Lu', 'Yb', 'Tm', 'Er', 'Ho', 'Dy', 'Tb', 'Gd',
-                       'Eu', 'Sm', 'Pm', 'Nd', 'Pr', 'Ce', 'La',  # Lanthanides
-                       'Y', 'Sc',  # Group 3
-                       'Rf', 'Hf', 'Zr', 'Ti',  # Group 4
-                       'Db', 'Ta', 'Nb', 'V',  # Group 5
-                       'Sg', 'W', 'Mo', 'Cr',  # Group 6
-                       'Bh', 'Re', 'Tc', 'Mn',  # Group 7
-                       'Hs', 'Os', 'Ru', 'Fe',  # Group 8
-                       'Mt', 'Ir', 'Rh', 'Co',  # Group 9
-                       'Ds', 'Pt', 'Pd', 'Ni',  # Group 10
-                       'Rg', 'Au', 'Ag', 'Cu',  # Group 11
-                       'Cn', 'Hg', 'Cd', 'Zn',  # Group 12
-                       'Nh', 'Tl', 'In', 'Ga', 'Al', 'B',  # Group 13
-                       'Fl', 'Pb', 'Sn', 'Ge', 'Si', 'C',  # Group 14
-                       'Mc', 'Bi', 'Sb', 'As', 'P', 'N',  # Group 15
-                       'Lv', 'Po', 'Te', 'Se', 'S', 'O',  # Group 16
-                       'H',  # hydrogen
-                       'Ts', 'At', 'I', 'Br', 'Cl', 'F']  # Group 17
+IUPAC_element_order = [
+    "v",
+    "Og",
+    "Rn",
+    "Xe",
+    "Kr",
+    "Ar",
+    "Ne",
+    "He",  # Group 18
+    "Fr",
+    "Cs",
+    "Rb",
+    "K",
+    "Na",
+    "Li",  # Group 1 (not H)
+    "Ra",
+    "Ba",
+    "Sr",
+    "Ca",
+    "Mg",
+    "Be",  # Group 2
+    "Lr",
+    "No",
+    "Md",
+    "Fm",
+    "Es",
+    "Cf",
+    "Bk",
+    "Cm",
+    "Am",
+    "Pu",
+    "Np",
+    "U",
+    "Pa",
+    "Th",
+    "Ac",  # Actinides
+    "Lu",
+    "Yb",
+    "Tm",
+    "Er",
+    "Ho",
+    "Dy",
+    "Tb",
+    "Gd",
+    "Eu",
+    "Sm",
+    "Pm",
+    "Nd",
+    "Pr",
+    "Ce",
+    "La",  # Lanthanides
+    "Y",
+    "Sc",  # Group 3
+    "Rf",
+    "Hf",
+    "Zr",
+    "Ti",  # Group 4
+    "Db",
+    "Ta",
+    "Nb",
+    "V",  # Group 5
+    "Sg",
+    "W",
+    "Mo",
+    "Cr",  # Group 6
+    "Bh",
+    "Re",
+    "Tc",
+    "Mn",  # Group 7
+    "Hs",
+    "Os",
+    "Ru",
+    "Fe",  # Group 8
+    "Mt",
+    "Ir",
+    "Rh",
+    "Co",  # Group 9
+    "Ds",
+    "Pt",
+    "Pd",
+    "Ni",  # Group 10
+    "Rg",
+    "Au",
+    "Ag",
+    "Cu",  # Group 11
+    "Cn",
+    "Hg",
+    "Cd",
+    "Zn",  # Group 12
+    "Nh",
+    "Tl",
+    "In",
+    "Ga",
+    "Al",
+    "B",  # Group 13
+    "Fl",
+    "Pb",
+    "Sn",
+    "Ge",
+    "Si",
+    "C",  # Group 14
+    "Mc",
+    "Bi",
+    "Sb",
+    "As",
+    "P",
+    "N",  # Group 15
+    "Lv",
+    "Po",
+    "Te",
+    "Se",
+    "S",
+    "O",  # Group 16
+    "H",  # hydrogen
+    "Ts",
+    "At",
+    "I",
+    "Br",
+    "Cl",
+    "F",
+]  # Group 17
 
 
 def dictionarize_formula(formula):
@@ -91,10 +188,10 @@ def dictionarize_formula(formula):
         The same chemical formula, but expressed as a dictionary.
     """
     f = dict()
-    elements = re.findall('[A-Z][^A-Z]*', formula)
+    elements = re.findall("[A-Z][^A-Z]*", formula)
     for element in elements:
-        element_name = re.split('[0-9][^A-Z]*', element)[0]
-        element_atoms = re.findall('[0-9][^A-Z]*', element)
+        element_name = re.split("[0-9][^A-Z]*", element)[0]
+        element_atoms = re.findall("[0-9][^A-Z]*", element)
         if len(element_atoms) == 0:
             element_atoms = Fraction(1.0)
         else:
@@ -121,15 +218,20 @@ def sum_formulae(formulae, amounts=None):
         The sum of the user-provided formulae
     """
     if amounts is None:
-        amounts = [1. for formula in formulae]
+        amounts = [1.0 for formula in formulae]
     else:
-        assert (len(formulae) == len(amounts))
+        assert len(formulae) == len(amounts)
 
     summed_formula = Counter()
     for i, formula in enumerate(formulae):
-        summed_formula.update(Counter({element: amounts[i] * n_atoms
-                                       for (element, n_atoms)
-                                       in formula.items()}))
+        summed_formula.update(
+            Counter(
+                {
+                    element: amounts[i] * n_atoms
+                    for (element, n_atoms) in formula.items()
+                }
+            )
+        )
     return summed_formula
 
 
@@ -147,12 +249,11 @@ def formula_mass(formula):
     mass : float
         The mass per mole of formula
     """
-    mass = sum(formula[element] * atomic_masses[element]
-               for element in formula)
+    mass = sum(formula[element] * atomic_masses[element] for element in formula)
     return mass
 
 
-def convert_formula(formula, to_type='mass', normalize=False):
+def convert_formula(formula, to_type="mass", normalize=False):
     """
     Converts a chemical formula from one type (mass or molar)
     into the other. Renormalises amounts if normalize=True
@@ -174,19 +275,25 @@ def convert_formula(formula, to_type='mass', normalize=False):
         The converted formula
     """
 
-    if to_type == 'mass':
-        f = {element: n_atoms * atomic_masses[element]
-             for (element, n_atoms) in formula.items()}
-    elif to_type == 'molar':
-        f = {element: n_atoms / atomic_masses[element]
-             for (element, n_atoms) in formula.items()}
+    if to_type == "mass":
+        f = {
+            element: n_atoms * atomic_masses[element]
+            for (element, n_atoms) in formula.items()
+        }
+    elif to_type == "molar":
+        f = {
+            element: n_atoms / atomic_masses[element]
+            for (element, n_atoms) in formula.items()
+        }
     else:
-        raise Exception('Value of parameter to_type not recognised. '
-                        'Should be either "mass" or "molar".')
+        raise Exception(
+            "Value of parameter to_type not recognised. "
+            'Should be either "mass" or "molar".'
+        )
 
     if normalize:
         s = np.sum([n for (element, n) in f.items()])
-        f = {element: n/s for (element, n) in f.items()}
+        f = {element: n / s for (element, n) in f.items()}
 
     return f
 
@@ -257,13 +364,12 @@ def process_solution_chemistry(solution_model):
         per mole of endmember.
     """
     formulae = solution_model.formulas
-    n_sites = formulae[0].count('[')
+    n_sites = formulae[0].count("[")
     n_endmembers = len(formulae)
 
     # Check the number of sites is the same for all endmembers
-    if not np.all(np.array([f.count('[') for f in formulae]) == n_sites):
-        raise Exception('All formulae must have the same '
-                        'number of distinct sites.')
+    if not np.all(np.array([f.count("[") for f in formulae]) == n_sites):
+        raise Exception("All formulae must have the same " "number of distinct sites.")
 
     solution_formulae = [{} for i in range(n_endmembers)]
     sites = [[] for i in range(n_sites)]
@@ -273,35 +379,36 @@ def process_solution_chemistry(solution_model):
 
     # Number of unique site occupancies (e.g.. Mg on X etc.)
     for i_mbr in range(n_endmembers):
-        list_occupancies.append([[0] * len(sites[site])
-                                for site in range(n_sites)])
-        s = re.split(r'\[', formulae[i_mbr])[1:]
+        list_occupancies.append([[0] * len(sites[site]) for site in range(n_sites)])
+        s = re.split(r"\[", formulae[i_mbr])[1:]
 
         for i_site, site_string in enumerate(s):
-            site_split = re.split(r'\]', site_string)
+            site_split = re.split(r"\]", site_string)
             site_occupancy = site_split[0]
 
-            mult = re.split('[A-Z][^A-Z]*', site_split[1])[0]
-            if mult == '':
+            mult = re.split("[A-Z][^A-Z]*", site_split[1])[0]
+            if mult == "":
                 list_multiplicities[i_mbr][i_site] = Fraction(1.0)
             else:
                 list_multiplicities[i_mbr][i_site] = Fraction(mult)
 
             # Loop over species on a site
-            species = re.findall('[A-Z][^A-Z]*', site_occupancy)
+            species = re.findall("[A-Z][^A-Z]*", site_occupancy)
 
             for sp in species:
                 # Find the species and its proportion on the site
-                species_split = re.split('([0-9][^A-Z]*)', sp)
+                species_split = re.split("([0-9][^A-Z]*)", sp)
                 name_of_species = species_split[0]
                 if len(species_split) == 1:
                     proportion_species_on_site = Fraction(1.0)
                 else:
                     proportion_species_on_site = Fraction(species_split[1])
 
-                solution_formulae[i_mbr][name_of_species] = solution_formulae[i_mbr].get(
-                    name_of_species, 0.0) + (list_multiplicities[i_mbr][i_site]
-                                             * proportion_species_on_site)
+                solution_formulae[i_mbr][name_of_species] = solution_formulae[
+                    i_mbr
+                ].get(name_of_species, 0.0) + (
+                    list_multiplicities[i_mbr][i_site] * proportion_species_on_site
+                )
 
                 if name_of_species not in sites[i_site]:
                     n_occupancies += 1
@@ -316,15 +423,17 @@ def process_solution_chemistry(solution_model):
             # Loop over species after site
             if len(site_split) != 1:
                 not_in_site = str(filter(None, site_split[1]))
-                not_in_site = not_in_site.replace(mult, '', 1)
-                for enamenumber in re.findall('[A-Z][^A-Z]*', not_in_site):
-                    sp = list(filter(None, re.split(r'(\d+)', enamenumber)))
+                not_in_site = not_in_site.replace(mult, "", 1)
+                for enamenumber in re.findall("[A-Z][^A-Z]*", not_in_site):
+                    sp = list(filter(None, re.split(r"(\d+)", enamenumber)))
                     # Look up number of atoms of element
                     if len(sp) == 1:
-                        nel = 1.
+                        nel = 1.0
                     else:
                         nel = float(float(sp[1]))
-                    solution_formulae[i_mbr][sp[0]] = solution_formulae[i_mbr].get(sp[0], 0.0) + nel
+                    solution_formulae[i_mbr][sp[0]] = (
+                        solution_formulae[i_mbr].get(sp[0], 0.0) + nel
+                    )
 
     # Site occupancies and multiplicities
     endmember_occupancies = np.empty(shape=(n_endmembers, n_occupancies))
@@ -334,15 +443,19 @@ def process_solution_chemistry(solution_model):
         n_species = 0
         for i_site in range(n_sites):
             for i_el in range(len(list_occupancies[i_mbr][i_site])):
-                endmember_occupancies[i_mbr][n_species] = list_occupancies[i_mbr][i_site][i_el]
-                site_multiplicities[i_mbr][n_species] = list_multiplicities[i_mbr][i_site]
+                endmember_occupancies[i_mbr][n_species] = list_occupancies[i_mbr][
+                    i_site
+                ][i_el]
+                site_multiplicities[i_mbr][n_species] = list_multiplicities[i_mbr][
+                    i_site
+                ]
                 n_species += 1
 
     # Site names
     solution_model.site_names = []
     for i, species in enumerate(sites):
         for sp in species:
-            solution_model.site_names.append('{0}_{1}'.format(sp, ucase[i]))
+            solution_model.site_names.append("{0}_{1}".format(sp, ucase[i]))
 
     # Finally, make attributes for solution model instance:
     solution_model.solution_formulae = solution_formulae
@@ -351,13 +464,14 @@ def process_solution_chemistry(solution_model):
     solution_model.site_multiplicities = site_multiplicities
     solution_model.n_occupancies = n_occupancies
     solution_model.endmember_occupancies = endmember_occupancies
-    solution_model.endmember_noccupancies = np.einsum('ij, ij->ij',
-                                                      endmember_occupancies,
-                                                      site_multiplicities)
+    solution_model.endmember_noccupancies = np.einsum(
+        "ij, ij->ij", endmember_occupancies, site_multiplicities
+    )
 
 
-def site_occupancies_to_strings(site_species_names, site_multiplicities,
-                                endmember_occupancies):
+def site_occupancies_to_strings(
+    site_species_names, site_multiplicities, endmember_occupancies
+):
     """
     Converts a list of endmember site occupancies into a list
     of string representations of those occupancies.
@@ -410,35 +524,40 @@ def site_occupancies_to_strings(site_species_names, site_multiplicities,
             site_multiplicities = np.array(site_mults)
 
         elif len(endmember_occupancies[0]) != len(site_multiplicities):
-            raise Exception('Site multiplicities should either be given '
-                            'on a per-site basis or a per-species basis')
+            raise Exception(
+                "Site multiplicities should either be given "
+                "on a per-site basis or a per-species basis"
+            )
 
-        site_multiplicities = np.einsum('i, j->ij', np.ones(n_endmembers),
-                                        site_multiplicities)
+        site_multiplicities = np.einsum(
+            "i, j->ij", np.ones(n_endmembers), site_multiplicities
+        )
     elif len(site_multiplicities.shape) == 2:
         if site_multiplicities.shape != endmember_occupancies.shape:
-            raise Exception('If site_multiplicities is 2D, it should have '
-                            'the same shape as endmember_occupancies. '
-                            'They currently have shapes '
-                            f'{site_multiplicities.shape} and '
-                            f'{endmember_occupancies.shape}.')
+            raise Exception(
+                "If site_multiplicities is 2D, it should have "
+                "the same shape as endmember_occupancies. "
+                "They currently have shapes "
+                f"{site_multiplicities.shape} and "
+                f"{endmember_occupancies.shape}."
+            )
     else:
-        raise Exception('Site multiplicities should either be 1D or 2D.')
+        raise Exception("Site multiplicities should either be 1D or 2D.")
 
     site_formulae = []
     for i_mbr, mbr_occupancies in enumerate(endmember_occupancies):
         i = 0
-        site_formulae.append('')
+        site_formulae.append("")
         for site in site_species_names:
-            amounts = mbr_occupancies[i:i+len(site)]
-            mult = site_multiplicities[i_mbr,i]
-            if np.abs(mult - 1.) < 1.e-12:
-                mult = ''
+            amounts = mbr_occupancies[i : i + len(site)]
+            mult = site_multiplicities[i_mbr, i]
+            if np.abs(mult - 1.0) < 1.0e-12:
+                mult = ""
             else:
                 mult = str(nsimplify(mult))
             amounts /= sum(amounts)
             site_occupancy = formula_to_string(dict(zip(site, amounts)))
-            site_formulae[-1] += '[{0}]{1}'.format(site_occupancy, mult)
+            site_formulae[-1] += "[{0}]{1}".format(site_occupancy, mult)
             i += len(site)
 
     return site_formulae
@@ -488,7 +607,7 @@ def ordered_compositional_array(formulae, elements):
     formula_array = np.zeros(shape=(len(formulae), len(elements)))
     for idx, formula in enumerate(formulae):
         for element in formula:
-            assert(element in elements)
+            assert element in elements
             formula_array[idx][elements.index(element)] = formula[element]
 
     return formula_array
@@ -510,18 +629,18 @@ def formula_to_string(formula):
         in the periodic table, then they are added at the end of the string.
     """
 
-    formula_string = ''
+    formula_string = ""
     for e in IUPAC_element_order:
-        if e in formula and np.abs(formula[e]) > 1.e-12:
-            if np.abs(formula[e] - 1.) < 1.e-12:
+        if e in formula and np.abs(formula[e]) > 1.0e-12:
+            if np.abs(formula[e] - 1.0) < 1.0e-12:
                 formula_string += e
             else:
                 formula_string += e + str(nsimplify(formula[e]))
 
     for e in formula:
         if e not in IUPAC_element_order:
-            if e in formula and np.abs(formula[e]) > 1.e-12:
-                if np.abs(formula[e] - 1.) < 1.e-12:
+            if e in formula and np.abs(formula[e]) > 1.0e-12:
+                if np.abs(formula[e] - 1.0) < 1.0e-12:
                     formula_string += e
                 else:
                     formula_string += e + str(nsimplify(formula[e]))
@@ -576,37 +695,53 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
     output_fractions : list of floats
         List of output phase fractions (of type output_type)
     """
-    if input_type == 'volume' or output_type == 'volume':
+    if input_type == "volume" or output_type == "volume":
         if composite.temperature is None:
             raise Exception(
-                composite.to_string() + ".set_state(P, T) has not been called, so volume fractions are currently undefined. Exiting.")
+                composite.to_string()
+                + ".set_state(P, T) has not been called, so volume fractions are currently undefined. Exiting."
+            )
 
-    if input_type == 'molar':
+    if input_type == "molar":
         molar_fractions = phase_fractions
-    if input_type == 'volume':
+    if input_type == "volume":
         total_moles = sum(
-            volume_fraction / phase.molar_volume for volume_fraction,
-            phase in zip(phase_fractions, composite.phases))
-        molar_fractions = [volume_fraction / (phase.molar_volume * total_moles)
-                           for volume_fraction, phase in zip(phase_fractions, composite.phases)]
-    if input_type == 'mass':
-        total_moles = sum(mass_fraction / phase.molar_mass for mass_fraction,
-                          phase in zip(phase_fractions, composite.phases))
-        molar_fractions = [mass_fraction / (phase.molar_mass * total_moles)
-                           for mass_fraction, phase in zip(phase_fractions, composite.phases)]
+            volume_fraction / phase.molar_volume
+            for volume_fraction, phase in zip(phase_fractions, composite.phases)
+        )
+        molar_fractions = [
+            volume_fraction / (phase.molar_volume * total_moles)
+            for volume_fraction, phase in zip(phase_fractions, composite.phases)
+        ]
+    if input_type == "mass":
+        total_moles = sum(
+            mass_fraction / phase.molar_mass
+            for mass_fraction, phase in zip(phase_fractions, composite.phases)
+        )
+        molar_fractions = [
+            mass_fraction / (phase.molar_mass * total_moles)
+            for mass_fraction, phase in zip(phase_fractions, composite.phases)
+        ]
 
-    if output_type == 'volume':
+    if output_type == "volume":
         total_volume = sum(
-            molar_fraction * phase.molar_volume for molar_fraction,
-            phase in zip(molar_fractions, composite.phases))
-        output_fractions = [molar_fraction * phase.molar_volume
-                            / total_volume for molar_fraction, phase in zip(molar_fractions, composite.phases)]
-    elif output_type == 'mass':
-        total_mass = sum(molar_fraction * phase.molar_mass for molar_fraction,
-                         phase in zip(molar_fractions, composite.phases))
-        output_fractions = [molar_fraction * phase.molar_mass
-                            / total_mass for molar_fraction, phase in zip(molar_fractions, composite.phases)]
-    elif output_type == 'molar':
+            molar_fraction * phase.molar_volume
+            for molar_fraction, phase in zip(molar_fractions, composite.phases)
+        )
+        output_fractions = [
+            molar_fraction * phase.molar_volume / total_volume
+            for molar_fraction, phase in zip(molar_fractions, composite.phases)
+        ]
+    elif output_type == "mass":
+        total_mass = sum(
+            molar_fraction * phase.molar_mass
+            for molar_fraction, phase in zip(molar_fractions, composite.phases)
+        )
+        output_fractions = [
+            molar_fraction * phase.molar_mass / total_mass
+            for molar_fraction, phase in zip(molar_fractions, composite.phases)
+        ]
+    elif output_type == "molar":
         output_fractions = molar_fractions
 
     return output_fractions
@@ -634,16 +769,16 @@ def reaction_matrix_as_strings(reaction_matrix, compound_names):
     """
     reaction_strings = []
     for reaction in reaction_matrix:
-        lhs, rhs = ('', '')
+        lhs, rhs = ("", "")
         for i, coefficient in enumerate(reaction):
-            if coefficient < -1.e-10:
+            if coefficient < -1.0e-10:
                 if len(lhs) > 0:
-                    lhs += ' + '
-                lhs += f'{-coefficient} {compound_names[i]}'
-            if coefficient > 1.e-10:
+                    lhs += " + "
+                lhs += f"{-coefficient} {compound_names[i]}"
+            if coefficient > 1.0e-10:
                 if len(rhs) > 0:
-                    rhs += ' + '
-                rhs += f'{coefficient} {compound_names[i]}'
-        reaction_strings.append(f'{lhs} = {rhs}')
+                    rhs += " + "
+                rhs += f"{coefficient} {compound_names[i]}"
+        reaction_strings.append(f"{lhs} = {rhs}")
 
     return reaction_strings

@@ -46,19 +46,19 @@ class Mineral(Material):
         Material.__init__(self)
         if params is not None:
             self.params = params
-        elif 'params' not in self.__dict__:
+        elif "params" not in self.__dict__:
             self.params = {}
 
         if property_modifiers is not None:
             self.property_modifiers = property_modifiers
-        elif 'property_modifiers' not in self.__dict__:
+        elif "property_modifiers" not in self.__dict__:
             self.property_modifiers = []
 
         self.method = None
-        if 'equation_of_state' in self.params:
-            self.set_method(self.params['equation_of_state'])
-        if 'name' in self.params:
-            self.name = self.params['name']
+        if "equation_of_state" in self.params:
+            self.set_method(self.params["equation_of_state"])
+        if "name" in self.params:
+            self.name = self.params["name"]
 
     def set_method(self, equation_of_state):
         """
@@ -77,23 +77,28 @@ class Mineral(Material):
             return
 
         new_method = eos.create(equation_of_state)
-        if self.method is not None and 'equation_of_state' in self.params:
-            self.method = eos.create(self.params['equation_of_state'])
+        if self.method is not None and "equation_of_state" in self.params:
+            self.method = eos.create(self.params["equation_of_state"])
 
-        if type(new_method).__name__ == 'instance':
+        if type(new_method).__name__ == "instance":
             raise Exception(
-                "Please derive your method from object (see python old style classes)")
+                "Please derive your method from object (see python old style classes)"
+            )
 
-        if ((self.method is not None
-             and isinstance(new_method, type(self.method)) is False)):
+        if (
+            self.method is not None
+            and isinstance(new_method, type(self.method)) is False
+        ):
 
             # Warn user that they are changing the EoS
-            warnings.warn('Warning, you are changing the method to '
-                          f'{new_method.__class__.__name__} even though the '
-                          'material is designed to be used with the method '
-                          f'{self.method.__class__.__name__}. '
-                          'This does not overwrite any mineral attributes',
-                          stacklevel=2)
+            warnings.warn(
+                "Warning, you are changing the method to "
+                f"{new_method.__class__.__name__} even though the "
+                "material is designed to be used with the method "
+                f"{self.method.__class__.__name__}. "
+                "This does not overwrite any mineral attributes",
+                stacklevel=2,
+            )
             self.reset()
 
         self.method = new_method
@@ -102,8 +107,10 @@ class Mineral(Material):
         try:
             self.method.validate_parameters(self.params)
         except Exception as e:
-            print(f'Mineral {self.to_string()} failed to validate parameters '
-                  f'with message: \"{e.message}\"')
+            print(
+                f"Mineral {self.to_string()} failed to validate parameters "
+                f'with message: "{e.message}"'
+            )
             raise
 
         # Invalidate the cache upon resetting the method
@@ -113,7 +120,13 @@ class Mineral(Material):
         """
         Returns the name of the mineral class
         """
-        return "'" + self.__class__.__module__.replace(".minlib_", ".") + "." + self.__class__.__name__ + "'"
+        return (
+            "'"
+            + self.__class__.__module__.replace(".minlib_", ".")
+            + "."
+            + self.__class__.__name__
+            + "'"
+        )
 
     def debug_print(self, indent=""):
         print("%s%s" % (indent, self.to_string()))
@@ -124,23 +137,33 @@ class Mineral(Material):
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
         Material.set_state(self, pressure, temperature)
-        self._property_modifiers = eos.property_modifiers.calculate_property_modifications(
-            self)
+        self._property_modifiers = (
+            eos.property_modifiers.calculate_property_modifications(self)
+        )
 
         if self.method is None:
             raise AttributeError(
-                "no method set for mineral, or equation_of_state given in mineral.params")
+                "no method set for mineral, or equation_of_state given in mineral.params"
+            )
 
     """
     Properties from equations of state
     We choose the P, T properties (e.g. Gibbs(P, T) rather than Helmholtz(V, T)),
     as it allows us to more easily apply corrections to the free energy
     """
+
     @material_property
     @copy_documentation(Material.molar_gibbs)
     def molar_gibbs(self):
-        return self.method.gibbs_free_energy(self.pressure, self.temperature, self._molar_volume_unmodified, self.params) \
-            + self._property_modifiers['G']
+        return (
+            self.method.gibbs_free_energy(
+                self.pressure,
+                self.temperature,
+                self._molar_volume_unmodified,
+                self.params,
+            )
+            + self._property_modifiers["G"]
+        )
 
     @material_property
     def _molar_volume_unmodified(self):
@@ -149,60 +172,85 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.molar_volume)
     def molar_volume(self):
-        return self._molar_volume_unmodified \
-            + self._property_modifiers['dGdP']
+        return self._molar_volume_unmodified + self._property_modifiers["dGdP"]
 
     @material_property
     @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
-        return self.method.entropy(self.pressure, self.temperature, self._molar_volume_unmodified, self.params) \
-            - self._property_modifiers['dGdT']
+        return (
+            self.method.entropy(
+                self.pressure,
+                self.temperature,
+                self._molar_volume_unmodified,
+                self.params,
+            )
+            - self._property_modifiers["dGdT"]
+        )
 
     @material_property
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
         K_T_orig = self.method.isothermal_bulk_modulus(
-            self.pressure, self.temperature,
-            self._molar_volume_unmodified, self.params)
+            self.pressure, self.temperature, self._molar_volume_unmodified, self.params
+        )
 
-        return self.molar_volume \
-            / ((self._molar_volume_unmodified / K_T_orig) - self._property_modifiers['d2GdP2'])
+        return self.molar_volume / (
+            (self._molar_volume_unmodified / K_T_orig)
+            - self._property_modifiers["d2GdP2"]
+        )
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
-        return (self.method.molar_heat_capacity_p(self.pressure,
-                                                  self.temperature,
-                                                  self._molar_volume_unmodified,
-                                                  self.params)
-                - self.temperature * self._property_modifiers['d2GdT2'])
+        return (
+            self.method.molar_heat_capacity_p(
+                self.pressure,
+                self.temperature,
+                self._molar_volume_unmodified,
+                self.params,
+            )
+            - self.temperature * self._property_modifiers["d2GdT2"]
+        )
 
     @material_property
     @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
         return (
-            (self.method.thermal_expansivity(self.pressure, self.temperature,
-                                             self._molar_volume_unmodified,
-                                             self.params)
-             * self._molar_volume_unmodified)
-            + self._property_modifiers['d2GdPdT']) / self.molar_volume
+            (
+                self.method.thermal_expansivity(
+                    self.pressure,
+                    self.temperature,
+                    self._molar_volume_unmodified,
+                    self.params,
+                )
+                * self._molar_volume_unmodified
+            )
+            + self._property_modifiers["d2GdPdT"]
+        ) / self.molar_volume
 
     @material_property
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
         G = self.method.shear_modulus(
-            self.pressure, self.temperature, self._molar_volume_unmodified,
-            self.params)
-        if G < np.finfo('float').eps:
-            warnings.formatwarning = lambda msg, * \
-                a: 'Warning from file \'{0}\', line {1}:\n{2}\n\n'.format(
-                    a[1], a[2], msg)
-            warnings.warn('You are trying to calculate shear modulus for {0} when it is exactly zero. \n'
-                          'If {0} is a liquid, then you can safely ignore this warning, but consider \n'
-                          'calculating bulk modulus or bulk sound rather than Vp or Vs. \n'
-                          'If {0} is not a liquid, then shear modulus calculations for the \n'
-                          'underlying equation of state ({1}) have not been implemented, \n'
-                          'and Vp and Vs estimates will be incorrect.'.format(self.name, self.method.__class__.__name__), stacklevel=1)
+            self.pressure, self.temperature, self._molar_volume_unmodified, self.params
+        )
+        if G < np.finfo("float").eps:
+            warnings.formatwarning = (
+                lambda msg, *a: "Warning from file '{0}', line {1}:\n{2}\n\n".format(
+                    a[1], a[2], msg
+                )
+            )
+            warnings.warn(
+                "You are trying to calculate shear modulus for {0} when it is exactly zero. \n"
+                "If {0} is a liquid, then you can safely ignore this warning, but consider \n"
+                "calculating bulk modulus or bulk sound rather than Vp or Vs. \n"
+                "If {0} is not a liquid, then shear modulus calculations for the \n"
+                "underlying equation of state ({1}) have not been implemented, \n"
+                "and Vp and Vs estimates will be incorrect.".format(
+                    self.name, self.method.__class__.__name__
+                ),
+                stacklevel=1,
+            )
         return G
 
     """
@@ -210,25 +258,28 @@ class Mineral(Material):
     Legendre transformations
     or Maxwell relations
     """
+
     @material_property
     def formula(self):
         """
         Returns the chemical formula of the Mineral class
         """
-        if 'formula' in self.params:
-            return self.params['formula']
+        if "formula" in self.params:
+            return self.params["formula"]
         else:
             raise ValueError(
-                'No formula parameter for mineral {0}.'.format(self.to_string))
+                "No formula parameter for mineral {0}.".format(self.to_string)
+            )
 
     @material_property
     @copy_documentation(Material.molar_mass)
     def molar_mass(self):
-        if 'molar_mass' in self.params:
-            return self.params['molar_mass']
+        if "molar_mass" in self.params:
+            return self.params["molar_mass"]
         else:
             raise ValueError(
-                'No molar_mass parameter for mineral {0}.'.format(self.to_string))
+                "No molar_mass parameter for mineral {0}.".format(self.to_string)
+            )
 
     @material_property
     @copy_documentation(Material.density)
@@ -238,7 +289,11 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.molar_internal_energy)
     def molar_internal_energy(self):
-        return self.molar_gibbs - self.pressure * self.molar_volume + self.temperature * self.molar_entropy
+        return (
+            self.molar_gibbs
+            - self.pressure * self.molar_volume
+            + self.temperature * self.molar_entropy
+        )
 
     @material_property
     @copy_documentation(Material.molar_helmholtz)
@@ -253,26 +308,32 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.adiabatic_bulk_modulus)
     def adiabatic_bulk_modulus(self):
-        if self.temperature < 1.e-10:
+        if self.temperature < 1.0e-10:
             return self.isothermal_bulk_modulus
         else:
-            return self.isothermal_bulk_modulus * self.molar_heat_capacity_p / self.molar_heat_capacity_v
+            return (
+                self.isothermal_bulk_modulus
+                * self.molar_heat_capacity_p
+                / self.molar_heat_capacity_v
+            )
 
     @material_property
     @copy_documentation(Material.isothermal_compressibility)
     def isothermal_compressibility(self):
-        return 1. / self.isothermal_bulk_modulus
+        return 1.0 / self.isothermal_bulk_modulus
 
     @material_property
     @copy_documentation(Material.adiabatic_compressibility)
     def adiabatic_compressibility(self):
-        return 1. / self.adiabatic_bulk_modulus
+        return 1.0 / self.adiabatic_bulk_modulus
 
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
-        return np.sqrt((self.adiabatic_bulk_modulus
-                        + 4. / 3. * self.shear_modulus) / self.density)
+        return np.sqrt(
+            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            / self.density
+        )
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
@@ -287,27 +348,38 @@ class Mineral(Material):
     @material_property
     @copy_documentation(Material.grueneisen_parameter)
     def grueneisen_parameter(self):
-        eps = np.finfo('float').eps
+        eps = np.finfo("float").eps
         if np.abs(self.molar_heat_capacity_v) > eps:
 
-            return (self.thermal_expansivity
-                    * self.isothermal_bulk_modulus
-                    * self.molar_volume
-                    / self.molar_heat_capacity_v)
-        elif ((np.abs(self._property_modifiers['d2GdPdT']) < eps)
-              and (np.abs(self._property_modifiers['d2GdP2']) < eps)
-              and (np.abs(self._property_modifiers['dGdP']) < eps)
-              and (np.abs(self._property_modifiers['d2GdT2']) < eps)):
+            return (
+                self.thermal_expansivity
+                * self.isothermal_bulk_modulus
+                * self.molar_volume
+                / self.molar_heat_capacity_v
+            )
+        elif (
+            (np.abs(self._property_modifiers["d2GdPdT"]) < eps)
+            and (np.abs(self._property_modifiers["d2GdP2"]) < eps)
+            and (np.abs(self._property_modifiers["dGdP"]) < eps)
+            and (np.abs(self._property_modifiers["d2GdT2"]) < eps)
+        ):
 
-            return self.method.grueneisen_parameter(self.pressure, self.temperature,
-                                                    self.molar_volume, self.params)
+            return self.method.grueneisen_parameter(
+                self.pressure, self.temperature, self.molar_volume, self.params
+            )
         else:
             raise Exception(
-                'You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers.')
+                "You are trying to calculate the grueneisen parameter at a temperature where the heat capacity is very low and where you have defined Gibbs property modifiers."
+            )
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
     def molar_heat_capacity_v(self):
-        return self.molar_heat_capacity_p - self.molar_volume * self.temperature \
-            * self.thermal_expansivity * self.thermal_expansivity \
+        return (
+            self.molar_heat_capacity_p
+            - self.molar_volume
+            * self.temperature
+            * self.thermal_expansivity
+            * self.thermal_expansivity
             * self.isothermal_bulk_modulus
+        )

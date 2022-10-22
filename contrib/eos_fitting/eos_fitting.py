@@ -20,14 +20,15 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
-plt.rcParams['axes.facecolor'] = 'white'
-plt.rcParams['axes.edgecolor'] = 'black'
+
+plt.style.use("ggplot")
+plt.rcParams["axes.facecolor"] = "white"
+plt.rcParams["axes.edgecolor"] = "black"
 
 
 # hack to allow scripts to be placed in subdirectories next to burnman:
-if not os.path.exists('burnman') and os.path.exists('../../burnman'):
-    sys.path.insert(1, os.path.abspath('../..'))
+if not os.path.exists("burnman") and os.path.exists("../../burnman"):
+    sys.path.insert(1, os.path.abspath("../.."))
 
 import burnman
 from burnman.utils.misc import attribute_function
@@ -65,241 +66,371 @@ if __name__ == "__main__":
     """
 
     # Input file
-    filename = 'test.dat'
+    filename = "test.dat"
 
     # Mineral to optimise (along with tweaks to initial properties if necessary)
     mineral = burnman.minerals.SLB_2011.periclase()
-    mineral.set_state(1.e5, 300.)
-    mineral.params['F_0'] = mineral.params['F_0'] - mineral.H
+    mineral.set_state(1.0e5, 300.0)
+    mineral.params["F_0"] = mineral.params["F_0"] - mineral.H
 
     # Fit parameters
-    fit_params =  ['V_0', 'K_0', 'Kprime_0', 'grueneisen_0', 'q_0', 'Debye_0', 'F_0']
+    fit_params = ["V_0", "K_0", "Kprime_0", "grueneisen_0", "q_0", "Debye_0", "F_0"]
 
     # Pressure and temperature sections to plot through the models
-    pressures = np.linspace(1.e5, 100.e9, 101)
-    temperature_sections = [300., 2000.]
+    pressures = np.linspace(1.0e5, 100.0e9, 101)
+    temperature_sections = [300.0, 2000.0]
 
-    temperatures = np.linspace(300., 2000., 101)
-    pressure_sections = [1.e5]
+    temperatures = np.linspace(300.0, 2000.0, 101)
+    pressure_sections = [1.0e5]
 
     # Properties to plot which have data in the input file
-    properties_for_data_comparison_plots = [('V', 1.e6, 'Volume (cm^3/mol)'),
-                                            ('H', 1.e-3, 'Enthalpy (kJ/mol)')]
+    properties_for_data_comparison_plots = [
+        ("V", 1.0e6, "Volume (cm^3/mol)"),
+        ("H", 1.0e-3, "Enthalpy (kJ/mol)"),
+    ]
 
     # Properties to plot along with confidence interval
-    properties_for_confidence_plots = [('p_wave_velocity', 1.e-3, 'P wave velocity (km/s)'),
-                                       ('K_T', 1.e-9, 'Bulk modulus (GPa)'),
-                                       ('alpha', 1., 'Thermal expansion (/K)'),
-                                       (['alpha', 'K_T'], 1.e-6, 'Thermal pressure (MPa/K)')]
+    properties_for_confidence_plots = [
+        ("p_wave_velocity", 1.0e-3, "P wave velocity (km/s)"),
+        ("K_T", 1.0e-9, "Bulk modulus (GPa)"),
+        ("alpha", 1.0, "Thermal expansion (/K)"),
+        (["alpha", "K_T"], 1.0e-6, "Thermal pressure (MPa/K)"),
+    ]
     confidence_interval = 0.95
     remove_outliers = True
     good_data_confidence_interval = 0.9
-    param_tolerance = 1.e-5
+    param_tolerance = 1.0e-5
 
     # That's it for user inputs. Now just sit back and watch the plots appear...
     flags, data, data_covariances = read_fitting_file(filename)
 
     list_flags = list(set(flags))
 
-    print('Starting to fit user-defined data. Please be patient.')
-    fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = mineral,
-                                                  flags = flags,
-                                                  fit_params = fit_params,
-                                                  data = data,
-                                                  data_covariances = data_covariances,
-                                                  param_tolerance = param_tolerance,
-                                                  verbose = False)
+    print("Starting to fit user-defined data. Please be patient.")
+    fitted_eos = burnman.eos_fitting.fit_PTp_data(
+        mineral=mineral,
+        flags=flags,
+        fit_params=fit_params,
+        data=data,
+        data_covariances=data_covariances,
+        param_tolerance=param_tolerance,
+        verbose=False,
+    )
 
     # Print the optimized parameters
-    print('Optimized equation of state:')
+    print("Optimized equation of state:")
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
-    print('\nParameters:')
+    print("\nParameters:")
     print(fitted_eos.popt)
-    print('\nFull covariance matrix:')
+    print("\nFull covariance matrix:")
     print(fitted_eos.pcov)
-    print('\nGoodness of fit:')
+    print("\nGoodness of fit:")
     print(fitted_eos.goodness_of_fit)
-    print('\n')
+    print("\n")
 
     # Create a plot of the residuals
     fig, ax = plt.subplots()
-    burnman.nonlinear_fitting.plot_residuals(ax=ax,
-                                             weighted_residuals=fitted_eos.weighted_residuals,
-                                             flags=fitted_eos.flags)
+    burnman.nonlinear_fitting.plot_residuals(
+        ax=ax, weighted_residuals=fitted_eos.weighted_residuals, flags=fitted_eos.flags
+    )
     plt.show()
 
-    confidence_bound, indices, probabilities = burnman.nonlinear_fitting.extreme_values(fitted_eos.weighted_residuals, good_data_confidence_interval)
+    confidence_bound, indices, probabilities = burnman.nonlinear_fitting.extreme_values(
+        fitted_eos.weighted_residuals, good_data_confidence_interval
+    )
     if indices != [] and remove_outliers == True:
-        print('Removing {0:d} outliers (at the {1:.1f}% confidence interval) and refitting. Please wait just a little longer.'.format(len(indices), good_data_confidence_interval*100.))
+        print(
+            "Removing {0:d} outliers (at the {1:.1f}% confidence interval) and refitting. Please wait just a little longer.".format(
+                len(indices), good_data_confidence_interval * 100.0
+            )
+        )
 
-        mask = [i for i in range(len(fitted_eos.weighted_residuals)) if i not in indices]
+        mask = [
+            i for i in range(len(fitted_eos.weighted_residuals)) if i not in indices
+        ]
         flags = [flag for i, flag in enumerate(flags) if i not in indices]
         data = data[mask]
         data_covariances = data_covariances[mask]
-        fitted_eos = burnman.eos_fitting.fit_PTp_data(mineral = mineral,
-                                                      flags = flags,
-                                                      fit_params = fit_params,
-                                                      data = data,
-                                                      data_covariances = data_covariances,
-                                                      param_tolerance = param_tolerance,
-                                                      verbose = False)
+        fitted_eos = burnman.eos_fitting.fit_PTp_data(
+            mineral=mineral,
+            flags=flags,
+            fit_params=fit_params,
+            data=data,
+            data_covariances=data_covariances,
+            param_tolerance=param_tolerance,
+            verbose=False,
+        )
 
     # Print the optimized parameters
-    print('Optimized equation of state:')
+    print("Optimized equation of state:")
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
-    print('\nParameters:')
+    print("\nParameters:")
     print(fitted_eos.popt)
-    print('\nFull covariance matrix:')
+    print("\nFull covariance matrix:")
     print(fitted_eos.pcov)
-    print('\nGoodness of fit:')
+    print("\nGoodness of fit:")
     print(fitted_eos.goodness_of_fit)
-    print('\n')
-
+    print("\n")
 
     # Create a plot of the residuals
     fig, ax = plt.subplots()
-    burnman.nonlinear_fitting.plot_residuals(ax=ax,
-                                             weighted_residuals=fitted_eos.weighted_residuals,
-                                             flags=fitted_eos.flags)
+    burnman.nonlinear_fitting.plot_residuals(
+        ax=ax, weighted_residuals=fitted_eos.weighted_residuals, flags=fitted_eos.flags
+    )
     plt.show()
 
     # Create a corner plot of the covariances
-    fig, ax_array = burnman.nonlinear_fitting.corner_plot(popt=fitted_eos.popt,
-                                                          pcov=fitted_eos.pcov,
-                                                          param_names=fitted_eos.fit_params)
+    fig, ax_array = burnman.nonlinear_fitting.corner_plot(
+        popt=fitted_eos.popt, pcov=fitted_eos.pcov, param_names=fitted_eos.fit_params
+    )
     plt.show()
 
     # Create plots for the weighted residuals of each type of measurement
-    for i, (material_property, scaling, name) in enumerate(properties_for_data_comparison_plots):
+    for i, (material_property, scaling, name) in enumerate(
+        properties_for_data_comparison_plots
+    ):
         fig, ax = plt.subplots()
-        burnman.nonlinear_fitting.weighted_residual_plot(ax=ax,
-                                                         model=fitted_eos,
-                                                         flag=material_property,
-                                                         sd_limit=3,
-                                                         cmap=plt.cm.RdYlBu,
-                                                         plot_axes=[0, 1],
-                                                         scale_axes=[1.e-9, 1.])
-        ax.set_title('Weighted residual plot for {0:s}'.format(name))
-        ax.set_xlabel('Pressure (GPa)')
-        ax.set_ylabel('Temperature (K)')
+        burnman.nonlinear_fitting.weighted_residual_plot(
+            ax=ax,
+            model=fitted_eos,
+            flag=material_property,
+            sd_limit=3,
+            cmap=plt.cm.RdYlBu,
+            plot_axes=[0, 1],
+            scale_axes=[1.0e-9, 1.0],
+        )
+        ax.set_title("Weighted residual plot for {0:s}".format(name))
+        ax.set_xlabel("Pressure (GPa)")
+        ax.set_ylabel("Temperature (K)")
         plt.show()
 
-
-        flag_mask = [i for i, flag in enumerate(flags) if flag==material_property]
+        flag_mask = [i for i, flag in enumerate(flags) if flag == material_property]
 
         if temperature_sections != []:
             for T in temperature_sections:
-                PTVs = np.array([pressures, [T]*len(pressures), mineral.evaluate(['V'], pressures, [T]*len(pressures))[0]]).T
+                PTVs = np.array(
+                    [
+                        pressures,
+                        [T] * len(pressures),
+                        mineral.evaluate(["V"], pressures, [T] * len(pressures))[0],
+                    ]
+                ).T
 
                 # Plot confidence bands on the volumes
-                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
-                                                                                 x_array=PTVs,
-                                                                                 confidence_interval=confidence_interval,
-                                                                                 f=attribute_function(mineral, material_property),
-                                                                                 flag='V')
+                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+                    model=fitted_eos,
+                    x_array=PTVs,
+                    confidence_interval=confidence_interval,
+                    f=attribute_function(mineral, material_property),
+                    flag="V",
+                )
 
-                plt.plot(PTVs[:,0] / 1.e9, (cp_bands[0] + cp_bands[1])/2.*scaling, label='Optimised fit at {0:.0f} K'.format(T))
-                plt.plot(PTVs[:,0] / 1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
-                plt.plot(PTVs[:,0] / 1.e9, (cp_bands[1])*scaling, linestyle='--', color='r')
+                plt.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[0] + cp_bands[1]) / 2.0 * scaling,
+                    label="Optimised fit at {0:.0f} K".format(T),
+                )
+                plt.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[0]) * scaling,
+                    linestyle="--",
+                    color="r",
+                    label="{0:.1f}% confidence bands".format(confidence_interval * 100),
+                )
+                plt.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[1]) * scaling,
+                    linestyle="--",
+                    color="r",
+                )
 
-            plt.errorbar(fitted_eos.data[:,0][flag_mask] / 1.e9, fitted_eos.data[:,2][flag_mask]*scaling,
-                         xerr=np.sqrt(fitted_eos.data_covariances.T[0][0][flag_mask]) / 1.e9,
-                         yerr=np.sqrt(fitted_eos.data_covariances.T[2][2][flag_mask])*scaling,
-                         linestyle='None', marker='o', label='Data')
+            plt.errorbar(
+                fitted_eos.data[:, 0][flag_mask] / 1.0e9,
+                fitted_eos.data[:, 2][flag_mask] * scaling,
+                xerr=np.sqrt(fitted_eos.data_covariances.T[0][0][flag_mask]) / 1.0e9,
+                yerr=np.sqrt(fitted_eos.data_covariances.T[2][2][flag_mask]) * scaling,
+                linestyle="None",
+                marker="o",
+                label="Data",
+            )
 
-            plt.plot(fitted_eos.data_mle[:,0][flag_mask] / 1.e9, fitted_eos.data_mle[:,2][flag_mask]*scaling, marker='o', markersize=2, color='k', linestyle='None', label='Maximum likelihood estimates')
-            plt.ylabel('{0:s}'.format(name))
-            plt.xlabel('Pressure (GPa)')
-            plt.legend(loc='upper right')
-            plt.title('Data comparison for fitted equation of state as a function of pressure')
+            plt.plot(
+                fitted_eos.data_mle[:, 0][flag_mask] / 1.0e9,
+                fitted_eos.data_mle[:, 2][flag_mask] * scaling,
+                marker="o",
+                markersize=2,
+                color="k",
+                linestyle="None",
+                label="Maximum likelihood estimates",
+            )
+            plt.ylabel("{0:s}".format(name))
+            plt.xlabel("Pressure (GPa)")
+            plt.legend(loc="upper right")
+            plt.title(
+                "Data comparison for fitted equation of state as a function of pressure"
+            )
             plt.show()
-
 
         if pressure_sections != []:
             for P in pressure_sections:
-                PTVs = np.array([[P]*len(temperatures), temperatures, mineral.evaluate(['V'], [P]*len(temperatures), temperatures)[0]]).T
+                PTVs = np.array(
+                    [
+                        [P] * len(temperatures),
+                        temperatures,
+                        mineral.evaluate(["V"], [P] * len(temperatures), temperatures)[
+                            0
+                        ],
+                    ]
+                ).T
 
                 # Plot confidence bands on the volumes
-                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
-                                                                                 x_array=PTVs,
-                                                                                 confidence_interval=confidence_interval,
-                                                                                 f=attribute_function(mineral, material_property),
-                                                                                 flag='V')
+                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+                    model=fitted_eos,
+                    x_array=PTVs,
+                    confidence_interval=confidence_interval,
+                    f=attribute_function(mineral, material_property),
+                    flag="V",
+                )
 
-                plt.plot(PTVs[:,1], (cp_bands[0] + cp_bands[1])/2.*scaling, label='Optimised fit at {0:.0f} GPa'.format(P/1.e9))
-                plt.plot(PTVs[:,1], (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
-                plt.plot(PTVs[:,1], (cp_bands[1])*scaling, linestyle='--', color='r')
+                plt.plot(
+                    PTVs[:, 1],
+                    (cp_bands[0] + cp_bands[1]) / 2.0 * scaling,
+                    label="Optimised fit at {0:.0f} GPa".format(P / 1.0e9),
+                )
+                plt.plot(
+                    PTVs[:, 1],
+                    (cp_bands[0]) * scaling,
+                    linestyle="--",
+                    color="r",
+                    label="{0:.1f}% confidence bands".format(confidence_interval * 100),
+                )
+                plt.plot(PTVs[:, 1], (cp_bands[1]) * scaling, linestyle="--", color="r")
 
-            plt.errorbar(fitted_eos.data[:,1][flag_mask], fitted_eos.data[:,2][flag_mask]*scaling,
-                         xerr=np.sqrt(fitted_eos.data_covariances.T[1][1][flag_mask]),
-                         yerr=np.sqrt(fitted_eos.data_covariances.T[2][2][flag_mask])*scaling,
-                         linestyle='None', marker='o', label='Data')
+            plt.errorbar(
+                fitted_eos.data[:, 1][flag_mask],
+                fitted_eos.data[:, 2][flag_mask] * scaling,
+                xerr=np.sqrt(fitted_eos.data_covariances.T[1][1][flag_mask]),
+                yerr=np.sqrt(fitted_eos.data_covariances.T[2][2][flag_mask]) * scaling,
+                linestyle="None",
+                marker="o",
+                label="Data",
+            )
 
-            plt.plot(fitted_eos.data_mle[:,1][flag_mask], fitted_eos.data_mle[:,2][flag_mask]*scaling, marker='o', markersize=2, color='k', linestyle='None', label='Maximum likelihood estimates')
-            plt.ylabel('{0:s}'.format(name))
-            plt.xlabel('Temperature (K)')
-            plt.legend(loc='upper right')
-            plt.title('Data comparison for fitted equation of state as a function of temperature')
+            plt.plot(
+                fitted_eos.data_mle[:, 1][flag_mask],
+                fitted_eos.data_mle[:, 2][flag_mask] * scaling,
+                marker="o",
+                markersize=2,
+                color="k",
+                linestyle="None",
+                label="Maximum likelihood estimates",
+            )
+            plt.ylabel("{0:s}".format(name))
+            plt.xlabel("Temperature (K)")
+            plt.legend(loc="upper right")
+            plt.title(
+                "Data comparison for fitted equation of state as a function of temperature"
+            )
             plt.show()
-
-
-
 
     # We can also look at the uncertainty in other properties
     # For example, let's look at the uncertainty in P wave velocities, bulk modulus, thermal expansion and thermal pressure
     def closest_factors(n):
         d = int(np.floor(np.sqrt(n)))
-        for i in reversed(range(1, d+1)):
+        for i in reversed(range(1, d + 1)):
             if (n % i) == 0:
-                return i, int(n/i)
+                return i, int(n / i)
 
     nj, ni = closest_factors(len(properties_for_confidence_plots))
 
     if temperature_sections != []:
         fig = plt.figure()
         for T in temperature_sections:
-            PTVs = np.array([pressures, [T]*len(pressures), mineral.evaluate(['V'], pressures, [T]*len(pressures))[0]]).T
+            PTVs = np.array(
+                [
+                    pressures,
+                    [T] * len(pressures),
+                    mineral.evaluate(["V"], pressures, [T] * len(pressures))[0],
+                ]
+            ).T
 
-            for i, (material_property, scaling, name) in enumerate(properties_for_confidence_plots):
-                ax = fig.add_subplot(ni, nj, i+1)
+            for i, (material_property, scaling, name) in enumerate(
+                properties_for_confidence_plots
+            ):
+                ax = fig.add_subplot(ni, nj, i + 1)
 
                 # Plot the confidence bands for the various material properties
-                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
-                                                                                 x_array=PTVs,
-                                                                                 confidence_interval=confidence_interval,
-                                                                                 f=attribute_function(mineral, material_property),
-                                                                                 flag='V')
-                ax.plot(PTVs[:,0]/1.e9, (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} K'.format(T))
-                ax.plot(PTVs[:,0]/1.e9, (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
-                ax.plot(PTVs[:,0]/1.e9, (cp_bands[1])*scaling, linestyle='--', color='r')
+                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+                    model=fitted_eos,
+                    x_array=PTVs,
+                    confidence_interval=confidence_interval,
+                    f=attribute_function(mineral, material_property),
+                    flag="V",
+                )
+                ax.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[0] + cp_bands[1]) / 2 * scaling,
+                    label="Best fit at {0:.0f} K".format(T),
+                )
+                ax.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[0]) * scaling,
+                    linestyle="--",
+                    color="r",
+                    label="{0:.1f}% confidence bands".format(confidence_interval * 100),
+                )
+                ax.plot(
+                    PTVs[:, 0] / 1.0e9,
+                    (cp_bands[1]) * scaling,
+                    linestyle="--",
+                    color="r",
+                )
 
                 plt.ylabel(name)
-                plt.xlabel('Pressure (GPa)')
+                plt.xlabel("Pressure (GPa)")
 
-        plt.legend(loc='upper right')
+        plt.legend(loc="upper right")
         plt.show()
-
-
 
     if pressure_sections != []:
         fig = plt.figure()
         for P in pressure_sections:
-            PTVs = np.array([[P]*len(temperatures), temperatures, mineral.evaluate(['V'], [P]*len(temperatures), temperatures)[0]]).T
+            PTVs = np.array(
+                [
+                    [P] * len(temperatures),
+                    temperatures,
+                    mineral.evaluate(["V"], [P] * len(temperatures), temperatures)[0],
+                ]
+            ).T
 
-            for i, (material_property, scaling, name) in enumerate(properties_for_confidence_plots):
-                ax = fig.add_subplot(ni,nj, i+1)
+            for i, (material_property, scaling, name) in enumerate(
+                properties_for_confidence_plots
+            ):
+                ax = fig.add_subplot(ni, nj, i + 1)
 
                 # Plot the confidence bands for the various material properties
-                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(model=fitted_eos,
-                                                                                 x_array=PTVs,
-                                                                                 confidence_interval=confidence_interval,
-                                                                                 f=attribute_function(mineral, material_property),
-                                                                                 flag='V')
-                ax.plot(PTVs[:,1], (cp_bands[0] + cp_bands[1])/2*scaling, label='Best fit at {0:.0f} GPa'.format(P/1.e9))
-                ax.plot(PTVs[:,1], (cp_bands[0])*scaling, linestyle='--', color='r', label='{0:.1f}% confidence bands'.format(confidence_interval*100))
-                ax.plot(PTVs[:,1], (cp_bands[1])*scaling, linestyle='--', color='r')
+                cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+                    model=fitted_eos,
+                    x_array=PTVs,
+                    confidence_interval=confidence_interval,
+                    f=attribute_function(mineral, material_property),
+                    flag="V",
+                )
+                ax.plot(
+                    PTVs[:, 1],
+                    (cp_bands[0] + cp_bands[1]) / 2 * scaling,
+                    label="Best fit at {0:.0f} GPa".format(P / 1.0e9),
+                )
+                ax.plot(
+                    PTVs[:, 1],
+                    (cp_bands[0]) * scaling,
+                    linestyle="--",
+                    color="r",
+                    label="{0:.1f}% confidence bands".format(confidence_interval * 100),
+                )
+                ax.plot(PTVs[:, 1], (cp_bands[1]) * scaling, linestyle="--", color="r")
                 plt.ylabel(name)
-                plt.xlabel('Temperature (K)')
+                plt.xlabel("Temperature (K)")
 
-        plt.legend(loc='upper right')
+        plt.legend(loc="upper right")
         plt.show()

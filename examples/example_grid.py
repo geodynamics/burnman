@@ -28,13 +28,14 @@ from burnman import minerals
 
 if __name__ == "__main__":
 
-    rock = burnman.Composite([minerals.SLB_2011.mg_perovskite(),
-                              minerals.SLB_2011.periclase()], [0.8, 0.2])
+    rock = burnman.Composite(
+        [minerals.SLB_2011.mg_perovskite(), minerals.SLB_2011.periclase()], [0.8, 0.2]
+    )
 
     seismic_model = burnman.seismic.PREM()
 
     depths = np.linspace(750e3, 2800e3, 10)
-    [p] = seismic_model.evaluate(['pressure'], depths)
+    [p] = seismic_model.evaluate(["pressure"], depths)
 
     # Now we get an array of temperatures at which will be used for computing
     # the seismic properties of the rock.
@@ -47,19 +48,20 @@ if __name__ == "__main__":
     tarray = np.tile(T, len(p))
     parray = np.repeat(p, len(T))
 
-    [vs] = rock.evaluate(['v_s'], parray, tarray)
+    [vs] = rock.evaluate(["v_s"], parray, tarray)
 
     mat_vs = np.reshape(vs, [len(p), len(T)])
 
     # print mat_vs
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, projection='3d')
+    ax = fig.add_subplot(1, 1, 1, projection="3d")
 
     X, Y = np.meshgrid(p / 1e9, T)
 
     surf = ax.plot_surface(
-        X, Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm)
+        X, Y, mat_vs.transpose(), rstride=1, cstride=1, linewidth=1, cmap=cm.coolwarm
+    )
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Temperature")
     ax.set_zlabel("Vs")

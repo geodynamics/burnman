@@ -57,19 +57,21 @@ class Solution(Mineral):
         Can be reset using the set_composition() method.
     """
 
-    def __init__(self,
-                 name=None,
-                 solution_type=None,
-                 endmembers=None,
-                 energy_interaction=None,
-                 volume_interaction=None,
-                 entropy_interaction=None,
-                 energy_ternary_terms=None,
-                 volume_ternary_terms=None,
-                 entropy_ternary_terms=None,
-                 alphas=None,
-                 excess_gibbs_function=None,
-                 molar_fractions=None):
+    def __init__(
+        self,
+        name=None,
+        solution_type=None,
+        endmembers=None,
+        energy_interaction=None,
+        volume_interaction=None,
+        entropy_interaction=None,
+        energy_ternary_terms=None,
+        volume_ternary_terms=None,
+        entropy_ternary_terms=None,
+        alphas=None,
+        excess_gibbs_function=None,
+        molar_fractions=None,
+    ):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
         """
@@ -77,7 +79,7 @@ class Solution(Mineral):
 
         # Solution needs a method attribute to call Mineral.set_state().
         # Note that set_method() below will not change self.method
-        self.method = 'SolutionMethod'
+        self.method = "SolutionMethod"
 
         if name is not None:
             self.name = name
@@ -104,62 +106,73 @@ class Solution(Mineral):
         if excess_gibbs_function is not None:
             self.excess_gibbs_function = excess_gibbs_function
 
-        if hasattr(self, 'endmembers') is False:
-            raise Exception("'endmembers' attribute missing "
-                            "from solution")
+        if hasattr(self, "endmembers") is False:
+            raise Exception("'endmembers' attribute missing " "from solution")
 
         # Set default solution model type
-        if hasattr(self, 'solution_type'):
-            if self.solution_type == 'mechanical':
+        if hasattr(self, "solution_type"):
+            if self.solution_type == "mechanical":
                 self.solution_model = MechanicalSolution(self.endmembers)
-            elif self.solution_type == 'ideal':
+            elif self.solution_type == "ideal":
                 self.solution_model = IdealSolution(self.endmembers)
             else:
-                if hasattr(self, 'energy_interaction') is False:
+                if hasattr(self, "energy_interaction") is False:
                     self.energy_interaction = None
-                if hasattr(self, 'volume_interaction') is False:
+                if hasattr(self, "volume_interaction") is False:
                     self.volume_interaction = None
-                if hasattr(self, 'entropy_interaction') is False:
+                if hasattr(self, "entropy_interaction") is False:
                     self.entropy_interaction = None
 
-                if self.solution_type == 'symmetric':
+                if self.solution_type == "symmetric":
                     self.solution_model = SymmetricRegularSolution(
-                        self.endmembers, self.energy_interaction,
-                        self.volume_interaction, self.entropy_interaction)
-                elif self.solution_type == 'asymmetric':
-                    if hasattr(self, 'alphas') is False:
-                        raise Exception(
-                            "'alphas' attribute missing from solution")
+                        self.endmembers,
+                        self.energy_interaction,
+                        self.volume_interaction,
+                        self.entropy_interaction,
+                    )
+                elif self.solution_type == "asymmetric":
+                    if hasattr(self, "alphas") is False:
+                        raise Exception("'alphas' attribute missing from solution")
                     self.solution_model = AsymmetricRegularSolution(
-                        self.endmembers, self.alphas, self.energy_interaction,
-                        self.volume_interaction, self.entropy_interaction)
-                elif self.solution_type == 'subregular':
-                    if hasattr(self, 'energy_ternary_terms') is False:
+                        self.endmembers,
+                        self.alphas,
+                        self.energy_interaction,
+                        self.volume_interaction,
+                        self.entropy_interaction,
+                    )
+                elif self.solution_type == "subregular":
+                    if hasattr(self, "energy_ternary_terms") is False:
                         self.energy_ternary_terms = None
-                    if hasattr(self, 'volume_ternary_terms') is False:
+                    if hasattr(self, "volume_ternary_terms") is False:
                         self.volume_ternary_terms = None
-                    if hasattr(self, 'entropy_ternary_terms') is False:
+                    if hasattr(self, "entropy_ternary_terms") is False:
                         self.entropy_ternary_terms = None
 
                     self.solution_model = SubregularSolution(
                         self.endmembers,
-                        self.energy_interaction,  self.volume_interaction,
+                        self.energy_interaction,
+                        self.volume_interaction,
                         self.entropy_interaction,
-                        self.energy_ternary_terms, self.volume_ternary_terms,
-                        self.entropy_ternary_terms)
-                elif self.solution_type == 'function':
-                    self.solution_model = FunctionSolution(self.endmembers,
-                                                           self.excess_gibbs_function)
+                        self.energy_ternary_terms,
+                        self.volume_ternary_terms,
+                        self.entropy_ternary_terms,
+                    )
+                elif self.solution_type == "function":
+                    self.solution_model = FunctionSolution(
+                        self.endmembers, self.excess_gibbs_function
+                    )
                 else:
-                    raise Exception("Solution model type "
-                                    + self.solution_type + "not recognised.")
+                    raise Exception(
+                        "Solution model type " + self.solution_type + "not recognised."
+                    )
         else:
             self.solution_model = SolutionModel()
 
         # Equation of state
         for i in range(self.n_endmembers):
             self.endmembers[i][0].set_method(
-                self.endmembers[i][0].params['equation_of_state'])
+                self.endmembers[i][0].params["equation_of_state"]
+            )
 
         # Molar fractions
         if molar_fractions is not None:
@@ -178,11 +191,11 @@ class Solution(Mineral):
         molar_fractions: list of float
             molar abundance for each endmember, needs to sum to one.
         """
-        assert(len(self.endmembers) == len(molar_fractions))
+        assert len(self.endmembers) == len(molar_fractions)
 
-        if self.solution_type != 'mechanical':
-            assert(sum(molar_fractions) > 0.9999)
-            assert(sum(molar_fractions) < 1.0001)
+        if self.solution_type != "mechanical":
+            assert sum(molar_fractions) > 0.9999
+            assert sum(molar_fractions) < 1.0001
 
         self.reset()
         self.molar_fractions = np.array(molar_fractions)
@@ -211,8 +224,9 @@ class Solution(Mineral):
         """
         Returns a list of endmember activities [unitless].
         """
-        return self.solution_model.activities(self.pressure, self.temperature,
-                                              self.molar_fractions)
+        return self.solution_model.activities(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def activity_coefficients(self):
@@ -220,9 +234,9 @@ class Solution(Mineral):
         Returns a list of endmember activity coefficients
         (gamma = activity / ideal activity) [unitless].
         """
-        return self.solution_model.activity_coefficients(self.pressure,
-                                                         self.temperature,
-                                                         self.molar_fractions)
+        return self.solution_model.activity_coefficients(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def molar_internal_energy(self):
@@ -238,7 +252,9 @@ class Solution(Mineral):
         Returns excess partial molar gibbs free energy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_partial_gibbs_free_energies(self.pressure, self.temperature, self.molar_fractions)
+        return self.solution_model.excess_partial_gibbs_free_energies(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def excess_partial_volumes(self):
@@ -246,9 +262,9 @@ class Solution(Mineral):
         Returns excess partial volumes [m^3].
         Property specific to solutions.
         """
-        return self.solution_model.excess_partial_volumes(self.pressure,
-                                                          self.temperature,
-                                                          self.molar_fractions)
+        return self.solution_model.excess_partial_volumes(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def excess_partial_entropies(self):
@@ -256,9 +272,9 @@ class Solution(Mineral):
         Returns excess partial entropies [J/K].
         Property specific to solutions.
         """
-        return self.solution_model.excess_partial_entropies(self.pressure,
-                                                            self.temperature,
-                                                            self.molar_fractions)
+        return self.solution_model.excess_partial_entropies(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def partial_gibbs(self):
@@ -266,9 +282,10 @@ class Solution(Mineral):
         Returns endmember partial molar gibbs free energy [J/mol].
         Property specific to solutions.
         """
-        return (np.array([self.endmembers[i][0].gibbs
-                          for i in range(self.n_endmembers)])
-                + self.excess_partial_gibbs)
+        return (
+            np.array([self.endmembers[i][0].gibbs for i in range(self.n_endmembers)])
+            + self.excess_partial_gibbs
+        )
 
     @material_property
     def partial_volumes(self):
@@ -276,9 +293,12 @@ class Solution(Mineral):
         Returns endmember partial volumes [m^3].
         Property specific to solutions.
         """
-        return (np.array([self.endmembers[i][0].molar_volume
-                          for i in range(self.n_endmembers)])
-                + self.excess_partial_volumes)
+        return (
+            np.array(
+                [self.endmembers[i][0].molar_volume for i in range(self.n_endmembers)]
+            )
+            + self.excess_partial_volumes
+        )
 
     @material_property
     def partial_entropies(self):
@@ -286,9 +306,12 @@ class Solution(Mineral):
         Returns endmember partial entropies [J/K].
         Property specific to solutions.
         """
-        return (np.array([self.endmembers[i][0].molar_entropy
-                          for i in range(self.n_endmembers)])
-                + self.excess_partial_entropies)
+        return (
+            np.array(
+                [self.endmembers[i][0].molar_entropy for i in range(self.n_endmembers)]
+            )
+            + self.excess_partial_entropies
+        )
 
     @material_property
     def excess_gibbs(self):
@@ -296,9 +319,9 @@ class Solution(Mineral):
         Returns molar excess gibbs free energy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_gibbs_free_energy(self.pressure,
-                                                            self.temperature,
-                                                            self.molar_fractions)
+        return self.solution_model.excess_gibbs_free_energy(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def gibbs_hessian(self):
@@ -306,9 +329,9 @@ class Solution(Mineral):
         Returns an array containing the second compositional derivative
         of the Gibbs free energy [J]. Property specific to solutions.
         """
-        return self.solution_model.gibbs_hessian(self.pressure,
-                                                 self.temperature,
-                                                 self.molar_fractions)
+        return self.solution_model.gibbs_hessian(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def entropy_hessian(self):
@@ -316,9 +339,9 @@ class Solution(Mineral):
         Returns an array containing the second compositional derivative
         of the entropy [J/K]. Property specific to solutions.
         """
-        return self.solution_model.entropy_hessian(self.pressure,
-                                                   self.temperature,
-                                                   self.molar_fractions)
+        return self.solution_model.entropy_hessian(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def volume_hessian(self):
@@ -326,9 +349,9 @@ class Solution(Mineral):
         Returns an array containing the second compositional derivative
         of the volume [m^3]. Property specific to solutions.
         """
-        return self.solution_model.volume_hessian(self.pressure,
-                                                  self.temperature,
-                                                  self.molar_fractions)
+        return self.solution_model.volume_hessian(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def molar_gibbs(self):
@@ -336,8 +359,15 @@ class Solution(Mineral):
         Returns molar Gibbs free energy of the solution [J/mol].
         Aliased with self.gibbs.
         """
-        return sum([self.endmembers[i][0].gibbs * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)]) + self.excess_gibbs
+        return (
+            sum(
+                [
+                    self.endmembers[i][0].gibbs * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.excess_gibbs
+        )
 
     @material_property
     def molar_helmholtz(self):
@@ -352,9 +382,12 @@ class Solution(Mineral):
         """
         Returns molar mass of the solution [kg/mol].
         """
-        return sum([self.endmembers[i][0].molar_mass
-                    * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)])
+        return sum(
+            [
+                self.endmembers[i][0].molar_mass * self.molar_fractions[i]
+                for i in range(self.n_endmembers)
+            ]
+        )
 
     @material_property
     def excess_volume(self):
@@ -362,9 +395,9 @@ class Solution(Mineral):
         Returns excess molar volume of the solution [m^3/mol].
         Specific property for solutions.
         """
-        return self.solution_model.excess_volume(self.pressure,
-                                                 self.temperature,
-                                                 self.molar_fractions)
+        return self.solution_model.excess_volume(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def molar_volume(self):
@@ -372,9 +405,15 @@ class Solution(Mineral):
         Returns molar volume of the solution [m^3/mol].
         Aliased with self.V.
         """
-        return sum([self.endmembers[i][0].molar_volume
-                    * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)]) + self.excess_volume
+        return (
+            sum(
+                [
+                    self.endmembers[i][0].molar_volume * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.excess_volume
+        )
 
     @material_property
     def density(self):
@@ -390,9 +429,9 @@ class Solution(Mineral):
         Returns excess molar entropy [J/K/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_entropy(self.pressure,
-                                                  self.temperature,
-                                                  self.molar_fractions)
+        return self.solution_model.excess_entropy(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def molar_entropy(self):
@@ -400,8 +439,15 @@ class Solution(Mineral):
         Returns molar entropy of the solution [J/K/mol].
         Aliased with self.S.
         """
-        return sum([self.endmembers[i][0].S * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)]) + self.excess_entropy
+        return (
+            sum(
+                [
+                    self.endmembers[i][0].S * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.excess_entropy
+        )
 
     @material_property
     def excess_enthalpy(self):
@@ -409,9 +455,9 @@ class Solution(Mineral):
         Returns excess molar enthalpy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_enthalpy(self.pressure,
-                                                   self.temperature,
-                                                   self.molar_fractions)
+        return self.solution_model.excess_enthalpy(
+            self.pressure, self.temperature, self.molar_fractions
+        )
 
     @material_property
     def molar_enthalpy(self):
@@ -419,8 +465,15 @@ class Solution(Mineral):
         Returns molar enthalpy of the solution [J/mol].
         Aliased with self.H.
         """
-        return sum([self.endmembers[i][0].H * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)]) + self.excess_enthalpy
+        return (
+            sum(
+                [
+                    self.endmembers[i][0].H * self.molar_fractions[i]
+                    for i in range(self.n_endmembers)
+                ]
+            )
+            + self.excess_enthalpy
+        )
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -428,10 +481,20 @@ class Solution(Mineral):
         Returns isothermal bulk modulus of the solution [Pa].
         Aliased with self.K_T.
         """
-        return self.V * 1. / (sum([self.endmembers[i][0].V
-                                   / (self.endmembers[i][0].K_T)
-                                   * self.molar_fractions[i]
-                                   for i in range(self.n_endmembers)]))
+        return (
+            self.V
+            * 1.0
+            / (
+                sum(
+                    [
+                        self.endmembers[i][0].V
+                        / (self.endmembers[i][0].K_T)
+                        * self.molar_fractions[i]
+                        for i in range(self.n_endmembers)
+                    ]
+                )
+            )
+        )
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -442,8 +505,11 @@ class Solution(Mineral):
         if self.temperature < 1e-10:
             return self.isothermal_bulk_modulus
         else:
-            return (self.isothermal_bulk_modulus
-                    * self.molar_heat_capacity_p / self.molar_heat_capacity_v)
+            return (
+                self.isothermal_bulk_modulus
+                * self.molar_heat_capacity_p
+                / self.molar_heat_capacity_v
+            )
 
     @material_property
     def isothermal_compressibility(self):
@@ -452,7 +518,7 @@ class Solution(Mineral):
         (or inverse isothermal bulk modulus) [1/Pa].
         Aliased with self.K_T.
         """
-        return 1. / self.isothermal_bulk_modulus
+        return 1.0 / self.isothermal_bulk_modulus
 
     @material_property
     def adiabatic_compressibility(self):
@@ -461,7 +527,7 @@ class Solution(Mineral):
         (or inverse adiabatic bulk modulus) [1/Pa].
         Aliased with self.K_S.
         """
-        return 1. / self.adiabatic_bulk_modulus
+        return 1.0 / self.adiabatic_bulk_modulus
 
     @material_property
     def shear_modulus(self):
@@ -469,8 +535,9 @@ class Solution(Mineral):
         Returns shear modulus of the solution [Pa].
         Aliased with self.G.
         """
-        G_list = np.fromiter((e[0].G for e in self.endmembers), dtype=float,
-                             count=self.n_endmembers)
+        G_list = np.fromiter(
+            (e[0].G for e in self.endmembers), dtype=float, count=self.n_endmembers
+        )
         return reuss_average_function(self.molar_fractions, G_list)
 
     @material_property
@@ -479,8 +546,10 @@ class Solution(Mineral):
         Returns P wave speed of the solution [m/s].
         Aliased with self.v_p.
         """
-        return np.sqrt((self.adiabatic_bulk_modulus
-                        + 4. / 3. * self.shear_modulus) / self.density)
+        return np.sqrt(
+            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            / self.density
+        )
 
     @material_property
     def bulk_sound_velocity(self):
@@ -505,10 +574,14 @@ class Solution(Mineral):
         Aliased with self.gr.
         """
         if self.temperature < 1e-10:
-            return float('nan')
+            return float("nan")
         else:
-            return (self.thermal_expansivity * self.isothermal_bulk_modulus
-                    * self.molar_volume / self.molar_heat_capacity_v)
+            return (
+                self.thermal_expansivity
+                * self.isothermal_bulk_modulus
+                * self.molar_volume
+                / self.molar_heat_capacity_v
+            )
 
     @material_property
     def thermal_expansivity(self):
@@ -517,10 +590,14 @@ class Solution(Mineral):
         of the solution [1/K].
         Aliased with self.alpha.
         """
-        return (1. / self.V) * sum([self.endmembers[i][0].alpha
-                                    * self.endmembers[i][0].V
-                                    * self.molar_fractions[i]
-                                    for i in range(self.n_endmembers)])
+        return (1.0 / self.V) * sum(
+            [
+                self.endmembers[i][0].alpha
+                * self.endmembers[i][0].V
+                * self.molar_fractions[i]
+                for i in range(self.n_endmembers)
+            ]
+        )
 
     @material_property
     def molar_heat_capacity_v(self):
@@ -529,10 +606,14 @@ class Solution(Mineral):
         solution [J/K/mol].
         Aliased with self.C_v.
         """
-        return (self.molar_heat_capacity_p
-                - self.molar_volume * self.temperature
-                * self.thermal_expansivity * self.thermal_expansivity
-                * self.isothermal_bulk_modulus)
+        return (
+            self.molar_heat_capacity_p
+            - self.molar_volume
+            * self.temperature
+            * self.thermal_expansivity
+            * self.thermal_expansivity
+            * self.isothermal_bulk_modulus
+        )
 
     @material_property
     def molar_heat_capacity_p(self):
@@ -541,9 +622,12 @@ class Solution(Mineral):
         of the solution [J/K/mol].
         Aliased with self.C_p.
         """
-        return sum([self.endmembers[i][0].molar_heat_capacity_p
-                    * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)])
+        return sum(
+            [
+                self.endmembers[i][0].molar_heat_capacity_p * self.molar_fractions[i]
+                for i in range(self.n_endmembers)
+            ]
+        )
 
     @cached_property
     def stoichiometric_matrix(self):
@@ -551,12 +635,14 @@ class Solution(Mineral):
         A sympy Matrix where each element M[i,j] corresponds
         to the number of atoms of element[j] in endmember[i].
         """
+
         def f(i, j):
             e = self.elements[j]
             if e in self.endmember_formulae[i]:
                 return nsimplify(self.endmember_formulae[i][e])
             else:
                 return 0
+
         return Matrix(len(self.endmember_formulae), len(self.elements), f)
 
     @cached_property
@@ -573,8 +659,9 @@ class Solution(Mineral):
         An array where each element arr[i,j] corresponds
         to the number of moles of endmember[j] involved in reaction[i].
         """
-        reaction_basis = np.array([v[:] for v in
-                                   self.stoichiometric_matrix.T.nullspace()])
+        reaction_basis = np.array(
+            [v[:] for v in self.stoichiometric_matrix.T.nullspace()]
+        )
 
         if len(reaction_basis) == 0:
             reaction_basis = np.empty((0, len(self.endmember_names)))
@@ -603,8 +690,11 @@ class Solution(Mineral):
         """
         The element indices not included in the independent list.
         """
-        return [i for i in range(len(self.elements))
-                if i not in self.independent_element_indices]
+        return [
+            i
+            for i in range(len(self.elements))
+            if i not in self.independent_element_indices
+        ]
 
     @cached_property
     def compositional_null_basis(self):
@@ -612,8 +702,7 @@ class Solution(Mineral):
         An array N such that N.b = 0 for all bulk compositions that can
         be produced with a linear sum of the endmembers in the solution.
         """
-        null_basis = np.array([v[:] for v in
-                               self.stoichiometric_matrix.nullspace()])
+        null_basis = np.array([v[:] for v in self.stoichiometric_matrix.nullspace()])
 
         M = null_basis[:, self.dependent_element_indices]
         assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
@@ -625,7 +714,7 @@ class Solution(Mineral):
         """
         A list of formulae for all the endmember in the solution.
         """
-        return [mbr[0].params['formula'] for mbr in self.endmembers]
+        return [mbr[0].params["formula"] for mbr in self.endmembers]
 
     @cached_property
     def endmember_names(self):

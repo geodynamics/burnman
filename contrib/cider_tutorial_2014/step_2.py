@@ -32,24 +32,26 @@ import matplotlib.pyplot as plt
 # hack to allow scripts to be placed in subdirectories next to burnman:
 import os
 import sys
-if not os.path.exists('burnman') and os.path.exists('../../burnman'):
-    sys.path.insert(1, os.path.abspath('../..'))
+
+if not os.path.exists("burnman") and os.path.exists("../../burnman"):
+    sys.path.insert(1, os.path.abspath("../.."))
 
 import burnman
 from burnman import minerals
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Again, we load the PREM seismic model and query it for pressure,
     # density, and elastic properties at lower mantle depths. This, too,
     # is identical to step 1
     n_depths = 20
-    min_depth = 850.e3
-    max_depth = 2800.e3
+    min_depth = 850.0e3
+    max_depth = 2800.0e3
     depths = np.linspace(min_depth, max_depth, n_depths)
 
     seismic_model = burnman.seismic.PREM()
     pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(
-        ['pressure', 'density', 'v_phi', 'v_s'], depths)
+        ["pressure", "density", "v_phi", "v_s"], depths
+    )
     temperature = burnman.geotherm.brown_shankland(depths)
 
     """
@@ -68,15 +70,18 @@ if __name__ == '__main__':
         # Here we define the rock as before.
         phase_2_fraction = 1.0 - phase_1_fraction
         rock = burnman.Composite(
-            [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()], [phase_1_fraction, phase_2_fraction])
+            [minerals.SLB_2011.stishovite(), minerals.SLB_2011.wuestite()],
+            [phase_1_fraction, phase_2_fraction],
+        )
 
         # Just as in step 1, we want to set which equation of state we use,
         # then call rock.evaluate(), which evaluates the
         # seismic velocities and density at the requested
         # pressures and temperatures
-        rock.set_method('slb3')
+        rock.set_method("slb3")
         density, vphi, vs = rock.evaluate(
-            ['density', 'v_phi', 'v_s'], pressure, temperature)
+            ["density", "v_phi", "v_s"], pressure, temperature
+        )
 
         # Since we will call this misfit function many times, we may be interested
         # in a status report.  These lines print some debug output so we
@@ -87,7 +92,8 @@ if __name__ == '__main__':
         # Here we integrate an L2 difference with depth between our calculated seismic
         # profiles and PREM.  We then return those misfits.
         [vs_err, vphi_err, rho_err] = burnman.utils.math.compare_l2(
-            depths, [vs, vphi, density], [seis_vs, seis_vphi, seis_rho])
+            depths, [vs, vphi, density], [seis_vs, seis_vphi, seis_rho]
+        )
 
         return vs_err, vphi_err, rho_err
 
@@ -113,8 +119,8 @@ if __name__ == '__main__':
     plt.plot(fraction, vs_misfit, "r-x", label=("Vs misfit"))
     plt.plot(fraction, vphi_misfit, "b-x", label=("Vphi misfit"))
     plt.plot(fraction, rho_misfit, "g-x", label=("Density misfit"))
-    plt.yscale('log')
-    plt.xlabel('Fraction Phase 1')
-    plt.ylabel('Misfit')
+    plt.yscale("log")
+    plt.xlabel("Fraction Phase 1")
+    plt.ylabel("Misfit")
     plt.legend()
     plt.show()

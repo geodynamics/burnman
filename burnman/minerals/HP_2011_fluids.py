@@ -44,121 +44,151 @@ from ..classes.mineral import Mineral
 from ..utils.chemistry import dictionarize_formula, formula_mass
 
 
-class CO2 (Mineral):
-
+class CO2(Mineral):
     def __init__(self):
-        formula = 'CO2'
+        formula = "CO2"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'carbon dioxide',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 304.2,
-            'cork_P': 0.0738e8,
-            'H_0': -393.51e3,
-            'S_0': 213.7,
-            'Cp': [87.8, -2.644e-3, 706.4e3, -998.9],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "carbon dioxide",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 304.2,
+            "cork_P": 0.0738e8,
+            "H_0": -393.51e3,
+            "S_0": 213.7,
+            "Cp": [87.8, -2.644e-3, 706.4e3, -998.9],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)
 
 
-class CH4 (Mineral):
-
+class CH4(Mineral):
     def __init__(self):
-        formula = 'CH4'
+        formula = "CH4"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'methane',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 190.6,
-            'cork_P': 0.0460e8,
-            'H_0': -74.81e3,
-            'S_0': 186.26,
-            'Cp': [150.1, 0.002063, 3427700., -2650.4],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "methane",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 190.6,
+            "cork_P": 0.0460e8,
+            "H_0": -74.81e3,
+            "S_0": 186.26,
+            "Cp": [150.1, 0.002063, 3427700.0, -2650.4],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)
 
 
-class O2 (Mineral):
-
+class O2(Mineral):
     def __init__(self):
-        formula = 'O2'
+        formula = "O2"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'oxygen',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 0.,
-            'cork_P': 1.0e5,
-            'H_0': 0.,
-            'S_0': 205.2,
-            'Cp': [48.3, -0.000691, 499200., -420.7],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "oxygen",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 0.0,
+            "cork_P": 1.0e5,
+            "H_0": 0.0,
+            "S_0": 205.2,
+            "Cp": [48.3, -0.000691, 499200.0, -420.7],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)
 
 
-class H2 (Mineral):
-
+class H2(Mineral):
     def __init__(self):
-        formula = 'H2'
+        formula = "H2"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'hydrogen',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 41.2,
-            'cork_P': 0.0211e8,
-            'H_0': 0.,
-            'S_0': 130.7,
-            'Cp': [23.3, 0.004627, 0.0, 76.3],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "hydrogen",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 41.2,
+            "cork_P": 0.0211e8,
+            "H_0": 0.0,
+            "S_0": 130.7,
+            "Cp": [23.3, 0.004627, 0.0, 76.3],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)
 
 
-class S2 (Mineral):
-
+class S2(Mineral):
     def __init__(self):
-        formula = 'S2'
+        formula = "S2"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'sulfur',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 1314.00,
-            'cork_P': 0.21000e8,
-            'H_0': 128.54e3,
-            'S_0': 231.0,
-            'Cp': [37.1, 0.002398, -161000.0, -65.0],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "sulfur",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 1314.00,
+            "cork_P": 0.21000e8,
+            "H_0": 128.54e3,
+            "S_0": 231.0,
+            "Cp": [37.1, 0.002398, -161000.0, -65.0],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)
 
 
-class H2S (Mineral):
-
+class H2S(Mineral):
     def __init__(self):
-        formula = 'H2S'
+        formula = "H2S"
         formula = dictionarize_formula(formula)
         self.params = {
-            'name': 'hydrogen sulfide',
-            'formula': formula,
-            'equation_of_state': 'cork',
-            'cork_params': [[5.45963e1, -8.63920e0], [9.18301e-1], [-3.30558e-2, 2.30524e-3], [6.93054e-4, -8.38293e-5]],
-            'cork_T': 373.15,
-            'cork_P': 0.08937e8,
-            'H_0': 128.54e3,
-            'S_0': 231.0,
-            'Cp': [47.4, 0.010240, 615900., -397.8],
-            'n': sum(formula.values()),
-            'molar_mass': formula_mass(formula)}
+            "name": "hydrogen sulfide",
+            "formula": formula,
+            "equation_of_state": "cork",
+            "cork_params": [
+                [5.45963e1, -8.63920e0],
+                [9.18301e-1],
+                [-3.30558e-2, 2.30524e-3],
+                [6.93054e-4, -8.38293e-5],
+            ],
+            "cork_T": 373.15,
+            "cork_P": 0.08937e8,
+            "H_0": 128.54e3,
+            "S_0": 231.0,
+            "Cp": [47.4, 0.010240, 615900.0, -397.8],
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
         Mineral.__init__(self)

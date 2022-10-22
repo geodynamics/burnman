@@ -43,12 +43,11 @@ if __name__ == "__main__":
 
     fo = SLB_2011.forsterite()
     cell_lengths = np.array([4.7646, 10.2296, 5.9942])
-    cell_lengths *= np.cbrt(fo.params['V_0'] / np.prod(cell_lengths))
+    cell_lengths *= np.cbrt(fo.params["V_0"] / np.prod(cell_lengths))
 
-    cell_parameters = np.array([cell_lengths[0],
-                                cell_lengths[1],
-                                cell_lengths[2],
-                                90, 90, 90])
+    cell_parameters = np.array(
+        [cell_lengths[0], cell_lengths[1], cell_lengths[2], 90, 90, 90]
+    )
 
     # The constants function is given as an expansion in ln(V/V0) and
     # thermal pressure (see paper). Here we are only interested in a single
@@ -61,93 +60,101 @@ if __name__ == "__main__":
     # This block is the most important; the other blocks are pressure and
     # temperature corrections.
     constants = np.zeros((6, 6, 2, 1))
-    constants[:, :, 1, 0] = np.array([[0.44,  -0.12, -0.1,  0.,   0.,   0.],
-                                      [-0.12,  0.78, -0.22, 0.,   0.,   0.],
-                                      [-0.1,  -0.22,  0.66, 0.,   0.,   0.],
-                                      [0.,     0.,    0.,   1.97, 0.,   0.],
-                                      [0.,     0.,    0.,   0.,   1.61, 0.],
-                                      [0.,     0.,    0.,   0.,   0.,   1.55]])
+    constants[:, :, 1, 0] = np.array(
+        [
+            [0.44, -0.12, -0.1, 0.0, 0.0, 0.0],
+            [-0.12, 0.78, -0.22, 0.0, 0.0, 0.0],
+            [-0.1, -0.22, 0.66, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1.97, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.61, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 1.55],
+        ]
+    )
 
     m = AnisotropicMineral(fo, cell_parameters, constants)
 
     # The following line checks that the mineral we just created is
     # internally consistent.
-    assert(check_anisotropic_eos_consistency(m))
+    assert check_anisotropic_eos_consistency(m)
 
     # Now we can set state and interrogate the
     # mineral for various anisotropic properties.
     # Here is a choice selection.
 
-    P = 1.e9
-    T = 1600.
+    P = 1.0e9
+    T = 1600.0
     m.set_state(P, T)
-    print(f'Model forsterite properties at {P/1.e9:.2f} GPa and {T:.2f} K:')
+    print(f"Model forsterite properties at {P/1.e9:.2f} GPa and {T:.2f} K:")
     np.set_printoptions(precision=3)
-    print('Cell vectors:')
+    print("Cell vectors:")
     print(m.cell_vectors)
-    print('Cell parameters:')
+    print("Cell parameters:")
     print(m.cell_parameters)
-    print('Thermal expansivity:')
+    print("Thermal expansivity:")
     print(m.thermal_expansivity_tensor)
-    print('Isothermal compressibility:')
+    print("Isothermal compressibility:")
     print(m.isothermal_compressibility_tensor)
-    print('Isothermal stiffness_tensor:')
+    print("Isothermal stiffness_tensor:")
     print(m.isothermal_stiffness_tensor)
-    print('Isentropic stiffness_tensor:')
+    print("Isentropic stiffness_tensor:")
     print(m.isentropic_stiffness_tensor)
-    print('Grueneisen tensor:')
+    print("Grueneisen tensor:")
     print(m.grueneisen_tensor)
 
     # We can also obtain the scalar properties that are inherited from
     # the isotropic equation of state
-    print(f'Volume: {m.V * 1.e6:.4f} cm^3/mol')
-    print(f'Entropy: {m.S:.2f} J/K/mol')
-    print(f'C_p: {m.molar_heat_capacity_p:.2f} J/K/mol')
+    print(f"Volume: {m.V * 1.e6:.4f} cm^3/mol")
+    print(f"Entropy: {m.S:.2f} J/K/mol")
+    print(f"C_p: {m.molar_heat_capacity_p:.2f} J/K/mol")
 
     # Plot thermal expansion figure
     fig = plt.figure(figsize=(8, 4))
     ax = [fig.add_subplot(1, 2, i) for i in range(1, 3)]
 
-    temperatures = np.linspace(10., 1600., 101)
+    temperatures = np.linspace(10.0, 1600.0, 101)
     alphas = np.empty((101, 4))
     extensions = np.empty((101, 3))
     vectors = np.empty((101, 4))
 
-    labels = ['a', 'b', 'c', 'V']
+    labels = ["a", "b", "c", "V"]
 
     for i, T in enumerate(temperatures):
-        m.set_state(1.e5, T)
-        alphas[i, :3] = np.diag(m.thermal_expansivity_tensor)*1.e5
-        alphas[i, 3] = m.alpha*1.e5 / 3.
-        extensions[i] = ((np.diag(m.cell_vectors)
-                          / np.diag(m.cell_vectors_0)) - 1.)*1.e4
+        m.set_state(1.0e5, T)
+        alphas[i, :3] = np.diag(m.thermal_expansivity_tensor) * 1.0e5
+        alphas[i, 3] = m.alpha * 1.0e5 / 3.0
+        extensions[i] = (
+            (np.diag(m.cell_vectors) / np.diag(m.cell_vectors_0)) - 1.0
+        ) * 1.0e4
         vectors[i, :3] = np.diag(m.cell_vectors)
 
         vectors[i, 3] = m.V
 
     for i in range(4):
-        label = f'$\\alpha_{{{labels[i]}}}$'
+        label = f"$\\alpha_{{{labels[i]}}}$"
         if i == 3:
-            ln = ax[0].plot(temperatures, alphas[:, i], label=label+'/3')
+            ln = ax[0].plot(temperatures, alphas[:, i], label=label + "/3")
         else:
             ax[0].plot(temperatures, alphas[:, i], label=label)
 
     for i in range(3):
         ax[1].plot(temperatures, extensions[:, i], label=labels[i])
 
-    Vthird_expansion = 1.e4*(np.power(np.prod(extensions*1.e-4 + 1, axis=1),
-                                      1./3.) - 1.)
-    ln = ax[1].plot(temperatures, Vthird_expansion, label='$V^{1/3}$')
+    Vthird_expansion = 1.0e4 * (
+        np.power(np.prod(extensions * 1.0e-4 + 1, axis=1), 1.0 / 3.0) - 1.0
+    )
+    ln = ax[1].plot(temperatures, Vthird_expansion, label="$V^{1/3}$")
 
-    ax[0].set_ylim(0.,)
+    ax[0].set_ylim(
+        0.0,
+    )
 
     for i in range(2):
-        ax[i].set_xlim(0., 1600.)
-        ax[i].set_xlabel('Temperature (K)')
+        ax[i].set_xlim(0.0, 1600.0)
+        ax[i].set_xlabel("Temperature (K)")
         ax[i].legend()
 
-    ax[0].set_ylabel('Thermal expansivity (10$^{-5}$/K)')
-    ax[1].set_ylabel('Relative length change ($10^{4} (x/x_0 - 1)$)')
+    ax[0].set_ylabel("Thermal expansivity (10$^{-5}$/K)")
+    ax[1].set_ylabel("Relative length change ($10^{4} (x/x_0 - 1)$)")
 
     fig.set_tight_layout(True)
     # fig.savefig('example_anisotropic_mineral_Figure_1.png')
@@ -157,7 +164,7 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(12, 12))
     ax = [fig.add_subplot(3, 3, i) for i in range(1, 10)]
 
-    pressures = np.linspace(1.e7, 30.e9, 101)
+    pressures = np.linspace(1.0e7, 30.0e9, 101)
     G_iso = np.empty_like(pressures)
     G_aniso = np.empty_like(pressures)
     C = np.empty((len(pressures), 6, 6))
@@ -165,22 +172,22 @@ if __name__ == "__main__":
     f = np.empty_like(pressures)
     dXdf = np.empty_like(pressures)
 
-    i_pq = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6),
-            (1, 2), (1, 3), (2, 3))
+    i_pq = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 2), (1, 3), (2, 3))
 
-    temperatures = [500., 1000., 1500., 2000.]
+    temperatures = [500.0, 1000.0, 1500.0, 2000.0]
     for T in temperatures:
         for i, P in enumerate(pressures):
             m.set_state(P, T)
             C[i] = m.isentropic_stiffness_tensor
 
         for i, (p, q) in enumerate(i_pq):
-            ln = ax[i].plot(pressures/1.e9, C[:, p-1, q-1]/1.e9,
-                            label=f'{T} K')
+            ln = ax[i].plot(
+                pressures / 1.0e9, C[:, p - 1, q - 1] / 1.0e9, label=f"{T} K"
+            )
 
     for i, (p, q) in enumerate(i_pq):
-        ax[i].set_xlabel('Pressure (GPa)')
-        ax[i].set_ylabel(f'$C_{{N {p}{q}}}$ (GPa)')
+        ax[i].set_xlabel("Pressure (GPa)")
+        ax[i].set_ylabel(f"$C_{{N {p}{q}}}$ (GPa)")
         ax[i].legend()
 
     fig.set_tight_layout(True)
@@ -190,20 +197,23 @@ if __name__ == "__main__":
     # Finally, we make a pretty plot of various elastic/seismic properties
     # at a fixed pressure and temperature.
     fig = plt.figure(figsize=(12, 7))
-    ax = [fig.add_subplot(2, 3, i, projection='polar') for i in range(1, 7)]
+    ax = [fig.add_subplot(2, 3, i, projection="polar") for i in range(1, 7)]
 
-    P = 3.e9
-    T = 1600.
+    P = 3.0e9
+    T = 1600.0
     m.set_state(P, T)
-    plot_types = ['vp', 'vs1', 'vp/vs1',
-                  's anisotropy', 'linear compressibility', 'youngs modulus']
+    plot_types = [
+        "vp",
+        "vs1",
+        "vp/vs1",
+        "s anisotropy",
+        "linear compressibility",
+        "youngs modulus",
+    ]
 
-    contour_sets, ticks, lines = plot_projected_elastic_properties(m,
-                                                                   plot_types,
-                                                                   ax)
+    contour_sets, ticks, lines = plot_projected_elastic_properties(m, plot_types, ax)
     for i in range(len(contour_sets)):
-        cbar = fig.colorbar(contour_sets[i], ax=ax[i],
-                            ticks=ticks[i], pad=0.1)
+        cbar = fig.colorbar(contour_sets[i], ax=ax[i], ticks=ticks[i], pad=0.1)
         cbar.add_lines(lines[i])
 
     fig.set_tight_layout(True)

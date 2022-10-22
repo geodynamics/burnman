@@ -20,7 +20,7 @@ class OrderedCounter(Counter, OrderedDict):
     """
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, OrderedDict(self))
+        return "%s(%r)" % (self.__class__.__name__, OrderedDict(self))
 
     def __reduce__(self):
         return self.__class__, (OrderedDict(self),)
@@ -36,9 +36,11 @@ def copy_documentation(copy_from):
         <optionally the documentation found in a()>
 
     """
+
     def mydecorator(func):
         def wrapper(*args):
             return func(*args)
+
         old = ""
         if func.__doc__:
             old = "\n" + func.__doc__
@@ -49,6 +51,7 @@ def copy_documentation(copy_from):
         wrapper.__doc__ = copied_from + copy_from.__doc__ + old
         wrapper.__name__ = func.__name__
         return wrapper
+
     return mydecorator
 
 
@@ -60,8 +63,11 @@ def merge_two_dicts(x, y):
 
 
 def flatten(arr):
-    return (flatten(arr[0]) + (flatten(arr[1:]) if len(arr) > 1 else [])
-            if type(arr) is list or type(arr) is np.ndarray else [arr])
+    return (
+        flatten(arr[0]) + (flatten(arr[1:]) if len(arr) > 1 else [])
+        if type(arr) is list or type(arr) is np.ndarray
+        else [arr]
+    )
 
 
 def pretty_print_values(popt, pcov, params):
@@ -75,14 +81,18 @@ def pretty_print_values(popt, pcov, params):
         p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
         c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
 
-        if p_rnd != 0.:
+        if p_rnd != 0.0:
             p_expnt = np.floor(np.log10(np.abs(p_rnd)))
         else:
-            p_expnt = 0.
+            p_expnt = 0.0
 
-        scale = np.power(10., p_expnt)
+        scale = np.power(10.0, p_expnt)
         nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
-        print('{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}'.format(p, p_rnd/scale, c_rnd/scale, scale, 0, (nd)/10.))
+        print(
+            "{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}".format(
+                p, p_rnd / scale, c_rnd / scale, scale, 0, (nd) / 10.0
+            )
+        )
 
 
 def pretty_print_table(table, use_tabs=False):
@@ -104,7 +114,11 @@ def pretty_print_table(table, use_tabs=False):
     # create a format string with the first column left aligned, the others right
     # example:   {:<27}{:>11}{:>6}{:>8}
     frmt = "".join(
-        [('{:<' if i == 0 else '{:>') + str(1 + col_width(table, i)) + '}' for i in range(len(table[0]))])
+        [
+            ("{:<" if i == 0 else "{:>") + str(1 + col_width(table, i)) + "}"
+            for i in range(len(table[0]))
+        ]
+    )
     for r in table:
         print(frmt.format(*r))
 
@@ -117,14 +131,15 @@ def sort_table(table, col=0):
 
 
 def read_table(filename):
-    datastream = pkgutil.get_data('burnman', 'data/' + filename)
-    datalines = [line.strip()
-                 for line in datastream.decode('ascii').split('\n') if line.strip()]
+    datastream = pkgutil.get_data("burnman", "data/" + filename)
+    datalines = [
+        line.strip() for line in datastream.decode("ascii").split("\n") if line.strip()
+    ]
     table = []
 
     for line in datalines:
-        if (line[0] != '#'):
-            numbers = np.fromstring(line, sep=' ')
+        if line[0] != "#":
+            numbers = np.fromstring(line, sep=" ")
             table.append(numbers)
     return np.array(table)
 
@@ -136,12 +151,13 @@ def array_from_file(filename):
 
     Commented lines are prefixed by the characters # or %.
     """
-    f = open(filename, 'r')
+    f = open(filename, "r")
     data = []
     datastream = f.read()
     f.close()
-    datalines = [line.strip().split()
-                 for line in datastream.split('\n') if line.strip()]
+    datalines = [
+        line.strip().split() for line in datastream.split("\n") if line.strip()
+    ]
     for line in datalines:
         if line[0] != "#" and line[0] != "%":
             data.append(map(float, line))
@@ -159,11 +175,12 @@ def cut_table(table, min_value, max_value):
 
 def lookup_and_interpolate(table_x, table_y, x_value):
     idx = bisect.bisect_left(table_x, x_value) - 1
-    if (idx < 0):
+    if idx < 0:
         return table_y[0]
-    elif (idx < len(table_x) - 1):
-        return linear_interpol(x_value, table_x[idx], table_x[idx + 1],
-                               table_y[idx], table_y[idx + 1])
+    elif idx < len(table_x) - 1:
+        return linear_interpol(
+            x_value, table_x[idx], table_x[idx + 1], table_y[idx], table_y[idx + 1]
+        )
     else:
         return table_y[idx]
 
@@ -199,13 +216,14 @@ def attribute_function(m, attributes, powers=[]):
     if type(attributes) is str:
         attributes = [attributes]
     if powers == []:
-        powers = [1. for a in attributes]
+        powers = [1.0 for a in attributes]
 
     def f(x):
         P, T, V = x
         m.set_state(P, T)
-        value = 1.
+        value = 1.0
         for a, p in zip(*[attributes, powers]):
             value *= np.power(getattr(m, a), p)
         return value
+
     return f

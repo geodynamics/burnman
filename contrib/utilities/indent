@@ -17,6 +17,8 @@ fi
 # with up to 10 in parallel
 echo "--- Indenting all BurnMan header and source files"
 
+# Run black autoformatter
+find burnman contrib examples misc tests \( -name '*.py' \) -print | xargs -n 1 -P 10 -I {} bash -c 'black "$@"' _ {}
 
 # remove execute permission on source files:
 find burnman contrib examples misc tests \( -name '*.py' \) -print | xargs -n 50 -P 10 chmod -x

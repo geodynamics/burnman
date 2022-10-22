@@ -42,10 +42,9 @@ if __name__ == "__main__":
     fe_pc = 0.2
     pv = minerals.SLB_2011.mg_fe_perovskite()
     pc = minerals.SLB_2011.ferropericlase()
-    pv.set_composition([1. - fe_pv, fe_pv, 0.])
-    pc.set_composition([1. - fe_pc, fe_pc])
-    rock = burnman.Composite(
-        [pv, pc], [amount_perovskite, 1.0 - amount_perovskite])
+    pv.set_composition([1.0 - fe_pv, fe_pv, 0.0])
+    pc.set_composition([1.0 - fe_pc, fe_pc])
+    rock = burnman.Composite([pv, pc], [amount_perovskite, 1.0 - amount_perovskite])
 
     # define some pressure range
     pressures = np.arange(25e9, 130e9, 5e9)
@@ -56,17 +55,18 @@ if __name__ == "__main__":
     print("Calculations are done for:")
     rock.debug_print()
 
-    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = \
-        rock.evaluate(
-            ['density', 'v_p', 'v_s', 'v_phi', 'K_S', 'G'], pressures, temperature)
+    mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = rock.evaluate(
+        ["density", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperature
+    )
     # write to file:
     output_filename = "example_woutput.txt"
-    f = open(output_filename, 'wb')
+    f = open(output_filename, "wb")
     header = "#Pressure\tTemperature\tmat_rho\tmat_vs\tmat_vp\tmat_vphi\tmat_K\tmat_G\n"
-    f.write(header.encode('utf-8'))
+    f.write(header.encode("utf-8"))
 
     data = list(
-        zip(pressures, temperature, mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_G))
-    np.savetxt(f, data, fmt='%.10e', delimiter='\t')
+        zip(pressures, temperature, mat_rho, mat_vs, mat_vp, mat_vphi, mat_K, mat_G)
+    )
+    np.savetxt(f, data, fmt="%.10e", delimiter="\t")
 
     print("\nYour data has been saved as: ", output_filename)

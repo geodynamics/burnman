@@ -11,11 +11,11 @@ from sympy.simplify.simplify import simplify as _simplify
 
 def _iszero(x):
     """Returns True if x is zero."""
-    return getattr(x, 'is_zero', None)
+    return getattr(x, "is_zero", None)
 
 
 def _find_reasonable_pivot(col, iszerofunc=_iszero, simpfunc=_simplify):
-    """ Find the lowest index of an item in ``col`` that is
+    """Find the lowest index of an item in ``col`` that is
     suitable for a pivot.  If ``col`` consists only of
     Floats, the pivot with the largest norm is returned.
     Otherwise, the first element where ``iszerofunc`` returns
@@ -37,8 +37,9 @@ def _find_reasonable_pivot(col, iszerofunc=_iszero, simpfunc=_simplify):
     # a column that contains a mix of floats and integers
     # but at least one float is considered a numerical
     # column, and so we do partial pivoting
-    if ((all(isinstance(x, (Float, Integer)) for x in col)
-         and any(isinstance(x, Float) for x in col))):
+    if all(isinstance(x, (Float, Integer)) for x in col) and any(
+        isinstance(x, Float) for x in col
+    ):
         col_abs = [abs(x) for x in col]
         max_value = max(col_abs)
         if iszerofunc(max_value):
@@ -46,8 +47,7 @@ def _find_reasonable_pivot(col, iszerofunc=_iszero, simpfunc=_simplify):
             # mean the value is numerically zero.  Make sure
             # to replace all entries with numerical zeros
             if max_value != 0:
-                newly_determined = [(i, 0) for i, x in enumerate(col)
-                                    if x != 0]
+                newly_determined = [(i, 0) for i, x in enumerate(col) if x != 0]
             return (None, None, False, newly_determined)
         index = col_abs.index(max_value)
         return (index, col[index], False, newly_determined)
@@ -119,8 +119,16 @@ def _find_reasonable_pivot(col, iszerofunc=_iszero, simpfunc=_simplify):
     return (i, col[i], True, newly_determined)
 
 
-def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
-                     normalize_last=True, normalize=True, zero_above=True):
+def _row_reduce_list(
+    mat,
+    rows,
+    cols,
+    iszerofunc,
+    simpfunc,
+    normalize_last=True,
+    normalize=True,
+    zero_above=True,
+):
     """Row reduce a flat list representation of a matrix and return a tuple
     (rref_matrix, pivot_cols, swaps) where ``rref_matrix`` is a flat list,
     ``pivot_cols`` are the pivot columns and ``swaps`` are any row swaps that
@@ -149,31 +157,38 @@ def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
         return mat[i::cols]
 
     def row_swap(i, j):
-        mat[i*cols:(i + 1)*cols], mat[j*cols:(j + 1)*cols] = \
-            mat[j*cols:(j + 1)*cols], mat[i*cols:(i + 1)*cols]
+        mat[i * cols : (i + 1) * cols], mat[j * cols : (j + 1) * cols] = (
+            mat[j * cols : (j + 1) * cols],
+            mat[i * cols : (i + 1) * cols],
+        )
 
     def cross_cancel(a, i, b, j):
         """Does the row op row[i] = a*row[i] - b*row[j]"""
-        q = (j - i)*cols
-        for p in range(i*cols, (i + 1)*cols):
-            mat[p] = isimp(a*mat[p] - b*mat[p + q])
+        q = (j - i) * cols
+        for p in range(i * cols, (i + 1) * cols):
+            mat[p] = isimp(a * mat[p] - b * mat[p + q])
 
     def isimp(x):
         return x
+
     piv_row, piv_col = 0, 0
     pivot_cols = []
     swaps = []
 
     # use a fraction free method to zero above and below each pivot
     while piv_col < cols and piv_row < rows:
-        pivot_offset, pivot_val, assumed_nonzero, newly_determined = _find_reasonable_pivot(
-            get_col(piv_col)[piv_row:], iszerofunc, simpfunc)
+        (
+            pivot_offset,
+            pivot_val,
+            assumed_nonzero,
+            newly_determined,
+        ) = _find_reasonable_pivot(get_col(piv_col)[piv_row:], iszerofunc, simpfunc)
 
         # _find_reasonable_pivot may have simplified some things
         # in the process.  Let's not let them go to waste
         for (offset, val) in newly_determined:
             offset += piv_row
-            mat[offset*cols + piv_col] = val
+            mat[offset * cols + piv_col] = val
 
         if pivot_offset is None:
             piv_col += 1
@@ -188,8 +203,8 @@ def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
         # before we zero the other rows
         if normalize_last is False:
             i, j = piv_row, piv_col
-            mat[i*cols + j] = S.One
-            for p in range(i*cols + j + 1, (i + 1)*cols):
+            mat[i * cols + j] = S.One
+            for p in range(i * cols + j + 1, (i + 1) * cols):
                 mat[p] = isimp(mat[p] / pivot_val)
             # after normalizing, the pivot value is 1
             pivot_val = S.One
@@ -203,7 +218,7 @@ def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
             if zero_above is False and row < piv_row:
                 continue
             # if we're already a zero, don't do anything
-            val = mat[row*cols + piv_col]
+            val = mat[row * cols + piv_col]
             if iszerofunc(val):
                 continue
 
@@ -213,9 +228,9 @@ def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
     # normalize each row
     if normalize_last is True and normalize is True:
         for piv_i, piv_j in enumerate(pivot_cols):
-            pivot_val = mat[piv_i*cols + piv_j]
-            mat[piv_i*cols + piv_j] = S.One
-            for p in range(piv_i*cols + piv_j + 1, (piv_i + 1)*cols):
+            pivot_val = mat[piv_i * cols + piv_j]
+            mat[piv_i * cols + piv_j] = S.One
+            for p in range(piv_i * cols + piv_j + 1, (piv_i + 1) * cols):
                 mat[p] = isimp(mat[p] / pivot_val)
 
     return mat, tuple(pivot_cols), tuple(swaps)
@@ -223,25 +238,37 @@ def _row_reduce_list(mat, rows, cols, iszerofunc, simpfunc,
 
 # This functions is a candidate for caching
 # if it gets implemented for matrices.
-def row_reduce(M, iszerofunc=lambda x: x.is_zero,
-               simpfunc=lambda x: Rational(x).limit_denominator(1000),
-               normalize_last=True,
-               normalize=True, zero_above=True):
+def row_reduce(
+    M,
+    iszerofunc=lambda x: x.is_zero,
+    simpfunc=lambda x: Rational(x).limit_denominator(1000),
+    normalize_last=True,
+    normalize=True,
+    zero_above=True,
+):
 
-    mat, pivot_cols, swaps = _row_reduce_list(list(M), M.rows, M.cols,
-                                              iszerofunc, simpfunc,
-                                              normalize_last=normalize_last,
-                                              normalize=normalize,
-                                              zero_above=zero_above)
+    mat, pivot_cols, swaps = _row_reduce_list(
+        list(M),
+        M.rows,
+        M.cols,
+        iszerofunc,
+        simpfunc,
+        normalize_last=normalize_last,
+        normalize=normalize,
+        zero_above=zero_above,
+    )
 
     return M._new(M.rows, M.cols, mat), pivot_cols, swaps
 
 
-def independent_row_indices(m, iszerofunc=lambda x: x.is_zero,
-                            simpfunc=lambda x: Rational(x).limit_denominator(1000)):
+def independent_row_indices(
+    m,
+    iszerofunc=lambda x: x.is_zero,
+    simpfunc=lambda x: Rational(x).limit_denominator(1000),
+):
 
     _, pivots, swaps = row_reduce(m, iszerofunc, simpfunc)
     indices = np.array(range(len(m)))
     for swap in np.array(swaps):
         indices[swap] = indices[swap[::-1]]
-    return indices[:len(pivots)]
+    return indices[: len(pivots)]

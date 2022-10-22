@@ -44,12 +44,12 @@ def linear_interpol(x, x1, x2, y1, y2):
     Linearly interpolate to point x, between
     the points (x1,y1), (x2,y2)
     """
-    assert(x1 <= x)
-    assert(x2 >= x)
-    assert(x1 <= x2)
+    assert x1 <= x
+    assert x2 >= x
+    assert x1 <= x2
 
     alpha = (x - x1) / (x2 - x1)
-    return (1. - alpha) * y1 + alpha * y2
+    return (1.0 - alpha) * y1 + alpha * y2
 
 
 def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
@@ -84,7 +84,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     """
     niter = 0
     dx = np.abs(dx)
-    assert(ratio > 1.0)
+    assert ratio > 1.0
 
     # Get the starting positions
     f0 = fn(x0, *args)
@@ -94,27 +94,33 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     f_right = fn(x_right, *args)
 
     # Overshot zero, try making dx smaller
-    if (f0 - f_left) * (f_right - f0) < 0.:
-        while (f0 - f_left) * (f_right - f0) < 0. and dx > np.finfo('float').eps and niter < maxiter:
+    if (f0 - f_left) * (f_right - f0) < 0.0:
+        while (
+            (f0 - f_left) * (f_right - f0) < 0.0
+            and dx > np.finfo("float").eps
+            and niter < maxiter
+        ):
             dx /= ratio
             x_left = x0 - dx
             x_right = x0 + dx
             f_left = fn(x_left, *args)
             f_right = fn(x_right, *args)
             niter += 1
-        if niter == maxiter:  # Couldn't find something with same slope in both directions
-            raise ValueError('Cannot find zero.')
+        if (
+            niter == maxiter
+        ):  # Couldn't find something with same slope in both directions
+            raise ValueError("Cannot find zero.")
 
     niter = 0
     slope = f_right - f0
-    if slope > 0. and f0 > 0.:  # Walk left
+    if slope > 0.0 and f0 > 0.0:  # Walk left
         dx = -dx
         x1 = x_left
         f1 = f_left
-    elif slope > 0. and f0 < 0.:  # Walk right
+    elif slope > 0.0 and f0 < 0.0:  # Walk right
         x1 = x_right
         f1 = f_right
-    elif slope < 0. and f0 > 0:  # Walk right
+    elif slope < 0.0 and f0 > 0:  # Walk right
         x1 = x_right
         f1 = f_right
     else:  # Walk left
@@ -123,7 +129,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
         f1 = f_left
 
     # Do the walking
-    while f0 * f1 > 0. and niter < maxiter:
+    while f0 * f1 > 0.0 and niter < maxiter:
         dx *= ratio
         xnew = x1 + dx
         fnew = fn(xnew, *args)
@@ -133,8 +139,8 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
         f1 = fnew
         niter += 1
 
-    if f0 * f1 > 0.:
-        raise ValueError('Cannot find zero.')
+    if f0 * f1 > 0.0:
+        raise ValueError("Cannot find zero.")
     else:
         return x0, x1, f0, f1
 
@@ -163,42 +169,68 @@ def _pad_ndarray_inverse_mirror(array, padding):
         The padded array
 
     """
-    padded_shape = [n + 2*padding[i] for i, n in enumerate(array.shape)]
+    padded_shape = [n + 2 * padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
 
-    slices = tuple([slice(padding[i], padding[i] + l)
-                    for i, l in enumerate(array.shape)])
+    slices = tuple(
+        [slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]
+    )
     padded_array[slices] = array
 
-    padded_array_indices = list(itertools.product(*[range(n + 2*padding[i])
-                                                    for i, n
-                                                    in enumerate(array.shape)]))
-    inserted_indices = list(itertools.product(*[range(padding[i], padding[i] + l)
-                                                for i, l
-                                                in enumerate(array.shape)]))
+    padded_array_indices = list(
+        itertools.product(
+            *[range(n + 2 * padding[i]) for i, n in enumerate(array.shape)]
+        )
+    )
+    inserted_indices = list(
+        itertools.product(
+            *[range(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]
+        )
+    )
     padded_array_indices.extend(inserted_indices)
 
     counter = Counter(padded_array_indices)
     keys = list(counter.keys())
-    padded_indices = [keys[i] for i, value in enumerate(counter.values())
-                      if value == 1]
-    edge_indices = tuple([tuple([np.min([np.max([axis_idx, padding[dimension]]),
-                                         padded_array.shape[dimension] - padding[dimension] - 1])
-                                 for dimension, axis_idx in enumerate(idx)]) for idx in padded_indices])
-    mirror_indices = tuple([tuple([2*edge_indices[i][j] - padded_indices[i][j]
-                                   for j in range(len(array.shape))])
-                            for i in range(len(padded_indices))])
+    padded_indices = [keys[i] for i, value in enumerate(counter.values()) if value == 1]
+    edge_indices = tuple(
+        [
+            tuple(
+                [
+                    np.min(
+                        [
+                            np.max([axis_idx, padding[dimension]]),
+                            padded_array.shape[dimension] - padding[dimension] - 1,
+                        ]
+                    )
+                    for dimension, axis_idx in enumerate(idx)
+                ]
+            )
+            for idx in padded_indices
+        ]
+    )
+    mirror_indices = tuple(
+        [
+            tuple(
+                [
+                    2 * edge_indices[i][j] - padded_indices[i][j]
+                    for j in range(len(array.shape))
+                ]
+            )
+            for i in range(len(padded_indices))
+        ]
+    )
 
     for i, idx in enumerate(padded_indices):
-        padded_array[idx] = (2.*padded_array[edge_indices[i]]
-                             - padded_array[mirror_indices[i]])
+        padded_array[idx] = (
+            2.0 * padded_array[edge_indices[i]] - padded_array[mirror_indices[i]]
+        )
 
     return padded_array
 
 
-def smooth_array(array, grid_spacing,
-                 gaussian_rms_widths, truncate=4.0,
-                 mode='inverse_mirror'):
+def smooth_array(
+    array, grid_spacing, gaussian_rms_widths, truncate=4.0, mode="inverse_mirror"
+):
     """
     Creates a smoothed array by convolving it with a gaussian filter.
     Grid resolutions and gaussian RMS widths are required for each of
@@ -234,15 +266,15 @@ def smooth_array(array, grid_spacing,
 
     # gaussian_filter works with standard deviations normalised to
     # the grid spacing.
-    sigma = tuple(np.array(gaussian_rms_widths)/np.array(grid_spacing))
+    sigma = tuple(np.array(gaussian_rms_widths) / np.array(grid_spacing))
 
-    if mode == 'inverse_mirror':
-        padding = tuple([int(np.ceil(truncate*s)) for s in sigma])
+    if mode == "inverse_mirror":
+        padding = tuple([int(np.ceil(truncate * s)) for s in sigma])
         padded_array = _pad_ndarray_inverse_mirror(array, padding)
-        smoothed_padded_array = gaussian_filter(padded_array,
-                                                sigma=sigma)
-        slices = tuple([slice(padding[i], padding[i] + l)
-                        for i, l in enumerate(array.shape)])
+        smoothed_padded_array = gaussian_filter(padded_array, sigma=sigma)
+        slices = tuple(
+            [slice(padding[i], padding[i] + l) for i, l in enumerate(array.shape)]
+        )
         smoothed_array = smoothed_padded_array[slices]
     else:
         smoothed_array = gaussian_filter(array, sigma=sigma, mode=mode)
@@ -250,12 +282,16 @@ def smooth_array(array, grid_spacing,
     return smoothed_array
 
 
-def interp_smoothed_array_and_derivatives(array,
-                                          x_values, y_values,
-                                          x_stdev=0., y_stdev=0.,
-                                          truncate=4.,
-                                          mode='inverse_mirror',
-                                          indexing='xy'):
+def interp_smoothed_array_and_derivatives(
+    array,
+    x_values,
+    y_values,
+    x_stdev=0.0,
+    y_stdev=0.0,
+    truncate=4.0,
+    mode="inverse_mirror",
+    indexing="xy",
+):
     """
     Creates a smoothed array on a regular 2D grid. Smoothing
     is achieved using :func:`burnman.tools.math.smooth_array`.
@@ -299,30 +335,34 @@ def interp_smoothed_array_and_derivatives(array,
     dx = x_values[1] - x_values[0]
     dy = y_values[1] - y_values[0]
 
-    if indexing == 'xy':
-        smoothed_array = smooth_array(array=array,
-                                      grid_spacing=np.array([dy, dx]),
-                                      gaussian_rms_widths=np.array([y_stdev,
-                                                                    x_stdev]),
-                                      truncate=truncate,
-                                      mode=mode)
+    if indexing == "xy":
+        smoothed_array = smooth_array(
+            array=array,
+            grid_spacing=np.array([dy, dx]),
+            gaussian_rms_widths=np.array([y_stdev, x_stdev]),
+            truncate=truncate,
+            mode=mode,
+        )
 
-    elif indexing == 'ij':
-        smoothed_array = smooth_array(array=array,
-                                      grid_spacing=np.array([dx, dy]),
-                                      gaussian_rms_widths=np.array([x_stdev,
-                                                                    y_stdev]),
-                                      truncate=truncate,
-                                      mode=mode).T
+    elif indexing == "ij":
+        smoothed_array = smooth_array(
+            array=array,
+            grid_spacing=np.array([dx, dy]),
+            gaussian_rms_widths=np.array([x_stdev, y_stdev]),
+            truncate=truncate,
+            mode=mode,
+        ).T
 
     else:
-        raise Exception('Indexing scheme not recognised. Should be ij or xy.')
+        raise Exception("Indexing scheme not recognised. Should be ij or xy.")
 
     dSAdydy, dSAdxdx = np.gradient(smoothed_array)
 
-    interps = (interp2d(x_values, y_values, smoothed_array, kind='linear'),
-               interp2d(x_values, y_values, dSAdxdx/dx, kind='linear'),
-               interp2d(x_values, y_values, dSAdydy/dy, kind='linear'))
+    interps = (
+        interp2d(x_values, y_values, smoothed_array, kind="linear"),
+        interp2d(x_values, y_values, dSAdxdx / dx, kind="linear"),
+        interp2d(x_values, y_values, dSAdydy / dy, kind="linear"),
+    )
 
     return interps
 
@@ -425,7 +465,7 @@ def chi_factor(calc, obs):
 
     err = np.empty_like(calc)
     for i in range(len(calc)):
-        err[i] = pow((calc[i] - obs[i]) / (0.01 * np.mean(obs)), 2.)
+        err[i] = pow((calc[i] - obs[i]) / (0.01 * np.mean(obs)), 2.0)
 
     err_tot = np.sum(err) / len(err)
 
@@ -449,14 +489,20 @@ def independent_row_indices(array):
         The indices corresponding to a set of independent rows
         of the input array.
     """
-    m = Matrix(array.shape[0], array.shape[1],
-               lambda i, j: Rational(array[i, j]).limit_denominator(1000))
-    _, pivots, swaps = row_reduce(m, iszerofunc=lambda x: x.is_zero,
-                                  simpfunc=lambda x: Rational(x).limit_denominator(1000))
+    m = Matrix(
+        array.shape[0],
+        array.shape[1],
+        lambda i, j: Rational(array[i, j]).limit_denominator(1000),
+    )
+    _, pivots, swaps = row_reduce(
+        m,
+        iszerofunc=lambda x: x.is_zero,
+        simpfunc=lambda x: Rational(x).limit_denominator(1000),
+    )
     indices = np.array(range(len(array)))
     for swap in np.array(swaps):
         indices[swap] = indices[swap[::-1]]
-    return sorted(indices[:len(pivots)])
+    return sorted(indices[: len(pivots)])
 
 
 def array_to_rational_matrix(array):
@@ -464,9 +510,7 @@ def array_to_rational_matrix(array):
     Converts a numpy array into a sympy matrix
     filled with rationals
     """
-    return Matrix([[Rational(v).limit_denominator(1000)
-                    for v in row]
-                   for row in array])
+    return Matrix([[Rational(v).limit_denominator(1000) for v in row] for row in array])
 
 
 def generate_complete_basis(incomplete_basis, array):
@@ -496,21 +540,23 @@ def generate_complete_basis(incomplete_basis, array):
 
     incomplete_rank = array_to_rational_matrix(incomplete_basis).rank()
     if incomplete_rank < len(incomplete_basis):
-        raise Exception('The incomplete basis is rank-deficient. '
-                        'Remove one or more endmembers.')
+        raise Exception(
+            "The incomplete basis is rank-deficient. " "Remove one or more endmembers."
+        )
 
     a = np.concatenate((incomplete_basis, array))
-    complete_basis = np.array(a[independent_row_indices(a)],
-                              dtype=float)
+    complete_basis = np.array(a[independent_row_indices(a)], dtype=float)
 
     # Store the rank of the matrix for later comparison
     len_basis = array_to_rational_matrix(complete_basis).rank()
 
     # This next step ensures that all of the original
     # rows are contained in the new basis in their original order
-    c = np.linalg.lstsq(np.array(complete_basis).astype(float).T,
-                        np.array(incomplete_basis).astype(float).T,
-                        rcond=None)[0].T
+    c = np.linalg.lstsq(
+        np.array(complete_basis).astype(float).T,
+        np.array(incomplete_basis).astype(float).T,
+        rcond=None,
+    )[0].T
 
     for row in np.eye(len(c[0])):
         old_rank = array_to_rational_matrix(c).rank()
@@ -524,7 +570,8 @@ def generate_complete_basis(incomplete_basis, array):
 
     # Check that the matrix rank has not changed
     if len_basis != array_to_rational_matrix(complete_basis).rank():
-        raise Exception('Basis length changed during conversion. '
-                        'Report this bug to developers.')
+        raise Exception(
+            "Basis length changed during conversion. " "Report this bug to developers."
+        )
 
-    return complete_basis.round(decimals=12) + 0.
+    return complete_basis.round(decimals=12) + 0.0
