@@ -13,6 +13,7 @@ from burnman.classes.solutionmodel import SymmetricRegularSolution
 from burnman.classes.solutionmodel import SubregularSolution
 from burnman.classes.solutionmodel import AsymmetricRegularSolution
 from burnman.classes.solutionmodel import FunctionSolution
+from burnman.classes.solutionmodel import PolynomialSolution
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.utils.chemistry import formula_to_string, sum_formulae
 from burnman.minerals import HGP_2018_ds633
@@ -67,9 +68,8 @@ class fayalite(Mineral):
 
 made_forsterite = CombinedMineral([forsterite(), forsterite()], [0.5, 0.5])
 
+
 # One-mineral solid solution
-
-
 class forsterite_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Dummy solid solution"
@@ -81,8 +81,6 @@ class forsterite_ss(burnman.SolidSolution):
 
 
 # Two-mineral solid solution
-
-
 class forsterite_forsterite_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Fo-Fo solid solution"
@@ -95,8 +93,6 @@ class forsterite_forsterite_ss(burnman.SolidSolution):
 
 
 # Ideal solid solution
-
-
 class olivine_ideal_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Fo-Fo solid solution"
@@ -108,8 +104,6 @@ class olivine_ideal_ss(burnman.SolidSolution):
 
 
 # Olivine solid solution
-
-
 class olivine_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "Olivine"
@@ -134,8 +128,6 @@ class olivine_ss2(burnman.SolidSolution):
 
 
 # Orthopyroxene solid solution
-
-
 class orthopyroxene(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         # Name
@@ -152,8 +144,6 @@ class orthopyroxene(burnman.SolidSolution):
 
 
 # Three-endmember, two site symmetric solid solution
-
-
 class two_site_ss(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "two_site_ss"
@@ -170,8 +160,6 @@ class two_site_ss(burnman.SolidSolution):
 
 
 # Three-endmember, two site asymmetric solid solution
-
-
 class two_site_ss_asymmetric(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
         self.name = "two_site_ss (asymmetric)"
@@ -189,11 +177,8 @@ class two_site_ss_asymmetric(burnman.SolidSolution):
 
 
 # Three-endmember, two site solid solution
-
-
 class two_site_ss_subregular(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
-        # Name
         self.name = "two_site_ss (subregular symmetric)"
         self.solution_model = SubregularSolution(
             endmembers=[
@@ -213,7 +198,6 @@ class two_site_ss_subregular(burnman.SolidSolution):
 # Three-endmember, two site solid solution
 class two_site_ss_subregular_asymmetric(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
-        # Name
         self.name = "two_site_ss (subregular symmetric)"
         self.solution_model = SubregularSolution(
             endmembers=[
@@ -233,8 +217,7 @@ class two_site_ss_subregular_asymmetric(burnman.SolidSolution):
 # Three-endmember, two site solid solution with ternary term
 class two_site_ss_subregular_ternary(burnman.SolidSolution):
     def __init__(self, molar_fractions=None):
-        # Name
-        self.name = "two_site_ss (subregular symmetric)"
+        self.name = "two_site_ss (subregular)"
         self.solution_model = SubregularSolution(
             endmembers=[
                 [forsterite(), "[Mg]3[Al]2Si3O12"],
@@ -247,6 +230,131 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
             ],
             entropy_interaction=[[[1.0, -2.0], [0.0, 1.0]], [[0.0, 0.0]]],
             energy_ternary_terms=[[0, 1, 2, 3.0e3]],
+        )
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+# As above, but using the PolynomialSolution model
+class two_site_ss_polynomial_ternary(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = "two_site_ss (subregular from polynomial)"
+        self.solution_model = PolynomialSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            ESV_interactions=[
+                # Wj and Wi terms in Helffrich and Wood
+                [10.0e3, 1.0, 0.0, 0, 1, 1],
+                [-10.0e3, -2.0, 0.0, 0, 0, 1],
+                [5.0e3, 0.0, 0.0, 0, 2, 2],
+                [3.0e3, 1.0, 0.0, 0, 0, 2],
+                [-10.0e3, 0.0, 0.0, 1, 2, 2],
+                [-10.0e3, 0.0, 0.0, 1, 1, 2],
+                # 0.5*Wk terms in Helffrich and Wood
+                # Because there are only three endmembers, there
+                # is only one additional term for each term above:
+                [5.0e3, 0.5, 0.0, 0, 1, 2],
+                [-5.0e3, -1.0, 0.0, 0, 1, 2],
+                [2.5e3, 0.0, 0.0, 0, 1, 2],
+                [1.5e3, 0.5, 0.0, 0, 1, 2],
+                [-5.0e3, 0.0, 0.0, 0, 1, 2],
+                [-5.0e3, 0.0, 0.0, 0, 1, 2],
+                # Ternary term
+                [3.0e3, 0.0, 0.0, 0, 1, 2],
+            ],
+        )
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+# As above, but using a transformation matrix to change the order of
+# endmembers.
+# The defined interactions are a function of the transformed endmembers,
+# not the ones defined by the endmembers parameter
+# So in this example, p[0] for the ESV_interactions corresponds to
+# the proportion of the second endmember in the endmembers list,
+# p[1] to the last endmember, and p[2] to the first.
+class two_site_ss_polynomial_ternary_transformed(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = "two_site_ss (subregular from polynomial)"
+        self.solution_model = PolynomialSolution(
+            endmembers=[
+                [forsterite(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+                [forsterite(), "[Mg]3[Al]2Si3O12"],
+                [forsterite(), "[Fe]3[Al]2Si3O12"],
+            ],
+            ESV_interactions=[
+                # Wj and Wi terms in Helffrich and Wood
+                [10.0e3, 1.0, 0.0, 0, 1, 1],
+                [-10.0e3, -2.0, 0.0, 0, 0, 1],
+                [5.0e3, 0.0, 0.0, 0, 2, 2],
+                [3.0e3, 1.0, 0.0, 0, 0, 2],
+                [-10.0e3, 0.0, 0.0, 1, 2, 2],
+                [-10.0e3, 0.0, 0.0, 1, 1, 2],
+                # 0.5*Wk terms in Helffrich and Wood
+                # Because there are only three endmembers, there
+                # is only one additional term for each term above:
+                [5.0e3, 0.5, 0.0, 0, 1, 2],
+                [-5.0e3, -1.0, 0.0, 0, 1, 2],
+                [2.5e3, 0.0, 0.0, 0, 1, 2],
+                [1.5e3, 0.5, 0.0, 0, 1, 2],
+                [-5.0e3, 0.0, 0.0, 0, 1, 2],
+                [-5.0e3, 0.0, 0.0, 0, 1, 2],
+                # Ternary term
+                [3.0e3, 0.0, 0.0, 0, 1, 2],
+            ],
+            transformation_matrix=np.array(
+                [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
+            ),
+        )
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+# Polynomial solution using extra endmembers
+# to define the mixing terms
+fo1 = forsterite()
+fo2 = forsterite()
+fo2.property_modifiers = [
+    ["linear", {"delta_E": 1200.0, "delta_S": 5.0, "delta_V": 1.0e-6}]
+]
+
+
+class polynomial_mbr_mixing(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = "binary mbr mixing"
+        self.solution_model = PolynomialSolution(
+            endmembers=[
+                [forsterite(), "[Mg]2"],
+                [fayalite(), "[Mg]2"],
+            ],
+            interaction_endmembers=[fo2, fo1],
+            endmember_coefficients_and_interactions=[[1.0, -1.0, 0, 1]],
+        )
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+fo3 = forsterite()
+fo3.property_modifiers = [
+    ["linear", {"delta_E": 600.0, "delta_S": 2.5, "delta_V": 0.5e-6}]
+]
+
+
+class polynomial_esv_and_mbr_mixing(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = "two_site_ss (subregular symmetric)"
+        self.solution_model = PolynomialSolution(
+            endmembers=[
+                [forsterite(), "[Mg]2"],
+                [fayalite(), "[Mg]2"],
+            ],
+            ESV_interactions=[[600.0, 2.5, 0.5e-6, 0, 1]],
+            interaction_endmembers=[fo3, fo1],
+            endmember_coefficients_and_interactions=[[1.0, -1.0, 0, 1]],
         )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -645,6 +753,118 @@ class test_solidsolution(BurnManTest):
         dGdx2 = ss.partial_gibbs
 
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+
+    def test_polynomial_using_subregular_scalars(self):
+
+        ss1 = two_site_ss_subregular_ternary()
+        ss2 = two_site_ss_polynomial_ternary()
+        f0 = [0.25, 0.35, 0.4]
+        for ss in [ss1, ss2]:
+            ss.set_state(1.0e5, 300.0)
+            ss.set_composition(f0)
+
+        ss1_properties = [
+            ss1.gibbs,
+            ss1.H,
+            ss1.S,
+            ss1.V,
+            ss1.C_p,
+            ss1.C_v,
+            ss1.alpha,
+            ss1.K_T,
+            ss1.K_S,
+            ss1.gr,
+        ]
+        ss2_properties = [
+            ss2.gibbs,
+            ss2.H,
+            ss2.S,
+            ss2.V,
+            ss2.C_p,
+            ss2.C_v,
+            ss2.alpha,
+            ss2.K_T,
+            ss2.K_S,
+            ss2.gr,
+        ]
+        self.assertArraysAlmostEqual(ss1_properties, ss2_properties)
+
+    def test_polynomial_using_subregular_gibbs(self):
+        ss1 = two_site_ss_subregular_ternary()
+        ss2 = two_site_ss_polynomial_ternary()
+        f0 = [0.25, 0.35, 0.4]
+        for ss in [ss1, ss2]:
+            ss.set_state(1.0e5, 300.0)
+            ss.set_composition(f0)
+
+        self.assertArraysAlmostEqual(ss1.excess_partial_gibbs, ss2.excess_partial_gibbs)
+        self.assertArraysAlmostEqual(
+            ss1.gibbs_hessian.flatten(), ss2.gibbs_hessian.flatten()
+        )
+
+    def test_polynomial_using_subregular_entropy(self):
+        ss1 = two_site_ss_subregular_ternary()
+        ss2 = two_site_ss_polynomial_ternary()
+        f0 = [0.25, 0.35, 0.4]
+        for ss in [ss1, ss2]:
+            ss.set_state(1.0e5, 300.0)
+            ss.set_composition(f0)
+
+        self.assertArraysAlmostEqual(
+            ss1.excess_partial_entropies, ss2.excess_partial_entropies
+        )
+        self.assertArraysAlmostEqual(
+            ss1.entropy_hessian.flatten(), ss2.entropy_hessian.flatten()
+        )
+
+    def test_polynomial_using_subregular_volume(self):
+        ss1 = two_site_ss_subregular_ternary()
+        ss2 = two_site_ss_polynomial_ternary()
+        f0 = [0.25, 0.35, 0.4]
+        for ss in [ss1, ss2]:
+            ss.set_state(1.0e5, 300.0)
+            ss.set_composition(f0)
+
+        self.assertArraysAlmostEqual(
+            ss1.excess_partial_volumes, ss2.excess_partial_volumes
+        )
+        self.assertArraysAlmostEqual(
+            ss1.volume_hessian.flatten(), ss2.volume_hessian.flatten()
+        )
+
+    def test_polynomial_mbr_mixing(self):
+        ss = polynomial_mbr_mixing()
+        f0 = [0.25, 0.75]
+        ss.set_state(1.0e5, 300.0)
+        ss.set_composition(f0)
+
+        self.assertAlmostEqual(
+            ss.excess_gibbs, 0.25 * 0.75 * (1200.0 - 300.0 * 5 + 1.0e5 * 1.0e-6)
+        )
+        self.assertAlmostEqual(ss.excess_entropy, 0.25 * 0.75 * 5)
+        self.assertAlmostEqual(ss.excess_volume, 0.25 * 0.75 * 1.0e-6)
+
+    def test_polynomial_ESV_and_mbr_mixing(self):
+        ss = polynomial_esv_and_mbr_mixing()
+        f0 = [0.25, 0.75]
+        ss.set_state(1.0e5, 300.0)
+        ss.set_composition(f0)
+        self.assertAlmostEqual(
+            ss.excess_gibbs, 0.25 * 0.75 * (1200.0 - 300.0 * 5 + 1.0e5 * 1.0e-6)
+        )
+        self.assertAlmostEqual(ss.excess_entropy, 0.25 * 0.75 * 5)
+        self.assertAlmostEqual(ss.excess_volume, 0.25 * 0.75 * 1.0e-6)
+
+    def test_polynomial_ternary_transformed(self):
+        ss1 = two_site_ss_polynomial_ternary()
+        ss2 = two_site_ss_polynomial_ternary_transformed()
+
+        for ss in [ss1, ss2]:
+            ss.set_state(1.0e5, 300.0)
+        ss1.set_composition([0.25, 0.35, 0.4])
+        ss2.set_composition([0.4, 0.25, 0.35])
+
+        self.assertAlmostEqual(ss1.excess_gibbs, ss2.excess_gibbs)
 
     def test_subregular(self):
         ss0 = two_site_ss()
