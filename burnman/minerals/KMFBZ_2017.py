@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
 from ..classes.solution import Solution
+from ..classes.solutionmodel import IdealSolution, SymmetricRegularSolution
 from ..utils.chemistry import dictionarize_formula, formula_mass
 
 """
@@ -25,22 +26,24 @@ SOLID SOLUTIONS
 class bridgmanite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "bridgmanite/perovskite"
-        self.solution_type = "ideal"
-        self.endmembers = [
-            [mg_si_perovskite(), "[Mg][Si]O3"],
-            [fe_si_perovskite(), "[Fe][Si]O3"],
-            [al_al_perovskite(), "[Al][Al]O3"],
-            [fe_al_perovskite(), "[Fe][Al]O3"],
-        ]
+        self.solution_model = IdealSolution(
+            endmembers=[
+                [mg_si_perovskite(), "[Mg][Si]O3"],
+                [fe_si_perovskite(), "[Fe][Si]O3"],
+                [al_al_perovskite(), "[Al][Al]O3"],
+                [fe_al_perovskite(), "[Fe][Al]O3"],
+            ]
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class ferropericlase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "magnesiowustite/ferropericlase"
-        self.solution_type = "symmetric"
-        self.endmembers = [[periclase(), "[Mg]O"], [wuestite(), "[Fe]O"]]
-        self.energy_interaction = [[13.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[periclase(), "[Mg]O"], [wuestite(), "[Fe]O"]],
+            energy_interaction=[[13.0e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 

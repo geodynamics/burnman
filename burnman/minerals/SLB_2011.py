@@ -16,7 +16,11 @@ from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
 from ..classes.solution import Solution
-from ..classes.solutionmodel import *
+from ..classes.solutionmodel import (
+    IdealSolution,
+    SymmetricRegularSolution,
+    AsymmetricRegularSolution,
+)
 from ..utils.chemistry import dictionarize_formula, formula_mass
 
 """
@@ -28,11 +32,12 @@ from inv251010 of HeFESTo
 class c2c_pyroxene(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "C2/c pyroxene"
-        self.solution_type = "ideal"
-        self.endmembers = [
-            [hp_clinoenstatite(), "[Mg]2Si2O6"],
-            [hp_clinoferrosilite(), "[Fe]2Si2O6"],
-        ]
+        self.solution_model = IdealSolution(
+            endmembers=[
+                [hp_clinoenstatite(), "[Mg]2Si2O6"],
+                [hp_clinoferrosilite(), "[Fe]2Si2O6"],
+            ]
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -40,12 +45,13 @@ class c2c_pyroxene(Solution):
 class ca_ferrite_structured_phase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "calcium ferrite structured phase"
-        self.solution_type = "ideal"
-        self.endmembers = [
-            [mg_ca_ferrite(), "[Mg]Al[Al]O4"],
-            [fe_ca_ferrite(), "[Fe]Al[Al]O4"],
-            [na_ca_ferrite(), "[Na]Al[Si]O4"],
-        ]
+        self.solution_model = IdealSolution(
+            endmembers=[
+                [mg_ca_ferrite(), "[Mg]Al[Al]O4"],
+                [fe_ca_ferrite(), "[Fe]Al[Al]O4"],
+                [na_ca_ferrite(), "[Na]Al[Si]O4"],
+            ]
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -53,21 +59,22 @@ class ca_ferrite_structured_phase(Solution):
 class clinopyroxene(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "clinopyroxene"
-        self.solution_type = "asymmetric"
-        self.endmembers = [
-            [diopside(), "[Ca][Mg][Si]2O6"],
-            [hedenbergite(), "[Ca][Fe][Si]2O6"],
-            [clinoenstatite(), "[Mg][Mg][Si]2O6"],
-            [ca_tschermaks(), "[Ca][Al][Si1/2Al1/2]2O6"],
-            [jadeite(), "[Na][Al][Si]2O6"],
-        ]
-        self.alphas = [1.0, 1.0, 1.0, 3.5, 1.0]
-        self.energy_interaction = [
-            [0.0, 24.74e3, 26.0e3, 24.3e3],
-            [24.74e3, 0.0, 0.0e3],
-            [60.53136e3, 0.0],
-            [10.0e3],
-        ]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [diopside(), "[Ca][Mg][Si]2O6"],
+                [hedenbergite(), "[Ca][Fe][Si]2O6"],
+                [clinoenstatite(), "[Mg][Mg][Si]2O6"],
+                [ca_tschermaks(), "[Ca][Al][Si1/2Al1/2]2O6"],
+                [jadeite(), "[Na][Al][Si]2O6"],
+            ],
+            alphas=[1.0, 1.0, 1.0, 3.5, 1.0],
+            energy_interaction=[
+                [0.0, 24.74e3, 26.0e3, 24.3e3],
+                [24.74e3, 0.0, 0.0e3],
+                [60.53136e3, 0.0],
+                [10.0e3],
+            ],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -75,20 +82,21 @@ class clinopyroxene(Solution):
 class garnet(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "garnet"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [pyrope(), "[Mg]3[Al][Al]Si3O12"],
-            [almandine(), "[Fe]3[Al][Al]Si3O12"],
-            [grossular(), "[Ca]3[Al][Al]Si3O12"],
-            [mg_majorite(), "[Mg]3[Mg][Si]Si3O12"],
-            [jd_majorite(), "[Na2/3Al1/3]3[Al][Si]Si3O12"],
-        ]
-        self.energy_interaction = [
-            [0.0, 30.0e3, 21.20278e3, 0.0],
-            [0.0, 0.0, 0.0],
-            [57.77596e3, 0.0],
-            [0.0],
-        ]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [pyrope(), "[Mg]3[Al][Al]Si3O12"],
+                [almandine(), "[Fe]3[Al][Al]Si3O12"],
+                [grossular(), "[Ca]3[Al][Al]Si3O12"],
+                [mg_majorite(), "[Mg]3[Mg][Si]Si3O12"],
+                [jd_majorite(), "[Na2/3Al1/3]3[Al][Si]Si3O12"],
+            ],
+            energy_interaction=[
+                [0.0, 30.0e3, 21.20278e3, 0.0],
+                [0.0, 0.0, 0.0],
+                [57.77596e3, 0.0],
+                [0.0],
+            ],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -96,13 +104,14 @@ class garnet(Solution):
 class akimotoite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "akimotoite/ilmenite"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [mg_akimotoite(), "[Mg][Si]O3"],
-            [fe_akimotoite(), "[Fe][Si]O3"],
-            [corundum(), "[Al][Al]O3"],
-        ]
-        self.energy_interaction = [[0.0, 66.0e3], [0.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [mg_akimotoite(), "[Mg][Si]O3"],
+                [fe_akimotoite(), "[Fe][Si]O3"],
+                [corundum(), "[Al][Al]O3"],
+            ],
+            energy_interaction=[[0.0, 66.0e3], [0.0e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -110,9 +119,10 @@ class akimotoite(Solution):
 class ferropericlase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "magnesiowustite/ferropericlase"
-        self.solution_type = "symmetric"
-        self.endmembers = [[periclase(), "[Mg]O"], [wuestite(), "[Fe]O"]]
-        self.energy_interaction = [[13.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[periclase(), "[Mg]O"], [wuestite(), "[Fe]O"]],
+            energy_interaction=[[13.0e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -120,9 +130,10 @@ class ferropericlase(Solution):
 class mg_fe_olivine(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "olivine"
-        self.solution_type = "symmetric"
-        self.endmembers = [[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]]
-        self.energy_interaction = [[7.81322e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[[forsterite(), "[Mg]2SiO4"], [fayalite(), "[Fe]2SiO4"]],
+            energy_interaction=[[7.81322e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -130,14 +141,15 @@ class mg_fe_olivine(Solution):
 class orthopyroxene(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [enstatite(), "[Mg][Mg]SiSiO6"],
-            [ferrosilite(), "[Fe][Fe]SiSiO6"],
-            [mg_tschermaks(), "[Mg][Al]AlSiO6"],
-            [ortho_diopside(), "[Ca][Mg]SiSiO6"],
-        ]  # Al avoidance, see Figure 3
-        self.energy_interaction = [[0.0, 0.0, 32.11352e3], [0.0, 0.0], [48.35316e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [enstatite(), "[Mg][Mg]SiSiO6"],
+                [ferrosilite(), "[Fe][Fe]SiSiO6"],
+                [mg_tschermaks(), "[Mg][Al]AlSiO6"],
+                [ortho_diopside(), "[Ca][Mg]SiSiO6"],
+            ],  # Al avoidance, see Figure 3
+            energy_interaction=[[0.0, 0.0, 32.11352e3], [0.0, 0.0], [48.35316e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -145,12 +157,13 @@ class orthopyroxene(Solution):
 class plagioclase(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "plagioclase"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [anorthite(), "[Ca][Al]2Si2O8"],
-            [albite(), "[Na][Al1/2Si1/2]2Si2O8"],
-        ]
-        self.energy_interaction = [[26.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [anorthite(), "[Ca][Al]2Si2O8"],
+                [albite(), "[Na][Al1/2Si1/2]2Si2O8"],
+            ],
+            energy_interaction=[[26.0e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -158,13 +171,14 @@ class plagioclase(Solution):
 class post_perovskite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "post-perovskite/bridgmanite"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [mg_post_perovskite(), "[Mg][Si]O3"],
-            [fe_post_perovskite(), "[Fe][Si]O3"],
-            [al_post_perovskite(), "[Al][Al]O3"],
-        ]
-        self.energy_interaction = [[0.0, 60.0e3], [0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [mg_post_perovskite(), "[Mg][Si]O3"],
+                [fe_post_perovskite(), "[Fe][Si]O3"],
+                [al_post_perovskite(), "[Al][Al]O3"],
+            ],
+            energy_interaction=[[0.0, 60.0e3], [0.0]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -172,27 +186,28 @@ class post_perovskite(Solution):
 class mg_fe_perovskite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "magnesium silicate perovskite/bridgmanite"
-        self.solution_type = "asymmetric"
-        self.endmembers = [
-            [mg_perovskite(), "[Mg][Si]O3"],
-            [fe_perovskite(), "[Fe][Si]O3"],
-            [al_perovskite(), "[Al][Al]O3"],
-        ]
-        self.energy_interaction = [[0.0, 116.0e3], [0.0]]
-
-        self.alphas = [1.0, 1.0, 0.39]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [mg_perovskite(), "[Mg][Si]O3"],
+                [fe_perovskite(), "[Fe][Si]O3"],
+                [al_perovskite(), "[Al][Al]O3"],
+            ],
+            energy_interaction=[[0.0, 116.0e3], [0.0]],
+            alphas=[1.0, 1.0, 0.39],
+        )
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
 class mg_fe_ringwoodite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "ringwoodite"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [mg_ringwoodite(), "[Mg]2SiO4"],
-            [fe_ringwoodite(), "[Fe]2SiO4"],
-        ]
-        self.energy_interaction = [[9.34084e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [mg_ringwoodite(), "[Mg]2SiO4"],
+                [fe_ringwoodite(), "[Fe]2SiO4"],
+            ],
+            energy_interaction=[[9.34084e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -200,12 +215,13 @@ class mg_fe_ringwoodite(Solution):
 class mg_fe_aluminous_spinel(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "spinel-hercynite binary, fixed order"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [spinel(), "[Mg3/4Al1/4]4[Al7/8Mg1/8]8O16"],
-            [hercynite(), "[Fe3/4Al1/4]4[Al7/8Fe1/8]8O16"],
-        ]
-        self.energy_interaction = [[5.87646e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [spinel(), "[Mg3/4Al1/4]4[Al7/8Mg1/8]8O16"],
+                [hercynite(), "[Fe3/4Al1/4]4[Al7/8Fe1/8]8O16"],
+            ],
+            energy_interaction=[[5.87646e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -213,12 +229,13 @@ class mg_fe_aluminous_spinel(Solution):
 class mg_fe_wadsleyite(Solution):
     def __init__(self, molar_fractions=None):
         self.name = "wadsleyite"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [mg_wadsleyite(), "[Mg]2SiO4"],
-            [fe_wadsleyite(), "[Fe]2SiO4"],
-        ]
-        self.energy_interaction = [[16.74718e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [mg_wadsleyite(), "[Mg]2SiO4"],
+                [fe_wadsleyite(), "[Fe]2SiO4"],
+            ],
+            energy_interaction=[[16.74718e3]],
+        )
 
         Solution.__init__(self, molar_fractions=molar_fractions)
 

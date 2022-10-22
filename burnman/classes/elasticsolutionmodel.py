@@ -248,6 +248,7 @@ class ElasticMechanicalSolution(ElasticSolutionModel):
     """
 
     def __init__(self, endmembers):
+        self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
         self.formulas = [e[1] for e in endmembers]
 
@@ -284,6 +285,7 @@ class ElasticIdealSolution(ElasticSolutionModel):
     """
 
     def __init__(self, endmembers):
+        self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
         self.formulas = [e[1] for e in endmembers]
 

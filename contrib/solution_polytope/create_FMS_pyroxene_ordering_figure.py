@@ -18,6 +18,7 @@ if not os.path.exists("burnman") and os.path.exists("../../burnman"):
 
 import burnman
 from burnman import minerals
+from burnman.classes.solutionmodel import SymmetricRegularSolution
 
 from pylab import rcParams
 
@@ -76,16 +77,17 @@ if __name__ == "__main__":
 
     disordered = burnman.SolidSolution(
         name="ordered phases unstable",
-        solution_type="symmetric",
-        endmembers=[
-            [cfs, "[Fe][Fe]Si2O6"],
-            [cen, "[Mg][Mg]Si2O6"],
-            [
-                burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [2.0e3, 0.0, 0.0]),
-                "[Fe][Mg]Si2O6",
+        solution_model=SymmetricRegularSolution(
+            endmembers=[
+                [cfs, "[Fe][Fe]Si2O6"],
+                [cen, "[Mg][Mg]Si2O6"],
+                [
+                    burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [2.0e3, 0.0, 0.0]),
+                    "[Fe][Mg]Si2O6",
+                ],
             ],
-        ],
-        energy_interaction=[[2.3e3, -0.85e3], [-0.85e3]],
+            energy_interaction=[[2.3e3, -0.85e3], [-0.85e3]],
+        ),
     )  # convergent, but ordered phases unstable
 
     """
@@ -120,16 +122,17 @@ if __name__ == "__main__":
     fm_HGP2018 = burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [-4.2e3, 0.0, 0.0])
     nonconvergent_HGP2018 = burnman.SolidSolution(
         name="nonconvergent ordering",
-        solution_type="symmetric",
-        endmembers=[
-            [cfs, "[Fe][Fe]Si2O6"],
-            [cen, "[Mg][Mg]Si2O6"],
-            [
-                burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [-4.2e3, 0.0, 0.0]),
-                "[Fe][Mg]Si2O6",
+        solution_model=SymmetricRegularSolution(
+            endmembers=[
+                [cfs, "[Fe][Fe]Si2O6"],
+                [cen, "[Mg][Mg]Si2O6"],
+                [
+                    burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [-4.2e3, 0.0, 0.0]),
+                    "[Fe][Mg]Si2O6",
+                ],
             ],
-        ],
-        energy_interaction=[[2.3e3, 3.5e3], [4.0e3]],
+            energy_interaction=[[2.3e3, 3.5e3], [4.0e3]],
+        ),
     )
 
     """
@@ -165,16 +168,17 @@ if __name__ == "__main__":
 
     convergent = burnman.SolidSolution(
         name="convergent ordering",
-        solution_type="symmetric",
-        endmembers=[
-            [cfs, "[Fe][Fe]Si2O6"],
-            [cen, "[Mg][Mg]Si2O6"],
-            [
-                burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [-4.2e3, 0.0, 0.0]),
-                "[Fe][Mg]Si2O6",
+        solution_model=SymmetricRegularSolution(
+            endmembers=[
+                [cfs, "[Fe][Fe]Si2O6"],
+                [cen, "[Mg][Mg]Si2O6"],
+                [
+                    burnman.CombinedMineral([cen, cfs], [0.5, 0.5], [-4.2e3, 0.0, 0.0]),
+                    "[Fe][Mg]Si2O6",
+                ],
             ],
-        ],
-        energy_interaction=[[2.3e3, 5.35e3], [5.35e3]],
+            energy_interaction=[[2.3e3, 5.35e3], [5.35e3]],
+        ),
     )
 
     """

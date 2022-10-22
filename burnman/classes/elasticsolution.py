@@ -55,33 +55,14 @@ class ElasticSolution(Mineral):
     ----------
     name : string
         Name of the solution
-    solution_type : string
-        String determining which SolutionModel to use. One of 'mechanical',
-        'ideal', 'symmetric', 'asymmetric' or 'subregular'.
-    endmembers : list of lists
-        List of endmembers in this solution. The first item of each
-        list should be a :class:`burnman.Mineral` object. The second item
-        should be a string with the site formula of the endmember.
+    solution_model : :class:`burnman.classes.elasticsolutionmodel.ElasticSolutionModel` object
+        The ElasticSolutionModel object defining the properties of the solution.
     molar_fractions : numpy array (optional)
         The molar fractions of each endmember in the solution.
         Can be reset using the set_composition() method.
     """
 
-    def __init__(
-        self,
-        name=None,
-        solution_type=None,
-        endmembers=None,
-        energy_interaction=None,
-        pressure_interaction=None,
-        entropy_interaction=None,
-        energy_ternary_terms=None,
-        pressure_ternary_terms=None,
-        entropy_ternary_terms=None,
-        alphas=None,
-        excess_helmholtz_function=None,
-        molar_fractions=None,
-    ):
+    def __init__(self, name=None, solution_model=None, molar_fractions=None):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
         """
@@ -93,107 +74,33 @@ class ElasticSolution(Mineral):
 
         if name is not None:
             self.name = name
-        if solution_type is not None:
-            self.solution_type = solution_type
-        if endmembers is not None:
-            self.endmembers = endmembers
-        if energy_interaction is not None:
-            self.energy_interaction = energy_interaction
-        if pressure_interaction is not None:
-            self.pressure_interaction = pressure_interaction
-        if entropy_interaction is not None:
-            self.entropy_interaction = entropy_interaction
-        if energy_ternary_terms is not None:
-            self.energy_ternary_terms = energy_ternary_terms
-        if pressure_ternary_terms is not None:
-            self.pressure_ternary_terms = pressure_ternary_terms
-        if entropy_ternary_terms is not None:
-            self.entropy_ternary_terms = entropy_ternary_terms
-        if alphas is not None:
-            self.alphas = alphas
-        if endmembers is not None:
-            self.endmembers = endmembers
-        if excess_helmholtz_function is not None:
-            self.excess_helmholtz_function = excess_helmholtz_function
+        if solution_model is not None:
+            self.solution_model = solution_model
 
-        if hasattr(self, "endmembers") is False:
-            raise Exception("'endmembers' attribute missing " "from solution")
-
-        # Set default solution model type
-        if hasattr(self, "solution_type"):
-            if self.solution_type == "mechanical":
-                self.solution_model = ElasticMechanicalSolution(self.endmembers)
-            elif self.solution_type == "ideal":
-                self.solution_model = ElasticIdealSolution(self.endmembers)
-            else:
-                if hasattr(self, "energy_interaction") is False:
-                    self.energy_interaction = None
-                if hasattr(self, "pressure_interaction") is False:
-                    self.pressure_interaction = None
-                if hasattr(self, "entropy_interaction") is False:
-                    self.entropy_interaction = None
-
-                if self.solution_type == "symmetric":
-                    self.solution_model = ElasticSymmetricRegularSolution(
-                        self.endmembers,
-                        self.energy_interaction,
-                        self.pressure_interaction,
-                        self.entropy_interaction,
-                    )
-                elif self.solution_type == "asymmetric":
-                    if hasattr(self, "alphas") is False:
-                        raise Exception("'alphas' attribute missing from solution")
-                    self.solution_model = ElasticAsymmetricRegularSolution(
-                        self.endmembers,
-                        self.alphas,
-                        self.energy_interaction,
-                        self.pressure_interaction,
-                        self.entropy_interaction,
-                    )
-                elif self.solution_type == "subregular":
-                    if hasattr(self, "energy_ternary_terms") is False:
-                        self.energy_ternary_terms = None
-                    if hasattr(self, "pressure_ternary_terms") is False:
-                        self.pressure_ternary_terms = None
-                    if hasattr(self, "entropy_ternary_terms") is False:
-                        self.entropy_ternary_terms = None
-
-                    self.solution_model = ElasticSubregularSolution(
-                        self.endmembers,
-                        self.energy_interaction,
-                        self.pressure_interaction,
-                        self.entropy_interaction,
-                        self.energy_ternary_terms,
-                        self.pressure_ternary_terms,
-                        self.entropy_ternary_terms,
-                    )
-                elif self.solution_type == "function":
-                    self.solution_model = ElasticFunctionSolution(
-                        self.endmembers, self.excess_helmholtz_function
-                    )
-                else:
-                    raise Exception(
-                        "Solution model type " + self.solution_type + "not recognised."
-                    )
+        if isinstance(solution_model, ElasticMechanicalSolution):
+            self.solution_type = "mechanical"
         else:
-            self.solution_model = ElasticSolutionModel()
+            self.solution_type = "chemical"
 
         # Starting guess and delta for pressure iteration
-        self.min_V0 = min([mbr[0].params["V_0"] for mbr in self.endmembers])
+        self.min_V0 = min(
+            [mbr[0].params["V_0"] for mbr in self.solution_model.endmembers]
+        )
         self.dV = 0.01 * self.min_V0
 
         # Equation of state
         for i in range(self.n_endmembers):
-            self.endmembers[i][0].set_method(
-                self.endmembers[i][0].params["equation_of_state"]
+            self.solution_model.endmembers[i][0].set_method(
+                self.solution_model.endmembers[i][0].params["equation_of_state"]
             )
 
         # Molar fractions
         if molar_fractions is not None:
             self.set_composition(molar_fractions)
 
-    def get_endmembers(self):
-        return self.endmembers
+    @cached_property
+    def endmembers(self):
+        return self.solution_model.endmembers
 
     def set_composition(self, molar_fractions):
         """
@@ -205,7 +112,7 @@ class ElasticSolution(Mineral):
         molar_fractions: list of float
             molar abundance for each endmember, needs to sum to one.
         """
-        assert len(self.endmembers) == len(molar_fractions)
+        assert len(self.solution_model.endmembers) == len(molar_fractions)
 
         if self.solution_type != "mechanical":
             assert sum(molar_fractions) > 0.9999
@@ -219,7 +126,7 @@ class ElasticSolution(Mineral):
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
-            self.endmembers[i][0].set_method(method)
+            self.solution_model.endmembers[i][0].set_method(method)
         # note: do not set self.method here!
         self.reset()
 
@@ -245,18 +152,20 @@ class ElasticSolution(Mineral):
         Returns a list of endmember activities [unitless].
         """
         volumes = [
-            self.endmembers[i][0].method.volume(
-                self.pressure, self.temperature, self.endmembers[i][0].params
+            self.solution_model.endmembers[i][0].method.volume(
+                self.pressure,
+                self.temperature,
+                self.solution_model.endmembers[i][0].params,
             )
             for i in range(self.n_endmembers)
         ]
 
         gibbs_pure = [
-            self.endmembers[i][0].method.gibbs_free_energy(
+            self.solution_model.endmembers[i][0].method.gibbs_free_energy(
                 self.pressure,
                 self.temperature,
                 volumes[i],
-                self.endmembers[i][0].params,
+                self.solution_model.endmembers[i][0].params,
             )
             for i in range(self.n_endmembers)
         ]
@@ -327,7 +236,10 @@ class ElasticSolution(Mineral):
         """
         return (
             np.array(
-                [self.endmembers[i][0].helmholtz for i in range(self.n_endmembers)]
+                [
+                    self.solution_model.endmembers[i][0].helmholtz
+                    for i in range(self.n_endmembers)
+                ]
             )
             + self._excess_partial_helmholtz
         )
@@ -339,7 +251,12 @@ class ElasticSolution(Mineral):
         Property specific to solutions.
         """
         return (
-            np.array([self.endmembers[i][0].pressure for i in range(self.n_endmembers)])
+            np.array(
+                [
+                    self.solution_model.endmembers[i][0].pressure
+                    for i in range(self.n_endmembers)
+                ]
+            )
             + self._excess_partial_pressures
         )
 
@@ -351,7 +268,10 @@ class ElasticSolution(Mineral):
         """
         return (
             np.array(
-                [self.endmembers[i][0].molar_entropy for i in range(self.n_endmembers)]
+                [
+                    self.solution_model.endmembers[i][0].molar_entropy
+                    for i in range(self.n_endmembers)
+                ]
             )
             + self._excess_partial_entropies
         )
@@ -473,7 +393,8 @@ class ElasticSolution(Mineral):
         return (
             sum(
                 [
-                    self.endmembers[i][0].molar_helmholtz * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].molar_helmholtz
+                    * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -495,7 +416,8 @@ class ElasticSolution(Mineral):
         """
         return sum(
             [
-                self.endmembers[i][0].molar_mass * self.molar_fractions[i]
+                self.solution_model.endmembers[i][0].molar_mass
+                * self.molar_fractions[i]
                 for i in range(self.n_endmembers)
             ]
         )
@@ -519,8 +441,10 @@ class ElasticSolution(Mineral):
 
         def _delta_pressure(volume):
             self._ptmp = [
-                self.endmembers[i][0].method.pressure(
-                    self.temperature, volume, self.endmembers[i][0].params
+                self.solution_model.endmembers[i][0].method.pressure(
+                    self.temperature,
+                    volume,
+                    self.solution_model.endmembers[i][0].params,
                 )
                 for i in range(self.n_endmembers)
             ]
@@ -541,8 +465,11 @@ class ElasticSolution(Mineral):
 
             return sum(
                 [
-                    self.endmembers[i][0].method.isothermal_bulk_modulus(
-                        0.0, self.temperature, volume, self.endmembers[i][0].params
+                    self.solution_model.endmembers[i][0].method.isothermal_bulk_modulus(
+                        0.0,
+                        self.temperature,
+                        volume,
+                        self.solution_model.endmembers[i][0].params,
                     )
                     * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
@@ -587,7 +514,9 @@ class ElasticSolution(Mineral):
 
         _delta_pressure(V)
         for i in range(self.n_endmembers):
-            self.endmembers[i][0].set_state(self._ptmp[i], self.temperature)
+            self.solution_model.endmembers[i][0].set_state(
+                self._ptmp[i], self.temperature
+            )
 
         return V
 
@@ -618,7 +547,7 @@ class ElasticSolution(Mineral):
         return (
             sum(
                 [
-                    self.endmembers[i][0].S * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].S * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -644,7 +573,7 @@ class ElasticSolution(Mineral):
         return (
             sum(
                 [
-                    self.endmembers[i][0].H * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].H * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -659,7 +588,8 @@ class ElasticSolution(Mineral):
         """
         return sum(
             [
-                self.endmembers[i][0].isothermal_bulk_modulus * self.molar_fractions[i]
+                self.solution_model.endmembers[i][0].isothermal_bulk_modulus
+                * self.molar_fractions[i]
                 for i in range(self.n_endmembers)
             ]
         )
@@ -704,7 +634,9 @@ class ElasticSolution(Mineral):
         Aliased with self.G.
         """
         G_list = np.fromiter(
-            (e[0].G for e in self.endmembers), dtype=float, count=self.n_endmembers
+            (e[0].G for e in self.solution_model.endmembers),
+            dtype=float,
+            count=self.n_endmembers,
         )
         return reuss_average_function(self.molar_fractions, G_list)
 
@@ -760,8 +692,8 @@ class ElasticSolution(Mineral):
         """
         alphaKT = sum(
             [
-                self.endmembers[i][0].isothermal_bulk_modulus
-                * self.endmembers[i][0].alpha
+                self.solution_model.endmembers[i][0].isothermal_bulk_modulus
+                * self.solution_model.endmembers[i][0].alpha
                 * self.molar_fractions[i]
                 for i in range(self.n_endmembers)
             ]
@@ -777,7 +709,8 @@ class ElasticSolution(Mineral):
         """
         return sum(
             [
-                self.endmembers[i][0].molar_heat_capacity_v * self.molar_fractions[i]
+                self.solution_model.endmembers[i][0].molar_heat_capacity_v
+                * self.molar_fractions[i]
                 for i in range(self.n_endmembers)
             ]
         )
@@ -883,21 +816,21 @@ class ElasticSolution(Mineral):
         """
         A list of formulae for all the endmember in the solution.
         """
-        return [mbr[0].params["formula"] for mbr in self.endmembers]
+        return [mbr[0].params["formula"] for mbr in self.solution_model.endmembers]
 
     @cached_property
     def endmember_names(self):
         """
         A list of names for all the endmember in the solution.
         """
-        return [mbr[0].name for mbr in self.endmembers]
+        return [mbr[0].name for mbr in self.solution_model.endmembers]
 
     @cached_property
     def n_endmembers(self):
         """
         The number of endmembers in the solution.
         """
-        return len(self.endmembers)
+        return len(self.solution_model.endmembers)
 
     @cached_property
     def elements(self):

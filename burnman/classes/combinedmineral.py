@@ -10,6 +10,7 @@ import numpy as np
 
 from .mineral import Mineral, material_property
 from .solution import Solution
+from .solutionmodel import MechanicalSolution
 
 
 class CombinedMineral(Mineral):
@@ -39,11 +40,9 @@ class CombinedMineral(Mineral):
         free_energy_adjustment=[],
         name="User-created endmember",
     ):
-        self.mixture = Solution(
-            solution_type="mechanical",
-            endmembers=[[m, ""] for m in mineral_list],
-            molar_fractions=molar_amounts,
-        )
+
+        model = MechanicalSolution(endmembers=[[m, ""] for m in mineral_list])
+        self.mixture = Solution(solution_model=model, molar_fractions=molar_amounts)
 
         # Remove elements from the chemical formula if they have
         # negligible concentrations

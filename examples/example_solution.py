@@ -41,6 +41,7 @@ These solutions can potentially deal with:
 
 """
 from __future__ import absolute_import
+from ast import Sub
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,6 +49,13 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import minerals
+from burnman import Solution
+from burnman.classes.solutionmodel import (
+    IdealSolution,
+    SymmetricRegularSolution,
+    AsymmetricRegularSolution,
+    SubregularSolution,
+)
 
 
 if __name__ == "__main__":
@@ -62,13 +70,14 @@ if __name__ == "__main__":
     We can create a single instance using the Solution constructor
     (here's an example of an ideal pyrope-almandine garnet) ...
     """
-    g1 = burnman.Solution(
+    g1 = Solution(
         name="Ideal pyrope-almandine garnet",
-        solution_type="ideal",
-        endmembers=[
-            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-        ],
+        solution_model=IdealSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+            ]
+        ),
         molar_fractions=[0.5, 0.5],
     )
 
@@ -83,11 +92,12 @@ if __name__ == "__main__":
     class mg_fe_garnet(burnman.Solution):
         def __init__(self, molar_fractions=None):
             self.name = "Ideal pyrope-almandine garnet"
-            self.solution_type = "ideal"
-            self.endmembers = [
-                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-            ]
+            self.solution_model = IdealSolution(
+                endmembers=[
+                    [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                    [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+                ]
+            )
 
             burnman.Solution.__init__(self, molar_fractions=molar_fractions)
 
@@ -186,12 +196,13 @@ if __name__ == "__main__":
     """
     g2 = burnman.Solution(
         name="Symmetric pyrope-almandine garnet",
-        solution_type="symmetric",
-        endmembers=[
-            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-        ],
-        energy_interaction=[[2.5e3]],
+        solution_model=SymmetricRegularSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+            ],
+            energy_interaction=[[2.5e3]],
+        ),
     )
 
     g2_excess_gibbs = np.empty_like(comp)
@@ -267,17 +278,18 @@ if __name__ == "__main__":
     DQF[2] = V_excess
     """
 
-    g3 = burnman.Solution(
+    g3 = Solution(
         name="Symmetric pyrope-almandine-majorite garnet",
-        solution_type="symmetric",
-        endmembers=[
-            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.maj(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-        ],
-        energy_interaction=[[2.5e3, 0.0e3], [10.0e3]],
-        entropy_interaction=[[0.0e3, 0.0e3], [0.0e3]],
-        volume_interaction=[[0.0e3, 0.0e3], [0.0e3]],
+        solution_model=SymmetricRegularSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.maj(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
+            ],
+            energy_interaction=[[2.5e3, 0.0e3], [10.0e3]],
+            entropy_interaction=[[0.0e3, 0.0e3], [0.0e3]],
+            volume_interaction=[[0.0e3, 0.0e3], [0.0e3]],
+        ),
     )
 
     g3_configurational_entropy = np.empty_like(comp)
@@ -311,17 +323,18 @@ if __name__ == "__main__":
     This model is also found in the HP_2011_ds62 database
     """
 
-    g4 = burnman.Solution(
+    g4 = Solution(
         name="garnet",
-        solution_type="asymmetric",
-        endmembers=[
-            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.andr(), "[Ca]3[Fe]2Si3O12"],
-        ],
-        alphas=[1.0, 1.0, 2.7, 2.7],
-        energy_interaction=[[2.5e3, 31.0e3, 53.2e3], [5.0e3, 37.24e3], [2.0e3]],
+        solution_model=AsymmetricRegularSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.andr(), "[Ca]3[Fe]2Si3O12"],
+            ],
+            alphas=[1.0, 1.0, 2.7, 2.7],
+            energy_interaction=[[2.5e3, 31.0e3, 53.2e3], [5.0e3, 37.24e3], [2.0e3]],
+        ),
     )
 
     g4_excess_gibbs_400 = np.empty_like(comp)
@@ -359,38 +372,39 @@ if __name__ == "__main__":
     def mult(x, n):
         return [[[v * n for v in i] for i in j] for j in x]
 
-    g5 = burnman.Solution(
+    g5 = Solution(
         name="Subregular pyrope-almandine-grossular " "garnet (Ganguly et al., 1996)",
-        solution_type="subregular",
-        endmembers=[
-            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
-            [minerals.HP_2011_ds62.spss(), "[Mn]3[Al]2Si3O12"],
-        ],
-        energy_interaction=mult(
-            [
-                [[2117.0, 695.0], [9834.0, 21627.0], [12083.0, 12083.0]],
-                [[6773.0, 873.0], [539.0, 539.0]],
-                [[0.0, 0.0]],
+        solution_model=SubregularSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
+                [minerals.HP_2011_ds62.spss(), "[Mn]3[Al]2Si3O12"],
             ],
-            3.0,
-        ),
-        volume_interaction=mult(
-            [
-                [[0.07e-5, 0.0], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
-                [[0.03e-5, 0.0], [0.04e-5, 0.01e-5]],
-                [[0.0, 0.0]],
-            ],
-            3.0,
-        ),
-        entropy_interaction=mult(
-            [
-                [[0.0, 0.0], [5.78, 5.78], [7.67, 7.67]],
-                [[1.69, 1.69], [0.0, 0.0]],
-                [[0.0, 0.0]],
-            ],
-            3.0,
+            energy_interaction=mult(
+                [
+                    [[2117.0, 695.0], [9834.0, 21627.0], [12083.0, 12083.0]],
+                    [[6773.0, 873.0], [539.0, 539.0]],
+                    [[0.0, 0.0]],
+                ],
+                3.0,
+            ),
+            volume_interaction=mult(
+                [
+                    [[0.07e-5, 0.0], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
+                    [[0.03e-5, 0.0], [0.04e-5, 0.01e-5]],
+                    [[0.0, 0.0]],
+                ],
+                3.0,
+            ),
+            entropy_interaction=mult(
+                [
+                    [[0.0, 0.0], [5.78, 5.78], [7.67, 7.67]],
+                    [[1.69, 1.69], [0.0, 0.0]],
+                    [[0.0, 0.0]],
+                ],
+                3.0,
+            ),
         ),
     )
 

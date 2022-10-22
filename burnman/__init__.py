@@ -213,7 +213,6 @@ from .classes.material import Material, material_property
 from .classes.perplex import PerplexMaterial
 from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
-from .classes.solutionmodel import SolutionModel
 from .classes.solution import Solution, SolidSolution
 from .classes.elasticsolutionmodel import ElasticSolutionModel
 from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution

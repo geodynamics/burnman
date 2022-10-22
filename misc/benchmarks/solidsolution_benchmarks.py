@@ -3,6 +3,11 @@ from __future__ import absolute_import
 # Benchmarks for the solid solution class
 import burnman
 from burnman import minerals
+from burnman.classes.solutionmodel import (
+    SymmetricRegularSolution,
+    AsymmetricRegularSolution,
+    SubregularSolution,
+)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,12 +39,13 @@ Excess properties
 class o_d_spinel(burnman.SolidSolution):
     def __init__(self):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [minerals.HP_2011_ds62.sp(), "[Mg][Al]2O4"],
-            [minerals.HP_2011_ds62.sp(), "[Al][Mg1/2Al1/2]2O4"],
-        ]
-        self.energy_interaction = [[0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [minerals.HP_2011_ds62.sp(), "[Mg][Al]2O4"],
+                [minerals.HP_2011_ds62.sp(), "[Al][Mg1/2Al1/2]2O4"],
+            ],
+            energy_interaction=[[0.0]],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -77,12 +83,13 @@ plt.show()
 class orthopyroxene_red(burnman.SolidSolution):
     def __init__(self):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [minerals.SLB_2011.enstatite(), "Mg[Mg][Si]SiO6"],
-            [minerals.SLB_2011.mg_tschermaks(), "Mg[Al][Al]SiO6"],
-        ]
-        self.energy_interaction = [[0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.enstatite(), "Mg[Mg][Si]SiO6"],
+                [minerals.SLB_2011.mg_tschermaks(), "Mg[Al][Al]SiO6"],
+            ],
+            energy_interaction=[[0.0]],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -90,12 +97,13 @@ class orthopyroxene_red(burnman.SolidSolution):
 class orthopyroxene_blue(burnman.SolidSolution):
     def __init__(self):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [minerals.SLB_2011.enstatite(), "Mg[Mg]Si2O6"],
-            [minerals.SLB_2011.mg_tschermaks(), "Mg[Al]AlSiO6"],
-        ]
-        self.energy_interaction = [[0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.enstatite(), "Mg[Mg]Si2O6"],
+                [minerals.SLB_2011.mg_tschermaks(), "Mg[Al]AlSiO6"],
+            ],
+            energy_interaction=[[0.0]],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -103,12 +111,13 @@ class orthopyroxene_blue(burnman.SolidSolution):
 class orthopyroxene_long_dashed(burnman.SolidSolution):
     def __init__(self):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [minerals.SLB_2011.enstatite(), "Mg[Mg]Si2O6"],
-            [minerals.SLB_2011.mg_tschermaks(), "[Mg1/2Al1/2]2AlSiO6"],
-        ]
-        self.energy_interaction = [[10.0e3]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.enstatite(), "Mg[Mg]Si2O6"],
+                [minerals.SLB_2011.mg_tschermaks(), "[Mg1/2Al1/2]2AlSiO6"],
+            ],
+            energy_interaction=[[10.0e3]],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -116,12 +125,13 @@ class orthopyroxene_long_dashed(burnman.SolidSolution):
 class orthopyroxene_short_dashed(burnman.SolidSolution):
     def __init__(self):
         self.name = "orthopyroxene"
-        self.solution_type = "symmetric"
-        self.endmembers = [
-            [minerals.SLB_2011.enstatite(), "Mg[Mg][Si]2O6"],
-            [minerals.SLB_2011.mg_tschermaks(), "Mg[Al][Al1/2Si1/2]2O6"],
-        ]
-        self.energy_interaction = [[0.0]]
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.enstatite(), "Mg[Mg][Si]2O6"],
+                [minerals.SLB_2011.mg_tschermaks(), "Mg[Al][Al1/2Si1/2]2O6"],
+            ],
+            energy_interaction=[[0.0]],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -166,13 +176,14 @@ plt.show()
 class clinopyroxene(burnman.SolidSolution):
     def __init__(self):
         self.name = "clinopyroxene"
-        self.solution_type = "asymmetric"
-        self.endmembers = [
-            [minerals.SLB_2011.diopside(), "[Ca][Mg][Si]2O6"],
-            [minerals.SLB_2011.ca_tschermaks(), "[Ca][Al][Si1/2Al1/2]2O6"],
-        ]
-        self.energy_interaction = [[26.0e3]]
-        self.alphas = [1.0, 3.5]
+        self.solution_model = AsymmetricRegularSolution(
+            endmembers=[
+                [minerals.SLB_2011.diopside(), "[Ca][Mg][Si]2O6"],
+                [minerals.SLB_2011.ca_tschermaks(), "[Ca][Al][Si1/2Al1/2]2O6"],
+            ],
+            energy_interaction=[[26.0e3]],
+            alphas=[1.0, 3.5],
+        )
 
         burnman.SolidSolution.__init__(self)
 
@@ -207,36 +218,37 @@ mult = lambda x, n: [[[v * n for v in i] for i in j] for j in x]
 
 g5 = burnman.SolidSolution(
     name="Subregular pyrope-almandine-grossular " "garnet (Ganguly et al., 1996)",
-    solution_type="subregular",
-    endmembers=[
-        [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
-        [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
-        [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
-        [minerals.HP_2011_ds62.spss(), "[Mn]3[Al]2Si3O12"],
-    ],
-    energy_interaction=mult(
-        [
-            [[2117.0, 695.0], [9834.0, 21627.0], [12083.0, 12083.0]],
-            [[6773.0, 873.0], [539.0, 539.0]],
-            [[0.0, 0.0]],
+    solution_model=SubregularSolution(
+        endmembers=[
+            [minerals.HP_2011_ds62.py(), "[Mg]3[Al]2Si3O12"],
+            [minerals.HP_2011_ds62.alm(), "[Fe]3[Al]2Si3O12"],
+            [minerals.HP_2011_ds62.gr(), "[Ca]3[Al]2Si3O12"],
+            [minerals.HP_2011_ds62.spss(), "[Mn]3[Al]2Si3O12"],
         ],
-        3.0,
-    ),
-    volume_interaction=mult(
-        [
-            [[0.07e-5, 0.0], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
-            [[0.03e-5, 0.0], [0.04e-5, 0.01e-5]],
-            [[0.0, 0.0]],
-        ],
-        3.0,
-    ),
-    entropy_interaction=mult(
-        [
-            [[0.0, 0.0], [5.78, 5.78], [7.67, 7.67]],
-            [[1.69, 1.69], [0.0, 0.0]],
-            [[0.0, 0.0]],
-        ],
-        3.0,
+        energy_interaction=mult(
+            [
+                [[2117.0, 695.0], [9834.0, 21627.0], [12083.0, 12083.0]],
+                [[6773.0, 873.0], [539.0, 539.0]],
+                [[0.0, 0.0]],
+            ],
+            3.0,
+        ),
+        volume_interaction=mult(
+            [
+                [[0.07e-5, 0.0], [0.058e-5, 0.012e-5], [0.04e-5, 0.03e-5]],
+                [[0.03e-5, 0.0], [0.04e-5, 0.01e-5]],
+                [[0.0, 0.0]],
+            ],
+            3.0,
+        ),
+        entropy_interaction=mult(
+            [
+                [[0.0, 0.0], [5.78, 5.78], [7.67, 7.67]],
+                [[1.69, 1.69], [0.0, 0.0]],
+                [[0.0, 0.0]],
+            ],
+            3.0,
+        ),
     ),
 )
 

@@ -51,6 +51,8 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import minerals
+from burnman.classes.solution import Solution
+from burnman.classes.solutionmodel import IdealSolution
 
 
 if __name__ == "__main__":
@@ -98,10 +100,11 @@ if __name__ == "__main__":
         # Define a new Solution with mg and fe perovskite endmembers
         mpv = minerals.SLB_2011.mg_perovskite()
         fpv = minerals.SLB_2011.fe_perovskite()
-        new_solution = burnman.Solution(
+        new_solution = Solution(
             name="New Mg-Fe bridgmanite",
-            endmembers=[[mpv, "[Mg]SiO3"], [fpv, "[Fe]SiO3"]],
-            solution_type="ideal",
+            solution_model=IdealSolution(
+                endmembers=[[mpv, "[Mg]SiO3"], [fpv, "[Fe]SiO3"]]
+            ),
         )
 
         # Set molar fraction of endmembers
