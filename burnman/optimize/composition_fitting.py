@@ -9,11 +9,14 @@ import numpy as np
 from .linear_fitting import weighted_constrained_least_squares
 
 
-def fit_composition_to_solution(solution,
-                                fitted_variables,
-                                variable_values, variable_covariances,
-                                variable_conversions=None,
-                                normalize=True):
+def fit_composition_to_solution(
+    solution,
+    fitted_variables,
+    variable_values,
+    variable_covariances,
+    variable_conversions=None,
+    normalize=True,
+):
     """
     Takes a Solution object and a set of variable names and
     associates values and covariances and finds the molar fractions of the
@@ -71,22 +74,28 @@ def fit_composition_to_solution(solution,
     solution_variables = solution.elements
     solution_variables.extend(solution.solution_model.site_names)
 
-    solution_matrix = np.hstack((solution.stoichiometric_matrix,
-                                 solution.solution_model.endmember_noccupancies))
+    solution_matrix = np.hstack(
+        (solution.stoichiometric_matrix, solution.solution_model.endmember_noccupancies)
+    )
 
     n_sol_vars = solution_matrix.shape[1]
 
     if variable_conversions is not None:
-        solution_matrix = np.hstack((solution_matrix,
-                                     np.zeros((solution_matrix.shape[0],
-                                               len(variable_conversions)))))
+        solution_matrix = np.hstack(
+            (
+                solution_matrix,
+                np.zeros((solution_matrix.shape[0], len(variable_conversions))),
+            )
+        )
 
         for i, (new_var, conversion_dict) in enumerate(variable_conversions.items()):
-            assert (new_var not in solution_variables)
+            assert new_var not in solution_variables
             solution_variables.append(new_var)
 
             for var in conversion_dict.keys():
-                solution_matrix[:, n_sol_vars+i] += solution_matrix[:, solution_variables.index(var)]
+                solution_matrix[:, n_sol_vars + i] += solution_matrix[
+                    :, solution_variables.index(var)
+                ]
 
     # Now, construct A using the fitted variables
     A = np.zeros((n_vars, solution_matrix.shape[0]))
@@ -101,19 +110,28 @@ def fit_composition_to_solution(solution,
     # are exactly equal to zero if the user specifies that
     # they are equal to zero.
     S, S_index = np.unique(A, axis=0, return_index=True)
-    S = np.array([s for i, s in enumerate(S)
-                  if np.abs(b[S_index[i]]) < 1.e-10
-                  and any(np.abs(s) > 1.e-10)])
+    S = np.array(
+        [
+            s
+            for i, s in enumerate(S)
+            if np.abs(b[S_index[i]]) < 1.0e-10 and any(np.abs(s) > 1.0e-10)
+        ]
+    )
     equality_constraints = [S, np.zeros(len(S))]
 
     # Ensure all site occupancies are non-negative
-    T = np.array([-t for t in np.unique(solution.solution_model.endmember_occupancies.T, axis=0)
-                  if any(np.abs(t) > 1.e-10)])
+    T = np.array(
+        [
+            -t
+            for t in np.unique(solution.solution_model.endmember_occupancies.T, axis=0)
+            if any(np.abs(t) > 1.0e-10)
+        ]
+    )
     inequality_constraints = [T, np.zeros(len(T))]
 
-    popt, pcov, res = weighted_constrained_least_squares(A, b, Cov_b,
-                                                         equality_constraints,
-                                                         inequality_constraints)
+    popt, pcov, res = weighted_constrained_least_squares(
+        A, b, Cov_b, equality_constraints, inequality_constraints
+    )
 
     if normalize:
         sump = sum(popt)
@@ -128,8 +146,7 @@ def fit_composition_to_solution(solution,
     return (popt, pcov, res)
 
 
-def fit_phase_proportions_to_bulk_composition(phase_compositions,
-                                              bulk_composition):
+def fit_phase_proportions_to_bulk_composition(phase_compositions, bulk_composition):
     """
     Performs weighted constrained least squares on a set of phase compositions
     to find the amount of those phases that best-fits a given bulk composition.
@@ -160,9 +177,7 @@ def fit_phase_proportions_to_bulk_composition(phase_compositions,
 
     n_phases = len(phase_compositions[0])
     inequality_constraints = [-np.eye(n_phases), np.zeros(n_phases)]
-    popt, pcov, res = weighted_constrained_least_squares(phase_compositions,
-                                                         bulk_composition,
-                                                         None,
-                                                         None,
-                                                         inequality_constraints)
+    popt, pcov, res = weighted_constrained_least_squares(
+        phase_compositions, bulk_composition, None, None, inequality_constraints
+    )
     return (popt, pcov, res)

@@ -25,12 +25,13 @@ def brown_shankland(depths):
         The list of temperatures for each of the pressures. :math:`[K]`
     """
 
-    assert(min(depths) >= min(table_brown_depth))
-    assert(max(depths) <= max(table_brown_depth))
+    assert min(depths) >= min(table_brown_depth)
+    assert max(depths) <= max(table_brown_depth)
     temperature = np.empty_like(depths)
     for i, depth in enumerate(depths):
         temperature[i] = lookup_and_interpolate(
-            table_brown_depth, table_brown_temperature, depth)
+            table_brown_depth, table_brown_temperature, depth
+        )
     return temperature
 
 
@@ -48,12 +49,13 @@ def anderson(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    assert(min(depths) >= min(table_anderson_depth))
-    assert(max(depths) <= max(table_anderson_depth))
+    assert min(depths) >= min(table_anderson_depth)
+    assert max(depths) <= max(table_anderson_depth)
     temperature = np.empty_like(depths)
     for i, depth in enumerate(depths):
         temperature[i] = lookup_and_interpolate(
-                table_anderson_depth, table_anderson_temperature, depth)
+            table_anderson_depth, table_anderson_temperature, depth
+        )
     return temperature
 
 
@@ -71,12 +73,13 @@ def stacey_continental(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    assert(min(depths) >= min(table_stacey_c_depth))
-    assert(max(depths) <= max(table_stacey_c_depth))
+    assert min(depths) >= min(table_stacey_c_depth)
+    assert max(depths) <= max(table_stacey_c_depth)
     temperature = np.empty_like(depths)
     for i, depth in enumerate(depths):
         temperature[i] = lookup_and_interpolate(
-                table_stacey_c_depth, table_stacey_c_temperature, depth)
+            table_stacey_c_depth, table_stacey_c_temperature, depth
+        )
     return temperature
 
 
@@ -94,12 +97,13 @@ def stacey_oceanic(depths):
     temperature : list of floats
         The list of temperatures for each of the pressures. :math:`[K]`
     """
-    assert(min(depths) >= min(table_stacey_o_depth))
-    assert(max(depths) <= max(table_stacey_o_depth))
+    assert min(depths) >= min(table_stacey_o_depth)
+    assert max(depths) <= max(table_stacey_o_depth)
     temperature = np.empty_like(depths)
     for i, depth in enumerate(depths):
         temperature[i] = lookup_and_interpolate(
-                table_stacey_o_depth, table_stacey_o_temperature, depth)
+            table_stacey_o_depth, table_stacey_o_temperature, depth
+        )
     return temperature
 
 
@@ -141,17 +145,22 @@ def adiabatic(pressures, T0, rock):
     rock.set_state(pressures[0], T0)
     S0 = rock.S
 
-    delta_S = lambda T, P, rock, S0: S0 - rock.evaluate(['S'], [P], [T])[0]
+    delta_S = lambda T, P, rock, S0: S0 - rock.evaluate(["S"], [P], [T])[0]
 
     temperatures = np.empty_like(pressures)
     temperatures[0] = T0
     for i in range(1, len(pressures)):
         args = (pressures[i], rock, S0)
-        sol = bracket(fn=delta_S,
-                      x0=(temperatures[i-1]
-                          + (rock.gr*temperatures[i-1]/rock.K_S)
-                          * (pressures[i] - pressures[i-1])),
-                      dx=1., args=args)
+        sol = bracket(
+            fn=delta_S,
+            x0=(
+                temperatures[i - 1]
+                + (rock.gr * temperatures[i - 1] / rock.K_S)
+                * (pressures[i] - pressures[i - 1])
+            ),
+            dx=1.0,
+            args=args,
+        )
         temperatures[i] = brentq(delta_S, sol[0], sol[1], args=args)
 
     return temperatures

@@ -32,31 +32,39 @@ class CombinedMineral(Mineral):
     This class is available as :class:`burnman.CombinedMineral`.
     """
 
-    def __init__(self, mineral_list, molar_amounts,
-                 free_energy_adjustment=[],
-                 name='User-created endmember'):
-        self.mixture = Solution(solution_type='mechanical',
-                                endmembers=[[m, ''] for m in mineral_list],
-                                molar_fractions=molar_amounts)
+    def __init__(
+        self,
+        mineral_list,
+        molar_amounts,
+        free_energy_adjustment=[],
+        name="User-created endmember",
+    ):
+        self.mixture = Solution(
+            solution_type="mechanical",
+            endmembers=[[m, ""] for m in mineral_list],
+            molar_fractions=molar_amounts,
+        )
 
         # Remove elements from the chemical formula if they have
         # negligible concentrations
         for key, value in list(self.mixture.formula.items()):
-            if np.abs(value) < 1.e-10:
+            if np.abs(value) < 1.0e-10:
                 self.mixture.formula.pop(key)
 
-        self.params = {'name': name,
-                       'formula': self.mixture.formula,
-                       'equation_of_state': 'combined',
-                       'molar_mass': self.mixture.molar_mass,
-                       'n': sum(self.mixture.formula.values())}
+        self.params = {
+            "name": name,
+            "formula": self.mixture.formula,
+            "equation_of_state": "combined",
+            "molar_mass": self.mixture.molar_mass,
+            "n": sum(self.mixture.formula.values()),
+        }
 
         if free_energy_adjustment != []:
-            assert(len(free_energy_adjustment) == 3)
+            assert len(free_energy_adjustment) == 3
             dE, dS, dV = free_energy_adjustment
-            self.property_modifiers = [['linear', {'delta_E': dE,
-                                                   'delta_S': dS,
-                                                   'delta_V': dV}]]
+            self.property_modifiers = [
+                ["linear", {"delta_E": dE, "delta_S": dS, "delta_V": dV}]
+            ]
 
         Mineral.__init__(self)
 
@@ -70,7 +78,7 @@ class CombinedMineral(Mineral):
         Returns Gibbs free energy of the mineral [J]
         Aliased with self.gibbs
         """
-        return self.mixture.molar_gibbs + self._property_modifiers['G']
+        return self.mixture.molar_gibbs + self._property_modifiers["G"]
 
     @material_property
     def _molar_volume_unmodified(self):
@@ -82,7 +90,7 @@ class CombinedMineral(Mineral):
         Returns molar volume of the mineral [m^3/mol]
         Aliased with self.V
         """
-        return self.mixture.molar_volume + self._property_modifiers['dGdP']
+        return self.mixture.molar_volume + self._property_modifiers["dGdP"]
 
     @material_property
     def molar_entropy(self):
@@ -90,7 +98,7 @@ class CombinedMineral(Mineral):
         Returns entropy of the mineral [J]
         Aliased with self.S
         """
-        return self.mixture.molar_entropy - self._property_modifiers['dGdT']
+        return self.mixture.molar_entropy - self._property_modifiers["dGdT"]
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -100,9 +108,10 @@ class CombinedMineral(Mineral):
         """
         K_T_orig = self.mixture.isothermal_bulk_modulus
 
-        return (self.molar_volume
-                / ((self._molar_volume_unmodified / K_T_orig)
-                   - self._property_modifiers['d2GdP2']))
+        return self.molar_volume / (
+            (self._molar_volume_unmodified / K_T_orig)
+            - self._property_modifiers["d2GdP2"]
+        )
 
     @material_property
     def shear_modulus(self):
@@ -118,9 +127,10 @@ class CombinedMineral(Mineral):
         Returns thermal expansion coefficient (alpha) of the mineral [1/K]
         Aliased with self.alpha
         """
-        return ((self.mixture.thermal_expansivity
-                 * self._molar_volume_unmodified)
-                + self._property_modifiers['d2GdPdT']) / self.molar_volume
+        return (
+            (self.mixture.thermal_expansivity * self._molar_volume_unmodified)
+            + self._property_modifiers["d2GdPdT"]
+        ) / self.molar_volume
 
     @material_property
     def molar_heat_capacity_p(self):
@@ -128,8 +138,10 @@ class CombinedMineral(Mineral):
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
         Aliased with self.C_p
         """
-        return (self.mixture.molar_heat_capacity_p
-                - self.temperature * self._property_modifiers['d2GdT2'])
+        return (
+            self.mixture.molar_heat_capacity_p
+            - self.temperature * self._property_modifiers["d2GdT2"]
+        )
 
     """
     Properties from mineral parameters,
@@ -165,9 +177,11 @@ class CombinedMineral(Mineral):
         Returns molar internal energy of the mineral [J/mol]
         Aliased with self.energy
         """
-        return (self.molar_gibbs
-                - self.pressure * self.molar_volume
-                + self.temperature * self.molar_entropy)
+        return (
+            self.molar_gibbs
+            - self.pressure * self.molar_volume
+            + self.temperature * self.molar_entropy
+        )
 
     @material_property
     def molar_helmholtz(self):
@@ -191,12 +205,14 @@ class CombinedMineral(Mineral):
         Returns adiabatic bulk modulus of the mineral [Pa]
         Aliased with self.K_S
         """
-        if self.temperature < 1.e-10:
+        if self.temperature < 1.0e-10:
             return self.isothermal_bulk_modulus
         else:
-            return (self.isothermal_bulk_modulus
-                    * self.molar_heat_capacity_p
-                    / self.molar_heat_capacity_v)
+            return (
+                self.isothermal_bulk_modulus
+                * self.molar_heat_capacity_p
+                / self.molar_heat_capacity_v
+            )
 
     @material_property
     def isothermal_compressibility(self):
@@ -205,7 +221,7 @@ class CombinedMineral(Mineral):
         (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.K_T
         """
-        return 1. / self.isothermal_bulk_modulus
+        return 1.0 / self.isothermal_bulk_modulus
 
     @material_property
     def adiabatic_compressibility(self):
@@ -214,7 +230,7 @@ class CombinedMineral(Mineral):
         (or inverse adiabatic bulk modulus) [1/Pa]
         Aliased with self.K_S
         """
-        return 1. / self.adiabatic_bulk_modulus
+        return 1.0 / self.adiabatic_bulk_modulus
 
     @material_property
     def p_wave_velocity(self):
@@ -222,8 +238,10 @@ class CombinedMineral(Mineral):
         Returns P wave speed of the mineral [m/s]
         Aliased with self.v_p
         """
-        return np.sqrt((self.adiabatic_bulk_modulus + 4. / 3. *
-                        self.shear_modulus) / self.density)
+        return np.sqrt(
+            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            / self.density
+        )
 
     @material_property
     def bulk_sound_velocity(self):
@@ -247,11 +265,15 @@ class CombinedMineral(Mineral):
         Returns grueneisen parameter of the mineral [unitless]
         Aliased with self.gr
         """
-        if self.temperature < 1.e-12:
-            return 0.
+        if self.temperature < 1.0e-12:
+            return 0.0
         else:
-            return self.thermal_expansivity * self.isothermal_bulk_modulus \
-                * self.molar_volume / self.molar_heat_capacity_v
+            return (
+                self.thermal_expansivity
+                * self.isothermal_bulk_modulus
+                * self.molar_volume
+                / self.molar_heat_capacity_v
+            )
 
     @material_property
     def molar_heat_capacity_v(self):
@@ -259,7 +281,11 @@ class CombinedMineral(Mineral):
         Returns molar heat capacity at constant volume of the mineral [J/K/mol]
         Aliased with self.C_v
         """
-        return (self.molar_heat_capacity_p
-                - self.molar_volume * self.temperature
-                * self.thermal_expansivity * self.thermal_expansivity
-                * self.isothermal_bulk_modulus)
+        return (
+            self.molar_heat_capacity_p
+            - self.molar_volume
+            * self.temperature
+            * self.thermal_expansivity
+            * self.thermal_expansivity
+            * self.isothermal_bulk_modulus
+        )

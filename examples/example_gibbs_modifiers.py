@@ -60,14 +60,14 @@ if __name__ == "__main__":
     # to the CaCl2 structure at high pressure
     stv = minerals.SLB_2011.stishovite()
 
-    T = 1500.
-    pressures = np.linspace(60.e9, 80.e9, 101)
-    temperatures = pressures*0. + 1500.
-    v_ps = stv.evaluate(['p_wave_velocity'], pressures, temperatures)[0]
+    T = 1500.0
+    pressures = np.linspace(60.0e9, 80.0e9, 101)
+    temperatures = pressures * 0.0 + 1500.0
+    v_ps = stv.evaluate(["p_wave_velocity"], pressures, temperatures)[0]
 
-    plt.plot(pressures / 1.e9, v_ps / 1.e3, label='stishovite')
-    plt.xlabel('P (GPa)')
-    plt.ylabel('$V_p$ (km/s)')
+    plt.plot(pressures / 1.0e9, v_ps / 1.0e3, label="stishovite")
+    plt.xlabel("P (GPa)")
+    plt.ylabel("$V_p$ (km/s)")
     plt.legend(loc="lower right")
     plt.show()
 
@@ -86,54 +86,65 @@ if __name__ == "__main__":
     # of tro also included.
     from burnman.utils.chemistry import dictionarize_formula, formula_mass
 
-    class lot (burnman.Mineral):
-
+    class lot(burnman.Mineral):
         def __init__(self):
-            formula = 'Fe1.0S1.0'
+            formula = "Fe1.0S1.0"
             formula = dictionarize_formula(formula)
             self.params = {
-                'name': 'lot',
-                'formula': formula,
-                'equation_of_state': 'hp_tmt',
-                'H_0': -102160.0,
-                'S_0': 60.0,
-                'V_0': 1.818e-05,
-                'Cp': [50.2, 0.011052, -940000.0, 0.0],
-                'a_0': 4.93e-05,
-                'K_0': 65800000000.0,
-                'Kprime_0': 4.17,
-                'Kdprime_0': -6.3e-11,
-                'n': sum(formula.values()),
-                'molar_mass': formula_mass(formula)}
+                "name": "lot",
+                "formula": formula,
+                "equation_of_state": "hp_tmt",
+                "H_0": -102160.0,
+                "S_0": 60.0,
+                "V_0": 1.818e-05,
+                "Cp": [50.2, 0.011052, -940000.0, 0.0],
+                "a_0": 4.93e-05,
+                "K_0": 65800000000.0,
+                "Kprime_0": 4.17,
+                "Kdprime_0": -6.3e-11,
+                "n": sum(formula.values()),
+                "molar_mass": formula_mass(formula),
+            }
             self.property_modifiers = [
-                ['landau_hp', {'P_0': 100000.0,
-                               'T_0': 298.15,
-                               'Tc_0': 420.0,
-                               'S_D': 10.0,
-                               'V_D': 0.0}],
-                ['landau_hp', {'P_0': 100000.0,
-                               'T_0': 298.15,
-                               'Tc_0': 598.0,
-                               'S_D': 12.0,
-                               'V_D': 4.1e-7}]]
+                [
+                    "landau_hp",
+                    {
+                        "P_0": 100000.0,
+                        "T_0": 298.15,
+                        "Tc_0": 420.0,
+                        "S_D": 10.0,
+                        "V_D": 0.0,
+                    },
+                ],
+                [
+                    "landau_hp",
+                    {
+                        "P_0": 100000.0,
+                        "T_0": 298.15,
+                        "Tc_0": 598.0,
+                        "S_D": 12.0,
+                        "V_D": 4.1e-7,
+                    },
+                ],
+            ]
             burnman.Mineral.__init__(self)
 
     troilite = lot()
     lot = minerals.HP_2011_ds62.lot()
     tro = minerals.HP_2011_ds62.tro()
 
-    temperatures = np.linspace(300., 1300., 101)
-    pressures = temperatures*0. + 1.e5
+    temperatures = np.linspace(300.0, 1300.0, 101)
+    pressures = temperatures * 0.0 + 1.0e5
 
-    C_ps_troilite = troilite.evaluate(['C_p'], pressures, temperatures)[0]
-    C_ps_lot = lot.evaluate(['C_p'], pressures, temperatures)[0]
-    C_ps_tro = tro.evaluate(['C_p'], pressures, temperatures)[0]
+    C_ps_troilite = troilite.evaluate(["C_p"], pressures, temperatures)[0]
+    C_ps_lot = lot.evaluate(["C_p"], pressures, temperatures)[0]
+    C_ps_tro = tro.evaluate(["C_p"], pressures, temperatures)[0]
 
-    plt.plot(temperatures, C_ps_lot, 'r--', label='low temperature (HP2011)')
-    plt.plot(temperatures, C_ps_tro, 'g--', label='high temperature (HP2011)')
-    plt.plot(temperatures, C_ps_troilite, 'b-', label='troilite')
-    plt.xlabel('T (K)')
-    plt.ylabel('$C_p$ (J/K/mol)')
+    plt.plot(temperatures, C_ps_lot, "r--", label="low temperature (HP2011)")
+    plt.plot(temperatures, C_ps_tro, "g--", label="high temperature (HP2011)")
+    plt.plot(temperatures, C_ps_troilite, "b-", label="troilite")
+    plt.xlabel("T (K)")
+    plt.ylabel("$C_p$ (J/K/mol)")
     plt.legend(loc="lower right")
     plt.show()
 
@@ -143,15 +154,15 @@ if __name__ == "__main__":
     sp2 = minerals.HP_2011_ds62.sp()
     sp2.property_modifiers = []
 
-    C_ps_sp = sp.evaluate(['C_p'], pressures, temperatures)[0]
-    C_ps_sp2 = sp2.evaluate(['C_p'], pressures, temperatures)[0]
+    C_ps_sp = sp.evaluate(["C_p"], pressures, temperatures)[0]
+    C_ps_sp2 = sp2.evaluate(["C_p"], pressures, temperatures)[0]
 
-    plt.plot(temperatures, C_ps_sp2, linestyle='--',
-             label='spinel without B-W transition')
-    plt.plot(temperatures, C_ps_sp,
-             label='spinel with B-W transition')
-    plt.xlabel('T (K)')
-    plt.ylabel('$C_p$ (J/K/mol)')
+    plt.plot(
+        temperatures, C_ps_sp2, linestyle="--", label="spinel without B-W transition"
+    )
+    plt.plot(temperatures, C_ps_sp, label="spinel with B-W transition")
+    plt.xlabel("T (K)")
+    plt.ylabel("$C_p$ (J/K/mol)")
     plt.legend(loc="lower right")
     plt.show()
 
@@ -165,24 +176,29 @@ if __name__ == "__main__":
     ne_HP2 = burnman.minerals.HP_2011_ds62.ne()
     ne_HP2.property_modifiers = []
 
-    ne_HP.set_state(1.e5, 1000.)
-    ne_HP2.set_state(1.e5, 1000.)
+    ne_HP.set_state(1.0e5, 1000.0)
+    ne_HP2.set_state(1.0e5, 1000.0)
 
-    ne_HP2.property_modifiers = [['linear',
-                                  {'delta_E': (ne_HP.molar_internal_energy
-                                               - ne_HP2.molar_internal_energy),
-                                   'delta_S': ne_HP.S - ne_HP2.S,
-                                   'delta_V': ne_HP.V - ne_HP2.V}]]
+    ne_HP2.property_modifiers = [
+        [
+            "linear",
+            {
+                "delta_E": (ne_HP.molar_internal_energy - ne_HP2.molar_internal_energy),
+                "delta_S": ne_HP.S - ne_HP2.S,
+                "delta_V": ne_HP.V - ne_HP2.V,
+            },
+        ]
+    ]
 
-    temperatures = np.linspace(300., 800., 101)
-    pressures = temperatures*0. + 1.e5
+    temperatures = np.linspace(300.0, 800.0, 101)
+    pressures = temperatures * 0.0 + 1.0e5
 
-    Ss_HP = ne_HP.evaluate(['molar_entropy'], pressures, temperatures)[0]
-    Ss_HP2 = ne_HP2.evaluate(['molar_entropy'], pressures, temperatures)[0]
+    Ss_HP = ne_HP.evaluate(["molar_entropy"], pressures, temperatures)[0]
+    Ss_HP2 = ne_HP2.evaluate(["molar_entropy"], pressures, temperatures)[0]
 
-    plt.plot(temperatures, Ss_HP, label='nepheline (HP2011)')
-    plt.plot(temperatures, Ss_HP2, label='nepheline (disordered)')
-    plt.xlabel('T (K)')
-    plt.ylabel('S (J/K/mol)')
+    plt.plot(temperatures, Ss_HP, label="nepheline (HP2011)")
+    plt.plot(temperatures, Ss_HP2, label="nepheline (disordered)")
+    plt.xlabel("T (K)")
+    plt.ylabel("S (J/K/mol)")
     plt.legend(loc="lower right")
     plt.show()

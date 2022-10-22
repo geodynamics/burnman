@@ -23,6 +23,7 @@ class HelperRockSwitcher(Material):
     1. By creating an instance and setting select_rock to a lambda that returns a rock
     2. By deriving from this class and implementing select_rock.
     """
+
     def __init__(self):
         self.current_rock = None
         Material.__init__(self)
@@ -130,11 +131,20 @@ class HelperLowHighPressureRockTransition(HelperRockSwitcher):
     """
     A Helper that represents a Material that switches between two given rocks based on a given transition pressure.
     """
+
     def __init__(self, transition_pressure, low_pressure_rock, high_pressure_rock):
         self.transition_pressure = transition_pressure
         self.rocks = [low_pressure_rock, high_pressure_rock]
         HelperRockSwitcher.__init__(self)
-        self._name = "HelperLowHighPressureRockTransition("+str(self.transition_pressure)+ " GPa, " + self.rocks[0].name +  ", " + self.rocks[1].name + ")"
+        self._name = (
+            "HelperLowHighPressureRockTransition("
+            + str(self.transition_pressure)
+            + " GPa, "
+            + self.rocks[0].name
+            + ", "
+            + self.rocks[1].name
+            + ")"
+        )
 
     def select_rock(self):
         if self._pressure < self.transition_pressure:
@@ -147,7 +157,10 @@ class HelperLowHighPressureRockTransition(HelperRockSwitcher):
             r.set_method(method)
 
     def debug_print(self, indent=""):
-        print("%sHelperLowHighPressureRockTransition (%f GPa):" % (indent, self.transition_pressure))
+        print(
+            "%sHelperLowHighPressureRockTransition (%f GPa):"
+            % (indent, self.transition_pressure)
+        )
         indent += "  "
         for r in self.rocks:
             r.debug_print(indent)
@@ -179,7 +192,7 @@ class HelperSpinTransition(Composite):
         self.hs_mat.debug_print(indent + "  ")
 
     def set_state(self, pressure, temperature):
-        if (pressure >= self.transition_pressure):
+        if pressure >= self.transition_pressure:
             Composite.set_fractions(self, [1.0, 0.0])
         else:
             Composite.set_fractions(self, [0.0, 1.0])

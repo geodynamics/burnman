@@ -19,6 +19,7 @@ from __future__ import print_function
 
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
+
 # Import BurnMan
 import burnman
 from burnman import minerals  # import mineral library seperately
@@ -27,7 +28,6 @@ from burnman import minerals  # import mineral library seperately
 import obspy
 from obspy.taup import taup_create
 from obspy.taup import TauPyModel
-
 
 
 def plot_rays_and_times(modelname):
@@ -40,20 +40,18 @@ def plot_rays_and_times(modelname):
     Name for BurnMan model (*.tvel file must be present)
     """
 
-
     # Arrivals to plot, some random examples of phase names to use ("P","S", "PcP", "Sdiff", "SKS", "PKIKP")
     # Phase naming in obspy.taup is explained at
     # https://docs.obspy.org/packages/obspy.taup.html
     phase_list = ["P", "PKP", "PKIKP"]
-    source_depth = 10 # in km
-    min_degrees = 60 # minimum distance for ray paths
-    max_degrees = 300 # maximum distance for ray paths
-    npoints = 9 # number of distances to plot ray paths
-    ref_model = 'prem' # choice of models available in obpsy, or input an npz file name
+    source_depth = 10  # in km
+    min_degrees = 60  # minimum distance for ray paths
+    max_degrees = 300  # maximum distance for ray paths
+    npoints = 9  # number of distances to plot ray paths
+    ref_model = "prem"  # choice of models available in obpsy, or input an npz file name
 
     # Build a taup_model for Obspy
-    taup_create.build_taup_model(
-                "./" + modelname + ".tvel", ".")
+    taup_create.build_taup_model("./" + modelname + ".tvel", ".")
 
     # Time to plot some predictions using routines from Obspy
     plt.figure(figsize=[9, 7])
@@ -61,12 +59,11 @@ def plot_rays_and_times(modelname):
     # plotting predicted travel times at all distances
     obspy.taup.plot_travel_times(
         ax=ax,
-        model='./' +
-        modelname +
-        '.npz',
+        model="./" + modelname + ".npz",
         source_depth=source_depth,
         phase_list=phase_list,
-        show=False)
+        show=False,
+    )
     plt.title(modelname)
     # plotting the same for PREM for reference
     ax = plt.subplot(2, 2, 2)
@@ -75,7 +72,8 @@ def plot_rays_and_times(modelname):
         model=ref_model,
         source_depth=source_depth,
         phase_list=phase_list,
-        show=False)
+        show=False,
+    )
     # not sure why the grid dissapears on this subplot, reactivate here...
     ax.grid()
     plt.title(ref_model)
@@ -84,16 +82,15 @@ def plot_rays_and_times(modelname):
     ax = plt.subplot(2, 2, 3, polar=True)
     obspy.taup.plot_ray_paths(
         ax=ax,
-        model='./' +
-        modelname +
-        '.npz',
+        model="./" + modelname + ".npz",
         source_depth=source_depth,
         min_degrees=min_degrees,
         max_degrees=max_degrees,
         npoints=npoints,
         phase_list=phase_list,
         verbose=True,
-        show=False)
+        show=False,
+    )
     # plotting the same for PREM for reference
     ax = plt.subplot(2, 2, 4, polar=True)
     obspy.taup.plot_ray_paths(
@@ -104,8 +101,8 @@ def plot_rays_and_times(modelname):
         max_degrees=max_degrees,
         npoints=npoints,
         phase_list=phase_list,
-        verbose=True)
-
+        verbose=True,
+    )
 
 
 if __name__ == "__main__":
@@ -115,16 +112,14 @@ if __name__ == "__main__":
     # Builds an earthlike planet
     example_planet = True
 
-
     # First example: replacing the lower mantle with a composition from BurnMan
     if example_layer:
-        modelname = 'perovskitic_mantle'
+        modelname = "perovskitic_mantle"
         # This is the first actual work done in this example.  We define
         # composite object and name it "rock".
         mg_fe_perovskite = minerals.SLB_2011.mg_fe_perovskite()
-        mg_fe_perovskite.set_composition(
-            [0.9, 0.1, 0])  # frac_mg, frac_fe, frac_al
-        rock = burnman.Composite([mg_fe_perovskite], [1.])
+        mg_fe_perovskite.set_composition([0.9, 0.1, 0])  # frac_mg, frac_fe, frac_al
+        rock = burnman.Composite([mg_fe_perovskite], [1.0])
 
         # We create an array of 20 depths at which we want to evaluate the
         # layer at
@@ -132,8 +127,8 @@ if __name__ == "__main__":
         # Here we define the lower mantle as a Layer(). The layer needs various
         # parameters to set a depth array and radius array.
         lower_mantle = burnman.Layer(
-            name='Perovskitic Lower Mantle',
-            radii=6371.e3 - depths)
+            name="Perovskitic Lower Mantle", radii=6371.0e3 - depths
+        )
         # Here we set the composition of the layer as the above defined 'rock'.
         lower_mantle.set_material(rock)
 
@@ -141,80 +136,82 @@ if __name__ == "__main__":
         # Here we use an adiabatic temperature and set the temperature at the
         # top of the layer
         lower_mantle.set_temperature_mode(
-            temperature_mode='adiabatic',
-            temperature_top=1900.)
+            temperature_mode="adiabatic", temperature_top=1900.0
+        )
 
         # And we set a self-consistent pressure. The pressure at the top of the layer and
         # gravity at the bottom of the layer are given by the PREM.
         pressure, gravity = burnman.seismic.PREM().evaluate(
-            ['pressure', 'gravity'], depths)
-        lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
-                                       pressure_top=pressure[-1], gravity_bottom=gravity[0])
+            ["pressure", "gravity"], depths
+        )
+        lower_mantle.set_pressure_mode(
+            pressure_mode="self-consistent",
+            pressure_top=pressure[-1],
+            gravity_bottom=gravity[0],
+        )
         lower_mantle.make()
 
         # Constructing the tvel file for obspy. Here we use PREM to fill in the
         # rest of the planet
         burnman.tools.output_seismo.write_tvel_file(
-            lower_mantle,
-            modelname=modelname,
-            background_model=burnman.seismic.PREM())
+            lower_mantle, modelname=modelname, background_model=burnman.seismic.PREM()
+        )
 
         # Plot ray paths and travel times
         plot_rays_and_times(modelname)
 
     # Second example implementing an entire planet
     if example_planet:
-        modelname = 'planetzog'
+        modelname = "planetzog"
 
         # A layer is defined by 4 parameters: Name, min_depth, max_depth,and number of slices within the layer.
         # Separately the composition and the temperature_mode need to set.
         # Radii of different layers
-        radius_planet = 6371.e3
-        radius_ic = 1220.e3
-        radius_oc = 3580.e3
-        radius_lm = 5711.e3
+        radius_planet = 6371.0e3
+        radius_ic = 1220.0e3
+        radius_oc = 3580.0e3
+        radius_lm = 5711.0e3
 
         # inner_core
-        inner_core = burnman.Layer(
-            'inner core', radii=np.linspace(
-                0., radius_ic, 10))
+        inner_core = burnman.Layer("inner core", radii=np.linspace(0.0, radius_ic, 10))
         inner_core.set_material(burnman.minerals.other.Fe_Dewaele())
 
         # The minerals that make up our core do not currently implement the
         # thermal equation of state, so we will set the temperature at 300 K.
-        inner_core.set_temperature_mode('user-defined',
-                                        300. * np.ones_like(inner_core.radii))
+        inner_core.set_temperature_mode(
+            "user-defined", 300.0 * np.ones_like(inner_core.radii)
+        )
 
         # outer_core
         outer_core = burnman.Layer(
-            'outer core', radii=np.linspace(
-                radius_ic, radius_oc, 10))
+            "outer core", radii=np.linspace(radius_ic, radius_oc, 10)
+        )
         outer_core.set_material(burnman.minerals.other.Liquid_Fe_Anderson())
         # The minerals that make up our core do not currently implement the
         # thermal equation of state, so we will define the temperature at 300
         # K.
         outer_core.set_temperature_mode(
-            'user-defined',
-            300. *
-            np.ones_like(
-                outer_core.radii))
+            "user-defined", 300.0 * np.ones_like(outer_core.radii)
+        )
 
         # Next the Mantle.
         lower_mantle = burnman.Layer(
-            'lower mantle', radii=np.linspace(
-                radius_oc, radius_lm, 10))
+            "lower mantle", radii=np.linspace(radius_oc, radius_lm, 10)
+        )
         lower_mantle.set_material(burnman.minerals.SLB_2011.mg_bridgmanite())
-        lower_mantle.set_temperature_mode('adiabatic')
+        lower_mantle.set_temperature_mode("adiabatic")
         upper_mantle = burnman.Layer(
-            'upper mantle', radii=np.linspace(
-                radius_lm, radius_planet, 10))
+            "upper mantle", radii=np.linspace(radius_lm, radius_planet, 10)
+        )
         upper_mantle.set_material(burnman.minerals.SLB_2011.forsterite())
-        upper_mantle.set_temperature_mode('adiabatic', temperature_top=1200.)
+        upper_mantle.set_temperature_mode("adiabatic", temperature_top=1200.0)
 
         # Now we calculate the planet.
         planet_zog = burnman.Planet(
-            'Planet Zog', [
-                inner_core, outer_core, lower_mantle, upper_mantle], verbose=True)
+            "Planet Zog",
+            [inner_core, outer_core, lower_mantle, upper_mantle],
+            verbose=True,
+        )
 
         # Here we compute its state. Go BurnMan Go!
         # (If we were to change composition of one of the layers, we would have to
@@ -224,10 +221,8 @@ if __name__ == "__main__":
         # Constructing the tvel file for obspy. Here we use PREM to fill in the
         # rest of the planet
         burnman.tools.output_seismo.write_tvel_file(
-            planet_zog,
-            modelname=modelname,
-            background_model=burnman.seismic.PREM())
-
+            planet_zog, modelname=modelname, background_model=burnman.seismic.PREM()
+        )
 
         # Plot ray paths and travel times
         plot_rays_and_times(modelname)

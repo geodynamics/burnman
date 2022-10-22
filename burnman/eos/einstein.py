@@ -22,10 +22,11 @@ def thermal_energy(T, einstein_T, n):
     """
     if T <= eps:
         # zero point energy
-        return 3. * n * constants.gas_constant * einstein_T * 0.5
+        return 3.0 * n * constants.gas_constant * einstein_T * 0.5
     x = einstein_T / T
-    E_th = 3. * n * constants.gas_constant * einstein_T * \
-        (0.5 + 1. / (np.exp(x) - 1.0))  # include the zero point energy
+    E_th = (
+        3.0 * n * constants.gas_constant * einstein_T * (0.5 + 1.0 / (np.exp(x) - 1.0))
+    )  # include the zero point energy
     return E_th
 
 
@@ -34,8 +35,12 @@ def molar_heat_capacity_v(T, einstein_T, n):
     Heat capacity at constant volume.  In J/K/mol
     """
     if T <= eps:
-        return 0.
+        return 0.0
     x = einstein_T / T
-    C_v = 3.0 * n * constants.gas_constant * \
-        (x * x * np.exp(x) / np.power(np.exp(x) - 1.0, 2.0))
+    C_v = (
+        3.0
+        * n
+        * constants.gas_constant
+        * (x * x * np.exp(x) / np.power(np.exp(x) - 1.0, 2.0))
+    )
     return C_v

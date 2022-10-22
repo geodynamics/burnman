@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
@@ -20,8 +21,9 @@ class Planet(object):
     planet is initialized, the planet will be built immediately.
     """
 
-    def __init__(self, name, layers, n_max_iterations=50,
-                 max_delta=1.e-5, verbose=False):
+    def __init__(
+        self, name, layers, n_max_iterations=50, max_delta=1.0e-5, verbose=False
+    ):
         """
         Parameters
         ----------
@@ -42,23 +44,21 @@ class Planet(object):
         # assert layers attach to one another
         if len(self.layers) > 1:
             for i in range(1, len(self.layers)):
-                assert(self.layers[i].inner_radius
-                       == self.layers[i - 1].outer_radius)
+                assert self.layers[i].inner_radius == self.layers[i - 1].outer_radius
 
         self.name = name
 
-        self.radii = self.evaluate(['radii'])
+        self.radii = self.evaluate(["radii"])
         self.n_slices = len(self.radii)
         self.radius_planet = max(self.radii)
-        self.volume = 4./3.*np.pi*np.power(self.radius_planet, 3.)
+        self.volume = 4.0 / 3.0 * np.pi * np.power(self.radius_planet, 3.0)
 
         for layer in self.layers:
             layer.n_start = np.where(self.radii == layer.inner_radius)[0][-1]
             layer.n_end = np.where(self.radii == layer.outer_radius)[0][0] + 1
         self._cached = {}
         self.verbose = verbose
-        self.set_pressure_mode(
-            n_max_iterations=n_max_iterations, max_delta=max_delta)
+        self.set_pressure_mode(n_max_iterations=n_max_iterations, max_delta=max_delta)
 
     def __iter__(self):
         """
@@ -70,8 +70,7 @@ class Planet(object):
         """
         Prints details of the planet
         """
-        writing = '{0} consists of {1} layers:\n'.format(
-            self.name, len(self.layers))
+        writing = "{0} consists of {1} layers:\n".format(self.name, len(self.layers))
         for layer in self:
             writing = writing + layer.__str__()
         return writing
@@ -136,37 +135,53 @@ class Planet(object):
             (1D if only one property was requested)
         """
         if radlist is None:
-            values = np.empty([len(properties),
-                               np.sum([len(layer.radii)
-                                       for layer in self.layers])])
+            values = np.empty(
+                [len(properties), np.sum([len(layer.radii) for layer in self.layers])]
+            )
             for i, prop in enumerate(properties):
-                if prop == 'depth':
+                if prop == "depth":
                     values[i] = np.array(
-                        [self.radius_planet - r for layer in self.layers
-                         for r in layer.radii])
+                        [
+                            self.radius_planet - r
+                            for layer in self.layers
+                            for r in layer.radii
+                        ]
+                    )
                 else:
                     j = 0
                     for layer in self.layers:
                         vals = getattr(layer, prop)
-                        values[i, j:j + len(vals)] = vals
+                        values[i, j : j + len(vals)] = vals
                         j += len(vals)
         else:
             values = np.empty([len(properties), len(radlist)])
-            l_idx = [i for i, layer in enumerate(self.layers) for r in radlist
-                     if r >= layer.inner_radius and r <= layer.outer_radius]
+            l_idx = [
+                i
+                for i, layer in enumerate(self.layers)
+                for r in radlist
+                if r >= layer.inner_radius and r <= layer.outer_radius
+            ]
 
             for j, r in enumerate(radlist):
-                values[:, j] = self.layers[l_idx[j]].evaluate(
-                    properties, [r], self.radius_planet).T[0]
+                values[:, j] = (
+                    self.layers[l_idx[j]]
+                    .evaluate(properties, [r], self.radius_planet)
+                    .T[0]
+                )
 
         if values.shape[0] == 1:
             values = values[0]
         return values
 
-    def set_pressure_mode(self, pressure_mode='self-consistent',
-                          pressures=None, pressure_top=0.,
-                          gravity_bottom=0., n_max_iterations=50,
-                          max_delta=1.e-5):
+    def set_pressure_mode(
+        self,
+        pressure_mode="self-consistent",
+        pressures=None,
+        pressure_top=0.0,
+        gravity_bottom=0.0,
+        n_max_iterations=50,
+        max_delta=1.0e-5,
+    ):
         """
         Sets the pressure mode of the planet by user-defined values are in a
         self-consistent fashion.
@@ -190,18 +205,20 @@ class Planet(object):
             (default = 50)
         """
         self.reset()
-        assert(pressure_mode == 'user-defined' or pressure_mode == 'self-consistent')
+        assert pressure_mode == "user-defined" or pressure_mode == "self-consistent"
 
         self.pressure_mode = pressure_mode
         self.gravity_bottom = gravity_bottom
 
-        if pressure_mode == 'user-defined':
-            assert(len(pressures) == len(self.radii))
+        if pressure_mode == "user-defined":
+            assert len(pressures) == len(self.radii)
             self._pressures = pressures
-            warnings.warn('User-defined pressures mean that the planet is '
-                          'unlikely to be self-consistent')
+            warnings.warn(
+                "User-defined pressures mean that the planet is "
+                "unlikely to be self-consistent"
+            )
 
-        if pressure_mode == 'self-consistent':
+        if pressure_mode == "self-consistent":
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
@@ -214,16 +231,16 @@ class Planet(object):
 
         self.reset()
         for layer in self.layers:
-            assert(layer.temperature_mode is not None)
+            assert layer.temperature_mode is not None
 
-        if self.pressure_mode == 'user-defined':
+        if self.pressure_mode == "user-defined":
             self._temperatures = self._evaluate_temperature(self._pressures)
 
-        if self.pressure_mode == 'self-consistent':
+        if self.pressure_mode == "self-consistent":
 
-            new_press = self.pressure_top + \
-                (-self.radii + max(self.radii)) * \
-                1.e3  # initial pressure curve guess
+            new_press = (
+                self.pressure_top + (-self.radii + max(self.radii)) * 1.0e3
+            )  # initial pressure curve guess
             temperatures = self._evaluate_temperature(new_press)
 
             # Make it self-consistent!!!
@@ -231,16 +248,16 @@ class Planet(object):
             while i < self.n_max_iterations:
                 i += 1
                 ref_press = new_press
-                new_grav, new_press = self._evaluate_eos(new_press,
-                                                         temperatures,
-                                                         self.gravity_bottom,
-                                                         self.pressure_top)
+                new_grav, new_press = self._evaluate_eos(
+                    new_press, temperatures, self.gravity_bottom, self.pressure_top
+                )
                 temperatures = self._evaluate_temperature(new_press)
-                rel_err = abs((max(ref_press) - max(new_press))
-                              / max(new_press))
+                rel_err = abs((max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
-                    print(f'Iteration {i:0d} maximum relative pressure error: '
-                          f'{rel_err:.1e}')
+                    print(
+                        f"Iteration {i:0d} maximum relative pressure error: "
+                        f"{rel_err:.1e}"
+                    )
 
                 if rel_err < self.max_delta:
                     break
@@ -251,17 +268,15 @@ class Planet(object):
 
         for layer in self.layers:
             layer.sublayers = []
-            layer.pressures = self.pressures[layer.n_start: layer.n_end]
-            layer.temperatures = self.temperatures[layer.n_start: layer.n_end]
+            layer.pressures = self.pressures[layer.n_start : layer.n_end]
+            layer.temperatures = self.temperatures[layer.n_start : layer.n_end]
             layer.gravity_bottom = self._gravity[layer.n_start - 1]
-            layer.pressure_mode = 'set-in-planet'
+            layer.pressure_mode = "set-in-planet"
             for i in range(len(layer.radii)):
                 layer.sublayers.append(layer.material.copy())
-                layer.sublayers[i].set_state(
-                    layer.pressures[i], layer.temperatures[i])
+                layer.sublayers[i].set_state(layer.pressures[i], layer.temperatures[i])
 
-    def _evaluate_eos(self, pressures, temperatures,
-                      gravity_bottom, pressure_top):
+    def _evaluate_eos(self, pressures, temperatures, gravity_bottom, pressure_top):
         """
         Used to update the pressure profile in set_state()
         """
@@ -276,9 +291,13 @@ class Planet(object):
         """
         density = []
         for layer in self.layers:
-            density.append(layer.material.evaluate(['density'],
-                                                   pressures[layer.n_start:layer.n_end],
-                                                   temperatures[layer.n_start:layer.n_end]))
+            density.append(
+                layer.material.evaluate(
+                    ["density"],
+                    pressures[layer.n_start : layer.n_end],
+                    temperatures[layer.n_start : layer.n_end],
+                )
+            )
         return np.squeeze(np.hstack(density))
 
     def _evaluate_temperature(self, pressures):
@@ -291,8 +310,11 @@ class Planet(object):
         for layer in self.layers[::-1]:
             if temperature_top is None or layer.temperature_top is not None:
                 temperature_top = layer.temperature_top
-            temps.extend(layer._evaluate_temperature(
-                (pressures[layer.n_start:layer.n_end]), temperature_top)[::-1])
+            temps.extend(
+                layer._evaluate_temperature(
+                    (pressures[layer.n_start : layer.n_end]), temperature_top
+                )[::-1]
+            )
             temperature_top = temps[-1]
         return np.hstack(np.squeeze(temps))[::-1]
 
@@ -307,8 +329,11 @@ class Planet(object):
         start_gravity = gravity_bottom
         grav = []
         for layer in self.layers:
-            grav.extend(layer._compute_gravity(
-                density[layer.n_start: layer.n_end], start_gravity))
+            grav.extend(
+                layer._compute_gravity(
+                    density[layer.n_start : layer.n_end], start_gravity
+                )
+            )
             start_gravity = grav[-1]
 
         return np.array(grav)
@@ -322,9 +347,13 @@ class Planet(object):
         start_pressure = pressure_top
         press = []
         for layer in self.layers[::-1]:
-            press.extend(layer._compute_pressure(density[layer.n_start:layer.n_end],
-                                                 gravity[layer.n_start: layer.n_end],
-                                                 start_pressure)[::-1])
+            press.extend(
+                layer._compute_pressure(
+                    density[layer.n_start : layer.n_end],
+                    gravity[layer.n_start : layer.n_end],
+                    start_pressure,
+                )[::-1]
+            )
             start_pressure = press[-1]
         return np.array(press)[::-1]
 
@@ -340,7 +369,7 @@ class Planet(object):
         """
         calculates the average density of the entire planet [kg/m^3]
         """
-        return self.mass/self.volume
+        return self.mass / self.volume
 
     @property
     def moment_of_inertia(self):
@@ -354,8 +383,9 @@ class Planet(object):
         """
         #Returns the moment of inertia of the planet [kg m^2]
         """
-        moment_factor = self.moment_of_inertia / self.mass / \
-            self.radius_planet / self.radius_planet
+        moment_factor = (
+            self.moment_of_inertia / self.mass / self.radius_planet / self.radius_planet
+        )
         return moment_factor
 
     @property
@@ -363,25 +393,25 @@ class Planet(object):
         """
         Returns depth of the layer [m]
         """
-        return self.evaluate(['depth'])
+        return self.evaluate(["depth"])
 
     @property
     def gravity(self):
         """
         Returns gravity of the layer [m s^(-2)]
         """
-        return self.evaluate(['gravity'])
+        return self.evaluate(["gravity"])
 
     @property
     def bullen(self):
         """
         Returns the Bullen parameter
         """
-        return self.evaluate(['bullen'])
+        return self.evaluate(["bullen"])
 
     @property
     def brunt_vasala(self):
-        return self.evaluate(['brunt_vasala'])
+        return self.evaluate(["brunt_vasala"])
 
     @property
     def pressure(self):
@@ -426,7 +456,7 @@ class Planet(object):
         molar_internal_energy : array of floats
             The internal energy in [J/mol].
         """
-        return self.evaluate(['molar_internal_energy'])
+        return self.evaluate(["molar_internal_energy"])
 
     @material_property
     def molar_gibbs(self):
@@ -441,7 +471,7 @@ class Planet(object):
         molar_gibbs : array of floats
             Gibbs free energy in [J/mol].
         """
-        return self.evaluate(['molar_gibbs'])
+        return self.evaluate(["molar_gibbs"])
 
     @material_property
     def molar_helmholtz(self):
@@ -456,7 +486,7 @@ class Planet(object):
         molar_helmholtz : array of floats
             Helmholtz free energy in [J/mol].
         """
-        return self.evaluate(['molar_helmholtz'])
+        return self.evaluate(["molar_helmholtz"])
 
     @material_property
     def molar_mass(self):
@@ -470,7 +500,7 @@ class Planet(object):
         molar_mass : array of floats
             Molar mass in [kg/mol].
         """
-        return self.evaluate(['molar_mass'])
+        return self.evaluate(["molar_mass"])
 
     @material_property
     def molar_volume(self):
@@ -485,7 +515,7 @@ class Planet(object):
         molar_volume : array of floats
             Molar volume in [m^3/mol].
         """
-        return self.evaluate(['molar_volume'])
+        return self.evaluate(["molar_volume"])
 
     @material_property
     def density(self):
@@ -500,7 +530,7 @@ class Planet(object):
         density : array of floats
             The density of this material in [kg/m^3].
         """
-        return self.evaluate(['density'])
+        return self.evaluate(["density"])
 
     @material_property
     def molar_entropy(self):
@@ -515,7 +545,7 @@ class Planet(object):
         molar_entropy : array of floats
             Entropy in [J/mol].
         """
-        return self.evaluate(['molar_entropy'])
+        return self.evaluate(["molar_entropy"])
 
     @material_property
     def molar_enthalpy(self):
@@ -530,7 +560,7 @@ class Planet(object):
         molar_enthalpy : array of floats
             Enthalpy in [J/mol].
         """
-        return self.evaluate(['molar_enthalpy'])
+        return self.evaluate(["molar_enthalpy"])
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -545,7 +575,7 @@ class Planet(object):
         isothermal_bulk_modulus : array of floats
             Bulk modulus in [Pa].
         """
-        return self.evaluate(['isothermal_bulk_modulus'])
+        return self.evaluate(["isothermal_bulk_modulus"])
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -560,7 +590,7 @@ class Planet(object):
         adiabatic_bulk_modulus : array of floats
             Adiabatic bulk modulus in [Pa].
         """
-        return self.evaluate(['adiabatic_bulk_modulus'])
+        return self.evaluate(["adiabatic_bulk_modulus"])
 
     @material_property
     def isothermal_compressibility(self):
@@ -576,7 +606,7 @@ class Planet(object):
         (K_T)^-1 : array of floats
             Compressibility in [1/Pa].
         """
-        return self.evaluate(['istothermal_compressibility'])
+        return self.evaluate(["istothermal_compressibility"])
 
     @material_property
     def adiabatic_compressibility(self):
@@ -592,7 +622,7 @@ class Planet(object):
         adiabatic_compressibility : array of floats
             adiabatic compressibility in [1/Pa].
         """
-        return self.evaluate(['adiabatic_compressibility'])
+        return self.evaluate(["adiabatic_compressibility"])
 
     @material_property
     def shear_modulus(self):
@@ -607,7 +637,7 @@ class Planet(object):
         shear_modulus : array of floats
             Shear modulus in [Pa].
         """
-        return self.evaluate(['shear_modulus'])
+        return self.evaluate(["shear_modulus"])
 
     @material_property
     def p_wave_velocity(self):
@@ -622,7 +652,7 @@ class Planet(object):
         p_wave_velocity : array of floats
             P wave speed in [m/s].
         """
-        return self.evaluate(['p_wave_velocity'])
+        return self.evaluate(["p_wave_velocity"])
 
     @material_property
     def bulk_sound_velocity(self):
@@ -637,7 +667,7 @@ class Planet(object):
         bulk sound velocity: array of floats
             Sound velocity in [m/s].
         """
-        return self.evaluate(['bulk_sound_velocity'])
+        return self.evaluate(["bulk_sound_velocity"])
 
     @material_property
     def shear_wave_velocity(self):
@@ -652,7 +682,7 @@ class Planet(object):
         shear_wave_velocity : array of floats
             Wave speed in [m/s].
         """
-        return self.evaluate(['shear_wave_velocity'])
+        return self.evaluate(["shear_wave_velocity"])
 
     @material_property
     def grueneisen_parameter(self):
@@ -667,7 +697,7 @@ class Planet(object):
         gr : array of floats
             Grueneisen parameters [unitless].
         """
-        return self.evaluate(['grueneisen_parameter'])
+        return self.evaluate(["grueneisen_parameter"])
 
     @material_property
     def thermal_expansivity(self):
@@ -682,7 +712,7 @@ class Planet(object):
         alpha : array of floats
             Thermal expansivity in [1/K].
         """
-        return self.evaluate(['thermal_expansivity'])
+        return self.evaluate(["thermal_expansivity"])
 
     @material_property
     def molar_heat_capacity_v(self):
@@ -697,7 +727,7 @@ class Planet(object):
         molar_heat_capacity_v : array of floats
             Heat capacity in [J/K/mol].
         """
-        return self.evaluate(['molar_heat_capacity_v'])
+        return self.evaluate(["molar_heat_capacity_v"])
 
     @material_property
     def molar_heat_capacity_p(self):
@@ -712,10 +742,10 @@ class Planet(object):
         molar_heat_capacity_p : array of floats
             Heat capacity in [J/K/mol].
         """
-        return self.evaluate(['molar_heat_capacity_p'])
+        return self.evaluate(["molar_heat_capacity_p"])
 
-#
-# Aliased properties
+    #
+    # Aliased properties
     @property
     def P(self):
         """Alias for :func:`~burnman.Material.pressure`"""

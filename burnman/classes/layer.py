@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
@@ -55,16 +56,18 @@ class Layer(object):
         self._temperatures = None
         self.sublayers = None
         self.material = None
-        self.pressure_mode = 'self-consistent'
+        self.pressure_mode = "self-consistent"
         self.temperature_mode = None
 
     def __str__(self):
         """
         Prints details of the layer
         """
-        writing = (f'The {self.name} is made of {self.material.name}'
-                   f' with {self.temperature_mode} temperatures and '
-                   f'{self.pressure_mode} pressures\n')
+        writing = (
+            f"The {self.name} is made of {self.material.name}"
+            f" with {self.temperature_mode} temperatures and "
+            f"{self.pressure_mode} pressures\n"
+        )
         return writing
 
     def reset(self):
@@ -81,12 +84,13 @@ class Layer(object):
         """
         Set the material of a Layer with a Material
         """
-        assert(isinstance(material, Material))
+        assert isinstance(material, Material)
         self.material = material
         self.reset()
 
-    def set_temperature_mode(self, temperature_mode='adiabatic',
-                             temperatures=None, temperature_top=None):
+    def set_temperature_mode(
+        self, temperature_mode="adiabatic", temperatures=None, temperature_top=None
+    ):
         """
         Sets temperatures within the layer as user-defined values or as
         a (potentially perturbed) adiabat.
@@ -113,29 +117,37 @@ class Layer(object):
             temperature_top - temperatures[-1].
         """
         self.reset()
-        assert(temperature_mode == 'user-defined'
-               or temperature_mode == 'adiabatic'
-               or temperature_mode == 'perturbed-adiabatic')
+        assert (
+            temperature_mode == "user-defined"
+            or temperature_mode == "adiabatic"
+            or temperature_mode == "perturbed-adiabatic"
+        )
 
         self.temperature_mode = temperature_mode
 
-        if ((temperature_mode == 'user-defined'
-             or temperature_mode == 'perturbed-adiabatic')):
-            assert(len(temperatures) == len(self.radii))
+        if (
+            temperature_mode == "user-defined"
+            or temperature_mode == "perturbed-adiabatic"
+        ):
+            assert len(temperatures) == len(self.radii)
             self.usertemperatures = temperatures
         else:
             self.usertemperatures = np.zeros_like(self.radii)
 
-        if ((temperature_mode == 'adiabatic'
-             or temperature_mode == 'perturbed-adiabatic')):
+        if temperature_mode == "adiabatic" or temperature_mode == "perturbed-adiabatic":
             self.temperature_top = temperature_top
         else:
             self.temperature_top = None
 
-    def set_pressure_mode(self, pressure_mode='self-consistent',
-                          pressures=None, gravity_bottom=None,
-                          pressure_top=None, n_max_iterations=50,
-                          max_delta=1.e-5):
+    def set_pressure_mode(
+        self,
+        pressure_mode="self-consistent",
+        pressures=None,
+        gravity_bottom=None,
+        pressure_top=None,
+        n_max_iterations=50,
+        max_delta=1.0e-5,
+    ):
         """
         Sets the pressure mode of the layer,
         which can either be 'user-defined', or 'self-consistent'.
@@ -167,26 +179,28 @@ class Layer(object):
             iterations to stop iterations (default = 1.e-5)
         """
         self.reset()
-        assert(pressure_mode == 'user-defined'
-               or pressure_mode == 'self-consistent')
+        assert pressure_mode == "user-defined" or pressure_mode == "self-consistent"
         self.pressure_mode = pressure_mode
 
-        assert(gravity_bottom is not None)
+        assert gravity_bottom is not None
         self.gravity_bottom = gravity_bottom
 
-        if pressure_mode == 'user-defined':
-            assert(pressures is not None)
-            assert(len(pressures) == len(self.radii))
+        if pressure_mode == "user-defined":
+            assert pressures is not None
+            assert len(pressures) == len(self.radii)
             self.pressures = pressures
-            warnings.warn("By setting the pressures in Layer they "
-                          "are unlikely to be self-consistent")
-        elif pressure_mode == 'self-consistent':
+            warnings.warn(
+                "By setting the pressures in Layer they "
+                "are unlikely to be self-consistent"
+            )
+        elif pressure_mode == "self-consistent":
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
         else:
-            raise NotImplementedError(f'pressure mode {pressure_mode} '
-                                      'not recognised')
+            raise NotImplementedError(
+                f"pressure mode {pressure_mode} " "not recognised"
+            )
 
     def make(self):
         """
@@ -196,25 +210,29 @@ class Layer(object):
         materials from which properties can be computed.
         """
         self.reset()
-        if not hasattr(self, 'material'):
-            raise AttributeError('You must set_material() for the layer '
-                                 'before running make().')
-        if not hasattr(self, 'temperature_mode'):
-            raise AttributeError('You must set_temperature_mode() for the '
-                                 'layer before running make().')
-        if not hasattr(self, 'pressure_mode'):
-            raise AttributeError('You must set_pressure_mode() for the layer '
-                                 'before running make().')
+        if not hasattr(self, "material"):
+            raise AttributeError(
+                "You must set_material() for the layer " "before running make()."
+            )
+        if not hasattr(self, "temperature_mode"):
+            raise AttributeError(
+                "You must set_temperature_mode() for the "
+                "layer before running make()."
+            )
+        if not hasattr(self, "pressure_mode"):
+            raise AttributeError(
+                "You must set_pressure_mode() for the layer " "before running make()."
+            )
 
-        if self.pressure_mode == 'user-defined':
+        if self.pressure_mode == "user-defined":
             self.temperatures = self._evaluate_temperature(
-                self.pressures, self.temperature_top)
-        elif self.pressure_mode == 'self-consistent':
-            new_press = (self.pressure_top
-                         + (-self.radii + max(self.radii))
-                         * 1.e3)  # initial pressure curve guess
-            temperatures = self._evaluate_temperature(
-                new_press, self.temperature_top)
+                self.pressures, self.temperature_top
+            )
+        elif self.pressure_mode == "self-consistent":
+            new_press = (
+                self.pressure_top + (-self.radii + max(self.radii)) * 1.0e3
+            )  # initial pressure curve guess
+            temperatures = self._evaluate_temperature(new_press, self.temperature_top)
             # Make it self-consistent!!!
             i = 0
 
@@ -222,15 +240,17 @@ class Layer(object):
                 i += 1
                 ref_press = new_press
                 new_grav, new_press = self._evaluate_eos(
-                    new_press, temperatures, self.gravity_bottom,
-                    self.pressure_top)
+                    new_press, temperatures, self.gravity_bottom, self.pressure_top
+                )
                 temperatures = self._evaluate_temperature(
-                    new_press, self.temperature_top)
-                rel_err = abs(
-                    (max(ref_press) - max(new_press)) / max(new_press))
+                    new_press, self.temperature_top
+                )
+                rel_err = abs((max(ref_press) - max(new_press)) / max(new_press))
                 if self.verbose:
-                    print(f'Iteration {i:0d} maximum relative pressure error: '
-                          f'{rel_err:.1f}')
+                    print(
+                        f"Iteration {i:0d} maximum relative pressure error: "
+                        f"{rel_err:.1f}"
+                    )
 
                 if rel_err < self.max_delta:
                     break
@@ -238,13 +258,12 @@ class Layer(object):
             self.pressures = new_press
             self.temperatures = temperatures
         else:
-            raise NotImplementedError('pressure mode not recognised')
+            raise NotImplementedError("pressure mode not recognised")
 
         self.sublayers = []
         for r in range(len(self.radii)):
             self.sublayers.append(self.material.copy())
-            self.sublayers[r].set_state(self.pressures[r],
-                                        self.temperatures[r])
+            self.sublayers[r].set_state(self.pressures[r], self.temperatures[r])
 
     def evaluate(self, properties, radlist=None, radius_planet=None):
         """
@@ -276,15 +295,18 @@ class Layer(object):
         if radlist is None:
             values = np.empty([len(properties), len(self.radii)])
             for i, prop in enumerate(properties):
-                if prop == 'depth':
+                if prop == "depth":
                     values[i] = radius_planet - self.radii
                 else:
                     try:
                         values[i] = getattr(self, prop)
                     except:
-                        values[i] = np.array([getattr(self.sublayers[i], prop)
-                                              for i
-                                              in range(len(self.sublayers))])
+                        values[i] = np.array(
+                            [
+                                getattr(self.sublayers[i], prop)
+                                for i in range(len(self.sublayers))
+                            ]
+                        )
         else:
             func_p = interp1d(self.radii, self.pressures)
             pressures = func_p(radlist)
@@ -292,13 +314,13 @@ class Layer(object):
             temperatures = func_t(radlist)
             values = np.empty([len(properties), len(radlist)])
             for i, prop in enumerate(properties):
-                if prop == 'depth':
+                if prop == "depth":
                     values[i] = radius_planet - radlist
                 else:
                     try:
-                        values[i] = self.material.evaluate([prop],
-                                                           pressures,
-                                                           temperatures)
+                        values[i] = self.material.evaluate(
+                            [prop], pressures, temperatures
+                        )
                     except:
                         func_prop = interp1d(self.radii, getattr(self, prop))
                         values[i] = func_prop(radlist)
@@ -312,24 +334,25 @@ class Layer(object):
         Returns the temperatures of the layer for given pressures.
         Used by make()
         """
-        if ((self.temperature_mode == 'adiabatic'
-             or self.temperature_mode == 'perturbed-adiabatic')):
-            adiabat = geotherm.adiabatic(pressures[::-1],
-                                         temperature_top
-                                         - self.usertemperatures[-1],
-                                         self.material)[::-1]
+        if (
+            self.temperature_mode == "adiabatic"
+            or self.temperature_mode == "perturbed-adiabatic"
+        ):
+            adiabat = geotherm.adiabatic(
+                pressures[::-1],
+                temperature_top - self.usertemperatures[-1],
+                self.material,
+            )[::-1]
         else:
             adiabat = np.zeros_like(self.radii)
         return adiabat + self.usertemperatures
 
-    def _evaluate_eos(self, pressures, temperatures,
-                      gravity_bottom, pressure_top):
+    def _evaluate_eos(self, pressures, temperatures, gravity_bottom, pressure_top):
         """
         Returns updated gravity and pressure
         make() loops over this until consistency is achieved.
         """
-        [density] = self.material.evaluate(
-            ['density'], pressures, temperatures)
+        [density] = self.material.evaluate(["density"], pressures, temperatures)
         grav = self._compute_gravity(density, gravity_bottom)
         press = self._compute_pressure(density, grav, pressure_top)
         return grav, press
@@ -344,11 +367,12 @@ class Layer(object):
         rhofunc = UnivariateSpline(self.radii, density)
         # Numerically integrate Poisson's equation
 
-        def poisson(p, x): return 4.0 * np.pi * \
-            constants.G * rhofunc(x) * x * x
-        grav = np.ravel(odeint(poisson,
-                               gravity_bottom * self.radii[0] * self.radii[0],
-                               self.radii))
+        def poisson(p, x):
+            return 4.0 * np.pi * constants.G * rhofunc(x) * x * x
+
+        grav = np.ravel(
+            odeint(poisson, gravity_bottom * self.radii[0] * self.radii[0], self.radii)
+        )
 
         if self.radii[0] == 0:
             grav[0] = 0
@@ -373,8 +397,9 @@ class Layer(object):
         gfunc = UnivariateSpline(depthfromtop, gravity)
 
         # integrate the hydrostatic equation
-        pressure = np.ravel(odeint((lambda p, x: gfunc(x) * rhofunc(x)),
-                                   pressure_top, depthfromtop))
+        pressure = np.ravel(
+            odeint((lambda p, x: gfunc(x) * rhofunc(x)), pressure_top, depthfromtop)
+        )
 
         return pressure[::-1]
 
@@ -385,10 +410,11 @@ class Layer(object):
         """
         mass = 0.0
         radii = self.radii
-        density = self.evaluate(['density'])
+        density = self.evaluate(["density"])
         rhofunc = UnivariateSpline(radii, density)
-        mass = np.abs(quad(lambda r: 4 * np.pi * rhofunc(r)
-                           * r * r, radii[0], radii[-1])[0])
+        mass = np.abs(
+            quad(lambda r: 4 * np.pi * rhofunc(r) * r * r, radii[0], radii[-1])[0]
+        )
         return mass
 
     @property
@@ -398,10 +424,15 @@ class Layer(object):
         """
         moment = 0.0
         radii = self.radii
-        density = self.evaluate(['density'])
+        density = self.evaluate(["density"])
         rhofunc = UnivariateSpline(radii, density)
-        moment = np.abs(quad(lambda r: 8.0 / 3.0 * np.pi * rhofunc(r)
-                             * r * r * r * r, radii[0], radii[-1])[0])
+        moment = np.abs(
+            quad(
+                lambda r: 8.0 / 3.0 * np.pi * rhofunc(r) * r * r * r * r,
+                radii[0],
+                radii[-1],
+            )[0]
+        )
         return moment
 
     @property
@@ -422,15 +453,17 @@ class Layer(object):
         e.g. across phase transitions Bullen parameter < 1,
         less compressed with pressure, e.g. across a boundary layer.
         """
-        kappa = (self.bulk_sound_velocity
-                 * self.bulk_sound_velocity * self.density)
+        kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
         phi = self.bulk_sound_velocity * self.bulk_sound_velocity
         try:
-            dkappadP = np.gradient(kappa, edge_order=2) / \
-                       np.gradient(self.pressures, edge_order=2)
-            dphidr = (np.gradient(phi, edge_order=2)
-                      / np.gradient(self.radii, edge_order=2)
-                      / self.gravity)
+            dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(
+                self.pressures, edge_order=2
+            )
+            dphidr = (
+                np.gradient(phi, edge_order=2)
+                / np.gradient(self.radii, edge_order=2)
+                / self.gravity
+            )
         except:
             dkappadP = np.gradient(kappa) / np.gradient(self.pressures)
             dphidr = np.gradient(phi) / np.gradient(self.radii) / self.gravity
@@ -446,10 +479,10 @@ class Layer(object):
         N= 0, fluid is neutral
         N > 0, fluid is stabily stratified.
         """
-        kappa = (self.bulk_sound_velocity
-                 * self.bulk_sound_velocity * self.density)
-        brunt_vasala = self.density * self.gravity * \
-            self.gravity * (self.bullen - 1.) / kappa
+        kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
+        brunt_vasala = (
+            self.density * self.gravity * self.gravity * (self.bullen - 1.0) / kappa
+        )
         return brunt_vasala
 
     @property
@@ -497,8 +530,12 @@ class Layer(object):
         molar_internal_energy : array of floats
             The internal energies in [J/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_internal_energy
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].molar_internal_energy
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def molar_gibbs(self):
@@ -513,8 +550,9 @@ class Layer(object):
         molar_gibbs : array of floats
             Gibbs free energies in [J/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_gibbs
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_gibbs for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def molar_helmholtz(self):
@@ -529,8 +567,9 @@ class Layer(object):
         molar_helmholtz : array of floats
             Helmholtz free energies in [J/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_helmholtz
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_helmholtz for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def molar_mass(self):
@@ -544,8 +583,9 @@ class Layer(object):
         molar_mass : array of floats
             Molar mass in [kg/mol].
         """
-        return np.array([self.sublayers[i].molar_mass
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_mass for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def molar_volume(self):
@@ -560,8 +600,9 @@ class Layer(object):
         molar_volume : array of floats
             Molar volumes in [m^3/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_volume
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_volume for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def density(self):
@@ -576,8 +617,7 @@ class Layer(object):
         density : array of floats
             The densities of this material in [kg/m^3] at the predefined radii.
         """
-        return np.array([self.sublayers[i].density
-                         for i in range(len(self.sublayers))])
+        return np.array([self.sublayers[i].density for i in range(len(self.sublayers))])
 
     @material_property
     def molar_entropy(self):
@@ -592,8 +632,9 @@ class Layer(object):
         molar_entropy : array of floats
             Entropies in [J/K/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_entropy
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_entropy for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def molar_enthalpy(self):
@@ -608,8 +649,9 @@ class Layer(object):
         molar_enthalpy : array of floats
             Enthalpies in [J/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_enthalpy
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].molar_enthalpy for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -626,8 +668,12 @@ class Layer(object):
         isothermal_bulk_modulus : array of floats
             Bulk moduli in [Pa] at the predefined radii.
         """
-        return np.array([self.sublayers[i].isothermal_bulk_modulus
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].isothermal_bulk_modulus
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -642,8 +688,12 @@ class Layer(object):
         adiabatic_bulk_modulus : array of floats
             Adiabatic bulk modulus in [Pa] at the predefined radii.
         """
-        return np.array([self.sublayers[i].adiabatic_bulk_modulus
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].adiabatic_bulk_modulus
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def isothermal_compressibility(self):
@@ -659,8 +709,12 @@ class Layer(object):
         (K_T)^-1 : array of floats
             Compressibilities in [1/Pa] at the predefined radii.
         """
-        return np.array([self.sublayers[i].isothermal_compressibility
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].isothermal_compressibility
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def adiabatic_compressibility(self):
@@ -676,8 +730,12 @@ class Layer(object):
         adiabatic_compressibility : array of floats
             adiabatic compressibilities in [1/Pa] at the predefined radii.
         """
-        return np.array([self.sublayers[i].adiabatic_compressibility
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].adiabatic_compressibility
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def shear_modulus(self):
@@ -692,8 +750,9 @@ class Layer(object):
         shear_modulus : array of floats
             Shear modulie in [Pa]  at the predefined radii.
         """
-        return np.array([self.sublayers[i].shear_modulus
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].shear_modulus for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def p_wave_velocity(self):
@@ -708,8 +767,9 @@ class Layer(object):
         p_wave_velocity : array of floats
             P wave speeds in [m/s] at the predefined radii.
         """
-        return np.array([self.sublayers[i].p_wave_velocity
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].p_wave_velocity for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def bulk_sound_velocity(self):
@@ -724,8 +784,9 @@ class Layer(object):
         bulk sound velocity: array of floats
             Sound velocities in [m/s] at the predefined radii.
         """
-        return np.array([self.sublayers[i].bulk_sound_velocity
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].bulk_sound_velocity for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def shear_wave_velocity(self):
@@ -740,8 +801,9 @@ class Layer(object):
         shear_wave_velocity : array of floats
             Wave speeds in [m/s] at the predefined radii.
         """
-        return np.array([self.sublayers[i].shear_wave_velocity
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].shear_wave_velocity for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def grueneisen_parameter(self):
@@ -756,8 +818,9 @@ class Layer(object):
         gr : array of floats
             Grueneisen parameters [unitless] at the predefined radii.
         """
-        return np.array([self.sublayers[i].grueneisen_parameter
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].grueneisen_parameter for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def thermal_expansivity(self):
@@ -772,8 +835,9 @@ class Layer(object):
         alpha : array of floats
             Thermal expansivities in [1/K] at the predefined radii.
         """
-        return np.array([self.sublayers[i].thermal_expansivity
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [self.sublayers[i].thermal_expansivity for i in range(len(self.sublayers))]
+        )
 
     @material_property
     def molar_heat_capacity_v(self):
@@ -788,8 +852,12 @@ class Layer(object):
         molar_heat_capacity_v : array of floats
             Heat capacities in [J/K/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_heat_capacity_v
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].molar_heat_capacity_v
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     @material_property
     def molar_heat_capacity_p(self):
@@ -804,8 +872,12 @@ class Layer(object):
         molar_heat_capacity_p : array of floats
             Heat capacities in [J/K/mol] at the predefined radii.
         """
-        return np.array([self.sublayers[i].molar_heat_capacity_p
-                         for i in range(len(self.sublayers))])
+        return np.array(
+            [
+                self.sublayers[i].molar_heat_capacity_p
+                for i in range(len(self.sublayers))
+            ]
+        )
 
     # Aliased properties
     @property
@@ -950,17 +1022,22 @@ class BoundaryLayerPerturbation(object):
         top boundary than the bottom boundary.
     """
 
-    def __init__(self, radius_bottom, radius_top, rayleigh_number,
-                 temperature_change, boundary_layer_ratio):
+    def __init__(
+        self,
+        radius_bottom,
+        radius_top,
+        rayleigh_number,
+        temperature_change,
+        boundary_layer_ratio,
+    ):
         self.r0 = radius_bottom
         self.r1 = radius_top
 
         self.Ra = rayleigh_number
-        self.c = np.power(self.Ra, 1./4.)
+        self.c = np.power(self.Ra, 1.0 / 4.0)
 
-        self.a = temperature_change / (np.exp(self.c)
-                                       * (1. + boundary_layer_ratio))
-        self.b = - boundary_layer_ratio * self.a
+        self.a = temperature_change / (np.exp(self.c) * (1.0 + boundary_layer_ratio))
+        self.b = -boundary_layer_ratio * self.a
 
     def temperature(self, radii):
         """
@@ -976,10 +1053,9 @@ class BoundaryLayerPerturbation(object):
         temperature : float or array
             The temperatures at the requested radii.
         """
-        return (self.a * np.exp((radii - self.r1)
-                                / (self.r0 - self.r1)*self.c)
-                + self.b * np.exp((radii - self.r0)
-                                  / (self.r1 - self.r0)*self.c))
+        return self.a * np.exp(
+            (radii - self.r1) / (self.r0 - self.r1) * self.c
+        ) + self.b * np.exp((radii - self.r0) / (self.r1 - self.r0) * self.c)
 
     def dTdr(self, radii):
         """
@@ -995,11 +1071,14 @@ class BoundaryLayerPerturbation(object):
         dTdr : float or array
             The thermal gradient at the requested radii.
         """
-        return (self.c/(self.r0 - self.r1)
-                * (self.a * np.exp((radii - self.r1)
-                                   / (self.r0 - self.r1)*self.c)
-                   - self.b * np.exp((radii - self.r0)
-                                     / (self.r1 - self.r0)*self.c)))
+        return (
+            self.c
+            / (self.r0 - self.r1)
+            * (
+                self.a * np.exp((radii - self.r1) / (self.r0 - self.r1) * self.c)
+                - self.b * np.exp((radii - self.r0) / (self.r1 - self.r0) * self.c)
+            )
+        )
 
     def set_model_thermal_gradients(self, dTdr_bottom, dTdr_top):
         """
@@ -1016,11 +1095,12 @@ class BoundaryLayerPerturbation(object):
             The thermal gradient at the top of the model [K/m].
             Typically negative for a cooling planet.
         """
+
         def delta_dTdrs(args, dTdr_bottom, dTdr_top):
             a, b = args
             self.a = a
             self.b = b
 
-            return [dTdr_bottom - self.dTdr(self.r0),
-                    dTdr_top - self.dTdr(self.r1)]
+            return [dTdr_bottom - self.dTdr(self.r0), dTdr_top - self.dTdr(self.r1)]
+
         fsolve(delta_dTdrs, [self.a, self.b], args=(dTdr_bottom, dTdr_top))

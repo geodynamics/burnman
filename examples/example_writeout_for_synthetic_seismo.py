@@ -53,14 +53,17 @@ if __name__ == "__main__":
     pyr_fp = 0.18
     pyr_capv = 0.07
     pyrolitic_mantle = burnman.Composite(
-        [mg_fe_perovskite, mg_fe_periclase, ca_perovskite], [pyr_pv, pyr_fp, pyr_capv])
+        [mg_fe_perovskite, mg_fe_periclase, ca_perovskite], [pyr_pv, pyr_fp, pyr_capv]
+    )
 
     # Chondritic composition
     chon_pv = 0.88
     chon_fp = 0.05
     chon_capv = 0.07
     chondritic_mantle = burnman.Composite(
-        [mg_fe_perovskite, mg_fe_periclase, ca_perovskite], [chon_pv, chon_fp, chon_capv])
+        [mg_fe_perovskite, mg_fe_periclase, ca_perovskite],
+        [chon_pv, chon_fp, chon_capv],
+    )
 
     # We create an array of 20 depths at which we want to evaluate PREM, and then
     # query the seismic model for the pressure, density, P wave speed, S wave
@@ -68,29 +71,34 @@ if __name__ == "__main__":
     depths = np.linspace(2890e3, 671e3, 20)
 
     # Here we define the lower mantle as a Layer(). .
-    lower_mantle = burnman.Layer(name='Lower Mantle', radii=6371.e3 - depths)
+    lower_mantle = burnman.Layer(name="Lower Mantle", radii=6371.0e3 - depths)
     lower_mantle.set_temperature_mode(
-        temperature_mode='adiabatic',
-        temperature_top=1900.)
-    lower_mantle.set_pressure_mode(pressure_mode='self-consistent',
-                                   pressure_top=2.4e10, gravity_bottom=10.0)
+        temperature_mode="adiabatic", temperature_top=1900.0
+    )
+    lower_mantle.set_pressure_mode(
+        pressure_mode="self-consistent", pressure_top=2.4e10, gravity_bottom=10.0
+    )
 
     lower_mantle.set_material(pyrolitic_mantle)
     lower_mantle.make()
 
     # Writing axisem input file
     burnman.tools.output_seismo.write_axisem_input(
-        [lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
+        [lower_mantle], modelname="lowermantle_pyrolite", plotting=True
+    )
     # Write mineos input file
     burnman.tools.output_seismo.write_mineos_input(
-        [lower_mantle], modelname='lowermantle_pyrolite', plotting=True)
+        [lower_mantle], modelname="lowermantle_pyrolite", plotting=True
+    )
 
     # change composition
     lower_mantle.set_material(chondritic_mantle)
     lower_mantle.make()
     # Writing axisem input file
     burnman.tools.output_seismo.write_axisem_input(
-        [lower_mantle], modelname='lowermantle_chondritic', plotting=True)
+        [lower_mantle], modelname="lowermantle_chondritic", plotting=True
+    )
     # Write mineos input file
     burnman.tools.output_seismo.write_mineos_input(
-        [lower_mantle], modelname='lowermantle_chondritic', plotting=True)
+        [lower_mantle], modelname="lowermantle_chondritic", plotting=True
+    )

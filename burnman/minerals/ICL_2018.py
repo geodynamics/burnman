@@ -19,24 +19,25 @@ from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
 
 
-class EPOC_vinet (Mineral):
-
+class EPOC_vinet(Mineral):
     def __init__(self):
         self.params = {
-            'equation_of_state': 'vinet',
-            'V_0': 8.18e-6,
-            'K_0': 67.5e9,
-            'Kprime_0': 6.12,
-            'molar_mass': .05,}
+            "equation_of_state": "vinet",
+            "V_0": 8.18e-6,
+            "K_0": 67.5e9,
+            "Kprime_0": 6.12,
+            "molar_mass": 0.05,
+        }
         Mineral.__init__(self)
 
-class EPOC_bm (Mineral):
 
+class EPOC_bm(Mineral):
     def __init__(self):
         self.params = {
-            'equation_of_state': 'bm3',
-            'V_0': 7.63e-6,
-            'K_0': 120e9,
-            'Kprime_0': 4.6,
-            'molar_mass': .05,}
+            "equation_of_state": "bm3",
+            "V_0": 7.63e-6,
+            "K_0": 120e9,
+            "Kprime_0": 4.6,
+            "molar_mass": 0.05,
+        }
         Mineral.__init__(self)

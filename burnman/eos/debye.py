@@ -10,12 +10,15 @@ import numpy as np
 # python interpreter
 try:
     import os
-    if 'NUMBA_DISABLE_JIT' in os.environ and int(os.environ['NUMBA_DISABLE_JIT']) == 1:
+
+    if "NUMBA_DISABLE_JIT" in os.environ and int(os.environ["NUMBA_DISABLE_JIT"]) == 1:
         raise ImportError("NOOOO!")
     from numba import jit
 except ImportError:
+
     def jit(fn):
         return fn
+
 
 import scipy.integrate as integrate
 
@@ -29,15 +32,26 @@ Birch-Murnaghan to get a full EOS
 
 
 chebyshev_representation = np.array(
-    [2.707737068327440945 / 2.0, 0.340068135211091751, -0.12945150184440869e-01,
-     0.7963755380173816e-03, -
-     0.546360009590824e-04, 0.39243019598805e-05,
-     -0.2894032823539e-06, 0.217317613962e-07, -
-     0.16542099950e-08,
-     0.1272796189e-09, -
-     0.987963460e-11, 0.7725074e-12, -
-     0.607797e-13,
-     0.48076e-14, -0.3820e-15, 0.305e-16, -0.24e-17])
+    [
+        2.707737068327440945 / 2.0,
+        0.340068135211091751,
+        -0.12945150184440869e-01,
+        0.7963755380173816e-03,
+        -0.546360009590824e-04,
+        0.39243019598805e-05,
+        -0.2894032823539e-06,
+        0.217317613962e-07,
+        -0.16542099950e-08,
+        0.1272796189e-09,
+        -0.987963460e-11,
+        0.7725074e-12,
+        -0.607797e-13,
+        0.48076e-14,
+        -0.3820e-15,
+        0.305e-16,
+        -0.24e-17,
+    ]
+)
 
 
 @jit
@@ -71,8 +85,9 @@ def debye_fn(x):
     xi = Debye_T/T
     """
     sol = integrate.quad(
-        lambda xi: (xi * xi * xi) / (np.exp(xi) - 1.), 0.0, x)  # EQ B3
-    return 3. * sol[0] / pow(x, 3.)
+        lambda xi: (xi * xi * xi) / (np.exp(xi) - 1.0), 0.0, x
+    )  # EQ B3
+    return 3.0 * sol[0] / pow(x, 3.0)
 
 
 eps = np.finfo(float).eps
@@ -91,7 +106,7 @@ def debye_fn_cheb(x):
     val_infinity = 19.4818182068004875
     xcut = -log_eps
 
-    assert(x > 0.0)  # check for invalid x
+    assert x > 0.0  # check for invalid x
 
     if x < 2.0 * np.sqrt(2.0) * sqrt_eps:
         return 1.0 - 3.0 * x / 8.0 + x * x / 20.0
@@ -128,8 +143,8 @@ def thermal_energy(T, debye_T, n):
     Returns thermal energy in J/mol
     """
     if T <= eps:
-        return 0.
-    E_th = 3. * n * constants.gas_constant * T * debye_fn_cheb(debye_T / T)
+        return 0.0
+    E_th = 3.0 * n * constants.gas_constant * T * debye_fn_cheb(debye_T / T)
     return E_th
 
 
@@ -139,10 +154,14 @@ def molar_heat_capacity_v(T, debye_T, n):
     Heat capacity at constant volume.  In J/K/mol
     """
     if T <= eps:
-        return 0.
+        return 0.0
     x = debye_T / T
-    C_v = 3.0 * n * constants.gas_constant * \
-        (4.0 * debye_fn_cheb(x) - 3.0 * x / (np.exp(x) - 1.0))
+    C_v = (
+        3.0
+        * n
+        * constants.gas_constant
+        * (4.0 * debye_fn_cheb(x) - 3.0 * x / (np.exp(x) - 1.0))
+    )
     return C_v
 
 
@@ -156,10 +175,14 @@ def helmholtz_free_energy(T, debye_T, n):
     In Joules.
     """
     if T <= eps:
-        return 0.
+        return 0.0
     x = debye_T / T
-    F = n * constants.gas_constant * T * \
-        (3.0 * np.log(1.0 - np.exp(-x)) - debye_fn_cheb(x))
+    F = (
+        n
+        * constants.gas_constant
+        * T
+        * (3.0 * np.log(1.0 - np.exp(-x)) - debye_fn_cheb(x))
+    )
     return F
 
 
@@ -168,8 +191,11 @@ def entropy(T, debye_T, n):
     Entropy due to lattice vibrations in the Debye model [J/K]
     """
     if T <= eps:
-        return 0.
+        return 0.0
     x = debye_T / T
-    S = n * constants.gas_constant * \
-        (4. * debye_fn_cheb(x) - 3. * np.log(1.0 - np.exp(-x)))
+    S = (
+        n
+        * constants.gas_constant
+        * (4.0 * debye_fn_cheb(x) - 3.0 * np.log(1.0 - np.exp(-x)))
+    )
     return S

@@ -3,7 +3,35 @@ name: test
 
 on: [push, pull_request, workflow_dispatch]
 
-jobs:
+jobs:  
+  indent:
+    name: indent
+    runs-on: [ubuntu-20.04]
+
+    strategy:
+      matrix:
+        python-versions: ['3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-versions }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-versions }}
+    - name: make indent
+      run: |
+        python -m pip install black
+        ./contrib/utilities/indent
+        git diff > changes-astyle.diff
+    - name: archive indent results
+      uses: actions/upload-artifact@v2
+      with:
+        name: changes-astyle.diff
+        path: changes-astyle.diff
+    - name: check indentation
+      run: |
+        git diff --exit-code
+
   linux:
     name: test
     runs-on: [ubuntu-20.04]

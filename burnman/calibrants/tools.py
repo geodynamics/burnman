@@ -1,8 +1,9 @@
 import numpy as np
 
 
-def pressure_to_pressure(old_calibrant, new_calibrant,
-                         pressure, temperature, PT_covariance=None):
+def pressure_to_pressure(
+    old_calibrant, new_calibrant, pressure, temperature, PT_covariance=None
+):
     """
     Convert from pressure defined by one calibrated equation of
     state of a material to pressure defined by an independent

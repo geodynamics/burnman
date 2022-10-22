@@ -17,14 +17,16 @@ from ..classes.composite import Composite
 from .solution import transform_solution_to_new_basis
 
 try:
-    cp = importlib.import_module('cvxpy')
+    cp = importlib.import_module("cvxpy")
 except ImportError as err:
-    print(f'Warning: {err}. '
-          'For full functionality of BurnMan, please install cvxpy.')
+    print(
+        f"Warning: {err}. " "For full functionality of BurnMan, please install cvxpy."
+    )
 
 
-def solution_polytope_from_charge_balance(charges, charge_total,
-                                          return_fractions=False):
+def solution_polytope_from_charge_balance(
+    charges, charge_total, return_fractions=False
+):
     """
     Creates a polytope object from a list of the charges for each species on
     each site and the total charge for all site-species.
@@ -54,26 +56,31 @@ def solution_polytope_from_charge_balance(charges, charge_total,
     n_sites = len(charges)
     all_charges = np.concatenate(charges)
     n_site_elements = len(all_charges)
-    equalities = np.empty((n_sites+1, n_site_elements+1))
+    equalities = np.empty((n_sites + 1, n_site_elements + 1))
     equalities[:-1, 0] = -1
     i = 0
     for i_site, site_charges in enumerate(charges):
-        equalities[i_site, 1:] = [1 if (j >= i and j < i+len(site_charges))
-                                  else 0 for j in range(n_site_elements)]
+        equalities[i_site, 1:] = [
+            1 if (j >= i and j < i + len(site_charges)) else 0
+            for j in range(n_site_elements)
+        ]
         i += len(site_charges)
 
     equalities[-1, 0] = -charge_total
     equalities[-1, 1:] = all_charges
 
-    pos_constraints = np.concatenate((np.zeros((len(equalities[0])-1, 1)),
-                                      np.identity(len(equalities[0]) - 1)),
-                                     axis=1)
-    return MaterialPolytope(equalities, pos_constraints,
-                            return_fractions=return_fractions)
+    pos_constraints = np.concatenate(
+        (np.zeros((len(equalities[0]) - 1, 1)), np.identity(len(equalities[0]) - 1)),
+        axis=1,
+    )
+    return MaterialPolytope(
+        equalities, pos_constraints, return_fractions=return_fractions
+    )
 
 
-def solution_polytope_from_endmember_occupancies(endmember_occupancies,
-                                                 return_fractions=False):
+def solution_polytope_from_endmember_occupancies(
+    endmember_occupancies, return_fractions=False
+):
     """
     Creates a polytope object from a list of independent endmember occupancies.
 
@@ -102,10 +109,9 @@ def solution_polytope_from_endmember_occupancies(endmember_occupancies,
     n_sites = sum(endmember_occupancies[0])
     n_occs = endmember_occupancies.shape[1]
 
-    nullspace = np.array(Matrix(endmember_occupancies).nullspace(),
-                         dtype=float)
+    nullspace = np.array(Matrix(endmember_occupancies).nullspace(), dtype=float)
 
-    equalities = np.zeros((len(nullspace)+1, n_occs+1))
+    equalities = np.zeros((len(nullspace) + 1, n_occs + 1))
     equalities[0, 0] = -n_sites
     equalities[0, 1:] = 1
 
@@ -115,17 +121,22 @@ def solution_polytope_from_endmember_occupancies(endmember_occupancies,
         except ValueError:
             equalities[1:, 1:] = nullspace[:, :, 0]
 
-    pos_constraints = np.concatenate((np.zeros((len(equalities[0])-1, 1)),
-                                      np.identity(len(equalities[0]) - 1)),
-                                     axis=1)
+    pos_constraints = np.concatenate(
+        (np.zeros((len(equalities[0]) - 1, 1)), np.identity(len(equalities[0]) - 1)),
+        axis=1,
+    )
 
-    return MaterialPolytope(equalities, pos_constraints,
-                            return_fractions=return_fractions,
-                            independent_endmember_occupancies=endmember_occupancies)
+    return MaterialPolytope(
+        equalities,
+        pos_constraints,
+        return_fractions=return_fractions,
+        independent_endmember_occupancies=endmember_occupancies,
+    )
 
 
-def composite_polytope_at_constrained_composition(composite, composition,
-                                                  return_fractions=False):
+def composite_polytope_at_constrained_composition(
+    composite, composition, return_fractions=False
+):
     """
     Creates a polytope object from a Composite object and a composition.
     This polytope describes the complete set of valid composite
@@ -150,11 +161,11 @@ def composite_polytope_at_constrained_composition(composite, composition,
         A polytope object corresponding to the parameters provided.
     """
     c_array = np.empty((composite.n_elements, 1))
-    c_array[:, 0] = [-composition[e] if e in composition else 0.
-                     for e in composite.elements]
+    c_array[:, 0] = [
+        -composition[e] if e in composition else 0.0 for e in composite.elements
+    ]
 
-    equalities = np.concatenate((c_array, composite.stoichiometric_array.T),
-                                axis=1)
+    equalities = np.concatenate((c_array, composite.stoichiometric_array.T), axis=1)
 
     eoccs = []
     for i, ph in enumerate(composite.phases):
@@ -164,12 +175,11 @@ def composite_polytope_at_constrained_composition(composite, composition,
             eoccs.append(np.ones((1, 1)))
 
     eoccs = block_diag(*eoccs)
-    inequalities = np.concatenate((np.zeros((len(eoccs), 1)), eoccs),
-                                  axis=1)
+    inequalities = np.concatenate((np.zeros((len(eoccs), 1)), eoccs), axis=1)
 
-    return MaterialPolytope(equalities, inequalities,
-                            number_type='float',
-                            return_fractions=return_fractions)
+    return MaterialPolytope(
+        equalities, inequalities, number_type="float", return_fractions=return_fractions
+    )
 
 
 def simplify_composite_with_composition(composite, composition):
@@ -195,9 +205,9 @@ def simplify_composite_with_composition(composite, composition):
     simple_composite : :class:`burnman.Composite` object
         The simplified Composite object
     """
-    polytope = composite_polytope_at_constrained_composition(composite,
-                                                             composition,
-                                                             return_fractions=True)
+    polytope = composite_polytope_at_constrained_composition(
+        composite, composition, return_fractions=True
+    )
 
     composite_changed = False
     new_phases = []
@@ -206,10 +216,10 @@ def simplify_composite_with_composition(composite, composition):
     for i_ph, n_mbrs in enumerate(composite.endmembers_per_phase):
         ph = composite.phases[i_ph]
 
-        amounts = mbr_amounts[:, i:i+n_mbrs].astype(float)
+        amounts = mbr_amounts[:, i : i + n_mbrs].astype(float)
         i += n_mbrs
 
-        rank = np.linalg.matrix_rank(amounts, tol=1.e-8)
+        rank = np.linalg.matrix_rank(amounts, tol=1.0e-8)
 
         if rank < n_mbrs:
 
@@ -221,42 +231,47 @@ def simplify_composite_with_composition(composite, composition):
                     c_mean = amounts[0]
 
                 poly = solution_polytope_from_endmember_occupancies(
-                    ph.solution_model.endmember_occupancies)
+                    ph.solution_model.endmember_occupancies
+                )
                 dmbrs = poly.endmembers_as_independent_endmember_amounts
 
                 x = cp.Variable(dmbrs.shape[0])
                 objective = cp.Minimize(cp.sum_squares(x))
-                constraints = [dmbrs.T@x == c_mean, x >= 0]
+                constraints = [dmbrs.T @ x == c_mean, x >= 0]
 
                 prob = cp.Problem(objective, constraints)
                 prob.solve()
 
                 mbr_indices = np.argsort(x.value)[::-1]
-                ind_indices = [i for i in mbr_indices
-                               if x.value[i] > 1.e-6]
+                ind_indices = [i for i in mbr_indices if x.value[i] > 1.0e-6]
                 new_basis = dmbrs[ind_indices]
 
                 # And now reduce the new basis if necessary
                 new_basis = new_basis[independent_row_indices(new_basis)]
 
                 if len(new_basis) < ph.n_endmembers:
-                    logging.info(f'Phase {i_ph} ({ph.name}) is '
-                                 'rank-deficient ({rank} < {n_mbrs}). '
-                                 'The transformed solution is described '
-                                 f'using {len(new_basis)} endmembers.')
+                    logging.info(
+                        f"Phase {i_ph} ({ph.name}) is "
+                        "rank-deficient ({rank} < {n_mbrs}). "
+                        "The transformed solution is described "
+                        f"using {len(new_basis)} endmembers."
+                    )
 
                     composite_changed = True
                     soln = transform_solution_to_new_basis(ph, new_basis)
                     new_phases.append(soln)
                 else:
-                    logging.info('This solution is rank-deficient '
-                                 f'({rank} < {n_mbrs}), '
-                                 'but its composition requires all '
-                                 'independent endmembers.')
+                    logging.info(
+                        "This solution is rank-deficient "
+                        f"({rank} < {n_mbrs}), "
+                        "but its composition requires all "
+                        "independent endmembers."
+                    )
             else:
                 composite_changed = True
-                logging.info(f'Phase {i_ph} ({ph.name}) removed from '
-                             'composite (rank = 0).')
+                logging.info(
+                    f"Phase {i_ph} ({ph.name}) removed from " "composite (rank = 0)."
+                )
         else:
             new_phases.append(ph)
 

@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
@@ -62,16 +63,18 @@ def material_property(func):
     Internally, the values are stored in a dictionary member called _cached, which
     is emptied by .reset().
     """
-    class mat_obj():
 
+    class mat_obj:
         def __init__(self, func):
             self.func = func
             self.varname = self.func.__name__
 
         def get(self, obj):
             if not hasattr(obj, "_cached"):
-                raise Exception("The material_property decorator could not find class member _cached. "
-                                "Did you forget to call Material.__init__(self) in __init___?")
+                raise Exception(
+                    "The material_property decorator could not find class member _cached. "
+                    "Did you forget to call Material.__init__(self) in __init___?"
+                )
             cache_array = getattr(obj, "_cached")
             if self.varname not in cache_array:
                 cache_array[self.varname] = self.func(obj)
@@ -103,7 +106,7 @@ class Material(object):
 
     @property
     def name(self):
-        """ Human-readable name of this material.
+        """Human-readable name of this material.
 
         By default this will return the name of the class, but it can be set
         to an arbitrary string. Overriden in Mineral.
@@ -122,8 +125,7 @@ class Material(object):
         -----
         Needs to be implemented in derived classes.
         """
-        raise NotImplementedError(
-            "need to implement set_method() in derived class!")
+        raise NotImplementedError("need to implement set_method() in derived class!")
 
     def to_string(self):
         """
@@ -142,7 +144,10 @@ class Material(object):
         Print a human-readable representation of this Material.
         """
         raise NotImplementedError(
-            "Derived classes need to implement debug_print(). This is '" + self.__class__.__name__ + "'")
+            "Derived classes need to implement debug_print(). This is '"
+            + self.__class__.__name__
+            + "'"
+        )
 
     def print_minerals_of_current_state(self):
         """
@@ -169,15 +174,18 @@ class Material(object):
             The desired temperature in [K].
         """
         if not hasattr(self, "_pressure"):
-            raise Exception("Material.set_state() could not find class member _pressure. "
-                            "Did you forget to call Material.__init__(self) in __init___?")
+            raise Exception(
+                "Material.set_state() could not find class member _pressure. "
+                "Did you forget to call Material.__init__(self) in __init___?"
+            )
         self.reset()
 
         self._pressure = pressure
         self._temperature = temperature
 
-    def set_state_with_volume(self, volume, temperature,
-                              pressure_guesses=[0.e9, 10.e9]):
+    def set_state_with_volume(
+        self, volume, temperature, pressure_guesses=[0.0e9, 10.0e9]
+    ):
         """
         This function acts similarly to set_state, but takes volume and
         temperature as input to find the pressure. In order to ensure
@@ -199,6 +207,7 @@ class Material(object):
             they should not lie outside the valid region of
             the equation of state.
         """
+
         def _delta_volume(pressure, volume, temperature):
             self.set_state(pressure, temperature)
             return volume - self.molar_volume
@@ -206,11 +215,12 @@ class Material(object):
         # we need to have a sign change in [a,b] to find a zero.
         args = (volume, temperature)
         try:
-            sol = bracket(_delta_volume,
-                          pressure_guesses[0], pressure_guesses[1], args)
+            sol = bracket(_delta_volume, pressure_guesses[0], pressure_guesses[1], args)
         except ValueError:
-            raise Exception('Cannot find a pressure, perhaps the volume or starting pressures '
-                            'are outside the range of validity for the equation of state?')
+            raise Exception(
+                "Cannot find a pressure, perhaps the volume or starting pressures "
+                "are outside the range of validity for the equation of state?"
+            )
         pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
         self.set_state(pressure, temperature)
 
@@ -242,8 +252,7 @@ class Material(object):
         minerals : list of :class:`burnman.Mineral`
             List of minerals.
         """
-        raise NotImplementedError(
-            "need to implement unroll() in derived class!")
+        raise NotImplementedError("need to implement unroll() in derived class!")
 
     def evaluate(self, vars_list, pressures, temperatures):
         """
@@ -272,7 +281,7 @@ class Material(object):
         pressures = np.array(pressures)
         temperatures = np.array(temperatures)
 
-        assert(pressures.shape == temperatures.shape)
+        assert pressures.shape == temperatures.shape
 
         output = np.empty((len(vars_list),) + pressures.shape)
         for i, p in np.ndenumerate(pressures):
@@ -338,7 +347,8 @@ class Material(object):
             The internal energy in [J/mol].
         """
         raise NotImplementedError(
-            "need to implement molar_internal_energy() in derived class!")
+            "need to implement molar_internal_energy() in derived class!"
+        )
 
     @material_property
     def molar_gibbs(self):
@@ -355,8 +365,7 @@ class Material(object):
         molar_gibbs : float
             Gibbs free energy in [J/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_gibbs() in derived class!")
+        raise NotImplementedError("need to implement molar_gibbs() in derived class!")
 
     @material_property
     def molar_helmholtz(self):
@@ -374,7 +383,8 @@ class Material(object):
             Helmholtz free energy in [J/mol].
         """
         raise NotImplementedError(
-            "need to implement molar_helmholtz() in derived class!")
+            "need to implement molar_helmholtz() in derived class!"
+        )
 
     @material_property
     def molar_mass(self):
@@ -390,8 +400,7 @@ class Material(object):
         molar_mass : float
             Molar mass in [kg/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_mass() in derived class!")
+        raise NotImplementedError("need to implement molar_mass() in derived class!")
 
     @material_property
     def molar_volume(self):
@@ -408,8 +417,7 @@ class Material(object):
         molar_volume : float
             Molar volume in [m^3/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_volume() in derived class!")
+        raise NotImplementedError("need to implement molar_volume() in derived class!")
 
     @material_property
     def density(self):
@@ -426,8 +434,7 @@ class Material(object):
         density : float
             The density of this material in [kg/m^3].
         """
-        raise NotImplementedError(
-            "need to implement density() in derived class!")
+        raise NotImplementedError("need to implement density() in derived class!")
 
     @material_property
     def molar_entropy(self):
@@ -444,8 +451,7 @@ class Material(object):
         molar_entropy : float
             Entropy in [J/K/mol].
         """
-        raise NotImplementedError(
-            "need to implement molar_entropy() in derived class!")
+        raise NotImplementedError("need to implement molar_entropy() in derived class!")
 
     @material_property
     def molar_enthalpy(self):
@@ -463,7 +469,8 @@ class Material(object):
             Enthalpy in [J/mol].
         """
         raise NotImplementedError(
-            "need to implement molar_enthalpy() in derived class!")
+            "need to implement molar_enthalpy() in derived class!"
+        )
 
     @material_property
     def isothermal_bulk_modulus(self):
@@ -481,7 +488,8 @@ class Material(object):
             Bulk modulus in [Pa].
         """
         raise NotImplementedError(
-            "need to implement isothermal_bulk_moduls() in derived class!")
+            "need to implement isothermal_bulk_moduls() in derived class!"
+        )
 
     @material_property
     def adiabatic_bulk_modulus(self):
@@ -499,7 +507,8 @@ class Material(object):
             Adiabatic bulk modulus in [Pa].
         """
         raise NotImplementedError(
-            "need to implement adiabatic_bulk_modulus() in derived class!")
+            "need to implement adiabatic_bulk_modulus() in derived class!"
+        )
 
     @material_property
     def isothermal_compressibility(self):
@@ -517,7 +526,8 @@ class Material(object):
             Compressibility in [1/Pa].
         """
         raise NotImplementedError(
-            "need to implement compressibility() in derived class!")
+            "need to implement compressibility() in derived class!"
+        )
 
     @material_property
     def adiabatic_compressibility(self):
@@ -536,7 +546,8 @@ class Material(object):
             adiabatic compressibility in [1/Pa].
         """
         raise NotImplementedError(
-            "need to implement compressibility() in derived class!")
+            "need to implement compressibility() in derived class!"
+        )
 
     @material_property
     def shear_modulus(self):
@@ -553,8 +564,7 @@ class Material(object):
         shear_modulus : float
             Shear modulus in [Pa].
         """
-        raise NotImplementedError(
-            "need to implement shear_modulus() in derived class!")
+        raise NotImplementedError("need to implement shear_modulus() in derived class!")
 
     @material_property
     def p_wave_velocity(self):
@@ -572,7 +582,8 @@ class Material(object):
             P wave speed in [m/s].
         """
         raise NotImplementedError(
-            "need to implement p_wave_velocity() in derived class!")
+            "need to implement p_wave_velocity() in derived class!"
+        )
 
     @material_property
     def bulk_sound_velocity(self):
@@ -590,7 +601,8 @@ class Material(object):
             Sound velocity in [m/s].
         """
         raise NotImplementedError(
-            "need to implement bulk_sound_velocity() in derived class!")
+            "need to implement bulk_sound_velocity() in derived class!"
+        )
 
     @material_property
     def shear_wave_velocity(self):
@@ -608,7 +620,8 @@ class Material(object):
             Wave speed in [m/s].
         """
         raise NotImplementedError(
-            "need to implement shear_wave_velocity() in derived class!")
+            "need to implement shear_wave_velocity() in derived class!"
+        )
 
     @material_property
     def grueneisen_parameter(self):
@@ -626,7 +639,8 @@ class Material(object):
             Grueneisen parameters [unitless].
         """
         raise NotImplementedError(
-            "need to implement grueneisen_parameter() in derived class!")
+            "need to implement grueneisen_parameter() in derived class!"
+        )
 
     @material_property
     def thermal_expansivity(self):
@@ -644,7 +658,8 @@ class Material(object):
             Thermal expansivity in [1/K].
         """
         raise NotImplementedError(
-            "need to implement thermal_expansivity() in derived class!")
+            "need to implement thermal_expansivity() in derived class!"
+        )
 
     @material_property
     def molar_heat_capacity_v(self):
@@ -662,7 +677,8 @@ class Material(object):
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError(
-            "need to implement molar_heat_capacity_v() in derived class!")
+            "need to implement molar_heat_capacity_v() in derived class!"
+        )
 
     @material_property
     def molar_heat_capacity_p(self):
@@ -680,7 +696,8 @@ class Material(object):
             Heat capacity in [J/K/mol].
         """
         raise NotImplementedError(
-            "need to implement molar_heat_capacity_p() in derived class!")
+            "need to implement molar_heat_capacity_p() in derived class!"
+        )
 
     #
     # Aliased properties

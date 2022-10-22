@@ -22,8 +22,7 @@ from burnman import utils
 if __name__ == "__main__":
 
     def create_list(name, mineral):
-        ownname = mineral.to_string().replace(
-            "'", "").replace("burnman.minerals.", "")
+        ownname = mineral.to_string().replace("'", "").replace("burnman.minerals.", "")
         if name != ownname:
             name = name + " (" + ownname + ")"
         row = [name]
@@ -34,20 +33,87 @@ if __name__ == "__main__":
 
     # Create a dictionary of the equation of state parameters to insert into the table
     # Equations of state not included in this dictionary will be ignored
-    eos_params = {'hp_tmt': ['V_0', 'K_0', 'Kprime_0', 'Kdprime_0', 'molar_mass', 'n', 'Cp'],
-                  'slb2': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
-                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
-                  'slb3': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
-                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
-                  'mgd2': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
-                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
-                  'mgd3': ['V_0', 'K_0', 'Kprime_0', 'G_0', 'Gprime_0',
-                           'molar_mass', 'n', 'Debye_0', 'grueneisen_0', 'q_0', 'eta_s_0'],
-                  'cork': ['cork_params', 'cork_T', 'cork_P', 'Cp'],
-                  'dks_s': ['V_0', 'T_0', 'E_0', 'S_0', 'K_0',
-                            'Kprime_0', 'Kdprime_0', 'n', 'Cv', 'grueneisen_0', 'q_0'],
-                  'dks_l': ['V_0', 'T_0', 'O_theta', 'O_f', 'm', 'zeta_0', 'xi', 'Tel_0', 'eta'],
-                  'aa': ['T_0', 'S_0', 'V_0', 'K_S', 'Kprime_S', 'Kprime_prime_S', 'grueneisen_0', 'grueneisen_prime', 'grueneisen_n']}
+    eos_params = {
+        "hp_tmt": ["V_0", "K_0", "Kprime_0", "Kdprime_0", "molar_mass", "n", "Cp"],
+        "slb2": [
+            "V_0",
+            "K_0",
+            "Kprime_0",
+            "G_0",
+            "Gprime_0",
+            "molar_mass",
+            "n",
+            "Debye_0",
+            "grueneisen_0",
+            "q_0",
+            "eta_s_0",
+        ],
+        "slb3": [
+            "V_0",
+            "K_0",
+            "Kprime_0",
+            "G_0",
+            "Gprime_0",
+            "molar_mass",
+            "n",
+            "Debye_0",
+            "grueneisen_0",
+            "q_0",
+            "eta_s_0",
+        ],
+        "mgd2": [
+            "V_0",
+            "K_0",
+            "Kprime_0",
+            "G_0",
+            "Gprime_0",
+            "molar_mass",
+            "n",
+            "Debye_0",
+            "grueneisen_0",
+            "q_0",
+            "eta_s_0",
+        ],
+        "mgd3": [
+            "V_0",
+            "K_0",
+            "Kprime_0",
+            "G_0",
+            "Gprime_0",
+            "molar_mass",
+            "n",
+            "Debye_0",
+            "grueneisen_0",
+            "q_0",
+            "eta_s_0",
+        ],
+        "cork": ["cork_params", "cork_T", "cork_P", "Cp"],
+        "dks_s": [
+            "V_0",
+            "T_0",
+            "E_0",
+            "S_0",
+            "K_0",
+            "Kprime_0",
+            "Kdprime_0",
+            "n",
+            "Cv",
+            "grueneisen_0",
+            "q_0",
+        ],
+        "dks_l": ["V_0", "T_0", "O_theta", "O_f", "m", "zeta_0", "xi", "Tel_0", "eta"],
+        "aa": [
+            "T_0",
+            "S_0",
+            "V_0",
+            "K_S",
+            "Kprime_S",
+            "Kprime_prime_S",
+            "grueneisen_0",
+            "grueneisen_prime",
+            "grueneisen_n",
+        ],
+    }
 
     libs = dir(minerals)
     for l in libs:
@@ -60,8 +126,15 @@ if __name__ == "__main__":
         if mineralgroup.__class__.__name__ == "module":
             for m in dir(mineralgroup):
                 mineral = getattr(mineralgroup, m)
-                if inspect.isclass(mineral) and mineral != burnman.Mineral and mineral != burnman.CombinedMineral and issubclass(mineral, burnman.Mineral) \
-                        and not issubclass(mineral, burnman.classes.mineral_helpers.HelperSpinTransition):
+                if (
+                    inspect.isclass(mineral)
+                    and mineral != burnman.Mineral
+                    and mineral != burnman.CombinedMineral
+                    and issubclass(mineral, burnman.Mineral)
+                    and not issubclass(
+                        mineral, burnman.classes.mineral_helpers.HelperSpinTransition
+                    )
+                ):
                     if issubclass(mineral, burnman.SolidSolution):
                         continue
                     # print mineral.__module__ + mineral.__name__
@@ -79,14 +152,18 @@ if __name__ == "__main__":
 
             # The following groups minerals from each module into groups based on eos and
             # prints a separate table for each eos group.
-            list_eoses = [phasename[1].params['equation_of_state'] for phasename in phasenames]
+            list_eoses = [
+                phasename[1].params["equation_of_state"] for phasename in phasenames
+            ]
             for (eos, params) in sorted(eos_params.items(), key=lambda x: x[0]):
-                eos_phasenames = [phasenames[i] for i, e in enumerate(list_eoses) if e == eos]
+                eos_phasenames = [
+                    phasenames[i] for i, e in enumerate(list_eoses) if e == eos
+                ]
                 if len(eos_phasenames) > 0:
                     table = []
                     tablel = []
 
-                    table.append(['Name ({0} equation of state)'.format(eos)] + params)
+                    table.append(["Name ({0} equation of state)".format(eos)] + params)
                     tablel.append([])
 
                     sortedlist = sorted(eos_phasenames, key=lambda x: x[0])
@@ -97,7 +174,7 @@ if __name__ == "__main__":
                         table.append(row)
                         tablel.append(row)
 
-                    if (len(sys.argv) == 1):
+                    if len(sys.argv) == 1:
                         utils.misc.pretty_print_table(table, False)
                     elif sys.argv[1] == "tab":
                         utils.misc.pretty_print_table(table, True)

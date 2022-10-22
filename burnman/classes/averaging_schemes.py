@@ -370,13 +370,13 @@ class HashinShtrikmanUpper(AveragingScheme):
 
         vol_frac = volumes / sum(volumes)
 
-        alpha_n = -3. / (3. * K_n + 4. * G_n)
+        alpha_n = -3.0 / (3.0 * K_n + 4.0 * G_n)
         A_n = 0
         for i in range(len(vol_frac)):
             if bulk_moduli[i] != K_n:
-                A_n += vol_frac[i] / (1. / (bulk_moduli[i] - K_n) - alpha_n)
+                A_n += vol_frac[i] / (1.0 / (bulk_moduli[i] - K_n) - alpha_n)
 
-        K_upper = K_n + A_n / (1. + alpha_n * A_n)
+        K_upper = K_n + A_n / (1.0 + alpha_n * A_n)
         return K_upper
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -405,14 +405,13 @@ class HashinShtrikmanUpper(AveragingScheme):
 
         vol_frac = volumes / sum(volumes)
 
-        beta_n = -3. * (K_n + 2. * G_n) / (5. * G_n * (3. * K_n + 4. * G_n))
+        beta_n = -3.0 * (K_n + 2.0 * G_n) / (5.0 * G_n * (3.0 * K_n + 4.0 * G_n))
         B_n = 0
         for i in range(len(vol_frac)):
             if shear_moduli[i] != G_n:
-                B_n += vol_frac[i] / (
-                    1. / (2. * (shear_moduli[i] - G_n)) - beta_n)
+                B_n += vol_frac[i] / (1.0 / (2.0 * (shear_moduli[i] - G_n)) - beta_n)
 
-        G_upper = G_n + (0.5) * B_n / (1. + beta_n * B_n)
+        G_upper = G_n + (0.5) * B_n / (1.0 + beta_n * B_n)
         return G_upper
 
 
@@ -456,13 +455,13 @@ class HashinShtrikmanLower(AveragingScheme):
 
         vol_frac = volumes / sum(volumes)
 
-        alpha_1 = -3. / (3. * K_1 + 4. * G_1)
+        alpha_1 = -3.0 / (3.0 * K_1 + 4.0 * G_1)
         A_1 = 0
         for i in range(len(vol_frac)):
             if bulk_moduli[i] != K_1:
-                A_1 += vol_frac[i] / (1. / (bulk_moduli[i] - K_1) - alpha_1)
+                A_1 += vol_frac[i] / (1.0 / (bulk_moduli[i] - K_1) - alpha_1)
 
-        K_lower = K_1 + A_1 / (1. + alpha_1 * A_1)
+        K_lower = K_1 + A_1 / (1.0 + alpha_1 * A_1)
         return K_lower
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
@@ -491,14 +490,13 @@ class HashinShtrikmanLower(AveragingScheme):
 
         vol_frac = volumes / sum(volumes)
 
-        beta_1 = -3. * (K_1 + 2. * G_1) / (5. * G_1 * (3. * K_1 + 4. * G_1))
+        beta_1 = -3.0 * (K_1 + 2.0 * G_1) / (5.0 * G_1 * (3.0 * K_1 + 4.0 * G_1))
         B_1 = 0
         for i in range(len(vol_frac)):
             if shear_moduli[i] != G_1:
-                B_1 += vol_frac[i] / (
-                    1. / (2. * (shear_moduli[i] - G_1)) - beta_1)
+                B_1 += vol_frac[i] / (1.0 / (2.0 * (shear_moduli[i] - G_1)) - beta_1)
 
-        G_lower = G_1 + (0.5) * B_1 / (1. + beta_1 * B_1)
+        G_lower = G_1 + (0.5) * B_1 / (1.0 + beta_1 * B_1)
         return G_lower
 
 
@@ -536,8 +534,10 @@ class HashinShtrikmanAverage(AveragingScheme):
         K : float
             The arithmetic mean of the Hashin-Shtrikman bounds on bulk modulus :math:`K`. :math:`[Pa]`
         """
-        return (self.upper.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)
-                + self.lower.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)) / 2.0
+        return (
+            self.upper.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)
+            + self.lower.average_bulk_moduli(volumes, bulk_moduli, shear_moduli)
+        ) / 2.0
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
@@ -560,8 +560,10 @@ class HashinShtrikmanAverage(AveragingScheme):
         G : float
             The arithmetic mean of the Hashin-Shtrikman bounds on shear modulus :math:`G`. :math:`[Pa]`
         """
-        return (self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
-                + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli)) / 2.0
+        return (
+            self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
+            + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
+        ) / 2.0
 
 
 def voigt_average_function(phase_volume, X):
@@ -588,7 +590,7 @@ def reuss_average_function(phase_volume, X):
         if x <= 0 and np.abs(f) > np.finfo(float).eps:
             warnings.warn("Oops, called reuss_average with Xi<=0!")
             return 0.0
-    X_reuss = 1. / sum(f / x for f, x in zip(vol_frac, X))
+    X_reuss = 1.0 / sum(f / x for f, x in zip(vol_frac, X))
     return X_reuss
 
 
@@ -599,6 +601,8 @@ def voigt_reuss_hill_function(phase_volume, X):
     voigt_reuss_hill class, takes a list of
     volumes and moduli, returns a modulus.
     """
-    X_vrh = (voigt_average_function(phase_volume, X)
-             + reuss_average_function(phase_volume, X)) / 2.0
+    X_vrh = (
+        voigt_average_function(phase_volume, X)
+        + reuss_average_function(phase_volume, X)
+    ) / 2.0
     return X_vrh
