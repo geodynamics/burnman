@@ -168,11 +168,10 @@ def molar_heat_capacity_v(T, debye_T, n):
 @jit
 def helmholtz_free_energy(T, debye_T, n):
     """
-    Helmholtz free energy of lattice vibrations in the Debye model.
+    Helmholtz free energy of lattice vibrations in the Debye model [J].
     It is important to note that this does NOT include the zero
-    point energy of vibration for the lattice.  As long as you are
+    point energy for the lattice.  As long as you are
     calculating relative differences in F, this should cancel anyways.
-    In Joules.
     """
     if T <= eps:
         return 0.0
@@ -186,9 +185,10 @@ def helmholtz_free_energy(T, debye_T, n):
     return F
 
 
+@jit
 def entropy(T, debye_T, n):
     """
-    Entropy due to lattice vibrations in the Debye model [J/K]
+    Entropy due to lattice vibrations in the Debye model [J/K].
     """
     if T <= eps:
         return 0.0
@@ -199,3 +199,21 @@ def entropy(T, debye_T, n):
         * (4.0 * debye_fn_cheb(x) - 3.0 * np.log(1.0 - np.exp(-x)))
     )
     return S
+
+
+@jit
+def dmolar_heat_capacity_v_dT(T, debye_T, n):
+    """
+    First temperature derivative of the heat capacity at constant volume
+    [J/K^2/mol].
+    """
+    if T <= eps:
+        return 0.0
+    x = debye_T / T
+
+    C_v_over_T = molar_heat_capacity_v(T, debye_T, n) / T
+    E_over_Tsqr = thermal_energy(T, debye_T, n) / T / T
+
+    dCvdT = 3.0 * C_v_over_T + (C_v_over_T - 4.0 * E_over_Tsqr) * x / (1.0 - np.exp(-x))
+
+    return dCvdT

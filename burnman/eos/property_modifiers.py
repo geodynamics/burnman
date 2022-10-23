@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import numpy as np
 import scipy.optimize as opt
 from ..constants import gas_constant
+from . import debye, einstein
 
 """
 Functions for modifying the thermodynamic properties of minerals
@@ -183,7 +184,6 @@ def _linear_excesses(pressure, temperature, params):
     useful as a first order tweak to free energies
     (especially in solid solution calculations)
     """
-
     G = (
         params["delta_E"]
         - (temperature) * params["delta_S"]
@@ -287,8 +287,8 @@ def _bragg_williams_excesses(pressure, temperature, params):
 
     # Calculating partial differentials with respect to P and T
     # are complicated by the fact that Q changes with P and T
-    # Since there's no analytical solution for Q(P, T), we are
-    # unfortunately driven to numerical differentiation. Schade.
+    # TODO: Calculate the analytical derivatives of G via the chain rule.
+    # For now, just use numerical differentiation.
     dT = 0.1
     dP = 1000.0
 
@@ -449,6 +449,130 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     return (excesses, None)
 
 
+def _debye_excesses(pressure, temperature, params):
+    """
+    Applies an excess contribution based
+    on a Debye model. The excess heat capacity
+    tends toward a constant value at high temperature.
+    """
+    f = params["Cv_inf"] / 3.0 / gas_constant
+    theta = params["Theta_0"]
+
+    G = debye.helmholtz_free_energy(temperature, theta, f)
+    dGdT = -debye.entropy(temperature, theta, f)
+    dGdP = 0.0
+    if temperature > 1.0e-20:
+        d2GdT2 = -debye.molar_heat_capacity_v(temperature, theta, f) / temperature
+    else:
+        d2GdT2 = 0.0
+    d2GdP2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+
+    return (excesses, None)
+
+
+def _debye_delta_excesses(pressure, temperature, params):
+    """
+    Applies an excess contribution based
+    on the thermal derivatives of a Debye model.
+    The excess entropy tends toward a
+    constant value at high temperature
+    and behaves like the heat capacity of a Debye model
+    at finite temperature.
+    """
+    f = params["S_inf"] / 3.0 / gas_constant
+    theta = params["Theta_0"]
+
+    G = -debye.thermal_energy(temperature, theta, f)
+    dGdT = -debye.molar_heat_capacity_v(temperature, theta, f)
+    dGdP = 0.0
+    d2GdT2 = -debye.dmolar_heat_capacity_v_dT(temperature, theta, f)
+    d2GdP2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+
+    return (excesses, None)
+
+
+def _einstein_excesses(pressure, temperature, params):
+    """
+    Applies an excess contribution based
+    on an Einstein model. The excess heat capacity
+    tends toward a constant value at high temperature.
+    """
+    f = params["Cv_inf"] / 3.0 / gas_constant
+    theta = params["Theta_0"]
+
+    G = einstein.helmholtz_free_energy(temperature, theta, f)
+    dGdT = -einstein.entropy(temperature, theta, f)
+    dGdP = 0.0
+    if temperature > 1.0e-20:
+        d2GdT2 = -einstein.molar_heat_capacity_v(temperature, theta, f) / temperature
+    else:
+        d2GdT2 = 0.0
+    d2GdP2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+
+    return (excesses, None)
+
+
+def _einstein_delta_excesses(pressure, temperature, params):
+    """
+    Applies an excess contribution based
+    on the thermal derivatives of an Einstein model.
+    The excess entropy tends toward a
+    constant value at high temperature
+    and behaves like the heat capacity of an Einstein model
+    at finite temperature.
+    """
+    f = params["S_inf"] / 3.0 / gas_constant
+    theta = params["Theta_0"]
+
+    G = -einstein.thermal_energy(temperature, theta, f)
+    dGdT = -einstein.molar_heat_capacity_v(temperature, theta, f)
+    dGdP = 0.0
+    d2GdT2 = -einstein.dmolar_heat_capacity_v_dT(temperature, theta, f)
+    d2GdP2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+
+    return (excesses, None)
+
+
 def calculate_property_modifications(mineral):
     """
     Sums the excesses from all the modifiers.
@@ -482,14 +606,26 @@ def calculate_property_modifications(mineral):
     for modifier in mineral.property_modifiers:
         if modifier[0] == "landau":
             xs_function = _landau_excesses
-        if modifier[0] == "landau_hp":
+        elif modifier[0] == "landau_hp":
             xs_function = _landau_hp_excesses
-        if modifier[0] == "linear":
+        elif modifier[0] == "linear":
             xs_function = _linear_excesses
-        if modifier[0] == "bragg_williams":
+        elif modifier[0] == "bragg_williams":
             xs_function = _bragg_williams_excesses
-        if modifier[0] == "magnetic_chs":
+        elif modifier[0] == "magnetic_chs":
             xs_function = _magnetic_excesses_chs
+        elif modifier[0] == "debye":
+            xs_function = _debye_excesses
+        elif modifier[0] == "debye_delta":
+            xs_function = _debye_delta_excesses
+        elif modifier[0] == "einstein":
+            xs_function = _einstein_excesses
+        elif modifier[0] == "einstein_delta":
+            xs_function = _einstein_delta_excesses
+        else:
+            raise Exception(
+                f"Property modifier label for {mineral.name} ({modifier[0]}) not recognised."
+            )
 
         xs_component, properties = xs_function(
             mineral.pressure, mineral.temperature, modifier[1]
