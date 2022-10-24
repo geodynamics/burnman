@@ -284,7 +284,14 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
 
     # Consistent Phi
     expr.extend(["dPsidf_Voigt[:3,:3] == 1"])
-    eq.extend([[np.sum(m.dPsidf_Voigt[:3, :3]), 1.0]])
+    eq.extend(
+        [
+            [
+                np.sum(m.isothermal_compliance_tensor[:3, :3]),
+                m.isothermal_compressibility_reuss,
+            ]
+        ]
+    )
 
     # Consistent inverses
     expr.extend([f"S_T = inv(C_T) ({i}{j})" for i in range(6) for j in range(i, 6)])
