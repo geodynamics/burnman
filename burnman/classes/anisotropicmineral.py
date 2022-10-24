@@ -102,6 +102,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 f"by {factor}."
             )
 
+        self.isotropic_mineral = isotropic_mineral
         if "name" in isotropic_mineral.params:
             self.name = isotropic_mineral.params["name"]
 
@@ -135,26 +136,17 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     def set_state(self, pressure, temperature):
         # 1) Compute dPthdf|T
         # relatively large dP needed for accurate estimate of dPthdf
-        Mineral.set_state(self, pressure, temperature)
-        dP = self.isothermal_bulk_modulus_reuss * 1.0e-5
 
-        Mineral.set_state(self, pressure - dP / 2.0, temperature)
-        V1 = self.V
-        Pth1 = (
-            pressure
-            - dP / 2.0
-            - self.method.pressure(self.params["T_0"], V1, self.params)
-        )
+        self.isotropic_mineral.set_state(pressure, temperature)
+        V2 = self.isotropic_mineral.V
+        KT2 = self.isotropic_mineral.K_T
+        self.isotropic_mineral.set_state_with_volume(V2, self.params["T_0"])
+        P1 = self.isotropic_mineral.pressure
+        KT1 = self.isotropic_mineral.K_T
+        dPthdf = KT1 - KT2
+        Pth = pressure - P1
 
-        Mineral.set_state(self, pressure + dP / 2.0, temperature)
-        V2 = self.V
-        Pth2 = (
-            pressure
-            + dP / 2.0
-            - self.method.pressure(self.params["T_0"], V2, self.params)
-        )
-
-        self.dPthdf = (Pth2 - Pth1) / np.log(V2 / V1)
+        self.isotropic_mineral.set_state(pressure, temperature)
         Mineral.set_state(self, pressure, temperature)
 
         # 2) Compute other properties needed for anisotropic equation of state
@@ -165,13 +157,17 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self._Vrel = Vrel
         self._f = f
 
-        Pth = pressure - self.method.pressure(self.params["T_0"], self.V, self.params)
-
         out = self.psi_function(f, Pth, self.anisotropic_params)
 
         self.Psi_Voigt = out[0]
-        self.dPsidf_Voigt = out[1]
-        self.dPsidPth_Voigt = out[2]
+
+        # Convert to (f, T) variables
+        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
+            out[1] + out[2] * dPthdf
+        )
+        self.dPsidT_Voigt = self.alpha * (
+            out[1] + out[2] * (dPthdf + self.isothermal_bulk_modulus_reuss)
+        )
 
     def _contract_compliances(self, compliances):
         """
@@ -378,9 +374,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             The isothermal compliance tensor [1/Pa]
             in Voigt form (:math:`\\mathbb{S}_{\\text{T} pq}`).
         """
-        S_T = self.isothermal_compressibility_reuss * (
-            self.dPsidf_Voigt + self.dPsidPth_Voigt * self.dPthdf
-        )
+        S_T = -self.dPsidP_Voigt
         if self.orthotropic:
             return S_T
         else:
@@ -397,13 +391,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         thermal_expansivity_tensor : 2D numpy array
             The tensor of thermal expansivities [1/K].
         """
-        a = self.alpha * (
-            self.dPsidf_Voigt
-            + self.dPsidPth_Voigt
-            * (self.dPthdf + 1.0 / self.isothermal_compressibility_reuss)
-        )
         alpha = np.einsum(
-            "ijkl, kl", self._voigt_notation_to_compliance_tensor(a), np.eye(3)
+            "ijkl, kl",
+            self._voigt_notation_to_compliance_tensor(self.dPsidT_Voigt),
+            np.eye(3),
         )
 
         if self.orthotropic:

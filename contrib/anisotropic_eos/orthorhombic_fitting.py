@@ -519,7 +519,6 @@ if do_plotting:
     betaN = np.empty_like(pressures)
     ST = np.empty((len(pressures), 6, 6))
     betaT = np.empty_like(pressures)
-    dpsidf = np.empty((len(pressures), 6, 6))
 
     f = np.empty_like(pressures)
     dXdf = np.empty_like(pressures)
@@ -536,7 +535,6 @@ if do_plotting:
             betaN[i] = 1.0 / m.isentropic_bulk_modulus_reuss
             ST[i] = m.isothermal_compliance_tensor
             betaT[i] = 1.0 / m.isothermal_bulk_modulus_reuss
-            dpsidf[i] = m.dPsidf_Voigt
             f[i] = np.log(rho0 / m.rho)
 
         # TK, PGPa, rho, rhoerr = d[:4]
