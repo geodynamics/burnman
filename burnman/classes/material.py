@@ -209,8 +209,15 @@ class Material(object):
         """
 
         def _delta_volume(pressure, volume, temperature):
-            self.set_state(pressure, temperature)
-            return volume - self.molar_volume
+            # Try to set the state with this pressure,
+            # but if the pressure is too low most equations of state
+            # fail. In this case, treat the molar_volume as infinite
+            # and brentq will try a larger pressure.
+            try:
+                self.set_state(pressure, temperature)
+                return volume - self.molar_volume
+            except Exception:
+                return -np.inf
 
         # we need to have a sign change in [a,b] to find a zero.
         args = (volume, temperature)
