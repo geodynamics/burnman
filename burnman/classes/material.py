@@ -209,8 +209,15 @@ class Material(object):
         """
 
         def _delta_volume(pressure, volume, temperature):
-            self.set_state(pressure, temperature)
-            return volume - self.molar_volume
+            # Try to set the state with this pressure,
+            # but if the pressure is too low most equations of state
+            # fail. In this case, treat the molar_volume as infinite
+            # and brentq will try a larger pressure.
+            try:
+                self.set_state(pressure, temperature)
+                return volume - self.molar_volume
+            except Exception:
+                return -np.inf
 
         # we need to have a sign change in [a,b] to find a zero.
         args = (volume, temperature)
@@ -763,6 +770,26 @@ class Material(object):
 
     @property
     def beta_S(self):
+        """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
+        return self.adiabatic_compressibility
+
+    @property
+    def isothermal_bulk_modulus_reuss(self):
+        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus`"""
+        return self.isothermal_bulk_modulus
+
+    @property
+    def adiabatic_bulk_modulus_reuss(self):
+        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus`"""
+        return self.adiabatic_bulk_modulus
+
+    @property
+    def isothermal_compressibility_reuss(self):
+        """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
+        return self.isothermal_compressibility
+
+    @property
+    def adiabatic_compressibility_reuss(self):
         """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
 

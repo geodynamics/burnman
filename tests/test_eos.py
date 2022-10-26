@@ -111,6 +111,37 @@ class periclase_morse(burnman.Mineral):
         }
 
 
+class alpha_quartz(burnman.Mineral):
+    def __init__(self):
+        formula = "SiO2"
+        formula = dictionarize_formula(formula)
+        self.params = {
+            "name": "alpha quartz",
+            "formula": formula,
+            "equation_of_state": "slb3",
+            "F_0": -2313.86317911,
+            "V_0": 2.2761615699999998e-05,
+            "K_0": 74803223700.0,
+            "Kprime_0": 7.01334832,
+            "Debye_0": 1069.02139,
+            "grueneisen_0": -0.0615759576,
+            "q_0": 10.940017,
+            "G_0": 44856170000.0,
+            "Gprime_0": 0.95315,
+            "eta_s_0": 2.36469,
+            "n": sum(formula.values()),
+            "molar_mass": formula_mass(formula),
+        }
+
+        self.property_modifiers = [
+            ["einstein", {"Theta_0": 510.158911, "Cv_inf": 39.9366924855}],
+            ["einstein", {"Theta_0": 801.41137578, "Cv_inf": -52.9869089}],
+            ["einstein", {"Theta_0": 2109.4459429999997, "Cv_inf": 13.0502164145}],
+        ]
+
+        burnman.Mineral.__init__(self)
+
+
 class eos(BurnManTest):
     def test_reference_values(self):
         rock = mypericlase()
@@ -415,15 +446,17 @@ class test_eos_validation(BurnManTest):
 
         self.assertArraysAlmostEqual(calculated, derivative)
 
-    def test_slb_failure(self):
-        m = mypericlase()
-        burnman.Mineral.__init__(m)
+    def test_pressure_finding(self):
 
-        def fn():
-            m.set_state_with_volume(m.params["V_0"] * 2.0, 300.0)
-
-        with np.errstate(all="ignore"):
-            self.assertRaises(Exception, fn)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m = alpha_quartz()
+            P = 1.0e5
+            T = 1000.0
+            m.set_state(P, T)
+            V = m.V
+            m.set_state_with_volume(V, T)
+        self.assertAlmostEqual(m.pressure / 1.0e5, P / 1.0e5, places=3)
 
 
 if __name__ == "__main__":
