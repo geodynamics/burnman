@@ -3,7 +3,7 @@
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 import numpy as np
-from scipy.linalg import expm
+from scipy.linalg import expm, logm
 from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
@@ -11,6 +11,50 @@ from .anisotropy import AnisotropicMaterial, voigt_compliance_factors
 from ..utils.misc import copy_documentation
 from ..utils.unitcell import cell_parameters_to_vectors
 from ..utils.unitcell import cell_vectors_to_parameters
+
+
+def contract_stresses(stresses):
+    """
+    Takes a stress tensor in standard (3x3) form
+    and returns the Voigt form (6). No factors
+    are required to maintain the relationship
+    with the corresponding stiffness and strain tensors
+    (see contract_strains, which does require
+    multiplicative factors).
+    """
+    return stresses[[0, 1, 2, 1, 0, 0], [0, 1, 2, 2, 2, 1]]
+
+
+def expand_stresses(stresses):
+    """
+    Takes a stress tensor in Voigt form (6)
+    and returns the standard form (3x3). No factors
+    are required to maintain the relationship
+    with the corresponding stiffness and strain tensors
+    (see contract_strains, which does require
+    multiplicative factors).
+    """
+    return np.array(
+        [
+            [stresses[0], stresses[5], stresses[4]],
+            [stresses[5], stresses[1], stresses[3]],
+            [stresses[4], stresses[3], stresses[2]],
+        ]
+    )
+
+
+def contract_strains(strains):
+    """
+    Takes a stress tensor in standard (3x3) form
+    and returns the Voigt form (6). Note the factors
+    which are required to maintain the relationship
+    with the corresponding stiffness and strain tensors.
+    """
+    # next line creates a copy, not just a view.
+    eps = strains[[0, 1, 2, 1, 0, 0], [0, 1, 2, 2, 2, 1]]
+    # only overwrites values in eps, not the input array
+    eps[3:] *= 2.0
+    return eps
 
 
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
@@ -102,6 +146,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 f"by {factor}."
             )
 
+        self.Psi_0_Voigt = self._contract_compliances(
+            np.einsum("ij, kl", logm(self.cell_vectors_0), np.eye(3) / 3.0)
+        )
+
         self.isotropic_mineral = isotropic_mineral
         if "name" in isotropic_mineral.params:
             self.name = isotropic_mineral.params["name"]
@@ -143,8 +191,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self.isotropic_mineral.set_state_with_volume(V2, self.params["T_0"])
         P1 = self.isotropic_mineral.pressure
         KT1 = self.isotropic_mineral.K_T
-        dPthdf = KT1 - KT2
-        Pth = pressure - P1
+        self.dPthdf = KT1 - KT2
+        self.Pth = pressure - P1
 
         self.isotropic_mineral.set_state(pressure, temperature)
         Mineral.set_state(self, pressure, temperature)
@@ -157,16 +205,15 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self._Vrel = Vrel
         self._f = f
 
-        out = self.psi_function(f, Pth, self.anisotropic_params)
-
-        self.Psi_Voigt = out[0]
+        out = self.psi_function(f, self.Pth, self.anisotropic_params)
 
         # Convert to (f, T) variables
-        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
-            out[1] + out[2] * dPthdf
-        )
+        self.Psi_Voigt, dPsidf, dPsidPth = out
+        self.Psi_Voigt += self.Psi_0_Voigt
+        self.dPsidf_Voigt = dPsidf + dPsidPth * self.dPthdf
+        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * self.dPsidf_Voigt
         self.dPsidT_Voigt = self.alpha * (
-            out[1] + out[2] * (dPthdf + self.isothermal_bulk_modulus_reuss)
+            dPsidf + dPsidPth * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
         )
 
     def _contract_compliances(self, compliances):
@@ -183,6 +230,19 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 m, n = self._voigt_index_to_ij(q)
                 voigt_notation[p, q] = compliances[i, j, m, n]
         return np.multiply(voigt_notation, voigt_compliance_factors)
+
+    def _contract_stiffnesses(self, stiffnesses):
+        """
+        Takes a stiffness tensor in standard (3x3x3x3) form
+        and returns the Voigt form (6x6).
+        """
+        voigt_notation = np.zeros((6, 6))
+        for p in range(6):
+            i, j = self._voigt_index_to_ij(p)
+            for q in range(6):
+                m, n = self._voigt_index_to_ij(q)
+                voigt_notation[p, q] = stiffnesses[i, j, m, n]
+        return voigt_notation
 
     @material_property
     def deformation_gradient_tensor(self):
@@ -212,7 +272,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
         """
-        return self.deformation_gradient_tensor.dot(self.cell_vectors_0)
+        return self.deformation_gradient_tensor
 
     @material_property
     def deformed_coordinate_frame(self):
@@ -324,7 +384,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         Anisotropic minerals do not have a single isentropic bulk modulus.
         This function returns a NotImplementedError. Users should instead
         consider either using isentropic_bulk_modulus_reuss,
-        isentropic_bulk_modulus_voigt (both derived from Anisotropicmineral),
+        isentropic_bulk_modulus_voigt (both derived from AnisotropicMineral),
         or directly querying the elements in the isentropic_stiffness_tensor.
         """
         raise NotImplementedError(
@@ -335,6 +395,38 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         )
 
     isothermal_bulk_modulus_reuss = Mineral.isothermal_bulk_modulus
+
+    @material_property
+    def isothermal_compressibility(self):
+        """
+        Anisotropic minerals do not have a single isentropic compressibility.
+        This function returns a NotImplementedError. Users should instead
+        consider either using isothermal_compressibility_reuss,
+        isothermal_compressibility_voigt (both derived from AnisotropicMineral),
+        or directly querying the elements in the isothermal_compliance_tensor.
+        """
+        raise NotImplementedError(
+            "isothermal_compressibility is not "
+            "sufficiently explicit for an "
+            "anisotropic mineral. Did you mean "
+            "isothermal_compressibility_reuss?"
+        )
+
+    @material_property
+    def isentropic_compressibility(self):
+        """
+        Anisotropic minerals do not have a single isentropic compressibility.
+        This function returns a NotImplementedError. Users should instead
+        consider either using isentropic_compressibility_reuss,
+        isentropic_compressibility_voigt (both derived from AnisotropicMineral),
+        or directly querying the elements in the isentropic_compliance_tensor.
+        """
+        raise NotImplementedError(
+            "isentropic_compressibility is not "
+            "sufficiently explicit for an "
+            "anisotropic mineral. Did you mean "
+            "isentropic_compressibility_reuss?"
+        )
 
     @material_property
     def isothermal_bulk_modulus_voigt(self):
@@ -364,6 +456,40 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             The Reuss bound on the isothermal compressibility in [1/Pa].
         """
         return 1.0 / self.isothermal_bulk_modulus_reuss
+
+    beta_T = isothermal_compressibility_reuss
+
+    @material_property
+    def isothermal_compressibility_voigt(self):
+        """
+        Returns
+        -------
+        isothermal_compressibility_voigt : float
+            The Voigt bound on the isothermal compressibility in [1/Pa].
+        """
+        return 1.0 / self.isothermal_bulk_modulus_voigt
+
+    @material_property
+    def isentropic_compressibility_reuss(self):
+        """
+        Returns
+        -------
+        isentropic_compressibility_reuss : float
+            The Reuss bound on the isentropic compressibility in [1/Pa].
+        """
+        return 1.0 / self.isentropic_bulk_modulus_reuss
+
+    beta_S = isentropic_compressibility_reuss
+
+    @material_property
+    def isentropic_compressibility_voigt(self):
+        """
+        Returns
+        -------
+        isentropic_compressibility_voigt : float
+            The Voigt bound on the isentropic compressibility in [1/Pa].
+        """
+        return 1.0 / self.isentropic_bulk_modulus_voigt
 
     @material_property
     def isothermal_compliance_tensor(self):
@@ -518,15 +644,15 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def grueneisen_parameter(self):
         """
-        Anisotropic minerals do not (in general) have a single grueneisen
-        parameter. This function returns a NotImplementedError.
-        Users should instead consider directly querying the elements in the
-        grueneisen_tensor.
+        Returns
+        -------
+        grueneisen_tensor : float
+            The scalar grueneisen parameter.
         """
-        raise NotImplementedError(
-            "Anisotropic minerals do not have a single "
-            "grueneisen parameter. Query "
-            "the grueneisen_tensor instead."
+        return (
+            self.thermal_expansivity
+            * self.V
+            / (self.isentropic_compressibility_reuss * self.molar_heat_capacity_p)
         )
 
     @material_property
@@ -561,7 +687,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         thermal stress : 2D numpy array
             The change in stress with temperature at constant strain.
         """
-        pi = np.einsum(
+        pi = -np.einsum(
             "ijkl, kl",
             self.full_isothermal_stiffness_tensor,
             self.thermal_expansivity_tensor,
@@ -576,23 +702,12 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         molar_isometric_heat_capacity : float
             The molar heat capacity at constant strain.
         """
-
+        alpha = self.thermal_expansivity_tensor
         pi = self.thermal_stress_tensor
-        pipiV = np.einsum("ij, kl -> ijkl", pi, pi) * self.V
-        indices = np.where(np.abs(pipiV) > 1.0e-5)
-        values = (
-            self.full_isentropic_stiffness_tensor
-            - self.full_isothermal_stiffness_tensor
-        )[indices] / pipiV[indices]
-        if not np.allclose(values, np.ones_like(values) * values[0], rtol=1.0e-5):
-            raise Exception(
-                "Could not calculate the molar heat "
-                "capacity at constant strain. "
-                "There is an inconsistency in the "
-                "equation of state."
-            )
-        C_isometric = self.temperature / values[0]
-
+        C_isometric = (
+            self.molar_heat_capacity_p
+            + self.V * self.temperature * np.einsum("ij, ij", alpha, pi)
+        )
         return C_isometric
 
     def check_standard_parameters(self, anisotropic_parameters):

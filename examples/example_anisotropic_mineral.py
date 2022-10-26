@@ -85,7 +85,7 @@ if __name__ == "__main__":
     T = 1600.0
     m.set_state(P, T)
     print(f"Model forsterite properties at {P/1.e9:.2f} GPa and {T:.2f} K:")
-    np.set_printoptions(precision=3)
+    np.set_printoptions(precision=4)
     print("Cell vectors:")
     print(m.cell_vectors)
     print("Cell parameters:")
@@ -94,6 +94,8 @@ if __name__ == "__main__":
     print(m.thermal_expansivity_tensor)
     print("Isothermal compressibility:")
     print(m.isothermal_compressibility_tensor)
+    print("Thermal stress tensor:")
+    print(m.thermal_stress_tensor)
     print("Isothermal stiffness_tensor:")
     print(m.isothermal_stiffness_tensor)
     print("Isentropic stiffness_tensor:")
@@ -105,7 +107,9 @@ if __name__ == "__main__":
     # the isotropic equation of state
     print(f"Volume: {m.V * 1.e6:.4f} cm^3/mol")
     print(f"Entropy: {m.S:.2f} J/K/mol")
-    print(f"C_p: {m.molar_heat_capacity_p:.2f} J/K/mol")
+    print(f"C_P: {m.molar_heat_capacity_p:.2f} J/K/mol")
+    print(f"C_V: {m.molar_heat_capacity_v:.2f} J/K/mol")
+    print(f"C_eps: {m.molar_isometric_heat_capacity:.2f} J/K/mol")
 
     # Plot thermal expansion figure
     fig = plt.figure(figsize=(8, 4))
