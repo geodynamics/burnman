@@ -206,14 +206,16 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self._f = f
 
         out = self.psi_function(f, self.Pth, self.anisotropic_params)
+        self.Psi_Voigt, self.dPsidf_Voigt, self.dPsidPth_Voigt = out
+        self.Psi_Voigt += self.Psi_0_Voigt
 
         # Convert to (f, T) variables
-        self.Psi_Voigt, dPsidf, dPsidPth = out
-        self.Psi_Voigt += self.Psi_0_Voigt
-        self.dPsidf_Voigt = dPsidf + dPsidPth * self.dPthdf
-        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * self.dPsidf_Voigt
+        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
+            self.dPsidf_Voigt + self.dPsidPth_Voigt * self.dPthdf
+        )
         self.dPsidT_Voigt = self.alpha * (
-            dPsidf + dPsidPth * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
+            self.dPsidf_Voigt
+            + self.dPsidPth_Voigt * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
         )
 
     def _contract_compliances(self, compliances):
