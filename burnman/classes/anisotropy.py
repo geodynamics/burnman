@@ -10,21 +10,11 @@ import numpy as np
 
 from ..utils.math import unit_normalize
 from .material import Material, material_property
-
-try:  # numpy.block was new in numpy version 1.13.0.
-    block = np.block(
-        [
-            [np.ones((3, 3)), 2.0 * np.ones((3, 3))],
-            [2.0 * np.ones((3, 3)), 4.0 * np.ones((3, 3))],
-        ]
-    )
-except:
-    block = np.array(
-        np.bmat(
-            [[[[1.0] * 3] * 3, [[2.0] * 3] * 3], [[[2.0] * 3] * 3, [[4.0] * 3] * 3]]
-        )
-    )
-voigt_compliance_factors = block
+from ..utils.anisotropy import (
+    voigt_array_from_cijs,
+    voigt_notation_to_compliance_tensor,
+    voigt_notation_to_stiffness_tensor,
+)
 
 
 class AnisotropicMaterial(Material):
@@ -52,51 +42,13 @@ class AnisotropicMaterial(Material):
 
         Material.__init__(self)
 
-    def _voigt_index_to_ij(self, m):
-        """
-        Returns the ij (or kl) indices of the
-        stiffness tensor which correspond to those
-        of the Voigt notation m (or n).
-        """
-        if m == 3:
-            return 1, 2
-        elif m == 4:
-            return 0, 2
-        elif m == 5:
-            return 0, 1
-        else:
-            return m, m
-
-    def _voigt_notation_to_stiffness_tensor(self, voigt_notation):
-        """
-        Converts a stiffness tensor in Voigt notation (6x6 matrix)
-        to the full fourth rank tensor (3x3x3x3 matrix).
-        """
-        stiffness_tensor = np.zeros([3, 3, 3, 3])
-        for m in range(6):
-            i, j = self._voigt_index_to_ij(m)
-            for n in range(6):
-                k, l = self._voigt_index_to_ij(n)
-                stiffness_tensor[i][j][k][l] = voigt_notation[m][n]
-                stiffness_tensor[j][i][k][l] = voigt_notation[m][n]
-                stiffness_tensor[i][j][l][k] = voigt_notation[m][n]
-                stiffness_tensor[j][i][l][k] = voigt_notation[m][n]
-        return stiffness_tensor
-
-    def _voigt_notation_to_compliance_tensor(self, voigt_notation):
-        return self._voigt_notation_to_stiffness_tensor(
-            np.divide(voigt_notation, voigt_compliance_factors)
-        )
-
     @material_property
     def isentropic_stiffness_tensor(self):
         return self._isentropic_stiffness_tensor
 
     @material_property
     def full_isentropic_stiffness_tensor(self):
-        return self._voigt_notation_to_stiffness_tensor(
-            self.isentropic_stiffness_tensor
-        )
+        return voigt_notation_to_stiffness_tensor(self.isentropic_stiffness_tensor)
 
     @material_property
     def isentropic_compliance_tensor(self):
@@ -104,9 +56,7 @@ class AnisotropicMaterial(Material):
 
     @material_property
     def full_isentropic_compliance_tensor(self):
-        return self._voigt_notation_to_compliance_tensor(
-            self.isentropic_compliance_tensor
-        )
+        return voigt_notation_to_compliance_tensor(self.isentropic_compliance_tensor)
 
     @material_property
     def density(self):
@@ -319,20 +269,6 @@ class AnisotropicMaterial(Material):
         velocities = np.sqrt(eigenvalues / self.density)
 
         return velocities, eigenvectors
-
-
-def voigt_array_from_cijs(cijs, index_lists):
-    """
-    Takes a list of cijs and a list of list of tuples corresponding to
-    the positions of each cij in the Voigt form matrix.
-    Note that the indices run from 0--5, not 1--6.
-    """
-    C = np.zeros([6, 6])
-    for i, index_list in enumerate(index_lists):
-        for indices in index_list:
-            C[indices] = cijs[i]
-            C[indices[::-1]] = cijs[i]
-    return C
 
 
 class IsotropicMaterial(AnisotropicMaterial):
