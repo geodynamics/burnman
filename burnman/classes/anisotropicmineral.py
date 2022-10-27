@@ -7,54 +7,15 @@ from scipy.linalg import expm, logm
 from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
-from .anisotropy import AnisotropicMaterial, voigt_compliance_factors
+from .anisotropy import AnisotropicMaterial
 from ..utils.misc import copy_documentation
 from ..utils.unitcell import cell_parameters_to_vectors
 from ..utils.unitcell import cell_vectors_to_parameters
-
-
-def contract_stresses(stresses):
-    """
-    Takes a stress tensor in standard (3x3) form
-    and returns the Voigt form (6). No factors
-    are required to maintain the relationship
-    with the corresponding stiffness and strain tensors
-    (see contract_strains, which does require
-    multiplicative factors).
-    """
-    return stresses[[0, 1, 2, 1, 0, 0], [0, 1, 2, 2, 2, 1]]
-
-
-def expand_stresses(stresses):
-    """
-    Takes a stress tensor in Voigt form (6)
-    and returns the standard form (3x3). No factors
-    are required to maintain the relationship
-    with the corresponding stiffness and strain tensors
-    (see contract_strains, which does require
-    multiplicative factors).
-    """
-    return np.array(
-        [
-            [stresses[0], stresses[5], stresses[4]],
-            [stresses[5], stresses[1], stresses[3]],
-            [stresses[4], stresses[3], stresses[2]],
-        ]
-    )
-
-
-def contract_strains(strains):
-    """
-    Takes a stress tensor in standard (3x3) form
-    and returns the Voigt form (6). Note the factors
-    which are required to maintain the relationship
-    with the corresponding stiffness and strain tensors.
-    """
-    # next line creates a copy, not just a view.
-    eps = strains[[0, 1, 2, 1, 0, 0], [0, 1, 2, 2, 2, 1]]
-    # only overwrites values in eps, not the input array
-    eps[3:] *= 2.0
-    return eps
+from ..utils.anisotropy import (
+    voigt_notation_to_compliance_tensor,
+    voigt_notation_to_stiffness_tensor,
+    contract_compliances,
+)
 
 
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
@@ -146,9 +107,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 f"by {factor}."
             )
 
-        self.Psi_0_Voigt = self._contract_compliances(
-            np.einsum("ij, kl", logm(self.cell_vectors_0), np.eye(3) / 3.0)
-        )
+        # Note, Psi_0 may be asymmetric, in which case the Voigt contraction
+        # cannot be applied
+        self.Psi_0 = np.einsum("ij, kl", logm(self.cell_vectors_0), np.eye(3) / 3.0)
 
         self.isotropic_mineral = isotropic_mineral
         if "name" in isotropic_mineral.params:
@@ -206,8 +167,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         self._f = f
 
         out = self.psi_function(f, self.Pth, self.anisotropic_params)
-        self.Psi_Voigt, self.dPsidf_Voigt, self.dPsidPth_Voigt = out
-        self.Psi_Voigt += self.Psi_0_Voigt
+        Psi_Voigt, self.dPsidf_Voigt, self.dPsidPth_Voigt = out
+        self.Psi = voigt_notation_to_compliance_tensor(Psi_Voigt) + self.Psi_0
 
         # Convert to (f, T) variables
         self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
@@ -217,34 +178,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             self.dPsidf_Voigt
             + self.dPsidPth_Voigt * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
         )
-
-    def _contract_compliances(self, compliances):
-        """
-        Takes a compliance tensor in standard (3x3x3x3) form
-        and returns the Voigt form (6x6). Note the compliance factors
-        which are required to maintain the inverse relationship with the
-        corresponding stiffness tensor.
-        """
-        voigt_notation = np.zeros((6, 6))
-        for p in range(6):
-            i, j = self._voigt_index_to_ij(p)
-            for q in range(6):
-                m, n = self._voigt_index_to_ij(q)
-                voigt_notation[p, q] = compliances[i, j, m, n]
-        return np.multiply(voigt_notation, voigt_compliance_factors)
-
-    def _contract_stiffnesses(self, stiffnesses):
-        """
-        Takes a stiffness tensor in standard (3x3x3x3) form
-        and returns the Voigt form (6x6).
-        """
-        voigt_notation = np.zeros((6, 6))
-        for p in range(6):
-            i, j = self._voigt_index_to_ij(p)
-            for q in range(6):
-                m, n = self._voigt_index_to_ij(q)
-                voigt_notation[p, q] = stiffnesses[i, j, m, n]
-        return voigt_notation
 
     @material_property
     def deformation_gradient_tensor(self):
@@ -256,8 +189,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             mineral from its undeformed state
             (i.e. the state at the reference pressure and temperature).
         """
-        Psi_full = self._voigt_notation_to_compliance_tensor(self.Psi_Voigt)
-        F = expm(np.einsum("ijkl, kl", Psi_full, np.eye(3)))
+        F = expm(np.einsum("ijkl, kl", self.Psi, np.eye(3)))
         return F
 
     @material_property
@@ -507,9 +439,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             return S_T
         else:
             R = self.rotation_matrix
-            S = self._voigt_notation_to_compliance_tensor(S_T)
+            S = voigt_notation_to_compliance_tensor(S_T)
             S_rotated = np.einsum("mi, nj, ok, pl, ijkl->mnop", R, R, R, R, S)
-            return self._contract_compliances(S_rotated)
+            return contract_compliances(S_rotated)
 
     @material_property
     def thermal_expansivity_tensor(self):
@@ -521,7 +453,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         alpha = np.einsum(
             "ijkl, kl",
-            self._voigt_notation_to_compliance_tensor(self.dPsidT_Voigt),
+            voigt_notation_to_compliance_tensor(self.dPsidT_Voigt),
             np.eye(3),
         )
 
@@ -553,7 +485,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in standard form (:math:`\\mathbb{S}_{\\text{T} ijkl}`).
         """
         S_Voigt = self.isothermal_compliance_tensor
-        return self._voigt_notation_to_compliance_tensor(S_Voigt)
+        return voigt_notation_to_compliance_tensor(S_Voigt)
 
     @material_property
     def full_isothermal_stiffness_tensor(self):
@@ -565,7 +497,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in standard form (:math:`\\mathbb{C}_{\\text{T} ijkl}`).
         """
         CT = self.isothermal_stiffness_tensor
-        return self._voigt_notation_to_stiffness_tensor(CT)
+        return voigt_notation_to_stiffness_tensor(CT)
 
     @material_property
     def full_isentropic_compliance_tensor(self):
@@ -598,7 +530,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in Voigt form (:math:`\\mathbb{S}_{\\text{N} pq}`).
         """
         S_full = self.full_isentropic_compliance_tensor
-        return self._contract_compliances(S_full)
+        return contract_compliances(S_full)
 
     @material_property
     def isentropic_stiffness_tensor(self):
@@ -621,7 +553,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in standard form (:math:`\\mathbb{C}_{\\text{N} ijkl}`).
         """
         C_Voigt = self.isentropic_stiffness_tensor
-        return self._voigt_notation_to_stiffness_tensor(C_Voigt)
+        return voigt_notation_to_stiffness_tensor(C_Voigt)
 
     @material_property
     def grueneisen_tensor(self):
