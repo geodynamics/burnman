@@ -54,7 +54,7 @@ chebyshev_representation = np.array(
 )
 
 
-@jit
+@jit(nopython=True)
 def _chebval(x, c):
     """
     Evaluate a Chebyshev series at points x.
@@ -95,7 +95,7 @@ sqrt_eps = np.sqrt(np.finfo(float).eps)
 log_eps = np.log(np.finfo(float).eps)
 
 
-@jit
+@jit(nopython=True)
 def debye_fn_cheb(x):
     """
     Evaluate the Debye function using a Chebyshev series expansion coupled with
@@ -135,7 +135,7 @@ def debye_fn_cheb(x):
         return ((val_infinity / x) / x) / x
 
 
-@jit
+@jit(nopython=True)
 def thermal_energy(T, debye_T, n):
     """
     calculate the thermal energy of a substance.  Takes the temperature,
@@ -148,7 +148,7 @@ def thermal_energy(T, debye_T, n):
     return E_th
 
 
-@jit
+@jit(nopython=True)
 def molar_heat_capacity_v(T, debye_T, n):
     """
     Heat capacity at constant volume.  In J/K/mol
@@ -165,7 +165,7 @@ def molar_heat_capacity_v(T, debye_T, n):
     return C_v
 
 
-@jit
+@jit(nopython=True)
 def helmholtz_free_energy(T, debye_T, n):
     """
     Helmholtz free energy of lattice vibrations in the Debye model [J].
@@ -185,7 +185,7 @@ def helmholtz_free_energy(T, debye_T, n):
     return F
 
 
-@jit
+@jit(nopython=True)
 def entropy(T, debye_T, n):
     """
     Entropy due to lattice vibrations in the Debye model [J/K].
@@ -201,7 +201,7 @@ def entropy(T, debye_T, n):
     return S
 
 
-@jit
+@jit(nopython=True)
 def dmolar_heat_capacity_v_dT(T, debye_T, n):
     """
     First temperature derivative of the heat capacity at constant volume

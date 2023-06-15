@@ -93,7 +93,6 @@ if __name__ == "__main__":
     """
 
     def realize_rock():
-
         phase_1_fraction = 0.5
         phase_2_fraction = 1.0 - phase_1_fraction
 
@@ -137,7 +136,6 @@ if __name__ == "__main__":
     outfile = open("uncertainty.dat", "wb")
 
     for i in range(n_realizations):
-
         print("realization", i + 1)
         try:
             # We call the realize_rock() to create the ith model
@@ -194,13 +192,13 @@ if __name__ == "__main__":
 
     # Create 2D histograms showing the spread of the data
     density_hist, rho_xedge, rho_yedge = np.histogram2d(
-        pressure_list, density_list, bins=len(pressures_sampled), normed=True
+        pressure_list, density_list, bins=len(pressures_sampled), density=True
     )
     vs_hist, vs_xedge, vs_yedge = np.histogram2d(
-        pressure_list, vs_list, bins=len(pressures_sampled), normed=True
+        pressure_list, vs_list, bins=len(pressures_sampled), density=True
     )
     vphi_hist, vphi_xedge, vphi_yedge = np.histogram2d(
-        pressure_list, vphi_list, bins=len(pressures_sampled), normed=True
+        pressure_list, vphi_list, bins=len(pressures_sampled), density=True
     )
 
     vs_xedge /= 1.0e9

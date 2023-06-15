@@ -29,7 +29,7 @@ Functions for the Einstein model of a solid.
 eps = np.finfo(float).eps
 
 
-@jit
+@jit(nopython=True)
 def thermal_energy(T, einstein_T, n):
     """
     calculate the thermal energy of a substance.  Takes the temperature,
@@ -43,7 +43,7 @@ def thermal_energy(T, einstein_T, n):
     return E_th
 
 
-@jit
+@jit(nopython=True)
 def molar_heat_capacity_v(T, einstein_T, n):
     """
     Heat capacity at constant volume.  In J/K/mol
@@ -60,7 +60,7 @@ def molar_heat_capacity_v(T, einstein_T, n):
     return C_v
 
 
-@jit
+@jit(nopython=True)
 def helmholtz_free_energy(T, einstein_T, n):
     """
     Helmholtz free energy of lattice vibrations in the Einstein model [J].
@@ -73,7 +73,7 @@ def helmholtz_free_energy(T, einstein_T, n):
     return E - T * S
 
 
-@jit
+@jit(nopython=True)
 def entropy(T, einstein_T, n):
     """
     Entropy due to lattice vibrations in the Einstein model [J/K]
@@ -90,7 +90,7 @@ def entropy(T, einstein_T, n):
     return S
 
 
-@jit
+@jit(nopython=True)
 def dmolar_heat_capacity_v_dT(T, einstein_T, n):
     """
     First temperature derivative of the heat capacity at constant volume
