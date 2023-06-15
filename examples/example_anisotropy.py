@@ -28,7 +28,6 @@ from burnman.classes import anisotropy
 
 
 if __name__ == "__main__":
-
     try:
         plt.rcParams["axes.facecolor"] = "white"
         plt.rcParams["axes.edgecolor"] = "black"

@@ -3,9 +3,8 @@ from tabulate import tabulate
 
 
 def print_table_for_mineral_constants(mineral, indices):
-
     constants = []
-    for (i, j) in indices:
+    for i, j in indices:
         constants.append(mineral.anisotropic_params["c"][i - 1, j - 1, :, :])
 
     constants = np.array(constants)
@@ -26,9 +25,8 @@ def print_table_for_mineral_constants(mineral, indices):
 
 
 def print_table_for_mineral_constants_2(mineral, param_list, indices):
-
     constants = []
-    for (i, j) in indices:
+    for i, j in indices:
         cs = []
         for param in param_list:
             cs.append(mineral.anisotropic_params[param][i - 1, j - 1])

@@ -32,7 +32,6 @@ from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 
 
 if __name__ == "__main__":
-
     # In this example, we'll be using the Decker (1971)
     # equation of state for NaCl.
     Decker_1971_NaCl = Decker_1971.NaCl_B1()

@@ -41,7 +41,6 @@ from burnman.optimize.composition_fitting import (
 
 
 if __name__ == "__main__":
-
     """
     Example 1
     ---------

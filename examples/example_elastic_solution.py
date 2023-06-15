@@ -48,7 +48,6 @@ These solutions can potentially deal with:
 """
 
 if __name__ == "__main__":
-
     """
     First, let's create an instance of an elastic solution.
     This is done in a very similar way to the definition of

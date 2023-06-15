@@ -36,7 +36,7 @@ calib = [
     [hcp, 40.0e9, 1000.0, 214601.0, 5.8583],
 ]
 
-for (m, P, T, G, V) in calib:
+for m, P, T, G, V in calib:
     m.set_state(P, T)
     # assert that the Gibbs energies are within 20 J/mol of each other
     assert m.gibbs - G < 20.0

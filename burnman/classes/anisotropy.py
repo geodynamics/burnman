@@ -33,7 +33,6 @@ class AnisotropicMaterial(Material):
     """
 
     def __init__(self, rho, cijs):
-
         self._isentropic_stiffness_tensor = cijs
         self._rho = rho
 
@@ -279,7 +278,6 @@ class IsotropicMaterial(AnisotropicMaterial):
     """
 
     def __init__(self, rho, cijs):
-
         assert len(cijs) == 2
         cijs = list(cijs)
         cijs.insert(0, cijs[0] + 2.0 * cijs[1])  # C11 = C12 + 2C44
@@ -302,7 +300,6 @@ class CubicMaterial(AnisotropicMaterial):
     """
 
     def __init__(self, rho, cijs):
-
         assert len(cijs) == 3
         index_lists = [
             [(0, 0), (1, 1), (2, 2)],  # C11
@@ -443,7 +440,6 @@ class OrthorhombicMaterial(AnisotropicMaterial):
     """
 
     def __init__(self, rho, cijs):
-
         assert len(cijs) == 9
         index_lists = [
             [(0, 0)],  # C11
@@ -470,7 +466,6 @@ class MonoclinicMaterial(AnisotropicMaterial):
     """
 
     def __init__(self, rho, cijs):
-
         assert len(cijs) == 13
         index_lists = [
             [(0, 0)],  # C11
@@ -501,7 +496,6 @@ class TriclinicMaterial(AnisotropicMaterial):
     """
 
     def __init__(self, rho, cijs):
-
         assert len(cijs) == 21
         index_lists = [[(i, j)] for i in range(6) for j in range(i, 6)]
 

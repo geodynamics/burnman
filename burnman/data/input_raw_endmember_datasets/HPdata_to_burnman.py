@@ -278,7 +278,6 @@ with open("HP_2011_ds62.py", "w") as outfile:
 
 # Process uncertainties
 with open("HP_2011_ds62_cov.py", "w") as outfile:
-
     outfile.write(
         "# This file is part of BurnMan - a thermoelastic and "
         "thermodynamic toolkit\n# for the Earth and Planetary "

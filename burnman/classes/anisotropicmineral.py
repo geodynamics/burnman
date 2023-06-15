@@ -76,7 +76,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         psi_function=None,
         orthotropic=None,
     ):
-
         if psi_function is None:
             self.check_standard_parameters(anisotropic_parameters)
             self.anisotropic_params = {"c": anisotropic_parameters}
@@ -645,7 +644,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         return C_isometric
 
     def check_standard_parameters(self, anisotropic_parameters):
-
         if not np.all(anisotropic_parameters[:, :, 0, 0] == 0):
             raise Exception(
                 "anisotropic_parameters_pqmn should be set to " "zero for all m = n = 0"

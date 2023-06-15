@@ -38,7 +38,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     # Define reference model and depth to evaluate
     seismic_model = burnman.seismic.PREM()
     number_of_points = 20

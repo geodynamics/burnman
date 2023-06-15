@@ -48,7 +48,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     # This is the first actual work done in this example.  We define
     # composite object and name it "rock".  A composite is made by
     # giving burnman.composite a list of minerals and their molar fractions.

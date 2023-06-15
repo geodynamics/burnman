@@ -7,7 +7,6 @@ from burnman import minerals
 
 class spin_transition(BurnManTest):
     def test_new(self):
-
         mins = [
             minerals.Murakami_etal_2012.fe_periclase(),
             minerals.Murakami_etal_2012.fe_periclase_HS(),

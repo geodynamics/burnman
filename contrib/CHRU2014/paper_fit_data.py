@@ -52,7 +52,6 @@ figure = plt.figure(dpi=100, figsize=figsize)
 
 
 def calc_shear_velocities(G_0, Gprime_0, mineral, pressures):
-
     mineral.params["G_0"] = G_0
     mineral.params["Gprime_0"] = Gprime_0
 
@@ -75,7 +74,6 @@ def error(guess, test_mineral, pressures, obs_vs):
 
 
 if __name__ == "__main__":
-
     mg_perovskite_data = np.loadtxt("Murakami_perovskite.txt")
     obs_pressures = mg_perovskite_data[:, 0] * 1.0e9
     obs_vs = mg_perovskite_data[:, 2] * 1000.0

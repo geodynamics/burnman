@@ -37,7 +37,6 @@ def read_dataset_utf8(datafile):
 
 
 def process_stixrude():
-
     perplex_ds = read_dataset("stx11ver.dat")
     alias_mapping = read_dataset("perplex_slb_2011_names.txt")
 

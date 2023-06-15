@@ -28,7 +28,6 @@ class Calibrant(object):
     """
 
     def __init__(self, calibrant_function, calibrant_function_return_type, params):
-
         if calibrant_function_return_type == "pressure":
             self.pressure_function = calibrant_function
             self.volume_function = self._volume_using_pressure_function

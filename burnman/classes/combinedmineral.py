@@ -40,7 +40,6 @@ class CombinedMineral(Mineral):
         free_energy_adjustment=[],
         name="User-created endmember",
     ):
-
         model = MechanicalSolution(endmembers=[[m, ""] for m in mineral_list])
         self.mixture = Solution(solution_model=model, molar_fractions=molar_amounts)
 

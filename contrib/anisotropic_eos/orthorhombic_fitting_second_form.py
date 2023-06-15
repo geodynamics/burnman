@@ -169,7 +169,7 @@ def make_orthorhombic_mineral_from_parameters(x):
         "c_2": np.ones((6, 6)),
     }
 
-    for (p, q) in ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 2), (1, 3)):
+    for p, q in ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 2), (1, 3)):
         anisotropic_parameters["a"][p - 1, q - 1] = x[i]
         anisotropic_parameters["a"][q - 1, p - 1] = x[i]
         i = i + 1

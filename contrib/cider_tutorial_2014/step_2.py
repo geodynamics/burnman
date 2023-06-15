@@ -66,7 +66,6 @@ if __name__ == "__main__":
     """
 
     def misfit(phase_1_fraction):
-
         # Here we define the rock as before.
         phase_2_fraction = 1.0 - phase_1_fraction
         rock = burnman.Composite(

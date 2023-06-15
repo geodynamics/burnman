@@ -41,7 +41,6 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
 def _delta_pressure(
     x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm
 ):
-
     f = 0.5 * (pow(V_0 / x, 2.0 / 3.0) - 1.0)
     nu_o_nu0_sq = 1.0 + a1_ii * f + 1.0 / 2.0 * a2_iikk * f * f
     debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)

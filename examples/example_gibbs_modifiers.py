@@ -54,7 +54,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     # Here we show the interesting features of Landau transitions
     # First, lets look at the P wave velocity in stishovite as it transforms
     # to the CaCl2 structure at high pressure

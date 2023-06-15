@@ -39,7 +39,6 @@ import burnman
 # www.mindat.org
 
 if __name__ == "__main__":
-
     # input variables ###
     #
 

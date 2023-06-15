@@ -751,7 +751,6 @@ class Composite(Material):
         endmember_names = []
         endmembers_per_phase = []
         for ph_idx, ph in enumerate(self.phases):
-
             if isinstance(ph, Solution):
                 endmember_formulae.extend(ph.endmember_formulae)
                 endmember_names.extend(

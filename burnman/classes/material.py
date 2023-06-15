@@ -9,6 +9,7 @@ from copy import deepcopy
 from ..utils.math import bracket
 from scipy.optimize import brentq
 
+
 # TODO: When we require Python 3.8+, replace with
 # functools.cached_property decorator
 class cached_property(property):
@@ -159,7 +160,7 @@ class Material(object):
             print(minerals[0].to_string())
         else:
             print("Material %s:" % self.to_string())
-            for (mineral, fraction) in zip(minerals, fractions):
+            for mineral, fraction in zip(minerals, fractions):
                 print("  %g of phase %s" % (fraction, mineral.to_string()))
 
     def set_state(self, pressure, temperature):

@@ -755,7 +755,6 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
     def test_polynomial_using_subregular_scalars(self):
-
         ss1 = two_site_ss_subregular_ternary()
         ss2 = two_site_ss_polynomial_ternary()
         f0 = [0.25, 0.35, 0.4]

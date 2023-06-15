@@ -430,7 +430,6 @@ class ElasticAsymmetricRegularSolution(ElasticIdealSolution):
         pressure_interaction=None,
         entropy_interaction=None,
     ):
-
         self.n_endmembers = len(endmembers)
 
         # Create array of van Laar parameters
@@ -644,7 +643,7 @@ class ElasticSubregularSolution(ElasticIdealSolution):
                 self.Wijke[j, i, j] -= w1
 
         if energy_ternary_terms is not None:
-            for (i, j, k, v) in energy_ternary_terms:
+            for i, j, k, v in energy_ternary_terms:
                 self.Wijke[i, j, k] += v
 
         if entropy_interaction is not None:
@@ -662,7 +661,7 @@ class ElasticSubregularSolution(ElasticIdealSolution):
                     self.Wijks[j, i, j] -= w1
 
         if entropy_ternary_terms is not None:
-            for (i, j, k, v) in entropy_ternary_terms:
+            for i, j, k, v in entropy_ternary_terms:
                 self.Wijks[i, j, k] += v
 
         if pressure_interaction is not None:
@@ -680,7 +679,7 @@ class ElasticSubregularSolution(ElasticIdealSolution):
                     self.Wijkp[j, i, j] -= w1
 
         if pressure_ternary_terms is not None:
-            for (i, j, k, v) in pressure_ternary_terms:
+            for i, j, k, v in pressure_ternary_terms:
                 self.Wijkv[i, j, k] += v
 
         # initialize ideal solution model

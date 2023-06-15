@@ -222,9 +222,7 @@ def simplify_composite_with_composition(composite, composition):
         rank = np.linalg.matrix_rank(amounts, tol=1.0e-8)
 
         if rank < n_mbrs:
-
             if isinstance(ph, Solution) and rank > 0:
-
                 if len(amounts) > 1:
                     c_mean = np.mean(amounts, axis=0)
                 else:

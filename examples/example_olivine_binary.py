@@ -34,7 +34,6 @@ from burnman.minerals import SLB_2011
 
 
 if __name__ == "__main__":
-
     # Initialize the minerals we will use in this example.
     ol = SLB_2011.mg_fe_olivine()
     wad = SLB_2011.mg_fe_wadsleyite()
@@ -51,7 +50,6 @@ if __name__ == "__main__":
 
     # Loop over three temperatures
     for T, color in [(1200.0, "blue"), (1600.0, "purple"), (2000.0, "red")]:
-
         # First, we find the compositions of the three phases
         # at the univariant.
         composition = {"Fe": 0.2, "Mg": 1.8, "Si": 1.0, "O": 4.0}

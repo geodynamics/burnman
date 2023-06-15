@@ -113,7 +113,6 @@ log10fO2_Re_PO1994 = np.empty_like(temperatures)
 log10fO2_ReReO2buffer = np.empty_like(temperatures)
 
 for i, T in enumerate(temperatures):
-
     oxygen.set_state(Pr, T)
     FMQ.set_state(P, T)
     ReReO2buffer.set_state(P, T)

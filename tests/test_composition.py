@@ -8,7 +8,6 @@ from burnman.classes.composition import Composition
 
 class composition(BurnManTest):
     def test_molar_no_normalize(self):
-
         c_dict = {"MgO": 1.0, "SiO2": 1.0}
         c = Composition(c_dict, unit_type="molar", normalize=False)
         self.assertArraysAlmostEqual(
@@ -23,7 +22,6 @@ class composition(BurnManTest):
         self.assertArraysAlmostEqual(c_fractions, c.molar_composition.values())
 
     def test_weight_no_normalize(self):
-
         c_dict = {"MgO": 1.0, "SiO2": 1.0}
         c = Composition(c_dict, unit_type="weight", normalize=False)
         self.assertArraysAlmostEqual(c_dict.values(), c.weight_composition.values())

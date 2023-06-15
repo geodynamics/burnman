@@ -186,7 +186,7 @@ def _row_reduce_list(
 
         # _find_reasonable_pivot may have simplified some things
         # in the process.  Let's not let them go to waste
-        for (offset, val) in newly_determined:
+        for offset, val in newly_determined:
             offset += piv_row
             mat[offset * cols + piv_col] = val
 
@@ -246,7 +246,6 @@ def row_reduce(
     normalize=True,
     zero_above=True,
 ):
-
     mat, pivot_cols, swaps = _row_reduce_list(
         list(M),
         M.rows,
@@ -266,7 +265,6 @@ def independent_row_indices(
     iszerofunc=lambda x: x.is_zero,
     simpfunc=lambda x: Rational(x).limit_denominator(1000),
 ):
-
     _, pivots, swaps = row_reduce(m, iszerofunc, simpfunc)
     indices = np.array(range(len(m)))
     for swap in np.array(swaps):

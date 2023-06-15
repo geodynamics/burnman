@@ -28,7 +28,6 @@ from burnman import minerals  # import mineral library seperately
 
 
 if __name__ == "__main__":
-
     # -Defining the rocks-
     # Here we test the models for a Pyrolitic and Chondritic lower mantle.
 

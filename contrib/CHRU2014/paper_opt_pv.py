@@ -44,7 +44,6 @@ from contrib.CHRU2014.helper_solid_solution import (
 import contrib.CHRU2014.colors as colors
 
 if __name__ == "__main__":
-
     # figsize=(6,5)
     fig = plt.figure(dpi=100, figsize=(12, 10))
     prop = {"size": 12}

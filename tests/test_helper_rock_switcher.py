@@ -8,7 +8,6 @@ from burnman.classes import mineral_helpers
 
 
 class RockSwitcher(BurnManTest):
-
     min_lm = burnman.minerals.SLB_2011.mg_bridgmanite()
     min_um = burnman.minerals.SLB_2011.forsterite()
 

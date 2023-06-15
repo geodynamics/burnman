@@ -46,7 +46,6 @@ import warnings
 
 
 if __name__ == "__main__":
-
     # List of seismic 1D models
     models = [
         burnman.seismic.PREM(),
@@ -65,7 +64,6 @@ if __name__ == "__main__":
     # Run through models and variables
     for variable_index in range(len(variables)):
         for model_index in range(len(models)):
-
             # specify where we want to evaluate, here we map from pressure
             # to depth
             # 1. format p = np.arange (starting pressure, ending pressure,

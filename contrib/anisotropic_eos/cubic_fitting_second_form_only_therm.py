@@ -130,7 +130,6 @@ def psi_func(f, Pth, params):
 
 
 def make_cubic_mineral_from_parameters(x):
-
     anisotropic_parameters = {
         "b_3": np.zeros((6, 6)),
         "c_3": np.ones((6, 6)),
@@ -309,7 +308,6 @@ for T in temperatures:
     dXdf = np.empty_like(pressures)
 
     for i, P in enumerate(pressures):
-
         per.set_state(P, T)
         m.set_state(P, T)
         C11[i] = m.isentropic_stiffness_tensor[0, 0]

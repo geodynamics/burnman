@@ -35,7 +35,6 @@ phases = [
 
 temperatures = [1000.0, 2000.0, 3000.0, 4000.0, 5000.0, 6000.0, 8000.0]
 for name, phase, PVT_range, EVT_range in phases:
-
     phase.params["G_0"] = 0.0  # just for consistency checking
     phase.params["Gprime_0"] = 1.3  # just for consistency checking
     phase.params["eta_s_0"] = 0.0  # just for consistency checking

@@ -41,7 +41,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     print("Part I: Making and interrogating composite materials")
 
     # In BurnMan, composite materials are those made up of a mechanical

@@ -36,7 +36,6 @@ from burnman.utils.misc import pretty_print_values
 from read_data import read_fitting_file
 
 if __name__ == "__main__":
-
     """
     First, please create a data file. This file should be in one of the two following formats:
     Type, P, T, property

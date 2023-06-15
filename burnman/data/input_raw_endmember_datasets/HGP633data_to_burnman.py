@@ -277,7 +277,6 @@ with open("HGP_2018_ds633.py", "w") as outfile:
 
 # Process uncertainties
 with open("HGP_2018_ds633_cov.py", "w") as outfile:
-
     outfile.write(
         "# This file is part of BurnMan - a thermoelastic and "
         "thermodynamic toolkit for the Earth and Planetary "

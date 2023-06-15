@@ -202,7 +202,6 @@ class RKprime(eos.EquationOfState):
         return 0.0
 
     def _intVdP(self, xi, params):
-
         a = params["Kprime_inf"]
         b = (
             params["Kprime_0"] / params["Kprime_inf"] / params["Kprime_inf"]

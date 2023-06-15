@@ -33,7 +33,6 @@ from burnman.optimize.nonlinear_fitting import weighted_residual_plot
 
 
 if __name__ == "__main__":
-
     # Set np.array printing precision to be low
     # (for more readable covariance matrices)
     np.set_printoptions(precision=1)

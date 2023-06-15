@@ -30,7 +30,6 @@ import warnings
 
 
 if __name__ == "__main__":
-
     # 1) Fitting shear modulus and its derivative to shear wave velocity data
     print("1) Fitting shear modulus and its derivative to shear wave velocity data\n")
 
