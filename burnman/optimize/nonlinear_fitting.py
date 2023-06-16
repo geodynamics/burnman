@@ -135,7 +135,6 @@ def nonlinear_least_squares_fit(
         diag_delta = np.diag(model.delta_params)
         param_values = model.get_params()
         for prm_i, value in enumerate(param_values):
-
             model.set_params(param_values - diag_delta[prm_i])
             x_mle_arr, residual_arr_0, weights_0 = _find_mle()
 
@@ -592,7 +591,6 @@ def extreme_values(weighted_residuals, confidence_interval):
 
 
 def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
-
     if flags is []:
         flags = [""] * len(weighted_residuals)
         list_flags = [""]

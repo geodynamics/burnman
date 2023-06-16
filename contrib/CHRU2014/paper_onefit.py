@@ -36,7 +36,6 @@ import contrib.CHRU2014.colors as colors
 
 
 def make_rock():
-
     # approximate four component pyrolite model
     x_pv = 0.67
     x_fp = 0.33

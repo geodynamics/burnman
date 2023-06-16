@@ -12,7 +12,6 @@ import numpy as np
 
 class equilibration(BurnManTest):
     def test_univariant_line(self):
-
         andalusite = HP_2011_ds62.andalusite()
         kyanite = HP_2011_ds62.ky()
         composition = kyanite.formula
@@ -61,7 +60,6 @@ class equilibration(BurnManTest):
         )
 
     def test_univariant_line_fo(self):
-
         forsterite = SLB_2011.forsterite()
         periclase = SLB_2011.periclase()
         bridgmanite = SLB_2011.mg_bridgmanite()

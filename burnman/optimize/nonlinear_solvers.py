@@ -217,7 +217,6 @@ def damped_newton_solve(
         and not persistent_bound_violation
         and not converged
     ):
-
         sol.J = J(sol.x)  # evaluate Jacobian
         luJ = lu_factor(sol.J)  # storing the factorisation saves time later
         dx = lu_solve(luJ, -sol.F)  # compute ordinary Newton step

@@ -51,7 +51,6 @@ from burnman.utils.chemistry import formula_mass
 
 
 if __name__ == "__main__":
-
     """
     First, we create three Mineral objects: one for periclase,
     one for high spin wuestite and another for low spin wuestite.
@@ -178,7 +177,6 @@ if __name__ == "__main__":
 
     for T, color in [[300.0, "blue"], [1800.0, "purple"], [3300.0, "red"]]:
         for i, P in enumerate(pressures):
-
             # Calculate and store the equilibrium volume and proportion of
             # iron in the low spin state
             fper.set_state(P, T)

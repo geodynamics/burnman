@@ -30,7 +30,7 @@ Authors (as of 2022):
 
 ## Requirements
 
-* Python 3.7+
+* Python 3.8+
 * Python modules:
   NumPy, SciPy, SymPy, Matplotlib
 

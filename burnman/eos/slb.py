@@ -26,7 +26,7 @@ from . import equation_of_state as eos
 from ..utils.math import bracket
 
 
-@jit
+@jit(nopython=True)
 def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     """global function with plain parameters so jit will work"""
     x = V_0 / volume
@@ -37,11 +37,10 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     return 1.0 / 6.0 / nu_o_nu0_sq * (2.0 * f + 1.0) * (a1_ii + a2_iikk * f)
 
 
-@jit
+@jit(nopython=True)
 def _delta_pressure(
     x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm
 ):
-
     f = 0.5 * (pow(V_0 / x, 2.0 / 3.0) - 1.0)
     nu_o_nu0_sq = 1.0 + a1_ii * f + 1.0 / 2.0 * a2_iikk * f * f
     debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)

@@ -127,18 +127,18 @@ def make_orthorhombic_mineral_from_parameters(x):
     # Next, each of the eight independent elastic tensor component get their turn.
     # We arbitrarily choose S[2,3] as the ninth component, which is determined by the others.
     i = 5
-    for (p, q) in ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 2), (1, 3)):
-        for (m, n) in ((1, 0), (2, 0), (3, 0)):
+    for p, q in ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 2), (1, 3)):
+        for m, n in ((1, 0), (2, 0), (3, 0)):
             constants[p - 1, q - 1, m, n] = x[i]
             constants[q - 1, p - 1, m, n] = x[i]
             i += 1
 
-        for (m, n) in ((0, 1), (1, 1), (2, 1), (3, 1)):
+        for m, n in ((0, 1), (1, 1), (2, 1), (3, 1)):
             constants[p - 1, q - 1, m, n] = x[i] * 1.0e-11
             constants[q - 1, p - 1, m, n] = x[i] * 1.0e-11
             i += 1
 
-        for (m, n) in ((0, 2),):
+        for m, n in ((0, 2),):
             constants[p - 1, q - 1, m, n] = x[i] * 1.0e-22
             constants[q - 1, p - 1, m, n] = x[i] * 1.0e-22
             i += 1

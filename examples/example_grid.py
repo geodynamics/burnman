@@ -27,7 +27,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     rock = burnman.Composite(
         [minerals.SLB_2011.mg_perovskite(), minerals.SLB_2011.periclase()], [0.8, 0.2]
     )

@@ -34,7 +34,6 @@ def round_to_n(x, xerr, n):
 
 
 if __name__ == "__main__":
-
     # First, let's check the EoS consistency of SLB_2011 periclase
     check_eos_consistency(
         burnman.minerals.SLB_2011.periclase(), P=10.0e9, T=3000.0, verbose=True

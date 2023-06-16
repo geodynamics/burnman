@@ -169,7 +169,6 @@ dXdf = np.empty_like(pressures)
 temperatures = [300.0, 500.0, 700.0, 900.0]
 for T in temperatures:
     for i, P in enumerate(pressures):
-
         per.set_state(P, T)
         m.set_state(P, T)
         C11[i] = m.isentropic_stiffness_tensor[0, 0]

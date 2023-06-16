@@ -32,7 +32,6 @@ from burnman.tools.plot import plot_projected_elastic_properties
 
 
 if __name__ == "__main__":
-
     # Let's create a first approximation to an olivine mineral.
     # Olivine is orthorhombic.
     # BurnMan has an AnisotropicMineral class, which requires as input:

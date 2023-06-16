@@ -24,6 +24,7 @@ from pylab import rcParams
 
 plt.rcParams["font.family"] = "sans-serif"
 
+
 # Define a class that forces representation of float to look a certain way
 # This remove trailing zero so '1.0' becomes '1'
 class nf(float):
@@ -65,7 +66,6 @@ def equilibrate_px(mineral, x_Fe, P, T):
 
 
 if __name__ == "__main__":
-
     """
     First, we create three FMS (clino)pyroxene solution models,
     one which is globally disordered, one which undergoes convergent ordering,

@@ -207,7 +207,6 @@ if __name__ == "__main__":
         plt.show()
 
     if whattodo == "misfittest":
-
         for a in np.linspace(0.4, 0.8, 10):
             for b in np.linspace(0.05, 0.2, 5):
                 for c in np.linspace(0, 0.2, 5):

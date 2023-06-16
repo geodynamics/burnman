@@ -26,7 +26,7 @@ from . import equation_of_state as eos
 from ..utils.math import bracket
 
 
-@jit
+@jit(nopython=True)
 def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     """global function with plain parameters so jit will work"""
     x = V_0 / volume
@@ -43,7 +43,7 @@ def _intgroverVdV(V_0, volume, gruen_0, q_0):
     )[0]
 
 
-@jit
+@jit(nopython=True)
 def _delta_pressure(
     x, pressure, temperature, V_0, T_0, Cv, a1_ii, a2_iikk, b_iikk, b_iikkmm
 ):

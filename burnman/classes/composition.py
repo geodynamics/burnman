@@ -336,5 +336,5 @@ class Composition(object):
         else:
             f = normalization_amount / c[normalization_component]
 
-        for (key, value) in sorted(c.items()):
+        for key, value in sorted(c.items()):
             print(f"{key}: {value*f:0.{significant_figures}f}")

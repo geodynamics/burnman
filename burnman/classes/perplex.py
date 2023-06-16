@@ -9,7 +9,8 @@ from subprocess import Popen, PIPE, STDOUT
 from os import rename
 
 import numpy as np
-from scipy.interpolate import interp2d, griddata
+from scipy.interpolate import RegularGridInterpolator
+from scipy.interpolate import griddata
 
 from .material import Material, material_property
 
@@ -205,66 +206,62 @@ class PerplexMaterial(Material):
         volumes = 1.0e-5 * properties["V,J/bar/mol"]
         molar_masses = densities * volumes
         molar_mass = np.mean(molar_masses)
+
         property_interpolators = {
-            "rho": interp2d(pressures, temperatures, densities.T, bounds_error=True),
-            "alpha": interp2d(
-                pressures, temperatures, properties["alpha,1/K"].T, bounds_error=True
+            "rho": RegularGridInterpolator(
+                (pressures, temperatures), densities, bounds_error=True
             ),
-            "K_T": interp2d(
-                pressures,
-                temperatures,
-                1.0e5 / properties["beta,1/bar"].T,
+            "alpha": RegularGridInterpolator(
+                (pressures, temperatures), properties["alpha,1/K"], bounds_error=True
+            ),
+            "K_T": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e5 / properties["beta,1/bar"],
                 bounds_error=True,
             ),
-            "K_S": interp2d(
-                pressures,
-                temperatures,
-                1.0e5 * properties["Ks,bar"].T,
+            "K_S": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e5 * properties["Ks,bar"],
                 bounds_error=True,
             ),
-            "G_S": interp2d(
-                pressures,
-                temperatures,
-                1.0e5 * properties["Gs,bar"].T,
+            "G_S": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e5 * properties["Gs,bar"],
                 bounds_error=True,
             ),
-            "bulk_sound_velocity": interp2d(
-                pressures,
-                temperatures,
-                1.0e3 * properties["v0,km/s"].T,
+            "bulk_sound_velocity": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e3 * properties["v0,km/s"],
                 bounds_error=True,
             ),
-            "p_wave_velocity": interp2d(
-                pressures,
-                temperatures,
-                1.0e3 * properties["vp,km/s"].T,
+            "p_wave_velocity": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e3 * properties["vp,km/s"],
                 bounds_error=True,
             ),
-            "s_wave_velocity": interp2d(
-                pressures,
-                temperatures,
-                1.0e3 * properties["vs,km/s"].T,
+            "s_wave_velocity": RegularGridInterpolator(
+                (pressures, temperatures),
+                1.0e3 * properties["vs,km/s"],
                 bounds_error=True,
             ),
-            "S": interp2d(
-                pressures,
-                temperatures,
-                properties["s,J/K/kg"].T * molar_masses.T,
+            "S": RegularGridInterpolator(
+                (pressures, temperatures),
+                properties["s,J/K/kg"] * molar_masses,
                 bounds_error=True,
             ),
-            "H": interp2d(
-                pressures,
-                temperatures,
-                properties["h,J/kg"].T * molar_masses.T,
+            "H": RegularGridInterpolator(
+                (pressures, temperatures),
+                properties["h,J/kg"] * molar_masses,
                 bounds_error=True,
             ),
-            "C_p": interp2d(
-                pressures,
-                temperatures,
-                properties["cp,J/K/kg"].T * molar_masses.T,
+            "C_p": RegularGridInterpolator(
+                (pressures, temperatures),
+                properties["cp,J/K/kg"] * molar_masses,
                 bounds_error=True,
             ),
-            "V": interp2d(pressures, temperatures, volumes.T, bounds_error=True),
+            "V": RegularGridInterpolator(
+                (pressures, temperatures), volumes, bounds_error=True
+            ),
         }
 
         bounds = [[Pmin, Pmax], [Tmin, Tmax]]
@@ -272,7 +269,6 @@ class PerplexMaterial(Material):
 
     @copy_documentation(Material.set_state)
     def set_state(self, pressure, temperature):
-
         if not np.logical_and(
             np.all(self.bounds[0][0] <= pressure), np.all(pressure <= self.bounds[0][1])
         ):
@@ -299,62 +295,64 @@ class PerplexMaterial(Material):
     @material_property
     @copy_documentation(Material.molar_volume)
     def molar_volume(self):
-        return self._property_interpolators["V"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["V"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.molar_enthalpy)
     def molar_enthalpy(self):
-        return self._property_interpolators["H"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["H"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.molar_entropy)
     def molar_entropy(self):
-        return self._property_interpolators["S"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["S"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.isothermal_bulk_modulus)
     def isothermal_bulk_modulus(self):
-        return self._property_interpolators["K_T"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["K_T"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.adiabatic_bulk_modulus)
     def adiabatic_bulk_modulus(self):
-        return self._property_interpolators["K_S"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["K_S"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
-        return self._property_interpolators["C_p"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["C_p"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._property_interpolators["alpha"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["alpha"]([self.pressure, self.temperature])[
+            0
+        ]
 
     @material_property
     @copy_documentation(Material.shear_modulus)
     def shear_modulus(self):
-        return self._property_interpolators["G_S"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["G_S"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
         return self._property_interpolators["p_wave_velocity"](
-            self.pressure, self.temperature
+            [self.pressure, self.temperature]
         )[0]
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
     def bulk_sound_velocity(self):
         return self._property_interpolators["bulk_sound_velocity"](
-            self.pressure, self.temperature
+            [self.pressure, self.temperature]
         )[0]
 
     @material_property
     @copy_documentation(Material.shear_wave_velocity)
     def shear_wave_velocity(self):
         return self._property_interpolators["s_wave_velocity"](
-            self.pressure, self.temperature
+            [self.pressure, self.temperature]
         )[0]
 
     """
@@ -381,7 +379,7 @@ class PerplexMaterial(Material):
     @material_property
     @copy_documentation(Material.density)
     def density(self):
-        return self._property_interpolators["rho"](self.pressure, self.temperature)[0]
+        return self._property_interpolators["rho"]([self.pressure, self.temperature])[0]
 
     @material_property
     @copy_documentation(Material.molar_internal_energy)

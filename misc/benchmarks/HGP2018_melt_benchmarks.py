@@ -21,7 +21,6 @@ from burnman.minerals import HGP_2018_ds633
 from burnman import equilibrate
 
 if __name__ == "__main__":
-
     di = HGP_2018_ds633.di()
     liq = HGP_2018_ds633.CMS_melt()
 

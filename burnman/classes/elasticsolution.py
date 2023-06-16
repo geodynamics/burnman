@@ -131,7 +131,6 @@ class ElasticSolution(Mineral):
         self.reset()
 
     def set_state(self, pressure, temperature):
-
         Mineral.set_state(self, pressure, temperature)
 
         try:

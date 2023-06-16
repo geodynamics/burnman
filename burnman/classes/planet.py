@@ -237,7 +237,6 @@ class Planet(object):
             self._temperatures = self._evaluate_temperature(self._pressures)
 
         if self.pressure_mode == "self-consistent":
-
             new_press = (
                 self.pressure_top + (-self.radii + max(self.radii)) * 1.0e3
             )  # initial pressure curve guess

@@ -10,7 +10,6 @@ from burnman import minerals
 # TODO: test composite that changes number of entries
 class composite(BurnManTest):
     def test_unroll(self):
-
         min1 = minerals.Murakami_etal_2012.fe_periclase()
         min2 = minerals.SLB_2005.periclase()
 
@@ -285,7 +284,6 @@ class composite(BurnManTest):
         )
 
     def test_evaluate(self):
-
         rock = burnman.Composite(
             [minerals.SLB_2005.wuestite(), minerals.SLB_2005.mg_perovskite()],
             [0.5, 0.5],

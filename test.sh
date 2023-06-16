@@ -56,6 +56,10 @@ EOF
 ret=$?
 cat $t.tmp.error >>$t.tmp
 rm -f $t.tmp.error
+
+grep -v "which is a non-GUI backend" $t.tmp | grep -v "plt.show()" > tmpfile
+mv tmpfile $t.tmp
+
 if [ "$ret" -ne 0 ]
 then
   echo "!  $t ... FAIL";

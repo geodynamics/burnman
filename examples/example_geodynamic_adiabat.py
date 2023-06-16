@@ -72,7 +72,7 @@ if __name__ == "__main__":
     def interp_isentrope(interp, pressures, entropy, T_guess):
         def _deltaS(args, S, P):
             T = args[0]
-            return interp(P, T)[0] - S
+            return interp((P, T)) - S
 
         sol = [T_guess]
         temperatures = np.empty_like(pressures)
@@ -247,7 +247,6 @@ if __name__ == "__main__":
     # 4 sigma level.
 
     for pressure_stdev in [0.0, pressure_std_dev]:
-
         unsmoothed_isentrope_temperatures = isentrope(grid_pressures)
         temperature_stdev = (
             temperature_smoothing_factor
@@ -329,30 +328,11 @@ if __name__ == "__main__":
         dVpdT = (Vpadd - Vpsub) / dT
         dVsdT = (Vsadd - Vssub) / dT
 
-        volumes = np.array(
-            [
-                interp_smoothed_V(p, T)[0]
-                for (p, T) in zip(*[pressures, smoothed_temperatures])
-            ]
-        )
-        dSdT = np.array(
-            [
-                interp_smoothed_dSdT(p, T)[0]
-                for (p, T) in zip(*[pressures, smoothed_temperatures])
-            ]
-        )
-        dVdT = np.array(
-            [
-                interp_smoothed_dVdT(p, T)[0]
-                for (p, T) in zip(*[pressures, smoothed_temperatures])
-            ]
-        )
-        dVdP = np.array(
-            [
-                interp_smoothed_dVdP(p, T)[0]
-                for (p, T) in zip(*[pressures, smoothed_temperatures])
-            ]
-        )
+        p_smoothT = np.array([pressures, smoothed_temperatures]).T
+        volumes = interp_smoothed_V(p_smoothT)
+        dSdT = interp_smoothed_dSdT(p_smoothT)
+        dVdT = interp_smoothed_dVdT(p_smoothT)
+        dVdP = interp_smoothed_dVdP(p_smoothT)
 
         specific_heats_relaxed = (
             smoothed_temperatures * dSdT / rock.params["molar_mass"]

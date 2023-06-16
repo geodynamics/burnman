@@ -108,7 +108,6 @@ class Solution(Mineral):
         self.reset()
 
     def set_state(self, pressure, temperature):
-
         if type(self.solution_model) == PolynomialSolution:
             self.solution_model.set_state(pressure, temperature)
 

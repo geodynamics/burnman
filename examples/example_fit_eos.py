@@ -32,7 +32,6 @@ from burnman.utils.misc import attribute_function
 from burnman.utils.misc import pretty_print_values
 
 if __name__ == "__main__":
-
     print("Least squares equation of state fitting\n")
 
     print("1) Fitting to room temperature PV data\n")
@@ -690,7 +689,6 @@ if __name__ == "__main__":
         for i, (material_property, scaling, name) in enumerate(
             properties_for_confidence_plots
         ):
-
             # Plot the confidence bands for the various material properties
             cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
                 model=fitted_eos,

@@ -35,7 +35,6 @@ def make_simple_forsterite():
 
 class test_anisotropic_mineral(BurnManTest):
     def test_isotropic_grueneisen(self):
-
         per = periclase()
         a = np.cbrt(per.params["V_0"])
         beta_RT = 1.0 / per.params["K_0"]

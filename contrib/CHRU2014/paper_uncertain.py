@@ -106,7 +106,6 @@ if __name__ == "__main__":
     reorder = [0, 1, 3, 4, 5, 6, 7, 8, 2]
 
     for i, order_idx in enumerate(reorder):
-
         vsmin = base_vs
         vsmax = base_vs
         vphimin = base_vphi

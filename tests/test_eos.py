@@ -447,7 +447,6 @@ class test_eos_validation(BurnManTest):
         self.assertArraysAlmostEqual(calculated, derivative)
 
     def test_pressure_finding(self):
-
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             m = alpha_quartz()

@@ -23,14 +23,14 @@ except ImportError:
         return fn
 
 
-@jit
+@jit(nopython=True)
 def _delta_PoverK_from_P(PoverK, pressure, K_0, Kprime_0, Kprime_inf):
     return PoverK - (pressure / K_0) * np.power(
         (1.0 - Kprime_inf * PoverK), Kprime_0 / Kprime_inf
     )  # eq. 58
 
 
-@jit
+@jit(nopython=True)
 def _delta_PoverK_from_V(PoverK, V, V_0, K_0, Kprime_0, Kprime_inf):
     Kprime_ratio = Kprime_0 / Kprime_inf
     return (
@@ -202,7 +202,6 @@ class RKprime(eos.EquationOfState):
         return 0.0
 
     def _intVdP(self, xi, params):
-
         a = params["Kprime_inf"]
         b = (
             params["Kprime_0"] / params["Kprime_inf"] / params["Kprime_inf"]

@@ -124,7 +124,6 @@ class test_tools(BurnManTest):
         self.assertTrue(sol[1] > 2.0)
 
     def test_bracket_failure(self):
-
         mineral = burnman.minerals.SLB_2011.fayalite()
         # This should be too high pressure for the EoS
         mineral.set_state(300.0e9, 300.0)
@@ -173,7 +172,7 @@ class test_tools(BurnManTest):
             array, axis_values, axis_values, 0, 0, indexing="ij"
         )
         self.assertArraysAlmostEqual(
-            [f(0.0, 1.0)[0], dfdx(0.0, 1.0)[0], dfdy(0.0, 1.0)[0]],
+            [f([0.0, 1.0])[0], dfdx([0.0, 1.0])[0], dfdy([0.0, 1.0])[0]],
             [array[0][1], 0.0, 1.0],
         )
 
@@ -184,7 +183,7 @@ class test_tools(BurnManTest):
             array, axis_values, axis_values, 0, 0, indexing="xy"
         )
         self.assertArraysAlmostEqual(
-            [f(0.0, 1.0)[0], dfdx(0.0, 1.0)[0], dfdy(0.0, 1.0)[0]],
+            [f([0.0, 1.0])[0], dfdx([0.0, 1.0])[0], dfdy([0.0, 1.0])[0]],
             [array[1][0], 1.0, 0.0],
         )
 

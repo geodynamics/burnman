@@ -94,7 +94,6 @@ class test_material_name(BurnManTest):
         self.assertEqual(m.name, "bla")
 
     def test_mineral_with_name(self):
-
         m = self.min_with_name()
         self.assertEqual(m.name, "name set in params")
         m.name = "bla"

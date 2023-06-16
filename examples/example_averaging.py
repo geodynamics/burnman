@@ -42,7 +42,6 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-
     # Create a rock out of MgSiO3 perovskite and MgO periclase
     amount_perovskite = 0.6
 

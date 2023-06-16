@@ -126,7 +126,6 @@ if __name__ == "__main__" and run_aluminosilicates:
         ([sillimanite, andalusite], low_pressures),
         ([sillimanite, kyanite], high_pressures),
     ]:
-
         assemblage = burnman.Composite(pair)
         equality_constraints = [
             ("P", pressures),
@@ -140,7 +139,7 @@ if __name__ == "__main__" and run_aluminosilicates:
     # Now we plot each stable field. Here, we do explicitly check
     # which polymorph is stable at each point.
     assemblage = burnman.Composite([sillimanite, andalusite, kyanite])
-    for (P, T) in [[0.2e9, 800.0], [0.6e9, 650], [0.5e9, 1000]]:
+    for P, T in [[0.2e9, 800.0], [0.6e9, 650], [0.5e9, 1000]]:
         assemblage.set_state(P, T)
 
         stable_phase = kyanite
@@ -400,12 +399,11 @@ if __name__ == "__main__" and run_lower_mantle:
     # along its stable pressure segments.
     prp_list = []
     prm_list = []
-    for (pressures, phases) in [
+    for pressures, phases in [
         [np.linspace(25.0e9, P_ppv_in, 21), [bdg, fper, cpv]],
         [np.linspace(P_ppv_in, P_bdg_in, 21), [bdg, fper, ppv, cpv]],
         [np.linspace(P_bdg_in, 140.0e9, 21), [ppv, fper, cpv]],
     ]:
-
         assemblage = burnman.Composite(phases)
         equality_constraints = [("P", pressures), ("S", S)]
         sols, prm = equilibrate(composition, assemblage, equality_constraints)
@@ -526,7 +524,6 @@ if __name__ == "__main__" and run_olivine_polymorphs:
         [np.linspace(Tinv1, T1, 8), [ol, wad], wad, 1.0],
         [np.linspace(Tinv1, T1, 8), [wad, rw], rw, 0.0],
     ]:
-
         temperatures, phases, phase, fraction = d
 
         assemblage = burnman.Composite(phases)

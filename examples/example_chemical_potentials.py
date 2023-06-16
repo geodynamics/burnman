@@ -31,7 +31,6 @@ import burnman.minerals as minerals
 
 
 if __name__ == "__main__":
-
     """
     Here we initialise the minerals we'll be using
     """

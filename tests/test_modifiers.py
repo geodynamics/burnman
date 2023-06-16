@@ -81,7 +81,7 @@ class Modifiers(BurnManTest):
             -517.2153,
         ]
         gibbs_excesses_output = []
-        for (fn, name, params) in fn_params:
+        for fn, name, params in fn_params:
             excesses = fn(P, T, params)
             gibbs_excesses_output.append(round(excesses[0]["G"], 4))
 
@@ -107,7 +107,7 @@ class Modifiers(BurnManTest):
 
     def test_consistency(self):
         per = SLB_2011.periclase()
-        for (fn, name, params) in fn_params:
+        for fn, name, params in fn_params:
             per.property_modifiers = [[name, params]]
             # Bragg-Williams currently calculates derivatives
             # numerically, so the modifier derivatives aren't

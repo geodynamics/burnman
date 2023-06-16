@@ -89,7 +89,6 @@ class Mineral(Material):
             self.method is not None
             and isinstance(new_method, type(self.method)) is False
         ):
-
             # Warn user that they are changing the EoS
             warnings.warn(
                 "Warning, you are changing the method to "
@@ -350,7 +349,6 @@ class Mineral(Material):
     def grueneisen_parameter(self):
         eps = np.finfo("float").eps
         if np.abs(self.molar_heat_capacity_v) > eps:
-
             return (
                 self.thermal_expansivity
                 * self.isothermal_bulk_modulus
@@ -363,7 +361,6 @@ class Mineral(Material):
             and (np.abs(self._property_modifiers["dGdP"]) < eps)
             and (np.abs(self._property_modifiers["d2GdT2"]) < eps)
         ):
-
             return self.method.grueneisen_parameter(
                 self.pressure, self.temperature, self.molar_volume, self.params
             )

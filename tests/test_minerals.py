@@ -10,13 +10,11 @@ from burnman import minerals
 # Instantiate every mineral in the mineral library
 class instantiate_minerals(BurnManTest):
     def test_instantiate_minerals(self):
-
         P = 25.0e9
         T = 1500.0
         mineral_libraries = dir(minerals)  # Get a list of mineral libraries available
 
         for minlib_name in mineral_libraries:
-
             minlib_ = getattr(minerals, minlib_name)
 
             # Pull all the members of the given mineral library

@@ -211,7 +211,6 @@ def write_axisem_input(
     f.close()
 
     if plotting:
-
         plt.plot(
             table[:, 0] / 1.0e3,
             table[:, 2] / 1.0e3,
@@ -338,7 +337,6 @@ def write_mineos_input(
     f.close()
 
     if plotting:
-
         plt.plot(
             table[:, 0] / 1.0e3,
             table[:, 2] / 1.0e3,

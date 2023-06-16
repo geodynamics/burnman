@@ -52,7 +52,7 @@ class HelperSolidSolution(burnman.Mineral):
     def debug_print(self, indent=""):
         print("%sHelperSolidSolution(%s):" % (indent, self.to_string()))
         indent += "  "
-        for (fraction, mat) in zip(self.molar_fractions, self.endmembers):
+        for fraction, mat in zip(self.molar_fractions, self.endmembers):
             print("%s%g of" % (indent, fraction))
             mat.debug_print(indent + "  ")
 

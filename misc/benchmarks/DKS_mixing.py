@@ -102,7 +102,7 @@ ax_H.imshow(figH, extent=[0, 1, -40000, 10000], aspect="auto")
 ax_S.imshow(figS, extent=[0, 1, 0, 24], aspect="auto")
 ax_V.imshow(figV, extent=[0, 1, -2.0e-6, 0.4e-6], aspect="auto")
 
-for (pressure, temperature) in zip(*[pressures, temperatures]):
+for pressure, temperature in zip(*[pressures, temperatures]):
     mask = [
         i
         for i in range(len(excesses[:, 1]))

@@ -573,7 +573,6 @@ class AsymmetricRegularSolution(IdealSolution):
         volume_interaction=None,
         entropy_interaction=None,
     ):
-
         self.n_endmembers = len(endmembers)
 
         # Create array of van Laar parameters
@@ -805,7 +804,7 @@ class SubregularSolution(IdealSolution):
                 self.Wijke[j, i, j] -= w1
 
         if energy_ternary_terms is not None:
-            for (i, j, k, v) in energy_ternary_terms:
+            for i, j, k, v in energy_ternary_terms:
                 self.Wijke[i, j, k] += v
 
         if entropy_interaction is not None:
@@ -823,7 +822,7 @@ class SubregularSolution(IdealSolution):
                     self.Wijks[j, i, j] -= w1
 
         if entropy_ternary_terms is not None:
-            for (i, j, k, v) in entropy_ternary_terms:
+            for i, j, k, v in entropy_ternary_terms:
                 self.Wijks[i, j, k] += v
 
         if volume_interaction is not None:
@@ -841,7 +840,7 @@ class SubregularSolution(IdealSolution):
                     self.Wijkv[j, i, j] -= w1
 
         if volume_ternary_terms is not None:
-            for (i, j, k, v) in volume_ternary_terms:
+            for i, j, k, v in volume_ternary_terms:
                 self.Wijkv[i, j, k] += v
 
         # initialize ideal solution model
@@ -1111,7 +1110,6 @@ class PolynomialSolution(IdealSolution):
         endmember_coefficients_and_interactions=None,
         transformation_matrix=None,
     ):
-
         # initialize ideal solution model
         IdealSolution.__init__(self, endmembers)
 
@@ -1296,7 +1294,7 @@ class PolynomialSolution(IdealSolution):
         xp = self.transform_scalar_list(x, A)
         xp_total = np.sum(xp)
         ESV = np.zeros(W_arrays[0][-1].shape[0])
-        for (dim, W_array) in W_arrays:
+        for dim, W_array in W_arrays:
             ESV += self.W_dots_x(dim, W_array, xp) / np.power(xp_total, dim - 1.0)
         return ESV
 
@@ -1306,7 +1304,7 @@ class PolynomialSolution(IdealSolution):
 
         dESVdx = np.zeros(W_arrays[0][-1].shape[:2])
 
-        for (dim, W_array) in W_arrays:
+        for dim, W_array in W_arrays:
             dESVdx += (
                 -(dim - 1)
                 / np.power(xp_total, dim)
@@ -1325,7 +1323,7 @@ class PolynomialSolution(IdealSolution):
 
         d2ESVdx2 = np.zeros(W_arrays[0][-1].shape[:3])
 
-        for (dim, W_array) in W_arrays:
+        for dim, W_array in W_arrays:
             d2ESVdx2 += (
                 (dim - 1)
                 * dim

@@ -281,19 +281,15 @@ class SeismicTable(Seismic1DModel):
         return self._lookup(depth, self.table_gravity)
 
     def v_p(self, depth):
-
         return self._lookup(depth, self.table_vp)
 
     def v_s(self, depth):
-
         return self._lookup(depth, self.table_vs)
 
     def QK(self, depth):
-
         return self._lookup(depth, self.table_QK)
 
     def QG(self, depth):
-
         return self._lookup(depth, self.table_QG)
 
     def density(self, depth):
@@ -335,7 +331,6 @@ class SeismicTable(Seismic1DModel):
         return depth
 
     def radius(self, pressure):
-
         radius = np.interp(
             pressure,
             self.table_pressure[::-1],

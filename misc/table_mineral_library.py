@@ -27,7 +27,6 @@ if __name__ == "__main__":
             name = name + " (" + ownname + ")"
         row = [name]
         for param in params:
-
             row.append(str(p.params[param] if param in p.params else ""))
         return row
 
@@ -117,7 +116,6 @@ if __name__ == "__main__":
 
     libs = dir(minerals)
     for l in libs:
-
         names = set()
         phasenames = []
 
@@ -155,7 +153,7 @@ if __name__ == "__main__":
             list_eoses = [
                 phasename[1].params["equation_of_state"] for phasename in phasenames
             ]
-            for (eos, params) in sorted(eos_params.items(), key=lambda x: x[0]):
+            for eos, params in sorted(eos_params.items(), key=lambda x: x[0]):
                 eos_phasenames = [
                     phasenames[i] for i, e in enumerate(list_eoses) if e == eos
                 ]
@@ -168,7 +166,7 @@ if __name__ == "__main__":
 
                     sortedlist = sorted(eos_phasenames, key=lambda x: x[0])
 
-                    for (name, p) in sortedlist:
+                    for name, p in sortedlist:
                         p.set_state(1e9, 300)
                         row = create_list(name, p)
                         table.append(row)

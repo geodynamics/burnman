@@ -8,7 +8,7 @@ from __future__ import print_function
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
-from scipy.interpolate import interp2d
+from scipy.interpolate import RegularGridInterpolator
 from sympy import Matrix, Rational
 import scipy.integrate as integrate
 from collections import Counter
@@ -295,7 +295,7 @@ def interp_smoothed_array_and_derivatives(
     """
     Creates a smoothed array on a regular 2D grid. Smoothing
     is achieved using :func:`burnman.tools.math.smooth_array`.
-    Outputs scipy.interpolate.interp2d() interpolators
+    Outputs scipy.interpolate.RegularGridInterpolator() interpolators
     which can be used to query the array, or its derivatives in the
     x- and y- directions.
 
@@ -326,7 +326,7 @@ def interp_smoothed_array_and_derivatives(
 
     Returns
     -------
-    interps: tuple of three interp2d functors
+    interps: tuple of three RegularGridInterpolator functors
         interpolation functions for the smoothed property and
         the first derivatives with respect to x and y.
 
@@ -342,7 +342,7 @@ def interp_smoothed_array_and_derivatives(
             gaussian_rms_widths=np.array([y_stdev, x_stdev]),
             truncate=truncate,
             mode=mode,
-        )
+        ).T
 
     elif indexing == "ij":
         smoothed_array = smooth_array(
@@ -351,17 +351,17 @@ def interp_smoothed_array_and_derivatives(
             gaussian_rms_widths=np.array([x_stdev, y_stdev]),
             truncate=truncate,
             mode=mode,
-        ).T
+        )
 
     else:
         raise Exception("Indexing scheme not recognised. Should be ij or xy.")
 
-    dSAdydy, dSAdxdx = np.gradient(smoothed_array)
+    dSAdxdx, dSAdydy = np.gradient(smoothed_array)
 
     interps = (
-        interp2d(x_values, y_values, smoothed_array, kind="linear"),
-        interp2d(x_values, y_values, dSAdxdx / dx, kind="linear"),
-        interp2d(x_values, y_values, dSAdydy / dy, kind="linear"),
+        RegularGridInterpolator((x_values, y_values), smoothed_array, method="linear"),
+        RegularGridInterpolator((x_values, y_values), dSAdxdx / dx, method="linear"),
+        RegularGridInterpolator((x_values, y_values), dSAdydy / dy, method="linear"),
     )
 
     return interps
