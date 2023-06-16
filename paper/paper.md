@@ -185,17 +185,39 @@ The other properties are compared to the PREM [@Dziewonski:1981].
 `BurnMan` also provides many utility classes and functions, including
 those required to undertake bulk and phase chemical calculations,
 to aid preparation and analysis of laboratory experiments.
-An example that uses bulk and phase compositions from samples
-to estimate phase proportions is shown in \autoref{fig:mars_fit}.
+One example is a utility function, `fit_phase_proportions_to_bulk_composition()`,
+that uses constrained least squares to estimate phase proportions
+and their corresponding covariances. The fitting applies appropriate
+non-negativity constraints (i.e. no phase can have a negative abundance
+in the bulk). An example that uses real
+experimental data [@Bertka:1997] is shown in \autoref{fig:mars_fit}.
+Loss of an independent component from the bulk composition
+can be tested by adding another phase with the composition of
+that component (e.g. Fe) and checking that the amount of that phase
+is zero within uncertainties. 
+Phase proportion covariances $C$ are given as
+a function of the bulk composition covariances $K$,
+and the phase compositions $A$
+$$C_{im} = (A_{ji} K^{-1}_{jk} A_{km})^{-1}.$$
+The weighted residuals are calculated
+using the phase proportions $x$ and the bulk composition $b$:
+$$\chi^2 = (K^{-0.5}_{ij} A_{jk} x_k - K^{-0.5}_{ik} b_k)(K^{-0.5}_{ip} A_{pq} x_q - K^{-0.5}_{iq} b_q).$$
+A related function is `fit_composition_to_solution()`,
+that uses weighted constrained least squares to fit a phase composition
+(calculated, for example, by EPMA) to a solution model. In this case,
+non-negativity constraints are applied such that no site may have a
+negative species occupancy.
 
-![Mineral phase proportions in the mantle of Mars, estimated from
-high pressure experimental data [@Bertka:1997]. Weighted residuals
+![Mineral phase proportions in the mantle of Mars, estimated by using 
+the method of constrained least squares on high pressure experimental
+data [@Bertka:1997]. Weighted residuals
 (misfits) are also shown, indicating that the majority of experimental
 run products are consistent with the reported starting composition.
 \label{fig:mars_fit}](figures/fit_mars_experiments.png)
 
 `BurnMan` does not attempt to replicate Gibbs minimization codes,
 of which there are many, such as PerpleX [@Connolly:2009],
+xMELTS [@Ghiorso:2007],
 MageMin [@Riel:2022],
 TheriakDomino [@deCapitani:2010],
 HeFESTo [@Stixrude:2022] and
