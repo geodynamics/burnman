@@ -96,7 +96,9 @@ seismological and geodynamic software, including: Mineos [@Masters:2011],
 AxiSEM [@NissenMeyer:2014] and
 ASPECT [@Kronbichler:2012;@aspect-doi-v2.4.0;@aspectmanual]
 
-The project also includes a tutorial, a large collection of annotated examples,
+The project also includes a multipart tutorial
+(\url{https://burnman.readthedocs.io/en/latest/tutorial.html}),
+a large collection of annotated examples,
 an extensive suite of unit tests and benchmarks, and 
 a directory containing user-contributed code from published papers.
 Use of the code requires only moderate Python skills, and its modular nature
@@ -125,18 +127,21 @@ mineral database [@Stixrude:2011] as a foundation. Since then,
 its scope has expanded considerably. `BurnMan` now contains equations
 of state for minerals and melts from several published datasets.
 A common set of methods for all equations of state allows easy
-access to many thermodynamic properties
-(e.g. \autoref{fig:qtzproperties}), including anisotropic properties
-[@Myhill:2022].
+access to many thermodynamic properties, including anisotropic properties
+[@Myhill:2022]. A simple example is shown in \autoref{fig:qtzproperties}.
+See \url{https://burnman.readthedocs.io/en/latest/tutorial_01_material_classes.html#}
+for more details and the code required to make that plot.
 
 ![Heat capacity and bulk sound velocities of quartz through the alpha-beta
 quartz transition as found in [@Stixrude:2011]. This transition is modelled
-via a Landau-type model.
+via a Landau-type model. 
 \label{fig:qtzproperties}](figures/quartz_properties.png)
 
 Several other object classes in `BurnMan` build on the endmember
 equations of state. Several solution model formulations are included
-(with one example model shown in \autoref{fig:garnetsolution}),
+(with one example model shown in \autoref{fig:garnetsolution}, see
+\url{https://burnman.readthedocs.io/en/latest/tutorial_01_material_classes.html#}
+for more details),
 including both Gibbs and Helmholtz formulations [@Myhill:2018].
 Functions are also provided to convert solution models from one
 endmember basis to another [@Myhill:2021]. A composite material model
@@ -150,21 +155,21 @@ Gibbs minimization, while the endmember activities can be used to
 determine equilibrium via the equilibrium relations [@Holland:1998].
 \label{fig:garnetsolution}](figures/mg_ca_gt_properties.png)
 
-`BurnMan` includes many higher level functions that use
-its material model classes. These include functions to
-fit thermodynamic models for endmembers
-and solutions including full error propagation (\autoref{fig:fit}),
-construction of self-consistent planetary models (\autoref{fig:zog})
-and the calculation of seismic properties. Tools are provided to
-compare calculated seismic properties with published seismic models of
+Another class implemented in `BurnMan` is the `Composition` class
+which provides a framework to convert between mass, molar,
+and elemental compositions, convert to different component systems,
+and add or subtract chemical components (see
+\url{https://burnman.readthedocs.io/en/latest/tutorial_02_composition_class.html#}). 
+
+`BurnMan` also includes planetary `Layer` and `Planet` classes,
+which can be used to construct planetary models with self-consistent
+pressure, gravity and density profiles
+and calculate seismic properties through those bodies 
+(\autoref{fig:zog}, \url{https://burnman.readthedocs.io/en/latest/tutorial_03_layers_and_planets.html}).
+Tools are provided to compare those seismic properties with published seismic models of
 the Earth, and to produce input files to compute synthetic
 seismic data using other codes, including
 AxiSEM [@NissenMeyer:2014] and Mineos [@Woodhouse:1988;@Masters:2011].
-
-![Optimized fit of a PV equation of state [@Holland:2011] to
-stishovite data [@Andrault:2003], including 95% confidence intervals
-on both the volume and the bulk modulus.
-\label{fig:fit}](figures/stishovite_fitting.png)
 
 ![A 1D profile through Planet Zog, a planet much like Earth, with an
 inner and outer core (blue and orange layers),
@@ -182,15 +187,30 @@ The computed geotherm is compared to several from the literature
 The other properties are compared to the PREM [@Dziewonski:1981].
 \label{fig:zog}](figures/zog.png)
 
-`BurnMan` also provides many utility classes and functions, including
-those required to undertake bulk and phase chemical calculations,
-to aid preparation and analysis of laboratory experiments.
-One example is a utility function, `fit_phase_proportions_to_bulk_composition()`,
-that uses constrained least squares to estimate phase proportions
-and their corresponding covariances. The fitting applies appropriate
-non-negativity constraints (i.e. no phase can have a negative abundance
-in the bulk). An example that uses real
-experimental data [@Bertka:1997] is shown in \autoref{fig:mars_fit}.
+
+Separate from the core classes within `BurnMan`, the module also
+includes many utility functions. These include functions to
+fit thermodynamic model parameters for endmembers
+and solutions including full error propagation 
+(\autoref{fig:fit}, \url{https://burnman.readthedocs.io/en/latest/tutorial_04_fitting.html#}).
+
+
+![Optimized fit of a PV equation of state [@Holland:2011] to
+stishovite data [@Andrault:2003], including 95% confidence intervals
+on both the volume and the bulk modulus.
+\label{fig:fit}](figures/stishovite_fitting.png)
+
+
+The utility functions `fit_composition_to_solution()` and
+`fit_phase_proportions_to_bulk_composition()`
+use weighted constrained least squares to estimate endmember or
+phase proportions and their corresponding covariances, given a bulk composition.
+The fitting functions apply appropriate
+non-negativity constraints 
+(i.e. that no species can have negative proportions on a site, 
+and that no phase can have a negative abundance
+in the bulk). An example of `fit_phase_proportions_to_bulk_composition()`
+that uses real experimental data [@Bertka:1997] is shown in \autoref{fig:mars_fit}.
 Loss of an independent component from the bulk composition
 can be tested by adding another phase with the composition of
 that component (e.g. Fe) and checking that the amount of that phase
@@ -202,11 +222,8 @@ $$C_{im} = (A_{ji} K^{-1}_{jk} A_{km})^{-1}.$$
 The weighted residuals are calculated
 using the phase proportions $x$ and the bulk composition $b$:
 $$\chi^2 = (K^{-0.5}_{ij} A_{jk} x_k - K^{-0.5}_{ik} b_k)(K^{-0.5}_{ip} A_{pq} x_q - K^{-0.5}_{iq} b_q).$$
-A related function is `fit_composition_to_solution()`,
-that uses weighted constrained least squares to fit a phase composition
-(calculated, for example, by EPMA) to a solution model. In this case,
-non-negativity constraints are applied such that no site may have a
-negative species occupancy.
+See \url{https://burnman.readthedocs.io/en/latest/tutorial_04_fitting.html#}
+for more details and the code required to make \autoref{fig:mars_fit}.
 
 ![Mineral phase proportions in the mantle of Mars, estimated by using 
 the method of constrained least squares on high pressure experimental
@@ -232,7 +249,9 @@ that chemically equilibrates a known assemblage under constraints
 phase proportions and compositions).
 An example is shown in \autoref{fig:eqm}.
 The equilibrate function is similar to that implemented in THERMOCALC
-[@Holland:1998].
+[@Holland:1998]. 
+See \url{https://burnman.readthedocs.io/en/latest/tutorial_05_equilibrium.html#}
+for more details and the code required to make \autoref{fig:eqm}.
 
 ![The olivine phase diagram at three different temperatures as computed
 using the equilibrate routines in `BurnMan`. The solution model properties
