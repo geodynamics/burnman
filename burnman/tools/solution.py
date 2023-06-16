@@ -26,20 +26,12 @@ def _decompose_3D_matrix(W):
     E = G_i p_i + WB_ij (1 - p_j + p_i) / 2 + WT_ijk p_i p_j p_k,
     and i < j < k.
 
-    Parameters
-    ----------
-    W : 3D numpy array
+    :param W: 3D interaction matrix.
+    :type W: numpy.array
 
-    Returns
-    -------
-    new_endmember_excesses : 1D numpy array
-        The array G_i
-
-    new_binary_matrix : 2D numpy array
-        The upper triangular matrix WB_ij
-
-    new_ternary_terms : list of lists of length 4
-        A list where each item is in the form [i, j, k, WT_ijk]
+    :returns: The 1D array G_i, the 2D upper triangular array WB_ij and
+        the ternary terms in a list where each item is in the form [i, j, k, WT_ijk]
+    :rtype: tuple
     """
 
     n_mbrs = len(W)
@@ -123,30 +115,22 @@ def _subregular_matrix_conversion(
     E = G_i p_i + WB_ij (1 - p_j + p_i) / 2 + WT_ijk p_i p_j p_k,
     and i < j < k.
 
-    Parameters
-    ----------
-    new_basis : 2D numpy array
-        The new endmember basis, given as amounts of the old endmembers.
+    :param new_basis: The new endmember basis, given as amounts of the old endmembers.
+    :type new_basis: 2D numpy array
 
-    binary_matrix : 2D numpy array
-        The upper triangular matrix WB_ij
+    :param binary_matrix: The upper triangular matrix WB_ij.
+    :type binary_matrix: 2D numpy array
 
-    ternary_terms : list of lists of length 4
-        A list where each item is in the form [i, j, k, WT_ijk]
+    :param ternary_terms: The ternary terms in a list where each
+        item is in the form [i, j, k, WT_ijk]
+    :type ternary_terms: list of lists of length 4
 
-    endmember_excesses : 1D numpy array
-        The array G_i
+    :param endmember_excesses: The array G_i
+    :type endmember_excesses: 1D numpy array
 
-    Returns
-    -------
-    new_endmember_excesses : 1D numpy array
-        The array G_i
-
-    new_binary_matrix : 2D numpy array
-        The upper triangular matrix WB_ij
-
-    new_ternary_terms : list of lists of length 4
-        A list where each item is in the form [i, j, k, WT_ijk]
+    :returns: The 1D array G_i, the 2D upper triangular array WB_ij and
+        the ternary terms in a list where each item is in the form [i, j, k, WT_ijk]
+    :rtype: tuple
     """
     n_mbrs = len(binary_matrix)
     # Compact 3D representation of original interactions
@@ -215,31 +199,27 @@ def transform_solution_to_new_basis(
     Transforms a solution model from one endmember basis to another.
     Returns a new Solution object.
 
-    Parameters
-    ----------
-    solution : :class:`burnman.Solution` object
-        The original solution object.
+    :param solution: The original solution object.
+    :type solution: :class:`burnman.Solution` object
 
-    new_basis : 2D numpy array
-        The new endmember basis, given as amounts of the old endmembers.
+    :param new_basis: The new endmember basis, given as amounts of the old endmembers.
+    :type new_basis: 2D numpy array
 
-    n_mbrs : float (optional)
-        The number of endmembers in the new solution
-        (defaults to the length of new_basis)
+    :param n_mbrs: The number of endmembers in the new solution
+        (defaults to the length of new_basis).
+    :type n_mbrs: float, optional
 
-    solution_name : string (optional)
-        A name corresponding to the new solution
+    :param solution_name: A name corresponding to the new solution.
+    :type solution_name: str, optional
 
-    endmember_names : list of strings (optional)
-        A list corresponding to the names of the new endmembers.
+    :param endmember_names: A list corresponding to the names of the new endmembers.
+    :type endmember_names: list of str, optional
 
-    molar_fractions : numpy array (optional)
-        Fractions of the new endmembers in the new solution.
+    :param molar_fractions: Fractions of the new endmembers in the new solution.
+    :type molar_fractions: numpy.array, optional
 
-    Returns
-    -------
-    solution : :class:`burnman.Solution` object
-        The transformed solution
+    :returns: The transformed solution.
+    :rtype: :class:`burnman.Solution` object
     """
     new_basis = np.array(new_basis)
     if n_mbrs is None:

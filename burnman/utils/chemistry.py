@@ -176,16 +176,12 @@ def dictionarize_formula(formula):
     A function to read a chemical formula string and
     convert it into a dictionary
 
-    Parameters
-    ----------
-    formula : string object
-        Chemical formula, written in the XnYm format, where
+    :param formula: Chemical formula, written in the XnYm format, where
         the formula has n atoms of element X and m atoms of element Y
+    :type formula: str
 
-    Returns
-    -------
-    f : dictionary object
-        The same chemical formula, but expressed as a dictionary.
+    :returns: The same chemical formula, but expressed as a dictionary.
+    :rtype: dict
     """
     f = dict()
     elements = re.findall("[A-Z][^A-Z]*", formula)
@@ -205,17 +201,13 @@ def sum_formulae(formulae, amounts=None):
     """
     Adds together a set of formulae.
 
-    Parameters
-    ----------
-    formulae : list of dictionary or counter objects
-        List of chemical formulae
-    amounts : list of floats
-        List of amounts of each formula
+    :param formulae: List of chemical formulae.
+    :type formulae: list of dictionary or counter objects
+    :param amounts: List of amounts of each formula.
+    :type amounts: list of floats
 
-    Returns
-    -------
-    summed_formula : Counter object
-        The sum of the user-provided formulae
+    :returns: The sum of the user-provided formulae
+    :rtype: Counter object
     """
     if amounts is None:
         amounts = [1.0 for formula in formulae]
@@ -239,15 +231,11 @@ def formula_mass(formula):
     """
     A function to take a chemical formula and compute the formula mass.
 
-    Parameters
-    ----------
-    formula : dictionary or counter object
-        A chemical formula
+    :param formula: A chemical formula
+    :type formula: dict or Counter object
 
-    Returns
-    -------
-    mass : float
-        The mass per mole of formula
+    :returns: The mass per mole of formula [kg]
+    :rtype: float
     """
     mass = sum(formula[element] * atomic_masses[element] for element in formula)
     return mass
@@ -256,23 +244,19 @@ def formula_mass(formula):
 def convert_formula(formula, to_type="mass", normalize=False):
     """
     Converts a chemical formula from one type (mass or molar)
-    into the other. Renormalises amounts if normalize=True
+    into the other. Renormalises amounts if normalize=True.
 
-    Parameters
-    ----------
-    formula : dictionary or counter object
-        A chemical formula
+    :param formula: A chemical formula.
+    :type formula: dict or Counter object
 
-    to_type : string, one of 'mass' or 'molar'
-        Conversion type
+    :param to_type: Conversion type, one of 'mass' or 'molar'.
+    :type to_type: str
 
-    normalize : boolean
-        Whether or not to normalize the converted formula to 1
+    :param normalize: Whether or not to normalize the converted formula to 1.
+    :type normalize: bool
 
-    Returns
-    -------
-    f : dictionary
-        The converted formula
+    :returns: The converted formula.
+    :rtype: dict
     """
 
     if to_type == "mass":
@@ -313,55 +297,45 @@ def process_solution_chemistry(solution_model):
     molar fractions of the phases and pressure
     and temperature where necessary.
 
-    Parameters
-    ----------
-    solution_model : instance of class
-        Class must have a "formulas" attribute, containing a
-        list of chemical formulae with site information
+    :param solution_model: Class must have a "formulas" attribute,
+        containing a list of chemical formulae with site information
+    :type solution model: instance of class
 
-    Returns
-    -------
-    none
-        Nothing is returned from this function, but the solution_model
-        object gains the following attributes.
+    :rtype: None
 
-    solution_formulae : list of dictionaries
-        List of endmember formulae is output from site formula strings
+    .. note:: Nothing is returned from this function, but the solution_model
+        object gains the following attributes:
 
-    n_sites : integer
-        Number of sites in the solution.
-        Should be the same for all endmembers.
-
-    sites : list of lists of strings
-        A list of species for each site in the solution
-
-    site_names : list of strings
-        A list of species_site pairs in the solution, where
-        each distinct site is given by a unique uppercase letter
-        e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B']
-
-    n_occupancies : integer
-        Sum of the number of possible species on each of the sites
-        in the solution.
-        Example: A binary solution [[A][B],[B][C1/2D1/2]] would have
-        n_occupancies = 5, with two possible species on
-        Site 1 and three on Site 2
-
-    site_multiplicities : 2D array of floats
-        A 1D array for each endmember in the solution,
-        containing the multiplicities of each site per formula unit.
-        To simplify computations later, the multiplicities
-        are repeated for each species on each site, so the shape of
-        this attribute is (n_endmembers, n_site_species).
-
-    endmember_occupancies : 2d array of floats
-        A 1D array for each endmember in the solution,
-        containing the fraction of atoms of each species on each site.
-
-    endmember_noccupancies : 2d array of floats
-        A 1D array for each endmember in the solution,
-        containing the number of atoms of each species on each site
-        per mole of endmember.
+        * solution_formulae [list of dictionaries]
+            List of endmember formulae in dictionary form.
+        * n_sites [integer]
+            Number of sites in the solution.
+            Should be the same for all endmembers.
+        * sites [list of lists of strings]
+            A list of species for each site in the solution.
+        * site_names [list of strings]
+            A list of species_site pairs in the solution, where
+            each distinct site is given by a unique uppercase letter
+            e.g. ['Mg_A', 'Fe_A', 'Al_A', 'Al_B', 'Si_B'].
+        * n_occupancies [integer]
+            Sum of the number of possible species on each of the sites
+            in the solution.
+            Example: A binary solution [[A][B],[B][C1/2D1/2]] would have
+            n_occupancies = 5, with two possible species on
+            Site 1 and three on Site 2.
+        * site_multiplicities [2D array of floats]
+            A 1D array for each endmember in the solution,
+            containing the multiplicities of each site per formula unit.
+            To simplify computations later, the multiplicities
+            are repeated for each species on each site, so the shape of
+            this attribute is (n_endmembers, n_site_species).
+        * endmember_occupancies [2d array of floats]
+            A 1D array for each endmember in the solution,
+            containing the fraction of atoms of each species on each site.
+        * endmember_noccupancies [2d array of floats]
+            A 1D array for each endmember in the solution,
+            containing the number of atoms of each species on each site
+            per mole of endmember.
     """
     formulae = solution_model.formulas
     n_sites = formulae[0].count("[")
@@ -476,35 +450,31 @@ def site_occupancies_to_strings(
     Converts a list of endmember site occupancies into a list
     of string representations of those occupancies.
 
-    Parameters
-    ----------
-    site_species_names : 2D list of strings
-        A list of list of strings, giving the names of the species
-        which reside on each site.
+    :param site_species_names: A list of list of strings,
+        giving the names of the species which reside on each site.
         List of sites, each of which contains a list of the species
         occupying each site.
+    :type site_species_names: 2D list of strings
 
-    site_multiplicities : 1D or 2D numpy array of floats
-        List of floats giving the multiplicity of each site.
-        If 2D, must have the same shape as endmember_occupancies.
+    :param site_multiplicities: List of floats giving the multiplicity
+        of each site. If 2D, must have the same shape as endmember_occupancies.
         If 1D, must be either the same length as the number of sites, or
         the same length as site_species_names
         (with an implied repetition of the same
         number for each species on a given site).
+    :type site_multiplicities: 1D or 2D numpy array of floats
 
-    endmember_occupancies : 2D numpy array of floats
-        A list of site-species occupancies for each endmember.
-        The first dimension loops over the endmembers, and the
+    :param endmember_occupancies: A list of site-species occupancies
+        for each endmember. The first dimension loops over the endmembers, and the
         second dimension loops over the site-species occupancies for that endmember.
         The total number and order of occupancies must
         be the same as the strings in site_species_names.
+    :type endmember_occupancies: 2D numpy array of floats
 
-    Returns
-    -------
-    site_formulae : list of strings
-        A list of strings in standard burnman format.
+    :returns: A list of strings in standard burnman format.
         For example, [Mg]3[Al]2 would correspond to the
         classic two-site pyrope garnet.
+    :rtype: list of strings
     """
 
     site_multiplicities = np.array(site_multiplicities)
@@ -565,18 +535,11 @@ def site_occupancies_to_strings(
 
 def compositional_array(formulae):
     """
-    Parameters
-    ----------
-    formulae : list of dictionaries
-        List of chemical formulae
+    :param formulae: List of chemical formulae
+    :type formulae: list of dicts
 
-    Returns
-    -------
-    formula_array : 2D array of floats
-        Array of endmember formulae
-
-    elements : List of strings
-        List of elements
+    :returns: Array of endmember formulae and a list of elements.
+    :rtype: 2D numpy.array of floats and a list of strs
     """
     elements = []
     for formula in formulae:
@@ -591,18 +554,14 @@ def compositional_array(formulae):
 
 def ordered_compositional_array(formulae, elements):
     """
-    Parameters
-    ----------
-    formulae : list of dictionaries
-        List of chemical formulae
+    :param formulae: List of chemical formulae
+    :type formulae: list of dicts
 
-    elements : List of strings
-        List of elements
+    :param elements : List of elements
+    :type elements: list of strings
 
-    Returns
-    -------
-    formula_array : 2D array of floats
-        Array of endmember formulae
+    :returns: Array of endmember formulae
+    :rtype: 2D array of floats
     """
     formula_array = np.zeros(shape=(len(formulae), len(elements)))
     for idx, formula in enumerate(formulae):
@@ -615,18 +574,14 @@ def ordered_compositional_array(formulae, elements):
 
 def formula_to_string(formula):
     """
-    Parameters
-    ----------
-    formula : dictionary or counter
-        Chemical formula
+    :param formula: Chemical formula
+    :type formula: dict or Counter
 
-    Returns
-    -------
-    formula_string : string
-        A formula string, with element order as given in the list
+    :returns: A formula string, with element order as given in the list
         IUPAC_element_order.
         If one or more keys in the dictionary are not one of the elements
         in the periodic table, then they are added at the end of the string.
+    :rtype: str
     """
 
     formula_string = ""
@@ -650,15 +605,11 @@ def formula_to_string(formula):
 
 def sort_element_list_to_IUPAC_order(element_list):
     """
-    Parameters
-    ----------
-    element_list : list
-        List of elements
+    :param element_list : List of elements.
+    :type element_list: list
 
-    Returns
-    -------
-    sorted_list : list
-        List of elements sorted into IUPAC order
+    :returns: List of elements sorted into IUPAC order
+    :rtype: list
     """
     sorted_list = [e for e in IUPAC_element_order if e in element_list]
     assert len(sorted_list) == len(element_list)
@@ -676,24 +627,21 @@ def convert_fractions(composite, phase_fractions, input_type, output_type):
     defined for all phases. Conversions to and from volume
     require set_state to have been called for the composite.
 
-    Parameters
-    ----------
-    composite : Composite
-        Composite for which fractions are to be defined.
+    :param composite: Composite for which fractions are to be defined.
+    :type composite: :class:`~burnman.Composite`
 
-    phase_fractions : list of floats
-        List of input phase fractions (of type input_type)
+    :param phase_fractions: List of input phase fractions
+        (of type input_type).
+    :type phase_fractions: list of floats
 
-    input_type : string
-        Input fraction type: 'molar', 'mass' or 'volume'
+    :param input_type: Input fraction type. One of 'molar', 'mass' or 'volume'.
+    :type input_type: str
 
-    output_type : string
-        Output fraction type: 'molar', 'mass' or 'volume'
+    :param output_type: Output fraction type. One of 'molar', 'mass' or 'volume'.
+    :type output_type: str
 
-    Returns
-    -------
-    output_fractions : list of floats
-        List of output phase fractions (of type output_type)
+    :returns: List of output phase fractions (of type output_type)
+    :rtype: list of floats
     """
     if input_type == "volume" or output_type == "volume":
         if composite.temperature is None:
@@ -752,20 +700,15 @@ def reaction_matrix_as_strings(reaction_matrix, compound_names):
     Returns a list of string representations of all the reactions in
     reaction_matrix.
 
+    :param reaction_matrix: Matrix of stoichiometric amounts
+        of each compound j in reaction i.
+    :type reaction_matrix: 2D numpy array
 
-    Parameters
-    ----------
-    reaction_matrix : 2D numpy array
-        Matrix of stoichiometric amounts
-        of each compound j in reaction i
+    :param compound_names: List of compound names.
+    :type compound_names: list of strings
 
-    compound_names : list of strings
-        List of compound names
-
-    Returns
-    -------
-    reaction_strings : list of strings
-        List of strings corresponding to each reaction
+    :returns: List of strings corresponding to each reaction.
+    :rtype: list of strings
     """
     reaction_strings = []
     for reaction in reaction_matrix:

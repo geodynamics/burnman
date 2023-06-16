@@ -29,74 +29,53 @@ def nonlinear_least_squares_fit(
 
     Parameters
     ----------
-    model : class instance
-        Must have the following attributes:
-            data : 2D numpy array.
-                Elements of x[i][j] contain the observed position of
-                data point i
+    :param model: Model containing data to be fit, and functions to
+        aid in fitting.
+    :type model: object
 
-            data_covariances : 3D numpy array
-                Elements of cov[i][j][k] contain the covariance matrix
-                of data point i
+    :param lm_damping: Levenberg-Marquardt parameter for least squares minimization.
+    :type lm_damping: float
 
-            mle_tolerances : numpy array
-                The iterations to find the maximum likelihood estimator
-                for each observed data point will stop when mle_tolerances[i] <
-                np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
-
-            delta_params : numpy array
-                parameter perturbations used to compute the jacobian
-
-        Must also contain the following functions:
-            set_params(self, param_values):
-                Function to set parameters
-
-            get_params(self):
-                Function to get current model parameters
-
-            function(self, x):
-                Returns value of model function evaluated at x
-
-            normal(self, x):
-                Returns value of normal to the model function
-                evaluated at x
-
-    lm_damping : float (optional, default: 0)
-        Levenberg-Marquardt parameter for least squares minimization
-
-    param_tolerance : float (optional, default: 1.e-5)
-        Levenberg-Marquardt iterations are terminated when
+    :param param_tolerance: Levenberg-Marquardt iterations are terminated when
         the maximum fractional change in any of the parameters
         during an iteration drops below this value
-
-    max_lm_iterations : integer (optional, default: 100)
-        Maximum number of Levenberg-Marquardt iterations
-
-    verbose : bool
-        Print some information to standard output
+    :type param_tolerance: float
 
 
-    Attributes added to model
-    ----------
-    n_dof : integer
-        Degrees of freedom of the system
-    data_mle : 2D numpy array
-        Maximum likelihood estimates of the observed data points
-        on the best-fit curve
-    jacobian : 2D numpy array
-        d(weighted_residuals)/d(parameter)
-    weighted_residuals : numpy array
-        Weighted residuals
-    weights : numpy array
-        1/(data variances normal to the best fit curve)
-    WSS : float
-        Weighted sum of squares residuals
-    popt : numpy array
-        Optimized parameters
-    pcov : 2D numpy array
-        Covariance matrix of optimized parameters
-    noise_variance : float
-        Estimate of the variance of the data normal to the curve
+    :param max_lm_iterations: Maximum number of Levenberg-Marquardt iterations
+    :type max_lm_iterations: int
+
+    :param verbose: Print some information to standard output
+    :type verbose: bool
+
+    .. note:: The object passed as model must have the following attributes:
+        * data [2D numpy.array] - Elements of x[i][j] contain the
+            observed position of data point i.
+        * data_covariances [3D numpy.array] Elements of cov[i][j][k] contain
+            the covariance matrix of data point i.
+        * mle_tolerances [numpy.array] - The iterations to find the maximum likelihood
+            estimator for each observed data point will stop when mle_tolerances[i] <
+            np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
+        * delta_params [numpy.array] - parameter perturbations used to compute the jacobian
+
+        Must also have the following methods:
+        * set_params(self, param_values) -  Function to set parameters.
+        * get_params(self) - Function to get current model parameters.
+        * function(self, x) - Returns value of model function evaluated at x.
+        * normal(self, x) - Returns value of normal to the model function evaluated at x.
+
+        After this function has been performed, the following attributes are added to model:
+
+        * n_dof [int] - Degrees of freedom of the system.
+        * data_mle [2D numpy array] - Maximum likelihood estimates of the observed data points
+            on the best-fit curve.
+        * jacobian [2D numpy array] - d(weighted_residuals)/d(parameter).
+        * weighted_residuals [numpy array] - Weighted residuals.
+        * weights [numpy array] - 1/(data variances normal to the best fit curve).
+        * WSS [float] - Weighted sum of squares residuals.
+        * popt [numpy array] - Optimized parameters.
+        * pcov [2D numpy array] - Covariance matrix of optimized parameters.
+        * noise_variance [float] - Estimate of the variance of the data normal to the curve.
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
@@ -227,47 +206,42 @@ def nonlinear_least_squares_fit(
 
 def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=None):
     """
-        This function calculates the confidence and prediction bands of
-        the function f(x) from a best-fit model with uncertainties in its
-        parameters as calculated (for example) by
-        the function nonlinear_least_squares_fit().
+    This function calculates the confidence and prediction bands of
+    the function f(x) from a best-fit model with uncertainties in its
+    parameters as calculated (for example) by
+    the function nonlinear_least_squares_fit().
 
-        The values are calculated via the delta method, which estimates
-        the variance of f evaluated at x as var(f(x)) = df(x)/dB var(B) df(x)/dB
-        where df(x)/dB is the vector of partial derivatives of f(x)
-        with respect to B
+    The values are calculated via the delta method, which estimates
+    the variance of f evaluated at x as var(f(x)) = df(x)/dB var(B) df(x)/dB
+    where df(x)/dB is the vector of partial derivatives of f(x)
+    with respect to B.
 
+    :param model: As modified (for example) by the function
+        :func:`burnman.nonlinear_least_squares_fit`.
+        Should contain the following functions: get_params, set_params, function, normal
+        And attributes: delta_params, pcov, dof, noise_variance
+    :type model: object
 
-        Parameters
-        ----------
-    '    model : class instance
-            As modified (for example) by the function
-            nonlinear_least_squares_fit(). Should contain the following functions:
-                get_params, set_params, function, normal
-            And attributes:
-                delta_params, pcov, dof, noise_variance
+    :param x_array: Coordinates at which to evaluate the bounds.
+    :type x_array: 2D numpy.array
 
-        x_array : 2D numpy array
-            coordinates at which to evaluate the bounds
+    :param confidence_interval: Probability level of finding the true model
+        (confidence bound) or any new data point (probability bound).
+        For example, the 95% confidence bounds should be calculated using a
+        confidence interval of 0.95.
+    :type confidence_interval: float
 
-        confidence_interval : float
-            Probability level of finding the true model (confidence bound) or
-            any new data point (probability bound). For example, the 95% confidence
-            bounds should be calculated using a confidence interval of 0.95.
+    :param f: The function defining the variable y=f(x) for which the
+        confidence and prediction bounds are desired.
+    :type f: function
 
-        f : function
-            This is the function defining the variable y=f(x) for which the
-            confidence and prediction bounds are desired
+    :param flag: This (optional) flag is passed to model.function to control how the
+        modified position of x is calculated. This value is then used by f(x)
+    :type flag: type informed by model object
 
-        flag : variable type
-            This (optional) flag is passed to model.function to control how the
-            modified position of x is calculated. This value is then used by f(x)
-
-        Output
-        ------
-        bounds : 2D numpy array
-            An element of bounds[i][j] gives the lower and upper confidence
-            (i=0, i=1) and prediction (i=2, i=3) bounds for the jth data point.
+    :returns: An element of bounds[i][j] gives the lower and upper confidence
+        (i=0, i=1) and prediction (i=2, i=3) bounds for the jth data point.
+    :rtype: 2D numpy.array
     """
 
     # Check array dimensions
@@ -327,20 +301,25 @@ def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):
     matrix (`cov`). Additional keyword arguments are passed on to the
     ellipse patch artist.
 
-    Parameters
-    ----------
-        cov : The 2x2 covariance matrix to base the ellipse on
-        pos : The location of the center of the ellipse. Expects a 2-element
-            sequence of [x0, y0].
-        nstd : The radius of the ellipse in numbers of standard deviations.
-            Defaults to 2 standard deviations.
-        ax : The axis that the ellipse will be plotted on. Defaults to the
-            current axis.
-        Additional keyword arguments are pass on to the ellipse patch.
+    :param cov: The 2x2 covariance matrix to base the ellipse on.
+    :type cov: numpy.array
 
-    Returns
-    -------
-        A matplotlib ellipse artist
+    :param pos: The location of the center of the ellipse. Expects a 2-element
+        sequence of [x0, y0].
+    :type pos: list or numpy.array
+
+    :param nstd: The radius of the ellipse in numbers of standard deviations.
+        Defaults to 2 standard deviations.
+    :type nstd: float
+
+    :param ax: The axis that the ellipse will be plotted on. Defaults to the
+        current axis.
+    :type ax: matplotlib.pyplot.axes
+
+    :param kwargs: Additional keyword arguments are passed on to the ellipse patch.
+
+    :returns: The covariance ellipse (already applied to the desired axes object).
+    :rtype: matplotlib.patches.Ellipse
     """
 
     def eigsorted(cov):
@@ -366,27 +345,21 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.0):
     """
     Creates a corner plot of covariances
 
-    Parameters
-    ----------
+    :param popt: Optimized parameters.
+    :type popt: numpy.array
 
-    popt : numpy array
-        Optimized parameters
+    :param pcov: Covariance matrix of the parameters.
+    :type pcov: 2D numpy.array
 
-    pcov : 2D numpy array
-        Covariance matrix of the parameters
+    :param param_names: Parameter names.
+    :type param_names: list
 
-    param_names : optional list
-        Parameter names
+    :param n_std: Number of standard deviations for ellipse.
+    :type n_std: float
 
-    n_std : float
-        Number of standard deviations for ellipse
-
-    Returns
-    -------
-    fig : matplotlib.pyplot.figure object
-
-    ax : list of matplotlib Axes objects
-
+    :returns: ``matplotlib.pyplot.figure`` and list of ``matplotlib.pyplot.Axes``
+        objects.
+    :rtype: tuple
     """
 
     if len(pcov[0]) != len(pcov[:, 0]):
@@ -472,37 +445,36 @@ def weighted_residual_plot(
     The chosen color palette (cmap) is discretised by standard deviation up
     to a cut off value of sd_limit.
 
-    Parameters
-    ----------
+    :param ax: Plot.
+    :param type: ``matplotlib.pyplot.Axes``
 
-    ax : matplotlib Axes object
-
-    model : user-defined object
-        A model as used by nonlinear_least_squares_fit
+    :param model: A model as used by
+        :func:`burnman.nonlinear_least_squares_fit`.
         Must contain the attributes model.data,
         model.weighted_residuals and
         model.flags (if flag is not None).
+    :type model: object
 
-    flag : string
-        String to determine which data to plot.
+    :param flag: String to determine which data to plot.
         Finds matches with model.flags.
+    :type flag: str
 
-    sd_limit : float
-        Data with weighted residuals exceeding this
-        limit are plotted in black
+    :param sd_limit: Data with weighted residuals exceeding this
+        limit are plotted in black.
+    :type sd_limit: float
 
-    cmap : matplotlib color palette
+    :param cmap: Color palette.
+    :type cmap: matplotlib color palette
 
-    plot_axes : list of integers
-        Data axes to use as plot axes
+    :param plot_axes: Data axes to use as plot axes.
+    :type plot_axes: list of int
 
-    scale_axes : list of floats
-        Plot axes are scaled by multiplication of the data by these values
+    :param scale_axes: Plot axes are scaled by multiplication
+        of the data by these values.
+    :type scale_axes: list of float
 
-    Returns
-    -------
-    ax : matplotlib Axes object
-
+    :returns: Coloured scatter plot of the weighted residuals in data space.
+    :rtype: matplotlib Axes object
     """
     if flag is None:
         mask = range(len(model.data[:, 0]))
@@ -537,31 +509,21 @@ def extreme_values(weighted_residuals, confidence_interval):
     of finding a data point at least that many standard deviations away.
 
 
-    Parameters
-    ----------
+    :param weighted_residuals: Array of residuals weighted by the square root
+        of their variances wr_i = r_i/sqrt(var_i).
+    :type weighted_residuals: array of float
 
-    weighted_residuals : array of floats
-        Array of residuals weighted by the square root of their
-        variances wr_i = r_i/sqrt(var_i)
+    :param confidence_interval: Probability at which all the weighted residuals lie
+        within the confidence bounds.
+    :type confidence_interval: float
 
-    confidence_interval : float
-        Probability at which all the weighted residuals lie
-        within the confidence bounds
-
-    Returns
-    -------
-    confidence_bound : float
-        Number of standard deviations at which we should expect to encompass
-        all data at the user-defined confidence interval.
-
-    indices : array of floats
-        Indices of weighted residuals exceeding the confidence_interval
-        defined by the user
-
-    probabilities : array of floats
-        The probabilities that the extreme data point of the distribution lies
+    :returns: Number of standard deviations at which we should expect to encompass
+        all data at the user-defined confidence interval, the indices of weighted
+        residuals exceeding the confidence_interval defined by the user, and
+        the probabilities that the extreme data point of the distribution lies
         further from the mean than the observed position wr_i for each i in
         the "indices" output array.
+    :rtype: tuple of (float, numpy.array, numpy.array)
     """
 
     n = len(weighted_residuals)

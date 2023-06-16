@@ -58,14 +58,13 @@ class Composite(Material):
         """
         Create a composite using a list of phases and their fractions (adding to 1.0).
 
-        Parameters
-        ----------
-        phases: list of :class:`burnman.Material`
-            list of phases.
-        fractions: list of floats
-            molar or mass fraction for each phase.
-        fraction_type: 'molar' or 'mass' (optional, 'molar' as standard)
+        :param phases: List of phases.
+        :type phases: list of :class:`burnman.Material`
+        :param fractions: molar or mass fraction for each phase.
+        :type fractions: list of floats
+        :param fraction_type: 'molar' or 'mass' (optional, 'molar' as standard)
             specify whether molar or mass fractions are specified.
+        :type fraction_type: str
         """
 
         Material.__init__(self)
@@ -110,11 +109,9 @@ class Composite(Material):
         Change the fractions of the phases of this Composite.
         Resets cached properties
 
-        Parameters
-        ----------
-        fractions: list or numpy array of floats
+        :param fractions: list or numpy array of floats
             molar or mass fraction for each phase.
-        fraction_type: 'molar' or 'mass'
+        :param fraction_type: 'molar' or 'mass'
             specify whether molar or mass fractions are specified.
         """
         assert len(self.phases) == len(fractions)
@@ -126,7 +123,8 @@ class Composite(Material):
             total = sum(fractions)
         except TypeError:
             raise Exception(
-                "Since v0.8, burnman.Composite takes an array of Materials, then an array of fractions"
+                "Since v0.8, burnman.Composite takes an array of Materials, "
+                "then an array of fractions"
             )
 
         assert np.all(fractions >= -1e-12)
@@ -356,7 +354,8 @@ class Composite(Material):
     @material_property
     def isothermal_compressibility(self):
         """
-        Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
+        Returns isothermal compressibility of the composite
+        (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_T
         """
         return 1.0 / self.isothermal_bulk_modulus
@@ -364,7 +363,8 @@ class Composite(Material):
     @material_property
     def adiabatic_compressibility(self):
         """
-        Returns isothermal compressibility of the composite (or inverse isothermal bulk modulus) [1/Pa]
+        Returns isothermal compressibility of the composite
+        (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.beta_S
         """
         return 1.0 / self.adiabatic_bulk_modulus
@@ -507,10 +507,8 @@ class Composite(Material):
         The method raises an exception if any of the chemical potentials are
         not defined by the assemblage.
 
-        Parameters
-        ----------
-        components: list of dictionaries
-            List of formulae of the components.
+        :param components: List of formulae of the components.
+        :type components: list of dictionaries
         """
         # Convert components into array form
         b = np.array(
@@ -544,18 +542,14 @@ class Composite(Material):
         in the composite. Raises an exception if
         the assemblage is not equilibrated.
 
-        Parameters
-        ----------
-        components: list of dictionaries (optional)
-            List of formulae of the desired components. If not specified,
-            the method uses the components specified by a previous call to
-            set_components.
+        :param components: List of formulae of the desired components.
+            If not specified, the method uses the components specified
+            by a previous call to set_components.
+        :type components: list of dictionaries
 
-        Returns
-        -------
-        chemical_potential: numpy array of floats
-            The chemical potentials of the desired components in the
+        :returns: The chemical potentials of the desired components in the
             equilibrium composite.
+        :rtype: numpy.array of floats
         """
         if not self.equilibrated:
             raise Exception(
@@ -573,18 +567,15 @@ class Composite(Material):
         """
         Converts a set of mass fractions for phases into a set of molar fractions.
 
-        Parameters
-        ----------
-        phases : list of :class:`burnman.Material`
-        The list of phases for which fractions should be converted.
+        :param phases: The list of phases for which fractions should be converted.
+        :type phases: list of :class:`burnman.Material`
 
-        mass_fractions : numpy array of floats
-        An array of mass fractions of the input phases.
+        :param mass_fractions: An array of mass fractions of the input phases.
+        :type mass_fractions: numpy.array of floats
 
-        Returns
-        -------
-        molar_fractions : numpy array of floats
-        An array of molar fractions corresponding to the input molar fractions
+        :returns: An array of molar fractions corresponding to the
+            input molar fractions.
+        :rtype: numpy.array of floats
         """
         molar_masses = np.array([phase.molar_mass for phase in phases])
         moles = mass_fractions / molar_masses
@@ -650,7 +641,8 @@ class Composite(Material):
         A list of an independent set of element indices. If the amounts of
         these elements are known (element_amounts),
         the amounts of the other elements can be
-        inferred by -compositional_null_basis[independent_element_indices].dot(element_amounts)
+        inferred by
+        -compositional_null_basis[independent_element_indices].dot(element_amounts)
         """
         return sorted(independent_row_indices(self.stoichiometric_matrix.T))
 

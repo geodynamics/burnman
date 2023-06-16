@@ -16,23 +16,20 @@ def calculate_nakajima_fp_pv_partition_coefficient(
     Calculate the partitioning of iron between periclase and bridgmanite as given
     by Nakajima et al., 2012.
 
-    Parameters
-    ----------
-    pressure : float
-        Equilibrium pressure [Pa]
-    temperature : float
-        Equilibrium temperature [K]
-    bulk_composition_mol : dictionary
-        Bulk composition [mol].
+    :param pressure: Equilibrium pressure [Pa]
+    :type pressure: float
+    :param temperature: Equilibrium temperature [K]
+    :type temperature: float
+    :param bulk_composition_mol: Bulk composition [mol].
         Only Mg, Fe, and Si are assumed to explicitly affect the partitioning
         with Al playing an implicit role.
-    initial_distribution_coefficient : float
-        The distribution coefficient (Kd_0) at 25 GPa and 0 K
+    :type bulk_composition_mol: dict
+    :param initial_distribution_coefficient: The distribution coefficient (Kd_0)
+        at 25 GPa and 0 K.
+    :type initial_distribution_coefficient: float
 
-    Returns
-    -------
-    partition_coefficient_array : tuple
-        The proportion of Fe in ferropericlase and perovskite, respectively
+    :returns: The proportion of Fe in ferropericlase and perovskite, respectively
+    :rtype: tuple
     """
 
     norm = bulk_composition_mol["Mg"] + bulk_composition_mol["Fe"]
@@ -51,7 +48,8 @@ def calculate_nakajima_fp_pv_partition_coefficient(
     K = np.exp(rs)
 
     # Solving equation 6 in Nakajima et al., 2012 for X_Fe_fp and X_Fe_pv
-    # Solved using the definition of the distribution coefficient to define X_Fe_fp as a function of X_Fe_pv
+    # Solved using the definition of the distribution coefficient
+    # to define X_Fe_fp as a function of X_Fe_pv
 
     num_to_sqrt = (-4.0 * f_FeO * (K - 1.0) * K * f_SiO2) + (
         pow(1.0 + (f_FeO * (K - 1)) + ((K - 1.0) * f_SiO2), 2.0)

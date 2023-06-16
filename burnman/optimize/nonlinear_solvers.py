@@ -10,27 +10,22 @@ def solve_constraint_lagrangian(x, jac_x, c_x, c_prime):
     subject to C(x_mod) = 0
     via the method of Lagrange multipliers.
 
-    Parameters
-    ----------
-    x : 1D numpy array
-        Parameter values at x
-    jac_x : 2D numpy array.
-        The (estimated, approximate or exact)
-        value of the Jacobian J(x)
-    c_x : 1D numpy array
-        Values of the constraints at x
-    c_prime : 2D array of floats
-        The Jacobian of the constraints
-        (A, where A.x + b = 0)
+    :param x: Parameter values at x.
+    :type x: 1D numpy array
 
-    Returns
-    -------
-    x_mod : 1D numpy array
-        The parameter values which minimizes the L2-norm
-        of any function which has the Jacobian jac_x.
-    lagrange_multipliers : 1D numpy array
-        The multipliers for each of the equality
-        constraints
+    :param jac_x: The (estimated, approximate or exact) value of the Jacobian J(x).
+    :type jac_x: 2D numpy array.
+
+    :param c_x: Values of the constraints at x.
+    :type c_x: 1D numpy array
+
+    :param c_prime: The Jacobian of the constraints (A, where A.x + b = 0).
+    :type c_prime: 2D array of floats
+
+    :returns: An array containing the parameter values which minimize the L2-norm
+        of any function which has the Jacobian jac_x, and another array containing
+        the multipliers for each of the equality constraints.
+    :rtype: tuple
     """
     n_x = len(x)
     n = n_x + len(c_x)
@@ -81,7 +76,8 @@ def damped_newton_solve(
 
     Successful termination of the solver is based on three criteria:
     - all(np.abs(dx (simplified newton step) < tol))
-    - all(np.abs(dx (full Newton step) < sqrt(10*tol))) [avoiding pathological behaviour] and
+    - all(np.abs(dx (full Newton step) < sqrt(10*tol)))
+      [avoiding pathological behaviour] and
     - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
 
     If these criteria are not satisfied, iterations continue until one of the following
@@ -94,54 +90,44 @@ def damped_newton_solve(
     Information on the root (or lack of root) obtained by the solver is provided
     in the returned namedtuple.
 
+    :param F: Function returning the system function F(x) as a 1D numpy array.
+    :type F: function of x
 
-    Parameters
-    ----------
-    F : function of x
-        Returns the system function F(x)
-        as a 1D numpy array.
-    J : function of x
-        Returns the Jacobian function J(x)
-        as a 2D numpy array.
-    guess : 1D numpy array
-        Starting guess for the solver.
-    tol : float or array of floats [1.e-6]
-        Tolerance(s) for termination.
-    max_iterations : integer [100]
-        Maximum number of iterations for solver.
-    lambda_bounds: function of dx and x
-        Returns a tuple of floats (1.e-8, 1.) corresponding
-        to the minimum and maximum allowed fractions of the
-        full newton step (dx).
-    linear_constraints : tuple of a 2D numpy array (A) and 1D numpy array (b)
+    :param J: Function returning the Jacobian function J(x) as a 2D numpy array.
+    :type J: function of x
+
+    :param guess: Starting guess for the solver.
+    :type guess: 1D numpy.array
+
+    :param tol: Tolerance(s) for termination.
+    :type: float or array of floats
+
+    :param max_iterations: Maximum number of iterations for the solver.
+    :type: int
+
+    :param lambda_bounds: A function of dx and x that returns
+        a tuple of floats corresponding to the minimum and maximum
+        allowed fractions of the full newton step (dx).
+    :type: function of dx and x
+
+    :param linear_constraints: tuple of a 2D numpy array (A) and 1D numpy array (b)
         Constraints are satisfied if A.x + b < eps
+    :type: tuple of a 2D numpy.array (A) and 1D numpy.array (b)
 
-
-    Returns
-    -------
-    sol : namedtuple
-        Includes the following attributes:
-        x : 1D numpy array of floats
-            The solution vector.
-        F : 1D numpy array of floats
-            The evaluated function F(x).
-        F_norm : float
-            Euclidean norm of F(x).
-        J : 2D numpy array of floats
-            The evaluated Jacobian J(x).
-        n_it : integer
-            Number of iterations.
-        code : integer
-            Numerical description of the solver termination.
-                0 -> Successful convergence
-                1 -> Failure due to solver hitting lower lambda bound
-                2 -> Failure due to descent vector crossing constraints
-                3 -> Failure due to solver reaching maximum number of iterations
-        text : string
-            Description of the solver termination.
-        success : bool
-            Solution convergence boolean.
-        iterates : namedtuple
+    :returns: A namedtuple with the following attributes:
+        * x - The solution vector [1D numpy array].
+        * F - The evaluated function F(x) [1D numpy array].
+        * F_norm - Euclidean norm of F(x) [float].
+        * J - The evaluated Jacobian J(x) [2D numpy array].
+        * n_it - Number of iterations [int].
+        * code - Numerical description of the solver termination [int].
+            0 -> Successful convergence
+            1 -> Failure due to solver hitting lower lambda bound
+            2 -> Failure due to descent vector crossing constraints
+            3 -> Failure due to solver reaching maximum number of iterations
+        * text - Description of the solver termination [str].
+        * success - Solver convergence state [bool].
+        * iterates - [namedtuple]
             Only present if store_iterates=True
             Includes the following attributes:
             x : list of 1D numpy arrays of floats
@@ -150,8 +136,9 @@ def damped_newton_solve(
                 The function for each iteration
             lmda : list of floats
                 The value of the damping parameter for each iteration
+    :rtype: namedtuple
 
-    This function is available as ``burnman.damped_newton_solve``.
+    This function is available as :func:`burnman.damped_newton_solve`.
     """
 
     # Make sure damping factor is within bounds, and that the bounds are reasonable
@@ -234,7 +221,8 @@ def damped_newton_solve(
         x_j = sol.x + lmda * dx
 
         # Check that all constraints are satisfied. If not, adjust lambda.
-        # This must be done just before every call to F() *if* lambda has been increased:
+        # This must be done just before every call to F() *if* lambda
+        # has been increased:
         c_x_j = constraints(x_j)
         if not np.all(
             c_x_j < eps
@@ -380,7 +368,8 @@ def damped_newton_solve(
 
     if converged and not persistent_bound_violation:
         sol.x = x_j + dxbar_j
-        # Even if the solver succeeds, there may be a small chance that the last simplified Newton step
+        # Even if the solver succeeds, there may be a small chance
+        # that the last simplified Newton step
         # shifts the solution just outside the constraints.
         # If so, shift the solution back to the allowed region
         c_x = constraints(sol.x)

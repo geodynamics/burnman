@@ -23,21 +23,21 @@ from ..utils.chemistry import reaction_matrix_as_strings
 
 def fugacity(standard_material, assemblage):
     """
-    Parameters
-    ----------
-    standard_material: burnman.Material object
-        set_method and set_state should already have been used
-        material must have a formula as a dictionary parameter
+    Calculates the fugacity of a standard material in another assemblage.
 
-    assemblage: burnman.Composite object
-        set_method and set_state should already have been used
+    .. note:: set_method and set_state should already have been
+        used on both assemblages.
 
-    Returns
-    -------
-    fugacity : float
-        Value of the fugacity of the component with respect to
-        the standard material
+    :param standard_material: Standard material for which to calculate the fugacity.
+        The material must have a formula as a dictionary parameter.
+    :type assemblage: :class:`burnman.Material`
 
+    :param assemblage: Assemblage for which to calculate the fugacity.
+    :type assemblage: :class:`burnman.Composite`
+
+    :returns: Value of the fugacity of the component with respect to
+        the standard material.
+    :rtype: float
     """
     component_formula = standard_material.params["formula"]
     chemical_potential = assemblage.chemical_potential([component_formula])[0]
@@ -51,23 +51,26 @@ def fugacity(standard_material, assemblage):
 
 def relative_fugacity(component_formula, assemblage, reference_assemblage):
     """
-    Parameters
-    ----------
-    component_formula: dictionary
-        Chemical formula for which to compute the relative fugacity.
+    Calculates the fugacity of a chemical component in one assemblage
+    relative to another one.
 
-    assemblage: burnman.Composite object
-        set_method and set_state should already have been used.
+    .. note:: set_method and set_state should already have been
+        used on both assemblages.
 
-    reference_assemblage: burnman.Composite object
-        set_method and set_state should already have been used.
+    :param component_formula: Chemical formula for which to compute the
+        relative fugacity.
+    :type component_formula: dictionary
 
-    Returns
-    -------
-    relative_fugacity : float
-        Value of the fugacity of the component in the assemblage
+    :param assemblage: Assemblage for which to calculate the fugacity.
+    :type assemblage: :class:`burnman.Composite`
+
+    :param reference_assemblage: Reference assemblage against which to
+        measure the fugacity.
+    :type reference_assemblage: :class:`burnman.Composite`
+
+    :returns: Value of the fugacity of the component in the assemblage
         with respect to the reference_assemblage.
-
+    :rtype: float
     """
     chemical_potential = assemblage.chemical_potential([component_formula])[0]
     reference_chemical_potential = reference_assemblage.chemical_potential(
@@ -89,25 +92,21 @@ def equilibrium_pressure(
     and a temperature of interest, compute the
     equilibrium pressure of the reaction.
 
-    Parameters
-    ----------
-    minerals : list of minerals
-        List of minerals involved in the reaction.
+    :param minerals: List of minerals involved in the reaction.
+    :type minerals: list of :class:`burnman.Mineral`
 
-    stoichiometry : list of floats
-        Reaction stoichiometry for the minerals provided.
-        Reactants and products should have the opposite signs [mol]
+    :param stoichiometry: Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol].
+    :type stoichiometry: list of floats
 
-    temperature : float
-        Temperature of interest [K]
+    :param temperature: Temperature of interest [K].
+    :type temperature: float
 
-    pressure_initial_guess : optional float
-        Initial pressure guess [Pa]
+    :param pressure_initial_guess: Initial pressure guess [Pa].
+    :type pressure_initial_guess: float
 
-    Returns
-    -------
-    pressure : float
-        The equilibrium pressure of the reaction [Pa]
+    :returns: The equilibrium pressure of the reaction [Pa].
+    :rtype: float
     """
 
     def eqm(P, T):
@@ -130,25 +129,21 @@ def equilibrium_temperature(
     and a pressure of interest, compute the
     equilibrium temperature of the reaction.
 
-    Parameters
-    ----------
-    minerals : list of minerals
-        List of minerals involved in the reaction.
+    :param minerals: List of minerals involved in the reaction.
+    :type minerals: list of :class:`burnman.Mineral`
 
-    stoichiometry : list of floats
-        Reaction stoichiometry for the minerals provided.
-        Reactants and products should have the opposite signs [mol]
+    :param stoichiometry: Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol].
+    :type stoichiometry: list of floats
 
-    pressure : float
-        Pressure of interest [Pa]
+    :param pressure: Pressure of interest [Pa].
+    :type pressure: float
 
-    temperature_initial_guess : optional float
-        Initial temperature guess [K]
+    :param temperature_initial_guess: Initial temperature guess [K].
+    :type temperature_initial_guess: float
 
-    Returns
-    -------
-    temperature : float
-        The equilibrium temperature of the reaction [K]
+    :returns: The equilibrium temperature of the reaction [K].
+    :rtype: float
     """
 
     def eqm(T, P):
@@ -175,25 +170,21 @@ def invariant_point(
     and a pressure of interest, compute the
     equilibrium temperature of the reaction.
 
-    Parameters
-    ----------
-    minerals : list of minerals
-        List of minerals involved in the reaction.
+    :param minerals: List of minerals involved in the reaction.
+    :type minerals: list of :class:`burnman.Mineral`
 
-    stoichiometry : list of floats
-        Reaction stoichiometry for the minerals provided.
-        Reactants and products should have the opposite signs [mol]
+    :param stoichiometry: Reaction stoichiometry for the minerals provided.
+        Reactants and products should have the opposite signs [mol].
+    :type stoichiometry: list of floats
 
-    pressure : float
-        Pressure of interest [Pa]
+    :param pressure: Pressure of interest [Pa].
+    :type pressure: float
 
-    temperature_initial_guess : optional float
-        Initial temperature guess [K]
+    :param temperature_initial_guess: Initial temperature guess [K].
+    :type temperature_initial_guess: float
 
-    Returns
-    -------
-    temperature : float
-        The equilibrium temperature of the reaction [K]
+    :returns: The equilibrium temperature of the reaction [K].
+    :rtype: float
     """
 
     def eqm(PT):
@@ -219,35 +210,27 @@ def hugoniot(mineral, P_ref, T_ref, pressures, reference_mineral=None):
     U2-U1 = 0.5*(p2 - p1)(V1 - V2) where U and V are the
     internal energies and volumes (mass or molar) and U = F + TS
 
+    :param mineral:  Mineral for which the Hugoniot is to be calculated.
+    :type mineral: :class:`burnman.Mineral`
 
-    Parameters
-    ----------
-    mineral : mineral
-        Mineral for which the Hugoniot is to be calculated.
+    :param P_ref: Reference pressure [Pa]
+    :type P_ref: float
 
-    P_ref : float
-        Reference pressure [Pa]
+    :param T_ref:  Reference temperature [K]
+    :type T_ref: float
 
-    T_ref : float
-        Reference temperature [K]
+    :param pressures: Set of pressures [Pa] for which the Hugoniot temperature
+        and volume should be calculated.
+    :type pressures: numpy.array of floats
 
-    pressures : numpy array of floats
-        Set of pressures [Pa] for which the Hugoniot temperature
-        and volume should be calculated
-
-    reference_mineral : mineral
-        Mineral which is stable at the reference conditions
+    :param reference_mineral: Mineral which is stable at the reference conditions
         Provides an alternative U_0 and V_0 when the reference
         mineral transforms to the mineral of interest at some
         (unspecified) pressure.
+    :type reference_mineral: :class:`burnman.Mineral`
 
-    Returns
-    -------
-    temperatures : numpy array of floats
-        The Hugoniot temperatures at pressure
-
-    volumes : numpy array of floats
-        The Hugoniot volumes at pressure
+    :returns: The Hugoniot temperatures and volumes at the given pressures.
+    :rtype: tuple of numpy.arrays
     """
 
     def Ediff(T, mineral, P, P_ref, U_ref, V_ref):
@@ -283,17 +266,13 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
     reverse reactions
     (so there will always be an even number of reactions).
 
-    Parameters
-    ----------
-    stoichiometric_matrix : 2D numpy array
-        An array of the stoichiometric (molar) amounts of
-        component j in compound i.
+    :param stoichiometric_matrix: An array of the stoichiometric
+        (molar) amounts of component j in compound i.
+    :type stoichiometric_matrix: 2D numpy array
 
-    Returns
-    -------
-    reactions : 2D numpy array
-        An array of the stoichiometric (molar) amounts of
+    :returns: An array of the stoichiometric (molar) amounts of
         compound j in reaction i.
+    :rtype: 2D numpy array
     """
     n_components = len(stoichiometric_matrix[0])
 
@@ -329,25 +308,21 @@ def reactions_from_formulae(formulae, compound_names, return_strings=True):
     reverse reactions
     (so there will always be an even number of reactions).
 
-    Parameters
-    ----------
-    formulae : list of dictionaries or list of strings
-        List of the chemical formulae, either as strings or
+    :param formulae: List of the chemical formulae, either as strings or
         as a list of dictionaries of elements.
+    :type formulae: list of dictionaries or list of strings
 
-    compound_names : list of strings
-        List of the compound names in the formula list
+    :param compound_names: List of the compound names in the formula list.
+    :type compound_names: list of strings
 
-    return_strings : boolean
-        Whether to return the reactions as strings or array.
+    :param return_strings: Whether to return the reactions as strings or array.
+    :type return_strings: bool
 
-    Returns
-    -------
-    reactions : 2D numpy array or list of strings
-        Either a 2D array of the stoichiometric (molar) amounts of
+    :returns: Either a 2D array of the stoichiometric (molar) amounts of
         compound j in reaction i, or a list of strings.
         The parameter compound_names is only used if strings
         are requested.
+    :rtype: 2D numpy array or list of strings
     """
     if isinstance(formulae[0], str):
         dict_formulae = [dictionarize_formula(f) for f in formulae]

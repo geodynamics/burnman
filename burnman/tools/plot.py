@@ -23,17 +23,32 @@ def plot_projected_elastic_properties(
     mineral, plot_types, axes, n_zenith=31, n_azimuth=91, n_divs=100
 ):
     """
-    Plot types must be one of:
-    'vp': V$_{P}$ (km/s)
-    'vs1': 'V$_{S1}$ (km/s)
-    'vs2': V$_{S2}$ (km/s)
-    'vp/vs1': V$_{P}$/V$_{S1}$
-    'vp/vs2': V$_{P}$/V$_{S2}$
-    's anisotropy': S-wave anisotropy (%), 200(vs1s - vs2s)/(vs1s + vs2s))
-    'linear compressibility' Linear compressibility (GPa$^{-1}$)
-    'youngs modulus': Youngs Modulus (GPa)
+    :param mineral: Mineral object on which calculations should be done
+    :type mineral: :class:`burnman.Mineral`
 
-    axes objects must be initialised with projection='polar'
+    :param plot_types: Plot types must be one of the following
+        * 'vp' - V$_{P}$ (km/s)
+        * 'vs1' - 'V$_{S1}$ (km/s)
+        * 'vs2' - V$_{S2}$ (km/s)
+        * 'vp/vs1' - V$_{P}$/V$_{S1}$
+        * 'vp/vs2' - V$_{P}$/V$_{S2}$
+        * 's anisotropy' - S-wave anisotropy (%), 200(vs1s - vs2s)/(vs1s + vs2s))
+        * 'linear compressibility' - Linear compressibility (GPa$^{-1}$)
+        * 'youngs modulus' - Youngs Modulus (GPa)
+    :type plot_types: list of str
+
+    :param axes: axes objects to be modified.
+        Must be initialised with projection='polar'.
+    :type axes: matplotlib.pyplot.axes objects
+
+    :param n_zenith: Number of zeniths (plot resolution).
+    :type n_zenith: int
+
+    :param n_azimuth: Number of azimuths (plot resolution).
+    :type n_azimuth: int
+
+    :param n_divs: Number of divisions for the color scale.
+    :type n_divs: int
     """
 
     assert len(plot_types) == len(axes)

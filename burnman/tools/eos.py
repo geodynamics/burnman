@@ -12,34 +12,33 @@ def check_eos_consistency(
     m, P=1.0e9, T=300.0, tol=1.0e-4, verbose=False, including_shear_properties=True
 ):
     """
-    Compute numerical derivatives of the gibbs free energy of a mineral
-    under given conditions, and check these values against those provided
-    analytically by the equation of state
+    Checks that numerical derivatives of the Gibbs energy of a mineral
+    under given conditions are equal to those provided
+    analytically by the equation of state.
 
-    Parameters
-    ----------
-    m : mineral
-        The mineral for which the equation of state
-        is to be checked for consistency
-    P : float
-        The pressure at which to check consistency
-    T : float
-        The temperature at which to check consistency
-    tol : float
-        The fractional tolerance for each of the checks
-    verbose : boolean
-        Decide whether to print information about each
-        check
-    including_shear_properties : boolean
-        Decide whether to check shear information,
+    :param m: The mineral for which the equation of state
+        is to be checked for consistency.
+    :type m: :class:`burnman.Mineral`
+
+    :param P: The pressure at which to check consistency.
+    :type P: float
+
+    :param T: The temperature at which to check consistency.
+    :type T: float
+
+    :param tol: The fractional tolerance for each of the checks.
+    :type tol: float
+
+    :param verbose: Decide whether to print information about each check.
+    :type verbose: bool
+
+    :param including_shear_properties: Decide whether to check shear information,
         which is pointless for liquids and equations of state
-        without shear modulus parameterizations
+        without shear modulus parameterizations.
+    :type including_shear_properties: bool
 
-    Returns
-    -------
-    consistency: boolean
-        If all checks pass, returns True
-
+    :returns: Boolean stating whether all checks have passed.
+    :rtype: bool
     """
     dT = 1.0
     dP = 1000.0
@@ -148,30 +147,28 @@ def check_eos_consistency(
 
 def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=False):
     """
-    Compute numerical derivatives of the gibbs free energy of a mineral
-    under given conditions, and check these values against those provided
-    analytically by the equation of state
+    Checks that numerical derivatives of the Gibbs energy of an anisotropic mineral
+    under given conditions are equal to those provided
+    analytically by the equation of state.
 
-    Parameters
-    ----------
-    m : mineral
-        The mineral for which the equation of state
-        is to be checked for consistency
-    P : float
-        The pressure at which to check consistency
-    T : float
-        The temperature at which to check consistency
-    tol : float
-        The fractional tolerance for each of the checks
-    verbose : boolean
-        Decide whether to print information about each
-        check
+    :param m: The anisotropic mineral for which the equation of state
+        is to be checked for consistency.
+    :type m: :class:`burnman.AnisotropicMineral`
 
-    Returns
-    -------
-    consistency: boolean
-        If all checks pass, returns True
+    :param P: The pressure at which to check consistency.
+    :type P: float
 
+    :param T: The temperature at which to check consistency.
+    :type T: float
+
+    :param tol: The fractional tolerance for each of the checks.
+    :type tol: float
+
+    :param verbose: Decide whether to print information about each check.
+    :type verbose: bool
+
+    :returns: Boolean stating whether all checks have passed.
+    :rtype: bool
     """
     dT = 1.0
     dP = 1000.0

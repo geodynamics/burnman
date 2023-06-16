@@ -19,11 +19,11 @@ class NaCl_B1(Calibrant):
     """
     The NaCl (B1 structured) pressure standard reported by Decker (1971).
 
-    Note: This calibrant is not exactly the same as that proposed by Decker.
-    The cold compression curve has here been approximated by a
-    Birch-Murnaghan EoS.
+    .. note:: This calibrant is not exactly the same as that proposed by Decker.
+        The cold compression curve has here been approximated by a
+        Birch-Murnaghan EoS.
 
-    TODO: Make the calibrant exactly match that published by Decker.
+    .. todo:: Make the calibrant exactly match that published by Decker.
     """
 
     def __init__(self):

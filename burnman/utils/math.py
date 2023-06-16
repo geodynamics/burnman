@@ -57,30 +57,28 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     Given a function and a starting guess, find two
     inputs for the function that bracket a root.
 
-    Parameters
-    ----------
-    fn : function
-        The function to bracket
-    x0 : float
-        The starting guess
-    dx : float
-        Small step for starting the search
-    args : parameter list
-        Additional arguments to give to fn
-    ratio :
-        The step size increases by this ratio
+    :param fn: The function to bracket.
+    :type fn: function
+    :param x0: The starting guess.
+    :type x0: float
+    :param dx: Small step for starting the search.
+    :type dx: float
+    :param args: Additional arguments to give to fn.
+    :type args: tuple
+    :param ratio: The step size increases by this ratio
         every step in the search. Defaults to
         the golden ratio.
-    maxiter : int
-        The maximum number of steps before giving up.
+    :type ratio: float
+    :param maxiter: The maximum number of steps before giving up.
+    :type maxiter: int
 
-    Returns
-    -------
-    xa, xb, fa, fb: floats
-        xa and xb are the inputs which bracket a root of fn.
-        fa and fb are the values of the function at those points.
+    :returns: xa, xb, fa, fb. xa and xb are the inputs which
+        bracket a root of fn. fa and fb are the values of the
+        function at those points.
         If the bracket function takes more than maxiter steps,
         it raises a ValueError.
+    :rtype: tuple of floats
+
     """
     niter = 0
     dx = np.abs(dx)
@@ -155,19 +153,15 @@ def _pad_ndarray_inverse_mirror(array, padding):
 
     -3 -2  0  |  2  4  6  7  8  |  9 10 12
 
-    Parameters
-    ----------
-    array : numpy ndarray
-        The array to be padded
-    padding : tuple
-        The number of elements with which to pad the
+    :param array: The array to be padded
+    :type array: numpy.ndarray
+
+    :param padding: The number of elements with which to pad the
         array in each dimension.
+    :type padding: tuple
 
-    Returns
-    -------
-    padded_array: numpy ndarray
-        The padded array
-
+    :returns: The padded array.
+    :type: numpy.ndarray
     """
     padded_shape = [n + 2 * padding[i] for i, n in enumerate(array.shape)]
     padded_array = np.zeros(padded_shape)
@@ -239,29 +233,25 @@ def smooth_array(
     can be padded in a number of different ways given by the
     'mode' parameter.
 
-    Parameters
-    ----------
-    array : numpy ndarray
-        The array to smooth
-    grid_spacing : numpy array of floats
-        The spacing of points along each axis
-    gaussian_rms_widths : numpy array of floats
-        The Gaussian RMS widths/standard deviations for the
+    :param array: The array to smooth.
+    :type array: numpy.ndarray
+    :param grid_spacing: The spacing of points along each axis.
+    :type grid_spacing: numpy.array of floats
+    :param gaussian_rms_widths: The Gaussian RMS widths/standard deviations for the
         Gaussian convolution.
-    truncate : float (default=4.)
-        The number of standard deviations at which to truncate
+    :type gaussian_rms_widths: numpy.array of floats
+    :param truncate: The number of standard deviations at which to truncate
         the smoothing.
-    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+    :type truncate: float
+    :param mode: {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
         The mode parameter determines how the array borders are handled
         either by scipy.ndimage.filters.gaussian_filter.
         Default is 'inverse_mirror', which uses
         :func:`burnman.tools.math._pad_ndarray_inverse_mirror`.
+    :type mode: str
 
-    Returns
-    -------
-    smoothed_array: numpy ndarray
-       The smoothed array
-
+    :returns: The smoothed array
+    :rtype: numpy.ndarray
     """
 
     # gaussian_filter works with standard deviations normalised to
@@ -299,37 +289,35 @@ def interp_smoothed_array_and_derivatives(
     which can be used to query the array, or its derivatives in the
     x- and y- directions.
 
-    Parameters
-    ----------
-    array : 2D numpy array
-        The array to smooth. Each element array[i][j]
+    :param array: The array to smooth. Each element array[i][j]
         corresponds to the position x_values[i], y_values[j]
-    x_values : 1D numpy array
-        The gridded x values over which to create the smoothed grid
-    y_values : 1D numpy array
-        The gridded y_values over which to create the smoothed grid
-    x_stdev : float
-        The standard deviation for the Gaussian filter along the x axis
-    y_stdev : float
-        The standard deviation for the Gaussian filter along the x axis
-    truncate : float (optional)
-        The number of standard deviations at which to truncate
-        the smoothing (default = 4.).
-    mode : {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
+    :type array: numpy.array (2D)
+    :param x_values: The gridded x values over which to create the smoothed grid
+    :type x_values: numpy.array (1D)
+    :param y_values: The gridded y_values over which to create the smoothed grid
+    :type y_values: numpy.array (1D)
+    :param x_stdev: The standard deviation for the Gaussian filter along the x axis
+    :type x_stdev: float
+    :param y_stdev: The standard deviation for the Gaussian filter along the y axis
+    :type y_stdev: float
+    :param truncate: The number of standard deviations at which to truncate
+        the smoothing.
+    :type truncate: float
+    :param mode: {'reflect', 'constant', 'nearest', 'mirror', 'wrap', 'inverse_mirror'}
         The mode parameter determines how the array borders are handled
         either by scipy.ndimage.filters.gaussian_filter.
         Default is 'inverse_mirror', which uses
         :func:`burnman.tools.math._pad_ndarray_inverse_mirror`.
-    indexing : {'xy', 'ij'}, optional
+    :type mode: str
+    :param indexing: {'xy', 'ij'}, optional
         Cartesian ('xy', default) or matrix ('ij') indexing of output.
         See numpy.meshgrid for more details.
+    :type indexing: str
 
-    Returns
-    -------
-    interps: tuple of three RegularGridInterpolator functors
+    :returns: Three RegularGridInterpolator functors
         interpolation functions for the smoothed property and
         the first derivatives with respect to x and y.
-
+    :rtype: tuple
     """
 
     dx = x_values[1] - x_values[0]
@@ -440,7 +428,6 @@ def nrmse(x, funca, funcb):
 
     :returns: RMS error
     :rtype: array of floats
-
     """
     diff = np.array(funca - funcb)
     diff = diff * diff
@@ -460,7 +447,6 @@ def chi_factor(calc, obs):
 
     :returns: :math:`\\chi` factor
     :rtype: array of floats
-
     """
 
     err = np.empty_like(calc)
@@ -478,16 +464,12 @@ def independent_row_indices(array):
     for a given array. The independent rows are determined from the pivots
     used during row reduction/Gaussian elimination.
 
-    Parameters
-    ----------
-    array : 2D numpy array of floats
-        The input array
+    :param array: The input array.
+    :type array: 2D numpy.array of floats
 
-    Returns
-    -------
-    indices : 1D numpy array of integers
-        The indices corresponding to a set of independent rows
+    :returns: The indices corresponding to a set of independent rows
         of the input array.
+    :rtype: 1D numpy array of integers
     """
     m = Matrix(
         array.shape[0],
@@ -523,19 +505,15 @@ def generate_complete_basis(incomplete_basis, array):
     [[1, 0, 0], [0, 1, 0], [0, 0, 1]], the complete basis will be:
     [[1, 0, 0], [1, 1, 0], [0, 0, 1]].
 
-    Parameters
-    ----------
-    incomplete_basis : 2D numpy array
-        An array containing the basis to be completed.
+    :param incomplete_basis: An array containing the basis to be completed.
+    :type incomplete_basis: 2D numpy.array
 
-    array : 2D numpy array
-        An array spanning the full space for which a basis is required.
+    :param array: An array spanning the full space for which a basis is required.
+    :type array: 2D numpy.array
 
-    Returns
-    -------
-    complete_basis : 2D numpy array
-        An array containing the basis vectors spanning both of the
+    :returns: An array containing the basis vectors spanning both of the
         input arrays.
+    :rtype: 2D numpy array
     """
 
     incomplete_rank = array_to_rational_matrix(incomplete_basis).rank()

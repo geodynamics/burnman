@@ -197,21 +197,20 @@ def attribute_function(m, attributes, powers=[]):
     Properties can either be simple attributes (e.g. K_T) or
     a product of attributes, each raised to some power.
 
-    Parameters
-    ----------
-    m : Material
-        The material instance evaluated by the output function.
-    attributes : list of strings
-        The list of material attributes / properties to
-        be evaluated in the product
-    powers : list of floats
-        The powers to which each attribute should be raised
-        during evaluation
-    Returns
-    -------
-    f : function(x)
-        Function which returns the value of product(a_i**p_i)
-        as a function of condition (x = [P, T, V])
+    :param m: The material instance evaluated by the output function.
+    :type m: :class:`burnman.Material`
+
+    :param attributes: The list of material attributes / properties to
+        be evaluated in the product.
+    :type attributes: list of str
+
+    :param powers: The powers to which each attribute should be raised
+        during evaluation.
+    :type powers: list of floats
+
+    :returns: Function which returns the value of product(a_i**p_i)
+        as a function of condition (x = [P, T, V]).
+    :rtype: function
     """
     if type(attributes) is str:
         attributes = [attributes]

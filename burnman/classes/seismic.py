@@ -15,7 +15,6 @@ from .. import constants
 
 
 class Seismic1DModel(object):
-
     """
     Base class for all the seismological models.
     """
@@ -27,17 +26,15 @@ class Seismic1DModel(object):
         """
         Returns the lists of data for a Seismic1DModel for the depths provided
 
-        Parameters
-        ----------
-        vars_list : array of str
-            Available variables depend on the seismic model, and can be chosen from 'pressure','density','gravity','v_s','v_p','v_phi','G','K','QG','QK'
-        depth_list : array of floats
-            Array of depths [m] to evaluate seismic model at.
+        :param vars_list: Available variables depend on the seismic model,
+            and can be chosen from 'pressure', 'density', 'gravity',
+            'v_s', 'v_p', 'v_phi', 'G', 'K', 'QG' and 'QK'.
+        :type vars_list: array of str
+        :param depth_list: Array of depths [m] to evaluate seismic model at.
+        :type depth_list: array of floats
 
-        Returns
-        -------
-        Array of values shapes as (len(vars_list),len(depth_list)).
-
+        :returns: Array of values shapes as (len(vars_list),len(depth_list)).
+        :rtype: numpy.array
         """
         if depth_list is None:
             depth_list = self.internal_depth_list()
@@ -50,77 +47,60 @@ class Seismic1DModel(object):
         self, mindepth=0.0, maxdepth=1.0e99, discontinuity_interval=1.0
     ):
         """
-        Returns a sorted list of depths where this seismic data is specified at. This allows you to compare the seismic data without interpolation. The depths can be bounded by the mindepth and maxdepth parameters.
+        Returns a sorted list of depths at which this seismic data is specified.
+        This allows you to compare the seismic data without interpolation.
+        The depths can be bounded by the mindepth and maxdepth parameters.
 
-        Parameters
-        ----------
-        mindepth  :  float
-            Minimum depth value to be returned [m]
-        maxdepth
-            Maximum depth value to be returned [m]
-        discontinuity interval
-            Shift continuities to remove ambigious values for depth, default value = 1 [m]
+        :param mindepth: Minimum depth value to be returned [m].
+        :type mindepth: float
+        :param maxdepth: Maximum depth value to be returned [m].
+        :type maxdepth: float
+        :param discontinuity_interval: Shift continuities to remove
+            ambigious values for depth [m].
+        :type discontinuity_interval: float
 
-        Returns
-        -------
-        depths : array of floats
-            Depths [m].
+        :returns: Depths [m].
+        :rtype: numpy.array
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def pressure(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        pressure : float or array of floats
-            Pressure(s) at given depth(s) in [Pa].
+        :returns: Pressure(s) at given depth(s) in [Pa].
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def v_p(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        v_p : float or array of floats
-            P wave velocity at given depth(s) in [m/s].
+        :returns: P wave velocity at given depth(s) in [m/s].
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def v_s(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        v_s : float or array of floats
-            S wave velocity at given depth(s) in [m/s].
+        :returns: S wave velocity at given depth(s) in [m/s].
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def v_phi(self, depth):
         """
-        Parameters
-        ----------
-        depth_list : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        v_phi : float or array of floats
-            bulk sound wave velocity at given depth(s) in [m/s].
+        :returns: Bulk sound wave velocity at given depth(s) in [m/s].
+        :rtype: float or numpy.array of floats
         """
         v_s = self.v_s(depth)
         v_p = self.v_p(depth)
@@ -128,89 +108,71 @@ class Seismic1DModel(object):
 
     def density(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        density : float or array of floats
-            Density at given depth(s) in [kg/m^3].
+        :returns: Density at given depth(s) in [kg/m^3].
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def G(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Shear modulus at given for depth(s) in [Pa].
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
+
+        :returns: Shear modulus at given depth(s) in [Pa].
+        :rtype: float or numpy.array of floats
         """
         return np.power(self.v_s(depth), 2.0) * self.density(depth)
 
     def K(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Bulk modulus at given for depth(s) in [Pa]
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
+
+        :returns: Bulk modulus at given depth(s) in [Pa]
+        :rtype: float or numpy.array of floats
         """
         return np.power(self.v_phi(depth), 2.0) * self.density(depth)
 
     def QK(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        Qk : float or array of floats
-            Quality factor (dimensionless) for bulk modulus at given depth(s).
+        :returns: Quality factor (dimensionless) for bulk modulus at given depth(s).
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def QG(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate seismic model at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        QG : float or array of floats
-            Quality factor (dimensionless) for shear modulus at given depth(s).
+        :returns: Quality factor (dimensionless) for shear modulus at given depth(s).
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def depth(self, pressure):
         """
-        Parameters
-        ----------
-        pressure : float or array of floats
-            Pressure(s) [Pa] to evaluate depth at.
+        :param pressure: Pressure(s) [Pa] at which to evaluate depths.
+        :type pressure: float or numpy.array of floats
 
-        Returns
-        -------
-        depth : float or array of floats
-            Depth(s) [m] for given pressure(s)
+        :returns: Depth(s) [m] for given pressure(s).
+        :type depth: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
     def gravity(self, depth):
         """
-        Parameters
-        ----------
-        depth : float or array of floats
-            Depth(s) [m] to evaluate gravity at.
+        :param depth: Depth(s) [m] at which to evaluate seismic model.
+        :type depth: float or numpy.array of floats
 
-        Returns
-        -------
-        gravity : float or array of floats
-            Gravity for given depths in [m/s^2]
+        :returns: Gravity at given depths in [m/s^2].
+        :rtype: float or numpy.array of floats
         """
         raise NotImplementedError("abstract method to be implemented in derived class")
 
@@ -221,9 +183,9 @@ class SeismicTable(Seismic1DModel):
     sorted by radius. Fill the tables in the constructor after deriving
     from this class. This class uses :class:`burnman.seismic.Seismic1DModel`
 
-    Note: all tables need to be sorted by increasing depth. self.table_depth needs to be defined
-    Alternatively, you can also overwrite the _lookup function if you
-    want to access with something else.
+    Note: all tables need to be sorted by increasing depth.
+    self.table_depth needs to be defined. Alternatively, you can also overwrite
+    the _lookup function if you want to access with something else.
     """
 
     def __init__(self):
@@ -376,9 +338,8 @@ class SeismicTable(Seismic1DModel):
 
 
 class PREM(SeismicTable):
-
     """
-    Reads  PREM (1s) (input_seismic/prem.txt, :cite:`dziewonski1981`).
+    Reads PREM (1s) (input_seismic/prem.txt, :cite:`dziewonski1981`).
     See also :class:`burnman.seismic.SeismicTable`.
     """
 
@@ -397,10 +358,12 @@ class PREM(SeismicTable):
 
 
 class Slow(SeismicTable):
-
     """
-    Inserts the mean profiles for slower regions in the lower mantle (Lekic et al. 2012).
-    We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_slow.txt', 'input_seismic/pwave_slow.txt').
+    Inserts the mean profiles for slower regions in the lower mantle
+    (Lekic et al. 2012). We stitch together tables
+    'input_seismic/prem_lowermantle.txt',
+    'input_seismic/swave_slow.txt',
+    'input_seismic/pwave_slow.txt').
     See also :class:`burnman.seismic.SeismicTable`.
     """
 
@@ -435,10 +398,12 @@ class Slow(SeismicTable):
 
 
 class Fast(SeismicTable):
-
     """
-    Inserts the mean profiles for faster regions in the lower mantle (Lekic et al. 2012).
-    We stitch together tables 'input_seismic/prem_lowermantle.txt', 'input_seismic/swave_fast.txt', 'input_seismic/pwave_fast.txt').
+    Inserts the mean profiles for faster regions in the lower mantle
+    (Lekic et al. 2012). We stitch together tables
+    'input_seismic/prem_lowermantle.txt',
+    'input_seismic/swave_fast.txt',
+    'input_seismic/pwave_fast.txt').
     See also :class:`burnman.seismic.Seismic1DModel`.
     """
 
@@ -473,9 +438,8 @@ class Fast(SeismicTable):
 
 
 class STW105(SeismicTable):
-
     """
-    Reads  STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
+    Reads STW05 (a.k.a. REF) (1s) (input_seismic/STW105.txt, :cite:`kustowski2008`).
     See also :class:`burnman.seismic.SeismicTable`.
     """
 
@@ -508,7 +472,7 @@ class STW105(SeismicTable):
 
 class IASP91(SeismicTable):
     """
-    Reads  REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
+    Reads REF/STW05 (input_seismic/STW105.txt, :cite:`kustowski2008`).
     See also :class:`burnman.seismic.SeismicTable`.
     """
 
@@ -524,7 +488,7 @@ class IASP91(SeismicTable):
 
 class AK135(SeismicTable):
     """
-    Reads  AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
+    Reads AK135 (input_seismic/ak135.txt, :cite:`kennett1995`).
     See also :class:`burnman.seismic.SeismicTable`.
     """
 
@@ -545,31 +509,27 @@ class AK135(SeismicTable):
 
 def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
     """
-    Applies the attenuation correction following Matas et al. (2007), page 4. This is simplified, and there is also currently no 1D Q model implemented. The correction, however, only slightly reduces the velocities, and can be ignored for our current applications. Arguably, it might not be as relevant when comparing computations to PREM for periods of 1s as is implemented here.
+    Applies the attenuation correction following Matas et al. (2007), page 4.
+    This is simplified, and there is also currently no 1D Q model implemented.
+    The correction, however, only slightly reduces the velocities,
+    and can be ignored for our current applications.
+    Arguably, it might not be as relevant when comparing computations
+    to PREM for periods of 1s as is implemented here.
     Called from :func:`burnman.main.apply_attenuation_correction`
 
-    Parameters
-    ----------
-    v_p : float
-        P wave velocity in [m/s].
-    v_s : float
-        S wave velocitiy in [m/s].
-    v_phi : float
-        Bulk sound velocity in [m/s].
-    Qs : float
-        shear quality factor [dimensionless]
-    Qphi: float
-        bulk quality factor [dimensionless]
+    :param v_p: P wave velocity in [m/s].
+    :type v_p: float
+    :param v_s: S wave velocitiy in [m/s].
+    :type v_s: float
+    :param v_phi: Bulk sound velocity in [m/s].
+    :type v_phi: float
+    :param Qs: Shear quality factor [dimensionless].
+    :type Qs: float
+    :param Qphi: Bulk quality factor [dimensionless].
+    :type Qphi: float
 
-
-    Returns
-    -------
-    v_p : float
-        corrected P wave velocity in [m/s].
-    v_s : float
-        corrected S wave velocitiy in [m/s].
-    v_phi : float
-        corrected Bulk sound velocity in [m/s].
+    :returns: Corrected P wave, S wave and bulk sound velocities in [m/s].
+    :rtype: tuple
     """
     beta = 0.3  # Matas et al. (2007) page 4
     Qp = 3.0 / 4.0 * pow((v_p / v_s), 2.0) * Qs  # Matas et al. (2007) page 4

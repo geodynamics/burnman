@@ -9,30 +9,26 @@ def pressure_to_pressure(
     state of a material to pressure defined by an independent
     calibration of the same material.
 
+    :param old_calibrant: The original calibration used to estimate the pressure
+    :type old_calibrant: :class:`burnman.Calibrant`
 
-    Arguments
-    ---------
-    old_calibrant : Calibrant object
-        The original calibration used to estimate the pressure
-    new_calibrant : Calibrant object
-        The new calibration from which the pressure is desired
-    pressure : float
-        The pressure calculated using the old calibration
-    temperature : float
-        The temperature of the material
+    :param new_calibrant: The new calibration from which the pressure is desired
+    :type new_calibrant: :class:`burnman.Calibrant`
 
-    PT_covariance : 2x2 numpy array [optional]
-            The pressure-temperature
-            variance-covariance matrix
+    :param pressure: The pressure calculated using the old calibration
+    :type pressure: float
 
+    :param temperature: The temperature of the material
+    :type temperature: float
 
-    Returns
-    -------
-    pressure : float
-        The pressure of the calibrant [Pa]
+    :param PT_covariance: The pressure-temperature variance-covariance matrix
+    :type PT_covariance: 2x2 numpy.array [optional]
 
-    PT_covariance : 2x2 numpy array (if PT_covariance is provided)
-        The pressure-temperature variance-covariance matrix.
+    :returns: The pressure of the calibrant [Pa] (float) and a 2x2 numpy array
+        (if the PT_covariance is provided) containing the
+        pressure-temperature variance-covariance matrix.
+
+    :rtype: tuple
     """
 
     if PT_covariance is None:

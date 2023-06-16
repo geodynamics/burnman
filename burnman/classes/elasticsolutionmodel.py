@@ -55,21 +55,18 @@ class ElasticSolutionModel(object):
         The base class implementation assumes that the excess Helmholtz
         energy is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        F_excess : float
-            The excess Helmholtz energy
+        :returns: The excess Helmholtz energy.
+        :rtype: float
         """
         return np.dot(
             np.array(molar_fractions),
@@ -84,21 +81,18 @@ class ElasticSolutionModel(object):
         compute the excess pressure of the solution.
         The base class implementation assumes that the excess pressure is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        P_excess : float
-            The excess pressure of the solution
+        :returns: The excess pressure of the solution.
+        :rtype: float
         """
         return np.dot(
             molar_fractions,
@@ -111,21 +105,18 @@ class ElasticSolutionModel(object):
         compute the excess entropy of the solution.
         The base class implementation assumes that the excess entropy is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        S_excess : float
-            The excess entropy of the solution
+        :returns: The excess entropy of the solution.
+        :rtype: float
         """
         return np.dot(
             molar_fractions,
@@ -138,21 +129,18 @@ class ElasticSolutionModel(object):
         compute the excess enthalpy of the solution.
         The base class implementation assumes that the excess enthalpy is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        H_excess : float
-            The excess enthalpy of the solution
+        :returns: The excess enthalpy of the solution.
+        :rtype: float
         """
         return (
             self.excess_helmholtz_energy(volume, temperature, molar_fractions)
@@ -167,21 +155,18 @@ class ElasticSolutionModel(object):
         The base class implementation assumes that the excess Helmholtz energy
         is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        partial_F_excess : numpy array
-            The excess Helmholtz energy of each endmember
+        :returns: The excess Helmholtz energy of each endmember
+        :rtype: numpy.array
         """
         return np.zeros_like(molar_fractions)
 
@@ -192,21 +177,18 @@ class ElasticSolutionModel(object):
         The base class implementation assumes that the excess entropy
         is zero (true for mechanical solutions).
 
-        Parameters
-        ----------
-        pressure : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        partial_S_excess : numpy array
-            The excess entropy of each endmember
+        :returns: The excess entropy of each endmember.
+        :rtype: numpy.array
         """
         return np.zeros_like(molar_fractions)
 
@@ -217,21 +199,18 @@ class ElasticSolutionModel(object):
         The base class implementation assumes that the excess pressure
         is zero.
 
-        Parameters
-        ----------
-        volume : float
-            Volume at which to evaluate the solution model. [m^3/mol]
+        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
+        :type volume: float
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
+        :param temperature: Temperature at which to evaluate the solution. [K]
+        :type temperature: float
 
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
+        :param molar_fractions: List of molar fractions of the different
+            endmembers in solution.
+        :type molar_fractions: list of floats
 
-        Returns
-        -------
-        partial_P_excess : numpy array
-            The excess pressure of each endmember
+        :returns: The excess pressure of each endmember.
+        :rtype: numpy.array
         """
         return np.zeros_like(np.array(molar_fractions))
 
@@ -570,39 +549,34 @@ class ElasticSubregularSolution(ElasticIdealSolution):
     Interaction parameters are inserted into a 3D interaction matrix during
     initialization to make use of numpy vector algebra.
 
-    Parameters
-    ----------
-    endmembers : list of lists
-        A list of all the independent endmembers in the solution.
+    :param endmembers: A list of all the independent endmembers in the solution.
         The first item of each list gives the Mineral object corresponding
         to the endmember. The second item gives the site-species formula.
-
-    energy_interaction : list of list of lists
-        The binary endmember interaction energies.
+    :type endmembers: list of lists
+    :param energy_interaction: The binary endmember interaction energies.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    pressure_interaction : list of list of lists
-        The binary endmember interaction pressures.
+    :type energy_interaction: list of list of lists
+    :param pressure_interaction: The binary endmember interaction pressures.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    entropy_interaction : list of list of lists
-        The binary endmember interaction entropies.
+    :type pressure_interaction: list of list of lists
+    :param entropy_interaction: The binary endmember interaction entropies.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    energy_ternary_terms : list of lists
-        The ternary interaction energies. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
-
-    pressure_ternary_terms : list of lists
-        The ternary interaction pressures. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
-
-    entropy_ternary_terms : list of lists
-        The ternary interaction entropies. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
+    :type entropy_interaction: list of list of lists
+    :param energy_ternary_terms: The ternary interaction energies.
+        Each list should contain four entries: the indices i, j, k
+        and the value of the interaction.
+    :type energy_ternary_terms: list of lists
+    :param pressure_ternary_terms: The ternary interaction pressures.
+        Each list should contain four entries: the indices i, j, k
+        and the value of the interaction.
+    :type pressure_ternary_terms: list of lists
+    :param entropy_ternary_terms: The ternary interaction entropies.
+        Each list should contain four entries:
+        the indices i, j, k and the value of the interaction.
+    :type entropy_ternary_terms: list of lists
     """
 
     def __init__(
@@ -758,18 +732,17 @@ class ElasticFunctionSolution(ElasticIdealSolution):
     and so the user-defined excess Helmholtz energy function
     should be defined using autograd-friendly expressions.
 
-    Parameters
-    ----------
-    endmembers : list of lists
-        A list of all the independent endmembers in the solution.
+    :param endmembers: A list of all the independent endmembers in the solution.
         The first item of each list gives the Mineral object corresponding
         to the endmember. The second item gives the site-species formula.
+    :type endmembers: list of lists
 
-    excess_helmholtz_function : function
-        The nonconfigurational Helmholtz energy function with arguments
-        volume, temperature and molar_amounts, in that order.
+    :param excess_helmholtz_function: The nonconfigurational
+        Helmholtz energy function with arguments volume,
+        temperature and molar_amounts, in that order.
         Note that the function must be extensive; if the molar amounts
         are doubled, the Helmholtz energy must also double.
+    :type excess_helmholtz_function: function
     """
 
     def __init__(self, endmembers, excess_helmholtz_function):
