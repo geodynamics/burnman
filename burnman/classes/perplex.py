@@ -1,11 +1,12 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2023 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
 from __future__ import print_function
 
-from subprocess import Popen, PIPE, STDOUT
+import time
+import subprocess
 from os import rename
 
 import numpy as np
@@ -27,7 +28,8 @@ def create_perplex_table(
     temperature_range=None,
 ):
     """
-    This function uses PerpleX's werami software to output a table file containing the following material properties.
+    This function uses PerpleX's werami software to output a table file
+    containing the following material properties.
     2 - Density (kg/m3)
     4 - Expansivity (1/K, for volume)
     5 - Compressibility (1/bar, for volume)
@@ -40,10 +42,13 @@ def create_perplex_table(
     18 - Enthalpy (J/kg)
     19 - Heat Capacity (J/K/kg)
     22 - Molar Volume (J/bar)
+
+    The user must already have a PerpleX build file,
+    and have run vertex on that build file.
     """
 
     print(
-        "Working on creating {0}x{1} P-T table file using werami. Please wait.\n".format(
+        "Creating a {0}x{1} P-T table file using werami. Please wait.\n".format(
             n_pressures, n_temperatures
         )
     )
@@ -55,7 +60,7 @@ def create_perplex_table(
             temperature_range[0],
             temperature_range[1],
         )
-    except:
+    except TypeError:
         print("Keeping P-T range the same as the original project range.\n")
         str2 = "n\n"
 
@@ -76,18 +81,60 @@ def create_perplex_table(
         "0\n"
         "{1:s}"
         "{2:d} {3:d}\n"
-        "0".format(project_name, str2, n_pressures, n_temperatures)
+        "0\n".format(project_name, str2, n_pressures, n_temperatures)
     )
 
-    p = Popen(werami_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding="utf8")
-    stdout = p.communicate(input=stdin)[0]
-    print(stdout)
-    out = [s for s in stdout.split("\n") if "Output has been written to the" in s][
-        0
-    ].split()[-1]
-    rename(out, outfile)
-    print("Output file renamed to {0:s}".format(outfile))
-    print("Processing complete")
+    with subprocess.Popen(
+        werami_path,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        encoding="utf8",
+    ) as process:
+        process.stdin.write(stdin)
+        process.stdin.flush()
+
+        out = ""
+        # Grab stdout line by line as it becomes available.
+        # This will loop until the process terminates.
+        stdoutput = ""
+        while process.poll() is not None:
+            line = process.stdout.readline()
+            stdoutput += line
+
+            # Check if vertex has been run on the build file
+            if "missing *.tof file" in line:
+                raise Exception(
+                    "You must run Perple_X vertex "
+                    f"({werami_path[0].split('werami')[0]}vertex) "
+                    "using the PerpleX build file ({project_name}) "
+                    "before running this script."
+                )
+
+        while process.poll() is None:
+            line = process.stdout.readline()
+            stdoutput += line
+
+            # Check if werami is trying to create a standard resolution grid
+            # Tell the user to modify their local perplex option file if so.
+            if "Continue (y/n)?" in line:
+                raise Exception(
+                    "If you do not want to define your own P-T range for the grid,\n"
+                    "you must set sample_on_grid to F in the perplex option file\n"
+                    "(default is perplex_option.dat)."
+                )
+
+            # Get the output file name
+            if "Output has been written to the" in line:
+                out = line.split()[-1]
+
+        # Print stdoutput
+        print(stdoutput)
+        print(process.stdout.read())
+
+        # Rename the file to the user-specified filename
+        rename(out, outfile)
+        print("Output file renamed to {0:s}".format(outfile))
+        print("Processing complete")
 
 
 class PerplexMaterial(Material):
