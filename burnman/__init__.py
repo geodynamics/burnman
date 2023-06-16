@@ -82,8 +82,18 @@ Requirements
 ------------
 
   - Python 3.8+
-  - Python modules: NumPy, SciPy, SymPy, Matplotlib
-  - Optional modules: cvxpy, pycddlib
+  - Python modules: NumPy, SciPy, SymPy, Sparse, Matplotlib
+
+Optional modules
+^^^^^^^^^^^^^^^^
+
+Needed for some functionality:
+
+  - cvxpy: required for some least squares fitting routines
+    and solution polytope calculations.
+  - pycddlib: required for solution polytope calculations.
+  - autograd: required for esoteric solution models defined using a single excess
+    function. Not required for the vast majority of users.
 
 Installation
 ------------

@@ -36,9 +36,9 @@ Authors (as of 2022):
 
 ## Optional, needed for some functionality
 
-* cvxpy
-* pycddlib
-* autograd
+* cvxpy - required for some least squares fitting routines and solution polytope calculations.
+* pycddlib - required for solution polytope calculations.
+* autograd - required for esoteric solution models defined using a single excess function. Not required for the vast majority of users.
 
 ## Installation
 Installation of BurnMan is mostly platform independent.
@@ -47,7 +47,7 @@ The following instructions should help, but let us know if you have any problems
 
 ### Environment management
 We strongly recommend using a python environment manager like conda or pyenv to install
-burnman and its dependencies. This is especially the case for installations on modern Mac systems.
+BurnMan and its dependencies. This is especially the case for installations on modern Mac systems.
 
 For pyenv, we suggest you select the most recent version of python supported by BurnMan, install all of the dependencies into that environment and set the burnman root directory to use that environment automatically.
 
@@ -62,7 +62,9 @@ Once you have checked your version of python, you should make sure you have inst
 
     python -m ensurepip --upgrade
 
-Mac users will also need to install Xcode, which can be found in the MacStore.
+Mac users will also need to install Xcode, which can be found in the MacStore, or can be installed with:
+
+    xcode-select --install
 
 ### Stable version
 If you are only interested in using BurnMan (rather than developing the software), and you aren't interested in any of the latest changes, you can install the stable version by typing the following into a terminal window:
