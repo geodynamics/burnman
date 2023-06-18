@@ -29,18 +29,11 @@ def calculate_constraints(assemblage, n_free_compositional_vectors):
     The sign convention is chosen such that the constraint is satisfied
     if A.x + b < eps.
 
-    Parameters
-    ----------
-    assemblage : burnman.Composite object
-        The assemblage for which the constraints are calculated.
+    :param assemblage: The assemblage for which the constraints are calculated.
+    :type assemblage: :class:`burnman.Composite`
 
-    Returns
-    -------
-    c_vector :
-        The constraints vector.
-
-    c_matrix :
-        The constraints matrix.
+    :returns: The constraints vector and matrix.
+    :rtype: tuple
     """
     bounds = []
     n_constraints = 0
@@ -93,15 +86,11 @@ def get_parameters(assemblage, n_free_compositional_vectors=0):
         of the independent endmembers in the solution, except for the first
         endmember (as the mole fractions must sum to one).
 
-    Parameters
-    ----------
-    assemblage : burnman.Composite object
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    Returns
-    -------
-    params : numpy array
-        An array containing the current parameter values.
+    :returns: The current values of all the parameters.
+    :rtype: numpy.array
     """
     params = np.zeros(assemblage.n_endmembers + 2 + n_free_compositional_vectors)
     n_moles_phase = assemblage.n_moles * np.array(assemblage.molar_fractions)
@@ -127,15 +116,11 @@ def get_endmember_amounts(assemblage):
     """
     Gets the absolute amounts of all the endmembers in the solution.
 
-    Parameters
-    ----------
-    assemblage : burnman.Composite object
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    Returns
-    -------
-    amounts : numpy array
-        An array containing the current amounts of all the endmembers.
+    :returns: The current amounts of all the endmembers.
+    :rtype: numpy.array
     """
     phase_amounts = assemblage.n_moles * assemblage.molar_fractions
     amounts = np.empty(assemblage.n_endmembers)
@@ -157,13 +142,11 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     Sets the phase compositions, amounts and state of the assemblage
     from a list of parameter values.
 
-    Parameters
-    ----------
-    assemblage : burnman.Composite object
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    parameters : numpy array
-        An array containing the current parameter values.
+    :param parameters: The current parameter values.
+    :type parameters: numpy.array
     """
     assemblage.set_state(parameters[0], parameters[1])
     i = 2
@@ -209,30 +192,26 @@ def F(
     The final set of vector values correspond to the bulk
     composition constraints.
 
-    Parameters
-    ----------
-    x : numpy array
-        Parameter values for the equilibrium problem to be solved.
+    :param x: Parameter values for the equilibrium problem to be solved.
+    :type x: numpy array
 
-    assemblage : burnman.Composite object
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    equality_constraints : list of lists
-        A list of the equality constraints (see above).
+    :param equality_constraints: A list of the equality constraints
+        (see above for valid formats).
+    :type equality_constraints: list of lists
 
-    reduced_composition_vector : numpy array
-        The vector corresponding to the amounts of the independent
+    :param reduced_composition_vector: The amounts of the independent
         elements.
+    :type reduced_composition_vector: numpy.array
 
-    reduced_free_composition_vectors : 2D numpy array
-        The amounts of the independent elements in each of the
-        free_compositional_vectors.
+    :param reduced_free_composition_vectors: The amounts of the
+        independent elements in each of the free_compositional_vectors.
+    :type reduced_free_composition_vectors: 2D numpy.array
 
-    Returns
-    -------
-    eqns : numpy array
-        An array containing the vector values which
-        are equal to zero at equilibrium.
+    :returns: The vector corresponding to F(x).
+    :rtype: numpy.array
     """
 
     set_compositions_and_state_from_parameters(assemblage, x)
@@ -279,25 +258,23 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
     See documentation for F and get_parameters
     (which return F and x respectively) for more details.
 
-    Parameters
-    ----------
-    x : numpy array
-        Parameter values for the equilibrium problem to be solved.
+    :param x: Parameter values for the equilibrium problem to be solved.
+    :type x: numpy.array
 
-    assemblage : burnman.Composite object
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    equality_constraints : list of lists
-        A list of the equality constraints (see documentation for F).
+    :param equality_constraints: A list of the equality constraints
+        (see documentation for :func:`burnman.tools.equilbration.F`).
+    :type equality_constraints: list of lists
 
-    reduced_free_composition_vectors : 2D numpy array
-        The amounts of the independent elements in each of the
-        free_compositional_vectors.
+    :param reduced_free_composition_vectors: The amounts of the
+        independent elements in each of the free_compositional_vectors.
+    :type reduced_free_composition_vectors: 2D numpy array
 
-    Returns
-    -------
-    jacobian : 2D numpy array
-        An array containing the Jacobian for the equilibrium problem.
+    :returns: The Jacobian for the equilibrium problem.
+    :rtype: 2D numpy.array
+
     """
     # The solver always calls the Jacobian with the same
     # x parameters as used previously for the root functions
@@ -451,21 +428,17 @@ def lambda_bounds(dx, x, endmembers_per_phase):
     Returns the lambda bounds for the damped affine invariant modification
     to Newton's method for nonlinear problems (Deuflhard, 1974;1975;2004).
 
-    Parameters
-    ----------
-    dx : numpy array
-        The proposed newton step.
+    :param dx: The proposed newton step.
+    :type dx: numpy.array
 
-    x : numpy array
-        Parameter values for the equilibrium problem to be solved.
+    :param x: Parameter values for the equilibrium problem to be solved.
+    :type x: numpy.array
 
-    endmembers_per_phase : list of integers
-        A list of the number of endmembers in each phase.
+    :param endmembers_per_phase: A list of the number of endmembers in each phase.
+    :type endmembers_per_phase: list of int
 
-    Returns
-    -------
-    lmda_bounds : tuple of floats
-        minimum and maximum allowed fractions of the full newton step (dx).
+    :returns: Minimum and maximum allowed fractions of the full newton step (dx).
+    :rtype: tuple of floats
     """
 
     max_steps = np.ones((len(x))) * 100000.0
@@ -499,27 +472,23 @@ def phase_fraction_constraints(phase, assemblage, fractions, prm):
     Converts a phase fraction constraint into standard linear form
     that can be processed by the root finding problem.
 
-    Parameters
-    ----------
-    phase : burnman.Solution or burnman.Mineral
-        The phase for which the fraction is to be constrained
+    :param phase: The phase for which the fraction is to be constrained
+    :type phase: :class:`burnman.Solution` or :class:`burnman.Mineral`
 
-    assemblage : burnman.Composite
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    fractions : numpy array
-        The phase fractions to be satified at equilibrium.
+    :param fractions: The phase fractions to be satified at equilibrium.
+    :type fractions: numpy.array
 
-    prm : namedtuple
-        A tuple with attributes n_parameters
+    :param prm: A tuple with attributes n_parameters
         (the number of parameters for the current equilibrium problem)
         and phase_amount_indices (the indices of the parameters that
         correspond to phase amounts).
+    :type prm: namedtuple
 
-    Returns
-    -------
-    constraints : list
-        An list of the phase fraction constraints.
+    :returns: The phase fraction constraints.
+    :rtype: list
     """
     phase_idx = assemblage.phases.index(phase)
 
@@ -551,22 +520,19 @@ def phase_composition_constraints(phase, assemblage, constraints, prm):
     (in terms of chemical constraints), but easier to use as a constraint
     in a nonlinear solve.
 
-    Parameters
-    ----------
-    phase : burnman.Solution
-        The phase for which the composition is to be constrained
+    :param phase: The phase for which the composition is to be constrained.
+    :type phase: :class:`burnman.Solution`
 
-    assemblage : burnman.Composite
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    constraints : a 4-tuple (list of strings, numpy array * 3)
-        A tuple corresponding to the desired constraints, in the form
-        (site_names, numerator, denominator, values).
+    :param constraints: The desired constraints in the form:
+        site_names (list of strings), numerator (numpy.array),
+        denominator (numpy.array), values (numpy.array).
+    :type constraints: tuple
 
-    Returns
-    -------
-    x_constraints : list
-        An list of the phase composition constraints in standard form.
+    :returns: The phase composition constraints in standard form.
+    :rtype: list
     """
     phase_idx = assemblage.phases.index(phase)
 
@@ -600,25 +566,21 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
     Builds a named tuple containing the parameter names and
     various other parameters needed by the equilibrium solve.
 
-    Parameters
-    ----------
-    assemblage : burnman.Composite
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    composition : dictionary
-        The bulk composition for the equilibrium problem.
+    :param composition: The bulk composition for the equilibrium problem.
+    :type composition: dict
 
-    free_compositional_vectors : list of dictionaries
-        The bulk compositional degrees of freedom
-        for the equilibrium problem.
+    :param free_compositional_vectors: The bulk compositional
+        degrees of freedom for the equilibrium problem.
+    :type free_compositional_vectors: list of dictionaries
 
-    Returns
-    -------
-    prm : namedtuple
-        A tuple with attributes n_parameters
+    :returns: A tuple with attributes n_parameters
         (the number of parameters for the current equilibrium problem)
         and phase_amount_indices (the indices of the parameters that
         correspond to phase amounts).
+    :rtype: namedtuple
     """
     # Initialize a named tuple for the equilibration parameters
     prm = namedtuple("assemblage_parameters", [])
@@ -697,27 +659,23 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
     solution parameters. It also turns vector-valued constraints into a
     list of scalar-valued constraints.
 
-    Parameters
-    ----------
-    equality_constraints : list
-        A list of equality constraints as provided by the user. For the
-        types of constraints, please see the documentation for the
-        equilibrate function.
+    :param equality_constraints: A list of equality constraints.
+        For valid types of constraints, please see the documentation for
+        :func:`burnman.equilibrate`.
+    :type equality_constraints: list
 
-    assemblage : burnman.Composite
-        The assemblage for which equilibrium is to be calculated.
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    prm : namedtuple
-        A tuple with attributes n_parameters
+    :param prm: A tuple with attributes n_parameters
         (the number of parameters for the current equilibrium problem)
         and phase_amount_indices (the indices of the parameters that
         correspond to phase amounts).
+    :type prm: namedtuple
 
-    Returns
-    -------
-    eq_constraint_lists : list of lists
-        A list of lists of equality constraints in a form that can be processed
+    :returns: Equality constraints in a form that can be processed
         by the F and jacobian functions.
+    :rtype: list of lists
     """
     eq_constraint_lists = []
     for i in range(len(equality_constraints)):
@@ -819,16 +777,14 @@ def equilibrate(
     (chemical affinities for feasible reactions in the system
     should be equal to zero).
 
-    Parameters
-    ----------
-    composition : dictionary
-        The bulk composition that the assemblage must satisfy
+    :param composition: The bulk composition that the assemblage must satisfy.
+    :type composition: dict
 
-    assemblage : burnman.Composite object
-        The assemblage to be equilibrated
+    :param assemblage: The assemblage to be equilibrated.
+    :type assemblage: :class:`burnman.Composite`
 
-    equality_constraints : list
-        A list of equality constraints. Each constraint
+
+    :param equality_constraints: A list of equality constraints. Each constraint
         should have the form: [<constraint type>, <constraint>], where
         <constraint type> is one of P, T, S, V, X, PT_ellipse,
         phase_fraction, or phase_composition. The <constraint> object should
@@ -848,41 +804,39 @@ def equilibrate(
         So, one could for example choose a constraint
         ([Mg_A, Fe_A], [1., 0.], [1., 1.], [0.5]) which would
         correspond to equal amounts Mg and Fe on the A site.
+    :type equality_constraints: list
 
-    free_compositional_vectors : list of dictionaries
-        A list of dictionaries containing the compositional freedom of
-        the solution. For example, if the list contains the
-        vector {'Mg': 1., 'Fe': -1}, that implies that the bulk composition
-        is equal to composition + a * (n_Mg - n_Fe), where a is a constant
-        to be determined by the solve.
+    :param free_compositional_vectors: A list of dictionaries containing
+        the compositional freedom of the solution. For example, if the list
+        contains the vector {'Mg': 1., 'Fe': -1}, that implies that the bulk
+        composition is equal to composition + a * (n_Mg - n_Fe), where a is a
+        constant to be determined by the solve.
+    :type free_compositional_vectors: list of dict
 
-    tol : float
-        The tolerance for the nonlinear solver.
+    :param tol: The tolerance for the nonlinear solver.
+    :type tol: float
 
-    store_iterates : boolean
-        Whether to store the parameter values for each iteration in
-        each solution object.
+    :param store_iterates: Whether to store the parameter values for
+        each iteration in each solution object.
+    :type store_iterates: bool
 
-    store_assemblage : boolean
-        Whether to store a copy of the assemblage object in each
-        solution object.
+    :param store_assemblage: Whether to store a copy of the assemblage
+        object in each solution object.
+    :type store_assemblage: bool
 
-    max_iterations : integer
-        The maximum number of iterations for the nonlinear solver.
+    :param max_iterations: The maximum number of iterations for the
+        nonlinear solver.
+    :type max_iterations: int
 
-    verbose : boolean
-        Whether to print output updating the user on the status of
+    :param verbose: Whether to print output updating the user on the status of
         equilibration.
+    :type verbose: bool
 
-    Returns
-    -------
-    sol_array : single, list, or 2D list of solver solution objects
-
-    prm : namedtuple object
-        A tuple with attributes n_parameters
-        (the number of parameters for the current equilibrium problem)
-        and phase_amount_indices (the indices of the parameters that
-        correspond to phase amounts).
+    :returns: Solver solution object (or a list, or a 2D list of solution objects)
+        created by :func:`burnman.optimize.nonlinear_solvers.damped_newton_solve`,
+        and a namedtuple object created by
+        :func:`burnman.tools.equilibration.get_equilibration_parameters`.
+    :rtype: tuple
     """
     for ph in assemblage.phases:
         if isinstance(ph, Solution) and not hasattr(ph, "molar_fractions"):

@@ -29,34 +29,28 @@ def weighted_constrained_least_squares(
     C.x == c
     D.x <= d
 
-    Parameters
-    ----------
-    A : 2D numpy array
-        The matrix A in the objective function above.
+    :param A: An array defining matrix A in the objective function above.
+    :type A: 2D numpy array
 
-    b : numpy array
-        The vector b in the objective function above.
+    :param b: An array defining vector b in the objective function above.
+    :type b: numpy array
 
-    Cov_b : 2D numpy array
-        The covariance matrix associated with b
+    :param Cov_b: A covariance matrix associated with b
+    :type Cov_b: 2D numpy array
 
-    equality_constraints : list containing a 2D array and 1D array
-        The list contains the matrices C and c in the objective function above.
+    :param equality_constraints: A list containing the matrices C and c
+        in the objective function above.
+    :type equality_constraints: list containing a 2D array and 1D array
 
-    inequality_constraints : list containing a 2D array and 1D array
-        The list contains the matrices D and d in the objective function above.
+    :param inequality_constraints: A list containing the matrices D and d
+        in the objective function above.
+    :type inequality_constraints: list containing a 2D array and 1D array
 
-
-    Returns
-    -------
-    popt : numpy array
-        Optimized phase amounts.
-
-    pcov : 2D numpy array
-        Covariance matrix corresponding to the optimized phase amounts.
-
-    res : float
-        The weighted residual of the fitting procedure.
+    :returns: Tuple containing the optimized phase amounts (1D numpy.array),
+        a covariance matrix corresponding to the optimized phase amounts
+        (2D numpy.array), and the weighted residual of the fitting procedure
+        (a float).
+    :rtype: tuple
     """
 
     if Cov_b is None:

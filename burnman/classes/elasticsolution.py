@@ -15,13 +15,7 @@ from burnman.classes.solutionmodel import IdealSolution
 from ..constants import gas_constant
 from .material import material_property, cached_property
 from .mineral import Mineral
-from .elasticsolutionmodel import ElasticSolutionModel
 from .elasticsolutionmodel import ElasticMechanicalSolution
-from .elasticsolutionmodel import ElasticIdealSolution
-from .elasticsolutionmodel import ElasticSymmetricRegularSolution
-from .elasticsolutionmodel import ElasticAsymmetricRegularSolution
-from .elasticsolutionmodel import ElasticSubregularSolution
-from .elasticsolutionmodel import ElasticFunctionSolution
 from .averaging_schemes import reuss_average_function
 
 from ..utils.math import bracket
@@ -51,15 +45,14 @@ class ElasticSolution(Mineral):
     see the documentation for individual models for details about
     other parameters.
 
-    Parameters
-    ----------
-    name : string
-        Name of the solution
-    solution_model : :class:`burnman.classes.elasticsolutionmodel.ElasticSolutionModel` object
-        The ElasticSolutionModel object defining the properties of the solution.
-    molar_fractions : numpy array (optional)
-        The molar fractions of each endmember in the solution.
+    :param name: Name of the solution.
+    :type name: string
+    :param solution_model: The ElasticSolutionModel object defining the
+        properties of the solution.
+    :type solution_model: :class:`burnman.ElasticSolutionModel`
+    :param molar_fractions: The molar fractions of each endmember in the solution.
         Can be reset using the set_composition() method.
+    :type molar_fractions: numpy.array
     """
 
     def __init__(self, name=None, solution_model=None, molar_fractions=None):
@@ -107,10 +100,9 @@ class ElasticSolution(Mineral):
         Set the composition for this solution.
         Resets cached properties.
 
-        Parameters
-        ----------
-        molar_fractions: list of float
-            molar abundance for each endmember, needs to sum to one.
+        :param molar_fractions: Molar abundance for each endmember,
+            needs to sum to one.
+        :type molar_fractions: list of float
         """
         assert len(self.solution_model.endmembers) == len(molar_fractions)
 
@@ -460,7 +452,8 @@ class ElasticSolution(Mineral):
             return pressure_try - self.pressure
 
         def _K_T(volume):
-            # Note, this only works when the excess pressure is not a function of V or T.
+            # Note, this only works when the excess pressure is not a function
+            # of V or T.
 
             return sum(
                 [

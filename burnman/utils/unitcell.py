@@ -12,19 +12,14 @@ def molar_volume_from_unit_cell_volume(unit_cell_v, z):
     Converts a unit cell volume from Angstroms^3 per unitcell,
     to m^3/mol.
 
-    Parameters
-    ----------
-    unit_cell_v : float
-        Unit cell volumes [A^3/unit cell]
+    :param unit_cell_v: Unit cell volumes [A^3/unit cell].
+    :type unit_cell_v: float
 
-    z : float
-        Number of formula units per unit cell
+    :param z: Number of formula units per unit cell.
+    :type z: float
 
-
-    Returns
-    -------
-    V : float
-        Volume [m^3/mol]
+    :returns: Volume [m^3/mol]
+    :rtype: float
     """
     V = unit_cell_v * constants.Avogadro / 1.0e30 / z
     return V
@@ -34,23 +29,19 @@ def cell_parameters_to_vectors(cell_parameters):
     """
     Converts cell parameters to unit cell vectors.
 
-    Parameters
-    ----------
-    cell_parameters : 1D numpy array
-        An array containing the three lengths of the unit cell vectors [m],
-        and the three angles [degrees].
+    :param cell_parameters: An array containing the three lengths of the
+        unit cell vectors [m], and the three angles [degrees].
         The first angle (:math:`\\alpha`) corresponds to the angle between the
         second and the third cell vectors, the second (:math:`\\beta`) to the
         angle between the first and third cell vectors, and the third
         (:math:`\\gamma`) to the angle between the first and second vectors.
+    :type cell_parameters: numpy.array (1D)
 
-    Returns
-    -------
-    M : 2D numpy array
-        The three vectors defining the parallelopiped cell [m].
+    :returns: The three vectors defining the parallelopiped cell [m].
         This function assumes that the first cell vector is colinear with the
         x-axis, and the second is perpendicular to the z-axis, and the third is
         defined in a right-handed sense.
+    :rtype: numpy.array (2D)
     """
     a, b, c, alpha_deg, beta_deg, gamma_deg = cell_parameters
     alpha = np.radians(alpha_deg)
@@ -72,23 +63,20 @@ def cell_vectors_to_parameters(M):
     """
     Converts unit cell vectors to cell parameters.
 
-    Parameters
-    ----------
-    M : 2D numpy array
-        The three vectors defining the parallelopiped cell [m].
+    :param M: The three vectors defining the parallelopiped cell [m].
         This function assumes that the first cell vector is colinear with the
         x-axis, the second is perpendicular to the z-axis, and the third is
         defined in a right-handed sense.
+    :type M: numpy.array (2D)
 
-    Returns
-    -------
-    cell_parameters : 1D numpy array
-        An array containing the three lengths of the unit cell vectors [m],
+
+    :returns: An array containing the three lengths of the unit cell vectors [m],
         and the three angles [degrees].
         The first angle (:math:`\\alpha`) corresponds to the angle between the
         second and the third cell vectors, the second (:math:`\\beta`) to the
         angle between the first and third cell vectors, and the third
         (:math:`\\gamma`) to the angle between the first and second vectors.
+    :rtype: numpy.array (1D)
     """
 
     assert M[0, 1] == 0

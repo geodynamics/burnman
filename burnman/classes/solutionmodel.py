@@ -13,7 +13,7 @@ import warnings
 import sparse
 import string
 from copy import deepcopy
-from .material import material_property, cached_property
+from .material import material_property
 
 try:
     ag = importlib.import_module("autograd")
@@ -157,21 +157,16 @@ class SolutionModel(object):
         The base class implementation assumes that the excess gibbs
         free energy is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        G_excess : float
-            The excess Gibbs free energy
+        :returns: The excess Gibbs energy.
+        :rtype: float
         """
         return np.dot(
             np.array(molar_fractions),
@@ -186,21 +181,16 @@ class SolutionModel(object):
         compute the excess volume of the solution.
         The base class implementation assumes that the excess volume is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        V_excess : float
-            The excess volume of the solution
+        :returns: The excess volume of the solution.
+        :rtype: float
         """
         return np.dot(
             molar_fractions,
@@ -213,21 +203,16 @@ class SolutionModel(object):
         compute the excess entropy of the solution.
         The base class implementation assumes that the excess entropy is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        S_excess : float
-            The excess entropy of the solution
+        :returns: The excess entropy of the solution.
+        :rtype: float
         """
         return np.dot(
             molar_fractions,
@@ -240,21 +225,16 @@ class SolutionModel(object):
         compute the excess enthalpy of the solution.
         The base class implementation assumes that the excess enthalpy is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        H_excess : float
-            The excess enthalpy of the solution
+        :returns: The excess enthalpy of the solution.
+        :rtype: float
         """
         return self.excess_gibbs_free_energy(
             pressure, temperature, molar_fractions
@@ -270,21 +250,16 @@ class SolutionModel(object):
         The base class implementation assumes that the excess gibbs
         free energy is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        partial_G_excess : numpy array
-            The excess Gibbs free energy of each endmember
+        :returns: The excess partial Gibbs free energy of each endmember.
+        :rtype: numpy.array
         """
         return np.zeros_like(molar_fractions)
 
@@ -295,21 +270,16 @@ class SolutionModel(object):
         The base class implementation assumes that the excess entropy
         is zero (true for mechanical solutions).
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        partial_S_excess : numpy array
-            The excess entropy of each endmember
+        :returns: The excess partial entropy of each endmember.
+        :rtype: numpy.array
         """
         return np.zeros_like(molar_fractions)
 
@@ -320,21 +290,16 @@ class SolutionModel(object):
         The base class implementation assumes that the excess volume
         is zero.
 
-        Parameters
-        ----------
-        pressure : float
-            Pressure at which to evaluate the solution model. [Pa]
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
 
-        temperature : float
-            Temperature at which to evaluate the solution. [K]
-
-        molar_fractions : list of floats
-            List of molar fractions of the different endmembers in solution
-
-        Returns
-        -------
-        partial_V_excess : numpy array
-            The excess volume of each endmember
+        :returns: The excess partial volume of each endmember.
+        :rtype: numpy.array
         """
         return np.zeros_like(np.array(molar_fractions))
 
@@ -731,39 +696,34 @@ class SubregularSolution(IdealSolution):
     Interaction parameters are inserted into a 3D interaction matrix during
     initialization to make use of numpy vector algebra.
 
-    Parameters
-    ----------
-    endmembers : list of lists
-        A list of all the independent endmembers in the solution.
+    :param endmembers: A list of all the independent endmembers in the solution.
         The first item of each list gives the Mineral object corresponding
         to the endmember. The second item gives the site-species formula.
-
-    energy_interaction : list of list of lists
-        The binary endmember interaction energies.
+    :type endmembers: list of lists
+    :param energy_interaction: The binary endmember interaction energies.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    volume_interaction : list of list of lists
-        The binary endmember interaction volumes.
+    :type energy_interaction: list of list of lists
+    :param volume_interaction: The binary endmember interaction volumes.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    entropy_interaction : list of list of lists
-        The binary endmember interaction entropies.
+    :type volume_interaction: list of list of lists
+    :param entropy_interaction: The binary endmember interaction entropies.
         Each interaction[i, j-i-1, 0] corresponds to W(i,j), while
         interaction[i, j-i-1, 1] corresponds to W(j,i).
-
-    energy_ternary_terms : list of lists
-        The ternary interaction energies. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
-
-    volume_ternary_terms : list of lists
-        The ternary interaction volumes. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
-
-    entropy_ternary_terms : list of lists
-        The ternary interaction entropies. Each list should contain
-        four entries: the indices i, j, k and the value of the interaction.
+    :type entropy_interaction: list of list of lists
+    :param energy_ternary_terms: The ternary interaction energies.
+        Each list should contain four entries:
+        the indices i, j, k and the value of the interaction.
+    :type energy_ternary_terms: list of lists
+    :param volume_ternary_terms: The ternary interaction volumes.
+        Each list should contain four entries:
+        the indices i, j, k and the value of the interaction.
+    :type volume_ternary_terms: list of lists
+    :param entropy_ternary_terms: The ternary interaction entropies.
+        Each list should contain four entries:
+        the indices i, j, k and the value of the interaction.
+    :type entropy_ternary_terms: list of lists
     """
 
     def __init__(
@@ -937,18 +897,16 @@ class FunctionSolution(IdealSolution):
     and so the user-defined excess Gibbs energy function
     should be defined using autograd-friendly expressions.
 
-    Parameters
-    ----------
-    endmembers : list of lists
-        A list of all the independent endmembers in the solution.
+    :param endmembers: A list of all the independent endmembers in the solution.
         The first item of each list gives the Mineral object corresponding
         to the endmember. The second item gives the site-species formula.
+    :type endmembers: list of lists
 
-    excess_gibbs_function : function
-        The nonconfigurational Gibbs energy function with arguments
-        pressure, temperature and molar_amounts, in that order.
+    :param excess_gibbs_function: The nonconfigurational Gibbs energy function
+        with arguments pressure, temperature and molar_amounts, in that order.
         Note that the function must be extensive; if the molar amounts
         are doubled, the Gibbs energy must also double.
+    :type excess_gibbs_function: function
     """
 
     def __init__(self, endmembers, excess_gibbs_function):
@@ -1066,40 +1024,33 @@ class PolynomialSolution(IdealSolution):
     """
     Solution model implementing a general polynomial solution model.
 
-    Parameters
-    ----------
-    endmembers : list of lists
-        A list of all the independent endmembers in the solution.
+    :param endmembers: A list of all the independent endmembers in the solution.
         The first item of each list gives the Mineral object corresponding
         to the endmember. The second item gives the site-species formula.
-
-    ESV_interactions : list of lists
-        A list containing lists where the first three elements are
+    :type endmembers: list of lists
+    :param ESV_interactions: A list containing lists where the first three elements are
         energy, entropy and volume interactions and the rest of the elements
         are indices of the transformed endmembers to which those
         interactions correspond.
         For example, [2., 0., 0., 0, 1, 1] would correspond to an interaction
         of 2*p'[0]*p'[1]*p'[1].
-
-    interaction_endmembers : list of burnman.Mineral objects
-        A list of minerals involved in the interaction terms.
-
-    endmember_coefficients_and_interactions : list of lists
+    :type ESV_interactions: list of lists
+    :param interaction_endmembers: A list of minerals involved in the interaction terms.
+    :type interaction_endmembers: list of :class:`burnman.Mineral` objects
+    :param endmember_coefficients_and_interactions: list of lists
         A list containing lists where the first n elements are
         coefficients for each of the interaction_endmembers and the
         rest of the elements are indices of the transformed
-        endmembers
-        to which those interactions correspond.
+        endmembers to which those interactions correspond.
         For example, [1., 0., -1., 0, 1, 1] would correspond to an interaction
         of (mbr[0].gibbs - mbr[2].gibbs)*p'[0]*p'[1]*p'[1].
-
-    transformation_matrix : 2D numpy array
-        The interactions for a given solution may be most compactly expressed
-        not as a polynomial function of the proportions of the
-        endmembers, but a polynomial function of a
+    :type endmember_coefficients_and_interactions: list of lists
+    :param transformation_matrix: The interactions for a given solution may
+        be most compactly expressed not as a polynomial function of the
+        proportions of the endmembers, but a polynomial function of a
         linearly transformed set. This parameter is a square numpy array A,
         where p'i = A_ij p_j
-
+    :type transformation_matrix: 2D numpy array
     """
 
     def __init__(
@@ -1160,11 +1111,13 @@ class PolynomialSolution(IdealSolution):
         for i, W in enumerate(Ws):
             if not all(W[i] <= W[i + 1] for i in range(3, len(W) - 1)):
                 raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must be upper triangular (i<=j<=k<=...<=z)"
+                    f"Interaction parameter {i+1}/{n_Ws} must be "
+                    "upper triangular (i<=j<=k<=...<=z)"
                 )
             if not W[3] < W[-1]:
                 raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the first diagonal (i=j=k=...=z)"
+                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the "
+                    "first diagonal (i=j=k=...=z)"
                 )
 
         W_arrays = []
@@ -1212,11 +1165,13 @@ class PolynomialSolution(IdealSolution):
         for i, W in enumerate(Ws):
             if not all(W[i] <= W[i + 1] for i in range(n_int, len(W) - 1)):
                 raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must be upper triangular (i<=j<=k<=...<=z)"
+                    f"Interaction parameter {i+1}/{n_Ws} must be "
+                    "upper triangular (i<=j<=k<=...<=z)"
                 )
             if not W[n_int] < W[-1]:
                 raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the first diagonal (i=j=k=...=z)"
+                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the "
+                    "first diagonal (i=j=k=...=z)"
                 )
 
         W_arrays = []

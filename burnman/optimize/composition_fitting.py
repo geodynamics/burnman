@@ -26,46 +26,37 @@ def fit_composition_to_solution(
     The fitting applies appropriate non-negativity constraints
     (i.e. no species can have a negative occupancy on a site).
 
-    Parameters
-    ----------
-    solution : burnman.Solution object
-        The solution to use in the fitting procedure.
+    :param solution: The solution to use in the fitting procedure.
+    :type solution: :class:`burnman.Solution`
 
-    fitted_variables : list of strings
-        A list of the variables used to find the best-fit molar fractions of
-        the solution. These should either be elements such as "Fe",
-        site_species such as "Fef_B" which would correspond to a
+    :param fitted_variables: A list of the variables used to find the best-fit
+        molar fractions of the solution. These should either be elements
+        such as "Fe", site_species such as "Fef_B" which would correspond to a
         species labelled Fef on the second site,
         or user-defined variables which are arithmetic sums of
         elements and/or site_species defined in "variable_conversions".
+    :type fitted_variables: list of str
 
-    variable_values : numpy array
-        Numerical values of the fitted variables.
+    :param variable_values: Numerical values of the fitted variables.
         These should be given as amounts; they do not need to be normalized.
+    :type variable_values: numpy.array
 
-    variable_covariances : 2D numpy array
-        Covariance matrix of the variables.
+    :param variable_covariances: Covariance matrix of the variables.
+    :type variable_covariances: 2D numpy.array
 
-    variable_conversions : dictionary of dictionaries or None
-        A dictionary converting any user-defined variables into an
-        arithmetic sum of element and site-species amounts. For example,
+    :param variable_conversions: A dictionary converting any user-defined variables
+        into an arithmetic sum of element and site-species amounts. For example,
         {'Mg_equal': {'Mg_A': 1., 'Mg_B': -1.}}, coupled with Mg_equal = 0
         would impose a constraint that the amount of Mg would be equal on
         the first and second site in the solution.
+    :type variable_conversions: dict of dict, or None
 
-    normalize : boolean (default: True)
-        If True, normalizes the optimized molar fractions to sum to unity.
+    :param normalize: If True, normalizes the optimized molar fractions to sum to unity.
+    :type normalize: bool
 
-    Returns
-    -------
-    popt : numpy array
-        Optimized molar fractions.
-
-    pcov : 2D numpy array
-        Covariance matrix corresponding to the optimized molar fractions.
-
-    res : float
-        The weighted residual of the fitting procedure.
+    :returns: Optimized molar fractions, corresponding covariance matrix and the
+        weighted residual.
+    :rtype: tuple of 1D numpy.array, 2D numpy.array and float
     """
 
     n_vars = len(fitted_variables)
@@ -154,25 +145,17 @@ def fit_phase_proportions_to_bulk_composition(phase_compositions, bulk_compositi
     The fitting applies appropriate non-negativity constraints
     (i.e. no phase can have a negative abundance in the bulk).
 
-    Parameters
-    ----------
-    phase_compositions : 2D numpy array
-        The composition of each phase. Can be in weight or mole amounts.
+    :param phase_compositions: The composition of each phase.
+        Can be in weight or mole amounts.
+    :type phase_compositions: 2D numpy.array
 
-    bulk_composition : numpy array
-        The bulk composition of the composite.
+    :param bulk_composition: The bulk composition of the composite.
         Must be in the same units as the phase compositions.
+    :type bulk_composition: numpy.array
 
-    Returns
-    -------
-    popt : numpy array
-        Optimized phase amounts.
-
-    pcov : 2D numpy array
-        Covariance matrix corresponding to the optimized phase amounts.
-
-    res : float
-        The weighted residual of the fitting procedure.
+    :returns: Optimized molar fractions, corresponding covariance matrix and the
+        weighted residual.
+    :rtype: tuple of 1D numpy.array, 2D numpy.array and float
     """
 
     n_phases = len(phase_compositions[0])

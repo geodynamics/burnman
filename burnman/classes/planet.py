@@ -13,7 +13,7 @@ from .material import material_property
 class Planet(object):
     """
     A class to build (self-consistent) Planets made out of Layers
-    (``burnman.Layer``). By default the planet is set to be self-consistent
+    (:class:`burnman.Layer`). By default the planet is set to be self-consistent
     (with zero pressure at the surface and zero gravity at the center),
     but this can be overwritte using the set_pressure_mode().
     Pressure_modes defined in the individual layers will be ignored.
@@ -25,19 +25,17 @@ class Planet(object):
         self, name, layers, n_max_iterations=50, max_delta=1.0e-5, verbose=False
     ):
         """
-        Parameters
-        ----------
-        name : string
-            Name of planet
-        layers : list of ``burnman.Layer``
-            Layers to build the planet out of
-            (layers are sorted within the planet)
-        n_max_iterations : int
-            Maximum number of iterations to reach self-consistent planet
-            (default = 50)
-        max_delta : float
-            Relative update to the center pressure of the planet between
-            iterations to stop iterations (default = 1.e-5)
+        :param name: Name of planet.
+        :type name: str
+        :param layers: Layers to build the planet out of
+            (layers are sorted within the planet).
+        :type layers: list of :class:`burnman.Layer`
+        :param n_max_iterations: Maximum number of iterations to reach
+            self-consistent planet.
+        :type n_max_iterations: int
+        :param max_delta: Relative update to the center pressure of the planet between
+            iterations to stop iterations.
+        :type max_delta: float
         """
         # sort layers
         self.layers = sorted(layers, key=lambda x: x.inner_radius)
@@ -86,10 +84,11 @@ class Planet(object):
         """
         Returns a layer with a given name
 
-        Parameters
-        ----------
-        name : string
-            Given name of a layer
+        :param name: Given name of a layer
+        :type name: str
+
+        :returns: Layer with the given name.
+        :rtype: :class:`burnman.Layer`
         """
         for layer in self.layers:
             if layer.name == name:
@@ -100,11 +99,11 @@ class Planet(object):
         """
         Returns a layer in which this radius lies
 
-        Parameters
-        ----------
-        radius : float
-            radius at which to evaluate the layer
+        :param radius: Radius at which to evaluate the layer.
+        :type radius: float
 
+        :returns: Layer in which the radius lies.
+        :rtype: :class:`burnman.Layer`
         """
         for layer in self.layers:
             if layer.outer_radius >= radius:
@@ -120,19 +119,15 @@ class Planet(object):
         layer material evaluated at those pressures and
         temperatures.
 
-        Parameters
-        ----------
-        properties : list of strings
-            List of properties to evaluate
-        radlist : array of floats
-            Radii to evaluate properties at. If left empty,
+        :param properties: List of properties to evaluate
+        :type properties: list of strings
+        :param radlist: Radii to evaluate properties at. If left empty,
             internal radius lists are used.
+        :type radlist: array of floats
 
-        Returns
-        -------
-        properties_array : numpy array
-            1D or 2D array of requested properties
+        :returns: 1D or 2D array of requested properties
             (1D if only one property was requested)
+        :rtype: numpy.array
         """
         if radlist is None:
             values = np.empty(
@@ -189,20 +184,18 @@ class Planet(object):
         The default for the planet is self-consistent, with zero pressure at
         the surface and zero pressure at the center.
 
-        Parameters
-        ----------
-        pressure_mode : string
-            This can be set to 'user-defined' or 'self-consistent'
-        pressures : array of floats
-            Pressures (Pa) to set layer to ('user-defined'). This should be the
-            same length as defined radius array for the layer
-        pressure_top : float
-            Pressure (Pa) at the top of the layer.
-        gravity_bottom : float
-            gravity (m/s^2) at the bottom the layer
-        n_max_iterations : int
-            Maximum number of iterations to reach self-consistent pressures
-            (default = 50)
+        :param pressure_mode: This can be set to 'user-defined' or 'self-consistent'.
+        :type pressure_mode: str
+        :param pressures: Pressures (Pa) to set layer to ('user-defined').
+            This should be the same length as defined radius array for the layer.
+        :type pressures: array of floats
+        :param pressure_top: Pressure (Pa) at the top of the layer.
+        :type pressure_top: float
+        :param gravity_bottom: Gravity (m/s^2) at the bottom the layer
+        :type gravity_bottom: float
+        :param n_max_iterations: Maximum number of iterations to reach
+            self-consistent pressures.
+        :type n_max_iterations: int
         """
         self.reset()
         assert pressure_mode == "user-defined" or pressure_mode == "self-consistent"
@@ -225,8 +218,10 @@ class Planet(object):
 
     def make(self):
         """
-        This routine needs to be called before evaluating any properties. If pressures and temperatures are self-consistent, they
-        are computed across the planet here. Also initializes an array of materials in each Layer to compute properties from.
+        This routine needs to be called before evaluating any properties.
+        If pressures and temperatures are self-consistent, they
+        are computed across the planet here. Also initializes an array of materials
+        in each Layer to compute properties from.
         """
 
         self.reset()
@@ -420,10 +415,8 @@ class Planet(object):
 
         Aliased with :func:`~burnman.Material.P`.
 
-        Returns
-        -------
-        pressure : array of floats
-            Pressure in [Pa].
+        :returns: Pressure in [Pa].
+        :rtype: array of floats
         """
         return self.pressures
 
@@ -435,10 +428,8 @@ class Planet(object):
 
         Aliased with :func:`~burnman.Material.T`.
 
-        Returns
-        -------
-        temperature : array of floats
-            Temperature in [K].
+        :returns: Temperature in [K].
+        :rtype: array of floats
         """
         return self.temperatures
 
@@ -450,10 +441,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.energy`.
 
-        Returns
-        -------
-        molar_internal_energy : array of floats
-            The internal energy in [J/mol].
+        :returns: The internal energy in [J/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_internal_energy"])
 
@@ -465,10 +454,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.gibbs`.
 
-        Returns
-        -------
-        molar_gibbs : array of floats
-            Gibbs free energy in [J/mol].
+        :returns: Gibbs energy in [J/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_gibbs"])
 
@@ -480,10 +467,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.helmholtz`.
 
-        Returns
-        -------
-        molar_helmholtz : array of floats
-            Helmholtz free energy in [J/mol].
+        :returns: Helmholtz energy in [J/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_helmholtz"])
 
@@ -494,10 +479,8 @@ class Planet(object):
 
         Needs to be implemented in derived classes.
 
-        Returns
-        -------
-        molar_mass : array of floats
-            Molar mass in [kg/mol].
+        :returns: Molar mass in [kg/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_mass"])
 
@@ -509,10 +492,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.V`.
 
-        Returns
-        -------
-        molar_volume : array of floats
-            Molar volume in [m^3/mol].
+        :returns: Molar volume in [m^3/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_volume"])
 
@@ -524,10 +505,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.rho`.
 
-        Returns
-        -------
-        density : array of floats
-            The density of this material in [kg/m^3].
+        :returns: The density of this material in [kg/m^3].
+        :rtype: array of floats
         """
         return self.evaluate(["density"])
 
@@ -539,10 +518,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.S`.
 
-        Returns
-        -------
-        molar_entropy : array of floats
-            Entropy in [J/mol].
+        :returns: Entropy in [J/K/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_entropy"])
 
@@ -554,10 +531,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.H`.
 
-        Returns
-        -------
-        molar_enthalpy : array of floats
-            Enthalpy in [J/mol].
+        :returns: Enthalpy in [J/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_enthalpy"])
 
@@ -569,10 +544,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.K_T`.
 
-        Returns
-        -------
-        isothermal_bulk_modulus : array of floats
-            Bulk modulus in [Pa].
+        :returns: Isothermal bulk modulus in [Pa].
+        :rtype: array of floats
         """
         return self.evaluate(["isothermal_bulk_modulus"])
 
@@ -584,10 +557,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.K_S`.
 
-        Returns
-        -------
-        adiabatic_bulk_modulus : array of floats
-            Adiabatic bulk modulus in [Pa].
+        :returns: Adiabatic bulk modulus in [Pa].
+        :rtype: array of floats
         """
         return self.evaluate(["adiabatic_bulk_modulus"])
 
@@ -600,10 +571,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_T`.
 
-        Returns
-        -------
-        (K_T)^-1 : array of floats
-            Compressibility in [1/Pa].
+        :returns: Isothermal compressibility in [1/Pa].
+        :rtype: array of floats
         """
         return self.evaluate(["istothermal_compressibility"])
 
@@ -616,10 +585,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_S`.
 
-        Returns
-        -------
-        adiabatic_compressibility : array of floats
-            adiabatic compressibility in [1/Pa].
+        :returns: Adiabatic compressibility in [1/Pa].
+        :rtype: array of floats
         """
         return self.evaluate(["adiabatic_compressibility"])
 
@@ -631,10 +598,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_G`.
 
-        Returns
-        -------
-        shear_modulus : array of floats
-            Shear modulus in [Pa].
+        :returns: Shear modulus in [Pa].
+        :rtype: array of floats
         """
         return self.evaluate(["shear_modulus"])
 
@@ -646,10 +611,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_p`.
 
-        Returns
-        -------
-        p_wave_velocity : array of floats
-            P wave speed in [m/s].
+        :returns: P wave speed in [m/s].
+        :rtype: array of floats
         """
         return self.evaluate(["p_wave_velocity"])
 
@@ -661,10 +624,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_phi`.
 
-        Returns
-        -------
-        bulk sound velocity: array of floats
-            Sound velocity in [m/s].
+        :returns: Bulk sound velocity in [m/s].
+        :rtype: array of floats
         """
         return self.evaluate(["bulk_sound_velocity"])
 
@@ -676,10 +637,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_s`.
 
-        Returns
-        -------
-        shear_wave_velocity : array of floats
-            Wave speed in [m/s].
+        :returns: Shear wave speed in [m/s].
+        :rtype: array of floats
         """
         return self.evaluate(["shear_wave_velocity"])
 
@@ -691,10 +650,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.gr`.
 
-        Returns
-        -------
-        gr : array of floats
-            Grueneisen parameters [unitless].
+        :returns: Grueneisen parameters [unitless].
+        :rtype: array of floats
         """
         return self.evaluate(["grueneisen_parameter"])
 
@@ -706,10 +663,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.alpha`.
 
-        Returns
-        -------
-        alpha : array of floats
-            Thermal expansivity in [1/K].
+        :returns: Thermal expansivity in [1/K].
+        :rtype: array of floats
         """
         return self.evaluate(["thermal_expansivity"])
 
@@ -721,10 +676,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.C_v`.
 
-        Returns
-        -------
-        molar_heat_capacity_v : array of floats
-            Heat capacity in [J/K/mol].
+        :returns: Isochoric heat capacity in [J/K/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_heat_capacity_v"])
 
@@ -736,10 +689,8 @@ class Planet(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.C_p`.
 
-        Returns
-        -------
-        molar_heat_capacity_p : array of floats
-            Heat capacity in [J/K/mol].
+        :returns: Isobaric heat capacity in [J/K/mol].
+        :rtype: array of floats
         """
         return self.evaluate(["molar_heat_capacity_p"])
 

@@ -17,9 +17,9 @@ from .composite import Composite
 
 class HelperRockSwitcher(Material):
     """
-    A Helper that represents a Material that switches between different rocks based on a user specified
-    select_rock() function based on current temperature and pressure. This class can be used in several
-    ways:
+    A Helper that represents a Material that switches between different rocks
+    based on a user specified select_rock() function based on current temperature
+    and pressure. This class can be used in several ways:
     1. By creating an instance and setting select_rock to a lambda that returns a rock
     2. By deriving from this class and implementing select_rock.
     """
@@ -129,7 +129,8 @@ class HelperRockSwitcher(Material):
 
 class HelperLowHighPressureRockTransition(HelperRockSwitcher):
     """
-    A Helper that represents a Material that switches between two given rocks based on a given transition pressure.
+    A Helper that represents a Material that switches between two given rocks based
+    on a given transition pressure.
     """
 
     def __init__(self, transition_pressure, low_pressure_rock, high_pressure_rock):

@@ -52,16 +52,13 @@ class SimplexGrid(object):
         """
         Generates the grid points of the simplex in lexicographic order.
 
-        Parameters
-        ----------
-        generate_type : 'list' or 'array'
-            Determines whether the generator returns lists or arrays
-            corresponding to each point in the simplex grid.
+        :param generate_type: Determines whether the generator returns
+            lists or arrays corresponding to each point in the simplex grid.
+            Valid options are 'list' or 'array'.
+        :type generate_type: str
 
-        Returns
-        -------
-        generator of lists or ndarrays (int, ndim=1)
-            Grid points of the simplex.
+        :returns: Grid points of the simplex.
+        :rtype: generator of lists or ndarrays (int, ndim=1)
         """
 
         if generate_type == "list":
@@ -133,23 +130,22 @@ class MaterialPolytope(object):
         Initialization function for the MaterialPolytope class.
         Declares basis attributes of the class.
 
-        Parameters
-        ----------
-        equalities: 2D numpy array
-            A numpy array containing all the equalities of the polytope.
-            Each row should evaluate to 0.
-        inequalities: 2D numpy array
-            A numpy array containing all the inequalities of the polytope.
-            Each row should evaluate to <= 0.
-        number_type: 'fraction' or 'float' (default is 'fraction')
-            Whether pycddlib should read the input arrays as
-            fractions or floats.
-        return_fractions : boolean (default is False)
-            Whether the generated polytope object should return fractions or
-            floats.
-        independent_endmember_occupancies : 2D numpy array (or None)
-            If specified, this array provides the independent endmember set
-            against which the dependent endmembers are defined.
+        :param equalities: A numpy array containing all the
+            equalities defining the polytope. Each row should evaluate to 0.
+        :type equalities: numpy.array (2D)
+        :param inequalities: A numpy array containing all the inequalities
+            defining the polytope. Each row should evaluate to <= 0.
+        :type inequalities: numpy.array (2D)
+        :param number_type: Whether pycddlib should read the input arrays as
+            fractions or floats. Valid options are 'fraction' or 'float'.
+        :type number_type: str
+        :param return_fractions: Choose whether the generated polytope object
+            should return fractions or floats.
+        :type return_fractions: bool
+        :param independent_endmember_occupancies: If specified, this array provides
+            the independent endmember set against which the dependent endmembers
+            are defined.
+        :type independent_endmember_occupancies: numpy.array (2D) or None
         """
         self.set_return_type(return_fractions)
         self.equality_matrix = equalities[:, 1:]
@@ -170,11 +166,9 @@ class MaterialPolytope(object):
         Sets the return_type for the polytope object. Also deletes the cached
         endmember_occupancies property.
 
-        Parameters
-        ----------
-        return_fractions : boolean (default is False)
-            Whether the generated polytope object should return fractions or
-            floats.
+        :param return_fractions: Choose whether the generated polytope object
+            should return fractions or floats.
+        :type return_fractions: bool
         """
         try:
             del self.__dict__["endmember_occupancies"]
@@ -329,25 +323,24 @@ class MaterialPolytope(object):
         """
         Create a grid of points which span the polytope.
 
-        Parameters
-        ----------
-        points_per_edge : integer (default is 2)
-            Number of points per edge of the polytope.
-        unique_sorted : boolean (default is True)
-            The gridding is done by splitting the polytope into
+        :param points_per_edge: Number of points per edge of the polytope.
+        :type points_per_edge: int
+        :param unique_sorted: The gridding is done by splitting the polytope into
             a set of simplices. This means that points will be duplicated along
             vertices, faces etc. If unique_sorted is True, this function
             will sort and make the points unique. This is an expensive
             operation for large polytopes, and may not always be necessary.
-        grid_type : 'independent endmember proportions' (default) or 'site occupancies'
-            Whether to grid the polytope in terms of
+        :type unique_sorted: bool
+        :param grid_type: Whether to grid the polytope in terms of
             independent endmember proportions or site occupancies.
-        limits : 2D numpy array
-            Additional inequalities restricting the gridded area of the polytope.
-        Returns
-        -------
-        points : 2D numpy array
-            A list of points gridding the polytope.
+            Choices are 'independent endmember proportions' or 'site occupancies'
+        :type grid_type: str
+        :param limits: Additional inequalities restricting the
+            gridded area of the polytope.
+        :type limits: numpy.array (2D)
+
+        :returns: A list of points gridding the polytope.
+        :rtype: numpy.array (2D)
         """
         if limits is None:
             if grid_type == "independent endmember proportions":

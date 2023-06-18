@@ -14,15 +14,12 @@ def brown_shankland(depths):
     """
     Geotherm from :cite:`Brown1981`. NOTE: Valid only above 270 km
 
-    Parameters
-    ----------
-    depths : list of floats
-        The list of depths at which to evaluate the geotherm. :math:`[m]`
+    :param depths: The list of depths at which to evaluate the geotherm.
+        :math:`[m]`
+    :type depths: list of floats
 
-    Returns
-    -------
-    temperature : list of floats
-        The list of temperatures for each of the pressures. :math:`[K]`
+    :returns: The list of temperatures for each of the pressures. :math:`[K]`
+    :rtype: list of floats
     """
 
     assert min(depths) >= min(table_brown_depth)
@@ -39,15 +36,12 @@ def anderson(depths):
     """
     Geotherm from :cite:`anderson1982earth`.
 
-    Parameters
-    ----------
-    depths : list of floats
-        The list of depths at which to evaluate the geotherm. :math:`[m]`
+    :param depths: The list of depths at which to evaluate the geotherm.
+        :math:`[m]`
+    :type depths: list of floats
 
-    Returns
-    -------
-    temperature : list of floats
-        The list of temperatures for each of the pressures. :math:`[K]`
+    :returns: The list of temperatures for each of the pressures. :math:`[K]`
+    :rtype: list of floats
     """
     assert min(depths) >= min(table_anderson_depth)
     assert max(depths) <= max(table_anderson_depth)
@@ -63,15 +57,12 @@ def stacey_continental(depths):
     """
     Continental geotherm from :cite:`stacey1977`.
 
-    Parameters
-    ----------
-    depths : list of floats
-        The list of depths at which to evaluate the geotherm. :math:`[m]`
+    :param depths: The list of depths at which to evaluate the geotherm.
+        :math:`[m]`
+    :type depths: list of floats
 
-    Returns
-    -------
-    temperature : list of floats
-        The list of temperatures for each of the pressures. :math:`[K]`
+    :returns: The list of temperatures for each of the pressures. :math:`[K]`
+    :rtype: list of floats
     """
     assert min(depths) >= min(table_stacey_c_depth)
     assert max(depths) <= max(table_stacey_c_depth)
@@ -87,15 +78,12 @@ def stacey_oceanic(depths):
     """
     Oceanic geotherm from :cite:`stacey1977`.
 
-    Parameters
-    ----------
-    depths : list of floats
-        The list of depths at which to evaluate the geotherm. :math:`[m]`
+    :param depths: The list of depths at which to evaluate the geotherm.
+        :math:`[m]`
+    :type depths: list of floats
 
-    Returns
-    -------
-    temperature : list of floats
-        The list of temperatures for each of the pressures. :math:`[K]`
+    :returns: The list of temperatures for each of the pressures. :math:`[K]`
+    :rtype: list of floats
     """
     assert min(depths) >= min(table_stacey_o_depth)
     assert max(depths) <= max(table_stacey_o_depth)
@@ -119,27 +107,21 @@ def adiabatic(pressures, T0, rock):
     where :math:`\\gamma` is the Grueneisen parameter and :math:`K_s` is
     the adiabatic bulk modulus.
 
-    Parameters
-    ----------
-
-    pressures : list of floats
-        The list of pressures in :math:`[Pa]` at which
+    :param pressures: The list of pressures in :math:`[Pa]` at which
         to evaluate the geotherm.
+    :type pressures: list of floats
 
-    T0 : float
-        An anchor temperature, corresponding to the temperature of the first
+    :param T0: An anchor temperature, corresponding to the temperature of the first
         pressure in the list. :math:`[K]`
+    :type T0: float
 
-    rock : :class:`burnman.composite`
-        Material for which we compute the adiabat.  From this material we
+    :param rock: Composite for which we compute the adiabat.  From this material we
         must compute average Grueneisen parameters and adiabatic bulk moduli
         for each pressure/temperature.
+    :type rock: :class:`burnman.composite`
 
-    Returns
-    -------
-
-    temperature: list of floats
-        The list of temperatures for each pressure. :math:`[K]`
+    :returns: The list of temperatures for each pressure. :math:`[K]`
+    :rtype: numpy.array of floats
     """
 
     rock.set_state(pressures[0], T0)

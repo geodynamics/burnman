@@ -95,26 +95,24 @@ class Layer(object):
         Sets temperatures within the layer as user-defined values or as
         a (potentially perturbed) adiabat.
 
-        Parameters
-        ----------
-        temperature_mode : string
-            This can be set to 'user-defined', 'adiabatic',
+        :param temperature_mode: This can be set to 'user-defined', 'adiabatic',
             or 'perturbed-adiabatic'. 'user-defined' fixes the temperature
             with the profile input by the user. 'adiabatic' self-consistently
             computes the adiabat when setting the state of the layer.
             'perturbed-adiabatic' adds the user input array to the adiabat.
             This allows the user to apply boundary layers (for example).
-        temperatures : array of float
-            The desired fixed temperatures in [K].
+        :type temperature_mode: string
+        :param temperatures: The desired fixed temperatures in [K].
             Should have same length as defined radii in layer.
-        temperature_top : float
-            Temperature at the top of the layer. Used if the temperature mode
-            is chosen to be 'adiabatic' or 'perturbed-adiabatic'.
-            If 'perturbed-adiabatic' is chosen as the temperature mode,
-            temperature_top corresponds to the true temperature at the
-            top of the layer, and the reference isentrope at this radius
+        :type temperatures: array of float
+        :param temperature_top: Temperature at the top of the layer.
+            Used if the temperature mode is chosen to be 'adiabatic' or
+            'perturbed-adiabatic'. If 'perturbed-adiabatic' is chosen as the
+            temperature mode, temperature_top corresponds to the true temperature
+            at the top of the layer, and the reference isentrope at this radius
             is defined to lie at a temperature of
             temperature_top - temperatures[-1].
+        :type temperature_top: float
         """
         self.reset()
         assert (
@@ -152,31 +150,29 @@ class Layer(object):
         Sets the pressure mode of the layer,
         which can either be 'user-defined', or 'self-consistent'.
 
-        Parameters
-        ----------
-        pressure_mode : string
-            This can be set to 'user-defined' or 'self-consistent'.
+        :param pressure_mode: This can be set to 'user-defined' or 'self-consistent'.
             'user-defined' fixes the pressures with the profile input
             by the user in the 'pressures' argument.
             'self-consistent' forces Layer to calculate pressures
             self-consistently. If this is selected, the user will need
             to supply values for the gravity_bottom [m/s^2]
             and pressure_top [Pa] arguments.
-        pressures : array of floats
-            Pressures [Pa] to set layer to
+        :type pressure_mode: string
+        :param pressures: Pressures [Pa] to set layer to
             (if the 'user-defined' pressure_mode has been selected).
             The array should be the same length as
             the layers user-defined radii array.
-        pressure_top : float
-            Pressure [Pa] at the top of the layer.
-        gravity_bottom : float
-            gravity [m/s^2] at the bottom of the layer.
-        n_max_iterations : integer
-            Maximum number of iterations to reach
-            self-consistent pressures (default = 50)
-        max_delta : float
-            Relative update to the highest pressure in the layer between
-            iterations to stop iterations (default = 1.e-5)
+        :type pressures: array of floats
+        :param pressure_top: Pressure [Pa] at the top of the layer.
+        :type pressure_top: float
+        :param gravity_bottom: Gravity [m/s^2] at the bottom of the layer.
+        :type gravity_bottom: float
+        :param n_max_iterations: Maximum number of iterations to reach
+            self-consistent pressures.
+        :type n_max_iterations: integer
+        :param max_delta: Relative update to the highest pressure in the layer between
+            iterations to stop iterations.
+        :type max_delta: float
         """
         self.reset()
         assert pressure_mode == "user-defined" or pressure_mode == "self-consistent"
@@ -275,21 +271,17 @@ class Layer(object):
         layer material evaluated at those pressures and
         temperatures.
 
-        Parameters
-        ----------
-        properties : list of strings
-            List of properties to evaluate
-        radlist : array of floats
-            Radii to evaluate properties at. If left empty,
+        :param properties: List of properties to evaluate.
+        :type properties: list of strings
+        :param radlist: Radii to evaluate properties at. If left empty,
             internal radii list is used.
-        planet_radius : float
-            Planet outer radius. Used only to calculate depth.
+        :type radlist: array of floats
+        :param planet_radius: Planet outer radius. Used only to calculate depth.
+        :type planet_radius: float
 
-        Returns
-        -------
-        property_array : numpy array
-            1D or 2D array of requested properties
+        :returns: 1D or 2D array of requested properties
             (1D if only one property was requested)
+        :rtype: numpy.array
         """
 
         if radlist is None:
@@ -493,10 +485,8 @@ class Layer(object):
 
         Aliased with :func:`~burnman.Material.P`.
 
-        Returns
-        -------
-        pressure : array of floats
-            Pressures in [Pa] at the predefined radii.
+        :returns: Pressures in [Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return self.pressures
 
@@ -508,10 +498,8 @@ class Layer(object):
 
         - Aliased with :func:`~burnman.Material.T`.
 
-        Returns
-        -------
-        temperature : array of floats
-            Temperatures in [K] at the predefined radii.
+        :returns: Temperatures in [K] at the predefined radii.
+        :rtype: numpy.array
         """
         return self.temperatures
 
@@ -525,10 +513,8 @@ class Layer(object):
         - Needs to be implemented in derived classes.
         - Aliased with :func:`~burnman.Material.energy`.
 
-        Returns
-        -------
-        molar_internal_energy : array of floats
-            The internal energies in [J/mol] at the predefined radii.
+        :returns: The internal energies in [J/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -545,10 +531,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.gibbs`.
 
-        Returns
-        -------
-        molar_gibbs : array of floats
-            Gibbs free energies in [J/mol] at the predefined radii.
+        :returns: Gibbs energies in [J/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_gibbs for i in range(len(self.sublayers))]
@@ -562,10 +546,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.helmholtz`.
 
-        Returns
-        -------
-        molar_helmholtz : array of floats
-            Helmholtz free energies in [J/mol] at the predefined radii.
+        :returns: Helmholtz energies in [J/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_helmholtz for i in range(len(self.sublayers))]
@@ -578,10 +560,8 @@ class Layer(object):
 
         Needs to be implemented in derived classes.
 
-        Returns
-        -------
-        molar_mass : array of floats
-            Molar mass in [kg/mol].
+        :returns: Molar mass in [kg/mol].
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_mass for i in range(len(self.sublayers))]
@@ -595,10 +575,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.V`.
 
-        Returns
-        -------
-        molar_volume : array of floats
-            Molar volumes in [m^3/mol] at the predefined radii.
+        :returns: Molar volumes in [m^3/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_volume for i in range(len(self.sublayers))]
@@ -612,10 +590,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.rho`.
 
-        Returns
-        -------
-        density : array of floats
-            The densities of this material in [kg/m^3] at the predefined radii.
+        :returns: The densities of this material in [kg/m^3] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array([self.sublayers[i].density for i in range(len(self.sublayers))])
 
@@ -627,10 +603,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.S`.
 
-        Returns
-        -------
-        molar_entropy : array of floats
-            Entropies in [J/K/mol] at the predefined radii.
+        :returns: Entropies in [J/K/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_entropy for i in range(len(self.sublayers))]
@@ -644,10 +618,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.H`.
 
-        Returns
-        -------
-        molar_enthalpy : array of floats
-            Enthalpies in [J/mol] at the predefined radii.
+        :returns: Enthalpies in [J/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].molar_enthalpy for i in range(len(self.sublayers))]
@@ -663,10 +635,8 @@ class Layer(object):
         - Needs to be implemented in derived classes.
         - Aliased with :func:`~burnman.Material.K_T`.
 
-        Returns
-        -------
-        isothermal_bulk_modulus : array of floats
-            Bulk moduli in [Pa] at the predefined radii.
+        :returns: Bulk moduli in [Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -683,10 +653,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.K_S`.
 
-        Returns
-        -------
-        adiabatic_bulk_modulus : array of floats
-            Adiabatic bulk modulus in [Pa] at the predefined radii.
+        :returns: Adiabatic bulk modulus in [Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -704,10 +672,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_T`.
 
-        Returns
-        -------
-        (K_T)^-1 : array of floats
-            Compressibilities in [1/Pa] at the predefined radii.
+        :returns: Isothermal compressibilities in [1/Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -725,10 +691,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_S`.
 
-        Returns
-        -------
-        adiabatic_compressibility : array of floats
-            adiabatic compressibilities in [1/Pa] at the predefined radii.
+        :returns: Adiabatic compressibilities in [1/Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -745,10 +709,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.beta_G`.
 
-        Returns
-        -------
-        shear_modulus : array of floats
-            Shear modulie in [Pa]  at the predefined radii.
+        :returns: Shear moduli in [Pa] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].shear_modulus for i in range(len(self.sublayers))]
@@ -762,10 +724,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_p`.
 
-        Returns
-        -------
-        p_wave_velocity : array of floats
-            P wave speeds in [m/s] at the predefined radii.
+        :returns: P wave speeds in [m/s] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].p_wave_velocity for i in range(len(self.sublayers))]
@@ -779,10 +739,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_phi`.
 
-        Returns
-        -------
-        bulk sound velocity: array of floats
-            Sound velocities in [m/s] at the predefined radii.
+        :returns: Bulk sound velocities in [m/s] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].bulk_sound_velocity for i in range(len(self.sublayers))]
@@ -796,10 +754,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.v_s`.
 
-        Returns
-        -------
-        shear_wave_velocity : array of floats
-            Wave speeds in [m/s] at the predefined radii.
+        :returns: Shear wave speeds in [m/s] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].shear_wave_velocity for i in range(len(self.sublayers))]
@@ -813,10 +769,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.gr`.
 
-        Returns
-        -------
-        gr : array of floats
-            Grueneisen parameters [unitless] at the predefined radii.
+        :returns: Grueneisen parameters [unitless] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].grueneisen_parameter for i in range(len(self.sublayers))]
@@ -830,10 +784,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.alpha`.
 
-        Returns
-        -------
-        alpha : array of floats
-            Thermal expansivities in [1/K] at the predefined radii.
+        :returns: Thermal expansivities in [1/K] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [self.sublayers[i].thermal_expansivity for i in range(len(self.sublayers))]
@@ -847,10 +799,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.C_v`.
 
-        Returns
-        -------
-        molar_heat_capacity_v : array of floats
-            Heat capacities in [J/K/mol] at the predefined radii.
+        :returns: Heat capacities in [J/K/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -867,10 +817,8 @@ class Layer(object):
         Needs to be implemented in derived classes.
         Aliased with :func:`~burnman.Material.C_p`.
 
-        Returns
-        -------
-        molar_heat_capacity_p : array of floats
-            Heat capacities in [J/K/mol] at the predefined radii.
+        :returns: Heat capacities in [J/K/mol] at the predefined radii.
+        :rtype: numpy.array
         """
         return np.array(
             [
@@ -998,28 +946,26 @@ class BoundaryLayerPerturbation(object):
     This model is a simpler version of that proposed
     by :cite:`Richter1981`.
 
-    Parameters
-    ----------
-    radius_bottom : float
-        The radius at the bottom of the layer (r0) [m].
+    :param radius_bottom: The radius at the bottom of the layer (r0) [m].
+    :type radius_bottom: float
 
-    radius_top : float
-        The radius at the top of the layer (r1) [m].
+    :param radius_top: The radius at the top of the layer (r1) [m].
+    :type radius_top: float
 
-    rayleigh_number : float
-        The Rayleigh number of convection within the layer. The
+    :param rayleigh_number: The Rayleigh number of convection within the layer. The
         exponential scale factor is this number to the power of 1/4
         (Ra = c^4).
+    :type rayleigh_number: float
 
-    temperature_change : float
-        The total difference in potential temperature across the layer [K].
-        temperature_change = (a + b)*exp(c)
+    :param temperature_change: The total difference in potential
+        temperature across the layer [K]. temperature_change = (a + b)*exp(c).
+    :type temperature_change: float
 
-    boundary_layer_ratio : float
-        The ratio of the linear scale factors (a/b) corresponding to the
-        thermal boundary layers at the top and bottom of the layer. A number
-        greater than 1 implies a larger change in temperature across the
-        top boundary than the bottom boundary.
+    :param boundary_layer_ratio: The ratio of the linear scale factors (a/b)
+        corresponding to the thermal boundary layers at the top and bottom of
+        the layer. A number greater than 1 implies a larger change in
+        temperature across the top boundary than the bottom boundary.
+    :type boundary_layer_ratio: float
     """
 
     def __init__(
@@ -1043,15 +989,11 @@ class BoundaryLayerPerturbation(object):
         """
         Returns the temperature at one or more radii [K].
 
-        Parameters
-        ----------
-        radii : float or array
-            The radii at which to evaluate the temperature.
+        :param radii: The radii at which to evaluate the temperature.
+        :type radii: float or numpy.array
 
-        Returns
-        -------
-        temperature : float or array
-            The temperatures at the requested radii.
+        :returns: The temperatures at the requested radii.
+        :rtype: float or numpy.array
         """
         return self.a * np.exp(
             (radii - self.r1) / (self.r0 - self.r1) * self.c
@@ -1061,15 +1003,11 @@ class BoundaryLayerPerturbation(object):
         """
         Returns the thermal gradient at one or more radii [K/m].
 
-        Parameters
-        ----------
-        radii : float or array
-            The radii at which to evaluate the thermal gradients.
+        :param radii: The radii at which to evaluate the thermal gradients.
+        :type radii: float or numpy.array
 
-        Returns
-        -------
-        dTdr : float or array
-            The thermal gradient at the requested radii.
+        :returns: The thermal gradient at the requested radii.
+        :rtype: float or numpy.array
         """
         return (
             self.c
@@ -1085,15 +1023,13 @@ class BoundaryLayerPerturbation(object):
         Reparameterizes the model based on the thermal gradients
         at the bottom and top of the model.
 
-        Parameters
-        ----------
-        dTdr_bottom : float
-            The thermal gradient at the bottom of the model [K/m].
+        :param dTdr_bottom: The thermal gradient at the bottom of the model [K/m].
             Typically negative for a cooling planet.
+        :type dTdr_bottom: float
 
-        dTdr_top : float
-            The thermal gradient at the top of the model [K/m].
+        :param dTdr_top: The thermal gradient at the top of the model [K/m].
             Typically negative for a cooling planet.
+        :type dTdr_top: float
         """
 
         def delta_dTdrs(args, dTdr_bottom, dTdr_top):

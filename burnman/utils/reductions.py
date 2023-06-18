@@ -15,7 +15,8 @@ def _iszero(x):
 
 
 def _find_reasonable_pivot(col, iszerofunc=_iszero, simpfunc=_simplify):
-    """Find the lowest index of an item in ``col`` that is
+    """
+    Find the lowest index of an item in ``col`` that is
     suitable for a pivot.  If ``col`` consists only of
     Floats, the pivot with the largest norm is returned.
     Otherwise, the first element where ``iszerofunc`` returns
@@ -129,28 +130,42 @@ def _row_reduce_list(
     normalize=True,
     zero_above=True,
 ):
-    """Row reduce a flat list representation of a matrix and return a tuple
+    """
+    Row reduce a flat list representation of a matrix and return a tuple
     (rref_matrix, pivot_cols, swaps) where ``rref_matrix`` is a flat list,
     ``pivot_cols`` are the pivot columns and ``swaps`` are any row swaps that
     were used in the process of row reduction.
-    Parameters
-    ==========
-    mat : list
-        list of matrix elements, must be ``rows`` * ``cols`` in length
-    rows, cols : integer
-        number of rows and columns in flat list representation
-    iszerofunc : determines if an entry can be used as a pivot
-    simpfunc : used to simplify elements and test if they are
-        zero if ``iszerofunc`` returns `None`
-    normalize_last : indicates where all row reduction should
+
+    :param mat: list of matrix elements, must be ``rows`` * ``cols`` in length.
+    :type mat: list
+
+    :param rows: number of rows in flat list representation.
+    :type rows: integer
+
+    :param cols: number of columns in flat list representation.
+    :type cols: integer
+
+    :param iszerofunc: determines if an entry can be used as a pivot.
+    :type iszerofunc: function
+
+    :param simpfunc: used to simplify elements and test if they are
+        zero if ``iszerofunc`` returns `None`.
+    :type simpfunc: function
+
+    :param normalize_last: indicates where all row reduction should
         happen in a fraction-free manner and then the rows are
         normalized (so that the pivots are 1), or whether
         rows should be normalized along the way (like the naive
-        row reduction algorithm)
-    normalize : whether pivot rows should be normalized so that
+        row reduction algorithm).
+    :type normalize_last: bool
+
+    :param normalize: whether pivot rows should be normalized so that
         the pivot value is 1
-    zero_above : whether entries above the pivot should be zeroed.
+    :type normalize: bool
+
+    :param zero_above: whether entries above the pivot should be zeroed.
         If ``zero_above=False``, an echelon matrix will be returned.
+    :type zero_above: bool
     """
 
     def get_col(i):

@@ -181,12 +181,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def deformation_gradient_tensor(self):
         """
-        Returns
-        -------
-        deformation_gradient_tensor : 2D numpy array
-            The deformation gradient tensor describing the deformation of the
+        :returns: The deformation gradient tensor describing the deformation of the
             mineral from its undeformed state
             (i.e. the state at the reference pressure and temperature).
+        :rtype: numpy.array (2D)
         """
         F = expm(np.einsum("ijkl, kl", self.Psi, np.eye(3)))
         return F
@@ -194,29 +192,25 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def unrotated_cell_vectors(self):
         """
-        Returns
-        -------
-        unrotated_cell_vectors : 2D numpy array
-            The vectors of the cell constructed from one mole of formula units
-            after deformation of the mineral from its undeformed state
-            (i.e. the state at the reference pressure and temperature).
-            Each vector is given in [m]. See the documentation for the function
+        :returns: The vectors of the cell [m] constructed from one mole
+            of formula units after deformation of the mineral from its
+            undeformed state (i.e. the state at the reference
+            pressure and temperature). See the documentation for the function
             :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
+        :rtype: numpy.array (2D)
         """
         return self.deformation_gradient_tensor
 
     @material_property
     def deformed_coordinate_frame(self):
         """
-        Returns
-        -------
-        deformed_coordinate_frame : 2D numpy array
-            The orientations of the three spatial coordinate axes
-            after deformation of the mineral. For orthotropic minerals,
+        :returns: The orientations of the three spatial coordinate axes
+            after deformation of the mineral [m]. For orthotropic minerals,
             this is equal to the identity matrix, as hydrostatic stresses only
             induce rotations in monoclinic and triclinic crystals.
+        :rtype: numpy.array (2D)
         """
         if self.orthotropic:
             return np.eye(3)
@@ -231,26 +225,22 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def rotation_matrix(self):
         """
-        Returns
-        -------
-        rotation_matrix : 2D numpy array
-            The matrix required to rotate the properties of the deformed
+        :returns: The matrix required to rotate the properties of the deformed
             mineral into the deformed coordinate frame. For orthotropic
             minerals, this is equal to the identity matrix.
+        :rtype: numpy.array (2D)
         """
         return self.deformed_coordinate_frame.T
 
     @material_property
     def cell_vectors(self):
         """
-        Returns
-        -------
-        cell_vectors : 2D numpy array
-            The vectors of the cell constructed from one mole of formula units.
-            Each vector is given in [m]. See the documentation for the function
+        :returns: The vectors of the cell constructed from one mole
+            of formula units [m]. See the documentation for the function
             :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
+        :rtype: numpy.array (2D)
         """
         if self.orthotropic:
             return self.unrotated_cell_vectors
@@ -262,10 +252,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def cell_parameters(self):
         """
-        Returns
-        -------
-        cell_parameters : 1D numpy array
-            The molar cell parameters of the mineral, given in standard form:
+        :returns: The molar cell parameters of the mineral, given in standard form:
             [:math:`a`, :math:`b`, :math:`c`,
             :math:`\\alpha`, :math:`\\beta`, :math:`\\gamma`],
             where the first three floats are the lengths of the vectors in [m]
@@ -275,6 +262,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`
             for the assumed relationships between the cell vectors and
             spatial coordinate axes.
+        :rtype: numpy.array (1D)
         """
         return cell_vectors_to_parameters(self.cell_vectors)
 
@@ -364,10 +352,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isothermal_bulk_modulus_voigt(self):
         """
-        Returns
-        -------
-        isothermal_bulk_modulus_voigt : float
-            The Voigt bound on the isothermal bulk modulus in [Pa].
+        :returns: The Voigt bound on the isothermal bulk modulus in [Pa].
+        :rtype: float
         """
         K = (
             np.sum(
@@ -383,10 +369,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isothermal_compressibility_reuss(self):
         """
-        Returns
-        -------
-        isothermal_compressibility_reuss : float
-            The Reuss bound on the isothermal compressibility in [1/Pa].
+        :returns: The Reuss bound on the isothermal compressibility in [1/Pa].
+        :rtype: float
         """
         return 1.0 / self.isothermal_bulk_modulus_reuss
 
@@ -395,20 +379,16 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isothermal_compressibility_voigt(self):
         """
-        Returns
-        -------
-        isothermal_compressibility_voigt : float
-            The Voigt bound on the isothermal compressibility in [1/Pa].
+        :returns: The Voigt bound on the isothermal compressibility in [1/Pa].
+        :rtype: float
         """
         return 1.0 / self.isothermal_bulk_modulus_voigt
 
     @material_property
     def isentropic_compressibility_reuss(self):
         """
-        Returns
-        -------
-        isentropic_compressibility_reuss : float
-            The Reuss bound on the isentropic compressibility in [1/Pa].
+        :returns: The Reuss bound on the isentropic compressibility in [1/Pa].
+        :rtype: float
         """
         return 1.0 / self.isentropic_bulk_modulus_reuss
 
@@ -417,21 +397,17 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isentropic_compressibility_voigt(self):
         """
-        Returns
-        -------
-        isentropic_compressibility_voigt : float
-            The Voigt bound on the isentropic compressibility in [1/Pa].
+        :returns: The Voigt bound on the isentropic compressibility in [1/Pa].
+        :rtype: float
         """
         return 1.0 / self.isentropic_bulk_modulus_voigt
 
     @material_property
     def isothermal_compliance_tensor(self):
         """
-        Returns
-        -------
-        isothermal_compliance_tensor : 2D numpy array
-            The isothermal compliance tensor [1/Pa]
+        :returns: The isothermal compliance tensor [1/Pa]
             in Voigt form (:math:`\\mathbb{S}_{\\text{T} pq}`).
+        :rtype: numpy.array (2D)
         """
         S_T = -self.dPsidP_Voigt
         if self.orthotropic:
@@ -445,10 +421,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def thermal_expansivity_tensor(self):
         """
-        Returns
-        -------
-        thermal_expansivity_tensor : 2D numpy array
-            The tensor of thermal expansivities [1/K].
+        :returns: The tensor of thermal expansivities [1/K].
+        :rtype: numpy.array (2D)
         """
         alpha = np.einsum(
             "ijkl, kl",
@@ -466,22 +440,18 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isothermal_stiffness_tensor(self):
         """
-        Returns
-        -------
-        isothermal_stiffness_tensor : 2D numpy array
-            The isothermal stiffness tensor [Pa]
+        :returns: The isothermal stiffness tensor [Pa]
             in Voigt form (:math:`\\mathbb{C}_{\\text{T} pq}`).
+        :rtype: numpy.array (2D)
         """
         return np.linalg.inv(self.isothermal_compliance_tensor)
 
     @material_property
     def full_isothermal_compliance_tensor(self):
         """
-        Returns
-        -------
-        full_isothermal_stiffness_tensor : 4D numpy array
-            The isothermal compliance tensor [1/Pa]
+        :returns: The isothermal compliance tensor [1/Pa]
             in standard form (:math:`\\mathbb{S}_{\\text{T} ijkl}`).
+        :rtype: numpy.array (4D)
         """
         S_Voigt = self.isothermal_compliance_tensor
         return voigt_notation_to_compliance_tensor(S_Voigt)
@@ -489,11 +459,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def full_isothermal_stiffness_tensor(self):
         """
-        Returns
-        -------
-        full_isothermal_stiffness_tensor : 4D numpy array
-            The isothermal stiffness tensor [Pa]
+        :returns: The isothermal stiffness tensor [Pa]
             in standard form (:math:`\\mathbb{C}_{\\text{T} ijkl}`).
+        :rtype: numpy.array (4D)
         """
         CT = self.isothermal_stiffness_tensor
         return voigt_notation_to_stiffness_tensor(CT)
@@ -501,11 +469,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def full_isentropic_compliance_tensor(self):
         """
-        Returns
-        -------
-        full_isentropic_stiffness_tensor : 4D numpy array
-            The isentropic compliance tensor [1/Pa]
+        :returns: The isentropic compliance tensor [1/Pa]
             in standard form (:math:`\\mathbb{S}_{\\text{N} ijkl}`).
+        :rtype: numpy.array (4D)
         """
         return (
             self.full_isothermal_compliance_tensor
@@ -522,11 +488,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isentropic_compliance_tensor(self):
         """
-        Returns
-        -------
-        isentropic_compliance_tensor : 2D numpy array
-            The isentropic compliance tensor [1/Pa]
+        :returns: The isentropic compliance tensor [1/Pa]
             in Voigt form (:math:`\\mathbb{S}_{\\text{N} pq}`).
+        :rtype: numpy.array (2D)
         """
         S_full = self.full_isentropic_compliance_tensor
         return contract_compliances(S_full)
@@ -534,22 +498,18 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isentropic_stiffness_tensor(self):
         """
-        Returns
-        -------
-        isentropic_stiffness_tensor : 2D numpy array
-            The isentropic stiffness tensor [Pa]
+        :returns: The isentropic stiffness tensor [Pa]
             in Voigt form (:math:`\\mathbb{C}_{\\text{N} pq}`).
+        :rtype: numpy.array (2D)
         """
         return np.linalg.inv(self.isentropic_compliance_tensor)
 
     @material_property
     def full_isentropic_stiffness_tensor(self):
         """
-        Returns
-        -------
-        full_isentropic_stiffness_tensor : 4D numpy array
-            The isentropic stiffness tensor [Pa]
+        :returns: The isentropic stiffness tensor [Pa]
             in standard form (:math:`\\mathbb{C}_{\\text{N} ijkl}`).
+        :rtype: numpy.array (4D)
         """
         C_Voigt = self.isentropic_stiffness_tensor
         return voigt_notation_to_stiffness_tensor(C_Voigt)
@@ -557,12 +517,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def grueneisen_tensor(self):
         """
-        Returns
-        -------
-        grueneisen_tensor : 2D numpy array
-            The grueneisen tensor.
+        :returns: The grueneisen tensor [unitless].
             This is defined by :cite:`BarronMunn1967` as
             :math:`\\mathbb{C}_{\\text{N} ijkl} \\alpha_{kl} V/C_{P}`.
+        :rtype: numpy.array (2D)
         """
         return (
             np.einsum(
@@ -577,10 +535,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def grueneisen_parameter(self):
         """
-        Returns
-        -------
-        grueneisen_tensor : float
-            The scalar grueneisen parameter.
+        :returns: The scalar grueneisen parameter [unitless].
+        :rtype: float
         """
         return (
             self.thermal_expansivity
@@ -591,10 +547,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isothermal_compressibility_tensor(self):
         """
-        Returns
-        -------
-        isothermal_compressibility_tensor : 2D numpy array
-            The isothermal compressibility tensor.
+        :returns: The isothermal compressibility tensor [1/Pa].
+        :rtype: numpy.array (2D)
         """
         return np.einsum(
             "ijkl, kl->ij", self.full_isothermal_compliance_tensor, np.eye(3)
@@ -603,10 +557,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def isentropic_compressibility_tensor(self):
         """
-        Returns
-        -------
-        isentropic_compressibility_tensor : 2D numpy array
-            The isentropic compressibility tensor.
+        :returns: The isentropic compressibility tensor [1/Pa].
+        :rtype: numpy.array (2D)
         """
         return np.einsum(
             "ijkl, kl->ij", self.full_isentropic_compliance_tensor, np.eye(3)
@@ -615,10 +567,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def thermal_stress_tensor(self):
         """
-        Returns
-        -------
-        thermal stress : 2D numpy array
-            The change in stress with temperature at constant strain.
+        :returns: The change in stress with temperature at constant strain [Pa/K].
+        :rtype: numpy.array (2D)
         """
         pi = -np.einsum(
             "ijkl, kl",
@@ -630,10 +580,8 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     @material_property
     def molar_isometric_heat_capacity(self):
         """
-        Returns
-        -------
-        molar_isometric_heat_capacity : float
-            The molar heat capacity at constant strain.
+        :returns: The molar heat capacity at constant strain [J/K/mol].
+        :rtype: float
         """
         alpha = self.thermal_expansivity_tensor
         pi = self.thermal_stress_tensor

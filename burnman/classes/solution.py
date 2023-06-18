@@ -39,15 +39,14 @@ class Solution(Mineral):
     see the documentation for individual models for details about
     other parameters.
 
-    Parameters
-    ----------
-    name : string
-        Name of the solution
-    solution_model : :class:`burnman.classes.solutionmodel.SolutionModel` object
-        The SolutionModel object defining the properties of the solution.
-    molar_fractions : numpy array (optional)
-        The molar fractions of each endmember in the solution.
+    :param name: Name of the solution.
+    :type name: string
+    :param solution_model: The SolutionModel object defining the properties
+        of the solution.
+    :type solution_model: :class:`burnman.SolutionModel`
+    :param molar_fractions: The molar fractions of each endmember in the solution.
         Can be reset using the set_composition() method.
+    :type molar_fractions: numpy.array
     """
 
     def __init__(self, name=None, solution_model=None, molar_fractions=None):
@@ -84,10 +83,8 @@ class Solution(Mineral):
         Set the composition for this solution.
         Resets cached properties.
 
-        Parameters
-        ----------
-        molar_fractions: list of float
-            molar abundance for each endmember, needs to sum to one.
+        :param molar_fractions: Molar abundance for each endmember, needs to sum to one.
+        :type molar_fractions: list of float
         """
         assert len(self.solution_model.endmembers) == len(molar_fractions)
 

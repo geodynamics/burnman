@@ -64,7 +64,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_bulk_modulus_voigt(self):
         """
-        Computes the isentropic bulk modulus (Voigt bound)
+        :returns: The Voigt bound on the isentropic bulk modulus [Pa].
+        :rtype: float
         """
         K = (
             np.sum(
@@ -80,7 +81,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_bulk_modulus_reuss(self):
         """
-        Computes the isentropic bulk modulus (Reuss bound)
+        :returns: The Reuss bound on the isentropic bulk modulus [Pa].
+        :rtype: float
         """
         beta = np.sum(
             [
@@ -93,7 +95,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_bulk_modulus_vrh(self):
         """
-        Computes the isentropic bulk modulus (Voigt-Reuss-Hill average)
+        :returns: The Voigt-Reuss-Hill average of the isentropic bulk modulus [Pa].
+        :rtype: float
         """
         return 0.5 * (
             self.isentropic_bulk_modulus_voigt + self.isentropic_bulk_modulus_reuss
@@ -102,7 +105,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_shear_modulus_voigt(self):
         """
-        Computes the isentropic shear modulus (Voigt bound)
+        :returns: The Voigt bound on the isentropic shear modulus [Pa].
+        :rtype: float
         """
         G = (
             np.sum([self.isentropic_stiffness_tensor[i][i] for i in [0, 1, 2]])
@@ -118,7 +122,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_shear_modulus_reuss(self):
         """
-        Computes the isentropic shear modulus (Reuss bound)
+        :returns: The Reuss bound on the isentropic shear modulus [Pa].
+        :rtype: float
         """
         beta = (
             np.sum([self.isentropic_compliance_tensor[i][i] for i in [0, 1, 2]]) * 4.0
@@ -135,7 +140,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_shear_modulus_vrh(self):
         """
-        Computes the shear modulus (Voigt-Reuss-Hill average)
+        :returns: The Voigt-Reuss-Hill average of the isentropic shear modulus [Pa].
+        :rtype: float
         """
         return 0.5 * (
             self.isentropic_shear_modulus_voigt + self.isentropic_shear_modulus_reuss
@@ -144,7 +150,8 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_universal_elastic_anisotropy(self):
         """
-        Compute the universal elastic anisotropy
+        :returns: The universal elastic anisotropy [unitless]
+        :rtype: float
         """
         return (
             5.0
@@ -159,8 +166,9 @@ class AnisotropicMaterial(Material):
     @material_property
     def isentropic_isotropic_poisson_ratio(self):
         """
-        Compute mu, the isotropic Poisson ratio
-        (a description of the laterial response to loading)
+        :returns: The isotropic Poisson ratio (mu) [unitless].
+            A metric of the laterial response to loading.
+        :rtype: float
         """
         return (
             3.0 * self.isentropic_bulk_modulus_vrh
@@ -172,11 +180,11 @@ class AnisotropicMaterial(Material):
 
     def christoffel_tensor(self, propagation_direction):
         """
-        Computes the Christoffel tensor from an elastic stiffness
-        tensor and a propagation direction for a seismic wave
-        relative to the stiffness tensor
-
-        T_ik = C_ijkl n_j n_l
+        :returns: The Christoffel tensor from an elastic stiffness
+            tensor and a propagation direction for a seismic wave
+            relative to the stiffness tensor:
+            T_ik = C_ijkl n_j n_l.
+        :rtype: float
         """
         propagation_direction = unit_normalize(propagation_direction)
         Tik = np.tensordot(
@@ -192,8 +200,9 @@ class AnisotropicMaterial(Material):
 
     def isentropic_linear_compressibility(self, direction):
         """
-        Computes the linear isentropic compressibility in a given direction
-        relative to the stiffness tensor
+        :returns: The linear isentropic compressibility in a given direction
+        relative to the stiffness tensor [1/Pa].
+        :rtype: float
         """
         direction = unit_normalize(direction)
         Sijkk = np.einsum("ijkk", self.full_isentropic_compliance_tensor)
@@ -202,8 +211,9 @@ class AnisotropicMaterial(Material):
 
     def isentropic_youngs_modulus(self, direction):
         """
-        Computes the isentropic Youngs modulus in a given direction
-        relative to the stiffness tensor
+        :returns: The isentropic Youngs modulus in a given direction
+        relative to the stiffness tensor [Pa].
+        :rtype: float
         """
         direction = unit_normalize(direction)
         Sijkl = self.full_isentropic_compliance_tensor
@@ -212,8 +222,9 @@ class AnisotropicMaterial(Material):
 
     def isentropic_shear_modulus(self, plane_normal, shear_direction):
         """
-        Computes the isentropic shear modulus on a plane in a given
-        shear direction relative to the stiffness tensor
+        :returns: The isentropic shear modulus on a plane in a given
+        shear direction relative to the stiffness tensor [Pa].
+        :rtype: float
         """
         plane_normal = unit_normalize(plane_normal)
         shear_direction = unit_normalize(shear_direction)
@@ -232,8 +243,9 @@ class AnisotropicMaterial(Material):
 
     def isentropic_poissons_ratio(self, axial_direction, lateral_direction):
         """
-        Computes the isentropic poisson ratio given loading and response
-        directions relative to the stiffness tensor
+        :returns: The isentropic poisson ratio given loading and response
+        directions relative to the stiffness tensor [unitless].
+        :rtype: float
         """
 
         axial_direction = unit_normalize(axial_direction)
@@ -250,11 +262,10 @@ class AnisotropicMaterial(Material):
 
     def wave_velocities(self, propagation_direction):
         """
-        Computes the compressional wave velocity, and two
-        shear wave velocities in a given propagation direction
-
-        Returns two lists, containing the wave speeds and
-        directions of particle motion relative to the stiffness tensor
+        :returns: The compressional wave velocity, and two
+        shear wave velocities in a given propagation direction [m/s].
+        :rtype: list, containing the wave speeds and directions
+            of particle motion relative to the stiffness tensor
         """
         propagation_direction = unit_normalize(propagation_direction)
 

@@ -12,19 +12,18 @@ class Calibrant(object):
     """
     The base class for a pressure calibrant material.
 
-    Initialization of a Calibrant object requires the following parameters:
+    :param calibrant_function: A function that takes either pressure,
+        temperature and a params object as arguments, returning the volume,
+        or takes volume, temperature and a params object, returning the pressure.
+    :type calibrant_function: function
 
-    calibrant_function : Function
-        A function that takes either pressure, temperature and a params
-        object as arguments, returning the volume, or takes volume, temperature
-        and a params object, returning the pressure.
+    :param calibrant_function_return_type: The return type of the calibrant function.
+        Valid values are 'pressure' or 'volume'.
+    :type calibrant_function_return_type: str
 
-    calibrant_function_return_type : 'pressure' or 'volume'
-        The return type of the calibrant function.
-
-    params : dictionary
-        A dictionary containing the parameters required by the
+    :param params: A dictionary containing the parameters required by the
         calibrant function.
+    :type params: dictionary
     """
 
     def __init__(self, calibrant_function, calibrant_function_return_type, params):
@@ -87,23 +86,20 @@ class Calibrant(object):
         volume, temperature and (optionally) a volume-temperature
         variance-covariance matrix.
 
-        Parameters
-        ----------
-        volume : float
-            The volume of the calibrant [m^3/mol]
-        temperature : float
-            The temperature of the calibrant [K]
-        VT_covariance : 2x2 numpy array [optional]
-            The volume-temperature
-            variance-covariance matrix
+        :param volume: The volume of the calibrant [m^3/mol].
+        :type volume: float
 
-        Returns
-        -------
-        pressure : float
-            The pressure of the calibrant [Pa]
+        :param temperature: The temperature of the calibrant [K].
+        :type temperature: float
 
-        PVT_covariance : 3x3 numpy array (if PT_covariance is provided)
-            The pressure-volume-temperature variance-covariance matrix.
+        :param VT_covariance: The volume-temperature
+            variance-covariance matrix [optional].
+        :type VT_covariance: 2x2 numpy.array
+
+        :returns: The pressure of the calibrant [Pa] and the
+            pressure-volume-temperature variance-covariance matrix
+            if PT_covariance is provided.
+        :rtype: float, tuple of a float and a numpy.array (3x3)
         """
         if VT_covariance is None:
             return self.pressure_function(volume, temperature, self.params)
@@ -131,23 +127,20 @@ class Calibrant(object):
         pressure, temperature and (optionally) a pressure-temperature
         variance-covariance matrix.
 
-        Parameters
-        ----------
-        pressure : float
-            The pressure of the calibrant [Pa]
-        temperature : float
-            The temperature of the calibrant [K]
-        PT_covariance : 2x2 numpy array [optional]
-            The pressure-temperature
-            variance-covariance matrix
+        :param pressure: The pressure of the calibrant [Pa].
+        :type pressure: float
 
-        Returns
-        -------
-        volume : float
-            The volume of the calibrant [m^3/mol]
+        :param temperature: The temperature of the calibrant [K].
+        :type temperature: float
 
-        VPT_covariance : 3x3 numpy array (if VT_covariance is provided)
-            The volume-pressure-temperature variance-covariance matrix.
+        :param PT_covariance: The pressure-temperature
+            variance-covariance matrix [optional].
+        :type PT_covariance: 2x2 numpy.array
+
+        :returns: The volume of the calibrant [m^3/mol] and
+            the volume-pressure-temperature variance-covariance matrix
+            if VT_covariance is provided.
+        :rtype: float, tuple of a float and a numpy.array (3x3)
         """
         if PT_covariance is None:
             return self.volume_function(pressure, temperature, self.params)

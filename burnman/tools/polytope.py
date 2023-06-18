@@ -31,27 +31,21 @@ def solution_polytope_from_charge_balance(
     Creates a polytope object from a list of the charges for each species on
     each site and the total charge for all site-species.
 
-    Parameters
-    ----------
-    charges : 2D list of floats
-        2D list containing the total charge for species j on site i,
+    :param charges: 2D list containing the total charge for species j on site i,
         including the site multiplicity. So, for example,
         a solution with the site formula [Mg,Fe]3[Mg,Al,Si]2Si3O12 would
         have the following list: [[6., 6.], [4., 6., 8.]].
-
-    charge_total : float
-        The total charge for all site-species per formula unit.
+    :type charges: 2D list of floats
+    :param charge_total: The total charge for all site-species per formula unit.
         The example given above would have charge_total = 12.
-
-    return_fractions : boolean
-        Determines whether the created polytope object returns its
+    :type charge_total: float
+    :param return_fractions: Determines whether the created polytope object returns its
         attributes (such as endmember occupancies) as fractions or as floats.
         Default is False.
+    :type return_fractions: bool
 
-    Returns
-    -------
-    polytope : :class:`burnman.polytope.MaterialPolytope` object
-        A polytope object corresponding to the parameters provided.
+    :returns: A polytope object corresponding to the parameters provided.
+    :rtype: :class:`burnman.polytope.MaterialPolytope` object
     """
     n_sites = len(charges)
     all_charges = np.concatenate(charges)
@@ -84,10 +78,8 @@ def solution_polytope_from_endmember_occupancies(
     """
     Creates a polytope object from a list of independent endmember occupancies.
 
-    Parameters
-    ----------
-    endmember_occupancies : 2D numpy array
-        2D list containing the site-species occupancies j for endmember i.
+    :param endmember_occupancies: 2D list containing the
+        site-species occupancies j for endmember i.
         So, for example, a solution with independent endmembers
         [Mg]3[Al]2Si3O12, [Mg]3[Mg0.5Si0.5]2Si3O12, [Fe]3[Al]2Si3O12
         might have the following array:
@@ -95,16 +87,15 @@ def solution_polytope_from_endmember_occupancies(
         [1., 0., 0., 0.5, 0.5],
         [0., 1., 1., 0., 0.]],
         where the order of site-species is Mg_A, Fe_A, Al_B, Mg_B, Si_B.
+    :type endmember_occupancies: 2D numpy array
 
-    return_fractions : boolean
-        Determines whether the created polytope object returns its
-        attributes (such as endmember occupancies) as fractions or as floats.
-        Default is False.
+    :param return_fractions: Determines whether the created polytope object
+        returns its attributes (such as endmember occupancies) as fractions
+        or as floats.
+    :type return_fractions: bool
 
-    Returns
-    -------
-    polytope : :class:`burnman.polytope.MaterialPolytope` object
-        A polytope object corresponding to the parameters provided.
+    :returns: A polytope object corresponding to the parameters provided.
+    :rtype: :class:`burnman.polytope.MaterialPolytope` object
     """
     n_sites = sum(endmember_occupancies[0])
     n_occs = endmember_occupancies.shape[1]
@@ -142,23 +133,19 @@ def composite_polytope_at_constrained_composition(
     This polytope describes the complete set of valid composite
     endmember amounts that satisfy the compositional constraints.
 
-    Parameters
-    ----------
-    composite : :class:`burnman.Composite` object
-        A composite containing one or more Solution and Mineral objects.
+    :param composite: A composite containing one or more Solution and Mineral objects.
+    :type composite: :class:`burnman.Composite` object
 
-    composition : dictionary
-        A dictionary containing the amounts of each element.
+    :param composition: A dictionary containing the amounts of each element.
+    :type composition: dict
 
-    return_fractions : boolean
-        Determines whether the created polytope object returns its
+    :param return_fractions: Determines whether the created polytope object returns its
         attributes (such as endmember occupancies) as fractions or as floats.
-        Default is False.
+    :type return_fractions: bool
 
-    Returns
-    -------
-    polytope : :class:`burnman.polytope.MaterialPolytope` object
-        A polytope object corresponding to the parameters provided.
+
+    :returns: A polytope object corresponding to the parameters provided.
+    :rtype: :class:`burnman.polytope.MaterialPolytope` object
     """
     c_array = np.empty((composite.n_elements, 1))
     c_array[:, 0] = [
@@ -192,18 +179,14 @@ def simplify_composite_with_composition(composite, composition):
     solutions, this function will return a composite that only contains
     the Mg-bearing endmembers.
 
-    Parameters
-    ----------
-    composite : :class:`burnman.Composite` object
-        The initial Composite object
+    :param composite: The initial Composite object.
+    :type composite: :class:`burnman.Composite` object
 
-    composition : dictionary
-        A dictionary containing the amounts of each element
+    :param composition: A dictionary containing the amounts of each element.
+    :type composition: dict
 
-    Returns
-    -------
-    simple_composite : :class:`burnman.Composite` object
-        The simplified Composite object
+    :returns: The simplified Composite object
+    :rtype: :class:`burnman.Composite` object
     """
     polytope = composite_polytope_at_constrained_composition(
         composite, composition, return_fractions=True

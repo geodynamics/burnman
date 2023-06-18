@@ -18,10 +18,7 @@ def file_to_composition_list(fname, unit_type, normalize):
     Takes an input file with a specific format and returns a list of
     compositions (and associated comments) contained in that file.
 
-    Parameters
-    ----------
-    fname : string
-        Path to ascii file containing composition data.
+    :param fname: Path to ascii file containing composition data.
         Lines beginning with a hash are not read.
         The first read-line of the datafile contains a list of tab or
         space-separated components (e.g. FeO or SiO2), followed by the
@@ -29,13 +26,15 @@ def file_to_composition_list(fname, unit_type, normalize):
         Following lines are lists of floats with the amounts of each component.
         After the component amounts, the user can write anything they like
         in the Comment section.
-    unit_type : 'mass', 'weight' or 'molar'
+    :type fname: str
+    :param unit_type: 'mass', 'weight' or 'molar'
         Specify whether the compositions in the file are given as
         mass (weight) or molar amounts.
-    normalize : boolean
-        If False, absolute numbers of moles/grams of component are stored,
+    :type unit_type: str
+    :param normalize: If False, absolute numbers of moles/grams of component are stored,
         otherwise the component amounts of returned compositions will
         sum to one (until Composition.renormalize() is used).
+    :type normalize : bool
 
     """
     lines = list(
@@ -71,17 +70,17 @@ class Composition(object):
         """
         Create a composition using a dictionary and unit type.
 
-        Parameters
-        ----------
-        composition_dictionary : dictionary
-            Dictionary of components (given as a string) and their amounts.
-        unit_type : 'mass', 'weight' or 'molar' (optional, 'mass' as default)
+        :param composition_dictionary: Dictionary of components
+            (given as a string) and their amounts.
+        :type composition_dictionary: dictionary
+        :param unit_type: 'mass', 'weight' or 'molar' (optional, 'mass' as default)
             Specify whether the input composition is given as mass or
             molar amounts.
-        normalize : boolean
-            If False, absolute numbers of kilograms/moles of component are
+        :type unit_type: str
+        :param normalize: If False, absolute numbers of kilograms/moles of component are
             stored, otherwise the component amounts of returned compositions
             will sum to one (until Composition.renormalize() is used).
+        :type normalize: bool
         """
 
         self._cached = {}
@@ -123,16 +122,16 @@ class Composition(object):
         to satisfy a given normalization condition
         (mass, weight, molar, or atomic)
 
-        Parameters
-        ----------
-        unit_type : 'mass', 'weight', 'molar' or 'atomic'
+        :param unit_type: 'mass', 'weight', 'molar' or 'atomic'
             Unit type with which to normalize the composition
-        normalization_component: string
-            Component/element on which to renormalize.
+        :type unit_type: str
+        :param normalization_component: Component/element on which to renormalize.
             String must either be one of the components/elements
-            already in the composition, or have the value 'total'
-        normalization_amount: float
-            Amount of component in the renormalised composition
+            already in the composition, or have the value 'total'.
+        :type normalization_component: str
+        :param normalization_amount: Amount of component in the
+            renormalised composition.
+        :type normalization_amount: float
         """
 
         if unit_type not in ["mass", "weight", "molar", "atomic"]:
@@ -161,12 +160,11 @@ class Composition(object):
         (mass, weight or molar) composition; if the composition has
         been renormalised, then this should be taken into account.
 
-        Parameters
-        ----------
-        composition_dictionary : dictionary
-            Components to add, and their amounts, in dictionary form
-        unit_type : 'mass', 'weight' or 'molar'
-            Unit type of the components to be added
+        :param composition_dictionary: Components to add, and their amounts.
+        :type composition_dictionary: dictionary
+        :param unit_type: 'mass', 'weight' or 'molar'.
+            Unit type of the components to be added.
+        :type unit_type: str
         """
         if unit_type == "mass" or unit_type == "weight":
             composition = self.mass_composition
@@ -190,10 +188,8 @@ class Composition(object):
         Will raise an exception if the new component set is
         invalid for the given composition.
 
-        Parameters
-        ----------
-        new_component_list : list of strings
-            New set of basis components.
+        :param new_component_list: New set of basis components.
+        :type new_component_list: list of strings
         """
         composition = np.array(
             [self.atomic_composition[element] for element in self.element_list]
@@ -265,10 +261,11 @@ class Composition(object):
         Helper function to return the composition in the
         desired type.
 
-        Parameters
-        ----------
-        unit_type : string
-            One of 'mass', 'weight', 'molar' and 'atomic'.
+        :param unit_type: One of 'mass', 'weight', 'molar' and 'atomic'.
+        :type unit_type: str
+
+        :returns: Mass (weight), molar or atomic composition.
+        :rtype: OrderedCounter
         """
         return getattr(self, f"{unit_type}_composition")
 
@@ -303,21 +300,21 @@ class Composition(object):
         This does not renormalize the Composition object itself,
         only the printed values.
 
-        Parameters
-        ----------
-        unit_type : 'mass', 'weight', 'molar' or 'atomic'
-            Unit type in which to print the composition
-        significant_figures : integer
-            Number of significant figures for each amount
-        normalization_component: string
-            Component/element on which to renormalize.
+        :param unit_type: 'mass', 'weight', 'molar' or 'atomic'
+            Unit type in which to print the composition.
+        :type unit_type: str
+        :param significant_figures: Number of significant figures
+            for each amount.
+        :type significant_figures: int
+        :param normalization_component: Component/element on which to renormalize.
             String must either be one of the components/elements
             already in composite, or have the value 'total'.
             (default = 'total')
-        normalization_amount: float
-            Amount of component in the renormalised composition.
-            If not explicitly set, no renormalization will be applied.
-            (default = None)
+        :type normalization_component: str
+        :param normalization_amount: Amount of component in the
+            renormalised composition. If not explicitly set,
+            no renormalization will be applied.
+        :type normalization_amount: float
         """
 
         if unit_type not in ["mass", "weight", "molar", "atomic"]:

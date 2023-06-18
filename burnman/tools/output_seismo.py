@@ -21,20 +21,18 @@ def write_tvel_file(planet_or_layer, modelname="burnmanmodel", background_model=
     are output as zeroes.  The tvel format has a column for density,
     but this column is not used by obspy for travel time calculations.
 
-    Parameters
-    ----------
-    planet_or_layer  :  burnman.Planet() or burnman.Layer()
-        Planet or layer to write out to tvel file
-    filename : string
-        Filename to read to
-    background_model : burnman.seismic.Seismic1DModel()
-        1D seismic model to fill in parts of planet
+    :param planet_or_layer: Planet or layer to write out to tvel file
+    :type planet_or_layer: :class:`burnman.Planet` or :class:`burnman.Layer`.
+    :param filename: Filename to read to.
+    :type filename: str
+    :param background_model:  1D seismic model to fill in parts of planet
         (likely to be an earth model) that aren't defined by layer
-        (only need when using Layer())
+        (only need when using :class:`burnman.Layer`)
+    :type background_model: :class:`burnman.seismic.Seismic1DModel`
     """
 
     if not isinstance(planet_or_layer, (Planet, Layer)):
-        raise TypeError("Input must be a Planet() or Layer() ")
+        raise TypeError("Input must be a Planet() or Layer() object.")
 
     if isinstance(planet_or_layer, Layer):
         assert background_model
@@ -116,18 +114,15 @@ def write_axisem_input(
     layers in the seismic model.
     Currently this function is only set for Earth.
 
-    Parameters
-    ----------
-    layers : list of one or more burnman.Layer()
-        List of layers to put in axisem file
-    modelname : string
-        Name of model, appears in name of output file
-    axisem_ref : string
-        Reference file, used to copy the header and for the rest of the planet,
-        in the case of a Layer(), default = 'axisem_prem_ani_noocean.txt'
-    plotting: Boolean
-        True means plot of the old model and replaced model will be shown
-        (default = False)
+    :param layers: List of layers to put in AXISEM file.
+    :type layers: list of one or more :class:`burnman.Layer`
+    :param modelname: Name of model, appears in name of output file.
+    :type modelname: str
+    :param axisem_ref: Reference file, used to copy the header
+        and for the rest of the planet, in the case of a :class:`burnman.Layer`.
+    :type axisem_ref: str
+    :param plotting: Choose whether to show plot of the old model and replaced model.
+    :type plotting: bool
     """
 
     if not isinstance(layers[0], Layer):
@@ -199,7 +194,8 @@ def write_axisem_input(
             discontinuity = discontinuity + 1
             f.write(
                 f"#          Discontinuity   {str(discontinuity)}, "
-                f"depth:    {str(np.round((6371.e3 - table[i, 0]) / 1.e3, decimals=2))} km \n"
+                f"depth:    {str(np.round((6371.e3 - table[i, 0]) / 1.e3, decimals=2))}"
+                " km \n"
             )
 
         f.write(
@@ -255,19 +251,15 @@ def write_mineos_input(
     in the synthetic input file, so it is best to only replace
     certain layers with burnman values
 
-    Parameters
-    ----------
-    layers : list of one or more burnman.Layer()
-        List of layers to put in axisem file
-    modelname : string
-        Name of model, appears in name of output file
-    mineos_ref : string
-        Reference file, used to copy the header and for the rest of the planet,
-        in the case of a Layer(), default = 'mineos_prem_noocean.txt'
-    plotting: Boolean
-        True means plot of the old model and replaced model will be shown
-        (default = False)
-
+    :param layers: List of layers to put in Mineos file.
+    :type layers: list of one or more :class:`burnman.Layer`
+    :param modelname: Name of model, appears in name of output file.
+    :type modelname: str
+    :param mineos_ref: Reference file, used to copy the header
+        and for the rest of the planet, in the case of a :class:`burnman.Layer`.
+    :type mineos_ref: str
+    :param plotting: Choose whether to show plot of the old model and replaced model.
+    :type plotting: bool
     """
 
     if not isinstance(layers[0], Layer):
