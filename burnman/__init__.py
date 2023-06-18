@@ -202,7 +202,7 @@ Acknowledgement and Support
 
 """
 from __future__ import absolute_import
-from .version import version as __version__
+import importlib.metadata
 
 # Low level utility functions
 from . import utils
@@ -254,3 +254,5 @@ from .optimize import linear_fitting
 from .optimize import nonlinear_fitting
 from .optimize import nonlinear_solvers
 from .optimize import eos_fitting
+
+__version__ = importlib.metadata.version("burnman")
