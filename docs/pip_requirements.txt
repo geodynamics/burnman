@@ -3,6 +3,7 @@ numpydoc
 matplotlib
 scipy
 sympy
+furo
 sphinxcontrib.bibtex
 nbsphinx
 cvxpy

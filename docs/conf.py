@@ -18,7 +18,6 @@ sys.path.insert(0, os.path.abspath("../examples"))
 sys.path.insert(0, os.path.abspath("../tutorial"))
 
 import burnman
-import burnman.version
 import datetime
 
 today = datetime.date.today()
@@ -34,7 +33,8 @@ copyright = (
 author = "Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn"
 
 # The short X.Y version.
-version = burnman.version.short_version
+v = burnman.__version__.split('.')
+version = f'{v[0]}.{v[1]}'
 # The full version, including alpha/beta/rc tags
 release = burnman.__version__
 
@@ -106,7 +106,7 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "default"
+html_theme = "furo"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "BurnMandoc"
@@ -229,6 +229,7 @@ Robert Myhill\\Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\
 language = "en"
 
 latex_logo = "burnjack-small.png"
+html_logo = "burnjack-small.png"
 
 latex_elements = {
     "sphinxsetup": "",

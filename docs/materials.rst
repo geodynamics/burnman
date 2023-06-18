@@ -7,18 +7,6 @@ most prominently in the form of minerals
 (:class:`~burnman.Mineral`) and composites (:class:`~burnman.Composite`).
 
 
-.. inheritance-diagram::
-  burnman.Material
-  burnman.Mineral
-  burnman.PerplexMaterial
-  burnman.Solution
-  burnman.ElasticSolution
-  burnman.Composite
-  burnman.CombinedMineral
-  burnman.AnisotropicMaterial
-  burnman.AnisotropicMineral
-
-
 Material Base Class
 -------------------
 
