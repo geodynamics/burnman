@@ -19,8 +19,9 @@ fi
 
 $PYTHON --version
 echo ""
-echo "Version numbers of required modules:"
-$PYTHON -m pip freeze | grep -f requirements.txt
+echo "Dependency tree:"
+$PYTHON -m pip install -q pipdeptree
+$PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 echo ""
 
 # Quietly install burnman in development mode
