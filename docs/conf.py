@@ -186,7 +186,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 % e.g. height=6.5in
 \begin{center}
 \vspace{.5in}
-\includegraphics[height=4.5in]{../../burnjack-small.png}
+\includegraphics[height=4.5in]{burnjack-small.png}
 % FILL: image file name
 % e.g. cover_image.png
 \end{center}
