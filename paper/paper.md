@@ -243,15 +243,30 @@ Instead, it provides two methods to deal with the problem of
 thermodynamic equilibrium: (1) reading in a pressure-temperature table
 of precalculated properties into a Material class
 (from which derivative properties can be calculated),
-and (2) an equilibrate function
-that chemically equilibrates a known assemblage under constraints
-(two or three choices from fixed pressure, temperature, entropy, volume,
-phase proportions and compositions).
-An example is shown in \autoref{fig:eqm}.
+and (2) an function called `equilibrate()`
+that chemically equilibrates a known assemblage under equality constraints.
 The equilibrate function is similar to that implemented in THERMOCALC
-[@Holland:1998]. 
+[@Holland:1998]. In this function, the user chooses an assemblage
+(e.g. olivine, garnet and orthopyroxene), a starting bulk composition,
+desired equality constraints, and optionally one or more
+compositional degrees of freedom. The equilibrate function attempts
+to find the remaining unknowns that satisfy those constraints using a
+damped Newton root finder [@Nowak:1991], modified to allow constraints
+using the method of Lagrange multipliers.
+
+There are a number of equality constraints implemented in `BurnMan`.
+These include fixed pressure, temperature, entropy or volume,
+"PT_ellipse" (which finds an equilibrium point on an ellipse with center given
+by a fixed pressure and temperature), a fixed molar fraction
+of a particular phase (which could be zero), or a compositional constraint on a 
+solution phase (such as a certain ratio of Mg and Fe on a particular site).
+The number of constraints required is two at fixed bulk composition, 
+and one more for each degree of compositional freedom.
+
+An example of use of the equilibrate function is shown in \autoref{fig:eqm}.
 See \url{https://burnman.readthedocs.io/en/latest/tutorial_05_equilibrium.html#}
-for more details and the code required to make \autoref{fig:eqm}.
+for more details and the code required to make \autoref{fig:eqm}. The manual
+also contains significantly more detail on this function.
 
 ![The olivine phase diagram at three different temperatures as computed
 using the equilibrate routines in `BurnMan`. The solution model properties
