@@ -29,6 +29,6 @@ Chemistry parsing and thermodynamics
 Equilibrium Thermodynamics
 ==========================
 
-.. autofunction:: burnman.tools.equilibrate
+.. autofunction:: burnman.tools.equilibration.equilibrate
 
-.. autofunction:: burnman.tools.get_equilibration_parameters
+.. autofunction:: burnman.tools.equilibration.get_equilibration_parameters
