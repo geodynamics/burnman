@@ -73,24 +73,25 @@ design that allows users to calculate many low-level properties that
 are not accessible using existing codes, and to combine various tools in
 novel, creative ways. The module includes:
 
-* many static and thermal equations of state for endmembers
-* several solution model formalisms (ideal, (a)symmetric, subregular)
+* over 10 static and thermal equations of state for endmembers
+* commonly-used solution model formalisms (ideal, (a)symmetric, subregular)
 and an option for user-defined functional forms
 * popular endmember and solution datasets 
 (including [@Holland:2011] and [@Stixrude:2011])
 * a consistent method for combining phases into a composite assemblage,
-with several seismic averaging schemes
+with seismic averaging schemes including Voigt, Reuss, Voigt-Reuss-Hill
+and the Hishin-Shtrikman bounds
 * a common set of methods to output thermodynamic and thermoelastic
 properties for all materials
 * an equilibrium reaction solver for composites
 * optimal least squares fitting routines for multivariate experimental
-data with (potentially correlated) errors. As an example, such functions
-can be used to simultaneously fit volumes, seismic velocities
-and enthalpies
-* a "Planet" class, which self-consistently calculates gravity profiles,
-mass, moment of inertia and temperature structure of planets given
+data with (potentially correlated) errors. Examples include simultaneous
+fitting of volumes, seismic velocities and enthalpies
+* a "Planet" class, which self-consistently calculates gravity-pressure-density
+profiles, mass, moment of inertia and temperature structure of planets given
 appropriate chemical and dynamic constraints
-* several geotherms from the literature
+* geothermal profiles from the literature as well as the option to calculate
+adiabatic profiles based on mineral assemblage
 * a set of high-level functions which create files readable by
 seismological and geodynamic software, including: Mineos [@Masters:2011],
 AxiSEM [@NissenMeyer:2014] and
@@ -98,7 +99,7 @@ ASPECT [@Kronbichler:2012;@aspect-doi-v2.4.0;@aspectmanual]
 
 The project also includes a multipart tutorial
 (\url{https://burnman.readthedocs.io/en/latest/tutorial.html}),
-a large collection of annotated examples,
+a over 40 annotated examples,
 an extensive suite of unit tests and benchmarks, and 
 a directory containing user-contributed code from published papers.
 Use of the code requires only moderate Python skills, and its modular nature
@@ -123,14 +124,20 @@ These are the needs satisfied by the `BurnMan` module.
 # The BurnMan project
 When `BurnMan` was first released [@Cottaar:2014], its focus was on
 the seismic properties of the lower mantle, using a single endmember
-mineral database [@Stixrude:2011] as a foundation. Since then,
-its scope has expanded considerably. `BurnMan` now contains equations
+mineral database [@Stixrude:2011] as a foundation.
+This initial release had no solution model implementation,
+no model for Gibbs energy or other thermodynamic potentials,
+no higher level functionality for fitting of experimental data or
+inversions, and no functions designed to model planetary bodies.
+Since then, its scope has expanded considerably
+(see \url{https://github.com/geodynamics/burnman/releases}
+for headline improvements). `BurnMan` now contains equations
 of state for minerals and melts from several published datasets.
 A common set of methods for all equations of state allows easy
 access to many thermodynamic properties, including anisotropic properties
 [@Myhill:2022]. A simple example is shown in \autoref{fig:qtzproperties}.
 See \url{https://burnman.readthedocs.io/en/latest/tutorial_01_material_classes.html#}
-for more details and the code required to make that plot.
+for more details and the code required to make the plot.
 
 ![Heat capacity and bulk sound velocities of quartz through the alpha-beta
 quartz transition as found in [@Stixrude:2011]. This transition is modelled
@@ -165,7 +172,9 @@ and add or subtract chemical components (see
 which can be used to construct planetary models with self-consistent
 pressure, gravity and density profiles
 and calculate seismic properties through those bodies 
-(\autoref{fig:zog}, \url{https://burnman.readthedocs.io/en/latest/tutorial_03_layers_and_planets.html}).
+\autoref{fig:zog} shows a 1D profile through Planet Zog, a planet much like Earth
+(see \url{https://burnman.readthedocs.io/en/latest/tutorial_03_layers_and_planets.html}
+for more details).
 Tools are provided to compare those seismic properties with published seismic models of
 the Earth, and to produce input files to compute synthetic
 seismic data using other codes, including
@@ -182,9 +191,11 @@ profiles satisfy hydrostatic equilibrium, and allows different layers
 to have different thermal profiles, including an isentropic profile
 with thermal boundary layers
 (shown here for the upper mantle, lower mantle and for the core).
+Depth dependent changes to density, gravity, pressure (solid blue lines)
+are compared with the Preliminary Reference Earth Model
+(PREM; dotted orange line, [@Dziewonski:1981]). 
 The computed geotherm is compared to several from the literature
 [@Stacey:1977;@Brown:1981;@Anderson:1982;@Alfe:2007;@Anzellini:2013].
-The other properties are compared to the PREM [@Dziewonski:1981].
 \label{fig:zog}](figures/zog.png)
 
 
