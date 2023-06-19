@@ -178,7 +178,7 @@ def F(
     reduced_free_composition_vectors,
 ):
     """
-    Returns a vector of values which are zero at equilibrium.
+    The vector-valued function for which the root is sought.
     The first two vector values depend on the
     equality_constraints chosen. For example, if
       - eq[i][0] = 'P', F[i] = P - eq[i][1]
@@ -254,9 +254,10 @@ def F(
 
 def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vectors):
     """
-    The Jacobian of the equilibrium problem (dF/dx).
-    See documentation for F and get_parameters
-    (which return F and x respectively) for more details.
+    The Jacobian of the vector-valued function :math:`F` for which the
+    root is sought (:math:`\\partial F / \\partial x`).
+    See documentation for :func:`F` and :func:`get_parameters`
+    (which return :math:`F` and :math:`x` respectively) for more details.
 
     :param x: Parameter values for the equilibrium problem to be solved.
     :type x: numpy.array
@@ -472,6 +473,17 @@ def phase_fraction_constraints(phase, assemblage, fractions, prm):
     Converts a phase fraction constraint into standard linear form
     that can be processed by the root finding problem.
 
+    We start with a single fraction or an array of fractions
+    for a particular phase (:math:`n_p / \\sum n = f`).
+    These are then converted into the "X" form of constraint
+    by multiplying by :math:`\\sum n` and moving all terms to
+    the LHS of the equation:
+
+    :math:`-f n_0 - f n_1 - \\ldots + (1-f) n_p - \\ldots = 0`
+
+    This form is less readable, but easier to use as a constraint
+    in a nonlinear solve.
+
     :param phase: The phase for which the fraction is to be constrained
     :type phase: :class:`burnman.Solution` or :class:`burnman.Mineral`
 
@@ -507,17 +519,35 @@ def phase_composition_constraints(phase, assemblage, constraints, prm):
     that can be processed by the root finding problem.
 
     We start with constraints in the form (site_names, n, d, v), where
-    n*x/d*x = v and n and d are fixed vectors of site coefficients.
-    So, one could for example choose a constraint
+    :math:`(n x)/ (d x) = v` and :math:`n` and :math:`d` are fixed vectors of
+    site coefficients. So, one could for example choose a constraint
     ([Mg_A, Fe_A], [1., 0.], [1., 1.], [0.5]) which would
     correspond to equal amounts Mg and Fe on the A site.
 
-    These are then converted by this function into endmember proportions
-    (n'*p/d'*p = v). Because the proportions must add up to zero,
-    we can reexpress this ratio as a linear constraint:
-    [(n'[1:] - n'[0]) - v*(d'[1:] - d'[0])]*xi = v*d0 - n0
-    which is less easy for a human to understand
-    (in terms of chemical constraints), but easier to use as a constraint
+    This function converts the user-defined vectors of site constraints
+    :math:`n` and :math:`d` into vectors of endmember proportion
+    constraints :math:`n'` and :math:`d'`, such that
+    :math:`(n' x)/ (d' x) = v`. This is done via linear transformation
+    using the site occupancy matrix provided by :class:`burnman.Solution`.
+    By multiplying by the denominator, we have the following scalar
+    comparison: :math:`(n' x) = v (d' x)`
+
+    The equilibration function does not use the proportion of
+    the first endmember (as the endmember proportions must sum to one),
+    and so we split :math:`x`, :math:`n'` and :math:`d'` into the first
+    element and following elements:
+    :math:`(n'_0 x_0 + n'_i x_i) = v (d'_0 x_0 + d'_i x_i)`
+    where :math:`i` is taken over all elements apart from the first.
+
+    With some more rearranging we can express the constraint in standard
+    linear form:
+    :math:`(n'_0 (1 - \\sum_j x_j) + n'_i x_i) = v (d'_0 (1 - \\sum_j x_j) + d'_i x_i)`
+
+    :math:`(n'_0 + (n'_i - 1_i n'_0) x_i) = v (d'_0 + (d'_i - 1_i d'_0) x_i)`
+
+    :math:`(((n'_i - 1_i n'_0) - v(d'_i - 1_i d'_0)) x_i) = (v d'_0 - n'_0)`
+
+    This form is less readable, but easier to use as a constraint
     in a nonlinear solve.
 
     :param phase: The phase for which the composition is to be constrained.
@@ -771,11 +801,49 @@ def equilibrate(
     verbose=False,
 ):
     """
-    A function that equilibrates an assemblage subject to given
-    bulk composition and equality constraints by
-    solving the equilibrium relations
-    (chemical affinities for feasible reactions in the system
-    should be equal to zero).
+    A function that finds the thermodynamic equilibrium state of an
+    assemblage subject to given equality constraints by solving a set of
+    nonlinear equations related to the chemical potentials and
+    other state variables of the system.
+
+    The user chooses an assemblage (e.g. olivine, garnet and orthopyroxene)
+    and :math:`2+n_c` equality constraints, where :math:`n_c` is the number of
+    bulk compositional degrees of freedom. The equilibrate function attempts to
+    find the remaining unknowns that satisfy those constraints.
+
+    There are a number of equality constraints implemented in burnman. These are
+    given as a list of lists. Each constraint should have the form:
+    [<constraint type>, <constraint>], where
+    <constraint type> is one of 'P', 'T', 'S', 'V', 'X', 'PT_ellipse',
+    'phase_fraction', or 'phase_composition'. The format of the
+    <constraint> object depends on the constraint type:
+        - P: float or numpy.array of
+            pressures [Pa]
+        - T: float or numpy.array of
+            temperatures [K]
+        - S: float or numpy.array of
+            entropies [J/K]
+        - V: float or numpy.array of
+            volumes [m:math:`^3`]
+        - PT_ellipse: list of two floats or numpy.arrays, where the equality
+            satifies the equation norm(([P, T] - arr[0])/arr[1]) = 1
+        - phase_fraction: tuple with the form (<phase> <fraction(s)>),
+            where <phase> is one of the phase objects in the assemblage
+            and <fraction(s)> is a float or numpy.array corresponding
+            to the desired phase fractions.
+        - phase_composition: tuple with the form (<phase> <constraint>),
+            where <phase> is one of the phase objects in the assemblage
+            and <constraint> has the form (site_names, n, d, v),
+            where :math:`(nx)/(dx) = v`, n and d are constant vectors of
+            site coefficients, and v is a float or numpy.array. For example,
+            a constraint of the form ([Mg_A, Fe_A], [1., 0.], [1., 1.], [0.5])
+            would correspond to equal amounts Mg and Fe on the A site
+            (Mg_A / (Mg_A + Fe_A) = 0.5).
+        - X: list of a numpy.array and a float or numpy.array,
+            where the equality satisfies the linear equation arr[0] x = arr[1].
+            The first numpy.array is fixed, and the second is to be looped over
+            by the equilibrate function.
+            This is a generic compositional equality constraint.
 
     :param composition: The bulk composition that the assemblage must satisfy.
     :type composition: dict
@@ -783,34 +851,16 @@ def equilibrate(
     :param assemblage: The assemblage to be equilibrated.
     :type assemblage: :class:`burnman.Composite`
 
-
-    :param equality_constraints: A list of equality constraints. Each constraint
-        should have the form: [<constraint type>, <constraint>], where
-        <constraint type> is one of P, T, S, V, X, PT_ellipse,
-        phase_fraction, or phase_composition. The <constraint> object should
-        either be a float or an array of floats for P, T, S, V
-        (representing the desired pressure, temperature,
-        entropy or volume of the material). If the constraint type is X
-        (a generic constraint on the solution vector) then the constraint c is
-        represented by the following equality:
-        np.dot(c[0], x) - c[1]. If the constraint type is
-        PT_ellipse, the equality is given by
-        norm(([P, T] - c[0])/c[1]) - 1.
-        The constraint_type phase_fraction assumes a tuple of the phase object
-        (which must be one of the phases in the burnman.Composite) and a float
-        or vector corresponding to the phase fractions. Finally, a
-        phase_composition constraint has the format (site_names, n, d, v),
-        where n*x/d*x = v and n and d are fixed vectors of site coefficients.
-        So, one could for example choose a constraint
-        ([Mg_A, Fe_A], [1., 0.], [1., 1.], [0.5]) which would
-        correspond to equal amounts Mg and Fe on the A site.
-    :type equality_constraints: list
+    :param equality_constraints: The list of equality constraints. See above
+        for valid formats.
+    :type equality_constraints: list of list
 
     :param free_compositional_vectors: A list of dictionaries containing
         the compositional freedom of the solution. For example, if the list
         contains the vector {'Mg': 1., 'Fe': -1}, that implies that the bulk
-        composition is equal to composition + a * (n_Mg - n_Fe), where a is a
-        constant to be determined by the solve.
+        composition is equal to composition + :math:`a` (n_Mg - n_Fe),
+        where the value of :math:`a` is to be determined by the solve.
+        Vector given in atomic (molar) units of elements.
     :type free_compositional_vectors: list of dict
 
     :param tol: The tolerance for the nonlinear solver.
@@ -835,7 +885,12 @@ def equilibrate(
     :returns: Solver solution object (or a list, or a 2D list of solution objects)
         created by :func:`burnman.optimize.nonlinear_solvers.damped_newton_solve`,
         and a namedtuple object created by
-        :func:`burnman.tools.equilibration.get_equilibration_parameters`.
+        :func:`burnman.tools.equilibration.get_equilibration_parameters`. See
+        documentation of these functions for the return types. If store_assemblage
+        is True, each solution object also has an attribute called `assemblage`,
+        which contains a copy of the input assemblage with the equilibrated
+        properties. So, for a 2D grid of solution objects, one could call either
+        sols[0][1].x[0] or sols[0][1].assemblage.pressure to get the pressure.
     :rtype: tuple
     """
     for ph in assemblage.phases:
