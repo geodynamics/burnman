@@ -75,17 +75,15 @@ def damped_newton_solve(
     minimizing the L2-norm of F(x_i+1) subject to the violated constraints.
 
     Successful termination of the solver is based on three criteria:
-    - all(np.abs(dx (simplified newton step) < tol))
-    - all(np.abs(dx (full Newton step) < sqrt(10*tol)))
-      [avoiding pathological behaviour] and
-    - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
+        - all(np.abs(dx (simplified newton step) < tol))
+        - all(np.abs(dx (full Newton step) < sqrt(10*tol))) (avoids pathology) and
+        - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step).
 
     If these criteria are not satisfied, iterations continue until one of the following
     occurs:
-    - the value of lmda is reduced to its minimum value
-      (this happens if the problem is very nonlinear)
-    - successive iterations have descent vectors which violate the constraints
-    - the maximum number of iterations (given by max_iterations) is reached.
+        - the value of lmda is reduced to its minimum value (for v. nonlinear problems)
+        - successive iterations have descent vectors which violate the constraints
+        - the maximum number of iterations (given by max_iterations) is reached.
 
     Information on the root (or lack of root) obtained by the solver is provided
     in the returned namedtuple.
@@ -100,45 +98,44 @@ def damped_newton_solve(
     :type guess: 1D numpy.array
 
     :param tol: Tolerance(s) for termination.
-    :type: float or array of floats
+    :type tol: float or array of floats
 
     :param max_iterations: Maximum number of iterations for the solver.
-    :type: int
+    :type max_iterations: int
 
     :param lambda_bounds: A function of dx and x that returns
         a tuple of floats corresponding to the minimum and maximum
         allowed fractions of the full newton step (dx).
-    :type: function of dx and x
+    :type lambda bounds: function of dx and x
 
     :param linear_constraints: tuple of a 2D numpy array (A) and 1D numpy array (b)
         Constraints are satisfied if A.x + b < eps
-    :type: tuple of a 2D numpy.array (A) and 1D numpy.array (b)
+    :type linear_constraints: tuple of a 2D numpy.array (A) and 1D numpy.array (b)
 
     :returns: A namedtuple with the following attributes:
-        * x - The solution vector [1D numpy array].
-        * F - The evaluated function F(x) [1D numpy array].
-        * F_norm - Euclidean norm of F(x) [float].
-        * J - The evaluated Jacobian J(x) [2D numpy array].
-        * n_it - Number of iterations [int].
-        * code - Numerical description of the solver termination [int].
-            0 -> Successful convergence
-            1 -> Failure due to solver hitting lower lambda bound
-            2 -> Failure due to descent vector crossing constraints
-            3 -> Failure due to solver reaching maximum number of iterations
-        * text - Description of the solver termination [str].
-        * success - Solver convergence state [bool].
-        * iterates - [namedtuple]
+
+        - x: The solution vector [1D numpy array].
+        - F: The evaluated function F(x) [1D numpy array].
+        - F_norm: Euclidean norm of F(x) [float].
+        - J: The evaluated Jacobian J(x) [2D numpy array].
+        - n_it: Number of iterations [int].
+        - code: Numerical description of the solver termination [int].
+            - 0: Successful convergence
+            - 1: Failure due to solver hitting lower lambda bound
+            - 2: Failure due to descent vector crossing constraints
+            - 3: Failure due to solver reaching maximum number of iterations
+        - text: Description of the solver termination [str].
+        - success: Solver convergence state [bool].
+        - iterates: [namedtuple]
             Only present if store_iterates=True
             Includes the following attributes:
-            x : list of 1D numpy arrays of floats
-                The parameters for each iteration
-            F : list of 2D numpy arrays of floats
-                The function for each iteration
-            lmda : list of floats
-                The value of the damping parameter for each iteration
+                - x: list of 1D numpy arrays of floats
+                    The parameters for each iteration
+                - F: list of 2D numpy arrays of floats
+                    The function for each iteration
+                - lmda: list of floats
+                    The value of the damping parameter for each iteration
     :rtype: namedtuple
-
-    This function is available as :func:`burnman.damped_newton_solve`.
     """
 
     # Make sure damping factor is within bounds, and that the bounds are reasonable

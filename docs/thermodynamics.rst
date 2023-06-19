@@ -1,4 +1,3 @@
-
 Thermodynamics
 ==============
 
@@ -30,4 +29,4 @@ Chemistry parsing and thermodynamics
 Equilibrium Thermodynamics
 ==========================
 
-.. autofunction:: burnman.equilibrate
+.. automodule:: burnman.tools.equilibration
