@@ -212,7 +212,7 @@ on both the volume and the bulk modulus.
 \label{fig:fit}](figures/stishovite_fitting.png)
 
 
-The utility functions `fit_composition_to_solution()` and
+The utility functions `fit_composition_to_solution()` and  
 `fit_phase_proportions_to_bulk_composition()`
 use weighted constrained least squares to estimate endmember or
 phase proportions and their corresponding covariances, given a bulk composition.
@@ -245,7 +245,7 @@ run products are consistent with the reported starting composition.
 
 `BurnMan` does not attempt to replicate Gibbs minimization codes,
 of which there are many, such as PerpleX [@Connolly:2009],
-xMELTS [@Ghiorso:2007],
+MELTS [@Ghiorso:1995],
 MageMin [@Riel:2022],
 TheriakDomino [@deCapitani:2010],
 HeFESTo [@Stixrude:2022] and
