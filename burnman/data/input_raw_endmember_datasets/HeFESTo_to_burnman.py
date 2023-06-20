@@ -281,7 +281,7 @@ for f in mbrdir.iterdir():
     if process:
         form = lines[0][0].replace("_", "").replace("(", "").replace(")", "")
         formula = dictionarize_formula(form)
-        full_name = '_'.join(lines[0][1:])
+        full_name = "_".join(lines[0][1:])
         # formula = formula_to_string(formula)
         # print(formula)
         # print(name)
