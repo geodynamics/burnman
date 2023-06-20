@@ -35,7 +35,7 @@ geophysics, and geodynamics. The features of BurnMan include:
     (including Vinet, Birch Murnaghan, Mie-Debye-Grueneisen, Modified Tait),
     and solution models (ideal, symmetric, asymmetric, subregular).
   - popular endmember and solution datasets already coded into burnman-usable format
-    (including :cite:`HP2011`, :cite:`Stixrude2005` and :cite:`Stixrude2011`)
+    (including :cite:`HP2011`, :cite:`Stixrude2005`, :cite:`Stixrude2011` and :cite:`Stixrude2022`)
   - Optimal least squares fitting routines for multivariate data with (potentially correlated) errors
     in pressure and temperature. As an example, such functions can be used to
     simultaneously fit volumes, seismic velocities and enthalpies.

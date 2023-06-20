@@ -11,7 +11,7 @@ from . import debye, einstein
 """
 Functions for modifying the thermodynamic properties of minerals
 Currently includes modifications for:
-- second order transitions (landau, landau_hp),
+- second order transitions (landau, landau_slb_2022, landau_hp),
 - order-disorder (bragg_williams),
 - magnetism (magnetic_chs),
 - and a linear modification (linear).
@@ -29,12 +29,11 @@ def _landau_excesses(pressure, temperature, params):
     Holland and Powell (2011), who compute properties relative to
     the completely disordered state and standard states respectively.
 
-    The current implementation is preferred, as the excess
-    entropy (and heat capacity) terms are equal to zero at 0 K.
+    The excess entropy (and heat capacity) terms are equal to zero at 0 K.
 
     N.B. The excesses are for a *completely relaxed* mineral;
     for example, seismic wave propagation is *slow* compared to the
-    rate of reaction.
+    rate of change in order parameter.
     """
 
     Tc = params["Tc_0"] + params["V_D"] * pressure / params["S_D"]
@@ -100,6 +99,91 @@ def _landau_excesses(pressure, temperature, params):
     return (excesses, {"Q": np.sqrt(Q2)})
 
 
+def _landau_slb_2022_excesses(pressure, temperature, params):
+    """
+    Applies a tricritical Landau correction to the properties
+    of an endmember which undergoes a displacive phase transition.
+    This correction follows Stixrude and Lithgow-Bertelloni (2022),
+    and is done relative to the state with order parameter Q=1.
+
+    The order parameter of this formulation can exceed one,
+    at odds with Putnis (above), but in better agreement with
+    atomic intuition (Stixrude and Lithgow-Bertelloni, 2022).
+    Nevertheless, this implementation is still not perfect,
+    as the excess entropy (and heat capacity) terms are not equal
+    to zero at 0 K. Q is limited to values less than or equal to 2
+    to avoid unrealistic stabilisation at ultrahigh pressure.
+
+    N.B. These excesses are for a *completely relaxed* mineral;
+    for example, seismic wave propagation is *slow* compared to the
+    rate of change in order parameter.
+    """
+
+    Tc = params["Tc_0"] + params["V_D"] * pressure / params["S_D"]
+
+    G_disordered = -params["S_D"] * ((temperature - Tc) + params["Tc_0"] / 3.0)
+    dGdT_disordered = -params["S_D"]
+    dGdP_disordered = params["V_D"]
+
+    if temperature < Tc:
+        Q2 = np.sqrt((Tc - temperature) / params["Tc_0"])
+
+        if Q2 < 4.0:
+            # Wolfram input to check partial differentials
+            # x = T, y = P, a = S, c = Tc0, d = V
+            # D[D[a ((x - c - d*y/a)*((c + d*y/a - x)/c)^0.5
+            # + c/3*((c + d*y/a - x)/c)^1.5), x], x]
+            # where Q2 = ((c + d*y/a - x)/c)^0.5
+            G = (
+                params["S_D"]
+                * ((temperature - Tc) * Q2 + params["Tc_0"] * Q2 * Q2 * Q2 / 3.0)
+                + G_disordered
+            )
+            dGdP = -params["V_D"] * Q2 + dGdP_disordered
+            dGdT = params["S_D"] * Q2 + dGdT_disordered
+            d2GdP2 = (
+                -0.5
+                * params["V_D"]
+                * params["V_D"]
+                / (params["S_D"] * params["Tc_0"] * Q2)
+            )
+            d2GdT2 = -0.5 * params["S_D"] / (Tc * Q2)
+            d2GdPdT = 0.5 * params["V_D"] / (Tc * Q2)
+        else:
+            # Wolfram input to check partial differentials
+            # x = T, y = P, a = S, c = Tc0, d = V
+            # D[D[a ((x - c - d*y/a)*4 + c/3*64), x], x]
+            G = (
+                params["S_D"] * ((temperature - Tc) * 4.0 + params["Tc_0"] * 64.0 / 3.0)
+                + G_disordered
+            )
+            dGdP = -params["V_D"] * 4.0 + dGdP_disordered
+            dGdT = params["S_D"] * 4.0 + dGdT_disordered
+            d2GdP2 = 0.0
+            d2GdT2 = 0.0
+            d2GdPdT = 0.0
+
+    else:
+        Q2 = 0.0
+        G = G_disordered
+        dGdT = dGdT_disordered
+        dGdP = dGdP_disordered
+        d2GdT2 = 0.0
+        d2GdP2 = 0.0
+        d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+
+    return (excesses, {"Q": np.sqrt(Q2)})
+
+
 def _landau_hp_excesses(pressure, temperature, params):
     """
     Applies a tricritical Landau correction to the properties
@@ -111,13 +195,12 @@ def _landau_hp_excesses(pressure, temperature, params):
     (Holland, pers. comm), which 'corrects' the terms involving
     the critical temperature Tc / Tc*
 
-    Note that this formalism is still inconsistent, as it predicts that
-    the order parameter can be greater than one. For this reason
-    _landau_excesses is preferred.
+    This formalism predicts that the order parameter can be greater
+    than one, unlike _landau_excesses.
 
     N.B. The excesses are for a *completely relaxed* mineral;
     i.e. the seismic wave propagation is *slow* compared to the
-    rate of reaction.
+    rate of change in order parameter.
     """
 
     P = pressure
@@ -606,6 +689,8 @@ def calculate_property_modifications(mineral):
     for modifier in mineral.property_modifiers:
         if modifier[0] == "landau":
             xs_function = _landau_excesses
+        elif modifier[0] == "landau_slb_2022":
+            xs_function = _landau_slb_2022_excesses
         elif modifier[0] == "landau_hp":
             xs_function = _landau_hp_excesses
         elif modifier[0] == "linear":

@@ -10,6 +10,7 @@ Mineral database
   - :mod:`~burnman.minerals.SLB_2005`
   - :mod:`~burnman.minerals.SLB_2011_ZSB_2013`
   - :mod:`~burnman.minerals.SLB_2011`
+  - :mod:`~burnman.minerals.SLB_2022`
   - :mod:`~burnman.minerals.DKS_2013_liquids`
   - :mod:`~burnman.minerals.DKS_2013_solids`
   - :mod:`~burnman.minerals.RS_2014_liquids`
@@ -26,6 +27,7 @@ Mineral database
 from __future__ import absolute_import
 
 # Stixrude and Lithgow-Bertelloni
+from . import SLB_2022
 from . import SLB_2011
 from . import SLB_2011_ZSB_2013
 from . import SLB_2005

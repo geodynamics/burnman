@@ -19,6 +19,9 @@ Mineral databases
 .. automodule::  burnman.minerals.SLB_2011
   :no-inherited-members:
 
+.. automodule::  burnman.minerals.SLB_2022
+  :no-inherited-members:
+
 .. automodule::  burnman.minerals.SLB_2011_ZSB_2013
   :no-inherited-members:
 
