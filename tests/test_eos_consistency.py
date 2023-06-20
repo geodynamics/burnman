@@ -28,6 +28,13 @@ class EosConsistency(BurnManTest):
             check_eos_consistency(burnman.minerals.SLB_2011.periclase(), P, T), True
         )
 
+    def test_SLB_2022(self):
+        P = 2.0e9
+        T = 500.0
+        self.assertEqual(
+            check_eos_consistency(burnman.minerals.SLB_2022.almandine(), P, T), True
+        )
+
     def test_modifier(self):
         P = 10.0e9
         T = 3000.0

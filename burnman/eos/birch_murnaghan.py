@@ -249,7 +249,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
             warnings.warn("Unusual value for V_0", stacklevel=2)
         if params["K_0"] < 1.0e9 or params["K_0"] > 1.0e13:
             warnings.warn("Unusual value for K_0", stacklevel=2)
-        if params["Kprime_0"] < 0.0 or params["Kprime_0"] > 10.0:
+        if params["Kprime_0"] < 0.0 or params["Kprime_0"] > 20.0:
             warnings.warn("Unusual value for Kprime_0", stacklevel=2)
         if params["G_0"] < 0.0 or params["G_0"] > 1.0e13:
             warnings.warn("Unusual value for G_0", stacklevel=2)

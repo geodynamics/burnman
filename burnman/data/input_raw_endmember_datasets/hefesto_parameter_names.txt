@@ -1,0 +1,47 @@
+n              Atoms in formula unit
+Z              Z, Formula units in unit cell
+molar_mass     Formula mass (g/mol)
+T_ref          T_0 (K)
+F_0            F_0 (kJ/mol)
+V_0            V_0 (cm^3/mol)
+K_0            K_0 (GPa)
+Kprime_0       K_0 prime
+unknown        K_0K_0 prime prime (zero for third order)
+Theta_0        Theta_0 (K)
+unknown        Debye Acoustic Branch 2
+unknown        Debye Acoustic Branch 3
+unknown        Sin Acoustic Branch 1
+unknown        Sin Acoustic Branch 2
+unknown        Sin Acoustic Branch 3
+unknown        Einstein Oscillator 1
+unknown        Weight of Einstein Oscillator 1
+unknown        Einstein Oscillator 2
+unknown        Weight of Einstein Oscillator 2
+unknown        Einstein Oscillator 3
+unknown        Weight of Einstein Oscillator 3
+unknown        Einstein Oscillator 4
+unknown        Weight of Einstein Oscillator 4
+unknown        Upper Limit of Optic Continuum
+unknown        Lower Limit of Optic Continuum
+gamma_0        gamma_0
+q_0            q_0
+beta       beta (electronic contribution)
+gammael_0        gammael_0 (electronic contribution)
+q_2A_2        q_2A_2 (anharmonic contribution)
+unknown        High Temperature Approximation (1=yes)
+unknown        Birch-Murnaghan (0) or Vinet (1)
+debye        Einstein (0) or Debye (1)
+zpp        Zero Point Pressure (1=yes)
+G_0            Ambient Shear Modulus
+Gprime_0        Pressure Derivative
+eta_s_0        Temperature Derivative
+T_crit         Critical Temperature (K)
+S_crit         Critical Entropy (J/mol/K)
+V_crit         Critical Volume (cm^3/mol)
+unknown        Van Laar size parameter (-)
+unknown        C11
+unknown        C12
+unknown        C44
+unknown        C11 prime
+unknown        C12 prime
+unknown        C44 prime
