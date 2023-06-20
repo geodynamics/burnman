@@ -307,7 +307,7 @@ for f in mbrdir.iterdir():
             "name": full_name,
             "formula": formula,
             "equation_of_state": "slb3",
-            "F_0": rfloat(idict["F_0"], 1.0e-3),
+            "F_0": rfloat(idict["F_0"], 1.0e3),
             "V_0": rfloat(idict["V_0"], 1.0e-6),
             "K_0": rfloat(idict["K_0"], 1.0e9),
             "Kprime_0": rfloat(idict["Kprime_0"]),
