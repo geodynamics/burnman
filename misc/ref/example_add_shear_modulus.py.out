@@ -1,0 +1,9 @@
+P: 1.00 GPa, T: 500.00 K
+
+Properties from modified object:
+    Shear modulus: 82.52 GPa
+    V_p: 8.66 km/s, V_s: 5.06 km/s
+
+Properties from object created from modified class:
+    Shear modulus: 82.52 GPa
+    V_p: 8.66 km/s, V_s: 5.06 km/s
