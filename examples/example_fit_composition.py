@@ -34,7 +34,9 @@ import matplotlib.pyplot as plt
 import itertools
 
 from burnman import minerals
+from burnman.utils.chemistry import formula_to_string
 from burnman.optimize.composition_fitting import fit_composition_to_solution
+from burnman.optimize.composition_fitting import DummyCompositionSolution
 from burnman.optimize.composition_fitting import (
     fit_phase_proportions_to_bulk_composition,
 )
@@ -96,7 +98,6 @@ if __name__ == "__main__":
     popt, pcov, res = fit_composition_to_solution(
         gt, fitted_species, species_amounts, species_covariances, species_conversions
     )
-
     # We can set the composition of gt using the optimized parameters
     gt.set_composition(popt)
 
@@ -108,9 +109,36 @@ if __name__ == "__main__":
             f"{gt.molar_fractions[i]:.3f} +/- "
             f"{np.sqrt(pcov[i][i]):.3f}"
         )
-    print()
-    print(f"Weighted residual: {res:.3f}")
 
+    # If you don't have a full solution model prepared,
+    # you can instead use the helper class
+    # DummyCompositionSolution
+    element_formulae = [
+        "Mg3Al2Si3O12",
+        "Fe3Al2Si3O12",
+        "Ca3Al2Si3O12",
+        "Ca3Fe2Si3O12",
+        "Mg3Cr2Si3O12",
+    ]
+    site_formulae = [
+        "[Mg]3[Al]2Si3O12",
+        "[Fe]3[Al]2Si3O12",
+        "[Ca]3[Al]2Si3O12",
+        "[Ca]3[Fef]2Si3O12",
+        "[Mg]3[Cr]2Si3O12",
+    ]
+    gt = DummyCompositionSolution(element_formulae, site_formulae)
+    popt1, pcov1, res1 = fit_composition_to_solution(
+        gt, fitted_species, species_amounts, species_covariances, species_conversions
+    )
+
+    assert res == res1
+    gt.set_composition(popt)
+
+    print("\nSite formula:")
+    print(gt.site_formula(2))
+
+    print(f"\nWeighted residual: {res:.3f}")
     """
     Example 2
     ---------

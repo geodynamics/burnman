@@ -8,6 +8,8 @@ from __future__ import absolute_import
 
 import numpy as np
 from sympy import Matrix, nsimplify
+from collections import OrderedDict
+
 from .material import material_property, cached_property
 from .mineral import Mineral
 from .solutionmodel import MechanicalSolution
@@ -116,8 +118,48 @@ class Solution(Mineral):
     def formula(self):
         """
         Returns molar chemical formula of the solution.
+        :rtype: Counter
         """
         return sum_formulae(self.endmember_formulae, self.molar_fractions)
+
+    @material_property
+    def site_occupancies(self):
+        """
+        :returns: The fractional occupancies of species on each site.
+        :rtype: list of OrderedDicts
+        """
+        occs = np.einsum(
+            "ij, i", self.solution_model.endmember_occupancies, self.molar_fractions
+        )
+        site_occs = []
+        k = 0
+        for i in range(self.solution_model.n_sites):
+            site_occs.append(OrderedDict())
+            for j in range(len(self.solution_model.sites[i])):
+                site_occs[-1][self.solution_model.sites[i][j]] = occs[k]
+                k += 1
+
+        return site_occs
+
+    def site_formula(self, precision=2):
+        """
+        Returns the molar chemical formula of the solution with site occupancies.
+            For example, [Mg0.4Fe0.6]2SiO4.
+
+        :param precision: Precision with which to print the site occupancies
+        :type precision: int
+
+        :returns: Molar chemical formula of the solution with site occupancies
+        :rtype: str
+        """
+        split_empty = self.solution_model.empty_formula.split("[")
+        formula = split_empty[0]
+        for i, site_occs in enumerate(self.site_occupancies):
+            formula += "["
+            for species, occ in site_occs.items():
+                formula += f"{species}{occ:0.{precision}f}"
+            formula += split_empty[i + 1]
+        return formula
 
     @material_property
     def activities(self):

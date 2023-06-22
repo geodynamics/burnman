@@ -6,7 +6,40 @@
 from __future__ import absolute_import
 
 import numpy as np
+from copy import deepcopy
+from collections import namedtuple
 from .linear_fitting import weighted_constrained_least_squares
+from ..utils.chemistry import dictionarize_formula
+from ..utils.chemistry import process_solution_chemistry
+from ..classes.solution import Solution
+
+
+class DummyCompositionSolution(Solution):
+    """
+    This is a dummy base class for a solution object to
+    facilitate composition fitting when no solution model has
+    been prepared. The model is initialized with appropriate
+    chemical formulae for each endmember, and can do all basic
+    compositional processing that doesn't involve any material
+    properties.
+
+    :param endmember_element_formulae: Formulae for each of the independent endmembers.
+        e.g. ['Mg2SiO4', 'Fe2SiO4'].
+    :type endmember_element_formulae: list of str
+    :param endmember_site_formulae: Site formulae for each of the independent endmembers,
+        in the same order as endmember_element_formulae. e.g. ['[Mg]2SiO4', '[Fe]2SiO4'].
+    :type endmember_site_formulae: list of str
+    """
+
+    def __init__(self, endmember_element_formulae, endmember_site_formulae):
+        self.endmember_formulae = [
+            dictionarize_formula(f) for f in endmember_element_formulae
+        ]
+        self.solution_model = type(
+            "Dimension", (object,), {"formulas": endmember_site_formulae}
+        )()
+        self.solution_model.endmembers = [None for f in endmember_site_formulae]
+        process_solution_chemistry(self.solution_model)
 
 
 def fit_composition_to_solution(
@@ -59,17 +92,15 @@ def fit_composition_to_solution(
     :rtype: tuple of 1D numpy.array, 2D numpy.array and float
     """
 
-    n_vars = len(fitted_variables)
-    n_mbrs = len(solution.endmembers)
-
-    solution_variables = solution.elements
+    solution_variables = deepcopy(solution.elements)
     solution_variables.extend(solution.solution_model.site_names)
 
     solution_matrix = np.hstack(
         (solution.stoichiometric_matrix, solution.solution_model.endmember_noccupancies)
     )
 
-    n_sol_vars = solution_matrix.shape[1]
+    n_vars = len(fitted_variables)
+    n_mbrs, n_sol_vars = solution_matrix.shape
 
     if variable_conversions is not None:
         solution_matrix = np.hstack(

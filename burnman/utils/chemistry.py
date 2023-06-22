@@ -308,6 +308,12 @@ def process_solution_chemistry(solution_model):
 
         * solution_formulae [list of dictionaries]
             List of endmember formulae in dictionary form.
+        * empty_formula [string]
+            Abbreviated chemical formula with sites denoted by empty
+            square brackets.
+        * general_formula [string]
+            General chemical formula with sites denoted by
+            square brackets filled with a comma-separated list of species
         * n_sites [integer]
             Number of sites in the solution.
             Should be the same for all endmembers.
@@ -441,6 +447,14 @@ def process_solution_chemistry(solution_model):
     solution_model.endmember_noccupancies = np.einsum(
         "ij, ij->ij", endmember_occupancies, site_multiplicities
     )
+
+    solution_model.empty_formula = re.sub(
+        "([\[]).*?([\]])", "\g<1>\g<2>", solution_model.formulas[0]
+    )
+    split_empty = solution_model.empty_formula.split("[")
+    solution_model.general_formula = split_empty[0]
+    for i in range(n_sites):
+        solution_model.general_formula += f"[{','.join(sites[i])}{split_empty[i+1]}"
 
 
 def site_occupancies_to_strings(
