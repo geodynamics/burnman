@@ -57,7 +57,7 @@ complex materials from simpler constructs: rocks are composites
 made up of one or more phases; phases are solutions of more than one
 endmember; and endmembers are usually mixtures of more than one element.
 The properties of the endmember building blocks at different pressures and
-temperatures rovided modelled using a wide array of different equations of state.
+temperatures can be modelled using a wide array of different equations of state.
 There are also many models for the averaging of endmember properties
 within solutions and composite materials. Once calculated,
 the physical properties of composite materials can be used in many
@@ -68,7 +68,7 @@ written in Python. It implements several different methods to
 calculate the physical properties of natural materials.
 The toolbox has a class-based, modular
 design that allows users to calculate many low-level properties that
-are not easily accessed using existing codes, and to combine various tools in
+are not easily accessed using other codes, and to combine various tools in
 novel, creative ways. The module includes:
 
 * over a dozen static and thermal equations of state for pure phases;
@@ -100,7 +100,7 @@ ASPECT [@Kronbichler:2012;@aspect-doi-v2.4.0;@aspectmanual]; and
 and elemental compositions, convert to different chemical component systems,
 and add or subtract components. 
 
-The project also includes over 40 annotated examples,
+The project includes over 40 annotated examples,
 an extensive suite of unit tests and benchmarks, and 
 a directory containing user-contributed code from published papers.
 A multipart tutorial illustrates key functionality, including the
