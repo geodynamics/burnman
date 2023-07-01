@@ -1,5 +1,41 @@
 Changelog
 ---------
+Release v1.2.0 (July 1, 2023) includes
+  - Two new helper functions:
+    :func:`burnman.tools.chemistry.reactions_from_stoichiometric_matrix`
+    :func:`burnman.tools.chemistry.reactions_from_formulae`.
+    These functions generate a complete list of reactions
+    (forward and reverse) from either the stoichiometric matrix
+    (a 2D numpy array containing the amount of component j in phase i),
+    or from a list of formulae
+    (as strings or dictionaries of elemental amounts).
+  - Solution and ElasticSolution objects are now instantiated
+    with a SolutionModel object as a solution_model parameter.
+    The use of the solution_type parameter has been removed
+    completely, along with all of the optional parameters that were
+    originally passed as parameters to SolutionModel.
+  - A generalised PolynomialSolution class. The
+    non-ideal excesses in this model are polynomial functions
+    of composition. This class can deal with arbitrarily high powers in endmember
+    proportions. However, because the class internally converts the
+    list of lists to numpy arrays, high powers of solutions with a
+    large number of endmembers will create very large
+    arrays (with order n_endmembers^(highest power) elements).
+    This may significantly slow down calculations.
+  - Five new property modifier formulations,
+    which can be specified with the names "debye", "debye_delta",
+    "einstein", "einstein_delta" and "landau_slb_2022". These
+    are based on the Debye and Einstein models of thermal energy
+    and the Landau model of Stixrude and Lithgow-Bertelloni (2022).
+    The heat capacity ("debye", "einstein")
+    or entropy ("debye_delta", "einstein_delta")
+    are based on the heat capacity of the respective thermal model,
+    and reach a maximum at high temperature. The
+    excess energy, entropy and heat capacity of these four modifiers
+    are all zero at 0 K, and the excess volume is always zero.
+  - An implementation of the SLB2022 dataset.
+  - This version is associated with acceptance of the JOSS paper.
+
 Release v1.1.0 (September 14, 2022)
   - the equilibrate function now solves problems where the bulk composition is allowed to vary
   - the solution model formulation has been updated to allow site multiplicities to vary linearly with endmember proportions (as in a Temkin model)
