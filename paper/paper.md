@@ -68,7 +68,7 @@ written in Python. It implements several different methods to
 calculate the physical properties of natural materials.
 The toolbox has a class-based, modular
 design that allows users to calculate many low-level properties that
-are not easily accessed using other codes, and to combine various tools in
+are not easily accessed using existing codes, and to combine various tools in
 novel, creative ways. The module includes:
 
 * over a dozen static and thermal equations of state for pure phases;
@@ -79,10 +79,10 @@ including @Holland:2011, @deKoker:2013 and @Stixrude:2022;
 * an anisotropic equation of state [@Myhill:2022];
 * a consistent method for combining phases into a composite assemblage,
 with seismic averaging schemes including Voigt, Reuss, Voigt-Reuss-Hill
-and the Hishin-Shtrikman bounds;
+and the Hashin-Shtrikman bounds;
 * a common set of methods to output thermodynamic and thermoelastic
 properties for all materials;
-* an solver to chemically equilibrate composite materials;
+* a solver to chemically equilibrate composite materials;
 * optimal least squares fitting routines for multivariate experimental
 data with (potentially correlated) errors. These allow (for example) simultaneous
 fitting of pure phase and solution model parameters to experimental volumes,
