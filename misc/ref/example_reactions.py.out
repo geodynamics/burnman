@@ -1,0 +1,53 @@
+Calculating upper mantle reactions in CMSH system...
+There are 10 forward reactions between the 10 endmembers in this system.
+... as matrix:
+array([[-1,  0,  0,  0,  0,  1,  0,  0,  0,  0],
+       [-1,  0,  0,  1,  0,  0,  0, -1,  0,  0],
+       [-1,  1,  0,  0,  0,  0,  0, -1,  0,  0],
+       [ 0, -1,  0,  0,  0,  1,  0,  1,  0,  0],
+       [ 0, -1,  0,  1,  0,  0,  0,  0,  0,  0],
+       [ 0,  0, -1,  0,  0,  0,  1,  0,  0,  0],
+       [ 0,  0, -1,  0,  1,  0,  0,  0,  0,  0],
+       [ 0,  0,  0, -1,  0,  1,  0,  1,  0,  0],
+       [ 0,  0,  0,  0, -1,  0,  1,  0,  0,  0],
+       [ 0,  0,  0,  0,  0,  0,  0,  0, -1,  1]])
+... as strings:
+1 foO = 1 foL
+1 foO + 1 qL = 1 enCpx
+1 foO + 1 qL = 1 enOpx
+1 enOpx = 1 foL + 1 qL
+1 enOpx = 1 enCpx
+1 diOpx = 1 diL
+1 diOpx = 1 diCpx
+1 enCpx = 1 foL + 1 qL
+1 diCpx = 1 diL
+1 wL = 1 wFluid
+
+Calculating lower mantle reactions in NCFMAS system for assemblage:
+"['bridgmanite', 'ferropericlase', 'Ca-Perovskite']"
+Endmembers:
+['Mg-Perovskite in bridgmanite',
+ 'Fe-Perovskite in bridgmanite',
+ 'Al-Perovskite in bridgmanite',
+ 'Periclase in ferropericlase',
+ 'W\\"ustite in ferropericlase',
+ 'alpha-NaO2_phase in ferropericlase',
+ 'Ca-Perovskite']
+Elements:
+['Na', 'Ca', 'Mg', 'Fe', 'Al', 'Si', 'O']
+Stoichiometric matrix:
+array([[0, 0, 1, 0, 0, 1, 3],
+       [0, 0, 0, 1, 0, 1, 3],
+       [0, 0, 0, 0, 2, 0, 3],
+       [0, 0, 4, 0, 0, 0, 4],
+       [0, 0, 0, 4, 0, 0, 4],
+       [2, 0, 0, 0, 2, 0, 4],
+       [0, 1, 0, 0, 0, 1, 3]])
+There are 1 forward reactions between the 7 endmembers in this system.
+[[-4 4 0 1 -1 0 0]]
+['4 Mg-Perovskite in bridgmanite + 1 W\\"ustite in ferropericlase = 4 Fe-Perovskite in bridgmanite + 1 Periclase in ferropericlase']
+
+Calculating lower mantle reactions in NCFMAS system for assemblage:
+("['bridgmanite', 'ferropericlase', 'Ca-Perovskite', "
+ "'calcium_ferrite_structured_phase', 'new_aluminous_phase']")
+There are 99 forward reactions between the 13 endmembers in this system.

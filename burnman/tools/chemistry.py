@@ -274,7 +274,7 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
         compound j in reaction i.
     :rtype: 2D numpy array
     """
-    n_components = len(stoichiometric_matrix[0])
+    n_components = stoichiometric_matrix.shape[1]
 
     equalities = np.concatenate(([np.zeros(n_components)], stoichiometric_matrix)).T
 
