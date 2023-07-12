@@ -1,7 +1,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8104293.svg)](https://doi.org/10.5281/zenodo.8104293)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.05389/status.svg)](https://doi.org/10.21105/joss.05389)
 
-# BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and planetary sciences
+# BurnMan - a Python toolkit for planetary geophysics, geochemistry and thermodynamics
 
 <img src="docs/burnjack.png" width="256">
 
