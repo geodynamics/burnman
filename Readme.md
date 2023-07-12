@@ -1,5 +1,5 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8104293.svg)](https://doi.org/10.5281/zenodo.8104293)
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.05464/status.svg)](https://doi.org/10.21105/joss.05464)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05389/status.svg)](https://doi.org/10.21105/joss.05389)
 
 # BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and planetary sciences
 
@@ -27,20 +27,39 @@ Authors (as of 2023):
 * Ian Rose
 * Sanne Cottaar
 * Timo Heister
+* Juliane Dannberg
+* Rene Gassmoeller
 
-## Requirements
+## Citing BurnMan
+
+If you use BurnMan in your work, we ask that you cite the following publications:
+
+  - Myhill, R., Cottaar, S., Heister, T., Rose, I., Unterborn, C.,
+    Dannberg, J. and Gassmoeller, R. (2023). BurnMan - a Python toolkit for
+    planetary geophysics, geochemistry and thermodynamics. Journal of Open Source Software.
+    https://doi.org/10.21105/joss.05389
+
+  - Myhill, R., Cottaar, S., Heister, T., Rose, I., and Unterborn, C. (2023):
+    BurnMan v1.2.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
+    https://doi.org/10.5281/zenodo.8104293
+
+  - Cottaar S., Heister, T., Rose, I., and Unterborn, C., (2014). BurnMan: A
+    lower mantle mineral physics toolkit, Geochemistry, Geophysics, and
+    Geosystems, 15(4), 1164-1179 https://doi.org/10.1002/2013GC005122
+    
+## Installation requirements
 
 * Python 3.8+
 * Python modules:
   NumPy, SciPy, SymPy, Matplotlib
 
-## Optional, needed for some functionality
+## Optional packages needed for some functionality
 
 * cvxpy - required for some least squares fitting routines and solution polytope calculations.
 * pycddlib - required for solution polytope calculations.
 * autograd - required for esoteric solution models defined using a single excess function. Not required for the vast majority of users.
 
-## Installation
+## Installation process
 Installation of BurnMan is mostly platform independent.
 As long as you know how to use a terminal, the process should be straightforward.
 The following instructions should help, but let us know if you have any problems.
