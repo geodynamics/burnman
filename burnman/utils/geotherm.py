@@ -127,7 +127,7 @@ def adiabatic(pressures, T0, rock):
     rock.set_state(pressures[0], T0)
     S0 = rock.S
 
-    delta_S = lambda T, P, rock, S0: S0 - rock.evaluate(["S"], [P], [T])[0]
+    delta_S = lambda T, P, rock, S0: S0 - rock.evaluate(["S"], [P], [T])[0][0]
 
     temperatures = np.empty_like(pressures)
     temperatures[0] = T0
