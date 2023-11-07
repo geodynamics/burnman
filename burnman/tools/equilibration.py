@@ -1071,7 +1071,7 @@ def equilibrate(
                     updated_params = True
 
     # Finally, make dimensions of sol_array equal the input dimensions
-    if np.product(sol_array.shape) > 1:
+    if np.prod(sol_array.shape) > 1:
         sol_array = np.squeeze(sol_array)
     else:
         sol_array = sol_array.flatten()[0]
