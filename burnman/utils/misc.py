@@ -214,7 +214,7 @@ def attribute_function(m, attributes, powers=[]):
     """
     if type(attributes) is str:
         attributes = [attributes]
-    if powers == []:
+    if len(powers) == 0:
         powers = [1.0 for a in attributes]
 
     def f(x):

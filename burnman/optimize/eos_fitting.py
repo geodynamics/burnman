@@ -187,7 +187,7 @@ def fit_PTp_data(
         )
 
     # Apply mle tolerances if they dont exist
-    if mle_tolerances == []:
+    if len(mle_tolerances) == 0:
         mineral.set_state(1.0e5, 300.0)
         mle_tolerance_factor = 1.0e-5
         mle_tolerances = np.empty(len(flags))
@@ -200,7 +200,7 @@ def fit_PTp_data(
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
     covariances_defined = True
-    if data_covariances == []:
+    if len(data_covariances) == 0:
         covariances_defined = False
         data_covariances = np.zeros((len(data[:, 0]), len(data[0]), len(data[0])))
         for i in range(len(data_covariances)):
@@ -535,7 +535,7 @@ def fit_XPTp_data(
         )
 
     # Apply mle tolerances if they dont exist
-    if mle_tolerances == []:
+    if len(mle_tolerances) == 0:
         solution.set_state(1.0e5, 300.0)
         mle_tolerance_factor = 1.0e-5
         mle_tolerances = np.empty(len(flags))
@@ -548,7 +548,7 @@ def fit_XPTp_data(
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and property)
     covariances_defined = True
-    if data_covariances == []:
+    if len(data_covariances) == 0:
         covariances_defined = False
         nX = solution.n_endmembers
         data_covariances = np.zeros((len(data[:, 0]), len(data[0]), len(data[0])))
