@@ -21,6 +21,19 @@ class EosConsistency(BurnManTest):
             True,
         )
 
+    def test_CORK(self):
+        P = 10.0e9
+        T = 3000.0
+        self.assertEqual(
+            check_eos_consistency(
+                burnman.minerals.HP_2011_fluids.CO2(),
+                P,
+                T,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
     def test_SLB(self):
         P = 10.0e9
         T = 3000.0
