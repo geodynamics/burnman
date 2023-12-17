@@ -179,6 +179,10 @@ def simplify_composite_with_composition(composite, composition):
     solutions, this function will return a composite that only contains
     the Mg-bearing endmembers.
 
+    If the solutions have endmember proportions that are consistent with the
+    bulk composition, the site occupancies of the new solution models are set to
+    the values in the original models.
+
     :param composite: The initial Composite object.
     :type composite: :class:`burnman.Composite` object
 
@@ -239,7 +243,24 @@ def simplify_composite_with_composition(composite, composition):
                     )
 
                     composite_changed = True
-                    soln = transform_solution_to_new_basis(ph, new_basis)
+
+                    # If the composition is set and
+                    # consistent with the new basis,
+                    # make a new solution with the composition
+                    # already set.
+                    try:
+                        sol = np.linalg.lstsq(
+                            new_basis.T, ph.molar_fractions, rcond=None
+                        )
+                        if sol[1][0] > 1.0e-10:
+                            f = None
+                        else:
+                            f = sol[0]
+                    except AttributeError:
+                        f = None
+                    soln = transform_solution_to_new_basis(
+                        ph, new_basis, molar_fractions=f
+                    )
                     new_phases.append(soln)
                 else:
                     logging.info(
