@@ -196,18 +196,17 @@ if __name__ == "__main__" and run_ordering:
         }
         sols, prm = equilibrate(composition, assemblage, equality_constraints)
         # We know that we've made a simpler orthopyroxene solution.
-        # In this case, the endmembers are either the same, and the names
-        # have just been appended with "in child solution", or
+        # In this case, the endmembers are either the same, or
         # the processing has created an anti-ordered endmember.
         # We get the index of the ordered/anti-ordered endmember here.
         try:
             idx = prm.parameter_names.index(
-                "p(ordered ferroenstatite " "in child solution)"
+                "p(ordered ferroenstatite in orthopyroxene (CFMASCrO) (transformed))"
             )
             p_fms = np.array([sol.x[idx] for sol in sols if sol.success])
         except ValueError:
             idx = prm.parameter_names.index(
-                "p(User-created endmember " "in child solution)"
+                "p(Derived member (occupancies: [Mg][Fe][Si]1/2) in orthopyroxene (CFMASCrO) (transformed))"
             )
             p_fms = np.array([-sol.x[idx] for sol in sols if sol.success])
 
