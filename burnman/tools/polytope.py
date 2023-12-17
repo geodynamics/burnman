@@ -258,9 +258,17 @@ def simplify_composite_with_composition(composite, composition):
                             f = sol[0]
                     except AttributeError:
                         f = None
+                    new_name = f"{ph.name} (transformed)"
                     soln = transform_solution_to_new_basis(
-                        ph, new_basis, molar_fractions=f
+                        ph, new_basis, solution_name=new_name, molar_fractions=f
                     )
+                    for h, name in enumerate(soln.endmember_names):
+                        if name == "User-created endmember":
+                            new_name = (
+                                f"Derived member (occupancies: {soln.endmembers[h][1]})"
+                            )
+                            soln.endmembers[h][0].name = new_name
+                            soln.endmember_names[h] = new_name
                     new_phases.append(soln)
                 else:
                     logging.info(
