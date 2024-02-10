@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 import numpy as np
 from scipy.linalg import expm, logm
@@ -91,6 +91,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             self.anisotropic_params = anisotropic_parameters
             self.psi_function = psi_function
 
+        # cell_vectors is the transpose of the cell tensor M
         self.cell_vectors_0 = cell_parameters_to_vectors(cell_parameters)
 
         if (
@@ -102,13 +103,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             )
             raise Exception(
                 "The standard state unit vectors are inconsistent "
-                "with the volume. Suggest multiplying each "
+                "with the volume. Suggest multiplying each vector length"
                 f"by {factor}."
             )
-
-        # Note, Psi_0 may be asymmetric, in which case the Voigt contraction
-        # cannot be applied
-        self.Psi_0 = np.einsum("ij, kl", logm(self.cell_vectors_0), np.eye(3) / 3.0)
 
         self.isotropic_mineral = isotropic_mineral
         if "name" in isotropic_mineral.params:
@@ -162,21 +159,90 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         V_0 = self.params["V_0"]
         Vrel = V / V_0
         f = np.log(Vrel)
-        self._Vrel = Vrel
-        self._f = f
 
         out = self.psi_function(f, self.Pth, self.anisotropic_params)
-        Psi_Voigt, self.dPsidf_Voigt, self.dPsidPth_Voigt = out
-        self.Psi = voigt_notation_to_compliance_tensor(Psi_Voigt) + self.Psi_0
+        Psi_Voigt, dPsidf_Voigt, dPsidPth_Voigt = out
+        Psi_full = voigt_notation_to_compliance_tensor(Psi_Voigt)
+        dPsidf_full = voigt_notation_to_compliance_tensor(dPsidf_Voigt)
+        dPsidPth_full = voigt_notation_to_compliance_tensor(dPsidPth_Voigt)
 
-        # Convert to (f, T) variables
-        self.dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
-            self.dPsidf_Voigt + self.dPsidPth_Voigt * self.dPthdf
+        PsiI = np.einsum("ijkl, kl", Psi_full, np.eye(3))
+        dPsidfI = np.einsum("ijkl, kl", dPsidf_full, np.eye(3))
+        dPsidPthI = np.einsum("ijkl, kl", dPsidPth_full, np.eye(3))
+
+        # dPsidP_Voigt is needed for both orthotropic and nonorthotropic
+        # materials
+        dPsidP_Voigt = -self.isothermal_compressibility_reuss * (
+            dPsidf_Voigt + dPsidPth_Voigt * self.dPthdf
         )
-        self.dPsidT_Voigt = self.alpha * (
-            self.dPsidf_Voigt
-            + self.dPsidPth_Voigt * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
-        )
+
+        # Calculate F, dFdP, dFdT
+        self._F = expm(PsiI)
+
+        if self.orthotropic:
+            self._S_T_unrotated_Voigt = -dPsidP_Voigt
+
+            self._unrotated_alpha = self.alpha * (
+                dPsidfI + dPsidPthI * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
+            )
+        else:
+            # Numerical derivatives with respect to f and Pth
+            df = f * 1.0e-5
+            Psi_full0 = voigt_notation_to_compliance_tensor(
+                Psi_Voigt - dPsidf_Voigt * df / 2.0
+            )
+            Psi_full1 = voigt_notation_to_compliance_tensor(
+                Psi_Voigt + dPsidf_Voigt * df / 2.0
+            )
+            F0 = expm(np.einsum("ijkl, kl", Psi_full0, np.eye(3)))
+            F1 = expm(np.einsum("ijkl, kl", Psi_full1, np.eye(3)))
+            dFdf = (F1 - F0) / df
+
+            dPth = self.Pth * 1.0e-5
+            Psi_full0 = voigt_notation_to_compliance_tensor(
+                Psi_Voigt - dPsidPth_Voigt * dPth / 2.0
+            )
+            Psi_full1 = voigt_notation_to_compliance_tensor(
+                Psi_Voigt + dPsidPth_Voigt * dPth / 2.0
+            )
+            F0 = expm(np.einsum("ijkl, kl", Psi_full0, np.eye(3)))
+            F1 = expm(np.einsum("ijkl, kl", Psi_full1, np.eye(3)))
+            dFdPth = (F1 - F0) / dPth
+
+            # Convert to pressure and temperature derivatives
+            dFdP = -self.isothermal_compressibility_reuss * (
+                dFdf + dFdPth * self.dPthdf
+            )
+            dFdT = self.alpha * (
+                dFdf + dFdPth * (self.dPthdf + self.isothermal_bulk_modulus_reuss)
+            )
+
+            # Calculate the unrotated isothermal compressibility
+            # and unrotated thermal expansivity tensors
+            invF = np.linalg.inv(self._F)
+            LP = np.einsum("ij,kj->ik", dFdP, invF)
+            beta_T = -0.5 * (LP + LP.T)
+            LT = np.einsum("ij,kj->ik", dFdT, invF)
+            self._unrotated_alpha = 0.5 * (LT + LT.T)
+
+            # Calculate the unrotated isothermal compliance
+            # tensor in Voigt form.
+            S = -dPsidP_Voigt
+            for i, j, k in [[0, 1, 2], [1, 2, 0], [0, 2, 1]]:
+                S[i][j] = 0.5 * (
+                    -S[i][i]
+                    - S[j][j]
+                    + S[k][k]
+                    + beta_T[i][i]
+                    + beta_T[j][j]
+                    - beta_T[k][k]
+                )
+                S[j][i] = S[i][j]
+
+                S[i][i + 3] = 2.0 * beta_T[j][k] - S[j][i + 3] - S[k][i + 3]
+                S[i + 3][i] = S[i][i + 3]
+
+            self._S_T_unrotated_Voigt = S
 
     @material_property
     def deformation_gradient_tensor(self):
@@ -186,8 +252,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             (i.e. the state at the reference pressure and temperature).
         :rtype: numpy.array (2D)
         """
-        F = expm(np.einsum("ijkl, kl", self.Psi, np.eye(3)))
-        return F
+        return self._F
 
     @material_property
     def unrotated_cell_vectors(self):
@@ -201,7 +266,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             spatial coordinate axes.
         :rtype: numpy.array (2D)
         """
-        return self.deformation_gradient_tensor
+        return np.einsum(
+            "ij,kj->ki", self.deformation_gradient_tensor, self.cell_vectors_0
+        )
 
     @material_property
     def deformed_coordinate_frame(self):
@@ -215,10 +282,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return np.eye(3)
         else:
-            M = self.unrotated_cell_vectors
+            M_T = self.unrotated_cell_vectors
             Q = np.empty((3, 3))
-            Q[0] = M[0] / np.linalg.norm(M[0])
-            Q[2] = np.cross(M[0], M[1]) / np.linalg.norm(np.cross(M[0], M[1]))
+            Q[0] = M_T[0] / np.linalg.norm(M_T[0])
+            Q[2] = np.cross(M_T[0], M_T[1]) / np.linalg.norm(np.cross(M_T[0], M_T[1]))
             Q[1] = np.cross(Q[2], Q[0])
             return Q
 
@@ -409,12 +476,11 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             in Voigt form (:math:`\\mathbb{S}_{\\text{T} pq}`).
         :rtype: numpy.array (2D)
         """
-        S_T = -self.dPsidP_Voigt
         if self.orthotropic:
-            return S_T
+            return self._S_T_unrotated_Voigt
         else:
             R = self.rotation_matrix
-            S = voigt_notation_to_compliance_tensor(S_T)
+            S = voigt_notation_to_compliance_tensor(self._S_T_unrotated_Voigt)
             S_rotated = np.einsum("mi, nj, ok, pl, ijkl->mnop", R, R, R, R, S)
             return contract_compliances(S_rotated)
 
@@ -424,17 +490,11 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         :returns: The tensor of thermal expansivities [1/K].
         :rtype: numpy.array (2D)
         """
-        alpha = np.einsum(
-            "ijkl, kl",
-            voigt_notation_to_compliance_tensor(self.dPsidT_Voigt),
-            np.eye(3),
-        )
-
         if self.orthotropic:
-            return alpha
+            return self._unrotated_alpha
         else:
             R = self.rotation_matrix
-            return np.einsum("mi, nj, ij->mn", R, R, alpha)
+            return np.einsum("mi, nj, ij->mn", R, R, self._unrotated_alpha)
 
     # Derived properties start here
     @material_property
@@ -611,7 +671,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             if np.abs(sum_ijij_block[m, 0]) > 1.0e-10:
                 raise Exception(
                     "The sum of the upper 3x3 pq-block of "
-                    "anisotropic_parameters_pqmn must equal 0 for"
+                    "anisotropic_parameters_pqmn must equal 0 for "
                     f"m={m}, n=0 for consistency with the volume. "
                     f"Value is {sum_ijij_block[m, 0]}"
                 )
@@ -625,6 +685,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                         f"0 for m={m}, n={n} for "
                         "consistency with the volume. "
                         f"Value is {sum_ijij_block[m, n]}"
+                    )
+
+        for m in range(len(sum_ijij_block)):
+            for n in range(len(sum_ijij_block[0])):
+                a = anisotropic_parameters[:, :, m, n]
+                if not np.allclose(a, a.T, rtol=1.0e-8, atol=1.0e-8):
+                    raise Exception(
+                        f"The anisotropic_parameters_pq{m}{n} must be symmetric."
                     )
 
         if cond(anisotropic_parameters[:, :, 1, 0]) > 1 / np.finfo(float).eps:

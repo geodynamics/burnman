@@ -29,7 +29,7 @@ def make_simple_forsterite():
         ]
     )
 
-    m = AnisotropicMineral(fo, cell_parameters, constants)
+    m = AnisotropicMineral(fo, cell_parameters, constants, orthotropic=True)
     return m
 
 
@@ -63,7 +63,7 @@ class test_anisotropic_mineral(BurnManTest):
 
     def test_orthorhombic_consistency(self):
         m = make_simple_forsterite()
-        self.assertTrue(check_anisotropic_eos_consistency(m))
+        self.assertTrue(check_anisotropic_eos_consistency(m, verbose=True))
 
     def test_stiffness(self):
         m = make_simple_forsterite()
