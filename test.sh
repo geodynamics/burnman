@@ -76,6 +76,7 @@ else
   sed -i.bak -e '/UserWarning: findfont: Font family/d' $t.tmp #remove font warning crap
   sed -i.bak -e '/tight_layout : falling back to Agg renderer/d' $t.tmp #remove font warning crap
   sed -i.bak -e '/cannot be converted with the encoding. Glyph may be wrong/d' $t.tmp #remove font warning crap
+  sed -i.bak -e '/UserWarning: FigureCanvasTemplate/d' $t.tmp #remove plotting nonsense
   sed -i.bak -e '/time old .* time new/d' $t.tmp #remove timing from tests/debye.py
   sed -i.bak -e '/  relative central core pressure error.*/d' $t.tmp #remove residuals from examples/example_build_planet
 
