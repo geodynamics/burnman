@@ -102,7 +102,7 @@ def adiabatic(pressures, T0, rock):
     pressure. A good first guess is provided by integrating:
 
     .. math::
-        \\frac{\partial T}{\partial P} = \\frac{ \\gamma  T}{ K_s }
+        \\frac{\\partial T}{\\partial P} = \\frac{ \\gamma  T}{ K_s }
 
     where :math:`\\gamma` is the Grueneisen parameter and :math:`K_s` is
     the adiabatic bulk modulus.

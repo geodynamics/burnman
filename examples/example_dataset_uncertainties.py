@@ -70,6 +70,6 @@ plot_cov_ellipse(cov_transformed, [0.0, 0.0], nstd=1.0, ax=ax)
 
 ax.set_xlim(-500.0, 500.0)
 ax.set_ylim(-500.0, 500.0)
-ax.set_xlabel("$\sigma_{q+per}$ (J/mol MgSiO$_3$)")
-ax.set_ylabel("$\sigma_{en/2}$ (J/mol MgSiO$_3$)")
+ax.set_xlabel("$\\sigma_{q+per}$ (J/mol MgSiO$_3$)")
+ax.set_ylabel("$\\sigma_{en/2}$ (J/mol MgSiO$_3$)")
 plt.show()

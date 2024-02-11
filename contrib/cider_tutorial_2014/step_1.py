@@ -230,7 +230,7 @@ if __name__ == "__main__":
     )
     plt.xlim(min(pressure) / 1.0e9, max(pressure) / 1.0e9)
     plt.xlabel("Pressure (GPa)")
-    plt.title("density ($\cdot 10^3$ kg/m$^3$)")
+    plt.title("density ($\\cdot 10^3$ kg/m$^3$)")
 
     # Finally, we plot the goetherm used
     plt.subplot(2, 2, 4)

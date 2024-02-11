@@ -76,14 +76,14 @@ class Murnaghan(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\mathcal{S}` of the mineral.
+        Returns the molar entropy :math:`\\mathcal{S}` of the mineral.
         :math:`[J/K/mol]`
         """
         return 0.0
 
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\mathcal{E}` of the mineral.
+        Returns the internal energy :math:`\\mathcal{E}` of the mineral.
         :math:`[J/mol]`
         """
         return energy(
@@ -92,7 +92,7 @@ class Murnaghan(eos.EquationOfState):
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral.
+        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral.
         :math:`[J/mol]`
         """
         # G = E + PV

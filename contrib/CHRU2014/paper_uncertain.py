@@ -54,7 +54,7 @@ if __name__ == "__main__":
     figure = plt.figure(dpi=100, figsize=(12, 10))
     prop = {"size": 12}
     plt.rc("text", usetex=True)
-    plt.rcParams["text.latex.preamble"] = r"\usepackage{relsize}"
+    plt.rcParams["text.latex.preamble"] = r"\\usepackage{relsize}"
     plt.rc("font", family="sans-serif")
 
     dashstyle2 = (6, 3)
@@ -96,9 +96,9 @@ if __name__ == "__main__":
         "$G_0$",
         "$G_0'$",
         "$\\theta_0$",
-        "$\gamma_0$",
+        "$\\gamma_0$",
         "$q_0$",
-        "$\eta_{S0}$",
+        "$\\eta_{S0}$",
         "$T_0$",
     ]
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
             linewidth=1.5,
             markersize=6,
             markerfacecolor="None",
-            label="$V_\phi$",
+            label="$V_\\phi$",
         )
         ax.plot(
             seis_p / 1.0e9,
@@ -223,7 +223,7 @@ if __name__ == "__main__":
             interpolate=False,
         )
 
-        ax.set_title("%s $\pm %d\\%%$ " % (names[i], spread[i] * 100))
+        ax.set_title("%s $\\pm %d\\%%$ " % (names[i], spread[i] * 100))
         ax.set_ylim([6.1, 11.8])
         ax.set_xlim([30, 130])
 

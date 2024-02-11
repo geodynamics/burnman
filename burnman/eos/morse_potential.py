@@ -111,13 +111,13 @@ class Morse(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.0
 
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
 
         x = (params["Kprime_0"] - 1) * (1 - np.power(volume / params["V_0"], 1.0 / 3.0))
@@ -134,7 +134,7 @@ class Morse(eos.EquationOfState):
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return (
             self.molar_internal_energy(pressure, temperature, volume, params)
