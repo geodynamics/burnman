@@ -9,7 +9,6 @@ import warnings
 
 
 class AveragingScheme(object):
-
     """
     Base class defining an interface for determining average
     elastic properties of a rock.  Given a list of volume
@@ -144,7 +143,6 @@ class AveragingScheme(object):
 
 
 class VoigtReussHill(AveragingScheme):
-
     """
     Class for computing the Voigt-Reuss-Hill average for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`,
@@ -218,7 +216,6 @@ class VoigtReussHill(AveragingScheme):
 
 
 class Voigt(AveragingScheme):
-
     """
     Class for computing the Voigt (iso-strain) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`,
@@ -277,7 +274,6 @@ class Voigt(AveragingScheme):
 
 
 class Reuss(AveragingScheme):
-
     """
     Class for computing the Reuss (iso-stress) bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`,
@@ -336,7 +332,6 @@ class Reuss(AveragingScheme):
 
 
 class HashinShtrikmanUpper(AveragingScheme):
-
     """
     Class for computing the upper Hashin-Shtrikman bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`,
@@ -423,7 +418,6 @@ class HashinShtrikmanUpper(AveragingScheme):
 
 
 class HashinShtrikmanLower(AveragingScheme):
-
     """
     Class for computing the lower Hashin-Shtrikman bound for elastic properties.
     This derives from :class:`burnman.averaging_schemes.averaging_scheme`,
@@ -510,7 +504,6 @@ class HashinShtrikmanLower(AveragingScheme):
 
 
 class HashinShtrikmanAverage(AveragingScheme):
-
     """
     Class for computing arithmetic mean of the Hashin-Shtrikman bounds on
     elastic properties.

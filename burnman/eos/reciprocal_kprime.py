@@ -124,7 +124,6 @@ def shear_modulus(pressure, params):
 
 
 class RKprime(eos.EquationOfState):
-
     """
     Class for the isothermal reciprocal K-prime equation of state
     detailed in :cite:`StaceyDavis2004`.  This equation of state is

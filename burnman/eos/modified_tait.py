@@ -92,7 +92,6 @@ def intVdP(pressure, params):
 
 
 class MT(eos.EquationOfState):
-
     """
     Base class for the generic modified Tait equation of state.
     References for this can be found in :cite:`HC1974`

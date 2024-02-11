@@ -12,7 +12,6 @@ import burnman.minerals as minerals
 
 
 class HelperSolidSolution(burnman.Mineral):
-
     """
     This material is deprecated!
 

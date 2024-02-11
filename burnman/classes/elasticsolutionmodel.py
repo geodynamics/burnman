@@ -26,7 +26,6 @@ except ImportError as err:
 
 
 class ElasticSolutionModel(object):
-
     """
     This is the base class for an Elastic solution model, intended for use
     in defining solutions and performing thermodynamic calculations
@@ -216,7 +215,6 @@ class ElasticSolutionModel(object):
 
 
 class ElasticMechanicalSolution(ElasticSolutionModel):
-
     """
     An extremely simple class representing a mechanical solution model.
     A mechanical solution experiences no interaction between endmembers.
@@ -251,7 +249,6 @@ class ElasticMechanicalSolution(ElasticSolutionModel):
 
 
 class ElasticIdealSolution(ElasticSolutionModel):
-
     """
     A class representing an ideal solution model.
     Calculates the excess Helmholtz energy and entropy due to configurational
@@ -382,7 +379,6 @@ class ElasticIdealSolution(ElasticSolutionModel):
 
 
 class ElasticAsymmetricRegularSolution(ElasticIdealSolution):
-
     """
     Solution model implementing the asymmetric regular solution model
     formulation as described in :cite:`HP2003`.
@@ -510,7 +506,6 @@ class ElasticAsymmetricRegularSolution(ElasticIdealSolution):
 
 
 class ElasticSymmetricRegularSolution(ElasticAsymmetricRegularSolution):
-
     """
     Solution model implementing the symmetric regular solution model.
     This is a special case of the
@@ -536,7 +531,6 @@ class ElasticSymmetricRegularSolution(ElasticAsymmetricRegularSolution):
 
 
 class ElasticSubregularSolution(ElasticIdealSolution):
-
     """
     Solution model implementing the subregular solution model formulation
     as described in :cite:`HW1989`. The excess conconfigurational

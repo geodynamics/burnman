@@ -56,7 +56,6 @@ def volume(pressure, params):
 
 
 class Vinet(eos.EquationOfState):
-
     """
     Base class for the isothermal Vinet equation of state.
     References for this equation of state are :cite:`vinet1986`

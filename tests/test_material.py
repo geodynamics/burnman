@@ -7,11 +7,9 @@ import burnman
 
 
 class test_material_name(BurnManTest):
-
     """test Material.name and that we can edit and override it in Mineral"""
 
     class min_no_name(burnman.Mineral):
-
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """
@@ -36,7 +34,6 @@ class test_material_name(BurnManTest):
             burnman.Mineral.__init__(self)
 
     class min_with_name(burnman.Mineral):
-
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """
@@ -62,7 +59,6 @@ class test_material_name(BurnManTest):
             burnman.Mineral.__init__(self)
 
     class min_with_name_manually(burnman.Mineral):
-
         """
         Stixrude & Lithgow-Bertelloni 2005 and references therein
         """

@@ -34,7 +34,6 @@ def cork_variables(cork, cork_P, cork_T, temperature):
 
 
 class CORK(eos.EquationOfState):
-
     """
     Class for the CoRK equation of state detailed in :cite:`HP1991`. The
     CoRK EoS is a simple virial-type extension to the modified Redlich-Kwong

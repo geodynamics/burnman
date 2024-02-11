@@ -17,7 +17,6 @@ from . import einstein
 
 
 class HP_TMT(eos.EquationOfState):
-
     """
     Base class for the thermal equation of state based on
     the generic modified Tait equation of state (class MT),
@@ -395,7 +394,6 @@ class HP_TMT(eos.EquationOfState):
 
 
 class HP_TMTL(eos.EquationOfState):
-
     """
     Base class for the thermal equation of state
     described in :cite:`HP1998`, but with the Modified Tait as the static part,
@@ -668,7 +666,6 @@ class HP_TMTL(eos.EquationOfState):
 
 
 class HP98(eos.EquationOfState):
-
     """
     Base class for the thermal equation of state
     described in :cite:`HP1998`.

@@ -36,7 +36,6 @@ class periclase(Mineral):
 
 
 class wuestite(Mineral):
-
     """
     Murakami 2013 and references therein
     """

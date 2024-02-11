@@ -14,7 +14,6 @@ from scipy.optimize import brentq
 # TODO: When we require Python 3.8+, replace with
 # functools.cached_property decorator
 class cached_property(property):
-
     """A decorator that converts a function into a lazy property.  The
     function wrapped is called the first time to retrieve the result
     and then that calculated result is used the next time you access
@@ -87,7 +86,6 @@ def material_property(func):
 
 
 class Material(object):
-
     """
     Base class for all materials. The main functionality is unroll() which
     returns a list of objects of type :class:`~burnman.Mineral` and their molar

@@ -61,7 +61,6 @@ def _delta_pressure(
 
 
 class DKS_S(eos.EquationOfState):
-
     """
     Base class for the finite strain solid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).

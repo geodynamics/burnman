@@ -42,9 +42,11 @@ def print_table_for_mineral_constants_2(mineral, param_list, indices):
         row = [f"{i}", f"{j}"]
         row.extend(
             [
-                f"{constants[ci, i]:.4e}"
-                if constants[ci, i] != 0 and constants[ci, i] != 1
-                else "-"
+                (
+                    f"{constants[ci, i]:.4e}"
+                    if constants[ci, i] != 0 and constants[ci, i] != 1
+                    else "-"
+                )
                 for i in range(len(param_list))
             ]
         )

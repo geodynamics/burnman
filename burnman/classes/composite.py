@@ -38,7 +38,6 @@ def check_pairs(phases, fractions):
 
 # static composite of minerals/composites
 class Composite(Material):
-
     """
     Base class for a composite material.
     The static phases can be minerals or materials,

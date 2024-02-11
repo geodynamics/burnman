@@ -63,7 +63,6 @@ def _delta_pressure(
 
 
 class SLBBase(eos.EquationOfState):
-
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state
     detailed in :cite:`Stixrude2005`.  For the most part the equations are
@@ -468,7 +467,6 @@ class SLBBase(eos.EquationOfState):
 
 
 class SLB3(SLBBase):
-
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
@@ -480,7 +478,6 @@ class SLB3(SLBBase):
 
 
 class SLB2(SLBBase):
-
     """
     SLB equation of state with second order finite strain expansion for the
     shear modulus.  In general, this should not be used, but sometimes

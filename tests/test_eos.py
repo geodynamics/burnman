@@ -11,7 +11,6 @@ from burnman.utils.chemistry import dictionarize_formula, formula_mass
 
 
 class mypericlase(burnman.Mineral):
-
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein
     """
@@ -36,7 +35,6 @@ class mypericlase(burnman.Mineral):
 
 
 class Fe_Dewaele(burnman.Mineral):
-
     """
     Dewaele et al., 2006, Physical Review Letters
     """
@@ -54,7 +52,6 @@ class Fe_Dewaele(burnman.Mineral):
 
 
 class Liquid_Fe_Anderson(burnman.Mineral):
-
     """
     Anderson & Ahrens, 1994 JGR
     """
@@ -72,7 +69,6 @@ class Liquid_Fe_Anderson(burnman.Mineral):
 
 
 class outer_core_rkprime(burnman.Mineral):
-
     """
     Stacey and Davis, 2004 PEPI (Table 5)
     """
@@ -90,7 +86,6 @@ class outer_core_rkprime(burnman.Mineral):
 
 
 class periclase_morse(burnman.Mineral):
-
     """
     Periclase parameters from SLB dataset (which uses BM3)
     """
