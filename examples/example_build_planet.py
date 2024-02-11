@@ -171,7 +171,7 @@ if __name__ == "__main__":
         premradii / 1.0e3, premdensity / 1.0e3, "--k", linewidth=1.0, label="PREM"
     )
     ax[0].set_ylim(0.0, (max(planet_zog.density) / 1.0e3) + 1.0)
-    ax[0].set_ylabel("Density ($\cdot 10^3$ kg/m$^3$)")
+    ax[0].set_ylabel("Density ($\\cdot 10^3$ kg/m$^3$)")
     ax[0].legend()
 
     # Make a subplot showing the calculated pressure profile

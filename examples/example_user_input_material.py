@@ -9,7 +9,7 @@ example_user_input_material
 ---------------------------
 
 Shows user how to input a mineral of his/her choice without usint the library and which physical values
-need to be input for BurnMan to calculate :math:`V_P, V_\Phi, V_S` and density at depth.
+need to be input for BurnMan to calculate :math:`V_P, V_\\Phi, V_S` and density at depth.
 
 *Specifically uses:*
 

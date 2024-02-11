@@ -65,16 +65,16 @@ def output_rock(rock, file_handle):
     for ph in rock.staticphases:
         if isinstance(ph.mineral, HelperSolidSolution):
             for mineral in ph.mineral.endmembers:
-                file_handle.write("\t" + mineral.to_string() + "\n")
+                file_handle.write("\\t" + mineral.to_string() + "\\n")
                 for key in mineral.params:
                     file_handle.write(
-                        "\t\t" + key + ": " + str(mineral.params[key]) + "\n"
+                        "\\t\\t" + key + ": " + str(mineral.params[key]) + "\\n"
                     )
         else:
-            file_handle.write("\t" + ph.mineral.to_string() + "\n")
+            file_handle.write("\\t" + ph.mineral.to_string() + "\\n")
             for key in ph.mineral.params:
                 file_handle.write(
-                    "\t\t" + key + ": " + str(ph.mineral.params[key]) + "\n"
+                    "\\t\\t" + key + ": " + str(ph.mineral.params[key]) + "\\n"
                 )
 
 
@@ -351,7 +351,7 @@ if __name__ == "__main__":
     figsize = (6, 5)
     prop = {"size": 12}
     plt.rc("text", usetex=True)
-    plt.rcParams["text.latex.preamble"] = r"\usepackage{relsize}"
+    plt.rcParams["text.latex.preamble"] = r"\\usepackage{relsize}"
     plt.rc("font", family="sans-serif")
     figure = plt.figure(dpi=100, figsize=figsize)
 
@@ -436,7 +436,7 @@ if __name__ == "__main__":
     )
 
     plt.xlabel("Pressure (GPa)")
-    plt.ylabel("Velocities (km/s) and Density ($\cdot 10^3$ kg/m$^3$)")
+    plt.ylabel("Velocities (km/s) and Density ($\\cdot 10^3$ kg/m$^3$)")
     plt.legend(bbox_to_anchor=(1.0, 0.9), prop={"size": 12})
     plt.xlim(25, 135)
     # plt.ylim(6,11)

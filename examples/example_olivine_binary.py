@@ -12,7 +12,7 @@ equilibrium binary phase diagram for the three olivine polymorphs
 (olivine, wadsleyite and ringwoodite).
 
 The calculations use the equilibrate function. Unlike the
-examples in example\_equilibrate.py, which are constrained to a
+examples in example\\_equilibrate.py, which are constrained to a
 fixed bulk composition, the bulk composition is allowed to vary
 along the vector [n_Mg - n_Fe].
 

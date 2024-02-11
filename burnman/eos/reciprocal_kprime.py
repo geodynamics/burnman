@@ -136,11 +136,11 @@ class RKprime(eos.EquationOfState):
     unstable at negative pressures, so should not be trusted to provide
     a good *HT-LP* equation of state using a thermal pressure
     formulation. The negative root of :math:`dP/dK`
-    can be found at :math:`K/P = K'_{\infty} - K'_0`,
+    can be found at :math:`K/P = K'_{\\infty} - K'_0`,
     which corresponds to a bulk modulus of
-    :math:`K = K_0 ( 1 - K'_{\infty}/K'_0 )^{K'_0/K'_{\infty}}`
+    :math:`K = K_0 ( 1 - K'_{\\infty}/K'_0 )^{K'_0/K'_{\\infty}}`
     and a volume of
-    :math:`V = V_0 ( K'_0 / (K'_0 - K'_{\infty}) )^{K'_0/{K'}^2_{\infty}} \exp{(-1/K'_{\infty})}`.
+    :math:`V = V_0 ( K'_0 / (K'_0 - K'_{\\infty}) )^{K'_0/{K'}^2_{\\infty}} \\exp{(-1/K'_{\\infty})}`.
 
     This equation of state has no temperature dependence.
     """
@@ -196,7 +196,7 @@ class RKprime(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.0
 
@@ -228,7 +228,7 @@ class RKprime(eos.EquationOfState):
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         # G = E0 + int VdP (when S = 0)
         K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
@@ -241,7 +241,7 @@ class RKprime(eos.EquationOfState):
 
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
         # E = G - PV (+ TS)
         return (
@@ -276,7 +276,7 @@ class RKprime(eos.EquationOfState):
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters.
-        The value for :math:`K'_{\infty}` is thermodynamically bounded
+        The value for :math:`K'_{\\infty}` is thermodynamically bounded
         between 5/3 and :math:`K'_0` :cite:`StaceyDavis2004`.
         """
 

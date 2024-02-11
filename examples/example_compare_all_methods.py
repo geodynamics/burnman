@@ -11,7 +11,7 @@ example_compare_all_methods
 This example demonstrates how to call each of the individual calculation
 methodologies that exist within BurnMan. See below for current options. This
 example calculates seismic velocity profiles for the same set of minerals and
-a plot of :math:`V_s, V_\phi` and :math:`\\rho` is produce for the user to compare each of the
+a plot of :math:`V_s, V_\\phi` and :math:`\\rho` is produce for the user to compare each of the
 different methods.
 
 *Specifically uses:*
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
     ax[0].set_ylabel("Vs (km/s)")
     ax[1].set_ylabel("Vphi (km/s)")
-    ax[2].set_ylabel("Density ($\cdot 10^3$ kg/m^3)")
+    ax[2].set_ylabel("Density ($\\cdot 10^3$ kg/m^3)")
     ax[3].set_ylabel("Temperature (K)")
     fig.savefig("output_figures/example_compare_all_methods.png")
     plt.show()

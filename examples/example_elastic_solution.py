@@ -215,9 +215,9 @@ if __name__ == "__main__":
     ax[0].set_ylabel("Gibbs (kJ/mol)")
     ax[1].set_ylabel("Volume (cm$^3$/mol)")
     ax[2].set_ylabel("Entropy (J/K/mol)")
-    ax[3].set_ylabel("Gibbs - $\mu(0.4)$ (kJ/mol)")
-    ax[4].set_ylabel("Volume - $d\mu(0.4)/dP$ (cm$^3$/mol)")
-    ax[5].set_ylabel("Entropy + $d\mu(0.4)/dT$ (J/K/mol)")
+    ax[3].set_ylabel("Gibbs - $\\mu(0.4)$ (kJ/mol)")
+    ax[4].set_ylabel("Volume - $d\\mu(0.4)/dP$ (cm$^3$/mol)")
+    ax[5].set_ylabel("Entropy + $d\\mu(0.4)/dT$ (J/K/mol)")
 
     fig.set_tight_layout(True)
 

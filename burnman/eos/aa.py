@@ -20,24 +20,24 @@ class AA(eos.EquationOfState):
     which gives volume as a function of pressure,
     coupled with the thermodynamic identity:
 
-    :math:`-\partial E/ \partial V |_S = P`.
+    :math:`-\\partial E/ \\partial V |_S = P`.
 
     The temperature along the isentrope is calculated via
 
-    :math:`\partial (\ln T)/\partial (\ln \\rho) |_S = \gamma`
+    :math:`\\partial (\\ln T)/\\partial (\\ln \\rho) |_S = \\gamma`
 
     which gives:
 
-    :math:`T_S/T_0 = \exp(\int( \gamma/\\rho ) d \\rho)`
+    :math:`T_S/T_0 = \\exp(\\int( \\gamma/\\rho ) d \\rho)`
 
     The thermal effect on internal energy is calculated at constant volume
     using expressions for the kinetic, electronic and potential contributions
     to the volumetric heat capacity, which can then be integrated with respect
     to temperature:
 
-    :math:`\partial E/\partial T |_V = C_V`
+    :math:`\\partial E/\\partial T |_V = C_V`
 
-    :math:`\partial E/\partial S |_V = T`
+    :math:`\\partial E/\\partial S |_V = T`
 
     We note that :cite:`AA1994` also include a detailed description
     of the Gruneisen parameter as a function of volume and energy (Equation 15),
@@ -50,16 +50,16 @@ class AA(eos.EquationOfState):
     1) As energy and entropy are defined by the equation of state at any
     temperature and volume, pressure can be found by via the expression:
 
-    :math:`\partial E/\partial V |_S = P`
+    :math:`\\partial E/\\partial V |_S = P`
 
     2) The Grueneisen parameter can now be determined as
-    :math:`\gamma = V \partial P/\partial E |_V`
+    :math:`\\gamma = V \\partial P/\\partial E |_V`
 
     To reiterate: away from the reference isentrope, the Grueneisen parameter
     calculated using these expressions is *not* equal to the
     (thermodynamically inconsistent) analytical expression given by :cite:`AA1994`.
 
-    A final note: the expression for :math:`\Lambda` (Equation 17).
+    A final note: the expression for :math:`\\Lambda` (Equation 17).
     does not reproduce Figure 5. We assume here that the figure matches the model
     actually used by :cite:`AA1994`, which has the form:
     :math:`F(-325.23 + 302.07 (\\rho/\\rho_0) + 30.45 (\\rho/\\rho_0)^{0.4})`.
@@ -249,7 +249,7 @@ class AA(eos.EquationOfState):
         E1 = self._isentropic_energy_change(volume, params) - params['E_0']
         E2 = E1 + dE
 
-        # Integrate at constant volume (V \int dP = \int gr dE)
+        # Integrate at constant volume (V \\int dP = \\int gr dE)
         dP = (params['grueneisen_0']*(E2 - E1) +
               (0.5*params['grueneisen_prime'] *
                np.power(params['V_0']/volume, params['grueneisen_n']) *

@@ -449,7 +449,7 @@ def process_solution_chemistry(solution_model):
     )
 
     solution_model.empty_formula = re.sub(
-        "([\[]).*?([\]])", "\g<1>\g<2>", solution_model.formulas[0]
+        "([\\[]).*?([\\]])", "\\g<1>\\g<2>", solution_model.formulas[0]
     )
     split_empty = solution_model.empty_formula.split("[")
     solution_model.general_formula = split_empty[0]

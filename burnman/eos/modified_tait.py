@@ -137,13 +137,13 @@ class MT(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.0
 
     def molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
 
         return (
@@ -153,7 +153,7 @@ class MT(eos.EquationOfState):
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the Gibbs free energy :math:`\mathcal{G}` of the mineral. :math:`[J/mol]`
+        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         # G = int VdP = [PV] - int PdV = E + PV
         a, b, c = tait_constants(params)

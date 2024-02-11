@@ -48,7 +48,7 @@ if __name__ == "__main__":
     fig = plt.figure(dpi=100, figsize=(12, 10))
     prop = {"size": 12}
     plt.rc("text", usetex=True)
-    plt.rcParams["text.latex.preamble"] = r"\usepackage{relsize}"
+    plt.rcParams["text.latex.preamble"] = r"\\usepackage{relsize}"
     plt.rc("font", family="sans-serif")
     figsize = (6, 5)
 
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         yy_vphi,
         "-",
         color=colors.color(3),
-        label=("$V_\phi$ error"),
+        label=("$V_\\phi$ error"),
         linewidth=1.5,
     )
     # plt.plot (xx*100,yy_vs+yy_vphi,"g--",label=("sum"),linewidth=1.5)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         [A * 100.0, A * 100.0],
         [ymin, ymax],
         color=colors.color(3),
-        label="A (%g\%% pv)" % (A * 100),
+        label="A (%g\\%% pv)" % (A * 100),
         linewidth=1.5,
         linestyle="-",
     )
@@ -177,7 +177,7 @@ if __name__ == "__main__":
         [B * 100.0, B * 100.0],
         [ymin, ymax],
         color=colors.color(1),
-        label="B (%g\%% pv)" % (B * 100),
+        label="B (%g\\%% pv)" % (B * 100),
         linewidth=1.5,
         dashes=dashstyle2,
     )
@@ -185,13 +185,13 @@ if __name__ == "__main__":
         [C * 100.0, C * 100.0],
         [ymin, ymax],
         color=colors.color(4),
-        label="C (%g\%% pv)" % (C * 100),
+        label="C (%g\\%% pv)" % (C * 100),
         linewidth=1.5,
         dashes=dashstyle3,
     )
 
     plt.yscale("log")
-    plt.xlabel("\% Perovskite")
+    plt.xlabel("\\% Perovskite")
     plt.ylabel("Error")
     plt.legend(loc="lower left", prop=prop)
     #    plt.tight_layout(pad=2)
@@ -219,7 +219,7 @@ if __name__ == "__main__":
         A_vs / 1.0e3,
         color=colors.color(3),
         linestyle="-",
-        label="A (%g\%% pv)" % (A * 100),
+        label="A (%g\\%% pv)" % (A * 100),
         linewidth=1.5,
         markevery=5,
         marker="v",
@@ -232,7 +232,7 @@ if __name__ == "__main__":
         B_vs / 1.0e3,
         color=colors.color(1),
         dashes=dashstyle2,
-        label="B (%g\%% pv)" % (B * 100),
+        label="B (%g\\%% pv)" % (B * 100),
         linewidth=1.5,
         markevery=5,
         marker="v",
@@ -245,7 +245,7 @@ if __name__ == "__main__":
         C_vs / 1.0e3,
         color=colors.color(4),
         dashes=dashstyle3,
-        label="C (%g\%% pv)" % (C * 100),
+        label="C (%g\\%% pv)" % (C * 100),
         linewidth=1.5,
         markevery=5,
         marker="v",
@@ -254,7 +254,9 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(4),
     )
     plt.xlabel("Pressure (GPa)")
-    plt.ylabel("Shear velocity $V_{\mathlarger{\mathlarger{\mathlarger{s}}}}$ (km/s)")
+    plt.ylabel(
+        "Shear velocity $V_{\\mathlarger{\\mathlarger{\\mathlarger{s}}}}$ (km/s)"
+    )
     plt.xlim([30, 130])
     plt.legend(loc="lower right", prop=prop)
     #  plt.tight_layout()
@@ -286,7 +288,7 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(3),
         markerfacecolor="None",
         mew=1.5,
-        label="A (%g\%% pv)" % (A * 100),
+        label="A (%g\\%% pv)" % (A * 100),
         linewidth=1.5,
     )
     plt.plot(
@@ -300,7 +302,7 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(1),
         markerfacecolor="None",
         mew=1.5,
-        label="B (%g\%% pv)" % (B * 100),
+        label="B (%g\\%% pv)" % (B * 100),
         linewidth=1.5,
     )
     plt.plot(
@@ -314,12 +316,12 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(4),
         markerfacecolor="None",
         mew=1.5,
-        label="C (%g\%% pv)" % (C * 100),
+        label="C (%g\\%% pv)" % (C * 100),
         linewidth=1.5,
     )
     plt.xlabel("Pressure (GPa)")
     plt.ylabel(
-        "Bulk sound velocity $V_{\mathlarger{\mathlarger{\mathlarger{\phi}}}}$ (km/s)"
+        "Bulk sound velocity $V_{\\mathlarger{\\mathlarger{\\mathlarger{\\phi}}}}$ (km/s)"
     )
     plt.xlim([30, 130])
     plt.legend(loc="lower right", prop=prop)
@@ -335,7 +337,7 @@ if __name__ == "__main__":
         seis_p / 1.0e9,
         (A_vs - seis_vs) / seis_vs * 100.0,
         color=colors.color(3),
-        label="$V_s$: A (%g\%% pv)" % (A * 100),
+        label="$V_s$: A (%g\\%% pv)" % (A * 100),
         linewidth=1.5,
         linestyle="-",
         markevery=5,
@@ -348,7 +350,7 @@ if __name__ == "__main__":
         seis_p / 1.0e9,
         (B_vs - seis_vs) / seis_vs * 100.0,
         color=colors.color(1),
-        label="$V_s$: B (%g\%% pv)" % (B * 100),
+        label="$V_s$: B (%g\\%% pv)" % (B * 100),
         linewidth=1.5,
         dashes=dashstyle2,
         markevery=5,
@@ -361,7 +363,7 @@ if __name__ == "__main__":
         seis_p / 1.0e9,
         (C_vs - seis_vs) / seis_vs * 100.0,
         color=colors.color(4),
-        label="$V_s$: C (%g\%% pv)" % (C * 100),
+        label="$V_s$: C (%g\\%% pv)" % (C * 100),
         linewidth=1.5,
         dashes=dashstyle3,
         markevery=5,
@@ -380,7 +382,7 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(3),
         markerfacecolor="None",
         mew=1.5,
-        label="$V_\phi$: A",
+        label="$V_\\phi$: A",
         linewidth=1.5,
         linestyle="-",
     )
@@ -394,7 +396,7 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(1),
         markerfacecolor="None",
         mew=1.5,
-        label="$V_\phi$: B",
+        label="$V_\\phi$: B",
         linewidth=1.5,
         dashes=dashstyle2,
     )
@@ -408,12 +410,12 @@ if __name__ == "__main__":
         markeredgecolor=colors.color(4),
         markerfacecolor="None",
         mew=1.5,
-        label="$V_\phi$: C",
+        label="$V_\\phi$: C",
         linewidth=1.5,
         dashes=dashstyle3,
     )
     plt.xlabel("Pressure (GPa)")
-    plt.ylabel("Difference from PREM (\%)")
+    plt.ylabel("Difference from PREM (\\%)")
     plt.ylim([-5, 4])
     plt.xlim([30, 130])
     plt.legend(loc="lower center", ncol=2, prop=prop)

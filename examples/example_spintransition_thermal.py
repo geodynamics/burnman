@@ -9,7 +9,7 @@ example_spintransition_thermal
 ------------------------------
 
 This example illustrates how to create a non-ideal solution model
-for (Mg,Fe\ :sup:`HS`\ ,Fe\ :sup:`LS`\ )O ferropericlase that has a gradual
+for (Mg,Fe\\ :sup:`HS`\\ ,Fe\\ :sup:`LS`\\ )O ferropericlase that has a gradual
 spin transition at finite temperature.
 First, we define the MgO endmember and two endmembers for the low and high spin
 states of FeO. Then we create a regular/symmetric solution that
@@ -22,7 +22,7 @@ In this example, we neglect the elastic component of mixing. We
 also implicitly apply the Bragg-Williams approximation (i.e., we assume
 that there is no short-range order by only incorporating interactions that are
 a function of the average occupancy of species on each distinct site).
-Furthermore, the one site model [Mg,Fe\ :sup:`HS`\ ,Fe\ :sup:`LS`\ ]O
+Furthermore, the one site model [Mg,Fe\\ :sup:`HS`\\ ,Fe\\ :sup:`LS`\\ ]O
 explicitly precludes long range order.
 
 *Specifically uses:*
