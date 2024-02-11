@@ -14,7 +14,6 @@ from .solutionmodel import MechanicalSolution
 
 
 class CombinedMineral(Mineral):
-
     """
     This is the base class for endmembers constructed from a
     linear combination of other minerals.

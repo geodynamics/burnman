@@ -75,7 +75,6 @@ def volume(pressure, params):
 
 
 class Morse(eos.EquationOfState):
-
     """
     Class for the isothermal Morse Potential equation of state
     detailed in :cite:`Stacey1981`.

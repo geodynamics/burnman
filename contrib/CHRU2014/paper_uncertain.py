@@ -28,7 +28,6 @@ import contrib.CHRU2014.colors as colors
 
 
 class my_perovskite(burnman.Mineral):
-
     """
     based on Stixrude & Lithgow-Bertelloni 2011 and references therein
     """

@@ -16,7 +16,6 @@ from ..utils.math import bracket
 
 
 class MGDBase(eos.EquationOfState):
-
     """
     Base class for a generic finite-strain Mie-Grueneisen-Debye
     equation of state.  References for this can be found in many
@@ -304,7 +303,6 @@ class MGDBase(eos.EquationOfState):
 
 
 class MGD3(MGDBase):
-
     """
     MGD equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
@@ -316,7 +314,6 @@ class MGD3(MGDBase):
 
 
 class MGD2(MGDBase):
-
     """
     MGD equation of state with second order finite strain expansion for the
     shear modulus.  In general, this should not be used, but sometimes

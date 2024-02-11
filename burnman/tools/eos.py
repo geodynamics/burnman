@@ -260,12 +260,37 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
     beta1 = np.einsum("mi, nj, ij->mn", Q, Q, beta1)
     alpha1 = np.einsum("mi, nj, ij->mn", Q, Q, alpha1)
 
-    expr.extend([f"SI = -d(lnm(F))/dP ({i}{j})" for i in range(3) for j in range(i, 3)])
-    eq.extend([[beta0[i, j], beta1[i, j]] for i in range(3) for j in range(i, 3)])
+    if m.orthotropic:
+        expr.extend(
+            [f"SI = -d(lnm(F))/dP ({i}{j})" for i in range(3) for j in range(i, 3)]
+        )
+        expr.extend(
+            [f"alpha = d(lnm(F))/dT ({i}{j})" for i in range(3) for j in range(i, 3)]
+        )
+    else:
+        expr.extend(
+            [
+                f"SI = -0.5(dF/dP*F^-1 + (dF/dP*F^-1)^T) ({i}{j})"
+                for i in range(3)
+                for j in range(i, 3)
+            ]
+        )
+        expr.extend(
+            [
+                f"alpha = 0.5(dF/dT*F^-1 + (dF/dT*F^-1)^T) ({i}{j})"
+                for i in range(3)
+                for j in range(i, 3)
+            ]
+        )
+        invF = np.linalg.inv(m.deformation_gradient_tensor)
+        dFdP = (F3 - F2) / dP
+        LP = np.einsum("ij,kj->ik", dFdP, invF)
+        beta0 = -0.5 * (LP + LP.T)
+        dFdT = (F1 - F0) / dT
+        LT = np.einsum("ij,kj->ik", dFdT, invF)
+        alpha0 = 0.5 * (LT + LT.T)
 
-    expr.extend(
-        [f"alpha = d(lnm(F))/dT ({i}{j})" for i in range(3) for j in range(i, 3)]
-    )
+    eq.extend([[beta0[i, j], beta1[i, j]] for i in range(3) for j in range(i, 3)])
     eq.extend([[alpha0[i, j], alpha1[i, j]] for i in range(3) for j in range(i, 3)])
 
     expr.extend(

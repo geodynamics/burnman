@@ -168,7 +168,6 @@ class HelperLowHighPressureRockTransition(HelperRockSwitcher):
 
 
 class HelperSpinTransition(Composite):
-
     """
     Helper class that makes a mineral that switches between two materials
     (for low and high spin) based on some transition pressure [Pa]

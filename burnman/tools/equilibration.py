@@ -644,9 +644,11 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
         prm.free_compositional_vectors = np.array(
             [
                 [
-                    free_compositional_vectors[i][e]
-                    if e in free_compositional_vectors[i]
-                    else 0.0
+                    (
+                        free_compositional_vectors[i][e]
+                        if e in free_compositional_vectors[i]
+                        else 0.0
+                    )
                     for e in assemblage.elements
                 ]
                 for i in range(n_free_compositional_vectors)

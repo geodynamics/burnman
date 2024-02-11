@@ -6,7 +6,6 @@ import burnman
 
 
 class mypericlase(burnman.Mineral):
-
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein
     """

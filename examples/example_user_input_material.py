@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 # See Stixrude & Lithgow-Bertelloni, 2005 for values
                 "q_0": 0.917,  # isotropic strain derivative of gruneisen
                 # parameter. Values in Stixrude & Lithgow-Bertelloni, 2005
-                "eta_s_0": 3.0  # full strain derivative of gruneisen parameter
+                "eta_s_0": 3.0,  # full strain derivative of gruneisen parameter
                 # parameter. Values in Stixrude & Lithgow-Bertelloni, 2005
             }
             burnman.Mineral.__init__(self)

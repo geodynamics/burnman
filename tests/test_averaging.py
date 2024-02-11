@@ -9,7 +9,6 @@ import burnman.classes.averaging_schemes as avg
 
 
 class mypericlase(burnman.Mineral):
-
     """
     Stixrude & Lithgow-Bertelloni 2005 and references therein
     """

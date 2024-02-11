@@ -39,7 +39,6 @@ def intVdP(pressure, V_0, K_0, Kprime_0):
 
 
 class Murnaghan(eos.EquationOfState):
-
     """
     Base class for the isothermal Murnaghan equation of state,
     as described in :cite:`Murnaghan1944`.

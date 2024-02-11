@@ -130,7 +130,6 @@ class Speziale_fe_periclase(helpers.HelperSpinTransition):
 
 
 class Speziale_fe_periclase_HS(Mineral):
-
     """
     Speziale et al. 2007, Mg#=83
     """
@@ -151,7 +150,6 @@ class Speziale_fe_periclase_HS(Mineral):
 
 
 class Speziale_fe_periclase_LS(Mineral):
-
     """
     Speziale et al. 2007, Mg#=83
     """
@@ -172,7 +170,6 @@ class Speziale_fe_periclase_LS(Mineral):
 
 
 class Liquid_Fe_Anderson(Mineral):
-
     """
     Anderson & Ahrens, 1994 JGR
     """
@@ -190,7 +187,6 @@ class Liquid_Fe_Anderson(Mineral):
 
 
 class Fe_Dewaele(Mineral):
-
     """
     Dewaele et al., 2006, Physical Review Letters
     """

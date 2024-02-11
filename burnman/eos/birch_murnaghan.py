@@ -114,7 +114,6 @@ def shear_modulus_third_order(volume, params):
 
 
 class BirchMurnaghanBase(eos.EquationOfState):
-
     """
     Base class for the isothermal Birch Murnaghan equation of state.  This is third order in strain, and
     has no temperature dependence.  However, the shear modulus is sometimes fit to a second order
@@ -258,7 +257,6 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
 
 class BM3(BirchMurnaghanBase):
-
     """
     Third order Birch Murnaghan isothermal equation of state.
     This uses the third order expansion for shear modulus.
@@ -269,7 +267,6 @@ class BM3(BirchMurnaghanBase):
 
 
 class BM2(BirchMurnaghanBase):
-
     """
     Third order Birch Murnaghan isothermal equation of state.
     This uses the second order expansion for shear modulus.

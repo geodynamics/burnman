@@ -81,7 +81,6 @@ def birch_murnaghan_fourth(x, params):
 
 
 class BM4(eos.EquationOfState):
-
     """
     Base class for the isothermal Birch Murnaghan equation of state.  This is fourth order in strain, and
     has no temperature dependence.

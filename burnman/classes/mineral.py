@@ -15,7 +15,6 @@ from ..utils.misc import copy_documentation
 
 
 class Mineral(Material):
-
     """
     This is the base class for all minerals. States of the mineral
     can only be queried after setting the pressure and temperature

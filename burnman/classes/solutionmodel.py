@@ -128,7 +128,6 @@ def inverseish(x, eps=1.0e-5):
 
 
 class SolutionModel(object):
-
     """
     This is the base class for a solution model,  intended for use
     in defining solutions and performing thermodynamic calculations
@@ -326,7 +325,6 @@ class SolutionModel(object):
 
 
 class MechanicalSolution(SolutionModel):
-
     """
     An extremely simple class representing a mechanical solution model.
     A mechanical solution experiences no interaction between endmembers.
@@ -372,7 +370,6 @@ class MechanicalSolution(SolutionModel):
 
 
 class IdealSolution(SolutionModel):
-
     """
     A class representing an ideal solution model.
     Calculates the excess gibbs free energy and entropy due to configurational
@@ -511,7 +508,6 @@ class IdealSolution(SolutionModel):
 
 
 class AsymmetricRegularSolution(IdealSolution):
-
     """
     Solution model implementing the asymmetric regular solution model
     formulation as described in :cite:`HP2003`.
@@ -657,7 +653,6 @@ class AsymmetricRegularSolution(IdealSolution):
 
 
 class SymmetricRegularSolution(AsymmetricRegularSolution):
-
     """
     Solution model implementing the symmetric regular solution model.
     This is a special case of the
@@ -683,7 +678,6 @@ class SymmetricRegularSolution(AsymmetricRegularSolution):
 
 
 class SubregularSolution(IdealSolution):
-
     """
     Solution model implementing the subregular solution model formulation
     as described in :cite:`HW1989`. The excess nonconfigurational
