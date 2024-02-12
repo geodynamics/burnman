@@ -329,14 +329,14 @@ class Mineral(Material):
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
         return np.sqrt(
-            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            (self.adiabatic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
             / self.density
         )
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
     def bulk_sound_velocity(self):
-        return np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return np.sqrt(self.adiabatic_bulk_modulus_reuss / self.density)
 
     @material_property
     @copy_documentation(Material.shear_wave_velocity)

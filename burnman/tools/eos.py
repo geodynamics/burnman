@@ -9,7 +9,13 @@ from scipy.linalg import logm
 
 
 def check_eos_consistency(
-    m, P=1.0e9, T=300.0, tol=1.0e-4, verbose=False, including_shear_properties=True
+    m,
+    P=1.0e9,
+    T=300.0,
+    tol=1.0e-4,
+    verbose=False,
+    including_shear_properties=True,
+    equilibration_function=None,
 ):
     """
     Checks that numerical derivatives of the Gibbs energy of a mineral
@@ -37,13 +43,24 @@ def check_eos_consistency(
         without shear modulus parameterizations.
     :type including_shear_properties: bool
 
+    :param equilibration_function: Function to internally equilibrate object.
+        Called after every set_state.
+        Takes the mineral object as its only argument.
+    :type equilibration_function: function
+
     :returns: Boolean stating whether all checks have passed.
     :rtype: bool
     """
+    if equilibration_function is None:
+
+        def equilibration_function(mineral):
+            pass
+
     dT = 1.0
     dP = 1000.0
 
     m.set_state(P, T)
+    equilibration_function(m)
     G0 = m.gibbs
     S0 = m.S
     V0 = m.V
@@ -56,16 +73,19 @@ def check_eos_consistency(
     ]
 
     m.set_state(P, T + dT)
+    equilibration_function(m)
     G1 = m.gibbs
     S1 = m.S
     V1 = m.V
 
     m.set_state(P + dP, T)
+    equilibration_function(m)
     G2 = m.gibbs
     V2 = m.V
 
     # T derivatives
     m.set_state(P, T + 0.5 * dT)
+    equilibration_function(m)
     expr.extend(["S = -dG/dT", "alpha = 1/V dV/dT", "C_p = T dS/dT"])
     eq.extend(
         [
@@ -77,8 +97,14 @@ def check_eos_consistency(
 
     # P derivatives
     m.set_state(P + 0.5 * dP, T)
+    equilibration_function(m)
     expr.extend(["V = dG/dP", "K_T = -V dP/dV"])
-    eq.extend([[m.V, (G2 - G0) / dP], [m.K_T, -0.5 * (V2 + V0) * dP / (V2 - V0)]])
+    eq.extend(
+        [
+            [m.V, (G2 - G0) / dP],
+            [m.isothermal_bulk_modulus_reuss, -0.5 * (V2 + V0) * dP / (V2 - V0)],
+        ]
+    )
 
     expr.extend(
         ["C_v = Cp - alpha^2*K_T*V*T", "K_S = K_T*Cp/Cv", "gr = alpha*K_T*V/Cv"]
@@ -87,15 +113,27 @@ def check_eos_consistency(
         [
             [
                 m.molar_heat_capacity_v,
-                m.molar_heat_capacity_p - m.alpha * m.alpha * m.K_T * m.V * T,
+                m.molar_heat_capacity_p
+                - m.alpha * m.alpha * m.isothermal_bulk_modulus_reuss * m.V * T,
             ],
-            [m.K_S, m.K_T * m.molar_heat_capacity_p / m.molar_heat_capacity_v],
-            [m.gr, m.alpha * m.K_T * m.V / m.molar_heat_capacity_v],
+            [
+                m.isentropic_bulk_modulus_reuss,
+                m.isothermal_bulk_modulus_reuss
+                * m.molar_heat_capacity_p
+                / m.molar_heat_capacity_v,
+            ],
+            [
+                m.gr,
+                m.alpha
+                * m.isothermal_bulk_modulus_reuss
+                * m.V
+                / m.molar_heat_capacity_v,
+            ],
         ]
     )
 
     expr.append("Vphi = np.sqrt(K_S/rho)")
-    eq.append([m.bulk_sound_velocity, np.sqrt(m.K_S / m.rho)])
+    eq.append([m.bulk_sound_velocity, np.sqrt(m.isentropic_bulk_modulus_reuss / m.rho)])
 
     if including_shear_properties:
         expr.extend(["Vp = np.sqrt((K_S + 4G/3)/rho)", "Vs = np.sqrt(G_S/rho)"])
@@ -104,7 +142,12 @@ def check_eos_consistency(
             warnings.simplefilter("always")
             eq.extend(
                 [
-                    [m.p_wave_velocity, np.sqrt((m.K_S + 4.0 * m.G / 3.0) / m.rho)],
+                    [
+                        m.p_wave_velocity,
+                        np.sqrt(
+                            (m.isentropic_bulk_modulus_reuss + 4.0 * m.G / 3.0) / m.rho
+                        ),
+                    ],
                     [m.shear_wave_velocity, np.sqrt(m.G / m.rho)],
                 ]
             )
@@ -129,6 +172,8 @@ def check_eos_consistency(
         print("Expressions within tolerance of {0:2f}".format(tol))
         for i, c in enumerate(consistencies):
             print("{0:10s} : {1:5s}".format(expr[i], str(c)))
+            if not c:
+                print(eq[i])
         if eos_is_consistent:
             print(
                 "All EoS consistency constraints satisfied for {0:s}".format(
@@ -145,7 +190,9 @@ def check_eos_consistency(
     return eos_is_consistent
 
 
-def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=False):
+def check_anisotropic_eos_consistency(
+    m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=False, equilibration_function=None
+):
     """
     Checks that numerical derivatives of the Gibbs energy of an anisotropic mineral
     under given conditions are equal to those provided
@@ -167,13 +214,24 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
     :param verbose: Decide whether to print information about each check.
     :type verbose: bool
 
+    :param equilibration_function: Function to internally equilibrate object.
+        Called after every set_state.
+        Takes the mineral object as its only argument.
+    :type equilibration_function: function
+
     :returns: Boolean stating whether all checks have passed.
     :rtype: bool
     """
+    if equilibration_function is None:
+
+        def equilibration_function(mineral):
+            pass
+
     dT = 1.0
     dP = 1000.0
 
     m.set_state(P, T)
+    equilibration_function(m)
     G0 = m.gibbs
     S0 = m.S
     V0 = m.V
@@ -186,16 +244,19 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
     ]
 
     m.set_state(P, T + dT)
+    equilibration_function(m)
     G1 = m.gibbs
     S1 = m.S
     V1 = m.V
 
     m.set_state(P + dP, T)
+    equilibration_function(m)
     G2 = m.gibbs
     V2 = m.V
 
     # T derivatives
     m.set_state(P, T + 0.5 * dT)
+    equilibration_function(m)
     expr.extend(["S = -dG/dT", "alpha = 1/V dV/dT", "C_p = T dS/dT"])
     eq.extend(
         [
@@ -207,6 +268,7 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
 
     # P derivatives
     m.set_state(P + 0.5 * dP, T)
+    equilibration_function(m)
     expr.extend(["V = dG/dP", "K_T = -V dP/dV"])
     eq.extend(
         [
@@ -220,7 +282,8 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
         [
             [
                 m.molar_heat_capacity_v,
-                m.molar_heat_capacity_p - m.alpha * m.alpha * m.K_T * m.V * T,
+                m.molar_heat_capacity_p
+                - m.alpha * m.alpha * m.isothermal_bulk_modulus_reuss * m.V * T,
             ],
             [
                 m.isentropic_bulk_modulus_reuss,
@@ -233,22 +296,27 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
 
     # Third derivative
     m.set_state(P + 0.5 * dP, T)
+    equilibration_function(m)
     b0 = m.isothermal_compressibility_tensor
     F0 = m.deformation_gradient_tensor
 
     m.set_state(P + 0.5 * dP, T + dT)
+    equilibration_function(m)
     b1 = m.isothermal_compressibility_tensor
     F1 = m.deformation_gradient_tensor
 
     m.set_state(P, T + 0.5 * dT)
+    equilibration_function(m)
     a0 = m.thermal_expansivity_tensor
     F2 = m.deformation_gradient_tensor
 
     m.set_state(P + dP, T + 0.5 * dT)
+    equilibration_function(m)
     a1 = m.thermal_expansivity_tensor
     F3 = m.deformation_gradient_tensor
 
     m.set_state(P + 0.5 * dP, T + 0.5 * dT)
+    equilibration_function(m)
 
     beta0 = -(logm(F3) - logm(F2)) / dP
     alpha0 = (logm(F1) - logm(F0)) / dT
@@ -339,13 +407,19 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
         [
             [m.V, np.linalg.det(m.cell_vectors)],
             [m.alpha, np.trace(m.thermal_expansivity_tensor)],
-            [m.beta_T, np.sum(m.isothermal_compliance_tensor[:3, :3])],
-            [m.beta_S, np.sum(m.isentropic_compliance_tensor[:3, :3])],
+            [
+                m.isothermal_compressibility_reuss,
+                np.sum(m.isothermal_compliance_tensor[:3, :3]),
+            ],
+            [
+                m.isentropic_compressibility_reuss,
+                np.sum(m.isentropic_compliance_tensor[:3, :3]),
+            ],
         ]
     )
 
     expr.append("Vphi = np.sqrt(K_S/rho)")
-    eq.append([m.bulk_sound_velocity, np.sqrt(m.K_S / m.rho)])
+    eq.append([m.bulk_sound_velocity, np.sqrt(m.isentropic_bulk_modulus_reuss / m.rho)])
 
     consistencies = [
         np.abs(e[0] - e[1]) < np.abs(tol * e[1]) + np.finfo("float").eps for e in eq
@@ -357,6 +431,8 @@ def check_anisotropic_eos_consistency(m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=
         print("Expressions within tolerance of {0:2f}".format(tol))
         for i, c in enumerate(consistencies):
             print("{0:10s} : {1:5s}".format(expr[i], str(c)))
+            if not c:
+                print(eq[i])
         if eos_is_consistent:
             print(
                 "All EoS consistency constraints satisfied for {0:s}".format(
