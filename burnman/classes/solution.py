@@ -452,6 +452,8 @@ class Solution(Mineral):
             )
         )
 
+    isothermal_bulk_modulus_reuss = isothermal_bulk_modulus
+
     @material_property
     def adiabatic_bulk_modulus(self):
         """
@@ -466,6 +468,8 @@ class Solution(Mineral):
                 * self.molar_heat_capacity_p
                 / self.molar_heat_capacity_v
             )
+
+    adiabatic_bulk_modulus_reuss = adiabatic_bulk_modulus
 
     @material_property
     def isothermal_compressibility(self):

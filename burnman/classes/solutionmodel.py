@@ -1160,12 +1160,12 @@ class PolynomialSolution(IdealSolution):
             if not all(W[i] <= W[i + 1] for i in range(n_int, len(W) - 1)):
                 raise Exception(
                     f"Interaction parameter {i+1}/{n_Ws} must be "
-                    "upper triangular (i<=j<=k<=...<=z)"
+                    f"upper triangular (i<=j<=k<=...<=z)\n(value = {W})"
                 )
             if not W[n_int] < W[-1]:
                 raise Exception(
                     f"Interaction parameter {i+1}/{n_Ws} must not lie on the "
-                    "first diagonal (i=j=k=...=z)"
+                    f"first diagonal (i=j=k=...=z)\n(value = {W})"
                 )
 
         W_arrays = []

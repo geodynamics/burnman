@@ -691,6 +691,11 @@ class Material(object):
         return self.adiabatic_bulk_modulus
 
     @property
+    def isentropic_bulk_modulus_reuss(self):
+        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus_reuss`"""
+        return self.adiabatic_bulk_modulus_reuss
+
+    @property
     def isothermal_compressibility_reuss(self):
         """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
         return self.isothermal_compressibility
@@ -699,6 +704,11 @@ class Material(object):
     def adiabatic_compressibility_reuss(self):
         """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
         return self.adiabatic_compressibility
+
+    @property
+    def isentropic_compressibility_reuss(self):
+        """Alias for :func:`~burnman.Material.adiabatic_compressibility_reuss`"""
+        return self.adiabatic_compressibility_reuss
 
     @property
     def G(self):
