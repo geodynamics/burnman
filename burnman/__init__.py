@@ -237,6 +237,7 @@ from .classes.anisotropy import AnisotropicMaterial
 from .classes.anisotropicmineral import AnisotropicMineral
 from .classes.anisotropicmineral import cell_parameters_to_vectors
 from .classes.anisotropicmineral import cell_vectors_to_parameters
+from .classes.anisotropicsolution import AnisotropicSolution
 from .classes.mineral_helpers import HelperLowHighPressureRockTransition
 from .classes.mineral_helpers import HelperSpinTransition
 from .classes.mineral_helpers import HelperRockSwitcher
