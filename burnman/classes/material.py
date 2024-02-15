@@ -202,7 +202,7 @@ class Material(object):
             These guesses should preferably bound the correct pressure,
             but do not need to do so. More importantly,
             they should not lie outside the valid region of
-            the equation of state. Defaults to [5.e9, 10.e9].
+            the equation of state. Defaults to [0.e9, 10.e9].
         :type pressure_guesses: list
         """
 
@@ -222,10 +222,13 @@ class Material(object):
         try:
             sol = bracket(_delta_volume, pressure_guesses[0], pressure_guesses[1], args)
         except ValueError:
-            raise Exception(
-                "Cannot find a pressure, perhaps the volume or starting pressures "
-                "are outside the range of validity for the equation of state?"
-            )
+            try:  # Try again with 0 Pa lower bound on the pressure
+                sol = bracket(_delta_volume, 0.0e9, pressure_guesses[1], args)
+            except ValueError:
+                raise Exception(
+                    "Cannot find a pressure, perhaps the volume or starting pressures "
+                    "are outside the range of validity for the equation of state?"
+                )
         pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
         self.set_state(pressure, temperature)
 
@@ -611,6 +614,16 @@ class Material(object):
         """
         raise NotImplementedError(
             "need to implement molar_heat_capacity_p() in derived class!"
+        )
+
+    @material_property
+    def isentropic_thermal_gradient(self):
+        """
+        :returns: dTdP, the change in temperature with pressure at constant entropy [Pa/K]
+        :rtype: float
+        """
+        raise NotImplementedError(
+            "need to implement isentropic_thermal_gradient() in derived class!"
         )
 
     #

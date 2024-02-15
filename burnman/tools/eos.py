@@ -191,7 +191,7 @@ def check_eos_consistency(
 
 
 def check_anisotropic_eos_consistency(
-    m, P=1.0e9, T=2000.0, tol=1.0e-4, verbose=False, equilibration_function=None
+    m, P=1.0e9, T=300.0, tol=1.0e-4, verbose=False, equilibration_function=None
 ):
     """
     Checks that numerical derivatives of the Gibbs energy of an anisotropic mineral

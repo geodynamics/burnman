@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -197,6 +198,8 @@ class Mineral(Material):
             - self._property_modifiers["d2GdP2"]
         )
 
+    isothermal_bulk_modulus_reuss = isothermal_bulk_modulus
+
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
@@ -379,3 +382,10 @@ class Mineral(Material):
             * self.thermal_expansivity
             * self.isothermal_bulk_modulus
         )
+
+    @material_property
+    @copy_documentation(Material.isentropic_thermal_gradient)
+    def isentropic_thermal_gradient(self):
+        return (
+            self.molar_volume * self.temperature * self.thermal_expansivity
+        ) / self.molar_heat_capacity_p
