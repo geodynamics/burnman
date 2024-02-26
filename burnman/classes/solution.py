@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -46,8 +46,8 @@ class Solution(Mineral):
     :param solution_model: The SolutionModel object defining the properties
         of the solution.
     :type solution_model: :class:`burnman.SolutionModel`
-    :param molar_fractions: The molar fractions of each endmember in the solution.
-        Can be reset using the set_composition() method.
+    :param molar_fractions: The molar fractions of each endmember
+        in the solution. Can be reset using the set_composition() method.
     :type molar_fractions: numpy.array
     """
 
@@ -67,10 +67,8 @@ class Solution(Mineral):
             self.solution_model = solution_model
 
         # Equation of state
-        for i in range(self.n_endmembers):
-            self.solution_model.endmembers[i][0].set_method(
-                self.solution_model.endmembers[i][0].params["equation_of_state"]
-            )
+        for mbr in self.solution_model.endmembers:
+            mbr[0].set_method(mbr[0].params["equation_of_state"])
 
         # Molar fractions
         if molar_fractions is not None:
@@ -85,16 +83,21 @@ class Solution(Mineral):
         Set the composition for this solution.
         Resets cached properties.
 
-        :param molar_fractions: Molar abundance for each endmember, needs to sum to one.
+        :param molar_fractions: Molar abundance for each endmember,
+            needs to sum to one.
         :type molar_fractions: list of float
         """
         assert len(self.solution_model.endmembers) == len(molar_fractions)
 
-        if type(self.solution_model) != MechanicalSolution:
-            assert sum(molar_fractions) > 0.9999
-            assert sum(molar_fractions) < 1.0001
+        if type(self.solution_model) is not MechanicalSolution:
+            if np.abs(sum(molar_fractions) - 1.0) > 1.0e-4:
+                raise ValueError(
+                    "Molar fractions do not sum to one for "
+                    "the current instance of "
+                    f"<{self.name}>: {molar_fractions}"
+                )
 
-        if type(self.solution_model) == PolynomialSolution:
+        if type(self.solution_model) is PolynomialSolution:
             self.solution_model.set_composition(molar_fractions)
 
         self.reset()
@@ -107,12 +110,12 @@ class Solution(Mineral):
         self.reset()
 
     def set_state(self, pressure, temperature):
-        if type(self.solution_model) == PolynomialSolution:
+        if type(self.solution_model) is PolynomialSolution:
             self.solution_model.set_state(pressure, temperature)
 
         Mineral.set_state(self, pressure, temperature)
-        for i in range(self.n_endmembers):
-            self.solution_model.endmembers[i][0].set_state(pressure, temperature)
+        for mbr in self.solution_model.endmembers:
+            mbr[0].set_state(pressure, temperature)
 
     @material_property
     def formula(self):
@@ -128,23 +131,22 @@ class Solution(Mineral):
         :returns: The fractional occupancies of species on each site.
         :rtype: list of OrderedDicts
         """
-        occs = np.einsum(
-            "ij, i", self.solution_model.endmember_occupancies, self.molar_fractions
-        )
+        f = self.molar_fractions
+        occs = np.einsum("ij, i", self.solution_model.endmember_occupancies, f)
         site_occs = []
         k = 0
-        for i in range(self.solution_model.n_sites):
+        for site in self.solution_model.sites:
             site_occs.append(OrderedDict())
-            for j in range(len(self.solution_model.sites[i])):
-                site_occs[-1][self.solution_model.sites[i][j]] = occs[k]
+            for species in site:
+                site_occs[-1][species] = occs[k]
                 k += 1
 
         return site_occs
 
     def site_formula(self, precision=2):
         """
-        Returns the molar chemical formula of the solution with site occupancies.
-            For example, [Mg0.4Fe0.6]2SiO4.
+        Returns the molar chemical formula of the solution with
+            site occupancies. For example, [Mg0.4Fe0.6]2SiO4.
 
         :param precision: Precision with which to print the site occupancies
         :type precision: int
@@ -225,12 +227,7 @@ class Solution(Mineral):
         Property specific to solutions.
         """
         return (
-            np.array(
-                [
-                    self.solution_model.endmembers[i][0].gibbs
-                    for i in range(self.n_endmembers)
-                ]
-            )
+            np.array([mbr[0].gibbs for mbr in self.solution_model.endmembers])
             + self.excess_partial_gibbs
         )
 
@@ -241,12 +238,7 @@ class Solution(Mineral):
         Property specific to solutions.
         """
         return (
-            np.array(
-                [
-                    self.solution_model.endmembers[i][0].molar_volume
-                    for i in range(self.n_endmembers)
-                ]
-            )
+            np.array([mbr[0].molar_volume for mbr in self.solution_model.endmembers])
             + self.excess_partial_volumes
         )
 
@@ -257,12 +249,7 @@ class Solution(Mineral):
         Property specific to solutions.
         """
         return (
-            np.array(
-                [
-                    self.solution_model.endmembers[i][0].molar_entropy
-                    for i in range(self.n_endmembers)
-                ]
-            )
+            np.array([mbr[0].molar_entropy for mbr in self.solution_model.endmembers])
             + self.excess_partial_entropies
         )
 
@@ -312,10 +299,11 @@ class Solution(Mineral):
         Returns molar Gibbs free energy of the solution [J/mol].
         Aliased with self.gibbs.
         """
+        f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].gibbs * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].gibbs * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -394,10 +382,11 @@ class Solution(Mineral):
         Returns molar entropy of the solution [J/K/mol].
         Aliased with self.S.
         """
+        f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].S * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].S * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -420,10 +409,11 @@ class Solution(Mineral):
         Returns molar enthalpy of the solution [J/mol].
         Aliased with self.H.
         """
+        f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].H * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].H * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -671,7 +661,8 @@ class Solution(Mineral):
         An array N such that N.b = 0 for all bulk compositions that can
         be produced with a linear sum of the endmembers in the solution.
         """
-        null_basis = np.array([v[:] for v in self.stoichiometric_matrix.nullspace()])
+        null = self.stoichiometric_matrix.nullspace()
+        null_basis = np.array([v[:] for v in null])
 
         M = null_basis[:, self.dependent_element_indices]
         assert (M.shape[0] == M.shape[1]) and (M == np.eye(M.shape[0])).all()
@@ -683,7 +674,8 @@ class Solution(Mineral):
         """
         A list of formulae for all the endmember in the solution.
         """
-        return [mbr[0].params["formula"] for mbr in self.solution_model.endmembers]
+        mbrs = self.solution_model.endmembers
+        return [mbr[0].params["formula"] for mbr in mbrs]
 
     @cached_property
     def endmember_names(self):
