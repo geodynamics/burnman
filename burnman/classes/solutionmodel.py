@@ -13,7 +13,12 @@ import warnings
 import sparse
 import string
 from copy import deepcopy
-from .material import material_property
+from .material import material_property, cached_property
+from dataclasses import make_dataclass
+
+Interaction = make_dataclass(
+    "Interaction", ["inds", "expts", "f_r", "m_jr", "f_rs", "m_jrs"]
+)
 
 try:
     ag = importlib.import_module("autograd")
@@ -125,6 +130,41 @@ def inverseish(x, eps=1.0e-5):
     oneoverx = np.where(x <= eps, 2.0 / eps - x / eps / eps, 0.0)
     oneoverx[mask] = 1.0 / x[mask]
     return oneoverx
+
+
+def dpdx(molar_amounts, n, ones, eye):
+    """
+    The partial derivative of endmember proportions
+    with respect to endmember amounts.
+
+    :param molar_amounts: molar amounts of independent endmembers
+    :type molar_fractions: 1D numpy array
+    :param n: sum of the endmember amounts (usually equal to one)
+    :type n: float
+    :param ones: a vector of ones of length equal to the number of endmembers
+    :type ones: 1D numpy array
+    :param eye: the identity matrix of size equal to the number of endmembers
+    :type eye: 2D numpy array
+    """
+    return (eye - np.einsum("k, m->km", molar_amounts, ones)) / n
+
+
+def d2pdxdx(molar_amounts, nsqr, ones, eyeones):
+    """
+    The second partial derivative of endmember proportions
+    with respect to endmember amounts.
+
+    :param molar_amounts: molar amounts of independent endmembers
+    :type molar_fractions: 1D numpy array
+    :param nsqr: square of the sum of the endmember amounts (usually equal to one)
+    :type n: float
+    :param ones: a vector of ones of length equal to the number of endmembers
+    :type ones: 1D numpy array
+    :param eyeones: delta_ij 1_k + delta_ik 1_j
+    :type eyeones: 3D numpy array
+    """
+
+    return (2.0 * np.einsum("n, m, k->knm", ones, ones, molar_amounts) - eyeones) / nsqr
 
 
 class SolutionModel(object):
@@ -505,6 +545,37 @@ class IdealSolution(SolutionModel):
 
     def activities(self, pressure, temperature, molar_fractions):
         return self._ideal_activities(molar_fractions)
+
+    @cached_property
+    def ones(self):
+        """
+        A vector of ones with length equal to the number of endmembers
+        :return: ones
+        :rtype: 1D numpy array
+        """
+        return np.ones(self.n_endmembers)
+
+    @cached_property
+    def eye(self):
+        """
+        An identity matrix with size equal to the number of endmembers
+        :return: eye
+        :rtype: 2D numpy array
+        """
+        return np.eye(self.n_endmembers)
+
+    @cached_property
+    def eyeones(self):
+        """
+        A convenience function consisting of two concatenations
+        of an identity matrix and ones vector with size
+        equal to the number of endmembers.
+        :return: delta_ij 1_k + delta_ik 1_j
+        :rtype: 3D numpy array
+        """
+        return np.einsum("km, n->kmn", self.eye, self.ones) + np.einsum(
+            "kn, m->kmn", self.eye, self.ones
+        )
 
 
 class AsymmetricRegularSolution(IdealSolution):
@@ -1025,9 +1096,9 @@ class PolynomialSolution(IdealSolution):
     :param ESV_interactions: A list containing lists where the first three elements are
         energy, entropy and volume interactions and the rest of the elements
         are indices of the transformed endmembers to which those
-        interactions correspond.
-        For example, [2., 0., 0., 0, 1, 1] would correspond to an interaction
-        of 2*p'[0]*p'[1]*p'[1].
+        interactions correspond, and the proportion exponents.
+        For example, [2., 0., 0., 0, 4, 1, 1] would correspond to an interaction
+        of 2*p'[0]^4*p'[1]^1.
     :type ESV_interactions: list of lists
     :param interaction_endmembers: A list of minerals involved in the interaction terms.
     :type interaction_endmembers: list of :class:`burnman.Mineral` objects
@@ -1036,8 +1107,8 @@ class PolynomialSolution(IdealSolution):
         coefficients for each of the interaction_endmembers and the
         rest of the elements are indices of the transformed
         endmembers to which those interactions correspond.
-        For example, [1., 0., -1., 0, 1, 1] would correspond to an interaction
-        of (mbr[0].gibbs - mbr[2].gibbs)*p'[0]*p'[1]*p'[1].
+        For example, [1., 0., -1., 0, 4, 1, 1] would correspond to an interaction
+        of (mbr[0].gibbs - mbr[2].gibbs)*p'[0]^4*p'[1]^1.
     :type endmember_coefficients_and_interactions: list of lists
     :param transformation_matrix: The interactions for a given solution may
         be most compactly expressed not as a polynomial function of the
@@ -1062,19 +1133,29 @@ class PolynomialSolution(IdealSolution):
         self.endmembers = endmembers
 
         self.W_ESV = None
+        self.c_ESV = None
+        self.n_W_ESV = 0
         if ESV_interactions is not None:
-            self.W_ESV = self.make_interaction_arrays(ESV_interactions)
+            self.W_ESV, self.c_ESV = self.make_interaction_arrays(ESV_interactions, 3)
+            self.n_W_ESV = len(ESV_interactions)
 
         self.n_interaction_endmembers = len(interaction_endmembers)
         self.interaction_endmembers = interaction_endmembers
 
         self.W_mbr = None
+        self.c_mbr = None
+        self.n_W_mbr = 0
         if self.n_interaction_endmembers > 0:
-            self.W_mbr = self.make_endmember_interaction_arrays(
-                endmember_coefficients_and_interactions
+            self.W_mbr, self.c_mbr = self.make_interaction_arrays(
+                endmember_coefficients_and_interactions, self.n_interaction_endmembers
             )
+            self.n_W_mbr = len(endmember_coefficients_and_interactions)
 
-        self.transformation_matrix = transformation_matrix
+        if transformation_matrix is None:
+            self.dqdp = np.eye(self.n_endmembers)
+        else:
+            self.dqdp = transformation_matrix
+        self.n_transformed_endmembers = len(self.dqdp)
         self.reset()
 
     def reset(self):
@@ -1091,6 +1172,7 @@ class PolynomialSolution(IdealSolution):
         """
         self.reset()
         self.molar_fractions = molar_fractions
+        self.trans_fractions = np.einsum("ij, j->i", self.dqdp, molar_fractions)
 
     def set_state(self, pressure, temperature):
         """
@@ -1100,253 +1182,189 @@ class PolynomialSolution(IdealSolution):
         for mbr in self.interaction_endmembers:
             mbr.set_state(pressure, temperature)
 
-    def make_interaction_arrays(self, Ws):
-        n_Ws = len(Ws)
-        for i, W in enumerate(Ws):
-            if not all(W[i] <= W[i + 1] for i in range(3, len(W) - 1)):
-                raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must be "
-                    "upper triangular (i<=j<=k<=...<=z)"
-                )
-            if not W[3] < W[-1]:
-                raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the "
-                    "first diagonal (i=j=k=...=z)"
-                )
+    def make_prefactors_and_exponents(self, a):
+        # assign exponent matrix for first derivatives
+        if len(a) % 2 != 0:
+            raise Exception("Interaction must have paired indices "
+                            f"and exponents, currently {a}")
+        indices = a[::2]
+        exponents = np.array(a[1::2])
+        n_indices = len(indices)
+        m_jr = np.zeros((n_indices, self.n_endmembers))
+        m_jr[:, :] = exponents[:, np.newaxis]
+        m_jr[list(range(len(m_jr))), indices] -= np.ones(len(indices))
 
+        # assign factors for first derivatives
+        f_jr = np.zeros((n_indices, self.n_endmembers))
+        f_jr[:, indices] = 1.0
+        f_jr[range(len(m_jr)), indices] = exponents
+        f_r = np.prod(f_jr, axis=0)
+
+        # assign exponent matrix for second derivatives
+        m_jrs = np.zeros((n_indices, self.n_endmembers, self.n_endmembers))
+        m_jrs[:, :, :] = exponents[:, np.newaxis, np.newaxis]
+
+        m_jrs -= (
+            np.einsum(
+                "ij, k->ijk", np.eye(self.n_endmembers), np.ones(self.n_endmembers)
+            )
+            + np.einsum(
+                "ik, j->ijk", np.eye(self.n_endmembers), np.ones(self.n_endmembers)
+            )
+        )[indices]
+
+        # assign factors for second derivatives
+        f_jrs = np.zeros((n_indices, self.n_endmembers, self.n_endmembers))
+        f_jrs[np.ix_(range(n_indices), indices, indices)] = 1.0
+
+        ival = np.array([indices, exponents]).T
+        for k, (i, iexp) in enumerate(ival):
+            for l, (j, jexp) in enumerate(ival[k:]):
+                if i == j:
+                    f_jrs[k, i, i] = iexp * (iexp - 1)
+                else:
+                    f_jrs[k, i, j] = iexp
+                    f_jrs[k, j, i] = iexp
+                    f_jrs[l, j, i] = jexp
+                    f_jrs[l, i, j] = jexp
+
+        f_rs = np.prod(f_jrs, axis=0)
+        return Interaction(indices, exponents, f_r, m_jr, f_rs, m_jrs)
+
+    def make_interaction_arrays(self, Ws, n):
         W_arrays = []
-
-        dims = sorted(list(set([len(W) - 3 for W in Ws])))
-        for dim in dims:
-            coords = [
-                [0, *W[3:]] for W in Ws if len(W) == dim + 3 and np.abs(W[0]) > 1.0e-10
-            ]
-            coords.extend(
-                [
-                    [1, *W[3:]]
-                    for W in Ws
-                    if len(W) == dim + 3 and np.abs(W[1]) > 1.0e-10
-                ]
-            )
-            coords.extend(
-                [
-                    [2, *W[3:]]
-                    for W in Ws
-                    if len(W) == dim + 3 and np.abs(W[2]) > 1.0e-10
-                ]
-            )
-            coords = list(zip(*coords))
-
-            data = [W[0] for W in Ws if len(W) == dim + 3 and np.abs(W[0]) > 1.0e-10]
-            data.extend(
-                [W[1] for W in Ws if len(W) == dim + 3 and np.abs(W[1]) > 1.0e-10]
-            )
-            data.extend(
-                [W[2] for W in Ws if len(W) == dim + 3 and np.abs(W[2]) > 1.0e-10]
-            )
-
-            shape = [3]  # First dimension is for E, S, V
-            shape.extend([self.n_endmembers for i in range(dim)])
-
-            shape = tuple(shape)
-            s = sparse.COO(coords, data, shape=shape).todense()
-            W_arrays.append((dim, s))
-        return W_arrays
-
-    def make_endmember_interaction_arrays(self, Ws):
-        n_Ws = len(Ws)
-        n_int = self.n_interaction_endmembers
+        interactions = np.empty((len(Ws), n))
         for i, W in enumerate(Ws):
-            if not all(W[i] <= W[i + 1] for i in range(n_int, len(W) - 1)):
-                raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must be "
-                    f"upper triangular (i<=j<=k<=...<=z)\n(value = {W})"
-                )
-            if not W[n_int] < W[-1]:
-                raise Exception(
-                    f"Interaction parameter {i+1}/{n_Ws} must not lie on the "
-                    f"first diagonal (i=j=k=...=z)\n(value = {W})"
-                )
+            interactions[i] = W[:n]
+            W_arrays.append(self.make_prefactors_and_exponents(W[n:]))
+        return interactions, W_arrays
 
-        W_arrays = []
-
-        dims = sorted(list(set([len(W) - n_int for W in Ws])))
-        for dim in dims:
-            coords = []
-            data = []
-            for i in range(n_int):
-                coords.extend(
-                    [
-                        [i, *W[n_int:]]
-                        for W in Ws
-                        if len(W) == dim + n_int and np.abs(W[i]) > 1.0e-10
-                    ]
-                )
-                data.extend(
-                    [
-                        W[i]
-                        for W in Ws
-                        if len(W) == dim + n_int and np.abs(W[i]) > 1.0e-10
-                    ]
-                )
-
-            coords = list(zip(*coords))
-
-            shape = [n_int]  # First dimension is for the excess_endmembers
-            shape.extend([self.n_endmembers for i in range(dim)])
-
-            shape = tuple(shape)
-            s = sparse.COO(coords, data, shape=shape).todense()
-            W_arrays.append((dim, s))
-        return W_arrays
-
-    def transform_scalar_list(self, x, A):
-        if A is not None:
-            return A.dot(x)
-        else:
-            return x
-
-    def transform_gradient_list(self, W, A):
-        if A is not None:
-            return np.einsum("ij, jk->ik", W, A)
-        else:
-            return W
-
-    def transform_hessian_list(self, W, A):
-        if A is not None:
-            return np.einsum("ki, mij, lj->mkl", A, W, A)
-        else:
-            return W
-
-    def W_dots_x(self, dim, W_array, x):
-        if dim == 0:
-            return W_array
-        else:
-            ESVdim = [W_array]
-            ESVdim.extend([x for i in range(dim)])
-            strng = string.ascii_lowercase[: W_array.ndim]
-            strng2 = ", ".join(strng[-dim:])
-            strng += f", {strng2}"
-            return np.einsum(strng, *ESVdim)
-
-    def rolled_array(self, W, istart):
-        W_array_rolled = deepcopy(W)
-        dim = len(W.shape) - 1
-
-        W_roll = deepcopy(W)
-        for i in range(dim - istart):
-            W_roll = np.moveaxis(W_roll, istart, -1)
-            W_array_rolled += W_roll
-        return W_array_rolled
-
-    def get_scalar_list(self, x, W_arrays, A):
-        xp = self.transform_scalar_list(x, A)
-        xp_total = np.sum(xp)
-        ESV = np.zeros(W_arrays[0][-1].shape[0])
-        for dim, W_array in W_arrays:
-            ESV += self.W_dots_x(dim, W_array, xp) / np.power(xp_total, dim - 1.0)
-        return ESV
-
-    def get_gradient_list(self, x, W_arrays, A):
-        xp = self.transform_scalar_list(x, A)
-        xp_total = np.sum(xp)
-
-        dESVdx = np.zeros(W_arrays[0][-1].shape[:2])
-
-        for dim, W_array in W_arrays:
-            dESVdx += (
-                -(dim - 1)
-                / np.power(xp_total, dim)
-                * self.W_dots_x(dim, W_array, xp)[:, np.newaxis]
+    @material_property
+    def _c_xs(self):
+        c = np.empty(self.n_W_ESV + self.n_W_mbr)
+        for i in range(self.n_W_ESV):
+            c[i] = np.prod(
+                np.power(self.trans_fractions[self.c_ESV[i].inds], self.c_ESV[i].expts),
+                axis=0,
+            )
+        for i in range(self.n_W_mbr):
+            j = i + self.n_W_ESV
+            c[j] = np.prod(
+                np.power(self.trans_fractions[self.c_mbr[i].inds], self.c_mbr[i].expts),
+                axis=0,
             )
 
-            W_array_rolled = self.rolled_array(W_array, 1)
-            dESVdx += self.W_dots_x(dim - 1, W_array_rolled, xp) / np.power(
-                xp_total, dim - 1.0
+        return c
+
+    @material_property
+    def _dc_xsdq(self):
+        c = np.empty((self.n_W_ESV + self.n_W_mbr, self.n_transformed_endmembers))
+        for i in range(self.n_W_ESV):
+            c[i] = self.c_ESV[i].f_r * np.prod(
+                np.power(
+                    self.trans_fractions[self.c_ESV[i].inds], self.c_ESV[i].m_jr.T
+                ),
+                axis=1,
             )
-        return self.transform_gradient_list(dESVdx, A)
-
-    def get_hessian_list(self, x, W_arrays, A):
-        xp = self.transform_scalar_list(x, A)
-        xp_total = np.sum(xp)
-
-        d2ESVdx2 = np.zeros(W_arrays[0][-1].shape[:3])
-
-        for dim, W_array in W_arrays:
-            d2ESVdx2 += (
-                (dim - 1)
-                * dim
-                / np.power(xp_total, dim + 1)
-                * self.W_dots_x(dim, W_array, xp)[:, np.newaxis, np.newaxis]
+        for i in range(self.n_W_mbr):
+            j = i + self.n_W_ESV
+            c[j] = self.c_mbr[i].f_r * np.prod(
+                np.power(
+                    self.trans_fractions[self.c_mbr[i].inds], self.c_mbr[i].m_jr.T
+                ),
+                axis=1,
             )
+        return c
 
-            W_array_rolled = self.rolled_array(W_array, 1)
+    @material_property
+    def _d2c_xsdqdq(self):
+        c = np.empty((self.n_W_ESV + self.n_W_mbr, self.n_transformed_endmembers, self.n_transformed_endmembers))
+        for i in range(self.n_W_ESV):
+            c[i] = self.c_ESV[i].f_rs * np.prod(
+                np.power(
+                    self.trans_fractions[self.c_ESV[i].inds], self.c_ESV[i].m_jrs.T
+                ),
+                axis=2,
+            )
+        for i in range(self.n_W_mbr):
+            j = i + self.n_W_ESV
+            c[j] = self.c_mbr[i].f_rs * np.prod(
+                np.power(
+                    self.trans_fractions[self.c_mbr[i].inds], self.c_mbr[i].m_jrs.T
+                ),
+                axis=2,
+            )
+        return c
 
-            f = self.W_dots_x(dim - 1, W_array_rolled, xp)
-            h = f[:, np.newaxis, :] + f[:, :, np.newaxis]
+    @material_property
+    def _dqdx(self):
+        return np.einsum(
+            "ik, km->im",
+            self.dqdp,
+            dpdx(self.molar_fractions, 1.0, self.ones, self.eye),
+        )
 
-            d2ESVdx2 += -(dim - 1) / np.power(xp_total, dim) * h
+    @material_property
+    def _dc_xsdx(self):
+        return np.einsum("ir, rm->im", self._dc_xsdq, self._dqdx) + np.einsum(
+            "i, m->im", self._c_xs, self.ones
+        )
 
-            W_array_rolled_2 = self.rolled_array(W_array_rolled, 2)
-            g = self.W_dots_x(dim - 2, W_array_rolled_2, xp)
-
-            d2ESVdx2 += g / np.power(xp_total, dim - 1.0)
-
-        return self.transform_hessian_list(d2ESVdx2, A)
+    @material_property
+    def _d2c_xsdxdx(self):
+        n = 1.0
+        a1 = np.einsum("irs, sn, rm", self._d2c_xsdqdq, self._dqdx, self._dqdx)
+        a2a = 1.0 / n * (np.einsum("ir, rm, n", self._dc_xsdq, self._dqdx, self.ones))
+        a2 = a2a + np.einsum("imn->inm", a2a)
+        a3 = np.einsum(
+            "ir, rk, knm->inm",
+            self._dc_xsdq,
+            self.dqdp,
+            d2pdxdx(self.molar_fractions, n * n, self.ones, self.eyeones),
+        )
+        return a1 + a2 + a3
 
     @material_property
     def ESV_scalar_list(self):
         if self.W_ESV is None:
             return np.zeros((3))
         else:
-            return self.get_scalar_list(
-                self.molar_fractions, self.W_ESV, self.transformation_matrix
-            )
+            return np.einsum("ij, i->j", self.W_ESV, self._c_xs[:self.n_W_ESV])
 
     @material_property
     def ESV_gradient_list(self):
         if self.W_ESV is None:
             return np.zeros((3, self.n_endmembers))
         else:
-            return self.get_gradient_list(
-                self.molar_fractions, self.W_ESV, self.transformation_matrix
-            )
+            return np.einsum("ij, ik->jk", self.W_ESV, self._dc_xsdx[:self.n_W_ESV])
 
     @material_property
     def ESV_hessian_list(self):
         if self.W_ESV is None:
             return np.zeros((3, self.n_endmembers, self.n_endmembers))
         else:
-            return self.get_hessian_list(
-                self.molar_fractions, self.W_ESV, self.transformation_matrix
-            )
+            return np.einsum("ij, ikl->jkl", self.W_ESV, self._d2c_xsdxdx[:self.n_W_ESV])
 
     @material_property
     def mbr_scalar_list(self):
         if self.W_mbr is None:
             return np.zeros((0))
         else:
-            return self.get_scalar_list(
-                self.molar_fractions, self.W_mbr, self.transformation_matrix
-            )
+            return np.einsum("ij, i->j", self.W_mbr, self._c_xs[self.n_W_ESV:])
 
     @material_property
     def mbr_gradient_list(self):
         if self.W_mbr is None:
             return np.zeros((0, self.n_endmembers))
         else:
-            return self.get_gradient_list(
-                self.molar_fractions, self.W_mbr, self.transformation_matrix
-            )
+            return np.einsum("ij, ik->jk", self.W_mbr, self._dc_xsdx[self.n_W_ESV:])
 
     @material_property
     def mbr_hessian_list(self):
         if self.W_mbr is None:
             return np.zeros((0, self.n_endmembers, self.n_endmembers))
         else:
-            return self.get_hessian_list(
-                self.molar_fractions, self.W_mbr, self.transformation_matrix
-            )
+            return np.einsum("ij, ikl->jkl", self.W_mbr, self._d2c_xsdxdx[self.n_W_ESV:])
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
         dEdx, dSdx, dVdx = self.ESV_gradient_list
