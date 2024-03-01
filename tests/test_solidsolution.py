@@ -20,6 +20,7 @@ from burnman.minerals import HGP_2018_ds633
 from burnman.minerals.SLB_2011 import mg_post_perovskite
 from burnman.minerals.SLB_2011 import fe_post_perovskite
 from burnman.minerals.SLB_2011 import al_post_perovskite
+from burnman.tools.eos import check_eos_consistency
 
 
 class forsterite(Mineral):
@@ -393,6 +394,22 @@ class polynomial_esv_and_mbr_mixing(burnman.SolidSolution):
             ],
             ESV_interactions=[[600.0, 2.5, 0.5e-6, 0, 1, 1, 1]],
             interaction_endmembers=[fo3, fo1],
+            endmember_coefficients_and_interactions=[[1.0, -1.0, 0, 1, 1, 1]],
+        )
+
+        burnman.SolidSolution.__init__(self, molar_fractions)
+
+
+class polynomial_esv_and_mbr_mixing_2(burnman.SolidSolution):
+    def __init__(self, molar_fractions=None):
+        self.name = "two_site_ss (subregular symmetric)"
+        self.solution_model = PolynomialSolution(
+            endmembers=[
+                [forsterite(), "[Mg]2"],
+                [fayalite(), "[Mg]2"],
+            ],
+            ESV_interactions=[[600.0, 2.5, 0.5e-6, 0, 1, 1, 1]],
+            interaction_endmembers=[fayalite(), fo1],
             endmember_coefficients_and_interactions=[[1.0, -1.0, 0, 1, 1, 1]],
         )
 
@@ -927,6 +944,11 @@ class test_solidsolution(BurnManTest):
         self.assertArraysAlmostEqual(ss1.partial_gibbs, ss2.partial_gibbs)
         self.assertArraysAlmostEqual(ss1.partial_entropies, ss2.partial_entropies)
         self.assertArraysAlmostEqual(ss1.partial_volumes, ss2.partial_volumes)
+
+    def test_polynomial_consistency(self):
+        ss = polynomial_esv_and_mbr_mixing_2()
+        ss.set_composition([0.4, 0.6])
+        self.assertTrue(check_eos_consistency(ss))
 
     def test_polynomial_mbr_mixing(self):
         ss1 = polynomial_mbr_mixing()
