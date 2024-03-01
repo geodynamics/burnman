@@ -247,23 +247,23 @@ class two_site_ss_polynomial_ternary(burnman.SolidSolution):
             ],
             ESV_interactions=[
                 # Wj and Wi terms in Helffrich and Wood
-                [10.0e3,   1.0, 0.0, 0, 1, 1, 2],
+                [10.0e3, 1.0, 0.0, 0, 1, 1, 2],
                 [-10.0e3, -2.0, 0.0, 0, 2, 1, 1],
-                [5.0e3,    0.0, 0.0, 0, 1, 2, 2],
-                [3.0e3,    1.0, 0.0, 0, 2, 2, 1],
-                [-10.0e3,  0.0, 0.0, 1, 1, 2, 2],
-                [-10.0e3,  0.0, 0.0, 1, 2, 2, 1],
+                [5.0e3, 0.0, 0.0, 0, 1, 2, 2],
+                [3.0e3, 1.0, 0.0, 0, 2, 2, 1],
+                [-10.0e3, 0.0, 0.0, 1, 1, 2, 2],
+                [-10.0e3, 0.0, 0.0, 1, 2, 2, 1],
                 # 0.5*Wk terms in Helffrich and Wood
                 # Because there are only three endmembers, there
                 # is only one additional term for each term above:
-                [5.0e3,   0.5, 0.0, 0, 1, 1, 1, 2, 1],
+                [5.0e3, 0.5, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, -1.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [2.5e3,   0.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [1.5e3,   0.5, 0.0, 0, 1, 1, 1, 2, 1],
-                [-5.0e3,  0.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [-5.0e3,  0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [2.5e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [1.5e3, 0.5, 0.0, 0, 1, 1, 1, 2, 1],
+                [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3,   0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
             ],
         )
 
@@ -288,23 +288,23 @@ class two_site_ss_polynomial_ternary_transformed(burnman.SolidSolution):
             ],
             ESV_interactions=[
                 # Wj and Wi terms in Helffrich and Wood
-                [10.0e3,   1.0, 0.0, 0, 1, 1, 2],
+                [10.0e3, 1.0, 0.0, 0, 1, 1, 2],
                 [-10.0e3, -2.0, 0.0, 0, 2, 1, 1],
-                [5.0e3,    0.0, 0.0, 0, 1, 2, 2],
-                [3.0e3,    1.0, 0.0, 0, 2, 2, 1],
-                [-10.0e3,  0.0, 0.0, 1, 1, 2, 2],
-                [-10.0e3,  0.0, 0.0, 1, 2, 2, 1],
+                [5.0e3, 0.0, 0.0, 0, 1, 2, 2],
+                [3.0e3, 1.0, 0.0, 0, 2, 2, 1],
+                [-10.0e3, 0.0, 0.0, 1, 1, 2, 2],
+                [-10.0e3, 0.0, 0.0, 1, 2, 2, 1],
                 # 0.5*Wk terms in Helffrich and Wood
                 # Because there are only three endmembers, there
                 # is only one additional term for each term above:
-                [5.0e3,   0.5, 0.0, 0, 1, 1, 1, 2, 1],
+                [5.0e3, 0.5, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, -1.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [2.5e3,   0.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [1.5e3,   0.5, 0.0, 0, 1, 1, 1, 2, 1],
-                [-5.0e3,  0.0, 0.0, 0, 1, 1, 1, 2, 1],
-                [-5.0e3,  0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [2.5e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [1.5e3, 0.5, 0.0, 0, 1, 1, 1, 2, 1],
+                [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3,   0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
             ],
             transformation_matrix=np.array(
                 [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
@@ -325,9 +325,9 @@ class two_site_ss_polynomial_high_order_transformed(burnman.SolidSolution):
             ],
             ESV_interactions=[
                 # Wj and Wi terms in Helffrich and Wood
-                [10.0e3,   1.0, 0.0, 0, 1, 1, 2],
+                [10.0e3, 1.0, 0.0, 0, 1, 1, 2],
                 [-10.0e3, -2.0, 0.0, 0, 2, 1, 6],
-                [5.0e3,   0.5, 0.0, 0, 6, 1, 1, 2, 1],
+                [5.0e3, 0.5, 0.0, 0, 6, 1, 1, 2, 1],
             ],
             transformation_matrix=np.array(
                 [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
@@ -841,8 +841,9 @@ class test_solidsolution(BurnManTest):
         dSdx2 = ss.partial_entropies
         dVdx2 = ss.partial_volumes
 
-        self.assertArraysAlmostEqual([dGdx0.dot(df), dSdx0.dot(df), dVdx0.dot(df)],
-                                     [G2 - G1, S2 - S1, V2 - V1])
+        self.assertArraysAlmostEqual(
+            [dGdx0.dot(df), dSdx0.dot(df), dVdx0.dot(df)], [G2 - G1, S2 - S1, V2 - V1]
+        )
         self.assertArraysAlmostEqual(HG0.dot(df), dGdx2 - dGdx1)
         self.assertArraysAlmostEqual(HS0.dot(df), dSdx2 - dSdx1)
         self.assertArraysAlmostEqual(HV0.dot(df), dVdx2 - dVdx1)
@@ -968,8 +969,12 @@ class test_solidsolution(BurnManTest):
         self.assertAlmostEqual(ss1.excess_gibbs, ss2.excess_gibbs)
         # roll back to compare properties
         self.assertArraysAlmostEqual(ss1.partial_gibbs, np.roll(ss2.partial_gibbs, -1))
-        self.assertArraysAlmostEqual(ss1.partial_entropies, np.roll(ss2.partial_entropies, -1))
-        self.assertArraysAlmostEqual(ss1.partial_volumes, np.roll(ss2.partial_volumes, -1))
+        self.assertArraysAlmostEqual(
+            ss1.partial_entropies, np.roll(ss2.partial_entropies, -1)
+        )
+        self.assertArraysAlmostEqual(
+            ss1.partial_volumes, np.roll(ss2.partial_volumes, -1)
+        )
 
     def test_subregular(self):
         ss0 = two_site_ss()

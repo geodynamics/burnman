@@ -132,7 +132,7 @@ def inverseish(x, eps=1.0e-5):
     return oneoverx
 
 
-def dpdx(molar_amounts, n, ones, eye):
+def dpdn(molar_amounts, n, ones, eye):
     """
     The partial derivative of endmember proportions
     with respect to endmember amounts.
@@ -149,7 +149,7 @@ def dpdx(molar_amounts, n, ones, eye):
     return (eye - np.einsum("k, m->km", molar_amounts, ones)) / n
 
 
-def d2pdxdx(molar_amounts, nsqr, ones, eyeones):
+def d2pdndn(molar_amounts, nsqr, ones, eyeones):
     """
     The second partial derivative of endmember proportions
     with respect to endmember amounts.
@@ -1136,7 +1136,7 @@ class PolynomialSolution(IdealSolution):
         self.c_ESV = None
         self.n_W_ESV = 0
         if ESV_interactions is not None:
-            self.W_ESV, self.c_ESV = self.make_interaction_arrays(ESV_interactions, 3)
+            self.W_ESV, self.c_ESV = self._make_interaction_arrays(ESV_interactions, 3)
             self.n_W_ESV = len(ESV_interactions)
 
         self.n_interaction_endmembers = len(interaction_endmembers)
@@ -1146,7 +1146,7 @@ class PolynomialSolution(IdealSolution):
         self.c_mbr = None
         self.n_W_mbr = 0
         if self.n_interaction_endmembers > 0:
-            self.W_mbr, self.c_mbr = self.make_interaction_arrays(
+            self.W_mbr, self.c_mbr = self._make_interaction_arrays(
                 endmember_coefficients_and_interactions, self.n_interaction_endmembers
             )
             self.n_W_mbr = len(endmember_coefficients_and_interactions)
@@ -1182,11 +1182,27 @@ class PolynomialSolution(IdealSolution):
         for mbr in self.interaction_endmembers:
             mbr.set_state(pressure, temperature)
 
-    def make_prefactors_and_exponents(self, a):
+    def _make_prefactors_and_exponents(self, a):
+        """
+        This hidden method makes an Interaction object
+        containing convenience arrays to facilitate rapid
+        calculation of the first and second compositional
+        derivatives of the Gibbs, entropy and volume
+        excesses.
+
+        :param a: A list of polynomial indices and exponents.
+        :type a: list
+        :return: An interaction object containing the
+            indices (inds), exponents (expts),
+            first derivative prefactors (j_r) and exponents (m_jr) and
+            second derivative prefactors (f_rs) and exponents (m_jrs).
+        :rtype: Interaction dataclass instance
+        """
         # assign exponent matrix for first derivatives
         if len(a) % 2 != 0:
-            raise Exception("Interaction must have paired indices "
-                            f"and exponents, currently {a}")
+            raise Exception(
+                "Interaction must have paired indices " f"and exponents, currently {a}"
+            )
         indices = a[::2]
         exponents = np.array(a[1::2])
         n_indices = len(indices)
@@ -1231,16 +1247,34 @@ class PolynomialSolution(IdealSolution):
         f_rs = np.prod(f_jrs, axis=0)
         return Interaction(indices, exponents, f_r, m_jr, f_rs, m_jrs)
 
-    def make_interaction_arrays(self, Ws, n):
-        W_arrays = []
-        interactions = np.empty((len(Ws), n))
+    def _make_interaction_arrays(self, Ws, n):
+        """
+        A hidden convenience function that splits each
+        excess term into _summary_
+
+        :param Ws: List of interactions in form input by the user.
+        :type Ws: list of lists
+        :param n: Number of interaction values (e.g. 3 for ESV interactions)
+        :type n: integer
+        :return: The processed interaction values, indices and exponents.
+        :rtype: tuple of 2D numpy array and list of Interaction objects
+        """
+        values = np.empty((len(Ws), n))
+        interactions = []
         for i, W in enumerate(Ws):
-            interactions[i] = W[:n]
-            W_arrays.append(self.make_prefactors_and_exponents(W[n:]))
-        return interactions, W_arrays
+            values[i] = W[:n]
+            interactions.append(self._make_prefactors_and_exponents(W[n:]))
+        return values, interactions
 
     @material_property
     def _c_xs(self):
+        """
+        Calculates the product of molar fractions raised to the exponents in
+        each polynomial interaction.
+        :return: Interaction postfactors
+            (not including the values of the interactions themselves)
+        :rtype: 1D numpy array
+        """
         c = np.empty(self.n_W_ESV + self.n_W_mbr)
         for i in range(self.n_W_ESV):
             c[i] = np.prod(
@@ -1258,6 +1292,14 @@ class PolynomialSolution(IdealSolution):
 
     @material_property
     def _dc_xsdq(self):
+        """
+        Calculates the first derivative of the product of
+        molar fractions raised to the exponents in each polynomial interaction
+        with respect to the transformed endmember proportions.
+        :return: Interaction postfactors
+            (not including the values of the interactions themselves)
+        :rtype: 2D numpy array
+        """
         c = np.empty((self.n_W_ESV + self.n_W_mbr, self.n_transformed_endmembers))
         for i in range(self.n_W_ESV):
             c[i] = self.c_ESV[i].f_r * np.prod(
@@ -1278,7 +1320,21 @@ class PolynomialSolution(IdealSolution):
 
     @material_property
     def _d2c_xsdqdq(self):
-        c = np.empty((self.n_W_ESV + self.n_W_mbr, self.n_transformed_endmembers, self.n_transformed_endmembers))
+        """
+        Calculates the second derivative of the product of
+        molar fractions raised to the exponents in each polynomial interaction
+        with respect to the transformed endmember proportions.
+        :return: Interaction postfactors
+            (not including the values of the interactions themselves)
+        :rtype: 3D numpy array
+        """
+        c = np.empty(
+            (
+                self.n_W_ESV + self.n_W_mbr,
+                self.n_transformed_endmembers,
+                self.n_transformed_endmembers,
+            )
+        )
         for i in range(self.n_W_ESV):
             c[i] = self.c_ESV[i].f_rs * np.prod(
                 np.power(
@@ -1297,80 +1353,136 @@ class PolynomialSolution(IdealSolution):
         return c
 
     @material_property
-    def _dqdx(self):
+    def _dqdn(self):
+        """
+        The first derivative of the transformed endmember proportions
+        with respect to the original endmember amounts.
+
+        :return: dqdn
+        :rtype: 2D numpy array
+        """
         return np.einsum(
             "ik, km->im",
             self.dqdp,
-            dpdx(self.molar_fractions, 1.0, self.ones, self.eye),
+            dpdn(self.molar_fractions, 1.0, self.ones, self.eye),
         )
 
     @material_property
-    def _dc_xsdx(self):
-        return np.einsum("ir, rm->im", self._dc_xsdq, self._dqdx) + np.einsum(
+    def _dc_xsdn(self):
+        """
+        Calculates the first derivative of the product of
+        molar fractions raised to the exponents in each polynomial interaction
+        with respect to the endmember amounts.
+        :return: Interaction postfactors
+            (not including the values of the interactions themselves)
+        :rtype: 2D numpy array
+        """
+        return np.einsum("ir, rm->im", self._dc_xsdq, self._dqdn) + np.einsum(
             "i, m->im", self._c_xs, self.ones
         )
 
     @material_property
-    def _d2c_xsdxdx(self):
+    def _d2c_xsdndn(self):
+        """
+        Calculates the second derivative of the product of
+        molar fractions raised to the exponents in each polynomial interaction
+        with respect to the endmember amounts.
+        :return: Interaction postfactors
+            (not including the values of the interactions themselves)
+        :rtype: 3D numpy array
+        """
         n = 1.0
-        a1 = np.einsum("irs, sn, rm", self._d2c_xsdqdq, self._dqdx, self._dqdx)
-        a2a = 1.0 / n * (np.einsum("ir, rm, n", self._dc_xsdq, self._dqdx, self.ones))
+        a1 = np.einsum("irs, sn, rm", self._d2c_xsdqdq, self._dqdn, self._dqdn)
+        a2a = 1.0 / n * (np.einsum("ir, rm, n", self._dc_xsdq, self._dqdn, self.ones))
         a2 = a2a + np.einsum("imn->inm", a2a)
         a3 = np.einsum(
             "ir, rk, knm->inm",
             self._dc_xsdq,
             self.dqdp,
-            d2pdxdx(self.molar_fractions, n * n, self.ones, self.eyeones),
+            d2pdndn(self.molar_fractions, n * n, self.ones, self.eyeones),
         )
         return a1 + a2 + a3
 
     @material_property
-    def ESV_scalar_list(self):
-        if self.W_ESV is None:
-            return np.zeros((3))
-        else:
-            return np.einsum("ij, i->j", self.W_ESV, self._c_xs[:self.n_W_ESV])
+    def _ESV_gradient_list(self):
+        """
+        Calculates the first derivative of the
+        internal energy, entropy and volume
+        with respect to the endmember amounts.
 
-    @material_property
-    def ESV_gradient_list(self):
+        :return: dEdn, dSdn and dVdn.
+        :rtype: 2D numpy array
+        """
         if self.W_ESV is None:
             return np.zeros((3, self.n_endmembers))
         else:
-            return np.einsum("ij, ik->jk", self.W_ESV, self._dc_xsdx[:self.n_W_ESV])
+            return np.einsum("ij, ik->jk", self.W_ESV, self._dc_xsdn[: self.n_W_ESV])
 
     @material_property
-    def ESV_hessian_list(self):
+    def _ESV_hessian_list(self):
+        """
+        Calculates the second derivative of the
+        internal energy, entropy and volume
+        with respect to the endmember amounts.
+
+        :return: d2Edndn, d2Sdndn and d2Vdndn.
+        :rtype: 3D numpy array
+        """
         if self.W_ESV is None:
             return np.zeros((3, self.n_endmembers, self.n_endmembers))
         else:
-            return np.einsum("ij, ikl->jkl", self.W_ESV, self._d2c_xsdxdx[:self.n_W_ESV])
+            return np.einsum(
+                "ij, ikl->jkl", self.W_ESV, self._d2c_xsdndn[: self.n_W_ESV]
+            )
 
     @material_property
     def mbr_scalar_list(self):
+        """
+        :return: The value with which to multiply
+        each interaction endmember property to get the
+        total excess property.
+        :rtype: 1D numpy array
+        """
         if self.W_mbr is None:
             return np.zeros((0))
         else:
-            return np.einsum("ij, i->j", self.W_mbr, self._c_xs[self.n_W_ESV:])
+            return np.einsum("ij, i->j", self.W_mbr, self._c_xs[self.n_W_ESV :])
 
     @material_property
-    def mbr_gradient_list(self):
+    def _mbr_gradient_list(self):
+        """
+        :return: The values with which to multiply
+        each interaction endmember property to get the
+        first derivatives of the total excess property
+        with respect to the endmember amounts.
+        :rtype: 2D numpy array
+        """
         if self.W_mbr is None:
             return np.zeros((0, self.n_endmembers))
         else:
-            return np.einsum("ij, ik->jk", self.W_mbr, self._dc_xsdx[self.n_W_ESV:])
+            return np.einsum("ij, ik->jk", self.W_mbr, self._dc_xsdn[self.n_W_ESV :])
 
     @material_property
-    def mbr_hessian_list(self):
+    def _mbr_hessian_list(self):
+        """
+        :return: The values with which to multiply
+        each interaction endmember property to get the
+        second derivatives of the total excess property
+        with respect to the endmember amounts.
+        :rtype: 3D numpy array
+        """
         if self.W_mbr is None:
             return np.zeros((0, self.n_endmembers, self.n_endmembers))
         else:
-            return np.einsum("ij, ikl->jkl", self.W_mbr, self._d2c_xsdxdx[self.n_W_ESV:])
+            return np.einsum(
+                "ij, ikl->jkl", self.W_mbr, self._d2c_xsdndn[self.n_W_ESV :]
+            )
 
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
-        dEdx, dSdx, dVdx = self.ESV_gradient_list
-        mbr_gradients = self.mbr_gradient_list
+        dEdn, dSdn, dVdn = self._ESV_gradient_list
+        mbr_gradients = self._mbr_gradient_list
         mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
-        gibbs = dEdx - temperature * dSdx + pressure * dVdx
+        gibbs = dEdn - temperature * dSdn + pressure * dVdn
         gibbs += np.einsum("i, ij->j", mbr_gibbs, mbr_gradients)
         return gibbs
 
@@ -1390,55 +1502,55 @@ class PolynomialSolution(IdealSolution):
             self, temperature, molar_fractions
         )
 
-        dSdx = self.ESV_gradient_list[1]
-        mbr_gradients = self.mbr_gradient_list
+        dSdn = self._ESV_gradient_list[1]
+        mbr_gradients = self._mbr_gradient_list
         mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
 
-        non_ideal_entropies = dSdx + np.einsum("i, ij->j", mbr_entropies, mbr_gradients)
+        non_ideal_entropies = dSdn + np.einsum("i, ij->j", mbr_entropies, mbr_gradients)
         return ideal_entropies + non_ideal_entropies
 
     def excess_partial_volumes(self, pressure, temperature, molar_fractions):
-        dVdx = self.ESV_gradient_list[2]
-        mbr_gradients = self.mbr_gradient_list
+        dVdn = self._ESV_gradient_list[2]
+        mbr_gradients = self._mbr_gradient_list
         mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
 
-        return dVdx + np.einsum("i, ij->j", mbr_volumes, mbr_gradients)
+        return dVdn + np.einsum("i, ij->j", mbr_volumes, mbr_gradients)
 
     def gibbs_hessian(self, pressure, temperature, molar_fractions):
         ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(
             self, temperature, molar_fractions
         )
 
-        d2Edx2, d2Sdx2, d2Vdx2 = self.ESV_hessian_list
-        mbr_hessian = self.mbr_hessian_list
+        d2Edndn, d2Sdndn, d2Vdndn = self._ESV_hessian_list
+        mbr_hessian = self._mbr_hessian_list
         mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
 
-        d2Gdx2 = d2Edx2 - temperature * d2Sdx2 + pressure * d2Vdx2
-        d2Gdx2 += np.einsum("i, ijk->jk", mbr_gibbs, mbr_hessian)
+        d2Gdndn = d2Edndn - temperature * d2Sdndn + pressure * d2Vdndn
+        d2Gdndn += np.einsum("i, ijk->jk", mbr_gibbs, mbr_hessian)
 
-        return d2Gdx2 - temperature * ideal_entropy_hessian
+        return d2Gdndn - temperature * ideal_entropy_hessian
 
     def entropy_hessian(self, pressure, temperature, molar_fractions):
         ideal_entropy_hessian = IdealSolution._ideal_entropy_hessian(
             self, temperature, molar_fractions
         )
 
-        d2Sdx2 = self.ESV_hessian_list[1]
-        mbr_hessian = self.mbr_hessian_list
+        d2Sdndn = self._ESV_hessian_list[1]
+        mbr_hessian = self._mbr_hessian_list
         mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
 
-        d2Sdx2 += np.einsum("i, ijk->jk", mbr_entropies, mbr_hessian)
+        d2Sdndn += np.einsum("i, ijk->jk", mbr_entropies, mbr_hessian)
 
-        return d2Sdx2 + ideal_entropy_hessian
+        return d2Sdndn + ideal_entropy_hessian
 
     def volume_hessian(self, pressure, temperature, molar_fractions):
-        d2Vdx2 = self.ESV_hessian_list[2]
-        mbr_hessian = self.mbr_hessian_list
+        d2Vdndn = self._ESV_hessian_list[2]
+        mbr_hessian = self._mbr_hessian_list
         mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
 
-        d2Vdx2 += np.einsum("i, ijk->jk", mbr_volumes, mbr_hessian)
+        d2Vdndn += np.einsum("i, ijk->jk", mbr_volumes, mbr_hessian)
 
-        return d2Vdx2
+        return d2Vdndn
 
     def Cp_excess(self):
         mbr_scalar = self.mbr_scalar_list
