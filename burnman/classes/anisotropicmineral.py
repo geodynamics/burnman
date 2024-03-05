@@ -204,6 +204,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             self.anisotropic_params = anisotropic_parameters
             self.psi_function = psi_function
 
+        Psi_Voigt0 = self.psi_function(0.0, 0.0, self.anisotropic_params)[0]
+        if not np.all(Psi_Voigt0 == 0.0):
+            raise ValueError(
+                "All elements of Psi should evaluate to zero at "
+                "standard state. The current array evaluates to: "
+                f"{Psi_Voigt0}"
+            )
+
         # cell_vectors is the transpose of the cell tensor M
         self.cell_vectors_0 = cell_parameters_to_vectors(cell_parameters)
 

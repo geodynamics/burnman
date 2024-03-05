@@ -102,12 +102,12 @@ def plot_projected_elastic_properties(
     ticks = []
     lines = []
     for i, prp in enumerate(prps):
-        title, item = prp
+        title, values = prp
 
         axes[i].set_title(title)
 
-        vmin = np.min(item)
-        vmax = np.max(item)
+        vmin = np.min(values)
+        vmax = np.max(values)
         spacing = np.power(10.0, np.floor(np.log10(vmax - vmin)))
         nt = int((vmax - vmin - vmax % spacing + vmin % spacing) / spacing)
         if nt == 1:
@@ -124,14 +124,14 @@ def plot_projected_elastic_properties(
         ticks.append(np.linspace(tmin, tmax, nt))
         contour_sets.append(
             axes[i].contourf(
-                theta, r, item, n_divs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax
+                theta, r, values, n_divs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax
             )
         )
         lines.append(
             axes[i].contour(
-                theta, r, item, ticks[-1], colors=("black",), linewidths=(1,)
+                theta, r, values, ticks[-1], colors=("black",), linewidths=(1,)
             )
         )
-        axes[i].set_yticks([100])
+        axes[i].set_yticks([])
 
     return contour_sets, ticks, lines

@@ -61,8 +61,8 @@ def psi_func(f, Pth, params):
     Psi = (
         0.0
         + params["a"] * f
-        + params["b_1"] * np.exp(params["c_1"] * f)
-        + params["b_2"] * np.exp(params["c_2"] * f)
+        + params["b_1"] * (np.exp(params["c_1"] * f) - 1.0)
+        + params["b_2"] * (np.exp(params["c_2"] * f) - 1.0)
     )
     Psi = Psi + Pth / 1.0e9 * (
         params["b_3"] * np.exp(params["c_3"] * f)
@@ -379,8 +379,8 @@ print(
     f'the isotropic model: $V_0$: {m.params["V_0"]*1.e6:.5f} cm$^3$/mol, '
     f'$K_0$: {m.params["K_0"]/1.e9:.5f} GPa, '
     f'$K\'_0$: {m.params["Kprime_0"]:.5f}, '
-    f'$\Theta_0$: {m.params["Debye_0"]:.5f} K, '
-    f'$\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
+    f'$\\Theta_0$: {m.params["Debye_0"]:.5f} K, '
+    f'$\\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
     f'and $q_0$: {m.params["q_0"]:.5f}.'
 )
 
