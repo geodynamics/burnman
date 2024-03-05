@@ -114,8 +114,8 @@ def psi_func(f, Pth, params):
     Psi = (
         0.0
         + params["a"] * f
-        + params["b_1"] * np.exp(params["c_1"] * f)
-        + params["b_2"] * np.exp(params["c_2"] * f)
+        + params["b_1"] * (np.exp(params["c_1"] * f) - 1.0)
+        + params["b_2"] * (np.exp(params["c_2"] * f) - 1.0)
     )
     Psi = Psi + Pth / 1.0e9 * (
         params["b_3"] * np.exp(params["c_3"] * f)

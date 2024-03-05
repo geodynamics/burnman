@@ -124,7 +124,7 @@ def plot_projected_elastic_properties(
         ticks.append(np.linspace(tmin, tmax, nt))
         contour_sets.append(
             axes[i].contourf(
-                theta, r, values, n_divs, cmap="rainbow", vmin=vmin, vmax=vmax
+                theta, r, values, n_divs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax
             )
         )
         lines.append(
