@@ -41,13 +41,14 @@ class test_anisotropy(BurnManTest):
         d1 = [1.0, 0.0, 0.0]
         d2 = [0.0, 1.0, 0.0]
 
-        beta_100 = m.isentropic_linear_compressibility(direction=d1)
-        E_100 = m.isentropic_youngs_modulus(direction=d1)
+        ds = np.array([d1, d2])
+        beta_100 = m.isentropic_linear_compressibility(direction=ds)[0]
+        E_100 = m.isentropic_youngs_modulus(direction=ds)[0]
         G_100_010 = m.isentropic_shear_modulus(plane_normal=d1, shear_direction=d2)
         nu_100_010 = m.isentropic_poissons_ratio(
             axial_direction=d1, lateral_direction=d2
         )
-        wave_speeds, wave_directions = m.wave_velocities(propagation_direction=d1)
+        wave_speeds, _ = m.wave_velocities(propagation_direction=d1)
         Vp, Vs1, Vs2 = wave_speeds
 
         array_2 = [
