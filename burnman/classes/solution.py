@@ -421,7 +421,7 @@ class Solution(Mineral):
         )
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def isothermal_bulk_modulus_reuss(self):
         """
         Returns isothermal bulk modulus of the solution [Pa].
         Aliased with self.K_T.
@@ -433,7 +433,11 @@ class Solution(Mineral):
                 sum(
                     [
                         self.solution_model.endmembers[i][0].V
-                        / (self.solution_model.endmembers[i][0].K_T)
+                        / (
+                            self.solution_model.endmembers[i][
+                                0
+                            ].isothermal_bulk_modulus_reuss
+                        )
                         * self.molar_fractions[i]
                         for i in range(self.n_endmembers)
                     ]
@@ -442,42 +446,38 @@ class Solution(Mineral):
             )
         )
 
-    isothermal_bulk_modulus_reuss = isothermal_bulk_modulus
-
     @material_property
-    def adiabatic_bulk_modulus(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
         Returns adiabatic bulk modulus of the solution [Pa].
         Aliased with self.K_S.
         """
         if self.temperature < 1e-10:
-            return self.isothermal_bulk_modulus
+            return self.isothermal_bulk_modulus_reuss
         else:
             return (
-                self.isothermal_bulk_modulus
+                self.isothermal_bulk_modulus_reuss
                 * self.molar_heat_capacity_p
                 / self.molar_heat_capacity_v
             )
 
-    adiabatic_bulk_modulus_reuss = adiabatic_bulk_modulus
-
     @material_property
-    def isothermal_compressibility(self):
+    def isothermal_compressibility_reuss(self):
         """
         Returns isothermal compressibility of the solution.
         (or inverse isothermal bulk modulus) [1/Pa].
         Aliased with self.K_T.
         """
-        return 1.0 / self.isothermal_bulk_modulus
+        return 1.0 / self.isothermal_bulk_modulus_reuss
 
     @material_property
-    def adiabatic_compressibility(self):
+    def isentropic_compressibility_reuss(self):
         """
         Returns adiabatic compressibility of the solution.
         (or inverse adiabatic bulk modulus) [1/Pa].
         Aliased with self.K_S.
         """
-        return 1.0 / self.adiabatic_bulk_modulus
+        return 1.0 / self.isentropic_bulk_modulus_reuss
 
     @material_property
     def shear_modulus(self):
@@ -499,7 +499,7 @@ class Solution(Mineral):
         Aliased with self.v_p.
         """
         return np.sqrt(
-            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            (self.isentropic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
             / self.density
         )
 
@@ -509,7 +509,7 @@ class Solution(Mineral):
         Returns bulk sound speed of the solution [m/s].
         Aliased with self.v_phi.
         """
-        return np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return np.sqrt(self.isentropic_bulk_modulus_reuss / self.density)
 
     @material_property
     def shear_wave_velocity(self):
@@ -530,7 +530,7 @@ class Solution(Mineral):
         else:
             return (
                 self.thermal_expansivity
-                * self.isothermal_bulk_modulus
+                * self.isothermal_bulk_modulus_reuss
                 * self.molar_volume
                 / self.molar_heat_capacity_v
             )
@@ -567,7 +567,7 @@ class Solution(Mineral):
             * self.temperature
             * self.thermal_expansivity
             * self.thermal_expansivity
-            * self.isothermal_bulk_modulus
+            * self.isothermal_bulk_modulus_reuss
         )
 
     @material_property

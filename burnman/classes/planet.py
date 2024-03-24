@@ -537,7 +537,7 @@ class Planet(object):
         return self.evaluate(["molar_enthalpy"])
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def isothermal_bulk_modulus_reuss(self):
         """
         Returns isothermal bulk modulus of the planet.
 
@@ -547,10 +547,10 @@ class Planet(object):
         :returns: Isothermal bulk modulus in [Pa].
         :rtype: array of floats
         """
-        return self.evaluate(["isothermal_bulk_modulus"])
+        return self.evaluate(["isothermal_bulk_modulus_reuss"])
 
     @material_property
-    def adiabatic_bulk_modulus(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
         Returns the adiabatic bulk modulus of the planet.
 
@@ -560,10 +560,10 @@ class Planet(object):
         :returns: Adiabatic bulk modulus in [Pa].
         :rtype: array of floats
         """
-        return self.evaluate(["adiabatic_bulk_modulus"])
+        return self.evaluate(["isentropic_bulk_modulus_reuss"])
 
     @material_property
-    def isothermal_compressibility(self):
+    def isothermal_compressibility_reuss(self):
         """
         Returns isothermal compressibility of the planet
         (or inverse isothermal bulk modulus).
@@ -577,7 +577,7 @@ class Planet(object):
         return self.evaluate(["istothermal_compressibility"])
 
     @material_property
-    def adiabatic_compressibility(self):
+    def isentropic_compressibility_reuss(self):
         """
         Returns adiabatic compressibility of the planet
         (or inverse adiabatic bulk modulus).
@@ -588,7 +588,7 @@ class Planet(object):
         :returns: Adiabatic compressibility in [1/Pa].
         :rtype: array of floats
         """
-        return self.evaluate(["adiabatic_compressibility"])
+        return self.evaluate(["isentropic_compressibility_reuss"])
 
     @material_property
     def shear_modulus(self):
@@ -743,23 +743,23 @@ class Planet(object):
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus`"""
-        return self.isothermal_bulk_modulus
+        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus_reuss`"""
+        return self.isothermal_bulk_modulus_reuss
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus`"""
-        return self.adiabatic_bulk_modulus
+        """Alias for :func:`~burnman.Material.isentropic_bulk_modulus_reuss`"""
+        return self.isentropic_bulk_modulus_reuss
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
-        return self.isothermal_compressibility
+        """Alias for :func:`~burnman.Material.isothermal_compressibility_reuss`"""
+        return self.isothermal_compressibility_reuss
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
-        return self.adiabatic_compressibility
+        """Alias for :func:`~burnman.Material.isentropic_compressibility_reuss`"""
+        return self.isentropic_compressibility_reuss
 
     @property
     def G(self):

@@ -187,9 +187,9 @@ class Mineral(Material):
         )
 
     @material_property
-    @copy_documentation(Material.isothermal_bulk_modulus)
-    def isothermal_bulk_modulus(self):
-        K_T_orig = self.method.isothermal_bulk_modulus(
+    @copy_documentation(Material.isothermal_bulk_modulus_reuss)
+    def isothermal_bulk_modulus_reuss(self):
+        K_T_orig = self.method.isothermal_bulk_modulus_reuss(
             self.pressure, self.temperature, self._molar_volume_unmodified, self.params
         )
 
@@ -197,8 +197,6 @@ class Mineral(Material):
             (self._molar_volume_unmodified / K_T_orig)
             - self._property_modifiers["d2GdP2"]
         )
-
-    isothermal_bulk_modulus_reuss = isothermal_bulk_modulus
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_p)
@@ -307,39 +305,39 @@ class Mineral(Material):
         return self.molar_gibbs + self.temperature * self.molar_entropy
 
     @material_property
-    @copy_documentation(Material.adiabatic_bulk_modulus)
-    def adiabatic_bulk_modulus(self):
+    @copy_documentation(Material.isentropic_bulk_modulus_reuss)
+    def isentropic_bulk_modulus_reuss(self):
         if self.temperature < 1.0e-10:
-            return self.isothermal_bulk_modulus
+            return self.isothermal_bulk_modulus_reuss
         else:
             return (
-                self.isothermal_bulk_modulus
+                self.isothermal_bulk_modulus_reuss
                 * self.molar_heat_capacity_p
                 / self.molar_heat_capacity_v
             )
 
     @material_property
-    @copy_documentation(Material.isothermal_compressibility)
-    def isothermal_compressibility(self):
-        return 1.0 / self.isothermal_bulk_modulus
+    @copy_documentation(Material.isothermal_compressibility_reuss)
+    def isothermal_compressibility_reuss(self):
+        return 1.0 / self.isothermal_bulk_modulus_reuss
 
     @material_property
-    @copy_documentation(Material.adiabatic_compressibility)
-    def adiabatic_compressibility(self):
-        return 1.0 / self.adiabatic_bulk_modulus
+    @copy_documentation(Material.isentropic_compressibility_reuss)
+    def isentropic_compressibility_reuss(self):
+        return 1.0 / self.isentropic_bulk_modulus_reuss
 
     @material_property
     @copy_documentation(Material.p_wave_velocity)
     def p_wave_velocity(self):
         return np.sqrt(
-            (self.adiabatic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
+            (self.isentropic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
             / self.density
         )
 
     @material_property
     @copy_documentation(Material.bulk_sound_velocity)
     def bulk_sound_velocity(self):
-        return np.sqrt(self.adiabatic_bulk_modulus_reuss / self.density)
+        return np.sqrt(self.isentropic_bulk_modulus_reuss / self.density)
 
     @material_property
     @copy_documentation(Material.shear_wave_velocity)
@@ -353,7 +351,7 @@ class Mineral(Material):
         if np.abs(self.molar_heat_capacity_v) > eps:
             return (
                 self.thermal_expansivity
-                * self.isothermal_bulk_modulus
+                * self.isothermal_bulk_modulus_reuss
                 * self.molar_volume
                 / self.molar_heat_capacity_v
             )
@@ -380,7 +378,7 @@ class Mineral(Material):
             * self.temperature
             * self.thermal_expansivity
             * self.thermal_expansivity
-            * self.isothermal_bulk_modulus
+            * self.isothermal_bulk_modulus_reuss
         )
 
     @material_property

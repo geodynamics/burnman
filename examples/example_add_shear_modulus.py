@@ -50,7 +50,9 @@ if __name__ == "__main__":
             f = 0.5 * (np.power(x, 2.0 / 3.0) - 1.0)
             f2 = np.power(1.0 + 2.0 * f, 5.0 / 2.0)
             G_T = params["shear_modulus_0"] * np.exp(-gamma * phi)
-            K_PT = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+            K_PT = self.isothermal_bulk_modulus_reuss(
+                pressure, temperature, volume, params
+            )
             K_T = K_PT / ((1.0 - f * (5.0 - 3.0 * params["Kprime_0"])) * f2)
             G = G_T * f2 * (1.0 - f * (5.0 - 3.0 * params["Gprime_0"] * K_T / G_T))
             return G

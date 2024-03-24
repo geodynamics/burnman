@@ -418,7 +418,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         )
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def K_T(self):
         """
         Anisotropic minerals do not have a single isothermal bulk modulus.
         This function returns a NotImplementedError. Users should instead
@@ -427,16 +427,16 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         or directly querying the elements in the isothermal_stiffness_tensor.
         """
         raise NotImplementedError(
-            "isothermal_bulk_modulus is not "
+            "K_T is not "
             "sufficiently explicit for an "
             "anisotropic mineral. Did you mean "
             "isothermal_bulk_modulus_reuss?"
         )
 
-    isothermal_bulk_modulus_reuss = Mineral.isothermal_bulk_modulus
+    isothermal_bulk_modulus_reuss = Mineral.isothermal_bulk_modulus_reuss
 
     @material_property
-    def isentropic_bulk_modulus(self):
+    def K_S(self):
         """
         Anisotropic minerals do not have a single isentropic bulk modulus.
         This function returns a NotImplementedError. Users should instead
@@ -445,16 +445,16 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         or directly querying the elements in the isentropic_stiffness_tensor.
         """
         raise NotImplementedError(
-            "isentropic_bulk_modulus is not "
+            "K_S is not "
             "sufficiently explicit for an "
             "anisotropic mineral. Did you mean "
             "isentropic_bulk_modulus_reuss?"
         )
 
-    isentropic_bulk_modulus_reuss = Mineral.adiabatic_bulk_modulus
+    isentropic_bulk_modulus_reuss = Mineral.isentropic_bulk_modulus_reuss
 
     @material_property
-    def isothermal_compressibility(self):
+    def beta_T(self):
         """
         Anisotropic minerals do not have a single isentropic compressibility.
         This function returns a NotImplementedError. Users should instead
@@ -463,14 +463,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         or directly querying the elements in the isothermal_compliance_tensor.
         """
         raise NotImplementedError(
-            "isothermal_compressibility is not "
+            "beta_T is not "
             "sufficiently explicit for an "
             "anisotropic mineral. Did you mean "
             "isothermal_compressibility_reuss?"
         )
 
     @material_property
-    def isentropic_compressibility(self):
+    def beta_S(self):
         """
         Anisotropic minerals do not have a single isentropic compressibility.
         This function returns a NotImplementedError. Users should instead
@@ -479,7 +479,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         or directly querying the elements in the isentropic_compliance_tensor.
         """
         raise NotImplementedError(
-            "isentropic_compressibility is not "
+            "beta_S is not "
             "sufficiently explicit for an "
             "anisotropic mineral. Did you mean "
             "isentropic_compressibility_reuss?"
@@ -518,8 +518,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         :rtype: float
         """
         return 1.0 / self.isentropic_bulk_modulus_reuss
-
-    beta_S = isentropic_compressibility_reuss
 
     @material_property
     def isentropic_compressibility_voigt(self):

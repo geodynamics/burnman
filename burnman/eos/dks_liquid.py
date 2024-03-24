@@ -606,7 +606,7 @@ class DKS_L(eos.EquationOfState):
             )
         return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`[Pa]`
         """
@@ -618,11 +618,13 @@ class DKS_L(eos.EquationOfState):
         )
         return K_T
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus. :math:`[Pa]`
         """
-        K_S = self.isothermal_bulk_modulus(pressure, temperature, volume, params) * (
+        K_S = self.isothermal_bulk_modulus_reuss(
+            pressure, temperature, volume, params
+        ) * (
             1.0
             + temperature
             * self.thermal_expansivity(pressure, temperature, volume, params)
@@ -676,9 +678,9 @@ class DKS_L(eos.EquationOfState):
         """
         Returns thermal expansivity. :math:`[1/K]`
         """
-        alpha = self._aK_T(temperature, volume, params) / self.isothermal_bulk_modulus(
-            0.0, temperature, volume, params
-        )
+        alpha = self._aK_T(
+            temperature, volume, params
+        ) / self.isothermal_bulk_modulus_reuss(0.0, temperature, volume, params)
         return alpha
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):

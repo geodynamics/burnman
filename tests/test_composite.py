@@ -303,12 +303,13 @@ class composite(BurnManTest):
 
         self.assertFloatEqual(rock1.molar_volume, min1.params["V_0"])
         self.assertFloatEqual(rock1.molar_mass, min1.params["molar_mass"])
-        self.assertFloatEqual(rock1.isothermal_bulk_modulus, min1.params["K_0"])
+        self.assertFloatEqual(rock1.isothermal_bulk_modulus_reuss, min1.params["K_0"])
         self.assertFloatEqual(
-            rock1.isothermal_compressibility, 1.0 / min1.params["K_0"]
+            rock1.isothermal_compressibility_reuss, 1.0 / min1.params["K_0"]
         )
         self.assertFloatEqual(
-            rock1.adiabatic_compressibility, 1.0 / rock1.adiabatic_bulk_modulus
+            rock1.isentropic_compressibility_reuss,
+            1.0 / rock1.isentropic_bulk_modulus_reuss,
         )
         self.assertFloatEqual(rock1.grueneisen_parameter, min1.params["grueneisen_0"])
         self.assertFloatEqual(rock1.thermal_expansivity, min1.alpha)

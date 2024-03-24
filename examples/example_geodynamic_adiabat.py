@@ -154,7 +154,7 @@ if __name__ == "__main__":
             "rho",
             "molar_heat_capacity_p",
             "thermal_expansivity",
-            "isothermal_compressibility",
+            "isothermal_compressibility_reuss",
             "p_wave_velocity",
             "shear_wave_velocity",
         ],

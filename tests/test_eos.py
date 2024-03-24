@@ -152,15 +152,15 @@ class eos(BurnManTest):
         for i in eoses:
             Volume_test = i.volume(pressure, temperature, rock.params)
             self.assertFloatEqual(Volume_test, rock.params["V_0"])
-            Kt_test = i.isothermal_bulk_modulus(
+            Kt_test = i.isothermal_bulk_modulus_reuss(
                 pressure, 300.0, rock.params["V_0"], rock.params
             )
             self.assertFloatEqual(Kt_test, rock.params["K_0"])
             # K_S is based on 0 reference temperature:
-            Kt_test = i.isothermal_bulk_modulus(
+            Kt_test = i.isothermal_bulk_modulus_reuss(
                 pressure, 0.0, rock.params["V_0"], rock.params
             )
-            K_test = i.adiabatic_bulk_modulus(
+            K_test = i.isentropic_bulk_modulus_reuss(
                 pressure, 0.0, rock.params["V_0"], rock.params
             )
             self.assertFloatEqual(K_test, Kt_test)
@@ -212,7 +212,7 @@ class eos(BurnManTest):
 
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Kt_test = eos.isothermal_bulk_modulus(
+        Kt_test = eos.isothermal_bulk_modulus_reuss(
             pressure, 300.0, rock.params["V_0"], rock.params
         )
         self.assertFloatEqual(Kt_test, rock.params["K_0"])
@@ -229,7 +229,7 @@ class eos(BurnManTest):
 
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Kt_test = eos.isothermal_bulk_modulus(
+        Kt_test = eos.isothermal_bulk_modulus_reuss(
             pressure, 300.0, rock.params["V_0"], rock.params
         )
         self.assertFloatEqual(Kt_test, rock.params["K_0"])
@@ -245,7 +245,7 @@ class eos(BurnManTest):
         eos = burnman.eos.Morse()
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Kt_test = eos.isothermal_bulk_modulus(
+        Kt_test = eos.isothermal_bulk_modulus_reuss(
             pressure, 300.0, rock.params["V_0"], rock.params
         )
         self.assertFloatEqual(Kt_test, rock.params["K_0"])
@@ -261,7 +261,7 @@ class eos(BurnManTest):
         eos = burnman.eos.RKprime()
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Kt_test = eos.isothermal_bulk_modulus(
+        Kt_test = eos.isothermal_bulk_modulus_reuss(
             pressure, 300.0, rock.params["V_0"], rock.params
         )
         self.assertFloatEqual(Kt_test, rock.params["K_0"])
@@ -277,7 +277,7 @@ class eos(BurnManTest):
         eos = burnman.eos.AA()
         Volume_test = eos.volume(pressure, temperature, rock.params)
         self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Ks_test = eos.adiabatic_bulk_modulus(
+        Ks_test = eos.isentropic_bulk_modulus_reuss(
             pressure, temperature, rock.params["V_0"], rock.params
         )
         self.assertFloatEqual(Ks_test, rock.params["K_S"])

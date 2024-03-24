@@ -626,7 +626,7 @@ class Layer(object):
         )
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def isothermal_bulk_modulus_reuss(self):
         """
         Returns isothermal bulk moduli across the layer.
 
@@ -640,13 +640,13 @@ class Layer(object):
         """
         return np.array(
             [
-                self.sublayers[i].isothermal_bulk_modulus
+                self.sublayers[i].isothermal_bulk_modulus_reuss
                 for i in range(len(self.sublayers))
             ]
         )
 
     @material_property
-    def adiabatic_bulk_modulus(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
         Returns the adiabatic bulk moduli across the layer.
 
@@ -658,13 +658,13 @@ class Layer(object):
         """
         return np.array(
             [
-                self.sublayers[i].adiabatic_bulk_modulus
+                self.sublayers[i].isentropic_bulk_modulus_reuss
                 for i in range(len(self.sublayers))
             ]
         )
 
     @material_property
-    def isothermal_compressibility(self):
+    def isothermal_compressibility_reuss(self):
         """
         Returns isothermal compressibilities across the layer
         (or inverse isothermal bulk moduli).
@@ -677,13 +677,13 @@ class Layer(object):
         """
         return np.array(
             [
-                self.sublayers[i].isothermal_compressibility
+                self.sublayers[i].isothermal_compressibility_reuss
                 for i in range(len(self.sublayers))
             ]
         )
 
     @material_property
-    def adiabatic_compressibility(self):
+    def isentropic_compressibility_reuss(self):
         """
         Returns adiabatic compressibilities across the layer
         (or inverse adiabatic bulk moduli).
@@ -696,7 +696,7 @@ class Layer(object):
         """
         return np.array(
             [
-                self.sublayers[i].adiabatic_compressibility
+                self.sublayers[i].isentropic_compressibility_reuss
                 for i in range(len(self.sublayers))
             ]
         )
@@ -875,23 +875,23 @@ class Layer(object):
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.Layer.isothermal_bulk_modulus`"""
-        return self.isothermal_bulk_modulus
+        """Alias for :func:`~burnman.Layer.isothermal_bulk_modulus_reuss`"""
+        return self.isothermal_bulk_modulus_reuss
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.Layer.adiabatic_bulk_modulus`"""
-        return self.adiabatic_bulk_modulus
+        """Alias for :func:`~burnman.Layer.isentropic_bulk_modulus_reuss`"""
+        return self.isentropic_bulk_modulus_reuss
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.Layer.isothermal_compressibility`"""
-        return self.isothermal_compressibility
+        """Alias for :func:`~burnman.Layer.isothermal_compressibility_reuss`"""
+        return self.isothermal_compressibility_reuss
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.Layer.adiabatic_compressibility`"""
-        return self.adiabatic_compressibility
+        """Alias for :func:`~burnman.Layer.isentropic_compressibility_reuss`"""
+        return self.isentropic_compressibility_reuss
 
     @property
     def G(self):

@@ -558,9 +558,11 @@ def check_slb_fig7_txt():
         forsterite.set_state(pressure[i], temperature[i])
         rho_comp[i] = 100.0 * (forsterite.density / 1000.0 - rho[i]) / rho[i]
         Kt_comp[i] = (
-            100.0 * (forsterite.isothermal_bulk_modulus / 1.0e9 - Kt[i]) / Kt[i]
+            100.0 * (forsterite.isothermal_bulk_modulus_reuss / 1.0e9 - Kt[i]) / Kt[i]
         )
-        Ks_comp[i] = 100.0 * (forsterite.adiabatic_bulk_modulus / 1.0e9 - Ks[i]) / Ks[i]
+        Ks_comp[i] = (
+            100.0 * (forsterite.isentropic_bulk_modulus_reuss / 1.0e9 - Ks[i]) / Ks[i]
+        )
         G_comp[i] = 100.0 * (forsterite.shear_modulus / 1.0e9 - G[i]) / G[i]
         VB_comp[i] = 100.0 * (forsterite.v_phi / 1000.0 - VB[i]) / VB[i]
         VS_comp[i] = 100.0 * (forsterite.v_s / 1000.0 - VS[i]) / VS[i]
@@ -646,13 +648,13 @@ def check_slb_fig7():
 
     pressure = 1.0e5
     forsterite.set_state(pressure, 300.0)
-    Ks_0 = forsterite.adiabatic_bulk_modulus
+    Ks_0 = forsterite.isentropic_bulk_modulus_reuss
 
     # calculate its thermal properties
     for i in range(len(temperature)):
         forsterite.set_state(pressure, temperature[i])
         volume[i] = forsterite.molar_volume / forsterite.params["V_0"]
-        bulk_modulus[i] = forsterite.adiabatic_bulk_modulus / Ks_0
+        bulk_modulus[i] = forsterite.isentropic_bulk_modulus_reuss / Ks_0
         shear_modulus[i] = forsterite.shear_modulus / forsterite.params["G_0"]
         heat_capacity[i] = forsterite.molar_heat_capacity_p / forsterite.params["n"]
 

@@ -24,7 +24,7 @@ class PerpleX(BurnManTest):
                 "grueneisen_parameter",
                 "alpha",
                 "V",
-                "adiabatic_bulk_modulus",
+                "isentropic_bulk_modulus_reuss",
                 "molar_heat_capacity_p",
             ],
             [10.0e9, 11.0e9],
