@@ -653,6 +653,21 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         )
 
     @material_property
+    def molar_heat_capacity_v(self):
+        """
+        :returns: The isochoric, hydrostatic heat capacity [J/K/mol].
+        :rtype: float
+        """
+        return (
+            self.molar_heat_capacity_p
+            - self.molar_volume
+            * self.temperature
+            * self.thermal_expansivity
+            * self.thermal_expansivity
+            * self.isothermal_bulk_modulus_reuss
+        )
+
+    @material_property
     def grueneisen_parameter(self):
         """
         :returns: The scalar grueneisen parameter [unitless].
