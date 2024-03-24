@@ -167,7 +167,7 @@ class AnisotropicMaterial(Material):
     def isentropic_isotropic_poisson_ratio(self):
         """
         :returns: The isotropic Poisson ratio (mu) [unitless].
-            A metric of the laterial response to loading.
+            A metric of the lateral response to loading.
         :rtype: float
         """
         return (
@@ -187,14 +187,11 @@ class AnisotropicMaterial(Material):
         :rtype: float
         """
         propagation_direction = unit_normalize(propagation_direction)
-        Tik = np.tensordot(
-            np.tensordot(
-                self.full_isentropic_stiffness_tensor,
-                propagation_direction,
-                axes=([1], [0]),
-            ),
+        Tik = np.einsum(
+            "ijkl, ...j, ...l",
+            self.full_isentropic_stiffness_tensor,
             propagation_direction,
-            axes=([2], [0]),
+            propagation_direction,
         )
         return Tik
 
@@ -205,8 +202,12 @@ class AnisotropicMaterial(Material):
         :rtype: float
         """
         direction = unit_normalize(direction)
-        Sijkk = np.einsum("ijkk", self.full_isentropic_compliance_tensor)
-        beta = Sijkk.dot(direction).dot(direction)
+        beta = np.einsum(
+            "ijkk, ...i, ...j",
+            self.full_isentropic_compliance_tensor,
+            direction,
+            direction,
+        )
         return beta
 
     def isentropic_youngs_modulus(self, direction):
@@ -216,8 +217,14 @@ class AnisotropicMaterial(Material):
         :rtype: float
         """
         direction = unit_normalize(direction)
-        Sijkl = self.full_isentropic_compliance_tensor
-        S = Sijkl.dot(direction).dot(direction).dot(direction).dot(direction)
+        S = np.einsum(
+            "ijkl, ...i, ...j, ...k, ...l",
+            self.full_isentropic_compliance_tensor,
+            direction,
+            direction,
+            direction,
+            direction,
+        )
         return 1.0 / S
 
     def isentropic_shear_modulus(self, plane_normal, shear_direction):
@@ -232,13 +239,16 @@ class AnisotropicMaterial(Material):
         assert (
             np.abs(plane_normal.dot(shear_direction)) < np.finfo(float).eps
         ), "plane_normal and shear_direction must be orthogonal"
-        Sijkl = self.full_isentropic_compliance_tensor
-        G = (
-            Sijkl.dot(shear_direction)
-            .dot(plane_normal)
-            .dot(shear_direction)
-            .dot(plane_normal)
+
+        G = np.einsum(
+            "ijkl, ...i, ...j, ...k, ...l",
+            self.full_isentropic_compliance_tensor,
+            shear_direction,
+            plane_normal,
+            shear_direction,
+            plane_normal,
         )
+
         return 0.25 / G
 
     def isentropic_poissons_ratio(self, axial_direction, lateral_direction):
@@ -250,14 +260,28 @@ class AnisotropicMaterial(Material):
 
         axial_direction = unit_normalize(axial_direction)
         lateral_direction = unit_normalize(lateral_direction)
-        assert (
-            np.abs(axial_direction.dot(lateral_direction)) < np.finfo(float).eps
-        ), "axial_direction and lateral_direction must be orthogonal"
 
-        Sijkl = self.full_isentropic_compliance_tensor
-        x = axial_direction
-        y = lateral_direction
-        nu = -(Sijkl.dot(y).dot(y).dot(x).dot(x) / Sijkl.dot(x).dot(x).dot(x).dot(x))
+        if len(axial_direction.shape) == 1:
+            assert (
+                np.abs(np.einsum("i, i", axial_direction, lateral_direction)) < 1.0e-12
+            ), "axial_direction and lateral_direction must be orthogonal"
+        else:
+            dot = np.einsum("...i, ...i->...", axial_direction, lateral_direction)
+            assert np.all(
+                np.abs(dot) < 1.0e-12
+            ), "axial_direction and lateral_direction must be orthogonal"
+
+        nu = -(
+            self.isentropic_youngs_modulus(axial_direction)
+            * np.einsum(
+                "ijkl, ...i, ...j, ...k, ...l",
+                self.full_isentropic_compliance_tensor,
+                lateral_direction,
+                lateral_direction,
+                axial_direction,
+                axial_direction,
+            )
+        )
         return nu
 
     def wave_velocities(self, propagation_direction):
@@ -267,15 +291,16 @@ class AnisotropicMaterial(Material):
         :rtype: list, containing the wave speeds and directions
             of particle motion relative to the stiffness tensor
         """
-        propagation_direction = unit_normalize(propagation_direction)
-
         Tik = self.christoffel_tensor(propagation_direction)
 
         eigenvalues, eigenvectors = np.linalg.eig(Tik)
 
-        idx = eigenvalues.argsort()[::-1]
-        eigenvalues = np.real(eigenvalues[idx])
-        eigenvectors = eigenvectors[:, idx]
+        # sort eigs by decreasing eigenvalue
+        idx = np.flip(eigenvalues.argsort(axis=-1), axis=-1)
+        vidx = np.expand_dims(idx, -1)
+        eigenvalues = np.take_along_axis(eigenvalues, idx, axis=-1)
+        eigenvectors = np.take_along_axis(eigenvectors, vidx, axis=-2)
+        eigenvalues = np.real(eigenvalues)
         velocities = np.sqrt(eigenvalues / self.density)
 
         return velocities, eigenvectors
