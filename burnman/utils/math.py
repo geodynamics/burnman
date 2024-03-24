@@ -553,3 +553,16 @@ def generate_complete_basis(incomplete_basis, array):
         )
 
     return complete_basis.round(decimals=12) + 0.0
+
+
+def is_positive_definite(matrix):
+    """
+    Checks if a matrix is positive definite
+
+    :param matrix: Input matrix
+    :type matrix: 2D numpy array
+
+    :return: Whether or not the matrix is positive definite
+    :rtype: bool
+    """
+    return np.all(np.linalg.eigvals(matrix) > 0)
