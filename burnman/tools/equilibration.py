@@ -318,7 +318,9 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "V":  # dV/dx
             # dV/dP = -V/K_T, dV/dT = aV
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles * assemblage.molar_volume / assemblage.K_T,
+                -assemblage.n_moles
+                * assemblage.molar_volume
+                / assemblage.isothermal_bulk_modulus_reuss,
                 assemblage.n_moles * assemblage.molar_volume,
             ]
             j = 2
