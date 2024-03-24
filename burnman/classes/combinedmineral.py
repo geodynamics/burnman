@@ -98,12 +98,12 @@ class CombinedMineral(Mineral):
         return self.mixture.molar_entropy - self._property_modifiers["dGdT"]
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def isothermal_bulk_modulus_reuss(self):
         """
         Returns isothermal bulk modulus of the mineral [Pa]
         Aliased with self.K_T
         """
-        K_T_orig = self.mixture.isothermal_bulk_modulus
+        K_T_orig = self.mixture.isothermal_bulk_modulus_reuss
 
         return self.molar_volume / (
             (self._molar_volume_unmodified / K_T_orig)
@@ -197,37 +197,37 @@ class CombinedMineral(Mineral):
         return self.molar_gibbs + self.temperature * self.molar_entropy
 
     @material_property
-    def adiabatic_bulk_modulus(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
         Aliased with self.K_S
         """
         if self.temperature < 1.0e-10:
-            return self.isothermal_bulk_modulus
+            return self.isothermal_bulk_modulus_reuss
         else:
             return (
-                self.isothermal_bulk_modulus
+                self.isothermal_bulk_modulus_reuss
                 * self.molar_heat_capacity_p
                 / self.molar_heat_capacity_v
             )
 
     @material_property
-    def isothermal_compressibility(self):
+    def isothermal_compressibility_reuss(self):
         """
         Returns isothermal compressibility of the mineral
         (or inverse isothermal bulk modulus) [1/Pa]
         Aliased with self.K_T
         """
-        return 1.0 / self.isothermal_bulk_modulus
+        return 1.0 / self.isothermal_bulk_modulus_reuss
 
     @material_property
-    def adiabatic_compressibility(self):
+    def isentropic_compressibility_reuss(self):
         """
         Returns adiabatic compressibility of the mineral
         (or inverse adiabatic bulk modulus) [1/Pa]
         Aliased with self.K_S
         """
-        return 1.0 / self.adiabatic_bulk_modulus
+        return 1.0 / self.isentropic_bulk_modulus_reuss
 
     @material_property
     def p_wave_velocity(self):
@@ -236,7 +236,7 @@ class CombinedMineral(Mineral):
         Aliased with self.v_p
         """
         return np.sqrt(
-            (self.adiabatic_bulk_modulus + 4.0 / 3.0 * self.shear_modulus)
+            (self.isentropic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
             / self.density
         )
 
@@ -246,7 +246,7 @@ class CombinedMineral(Mineral):
         Returns bulk sound speed of the mineral [m/s]
         Aliased with self.v_phi
         """
-        return np.sqrt(self.adiabatic_bulk_modulus / self.density)
+        return np.sqrt(self.isentropic_bulk_modulus_reuss / self.density)
 
     @material_property
     def shear_wave_velocity(self):
@@ -267,7 +267,7 @@ class CombinedMineral(Mineral):
         else:
             return (
                 self.thermal_expansivity
-                * self.isothermal_bulk_modulus
+                * self.isothermal_bulk_modulus_reuss
                 * self.molar_volume
                 / self.molar_heat_capacity_v
             )
@@ -284,5 +284,5 @@ class CombinedMineral(Mineral):
             * self.temperature
             * self.thermal_expansivity
             * self.thermal_expansivity
-            * self.isothermal_bulk_modulus
+            * self.isothermal_bulk_modulus_reuss
         )

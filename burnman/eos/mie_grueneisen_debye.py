@@ -52,7 +52,7 @@ class MGDBase(eos.EquationOfState):
             )
         return opt.brentq(func, sol[0], sol[1])
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ B8
@@ -102,7 +102,7 @@ class MGDBase(eos.EquationOfState):
         """
         C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params["V_0"] / volume, params)
-        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
 
@@ -117,12 +117,12 @@ class MGDBase(eos.EquationOfState):
         C_p = C_v * (1.0 + gr * alpha * temperature)
         return C_p
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ D6
         """
-        K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params["V_0"] / volume, params)
         K_S = K_T * (1.0 + gr * alpha * temperature)

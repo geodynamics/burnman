@@ -92,9 +92,11 @@ def check_slb_fig7_txt():
         forsterite.set_state(pressure[i], temperature[i])
         rho_comp[i] = 100.0 * (forsterite.density / 1000.0 - rho[i]) / rho[i]
         Kt_comp[i] = (
-            100.0 * (forsterite.isothermal_bulk_modulus / 1.0e9 - Kt[i]) / Kt[i]
+            100.0 * (forsterite.isothermal_bulk_modulus_reuss / 1.0e9 - Kt[i]) / Kt[i]
         )
-        Ks_comp[i] = 100.0 * (forsterite.adiabatic_bulk_modulus / 1.0e9 - Ks[i]) / Ks[i]
+        Ks_comp[i] = (
+            100.0 * (forsterite.isentropic_bulk_modulus_reuss / 1.0e9 - Ks[i]) / Ks[i]
+        )
         G_comp[i] = 100.0 * (forsterite.shear_modulus / 1.0e9 - G[i]) / G[i]
         VB_comp[i] = 100.0 * (forsterite.v_phi / 1000.0 - VB[i]) / VB[i]
         VS_comp[i] = 100.0 * (forsterite.v_s / 1000.0 - VS[i]) / VS[i]

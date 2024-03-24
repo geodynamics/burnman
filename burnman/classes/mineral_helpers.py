@@ -79,20 +79,20 @@ class HelperRockSwitcher(Material):
         return self.current_rock.molar_enthalpy
 
     @material_property
-    def isothermal_bulk_modulus(self):
-        return self.current_rock.isothermal_bulk_modulus
+    def isothermal_bulk_modulus_reuss(self):
+        return self.current_rock.isothermal_bulk_modulus_reuss
 
     @material_property
-    def adiabatic_bulk_modulus(self):
-        return self.current_rock.adiabatic_bulk_modulus
+    def isentropic_bulk_modulus_reuss(self):
+        return self.current_rock.isentropic_bulk_modulus_reuss
 
     @material_property
-    def isothermal_compressibility(self):
-        return self.current_rock.isothermal_compressibility
+    def isothermal_compressibility_reuss(self):
+        return self.current_rock.isothermal_compressibility_reuss
 
     @material_property
-    def adiabatic_compressibility(self):
-        return self.current_rock.adiabatic_compressibility
+    def isentropic_compressibility_reuss(self):
+        return self.current_rock.isentropic_compressibility_reuss
 
     @material_property
     def shear_modulus(self):

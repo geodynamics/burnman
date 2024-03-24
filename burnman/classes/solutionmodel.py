@@ -1569,7 +1569,10 @@ class PolynomialSolution(IdealSolution):
     def VoverKT_excess(self):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdp = np.array(
-            [mbr.V / mbr.K_T for mbr in self.interaction_endmembers]
+            [
+                mbr.V / mbr.isothermal_bulk_modulus_reuss
+                for mbr in self.interaction_endmembers
+            ]
         )
         return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdp)
 

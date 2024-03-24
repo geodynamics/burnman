@@ -49,7 +49,7 @@ class CORK(eos.EquationOfState):
         temperature, and volume.
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         return alpha * K_T * volume / C_V
 
@@ -75,7 +75,7 @@ class CORK(eos.EquationOfState):
         )
         return V
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ 13+2
@@ -119,7 +119,7 @@ class CORK(eos.EquationOfState):
         C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
         V = self.volume(pressure, temperature, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         return C_p - V * temperature * alpha * alpha * K_T
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
@@ -215,12 +215,12 @@ class CORK(eos.EquationOfState):
 
         return Cp0 - temperature * d2RTlnfdTdT
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].
         """
-        K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
         C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         K_S = K_T * C_p / C_v

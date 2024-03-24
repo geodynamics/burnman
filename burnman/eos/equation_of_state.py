@@ -103,7 +103,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         :param pressure: Pressure at which to evaluate the equation of state
             :math:`[Pa]`.
@@ -126,7 +126,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         :param pressure: Pressure at which to evaluate the equation of state
             :math:`[Pa]`.

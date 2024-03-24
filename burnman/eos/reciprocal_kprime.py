@@ -175,14 +175,14 @@ class RKprime(eos.EquationOfState):
             )
         )
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
         return bulk_modulus(pressure, params)
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
         """
@@ -231,7 +231,7 @@ class RKprime(eos.EquationOfState):
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         # G = E0 + int VdP (when S = 0)
-        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         return (
             params["E_0"]
             + params["P_0"] * params["V_0"]

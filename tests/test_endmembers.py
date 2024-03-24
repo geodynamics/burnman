@@ -93,14 +93,16 @@ class test_endmembers(BurnManTest):
         bdg = burnman.minerals.Matas_etal_2007.mg_perovskite()
         bdg.set_state(1.0e5, 300.0)
         self.assertFloatEqual(bdg.grueneisen_parameter, bdg.params["grueneisen_0"])
-        self.assertFloatEqual(bdg.isothermal_bulk_modulus, bdg.params["K_0"])
+        self.assertFloatEqual(bdg.isothermal_bulk_modulus_reuss, bdg.params["K_0"])
         self.assertFloatEqual(bdg.molar_volume, bdg.params["V_0"])
         self.assertFloatEqual(bdg.shear_modulus, bdg.params["G_0"])
         bdg.set_state(1.0e5, 0.0)
         self.assertFloatEqual(bdg.molar_heat_capacity_v, 0.0)
         self.assertFloatEqual(bdg.molar_heat_capacity_p, 0.0)
         self.assertFloatEqual(bdg.thermal_expansivity, 0.0)
-        self.assertFloatEqual(bdg.isothermal_bulk_modulus, bdg.adiabatic_bulk_modulus)
+        self.assertFloatEqual(
+            bdg.isothermal_bulk_modulus_reuss, bdg.isentropic_bulk_modulus_reuss
+        )
 
     def test_make_mbr(self):
         bdg = burnman.minerals.SLB_2011.mg_perovskite()

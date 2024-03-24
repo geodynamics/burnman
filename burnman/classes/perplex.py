@@ -5,7 +5,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import time
 import subprocess
 from os import rename
 
@@ -355,13 +354,13 @@ class PerplexMaterial(Material):
         return self._property_interpolators["S"]([self.pressure, self.temperature])[0]
 
     @material_property
-    @copy_documentation(Material.isothermal_bulk_modulus)
-    def isothermal_bulk_modulus(self):
+    @copy_documentation(Material.isothermal_bulk_modulus_reuss)
+    def isothermal_bulk_modulus_reuss(self):
         return self._property_interpolators["K_T"]([self.pressure, self.temperature])[0]
 
     @material_property
-    @copy_documentation(Material.adiabatic_bulk_modulus)
-    def adiabatic_bulk_modulus(self):
+    @copy_documentation(Material.isentropic_bulk_modulus_reuss)
+    def isentropic_bulk_modulus_reuss(self):
         return self._property_interpolators["K_S"]([self.pressure, self.temperature])[0]
 
     @material_property
@@ -443,14 +442,14 @@ class PerplexMaterial(Material):
         return self.molar_gibbs - self.pressure * self.molar_volume
 
     @material_property
-    @copy_documentation(Material.isothermal_compressibility)
-    def isothermal_compressibility(self):
-        return 1.0 / self.isothermal_bulk_modulus
+    @copy_documentation(Material.isothermal_compressibility_reuss)
+    def isothermal_compressibility_reuss(self):
+        return 1.0 / self.isothermal_bulk_modulus_reuss
 
     @material_property
-    @copy_documentation(Material.adiabatic_compressibility)
-    def adiabatic_compressibility(self):
-        return 1.0 / self.adiabatic_bulk_modulus
+    @copy_documentation(Material.isentropic_compressibility_reuss)
+    def isentropic_compressibility_reuss(self):
+        return 1.0 / self.isentropic_bulk_modulus_reuss
 
     @material_property
     @copy_documentation(Material.molar_heat_capacity_v)
@@ -461,7 +460,7 @@ class PerplexMaterial(Material):
             * self.temperature
             * self.thermal_expansivity
             * self.thermal_expansivity
-            * self.isothermal_bulk_modulus
+            * self.isothermal_bulk_modulus_reuss
         )
 
     @material_property
@@ -470,6 +469,6 @@ class PerplexMaterial(Material):
         return (
             self.thermal_expansivity
             * self.molar_volume
-            * self.adiabatic_bulk_modulus
+            * self.isentropic_bulk_modulus_reuss
             / self.molar_heat_capacity_p
         )

@@ -115,13 +115,13 @@ class MT(eos.EquationOfState):
         """
         return modified_tait(params["V_0"] / volume, params)
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` of the mineral. :math:`[Pa]`.
         """
         return bulk_modulus(pressure, params)
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[Pa]`
         """

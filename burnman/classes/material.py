@@ -436,7 +436,7 @@ class Material(object):
         )
 
     @material_property
-    def isothermal_bulk_modulus(self):
+    def isothermal_bulk_modulus_reuss(self):
         """
         Returns isothermal bulk modulus of the material.
 
@@ -447,11 +447,11 @@ class Material(object):
         :rtype: float
         """
         raise NotImplementedError(
-            "need to implement isothermal_bulk_moduls() in derived class!"
+            "need to implement isothermal_bulk_modulus_reuss() in derived class!"
         )
 
     @material_property
-    def adiabatic_bulk_modulus(self):
+    def isentropic_bulk_modulus_reuss(self):
         """
         Returns the adiabatic bulk modulus of the mineral.
 
@@ -462,11 +462,11 @@ class Material(object):
         :rtype: float
         """
         raise NotImplementedError(
-            "need to implement adiabatic_bulk_modulus() in derived class!"
+            "need to implement isentropic_bulk_modulus_reuss() in derived class!"
         )
 
     @material_property
-    def isothermal_compressibility(self):
+    def isothermal_compressibility_reuss(self):
         """
         Returns isothermal compressibility of the mineral
         (or inverse isothermal bulk modulus).
@@ -478,11 +478,11 @@ class Material(object):
         :rtype: float
         """
         raise NotImplementedError(
-            "need to implement compressibility() in derived class!"
+            "need to implement isothermal_compressibility_reuss() in derived class!"
         )
 
     @material_property
-    def adiabatic_compressibility(self):
+    def isentropic_compressibility_reuss(self):
         """
         Returns adiabatic compressibility of the mineral
         (or inverse adiabatic bulk modulus).
@@ -495,7 +495,7 @@ class Material(object):
         :rtype: float
         """
         raise NotImplementedError(
-            "need to implement compressibility() in derived class!"
+            "need to implement isentropic_compressibility_reuss() in derived class!"
         )
 
     @material_property
@@ -675,53 +675,23 @@ class Material(object):
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus`"""
-        return self.isothermal_bulk_modulus
+        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus_reuss`"""
+        return self.isothermal_bulk_modulus_reuss
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus`"""
-        return self.adiabatic_bulk_modulus
+        """Alias for :func:`~burnman.Material.isentropic_bulk_modulus_reuss`"""
+        return self.isentropic_bulk_modulus_reuss
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
-        return self.isothermal_compressibility
+        """Alias for :func:`~burnman.Material.isothermal_compressibility_reuss`"""
+        return self.isothermal_compressibility_reuss
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
-        return self.adiabatic_compressibility
-
-    @property
-    def isothermal_bulk_modulus_reuss(self):
-        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus`"""
-        return self.isothermal_bulk_modulus
-
-    @property
-    def adiabatic_bulk_modulus_reuss(self):
-        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus`"""
-        return self.adiabatic_bulk_modulus
-
-    @property
-    def isentropic_bulk_modulus_reuss(self):
-        """Alias for :func:`~burnman.Material.adiabatic_bulk_modulus_reuss`"""
-        return self.adiabatic_bulk_modulus_reuss
-
-    @property
-    def isothermal_compressibility_reuss(self):
-        """Alias for :func:`~burnman.Material.isothermal_compressibility`"""
-        return self.isothermal_compressibility
-
-    @property
-    def adiabatic_compressibility_reuss(self):
-        """Alias for :func:`~burnman.Material.adiabatic_compressibility`"""
-        return self.adiabatic_compressibility
-
-    @property
-    def isentropic_compressibility_reuss(self):
-        """Alias for :func:`~burnman.Material.adiabatic_compressibility_reuss`"""
-        return self.adiabatic_compressibility_reuss
+        """Alias for :func:`~burnman.Material.isentropic_compressibility_reuss`"""
+        return self.isentropic_compressibility_reuss
 
     @property
     def G(self):

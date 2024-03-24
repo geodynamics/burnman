@@ -53,7 +53,7 @@ class Murnaghan(eos.EquationOfState):
     def pressure(self, temperature, volume, params):
         return pressure(volume, params["V_0"], params["K_0"], params["Kprime_0"])
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]`
         as a function of pressure :math:`[Pa]`,
@@ -61,7 +61,7 @@ class Murnaghan(eos.EquationOfState):
         """
         return bulk_modulus(pressure, params["K_0"], params["Kprime_0"])
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
         """

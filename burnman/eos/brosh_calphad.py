@@ -90,7 +90,7 @@ class BroshCalphad(eos.EquationOfState):
 
         return brentq(_delta_volume, sol[0], sol[1])
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns the isothermal bulk modulus :math:`K_T` :math:`[Pa]`
         as a function of pressure :math:`[Pa]`,
@@ -103,15 +103,19 @@ class BroshCalphad(eos.EquationOfState):
 
         return -volume * dP / dV
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns the adiabatic bulk modulus of the mineral. :math:`[Pa]`.
         """
         if temperature < 1.0e-10:
-            return self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+            return self.isothermal_bulk_modulus_reuss(
+                pressure, temperature, volume, params
+            )
         else:
             return (
-                self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+                self.isothermal_bulk_modulus_reuss(
+                    pressure, temperature, volume, params
+                )
                 * self.molar_heat_capacity_p(pressure, temperature, volume, params)
                 / self.molar_heat_capacity_v(pressure, temperature, volume, params)
             )
@@ -405,7 +409,9 @@ class BroshCalphad(eos.EquationOfState):
         else:
             return (
                 self.thermal_expansivity(pressure, temperature, volume, params)
-                * self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+                * self.isothermal_bulk_modulus_reuss(
+                    pressure, temperature, volume, params
+                )
                 * self.volume(pressure, temperature, params)
             ) / Cv
 

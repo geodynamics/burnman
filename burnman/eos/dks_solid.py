@@ -186,7 +186,7 @@ class DKS_S(eos.EquationOfState):
             params["V_0"], volume, params["grueneisen_0"], params["q_0"]
         )
 
-    def isothermal_bulk_modulus(self, pressure, temperature, volume, params):
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`[Pa]`
         """
@@ -202,11 +202,11 @@ class DKS_S(eos.EquationOfState):
 
         return K
 
-    def adiabatic_bulk_modulus(self, pressure, temperature, volume, params):
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns adiabatic bulk modulus. :math:`[Pa]`
         """
-        K_T = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
         K_S = K_T * (1.0 + gr * alpha * temperature)
@@ -246,7 +246,7 @@ class DKS_S(eos.EquationOfState):
         """
         C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
         gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K = self.isothermal_bulk_modulus(pressure, temperature, volume, params)
+        K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
 
