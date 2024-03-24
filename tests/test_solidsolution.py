@@ -1203,6 +1203,21 @@ class test_solidsolution(BurnManTest):
             ss[0].activity_coefficients, ss[1].activity_coefficients
         )
 
+    def test_evaluate(self):
+        ol = olivine_ideal_ss()
+        molar_fractions = np.array([[0.1, 0.9], [0.2, 0.8]])
+        pressures = [1.0e9, 2.0e9]
+        temperatures = [300.0, 600.0]
+        G1 = ol.evaluate(["gibbs"], pressures, temperatures, molar_fractions)[0]
+
+        G2 = []
+        for i in range(2):
+            ol.set_state(pressures[i], temperatures[i])
+            ol.set_composition(molar_fractions[i])
+            G2.append(ol.gibbs)
+
+        self.assertArraysAlmostEqual(G1, G2)
+
 
 if __name__ == "__main__":
     unittest.main()

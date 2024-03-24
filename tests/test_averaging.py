@@ -175,10 +175,10 @@ class Reuss(BurnManTest):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], 10.0e9, 300.0
             )
-            assert len(w) == 1  # we expect one error to be thrown when p_nonrigid = 0
-        self.assertFloatEqual(150.901, G[0] / 1.0e9)
+            assert len(w) == 2  # we expect two errors to be thrown when p_nonrigid = 0
+        self.assertFloatEqual(150.901, G / 1.0e9)
 
     def test_present_non_rigid_phase(self):
         rock = burnman.Composite([mypericlase(), my_nonrigid_mineral()], [0.5, 0.5])
@@ -186,10 +186,12 @@ class Reuss(BurnManTest):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], 10.0e9, 300.0
             )
-            assert len(w) == 2  # we expect two errors to be thrown when p_nonrigid != 0
-        self.assertFloatEqual(0.0, G[0] / 1.0e9)
+            assert (
+                len(w) == 4
+            )  # we expect four errors to be thrown when p_nonrigid != 0
+        self.assertFloatEqual(0.0, G / 1.0e9)
 
 
 class Voigt(BurnManTest):
