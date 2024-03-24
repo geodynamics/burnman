@@ -13,6 +13,7 @@ from burnman.utils.math import bracket
 from burnman.utils.math import smooth_array
 from burnman.utils.math import interp_smoothed_array_and_derivatives
 from burnman.utils.math import _pad_ndarray_inverse_mirror
+from burnman.utils.math import is_positive_definite
 
 
 class test_tools(BurnManTest):
@@ -199,6 +200,10 @@ class test_tools(BurnManTest):
             reactions_from_formulae(formulae, compound_names, return_strings=True)
         )
         self.assertTrue(R[0] == "2 fa = 2 fper + 1 fs")
+
+    def test_positive_definite(self):
+        arr = np.array([[2.0, 0.0], [0.0, 1.0]])
+        self.assertTrue(is_positive_definite(arr))
 
 
 if __name__ == "__main__":
