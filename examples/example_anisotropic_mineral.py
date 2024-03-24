@@ -199,8 +199,8 @@ if __name__ == "__main__":
 
     # Finally, we make a pretty plot of various elastic/seismic properties
     # at a fixed pressure and temperature.
-    fig = plt.figure(figsize=(12, 7))
-    ax = [fig.add_subplot(2, 3, i, projection="polar") for i in range(1, 7)]
+    fig = plt.figure(figsize=(12, 10.5))
+    ax = [fig.add_subplot(3, 3, i, projection="polar") for i in range(1, 10)]
 
     P = 3.0e9
     T = 1600.0
@@ -209,9 +209,12 @@ if __name__ == "__main__":
         "vp",
         "vs1",
         "vp/vs1",
+        "vp/vs2",
         "s anisotropy",
         "linear compressibility",
         "youngs modulus",
+        "minimum poisson ratio",
+        "maximum poisson ratio",
     ]
 
     contour_sets, ticks, lines = plot_projected_elastic_properties(m, plot_types, ax)
