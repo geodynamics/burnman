@@ -259,7 +259,7 @@ class Material(object):
         """
         raise NotImplementedError("need to implement unroll() in derived class!")
 
-    def evaluate(self, vars_list, pressures, temperatures):
+    def evaluate(self, vars_list, pressures, temperatures, molar_fractions=None):
         """
         Returns an array of material properties requested through a list of strings
         at given pressure and temperature conditions.
@@ -275,9 +275,11 @@ class Material(object):
         :param temperatures: ndlist or ndarray of float of temperatures in [K].
         :type temperatures: :class:`numpy.array`, n-dimensional
 
-        :returns: Array returning all variables at given pressure/temperature values.
+        :returns: List or array returning all variables at given pressure/temperature values.
             output[i][j] is property vars_list[j] for temperatures[i] and pressures[i].
-        :rtype: :class:`numpy.array`, n-dimensional
+            Attempts to return an array, falls back to a list if the returned properties
+            have different shapes.
+        :rtype: list or :class:`numpy.array`, n-dimensional
         """
         old_pressure = self.pressure
         old_temperature = self.temperature
@@ -286,11 +288,27 @@ class Material(object):
 
         assert pressures.shape == temperatures.shape
 
-        output = np.empty((len(vars_list),) + pressures.shape)
+        if molar_fractions is not None:
+            molar_fractions = np.array(molar_fractions)
+            assert temperatures.shape == molar_fractions.shape[:-1]
+
+        # First, check the output types of all the requested variables:
+        self.set_state(pressures.flat[0], temperatures.flat[0])
+
+        output = []
+        for j in range(len(vars_list)):
+            try:
+                var_shape = getattr(self, vars_list[j]).shape
+            except AttributeError:
+                var_shape = ()
+            output.append(np.empty(pressures.shape + var_shape))
+
         for i, p in np.ndenumerate(pressures):
+            if molar_fractions is not None:
+                self.set_composition(molar_fractions[i])
             self.set_state(p, temperatures[i])
             for j in range(len(vars_list)):
-                output[(j,) + i] = getattr(self, vars_list[j])
+                output[j][i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
             # do not set_state if old values were None. Just reset to None
             # manually
@@ -299,6 +317,76 @@ class Material(object):
         else:
             self.set_state(old_pressure, old_temperature)
 
+        try:
+            output = np.array(output)
+        except ValueError:  # if the lists are different shapes
+            pass
+        return output
+
+    def evaluate_with_volumes(
+        self, vars_list, volumes, temperatures, molar_fractions=None
+    ):
+        """
+        Returns an array of material properties requested through a list of strings
+        at given volume and temperature conditions.
+        At the end it resets the set_state to the original values.
+        The user needs to call set_method() before.
+
+        :param vars_list: Variables to be returned for given conditions
+        :type vars_list: list of strings
+
+        :param volumes: ndlist or ndarray of float of volumes in [m^3].
+        :type volumes: :class:`numpy.array`, n-dimensional
+
+        :param temperatures: ndlist or ndarray of float of temperatures in [K].
+        :type temperatures: :class:`numpy.array`, n-dimensional
+
+        :returns: List or array returning all variables at given pressure/temperature values.
+            output[i][j] is property vars_list[j] for temperatures[i] and pressures[i].
+            Attempts to return an array, falls back to a list if the returned properties
+            have different shapes.
+        :rtype: list or :class:`numpy.array`, n-dimensional
+        """
+        old_pressure = self.pressure
+        old_temperature = self.temperature
+        volumes = np.array(volumes)
+        temperatures = np.array(temperatures)
+
+        assert volumes.shape == temperatures.shape
+
+        if molar_fractions is not None:
+            molar_fractions = np.array(molar_fractions)
+            assert temperatures.shape == molar_fractions.shape[:-1]
+
+        # First, check the output types of all the requested variables:
+        self.set_state_with_volume(volumes.flat[0], temperatures.flat[0])
+
+        output = []
+        for j in range(len(vars_list)):
+            try:
+                var_shape = getattr(self, vars_list[j]).shape
+            except AttributeError:
+                var_shape = ()
+            output.append(np.empty(volumes.shape + var_shape))
+
+        for i, v in np.ndenumerate(volumes):
+            if molar_fractions is not None:
+                self.set_composition(molar_fractions[i])
+            self.set_state_with_volume(v, temperatures[i])
+            for j in range(len(vars_list)):
+                output[j][i] = getattr(self, vars_list[j])
+        if old_pressure is None or old_temperature is None:
+            # do not set_state if old values were None. Just reset to None
+            # manually
+            self._pressure = self._temperature = None
+            self.reset()
+        else:
+            self.set_state(old_pressure, old_temperature)
+
+        try:
+            output = np.array(output)
+        except ValueError:  # if the lists are different shapes
+            pass
         return output
 
     @property
