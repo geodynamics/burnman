@@ -17,6 +17,7 @@ from ..classes.solutionmodel import (
     SubregularSolution,
 )
 from ..utils.chemistry import site_occupancies_to_strings
+from ..utils.math import complete_basis
 
 
 def _decompose_3D_matrix(W):
@@ -168,23 +169,6 @@ def _subregular_matrix_conversion(
     )
 
     return (new_endmember_excesses, new_binary_terms, new_ternary_terms)
-
-
-def complete_basis(basis):
-    """
-    Creates a full basis by filling remaining rows with
-    rows of the identity matrix with row indices not
-    in the column pivot list of the basis RREF
-    """
-
-    n, m = basis.shape
-    if n < m:
-        pivots = list(Matrix(basis).rref()[1])
-        return np.concatenate(
-            (basis, np.identity(m)[[i for i in range(m) if i not in pivots], :]), axis=0
-        )
-    else:
-        return basis
 
 
 def transform_solution_to_new_basis(

@@ -228,7 +228,7 @@ from .classes.material import Material, material_property
 from .classes.perplex import PerplexMaterial
 from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
-from .classes.solution import Solution, SolidSolution
+from .classes.solution import Solution, SolidSolution, RelaxedSolution
 from .classes.elasticsolutionmodel import ElasticSolutionModel
 from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution
 from .classes.composite import Composite
@@ -237,7 +237,7 @@ from .classes.anisotropy import AnisotropicMaterial
 from .classes.anisotropicmineral import AnisotropicMineral
 from .classes.anisotropicmineral import cell_parameters_to_vectors
 from .classes.anisotropicmineral import cell_vectors_to_parameters
-from .classes.anisotropicsolution import AnisotropicSolution
+from .classes.anisotropicsolution import AnisotropicSolution, RelaxedAnisotropicSolution
 from .classes.mineral_helpers import HelperLowHighPressureRockTransition
 from .classes.mineral_helpers import HelperSpinTransition
 from .classes.mineral_helpers import HelperRockSwitcher
