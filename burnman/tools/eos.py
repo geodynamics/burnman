@@ -399,8 +399,8 @@ def check_anisotropic_eos_consistency(
         [
             "V = det(M)",
             "alpha_v = tr(alpha)",
-            "beta_T = sum(S_T I)",
-            "beta_S = sum(S_S I)",
+            "beta_RT = sum(I S_T I)",
+            "beta_RS = sum(I S_S I)",
         ]
     )
     eq.extend(
