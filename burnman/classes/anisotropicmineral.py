@@ -265,10 +265,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
 
         self.isotropic_mineral.set_state(pressure, temperature)
         V2 = self.isotropic_mineral.V
-        KT2 = self.isotropic_mineral.K_T
+        KT2 = self.isotropic_mineral.isothermal_bulk_modulus_reuss
         self.isotropic_mineral.set_state_with_volume(V2, self.params["T_0"])
         P1 = self.isotropic_mineral.pressure
-        KT1 = self.isotropic_mineral.K_T
+        KT1 = self.isotropic_mineral.isothermal_bulk_modulus_reuss
         self.dPthdf = KT1 - KT2
         self.Pth = pressure - P1
 

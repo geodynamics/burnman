@@ -78,7 +78,7 @@ class MineralFit(object):
 
         if flag == "V":
             self.m.set_state(P, T)
-            dPdp = -self.m.K_T / self.m.V
+            dPdp = -self.m.isothermal_bulk_modulus_reuss / self.m.V
             dpdT = self.m.alpha * self.m.V
         elif flag == "H":
             self.m.set_state(P, T)
@@ -411,7 +411,7 @@ class SolutionFit(object):
 
         if flag == "V":
             self.m.set_state(P, T)
-            dPdp = -self.m.K_T / self.m.V
+            dPdp = -self.m.isothermal_bulk_modulus_reuss / self.m.V
             dpdT = self.m.alpha * self.m.V
         elif flag == "H":
             self.m.set_state(P, T)
