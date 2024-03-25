@@ -24,7 +24,7 @@ from ..utils.misc import copy_documentation
 class AnisotropicSolution(Solution, AnisotropicMineral):
     """
     A class implementing the anisotropic solution model described
-    in :cite:`Myhill2024`.
+    in :cite:`Myhill2024a`.
     This class is derived from Solution and AnisotropicMineral,
     and inherits most of the methods from those classes.
 
@@ -35,9 +35,11 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
     excess contributions to the anisotropic state tensor (Psi_xs)
     and its derivatives with respect to volume and temperature.
     The function arguments should be ln(V), Pth,
-    X (a vector) and the parameter dictionary, in that order.
+    p (a vector of proportions) and the parameter dictionary,
+    in that order.
     The output variables Psi_xs_Voigt, dPsidf_Pth_Voigt_xs and
-    dPsidPth_f_Voigt_xs (all 6x6 matrices) must be returned in that
+    dPsidPth_f_Voigt_xs (all 6x6 matrices) and dPsiIdp_xs
+    (a 3 x 3 x n_endmember matrix) must be returned in that
     order in a tuple.
     States of the mineral can only be queried after setting the
     pressure and temperature using set_state() and the composition using
@@ -63,7 +65,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
 
         # Initialise as both Material and Solution object
         Material.__init__(self)
-        Solution.__init__(self, name, solution_model)
+        Solution.__init__(self, name, solution_model, molar_fractions)
 
         # Store a scalar copy of the solution model to speed up set_state
         scalar_solution_model = copy.copy(solution_model)
@@ -72,21 +74,20 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         ]
         self._scalar_solution = Solution(name, scalar_solution_model, molar_fractions)
 
-        self._logm_M_T_0_mbr = np.array(
-            [logm(m[0].cell_vectors_0) for m in self.endmembers]
+        self._logm_M0_mbr = np.einsum(
+            "kij->ijk", np.array([logm(m[0].cell_vectors_0.T) for m in self.endmembers])
         )
+
         self.anisotropic_params = anisotropic_parameters
         self.psi_excess_function = psi_excess_function
 
+        # Finally, set the composition
         if molar_fractions is not None:
             self.set_composition(molar_fractions)
 
     def set_state(self, pressure, temperature):
         # Set solution conditions
         ss = self._scalar_solution
-        if not hasattr(ss, "molar_fractions"):
-            raise Exception("To use this EoS, you must first set the composition")
-
         ss.set_state(pressure, temperature)
 
         try:
@@ -105,7 +106,6 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         KT_at_T = ss.isothermal_bulk_modulus_reuss
         f = np.log(V)
         self._f = f
-
         # Evaluate endmember properties at V, T
         # Here we explicitly manipulate each of the anisotropic endmembers
         pressure_guesses = [np.max([0.0e9, pressure - 2.0e9]), pressure + 2.0e9]
@@ -114,13 +114,13 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
             mbr[0].set_state_with_volume(V, temperature, pressure_guesses)
 
         # Endmember cell vectors and other functions of Psi (all unrotated)
-        PsiI_mbr = np.array([m[0]._PsiI for m in mbrs])
+        self._PsiI_mbr = np.einsum("kij->ijk", np.array([m[0]._PsiI for m in mbrs]))
         dPsidf_T_Voigt_mbr = np.array([m[0]._dPsidf_T_Voigt for m in mbrs])
         dPsiIdf_T_mbr = np.array([m[0]._dPsiIdf_T for m in mbrs])
         dPsiIdT_f_mbr = np.array([m[0]._dPsiIdT_f for m in mbrs])
 
         fr = self.molar_fractions
-        PsiI_ideal = np.einsum("p,pij->ij", fr, PsiI_mbr)
+        PsiI_ideal = np.einsum("ijp, p->ij", self._PsiI_mbr, fr)
         dPsidf_T_Voigt_ideal = np.einsum("p,pij->ij", fr, dPsidf_T_Voigt_mbr)
         dPsiIdf_T_ideal = np.einsum("p,pij->ij", fr, dPsiIdf_T_mbr)
         dPsiIdT_f_ideal = np.einsum("p,pij->ij", fr, dPsiIdT_f_mbr)
@@ -142,7 +142,8 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         out = self.psi_excess_function(
             f, self.Pth, self.molar_fractions, self.anisotropic_params
         )
-        Psi_xs_Voigt, dPsidf_Pth_Voigt_xs, dPsidPth_f_Voigt_xs = out
+        Psi_xs_Voigt, dPsidf_Pth_Voigt_xs, dPsidPth_f_Voigt_xs = out[:3]
+        self._dPsiIdp_xs = out[3]
         Psi_xs_full = voigt_notation_to_compliance_tensor(Psi_xs_Voigt)
         PsiI_xs = np.einsum("ijkl, kl", Psi_xs_full, np.eye(3))
 
@@ -153,20 +154,27 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         )
         dPsidf_T_Voigt_xs, dPsiIdf_T_xs, dPsiIdT_f_xs = out
 
+        self._PsiI = PsiI_ideal + PsiI_xs
+
         out = deformation_gradient_alpha_and_compliance(
-            self.alpha,
-            self.isothermal_compressibility_reuss,
-            PsiI_ideal + PsiI_xs,
+            ss.alpha,
+            ss.isothermal_compressibility_reuss,
+            self._PsiI,
             dPsidf_T_Voigt_ideal + dPsidf_T_Voigt_xs,
             dPsiIdf_T_ideal + dPsiIdf_T_xs,
             dPsiIdT_f_ideal + dPsiIdT_f_xs,
         )
-        self._unrotated_F, self._unrotated_alpha, self._unrotated_S_T_Voigt = out
+        (
+            self._unrotated_F,
+            self._unrotated_dFdf_T,
+            self._unrotated_alpha,
+            self._unrotated_S_T_Voigt,
+        ) = out
 
     def set_composition(self, molar_fractions):
         self._scalar_solution.set_composition(molar_fractions)
         self.cell_vectors_0 = expm(
-            np.einsum("p, pij->ij", molar_fractions, self._logm_M_T_0_mbr)
+            np.einsum("ijk, k ->ji", self._logm_M0_mbr, molar_fractions)
         )
         # Calculate all other required properties
         Solution.set_composition(self, molar_fractions)
