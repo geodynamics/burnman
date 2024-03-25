@@ -1218,6 +1218,20 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(G1, G2)
 
+    def test_relaxed_solution(self):
+        opx = burnman.minerals.JH_2015.orthopyroxene()
+        ropx = burnman.RelaxedSolution(opx, opx.reaction_basis, opx.compositional_basis)
+
+        ropx.set_composition([0.2, 0.2, 0.1, 0.1, 0.2, 0.2])
+
+        for T in [300.0, 1000.0, 2000.0]:
+            ropx.set_state(1.0e9, T)
+            mu = np.einsum("ij, j", opx.reaction_basis, ropx.partial_gibbs)[0]
+
+            # Check that the reaction affinity is essentially zero
+            # Give 5 J tolerance.
+            self.assertTrue(np.abs(mu) < 5.0)
+
 
 if __name__ == "__main__":
     unittest.main()

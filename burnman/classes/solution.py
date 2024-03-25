@@ -18,6 +18,11 @@ from .averaging_schemes import reuss_average_function
 
 from ..utils.reductions import independent_row_indices
 from ..utils.chemistry import sum_formulae, sort_element_list_to_IUPAC_order
+from ..utils.misc import copy_documentation
+from ..utils.math import complete_basis
+
+import copy
+from scipy.optimize import minimize
 
 
 class Solution(Mineral):
@@ -619,7 +624,7 @@ class Solution(Mineral):
         to the number of moles of endmember[j] involved in reaction[i].
         """
         reaction_basis = np.array(
-            [v[:] for v in self.stoichiometric_matrix.T.nullspace()]
+            [v[:] for v in self.stoichiometric_matrix.T.nullspace()], dtype=float
         )
 
         if len(reaction_basis) == 0:
@@ -633,6 +638,15 @@ class Solution(Mineral):
         The number of reactions in reaction_basis.
         """
         return len(self.reaction_basis[:, 0])
+
+    @cached_property
+    def compositional_basis(self):
+        """_summary_
+
+        :return: _description_
+        :rtype: _type_
+        """
+        return complete_basis(self.reaction_basis)[self.n_reactions :]
 
     @cached_property
     def independent_element_indices(self):
@@ -705,3 +719,319 @@ class Solution(Mineral):
 
 
 SolidSolution = Solution
+
+
+class RelaxedSolution(Solution):
+    """
+    A class implementing a relaxed solution
+    model.
+    This class is derived from Solution,
+    and inherits most of the methods from that class.
+
+    Instantiation of a RelaxedSolution involves passing
+    an Solution, plus a set of vectors that represent rapid
+    deformation modes. For example, a solution of MgO, FeHSO and FeLSO
+    (high and low spin wuestite) can rapidly change proportion of
+    high spin and low spin iron, and so a single vector should be passed:
+    np.array([[0., -1., 1.]]) or some multiple thereof.
+
+    States of the mineral can only be queried after setting the
+    pressure and temperature using set_state() and the composition using
+    set_composition().
+
+    This class is available as ``burnman.RelaxedSolution``.
+    """
+
+    def __init__(
+        self,
+        solution,
+        relaxation_vectors,
+        unrelaxed_vectors,
+    ):
+        # Make an attribute with the unrelaxed solution
+        self.unrelaxed = solution
+
+        # The relaxation vectors
+        self.n_relaxation_vectors = len(relaxation_vectors)
+        self.n_unrelaxed_vectors = len(unrelaxed_vectors)
+
+        self.dndq = np.array(relaxation_vectors).T
+        assert len(self.dndq.shape) == 2
+        assert len(self.dndq) == self.unrelaxed.n_endmembers
+
+        self.dndx = np.array(unrelaxed_vectors).T
+        assert len(self.dndx.shape) == 2
+        assert len(self.dndx) == self.unrelaxed.n_endmembers
+        assert (
+            len(unrelaxed_vectors) + len(relaxation_vectors)
+            == self.unrelaxed.n_endmembers
+        )
+
+        self.q_initial = np.zeros(len(relaxation_vectors)) + 0.001
+
+        try:
+            molar_fractions = solution.molar_fractions
+        except AttributeError:
+            molar_fractions = None
+
+        # Give the relaxed solution the same base properties as the
+        # unrelaxed solution
+        Solution.__init__(
+            self,
+            name=solution.name,
+            solution_model=solution.solution_model,
+            molar_fractions=molar_fractions,
+        )
+
+    def set_state(self, pressure, temperature, relaxed=True):
+        """
+        Sets the state of the solution. Also relaxes the
+        structure parameters if set_composition() has already
+        been used and if the relaxed argument has been set to
+        True.
+
+        :param pressure: The pressure of the solution [Pa]
+        :type pressure: float
+        :param temperature: The temperature of the solution [K]
+        :type temperature: float
+        :param relaxed: Whether to minimize the Gibbs energy
+            of the material by changing the values of the structure
+            parameters. Defaults to True.
+        :type relaxed: bool, optional
+        """
+        self.unrelaxed.set_state(pressure, temperature)
+
+        if hasattr(self.unrelaxed, "molar_fractions") and relaxed:
+            self._relax_at_PTX()
+            Solution.set_state(self, pressure, temperature)
+
+    def set_composition(self, molar_fractions, q_initial=None, relaxed=True):
+        """
+        Sets the composition of the model. Also relaxes the
+        structure parameters if set_state() has already
+        been used and if the relaxed argument has been set to
+        True.
+
+        :param molar_fractions: Molar fractions of the
+            independent endmembers corresponding to the
+            unrelaxed vectors specified during initialisation.
+        :type molar_fractions: 1D numpy array
+        :param q_initial: Initial values of the structure parameters.
+            Defaults to None, in which case the preexisting
+            initial values are used
+            (first set to 0.001 during initialisation).
+        :type q_initial: 1D numpy array, optional
+        :param relaxed: Whether to minimize the Gibbs energy
+            of the material by changing the values of the structure
+            parameters. Defaults to True.
+        :type relaxed: bool, optional
+        """
+        self.unrelaxed_vectors = molar_fractions
+        if q_initial is not None:
+            self.q_initial = np.array(q_initial)
+        n = np.einsum("ij, j", self.dndq, self.q_initial) + np.einsum(
+            "ij, j", self.dndx, molar_fractions
+        )
+
+        self.unrelaxed.set_composition(n)
+
+        if self.unrelaxed.pressure is not None and relaxed:
+            self._relax_at_PTX()
+            Solution.set_composition(self, n)
+            self.unrelaxed.set_composition(self.molar_fractions)
+
+    def _relax_at_PTX(self):
+        """
+        Minimizes the Gibbs energy at constant pressure and
+        temperature by changing the structural parameters.
+
+        Run during set_state() and set_composition(), as long as both
+        state and composition have already been set. This function
+        should not generally be needed by the user.
+        """
+        n0 = copy.copy(self.unrelaxed.molar_fractions)
+
+        def G_func(dq):
+            n = n0 + np.einsum("ij, j", self.dndq, dq)
+            self.unrelaxed.set_composition(n)
+            return self.unrelaxed.molar_gibbs
+
+        sol = minimize(G_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        assert sol.success
+        n = n0 + np.einsum("ij, j", self.dndq, sol.x)
+        self.unrelaxed.set_composition(n)
+        Solution.set_composition(self, n)
+
+    def set_state_with_volume(
+        self, volume, temperature, pressure_guesses=[0.0e9, 10.0e9]
+    ):
+        """
+        This function acts similarly to set_state, but takes volume and
+        temperature as input to find the pressure. In order to ensure
+        self-consistency, this function does not use any pressure functions
+        from the material classes, but instead finds the pressure using the
+        brentq root-finding and Nelder-Mead minimization methods.
+
+        Composition should have been set before this function is used.
+
+        :param volume: The desired molar volume of the mineral [m^3].
+        :type volume: float
+
+        :param temperature: The desired temperature of the mineral [K].
+        :type temperature: float
+
+        :param pressure_guesses: A list of floats denoting the initial
+            low and high guesses for bracketing of the pressure [Pa].
+            These guesses should preferably bound the correct pressure,
+            but do not need to do so. More importantly,
+            they should not lie outside the valid region of
+            the equation of state. Defaults to [0.e9, 10.e9].
+        :type pressure_guesses: list
+        """
+        ss = self.unrelaxed
+        n0 = copy.copy(ss.molar_fractions)
+
+        # Initial set_state without changing structural parameters
+        # to estimate pressure
+        ss.set_state_with_volume(volume, temperature, pressure_guesses)
+        # Store in a mutable so that it can be updated in the loop
+        pressure = [ss.pressure]
+
+        def F_func(dq):
+            n = n0 + np.einsum("ij, j", self.dndq, dq)
+            ss.set_composition(n)
+            ss.set_state_with_volume(
+                volume, temperature, [pressure[0] - 1.0e9, pressure[0] + 1.0e9]
+            )
+            pressure[0] = ss.pressure
+            return ss.molar_helmholtz
+
+        sol = minimize(F_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        assert sol.success
+
+        # Run one more time with root
+        F_func(sol.x)
+        self.unrelaxed.set_composition(ss.molar_fractions)
+        Solution.set_composition(self, ss.molar_fractions)
+        self.set_state(pressure[0], temperature)
+
+    @material_property
+    def _d2Gdqdq_fixed_PT(self):
+        """
+        Gibbs structural hessian
+        calculated at constant pressure and temperature.
+        """
+        return np.einsum(
+            "ij, ik, jl->kl", self.unrelaxed.gibbs_hessian, self.dndq, self.dndq
+        )
+
+    @material_property
+    def _d2Gdqdz(self):
+        """
+        Second derivatives of the Helmholtz energy with
+        respect to composition and z (pressure or temperature).
+        """
+        dVdq = np.einsum("i, ij->j", self.unrelaxed.partial_volumes, self.dndq)
+        dSdq = np.einsum("i, ij->j", self.unrelaxed.partial_entropies, self.dndq)
+
+        return np.array([dVdq, -dSdq]).T
+
+    @material_property
+    def _d2Gdqdq_fixed_PT_pinv(self):
+        """
+        The second derivative of the Helmholtz energy
+        with respect to the structure parameters at constant
+        strain and temperature. Often referred to as the
+        susceptibility matrix.
+        """
+        return np.linalg.pinv(self._d2Gdqdq_fixed_PT)
+
+    @material_property
+    def dqdz_relaxed(self):
+        """
+        The change of the structure parameters with respect to
+        strain and temperature that minimizes the Helmholtz
+        energy.
+        """
+        return -np.einsum("kl, lj->kj", self._d2Gdqdq_fixed_PT_pinv, self._d2Gdqdz)
+
+    @material_property
+    def _d2Gdzdz_Q(self):
+        """
+        Block matrix of -V*beta_TR, V*alpha, -c_p/T
+        at fixed Q
+        """
+        beta_TR = self.unrelaxed.isothermal_compressibility_reuss
+        alpha = self.unrelaxed.thermal_expansivity
+        c_p = self.unrelaxed.molar_heat_capacity_p
+        V = self.molar_volume
+        T = self.temperature
+        return np.array([[-V * beta_TR, V * alpha], [V * alpha, -c_p / T]])
+
+    @material_property
+    def _d2Gdzdz(self):
+        """
+        Block matrix of -V*beta_TR, V*alpha, -c_p/T
+        under Gibbs-minimizing Q
+        """
+        return self._d2Gdzdz_Q + np.einsum(
+            "ki, kj->ij", self._d2Gdqdz, self.dqdz_relaxed
+        )
+
+    # The following scalar properties are all
+    # second derivatives that are calculated in AnisotropicMineral
+    # or Solution (rather than being derived from other properties),
+    # and must therefore be redefined in relaxed materials
+
+    # The volumetric molar heat capacity and grueneisen parameter are
+    # derived properties in AnisotropicMineral
+    # and so do not need to be redefined.
+
+    @material_property
+    @copy_documentation(Solution.isothermal_compressibility_reuss)
+    def isothermal_compressibility_reuss(self):
+        return -self._d2Gdzdz[0, 0] / self.V
+
+    @material_property
+    @copy_documentation(Solution.thermal_expansivity)
+    def thermal_expansivity(self):
+        return self._d2Gdzdz[0, 1] / self.V
+
+    @material_property
+    @copy_documentation(Solution.molar_heat_capacity_p)
+    def molar_heat_capacity_p(self):
+        return -self._d2Gdzdz[1, 1] * self.T
+
+    @material_property
+    @copy_documentation(Solution.isothermal_bulk_modulus_reuss)
+    def isothermal_bulk_modulus_reuss(self):
+        return 1.0 / self.isothermal_compressibility_reuss
+
+    @material_property
+    @copy_documentation(Solution.molar_heat_capacity_v)
+    def molar_heat_capacity_v(self):
+        return (
+            self.molar_heat_capacity_p
+            - self.molar_volume
+            * self.temperature
+            * self.thermal_expansivity
+            * self.thermal_expansivity
+            * self.isothermal_bulk_modulus_reuss
+        )
+
+    @material_property
+    @copy_documentation(Solution.isentropic_bulk_modulus_reuss)
+    def isentropic_bulk_modulus_reuss(self):
+        if self.temperature < 1.0e-10:
+            return self.isothermal_bulk_modulus_reuss
+        else:
+            return (
+                self.isothermal_bulk_modulus_reuss
+                * self.molar_heat_capacity_p
+                / self.molar_heat_capacity_v
+            )
+
+    @material_property
+    @copy_documentation(Solution.isentropic_compressibility_reuss)
+    def isentropic_compressibility_reuss(self):
+        return 1.0 / self.isentropic_bulk_modulus_reuss

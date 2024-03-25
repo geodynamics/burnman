@@ -495,6 +495,37 @@ def array_to_rational_matrix(array):
     return Matrix([[Rational(v).limit_denominator(1000) for v in row] for row in array])
 
 
+def complete_basis(basis, flip_columns=True):
+    """
+    Creates a full basis by filling remaining rows with
+    selected rows of the identity matrix that have indices
+    not in the column pivot list of the basis RREF
+
+    :param basis: A partial basis
+    :type basis: numpy array
+    :param flip_columns: whether to calculate the RREF
+        from a flipped basis. This can be useful, for example,
+        when dependent columns are known to be further to the
+        right in the basis. defaults to True
+    :type flip_columns: bool, optional
+    :return: basis
+    :rtype: numpy array
+    """
+
+    n, m = basis.shape
+    if n < m:
+        if flip_columns:
+            pivots = list(m - 1 - np.array(Matrix(np.flip(basis, axis=1)).rref()[1]))
+        else:
+            pivots = list(Matrix(basis)).rref()[1]
+
+        return np.concatenate(
+            (basis, np.identity(m)[[i for i in range(m) if i not in pivots], :]), axis=0
+        )
+    else:
+        return basis
+
+
 def generate_complete_basis(incomplete_basis, array):
     """
     Given a 2D array with independent rows and a second 2D array that spans a
