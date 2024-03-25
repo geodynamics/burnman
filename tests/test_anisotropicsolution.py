@@ -5,6 +5,7 @@ import numpy as np
 
 from burnman.constants import Avogadro
 from burnman import AnisotropicMineral, AnisotropicSolution
+from burnman import RelaxedAnisotropicSolution
 from burnman.classes.solutionmodel import SymmetricRegularSolution
 from burnman.tools.eos import check_eos_consistency
 from burnman.tools.eos import check_anisotropic_eos_consistency
@@ -45,7 +46,7 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
     return m
 
 
-def make_nonorthotropic_solution():
+def make_nonorthotropic_solution(two_fos=False):
 
     cell_lengths_A = np.array([4.7646, 10.2296, 5.9942])
     lth = cell_lengths_A * 1.0e-10 * np.cbrt(Avogadro / 4.0)
@@ -57,15 +58,25 @@ def make_nonorthotropic_solution():
         lth[0] * 1.2, lth[1] * 1.4, lth[2], 90.0, 90.0, 90.0, 0.4, -1.0, -0.6
     )
 
-    solution_model = SymmetricRegularSolution(
-        endmembers=[[m1, "[Mg]2SiO4"], [m2, "[Fe]2SiO4"]],
-        energy_interaction=[[10.0e3]],
-        volume_interaction=[[1.0e-6]],
-    )
+    if two_fos:
+        n_mbrs = 3
+        solution_model = SymmetricRegularSolution(
+            endmembers=[[m1, "[Mg]2SiO4"], [m1, "[Mg]2SiO4"], [m2, "[Fe]2SiO4"]],
+            energy_interaction=[[-1.0e3, 10.0e3], [10.0e3]],
+            volume_interaction=[[0.0, 1.0e-6], [1.0e-6]],
+        )
+    else:
+        n_mbrs = 2
+        solution_model = SymmetricRegularSolution(
+            endmembers=[[m1, "[Mg]2SiO4"], [m2, "[Fe]2SiO4"]],
+            energy_interaction=[[10.0e3]],
+            volume_interaction=[[1.0e-6]],
+        )
 
     def fn(lnV, Pth, X, params):
         z = np.zeros((6, 6))
-        return (z, z, z)
+        f = np.zeros((3, 3, n_mbrs))
+        return (z, z, z, f)
 
     prm = {}
 
@@ -97,6 +108,16 @@ class test_two_member_solution(BurnManTest):
     def test_non_orthotropic_solution_consistency(self):
         ss = make_nonorthotropic_solution()
         ss.set_composition([0.8, 0.2])
+        self.assertTrue(
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
+        )
+
+    def test_relaxed_non_orthotropic_solution_consistency(self):
+        ss = make_nonorthotropic_solution(two_fos=True)
+        ss = RelaxedAnisotropicSolution(
+            ss, [[1.0, -1.0, 0.0]], [[0.5, 0.5, 0.0], [0.0, 0.0, 1.0]]
+        )
+        ss.set_composition([0.8, 0.2], relaxed=False)
         self.assertTrue(
             check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
         )

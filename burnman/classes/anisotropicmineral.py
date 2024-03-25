@@ -83,9 +83,11 @@ def deformation_gradient_alpha_and_compliance(
         with respect to T at constant f.
     :type dPsiIdT_f: numpy array (3x3)
 
-    :returns: The unrotated isothermal compliance tensor in Voigt form (6x6),
-        and the thermal expansivity tensor (3x3).
-    :rtype: Tuple of two objects of type numpy.array (2D)
+    :returns: The deformation gradient tensor (3x3),
+        derivative with respect to lnV (3x3),
+        the thermal expansivity tensor (3x3),
+        and the unrotated isothermal compliance tensor in Voigt form (6x6).
+    :rtype: Tuple of four objects of type numpy.array (2D)
     """
     # Numerical derivatives with respect to f and T
     df = 1.0e-7
@@ -128,7 +130,7 @@ def deformation_gradient_alpha_and_compliance(
         S_T[i][i + 3] = 2.0 * beta_T[j][k] - S_T[j][i + 3] - S_T[k][i + 3]
         S_T[i + 3][i] = S_T[i][i + 3]
 
-    return F, alpha, S_T
+    return F, dFdf_T, alpha, S_T
 
 
 class AnisotropicMineral(Mineral, AnisotropicMaterial):
@@ -309,7 +311,12 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 self._dPsiIdf_T,
                 self._dPsiIdT_f,
             )
-            self._unrotated_F, self._unrotated_alpha, self._unrotated_S_T_Voigt = out
+            (
+                self._unrotated_F,
+                self._unrotated_dFdf_T,
+                self._unrotated_alpha,
+                self._unrotated_S_T_Voigt,
+            ) = out
 
     @material_property
     def deformation_gradient_tensor(self):
@@ -458,8 +465,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Anisotropic minerals do not have a single isentropic compressibility.
         This function returns a NotImplementedError. Users should instead
-        consider either using isothermal_compressibility_reuss,
-        isothermal_compressibility_voigt (both derived from AnisotropicMineral),
+        consider using isothermal_compressibility_tensor,
+        isothermal_compressibility_reuss or isothermal_compressibility_voigt
+        (all derived from AnisotropicMineral),
         or directly querying the elements in the isothermal_compliance_tensor.
         """
         raise NotImplementedError(
@@ -474,8 +482,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         Anisotropic minerals do not have a single isentropic compressibility.
         This function returns a NotImplementedError. Users should instead
-        consider either using isentropic_compressibility_reuss,
-        isentropic_compressibility_voigt (both derived from AnisotropicMineral),
+        consider either using isentropic_compressibility_tensor,
+        isentropic_compressibility_reuss or isentropic_compressibility_voigt
+        (all derived from AnisotropicMineral),
         or directly querying the elements in the isentropic_compliance_tensor.
         """
         raise NotImplementedError(
@@ -510,6 +519,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         :rtype: float
         """
         return 1.0 / self.isothermal_bulk_modulus_voigt
+
+    @material_property
+    def isentropic_bulk_modulus_voigt(self):
+        """
+        :returns: The Voigt bound on the isentropic bulk modulus in [Pa].
+        :rtype: float
+        """
+        return np.sum(self.isentropic_stiffness_tensor[:3, :3]) / 9.0
 
     @material_property
     def isentropic_compressibility_reuss(self):
