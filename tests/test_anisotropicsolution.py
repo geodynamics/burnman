@@ -19,7 +19,10 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
     cell_parameters = np.array(
         [cell_lengths[0], cell_lengths[1], cell_lengths[2], alpha, beta, gamma]
     )
-    fo.params["V_0"] = np.linalg.det(cell_parameters_to_vectors(cell_parameters))
+    frame_convention = [0, 1, 2]
+    fo.params["V_0"] = np.linalg.det(
+        cell_parameters_to_vectors(cell_parameters, frame_convention)
+    )
     constants = np.zeros((6, 6, 3, 1))
     constants[:, :, 1, 0] = np.array(
         [
@@ -42,7 +45,7 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
         ]
     )
 
-    m = AnisotropicMineral(fo, cell_parameters, constants)
+    m = AnisotropicMineral(fo, cell_parameters, constants, frame_convention)
     return m
 
 

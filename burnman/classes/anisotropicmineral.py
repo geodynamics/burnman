@@ -152,6 +152,11 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
     4D array, please refer to the code
     or to the original paper.
 
+    For non-orthotropic materials, the argument frame_convention
+    should be set to define the orientation of the reference frame
+    relative to the crystallographic axes
+    (see :func:`~burnman.utils.unitcell.cell_parameters_to_vectors`).
+
     If the user chooses to define their parameters as a dictionary,
     they must also provide a function to the psi_function argument
     that describes how to compute the tensors Psi, dPsidf and dPsidPth
@@ -188,6 +193,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         isotropic_mineral,
         cell_parameters,
         anisotropic_parameters,
+        frame_convention=None,
         psi_function=None,
         orthotropic=None,
     ):
@@ -206,6 +212,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             self.anisotropic_params = anisotropic_parameters
             self.psi_function = psi_function
 
+        if self.orthotropic:
+            self.frame_convention = [0, 1, 2]
+        else:
+            assert (
+                len(frame_convention) == 3
+            ), "frame_convention must be set for this non-orthotropic mineral"
+            self.frame_convention = frame_convention
+
         Psi_Voigt0 = self.psi_function(0.0, 0.0, self.anisotropic_params)[0]
         if not np.all(Psi_Voigt0 == 0.0):
             raise ValueError(
@@ -215,7 +229,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             )
 
         # cell_vectors is the transpose of the cell tensor M
-        self.cell_vectors_0 = cell_parameters_to_vectors(cell_parameters)
+        self.cell_vectors_0 = cell_parameters_to_vectors(
+            cell_parameters, self.frame_convention
+        )
 
         if (
             np.abs(np.linalg.det(self.cell_vectors_0) - isotropic_mineral.params["V_0"])
@@ -405,7 +421,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             spatial coordinate axes.
         :rtype: numpy.array (1D)
         """
-        return cell_vectors_to_parameters(self.cell_vectors)
+        return cell_vectors_to_parameters(self.cell_vectors, self.frame_convention)
 
     @material_property
     def shear_modulus(self):

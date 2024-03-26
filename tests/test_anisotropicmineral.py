@@ -45,7 +45,7 @@ def make_forsterite(orthotropic=True):
         ]
     )
 
-    m = AnisotropicMineral(fo, cell_parameters, constants)
+    m = AnisotropicMineral(fo, cell_parameters, constants, [0, 1, 2])
     return m
 
 
