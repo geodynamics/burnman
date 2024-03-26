@@ -283,6 +283,11 @@ class Material(object):
         """
         old_pressure = self.pressure
         old_temperature = self.temperature
+        try:
+            old_molar_fractions = self.molar_fractions
+        except AttributeError:
+            old_molar_fractions = None
+
         pressures = np.array(pressures)
         temperatures = np.array(temperatures)
 
@@ -290,6 +295,7 @@ class Material(object):
 
         if molar_fractions is not None:
             molar_fractions = np.array(molar_fractions)
+            self.set_composition(molar_fractions[0])
             assert temperatures.shape == molar_fractions.shape[:-1]
 
         # First, check the output types of all the requested variables:
@@ -316,6 +322,11 @@ class Material(object):
             self.reset()
         else:
             self.set_state(old_pressure, old_temperature)
+            if old_molar_fractions is not None:
+                try:
+                    self.set_composition(old_molar_fractions)
+                except AttributeError:
+                    pass
 
         try:
             output = np.array(output)
@@ -349,6 +360,11 @@ class Material(object):
         """
         old_pressure = self.pressure
         old_temperature = self.temperature
+        try:
+            old_molar_fractions = self.molar_fractions
+        except AttributeError:
+            old_molar_fractions = None
+
         volumes = np.array(volumes)
         temperatures = np.array(temperatures)
 
@@ -356,6 +372,7 @@ class Material(object):
 
         if molar_fractions is not None:
             molar_fractions = np.array(molar_fractions)
+            self.set_composition(molar_fractions[0])
             assert temperatures.shape == molar_fractions.shape[:-1]
 
         # First, check the output types of all the requested variables:
@@ -382,6 +399,12 @@ class Material(object):
             self.reset()
         else:
             self.set_state(old_pressure, old_temperature)
+
+            if old_molar_fractions is not None:
+                try:
+                    self.set_composition(old_molar_fractions)
+                except AttributeError:
+                    pass
 
         try:
             output = np.array(output)
