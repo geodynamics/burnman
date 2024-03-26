@@ -4,6 +4,10 @@ from util import BurnManTest
 import numpy as np
 
 from burnman.classes import anisotropy
+from burnman.utils.unitcell import (
+    cell_parameters_to_vectors,
+    cell_vectors_to_parameters,
+)
 
 
 class test_anisotropy(BurnManTest):
@@ -134,6 +138,34 @@ class test_anisotropy(BurnManTest):
                 -m.isentropic_stiffness_tensor[1][4],
             ],
         )
+
+    def test_cell_parameters_conversions(self):
+        cell_parameters = np.array([1.0, 4.2, 2.2, 80.0, 85.0, 88.0])
+        lengths_orig = cell_parameters[:3]
+        cos_a = np.cos(np.deg2rad(cell_parameters[3:]))
+        for convention in [
+            [0, 1, 2],
+            [0, 2, 1],
+            [1, 0, 2],
+            [1, 2, 0],
+            [2, 1, 0],
+            [2, 0, 1],
+        ]:
+            v = cell_parameters_to_vectors(cell_parameters, convention)
+            p = cell_vectors_to_parameters(v, convention)
+            self.assertArraysAlmostEqual(cell_parameters, p)
+
+            # check angles
+            lengths = np.linalg.norm(v, axis=1)
+            cos_a2 = np.array(
+                [
+                    np.dot(v[1], v[2]) / lengths[1] / lengths[2],
+                    np.dot(v[0], v[2]) / lengths[0] / lengths[2],
+                    np.dot(v[0], v[1]) / lengths[0] / lengths[1],
+                ]
+            )
+            self.assertArraysAlmostEqual(cos_a, cos_a2)
+            self.assertArraysAlmostEqual(lengths_orig, lengths)
 
 
 if __name__ == "__main__":
