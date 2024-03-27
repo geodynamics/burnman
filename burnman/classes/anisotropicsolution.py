@@ -77,7 +77,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         self._logm_M0_mbr = np.einsum(
             "kij->ijk", np.array([logm(m[0].cell_vectors_0.T) for m in self.endmembers])
         )
-
+        self.frame_convention = self.endmembers[0][0].frame_convention
         self.anisotropic_params = anisotropic_parameters
         self.psi_excess_function = psi_excess_function
 

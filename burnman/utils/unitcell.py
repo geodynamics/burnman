@@ -100,9 +100,9 @@ def cell_vectors_to_parameters(vectors, frame_convention):
     """
 
     c = frame_convention
-    assert vectors[c[0], c[1]] == 0
-    assert vectors[c[0], c[2]] == 0
-    assert vectors[c[1], c[2]] == 0
+    assert np.abs(vectors[c[0], c[1]]) < np.finfo(float).eps
+    assert np.abs(vectors[c[0], c[2]]) < np.finfo(float).eps
+    assert np.abs(vectors[c[1], c[2]]) < np.finfo(float).eps
 
     lengths = np.empty(3)
     angles = np.empty(3)
