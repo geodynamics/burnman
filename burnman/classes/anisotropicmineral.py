@@ -372,11 +372,14 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return np.eye(3)
         else:
+            c = self.frame_convention
             M_T = self.unrotated_cell_vectors
             Q = np.empty((3, 3))
-            Q[0] = M_T[0] / np.linalg.norm(M_T[0])
-            Q[2] = np.cross(M_T[0], M_T[1]) / np.linalg.norm(np.cross(M_T[0], M_T[1]))
-            Q[1] = np.cross(Q[2], Q[0])
+            Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
+            Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
+                np.cross(M_T[c[0]], M_T[c[1]])
+            )
+            Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
             return Q
 
     @material_property
@@ -402,9 +405,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return self.unrotated_cell_vectors
         else:
-            return np.einsum(
+            vectors = np.einsum(
                 "ij, jk->ik", self.unrotated_cell_vectors, self.rotation_matrix
             )
+            return vectors
 
     @material_property
     def cell_parameters(self):
