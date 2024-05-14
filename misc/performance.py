@@ -46,9 +46,10 @@ if True:
         for aa in range(0, 500):
             a = burnman.eos.SLB3()
             m = minerals.SLB_2011.fayalite()
+            m.set_state(1.0e9, 1.0e3)
             x = 0
             for i in range(0, 10000):
-                x += a.grueneisen_parameter(1e9, 1e4, 1.1, m.params)
+                x += m.grueneisen_parameter
         return x
 
     test_grueneisen()

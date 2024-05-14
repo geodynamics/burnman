@@ -1,0 +1,67 @@
+Checking iron bearing mineral properties...
+wu in agreement with HeFESTo (max rel error 0.0001 %)
+mag in agreement with HeFESTo (max rel error 0.0001 %)
+wu in agreement with HeFESTo (max rel error 0.0001 %)
+mag in agreement with HeFESTo (max rel error 0.0001 %)
+hem in agreement with HeFESTo (max rel error 0.0001 %)
+hepv in agreement with HeFESTo (max rel error 0.0001 %)
+hlpv in agreement with HeFESTo (max rel error 0.0001 %)
+hppv in agreement with HeFESTo (max rel error 0.0001 %)
+fea in agreement with HeFESTo (max rel error 0.0002 %)
+feg in agreement with HeFESTo (max rel error 0.0006 %)
+fee in agreement with HeFESTo (max rel error 0.0003 %)
+hmag in agreement with HeFESTo (max rel error 0.0001 %)
+
+Checking EoS consistency for 'burnman.minerals.SLB_2024.fea'
+Expressions within tolerance of 0.000100
+G = F + PV : True 
+G = H - TS : True 
+G = E - TS + PV : True 
+S = -dG/dT : True 
+alpha = 1/V dV/dT : True 
+C_p = T dS/dT : True 
+V = dG/dP  : True 
+K_T = -V dP/dV : True 
+C_v = Cp - alpha^2*K_T*V*T : True 
+K_S = K_T*Cp/Cv : True 
+gr = alpha*K_T*V/Cv : True 
+Vphi = np.sqrt(K_S/rho) : True 
+Vp = np.sqrt((K_S + 4G/3)/rho) : True 
+Vs = np.sqrt(G_S/rho) : True 
+All EoS consistency constraints satisfied for 'burnman.minerals.SLB_2024.fea'
+
+Checking fper configurational entropy...
+Endmember entropies (should all be zero):
+[0. 0. 0. 0. 0.]
+Equimolar wu-mag: 11.52629 J/K/mol (should be 11.52629 J/K/mol)
+
+Checking Figure 1...
+Mg2Fe2O4 ferropericlase at 70 GPa, 300 K:
+Molar proportions: 0.50, 0.24, 0.26, 0.00, 0.00
+Volume: 35.49 cm^3/mol
+
+Checking Figure 3...
+BCC-fper-mag triple point at 1 bar: 825.98 K
+
+Checking Figure 6a...
+BCC iron Cp, V at 1 bar, 1000 K: 52.29 J/K/mol, 7.30 cm^3/mol
+
+Checking Figure 6c...
+The bcc-fcc-hcp invariant is at 11.27 GPa, 825.7 K
+
+Checking Figure 7...
+fO2 values at 1500 K:
+['Fayalite', 'gamma_(fcc)_Iron', 'Quartz']
+log10fO2 = -12.076
+['Fayalite', 'alpha_(bcc)_Iron', 'Quartz']
+log10fO2 = -12.077
+['Fayalite', 'Magnetite', 'Quartz']
+log10fO2 = -8.233
+['Magnetite', 'Hematite', 'Hematite']
+log10fO2 = -2.635
+
+Checking Figure A1...
+(Mg0.5Fe0.5)(Fe0.5Si0.5)O3 V at 60 GPa, 300 K: 21.634 cm^3/mol
+
+Checking Figure A4...
+Stv Vs at 10 GPa, 2000 K: 6.421 km/s

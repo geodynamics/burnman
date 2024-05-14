@@ -108,7 +108,7 @@ def _non_ideal_interactions_subreg(p, n_endmembers, Wijk):
     return Wint
 
 
-def logish(x, eps=1.0e-5):
+def logish(x, eps=1.0e-7):
     """
     2nd order series expansion of log(x) about eps:
     log(eps) - sum_k=1^infty (f_eps)^k / k
@@ -434,7 +434,13 @@ class IdealSolution(SolutionModel):
     def _calculate_endmember_configurational_entropies(self):
         S_conf = -(
             constants.gas_constant
-            * (self.endmember_noccupancies * logish(self.endmember_occupancies)).sum(-1)
+            * (
+                self.endmember_noccupancies
+                * (
+                    logish(self.endmember_noccupancies)
+                    - logish(self.site_multiplicities)
+                )
+            ).sum(-1)
         )
         self.endmember_configurational_entropies = S_conf
 

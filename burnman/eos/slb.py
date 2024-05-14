@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
@@ -23,11 +23,12 @@ except ImportError:
 from . import birch_murnaghan as bm
 from . import debye
 from . import equation_of_state as eos
+from . import bukowinski_electronic as el
 from ..utils.math import bracket
 
 
 @jit(nopython=True)
-def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
+def _grueneisen_parameter_slb(V_0, volume, gruen_0, q_0):
     """global function with plain parameters so jit will work"""
     x = V_0 / volume
     f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
@@ -39,7 +40,19 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
 
 @jit(nopython=True)
 def _delta_pressure(
-    x, pressure, temperature, V_0, T_0, Debye_0, n, a1_ii, a2_iikk, b_iikk, b_iikkmm
+    x,
+    pressure,
+    temperature,
+    V_0,
+    T_0,
+    Debye_0,
+    n,
+    a1_ii,
+    a2_iikk,
+    b_iikk,
+    b_iikkmm,
+    bel_0,
+    gel,
 ):
     f = 0.5 * (pow(V_0 / x, 2.0 / 3.0) - 1.0)
     nu_o_nu0_sq = 1.0 + a1_ii * f + 1.0 / 2.0 * a2_iikk * f * f
@@ -53,11 +66,21 @@ def _delta_pressure(
     nu_o_nu0_sq = 1.0 + a1_ii * f + (1.0 / 2.0) * a2_iikk * f * f  # EQ 41
     gr = 1.0 / 6.0 / nu_o_nu0_sq * (2.0 * f + 1.0) * (a1_ii + a2_iikk * f)
 
+    Pel = (
+        0.5
+        * gel
+        * bel_0
+        * np.power(x / V_0, gel)
+        * (temperature * temperature - T_0 * T_0)
+        / x
+    )
+
     return (
         (1.0 / 3.0)
         * (pow(1.0 + 2.0 * f, 5.0 / 2.0))
         * ((b_iikk * f) + (0.5 * b_iikkmm * f * f))
         + gr * (E_th - E_th_ref) / x
+        + Pel
         - pressure
     )  # EQ 21
 
@@ -149,14 +172,6 @@ class SLBBase(eos.EquationOfState):
 
         return eta_s
 
-    # calculate isotropic thermal pressure, see
-    # Matas et. al. (2007) eq B4
-    def _thermal_pressure(self, T, V, params):
-        Debye_T = self._debye_temperature(params["V_0"] / V, params)
-        gr = self.grueneisen_parameter(0.0, T, V, params)  # P not important
-        P_th = gr * debye.thermal_energy(T, Debye_T, params["n"]) / V
-        return P_th
-
     def volume(self, pressure, temperature, params):
         """
         Returns molar volume. :math:`[m^3]`
@@ -177,6 +192,10 @@ class SLBBase(eos.EquationOfState):
         b_iikk = 9.0 * params["K_0"]  # EQ 28
         b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
 
+        bel_0, gel = 0.0, 1.0
+        if self.conductive:
+            bel_0, gel = params["bel_0"], params["gel"]
+
         # Finding the volume at a given pressure requires a
         # root-finding scheme. Here we use brentq to find the root.
 
@@ -193,6 +212,8 @@ class SLBBase(eos.EquationOfState):
             a2_iikk,
             b_iikk,
             b_iikkmm,
+            bel_0,
+            gel,
         )
 
         try:
@@ -241,9 +262,10 @@ class SLBBase(eos.EquationOfState):
         [Pa]
         """
         debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        gr = self.grueneisen_parameter(
-            0.0, temperature, volume, params
-        )  # does not depend on pressure
+        gr = _grueneisen_parameter_slb(
+            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
+        )
+        # does not depend on pressure
         # thermal energy at temperature T
         E_th = debye.thermal_energy(temperature, debye_T, params["n"])
         # thermal energy at reference temperature
@@ -257,16 +279,16 @@ class SLBBase(eos.EquationOfState):
         ) + gr * (
             E_th - E_th_ref
         ) / volume  # EQ 21
-
+        if self.conductive:
+            P += el.pressure(
+                temperature,
+                volume,
+                params["T_0"],
+                params["V_0"],
+                params["bel_0"],
+                params["gel"],
+            )
         return P
-
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter :math:`[unitless]`
-        """
-        return _grueneisen_parameter_fast(
-            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
-        )
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
@@ -274,7 +296,9 @@ class SLBBase(eos.EquationOfState):
         """
         T_0 = params["T_0"]
         debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        gr = _grueneisen_parameter_slb(
+            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
+        )
 
         # thermal energy at temperature T
         E_th = debye.thermal_energy(temperature, debye_T, params["n"])
@@ -294,17 +318,16 @@ class SLBBase(eos.EquationOfState):
             - (pow(gr, 2.0) / volume) * (C_v * temperature - C_v_ref * T_0)
         )
 
+        if self.conductive:
+            K += volume * el.KToverV(
+                temperature,
+                volume,
+                params["T_0"],
+                params["V_0"],
+                params["bel_0"],
+                params["gel"],
+            )
         return K
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus. :math:`[Pa]`
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K_S = K_T * (1.0 + gr * alpha * temperature)
-        return K_S
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
@@ -335,47 +358,32 @@ class SLBBase(eos.EquationOfState):
         Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
         debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        return debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
+        C_v = debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
 
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant pressure. :math:`[J/K/mol]`
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        C_p = C_v * (1.0 + gr * alpha * temperature)
-        return C_p
+        if self.conductive:
+            C_v += temperature * el.CVoverT(
+                volume, params["V_0"], params["bel_0"], params["gel"]
+            )
+        return C_v
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Returns thermal expansivity. :math:`[1/K]`
         """
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        alpha = gr * C_v / K / volume
-        return alpha
-
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the Gibbs free energy at the pressure and temperature
-        of the mineral [J/mol]
-        """
-        G = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + pressure * volume
+        debye_T = self._debye_temperature(params["V_0"] / volume, params)
+        C_v = debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
+        gr_slb = _grueneisen_parameter_slb(
+            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
         )
-        return G
+        K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
+        alpha = gr_slb * C_v / volume / K
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy at the pressure and temperature
-        of the mineral [J/mol]
-        """
-        return self.helmholtz_free_energy(
-            pressure, temperature, volume, params
-        ) + temperature * self.entropy(pressure, temperature, volume, params)
+        if self.conductive:
+            aKTel = el.aKT(
+                temperature, volume, params["V_0"], params["bel_0"], params["gel"]
+            )
+            alpha += aKTel / K
+        return alpha
 
     def entropy(self, pressure, temperature, volume, params):
         """
@@ -384,19 +392,12 @@ class SLBBase(eos.EquationOfState):
         """
         Debye_T = self._debye_temperature(params["V_0"] / volume, params)
         S = debye.entropy(temperature, Debye_T, params["n"])
+
+        if self.conductive:
+            S += el.entropy(
+                temperature, volume, params["V_0"], params["bel_0"], params["gel"]
+            )
         return S
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy at the pressure and temperature
-        of the mineral [J/mol]
-        """
-
-        return (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-            + pressure * volume
-        )
 
     def helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
@@ -421,7 +422,88 @@ class SLBBase(eos.EquationOfState):
             + F_quasiharmonic
         )
 
+        if self.conductive:
+            F += el.helmholtz(
+                temperature,
+                volume,
+                params["T_0"],
+                params["V_0"],
+                params["bel_0"],
+                params["gel"],
+            )
         return F
+
+    # Derived properties from here
+    # These functions can use pressure as an argument,
+    # as pressure should have been determined self-consistently
+    # by the point at which these functions are called.
+    def grueneisen_parameter(self, pressure, temperature, volume, params):
+        """
+        Returns grueneisen parameter :math:`[unitless]`
+        """
+        if self.conductive:
+            temperature = max(temperature, 1.0e-6)
+            K_T = self.isothermal_bulk_modulus_reuss(
+                pressure, temperature, volume, params
+            )
+            alpha = self.thermal_expansivity(pressure, temperature, volume, params)
+            C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+            return alpha * K_T * volume / C_v
+        else:
+            return _grueneisen_parameter_slb(
+                params["V_0"], volume, params["grueneisen_0"], params["q_0"]
+            )
+
+    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
+        """
+        Returns adiabatic bulk modulus. :math:`[Pa]`
+        """
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
+        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
+        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        return K_T * (1.0 + gr * alpha * temperature)
+
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
+        """
+        Returns heat capacity at constant pressure. :math:`[J/K/mol]`
+        """
+        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
+        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+        C_p = C_v * (1.0 + gr * alpha * temperature)
+        return C_p
+
+    def molar_internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy at the pressure and temperature
+        of the mineral [J/mol]
+        """
+        return self.helmholtz_free_energy(
+            pressure, temperature, volume, params
+        ) + temperature * self.entropy(pressure, temperature, volume, params)
+
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Gibbs free energy at the pressure and temperature
+        of the mineral [J/mol]
+        """
+        G = (
+            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            + pressure * volume
+        )
+        return G
+
+    def enthalpy(self, pressure, temperature, volume, params):
+        """
+        Returns the enthalpy at the pressure and temperature
+        of the mineral [J/mol]
+        """
+
+        return (
+            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            + temperature * self.entropy(pressure, temperature, volume, params)
+            + pressure * volume
+        )
 
     def validate_parameters(self, params):
         """
@@ -445,6 +527,9 @@ class SLBBase(eos.EquationOfState):
         # Now check all the required keys for the
         # thermal part of the EoS are in the dictionary
         expected_keys = ["molar_mass", "n", "Debye_0", "grueneisen_0", "q_0", "eta_s_0"]
+        if self.conductive:
+            expected_keys.extend(["bel_0", "gel"])
+
         for k in expected_keys:
             if k not in params:
                 raise KeyError("params object missing parameter : " + k)
@@ -470,11 +555,12 @@ class SLB3(SLBBase):
     """
     SLB equation of state with third order finite strain expansion for the
     shear modulus (this should be preferred, as it is more thermodynamically
-    consistent.)
+    consistent).
     """
 
     def __init__(self):
         self.order = 3
+        self.conductive = False
 
 
 class SLB2(SLBBase):
@@ -487,3 +573,16 @@ class SLB2(SLBBase):
 
     def __init__(self):
         self.order = 2
+        self.conductive = False
+
+
+class SLB3Conductive(SLBBase):
+    """
+    SLB equation of state with third order finite strain expansion for the
+    shear modulus and a contribution to the Helmholtz free energy
+    that arises from the thermal excitation of electrons (Bukowinski, 1977).
+    """
+
+    def __init__(self):
+        self.order = 3
+        self.conductive = True

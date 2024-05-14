@@ -17,7 +17,7 @@ from .murnaghan import Murnaghan
 from .birch_murnaghan import BM2, BM3
 from .birch_murnaghan_4th import BM4
 from .mie_grueneisen_debye import MGD2, MGD3
-from .slb import SLB2, SLB3
+from .slb import SLB2, SLB3, SLB3Conductive
 from .modified_tait import MT
 from .hp import HP_TMT
 from .hp import HP_TMTL
