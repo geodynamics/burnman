@@ -80,6 +80,10 @@ def get_data():
     b = np.moveaxis(b, 1, 0)
     b_err = np.moveaxis(b_err, 1, 0)
 
+    # Brown reports the sum in Voigt form (Section 3.1)
+    b[:, 3:] = b[:, 3:] / 2
+    b_err[:, 3:] = b_err[:, 3:] / 2
+
     data["beta"] = {
         "P": d[:, 0] * 0.0 + 1.0e5,
         "T": d[:, 0] * 0.0 + 298.15,

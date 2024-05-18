@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from plagioclase_parameters import scalar_args, cell_args, elastic_args
 from plagioclase_model import make_anisotropic_model
 from plagioclase_data import get_data
+from burnman.minerals.SLB_2022 import plagioclase
+
+ss_SLB = plagioclase()
 
 ss = make_anisotropic_model(scalar_args, cell_args, elastic_args)
 
@@ -26,9 +29,19 @@ prps = ss.evaluate(
     molar_fractions,
 )
 
+prps_SLB = ss_SLB.evaluate(
+    ["molar_volume", "isothermal_bulk_modulus_reuss"],
+    pressures,
+    temperatures,
+    molar_fractions,
+)
+
+
 labels = ["V", "KTR", "CT", "CN", "ST", "betaT", "cell"]
 prps = {labels[i]: prps[i] for i in range(7)}
 prps["psi"] = np.einsum("ijk, i->ijk", prps["ST"], prps["KTR"])
+
+prps_SLB = {labels[i]: prps_SLB[i] for i in range(2)}
 
 d = get_data()
 
@@ -40,7 +53,15 @@ ax = [fig.add_subplot(1, 2, i) for i in range(1, 3)]
 
 mask2 = p_ans < 0.5
 
-ln = ax[0].plot(p_ans[mask2], prps["V"][mask2] * 1.0e6)
+ln = ax[0].plot(p_ans[mask2], prps["V"][mask2] * 1.0e6, label="C$\\bar{1}$, this study")
+ln = ax[0].plot(
+    p_ans,
+    prps_SLB["V"] * 1.0e6,
+    linestyle="--",
+    color=ln[0].get_color(),
+    label="SLB2022",
+)
+
 ax[0].plot(
     p_ans[~mask2], prps["V"][~mask2] * 1.0e6, color=ln[0].get_color(), linestyle=":"
 )
@@ -72,7 +93,8 @@ ax[0].errorbar(
 )
 
 
-ax[1].plot(p_ans[mask2], prps["KTR"][mask2] / 1.0e9)
+ax[1].plot(p_ans[mask2], prps["KTR"][mask2] / 1.0e9, color=ln[0].get_color())
+ax[1].plot(p_ans, prps_SLB["KTR"] / 1.0e9, linestyle="--", color=ln[0].get_color())
 ax[1].plot(
     p_ans[~mask2], prps["KTR"][~mask2] / 1.0e9, color=ln[0].get_color(), linestyle=":"
 )
@@ -108,8 +130,10 @@ ax[1].errorbar(
 for i in range(2):
     ax[i].set_xlabel("$p_{an}$")
 
-ax[0].set_ylabel("$V$ (m$^3$/mol)")
+ax[0].set_ylabel("$V$ (cm$^3$/mol)")
 ax[1].set_ylabel("$K_{\\text{TR}}$ (GPa)")
+
+ax[0].legend()
 
 fig.set_tight_layout(True)
 fig.savefig("plag_V_KT.pdf")
@@ -189,7 +213,7 @@ for irow, (i, j) in enumerate(inds):
 for i in range(7):
     ax[i].legend()
     ax[i].set_xlabel("$p_{an}$")
-    ax[i].set_ylabel("modulus (GPa)")
+    ax[i].set_ylabel("$C_{Nij}$ (GPa)")
 
 fig.set_tight_layout(True)
 fig.savefig("plag_stiffnesses.pdf")
@@ -198,7 +222,7 @@ fig.savefig("plag_stiffnesses.pdf")
 fig = plt.figure(figsize=(10, 8))
 ax = [fig.add_subplot(3, 3, i) for i in range(1, 8)]
 for irow, (i, j) in enumerate(inds):
-    name = f"$d\\Psi_{{{i+1}{j+1}}} / df$"
+    name = f"$S_{{N{i+1}{j+1}}} / \\beta_{{NR}}$"
     axi = int((irow - (irow) % 3) / 3)
     ln = ax[axi].plot(p_ans[mask2], prps["psi"][mask2, i, j])
     ax[axi].plot(
@@ -220,7 +244,7 @@ for irow, (i, j) in enumerate(inds):
 for i in range(7):
     ax[i].legend()
     ax[i].set_xlabel("$p_{an}$")
-    ax[i].set_ylabel("$d\\Psi / df$")
+    ax[i].set_ylabel("$S_{Nij} / \\beta_{NR}$")
 
 fig.set_tight_layout(True)
 fig.savefig("plag_psi.pdf")
@@ -329,7 +353,7 @@ for axi, (i, j) in enumerate(inds):
         alpha=0.5,
     )
 
-    ax[axi].set_ylabel(f"$\\beta_{{{axi}}}$ (m)")
+    ax[axi].set_ylabel(f"$\\beta_{{T{axi+1}}}$ (GPa$^{{-1}}$)")
     ax[axi].set_xlabel("$p_{an}$")
 
 fig.set_tight_layout(True)

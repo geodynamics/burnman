@@ -5,6 +5,7 @@ from burnman import AnisotropicMineral, AnisotropicSolution
 import numpy as np
 from copy import deepcopy
 from burnman.utils.unitcell import cell_parameters_to_vectors
+from tabulate import tabulate
 
 
 def make_scalar_model(args):
@@ -14,6 +15,11 @@ def make_scalar_model(args):
     ab_scalar = SLB_2022.albite()
     an_scalar = SLB_2022.anorthite()
 
+    ab_scalar.params["V_0"] = ab_scalar.params["V_0"] + dV_ab
+    an_scalar.params["V_0"] = an_scalar.params["V_0"] + dV_an
+    ab_scalar.params["K_0"] = ab_scalar.params["K_0"] + dK_ab
+    an_scalar.params["K_0"] = an_scalar.params["K_0"] + dK_an
+
     aban_linear = SLB_2022.anorthite()
     aban_linear.params["V_0"] = 0.5 * (
         ab_scalar.params["V_0"] + an_scalar.params["V_0"]
@@ -21,16 +27,33 @@ def make_scalar_model(args):
     aban_linear.params["K_0"] = 0.5 * (
         ab_scalar.params["K_0"] + an_scalar.params["K_0"]
     )
+    aban_linear.params["Kprime_0"] = 0.5 * (
+        ab_scalar.params["Kprime_0"] + an_scalar.params["Kprime_0"]
+    )
 
     aban_scalar = deepcopy(aban_linear)
 
-    ab_scalar.params["V_0"] = ab_scalar.params["V_0"] + dV_ab
-    an_scalar.params["V_0"] = an_scalar.params["V_0"] + dV_an
     aban_scalar.params["V_0"] = aban_scalar.params["V_0"] + dV_aban
-
-    ab_scalar.params["K_0"] = ab_scalar.params["K_0"] + dK_ab
-    an_scalar.params["K_0"] = an_scalar.params["K_0"] + dK_an
     aban_scalar.params["K_0"] = aban_scalar.params["K_0"] + dK_aban
+
+    table = [
+        ["", "ab", "an", "an$_{50}$ (1)", "an$_{50}$ (2)"],
+        [
+            "V_0 (cm$^3$/mol)",
+            ab_scalar.params["V_0"] * 1.0e6,
+            an_scalar.params["V_0"] * 1.0e6,
+            aban_linear.params["V_0"] * 1.0e6,
+            aban_scalar.params["V_0"] * 1.0e6,
+        ],
+        [
+            "K_0 (GPa)",
+            ab_scalar.params["K_0"] / 1.0e9,
+            an_scalar.params["K_0"] / 1.0e9,
+            aban_linear.params["K_0"] / 1.0e9,
+            aban_scalar.params["K_0"] / 1.0e9,
+        ],
+    ]
+    print(tabulate(table, headers="firstrow", tablefmt="latex_raw", floatfmt=".6e"))
 
     class plagioclase_scalar(Solution):
         def __init__(self, molar_fractions=None):
@@ -76,6 +99,16 @@ def make_anisotropic_model(scalar_args, cell_args, elastic_args):
     M = cell_parameters_to_vectors(an_cell_parameters, frame_convention)
     f = np.cbrt(an_scalar.params["V_0"] / np.linalg.det(M))
     an_cell_parameters[:3] = an_cell_parameters[:3] * f
+
+    table = [
+        ["", "$a$", "$b$", "$c$", "$\\alpha$", "$\\beta$", "$\\gamma$"],
+        ["ab"],
+        ["an"],
+    ]
+    table[1].extend(ab_cell_parameters)
+    table[2].extend(an_cell_parameters)
+
+    print(tabulate(table, headers="firstrow", tablefmt="latex_raw", floatfmt=".6e"))
 
     an_a = np.zeros((6, 6))
     ab_a = np.zeros((6, 6))
@@ -135,6 +168,12 @@ def make_anisotropic_model(scalar_args, cell_args, elastic_args):
     # Finally, 11
     an_a[0, 0] = 1.0 - np.sum(an_a[:3, :3])
     ab_a[0, 0] = 1.0 - np.sum(ab_a[:3, :3])
+
+    table = ab_a
+    print(tabulate(table, tablefmt="latex_raw", floatfmt=".5f"))
+
+    table = an_a
+    print(tabulate(table, tablefmt="latex_raw", floatfmt=".5f"))
 
     # print(an_a)
     # print(ab_a)
