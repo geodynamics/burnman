@@ -87,7 +87,7 @@ for f in phasedir.iterdir():
     # Do not process liquid!!
     if os.stat(f).st_size > 0 and str(f).split("/")[-1] != "liq":
         name = str(f).split("/")[-1]
-        d = pd.read_csv(f, delim_whitespace=True)
+        d = pd.read_csv(f, sep='\\s+')
 
         endmembers = list(d.columns)
 
@@ -295,7 +295,7 @@ for f in mbrdir.iterdir():
 
         assert idict["debye"] == "1.00000"
 
-    if idict["beta"] != "0.00000":
+    if idict["bel_0"] != "0.00000":
         # Fe endmember equations of state not yet implemented
         process = False
 
