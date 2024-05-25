@@ -1622,6 +1622,11 @@ SOLUTIONS
 
 class c2c_pyroxene(Solution):
     def __init__(self, molar_fractions=None):
+        """IdealSolution model for c2c_pyroxene (c2c).
+        Endmembers (and site species distributions) are given in the order:
+        - mgc2 ([Mg]2)
+        - fec2 ([Fe]2)
+        """
         self.name = "c2c_pyroxene"
         self.solution_model = IdealSolution(
             endmembers=[
@@ -1635,6 +1640,12 @@ class c2c_pyroxene(Solution):
 
 class calcium_ferrite_structured_phase(Solution):
     def __init__(self, molar_fractions=None):
+        """AsymmetricRegularSolution model for calcium_ferrite_structured_phase (cf).
+        Endmembers (and site species distributions) are given in the order:
+        - mgcf ([Mg][Al])
+        - fecf ([Fe][Al])
+        - nacf ([Na][Si])
+        """
         self.name = "calcium_ferrite_structured_phase"
         self.solution_model = AsymmetricRegularSolution(
             endmembers=[
@@ -1651,6 +1662,14 @@ class calcium_ferrite_structured_phase(Solution):
 
 class clinopyroxene(Solution):
     def __init__(self, molar_fractions=None):
+        """AsymmetricRegularSolution model for clinopyroxene (cpx).
+        Endmembers (and site species distributions) are given in the order:
+        - di ([Ca][Mg][Si]2)
+        - he ([Ca][Fe][Si]2)
+        - cen ([Mg][Mg][Si]2)
+        - cats ([Ca][Al][Si1/2Al1/2]2)
+        - jd ([Na][Al][Si]2)
+        """
         self.name = "clinopyroxene"
         self.solution_model = AsymmetricRegularSolution(
             endmembers=[
@@ -1674,6 +1693,14 @@ class clinopyroxene(Solution):
 
 class garnet(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for garnet (gt).
+        Endmembers (and site species distributions) are given in the order:
+        - py ([Mg]3[Al][Al])
+        - al ([Fe]3[Al][Al])
+        - gr ([Ca]3[Al][Al])
+        - mgmj ([Mg]3[Mg][Si])
+        - namj ([Na2/3Mg1/3]3[Si][Si])
+        """
         self.name = "garnet"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1702,6 +1729,12 @@ class garnet(Solution):
 
 class ilmenite(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for ilmenite (il).
+        Endmembers (and site species distributions) are given in the order:
+        - mgil ([Mg][Si])
+        - feil ([Fe][Si])
+        - co ([Al][Al])
+        """
         self.name = "ilmenite"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1717,6 +1750,13 @@ class ilmenite(Solution):
 
 class ferropericlase(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for ferropericlase (mw).
+        Endmembers (and site species distributions) are given in the order:
+        - pe ([Mg]2[Mg]2)
+        - wu ([Fe]2[Fe]2)
+        - anao ([Na]2[Al]2)
+        The entropy from the first site in magnetite is not counted.
+        """
         self.name = "ferropericlase"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1733,6 +1773,12 @@ class ferropericlase(Solution):
 
 class new_aluminous_phase(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for new_aluminous_phase (nal).
+        Endmembers (and site species distributions) are given in the order:
+        - mnal ([Mg]2[Al5/6Si1/6]6)
+        - fnal ([Fe]2[Al5/6Si1/6]6)
+        - nnal ([Na]2[Al3/6Si3/6]6)
+        """
         self.name = "new_aluminous_phase"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1748,6 +1794,11 @@ class new_aluminous_phase(Solution):
 
 class olivine(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for olivine (ol).
+        Endmembers (and site species distributions) are given in the order:
+        - fo ([Mg]2)
+        - fa ([Fe]2)
+        """
         self.name = "olivine"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1762,6 +1813,13 @@ class olivine(Solution):
 
 class orthopyroxene(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for orthopyroxene (opx).
+        Endmembers (and site species distributions) are given in the order:
+        - en ([Mg][Mg])
+        - fs ([Fe][Fe])
+        - mgts ([Mg][Al])
+        - odi ([Ca][Mg])
+        """
         self.name = "orthopyroxene"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1778,6 +1836,11 @@ class orthopyroxene(Solution):
 
 class plagioclase(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for plagioclase (plg).
+        Endmembers (and site species distributions) are given in the order:
+        - an ([Ca])
+        - ab ([Na])
+        """
         self.name = "plagioclase"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1792,6 +1855,12 @@ class plagioclase(Solution):
 
 class post_perovskite(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for post_perovskite (ppv).
+        Endmembers (and site species distributions) are given in the order:
+        - mppv ([Mg][Si])
+        - fppv ([Fe][Si])
+        - appv ([Al][Al])
+        """
         self.name = "post_perovskite"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1807,6 +1876,12 @@ class post_perovskite(Solution):
 
 class bridgmanite(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for bridgmanite (pv).
+        Endmembers (and site species distributions) are given in the order:
+        - mgpv ([Mg][Si])
+        - fepv ([Fe][Si])
+        - alpv ([Al][Al])
+        """
         self.name = "bridgmanite"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1822,6 +1897,11 @@ class bridgmanite(Solution):
 
 class ringwoodite(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for ringwoodite (ri).
+        Endmembers (and site species distributions) are given in the order:
+        - mgri ([Mg]2)
+        - feri ([Fe]2)
+        """
         self.name = "ringwoodite"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1836,6 +1916,11 @@ class ringwoodite(Solution):
 
 class mg_fe_aluminous_spinel(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for mg_fe_aluminous_spinel (sp).
+        Endmembers (and site species distributions) are given in the order:
+        - sp ([Mg3/4Al1/4]4[Al7/8Mg1/8]8)
+        - hc ([Fe3/4Al1/4]4[Al7/8Fe1/8]8)
+        """
         self.name = "mg_fe_aluminous_spinel"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
@@ -1850,6 +1935,11 @@ class mg_fe_aluminous_spinel(Solution):
 
 class wadsleyite(Solution):
     def __init__(self, molar_fractions=None):
+        """SymmetricRegularSolution model for wadsleyite (wa).
+        Endmembers (and site species distributions) are given in the order:
+        - mgwa ([Mg]2)
+        - fewa ([Fe]2)
+        """
         self.name = "wadsleyite"
         self.solution_model = SymmetricRegularSolution(
             endmembers=[
