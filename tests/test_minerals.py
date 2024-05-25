@@ -27,6 +27,7 @@ class instantiate_minerals(BurnManTest):
                 for m in member_list
                 if inspect.isclass(m)
                 and issubclass(m, burnman.Mineral)
+                and not issubclass(m, burnman.RelaxedSolution)
                 and m is not burnman.Mineral
                 and m is not burnman.SolidSolution
                 and m is not burnman.CombinedMineral

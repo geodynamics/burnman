@@ -810,6 +810,36 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
+    def test_slb_ferropericlase_partial_gibbs_multicomponent_change(self):
+        ss = burnman.minerals.SLB_2024.ferropericlase()
+        f0 = [0.15, 0.25, 0.35, 0.05, 0.2]
+        ss.set_composition(f0)
+        ss.set_state(1.0e5, 300.0)
+        mu0 = ss.partial_gibbs
+
+        df = np.array([2.0e-6, -1.5e-6, -0.5e-6, 0.25e-6, -0.25e-6])
+        ss.set_composition(f0 - df / 2.0)
+        G1 = ss.gibbs
+        ss.set_composition(f0 + df / 2.0)
+        G2 = ss.gibbs
+
+        self.assertAlmostEqual(mu0.dot(df), G2 - G1)
+
+    def test_slb_ferropericlase_hessian_multicomponent_change(self):
+        ss = burnman.minerals.SLB_2024.ferropericlase()
+        f0 = [0.15, 0.25, 0.35, 0.05, 0.2]
+        ss.set_composition(f0)
+        ss.set_state(1.0e5, 300.0)
+        H0 = ss.gibbs_hessian
+
+        df = np.array([2.0e-6, -1.5e-6, -0.5e-6, 0.25e-6, -0.25e-6])
+        ss.set_composition(f0 - df / 2.0)
+        dGdx1 = ss.partial_gibbs
+        ss.set_composition(f0 + df / 2.0)
+        dGdx2 = ss.partial_gibbs
+
+        self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
+
     def test_polynomial_model_partial_entropy_multicomponent_change(self):
         ss = two_site_ss_polynomial_ternary()
         f0 = np.array([0.25, 0.35, 0.4])
