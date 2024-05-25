@@ -87,7 +87,7 @@ for f in phasedir.iterdir():
     # Do not process liquid!!
     if os.stat(f).st_size > 0 and str(f).split("/")[-1] != "liq":
         name = str(f).split("/")[-1]
-        d = pd.read_csv(f, sep='\\s+')
+        d = pd.read_csv(f, sep="\\s+")
 
         endmembers = list(d.columns)
 
@@ -384,9 +384,19 @@ print('"""\n' "SOLUTIONS\n" '"""\n')
 
 
 for key, prm in sorted(sol_params.items()):
+    docstring = '"""'
+    docstring += f'{prm["solution_type"]} model for {solution_aliases[key]} ({key}).\n'
+    docstring += "Endmembers (and site species distributions) are given in the order:\n"
+    for i in range(prm["n_mbrs"]):
+        docstring += f'- {prm["mbr_names"][i]} ({prm["mbr_site_formulae"][i]})\n'
+    if key == "mw":
+        docstring += "The entropy from the first site in magnetite is not counted.\n"
+    docstring += '"""'
+
     print(
         f"\nclass {solution_aliases[key]}(Solution):\n"
         "    def __init__(self, molar_fractions=None):\n"
+        f"        {docstring}\n"
         f'        self.name = "{solution_aliases[key]}"\n'
         f"        self.solution_model = {prm['solution_type']}(\n"
         "            endmembers=["
