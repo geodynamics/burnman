@@ -202,13 +202,13 @@ class Composition(object):
                 component_matrix[i][self.element_list.index(element)] = n_atoms
 
         sol = nnls(component_matrix.T, composition)
-        if sol[1] < 1.0e-12:
+        if sol[1] < 1.0e-10:
             component_amounts = sol[0]
         else:
             raise Exception(
                 "Failed to change component set. "
                 "Could not find a non-negative "
-                "least squares solution. "
+                f"least squares solution (residual={sol[1]}). "
                 "Can the bulk composition be described "
                 "with this set of components?"
             )
