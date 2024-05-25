@@ -18,15 +18,14 @@ then
 fi
 
 $PYTHON --version
-echo ""
-echo "Dependency tree:"
-$PYTHON -m pip install -q pipdeptree
-$PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
-echo ""
-
 # Quietly install burnman in development mode
 echo "Installing BurnMan in development mode ..."
 $PYTHON -m pip install -q -e .
+echo ""
+
+echo "Dependency tree:"
+$PYTHON -m pip install -q pipdeptree .
+$PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 echo ""
 
 # Quietly install optional modules after burnman
