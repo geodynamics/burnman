@@ -10,9 +10,6 @@ import numpy as np
 from ..utils.chemistry import process_solution_chemistry
 from .. import constants
 import warnings
-import sparse
-import string
-from copy import deepcopy
 from .material import material_property, cached_property
 from dataclasses import make_dataclass
 

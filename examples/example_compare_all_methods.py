@@ -27,6 +27,7 @@ different methods.
 from __future__ import absolute_import
 from __future__ import print_function
 
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -76,7 +77,9 @@ if __name__ == "__main__":
     ax = [fig.add_subplot(2, 2, i) for i in range(1, 5)]
 
     for m in range(len(methods)):
-        rock.set_method(methods[m])
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            rock.set_method(methods[m])
         temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
 
         print("Calculations are done for:")
