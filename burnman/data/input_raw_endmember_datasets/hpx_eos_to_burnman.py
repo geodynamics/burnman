@@ -24,6 +24,7 @@ from datetime import date
 dataset = HGP_2018_ds633
 mbr_dataset = "HGP_2018_ds633"
 solution_file = "tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASHTOCr.txt"
+solution_file = "tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASTOCr.txt"
 first_model = "pl4tr"  # melt and fl are (currently unreadable) Temkin models
 
 # logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -146,8 +147,12 @@ with open(solution_file, "r") as file:
                 if increment_i:
                     i += 1
 
+n_data = len(data)
+
 noods = []
-for k in range(16):
+while True:
+    if i > n_data - 3:
+        break
     name = data[i][0]
     n_mbrs = int(data[i][1])
     logging.debug(f"Solution: {name}")
