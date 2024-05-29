@@ -54,6 +54,10 @@ from . import JH_2015
 from . import HGP_2018_ds633
 from . import ig50NCKFMASHTOCr
 from . import ig50NCKFMASTOCr
+from . import mb50NCKFMASHTO
+from . import mp50KFMASH
+from . import mp50MnNCKFMASHTO
+from . import mp50NCKFMASHTO
 
 # Kurnosov et al. 2017
 from . import KMFBZ_2017
