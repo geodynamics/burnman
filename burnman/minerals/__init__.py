@@ -52,6 +52,8 @@ from . import HP_2011_fluids
 from . import HHPH_2013
 from . import JH_2015
 from . import HGP_2018_ds633
+from . import ig50NCKFMASHTOCr
+from . import ig50NCKFMASTOCr
 
 # Kurnosov et al. 2017
 from . import KMFBZ_2017
