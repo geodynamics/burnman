@@ -413,7 +413,7 @@ def l2(x, funca, funcb):
     diff = np.array(funca - funcb)
     diff = diff * diff
 
-    return integrate.trapz(diff, x)
+    return integrate.trapezoid(diff, x)
 
 
 def nrmse(x, funca, funcb):

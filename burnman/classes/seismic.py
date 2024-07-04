@@ -312,7 +312,7 @@ class SeismicTable(Seismic1DModel):
 
         if len(density) > 0:
             radii = self.table_radius[::-1]
-            g = scipy.integrate.cumtrapz(
+            g = scipy.integrate.cumulative_trapezoid(
                 constants.G * 4.0 * np.pi * density * radii * radii, x=radii, initial=0
             )
             g[1:] = g[1:] / radii[1:] / radii[1:]
@@ -332,7 +332,9 @@ class SeismicTable(Seismic1DModel):
 
         # convert radii to depths
         depth = self.earth_radius - radii
-        pressure = scipy.integrate.cumtrapz(gravity * density, x=depth, initial=0.0)
+        pressure = scipy.integrate.cumulative_trapezoid(
+            gravity * density, x=depth, initial=0.0
+        )
 
         self.table_pressure = pressure
 
