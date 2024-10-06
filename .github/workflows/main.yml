@@ -13,9 +13,9 @@ jobs:
         python-versions: ['3.12']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-versions }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-versions }}
     - name: make indent
@@ -24,7 +24,7 @@ jobs:
         ./contrib/utilities/indent
         git diff > changes-astyle.diff
     - name: archive indent results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: changes-astyle.diff
         path: changes-astyle.diff
@@ -41,9 +41,9 @@ jobs:
         python-versions: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-versions }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-versions }}
     - name: setup
@@ -55,7 +55,7 @@ jobs:
          texlive \
          texlive-latex-extra
         python -m pip install --upgrade pip
-        pip install pycddlib # this is optional
+        pip install pycddlib==2.1.7 # this is optional
         pip install autograd # this is optional
         python --version
     - name: test

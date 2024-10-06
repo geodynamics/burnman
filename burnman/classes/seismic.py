@@ -333,7 +333,7 @@ class SeismicTable(Seismic1DModel):
         # convert radii to depths
         depth = self.earth_radius - radii
         pressure = scipy.integrate.cumulative_trapezoid(
-            gravity * density, x=depth, initial=0.0
+            gravity * density, x=depth, initial=0
         )
 
         self.table_pressure = pressure
