@@ -679,8 +679,8 @@ class Solution(Mineral):
         null_basis = np.array([v[:] for v in null])
 
         M = null_basis[:, self.dependent_element_indices]
-        assert (M.shape[0] == M.shape[1])
-        assert (np.abs(M - np.eye(M.shape[0])) < 1.e-20).all()
+        assert M.shape[0] == M.shape[1]
+        assert (np.abs(M - np.eye(M.shape[0])) < 1.0e-20).all()
 
         return null_basis
 

@@ -30,7 +30,7 @@ echo ""
 
 # Quietly install optional modules after burnman
 echo "Installing optional cvxpy, pycddlib, autograd and jupyter modules ..."
-$PYTHON -m pip install -q cvxpy pycddlib autograd jupyter
+$PYTHON -m pip install -q cvxpy pycddlib==2.1.7 autograd jupyter
 echo ""
 
 function testit {
