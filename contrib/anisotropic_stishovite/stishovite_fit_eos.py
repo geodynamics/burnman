@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np
-from scipy.optimize import minimize, differential_evolution
+from scipy.optimize import minimize, differential_evolution, leastsq
 
 from stishovite_data import (
     common_data,
@@ -64,8 +64,12 @@ def misfit_scalar(args):
         P_tr_GPa,
         fP_Zhang,
         fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
         fP2_Zhang,
         fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
     ) = args
 
     scalar_prms = make_scalar_model(
@@ -88,10 +92,12 @@ def misfit_scalar(args):
     P_tr_3000K_model = transition_pressure(scalar_stv, 3000.0) / 1.0e9
     P_tr_3000K_obs = 90.0
     P_tr_3000K_err = 1.0
-    chisqr = np.sum(np.power((P_tr_3000K_model - P_tr_3000K_obs) / P_tr_3000K_err, 2.0))
+    misfits = [(P_tr_3000K_model - P_tr_3000K_obs) / P_tr_3000K_err]
 
     # Fit volumes for stishovite from Zhang, Andrault
     for phase, publication in [
+        ("stv", "Nishihara_2005"),
+        ("stv", "Wang_2012"),
         ("stv", "Zhang_2021"),
         ("poststv", "Zhang_2021"),
         ("stv", "Andrault_2003"),
@@ -103,6 +109,12 @@ def misfit_scalar(args):
         elif publication == "Andrault_2003":
             fP = fP_Andrault
             fP2 = fP2_Andrault
+        elif publication == "Wang_2012":
+            fP = fP_Wang
+            fP2 = fP2_Wang
+        elif publication == "Nishihara_2005":
+            fP = fP_Nishihara
+            fP2 = fP2_Nishihara
         else:
             fP = 1.0
             fP2 = 0.0
@@ -114,7 +126,7 @@ def misfit_scalar(args):
             0
         ]
         P_actual = PTV[:, 0] * (fP + fP2 * PTV[:, 0])
-        chisqr += np.sum(np.power((P_model - P_actual) / PTV_err[:, 0], 2.0))
+        misfits.extend(list((P_model - P_actual) / PTV_err[:, 0]))
 
         if plot:
             sort = np.argsort(P_model)
@@ -128,7 +140,7 @@ def misfit_scalar(args):
     scalar_stv.set_state(1.0e5, 298.15)
     PTV[:, 2] = PTV[:, 2] / PTV[0, 2] * scalar_stv.V
     V_model = relaxed_stv.evaluate(["V"], PTV[:, 0], PTV[:, 1])[0]
-    chisqr += np.sum(np.power((V_model - PTV[:, 2]) / PTV_err[:, 2], 2.0))
+    misfits.extend(list((V_model - PTV[:, 2]) / PTV_err[:, 2]))
 
     if plot:
         sort = np.argsort(PTV[:, 1])
@@ -139,7 +151,7 @@ def misfit_scalar(args):
     KNR_obs = relaxed_stv.evaluate_with_volumes(
         ["isentropic_bulk_modulus_reuss"], V_for_CN, T_for_CN
     )[0]
-    chisqr += np.sum(np.power((KNR_GPa - KNR_obs / 1.0e9) / KNR_err_GPa, 2.0))
+    misfits.extend(list((KNR_GPa - KNR_obs / 1.0e9) / KNR_err_GPa))
 
     if plot:
         sort = np.argsort(V_for_CN)
@@ -147,11 +159,14 @@ def misfit_scalar(args):
         ax[2].scatter(V_for_CN[sort], KNR_GPa[sort])
         plt.show()
 
+    misfits = np.array(misfits)
+    chisqr = np.sum(np.power(misfits, 2.0))
+
     if chisqr < min_misfit_scalar[0]:
         min_misfit_scalar[0] = chisqr
         print(repr(args))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 def misfit_cell(args, scalar_args):
@@ -166,8 +181,12 @@ def misfit_cell(args, scalar_args):
         P_tr_GPa,
         fP_Zhang,
         fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
         fP2_Zhang,
         fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
     ) = scalar_args
     (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = args
     (
@@ -229,7 +248,7 @@ def misfit_cell(args, scalar_args):
     _, _, _, stishovite_relaxed = models
     stishovite_relaxed.set_composition([1.0])
 
-    chisqr = 0.0
+    misfits = []
 
     if plot:
         fig = plt.figure()
@@ -248,6 +267,12 @@ def misfit_cell(args, scalar_args):
         elif publication == "Andrault_2003":
             fP = fP_Andrault
             fP2 = fP2_Andrault
+        elif publication == "Wang_2012":
+            fP = fP_Wang
+            fP2 = fP2_Wang
+        elif publication == "Nishihara_2005":
+            fP = fP_Nishihara
+            fP2 = fP2_Nishihara
         else:
             fP = 1.0
             fP2 = 0.0
@@ -268,7 +293,7 @@ def misfit_cell(args, scalar_args):
         )[0]
         abc_model = cell_parameters_model[:, :3]
 
-        chisqr += np.sum(np.power((abc_obs - abc_model) / abc_err_obs, 2.0))
+        misfits.extend(list(np.ravel((abc_obs - abc_model) / abc_err_obs)))
         if plot:
             for i in range(3):
                 j = 1
@@ -296,11 +321,14 @@ def misfit_cell(args, scalar_args):
             ax[j].plot(pressures, abc_model[:, i])
         plt.show()
 
+    misfits = np.array(misfits)
+    chisqr = np.sum(np.power(misfits, 2.0))
+
     if chisqr < min_misfit_cell[0]:
         min_misfit_cell[0] = chisqr
         print(repr(args))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 def misfit_elastic(args, scalar_args, cell_args):
@@ -315,8 +343,12 @@ def misfit_elastic(args, scalar_args, cell_args):
         P_tr_GPa,
         fP_Zhang,
         fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
         fP2_Zhang,
         fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
     ) = scalar_args
     (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = cell_args
     (a11, a22, a33, a44, a55, a66, b11i, b33i, b44i, b66i, c44, c66, b112i, b332i) = (
@@ -377,7 +409,7 @@ def misfit_elastic(args, scalar_args, cell_args):
     _, _, _, stishovite_relaxed = models
     stishovite_relaxed.set_composition([1.0])
 
-    chisqr = 0.0
+    misfits = []
 
     if plot:
         fig = plt.figure()
@@ -403,7 +435,7 @@ def misfit_elastic(args, scalar_args, cell_args):
         (5, 5),
     ]:
         chis = (CN_GPa[:, i, j] - CN_model[:, i, j] / 1.0e9) / CN_err_GPa[:, i, j]
-        chisqr += np.sum(np.power(chis, 2.0))
+        misfits.extend(list(chis))
 
         if plot:
             axi = 2
@@ -428,63 +460,74 @@ def misfit_elastic(args, scalar_args, cell_args):
             ax[axi].legend()
         plt.show()
 
+    misfits = np.array(misfits)
+    chisqr = np.sum(np.power(misfits, 2.0))
+
     if chisqr < min_misfit_elastic[0]:
         min_misfit_elastic[0] = chisqr
         print(repr(args))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 def misfit_scalar_and_cell(args):
-    scalar_args = args[:12]
-    cell_args = args[12:]
-    chisqr = misfit_scalar(scalar_args)
-    chisqr += misfit_cell(cell_args, scalar_args)
+    scalar_args = args[:16]
+    cell_args = args[16:]
+    misfits = np.concatenate(
+        (misfit_scalar(scalar_args), misfit_cell(cell_args, scalar_args))
+    )
+    chisqr = np.sum(np.power(misfits, 2.0))
 
     if chisqr < min_misfit_combined[0]:
         min_misfit_combined[0] = chisqr
         print(repr(args))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 def misfit_cell_and_elastic(args, scalar_args):
     cell_args = args[:7]
     elastic_args = args[7:]
-    chisqr = misfit_cell(cell_args, scalar_args)
+    misfits_1 = misfit_cell(cell_args, scalar_args)
     modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
-    chisqr += misfit_elastic(elastic_args, scalar_args, cell_args)
+    misfits_2 = misfit_elastic(elastic_args, scalar_args, cell_args)
+
+    misfits = np.concatenate((misfits_1, misfits_2))
+    chisqr = np.sum(np.power(misfits, 2.0))
 
     if chisqr < min_misfit_combined[0]:
         min_misfit_combined[0] = chisqr
         print(repr(args))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 def misfit_all(args):
-    scalar_args = args[:12]
-    cell_args = args[12:19]
-    elastic_args = args[19:]
-    chisqr = misfit_scalar(scalar_args)
-    chisqr += misfit_cell(cell_args, scalar_args)
+    scalar_args = args[:16]
+    cell_args = args[16:23]
+    elastic_args = args[23:]
+    misfits_1 = misfit_scalar(scalar_args)
+    misfits_2 = misfit_cell(cell_args, scalar_args)
     modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
-    chisqr += misfit_elastic(elastic_args, scalar_args, cell_args)
+    misfits_3 = misfit_elastic(elastic_args, scalar_args, cell_args)
+
+    misfits = np.concatenate((misfits_1, misfits_2, misfits_3))
+    chisqr = np.sum(np.power(misfits, 2.0))
 
     if chisqr < min_misfit_combined[0]:
         min_misfit_combined[0] = chisqr
-        print(repr(args[:12]))
-        print(repr(args[12:19]))
-        print(repr(args[19:]))
+        print(repr(args[:16]))
+        print(repr(args[16:23]))
+        print(repr(args[23:]))
     print(chisqr)
-    return chisqr
+    return misfits
 
 
 if __name__ == "__main__":
     if False:
-        sol = minimize(
-            misfit_scalar, scalar_args, bounds=scalar_bounds, method="Nelder-Mead"
-        )
+        print("Starting misfit_scalar")
+        sol = leastsq(misfit_scalar, scalar_args, full_output=True)
+        print(sol)
 
     if False:
 
@@ -502,14 +545,37 @@ if __name__ == "__main__":
         )
 
     if False:
-        sol = minimize(
-            misfit_scalar_and_cell,
-            scalar_and_cell_args,
-            bounds=scalar_bounds + cell_bounds,
-            method="Nelder-Mead",
-        )
+        print("Starting misfit_scalar_and_cell")
+        sol = leastsq(
+            misfit_scalar_and_cell, scalar_and_cell_args, factor=0.01, full_output=True
+        )  # factor = 0.01 definitely helps
+        print(sol)
 
     if True:
+        print("Starting misfit_all")
+        sol = leastsq(
+            misfit_all, all_args, factor=0.01, full_output=True
+        )  # factor = 0.01 definitely helps
+
+        # Estimating covariance. See here:
+        # https://stackoverflow.com/q/14854339/6272561
+        x = sol[0]
+        residuals = misfit_all(x)
+        n_data = len(residuals)
+        n_params = len(x)
+        residual_variance = np.sum(np.power(residuals, 2.0)) / (n_data - n_params)
+
+        sig = np.sqrt(np.diag(sol[1] * residual_variance))
+        np.savetxt("model_output/covariance_matrix.dat", sol[1] * residual_variance)
+        print(repr(sig))
+        for i in range(len(x)):
+            print(f"{x[i]:.4e} +/- {sig[i]:.4e}")
+
+    if False:
+
+        def lsq(args):
+            return np.sum(np.power(misfit_all(args), 2.0))
+
         sol = minimize(
             misfit_all,
             all_args,

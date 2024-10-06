@@ -18,18 +18,29 @@ CN_GPa_orig = deepcopy(CN_GPa)
 
 models = get_models()
 _, stishovite_scalar, stishovite_unrelaxed, stishovite_relaxed = models[0]
-fP_Zhang, fP_Andrault, fP2_Zhang, fP2_Andrault = models[1:]
+(
+    fP_Zhang,
+    fP_Andrault,
+    fP_Wang,
+    fP_Nishihara,
+    fP2_Zhang,
+    fP2_Andrault,
+    fP2_Wang,
+    fP2_Nishihara,
+) = models[1:]
 
 stishovite_relaxed.set_composition([1.0])
 stishovite_unrelaxed.set_composition([0.5, 0.5])
 
-plot_isotropic_velocities = True
-plot_seismic_properties = True
-low_res_seismic_properties = True
+plot_isotropic_velocities = False
+plot_seismic_properties = False
+low_res_seismic_properties = False
 plot_relaxed = True
-plot_Q_V_abc = True
-plot_G = True
-plot_lnabc = True
+plot_Q_V_abc = False
+plot_G = False
+plot_lnabc = False
+
+show_plots_one_by_one = False
 
 if plot_isotropic_velocities:
     pressures = np.linspace(9.0e9, 128e9, 501)
@@ -93,12 +104,15 @@ if plot_isotropic_velocities:
     ax[0].legend()
     fig.set_tight_layout(True)
     fig.savefig("figures/stv_isotropic_velocities.pdf")
-    plt.show()
+    if show_plots_one_by_one:
+        plt.show()
 
 if plot_seismic_properties:
     T = 2200.0
     # for delta_P in [0.1e9]:
-    for delta_P in [-40.0e9, -1.0e9, -0.1e9, 0.1e9, 1.0e9, 40.0e9]:
+    # for delta_P in [-40.0e9, -1.0e9, -0.1e9, 0.1e9, 1.0e9, 40.0e9]:
+    # for delta_P in [-40.0e9, -30.e9, -20.e9, -10.e9, -1.0e9, -0.1e9, 0.1e9, 1.0e9, 10.e9, 20.e9, 30.e9, 40.0e9]:
+    for delta_P in [-10.0e9]:
         print(
             f"Plotting seismic properties at {delta_P/1.e9:.2f} GPa above the transition"
         )
@@ -143,13 +157,19 @@ if plot_seismic_properties:
         fig.savefig(
             f"figures/stishovite_seismic_properties_{P/1.e9:.2f}_GPa_{int(T)}_K.pdf"
         )
-        plt.show()
+        fig.savefig(
+            f"figures/stishovite_seismic_properties_{P/1.e9:.2f}_GPa_{int(T)}_K.jpg"
+        )
+        if show_plots_one_by_one:
+            plt.show()
 
 data = common_data()
 
 PTV = np.concatenate(
     (
         data["PTV"]["stv"]["Ito_1974"],
+        data["PTV"]["stv"]["Wang_2012"],
+        data["PTV"]["stv"]["Nishihara_2005"],
         data["PTV"]["stv"]["Zhang_2021"],
         data["PTV"]["poststv"]["Zhang_2021"],
         data["PTV"]["stv"]["Andrault_2003"],
@@ -161,6 +181,8 @@ PTV = np.concatenate(
 PTV_err = np.concatenate(
     (
         data["PTV_err"]["stv"]["Ito_1974"],
+        data["PTV_err"]["stv"]["Wang_2012"],
+        data["PTV_err"]["stv"]["Nishihara_2005"],
         data["PTV_err"]["stv"]["Zhang_2021"],
         data["PTV_err"]["poststv"]["Zhang_2021"],
         data["PTV_err"]["stv"]["Andrault_2003"],
@@ -172,6 +194,8 @@ PTV_err = np.concatenate(
 abc = np.concatenate(
     (
         data["abc"]["stv"]["Ito_1974"],
+        data["abc"]["stv"]["Wang_2012"],
+        data["abc"]["stv"]["Nishihara_2005"],
         data["abc"]["stv"]["Zhang_2021"],
         data["abc"]["poststv"]["Zhang_2021"],
         data["abc"]["stv"]["Andrault_2003"],
@@ -183,6 +207,8 @@ abc = np.concatenate(
 abc_err = np.concatenate(
     (
         data["abc_err"]["stv"]["Ito_1974"],
+        data["abc_err"]["stv"]["Wang_2012"],
+        data["abc_err"]["stv"]["Nishihara_2005"],
         data["abc_err"]["stv"]["Zhang_2021"],
         data["abc_err"]["poststv"]["Zhang_2021"],
         data["abc_err"]["stv"]["Andrault_2003"],
@@ -195,22 +221,29 @@ abc_err = np.concatenate(
 id = np.concatenate(
     (
         np.ones(len(data["abc_err"]["stv"]["Ito_1974"])) * 1,
-        np.ones(len(data["abc_err"]["stv"]["Zhang_2021"])) * 2,
-        np.ones(len(data["abc_err"]["poststv"]["Zhang_2021"])) * 2,
-        np.ones(len(data["abc_err"]["stv"]["Andrault_2003"])) * 3,
-        np.ones(len(data["abc_err"]["poststv"]["Andrault_2003"])) * 3,
-        np.ones(len(data["abc_err"]["stv"]["Fischer_2018"])) * 4,
-        np.ones(len(data["abc_err"]["poststv"]["Fischer_2018"])) * 4,
+        np.ones(len(data["abc_err"]["stv"]["Wang_2012"])) * 2,
+        np.ones(len(data["abc_err"]["stv"]["Nishihara_2005"])) * 3,
+        np.ones(len(data["abc_err"]["stv"]["Zhang_2021"])) * 4,
+        np.ones(len(data["abc_err"]["poststv"]["Zhang_2021"])) * 4,
+        np.ones(len(data["abc_err"]["stv"]["Andrault_2003"])) * 5,
+        np.ones(len(data["abc_err"]["poststv"]["Andrault_2003"])) * 5,
+        np.ones(len(data["abc_err"]["stv"]["Fischer_2018"])) * 6,
+        np.ones(len(data["abc_err"]["poststv"]["Fischer_2018"])) * 6,
     )
 )
 
 Ito_mask = id == 1
-Zhang_mask = id == 2
-Andrault_mask = id == 3
-Fischer_mask = id == 4
+Wang_mask = id == 2
+Nishihara_mask = id == 3
+Zhang_mask = id == 4
+Andrault_mask = id == 5
+Fischer_mask = id == 6
 
 PTV[Zhang_mask, 0] *= fP_Zhang + PTV[Zhang_mask, 0] * fP2_Zhang
 PTV[Andrault_mask, 0] *= fP_Andrault + PTV[Andrault_mask, 0] * fP2_Andrault
+PTV[Wang_mask, 0] *= fP_Wang + PTV[Wang_mask, 0] * fP2_Wang
+PTV[Nishihara_mask, 0] *= fP_Nishihara + PTV[Nishihara_mask, 0] * fP2_Nishihara
+P_for_CN_orig = deepcopy(P_for_CN)
 P_for_CN *= fP_Zhang + P_for_CN * fP2_Zhang
 
 print(
@@ -221,17 +254,28 @@ stishovite_relaxed.set_composition([1])
 print(f"Consistent?: {check_anisotropic_eos_consistency(stishovite_relaxed)}")
 
 if plot_lnabc:
-    fig_lnabc = plt.figure(figsize=(8, 4))
+    fig_lnabc = plt.figure(figsize=(10, 4))
     ax_lnabc = [fig_lnabc.add_subplot(1, 2, i) for i in range(1, 3)]
 
-    colors = ["tab:blue", "tab:red", "tab:purple", "tab:orange"]
-    labels = [
-        "Ito et al. (1974)",
-        "Zhang et al. (2021)",
-        "Andrault et al. (2003)",
-        "Fischer et al. (2018)",
+    colors = [
+        "tab:olive",
+        "tab:cyan",
+        "tab:orange",
+        "tab:blue",
+        "tab:purple",
+        "tab:red",
     ]
-    for i, mask in enumerate([Ito_mask, Zhang_mask, Andrault_mask, Fischer_mask]):
+    labels = [
+        "Zhang et al. (2021)",
+        "Fischer et al. (2018)",
+        "Wang et al. (2012)",
+        "Nishihara et al. (2005)",
+        "Andrault et al. (2003)",
+        "Ito et al. (1974)",
+    ]
+    for i, mask in enumerate(
+        [Zhang_mask, Fischer_mask, Wang_mask, Nishihara_mask, Andrault_mask, Ito_mask]
+    ):
         c = colors[i]
 
         lnV = deepcopy(np.log(PTV[mask, 2]))
@@ -277,10 +321,12 @@ if plot_lnabc:
 
     ax_lnabc[0].set_ylabel("$\\ln(a)$, $\\ln(b)$ (cm/mol$^{\\frac{1}{3}}$)")
     ax_lnabc[1].set_ylabel("$\\ln(c)$ (cm/mol$^{\\frac{1}{3}}$)")
-    ax_lnabc[1].legend()
+    handles, labels = ax_lnabc[1].get_legend_handles_labels()
+    ax_lnabc[1].legend(handles[::-1], labels[::-1])
     fig_lnabc.set_tight_layout(True)
     fig_lnabc.savefig("figures/stv_lnabc.pdf")
-    plt.show()
+    if show_plots_one_by_one:
+        plt.show()
 
 
 if plot_G:
@@ -294,17 +340,29 @@ if plot_G:
     G_xs = stishovite_scalar.evaluate(
         ["excess_gibbs"], pressure_grid, T_grid, molar_fractions
     )[0]
+
+    n_lines = len(pressures)
+    cmap = matplotlib.colormaps["rainbow"]
+
+    # Take colors at regular intervals spanning the colormap.
+    colors = cmap(np.linspace(0, 1, n_lines))
+
     for i in range(len(pressures)):
         if i % 2 == 0:
             ax_G[0].plot(
-                p_grid[:, i], G_xs[:, i] / 1000.0, label=f"{pressures[i]/1.e9} GPa"
+                p_grid[:, i],
+                G_xs[:, i] / 1000.0,
+                label=f"{pressures[i]/1.e9} GPa",
+                color=colors[i],
             )
         else:
-            ax_G[0].plot(p_grid[:, i], G_xs[:, i] / 1000.0, linestyle=":")
+            ax_G[0].plot(
+                p_grid[:, i], G_xs[:, i] / 1000.0, linestyle=":", color=colors[i]
+            )
         imin = np.argmin(G_xs[:, i])
         G_min = G_xs[imin, i] / 1.0e3
         p_min = p_grid[imin, i]
-        ax_G[0].scatter([p_min, 1.0 - p_min], [G_min, G_min])
+        ax_G[0].scatter([p_min, 1.0 - p_min], [G_min, G_min], color=colors[i])
     ax_G[0].set_xlim(-0.25, 1.25)
     ax_G[0].set_xlabel("$p_{Q1}$")
     ax_G[0].set_ylabel("$\\mathcal{G}_{xs}$ (kJ/mol)")
@@ -317,7 +375,8 @@ if plot_G:
     ax_G2.set_xlabel("$Q$")
     fig_G.set_tight_layout(True)
     fig_G.savefig("figures/stv_G.pdf")
-    plt.show()
+    if show_plots_one_by_one:
+        plt.show()
 
 
 if plot_Q_V_abc:
@@ -430,6 +489,8 @@ if plot_Q_V_abc:
     fig_Q.savefig("figures/stv_Q.pdf")
     fig_V.savefig("figures/stv_V.pdf")
     fig_abc.savefig("figures/stv_abc.pdf")
+    if show_plots_one_by_one:
+        plt.show()
 
 if plot_relaxed:
     fig_relaxed = plt.figure(figsize=(12, 4))
@@ -467,14 +528,14 @@ if plot_relaxed:
         ["isentropic_stiffness_tensor", "isentropic_bulk_modulus_reuss"], pressures, Ts
     )
 
-    c = ax_relaxed[1].plot(pressures / 1.0e9, K_NR / 1.0e9, label="$K_{NR}$")
+    c = ax_relaxed[1].plot(pressures / 1.0e9, K_NR / 1.0e9, label="$K_{SR}$")
     ax_relaxed[1].plot(
         pressures / 1.0e9, K_NR_u / 1.0e9, linestyle=":", c=c[0].get_color()
     )
-    ax_relaxed[1].scatter(P_for_CN / 1.0e9, KNR_GPa, label="$K_{NR}$")
+    ax_relaxed[1].scatter(P_for_CN / 1.0e9, KNR_GPa, label="$K_{SR}$")
 
-    ax_Q0[1].plot(pressures / 1.0e9, K_NR_Q0 / 1.0e9, label="$K_{NR} (Q0)$")
-    ax_Q0[1].plot(pressures / 1.0e9, K_NR_Q1 / 1.0e9, label="$K_{NR} (Q1)$")
+    ax_Q0[1].plot(pressures / 1.0e9, K_NR_Q0 / 1.0e9, label="$K_{SR} (Q0)$")
+    ax_Q0[1].plot(pressures / 1.0e9, K_NR_Q1 / 1.0e9, label="$K_{SR} (Q1)$")
 
     for axi, i, j in (
         (0, 0, 0),
@@ -488,7 +549,7 @@ if plot_relaxed:
         (2, 5, 5),
     ):
         c = ax_relaxed[axi].plot(
-            pressures / 1.0e9, C_N[:, i, j] / 1.0e9, label=f"$C_{{N{i+1}{j+1}}}$"
+            pressures / 1.0e9, C_N[:, i, j] / 1.0e9, label=f"$C_{{S{i+1}{j+1}}}$"
         )
         color = c[0].get_color()
         ax_relaxed[axi].plot(
@@ -497,8 +558,10 @@ if plot_relaxed:
         ax_relaxed[axi].scatter(
             P_for_CN / 1.0e9, CN_GPa[:, i, j], label=f"{i+1}{j+1}", color=color
         )
+
+        # Plot original data
         ax_relaxed[axi].errorbar(
-            P_for_CN / 1.0e9,
+            P_for_CN_orig / 1.0e9,
             CN_GPa_orig[:, i, j],
             yerr=CN_err_GPa[:, i, j],
             alpha=0.5,
@@ -506,7 +569,7 @@ if plot_relaxed:
             ls="none",
         )
         ax_relaxed[axi].scatter(
-            P_for_CN / 1.0e9, CN_GPa_orig[:, i, j], s=5, alpha=0.5, color=color
+            P_for_CN_orig / 1.0e9, CN_GPa_orig[:, i, j], s=5, alpha=0.5, color=color
         )
 
         ax_Q0[axi].plot(
@@ -531,4 +594,8 @@ if plot_relaxed:
 
     fig_relaxed.savefig("figures/stv_relaxed.pdf")
 
+    if show_plots_one_by_one:
+        plt.show()
+
+if not show_plots_one_by_one:
     plt.show()
