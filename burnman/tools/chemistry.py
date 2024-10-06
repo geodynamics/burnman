@@ -284,16 +284,23 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
     ]
     reactions = []
     for p in polys:
-        v = np.array([[value for value in v] for v in p.raw_vertices])
+        v = np.array(
+            [
+                [Rational(value).limit_denominator(1000000) for value in v]
+                for v in p.raw_vertices
+            ]
+        )
 
         if v is not []:
             reactions.extend(v)
 
-    reactions = np.unique(np.array(reactions, dtype=float), axis=0)
-
-    reactions = np.array(
-        [[Rational(value).limit_denominator(1000000) for value in v] for v in reactions]
+    # There are many duplicate reactions produced by the above procedure
+    # Here we pick out the unique values
+    reactions = np.array(reactions)
+    _, unique_indices = np.unique(
+        np.array(reactions, dtype=float), return_index=True, axis=0
     )
+    reactions = reactions[unique_indices]  # return as rationals
 
     assert np.max(reactions[:-1, 0]) == 0
     assert np.max(reactions[-1, 1:]) == 0

@@ -29,8 +29,8 @@ $PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 echo ""
 
 # Quietly install optional modules after burnman
-echo "Installing optional cvxpy, pycddlib, autograd and jupyter modules ..."
-$PYTHON -m pip install -q cvxpy pycddlib==2.1.7 autograd jupyter
+echo "Installing optional autograd and jupyter modules ..."
+$PYTHON -m pip install -q autograd jupyter
 echo ""
 
 function testit {

@@ -12,18 +12,13 @@ from fractions import Fraction
 from scipy.spatial import Delaunay
 from scipy.special import comb
 from copy import copy
+import cdd
 
 from .material import cached_property
 
 from ..utils.math import independent_row_indices
 
-try:
-    cdd = importlib.import_module("cdd")
-except ImportError as err:
-    print(
-        f"Warning: {err}. "
-        "For full functionality of BurnMan, please install pycddlib."
-    )
+cdd_number_type = "float"
 
 
 class SimplexGrid(object):
@@ -142,21 +137,21 @@ class MaterialPolytope(object):
         :param return_fractions: Choose whether the generated polytope object
             should return fractions or floats.
         :type return_fractions: bool
-        :param independent_endmember_occupancies: If specified, this array provides
-            the independent endmember set against which the dependent endmembers
-            are defined.
+        :param independent_endmember_occupancies: If specified, this array
+            provides the independent endmember set against which the
+            dependent endmembers are defined.
         :type independent_endmember_occupancies: numpy.array (2D) or None
         """
         self.set_return_type(return_fractions)
         self.equality_matrix = equalities[:, 1:]
         self.equality_vector = -equalities[:, 0]
 
-        self.polytope_matrix = cdd.Matrix(
-            equalities, linear=True, number_type=number_type
-        )
+        self.polytope_matrix = cdd.matrix_from_array(equalities)
+        self.polytope_matrix.lin_set = set(range(len(equalities)))
         self.polytope_matrix.rep_type = cdd.RepType.INEQUALITY
-        self.polytope_matrix.extend(inequalities, linear=False)
-        self.polytope = cdd.Polyhedron(self.polytope_matrix)
+
+        cdd.matrix_append_to(self.polytope_matrix, cdd.matrix_from_array(inequalities))
+        self.polytope = cdd.polyhedron_from_matrix(self.polytope_matrix)
 
         if independent_endmember_occupancies is not None:
             self.independent_endmember_occupancies = independent_endmember_occupancies
@@ -182,14 +177,14 @@ class MaterialPolytope(object):
         Returns a list of the vertices of the polytope without any
         postprocessing. See also endmember_occupancies.
         """
-        return self.polytope.get_generators()[:]
+        return cdd.copy_generators(self.polytope).array
 
     @cached_property
     def limits(self):
         """
         Return the limits of the polytope (the set of bounding inequalities).
         """
-        return np.array(self.polytope.get_inequalities(), dtype=float)
+        return np.array(cdd.copy_inequalities(self.polytope).array, dtype=float)
 
     @cached_property
     def n_endmembers(self):
@@ -206,7 +201,7 @@ class MaterialPolytope(object):
         (a processed list of all of the vertex locations).
         """
         if self.return_fractions:
-            if self.polytope.number_type == "fraction":
+            if cdd_number_type == "fraction":
                 v = np.array(
                     [[Fraction(value) for value in v] for v in self.raw_vertices]
                 )
@@ -225,7 +220,6 @@ class MaterialPolytope(object):
                 "The combined equality and positivity "
                 "constraints result in a null polytope."
             )
-
         return v[:, 1:] / v[:, 0, np.newaxis]
 
     @cached_property
@@ -281,9 +275,9 @@ class MaterialPolytope(object):
         """
         arr = self.endmembers_as_independent_endmember_amounts
         arr = np.hstack((np.ones((len(arr), 1)), arr[:, :-1]))
-        M = cdd.Matrix(arr, number_type="fraction")
+        M = cdd.matrix_from_array(arr)
         M.rep_type = cdd.RepType.GENERATOR
-        return cdd.Polyhedron(M)
+        return cdd.polyhedron_from_matrix(M)
 
     @cached_property
     def independent_endmember_limits(self):
@@ -291,27 +285,28 @@ class MaterialPolytope(object):
         Gets the limits of the polytope as a function of the independent
         endmembers.
         """
-        return np.array(
-            self.independent_endmember_polytope.get_inequalities(), dtype=float
-        )
+        ind_poly = self.independent_endmember_polytope
+        inequalities = cdd.copy_inequalities(ind_poly).array
+        return np.array(inequalities, dtype=float)
 
     def subpolytope_from_independent_endmember_limits(self, limits):
         """
         Returns a smaller polytope by applying additional limits to the amounts
         of the independent endmembers.
         """
-        modified_limits = self.independent_endmember_polytope.get_inequalities().copy()
-        modified_limits.extend(limits, linear=False)
-        return cdd.Polyhedron(modified_limits)
+        ind_poly = self.independent_endmember_polytope
+        modified_limits = cdd.copy_inequalities(ind_poly)
+        cdd.matrix_append_to(modified_limits, cdd.matrix_from_array(limits))
+        return cdd.polyhedron_from_matrix(modified_limits)
 
     def subpolytope_from_site_occupancy_limits(self, limits):
         """
         Returns a smaller polytope by applying additional limits to the
         individual site occupancies.
         """
-        modified_limits = self.polytope_matrix.copy()
-        modified_limits.extend(limits, linear=False)
-        return cdd.Polyhedron(modified_limits)
+        modified_limits = copy(self.polytope_matrix)
+        cdd.matrix_append_to(modified_limits, cdd.matrix_from_array(limits))
+        return cdd.polyhedron_from_matrix(modified_limits)
 
     def grid(
         self,
@@ -325,15 +320,16 @@ class MaterialPolytope(object):
 
         :param points_per_edge: Number of points per edge of the polytope.
         :type points_per_edge: int
-        :param unique_sorted: The gridding is done by splitting the polytope into
-            a set of simplices. This means that points will be duplicated along
-            vertices, faces etc. If unique_sorted is True, this function
+        :param unique_sorted: The gridding is done by splitting the polytope
+            into a set of simplices. This means that points will be duplicated
+            along vertices, faces etc. If unique_sorted is True, this function
             will sort and make the points unique. This is an expensive
             operation for large polytopes, and may not always be necessary.
         :type unique_sorted: bool
         :param grid_type: Whether to grid the polytope in terms of
             independent endmember proportions or site occupancies.
-            Choices are 'independent endmember proportions' or 'site occupancies'
+            Choices are 'independent endmember proportions' or
+            'site occupancies'
         :type grid_type: str
         :param limits: Additional inequalities restricting the
             gridded area of the polytope.
@@ -361,11 +357,8 @@ class MaterialPolytope(object):
             )
         else:
             if grid_type == "independent endmember proportions":
-                ppns = np.array(
-                    self.subpolytope_from_independent_endmember_limits(
-                        limits
-                    ).get_generators()[:]
-                )[:, 1:]
+                plims = self.subpolytope_from_site_occupancy_limits(limits)
+                ppns = np.array(cdd.copy_generators(plims).array)[:, 1:]
                 last_ppn = np.array([1.0 - sum(p) for p in ppns]).reshape(
                     (len(ppns), 1)
                 )
@@ -377,11 +370,8 @@ class MaterialPolytope(object):
                 )
 
             elif grid_type == "site occupancies":
-                occ = np.array(
-                    self.subpolytope_from_site_occupancy_limits(
-                        limits
-                    ).get_generators()[:]
-                )[:, 1:]
+                plims = self.subpolytope_from_site_occupancy_limits(limits)
+                occ = np.array(cdd.copy_generators(plims).array)[:, 1:]
                 f_occ = occ / (points_per_edge - 1)
 
                 ind = self.independent_endmember_occupancies
