@@ -24,8 +24,12 @@ def modify_Zhang_elasticity(scalar_args, cell_args, elastic_args):
         P_tr_GPa,
         fP_Zhang,
         fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
         fP2_Zhang,
         fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
     ) = scalar_args
     (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = cell_args
     (a11, a22, a33, a44, a55, a66, b11i, b33i, b44i, b66i, c44, c66, b112i, b332i) = (
@@ -498,9 +502,9 @@ def make_models(
 
 def get_models():
 
-    scalar_args = all_args[:12]
-    cell_args = all_args[12:19]
-    elastic_args = all_args[19:]
+    scalar_args = all_args[:16]
+    cell_args = all_args[16:23]
+    elastic_args = all_args[23:]
 
     modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
 
@@ -515,8 +519,12 @@ def get_models():
         P_tr_GPa,
         fP_Zhang,
         fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
         fP2_Zhang,
         fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
     ) = scalar_args
     (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = cell_args
     (a11, a22, a33, a44, a55, a66, b11i, b33i, b44i, b66i, c44, c66, b112i, b332i) = (
@@ -583,6 +591,8 @@ def get_models():
 
     sm = models[1]
     Q0, Q1 = sm.solution_model.interaction_endmembers
+    Q1.params["F_0"] -= Q0.params["F_0"]
+    Q0.params["F_0"] = 0
     properties = ["F_0", "V_0", "K_0", "Kprime_0", "Debye_0", "grueneisen_0", "q_0"]
     pps = [
         "$\\mathcal{F}_0$",
@@ -595,12 +605,13 @@ def get_models():
     ]
     table = [["", "$Q = 0$", "$Q = 1$"]]
     for i, p in enumerate(properties):
-        table.append([pps[i], f"{Q0.params[p]:.6e}", f"{Q1.params[p]:.6e}"])
+        table.append([pps[i], f"{Q0.params[p]:.4e}", f"{Q1.params[p]:.4e}"])
 
+    table[1][1] = "-"
     table.append(["$a_0$", "-", a0Q1])
     table.append(["$b_0$", "-", b0Q1])
 
-    print(tabulate(table, headers="firstrow", tablefmt="latex_raw", floatfmt=".6e"))
+    print(tabulate(table, headers="firstrow", tablefmt="latex_raw", floatfmt=".4e"))
 
     print("b_xs", sm.b_xs)
 
@@ -663,7 +674,7 @@ def get_models():
     )
 
     table = [
-        [f"{item:.6e}" if type(item) is np.float64 else item for item in row]
+        [f"{item:.4e}" if type(item) is np.float64 else item for item in row]
         for row in table
     ]
     print(
@@ -671,11 +682,23 @@ def get_models():
             list(map(list, zip(*table))),
             headers="firstrow",
             tablefmt="latex_raw",
-            floatfmt=".6e",
+            floatfmt=".4e",
         )
     )
 
     print("Corrections to pressure:")
-    print(f"    Zhang: {fP_Zhang}, {fP2_Zhang}")
-    print(f"    Andrault: {fP_Andrault}, {fP2_Andrault}")
-    return models, fP_Zhang, fP_Andrault, fP2_Zhang, fP2_Andrault
+    print(f"${fP_Zhang:.4f}{fP2_Zhang*1e9:+.4f}P$ (Zhang)")
+    print(f"${fP_Andrault:.4f}{fP2_Andrault*1e9:+.4f}P$ (Andrault)")
+    print(f"${fP_Wang:.4f}{fP2_Wang*1e9:+.4f}P$ (Wang)")
+    print(f"${fP_Nishihara:.4f}{fP2_Nishihara*1e9:+.4f}P$ (Nishihara)")
+    return (
+        models,
+        fP_Zhang,
+        fP_Andrault,
+        fP_Wang,
+        fP_Nishihara,
+        fP2_Zhang,
+        fP2_Andrault,
+        fP2_Wang,
+        fP2_Nishihara,
+    )

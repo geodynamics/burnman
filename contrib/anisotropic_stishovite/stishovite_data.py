@@ -150,6 +150,42 @@ def get_data():
     d["P"] = d["T"] * 0.0 + 0.0001
     d["P_err"] = d["T"] * 0.0 + 0.000001
 
+    # Wang data (only stishovite)
+    W_data = np.loadtxt("data/Wang_et_al_2012_stv.dat")
+    header = [
+        "id",
+        "T",
+        "P",
+        "P_err",
+        "a",
+        "a_err",
+        "c",
+        "c_err",
+        "V",
+        "V_err",
+        "VAu",
+        "VAu_err",
+    ]
+    compilation = [["stv", header, W_data]]
+    add_to_data(data, "Wang_2012", compilation)
+
+    d = data["Wang_2012"]["stv"]
+    d["T_err"] = d["T"] / 100.0
+    d["b"] = d["a"]
+    d["b_err"] = d["a_err"]
+
+    # Nishihara data (only stishovite)
+    N_data = np.loadtxt("data/Nishihara_et_al_2005_stv.dat")
+    header = ["P", "T", "a", "a_err", "c", "c_err", "V", "V_err"]
+    compilation = [["stv", header, N_data]]
+    add_to_data(data, "Nishihara_2005", compilation)
+
+    d = data["Nishihara_2005"]["stv"]
+    d["T_err"] = d["T"] / 100.0
+    d["P_err"] = d["P"] * 0.05 + 0.2  # conservative estimate of the pressure error
+    d["b"] = d["a"]
+    d["b_err"] = d["a_err"]
+
     # Convert to SI units
     d = data["Zhang_2021"]["CT"]
     d["P"] = d["P"] * 1.0e9
@@ -165,6 +201,8 @@ def get_data():
         data["Fischer_2018"]["poststv"],
         data["Zhang_2021"]["stv"],
         data["Zhang_2021"]["poststv"],
+        data["Wang_2012"]["stv"],
+        data["Nishihara_2005"]["stv"],
     ]:
         d["V"] = molar_volume_from_unit_cell_volume(d["V"], 2.0)
         d["V_err"] = molar_volume_from_unit_cell_volume(d["V_err"], 2.0)
@@ -214,7 +252,14 @@ def common_data():
     d["abc"] = {"stv": {}, "poststv": {}}
     d["abc_err"] = {"stv": {}, "poststv": {}}
 
-    for pub in ["Ito_1974", "Andrault_2003", "Fischer_2018", "Zhang_2021"]:
+    for pub in [
+        "Ito_1974",
+        "Andrault_2003",
+        "Nishihara_2005",
+        "Wang_2012",
+        "Fischer_2018",
+        "Zhang_2021",
+    ]:
         for phase in ["stv", "poststv"]:
             try:
                 Z_data = data[pub][phase]
