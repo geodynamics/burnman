@@ -293,9 +293,10 @@ class Material(object):
 
         assert pressures.shape == temperatures.shape
 
+        first_index = list(np.ndenumerate(temperatures))[0][0]
         if molar_fractions is not None:
             molar_fractions = np.array(molar_fractions)
-            self.set_composition(molar_fractions[0])
+            self.set_composition(molar_fractions[first_index])
             assert temperatures.shape == molar_fractions.shape[:-1]
 
         # First, check the output types of all the requested variables:
