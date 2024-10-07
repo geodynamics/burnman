@@ -12,13 +12,23 @@ from fractions import Fraction
 from scipy.spatial import Delaunay
 from scipy.special import comb
 from copy import copy
-import cdd
+import cdd as cdd_float
 
 from .material import cached_property
 
 from ..utils.math import independent_row_indices
 
-cdd_number_type = "float"
+cdd_gmp_loaded = False
+
+try:
+    cdd_fraction = importlib.import_module("cdd.gmp")
+    cdd_gmp_loaded = True
+except ImportError as err:
+    cdd_fraction = importlib.import_module("cdd")
+    print(
+        f"Warning: {err}. Only pycddlib-standalone is installed."
+        "For precise fractional representations of polytopes, please install pycddlib."
+    )
 
 
 class SimplexGrid(object):
@@ -117,7 +127,6 @@ class MaterialPolytope(object):
         self,
         equalities,
         inequalities,
-        number_type="fraction",
         return_fractions=False,
         independent_endmember_occupancies=None,
     ):
@@ -133,25 +142,38 @@ class MaterialPolytope(object):
         :type inequalities: numpy.array (2D)
         :param number_type: Whether pycddlib should read the input arrays as
             fractions or floats. Valid options are 'fraction' or 'float'.
-        :type number_type: str
-        :param return_fractions: Choose whether the generated polytope object
-            should return fractions or floats.
         :type return_fractions: bool
         :param independent_endmember_occupancies: If specified, this array
             provides the independent endmember set against which the
             dependent endmembers are defined.
         :type independent_endmember_occupancies: numpy.array (2D) or None
         """
+        if equalities.dtype != inequalities.dtype:
+            raise Exception(
+                f"The dtype of the equalities ({equalities.dtype}) and inequalities ({inequalities.dtype}) arrays should be the same."
+            )
+
         self.set_return_type(return_fractions)
         self.equality_matrix = equalities[:, 1:]
         self.equality_vector = -equalities[:, 0]
 
-        self.polytope_matrix = cdd.matrix_from_array(equalities)
-        self.polytope_matrix.lin_set = set(range(len(equalities)))
-        self.polytope_matrix.rep_type = cdd.RepType.INEQUALITY
+        if equalities.dtype == Fraction and cdd_gmp_loaded is True:
+            self.number_type = Fraction
+            self.cdd = cdd_fraction
+        elif equalities.dtype == float or cdd_gmp_loaded is False:
+            self.number_type = float
+            self.cdd = cdd_float
+        else:
+            raise Exception("number_type should be either float or Fraction.")
 
-        cdd.matrix_append_to(self.polytope_matrix, cdd.matrix_from_array(inequalities))
-        self.polytope = cdd.polyhedron_from_matrix(self.polytope_matrix)
+        self.polytope_matrix = self.cdd.matrix_from_array(equalities)
+        self.polytope_matrix.lin_set = set(range(len(equalities)))
+        self.polytope_matrix.rep_type = self.cdd.RepType.INEQUALITY
+
+        self.cdd.matrix_append_to(
+            self.polytope_matrix, self.cdd.matrix_from_array(inequalities)
+        )
+        self.polytope = self.cdd.polyhedron_from_matrix(self.polytope_matrix)
 
         if independent_endmember_occupancies is not None:
             self.independent_endmember_occupancies = independent_endmember_occupancies
@@ -177,14 +199,14 @@ class MaterialPolytope(object):
         Returns a list of the vertices of the polytope without any
         postprocessing. See also endmember_occupancies.
         """
-        return cdd.copy_generators(self.polytope).array
+        return self.cdd.copy_generators(self.polytope).array
 
     @cached_property
     def limits(self):
         """
         Return the limits of the polytope (the set of bounding inequalities).
         """
-        return np.array(cdd.copy_inequalities(self.polytope).array, dtype=float)
+        return np.array(self.cdd.copy_inequalities(self.polytope).array, dtype=float)
 
     @cached_property
     def n_endmembers(self):
@@ -200,20 +222,15 @@ class MaterialPolytope(object):
         Return the endmember occupancies
         (a processed list of all of the vertex locations).
         """
-        if self.return_fractions:
-            if cdd_number_type == "fraction":
-                v = np.array(
-                    [[Fraction(value) for value in v] for v in self.raw_vertices]
-                )
-            else:
-                v = np.array(
-                    [
-                        [Rational(value).limit_denominator(1000000) for value in v]
-                        for v in self.raw_vertices
-                    ]
-                )
+        if self.number_type == float and self.return_fractions:
+            v = np.array(
+                [
+                    [Rational(value).limit_denominator(1000000) for value in v]
+                    for v in self.raw_vertices
+                ]
+            )
         else:
-            v = np.array([[float(value) for value in v] for v in self.raw_vertices])
+            v = np.array(self.raw_vertices)
 
         if len(v.shape) == 1:
             raise ValueError(
@@ -275,9 +292,10 @@ class MaterialPolytope(object):
         """
         arr = self.endmembers_as_independent_endmember_amounts
         arr = np.hstack((np.ones((len(arr), 1)), arr[:, :-1]))
-        M = cdd.matrix_from_array(arr)
-        M.rep_type = cdd.RepType.GENERATOR
-        return cdd.polyhedron_from_matrix(M)
+        arr = [[Fraction(value).limit_denominator(1000000) for value in v] for v in arr]
+        M = cdd_fraction.matrix_from_array(arr)
+        M.rep_type = cdd_fraction.RepType.GENERATOR
+        return cdd_fraction.polyhedron_from_matrix(M)
 
     @cached_property
     def independent_endmember_limits(self):
@@ -286,7 +304,7 @@ class MaterialPolytope(object):
         endmembers.
         """
         ind_poly = self.independent_endmember_polytope
-        inequalities = cdd.copy_inequalities(ind_poly).array
+        inequalities = cdd_fraction.copy_inequalities(ind_poly).array
         return np.array(inequalities, dtype=float)
 
     def subpolytope_from_independent_endmember_limits(self, limits):
@@ -295,9 +313,11 @@ class MaterialPolytope(object):
         of the independent endmembers.
         """
         ind_poly = self.independent_endmember_polytope
-        modified_limits = cdd.copy_inequalities(ind_poly)
-        cdd.matrix_append_to(modified_limits, cdd.matrix_from_array(limits))
-        return cdd.polyhedron_from_matrix(modified_limits)
+        modified_limits = cdd_fraction.copy_inequalities(ind_poly)
+        cdd_fraction.matrix_append_to(
+            modified_limits, cdd_fraction.matrix_from_array(limits)
+        )
+        return cdd_fraction.polyhedron_from_matrix(modified_limits)
 
     def subpolytope_from_site_occupancy_limits(self, limits):
         """
@@ -305,8 +325,8 @@ class MaterialPolytope(object):
         individual site occupancies.
         """
         modified_limits = copy(self.polytope_matrix)
-        cdd.matrix_append_to(modified_limits, cdd.matrix_from_array(limits))
-        return cdd.polyhedron_from_matrix(modified_limits)
+        self.cdd.matrix_append_to(modified_limits, self.cdd.matrix_from_array(limits))
+        return self.cdd.polyhedron_from_matrix(modified_limits)
 
     def grid(
         self,
@@ -358,7 +378,7 @@ class MaterialPolytope(object):
         else:
             if grid_type == "independent endmember proportions":
                 plims = self.subpolytope_from_site_occupancy_limits(limits)
-                ppns = np.array(cdd.copy_generators(plims).array)[:, 1:]
+                ppns = np.array(self.cdd.copy_generators(plims).array)[:, 1:]
                 last_ppn = np.array([1.0 - sum(p) for p in ppns]).reshape(
                     (len(ppns), 1)
                 )
@@ -371,7 +391,7 @@ class MaterialPolytope(object):
 
             elif grid_type == "site occupancies":
                 plims = self.subpolytope_from_site_occupancy_limits(limits)
-                occ = np.array(cdd.copy_generators(plims).array)[:, 1:]
+                occ = np.array(self.cdd.copy_generators(plims).array)[:, 1:]
                 f_occ = occ / (points_per_edge - 1)
 
                 ind = self.independent_endmember_occupancies

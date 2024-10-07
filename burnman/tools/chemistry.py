@@ -276,10 +276,12 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
     """
     n_components = stoichiometric_matrix.shape[1]
 
-    equalities = np.concatenate(([np.zeros(n_components)], stoichiometric_matrix)).T
+    equalities = np.concatenate(
+        ([np.zeros(n_components)], np.array(stoichiometric_matrix).astype(float))
+    ).T
 
     polys = [
-        MaterialPolytope(equalities, np.diag(v))
+        MaterialPolytope(equalities, np.diag(v).astype(float))
         for v in itertools.product(*[[-1, 1]] * len(equalities[0]))
     ]
     reactions = []
@@ -288,19 +290,17 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
             [
                 [Rational(value).limit_denominator(1000000) for value in v]
                 for v in p.raw_vertices
-            ]
+            ],
+            dtype=float,
         )
 
         if v is not []:
             reactions.extend(v)
 
-    # There are many duplicate reactions produced by the above procedure
-    # Here we pick out the unique values
-    reactions = np.array(reactions)
-    _, unique_indices = np.unique(
-        np.array(reactions, dtype=float), return_index=True, axis=0
+    reactions = np.unique(np.array(reactions), axis=0)
+    reactions = np.array(
+        [[Rational(value).limit_denominator(1000000) for value in v] for v in reactions]
     )
-    reactions = reactions[unique_indices]  # return as rationals
 
     assert np.max(reactions[:-1, 0]) == 0
     assert np.max(reactions[-1, 1:]) == 0
