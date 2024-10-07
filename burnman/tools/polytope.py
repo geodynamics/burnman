@@ -164,9 +164,7 @@ def composite_polytope_at_constrained_composition(
     eoccs = block_diag(*eoccs)
     inequalities = np.concatenate((np.zeros((len(eoccs), 1)), eoccs), axis=1)
 
-    return MaterialPolytope(
-        equalities, inequalities, number_type="float", return_fractions=return_fractions
-    )
+    return MaterialPolytope(equalities, inequalities, return_fractions=return_fractions)
 
 
 def simplify_composite_with_composition(composite, composition):

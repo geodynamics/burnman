@@ -276,21 +276,28 @@ def reactions_from_stoichiometric_matrix(stoichiometric_matrix):
     """
     n_components = stoichiometric_matrix.shape[1]
 
-    equalities = np.concatenate(([np.zeros(n_components)], stoichiometric_matrix)).T
+    equalities = np.concatenate(
+        ([np.zeros(n_components)], np.array(stoichiometric_matrix).astype(float))
+    ).T
 
     polys = [
-        MaterialPolytope(equalities, np.diag(v))
+        MaterialPolytope(equalities, np.diag(v).astype(float))
         for v in itertools.product(*[[-1, 1]] * len(equalities[0]))
     ]
     reactions = []
     for p in polys:
-        v = np.array([[value for value in v] for v in p.raw_vertices])
+        v = np.array(
+            [
+                [Rational(value).limit_denominator(1000000) for value in v]
+                for v in p.raw_vertices
+            ],
+            dtype=float,
+        )
 
         if v is not []:
             reactions.extend(v)
 
-    reactions = np.unique(np.array(reactions, dtype=float), axis=0)
-
+    reactions = np.unique(np.array(reactions), axis=0)
     reactions = np.array(
         [[Rational(value).limit_denominator(1000000) for value in v] for v in reactions]
     )
