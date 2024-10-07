@@ -58,3 +58,32 @@ jobs:
     - name: test
       run: |
         PYTHON=python ./test.sh
+
+  linux_full_pycddlib:
+    name: test with full pycddlib
+    runs-on: [ubuntu-24.04]
+
+    strategy:
+      matrix:
+        python-versions: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-versions }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-versions }}
+    - name: setup
+      run: |
+        sudo apt update && sudo apt install --yes \
+         libcdd-dev \
+         libgmp-dev \
+         numdiff \
+         texlive \
+         texlive-latex-extra
+        python -m pip install --upgrade pip
+        pip install pycddlib autograd # this is optional
+        python --version
+    - name: test with full pycddlib
+      run: |
+        PYTHON=python ./test.sh
