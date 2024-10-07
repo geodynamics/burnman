@@ -18,17 +18,13 @@ from .material import cached_property
 
 from ..utils.math import independent_row_indices
 
-cdd_gmp_loaded = False
 
 try:
     cdd_fraction = importlib.import_module("cdd.gmp")
     cdd_gmp_loaded = True
-except ImportError as err:
+except ImportError:
     cdd_fraction = importlib.import_module("cdd")
-    print(
-        f"Warning: {err}. Only pycddlib-standalone is installed."
-        "For precise fractional representations of polytopes, please install pycddlib."
-    )
+    cdd_gmp_loaded = False
 
 
 class SimplexGrid(object):
