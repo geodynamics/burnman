@@ -35,6 +35,7 @@ composite polytope.
 """
 from __future__ import absolute_import
 import numpy as np
+from sympy import Rational
 
 import burnman
 from burnman.minerals import SLB_2011
@@ -197,14 +198,21 @@ if __name__ == "__main__":
     )
     print([formula_to_string(f) for f in assemblage.endmember_formulae])
 
+    # The conversions from Fraction to Rational below
+    # are solely for pretty-printing purposes.
     print(
         "Which led to the following extreme vertices satifying "
         "the bulk compositional constraints:"
     )
-    print(old_polytope.endmember_occupancies)
+
+    print(
+        np.array([[Rational(v) for v in i] for i in old_polytope.endmember_occupancies])
+    )
 
     print("\nThe new assemblage has fewer endmembers, with compositions:")
     print([formula_to_string(f) for f in new_assemblage.endmember_formulae])
 
     print("The same vertices now look like this:")
-    print(new_polytope.endmember_occupancies)
+    print(
+        np.array([[Rational(v) for v in i] for i in new_polytope.endmember_occupancies])
+    )

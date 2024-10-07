@@ -112,9 +112,7 @@ class SimplexGrid(object):
 
 class MaterialPolytope(object):
     """
-    A class that can be instantiated to create pycddlib polytope objects.
-    These objects can be interrogated to provide the vertices satisfying the
-    input constraints.
+    A class for creating and manipulating polytope objects using pycddlib.
 
     This class is available as :class:`burnman.polytope.MaterialPolytope`.
     """
@@ -132,12 +130,11 @@ class MaterialPolytope(object):
 
         :param equalities: A numpy array containing all the
             equalities defining the polytope. Each row should evaluate to 0.
-        :type equalities: numpy.array (2D)
+        :type equalities: numpy.array (2D) of floats or Fractions
         :param inequalities: A numpy array containing all the inequalities
             defining the polytope. Each row should evaluate to <= 0.
-        :type inequalities: numpy.array (2D)
-        :param number_type: Whether pycddlib should read the input arrays as
-            fractions or floats. Valid options are 'fraction' or 'float'.
+        :type inequalities: numpy.array (2D) of the same type as equalities
+        :param return_fractions: Whether or not to return fractions.
         :type return_fractions: bool
         :param independent_endmember_occupancies: If specified, this array
             provides the independent endmember set against which the
@@ -146,7 +143,7 @@ class MaterialPolytope(object):
         """
         if equalities.dtype != inequalities.dtype:
             raise Exception(
-                f"The dtype of the equalities ({equalities.dtype}) and inequalities ({inequalities.dtype}) arrays should be the same."
+                f"The equalities and inequalities arrays should have the same type ({equalities.dtype} != {inequalities.dtype})."
             )
 
         self.set_return_type(return_fractions)
@@ -160,7 +157,9 @@ class MaterialPolytope(object):
             self.number_type = float
             self.cdd = cdd_float
         else:
-            raise Exception("number_type should be either float or Fraction.")
+            raise Exception(
+                "equalities should be arrays of either floats or Fractions."
+            )
 
         self.polytope_matrix = self.cdd.matrix_from_array(equalities)
         self.polytope_matrix.lin_set = set(range(len(equalities)))
@@ -221,10 +220,12 @@ class MaterialPolytope(object):
         if self.number_type == float and self.return_fractions:
             v = np.array(
                 [
-                    [Rational(value).limit_denominator(1000000) for value in v]
+                    [Fraction(value).limit_denominator(1000000) for value in v]
                     for v in self.raw_vertices
                 ]
             )
+        elif self.number_type == Fraction and not self.return_fractions:
+            v = np.array(self.raw_vertices).astype(float)
         else:
             v = np.array(self.raw_vertices)
 
