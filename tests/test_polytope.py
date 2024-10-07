@@ -2,12 +2,16 @@ from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 import numpy as np
+from sympy import Matrix
+from fractions import Fraction
+import importlib
 
 from burnman import Composite
-from burnman.minerals import SLB_2011
+from burnman.minerals import SLB_2011, JH_2015
 from burnman.tools.polytope import solution_polytope_from_charge_balance
 from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
 from burnman.tools.polytope import simplify_composite_with_composition
+from burnman import MaterialPolytope
 
 
 class polytope(BurnManTest):
@@ -61,6 +65,47 @@ class polytope(BurnManTest):
         self.assertEqual(strings[0], "[Fe]3[Mg][Si]")
         self.assertEqual(strings[1], "[Mg]3[Mg][Si]")
         self.assertArraysAlmostEqual([0.1, 0.9], new_gt.molar_fractions)
+
+    def test_cddlib_versions(self):
+        gt = JH_2015.garnet()
+        endmember_occupancies = gt.solution_model.endmember_occupancies
+
+        n_sites = sum(endmember_occupancies[0])
+        n_occs = endmember_occupancies.shape[1]
+
+        nullspace = np.array(Matrix(endmember_occupancies).nullspace(), dtype=float)
+
+        equalities = np.zeros((len(nullspace) + 1, n_occs + 1))
+        equalities[0, 0] = -n_sites
+        equalities[0, 1:] = 1
+        if len(nullspace) > 0:
+            try:
+                equalities[1:, 1:] = nullspace
+            except ValueError:
+                equalities[1:, 1:] = nullspace[:, :, 0]
+
+        pos_constraints = np.concatenate(
+            (
+                np.zeros((len(equalities[0]) - 1, 1)),
+                np.identity(len(equalities[0]) - 1),
+            ),
+            axis=1,
+        )
+
+        equalities = np.array([[Fraction(v) for v in r] for r in equalities])
+        pos_constraints = np.array([[Fraction(v) for v in r] for r in pos_constraints])
+
+        poly = MaterialPolytope(
+            equalities,
+            pos_constraints,
+            independent_endmember_occupancies=endmember_occupancies,
+        )
+
+        try:
+            _ = importlib.import_module("cdd.gmp")
+            self.assertTrue(type(poly.raw_vertices[0][0]) is Fraction)
+        except ImportError:
+            self.assertTrue(type(poly.raw_vertices[0][0]) is float)
 
 
 if __name__ == "__main__":

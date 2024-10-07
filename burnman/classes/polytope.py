@@ -7,7 +7,6 @@ from __future__ import absolute_import
 
 import importlib
 import numpy as np
-from sympy import Rational
 from fractions import Fraction
 from scipy.spatial import Delaunay
 from scipy.special import comb
