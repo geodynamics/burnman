@@ -4,7 +4,21 @@ from plagioclase_parameters import scalar_args, cell_args, elastic_args
 from plagioclase_model import make_anisotropic_model
 from plagioclase_data import get_data
 from burnman.minerals.SLB_2022 import plagioclase
+from burnman.utils.unitcell import cell_parameters_to_vectors
+from burnman.constants import Avogadro
 
+# First, let's convert the Brown albite cell parameters into
+# the model cell tensor, and also calculate the volume.
+cell_parameters = [8.1366e-10, 12.7857e-10, 7.1582e-10, 94.253, 116.605, 87.756]
+Z = 4
+cell_vectors = np.cbrt(Avogadro / Z) * cell_parameters_to_vectors(
+    cell_parameters, [1, 2, 0]
+)
+np.set_printoptions(precision=6)
+print(cell_vectors.T)
+print(np.linalg.det(cell_vectors.T))
+
+# Now load the SLB plagioclase and the one for this study
 ss_SLB = plagioclase()
 
 ss = make_anisotropic_model(scalar_args, cell_args, elastic_args)
