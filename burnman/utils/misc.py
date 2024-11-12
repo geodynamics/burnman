@@ -70,7 +70,7 @@ def flatten(arr):
     )
 
 
-def pretty_print_values(popt, pcov, params):
+def pretty_print_values(popt, pcov, params, extra_decimal_places=0):
     """
     Takes a numpy array of parameters, the corresponding covariance matrix
     and a set of parameter names and prints the parameters and
@@ -78,8 +78,10 @@ def pretty_print_values(popt, pcov, params):
     in a nice text based format.
     """
     for i, p in enumerate(params):
-        p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1)
-        c_rnd = round_to_n(np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1)
+        p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1 + extra_decimal_places)
+        c_rnd = round_to_n(
+            np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1 + extra_decimal_places
+        )
 
         if p_rnd != 0.0:
             p_expnt = np.floor(np.log10(np.abs(p_rnd)))
@@ -87,7 +89,7 @@ def pretty_print_values(popt, pcov, params):
             p_expnt = 0.0
 
         scale = np.power(10.0, p_expnt)
-        nd = p_expnt - np.floor(np.log10(np.abs(c_rnd)))
+        nd = p_expnt - np.floor(np.log10(np.abs(c_rnd))) + extra_decimal_places
         print(
             "{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}".format(
                 p, p_rnd / scale, c_rnd / scale, scale, 0, (nd) / 10.0
