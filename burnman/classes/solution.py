@@ -164,6 +164,8 @@ class Solution(Mineral):
         for i, site_occs in enumerate(self.site_occupancies):
             formula += "["
             for species, occ in site_occs.items():
+                if np.abs(occ) < 1.0e-12:
+                    occ = np.abs(occ)
                 formula += f"{species}{occ:0.{precision}f}"
             formula += split_empty[i + 1]
         return formula
