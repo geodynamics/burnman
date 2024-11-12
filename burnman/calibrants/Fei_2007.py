@@ -7,7 +7,7 @@ from burnman.eos.vinet import Vinet
 from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
 from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
-
+from burnman.utils.unitcell import molar_volume_from_unit_cell_volume
 
 """
 Fei_2007
@@ -61,3 +61,42 @@ class Pt(Calibrant):
         }
 
         Calibrant.__init__(self, _pressure_Fei_Pt, "pressure", _params_Fei_Pt)
+
+
+class Au(Calibrant):
+    """
+    The Au pressure standard reported by
+    Fei et al. (2007; https://doi.org/10.1073/pnas.0609013104).
+    """
+
+    def __init__(self):
+        def _pressure_Fei_Au(volume, temperature, params):
+
+            # Isothermal pressure (GPa)
+            pressure_model = Vinet()
+            P0 = pressure_model.pressure(params["T_0"], volume, params)
+
+            # Thermal pressure
+            thermal_model = MGDBase()
+            Pth0 = thermal_model._thermal_pressure(params["T_0"], volume, params)
+            Pth = thermal_model._thermal_pressure(temperature, volume, params)
+
+            # Total pressure
+            P = P0 + Pth - Pth0
+
+            return P
+
+        _params_Fei_Au = {
+            "V_0": molar_volume_from_unit_cell_volume(67.850, 4.0),
+            "K_0": 167.0e9,
+            "Kprime_0": 6.00,
+            "Debye_0": 170.0,
+            "grueneisen_0": 2.97,
+            "q_0": 0.6,
+            "n": 1.0,
+            "T_0": 300.0,
+            "P_0": 0.0,
+            "Z": 4.0,
+        }
+
+        Calibrant.__init__(self, _pressure_Fei_Au, "pressure", _params_Fei_Au)

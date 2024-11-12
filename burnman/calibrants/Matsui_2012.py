@@ -3,7 +3,6 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.vinet import Vinet
 from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
 
@@ -30,7 +29,7 @@ class NaCl_B1(Calibrant):
                 + 9 * params["Kprime_0"] ** 2
                 - 63 * params["Kprime_0"]
                 + 143
-            )
+            ) / 6.0
             f = 0.5 * ((volume / params["V_0"]) ** (-2 / 3) - 1)
             K_T = (
                 params["K_0"]

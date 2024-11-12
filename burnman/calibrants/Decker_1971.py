@@ -33,7 +33,7 @@ class NaCl_B1(Calibrant):
                 + 9 * params["Kprime_0"] ** 2
                 - 63 * params["Kprime_0"]
                 + 143
-            )
+            ) / 6.0
             f = 0.5 * ((volume / params["V_0"]) ** (-2 / 3) - 1)
             K_T = (
                 params["K_0"]
@@ -55,7 +55,7 @@ class NaCl_B1(Calibrant):
         _params_Decker_NaCl = {
             "V_0": 2.7013e-05,
             "K_0": 23.7,
-            "Kprime_0": 5.04,  # 4.91 in Matsui (2012), however 5.04 is required to reproduce values in Table 4.
+            "Kprime_0": 4.91,
             "Kprime_prime_0": -0.267,
             "Debye_0": 279.0,
             "grueneisen_0": 1.59,
