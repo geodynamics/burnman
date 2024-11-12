@@ -91,14 +91,13 @@ def weighted_constrained_least_squares(
 
     try:
         with warnings.catch_warnings(record=True) as w:
-            res = prob.solve(solver=cp.ECOS)
+            res = prob.solve()
             popt = np.array([x.value[i] for i in range(len(A.T))])
             warns.extend(w)
     except Exception:
-        print("ECOS Solver failed. Trying default solver.")
         try:
             with warnings.catch_warnings(record=True) as w:
-                res = prob.solve()
+                res = prob.solve(solver=cp.ECOS)
                 popt = np.array([x.value[i] for i in range(len(A.T))])
                 warns.extend(w)
         except Exception as e:

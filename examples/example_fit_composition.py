@@ -136,7 +136,7 @@ if __name__ == "__main__":
     gt.set_composition(popt)
 
     print("\nSite formula:")
-    print(gt.site_formula(2))
+    print(gt.site_formula(precision=2))
 
     print(f"\nWeighted residual: {res:.3f}")
     """
