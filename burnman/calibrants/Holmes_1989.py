@@ -32,12 +32,14 @@ class Pt(Calibrant):
 
             return P_300 + params["alpha_T"] * params["beta_T"] * (temperature - 300.0)
 
+        Z = 4.0
         _params = {
-            "V_0": molar_volume_from_unit_cell_volume(60.38, 4.0),
+            "V_0": molar_volume_from_unit_cell_volume(60.38, Z),
             "beta_T": 798.31e9 / 3.0,
             "eta": 7.2119,
             "beta_prime_T": (7.2119 / 1.5) + 1.0,
             "alpha_T": 2.61e-5,
+            "Z": Z,
         }
 
         Calibrant.__init__(self, _pressure, "pressure", _params)

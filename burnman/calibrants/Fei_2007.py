@@ -33,22 +33,14 @@ class Pt(Calibrant):
             Pth0 = thermal_model._thermal_pressure(params["T_0"], volume, params)
             Pth = thermal_model._thermal_pressure(temperature, volume, params)
 
-            # Electronic pressure
-            Pel = (
-                1.1916e-15 * temperature**4.0
-                - 1.4551e-11 * temperature**3.0
-                + 1.6209e-07 * temperature**2.0
-                + 1.8269e-4 * temperature
-                - 0.069
-            ) * 1.0e09
-
             # Total pressure
-            P = P0 + Pth - Pth0 + Pel
+            P = P0 + Pth - Pth0
 
             return P
 
+        Z = 4.0
         _params_Fei_Pt = {
-            "V_0": 9.0904e-06,
+            "V_0": molar_volume_from_unit_cell_volume(60.38, Z),
             "K_0": 277.0e9,
             "Kprime_0": 5.08,
             "Debye_0": 230.0,
@@ -57,7 +49,7 @@ class Pt(Calibrant):
             "n": 1.0,
             "T_0": 300.0,
             "P_0": 0.0,
-            "Z": 4.0,
+            "Z": Z,
         }
 
         Calibrant.__init__(self, _pressure_Fei_Pt, "pressure", _params_Fei_Pt)
@@ -86,17 +78,18 @@ class Au(Calibrant):
 
             return P
 
+        Z = 4.0
         _params_Fei_Au = {
-            "V_0": molar_volume_from_unit_cell_volume(67.850, 4.0),
+            "V_0": molar_volume_from_unit_cell_volume(67.850, Z),
             "K_0": 167.0e9,
-            "Kprime_0": 6.00,
+            "Kprime_0": 6.0,
             "Debye_0": 170.0,
             "grueneisen_0": 2.97,
             "q_0": 0.6,
             "n": 1.0,
             "T_0": 300.0,
             "P_0": 0.0,
-            "Z": 4.0,
+            "Z": Z,
         }
 
         Calibrant.__init__(self, _pressure_Fei_Au, "pressure", _params_Fei_Au)
