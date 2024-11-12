@@ -3,15 +3,15 @@ Volume: 19.0287 +/- 0.1903 m^3/mol
 Temperature: 1073.15 +/- 10.0 K
 
 Pressure estimated using the Decker equation of state:
-21.6417 GPa
+21.7355 GPa
 
 Pressure with propagated uncertainty
 estimated using the Decker equation of state:
-21.6417 +/- 1.0010 GPa
+21.7355 +/- 1.0254 GPa
 PVT correlation matrix:
-[[ 1.         -0.99955588  0.02979992]
- [-0.99955588  1.          0.        ]
- [ 0.02979992  0.          1.        ]]
+[[ 1.         -0.99957671  0.02909288]
+ [-0.99957671  1.          0.        ]
+ [ 0.02909288  0.          1.        ]]
 The uncertainties and correlation matrix only take into account 
 the uncertainties in the measured volume and temperature, 
 not the uncertainties in the calibrated equation of state.
@@ -19,8 +19,8 @@ not the uncertainties in the calibrated equation of state.
 Consistency checks:
 Volume: 19.0287 +/- 0.1903 m^3/mol
 Temperature: 1073.15 +/- 10.0000 K
-V-T correlation: -0.000000
+V-T correlation: 0.000000
 
 Result of conversion from Decker calibration to Decker calibration:
-21.6417 +/- 1.0010 GPa
+21.7355 +/- 1.0254 GPa
 (This should be the same as the pressures above)
