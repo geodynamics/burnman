@@ -20,6 +20,7 @@ Calibrant database
   - :mod:`~burnman.calibrants.Dubrovinsky_1998`
   - :mod:`~burnman.calibrants.Fei_2007`
   - :mod:`~burnman.calibrants.Fei_2016`
+  - :mod:`~burnman.calibrants.Holmes_1989`
   - :mod:`~burnman.calibrants.Huang_2016`
   - :mod:`~burnman.calibrants.LeGodec_2000`
   - :mod:`~burnman.calibrants.Litasov_2013`
@@ -35,6 +36,7 @@ Calibrant database
   - :mod:`~burnman.calibrants.Speziale_2001`
   - :mod:`~burnman.calibrants.Tange_2009`
   - :mod:`~burnman.calibrants.Tateno_2019`
+  - :mod:`~burnman.calibrants.Tsuchiya_2003`
   - :mod:`~burnman.calibrants.Walker_2002`
   - :mod:`~burnman.calibrants.Zeng_2010`
   - :mod:`~burnman.calibrants.Zha_2004`
@@ -56,6 +58,7 @@ from . import Dorogokupets_2017
 from . import Dubrovinsky_1998
 from . import Fei_2007
 from . import Fei_2016
+from . import Holmes_1989
 from . import Huang_2016
 from . import LeGodec_2000
 from . import Litasov_2013
@@ -71,6 +74,7 @@ from . import Sokolova_2013
 from . import Speziale_2001
 from . import Tange_2009
 from . import Tateno_2019
+from . import Tsuchiya_2003
 from . import Walker_2002
 from . import Zeng_2010
 from . import Zha_2004

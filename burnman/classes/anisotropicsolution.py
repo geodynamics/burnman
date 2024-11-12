@@ -599,7 +599,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
     @material_property
     def _d2Fdqdq_fixed_epsT_pinv(self):
         """
-        The second derivative of the Helmholtz energy
+        The inverse of the second derivative of the Helmholtz energy
         with respect to the structure parameters at constant
         strain and temperature. Often referred to as the
         susceptibility matrix.
