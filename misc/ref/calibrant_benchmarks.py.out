@@ -1,3 +1,31 @@
+Pressures from Decker 1971 calibrant vs. tabulated data in original paper (given in GPa)
+
+V=2.7013e-05 m^3/mol (standard state volume):
+25.0 C: 0.00, 0.00
+100.0 C: 0.21, 0.21
+200.0 C: 0.50, 0.50
+300.0 C: 0.79, 0.79
+500.0 C: 1.37, 1.37
+800.0 C: 2.25, 2.25
+
+V=2.1870e-05 m^3/mol (middle row):
+0.0 C: 8.32, 8.32
+25.0 C: 8.39, 8.39
+100.0 C: 8.60, 8.60
+200.0 C: 8.88, 8.89
+300.0 C: 9.17, 9.18
+500.0 C: 9.76, 9.77
+800.0 C: 10.65, 10.65
+
+V=1.9044e-05 m^3/mol (last row):
+0.0 C: 19.33, 19.34
+25.0 C: 19.40, 19.41
+100.0 C: 19.60, 19.62
+200.0 C: 19.89, 19.90
+300.0 C: 20.18, 20.19
+500.0 C: 20.77, 20.78
+800.0 C: 21.66, 21.67
+
 Checking burnman.calibrants.Fei_2007.Au...
 Checking burnman.calibrants.Fei_2007.Pt...
 Checking burnman.calibrants.Holmes_1989.Pt...
