@@ -10,6 +10,7 @@ Decker_1971
 
 from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
+from burnman.eos.birch_murnaghan_4th import birch_murnaghan_fourth
 
 
 class NaCl_B1(Calibrant):
@@ -25,43 +26,26 @@ class NaCl_B1(Calibrant):
 
     def __init__(self):
         def _pressure_Decker_NaCl(volume, temperature, params):
-
             # Isothermal pressure (GPa)
-            a = (3 / 2) * (params["Kprime_0"] - 4)
-            b = (
-                9 * params["K_0"] * params["Kprime_prime_0"]
-                + 9 * params["Kprime_0"] ** 2
-                - 63 * params["Kprime_0"]
-                + 143
-            ) / 6.0
-            f = 0.5 * ((volume / params["V_0"]) ** (-2 / 3) - 1)
-            K_T = (
-                params["K_0"]
-                * ((1 + 2 * f) ** (5 / 2))
-                * (1 + (7 + 2 * a) * f + (9 * a + 3 * b) * f**2 + 11 * b * f**3)
-            )
-            P0 = 3 * f * params["K_0"] * (1 + 2 * f) ** (5 / 2) * (1 + a * f + b * f**2)
+            P0 = birch_murnaghan_fourth(params["V_0"] / volume, params)
 
             # Thermal pressure
             thermal_model = MGDBase()
             Pth0 = thermal_model._thermal_pressure(params["T_0"], volume, params)
             Pth = thermal_model._thermal_pressure(temperature, volume, params)
 
-            # Total pressure
-            P = (P0 * 1e9) + Pth - Pth0
-
-            return P
+            return P0 + Pth - Pth0
 
         _params_Decker_NaCl = {
             "V_0": 2.7013e-05,
-            "K_0": 23.7,
+            "K_0": 23.7e9,
             "Kprime_0": 4.91,
-            "Kprime_prime_0": -0.267,
+            "Kprime_prime_0": -0.267e-9,
             "Debye_0": 279.0,
             "grueneisen_0": 1.59,
             "q_0": 0.93,
             "n": 2.0,
-            "T_0": 300.0,
+            "T_0": 298.15,
             "P_0": 0.0,
             "Z": 4.0,
         }
