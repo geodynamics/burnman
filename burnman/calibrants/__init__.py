@@ -7,7 +7,7 @@
 """
 Calibrant database
 
-  - :mod:`~burnman.calibrants.Decker_1971`
+  - :mod:`~burnman.calibrants.Anderson_1989`
   - :mod:`~burnman.calibrants.Armentrout_2015`
   - :mod:`~burnman.calibrants.Campbell_2009`
   - :mod:`~burnman.calibrants.Chidester_2021`
@@ -16,6 +16,7 @@ Calibrant database
   - :mod:`~burnman.calibrants.Dewaele_2012`
   - :mod:`~burnman.calibrants.Dewaele_2013`
   - :mod:`~burnman.calibrants.Dewaele_2020`
+  - :mod:`~burnman.calibrants.Dorogokupets_2007`
   - :mod:`~burnman.calibrants.Dorogokupets_2017`
   - :mod:`~burnman.calibrants.Dubrovinsky_1998`
   - :mod:`~burnman.calibrants.Fei_2007`
@@ -46,6 +47,7 @@ Calibrant database
   - :mod:`~burnman.calibrants.Zhao_2000`
 """
 
+from . import Anderson_1989
 from . import Armentrout_2015
 from . import Campbell_2009
 from . import Chidester_2021
@@ -54,6 +56,7 @@ from . import Dewaele_2008
 from . import Dewaele_2012
 from . import Dewaele_2013
 from . import Dewaele_2020
+from . import Dorogokupets_2007
 from . import Dorogokupets_2017
 from . import Dubrovinsky_1998
 from . import Fei_2007

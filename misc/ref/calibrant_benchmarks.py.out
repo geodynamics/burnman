@@ -1,5 +1,8 @@
-Pressures from Decker 1971 calibrant vs. tabulated data in original paper (given in GPa)
+Checking burnman.calibrants.Anderson_1989.Au at compression 0.34...
+Temperature: 300.0 K, Pressure: 216.06 (reported to be 216.06 GPa)
+Temperature: 3000.0 K, Pressure: 222.44 (reported to be 222.44 GPa)
 
+Pressures from Decker 1971 calibrant vs. tabulated data in original paper (given in GPa)
 V=2.7013e-05 m^3/mol (standard state volume):
 25.0 C: 0.00, 0.00
 100.0 C: 0.21, 0.21
@@ -25,6 +28,43 @@ V=1.9044e-05 m^3/mol (last row):
 300.0 C: 20.18, 20.19
 500.0 C: 20.77, 20.78
 800.0 C: 21.66, 21.67
+
+Checking burnman.calibrants.Dorogokupets_2007.Ag...
+V=0.7*V0, P=100.37 GPa, T=298.15 K: 0.250 MPa difference
+V=0.7*V0, P=104.73 GPa, T=1000 K: -0.662 MPa difference
+V=0.7*V0, P=111.15 GPa, T=2000 K: -0.997 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.Al...
+V=0.7*V0, P=56.97 GPa, T=298.15 K: -11.383 MPa difference
+V=0.7*V0, P=60.03 GPa, T=1000 K: -12.426 MPa difference
+V=0.7*V0, P=64.86 GPa, T=2000 K: -43.175 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.Au...
+V=0.7*V0, P=164.83 GPa, T=298.15 K: -0.482 MPa difference
+V=0.7*V0, P=169.00 GPa, T=1000 K: -4.064 MPa difference
+V=0.7*V0, P=175.03 GPa, T=2000 K: 4.056 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.Cu...
+V=0.7*V0, P=118.65 GPa, T=298.15 K: 78.072 MPa difference
+V=0.7*V0, P=124.11 GPa, T=1000 K: 77.859 MPa difference
+V=0.7*V0, P=132.31 GPa, T=2000 K: 77.234 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.Pt...
+V=0.7*V0, P=242.66 GPa, T=298.15 K: -13.987 MPa difference
+V=0.7*V0, P=247.39 GPa, T=1000 K: -15.448 MPa difference
+V=0.7*V0, P=254.71 GPa, T=2000 K: -16.100 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.Ta...
+V=0.7*V0, P=130.95 GPa, T=298.15 K: 60.149 MPa difference
+V=0.7*V0, P=133.95 GPa, T=1000 K: 58.981 MPa difference
+V=0.7*V0, P=138.53 GPa, T=2000 K: 58.331 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.W...
+V=0.7*V0, P=222.43 GPa, T=298.15 K: -17.322 MPa difference
+V=0.7*V0, P=224.83 GPa, T=1000 K: -19.063 MPa difference
+V=0.7*V0, P=228.53 GPa, T=2000 K: -20.886 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.MgO...
+V=0.7*V0, P=116.72 GPa, T=298.15 K: 52.963 MPa difference
+V=0.7*V0, P=120.96 GPa, T=1000 K: 51.888 MPa difference
+V=0.7*V0, P=128.13 GPa, T=2000 K: 51.510 MPa difference
+Checking burnman.calibrants.Dorogokupets_2007.diamond...
+V=0.7*V0, P=301.53 GPa, T=298.15 K: 13.945 MPa difference
+V=0.7*V0, P=303.90 GPa, T=1000 K: 13.360 MPa difference
+V=0.7*V0, P=309.77 GPa, T=2000 K: 10.797 MPa difference
 
 Checking burnman.calibrants.Fei_2007.Au...
 Checking burnman.calibrants.Fei_2007.Pt...

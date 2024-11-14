@@ -63,6 +63,23 @@ def check_figures():
     )
 
 
+def check_Anderson_1989():
+    Au = calibrants.Anderson_1989.Au()
+    name = str(Au).split(" ")[0][1:]
+    compression = 0.34
+    print(f"Checking {name} at compression {compression}...")
+    V = (1 - compression) * Au.params["V_0"]
+    T = 300.0
+    print(
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} (reported to be 216.06 GPa)"
+    )
+    T = 3000.0
+    print(
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} (reported to be 222.44 GPa)"
+    )
+    print()
+
+
 def check_Decker_1971():
     NaCl = calibrants.Decker_1971.NaCl_B1()
     V_0 = NaCl.params["V_0"]
@@ -74,7 +91,7 @@ def check_Decker_1971():
         "Pressures from Decker 1971 calibrant "
         "vs. tabulated data in original paper (given in GPa)"
     )
-    print(f"\nV={V:.4e} m^3/mol (standard state volume):")
+    print(f"V={V:.4e} m^3/mol (standard state volume):")
     T_C = [25.0, 100.0, 200.0, 300.0, 500.0, 800.0]
     P_kbar = [0.00, 2.13, 5.00, 7.89, 13.72, 22.48]
     for i, T in enumerate(T_C):
@@ -97,6 +114,38 @@ def check_Decker_1971():
     print("")
 
 
+def check_Dorogokupets_Oganov_2007():
+    tests = [
+        [calibrants.Dorogokupets_2007.Ag(), 0.7, 100.371, 104.735, 111.146],
+        [calibrants.Dorogokupets_2007.Al(), 0.7, 56.986, 60.046, 64.905],
+        [calibrants.Dorogokupets_2007.Au(), 0.7, 164.83, 169.00, 175.03],
+        [calibrants.Dorogokupets_2007.Cu(), 0.7, 118.576, 124.032, 132.235],
+        [calibrants.Dorogokupets_2007.Pt(), 0.7, 242.676, 247.403, 254.730],
+        [calibrants.Dorogokupets_2007.Ta(), 0.7, 130.887, 133.891, 138.468],
+        [calibrants.Dorogokupets_2007.W(), 0.7, 222.444, 224.854, 228.550],
+        [calibrants.Dorogokupets_2007.MgO(), 0.7, 116.670, 120.904, 128.081],
+        [calibrants.Dorogokupets_2007.diamond(), 0.7, 301.514, 303.890, 309.757],
+    ]
+
+    temperatures = [298.15, 1000, 2000]
+
+    for test in tests:
+        calibrant = test[0]
+        Vrel = test[1]
+        pressures_GPa = test[2:]
+
+        name = str(calibrant).split(" ")[0][1:]
+        print(f"Checking {name}...")
+        for i in range(len(temperatures)):
+            P = calibrant.pressure(calibrant.params["V_0"] * Vrel, temperatures[i])
+            print(
+                f"V={Vrel}*V0, P={P/1.e9:.2f} GPa, T={temperatures[i]} K: {P/1.e6 - pressures_GPa[i]*1.e3:.3f} MPa difference"
+            )
+    print()
+
+
 if __name__ == "__main__":
+    check_Anderson_1989()
     check_Decker_1971()
+    check_Dorogokupets_Oganov_2007()
     check_figures()
