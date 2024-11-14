@@ -1,5 +1,23 @@
 Changelog
 ---------
+Release v2.0.0 (November 14, 2024) includes
+  - Compatibility with Python 3.12.
+  - Compatibility with new versions of numpy (1.26.0), scipy (1.14.0),
+    cvxpy (1.6.0), pycddlib (3.0.0), matplotlib (3.9.0).
+  - New: The evaluate method now allows users to specify different compositions
+    as well as pressures and temperatures.
+  - New: Non-orthotropic anisotropy in AnisotropicMaterial.
+  - New: Addition of an AnisotropicSolution class.
+  - New: Addition of a RelaxedSolution class, that calculates second derivatives
+    while allowing isochemical variables to change to minimise the
+    thermodynamic potential.
+  - New: The Stixrude and Lithgow-Bertelloni (2024) dataset.
+  - New: The Holland, Green and Powell (2018) solution models.
+  - New: A large range of published pressure calibrants (many thanks to Robert Farla).
+  - Fix: The generic PolynomialSolution model now has correct second derivatives.
+  - Improved: Consistent naming of isentropic properties (rather than adiabatic).
+  - Improved: Explicit specification of Reuss (isostress) properties.
+
 Release v1.2.0 (July 1, 2023) includes
   - Two new helper functions:
     :func:`burnman.tools.chemistry.reactions_from_stoichiometric_matrix`
