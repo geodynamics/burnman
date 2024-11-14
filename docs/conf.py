@@ -13,6 +13,16 @@
 import os
 import sys
 
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
+
 sys.path.insert(0, os.path.abspath(".."))
 sys.path.insert(0, os.path.abspath("../examples"))
 sys.path.insert(0, os.path.abspath("../tutorial"))
@@ -33,8 +43,8 @@ copyright = (
 author = "Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn"
 
 # The short X.Y version.
-v = burnman.__version__.split('.')
-version = f'{v[0]}.{v[1]}'
+v = burnman.__version__.split(".")
+version = f"{v[0]}.{v[1]}"
 # The full version, including alpha/beta/rc tags
 release = burnman.__version__
 
@@ -307,4 +317,4 @@ texinfo_documents = [
 # texinfo_show_urls = 'footnote'
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"http://docs.python.org/": None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
