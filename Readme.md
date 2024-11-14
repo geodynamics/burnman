@@ -21,7 +21,7 @@ Source code: https://github.com/geodynamics/burnman
 
 Forums: https://community.geodynamics.org/c/burnman
 
-Authors (as of 2023):
+Authors (as of 2024):
 * Bob (Robert) Myhill (main contributor)
 * Cayman Unterborn
 * Ian Rose
@@ -29,6 +29,7 @@ Authors (as of 2023):
 * Timo Heister
 * Juliane Dannberg
 * Rene Gassmoeller
+* Robert Farla
 
 ## Citing BurnMan
 
