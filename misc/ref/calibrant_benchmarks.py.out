@@ -1,6 +1,6 @@
 Checking burnman.calibrants.Anderson_1989.Au at compression 0.34...
-Temperature: 300.0 K, Pressure: 216.06 (reported to be 216.06 GPa)
-Temperature: 3000.0 K, Pressure: 222.44 (reported to be 222.44 GPa)
+Temperature: 300.0 K, Pressure: 216.06 GPa (reported to be 216.06 GPa)
+Temperature: 3000.0 K, Pressure: 222.44 GPa (reported to be 222.44 GPa)
 
 Pressures from Decker 1971 calibrant vs. tabulated data in original paper (given in GPa)
 V=2.7013e-05 m^3/mol (standard state volume):
@@ -65,6 +65,10 @@ Checking burnman.calibrants.Dorogokupets_2007.diamond...
 V=0.7*V0, P=301.53 GPa, T=298.15 K: 13.945 MPa difference
 V=0.7*V0, P=303.90 GPa, T=1000 K: 13.360 MPa difference
 V=0.7*V0, P=309.77 GPa, T=2000 K: 10.797 MPa difference
+
+Checking burnman.calibrants.Tsuchiya_2003.Au at compression 0.34...
+Temperature: 300.0 K, Pressure: 229.56 GPa (reported to be 229.56 GPa)
+Temperature: 2500.0 K, Pressure: 239.84 GPa (reported to be 239.84 GPa)
 
 Checking burnman.calibrants.Fei_2007.Au...
 Checking burnman.calibrants.Fei_2007.Pt...

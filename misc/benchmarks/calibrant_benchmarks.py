@@ -71,11 +71,11 @@ def check_Anderson_1989():
     V = (1 - compression) * Au.params["V_0"]
     T = 300.0
     print(
-        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} (reported to be 216.06 GPa)"
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} GPa (reported to be 216.06 GPa)"
     )
     T = 3000.0
     print(
-        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} (reported to be 222.44 GPa)"
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} GPa (reported to be 222.44 GPa)"
     )
     print()
 
@@ -144,8 +144,26 @@ def check_Dorogokupets_Oganov_2007():
     print()
 
 
+def check_Tsuchiya_2003():
+    Au = calibrants.Tsuchiya_2003.Au()
+    name = str(Au).split(" ")[0][1:]
+    compression = 0.34
+    print(f"Checking {name} at compression {compression}...")
+    V = (1 - compression) * Au.params["V_0"]
+    T = 300.0
+    print(
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} GPa (reported to be 229.56 GPa)"
+    )
+    T = 2500.0
+    print(
+        f"Temperature: {T} K, Pressure: {Au.pressure(V, T)/1.e9:.2f} GPa (reported to be 239.84 GPa)"
+    )
+    print()
+
+
 if __name__ == "__main__":
     check_Anderson_1989()
     check_Decker_1971()
     check_Dorogokupets_Oganov_2007()
-    check_figures()
+    check_Tsuchiya_2003()
+    check_figures()  # Checking Fei et al. (2007) Au and Pt, and Holmes 1989 (Pt)
