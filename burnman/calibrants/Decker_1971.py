@@ -10,7 +10,7 @@ Decker_1971
 
 from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
-from burnman.eos.birch_murnaghan_4th import birch_murnaghan_fourth
+from burnman.eos.birch_murnaghan_4th import pressure_birch_murnaghan_fourth
 
 
 class NaCl_B1(Calibrant):
@@ -27,7 +27,7 @@ class NaCl_B1(Calibrant):
     def __init__(self):
         def _pressure_Decker_NaCl(volume, temperature, params):
             # Isothermal pressure (GPa)
-            P0 = birch_murnaghan_fourth(params["V_0"] / volume, params)
+            P0 = pressure_birch_murnaghan_fourth(params["V_0"] / volume, params)
 
             # Thermal pressure
             thermal_model = MGDBase()

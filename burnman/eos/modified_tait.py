@@ -30,15 +30,21 @@ def tait_constants(params):
     return a, b, c
 
 
-def modified_tait(x, params):
+def pressure_modified_tait(Vrel, params):
     """
-    equation for the modified Tait equation of state, returns
-    pressure in the same units that are supplied for the reference bulk
-    modulus (params['K_0'])
+    Pressure according to the modified Tait equation of state.
     EQ 2 from Holland and Powell, 2011
+
+    :param Vrel: V/V_0
+    :type Vrel: float or numpy array
+    :param params: Parameter dictionary
+    :type params: dictionary
+    :return: pressure in the same units that are supplied for the reference bulk
+    modulus (params['K_0'])
+    :rtype: float or numpy array
     """
     a, b, c = tait_constants(params)
-    return (np.power((x + a - 1.0) / a, -1.0 / c) - 1.0) / b + params["P_0"]
+    return (np.power((Vrel + a - 1.0) / a, -1.0 / c) - 1.0) / b + params["P_0"]
 
 
 def volume(pressure, params):
@@ -47,8 +53,8 @@ def volume(pressure, params):
     EQ 12
     """
     a, b, c = tait_constants(params)
-    x = 1 - a * (1.0 - np.power((1.0 + b * (pressure - params["P_0"])), -1.0 * c))
-    return x * params["V_0"]
+    Vrel = 1.0 - a * (1.0 - np.power((1.0 + b * (pressure - params["P_0"])), -1.0 * c))
+    return Vrel * params["V_0"]
 
 
 def bulk_modulus(pressure, params):
@@ -113,7 +119,7 @@ class MT(eos.EquationOfState):
         """
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
         """
-        return modified_tait(params["V_0"] / volume, params)
+        return pressure_modified_tait(volume / params["V_0"], params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
