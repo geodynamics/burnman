@@ -45,14 +45,17 @@ def bulk_modulus_fourth(volume, params):
 
 
 def volume_fourth_order(pressure, params):
-    func = lambda x: birch_murnaghan_fourth(params["V_0"] / x, params) - pressure
+
+    def delta_pressure(x):
+        return birch_murnaghan_fourth(params["V_0"] / x, params) - pressure
+
     try:
-        sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
+        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
     except:
         raise ValueError(
             "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
         )
-    return opt.brentq(func, sol[0], sol[1])
+    return opt.brentq(delta_pressure, sol[0], sol[1])
 
 
 def birch_murnaghan_fourth(x, params):
@@ -93,7 +96,7 @@ class BM4(eos.EquationOfState):
         return volume_fourth_order(pressure, params)
 
     def pressure(self, temperature, volume, params):
-        return birch_murnaghan_fourth(volume / params["V_0"], params)
+        return birch_murnaghan_fourth(params["V_0"] / volume, params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """

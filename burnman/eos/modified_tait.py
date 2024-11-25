@@ -113,7 +113,7 @@ class MT(eos.EquationOfState):
         """
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
         """
-        return modified_tait(params["V_0"] / volume, params)
+        return modified_tait(volume / params["V_0"], params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
