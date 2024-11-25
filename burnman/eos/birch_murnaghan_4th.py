@@ -19,8 +19,8 @@ def bulk_modulus_fourth(volume, params):
     modulus.  Pressure must be in :math:`[Pa]`.
     """
 
-    x = params["V_0"] / volume
-    f = 0.5 * (pow(x, 2.0 / 3.0) - 1.0)
+    invVrel = params["V_0"] / volume
+    f = 0.5 * (pow(invVrel, 2.0 / 3.0) - 1.0)
 
     Xi = (3.0 / 4.0) * (4.0 - params["Kprime_0"])
     Zeta = (3.0 / 8.0) * (
@@ -45,27 +45,46 @@ def bulk_modulus_fourth(volume, params):
 
 
 def volume_fourth_order(pressure, params):
+    """
+    Volume according to the fourth-order
+    Birch-Murnaghan equation of state.
+
+    :param pressure: Pressure in the same units that are supplied for the reference bulk
+    modulus (params['K_0'])
+    :type pressure: float
+    :param params: parameter dictionary
+    :type params: dictionary
+    :return: V/V_0
+    :rtype: float
+    """
 
     def delta_pressure(x):
-        return birch_murnaghan_fourth(params["V_0"] / x, params) - pressure
+        return pressure_birch_murnaghan_fourth(params["V_0"] / x, params) - pressure
 
     try:
         sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
-    except:
+    except ValueError:
         raise ValueError(
             "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
         )
     return opt.brentq(delta_pressure, sol[0], sol[1])
 
 
-def birch_murnaghan_fourth(x, params):
+def pressure_birch_murnaghan_fourth(invVrel, params):
     """
-    equation for the fourth order birch-murnaghan equation of state, returns
-    pressure in the same units that are supplied for the reference bulk
+    Pressure according to the fourth-order
+    Birch-Murnaghan equation of state.
+
+    :param invVrel: V/V_0
+    :type invVrel: float or numpy array
+    :param params: parameter dictionary
+    :type params: dictionary
+    :return: Pressure in the same units that are supplied for the reference bulk
     modulus (params['K_0'])
+    :rtype: float or numpy array
     """
 
-    f = 0.5 * (pow(x, 2.0 / 3.0) - 1.0)
+    f = 0.5 * (pow(invVrel, 2.0 / 3.0) - 1.0)
     Xi = (3.0 / 4.0) * (4.0 - params["Kprime_0"])
     Zeta = (3.0 / 8.0) * (
         (params["K_0"] * params["Kprime_prime_0"])
@@ -96,7 +115,7 @@ class BM4(eos.EquationOfState):
         return volume_fourth_order(pressure, params)
 
     def pressure(self, temperature, volume, params):
-        return birch_murnaghan_fourth(params["V_0"] / volume, params)
+        return pressure_birch_murnaghan_fourth(params["V_0"] / volume, params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
