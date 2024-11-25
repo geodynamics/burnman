@@ -1,0 +1,8 @@
+The MACAW EoS is internally consistent.
+
+  0 GPa: V/V_0 = 1.000, K_T =  15.22 GPa
+ 20 GPa: V/V_0 = 0.704, K_T = 127.87 GPa
+ 40 GPa: V/V_0 = 0.626, K_T = 218.49 GPa
+ 60 GPa: V/V_0 = 0.579, K_T = 300.87 GPa
+ 80 GPa: V/V_0 = 0.546, K_T = 378.32 GPa
+100 GPa: V/V_0 = 0.520, K_T = 452.36 GPa
