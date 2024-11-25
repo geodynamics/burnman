@@ -12,6 +12,7 @@ from . import birch_murnaghan as bm
 from . import birch_murnaghan_4th as bm4
 from . import modified_tait as mt
 from . import macaw
+from . import spock
 from . import dks_liquid
 from . import dks_solid
 from . import hp
@@ -73,6 +74,8 @@ def create(method):
             return mt.MT()
         elif method == "macaw":
             return macaw.MACAW()
+        elif method == "spock":
+            return spock.SPOCK()
         elif method == "hp98":
             return hp.HP98()
         elif method == "hp_tmt":
