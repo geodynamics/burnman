@@ -1,0 +1,8 @@
+The SPOCK EoS is internally consistent.
+
+  0 GPa: V/V_0 = 1.000, K_T =  15.22 GPa
+ 20 GPa: V/V_0 = 0.711, K_T = 137.70 GPa
+ 40 GPa: V/V_0 = 0.638, K_T = 243.48 GPa
+ 60 GPa: V/V_0 = 0.596, K_T = 342.73 GPa
+ 80 GPa: V/V_0 = 0.566, K_T = 437.90 GPa
+100 GPa: V/V_0 = 0.543, K_T = 530.17 GPa

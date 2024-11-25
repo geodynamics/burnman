@@ -27,6 +27,7 @@ from .vinet import Vinet
 from .morse_potential import Morse
 from .reciprocal_kprime import RKprime
 from .macaw import MACAW
+from .spock import SPOCK
 from .dks_liquid import DKS_L
 from .dks_solid import DKS_S
 from .aa import AA
