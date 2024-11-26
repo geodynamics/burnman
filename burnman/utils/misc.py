@@ -70,7 +70,9 @@ def flatten(arr):
     )
 
 
-def pretty_string_values(popt, pcov, extra_decimal_places=0):
+def pretty_string_values(
+    popt, pcov, extra_decimal_places=0, combine_value_and_sigma=False
+):
     """
     Takes a numpy array of parameters, the corresponding covariance matrix
     and a set of parameter names and returns the scaled variables and
@@ -83,6 +85,8 @@ def pretty_string_values(popt, pcov, extra_decimal_places=0):
     :type pcov: 2D numpy array
     :param extra_decimal_places: extra precision for values, defaults to 0
     :type extra_decimal_places: int, optional
+    :param combine_value_and_sigma: give values in value(sigma) format, defaults to False
+    :type combine_value_and_sigma: bool, optional
     :return: values, uncertainties and the scaling factors
     :rtype: tuple of 3 lists
     """
@@ -103,6 +107,8 @@ def pretty_string_values(popt, pcov, extra_decimal_places=0):
         scale = np.power(10.0, p_expnt)
         nd = p_expnt - np.floor(np.log10(np.abs(c_rnd))) + extra_decimal_places
         pval.append(f"{p_rnd / scale:0{nd / 10.0}f}")
+        if combine_value_and_sigma:
+            pval[-1] = f"{pval[-1]}({int(c_rnd / scale * np.power(10, nd))})"
         psig.append(f"{c_rnd / scale:0{nd / 10.0}f}")
         pscale.append(f"{scale:.0e}")
     return (pval, psig, pscale)
