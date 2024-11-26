@@ -70,15 +70,27 @@ def flatten(arr):
     )
 
 
-def pretty_print_values(popt, pcov, params, extra_decimal_places=0):
+def pretty_string_values(popt, pcov, extra_decimal_places=0):
     """
     Takes a numpy array of parameters, the corresponding covariance matrix
-    and a set of parameter names and prints the parameters and
-    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i]))
-    in a nice text based format.
+    and a set of parameter names and returns the scaled variables and
+    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i])) and scaling factor
+    as three separate lists of strings.
+
+    :param popt: Parameter values
+    :type popt: numpy array
+    :param pcov: Variance-covariance matrix
+    :type pcov: 2D numpy array
+    :param extra_decimal_places: extra precision for values, defaults to 0
+    :type extra_decimal_places: int, optional
+    :return: values, uncertainties and the scaling factors
+    :rtype: tuple of 3 lists
     """
-    for i, p in enumerate(params):
-        p_rnd = round_to_n(popt[i], np.sqrt(pcov[i][i]), 1 + extra_decimal_places)
+    pval = []
+    psig = []
+    pscale = []
+    for i, p in enumerate(popt):
+        p_rnd = round_to_n(p, np.sqrt(pcov[i][i]), 1 + extra_decimal_places)
         c_rnd = round_to_n(
             np.sqrt(pcov[i][i]), np.sqrt(pcov[i][i]), 1 + extra_decimal_places
         )
@@ -90,11 +102,29 @@ def pretty_print_values(popt, pcov, params, extra_decimal_places=0):
 
         scale = np.power(10.0, p_expnt)
         nd = p_expnt - np.floor(np.log10(np.abs(c_rnd))) + extra_decimal_places
-        print(
-            "{0:s}: ({1:{4}{5}f} +/- {2:{4}{5}f}) x {3:.0e}".format(
-                p, p_rnd / scale, c_rnd / scale, scale, 0, (nd) / 10.0
-            )
-        )
+        pval.append(f"{p_rnd / scale:0{nd / 10.0}f}")
+        psig.append(f"{c_rnd / scale:0{nd / 10.0}f}")
+        pscale.append(f"{scale:.0e}")
+    return (pval, psig, pscale)
+
+
+def pretty_print_values(popt, pcov, params, extra_decimal_places=0):
+    """
+    Takes a numpy array of parameters, the corresponding covariance matrix
+    and a set of parameter names and prints the scaled variables and
+    principal 1-s.d.uncertainties (np.sqrt(pcov[i][i])) and scaling factor
+    in an easy to read format.
+
+    :param popt: Parameter values
+    :type popt: numpy array
+    :param pcov: Variance-covariance matrix
+    :type pcov: 2D numpy array
+    :param extra_decimal_places: extra precision for values, defaults to 0
+    :type extra_decimal_places: int, optional
+    """
+    pval, psig, pscale = pretty_string_values(popt, pcov, extra_decimal_places)
+    for i, p in enumerate(params):
+        print(f"{p:s}: ({pval[i]} +/- {psig[i]}) x {pscale[i]}")
 
 
 def pretty_print_table(table, use_tabs=False):
