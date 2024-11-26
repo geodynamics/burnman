@@ -24,24 +24,35 @@ except ImportError:
         return fn
 
 
-def gammaincc(a, x):
+def generalised_gammainc(a, x1, x2):
     """
-    An implementation of the non-regularised upper incomplete gamma
+    An implementation of the generalised incomplete gamma
     function. Computed using the relationship with the regularised
     lower incomplete gamma function (scipy.special.gammainc).
     Uses the recurrence relation wherever a<0.
+
+    We could have used mpmath.gammainc(a, x1, x2) directly,
+    but it is significantly slower than this implementation.
     """
     n = int(-np.floor(a))
     if n > 0:
         a = a + n
-        u_gamma = exp1(x) if a == 0 else (1.0 - gammainc(a, x)) * gamma(a)
+        u_gamma = (
+            exp1(x1) - exp1(x2)
+            if np.abs(a) < 1.0e-12
+            else (gammainc(a, x2) - gammainc(a, x1)) * gamma(a)
+        )
 
+        esubx1 = np.exp(-x1)
+        esubx2 = np.exp(-x2)
         for _ in range(n):
             a = a - 1.0
-            u_gamma = (u_gamma - np.power(x, a) * np.exp(-x)) / a
+            u_gamma = (
+                u_gamma + np.power(x2, a) * esubx2 - np.power(x1, a) * esubx1
+            ) / a
         return u_gamma
     else:
-        return (1.0 - gammainc(a, x)) * gamma(a)
+        return (gammainc(a, x2) - gammainc(a, x1)) * gamma(a)
 
 
 @jit(nopython=True)
@@ -98,13 +109,7 @@ class SPOCK(eos.EquationOfState):
             * np.exp(bi)
             / ai
             * np.power(bi, ci / ai)
-            * (
-                gammaincc(
-                    -ci / ai,
-                    bi * np.exp(ai * lnVrel),
-                )
-                - gammaincc(-ci / ai, bi)
-            )
+            * (generalised_gammainc(-ci / ai, bi * np.exp(ai * lnVrel), bi))
         )
 
     def molar_internal_energy(self, pressure, temperature, volume, params):
@@ -127,18 +132,9 @@ class SPOCK(eos.EquationOfState):
         I1 = (
             np.power(bi, 1.0 / ai)
             * Vrel
-            * (
-                gammaincc(
-                    -ci / ai,
-                    bi * np.exp(ai * lnVrel),
-                )
-                - gammaincc(-ci / ai, bi)
-            )
+            * (generalised_gammainc(-ci / ai, bi * np.exp(ai * lnVrel), bi))
         )
-        I2 = gammaincc(
-            (1.0 - ci) / ai,
-            bi * np.exp(ai * lnVrel),
-        ) - gammaincc((1.0 - ci) / ai, bi)
+        I2 = generalised_gammainc((1.0 - ci) / ai, bi * np.exp(ai * lnVrel), bi)
 
         return params["E_0"] + params["P_0"] * (volume - params["V_0"]) + f * (I1 - I2)
 
