@@ -217,9 +217,22 @@ class SPOCK(eos.EquationOfState):
         if params["Kprime_0"] < 0.0 or params["Kprime_0"] > 10.0:
             warnings.warn("Unusual value for Kprime_0", stacklevel=2)
         if params["Kdprime_0"] > 0.0:
-            warnings.warn("Unusual value for Kdprime_0", stacklevel=2)
+            warnings.warn("Kdprime_0 should be negative", stacklevel=2)
+        if (
+            -params["Kdprime_0"] * params["K_0"]
+            < params["Kprime_0"] - params["Kprime_inf"]
+        ):
+            warnings.warn(
+                "Kdprime_0*K_0 is expected to be more "
+                "negative than (Kprime_0 - Kprime_inf)",
+                stacklevel=2,
+            )
         if (
             params["Kprime_inf"] < 5.0 / 3.0
             or params["Kprime_inf"] > params["Kprime_0"]
         ):
-            warnings.warn("Unusual value for Kprime_inf", stacklevel=2)
+            warnings.warn(
+                "Kprime_inf is expected to be greater "
+                "than the Thomas-Fermi limit (5/3)",
+                stacklevel=2,
+            )
