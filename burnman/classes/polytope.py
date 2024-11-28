@@ -11,19 +11,28 @@ from fractions import Fraction
 from scipy.spatial import Delaunay
 from scipy.special import comb
 from copy import copy
-import cdd as cdd_float
 
 from .material import cached_property
 
 from ..utils.math import independent_row_indices
 
 
+# Try to import pycddlib.
+# First, try separating the imports into float and
+# fractional, then fall back to only using the float
+# representation, and finally don't import anything
+# (limiting functionality)
 try:
+    cdd_float = importlib.import_module("cdd")
     cdd_fraction = importlib.import_module("cdd.gmp")
     cdd_gmp_loaded = True
 except ImportError:
-    cdd_fraction = importlib.import_module("cdd")
-    cdd_gmp_loaded = False
+    try:
+        cdd_float = importlib.import_module("cdd")
+        cdd_fraction = importlib.import_module("cdd")
+        cdd_gmp_loaded = False
+    except ImportError:
+        cdd_float = None
 
 
 class SimplexGrid(object):
@@ -140,6 +149,11 @@ class MaterialPolytope(object):
             dependent endmembers are defined.
         :type independent_endmember_occupancies: numpy.array (2D) or None
         """
+        if cdd_float is None:
+            raise ImportError(
+                "You need to install pycddlib to create a MaterialPolytope object."
+            )
+
         if equalities.dtype != inequalities.dtype:
             raise Exception(
                 f"The equalities and inequalities arrays should have the same type ({equalities.dtype} != {inequalities.dtype})."

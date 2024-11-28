@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "burnman"
-version = "2.0.1a0"
+version = "2.1.1a"
 description = "A thermoelastic and thermodynamic toolkit for the Earth and planetary sciences"
 license = "GPL"
 authors = ["The BurnMan Team <bob.myhill@bristol.ac.uk>",]
@@ -25,11 +25,14 @@ sympy = "^1.12"
 cvxpy = "^1.3"
 matplotlib = "^3.7"
 numba = "^0.59"
-pycddlib-standalone = "^3.0"
+pycddlib-standalone = {version = "^3.0", optional = true}
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.5"
 numba = "^0.59"
+
+[tool.poetry.extras]
+dev = ["pycddlib-standalone"]
 
 [tool.poetry.group.dev.dependencies]
 black = "24.1.1"
