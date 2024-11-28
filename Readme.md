@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14165625.svg)](https://doi.org/10.5281/zenodo.14165625)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14238360.svg)](https://doi.org/10.5281/zenodo.14238360)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.05389/status.svg)](https://doi.org/10.21105/joss.05389)
 
 # BurnMan - a Python toolkit for planetary geophysics, geochemistry and thermodynamics
@@ -42,8 +42,8 @@ If you use BurnMan in your work, we ask that you cite the following publications
 
   - Myhill, R., Cottaar, S., Heister, T., Rose, I., Unterborn, C.,
     Dannberg, J., Gassmoeller, R. and Farla, R. (2024):
-    BurnMan v2.0.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
-    https://doi.org/10.5281/zenodo.14165625
+    BurnMan v2.1.0 [Software]. Computational Infrastructure for Geodynamics. Zenodo.
+    https://doi.org/10.5281/zenodo.14238360
 
   - Cottaar S., Heister, T., Rose, I., and Unterborn, C., (2014). BurnMan: A
     lower mantle mineral physics toolkit, Geochemistry, Geophysics, and

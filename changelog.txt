@@ -1,5 +1,9 @@
 Changelog
 ---------
+Release v2.1.0 (November 28, 2024) includes
+  - New: Added MACAW and SPOCK Equations of State
+  - Changed: pycddlib returned to optional dependency as hard to install on Windows.
+
 Release v2.0.0 (November 14, 2024) includes
   - Compatibility with Python 3.12.
   - Compatibility with new versions of numpy (1.26.0), scipy (1.14.0),

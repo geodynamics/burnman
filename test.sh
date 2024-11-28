@@ -20,7 +20,7 @@ fi
 $PYTHON --version
 # Quietly install burnman in development mode
 echo "Installing BurnMan in development mode ..."
-$PYTHON -m pip install -q -e .
+$PYTHON -m pip install -q -e .[dev]
 echo ""
 
 echo "Dependency tree:"
@@ -29,6 +29,10 @@ $PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 pycddlib_version=`pip freeze | grep "pycddlib=" | awk -F"==" '{print $2}'`
 if [ ! -z "${pycddlib_version}" ]
 then echo "└── pycddlib [optional, installed: ${pycddlib_version}]"
+fi
+pycddlib_version=`pip freeze | grep "pycddlib-standalone=" | awk -F"==" '{print $2}'`
+if [ ! -z "${pycddlib_version}" ]
+then echo "└── pycddlib-standalone [optional, installed: ${pycddlib_version}]"
 fi
 echo ""
 
