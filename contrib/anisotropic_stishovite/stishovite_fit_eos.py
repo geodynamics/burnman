@@ -2,20 +2,29 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np
-from scipy.optimize import minimize, differential_evolution, leastsq
+from scipy.optimize import minimize, differential_evolution, leastsq, least_squares
 
 from stishovite_data import (
     common_data,
-    P_for_CN,
+    P_for_CN_new,
     V_for_CN,
     T_for_CN,
     KNR_GPa,
     KNR_err_GPa,
     CN_GPa,
     CN_err_GPa,
+    J2009_stiffness_matrices,
+    J2009_pressures,
+    J2009_temperatures,
+    C2024_pressures,
+    C2024_temperatures,
+    C2024_KS,
+    C2024_KS_unc,
+    C2024_G,
+    C2024_G_unc,
 )
 from scipy.optimize import root_scalar
-from stishovite_model import make_models, make_scalar_model, modify_Zhang_elasticity
+from stishovite_model import make_models, make_scalar_model
 from copy import deepcopy
 from burnman import RelaxedSolution
 import matplotlib.pyplot as plt
@@ -62,14 +71,6 @@ def misfit_scalar(args):
         V0Q1overV0Q0,
         dDebye_0,
         P_tr_GPa,
-        fP_Zhang,
-        fP_Andrault,
-        fP_Wang,
-        fP_Nishihara,
-        fP2_Zhang,
-        fP2_Andrault,
-        fP2_Wang,
-        fP2_Nishihara,
     ) = args
 
     scalar_prms = make_scalar_model(
@@ -88,36 +89,24 @@ def misfit_scalar(args):
     )
     relaxed_stv.set_composition([1.0])
 
+    misfits = []
     # Fit the HT transition pressure from Fischer
     P_tr_3000K_model = transition_pressure(scalar_stv, 3000.0) / 1.0e9
     P_tr_3000K_obs = 90.0
     P_tr_3000K_err = 1.0
     misfits = [(P_tr_3000K_model - P_tr_3000K_obs) / P_tr_3000K_err]
 
-    # Fit volumes for stishovite from Zhang, Andrault
+    # Fit volumes for stishovite from Nishihara, Wang, Andrault
     for phase, publication in [
         ("stv", "Nishihara_2005"),
         ("stv", "Wang_2012"),
-        ("stv", "Zhang_2021"),
-        ("poststv", "Zhang_2021"),
+        # ("stv", "Zhang_2021"),
+        # ("poststv", "Zhang_2021"),
         ("stv", "Andrault_2003"),
         ("poststv", "Andrault_2003"),
+        # ("stv", "Fischer_2018"),
+        # ("poststv", "Fischer_2018"),
     ]:
-        if publication == "Zhang_2021":
-            fP = fP_Zhang
-            fP2 = fP2_Zhang
-        elif publication == "Andrault_2003":
-            fP = fP_Andrault
-            fP2 = fP2_Andrault
-        elif publication == "Wang_2012":
-            fP = fP_Wang
-            fP2 = fP2_Wang
-        elif publication == "Nishihara_2005":
-            fP = fP_Nishihara
-            fP2 = fP2_Nishihara
-        else:
-            fP = 1.0
-            fP2 = 0.0
 
         PTV = deepcopy(data["PTV"][phase][publication])
         PTV_err = deepcopy(data["PTV_err"][phase][publication])
@@ -125,7 +114,7 @@ def misfit_scalar(args):
         P_model = relaxed_stv.evaluate_with_volumes(["pressure"], PTV[:, 2], PTV[:, 1])[
             0
         ]
-        P_actual = PTV[:, 0] * (fP + fP2 * PTV[:, 0])
+        P_actual = PTV[:, 0]
         misfits.extend(list((P_model - P_actual) / PTV_err[:, 0]))
 
         if plot:
@@ -148,14 +137,14 @@ def misfit_scalar(args):
         ax[1].scatter(PTV[:, 1][sort], PTV[:, 2][sort])
 
     # Fit isentropic bulk moduli from Zhang
-    KNR_obs = relaxed_stv.evaluate_with_volumes(
+    KNR_mod = relaxed_stv.evaluate_with_volumes(
         ["isentropic_bulk_modulus_reuss"], V_for_CN, T_for_CN
     )[0]
-    misfits.extend(list((KNR_GPa - KNR_obs / 1.0e9) / KNR_err_GPa))
+    misfits.extend(list((KNR_GPa - KNR_mod / 1.0e9) / KNR_err_GPa))
 
     if plot:
         sort = np.argsort(V_for_CN)
-        ax[2].plot(V_for_CN[sort], KNR_obs[sort] / 1.0e9)
+        ax[2].plot(V_for_CN[sort], KNR_mod[sort] / 1.0e9)
         ax[2].scatter(V_for_CN[sort], KNR_GPa[sort])
         plt.show()
 
@@ -179,36 +168,17 @@ def misfit_cell(args, scalar_args):
         V0Q1overV0Q0,
         dDebye_0,
         P_tr_GPa,
-        fP_Zhang,
-        fP_Andrault,
-        fP_Wang,
-        fP_Nishihara,
-        fP2_Zhang,
-        fP2_Andrault,
-        fP2_Wang,
-        fP2_Nishihara,
     ) = scalar_args
-    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = args
-    (
-        a11,
-        a22,
-        a33,
-        a44,
-        a55,
-        a66,
-        b11,
-        b22,
-        b33,
-        b44,
-        b55,
-        b66,
-        c44,
-        c55,
-        c66,
-        b112,
-        b222,
-        b332,
-    ) = np.zeros(18)
+    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22) = args
+
+    (a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, d44, d66) = np.zeros(12)
+
+    c44 = 1.0
+    c66 = 1.0
+    b22 = b11
+    b55 = b44
+    c55 = c44
+    d55 = d44
 
     models = make_models(
         dVQ0,
@@ -224,8 +194,8 @@ def misfit_cell(args, scalar_args):
         PsiI_33_a,
         PsiI_33_b,
         PsiI_33_c,
-        PsiI_33_b2,
-        PsiI_33_c2,
+        PsiI_33_d,
+        f_PsiI_22,
         a11,
         a22,
         a33,
@@ -241,9 +211,9 @@ def misfit_cell(args, scalar_args):
         c44,
         c55,
         c66,
-        b112,
-        b222,
-        b332,
+        d44,
+        d55,
+        d66,
     )
     _, _, _, stishovite_relaxed = models
     stishovite_relaxed.set_composition([1.0])
@@ -261,21 +231,6 @@ def misfit_cell(args, scalar_args):
         # ("stv", "Andrault_2003"),
         ("poststv", "Andrault_2003"),
     ]:
-        if publication == "Zhang_2021":
-            fP = fP_Zhang
-            fP2 = fP2_Zhang
-        elif publication == "Andrault_2003":
-            fP = fP_Andrault
-            fP2 = fP2_Andrault
-        elif publication == "Wang_2012":
-            fP = fP_Wang
-            fP2 = fP2_Wang
-        elif publication == "Nishihara_2005":
-            fP = fP_Nishihara
-            fP2 = fP2_Nishihara
-        else:
-            fP = 1.0
-            fP2 = 0.0
 
         PTV = data["PTV"][phase][publication]
         abc_obs = data["abc"][phase][publication]
@@ -287,7 +242,7 @@ def misfit_cell(args, scalar_args):
             axis=0,
         )
 
-        P_actual = PTV[:, 0] * (fP + fP2 * PTV[:, 0])
+        P_actual = PTV[:, 0]
         cell_parameters_model = stishovite_relaxed.evaluate(
             ["cell_parameters"], P_actual, PTV[:, 1]
         )[0]
@@ -341,35 +296,14 @@ def misfit_elastic(args, scalar_args, cell_args):
         V0Q1overV0Q0,
         dDebye_0,
         P_tr_GPa,
-        fP_Zhang,
-        fP_Andrault,
-        fP_Wang,
-        fP_Nishihara,
-        fP2_Zhang,
-        fP2_Andrault,
-        fP2_Wang,
-        fP2_Nishihara,
     ) = scalar_args
-    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_b2, PsiI_33_c2) = cell_args
-    (a11, a22, a33, a44, a55, a66, b11i, b33i, b44i, b66i, c44, c66, b112i, b332i) = (
-        args
-    )
+    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22) = cell_args
+    (a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, c44, c66, d44, d66) = args
 
-    b55i = b44i
-    b22i = b11i
-    b222i = b112i
+    b22 = b11
+    b55 = b44
     c55 = c44
-
-    frel = -0.14
-    b11 = b11i / (PsiI_33_c * np.exp(PsiI_33_c * frel) - 1.0)
-    b22 = b22i / (PsiI_33_c * np.exp(PsiI_33_c * frel) - 1.0)
-    b33 = b33i / (PsiI_33_c * np.exp(PsiI_33_c * frel) - 1.0)
-    b112 = b112i / (PsiI_33_c2 * np.exp(PsiI_33_c2 * frel) - 1.0)
-    b222 = b222i / (PsiI_33_c2 * np.exp(PsiI_33_c2 * frel) - 1.0)
-    b332 = b332i / (PsiI_33_c2 * np.exp(PsiI_33_c2 * frel) - 1.0)
-    b44 = b44i / (c44 * np.exp(c44 * frel) - 1.0)
-    b55 = b55i / (c55 * np.exp(c55 * frel) - 1.0)
-    b66 = b66i / (c66 * np.exp(c66 * frel) - 1.0)
+    d55 = d44
 
     models = make_models(
         dVQ0,
@@ -385,8 +319,8 @@ def misfit_elastic(args, scalar_args, cell_args):
         PsiI_33_a,
         PsiI_33_b,
         PsiI_33_c,
-        PsiI_33_b2,
-        PsiI_33_c2,
+        PsiI_33_d,
+        f_PsiI_22,
         a11,
         a22,
         a33,
@@ -402,42 +336,60 @@ def misfit_elastic(args, scalar_args, cell_args):
         c44,
         c55,
         c66,
-        b112,
-        b222,
-        b332,
+        d44,
+        d55,
+        d66,
     )
-    _, _, _, stishovite_relaxed = models
+    _, _, stishovite_unrelaxed, stishovite_relaxed = models
     stishovite_relaxed.set_composition([1.0])
 
     misfits = []
+
+    # Try to make b33 positive
+    # CN_model = stishovite_relaxed.evaluate(
+    #    ["isentropic_stiffness_tensor"], [0., 10.e9, 20.e9], [298, 298, 298])[0]
+    # C33 = CN_model[:, 2, 2]/10.e9
+
+    # d2C33dP2 = (C33[2] - C33[1]) - (C33[1] - C33[0])
+    # if d2C33dP2 < 0.:
+    #    misfits.append(400.*d2C33dP2*d2C33dP2)
+
+    # b33 = stishovite_relaxed.endmembers[0][0].anisotropic_params["b"][2][2]
+    # b11 = stishovite_relaxed.endmembers[0][0].anisotropic_params["b"][0][0]
+
+    # misfits.append(400.*np.power(b33-b11, 2.))
 
     if plot:
         fig = plt.figure()
         ax = [fig.add_subplot(1, 3, i) for i in range(1, 4)]
 
-    # Fit compliance data
-    fP = fP_Zhang
-    fP2 = fP2_Zhang
-    P_actual = P_for_CN * (fP + fP2 * P_for_CN)
+    # Fit compliance data for Zhang
+    # Part I: Fit data under 25 GPa
+    mask = P_for_CN_new < 25.0e9
+    P_actual = P_for_CN_new[mask]
     CN_model = stishovite_relaxed.evaluate(
-        ["isentropic_stiffness_tensor"], P_actual, T_for_CN
+        ["isentropic_stiffness_tensor"], P_actual, T_for_CN[mask]
     )[0]
     sort = np.argsort(P_actual)
-    for i, j in [
-        (0, 0),
-        (1, 1),
-        (2, 2),
-        (0, 1),
-        (0, 2),
-        (1, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5),
-    ]:
-        chis = (CN_GPa[:, i, j] - CN_model[:, i, j] / 1.0e9) / CN_err_GPa[:, i, j]
-        misfits.extend(list(chis))
 
-        if plot:
+    chis = (CN_GPa[mask] - CN_model / 1.0e9) / CN_err_GPa[mask]
+    chis[:, 2, 2] = chis[:, 2, 2] * 0.0  # don't fit C33
+    chis = np.ravel(np.triu(chis))
+    misfits.extend(list(chis))
+
+    if plot:
+        for i, j in [
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (0, 1),
+            (0, 2),
+            (1, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+        ]:
+
             axi = 2
             if i < 2 and j < 2:
                 axi = 0
@@ -460,6 +412,58 @@ def misfit_elastic(args, scalar_args, cell_args):
             ax[axi].legend()
         plt.show()
 
+    P_actual = P_for_CN_new[mask]
+    CN_model = stishovite_relaxed.evaluate(
+        ["isentropic_stiffness_tensor"], J2009_pressures, J2009_temperatures
+    )[0]
+    chis = (J2009_stiffness_matrices - CN_model) / 10.0e9
+    chis = np.ravel(np.triu(chis))
+    misfits.extend(list(chis))
+
+    if True:
+        # Part 2: Fit splitting data (>50 GPa)
+        chi_scale = 4.0
+        split_mask = CN_GPa[:, 0, 0] != CN_GPa[:, 1, 1]
+        P_actual = P_for_CN_new[split_mask]
+        CN_model = stishovite_relaxed.evaluate(
+            ["isentropic_stiffness_tensor"], P_actual, T_for_CN[split_mask]
+        )[0]
+        sort = np.argsort(P_actual)
+
+        # (11 and 22), (13 and 23), and (44 and 55) split
+        for i1, j1, i2, j2 in [(0, 0, 1, 1), (0, 2, 1, 2), (3, 3, 4, 4)]:
+            obs_split = CN_GPa[split_mask, i1, j1] - CN_GPa[split_mask, i2, j2]
+            unc_split = np.sqrt(
+                np.power(CN_err_GPa[split_mask, i1, j1], 2.0)
+                + np.power(CN_err_GPa[split_mask, i2, j2], 2.0)
+            )
+            model_split = CN_model[:, i1, j1] / 1.0e9 - CN_model[:, i2, j2] / 1.0e9
+            chis = (obs_split - model_split) / unc_split * chi_scale
+            misfits.extend(list(chis))
+
+        # Value of 44, 55 and 13, 23
+        if True:
+            for i, j in [(3, 3), (4, 4), (0, 2), (1, 2)]:
+                obs = CN_GPa[split_mask, i, j]
+                unc = CN_err_GPa[split_mask, i, j]
+                model = CN_model[:, i, j] / 1.0e9
+                chis = (obs - model) / unc
+                misfits.extend(list(chis))
+
+        # Chen 2024 data
+        K_mod, G_mod = stishovite_relaxed.evaluate(
+            ["isentropic_bulk_modulus_vrh", "isentropic_shear_modulus_vrh"],
+            C2024_pressures,
+            C2024_temperatures,
+        )
+        misfits.extend(list((C2024_KS - K_mod) / C2024_KS_unc / 2.0))
+        misfits.extend(list((C2024_G - G_mod) / C2024_G_unc / 2.0))
+        # Finally, impose a weak penalty on large 0.5*(C11 + C22) - C12
+        # stishovite_unrelaxed.set_composition([0.5, 0.5])
+        # CN = stishovite_unrelaxed.evaluate(["isentropic_stiffness_tensor"],
+        #                                    100.e9, 298.15)[0]
+        # misfits.extend([(CN[0, 1] - 0.5*(CN[0, 0] + CN[1, 1])) / 100.e9])
+
     misfits = np.array(misfits)
     chisqr = np.sum(np.power(misfits, 2.0))
 
@@ -471,8 +475,8 @@ def misfit_elastic(args, scalar_args, cell_args):
 
 
 def misfit_scalar_and_cell(args):
-    scalar_args = args[:16]
-    cell_args = args[16:]
+    scalar_args = args[:8]
+    cell_args = args[8:]
     misfits = np.concatenate(
         (misfit_scalar(scalar_args), misfit_cell(cell_args, scalar_args))
     )
@@ -489,7 +493,6 @@ def misfit_cell_and_elastic(args, scalar_args):
     cell_args = args[:7]
     elastic_args = args[7:]
     misfits_1 = misfit_cell(cell_args, scalar_args)
-    modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
     misfits_2 = misfit_elastic(elastic_args, scalar_args, cell_args)
 
     misfits = np.concatenate((misfits_1, misfits_2))
@@ -503,12 +506,11 @@ def misfit_cell_and_elastic(args, scalar_args):
 
 
 def misfit_all(args):
-    scalar_args = args[:16]
-    cell_args = args[16:23]
-    elastic_args = args[23:]
+    scalar_args = args[:8]
+    cell_args = args[8:15]
+    elastic_args = args[15:]
     misfits_1 = misfit_scalar(scalar_args)
     misfits_2 = misfit_cell(cell_args, scalar_args)
-    modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
     misfits_3 = misfit_elastic(elastic_args, scalar_args, cell_args)
 
     misfits = np.concatenate((misfits_1, misfits_2, misfits_3))
@@ -516,9 +518,9 @@ def misfit_all(args):
 
     if chisqr < min_misfit_combined[0]:
         min_misfit_combined[0] = chisqr
-        print(repr(args[:16]))
-        print(repr(args[16:23]))
-        print(repr(args[23:]))
+        print(repr(args[:8]))
+        print(repr(args[8:15]))
+        print(repr(args[15:]))
     print(chisqr)
     return misfits
 
@@ -585,7 +587,6 @@ if __name__ == "__main__":
 
     if False:
         cell_and_elastic_args = np.concatenate((cell_args, elastic_args))
-        modify_Zhang_elasticity(scalar_args, cell_args, elastic_args)
         sol = minimize(
             misfit_cell_and_elastic,
             cell_and_elastic_args,
@@ -595,8 +596,35 @@ if __name__ == "__main__":
         )
 
     if False:
+
+        def misfit(all_args):
+            misfits = misfit_all(all_args)
+            return np.sum(np.power(misfits, 2.0))
+
         sol = minimize(
-            misfit_elastic,
+            misfit,
+            all_args,
+            bounds=scalar_bounds + cell_bounds + elastic_bounds,
+            # method="Nelder-Mead",
+            method="Powell",
+        )
+
+        sol = minimize(
+            misfit,
+            sol.x,
+            bounds=scalar_bounds + cell_bounds + elastic_bounds,
+            method="Nelder-Mead",
+            # method="Powell",
+        )
+
+    if False:
+
+        def misfit(elastic_args, cell_args, scalar_args):
+            misfits = misfit_elastic(elastic_args, cell_args, scalar_args)
+            return np.sum(np.power(misfits, 2.0))
+
+        sol = minimize(
+            misfit,
             elastic_args,
             bounds=elastic_bounds,
             args=(scalar_args, cell_args),
@@ -604,8 +632,13 @@ if __name__ == "__main__":
         )
 
     if False:
+
+        def misfit(cell_args, scalar_args):
+            misfits = misfit_cell(cell_args, scalar_args)
+            return np.sum(np.power(misfits, 2.0))
+
         sol = minimize(
-            misfit_cell,
+            misfit,
             cell_args,
             bounds=cell_bounds,
             args=(scalar_args),
