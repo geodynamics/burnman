@@ -22,6 +22,19 @@ from burnman.utils.unitcell import molar_volume_from_unit_cell_volume
 from burnman.utils.misc import pretty_string_values
 from tabulate import tabulate
 
+# Colorblind friendly colors
+# https://www.nature.com/articles/nmeth.1618.pdf
+colors = {
+    "SPOCK": "#000000",
+    "BM3": "#E69F00",
+    "none": "#56B4E9",
+    "MT": "#009E73",
+    "Vinet": "#F0E442",
+    "MACAW": "#0072B2",
+    "BM4": "#D55E00",
+    "RK": "#CC79A7",
+}
+
 # Loop over the gold and platinum datasets from Fratanduono et al. (2021)
 for basename in ["Au", "Pt"]:
     print(f"Fitting {basename} equation of state parameters")
@@ -33,8 +46,7 @@ for basename in ["Au", "Pt"]:
     V = molar_volume_from_unit_cell_volume(d[:, 1], 1.0)
     P = d[:, -2] * 1.0e9
     T = P * 0.0 + 298.15
-    P_unc = np.max(np.array([d[:, -1] * 1.0e9, 1.0e6 + d[:, -1] * 0.0]),
-                   axis=0)
+    P_unc = np.max(np.array([d[:, -1] * 1.0e9, 1.0e6 + d[:, -1] * 0.0]), axis=0)
 
     # Approximate the bulk modulus from the data
     KT_estimates = -np.gradient(P, np.log(V), edge_order=2)
@@ -126,15 +138,30 @@ for basename in ["Au", "Pt"]:
     T_plot = 298.15 + 0.0 * P_plot
 
     # Loop over all the equations of state
-    for ename, eos, fit_params in [
-        ("Vinet", "vinet", ["V_0", "K_0", "Kprime_0"]),
-        ("BM3", "bm3", ["V_0", "K_0", "Kprime_0"]),
-        ("BM4", "bm4", ["V_0", "K_0", "Kprime_0", "Kprime_prime_0"]),
-        ("Modified Tait", "mt", ["V_0", "K_0", "Kprime_0", "Kdprime_0"]),
-        ("RK", "rkprime", ["V_0", "K_0", "Kprime_0", "Kprime_inf"]),
-        ("MACAW", "macaw", ["V_0", "K_0", "Kprime_0", "Kprime_inf"]),
-        ("SPOCK", "spock", ["V_0", "K_0", "Kprime_0", "Kprime_inf", "Kdprime_0"]),
+    for sname, ename, eos, fit_params in [
+        ("Vinet", "Vinet", "vinet", ["V_0", "K_0", "Kprime_0"]),
+        ("BM3", "BM3", "bm3", ["V_0", "K_0", "Kprime_0"]),
+        ("BM4", "BM4", "bm4", ["V_0", "K_0", "Kprime_0", "Kprime_prime_0"]),
+        ("MT", "Modified Tait", "mt", ["V_0", "K_0", "Kprime_0", "Kdprime_0"]),
+        ("RK", "RK", "rkprime", ["V_0", "K_0", "Kprime_0", "Kprime_inf"]),
+        ("MACAW", "MACAW", "macaw", ["V_0", "K_0", "Kprime_0", "Kprime_inf"]),
+        (
+            "SPOCK",
+            "SPOCK",
+            "spock",
+            ["V_0", "K_0", "Kprime_0", "Kprime_inf", "Kdprime_0"],
+        ),
     ]:
+
+        # Define some plotting values
+        if sname == "SPOCK":
+            linestyle = "-"
+            linewidth = 2.0
+            alpha = 1.0
+        else:
+            linestyle = "-"
+            linewidth = 1.5
+            alpha = 1.0
 
         params = copy(vinet_params)
         params["Kprime_inf"] = 2.87
@@ -188,20 +215,42 @@ for basename in ["Au", "Pt"]:
 
         V, KT = m.evaluate(["V", "K_T"], P_plot, T_plot)
         ax[0].plot(
-            P_plot / 1.0e9, V * 1.0e6, label=f"{ename} (WSS={fitted_eos.WSS:.2f})"
+            P_plot / 1.0e9,
+            V * 1.0e6,
+            c=colors[sname],
+            alpha=alpha,
+            linestyle=linestyle,
+            linewidth=linewidth,
+            label=f"{ename} (WSS={fitted_eos.WSS:.2f})",
         )
-        ax[1].plot(P_plot / 1.0e9, KT / 1.0e9, label=f"{ename}")
+        ax[1].plot(
+            P_plot / 1.0e9,
+            KT / 1.0e9,
+            c=colors[sname],
+            alpha=alpha,
+            linestyle=linestyle,
+            linewidth=linewidth,
+            label=f"{ename}",
+        )
 
         diff_KT = m.evaluate(["K_T"], PTV[:, 0], PTV[:, 1])[0] - KT_estimates
         diff_V = m.evaluate(["V"], PTV[:, 0], PTV[:, 1])[0] - PTV[:, 2]
         ax[2].plot(
             PTV[:, 0] / 1.0e9,
             diff_V / PTV[:, 2],
+            c=colors[sname],
+            alpha=alpha,
+            linestyle=linestyle,
+            linewidth=linewidth,
             label=f"{ename}/obs - 1",
         )
         ax[3].plot(
             PTV[:, 0] / 1.0e9,
             diff_KT / KT_estimates,
+            c=colors[sname],
+            alpha=alpha,
+            linestyle=linestyle,
+            linewidth=linewidth,
             label=f"{ename}/obs - 1",
         )
 
@@ -256,3 +305,4 @@ for basename in ["Au", "Pt"]:
     ]
     print(basename)
     print(tabulate(df, headers="keys", tablefmt="latex_raw", floatfmt=".2f"))
+    plt.show()

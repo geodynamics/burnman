@@ -17,6 +17,20 @@ Au_comparison
 -------------
 """
 
+# Colorblind friendly colors
+# https://www.nature.com/articles/nmeth.1618.pdf
+colors = {
+    "SPOCK": "#000000",
+    "BM3": "#E69F00",
+    "none": "#56B4E9",
+    "MT": "#009E73",
+    "Vinet": "#F0E442",
+    "MACAW": "#0072B2",
+    "BM4": "#D55E00",
+    "RK": "#CC79A7",
+}
+
+
 # Define the equations of state we wish to compare
 eoses = {
     "Vinet": Vinet(),
@@ -69,8 +83,8 @@ for name, eos in eoses.items():
         linewidth = 2.0
         alpha = 1.0
     else:
-        linestyle = "--"
-        linewidth = 1.0
+        linestyle = "-"
+        linewidth = 1.5
         alpha = 1.0
 
     # Get the values of the properties to plot from the equations of state
@@ -87,7 +101,8 @@ for name, eos in eoses.items():
                     pressures[i], 0.0, volumes[i], params
                 )
                 Es[i] = (
-                    eos.molar_internal_energy(pressures[i], 0.0, volumes[i], params) / 1.0e9
+                    eos.molar_internal_energy(pressures[i], 0.0, volumes[i], params)
+                    / 1.0e9
                 )
             except ValueError:
                 pressures[i] = np.nan
@@ -105,6 +120,7 @@ for name, eos in eoses.items():
         linewidth=linewidth,
         alpha=alpha,
         label=name,
+        c=colors[name],
     )
     ax[1].plot(
         Vs / params["V_0"],
@@ -113,6 +129,7 @@ for name, eos in eoses.items():
         linestyle=linestyle,
         linewidth=linewidth,
         label=name,
+        c=colors[name],
     )
     ax[2].plot(
         Vs / params["V_0"],
@@ -121,6 +138,7 @@ for name, eos in eoses.items():
         linestyle=linestyle,
         linewidth=linewidth,
         label=name,
+        c=colors[name],
     )
     ax[3].plot(
         Vs / params["V_0"],
@@ -129,6 +147,7 @@ for name, eos in eoses.items():
         linestyle=linestyle,
         linewidth=linewidth,
         label=name,
+        c=colors[name],
     )
 
 

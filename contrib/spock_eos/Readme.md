@@ -21,3 +21,8 @@ Au_comparison.py
 This script compares various equations of state given the standard state
 and infinite pressure parameters optimised for the Au SPOCK equation of state.
 Plots Figure 3.
+
+SPOCK_EoS.xlsx
+--------------
+This Excel spreadsheet contains an implementation of the SPOCK equation
+of state.
