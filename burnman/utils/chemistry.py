@@ -402,7 +402,7 @@ def process_solution_chemistry(solution_model):
 
             # Loop over species after site
             if len(site_split) != 1:
-                not_in_site = str(filter(None, site_split[1]))
+                not_in_site = site_split[1].strip()
                 not_in_site = not_in_site.replace(mult, "", 1)
                 for enamenumber in re.findall("[A-Z][^A-Z]*", not_in_site):
                     sp = list(filter(None, re.split(r"(\d+)", enamenumber)))
