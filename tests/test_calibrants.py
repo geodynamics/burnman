@@ -5,6 +5,7 @@ import unittest
 import inspect
 import burnman
 from burnman import calibrants
+from burnman.calibrants.tools import pressure_to_pressure
 
 
 class test_calibrants(BurnManTest):
@@ -31,6 +32,17 @@ class test_calibrants(BurnManTest):
 
         pressures = np.array(pressures)
         self.assertArraysAlmostEqual(pressures, 10.0e9 + pressures * 0.0)
+
+    def test_pressure_to_pressure(self):
+        gold1 = calibrants.Anderson_1989.Au()
+        gold2 = calibrants.Fei_2007.Au()
+
+        temperature = 1000.0
+        pressure1 = 20.0e9
+        pressure2 = pressure_to_pressure(gold1, gold2, pressure1, temperature)
+        pressure1new = pressure_to_pressure(gold2, gold1, pressure2, temperature)
+
+        self.assertAlmostEqual(pressure1 / 1.0e9, pressure1new / 1.0e9, 4)
 
 
 if __name__ == "__main__":
