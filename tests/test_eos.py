@@ -7,6 +7,7 @@ import numpy as np
 
 import burnman
 from burnman import minerals
+from burnman.eos import debye
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 
 
@@ -415,7 +416,17 @@ class test_eos_validation(BurnManTest):
             }
         )
 
-        eoses = ["bm3", "bm4", "vinet", "mt", "morse", "rkprime"]
+        eoses = [
+            "bm3",
+            "bm4",
+            "vinet",
+            "mt",
+            "morse",
+            "rkprime",
+            "macaw",
+            "spock",
+            "murnaghan",
+        ]
 
         calculated = []
         derivative = []
@@ -424,12 +435,12 @@ class test_eos_validation(BurnManTest):
             burnman.Mineral.__init__(m)
 
             P_0 = 10.0e9
-            dP = 1000.0
+            dP = 10000.0
             pressures = [P_0 - 0.5 * dP, P_0, P_0 + 0.5 * dP]
             temperatures = [0.0, 0.0, 0.0]
 
-            E, G, H, A, V = m.evaluate(
-                ["molar_internal_energy", "gibbs", "H", "helmholtz", "V"],
+            E, G, H, A, V, KT = m.evaluate(
+                ["molar_internal_energy", "gibbs", "H", "helmholtz", "V", "K_T"],
                 pressures,
                 temperatures,
             )
@@ -438,8 +449,33 @@ class test_eos_validation(BurnManTest):
             derivative.append(-(E[2] - E[0]) / (V[2] - V[0]))
             calculated.append(V[1])
             derivative.append((G[2] - G[0]) / dP)
+            calculated.append(-V[1] / KT[1])
+            derivative.append((V[2] - V[0]) / dP)
 
         self.assertArraysAlmostEqual(calculated, derivative)
+
+    def test_debye(self):
+        T = 500.0
+        debye_T = 200.0
+        n = 3.0
+
+        dT = 0.001
+
+        Cv = debye.molar_heat_capacity_v(T, debye_T, n)
+        S = debye.entropy(T, debye_T, n)
+        Cv2 = (
+            debye.thermal_energy(T + dT / 2.0, debye_T, n)
+            - debye.thermal_energy(T - dT / 2.0, debye_T, n)
+        ) / dT
+        S2 = (
+            -(
+                debye.helmholtz_free_energy(T + dT / 2.0, debye_T, n)
+                - debye.helmholtz_free_energy(T - dT / 2.0, debye_T, n)
+            )
+            / dT
+        )
+        self.assertAlmostEqual(Cv, Cv2)
+        self.assertAlmostEqual(S, S2)
 
     def test_pressure_finding(self):
         with warnings.catch_warnings(record=True) as w:

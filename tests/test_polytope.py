@@ -12,9 +12,18 @@ from burnman.tools.polytope import solution_polytope_from_charge_balance
 from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
 from burnman.tools.polytope import simplify_composite_with_composition
 from burnman import MaterialPolytope
+from burnman.classes.polytope import SimplexGrid
 
 
 class polytope(BurnManTest):
+    def test_simplex(self):
+        simplex = SimplexGrid(3, 4)
+        grid_list = np.array(simplex.grid(generate_type="list"))
+        grid_array = simplex.grid(generate_type="array")
+
+        self.assertArraysAlmostEqual(grid_list[-1], grid_array[-1])
+        self.assertTrue(simplex.n_points() == len(grid_array))
+
     def test_polytope_from_charge_balance(self):
         bdg_poly = solution_polytope_from_charge_balance(
             [[2, 2, 3, 3], [3, 3, 4]], 6, return_fractions=False
@@ -37,6 +46,26 @@ class polytope(BurnManTest):
                 < 1.0e-5
             )
         )
+
+        self.assertTrue(len(gt.solution_model.endmember_occupancies) == 5)
+        self.assertTrue(len(gt_poly.independent_endmember_occupancies) == 5)
+
+        self.assertTrue(len(gt.solution_model.endmember_occupancies[0]) == 9)
+        self.assertTrue(len(gt_poly.endmember_occupancies[0]) == 9)
+        self.assertTrue(len(gt_poly.independent_endmember_occupancies[0]) == 9)
+
+        self.assertTrue(gt_poly.n_endmembers == 7)
+        self.assertTrue(len(gt_poly.limits) == 14)
+
+        self.assertTrue(len(gt_poly.independent_endmember_limits) == 6)
+        self.assertTrue(len(gt_poly.independent_endmember_limits[0]) == 5)
+
+        grid1 = gt_poly.grid(2, grid_type="independent endmember proportions")
+        self.assertTrue(len(grid1) == 7)
+        self.assertTrue(len(grid1[0]) == 5)
+        grid2 = gt_poly.grid(2, grid_type="site occupancies")
+        self.assertTrue(len(grid2) == 7)
+        self.assertTrue(len(grid2[0]) == 9)
 
     def test_simplify_composite(self):
         gt = SLB_2011.garnet()

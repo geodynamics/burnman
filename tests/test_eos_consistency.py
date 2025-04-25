@@ -48,6 +48,32 @@ class EosConsistency(BurnManTest):
             check_eos_consistency(burnman.minerals.SLB_2022.almandine(), P, T), True
         )
 
+    def test_DKS_liquid(self):
+        P = 10.0e9
+        T = 3000.0
+        self.assertEqual(
+            check_eos_consistency(
+                burnman.minerals.DKS_2013_liquids.Mg3Si2O7_liquid(),
+                P,
+                T,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
+    def test_DKS_solid(self):
+        P = 10.0e9
+        T = 3000.0
+        self.assertEqual(
+            check_eos_consistency(
+                burnman.minerals.DKS_2013_solids.periclase(),
+                P,
+                T,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
     def test_modifier(self):
         P = 10.0e9
         T = 3000.0
