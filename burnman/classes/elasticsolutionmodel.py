@@ -227,7 +227,7 @@ class ElasticMechanicalSolution(ElasticSolutionModel):
     def __init__(self, endmembers):
         self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
-        self.formulas = [e[1] for e in endmembers]
+        self.site_formulae = [e[1] for e in endmembers]
 
     def excess_helmholtz_energy(self, volume, temperature, molar_fractions):
         return 0.0
@@ -263,7 +263,7 @@ class ElasticIdealSolution(ElasticSolutionModel):
     def __init__(self, endmembers):
         self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
-        self.formulas = [e[1] for e in endmembers]
+        self.site_formulae = [e[1] for e in endmembers]
 
         # Process solution chemistry
         process_solution_chemistry(self)

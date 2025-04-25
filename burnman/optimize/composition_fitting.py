@@ -36,7 +36,7 @@ class DummyCompositionSolution(Solution):
             dictionarize_formula(f) for f in endmember_element_formulae
         ]
         self.solution_model = type(
-            "Dimension", (object,), {"formulas": endmember_site_formulae}
+            "Dimension", (object,), {"site_formulae": endmember_site_formulae}
         )()
         self.solution_model.endmembers = [None for f in endmember_site_formulae]
         process_solution_chemistry(self.solution_model)
