@@ -1,5 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14238360.svg)](https://doi.org/10.5281/zenodo.14238360)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.05389/status.svg)](https://doi.org/10.21105/joss.05389)
+![coverage](https://img.shields.io/badge/coverage-%3E84%25-green")
 
 # BurnMan - a Python toolkit for planetary geophysics, geochemistry and thermodynamics
 
