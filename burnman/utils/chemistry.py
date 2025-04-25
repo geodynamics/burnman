@@ -284,7 +284,7 @@ def convert_formula(formula, to_type="mass", normalize=False):
 
 def process_solution_chemistry(solution_model):
     """
-    This function parses a class instance with a "formulas"
+    This function parses a class instance with a "site_formulae"
     attribute containing site information, e.g.
 
         [ '[Mg]3[Al]2Si3O12', '[Mg]3[Mg1/2Si1/2]2Si3O12' ]
@@ -297,7 +297,7 @@ def process_solution_chemistry(solution_model):
     molar fractions of the phases and pressure
     and temperature where necessary.
 
-    :param solution_model: Class must have a "formulas" attribute,
+    :param solution_model: Class must have a "site_formulae" attribute,
         containing a list of chemical formulae with site information
     :type solution model: instance of class
 
@@ -341,7 +341,7 @@ def process_solution_chemistry(solution_model):
             containing the number of atoms of each species on each site
             per mole of endmember.
     """
-    formulae = solution_model.formulas
+    formulae = solution_model.site_formulae
     n_sites = formulae[0].count("[")
     n_endmembers = len(formulae)
 
@@ -424,7 +424,7 @@ def process_solution_chemistry(solution_model):
     )
 
     solution_model.empty_formula = re.sub(
-        "([\\[]).*?([\\]])", "\\g<1>\\g<2>", solution_model.formulas[0]
+        "([\\[]).*?([\\]])", "\\g<1>\\g<2>", solution_model.site_formulae[0]
     )
     split_empty = solution_model.empty_formula.split("[")
     solution_model.general_formula = split_empty[0]

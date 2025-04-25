@@ -374,7 +374,7 @@ class MechanicalSolution(SolutionModel):
     def __init__(self, endmembers):
         self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
-        self.formulas = [e[1] for e in endmembers]
+        self.site_formulae = [e[1] for e in endmembers]
 
     def excess_gibbs_free_energy(self, pressure, temperature, molar_fractions):
         return 0.0
@@ -421,7 +421,7 @@ class IdealSolution(SolutionModel):
     def __init__(self, endmembers):
         self.endmembers = endmembers
         self.n_endmembers = len(endmembers)
-        self.formulas = [e[1] for e in endmembers]
+        self.site_formulae = [e[1] for e in endmembers]
 
         # Process solution chemistry
         process_solution_chemistry(self)
