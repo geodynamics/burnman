@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 # This module provides the functions required to process the
@@ -306,8 +306,6 @@ def process_solution_chemistry(solution_model):
     .. note:: Nothing is returned from this function, but the solution_model
         object gains the following attributes:
 
-        * solution_formulae [list of dictionaries]
-            List of endmember formulae in dictionary form.
         * empty_formula [string]
             Abbreviated chemical formula with sites denoted by empty
             square brackets.
@@ -351,7 +349,6 @@ def process_solution_chemistry(solution_model):
     if not np.all(np.array([f.count("[") for f in formulae]) == n_sites):
         raise Exception("All formulae must have the same " "number of distinct sites.")
 
-    solution_formulae = [{} for i in range(n_endmembers)]
     sites = [[] for i in range(n_sites)]
     list_occupancies = []
     list_multiplicities = np.empty(shape=(n_endmembers, n_sites))
@@ -384,12 +381,6 @@ def process_solution_chemistry(solution_model):
                 else:
                     proportion_species_on_site = Fraction(species_split[1])
 
-                solution_formulae[i_mbr][name_of_species] = solution_formulae[
-                    i_mbr
-                ].get(name_of_species, 0.0) + (
-                    list_multiplicities[i_mbr][i_site] * proportion_species_on_site
-                )
-
                 if name_of_species not in sites[i_site]:
                     n_occupancies += 1
                     sites[i_site].append(name_of_species)
@@ -399,21 +390,6 @@ def process_solution_chemistry(solution_model):
                 else:
                     i_el = sites[i_site].index(name_of_species)
                 list_occupancies[i_mbr][i_site][i_el] = proportion_species_on_site
-
-            # Loop over species after site
-            if len(site_split) != 1:
-                not_in_site = site_split[1].strip()
-                not_in_site = not_in_site.replace(mult, "", 1)
-                for enamenumber in re.findall("[A-Z][^A-Z]*", not_in_site):
-                    sp = list(filter(None, re.split(r"(\d+)", enamenumber)))
-                    # Look up number of atoms of element
-                    if len(sp) == 1:
-                        nel = 1.0
-                    else:
-                        nel = float(float(sp[1]))
-                    solution_formulae[i_mbr][sp[0]] = (
-                        solution_formulae[i_mbr].get(sp[0], 0.0) + nel
-                    )
 
     # Site occupancies and multiplicities
     endmember_occupancies = np.empty(shape=(n_endmembers, n_occupancies))
@@ -438,7 +414,6 @@ def process_solution_chemistry(solution_model):
             solution_model.site_names.append("{0}_{1}".format(sp, ucase[i]))
 
     # Finally, make attributes for solution model instance:
-    solution_model.solution_formulae = solution_formulae
     solution_model.n_sites = n_sites
     solution_model.sites = sites
     solution_model.site_multiplicities = site_multiplicities
