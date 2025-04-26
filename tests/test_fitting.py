@@ -2,9 +2,13 @@ import os
 import unittest
 from util import BurnManTest
 import numpy as np
+from numpy import random
+import matplotlib.pyplot as plt
 
 import burnman
+from burnman.optimize.eos_fitting import fit_XPTp_data
 from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
+from burnman.utils.misc import attribute_function, pretty_string_values
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -141,7 +145,142 @@ class test_fitting(BurnManTest):
             fo, params, PTV, bounds=bounds, verbose=False
         )
 
+        cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+            model=fitted_eos,
+            x_array=PTV,
+            confidence_interval=0.95,
+            f=attribute_function(fo, "V"),
+            flag="V",
+        )
+        self.assertEqual(len(cp_bands[0]), len(PTV))
+        self.assertEqual(len(cp_bands), 4)
+
         self.assertFloatEqual(3.0, fitted_eos.popt[2])
+
+        s = pretty_string_values(
+            fitted_eos.popt,
+            fitted_eos.pcov,
+            extra_decimal_places=1,
+            combine_value_and_sigma=False,
+        )
+
+        self.assertEqual(len(s), 3)
+        self.assertEqual(len(s[0]), 3)
+        self.assertEqual(len(s[1]), 3)
+        self.assertEqual(len(s[2]), 3)
+
+        s = pretty_string_values(
+            fitted_eos.popt,
+            fitted_eos.pcov,
+            extra_decimal_places=1,
+            combine_value_and_sigma=True,
+        )
+
+        self.assertEqual(len(s), 3)
+        self.assertEqual(len(s[0]), 3)
+        self.assertEqual(len(s[1]), 3)
+        self.assertEqual(len(s[2]), 3)
+
+    def test_bounded_solution_fitting(self):
+        solution = burnman.minerals.SLB_2011.mg_fe_olivine()
+        solution.set_state(1.0e5, 300.0)
+        fit_params = [["V_0", 0], ["V_0", 1], ["V", 0, 1]]
+
+        n_data = 5
+        data = []
+        data_covariances = []
+        flags = []
+
+        f_Verror = 1.0e-3
+
+        # Choose a specific seed so that the test is reproducible.
+        random.seed(10)
+        for i in range(n_data):
+            x_fa = random.random()
+            P = random.random() * 1.0e10
+            T = random.random() * 1000.0 + 300.0
+            X = [1.0 - x_fa, x_fa]
+            solution.set_composition(X)
+            solution.set_state(P, T)
+            f = 1.0 + (random.normal() - 0.5) * f_Verror
+            V = solution.V * f
+
+            data.append([1.0 - x_fa, x_fa, P, T, V])
+            data_covariances.append(np.zeros((5, 5)))
+            data_covariances[-1][4, 4] = np.power(solution.V * f_Verror, 2.0)
+
+        flags = ["V"] * 5
+
+        n_data = 2
+        f_Vperror = 1.0e-2
+
+        for i in range(n_data):
+            x_fa = random.random()
+            P = random.random() * 1.0e10
+            T = random.random() * 1000.0 + 300.0
+            X = [1.0 - x_fa, x_fa]
+            solution.set_composition(X)
+            solution.set_state(P, T)
+            f = 1.0 + (random.normal() - 0.5) * f_Vperror
+            Vp = solution.p_wave_velocity * f
+
+            data.append([1.0 - x_fa, x_fa, P, T, Vp])
+            data_covariances.append(np.zeros((5, 5)))
+            data_covariances[-1][4, 4] = np.power(
+                solution.p_wave_velocity * f_Vperror, 2.0
+            )
+            flags.append("p_wave_velocity")
+
+        data = np.array(data)
+        data_covariances = np.array(data_covariances)
+        flags = np.array(flags)
+        delta_params = np.array([1.0e-8, 1.0e-8, 1.0e-8])
+        bounds = np.array([[0, np.inf], [0, np.inf], [-np.inf, np.inf]])
+
+        fitted_eos = fit_XPTp_data(
+            solution=solution,
+            flags=flags,
+            fit_params=fit_params,
+            data=data,
+            data_covariances=data_covariances,
+            delta_params=delta_params,
+            bounds=bounds,
+            param_tolerance=1.0e-5,
+            verbose=False,
+        )
+
+        self.assertEqual(len(fitted_eos.popt), 3)
+
+        cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+            model=fitted_eos,
+            x_array=data,
+            confidence_interval=0.95,
+            f=attribute_function(solution, "V"),
+            flag="V",
+        )
+        self.assertEqual(len(cp_bands[0]), len(data))
+        self.assertEqual(len(cp_bands), 4)
+
+        good_data_confidence_interval = 0.9
+        _, indices, probabilities = burnman.nonlinear_fitting.extreme_values(
+            fitted_eos.weighted_residuals, good_data_confidence_interval
+        )
+        self.assertEqual(len(indices), 0)
+        self.assertEqual(len(probabilities), 0)
+
+        # Just check plotting doesn't return an error
+        fig, ax = plt.subplots()
+        burnman.nonlinear_fitting.plot_residuals(
+            ax=ax,
+            weighted_residuals=fitted_eos.weighted_residuals,
+            flags=fitted_eos.flags,
+        )
+        fig, ax = plt.subplots()
+        burnman.nonlinear_fitting.weighted_residual_plot(ax, fitted_eos)
+
+        fig, ax = burnman.nonlinear_fitting.corner_plot(
+            fitted_eos.popt, fitted_eos.pcov
+        )
 
 
 if __name__ == "__main__":

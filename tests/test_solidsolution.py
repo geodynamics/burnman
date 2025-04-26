@@ -511,6 +511,16 @@ class test_solidsolution(BurnManTest):
         ol_ss.set_state(P, T)
         return fo, ol_ss
 
+    def test_ol_ss_formulae(self):
+        P = 1.0e5
+        T = 1000.0
+
+        ol_ss = olivine_ss()
+        ol_ss.set_composition([0.4, 0.6])
+        ol_ss.set_state(P, T)
+
+        self.assertEqual(ol_ss.site_formula(), "[Mg0.40Fe0.60]2SiO4")
+
     def test_1_gibbs(self):
         fo, fo_ss = self.setup_1min_ss()
         with warnings.catch_warnings(record=True) as w:
@@ -1066,6 +1076,9 @@ class test_solidsolution(BurnManTest):
             formula_to_string(sum_formulae(ol.endmember_formulae, [0.5, 0.5])),
             "MgFeSiO4",
         )
+        s = np.array([[2, 0, 1, 4], [0, 2, 1, 4]])
+        self.assertArraysAlmostEqual(ol.stoichiometric_array[0], s[0])
+        self.assertArraysAlmostEqual(ol.stoichiometric_array[1], s[1])
 
     def test_stoichiometric_matrix_binary_solution(self):
         olivine = burnman.minerals.SLB_2011.mg_fe_olivine()
@@ -1261,6 +1274,39 @@ class test_solidsolution(BurnManTest):
             # Check that the reaction affinity is essentially zero
             # Give 5 J tolerance.
             self.assertTrue(np.abs(mu) < 5.0)
+
+        V = ropx.V
+        ropx.set_state(1.0e10, T)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            ropx.set_state_with_volume(V * 1.000001, T)
+            self.assertTrue(ropx.pressure < 1.0e9)
+            ropx.set_state_with_volume(V * 0.999999, T)
+            self.assertTrue(ropx.pressure > 1.0e9)
+
+        self.assertAlmostEqual(
+            ropx.isothermal_compressibility_reuss,
+            1.0 / ropx.isothermal_bulk_modulus_reuss,
+        )
+        self.assertAlmostEqual(
+            ropx.isentropic_compressibility_reuss,
+            1.0 / ropx.isentropic_bulk_modulus_reuss,
+        )
+        self.assertTrue(
+            ropx.isothermal_compressibility_reuss
+            > ropx.isentropic_compressibility_reuss
+        )
+        self.assertTrue(ropx.molar_heat_capacity_p > ropx.molar_heat_capacity_v)
+
+        self.assertTrue(ropx.thermal_expansivity > ropx.unrelaxed.thermal_expansivity)
+        self.assertTrue(
+            ropx.molar_heat_capacity_p > ropx.unrelaxed.molar_heat_capacity_p
+        )
+        self.assertTrue(
+            ropx.isothermal_compressibility_reuss
+            > ropx.unrelaxed.isothermal_compressibility_reuss
+        )
 
 
 if __name__ == "__main__":

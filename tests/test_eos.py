@@ -477,7 +477,7 @@ class test_eos_validation(BurnManTest):
         self.assertAlmostEqual(Cv, Cv2)
         self.assertAlmostEqual(S, S2)
 
-    def test_pressure_finding(self):
+    def test_pressure_finding_SLB(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             m = alpha_quartz()
@@ -485,6 +485,18 @@ class test_eos_validation(BurnManTest):
             T = 1000.0
             m.set_state(P, T)
             V = m.V
+            m.set_state_with_volume(V, T)
+        self.assertAlmostEqual(m.pressure / 1.0e5, P / 1.0e5, places=3)
+
+    def test_pressure_finding_HP(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m = minerals.HP_2011_ds62.mt()
+            P = 1.0e9
+            T = 1000.0
+            m.set_state(P, T)
+            V = m.V
+            m.set_state(P * 1.01, T)
             m.set_state_with_volume(V, T)
         self.assertAlmostEqual(m.pressure / 1.0e5, P / 1.0e5, places=3)
 

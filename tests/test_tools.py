@@ -1,6 +1,7 @@
 import unittest
 from util import BurnManTest
 import numpy as np
+import matplotlib.pyplot as plt
 
 import burnman
 from burnman.tools.chemistry import equilibrium_temperature
@@ -8,6 +9,7 @@ from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import hugoniot
 from burnman.tools.chemistry import reactions_from_stoichiometric_matrix
 from burnman.tools.chemistry import reactions_from_formulae
+from burnman.tools.plot import plot_projected_elastic_properties, pretty_plot
 from burnman.utils.chemistry import convert_fractions
 from burnman.utils.math import bracket
 from burnman.utils.math import smooth_array
@@ -204,6 +206,124 @@ class test_tools(BurnManTest):
     def test_positive_definite(self):
         arr = np.array([[2.0, 0.0], [0.0, 1.0]])
         self.assertTrue(is_positive_definite(arr))
+
+    def test_plot_elastic(self):
+
+        pretty_plot()
+
+        stishovite_Q1 = burnman.Mineral(
+            {
+                "name": "Stishovite",
+                "formula": {"Si": 1.0, "O": 2.0},
+                "equation_of_state": "slb3",
+                "F_0": -815061.947383201,
+                "V_0": 1.3985103364121215e-05,
+                "K_0": 302651021060.0,
+                "Kprime_0": 4.231768387000001,
+                "Debye_0": 1099.41845635,
+                "grueneisen_0": 1.815179405,
+                "q_0": 2.2095517465427,
+                "G_0": 228000000000.0,
+                "Gprime_0": 1.94045,
+                "eta_s_0": 4.40394,
+                "n": 3.0,
+                "Z": 2.0,
+                "molar_mass": 0.060085,
+                "T_0": 300.0,
+                "E_0": 0.0,
+                "P_0": 0.0,
+            }
+        )
+        a = 2.754879e-02
+        b = 2.839605e-02
+        c = 1.3985103364121215e-05 / (a * b)
+        cell_parameters = [a, b, c, 90, 90, 90]
+
+        c11 = 7.93215475
+        c44 = 3.6433892
+        c66 = 4.63773363
+        d11 = 0.03176523
+        d44 = 0.31665864
+        d66 = 0.09046939
+
+        carr = c11 * np.ones((6, 6))
+        carr[3, 3] = c44
+        carr[4, 4] = c44
+        carr[5, 5] = c66
+        darr = d11 * np.ones((6, 6))
+        darr[3, 3] = d44
+        darr[4, 4] = d44
+        darr[5, 5] = d66
+
+        anisotropic_parameters = {
+            "a": np.array(
+                [
+                    [0.56655959, -0.08994629, -0.04885663, 0.0, 0.0, 0.0],
+                    [-0.08994629, 0.71555477, -0.25117643, 0.0, 0.0, 0.0],
+                    [-0.04885663, -0.25117643, 0.49784435, 0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, 1.33005083, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 1.45154562, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.97764314],
+                ]
+            ),
+            "b": np.array(
+                [
+                    [0.17631275, -0.06562267, -0.04243526, 0.0, 0.0, 0.0],
+                    [-0.06562267, 0.17631275, -0.04243526, 0.0, 0.0, 0.0],
+                    [-0.04243526, -0.04243526, -0.0516391, 0.0, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, -0.70121757, 0.0, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, -0.70121757, 0.0],
+                    [0.0, 0.0, 0.0, 0.0, 0.0, -0.18867047],
+                ]
+            ),
+            "c": carr,
+            "d": darr,
+        }
+
+        def psi_func(f, Pth, params):
+            a = params["a"]
+            b = params["b"]
+            c = params["c"]
+            d = params["d"]
+
+            dPsidf = a + b * np.tanh(c * f + d)
+            Psi = a * f + b / c * np.log(np.cosh(c * f + d) / np.cosh(d))
+            dPsidPth = np.zeros((6, 6))
+            return (Psi, dPsidf, dPsidPth)
+
+        m = burnman.AnisotropicMineral(
+            stishovite_Q1,
+            cell_parameters,
+            anisotropic_parameters,
+            psi_function=psi_func,
+            orthotropic=True,
+        )
+        m.set_state(1.0e9, 1000.0)
+        plot_types = [
+            "vp",
+            "vs1",
+            "vs2",
+            "linear compressibility",
+            "minimum poisson ratio",
+            "maximum poisson ratio",
+            "vp/vs1",
+            "vp/vs2",
+            "s anisotropy",
+            "linear compressibility",
+            "youngs modulus",
+        ]
+
+        fig = plt.figure(figsize=(12, 7))
+        ax = [fig.add_subplot(4, 3, i, projection="polar") for i in range(1, 12)]
+
+        # very low resolution to make sure the function works
+        contour_sets, ticks, lines = plot_projected_elastic_properties(
+            m, plot_types, ax, 4, 4, 5, 5
+        )
+
+        self.assertTrue(len(contour_sets) == 11)
+        self.assertTrue(len(ticks) == 11)
+        self.assertTrue(len(lines) == 11)
 
 
 if __name__ == "__main__":

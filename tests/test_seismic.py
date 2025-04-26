@@ -1,8 +1,10 @@
 from __future__ import absolute_import
 import unittest
 from util import BurnManTest
+import numpy as np
 
 import burnman
+from burnman.tools import output_seismo
 
 
 class test_seismic(BurnManTest):
@@ -83,6 +85,33 @@ class test_seismic(BurnManTest):
             result = list(result.T[0])
             # print "'%s': %s," % (name, result)
             self.assertArraysAlmostEqual(result, ref[name])
+
+    def test_output(self):
+        mg_fe_perovskite = burnman.minerals.SLB_2011.mg_fe_perovskite()
+        mg_fe_perovskite.set_composition([0.9, 0.1, 0])  # frac_mg, frac_fe, frac_al
+        rock = burnman.Composite([mg_fe_perovskite], [1.0])
+        depths = np.linspace(2890e3, 670e3, 20)
+        lower_mantle = burnman.Layer(name="Pv LM", radii=6371.0e3 - depths)
+        lower_mantle.set_material(rock)
+        lower_mantle.set_temperature_mode(
+            temperature_mode="adiabatic", temperature_top=1900.0
+        )
+        lower_mantle.set_pressure_mode(
+            pressure_mode="self-consistent", pressure_top=2.4e10, gravity_bottom=10.0
+        )
+        lower_mantle.make()
+
+        # Make sure that all the writing functions return a value
+        tvel = output_seismo.tvel_formatted_data_and_header(
+            lower_mantle, background_model=burnman.seismic.PREM()
+        )
+        axisem = output_seismo.axisem_formatted_data_and_reference([lower_mantle])
+        mineos = output_seismo.mineos_formatted_data_and_reference([lower_mantle])
+
+        # Write to nothing
+        output_seismo.write_tvel_file(lower_mantle, [], burnman.seismic.PREM())
+        output_seismo.write_axisem_input([lower_mantle], [], verbose=False)
+        output_seismo.write_mineos_input([lower_mantle], [], verbose=False)
 
 
 if __name__ == "__main__":

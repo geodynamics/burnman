@@ -182,35 +182,6 @@ def read_table(filename):
     return np.array(table)
 
 
-def array_from_file(filename):
-    """
-    Generic function to read a file containing floats and commented lines
-    into a 2D numpy array.
-
-    Commented lines are prefixed by the characters # or %.
-    """
-    f = open(filename, "r")
-    data = []
-    datastream = f.read()
-    f.close()
-    datalines = [
-        line.strip().split() for line in datastream.split("\n") if line.strip()
-    ]
-    for line in datalines:
-        if line[0] != "#" and line[0] != "%":
-            data.append(map(float, line))
-
-    data = np.array(zip(*data))
-    return data
-
-
-def cut_table(table, min_value, max_value):
-    tablen = []
-    for i in range(min_value, max_value, 1):
-        tablen.append(table[i, :])
-    return tablen
-
-
 def lookup_and_interpolate(table_x, table_y, x_value):
     idx = bisect.bisect_left(table_x, x_value) - 1
     if idx < 0:
@@ -247,7 +218,7 @@ def attribute_function(m, attributes, powers=[]):
     :type powers: list of floats
 
     :returns: Function which returns the value of product(a_i**p_i)
-        as a function of condition (x = [P, T, V]).
+        as a function of condition (x = [X1, X2, ..., P, T, V]).
     :rtype: function
     """
     if type(attributes) is str:
@@ -256,7 +227,9 @@ def attribute_function(m, attributes, powers=[]):
         powers = [1.0 for a in attributes]
 
     def f(x):
-        P, T, V = x
+        if len(x) > 3:
+            m.set_composition(x[:-3])
+        P, T = x[-3:-1]
         m.set_state(P, T)
         value = 1.0
         for a, p in zip(*[attributes, powers]):

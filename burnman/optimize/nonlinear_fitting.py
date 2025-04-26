@@ -425,7 +425,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.0):
                 )
             )
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
 
     return fig, ax
 

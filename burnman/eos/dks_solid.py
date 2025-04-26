@@ -124,12 +124,6 @@ class DKS_S(eos.EquationOfState):
 
         return eta_s
 
-    # calculate isotropic thermal pressure, see
-    # Matas et. al. (2007) eq B4
-    def _thermal_pressure(self, T, V, params):
-        gr = self.grueneisen_parameter(0.0, T, V, params)  # P not important
-        return params["Cv"] * (T - params["T_0"]) * gr
-
     def volume(self, pressure, temperature, params):
         """
         Returns molar volume. :math:`[m^3]`
@@ -202,16 +196,6 @@ class DKS_S(eos.EquationOfState):
 
         return K
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus. :math:`[Pa]`
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        K_S = K_T * (1.0 + gr * alpha * temperature)
-        return K_S
-
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus. :math:`[Pa]`
@@ -260,14 +244,6 @@ class DKS_S(eos.EquationOfState):
         )
         return G
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy at the pressure and temperature of the mineral [J/mol]
-        """
-        return self.helmholtz_free_energy(
-            pressure, temperature, volume, params
-        ) + temperature * self.entropy(pressure, temperature, volume, params)
-
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the entropy at the pressure and temperature of the mineral [J/K/mol]
@@ -281,17 +257,6 @@ class DKS_S(eos.EquationOfState):
         )
 
         return S_0 + S_th
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
-        """
-
-        return (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-            + pressure * volume
-        )
 
     def helmholtz_free_energy(self, pressure, temperature, volume, params):
         """

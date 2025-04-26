@@ -11,9 +11,41 @@ class EosConsistency(BurnManTest):
     def test_HP(self):
         P = 10.0e9
         T = 3000.0
+        per = burnman.minerals.HP_2011_ds62.per()
         self.assertEqual(
             check_eos_consistency(
-                burnman.minerals.HP_2011_ds62.per(),
+                per,
+                P,
+                T,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
+    def test_HP98(self):
+        P = 10.0e9
+        T = 3000.0
+
+        params = burnman.minerals.HP_2011_ds62.per().params
+        params["equation_of_state"] = "hp98"
+        params["dKdT_0"] = -1.0e7
+        per = burnman.Mineral(params)
+        self.assertEqual(
+            check_eos_consistency(
+                per,
+                P,
+                T,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
+    def test_HP_liquid(self):
+        P = 10.0e9
+        T = 3000.0
+        self.assertEqual(
+            check_eos_consistency(
+                burnman.minerals.HP_2011_ds62.foL(),
                 P,
                 T,
                 including_shear_properties=False,
@@ -64,13 +96,13 @@ class EosConsistency(BurnManTest):
     def test_DKS_solid(self):
         P = 10.0e9
         T = 3000.0
+        params = burnman.minerals.DKS_2013_solids.periclase().params
+        params2 = burnman.minerals.SLB_2011.periclase().params
+        for p in ["G_0", "Gprime_0", "eta_s_0"]:
+            params[p] = params2[p]
+        m = burnman.Mineral(params)
         self.assertEqual(
-            check_eos_consistency(
-                burnman.minerals.DKS_2013_solids.periclase(),
-                P,
-                T,
-                including_shear_properties=False,
-            ),
+            check_eos_consistency(m, P, T, including_shear_properties=True),
             True,
         )
 
