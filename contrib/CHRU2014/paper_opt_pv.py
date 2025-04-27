@@ -423,7 +423,7 @@ if __name__ == "__main__":
     #    plt.savefig("opt_pv_4.pdf",bbox_inches='tight')
     #    plt.show()
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     if "RUNNING_TESTS" not in globals():
         plt.savefig("paper_opt_pv.pdf", bbox_inches="tight")
     plt.show()

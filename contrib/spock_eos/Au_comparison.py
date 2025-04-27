@@ -233,7 +233,7 @@ for i, label in enumerate(["d", "b", "a", "c"]):
     )
 
 ax[2].legend()
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 
 # Save and show the figure
 fig.savefig("figures/Au_comparison.pdf")

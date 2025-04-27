@@ -345,6 +345,6 @@ for i in range(3):
     ax[i].set_xlabel("Pressure (GPa)")
     ax[i].legend()
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("figures/Zhang_2021_model.pdf")
 plt.show()

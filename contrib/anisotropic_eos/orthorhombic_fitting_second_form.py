@@ -501,7 +501,7 @@ if do_plotting:
     ax[0].set_ylabel("Thermal expansivity (10$^{-5}$/K)")
     ax[1].set_ylabel("Relative length change ($10^{4} (x/x_0 - 1)$)")
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig("olivine_expansivities.pdf")
     plt.show()
 
@@ -579,7 +579,7 @@ if do_plotting:
         ax[i].set_ylabel(f"$C_{{N {p}{q}}}$ (GPa)")
         ax[i].legend()
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig("olivine_CNijs.pdf")
     plt.show()
 
@@ -603,6 +603,6 @@ if do_plotting:
         cbar = fig.colorbar(contour_sets[i], ax=ax[i], ticks=ticks[i], pad=0.1)
         cbar.add_lines(lines[i])
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig(f"olivine_seismic_properties_{P/1.e9:.2f}_GPa_{int(T)}_K.pdf")
     plt.show()

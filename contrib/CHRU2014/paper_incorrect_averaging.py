@@ -339,7 +339,7 @@ if __name__ == "__main__":
     plt.title(" V.-R.-H. on moduli")
     plt.xlabel("Pressure (GPa)")
     plt.ylabel("Shear Velocity Vs (km/s)")
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     if "RUNNING_TESTS" not in globals():
         plt.savefig("example_incorrect_averaging.pdf", bbox_inches="tight")
     plt.show()
