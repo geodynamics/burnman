@@ -45,16 +45,6 @@ class HP_TMT(eos.EquationOfState):
         Pth = self.__relative_thermal_pressure(temperature, params)
         return mt.modified_tait(params["V_0"] / volume, params) + Pth
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter [unitless] as a function of pressure,
-        temperature, and volume.
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        return alpha * K_T * volume / C_V
-
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
@@ -71,18 +61,6 @@ class HP_TMT(eos.EquationOfState):
         Could potentially apply a fixed Poissons ratio as a rough estimate.
         """
         return 0.0
-
-    # Cv, heat capacity at constant volume
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant volume at the pressure, temperature,
-        and volume [J/K/mol].
-        """
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        V = self.volume(pressure, temperature, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        return C_p - V * temperature * alpha * alpha * K_T
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
@@ -120,29 +98,6 @@ class HP_TMT(eos.EquationOfState):
             + params["Cp"][3] * np.power(temperature, -0.5)
         )
         return Cp
-
-    def molar_heat_capacity_p_einstein(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant pressure at the pressure,
-        temperature, and volume, using the C_v and Einstein model [J/K/mol]
-        WARNING: Only for comparison with internally self-consistent C_p
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        C_p = C_v * (1.0 + gr * alpha * temperature)
-        return C_p
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        K_S = K_T * C_p / C_v
-        return K_S
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
@@ -182,11 +137,6 @@ class HP_TMT(eos.EquationOfState):
             + intVdP
         )
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
-        return self.gibbs_free_energy(
-            pressure, temperature, volume, params
-        ) - pressure * self.volume(pressure, temperature, params)
-
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the entropy [J/K/mol] as a function of pressure [Pa]
@@ -208,15 +158,6 @@ class HP_TMT(eos.EquationOfState):
             - np.power((1.0 - b * Pth), 0.0 - c)
         )
         return params["S_0"] + self.__intCpoverTdT(temperature, params) + dintVdpdT
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy [J/mol] as a function of pressure [Pa]
-        and temperature [K].
-        """
-        gibbs = self.gibbs_free_energy(pressure, temperature, volume, params)
-        entropy = self.entropy(pressure, temperature, volume, params)
-        return gibbs + temperature * entropy
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
@@ -422,24 +363,6 @@ class HP_TMTL(eos.EquationOfState):
         self.static_params["K_0"] = self._K_T_1bar(temperature, params)
         return mt.volume(pressure, self.static_params)
 
-    def pressure(self, temperature, volume, params):
-        """
-        Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
-        """
-        self.static_params["V_0"] = self._V_T_1bar(temperature, params)
-        self.static_params["K_0"] = self._K_T_1bar(temperature, params)
-        return mt.pressure(volume, self.static_params)
-
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter [unitless] as a function of pressure,
-        temperature, and volume.
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        return alpha * K_T * volume / C_V
-
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
@@ -457,18 +380,6 @@ class HP_TMTL(eos.EquationOfState):
         Could potentially apply a fixed Poissons ratio as a rough estimate.
         """
         return 0.0
-
-    # Cv, heat capacity at constant volume
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant volume at the pressure, temperature,
-        and volume [J/K/mol].
-        """
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        V = self.volume(pressure, temperature, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        return C_p - V * temperature * alpha * alpha * K_T
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
@@ -502,17 +413,6 @@ class HP_TMTL(eos.EquationOfState):
         )
         return Cp
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        K_S = K_T * C_p / C_v
-        return K_S
-
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
@@ -527,11 +427,6 @@ class HP_TMTL(eos.EquationOfState):
             + mt.intVdP(pressure, self.static_params)
         )
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
-        return self.gibbs_free_energy(
-            pressure, temperature, volume, params
-        ) - pressure * self.volume(pressure, temperature, params)
-
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the entropy [J/K/mol] as a function of pressure [Pa]
@@ -545,15 +440,6 @@ class HP_TMTL(eos.EquationOfState):
         G0 = self.gibbs_free_energy(pressure, temperature - dT / 2.0, volume, params)
 
         return (G0 - G1) / dT
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy [J/mol] as a function of pressure [Pa]
-        and temperature [K].
-        """
-        gibbs = self.gibbs_free_energy(pressure, temperature, volume, params)
-        entropy = self.entropy(pressure, temperature, volume, params)
-        return gibbs + temperature * entropy
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
@@ -697,27 +583,6 @@ class HP98(eos.EquationOfState):
             params["Kprime_0"],
         )
 
-    def pressure(self, temperature, volume, params):
-        """
-        Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
-        """
-        return murn.pressure(
-            volume,
-            self._V_T_1bar(temperature, params),
-            self._K_T_1bar(temperature, params),
-            params["Kprime_0"],
-        )
-
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter [unitless] as a function of pressure,
-        temperature, and volume.
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        return alpha * K_T * volume / C_V
-
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
@@ -735,18 +600,6 @@ class HP98(eos.EquationOfState):
         Could potentially apply a fixed Poissons ratio as a rough estimate.
         """
         return 0.0
-
-    # Cv, heat capacity at constant volume
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant volume at the pressure, temperature,
-        and volume [J/K/mol].
-        """
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        V = self.volume(pressure, temperature, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        return C_p - V * temperature * alpha * alpha * K_T
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
@@ -782,17 +635,6 @@ class HP98(eos.EquationOfState):
         )
         return Cp
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        K_S = K_T * C_p / C_v
-        return K_S
-
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
@@ -809,11 +651,6 @@ class HP98(eos.EquationOfState):
                 params["Kprime_0"],
             )
         )
-
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
-        return self.gibbs_free_energy(
-            pressure, temperature, volume, params
-        ) - pressure * self.volume(pressure, temperature, params)
 
     def entropy(self, pressure, temperature, volume, params):
         """
@@ -837,15 +674,6 @@ class HP98(eos.EquationOfState):
         ) / (params["Kprime_0"] - 1.0)
         dintVdpdT = dVTdT * g + VT * dgdKT * params["dKdT_0"]
         return params["S_0"] + self.__intCpoverTdT(temperature, params) - dintVdpdT
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy [J/mol] as a function of pressure [Pa]
-        and temperature [K].
-        """
-        gibbs = self.gibbs_free_energy(pressure, temperature, volume, params)
-        entropy = self.entropy(pressure, temperature, volume, params)
-        return gibbs + temperature * entropy
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
