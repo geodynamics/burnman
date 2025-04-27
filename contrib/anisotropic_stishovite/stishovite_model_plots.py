@@ -130,7 +130,7 @@ if plot_Fischer_Andrault_splitting:
     ax[0].set_ylabel("Temperature (K)")
     ax[0].set_xlim(0.0, 125.0)
     ax[0].set_ylim(0.0, 4000.0)
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig("figures/Fischer_Andrault_splitting.pdf")
     plt.show()
 
@@ -434,7 +434,7 @@ if plot_cell_properties:
 
     ax[1].set_ylim(-1.0, 1.0)
     ax[1].legend(fontsize=8)
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig("figures/stv_cell_properties.pdf")
     plt.show()
 
@@ -545,7 +545,7 @@ if plot_isotropic_velocities:
     ax[0].set_xlabel("Depth (km)")
     ax[0].set_ylabel("Velocity (km/s)")
     ax[0].legend(fontsize=8.0)
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig("figures/stv_isotropic_velocities.pdf")
     if show_plots_one_by_one:
         plt.show()
@@ -611,7 +611,7 @@ if plot_seismic_properties:
             cbar = fig.colorbar(contour_sets[i], ax=ax[i], ticks=ticks[i], pad=0.1)
             cbar.add_lines(lines[i])
 
-        fig.set_tight_layout(True)
+        fig.set_layout_engine("tight")
         fig.savefig(
             f"figures/stishovite_seismic_properties_{P/1.e9:.2f}_GPa_{int(T)}_K.pdf"
         )
@@ -834,7 +834,7 @@ if plot_lnabc:
     ax_lnabc[1].set_ylabel("$\\ln(c)$ (cm/mol$^{\\frac{1}{3}}$)")
     handles, labels = ax_lnabc[1].get_legend_handles_labels()
     ax_lnabc[1].legend(handles[::-1], labels[::-1], fontsize=8)
-    fig_lnabc.set_tight_layout(True)
+    fig_lnabc.set_layout_engine("tight")
     fig_lnabc.savefig("figures/stv_lnabc.pdf")
     if show_plots_one_by_one:
         plt.show()
@@ -884,7 +884,7 @@ if plot_G:
     ax_G2.set_xlim(-1.5, 1.5)
     ax_G2.tick_params(axis="x")
     ax_G2.set_xlabel("$Q$")
-    fig_G.set_tight_layout(True)
+    fig_G.set_layout_engine("tight")
     fig_G.savefig("figures/stv_G.pdf")
     if show_plots_one_by_one:
         plt.show()
@@ -1066,9 +1066,9 @@ if plot_Q_V_abc:
     ax_abc[1].set_xlim(0.0, 150.0)
     ax_Q[0].set_xlim(0.0, 150.0)
 
-    fig_Q.set_tight_layout(True)
-    fig_V.set_tight_layout(True)
-    fig_abc.set_tight_layout(True)
+    fig_Q.set_layout_engine("tight")
+    fig_V.set_layout_engine("tight")
+    fig_abc.set_layout_engine("tight")
 
     fig_Q.savefig("figures/stv_Q.pdf")
     fig_V.savefig("figures/stv_V.pdf")
@@ -1185,8 +1185,8 @@ if plot_relaxed:
         ax_relaxed[i].set_ylabel("Modulus (GPa)")
         ax_Q0[i].set_ylabel("Modulus (GPa)")
 
-    fig_relaxed.set_tight_layout(True)
-    fig_Q0.set_tight_layout(True)
+    fig_relaxed.set_layout_engine("tight")
+    fig_Q0.set_layout_engine("tight")
 
     fig_relaxed.savefig("figures/stv_relaxed.pdf")
 
@@ -1295,8 +1295,8 @@ if plot_relaxed_SN:
         ax_relaxed[i].set_ylabel("Compliance (1/GPa)")
         ax_Q0[i].set_ylabel("Compliance (1/GPa)")
 
-    fig_relaxed.set_tight_layout(True)
-    fig_Q0.set_tight_layout(True)
+    fig_relaxed.set_layout_engine("tight")
+    fig_Q0.set_layout_engine("tight")
 
     fig_relaxed.savefig("figures/stv_relaxed_ST.pdf")
 

@@ -376,7 +376,7 @@ if __name__ == "__main__":
         ax_beta.plot(x, compressibilities_relaxed)
 
     ax_T.legend(loc="upper left")
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
 
     plt.show()
 

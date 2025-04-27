@@ -219,6 +219,6 @@ if __name__ == "__main__":
     ax[4].set_ylabel("Volume - $d\\mu(0.4)/dP$ (cm$^3$/mol)")
     ax[5].set_ylabel("Entropy + $d\\mu(0.4)/dT$ (J/K/mol)")
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
 
     plt.show()

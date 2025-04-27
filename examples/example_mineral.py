@@ -175,5 +175,5 @@ if __name__ == "__main__":
 
     ax[0].set_ylabel("Molar isobaric heat capacity (J/K/mol)")
     ax[1].set_ylabel("Molar volume (cm$^3$/mol)")
-    fig.tight_layout()
+    fig.set_layout_engine("tight")
     plt.show()

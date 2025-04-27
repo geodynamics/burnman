@@ -371,6 +371,6 @@ if __name__ == "__main__":
 
             ax[j_px].plot(pMg1s, pMg2s, linestyle=ls[k], c=cs[k], zorder=105)
 
-    fig.tight_layout()
+    fig.set_layout_engine("tight")
     fig.savefig("energy_entropy_2_site_ordering.pdf")
     plt.show()

@@ -352,9 +352,9 @@ ax[3].set_ylabel("$G$ (GPa)")
 for i in range(4):
     ax[i].legend()
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("periclase_stiffness_tensor.pdf")
-fig2.set_tight_layout(True)
+fig2.set_layout_engine("tight")
 fig2.savefig("periclase_shear_modulus.pdf")
 plt.show()
 
@@ -404,6 +404,6 @@ ax[0].set_ylabel("Elastic modulus (GPa)")
 
 ax[0].legend()
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("periclase_properties_1bar.pdf")
 plt.show()

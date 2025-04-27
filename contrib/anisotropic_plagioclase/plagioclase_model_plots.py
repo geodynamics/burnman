@@ -149,7 +149,7 @@ ax[1].set_ylabel("$K_{\\text{TR}}$ (GPa)")
 
 ax[0].legend()
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("plag_V_KT.pdf")
 
 # Elastic stiffness data
@@ -229,7 +229,7 @@ for i in range(7):
     ax[i].set_xlabel("$p_{an}$")
     ax[i].set_ylabel("$C_{Nij}$ (GPa)")
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("plag_stiffnesses.pdf")
 
 # psi
@@ -260,7 +260,7 @@ for i in range(7):
     ax[i].set_xlabel("$p_{an}$")
     ax[i].set_ylabel("$S_{Nij} / \\beta_{NR}$")
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("plag_psi.pdf")
 
 # Cell parameters
@@ -309,7 +309,7 @@ for i, label in enumerate(labels):
         ax[i].set_ylabel(f"$\\{label}$ ($^{{\\circ}}$)")
     ax[i].set_xlabel("$p_{an}$")
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("plag_cell_parameters.pdf")
 
 # Compressibilities
@@ -370,6 +370,6 @@ for axi, (i, j) in enumerate(inds):
     ax[axi].set_ylabel(f"$\\beta_{{T{axi+1}}}$ (GPa$^{{-1}}$)")
     ax[axi].set_xlabel("$p_{an}$")
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("plag_compressibilities.pdf")
 plt.show()

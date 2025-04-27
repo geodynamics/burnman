@@ -159,7 +159,7 @@ if __name__ == "__main__":
     ax[0].set_ylabel("Thermal expansivity (10$^{-5}$/K)")
     ax[1].set_ylabel("Relative length change ($10^{4} (x/x_0 - 1)$)")
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     # fig.savefig('example_anisotropic_mineral_Figure_1.png')
     plt.show()
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
         ax[i].set_ylabel(f"$C_{{N {p}{q}}}$ (GPa)")
         ax[i].legend()
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     # fig.savefig('example_anisotropic_mineral_Figure_2.png')
     plt.show()
 
@@ -222,5 +222,5 @@ if __name__ == "__main__":
         cbar = fig.colorbar(contour_sets[i], ax=ax[i], ticks=ticks[i], pad=0.1)
         cbar.add_lines(lines[i])
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     plt.show()

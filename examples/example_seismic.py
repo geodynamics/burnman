@@ -120,7 +120,7 @@ if __name__ == "__main__":
         ax[variable_index].set_ylabel(units[variable_index])
         ax[variable_index].set_xticks([660, 2891, 5150])
 
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     plt.show()
 
     # Alternatively one is able to evaluate all the variables for a model in a

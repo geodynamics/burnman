@@ -287,7 +287,7 @@ for basename in ["Au", "Pt"]:
         )
 
     ax[0].legend()
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     fig.savefig(f"figures/{basename}_eos_fit.pdf")
 
     # Create a pandas dataframe from the data and print it

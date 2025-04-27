@@ -224,5 +224,5 @@ if __name__ == "__main__":
     ax[0].set_ylim(7, 13)
 
     # Tidy the plot and show it
-    fig.set_tight_layout(True)
+    fig.set_layout_engine("tight")
     plt.show()

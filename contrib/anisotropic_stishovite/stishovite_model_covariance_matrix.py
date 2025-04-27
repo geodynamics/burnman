@@ -93,6 +93,6 @@ ax.vlines(
 )
 
 
-fig.set_tight_layout(True)
+fig.set_layout_engine("tight")
 fig.savefig("figures/correlation_matrix.pdf")
 plt.show()
