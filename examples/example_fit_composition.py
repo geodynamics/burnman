@@ -191,8 +191,8 @@ if __name__ == "__main__":
     # Create empty arrays to store the weight proportions of each phase,
     # and the principal uncertainties (we do not use the covariances here,
     # although they are calculated)
-    weight_proportions = np.zeros((len(samples), len(phases))) * np.NaN
-    weight_proportion_uncertainties = np.zeros((len(samples), len(phases))) * np.NaN
+    weight_proportions = np.zeros((len(samples), len(phases))) * np.nan
+    weight_proportion_uncertainties = np.zeros((len(samples), len(phases))) * np.nan
 
     # Loop over the samples, fitting phase proportions
     # to the provided bulk composition
