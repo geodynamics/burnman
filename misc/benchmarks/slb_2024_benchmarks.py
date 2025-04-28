@@ -183,6 +183,8 @@ def check_fig_3_fcc_ferric_fper():
     fper = SLB_2024.ferropericlase()
     mag = SLB_2024.smag()
 
+    fper.set_composition([0.0, 0.95, 0.01, 0.0, 0.04])
+
     assemblage = simplify_composite_with_composition(
         Composite([fper]), {"Fe": 1.0, "O": 1.1}
     )
@@ -190,9 +192,8 @@ def check_fig_3_fcc_ferric_fper():
 
     composition = {"Fe": 1.0, "O": 1.0}
     assemblage = Composite([bcc, fper, mag], [0.5, 0.49, 0.01])
-    fper.set_composition([0.05, 0.0, 0.95])
     equality_constraints = [["P", 1.0e5], ["phase_fraction", (mag, 0.0)]]
-    sol = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-5)
+    sol = equilibrate(composition, assemblage, equality_constraints)
     T_a_wu_mag = sol[0].assemblage.temperature
     print(f"BCC-fper-mag triple point at 1 bar: {T_a_wu_mag:.2f} K")
 
