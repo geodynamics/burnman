@@ -53,7 +53,9 @@ fulldir=$2
 #echo "*** testing $t ..."
 ($PYTHON <<EOF
 import matplotlib as m
+import numpy as np
 m.use('Template')
+np.set_printoptions(legacy='1.25')
 VERBOSE=1
 RUNNING_TESTS=1
 with open('$t') as f:
