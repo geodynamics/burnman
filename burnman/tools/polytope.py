@@ -9,12 +9,20 @@ import numpy as np
 from sympy import Matrix
 from scipy.linalg import block_diag
 
+import warnings
 import logging
 import importlib
 from ..classes.polytope import MaterialPolytope, independent_row_indices
 from ..classes.solution import Solution
 from ..classes.composite import Composite
 from .solution import transform_solution_to_new_basis
+
+logging.captureWarnings(True)
+warnings.filterwarnings(
+    "ignore",
+    message="The default value of raise_error will change to True in the future.",
+    category=FutureWarning,
+)
 
 try:
     cp = importlib.import_module("cvxpy")
