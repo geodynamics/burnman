@@ -55,13 +55,18 @@ jobs:
           exit 1
         fi
 
-    - name: Generate HTML coverage report
+    - name: Generate HTML and json coverage reports
       run: |
         coverage run -m unittest discover ./tests
         coverage html -d htmlcov
+        coverage json -o coverage.json
       
     - name: Upload HTML coverage report
       uses: actions/upload-artifact@v4
       with:
         name: coverage-html
         path: htmlcov/
+
+    - name: Update coverage badge
+      if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      uses: we-cli/coverage-badge-action@main
