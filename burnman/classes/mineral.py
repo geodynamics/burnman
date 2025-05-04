@@ -154,20 +154,13 @@ class Mineral(Material):
         This function acts similarly to set_state, but takes volume and
         temperature as input to find the pressure.
 
-        In order to ensure self-consistency, this function does not
-        generally use any pressure functions from the material classes,
-        but instead finds the pressure using the brentq root-finding
-        method. To provide more context, even if a mineral is being
-        evaluated with a P(V, T) equation of state, there might be a
-        property modifier G_mod(P, T) added on top - which might then
-        introduce a pressure dependent V_mod(P, T).
-        Thus, we must solve for the volume iteratively:
-        V = V_i(P(V_i, T), T) + V_mod(P, T), where P(V_i, T) is
-        solved for iteratively and V_i is calculated implicitly.
-
-        Exceptions to the above: If V_mod is constant,
-        this is done more efficiently by setting V_i = V - V_mod,
-        and then directly evaluating P(V_i, T) directly.
+        If the mineral is an endmember that has a pressure(T, V)
+        function and does not have property modifiers,
+        this function evaluates the pressure directly.
+        Otherwise, it finds the pressure using the brentq root-finding
+        method on the molar_volume attribute of the mineral.
+        This ensures self-consistency even if the mineral has a
+        pressure-dependent volume modifier.
 
         :param volume: The desired molar volume of the mineral [m^3].
         :type volume: float
@@ -196,9 +189,9 @@ class Mineral(Material):
                 return -np.inf
 
         if (
-            type(self.method) == str
-            or not self.method.pressure
-            or self.property_modifiers
+            type(self.method) == str  # require an endmember method
+            or not self.method.pressure  # that has a P(V, T) function
+            or self.property_modifiers  # and that doesn't have modifiers
         ):
             # we need to have a sign change in [a,b] to find a zero.
             args = (volume, temperature)
