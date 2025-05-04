@@ -13,6 +13,8 @@ import numpy as np
 from .material import Material, material_property
 from .. import eos
 from ..utils.misc import copy_documentation
+from ..utils.math import bracket
+from scipy.optimize import brentq
 
 
 class Mineral(Material):
@@ -143,6 +145,80 @@ class Mineral(Material):
         if self.method is None:
             raise AttributeError(
                 "no method set for mineral, or equation_of_state given in mineral.params"
+            )
+
+    def set_state_with_volume(
+        self, volume, temperature, pressure_guesses=[0.0e9, 10.0e9]
+    ):
+        """
+        This function acts similarly to set_state, but takes volume and
+        temperature as input to find the pressure.
+
+        In order to ensure self-consistency, this function does not
+        generally use any pressure functions from the material classes,
+        but instead finds the pressure using the brentq root-finding
+        method. To provide more context, even if a mineral is being
+        evaluated with a P(V, T) equation of state, there might be a
+        property modifier G_mod(P, T) added on top - which might then
+        introduce a pressure dependent V_mod(P, T).
+        Thus, we must solve for the volume iteratively:
+        V = V_i(P(V_i, T), T) + V_mod(P, T), where P(V_i, T) is
+        solved for iteratively and V_i is calculated implicitly.
+
+        Exceptions to the above: If V_mod is constant,
+        this is done more efficiently by setting V_i = V - V_mod,
+        and then directly evaluating P(V_i, T) directly.
+
+        :param volume: The desired molar volume of the mineral [m^3].
+        :type volume: float
+
+        :param temperature: The desired temperature of the mineral [K].
+        :type temperature: float
+
+        :param pressure_guesses: A list of floats denoting the initial
+            low and high guesses for bracketing of the pressure [Pa].
+            These guesses should preferably bound the correct pressure,
+            but do not need to do so. More importantly,
+            they should not lie outside the valid region of
+            the equation of state. Defaults to [0.e9, 10.e9].
+        :type pressure_guesses: list
+        """
+
+        def _delta_volume(pressure, volume, temperature):
+            # Try to set the state with this pressure,
+            # but if the pressure is too low most equations of state
+            # fail. In this case, treat the molar_volume as infinite
+            # and brentq will try a larger pressure.
+            try:
+                self.set_state(pressure, temperature)
+                return volume - self.molar_volume
+            except Exception:
+                return -np.inf
+
+        if (
+            type(self.method) == str
+            or not self.method.pressure
+            or self.property_modifiers
+        ):
+            # we need to have a sign change in [a,b] to find a zero.
+            args = (volume, temperature)
+            try:
+                sol = bracket(
+                    _delta_volume, pressure_guesses[0], pressure_guesses[1], args
+                )
+            except ValueError:
+                try:  # Try again with 0 Pa lower bound on the pressure
+                    sol = bracket(_delta_volume, 0.0e9, pressure_guesses[1], args)
+                except ValueError:
+                    raise Exception(
+                        "Cannot find a pressure, perhaps the volume or starting pressures "
+                        "are outside the range of validity for the equation of state?"
+                    )
+            pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
+            self.set_state(pressure, temperature)
+        else:
+            self.set_state(
+                self.method.pressure(temperature, volume, self.params), temperature
             )
 
     """

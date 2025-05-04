@@ -58,7 +58,8 @@ for name, phase, PVT_range, EVT_range in phases:
     pressures = np.empty_like(volumes)
     for temperature in temperatures:
         for i, volume in enumerate(volumes):
-            pressures[i] = phase.method.pressure(temperature, volume, phase.params)
+            phase.set_state_with_volume(volume, temperature)
+            pressures[i] = phase.pressure
         ax_P.plot(
             volumes * 1e6,
             pressures / 1e9,
@@ -77,8 +78,7 @@ for name, phase, PVT_range, EVT_range in phases:
     energies = np.empty_like(volumes)
     for temperature in temperatures:
         for i, volume in enumerate(volumes):
-            P = phase.method.pressure(temperature, volume, phase.params)
-            phase.set_state(P, temperature)
+            phase.set_state_with_volume(volume, temperature)
             energies[i] = phase.molar_internal_energy
         ax_E.plot(
             volumes * 1e6,
