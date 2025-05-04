@@ -64,7 +64,7 @@ with open('$t') as f:
 EOF
 ) >$t.tmp 2>$t.tmp.error
 ret=$?
-cat $t.tmp.error >>$t.tmp
+grep -v "^$" $t.tmp.error >>$t.tmp #append non-empty error messages to output
 rm -f $t.tmp.error
 
 grep -v "which is a non-GUI backend" $t.tmp | grep -v "plt.show()" > tmpfile
