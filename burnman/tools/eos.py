@@ -318,9 +318,6 @@ def check_anisotropic_eos_consistency(
     m.set_state(P + 0.5 * dP, T + 0.5 * dT)
     equilibration_function(m)
 
-    beta0 = -(logm(F3) - logm(F2)) / dP
-    alpha0 = (logm(F1) - logm(F0)) / dT
-
     Q = m.deformed_coordinate_frame
     beta1 = m.isothermal_compressibility_tensor
     alpha1 = m.thermal_expansivity_tensor
@@ -329,6 +326,9 @@ def check_anisotropic_eos_consistency(
     alpha1 = np.einsum("mi, nj, ij->mn", Q, Q, alpha1)
 
     if m.orthotropic:
+        beta0 = -(logm(F3) - logm(F2)) / dP
+        alpha0 = (logm(F1) - logm(F0)) / dT
+
         expr.extend(
             [f"SI = -d(lnm(F))/dP ({i}{j})" for i in range(3) for j in range(i, 3)]
         )
