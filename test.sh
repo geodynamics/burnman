@@ -24,7 +24,7 @@ $PYTHON -m pip install -q -e .[dev]
 echo ""
 
 echo "Dependency tree:"
-$PYTHON -m pip install -q pipdeptree .
+$PYTHON -m pip install -q pipdeptree
 $PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 pycddlib_version=`pip freeze | grep "pycddlib=" | awk -F"==" '{print $2}'`
 if [ ! -z "${pycddlib_version}" ]
@@ -64,7 +64,7 @@ with open('$t') as f:
 EOF
 ) >$t.tmp 2>$t.tmp.error
 ret=$?
-cat $t.tmp.error >>$t.tmp
+grep -v "^$" $t.tmp.error >>$t.tmp #append non-empty error messages to output
 rm -f $t.tmp.error
 
 grep -v "which is a non-GUI backend" $t.tmp | grep -v "plt.show()" > tmpfile

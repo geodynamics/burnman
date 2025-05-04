@@ -254,41 +254,47 @@ class SLBBase(eos.EquationOfState):
                         "the equation of state?"
                     )
 
-        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
+        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args, xtol=1.0e-24)
 
     def pressure(self, temperature, volume, params):
         """
         Returns the pressure of the mineral at a given temperature and volume
         [Pa]
         """
-        debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        gr = _grueneisen_parameter_slb(
-            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
-        )
-        # does not depend on pressure
-        # thermal energy at temperature T
-        E_th = debye.thermal_energy(temperature, debye_T, params["n"])
-        # thermal energy at reference temperature
-        E_th_ref = debye.thermal_energy(params["T_0"], debye_T, params["n"])
+        T_0 = params["T_0"]
+        Debye_0 = params["Debye_0"]
+        V_0 = params["V_0"]
+        n = params["n"]
+
+        a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
+        a2_iikk = (
+            -12.0 * params["grueneisen_0"]
+            + 36.0 * pow(params["grueneisen_0"], 2.0)
+            - 18.0 * params["q_0"] * params["grueneisen_0"]
+        )  # EQ 47
 
         b_iikk = 9.0 * params["K_0"]  # EQ 28
-        b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29
-        f = 0.5 * (pow(params["V_0"] / volume, 2.0 / 3.0) - 1.0)  # EQ 24
-        P = (1.0 / 3.0) * (pow(1.0 + 2.0 * f, 5.0 / 2.0)) * (
-            (b_iikk * f) + (0.5 * b_iikkmm * pow(f, 2.0))
-        ) + gr * (
-            E_th - E_th_ref
-        ) / volume  # EQ 21
+        b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
+
+        bel_0, gel = 0.0, 1.0
         if self.conductive:
-            P += el.pressure(
-                temperature,
-                volume,
-                params["T_0"],
-                params["V_0"],
-                params["bel_0"],
-                params["gel"],
-            )
-        return P
+            bel_0, gel = params["bel_0"], params["gel"]
+
+        return _delta_pressure(
+            volume,
+            0.0,
+            temperature,
+            V_0,
+            T_0,
+            Debye_0,
+            n,
+            a1_ii,
+            a2_iikk,
+            b_iikk,
+            b_iikkmm,
+            bel_0,
+            gel,
+        )
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """

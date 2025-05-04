@@ -316,6 +316,20 @@ class composite(BurnManTest):
         self.assertFloatEqual(rock1.molar_heat_capacity_v, min1.C_v)
         self.assertFloatEqual(rock1.molar_heat_capacity_p, min1.C_p)
 
+    def test_set_state_with_volume(self):
+        min1 = minerals.SLB_2011.periclase()
+        rock1 = burnman.Composite([min1, min1], [0.5, 0.5])
+        P = 1.0e9
+        P2 = 2.0e9
+        T = 1000.0
+        rock1.set_state(P, T)
+        V = rock1.molar_volume
+        rock1.set_state(P2, T)  # reset state
+        _ = rock1.molar_volume
+        rock1.set_state_with_volume(V, T)  # try to find original state
+
+        self.assertFloatEqual(P, rock1.pressure)
+
     def test_stoichiometric_matrix_single_mineral(self):
         rock = burnman.Composite([minerals.SLB_2011.quartz()])
 

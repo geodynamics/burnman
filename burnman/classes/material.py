@@ -186,10 +186,20 @@ class Material(object):
     ):
         """
         This function acts similarly to set_state, but takes volume and
-        temperature as input to find the pressure. In order to ensure
-        self-consistency, this function does not use any pressure functions
-        from the material classes, but instead finds the pressure using the
-        brentq root-finding method.
+        temperature as input to find the pressure.
+
+        In order to ensure self-consistency, this function does not
+        use any pressure functions from the material classes,
+        but instead finds the pressure using the brentq root-finding
+        method. To provide more context, even if a mineral is being
+        evaluated with a P(V, T) equation of state, there might be a
+        property modifier G_mod(P, T) added on top - which might then
+        introduce a pressure dependent V_mod(P, T).
+        Thus, we must solve for the volume iteratively:
+        V = V_i(P(V_i, T), T) + V_mod(P, T), where P(V_i, T) is
+        solved for iteratively.
+
+        This function is overloaded by the Mineral class.
 
         :param volume: The desired molar volume of the mineral [m^3].
         :type volume: float
