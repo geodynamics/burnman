@@ -24,7 +24,7 @@ $PYTHON -m pip install -q -e .[dev]
 echo ""
 
 echo "Dependency tree:"
-$PYTHON -m pip install -q pipdeptree .
+$PYTHON -m pip install -q pipdeptree
 $PYTHON -m pipdeptree -p burnman -d 1 2> /dev/null
 pycddlib_version=`pip freeze | grep "pycddlib=" | awk -F"==" '{print $2}'`
 if [ ! -z "${pycddlib_version}" ]
