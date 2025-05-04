@@ -106,13 +106,13 @@ class test_two_member_solution(BurnManTest):
     def test_non_orthotropic_endmember_consistency(self):
         ss = make_nonorthotropic_solution()
         ss.set_composition([1.0, 0.0])
-        self.assertTrue(check_anisotropic_eos_consistency(ss, P=2.0e10, tol=1.0e-5))
+        self.assertTrue(check_anisotropic_eos_consistency(ss, P=2.0e10, tol=1.0e-6))
 
     def test_non_orthotropic_solution_consistency(self):
         ss = make_nonorthotropic_solution()
         ss.set_composition([0.8, 0.2])
         self.assertTrue(
-            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-5)
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
         )
 
     def test_relaxed_non_orthotropic_solution_consistency(self):
@@ -122,7 +122,7 @@ class test_two_member_solution(BurnManTest):
         )
         ss.set_composition([0.8, 0.2], relaxed=False)
         self.assertTrue(
-            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-5)
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
         )
 
     def test_non_orthotropic_solution_clone(self):
