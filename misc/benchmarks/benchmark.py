@@ -126,30 +126,26 @@ def check_vinet():
     plt.close()
 
     # make a test mineral
-    test_mineral = burnman.Mineral()
-    test_mineral.params = {
+    params = {
         "name": "test",
         "V_0": 6.75e-6,
         "K_0": 163.4e9,
         "Kprime_0": 5.38,
+        "equation_of_state": "vinet",
     }
 
-    test_mineral.set_method("vinet")
+    test_mineral = burnman.Mineral(params)
 
-    pressure = np.linspace(17.7e9, 300.0e9, 20)
-    volume = np.empty_like(pressure)
-
-    # calculate its static properties
-    for i in range(len(pressure)):
-        volume[i] = vinet.volume(pressure[i], test_mineral.params)
+    pressures = np.linspace(17.7e9, 300.0e9, 20)
+    volumes = test_mineral.evaluate("V", pressures, pressures * 0.0)[0]
 
     # compare with figure 1
-    plt.plot(pressure / 1.0e9, volume / 6.02e-7)
+    plt.plot(pressures / 1.0e9, volumes / 6.02e-7)
     fig1 = mpimg.imread("../../burnman/data/input_figures/Dewaele.png")
     plt.imshow(fig1, extent=[0.0, 300.0, 6.8, 11.8], aspect="auto")
     plt.plot(
-        pressure / 1.0e9,
-        volume / 6.02e-7,
+        pressures / 1.0e9,
+        volumes / 6.02e-7,
         marker="o",
         color="r",
         linestyle="",

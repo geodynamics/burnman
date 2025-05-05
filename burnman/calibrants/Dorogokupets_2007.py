@@ -367,25 +367,23 @@ def _F_th(temperature, x, params):
     return F_qh + F_anh + F_el + F_def
 
 
-def _helmholtz_energy(volume, temperature, params):
-    # Equation 6
-    E = do_cold_eos.molar_internal_energy(0.0, 0.0, volume, params)
-
+def _thermal_helmholtz_energy(volume, temperature, params):
     # Just after Equation 6b
     Vrel = volume / params["V_0"]
     Fth = _F_th(temperature, Vrel, params)
     Fth0 = _F_th(params["T_0"], Vrel, params)
 
     # Equation 5
-    return E + gas_constant * (Fth - Fth0)
+    return gas_constant * (Fth - Fth0)
 
 
 def _pressure(volume, temperature, params):
+    cold_pressure = do_cold_eos.pressure(temperature, volume, params)
     dV = params["V_0"] * 1.0e-7
 
-    F1 = _helmholtz_energy(volume + dV / 2.0, temperature, params)
-    F0 = _helmholtz_energy(volume - dV / 2.0, temperature, params)
-    return -(F1 - F0) / dV
+    F1 = _thermal_helmholtz_energy(volume + dV / 2.0, temperature, params)
+    F0 = _thermal_helmholtz_energy(volume - dV / 2.0, temperature, params)
+    return cold_pressure - (F1 - F0) / dV
 
 
 class Ag(Calibrant):
