@@ -31,12 +31,12 @@ V=1.9044e-05 m^3/mol (last row):
 
 Checking burnman.calibrants.Dorogokupets_2007.Ag...
 V=0.7*V0, P=100.37 GPa, T=298.15 K: 0.250 MPa difference
-V=0.7*V0, P=104.73 GPa, T=1000 K: -0.662 MPa difference
+V=0.7*V0, P=104.73 GPa, T=1000 K: -0.661 MPa difference
 V=0.7*V0, P=111.15 GPa, T=2000 K: -0.997 MPa difference
 Checking burnman.calibrants.Dorogokupets_2007.Al...
 V=0.7*V0, P=56.97 GPa, T=298.15 K: -11.383 MPa difference
-V=0.7*V0, P=60.03 GPa, T=1000 K: -12.426 MPa difference
-V=0.7*V0, P=64.86 GPa, T=2000 K: -43.175 MPa difference
+V=0.7*V0, P=60.03 GPa, T=1000 K: -12.427 MPa difference
+V=0.7*V0, P=64.86 GPa, T=2000 K: -43.176 MPa difference
 Checking burnman.calibrants.Dorogokupets_2007.Au...
 V=0.7*V0, P=164.83 GPa, T=298.15 K: -0.482 MPa difference
 V=0.7*V0, P=169.00 GPa, T=1000 K: -4.064 MPa difference
@@ -59,11 +59,11 @@ V=0.7*V0, P=224.83 GPa, T=1000 K: -19.063 MPa difference
 V=0.7*V0, P=228.53 GPa, T=2000 K: -20.886 MPa difference
 Checking burnman.calibrants.Dorogokupets_2007.MgO...
 V=0.7*V0, P=116.72 GPa, T=298.15 K: 52.963 MPa difference
-V=0.7*V0, P=120.96 GPa, T=1000 K: 51.888 MPa difference
-V=0.7*V0, P=128.13 GPa, T=2000 K: 51.510 MPa difference
+V=0.7*V0, P=120.96 GPa, T=1000 K: 51.887 MPa difference
+V=0.7*V0, P=128.13 GPa, T=2000 K: 51.509 MPa difference
 Checking burnman.calibrants.Dorogokupets_2007.diamond...
-V=0.7*V0, P=301.53 GPa, T=298.15 K: 13.945 MPa difference
-V=0.7*V0, P=303.90 GPa, T=1000 K: 13.360 MPa difference
+V=0.7*V0, P=301.53 GPa, T=298.15 K: 13.944 MPa difference
+V=0.7*V0, P=303.90 GPa, T=1000 K: 13.359 MPa difference
 V=0.7*V0, P=309.77 GPa, T=2000 K: 10.797 MPa difference
 
 Checking burnman.calibrants.Tsuchiya_2003.Au at compression 0.34...

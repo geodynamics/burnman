@@ -453,40 +453,35 @@ def check_slb_fig3():
     """
     Benchmark grueneisen parameter against figure 3 of Stixrude and Lithgow-Bertelloni (2005b)
     """
-    perovskite = burnman.Mineral()
-    perovskite.params = {
-        "name": "perovksite",
-        "V_0": molar_volume_from_unit_cell_volume(168.27, 4.0),
-        "grueneisen_0": 1.63,
-        "q_0": 1.7,
-    }
+    perovskite = burnman.minerals.SLB_2005.mg_perovskite()
+    perovskite.params["V_0"] = molar_volume_from_unit_cell_volume(168.27, 4.0)
+    perovskite.params["grueneisen_0"] = 1.63
+    perovskite.params["q_0"] = 1.7
+    perovskite.set_method(slb.SLB2)
 
-    volume = np.linspace(0.6, 1.0, 100)
-    grueneisen_slb = np.empty_like(volume)
-    grueneisen_mgd = np.empty_like(volume)
-    q_slb = np.empty_like(volume)
-    q_mgd = np.empty_like(volume)
+    Vrel = np.linspace(0.6, 1.0, 100)
+    grueneisen_slb = np.empty_like(Vrel)
+    grueneisen_mgd = np.empty_like(Vrel)
+    q_slb = np.empty_like(Vrel)
+    q_mgd = np.empty_like(Vrel)
 
-    slb_eos = slb.SLB2()
     mgd_eos = mgd.MGD2()
 
     # calculate its thermal properties
-    for i in range(len(volume)):
-        # call with dummy pressure and temperatures, they do not change it
-        grueneisen_slb[i] = slb_eos.grueneisen_parameter(
-            0.0, 0.0, volume[i] * perovskite.params["V_0"], perovskite.params
-        )
-        grueneisen_mgd[i] = mgd_eos.grueneisen_parameter(
-            0.0, 0.0, volume[i] * perovskite.params["V_0"], perovskite.params
-        )
-        q_slb[i] = slb_eos.volume_dependent_q(1.0 / volume[i], perovskite.params)
+    for i in range(len(Vrel)):
+        volume = Vrel[i] * perovskite.params["V_0"]
+        perovskite.set_state_with_volume(volume, 300.0)
+        grueneisen_slb[i] = perovskite.grueneisen_parameter
+
+        grueneisen_mgd[i] = mgd_eos._grueneisen_parameter(volume, perovskite.params)
+        q_slb[i] = slb.SLB2()._volume_dependent_q(1.0 / Vrel[i], perovskite.params)
         q_mgd[i] = perovskite.params["q_0"]
 
     # compare with figure 7
     fig1 = mpimg.imread("../../burnman/data/input_figures/slb_fig3.png")
     plt.imshow(fig1, extent=[0.6, 1.0, 0.35, 2.0], aspect="auto")
-    plt.plot(volume, grueneisen_slb, "g+", volume, grueneisen_mgd, "b+")
-    plt.plot(volume, q_slb, "g+", volume, q_mgd, "b+")
+    plt.plot(Vrel, grueneisen_slb, "g+", Vrel, grueneisen_mgd, "b+")
+    plt.plot(Vrel, q_slb, "g+", Vrel, q_mgd, "b+")
     plt.xlim(0.6, 1.0)
     plt.ylim(0.35, 2.0)
     plt.ylabel("Grueneisen parameter")
@@ -517,37 +512,28 @@ def check_slb_fig7_txt():
     }
     forsterite.set_method("slb3")
 
-    data = np.loadtxt("../../burnman/data/input_minphys/slb_fig7.txt", skiprows=2)
+    data = np.loadtxt(
+        "../../burnman/data/input_minphys/slb_fig7.txt", skiprows=2, unpack=True
+    )
 
-    temperature = np.array(data[:, 2])
-    pressure = np.array(data[:, 0])
-    rho = np.array(data[:, 3])
+    pressure, _, temperature = data[:3]
+    temperature[0] = 1.0e-1
+    rho, Kt, Ks, G, VB, VS, VP = data[3:10]
     rho_comp = np.empty_like(rho)
-    Kt = np.array(data[:, 4])
     Kt_comp = np.empty_like(Kt)
-    Ks = np.array(data[:, 5])
     Ks_comp = np.empty_like(Ks)
-    G = np.array(data[:, 6])
     G_comp = np.empty_like(G)
-    VB = np.array(data[:, 7])
     VB_comp = np.empty_like(VB)
-    VS = np.array(data[:, 8])
     VS_comp = np.empty_like(VS)
-    VP = np.array(data[:, 9])
     VP_comp = np.empty_like(VP)
-    vol = np.array(data[:, 10])
+
+    vol, alpha, Cp, gr, gibbs, entropy, enthalpy = data[10:17]
     vol_comp = np.empty_like(vol)
-    alpha = np.array(data[:, 11])
     alpha_comp = np.empty_like(alpha)
-    Cp = np.array(data[:, 12])
     Cp_comp = np.empty_like(Cp)
-    gr = np.array(data[:, 13])
     gr_comp = np.empty_like(gr)
-    gibbs = np.array(data[:, 14])
     gibbs_comp = np.empty_like(gibbs)
-    entropy = np.array(data[:, 15])
-    entropy_comp = np.empty_like(gibbs)
-    enthalpy = np.array(data[:, 16])
+    entropy_comp = np.empty_like(entropy)
     enthalpy_comp = np.empty_like(gibbs)
 
     for i in range(len(temperature)):
