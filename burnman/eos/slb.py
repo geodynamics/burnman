@@ -16,8 +16,11 @@ try:
     from numba import jit
 except ImportError:
 
-    def jit(fn):
-        return fn
+    def jit(nopython=True):
+        def decorator(fn):
+            return fn
+
+        return decorator
 
 
 from . import birch_murnaghan as bm
