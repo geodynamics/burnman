@@ -9,6 +9,7 @@ import burnman
 from burnman.optimize.eos_fitting import fit_XPTp_data
 from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
 from burnman.utils.misc import attribute_function, pretty_string_values
+from burnman.optimize.composition_fitting import fit_composition_to_solution
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -281,6 +282,30 @@ class test_fitting(BurnManTest):
         fig, ax = burnman.nonlinear_fitting.corner_plot(
             fitted_eos.popt, fitted_eos.pcov
         )
+
+    def test_fit_composition_to_solution(self):
+        gt = burnman.minerals.JH_2015.garnet()
+        fitted_species = ["Fe", "Ca", "Mg", "Cr", "Al", "Si", "Fe3+"]
+        species_amounts = np.array([1.1, 2.0, 0.0, 0, 1.9, 3.0, 0.1])
+        species_covariances = np.eye(7) * 0.01 * 0.01
+        species_conversions = {"Fe3+": {"Fef_B": 1.0}}
+
+        np.random.seed(100)
+        species_amounts = np.random.multivariate_normal(
+            species_amounts, species_covariances
+        )
+
+        popt, _, _ = fit_composition_to_solution(
+            gt,
+            fitted_species,
+            species_amounts,
+            species_covariances,
+            species_conversions,
+        )
+        gt.set_composition(popt)
+        f = [0.004, 0.328, 0.619, 0.048, 0.000]
+        f2 = np.round(gt.molar_fractions, 3)
+        self.assertArraysAlmostEqual(f, f2)
 
 
 if __name__ == "__main__":
