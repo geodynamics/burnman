@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -9,27 +9,27 @@ import warnings
 from math import exp
 
 
-def bulk_modulus(volume, params):
+def bulk_modulus_vinet(volume, params):
     """
     compute the bulk modulus as per the
     Vinet equation of state.  Reference bulk
     modulus should be in :math:`[Pa]`.
     """
 
-    x = volume / params["V_0"]
+    V_rel = volume / params["V_0"]
     eta = (3.0 / 2.0) * (params["Kprime_0"] - 1.0)
 
     K = (
-        (params["K_0"] * pow(x, -2.0 / 3.0))
-        * (1 + ((eta * pow(x, 1.0 / 3.0) + 1.0) * (1.0 - pow(x, 1.0 / 3.0))))
-        * exp(eta * (1.0 - pow(x, 1.0 / 3.0)))
+        (params["K_0"] * pow(V_rel, -2.0 / 3.0))
+        * (1 + ((eta * pow(V_rel, 1.0 / 3.0) + 1.0) * (1.0 - pow(V_rel, 1.0 / 3.0))))
+        * exp(eta * (1.0 - pow(V_rel, 1.0 / 3.0)))
     )
     return K
 
 
-def vinet(x, params):
+def pressure_vinet(V_rel, params):
     """
-    equation for the  Vinet equation of state, returns
+    Pressure equation for the Vinet equation of state, returns
     pressure in the same units that are supplied for the reference bulk
     modulus (params['K_0']), which should be in math:`[Pa]`.
     """
@@ -37,20 +37,22 @@ def vinet(x, params):
     return (
         3.0
         * params["K_0"]
-        * (pow(x, -2.0 / 3.0))
-        * (1.0 - (pow(x, 1.0 / 3.0)))
-        * exp(eta * (1.0 - pow(x, 1.0 / 3.0)))
+        * (pow(V_rel, -2.0 / 3.0))
+        * (1.0 - (pow(V_rel, 1.0 / 3.0)))
+        * exp(eta * (1.0 - pow(V_rel, 1.0 / 3.0)))
         + params["P_0"]
     )
 
 
-def volume(pressure, params):
+def volume_vinet(pressure, params):
     """
-    Get the Vinet volume at a reference temperature for a given
+    Get the volume at a reference temperature for a given
     pressure :math:`[Pa]`. Returns molar volume in :math:`[m^3]`
     """
 
-    func = lambda x: vinet(x / params["V_0"], params) - pressure
+    def func(V):
+        return pressure_vinet(V / params["V_0"], params) - pressure
+
     V = opt.brentq(func, 0.1 * params["V_0"], 1.5 * params["V_0"])
     return V
 
@@ -68,41 +70,38 @@ class Vinet(eos.EquationOfState):
         """
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
-        return volume(pressure, params)
+        return volume_vinet(pressure, params)
 
     def pressure(self, temperature, volume, params):
-        return vinet(volume / params["V_0"], params)
+        return pressure_vinet(volume / params["V_0"], params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        return bulk_modulus(volume, params)
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
-        """
-        return bulk_modulus(volume, params)
+        return bulk_modulus_vinet(volume, params)
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
-        Currently not included in the Vinet EOS, so omitted.
+        Not included in the Vinet EOS, so returns 0.
         """
         return 0.0
 
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        The Vinet EOS is athermal, so this function returns 0.
         """
         return 0.0
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
+    def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
+        # G = int VdP = [PV] - int PdV = E + PV
+
         x = pow(volume / params["V_0"], 1.0 / 3.0)
         eta = (3.0 / 2.0) * (params["Kprime_0"] - 1.0)
 
@@ -114,40 +113,17 @@ class Vinet(eos.EquationOfState):
             * ((1.0 - eta * (1.0 - x)) * exp(eta * (1.0 - x)) - 1.0)
         )
 
-        return -intPdV + params["E_0"]
-
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
-        """
-        # G = int VdP = [PV] - int PdV = E + PV
-
-        return (
-            self.molar_internal_energy(pressure, temperature, volume, params)
-            + volume * pressure
-        )
-
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
+        return params["E_0"] - intPdV + volume * pressure
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
+        The Vinet EOS is athermal, so this function returns a very large number. :math:`[J/K/mol]`
         """
         return 1.0e99
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
+        The Vinet EOS is athermal, so this function returns zero. :math:`[1/K]`
         """
         return 0.0
 

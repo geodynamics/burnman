@@ -66,7 +66,7 @@ class DKS_S(eos.EquationOfState):
     in :cite:`deKoker2013` (supplementary materials).
     """
 
-    def volume_dependent_q(self, x, params):
+    def _volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
         derivative of the grueneisen parameter.
@@ -157,7 +157,7 @@ class DKS_S(eos.EquationOfState):
         """
         Returns the pressure of the mineral at a given temperature and volume [Pa]
         """
-        gr = self.grueneisen_parameter(
+        gr = self._grueneisen_parameter(
             0.0, temperature, volume, params
         )  # does not depend on pressure
 
@@ -172,7 +172,7 @@ class DKS_S(eos.EquationOfState):
 
         return P
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter :math:`[unitless]`
         """
@@ -186,8 +186,8 @@ class DKS_S(eos.EquationOfState):
         """
 
         E_th_diff = params["Cv"] * (temperature - params["T_0"])
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        q = self.volume_dependent_q(params["V_0"] / volume, params)
+        gr = self._grueneisen_parameter(pressure, temperature, volume, params)
+        q = self._volume_dependent_q(params["V_0"] / volume, params)
         K = (
             bm.bulk_modulus(volume, params)
             + (gr + 1.0 - q) * (gr / volume) * E_th_diff
@@ -200,7 +200,6 @@ class DKS_S(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]`
         """
-        T_0 = params["T_0"]
         eta_s = self._isotropic_eta_s(params["V_0"] / volume, params)
 
         E_th_diff = params["Cv"] * (temperature - params["T_0"])
@@ -208,19 +207,13 @@ class DKS_S(eos.EquationOfState):
             bm.shear_modulus_third_order(volume, params) - eta_s * (E_th_diff) / volume
         )
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant volume. :math:`[J/K/mol]`
-        """
-        return params["Cv"]
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+        gr = self._grueneisen_parameter(pressure, temperature, volume, params)
+        C_v = params["Cv"]
         C_p = C_v * (1.0 + gr * alpha * temperature)
         return C_p
 
@@ -228,8 +221,8 @@ class DKS_S(eos.EquationOfState):
         """
         Returns thermal expansivity. :math:`[1/K]`
         """
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
+        C_v = params["Cv"]
+        gr = self._grueneisen_parameter(pressure, temperature, volume, params)
         K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
@@ -239,7 +232,7 @@ class DKS_S(eos.EquationOfState):
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_free_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
@@ -258,7 +251,7 @@ class DKS_S(eos.EquationOfState):
 
         return S_0 + S_th
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """

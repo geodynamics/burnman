@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import scipy.optimize as opt
 from scipy.special import gamma, gammainc
 from . import equation_of_state as eos
-from ..utils.math import bracket
 import warnings
 import numpy as np
 
@@ -182,12 +181,6 @@ class RKprime(eos.EquationOfState):
         """
         return bulk_modulus(pressure, params)
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
-        """
-        return bulk_modulus(pressure, params)
-
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
@@ -239,22 +232,6 @@ class RKprime(eos.EquationOfState):
             - self._intVdP(0.0, params)
         )
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
-        """
-        # E = G - PV (+ TS)
-        return (
-            self.gibbs_free_energy(pressure, temperature, volume, params)
-            - pressure * volume
-        )
-
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -267,7 +244,7 @@ class RKprime(eos.EquationOfState):
         """
         return 0.0
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
         """

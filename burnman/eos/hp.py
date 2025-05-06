@@ -86,7 +86,7 @@ class HP_TMT(eos.EquationOfState):
         )
         return alpha
 
-    def molar_heat_capacity_p0(self, temperature, params):
+    def _molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature
         [J/K/mol]. Cp = a + bT + cT^-2 + dT^-0.5 in :cite:`HP2011`.
@@ -202,7 +202,7 @@ class HP_TMT(eos.EquationOfState):
         dSdT1 = -dintVdpdT * dCv_einstdT / einstein.molar_heat_capacity_v(T, T_e, n)
 
         dSdT = dSdT0 + dSdT1
-        return self.molar_heat_capacity_p0(temperature, params) + temperature * dSdT
+        return self._molar_heat_capacity_p0(temperature, params) + temperature * dSdT
 
     def __thermal_pressure(self, T, params):
         """
@@ -320,9 +320,9 @@ class HP_TMT(eos.EquationOfState):
         if params["V_0"] < 1.0e-7 or params["V_0"] > 1.0e-2:
             warnings.warn("Unusual value for V_0", stacklevel=2)
 
-        if self.molar_heat_capacity_p0(params["T_0"], params) < 0.0:
+        if self._molar_heat_capacity_p0(params["T_0"], params) < 0.0:
             warnings.warn("Negative heat capacity at T_0", stacklevel=2)
-        if self.molar_heat_capacity_p0(2000.0, params) < 0.0:
+        if self._molar_heat_capacity_p0(2000.0, params) < 0.0:
             warnings.warn("Negative heat capacity at 2000K", stacklevel=2)
 
         if params["a_0"] < 0.0 or params["a_0"] > 1.0e-3:
@@ -399,7 +399,7 @@ class HP_TMTL(eos.EquationOfState):
 
         return 2.0 * (volume1 - volume0) / (volume1 + volume0) / dT
 
-    def molar_heat_capacity_p0(self, temperature, params):
+    def _molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature
         [J/K/mol]
@@ -537,9 +537,9 @@ class HP_TMTL(eos.EquationOfState):
         if params["V_0"] < 1.0e-7 or params["V_0"] > 1.0e-2:
             warnings.warn("Unusual value for V_0", stacklevel=2)
 
-        if self.molar_heat_capacity_p0(params["T_0"], params) < 0.0:
+        if self._molar_heat_capacity_p0(params["T_0"], params) < 0.0:
             warnings.warn("Negative heat capacity at T_0", stacklevel=2)
-        if self.molar_heat_capacity_p0(2000.0, params) < 0.0:
+        if self._molar_heat_capacity_p0(2000.0, params) < 0.0:
             warnings.warn("Negative heat capacity at 2000K", stacklevel=2)
 
         if params["a_0"] < 0.0 or params["a_0"] > 1.0e-3:
@@ -621,7 +621,7 @@ class HP98(eos.EquationOfState):
         dVdT = dVTdT * g + VT * dgdKT * params["dKdT_0"]
         return dVdT / volume
 
-    def molar_heat_capacity_p0(self, temperature, params):
+    def _molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature
         [J/K/mol]
@@ -764,9 +764,9 @@ class HP98(eos.EquationOfState):
         if params["V_0"] < 1.0e-7 or params["V_0"] > 1.0e-2:
             warnings.warn("Unusual value for V_0", stacklevel=2)
 
-        if self.molar_heat_capacity_p0(params["T_0"], params) < 0.0:
+        if self._molar_heat_capacity_p0(params["T_0"], params) < 0.0:
             warnings.warn("Negative heat capacity at T_0", stacklevel=2)
-        if self.molar_heat_capacity_p0(2000.0, params) < 0.0:
+        if self._molar_heat_capacity_p0(2000.0, params) < 0.0:
             warnings.warn("Negative heat capacity at 2000K", stacklevel=2)
 
         if params["a_0"] < 0.0 or params["a_0"] > 1.0e-3:

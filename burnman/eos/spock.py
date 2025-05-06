@@ -86,8 +86,7 @@ class SPOCK(eos.EquationOfState):
 
     def volume(self, pressure, temperature, params):
         """
-        Get the Vinet volume at a reference temperature for a given
-        pressure :math:`[Pa]`. Returns molar volume in :math:`[m^3]`
+        Returns volume at a given pressure :math:`[Pa]` in :math:`[m^3]`
         """
 
         def delta_pressure(x):
@@ -112,9 +111,10 @@ class SPOCK(eos.EquationOfState):
             * (generalised_gammainc(-ci / ai, bi * np.exp(ai * lnVrel), bi))
         )
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Internal function returning the internal energy
+        :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
         ai, bi, ci = make_params(
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
@@ -143,49 +143,42 @@ class SPOCK(eos.EquationOfState):
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return (
-            self.molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_internal_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
-        """
-        return self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
+        This equation of state is athermal, so the function returns a very large number.
         """
         return 1.0e99
 
     def entropy(self, pressure, temperature, volume, params):
         """
         Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        This equation of state is athermal, so the function returns zero.
         """
         return 0.0
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, return a very small number. :math:`[J/K/mol]`
-        """
-        return 1.0e-99
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, return a very small number. :math:`[J/K/mol]`
+        Returns the molar heat capacity at constant pressure. :math:`[J/K/mol]`
+        This equation of state is athermal, so the function returns zero.
         """
         return 1.0e-99
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, return zero. :math:`[1/K]`
+        Returns the thermal expansivity at constant pressure. :math:`[1/K]`
+        This equation of state is athermal, so the function returns zero.
         """
         return 0.0
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, return zero. :math:`[unitless]`
+        Returns the grueneisen parameter. Unitless
+        This equation of state is athermal, so the function returns zero.
         """
         return 0.0
 

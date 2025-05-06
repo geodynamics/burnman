@@ -56,7 +56,7 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate(
     ax_E.set_xlabel("Volume (cm^3/mol)")
 
     ax_P.set_ylabel("Pressure (GPa)")
-    ax_S.set_ylabel("Entropy/nR (J)")
+    ax_S.set_ylabel("Entropy/nR")
     ax_E.set_ylabel("Internal Energy (kJ/mol)")
 
     ax_P.imshow(mpimg.imread(plots[i][0][0]), extent=plots[i][0][1], aspect="auto")
@@ -64,16 +64,21 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate(
     ax_E.imshow(mpimg.imread(plots[i][2][0]), extent=plots[i][2][1], aspect="auto")
 
     for temperature in temperatures:
-        pressures = np.empty_like(volumes)
-        entropies = np.empty_like(volumes)
-        energies = np.empty_like(volumes)
+        pressures = np.empty_like(volumes) + np.nan
+        entropies = np.empty_like(volumes) + np.nan
+        energies = np.empty_like(volumes) + np.nan
 
         for j, volume in enumerate(volumes):
-            pressures[j] = phase.method.pressure(temperature, volume, phase.params)
-            entropies[j] = phase.method._S_el(temperature, volume, phase.params)
-            energies[j] = phase.method.molar_internal_energy(
-                0.0, temperature, volume, phase.params
-            )
+            try:
+                phase.set_state_with_volume(volume, temperature)
+                pressures[j] = phase.pressure
+                entropies[j] = phase.method._S_el(temperature, volume, phase.params)
+                energies[j] = phase.method._molar_internal_energy(
+                    phase.pressure, temperature, volume, phase.params
+                )
+                energies[j] = phase.molar_internal_energy
+            except Exception as e:
+                print(e.message)
 
         ax_P.plot(
             volumes * 1.0e6,
@@ -96,6 +101,7 @@ for i, (phase, n_atoms, temperatures, volumes) in enumerate(
 
         ax_E.legend(loc="upper right")
 
+    fig.set_layout_engine("tight")
     plt.show()
 
 
@@ -144,4 +150,5 @@ ax_hugoniot.set_xlabel("Densities (Mg/m^3)")
 ax_hugoniot.set_ylabel("Pressures (GPa)")
 ax_hugoniot.set_title("hugoniot")
 
+fig.set_layout_engine("tight")
 plt.show()

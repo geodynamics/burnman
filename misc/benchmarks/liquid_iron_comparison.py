@@ -16,6 +16,7 @@ check_eos_consistency(
     liq, P=10.0e9, T=7000.0, tol=1.0e-3, verbose=True, including_shear_properties=False
 )
 
+R = burnman.constants.gas_constant
 
 # Find heat capacities
 temperatures = np.linspace(1000.0, 15000.0, 101)
@@ -26,10 +27,8 @@ densities = [5.0e3, 10.0e3, 15.0e3]
 for rho in densities:
     V = m / rho
     for i, T in enumerate(temperatures):
-        Cvs[i] = (
-            liq.method.molar_heat_capacity_v(0.0, T, V, liq.params)
-            / burnman.constants.gas_constant
-        )
+        liq.set_state_with_volume(V, T)
+        Cvs[i] = liq.molar_heat_capacity_v / R
 
     plt.plot(temperatures, Cvs)
 
@@ -59,6 +58,7 @@ pressures = np.linspace(0.0, 500.0e9, 21)
 temperatures = np.empty_like(pressures)
 rhos = np.empty_like(pressures)
 Vps = np.empty_like(pressures)
+
 
 for i, P in enumerate(pressures):
     temperatures[i] = fsolve(isentrope, 1811.0, args=(P, reference_entropy, liq))[0]

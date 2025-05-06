@@ -590,21 +590,19 @@ class DKS_L(eos.EquationOfState):
         return P
 
     def volume(self, pressure, temperature, params):
-        _delta_pressure = (
-            lambda x, pressure, temperature, params: pressure
-            - self.pressure(temperature, x, params)
-        )
+
+        def _delta_pressure(x):
+            return pressure - self.pressure(temperature, x, params)
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
-        args = (pressure, temperature, params)
         try:
-            sol = bracket(_delta_pressure, params["V_0"], 1.0e-2 * params["V_0"], args)
+            sol = bracket(_delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
         except ValueError:
             raise Exception(
                 "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
             )
-        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
+        return opt.brentq(_delta_pressure, sol[0], sol[1])
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
@@ -618,28 +616,14 @@ class DKS_L(eos.EquationOfState):
         )
         return K_T
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus. :math:`[Pa]`
-        """
-        K_S = self.isothermal_bulk_modulus_reuss(
-            pressure, temperature, volume, params
-        ) * (
-            1.0
-            + temperature
-            * self.thermal_expansivity(pressure, temperature, volume, params)
-            * self.grueneisen_parameter(pressure, temperature, volume, params)
-        )
-        return K_S
-
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter. :math:`[unitless]`
         """
         gamma = (
             self._aK_T(temperature, volume, params)
             * volume
-            / self.molar_heat_capacity_v(pressure, temperature, volume, params)
+            / self._molar_heat_capacity_v(pressure, temperature, volume, params)
         )
         return gamma
 
@@ -650,7 +634,7 @@ class DKS_L(eos.EquationOfState):
         """
         return 0.0
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
+    def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
@@ -666,11 +650,11 @@ class DKS_L(eos.EquationOfState):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
-        C_p = self.molar_heat_capacity_v(pressure, temperature, volume, params) * (
+        C_p = self._molar_heat_capacity_v(pressure, temperature, volume, params) * (
             1.0
             + temperature
             * self.thermal_expansivity(pressure, temperature, volume, params)
-            * self.grueneisen_parameter(pressure, temperature, volume, params)
+            * self._grueneisen_parameter(pressure, temperature, volume, params)
         )
         return C_p
 
@@ -688,7 +672,7 @@ class DKS_L(eos.EquationOfState):
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_free_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
@@ -705,18 +689,7 @@ class DKS_L(eos.EquationOfState):
         )
         return S
 
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
-        """
-        H = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-            + pressure * self.volume(pressure, temperature, params)
-        )
-        return H
-
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
@@ -728,11 +701,13 @@ class DKS_L(eos.EquationOfState):
         )
         return F
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        E = self.helmholtz_free_energy(
-            pressure, temperature, volume, params
-        ) + temperature * self.entropy(pressure, temperature, volume, params)
-        return E
+    def _molar_internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
+        """
+        F = self._helmholtz_free_energy(pressure, temperature, volume, params)
+        S = self.entropy(pressure, temperature, volume, params)
+        return F + temperature * S
 
     def validate_parameters(self, params):
         """

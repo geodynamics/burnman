@@ -43,16 +43,6 @@ class CORK(eos.EquationOfState):
     the saturation curve.
     """
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns grueneisen parameter [unitless] as a function of pressure,
-        temperature, and volume.
-        """
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_V = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        return alpha * K_T * volume / C_V
-
     def volume(self, pressure, temperature, params):
         """
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
@@ -111,17 +101,6 @@ class CORK(eos.EquationOfState):
         """
         return 0.0
 
-    # Cv, heat capacity at constant volume
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol].
-        """
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        V = self.volume(pressure, temperature, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        return C_p - V * temperature * alpha * alpha * K_T
-
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
@@ -150,7 +129,7 @@ class CORK(eos.EquationOfState):
         return dVdT / volume
 
     # Heat capacity at ambient pressure
-    def molar_heat_capacity_p0(self, temperature, params):
+    def _molar_heat_capacity_p0(self, temperature, params):
         """
         Returns heat capacity at ambient pressure as a function of temperature [J/K/mol]
         Cp = a + bT + cT^-2 + dT^-0.5 in Holland and Powell, 2011
@@ -167,10 +146,9 @@ class CORK(eos.EquationOfState):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
-        T_0 = params["T_0"]
         P_relative = pressure - params["P_0"]
 
-        Cp0 = self.molar_heat_capacity_p0(temperature, params)
+        Cp0 = self._molar_heat_capacity_p0(temperature, params)
 
         if params["cork_T"] == 0:
             d2RTlnfdTdT = 0.0
@@ -214,17 +192,6 @@ class CORK(eos.EquationOfState):
             )  # Second temperature derivative of Eq. 8 in Holland and Powell, 1991
 
         return Cp0 - temperature * d2RTlnfdTdT
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        C_p = self.molar_heat_capacity_p(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        K_S = K_T * C_p / C_v
-        return K_S
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
@@ -348,26 +315,6 @@ class CORK(eos.EquationOfState):
 
         return params["S_0"] + intCpoverTdT - dRTlnfdT
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
-        return self.gibbs_free_energy(
-            pressure, temperature, volume, params
-        ) - pressure * self.volume(pressure, temperature, params)
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy [J/mol] as a function of pressure [Pa]
-        and temperature [K].
-        """
-        gibbs = self.gibbs_free_energy(pressure, temperature, volume, params)
-        entropy = self.entropy(pressure, temperature, volume, params)
-        return gibbs + temperature * entropy
-
-    def pressure(self, temperature, volume, params):
-        """
-        Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
-        """
-        return NotImplementedError("")
-
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters
@@ -414,7 +361,7 @@ class CORK(eos.EquationOfState):
         if params["cork_P"] < 1.0e4 or params["cork_P"] > 1.0e8:
             warnings.warn("Unusual value for cork_P", stacklevel=2)
 
-        if self.molar_heat_capacity_p0(params["T_0"], params) < 0.0:
+        if self._molar_heat_capacity_p0(params["T_0"], params) < 0.0:
             warnings.warn("Negative heat capacity at T_0", stacklevel=2)
-        if self.molar_heat_capacity_p0(2000.0, params) < 0.0:
+        if self._molar_heat_capacity_p0(2000.0, params) < 0.0:
             warnings.warn("Negative heat capacity at 2000K", stacklevel=2)

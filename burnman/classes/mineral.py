@@ -213,6 +213,7 @@ class Mineral(Material):
             self.set_state(
                 self.method.pressure(temperature, volume, self.params), temperature
             )
+        self._cached["_molar_volume_unmodified"] = volume
 
     """
     Properties from equations of state
@@ -430,7 +431,7 @@ class Mineral(Material):
             and (np.abs(self._property_modifiers["dGdP"]) < eps)
             and (np.abs(self._property_modifiers["d2GdT2"]) < eps)
         ):
-            return self.method.grueneisen_parameter(
+            return self.method._grueneisen_parameter(
                 self.pressure, self.temperature, self.molar_volume, self.params
             )
         else:

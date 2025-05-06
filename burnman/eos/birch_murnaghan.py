@@ -136,12 +136,6 @@ class BirchMurnaghanBase(eos.EquationOfState):
         """
         return bulk_modulus(volume, params)
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
-        """
-        return bulk_modulus(volume, params)
-
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
@@ -157,7 +151,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
         """
         return 0.0
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
@@ -189,15 +183,9 @@ class BirchMurnaghanBase(eos.EquationOfState):
         # G = int VdP = [PV] - int PdV = E + PV
 
         return (
-            self.molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_internal_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
-
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
@@ -211,7 +199,7 @@ class BirchMurnaghanBase(eos.EquationOfState):
         """
         return 0.0
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
         """
