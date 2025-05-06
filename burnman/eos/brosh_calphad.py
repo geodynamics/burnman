@@ -103,39 +103,11 @@ class BroshCalphad(eos.EquationOfState):
 
         return -volume * dP / dV
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns the adiabatic bulk modulus of the mineral. :math:`[Pa]`.
-        """
-        if temperature < 1.0e-10:
-            return self.isothermal_bulk_modulus_reuss(
-                pressure, temperature, volume, params
-            )
-        else:
-            return (
-                self.isothermal_bulk_modulus_reuss(
-                    pressure, temperature, volume, params
-                )
-                * self.molar_heat_capacity_p(pressure, temperature, volume, params)
-                / self.molar_heat_capacity_v(pressure, temperature, volume, params)
-            )
-
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Returns the shear modulus :math:`G` of the mineral. :math:`[Pa]`
         """
         return 0.0
-
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy of the mineral. :math:`[J/mol]`
-        """
-
-        return (
-            self.gibbs_free_energy(pressure, temperature, volume, params)
-            - pressure * self.volume(pressure, temperature, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-        )
 
     def _Cp_1bar(self, temperature, params):
         # first, identify which of the piecewise segments we're in
@@ -398,7 +370,7 @@ class BroshCalphad(eos.EquationOfState):
             )
             return dV / dT / volume
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns the grueneisen parameter.
         This is a dependent thermodynamic variable in this equation of state.

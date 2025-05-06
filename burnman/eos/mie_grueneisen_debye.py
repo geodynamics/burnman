@@ -25,7 +25,7 @@ class MGDBase(eos.EquationOfState):
     was developed by Hama and Suito (1998).
     """
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Returns grueneisen parameter [unitless] as a function of pressure,
         temperature, and volume (EQ B6)
@@ -88,7 +88,7 @@ class MGDBase(eos.EquationOfState):
             raise NotImplementedError("")
 
     # heat capacity at constant volume
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
+    def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume at the pressure, temperature, and volume [J/K/mol]
         """
@@ -100,33 +100,21 @@ class MGDBase(eos.EquationOfState):
         """
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
         """
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self._molar_heat_capacity_v(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params["V_0"] / volume, params)
         K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         alpha = gr * C_v / K / volume
         return alpha
 
-    # heat capacity at constant pressure
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure at the pressure, temperature, and volume [J/K/mol]
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
         gr = self._grueneisen_parameter(params["V_0"] / volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+        C_v = self._molar_heat_capacity_v(pressure, temperature, volume, params)
         C_p = C_v * (1.0 + gr * alpha * temperature)
         return C_p
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].  EQ D6
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self._grueneisen_parameter(params["V_0"] / volume, params)
-        K_S = K_T * (1.0 + gr * alpha * temperature)
-        return K_S
 
     def pressure(self, temperature, volume, params):
         """
@@ -145,18 +133,10 @@ class MGDBase(eos.EquationOfState):
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_free_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
-
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy at the pressure and temperature of the mineral [J/mol]
-        """
-        return self.helmholtz_free_energy(
-            pressure, temperature, volume, params
-        ) + temperature * self.entropy(pressure, temperature, volume, params)
 
     def entropy(self, pressure, temperature, volume, params):
         """
@@ -166,18 +146,7 @@ class MGDBase(eos.EquationOfState):
         S = debye.entropy(temperature, Debye_T, params["n"])
         return S
 
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy at the pressure and temperature of the mineral [J/mol]
-        """
-
-        return (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-            + pressure * volume
-        )
-
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """

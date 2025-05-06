@@ -33,6 +33,7 @@ class mypericlase(burnman.Mineral):
             "q_0": 1.5,
             "eta_s_0": 2.8,
         }
+        burnman.Mineral.__init__(self)
 
 
 class Fe_Dewaele(burnman.Mineral):
@@ -157,14 +158,7 @@ class eos(BurnManTest):
                 pressure, 300.0, rock.params["V_0"], rock.params
             )
             self.assertFloatEqual(Kt_test, rock.params["K_0"])
-            # K_S is based on 0 reference temperature:
-            Kt_test = i.isothermal_bulk_modulus_reuss(
-                pressure, 0.0, rock.params["V_0"], rock.params
-            )
-            K_test = i.isentropic_bulk_modulus_reuss(
-                pressure, 0.0, rock.params["V_0"], rock.params
-            )
-            self.assertFloatEqual(K_test, Kt_test)
+
             G_test = i.shear_modulus(
                 pressure, temperature, rock.params["V_0"], rock.params
             )
@@ -179,30 +173,18 @@ class eos(BurnManTest):
             Cp_test = i.molar_heat_capacity_p(
                 pressure, temperature, rock.params["V_0"], rock.params
             )
-            Cv_test = i.molar_heat_capacity_v(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
-            Grun_test = i.grueneisen_parameter(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
 
         eoses_thermal = [burnman.eos.SLB2(), burnman.eos.SLB3()]
         for i in eoses_thermal:
-            Cp_test = i.molar_heat_capacity_p(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
+            rock.set_method(i)
+            rock.set_state(pressure, temperature)
+            Cp_test = rock.molar_heat_capacity_p
             self.assertFloatEqual(Cp_test, 37.076768469502042)
-            Cv_test = i.molar_heat_capacity_v(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
+            Cv_test = rock.molar_heat_capacity_v
             self.assertFloatEqual(Cv_test, 36.577717628901553)
-            alpha_test = i.thermal_expansivity(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
+            alpha_test = rock.thermal_expansivity
             self.assertFloatEqual(alpha_test, 3.031905596878513e-05)
-            Grun_test = i.grueneisen_parameter(
-                pressure, temperature, rock.params["V_0"], rock.params
-            )
+            Grun_test = rock.grueneisen_parameter
             self.assertFloatEqual(Grun_test, rock.params["grueneisen_0"])
 
     def test_reference_values_vinet(self):
@@ -272,20 +254,15 @@ class eos(BurnManTest):
         )
 
     def test_reference_values_aa(self):
-        rock = minerals.other.liquid_iron()
-        pressure = rock.params["P_0"]
-        temperature = rock.params["T_0"]
-        eos = burnman.eos.AA()
-        Volume_test = eos.volume(pressure, temperature, rock.params)
-        self.assertFloatEqual(Volume_test, rock.params["V_0"])
-        Ks_test = eos.isentropic_bulk_modulus_reuss(
-            pressure, temperature, rock.params["V_0"], rock.params
-        )
-        self.assertFloatEqual(Ks_test, rock.params["K_S"])
-        Density_test = eos.density(rock.params["V_0"], rock.params)
-        self.assertFloatEqual(
-            Density_test, rock.params["molar_mass"] / rock.params["V_0"]
-        )
+        m = minerals.other.liquid_iron()
+        pressure = m.params["P_0"]
+        temperature = m.params["T_0"]
+        rho0 = m.params["molar_mass"] / m.params["V_0"]
+        m.set_state(pressure, temperature)
+        self.assertFloatEqual(m.V, m.params["V_0"])
+        Ks = m.isentropic_bulk_modulus_reuss
+        self.assertFloatEqual(Ks, m.params["K_S"])
+        self.assertFloatEqual(m.density, rho0)
 
 
 class test_eos_validation(BurnManTest):

@@ -91,7 +91,7 @@ class MACAW(eos.EquationOfState):
         term3 = C * np.power(Vrel, 1.5) + B
         return term1 * term2 * term3 - A * (B + C) + params["P_0"]
 
-    def molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
         """
@@ -109,15 +109,9 @@ class MACAW(eos.EquationOfState):
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return (
-            self.molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_internal_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
-
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus :math:`K_s` of the mineral. :math:`[Pa]`.
-        """
-        return self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
@@ -131,12 +125,6 @@ class MACAW(eos.EquationOfState):
         """
         return 0.0
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, return a very small number. :math:`[J/K/mol]`
-        """
-        return 1.0e-99
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, return a very small number. :math:`[J/K/mol]`
@@ -149,7 +137,7 @@ class MACAW(eos.EquationOfState):
         """
         return 0.0
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, return zero. :math:`[unitless]`
         """

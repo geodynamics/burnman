@@ -127,12 +127,6 @@ class MT(eos.EquationOfState):
         """
         return bulk_modulus(pressure, params)
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[Pa]`
-        """
-        return 1.0e99
-
     def shear_modulus(self, pressure, temperature, volume, params):
         """
         Not implemented in the Modified Tait EoS. :math:`[Pa]`
@@ -146,16 +140,6 @@ class MT(eos.EquationOfState):
         Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
         """
         return 0.0
-
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
-        """
-
-        return (
-            self.gibbs_free_energy(pressure, temperature, volume, params)
-            - volume * pressure
-        )
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
@@ -173,12 +157,6 @@ class MT(eos.EquationOfState):
 
         return intVdP + params["E_0"] + params["V_0"] * params["P_0"]
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
@@ -191,7 +169,7 @@ class MT(eos.EquationOfState):
         """
         return 0.0
 
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
         Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
         """

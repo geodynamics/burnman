@@ -115,7 +115,7 @@ class SLBBase(eos.EquationOfState):
                 "part of the slb equation of state."
             )
 
-    def volume_dependent_q(self, x, params):
+    def _volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
         derivative of the grueneisen parameter.
@@ -316,7 +316,7 @@ class SLBBase(eos.EquationOfState):
         # heat capacity at reference temperature
         C_v_ref = debye.molar_heat_capacity_v(T_0, debye_T, params["n"])
 
-        q = self.volume_dependent_q(params["V_0"] / volume, params)
+        q = self._volume_dependent_q(params["V_0"] / volume, params)
 
         K = (
             bm.bulk_modulus(volume, params)
@@ -359,7 +359,7 @@ class SLBBase(eos.EquationOfState):
         else:
             raise NotImplementedError("")
 
-    def molar_heat_capacity_v(self, pressure, temperature, volume, params):
+    def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
@@ -405,7 +405,7 @@ class SLBBase(eos.EquationOfState):
             )
         return S
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature
         of the mineral [J/mol]
@@ -443,9 +443,13 @@ class SLBBase(eos.EquationOfState):
     # These functions can use pressure as an argument,
     # as pressure should have been determined self-consistently
     # by the point at which these functions are called.
-    def grueneisen_parameter(self, pressure, temperature, volume, params):
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Returns grueneisen parameter :math:`[unitless]`
+        Returns grueneisen parameter (-dlnT/dlnV at fixed entropy) :math:`[unitless]`
+        Although the grueneisen parameter is a product of partial derivatives of the
+        Helmholtz energy, the product involves a division by the heat capacity
+        (which goes to zero at low temperatures).
+        Therefore a direct calculation is more robust.
         """
         if self.conductive:
             temperature = max(temperature, 1.0e-6)
@@ -453,40 +457,22 @@ class SLBBase(eos.EquationOfState):
                 pressure, temperature, volume, params
             )
             alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-            C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
+            C_v = self._molar_heat_capacity_v(pressure, temperature, volume, params)
             return alpha * K_T * volume / C_v
         else:
             return _grueneisen_parameter_slb(
                 params["V_0"], volume, params["grueneisen_0"], params["q_0"]
             )
 
-    def isentropic_bulk_modulus_reuss(self, pressure, temperature, volume, params):
-        """
-        Returns adiabatic bulk modulus. :math:`[Pa]`
-        """
-        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
-        alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        return K_T * (1.0 + gr * alpha * temperature)
-
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
         Returns heat capacity at constant pressure. :math:`[J/K/mol]`
         """
         alpha = self.thermal_expansivity(pressure, temperature, volume, params)
-        gr = self.grueneisen_parameter(pressure, temperature, volume, params)
-        C_v = self.molar_heat_capacity_v(pressure, temperature, volume, params)
-        C_p = C_v * (1.0 + gr * alpha * temperature)
+        K_T = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
+        C_v = self._molar_heat_capacity_v(pressure, temperature, volume, params)
+        C_p = C_v + alpha * alpha * K_T * volume * temperature
         return C_p
-
-    def molar_internal_energy(self, pressure, temperature, volume, params):
-        """
-        Returns the internal energy at the pressure and temperature
-        of the mineral [J/mol]
-        """
-        return self.helmholtz_free_energy(
-            pressure, temperature, volume, params
-        ) + temperature * self.entropy(pressure, temperature, volume, params)
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
@@ -494,22 +480,10 @@ class SLBBase(eos.EquationOfState):
         of the mineral [J/mol]
         """
         G = (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_free_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
-
-    def enthalpy(self, pressure, temperature, volume, params):
-        """
-        Returns the enthalpy at the pressure and temperature
-        of the mineral [J/mol]
-        """
-
-        return (
-            self.helmholtz_free_energy(pressure, temperature, volume, params)
-            + temperature * self.entropy(pressure, temperature, volume, params)
-            + pressure * volume
-        )
 
     def validate_parameters(self, params):
         """
