@@ -38,12 +38,14 @@ jobs:
         cd burnman
         git status
         python -m pip install -e .[dev]
+        python -m pip uninstall -y numba
         coverage run -m unittest discover ./tests
         coverage report > main_coverage.tmp
         main_coverage=$(coverage report --precision=7 --format=total)
         cd ../..
         rm -fr main
         python -m pip install -q -e .[dev]
+        python -m pip uninstall -y numba
         coverage run -m unittest discover ./tests
         coverage report > new_coverage.tmp
         new_coverage=$(coverage report --precision=7 --format=total)
