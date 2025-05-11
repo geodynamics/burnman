@@ -14,6 +14,8 @@ create and read your own tables.
 - **read_lo_res_table.py**  
   A Python script to read and parse the generated low-resolution table (e.g., from `table.txt`) for further analysis or plotting.
 
+- **perplex_utils.py**  
+  A python file containing useful Perple_X-related functions.
 
 ## Getting Started
 
@@ -43,5 +45,5 @@ create and read your own tables.
 
 ## Notes
 
-- This setup is designed for educational or rapid prototyping use; the resolution and thermodynamic scope are intentionally simplified.
+- The resolution and thermodynamic scope in this example are intentionally simplified.
 - Make sure to review Perple_X license and citation guidelines when using in published work.

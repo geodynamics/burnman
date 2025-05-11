@@ -5,9 +5,9 @@ import os
 import shutil
 
 import burnman
-from burnman.classes.perplex import databases, make_build_file
-from burnman.classes.perplex import run_vertex, run_pssect
-from burnman.classes.perplex import create_perplex_table
+from perplex_utils import databases, make_build_file
+from perplex_utils import run_vertex, run_pssect
+from perplex_utils import create_perplex_table
 
 project_name = "iron_olivine_lo_res"
 database = databases["stx24"]
