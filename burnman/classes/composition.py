@@ -94,17 +94,8 @@ class Composition(object):
                 input_dictionary[k] = composition_dictionary[k] / n_total
 
         # Break component formulae into atomic dictionaries
-        self.component_formulae = {
-            c: dictionarize_formula(c) for c in composition_dictionary.keys()
-        }
-
-        # Create lists of elemental compositions of components
-        self.element_list = OrderedCounter()
-        for component in self.component_formulae.values():
-            self.element_list += OrderedCounter(
-                {element: n_atoms for (element, n_atoms) in component.items()}
-            )
-        self.element_list = list(self.element_list.keys())
+        fl = self._component_formulae_and_element_lists(composition_dictionary.keys())
+        self.component_formulae, self.element_list = fl
 
         if unit_type == "mass" or unit_type == "weight":
             self.mass_composition = input_dictionary
@@ -115,6 +106,30 @@ class Composition(object):
                 "Unit type not yet implemented. "
                 "Should be either mass, weight or molar."
             )
+
+    def _component_formulae_and_element_lists(self, component_strings):
+        """
+        Converts a list of components in string form into a list of components in dictionary form
+        and a list of elements.
+
+        :param component_strings: A list of strings containing a formula for each component
+        :type component_strings: list of strings
+        :return: a list of components in dictionary form and a list of elements.
+        :rtype: _type_
+        """
+
+        # Break component formulae into atomic dictionaries
+        component_formulae = {c: dictionarize_formula(c) for c in component_strings}
+
+        # Create lists of elemental compositions of components
+        element_list = OrderedCounter()
+        for component in component_formulae.values():
+            element_list += OrderedCounter(
+                {element: n_atoms for (element, n_atoms) in component.items()}
+            )
+        element_list = list(element_list.keys())
+
+        return component_formulae, element_list
 
     def renormalize(self, unit_type, normalization_component, normalization_amount):
         """
@@ -191,6 +206,14 @@ class Composition(object):
         :param new_component_list: New set of basis components.
         :type new_component_list: list of strings
         """
+
+        old_element_list = self.element_list
+        _, new_element_list = self._component_formulae_and_element_lists(
+            new_component_list
+        )
+
+        self.element_list = list(set(old_element_list).union(set(new_element_list)))
+
         composition = np.array(
             [self.atomic_composition[element] for element in self.element_list]
         )
@@ -217,6 +240,24 @@ class Composition(object):
 
         # Reinitialize the object
         self.__init__(composition, "molar")
+
+    def remove_null_components(self, tol=1.0e-12):
+        """
+        Removes components with absolute concentrations less than a given tolerance.
+
+        :param tol: zero tolerance, defaults to 1.e-12
+        :type tol: float, optional
+        """
+        c = deepcopy(self.molar_composition)
+        del_keys = []
+        for key, value in c.items():
+            if np.abs(value) < tol:
+                del_keys.append(key)
+        for key in del_keys:
+            c.pop(key)
+
+        # Reinitialize the object
+        self.__init__(c, "molar")
 
     def _mole_to_mass_composition(self, molar_comp):
         """

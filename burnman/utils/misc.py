@@ -6,6 +6,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+import subprocess
 import operator
 import bisect
 import pkgutil
@@ -237,3 +238,69 @@ def attribute_function(m, attributes, powers=[]):
         return value
 
     return f
+
+
+def extract_lines_between_markers(file, start_string, end_string, inclusive=False):
+    """
+    Extract lines from a file between two marker strings.
+
+    :param file: Path to the input text file.
+    :type file: str
+    :param start_string: The marker string indicating where to start collecting lines.
+    :type start_string: str
+    :param end_string: The marker string indicating where to stop collecting lines.
+    :type end_string: str
+    :param inclusive: Whether to include the lines containing start_string and end_string, defaults to False.
+    :type inclusive: bool, optional
+    :return: A list of lines between the two markers.
+    :rtype: list[str]
+    """
+    lines = []
+    with open(file, encoding="latin-1") as f:
+        inside = False
+        for line in f:
+            if start_string in line and not inside:
+                inside = True
+                if inclusive:
+                    lines.append(line.strip())
+                continue  # Don't reprocess the start line if not inclusive
+
+            if inside:
+                if end_string in line:
+                    if inclusive:
+                        lines.append(line.strip())
+                    break
+                lines.append(line.strip())
+
+    return lines
+
+
+def run_cli_program_with_input(program_path, stdin, verbose=True):
+    """
+    Run a command-line program with provided input and capture its output.
+
+    :param program_path: Path to the CLI executable or a list of command-line arguments.
+    :type program_path: str | list[str]
+    :param stdin: The input string to pass to the program via standard input.
+    :type stdin: str
+    :param verbose: If True, prints the program's output to stdout, defaults to True.
+    :type verbose: bool, optional
+    :return: The standard output produced by the program.
+    :rtype: str
+    """
+    process = subprocess.Popen(
+        program_path,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    stdoutput, stderr = process.communicate(stdin)
+
+    if verbose:
+        print(stdoutput)
+        if stderr:
+            print("Error output:", stderr)
+
+    return stdoutput

@@ -5,9 +5,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import subprocess
-from os import rename
-
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 from scipy.interpolate import griddata
@@ -15,125 +12,6 @@ from scipy.interpolate import griddata
 from .material import Material, material_property
 
 from ..utils.misc import copy_documentation
-
-
-def create_perplex_table(
-    werami_path,
-    project_name,
-    outfile,
-    n_pressures,
-    n_temperatures,
-    pressure_range=None,
-    temperature_range=None,
-):
-    """
-    This function uses PerpleX's werami software to output a table file
-    containing the following material properties.
-    2 - Density (kg/m3)
-    4 - Expansivity (1/K, for volume)
-    5 - Compressibility (1/bar, for volume)
-    10 - Adiabatic bulk modulus (bar)
-    11 - Adiabatic shear modulus (bar)
-    12 - Sound velocity (km/s)
-    13 - P-wave velocity (Vp, km/s)
-    14 - S-wave velocity (Vs, km/s)
-    17 - Entropy (J/K/kg)
-    18 - Enthalpy (J/kg)
-    19 - Heat Capacity (J/K/kg)
-    22 - Molar Volume (J/bar)
-
-    The user must already have a PerpleX build file,
-    and have run vertex on that build file.
-    """
-
-    print(
-        "Creating a {0}x{1} P-T table file using werami. Please wait.\n".format(
-            n_pressures, n_temperatures
-        )
-    )
-
-    try:
-        str2 = "y\n{0} {1}\n{2} {3}\n".format(
-            pressure_range[0] / 1.0e5,
-            pressure_range[1] / 1.0e5,
-            temperature_range[0],
-            temperature_range[1],
-        )
-    except TypeError:
-        print("Keeping P-T range the same as the original project range.\n")
-        str2 = "n\n"
-
-    stdin = (
-        "{0:s}\n2\n"
-        "2\nn\n"
-        "4\nn\n"
-        "5\nn\n"
-        "10\nn\n"
-        "11\nn\n"
-        "12\nn\n"
-        "13\nn\n"
-        "14\nn\n"
-        "17\nn\n"
-        "18\nn\n"
-        "19\nn\n"
-        "22\nn\n"
-        "0\n"
-        "{1:s}"
-        "{2:d} {3:d}\n"
-        "0\n".format(project_name, str2, n_pressures, n_temperatures)
-    )
-
-    with subprocess.Popen(
-        werami_path,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        encoding="utf8",
-    ) as process:
-        process.stdin.write(stdin)
-        process.stdin.flush()
-
-        out = ""
-        # Grab stdout line by line as it becomes available.
-        # This will loop until the process terminates.
-        stdoutput = ""
-        while process.poll() is not None:
-            line = process.stdout.readline()
-            stdoutput += line
-
-            # Check if vertex has been run on the build file
-            if "missing *.tof file" in line:
-                raise Exception(
-                    "You must run Perple_X vertex "
-                    f"({werami_path[0].split('werami')[0]}vertex) "
-                    "using the PerpleX build file ({project_name}) "
-                    "before running this script."
-                )
-
-        while process.poll() is None:
-            line = process.stdout.readline()
-            stdoutput += line
-
-            # Check if werami is trying to create a standard resolution grid
-            # Tell the user to modify their local perplex option file if so.
-            if "Continue (y/n)?" in line:
-                raise Exception(
-                    "If you do not want to define your own P-T range for the grid,\n"
-                    "you must set sample_on_grid to F in the perplex option file\n"
-                    "(default is perplex_option.dat)."
-                )
-
-            # Get the output file name
-            if "Output has been written to the" in line:
-                out = line.split()[-1]
-
-        # Print stdoutput
-        print(stdoutput)
-        print(process.stdout.read())
-
-        # Rename the file to the user-specified filename
-        rename(out, outfile)
-        print("Output file renamed to {0:s}".format(outfile))
-        print("Processing complete")
 
 
 class PerplexMaterial(Material):
