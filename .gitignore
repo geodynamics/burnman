@@ -6,3 +6,5 @@
 /build/*
 *.tmp
 *.pyc
+/contrib/perplex/perplex-installer
+/contrib/perplex/iron_olivine_lo_res
