@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 """
@@ -8,9 +8,11 @@ example_perplex
 ---------------
 
 This minimal example demonstrates how burnman can be used
-to read and interrogate a PerpleX tab file
-(as produced by burnman/misc/create_burnman_readable_perplex_table.py
-It also demonstrates how we can smooth a given property on a given P-T grid.
+to read and interrogate a Perple_X tab file, and how to smooth
+thermodynamic properties on a given P-T grid..
+For a workflow showing how to create Perple_X tables and save
+smoothed properties along an adiabat in an ASPECT-compatible
+format, see burnman/contrib/perplex/.
 
 *Uses:*
 

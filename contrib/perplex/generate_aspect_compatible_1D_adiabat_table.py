@@ -1,13 +1,14 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences.
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 """
-example_geodynamic_adiabat
-----------------
+generate_aspect_compatible_1D_adiabat_table
+-------------------------------------------
 
-This example script demonstrates how BurnMan can be used to
+This example script demonstrates how burnman can be used to
 self-consistently calculate properties along 1D adiabatic profiles
 for use in geodynamics simulations.
 
@@ -19,7 +20,8 @@ convection studies, where reactions are fast compared with
 timescales of convection.
 
 Finally, we show how burnman can be used to smooth entropy and
-volume in order to create smoothly varying relaxed properties.
+volume in order to create smoothly varying relaxed properties, and
+save these properties to an ASPECT-compatible file.
 
 *Uses:*
 
@@ -41,7 +43,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import fsolve, brentq
 from scipy.integrate import odeint
 from scipy.interpolate import UnivariateSpline
@@ -51,6 +52,31 @@ from burnman.utils.math import interp_smoothed_array_and_derivatives
 
 
 if __name__ == "__main__":
+    # BEGIN USER INPUTS
+
+    # Declare the rock we want to use
+    rock = burnman.PerplexMaterial("../../burnman/data/input_perplex/in23_1.tab")
+
+    # Declare name of output file
+    outfile = "ASPECT_1D_isentrope_properties.txt"
+
+    # First we calculate the isentrope at a given potential temperature
+    potential_temperature = 1550.0  # K
+    max_pressure = 25.0e9
+    outer_radius = 6371.0e3
+    surface_gravity = 9.81
+
+    n_P_gridpoints = 501
+    n_T_gridpoints = 101
+
+    n_points = 301
+
+    pressure_std_dev = 5.0e8
+    temperature_smoothing_factor = 0.5
+    truncate = 4.0
+
+    # END USER INPUTS
+
     #  Define fitting function to find the temperature along the isentrope
     def isentrope(rock, pressures, entropy, T_guess):
         def _deltaS(T, S, P, rock):
@@ -113,28 +139,6 @@ if __name__ == "__main__":
             gravity = gravity / radii / radii
         return depths, gravity
 
-    # BEGIN USER INPUTS
-
-    # Declare the rock we want to use
-    rock = burnman.PerplexMaterial("../burnman/data/input_perplex/in23_1.tab")
-
-    # First we calculate the isentrope at a given potential temperature
-    potential_temperature = 1550.0  # K
-    max_pressure = 25.0e9
-    outer_radius = 6371.0e3
-    surface_gravity = 9.81
-
-    n_P_gridpoints = 501
-    n_T_gridpoints = 101
-
-    n_points = 301
-
-    pressure_std_dev = 5.0e8
-    temperature_smoothing_factor = 0.5
-    truncate = 4.0
-
-    # END USER INPUTS
-
     min_grid_pressure = rock.bounds[0][0]
     max_grid_pressure = rock.bounds[0][1]
     min_grid_temperature = rock.bounds[1][0]
@@ -176,50 +180,6 @@ if __name__ == "__main__":
     )
 
     x = pressures / 1.0e9
-
-    plt.rcParams["figure.figsize"] = 16, 8  # inches
-    fig = plt.figure()
-    ax_T = fig.add_subplot(2, 4, 1)
-    ax_T.plot(x, temperatures, label="unrelaxed")
-    ax_T.set_ylabel("Temperature (K)")
-    ax_T.set_xlabel("Pressures (GPa)")
-
-    ax_z = fig.add_subplot(2, 4, 2)
-    ax_z.plot(x, depths / 1.0e3)
-    ax_z.set_ylabel("Depths (km)")
-    ax_z.set_xlabel("Pressures (GPa)")
-
-    ax_g = fig.add_subplot(2, 4, 3)
-    ax_g.plot(x, gravity)
-    ax_g.set_ylabel("Gravity (m/s^2)")
-    ax_g.set_xlabel("Pressures (GPa)")
-
-    ax_rho = fig.add_subplot(2, 4, 4)
-    ax_rho.plot(x, densities)
-    ax_rho.set_ylabel("Density (kg/m^3)")
-    ax_rho.set_xlabel("Pressures (GPa)")
-
-    ax_cp = fig.add_subplot(2, 4, 5)
-    ax_cp.plot(x, specific_heats)
-    ax_cp.set_ylabel("Cp (J/K/kg)")
-    ax_cp.set_xlabel("Pressures (GPa)")
-
-    ax_alpha = fig.add_subplot(2, 4, 6)
-    ax_alpha.plot(x, alphas)
-    ax_alpha.set_ylabel("alpha (/K)")
-    ax_alpha.set_xlabel("Pressures (GPa)")
-
-    ax_beta = fig.add_subplot(2, 4, 7)
-    ax_beta.plot(x, compressibilities)
-    ax_beta.set_ylabel("compressibilities (/Pa)")
-    ax_beta.set_xlabel("Pressures (GPa)")
-
-    ax_vs = fig.add_subplot(2, 4, 8)
-    ax_vs.plot(x, p_wave_velocities, label="P")
-    ax_vs.plot(x, s_wave_velocities, label="S")
-    ax_vs.legend(loc="upper left")
-    ax_vs.set_ylabel("Velocities (km/s)")
-    ax_vs.set_xlabel("Pressures (GPa)")
 
     # Now let's calculate some relaxed material properties.
     # These are commonly used in geodynamic simulations, because
@@ -340,42 +300,56 @@ if __name__ == "__main__":
         alphas_relaxed = dVdT / volumes
         compressibilities_relaxed = -dVdP / volumes
 
-        print(
-            "Min and max relaxed property when pressure smoothing standard deviation is {0:.2f} GPa".format(
-                pressure_stdev / 1.0e9
-            )
-        )
-        print(
-            "Specific heat: {0:.2e}, {1:.2e}".format(
-                np.min(specific_heats_relaxed), np.max(specific_heats_relaxed)
-            )
-        )
-        print(
-            "Thermal expansivity: {0:.2e}, {1:.2e}".format(
-                np.min(alphas_relaxed), np.max(alphas_relaxed)
-            )
-        )
-        print(
-            "Compressibilities: {0:.2e}, {1:.2e}\n".format(
-                np.min(compressibilities_relaxed), np.max(compressibilities_relaxed)
-            )
-        )
+    # Convert to equal slices in depth
+    p_spline = UnivariateSpline(depths, pressures)
+    depths_eq = np.linspace(depths[0], depths[-1], n_points)
+    pressures_eq = p_spline(depths_eq)
+    smoothed_temperatures = np.interp(pressures_eq, pressures, smoothed_temperatures)
+    densities = np.interp(pressures_eq, pressures, densities)
+    gravity = np.interp(pressures_eq, pressures, gravity)
+    alphas_relaxed = np.interp(pressures_eq, pressures, alphas_relaxed)
+    specific_heats_relaxed = np.interp(pressures_eq, pressures, specific_heats_relaxed)
+    compressibilities_relaxed = np.interp(
+        pressures_eq, pressures, compressibilities_relaxed
+    )
+    Vss = np.interp(pressures_eq, pressures, Vss)
+    Vps = np.interp(pressures_eq, pressures, Vps)
+    dVsdT = np.interp(pressures_eq, pressures, dVsdT)
+    dVpdT = np.interp(pressures_eq, pressures, dVpdT)
 
-        ax_T.plot(
-            x,
+    # Finally, output smoothed, relaxed properties for use in ASPECT
+    # depth, pressure, temperature, density, gravity, Cp (per kilo), thermal expansivity.
+
+    header = (
+        "# This ASPECT-compatible file contains material properties "
+        "calculated along an isentrope by the BurnMan software.\n"
+        f"# POINTS: {n_points}\n"
+        "# depth (m), pressure (Pa), temperature (K), density (kg/m^3), "
+        "gravity (m/s^2), thermal expansivity (1/K), "
+        "specific heat (J/K/kg), compressibility (1/Pa), "
+        "seismic Vs (m/s), seismic Vp (m/s), "
+        "seismic dVs/dT (m/s/K), seismic dVp/dT (m/s/K)\n"
+        "depth\tpressure\ttemperature\tdensity\tgravity\t"
+        "thermal_expansivity\tspecific_heat\tcompressibility\t"
+        "seismic_Vs\tseismic_Vp\tseismic_dVs_dT\tseismic_dVp_dT"
+    )
+    X = np.array(
+        [
+            depths_eq,
+            pressures_eq,
             smoothed_temperatures,
-            label="relaxed, smoothed (P_sd: {0:.1f} GPa)".format(
-                pressure_stdev / 1.0e9
-            ),
-        )
-        ax_z.plot(x, depths / 1.0e3)
-        ax_g.plot(x, gravity)
-        ax_rho.plot(x, densities)
-        ax_cp.plot(x, specific_heats_relaxed)
-        ax_alpha.plot(x, alphas_relaxed)
-        ax_beta.plot(x, compressibilities_relaxed)
+            densities,
+            gravity,
+            alphas_relaxed,
+            specific_heats_relaxed,
+            compressibilities_relaxed,
+            Vss,
+            Vps,
+            dVsdT,
+            dVpdT,
+        ]
+    ).T
 
-    ax_T.legend(loc="upper left")
-    fig.set_layout_engine("tight")
+    np.savetxt(outfile, X=X, header=header, fmt="%.10e", delimiter="\t", comments="")
 
-    plt.show()
+    print(f"ASPECT compatible table created and saved to {outfile}.")

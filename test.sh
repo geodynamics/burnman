@@ -159,8 +159,6 @@ do
     [ $test == "burnman_path.py" ] && continue
     [ $test == "gen_doc.py" ] && echo "  *** skipping $test !" && continue
     [ $test == "table_mineral_library.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "create_burnman_readable_perplex_table.py" ] && echo "  *** skipping $test !" && continue
-    [ $test == "create_burnman_readable_perplex_table_v6.py" ] && echo "  *** skipping $test !" && continue
 
     testit $test $fulldir || exit 1
 done
@@ -201,6 +199,15 @@ echo "*** checking contrib/solution_polytope/ ..."
 cd contrib/solution_polytope/
 testit create_polytope_paper_tables.py $fulldir || exit 1
 testit example_solution_creation_and_manipulation.py $fulldir || exit 1
+cd ../..
+echo ""
+
+echo "*** checking contrib/perplex/ ..."
+cd contrib/perplex/
+./download_and_install_perplex.sh
+testit create_lo_res_table.py $fulldir || exit 1
+testit read_lo_res_table.py $fulldir || exit 1
+testit generate_aspect_compatible_1D_adiabat_table.py $fulldir || exit 1
 cd ../..
 echo ""
 
