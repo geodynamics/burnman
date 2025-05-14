@@ -205,6 +205,7 @@ echo ""
 echo "*** checking contrib/perplex/ ..."
 cd contrib/perplex/
 ./download_and_install_perplex.sh
+rm -fr iron_olivine_lo_res
 testit create_lo_res_table.py $fulldir || exit 1
 testit read_lo_res_table.py $fulldir || exit 1
 testit generate_aspect_compatible_1D_adiabat_table.py $fulldir || exit 1

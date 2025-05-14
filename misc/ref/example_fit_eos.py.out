@@ -1,13 +1,13 @@
 Least squares equation of state fitting
 
-1) Fitting to room temperature PV data
+1) Fitting to stishovite room temperature PV data
 
 Optimized equation of state for stishovite:
-V_0: (1.4003 +/- 0.0009) x 1e-05
-K_0: (3.19 +/- 0.09) x 1e+11
-Kprime_0: (3.9 +/- 0.5) x 1e+00
+V_0: (1.4005 +/- 0.0001) x 1e-05
+K_0: (3.12 +/- 0.03) x 1e+11
+Kprime_0: (4.4 +/- 0.2) x 1e+00
 
-2) Fitting to high pressure PTV data only
+2) Fitting to periclase high pressure PTV data only
 
 Optimized equation of state:
 V_0: (1.1232 +/- 0.0004) x 1e-05
@@ -16,11 +16,14 @@ Kprime_0: (4.4 +/- 0.4) x 1e+00
 grueneisen_0: (1.9 +/- 0.2) x 1e+00
 q_0: (3.9 +/- 0.9) x 1e+00
 
+Goodness of fit:
+1.2212890225970556
+
 Fitting an equation of state using only high pressure P-T-V data can produce some surprising (incorrect) thermodynamic predictions. We must use additional data to provide strong constraints on all parameters. In this case, we would like to improve our constraints on grueneisen_0 and q_0.
 
 How should we improve on this "optimal" PVT fit?
 
-2) Fitting to PTV *and* PT-enthalpy data
+3) Fitting to periclase PTV *and* PT-enthalpy data
 
 Optimized equation of state:
 V_0: (1.1237 +/- 0.0002) x 1e-05
@@ -30,6 +33,9 @@ grueneisen_0: (1.40 +/- 0.03) x 1e+00
 q_0: (-3 +/- 4) x 1e-01
 Debye_0: (7.8 +/- 0.1) x 1e+02
 F_0: (-6.9 +/- 0.2) x 1e+03
+
+Goodness of fit:
+1.3184129992486777
 
 Hmmm, looks promising. The heat capacities don't blow up any more. Let's check the new weighted residuals...
 
@@ -52,7 +58,7 @@ Debye_0: (7.75 +/- 0.05) x 1e+02
 F_0: (-7.00 +/- 0.09) x 1e+03
 
 Goodness of fit:
-0.320602656406
+0.3206021030322475
 
 
 Hurrah! That looks much better! The patches of positive and negative weighted residuals in P-T space have completely disappeared, and the weighted residuals are now distributed more evenly about zero. The uncertainties on all the parameters have got much smaller, and several have moved outside the previous 1-s.d. uncertainty bounds. Cool, huh?! Let's finish this example by looking at some pretty plots characterising our optimised equation of state.

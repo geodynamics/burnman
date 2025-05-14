@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman.optimize.eos_fitting import fit_XPTp_data
-from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
+from burnman.optimize.nonlinear_fitting import (
+    NonLinearModel,
+    nonlinear_least_squares_fit,
+)
 from burnman.utils.misc import attribute_function, pretty_string_values
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 
@@ -24,7 +27,7 @@ class test_fitting(BurnManTest):
         data = np.array([x, y]).T
         cov = np.array([[1.0 / Wx, 0.0 * Wx], [0.0 * Wy, 1.0 / Wy]]).T
 
-        class m:
+        class m(NonLinearModel):
             def __init__(self, data, cov, guessed_params, delta_params):
                 self.data = data
                 self.data_covariances = cov
@@ -63,7 +66,7 @@ class test_fitting(BurnManTest):
         data = np.array([x, y]).T
         cov = np.array([[1.0 / Wx, 0.0 * Wx], [0.0 * Wy, 1.0 / Wy]]).T
 
-        class m:
+        class m(NonLinearModel):
             def __init__(self, data, cov, guessed_params, delta_params):
                 self.data = data
                 self.data_covariances = cov
@@ -119,6 +122,35 @@ class test_fitting(BurnManTest):
 
         params = ["V_0", "K_0", "Kprime_0"]
         fitted_eos = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
+        zeros = np.zeros_like(fitted_eos.pcov[0])
+
+        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
+
+    def test_fit_PVT_data_w_priors(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        PTV = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            PTV[i] = [pressures[i], temperatures[i], fo.V]
+
+        params = ["V_0", "K_0", "Kprime_0"]
+        priors = [fo.params["V_0"], fo.params["K_0"], fo.params["Kprime_0"]]
+        invcov = np.linalg.inv(
+            np.diag(np.power(np.array([fo.params["V_0"] / 10.0, 1.0e9, 1.0]), 2.0))
+        )
+        fitted_eos = burnman.eos_fitting.fit_PTV_data(
+            fo,
+            params,
+            PTV,
+            param_priors=priors,
+            param_prior_inv_cov_matrix=invcov,
+            verbose=False,
+        )
         zeros = np.zeros_like(fitted_eos.pcov[0])
 
         self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
@@ -237,7 +269,14 @@ class test_fitting(BurnManTest):
         flags = np.array(flags)
         delta_params = np.array([1.0e-8, 1.0e-8, 1.0e-8])
         bounds = np.array([[0, np.inf], [0, np.inf], [-np.inf, np.inf]])
-
+        priors = np.array(
+            [
+                solution.endmembers[0][0].params["V_0"],
+                solution.endmembers[1][0].params["V_0"],
+                0.0,
+            ]
+        )
+        invcov = np.linalg.inv(np.diag(np.array([1.0e-7, 1.0e-7, 1.0e-7])))
         fitted_eos = fit_XPTp_data(
             solution=solution,
             flags=flags,
@@ -247,6 +286,8 @@ class test_fitting(BurnManTest):
             delta_params=delta_params,
             bounds=bounds,
             param_tolerance=1.0e-5,
+            param_priors=priors,
+            param_prior_inv_cov_matrix=invcov,
             verbose=False,
         )
 

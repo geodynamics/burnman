@@ -34,7 +34,7 @@ from burnman.utils.misc import pretty_print_values
 if __name__ == "__main__":
     print("Least squares equation of state fitting\n")
 
-    print("1) Fitting to room temperature PV data\n")
+    print("1) Fitting to stishovite room temperature PV data\n")
     # Now let's fit some EoS data
     # Let's just take a bit of data from Andrault et al. (2003) on stishovite
     PV = np.array(
@@ -66,22 +66,28 @@ if __name__ == "__main__":
         ]
     )
 
+    Z = 2.0  # number of formula units per unit cell in stishovite
     PTV = np.array(
         [
-            PV.T[0] * 1.0e9,
-            PV.T[0] * 0.0 + 298.15,
-            molar_volume_from_unit_cell_volume(PV.T[1], 2.0),
+            PV[:, 0] * 1.0e9,
+            298.15 * np.ones_like(PV[:, 0]),
+            molar_volume_from_unit_cell_volume(PV[:, 1], Z),
         ]
     ).T
 
-    nul = 0.0 * PTV.T[0]
+    # Here, we assume that the pressure uncertainties are equal to 3% of the total pressure,
+    # that the temperature uncertainties are negligible, and take the unit cell volume
+    # uncertainties from the paper.
+    # We also assume that the uncertainties in pressure and volume are uncorrelated.
+    nul = np.zeros_like(PTV[:, 0])
     PTV_covariances = np.array(
         [
-            [0.03 * PTV.T[0], nul, nul],
+            [0.03 * PTV[:, 0], nul, nul],
             [nul, nul, nul],
-            [nul, nul, molar_volume_from_unit_cell_volume(PV.T[2], 2.0)],
+            [nul, nul, molar_volume_from_unit_cell_volume(PV[:, 2], Z)],
         ]
     ).T
+    PTV_covariances = np.power(PTV_covariances, 2.0)
 
     # Here's where we fit the data
     # The mineral parameters are automatically updated during fitting
@@ -144,8 +150,8 @@ if __name__ == "__main__":
     plt.errorbar(
         PTV[:, 0] / 1.0e9,
         PTV[:, 2] * 1.0e6,
-        xerr=PTV_covariances.T[0][0] / 1.0e9,
-        yerr=PTV_covariances.T[2][2] * 1.0e6,
+        xerr=np.sqrt(PTV_covariances.T[0][0]) / 1.0e9,
+        yerr=np.sqrt(PTV_covariances.T[2][2]) * 1.0e6,
         linestyle="None",
         marker="o",
         label="Andrault et al. (2003)",
@@ -185,7 +191,7 @@ if __name__ == "__main__":
     plt.title("Stishovite EoS; uncertainty in bulk modulus (room temperature)")
     plt.show()
 
-    print("2) Fitting to high pressure PTV data only\n")
+    print("2) Fitting to periclase high pressure PTV data only\n")
 
     # First, let's read in the PVT equation of state data for MgO from Dewaele et al., (2000).
     (
@@ -233,6 +239,8 @@ if __name__ == "__main__":
     # Print the optimized parameters
     print("Optimized equation of state:")
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    print("\nGoodness of fit:")
+    print(fitted_eos.goodness_of_fit)
     print("")
 
     # Create a corner plot of the covariances
@@ -300,7 +308,7 @@ if __name__ == "__main__":
 
     # 2) Now let's be a bit more exotic and fit enthalpy *and* PVT data together
 
-    print("2) Fitting to PTV *and* PT-enthalpy data\n")
+    print("3) Fitting to periclase PTV *and* PT-enthalpy data\n")
 
     # Create the mineral instance that we'll optimise
     per_opt = burnman.minerals.SLB_2011.periclase()
@@ -377,6 +385,8 @@ if __name__ == "__main__":
     # Print the optimized parameters
     print("Optimized equation of state:")
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
+    print("\nGoodness of fit:")
+    print(fitted_eos.goodness_of_fit)
     print("")
 
     # Create a corner plot of the covariances
