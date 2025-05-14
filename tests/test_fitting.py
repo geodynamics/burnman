@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman.optimize.eos_fitting import fit_XPTp_data
-from burnman.optimize.nonlinear_fitting import nonlinear_least_squares_fit
+from burnman.optimize.nonlinear_fitting import (
+    NonLinearModel,
+    nonlinear_least_squares_fit,
+)
 from burnman.utils.misc import attribute_function, pretty_string_values
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 
@@ -24,7 +27,7 @@ class test_fitting(BurnManTest):
         data = np.array([x, y]).T
         cov = np.array([[1.0 / Wx, 0.0 * Wx], [0.0 * Wy, 1.0 / Wy]]).T
 
-        class m:
+        class m(NonLinearModel):
             def __init__(self, data, cov, guessed_params, delta_params):
                 self.data = data
                 self.data_covariances = cov
@@ -63,7 +66,7 @@ class test_fitting(BurnManTest):
         data = np.array([x, y]).T
         cov = np.array([[1.0 / Wx, 0.0 * Wx], [0.0 * Wy, 1.0 / Wy]]).T
 
-        class m:
+        class m(NonLinearModel):
             def __init__(self, data, cov, guessed_params, delta_params):
                 self.data = data
                 self.data_covariances = cov
