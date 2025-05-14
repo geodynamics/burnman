@@ -1,13 +1,12 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 from __future__ import absolute_import
 
 import numpy as np
 from copy import deepcopy
-from collections import namedtuple
 from .linear_fitting import weighted_constrained_least_squares
 from ..utils.chemistry import dictionarize_formula
 from ..utils.chemistry import process_solution_chemistry
@@ -16,9 +15,10 @@ from ..classes.solution import Solution
 
 class DummyCompositionSolution(Solution):
     """
-    This is a dummy base class for a solution object to
-    facilitate composition fitting when no solution model has
-    been prepared. The model is initialized with appropriate
+    A mock Solution class to enable compositional fitting when no thermodynamic
+    model is available. Useful for pure composition analysis.
+
+    The model is initialized with appropriate
     chemical formulae for each endmember, and can do all basic
     compositional processing that doesn't involve any material
     properties.
@@ -51,10 +51,8 @@ def fit_composition_to_solution(
     normalize=True,
 ):
     """
-    Takes a Solution object and a set of variable names and
-    associates values and covariances and finds the molar fractions of the
-    solution which provide the best fit (in a least-squares sense)
-    to the variable values.
+    Fit a set of molar fractions to a solution model that best matches
+    observed compositional variables (in a least-squares sense).
 
     The fitting applies appropriate non-negativity constraints
     (i.e. no species can have a negative occupancy on a site).
@@ -83,13 +81,21 @@ def fit_composition_to_solution(
         would impose a constraint that the amount of Mg would be equal on
         the first and second site in the solution.
     :type variable_conversions: dict of dict, or None
+    :param normalize: Whether to normalize the molar fractions to sum to one.
+    :type normalize: bool, default=True
 
-    :param normalize: If True, normalizes the optimized molar fractions to sum to unity.
-    :type normalize: bool
-
-    :returns: Optimized molar fractions, corresponding covariance matrix and the
-        weighted residual.
+    :returns: (molar_fractions, covariance_matrix, weighted_residual)
+             - molar_fractions: Optimized molar fractions of endmembers.
+             - covariance_matrix: Covariance matrix of the optimized fractions,
+                                  computed from the pseudo-inverse of the weighted design matrix.
+             - weighted_residual: The weighted residual of the fit, calculated as the
+                                  square root of the weighted sum of squared differences
+                                  between observed and modeled variables.
     :rtype: tuple of 1D numpy.array, 2D numpy.array and float
+
+    .. seealso::
+        :func:`burnman.optimize.linear_fitting.weighted_constrained_least_squares` -
+        Performs the weighted constrained least squares optimization used internally.
     """
 
     solution_variables = deepcopy(solution.elements)
@@ -170,8 +176,8 @@ def fit_composition_to_solution(
 
 def fit_phase_proportions_to_bulk_composition(phase_compositions, bulk_composition):
     """
-    Performs weighted constrained least squares on a set of phase compositions
-    to find the amount of those phases that best-fits a given bulk composition.
+    Determine the proportions of phases that best fit a given bulk composition
+    (in a weighted constrained least squares sense).
 
     The fitting applies appropriate non-negativity constraints
     (i.e. no phase can have a negative abundance in the bulk).
@@ -184,9 +190,18 @@ def fit_phase_proportions_to_bulk_composition(phase_compositions, bulk_compositi
         Must be in the same units as the phase compositions.
     :type bulk_composition: numpy.array
 
-    :returns: Optimized molar fractions, corresponding covariance matrix and the
-        weighted residual.
+    :returns: (phase_proportions, covariance_matrix, weighted_residual)
+             - phase_proportions: Optimized proportions of each phase.
+             - covariance_matrix: Covariance matrix of the optimized phase proportions,
+                                  computed from the pseudo-inverse of the weighted design matrix.
+             - weighted_residual: The weighted residual of the fit, representing the square root
+                                  of the weighted sum of squared differences between observed
+                                  and modeled bulk compositions.
     :rtype: tuple of 1D numpy.array, 2D numpy.array and float
+
+    .. seealso::
+        :func:`burnman.optimize.linear_fitting.weighted_constrained_least_squares` -
+        Performs the weighted constrained least squares optimization used internally.
     """
 
     n_phases = len(phase_compositions[0])
