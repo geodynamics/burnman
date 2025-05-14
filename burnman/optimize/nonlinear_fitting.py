@@ -6,6 +6,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+from abc import ABC, abstractmethod
 import numpy as np
 from scipy.stats import t, norm, genextreme
 import copy
@@ -16,8 +17,207 @@ import matplotlib.colors as colors
 from matplotlib.patches import Ellipse
 
 
+class NonLinearModel(ABC):
+    """
+    Abstract base class that defines the required interface
+    for models used in nonlinear least squares fitting. Models must support
+    evaluation, normal vector computation, and parameter handling.
+    """
+
+    @abstractmethod
+    def get_params(self):
+        """
+        :returns: Current model parameters as a NumPy array.
+        :rtype: numpy.ndarray
+        """
+        raise NotImplementedError("get_params() must be implemented by subclass")
+
+    @abstractmethod
+    def set_params(self, param_values):
+        """
+        :param param_values: Parameter values to set.
+        :type param_values: numpy.ndarray
+        """
+        raise NotImplementedError("set_params() must be implemented by subclass")
+
+    @abstractmethod
+    def function(self, x, flag=None):
+        """
+        :param x: Input coordinates.
+        :type x: numpy.ndarray
+
+        :param flag: Optional argument to control evaluation mode.
+        :type flag: any
+
+        :returns: Model output.
+        :rtype: numpy.ndarray
+        """
+        raise NotImplementedError("function() must be implemented by subclass")
+
+    @abstractmethod
+    def normal(self, x, flag=None):
+        """
+        :param x: Input coordinates.
+        :type x: numpy.ndarray
+
+        :param flag: Optional argument to control evaluation mode.
+        :type flag: any
+
+        :returns: Normal vector.
+        :rtype: numpy.ndarray
+        """
+        raise NotImplementedError("normal() must be implemented by subclass")
+
+    def validate(self):
+        """
+        Ensure that all required model attributes are present before fitting.
+        These include observed data, data covariance matrices, convergence
+        tolerances for MLE projections, and finite difference step sizes.
+
+        :raises AssertionError: If required attributes are missing.
+        """
+        assert hasattr(self, "data")
+        assert hasattr(self, "data_covariances")
+        assert hasattr(self, "mle_tolerances")
+        assert hasattr(self, "delta_params")
+
+
+def abs_line_project(M, n):
+    """
+    Project a covariance matrix M onto a unit direction vector n.
+    This gives the variance of the distribution in the direction n.
+
+    :param M: Covariance matrix.
+    :type M: numpy.ndarray
+
+    :param n: Direction vector.
+    :type n: numpy.ndarray
+
+    :returns: Projected variance.
+    :rtype: float
+    """
+    n = unit_normalize(n)
+    return n.dot(M).dot(n.T)
+
+
+def mle_estimate(model, x, x_m, cov, flag):
+    """
+    Find an approximation to the maximum likelihood estimate
+    of a point on the model surface corresponding to
+    noisy observation x, under Gaussian noise with covariance
+    cov, given a starting estimate on the model surface x_m.
+
+    This approximation is the orthogonal projection of x
+    onto the local tangent plane of the model surface,
+    as determined using the Mahalanobis metric defined by cov.
+
+    :param model: Model object.
+    :type model: NonLinearModel
+
+    :param x: Observed data point.
+    :type x: numpy.ndarray
+
+    :param x_m: Initial guess on the model surface.
+    :type x_m: numpy.ndarray
+
+    :param cov: Covariance matrix.
+    :type cov: numpy.ndarray
+
+    :param flag: Optional flag for evaluation.
+    :type flag: any
+
+    :returns: Tuple containing MLE position, residual, and projected variance.
+    :rtype: tuple(numpy.ndarray, float, float)
+    """
+    # Find the local tangent plane to the model surface.
+    n = model.normal(x_m, flag)
+
+    # Signed distance from x to the local tangent plane of
+    # the model surface at x_m in the direction of the
+    # normal vector n.
+    d = (x_m - x).dot(n)
+
+    # Project the covariance matrix M onto the normal
+    # to the local tangent plane n.
+    var_n = abs_line_project(cov, n)
+    x_mle = x + (d / var_n) * cov.dot(n)
+    return x_mle, d, var_n
+
+
+def find_mle(model):
+    """
+    Find the maximum likelihood point for
+    each datum given the current model parameters.
+
+    This is done iteratively using the function mle_estimate.
+
+    :param model: Model object with required attributes.
+    :type model: FittableModel
+
+    :returns: MLE data positions, weighted residuals, and weights.
+    :rtype: tuple(numpy.ndarray, numpy.ndarray, numpy.ndarray)
+    """
+    x_mle_arr = np.empty_like(model.data)
+    residual_arr = np.empty(len(model.data))
+    var_arr = np.empty(len(model.data))
+
+    # For each datum, iterate over the MLE estimates until the
+    # global minimum is found.
+    for i, (x, cov, flag) in enumerate(
+        zip(model.data, model.data_covariances, model.flags)
+    ):
+        x_mle_arr[i] = model.function(x, flag)
+        x_mle_est, residual_arr[i], var_arr[i] = mle_estimate(
+            model, x, x_mle_arr[i], cov, flag
+        )
+        delta_x = x_mle_arr[i] - x
+        while np.linalg.norm(delta_x) > model.mle_tolerances[i]:
+            x_mle_est, residual_arr[i], var_arr[i] = mle_estimate(
+                model, x, x_mle_arr[i], cov, flag
+            )
+            x_mle_arr[i] = model.function(x_mle_est, flag)
+            delta_x = x_mle_arr[i] - x_mle_est
+    return x_mle_arr, residual_arr / np.sqrt(var_arr), 1.0 / var_arr
+
+
+def calculate_jacobian(model):
+    """
+    Compute the Jacobian matrix of weighted residuals with respect
+    to model parameters using central finite differences.
+
+    :param model: Model object.
+    :type model: FittableModel
+
+    :modifies: model.jacobian — Populated with partial derivatives.
+    """
+    n_data = len(model.data)
+    n_params = len(model.get_params())
+    model.jacobian = np.empty((n_data, n_params))
+    diag_delta = np.diag(model.delta_params)
+    param_values = model.get_params()
+
+    # Get d (weighted residual) / d parameter by numerical differences
+    for i in range(n_params):
+        model.set_params(param_values - diag_delta[i])
+        _, res_0, _ = find_mle(model)
+
+        model.set_params(param_values + diag_delta[i])
+        _, res_1, _ = find_mle(model)
+
+        model.jacobian[:, i] = (res_1 - res_0) / (2.0 * diag_delta[i][i])
+
+    # Reset parameter values
+    model.set_params(param_values)
+
+
 def nonlinear_least_squares_fit(
-    model, lm_damping=0.0, param_tolerance=1.0e-7, max_lm_iterations=100, verbose=False
+    model,
+    lm_damping=0.0,
+    param_tolerance=1.0e-7,
+    max_lm_iterations=100,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
+    verbose=False,
 ):
     """
     Function to compute the "best-fit" parameters for a model
@@ -27,26 +227,28 @@ def nonlinear_least_squares_fit(
     Section 23.1 of Bayesian Probability Theory
     (von der Linden et al., 2014; Cambridge University Press).
 
-    Parameters
-    ----------
-    :param model: Model containing data to be fit, and functions to
-        aid in fitting.
-    :type model: object
+    :param model: Model with fitting interface.
+    :type model: FittableModel
 
-    :param lm_damping: Levenberg-Marquardt parameter for least squares minimization.
+    :param lm_damping: Damping factor for Levenberg-Marquardt updates.
     :type lm_damping: float
 
-    :param param_tolerance: Levenberg-Marquardt iterations are terminated when
-        the maximum fractional change in any of the parameters
-        during an iteration drops below this value
+    :param param_tolerance: Convergence tolerance based on fractional parameter change.
     :type param_tolerance: float
 
-
-    :param max_lm_iterations: Maximum number of Levenberg-Marquardt iterations
+    :param max_lm_iterations: Maximum number of LM iterations.
     :type max_lm_iterations: int
 
-    :param verbose: Print some information to standard output
+    :param param_priors: Prior values for the parameters.
+    :type param_priors: 1D numpy array
+
+    :param param_prior_inv_cov_matrix: Inverse of the 1 sigma uncertainties for the prior values of the parameters.
+    :type param_prior_inv_cov_matrix: 2D numpy array (square)
+
+    :param verbose: If True, print iteration status.
     :type verbose: bool
+
+    :modifies: model — Sets optimized parameters, covariance matrix, weighted residuals, Jacobian, and noise estimates.
 
     .. note:: The object passed as model must have the following attributes:
         * data [2D numpy.array] - Elements of x[i][j] contain the
@@ -79,69 +281,49 @@ def nonlinear_least_squares_fit(
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
+    model.validate()
+    n_data = len(model.data)
+    n_params = len(model.get_params())
+    model.dof = n_data - n_params
 
-    def _mle_estimate(x, x_m, cov, flag):
-        n = model.normal(x_m, flag)
-        var_n = abs_line_project(cov, n)
-        d = (x_m - x).dot(n)
-        x_mle = x + d * ((n.dot(cov)).T) / var_n
-        return x_mle, d, var_n
+    if not hasattr(model, "flags"):
+        model.flags = [None] * n_data
 
-    def _find_mle():
-        x_mle_arr = np.empty_like(model.data)
-        residual_arr = np.empty(n_data)
-        var_arr = np.empty(n_data)
-        for i, (x, cov, flag) in enumerate(
-            zip(*[model.data, model.data_covariances, model.flags])
-        ):
-            x_mle_arr[i] = model.function(x, flag)
-            x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(
-                x, x_mle_arr[i], cov, flag
-            )
-            delta_x = x_mle_arr[i] - x
-
-            while np.linalg.norm(delta_x) > model.mle_tolerances[i]:
-                x_mle_est, residual_arr[i], var_arr[i] = _mle_estimate(
-                    x, x_mle_arr[i], cov, flag
-                )
-                x_mle_arr[i] = model.function(x_mle_est, flag)
-                delta_x = x_mle_arr[i] - x_mle_est
-
-        return x_mle_arr, residual_arr / np.sqrt(var_arr), 1.0 / var_arr
-
-    def calculate_jacobian():
-        model.jacobian = np.empty((n_data, n_params))
-        diag_delta = np.diag(model.delta_params)
-        param_values = model.get_params()
-        for prm_i, value in enumerate(param_values):
-            model.set_params(param_values - diag_delta[prm_i])
-            x_mle_arr, residual_arr_0, weights_0 = _find_mle()
-
-            model.set_params(param_values + diag_delta[prm_i])
-            x_mle_arr, residual_arr_1, weights_1 = _find_mle()
-
-            model.jacobian[:, prm_i] = (residual_arr_1 - residual_arr_0) / (
-                2.0 * diag_delta[prm_i][prm_i]
-            )
-        model.set_params(param_values)  # reset params
+    with_param_priors = False
+    if param_priors is not None and param_prior_inv_cov_matrix is not None:
+        assert len(param_priors) == n_params
+        assert param_prior_inv_cov_matrix.shape == (n_params, n_params)
+        with_param_priors = True
 
     def _update_beta(lmbda):
-        # Performs a Levenberg-Marquardt iteration
-        # Note that if lambda = 0, this is a simple Gauss-Newton iteration
-        calculate_jacobian()
-        model.data_mle, model.weighted_residuals, model.weights = _find_mle()
+        # Performs a single Levenberg-Marquardt iteration
+        # Step 1: Compute Jacobian matrix of weighted residuals
+        # Note that if lmbda = 0, this is a simple Gauss-Newton iteration
+        calculate_jacobian(model)
 
-        J = model.jacobian  # this the weighted Jacobian
-        JTJ = J.T.dot(J)
-        delta_beta = (
-            np.linalg.inv(JTJ + lmbda * np.diag(JTJ))
-            .dot(J.T)
-            .dot(model.weighted_residuals)
-        )
-        old_params = np.copy(model.get_params())
-        new_params = old_params - delta_beta
-        # f_delta_beta = delta_beta/new_params
+        # Step 2: Compute MLE projections and residuals given the current
+        # parameters (does not update parameter values)
+        model.data_mle, model.weighted_residuals, model.weights = find_mle(model)
 
+        # Step 2: Build data terms
+        current_params = model.get_params()
+        J = model.jacobian  # d weighted residuals / d params
+        r = model.weighted_residuals
+        JTJ = J.T @ J
+        JTr = J.T @ r
+
+        # Step 3: Add Gaussian prior if defined
+        if with_param_priors:
+            prior_residual = current_params - param_priors
+            JTJ += param_prior_inv_cov_matrix
+            JTr += param_prior_inv_cov_matrix @ prior_residual
+
+        # Step 4: Apply Levenberg-Marquardt update rule
+        A = JTJ + lmbda * np.diag(np.diag(JTJ))
+        delta_beta = np.linalg.solve(A, JTr)
+
+        # Step 5: Update parameters and compute fractional change
+        new_params = current_params - delta_beta
         model.set_params(new_params)
 
         # set_params may modify the step to satisfy bounds on the problem
@@ -154,54 +336,40 @@ def nonlinear_least_squares_fit(
         mod_params = np.where(
             np.abs(new_params) < param_tolerance, param_tolerance, new_params
         )
-        f_delta_beta = (old_params - new_params) / mod_params
-        return f_delta_beta
-
-    n_data = len(model.data)
-    params = model.get_params()
-    n_params = len(params)
-    model.dof = n_data - n_params
-
-    if not hasattr(model, "flags"):
-        model.flags = [None] * n_data
+        return (current_params - new_params) / mod_params
 
     for n_it in range(max_lm_iterations):
         # update the parameters with a LM iteration
         f_delta_beta = _update_beta(lm_damping)
         max_f = np.max(np.abs(f_delta_beta))
-        if verbose is True:
-            print(
-                "Iteration {0:d}: {1}. Max change in param: {2}".format(
-                    n_it, model.get_params(), max_f
-                )
-            )
+        if verbose:
+            print(f"Iteration {n_it}: max param change = {max_f:.2e}")
         if max_f < param_tolerance:
             break
 
     J = model.jacobian
     r = model.weighted_residuals
-    model.WSS = r.dot(r.T)
-
+    model.WSS = r @ r
     model.popt = model.get_params()
-    model.pcov = np.linalg.inv(J.T.dot(J)) * r.dot(r.T) / model.dof
+    JTJ = J.T @ J
 
-    # Estimate the noise variance normal to the curve
+    if with_param_priors:
+        prior_residual = model.popt - param_priors
+        model.WSS += prior_residual @ param_prior_inv_cov_matrix @ prior_residual
+        JTJ += param_prior_inv_cov_matrix
+
+    model.pcov = np.linalg.inv(JTJ) * model.WSS / model.dof
     model.goodness_of_fit = model.WSS / model.dof
-    model.noise_variance = r.dot(np.diag(1.0 / model.weights)).dot(r.T) / model.dof
+    model.noise_variance = r @ np.diag(1.0 / model.weights) @ r / model.dof
 
-    if verbose is True:
-        if n_it == max_lm_iterations - 1:
-            print(
-                f"Max iterations ({max_lm_iterations:d}) reached "
-                f"(param tolerance = {param_tolerance:1e})"
-            )
-        else:
-            print("Converged in {0:d} iterations".format(n_it))
-        print("\nOptimised parameter values:")
-        print(model.popt)
-        print("\nParameter covariance matrix:")
-        print(model.pcov)
-        print("")
+    if verbose:
+        print(
+            "Converged in {0:d} iterations"
+            if n_it < max_lm_iterations - 1
+            else f"Max iterations reached (param tolerance = {param_tolerance:1e})"
+        )
+        print("\nOptimized parameter values:\n", model.popt)
+        print("\nParameter covariance matrix:\n", model.pcov)
 
 
 def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=None):
@@ -288,11 +456,6 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     return np.array(
         [confidence_bound_0, confidence_bound_1, prediction_bound_0, prediction_bound_1]
     )
-
-
-def abs_line_project(M, n):
-    n = unit_normalize(n)
-    return n.dot(M).dot(n.T)
 
 
 def plot_cov_ellipse(cov, pos, nstd=2, ax=None, **kwargs):

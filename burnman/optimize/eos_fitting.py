@@ -11,10 +11,10 @@ import numpy as np
 from . import nonlinear_fitting
 from ..utils.misc import flatten
 from ..utils.math import unit_normalize
-from .nonlinear_fitting import nonlinear_least_squares_fit
+from .nonlinear_fitting import NonLinearModel, nonlinear_least_squares_fit
 
 
-class MineralFit(object):
+class MineralFit(NonLinearModel):
     """
     Class for fitting mineral parameters to experimental data.
     Instances of this class are passed to
@@ -119,6 +119,8 @@ def fit_PTp_data(
     delta_params=None,
     bounds=None,
     max_lm_iterations=50,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
     verbose=True,
 ):
     """
@@ -221,6 +223,8 @@ def fit_PTp_data(
         model,
         max_lm_iterations=max_lm_iterations,
         param_tolerance=param_tolerance,
+        param_priors=param_priors,
+        param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
         verbose=verbose,
     )
 
@@ -265,6 +269,8 @@ def fit_PTV_data(
     bounds=None,
     param_tolerance=1.0e-5,
     max_lm_iterations=50,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
     verbose=True,
 ):
     """
@@ -281,11 +287,13 @@ def fit_PTV_data(
         delta_params=delta_params,
         bounds=bounds,
         max_lm_iterations=max_lm_iterations,
+        param_priors=param_priors,
+        param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
         verbose=verbose,
     )
 
 
-class SolutionFit(object):
+class SolutionFit(NonLinearModel):
     """
     Class for fitting mineral parameters to experimental data.
     Instances of this class are passed to
@@ -460,6 +468,8 @@ def fit_XPTp_data(
     delta_params=None,
     bounds=None,
     max_lm_iterations=50,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
     verbose=True,
 ):
     """
@@ -570,6 +580,8 @@ def fit_XPTp_data(
         model,
         max_lm_iterations=max_lm_iterations,
         param_tolerance=param_tolerance,
+        param_priors=param_priors,
+        param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
         verbose=verbose,
     )
 
