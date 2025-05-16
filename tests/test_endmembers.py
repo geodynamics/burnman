@@ -7,6 +7,7 @@ import warnings
 import burnman
 from burnman import Mineral, CombinedMineral
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
+from burnman.tools.eos import check_eos_consistency
 
 
 class forsterite(Mineral):
@@ -136,6 +137,7 @@ class test_endmembers(BurnManTest):
         self.assertTrue(
             abs(fcc.pressure - fcc.method.pressure(500.0, fcc.V, fcc.params)) < 1000.0
         )
+        self.assertTrue(check_eos_consistency(fcc, including_shear_properties=False))
 
 
 if __name__ == "__main__":
