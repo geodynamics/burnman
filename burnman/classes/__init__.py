@@ -7,7 +7,6 @@
 BurnMan object classes
 """
 
-from __future__ import absolute_import
 
 from . import material
 from . import perplex

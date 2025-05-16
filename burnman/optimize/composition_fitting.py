@@ -3,7 +3,6 @@
 # Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
 
 import numpy as np
 from copy import deepcopy

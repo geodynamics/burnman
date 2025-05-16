@@ -6,7 +6,6 @@
 # TO DO: Correct heat capacity, volume where internal order-disorder is
 # implemented (Landau and Bragg-Williams models)
 
-from __future__ import absolute_import
 
 import numpy as np
 

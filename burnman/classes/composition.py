@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2018 by the BurnMan team, released under the GNU

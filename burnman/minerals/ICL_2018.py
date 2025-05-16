@@ -13,7 +13,7 @@ See:
 Irving, Cottaar, Lekic (2018) Seismically determined elastic parameters for the outer core, Science Advances
 
 """
-from __future__ import absolute_import
+
 
 from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral

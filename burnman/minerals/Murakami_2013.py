@@ -10,7 +10,7 @@ Murakami_2013
 Minerals from Murakami 2013 and references therein.
 
 """
-from __future__ import absolute_import
+
 
 from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral

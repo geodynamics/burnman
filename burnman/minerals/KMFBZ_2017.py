@@ -11,7 +11,6 @@ Kurnosov, A., et al. "Evidence for a Fe3+-rich pyrolitic lower mantle from
 Nature 543.7646 (2017): 543-546. doi:10.1038/nature21390
 """
 
-from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
 from ..classes.solution import Solution

@@ -217,7 +217,7 @@ Acknowledgement and Support
     and accepting our donation of BurnMan as an official project.
 
 """
-from __future__ import absolute_import
+
 import importlib.metadata
 
 # Low level utility functions

@@ -12,7 +12,7 @@ EoS terms for bcc are from HP_2011_ds62 for iron
 EoS terms for fcc are from an unpublished calibration
 (R. Myhill, 02/2017)
 """
-from __future__ import absolute_import
+
 
 from ..classes.mineral import Mineral
 from ..utils.chemistry import formula_mass

@@ -10,7 +10,7 @@ SLB_2005
 Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
-from __future__ import absolute_import
+
 from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
 

@@ -4,8 +4,6 @@
 # GPL v2 or later.
 
 
-from __future__ import absolute_import
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt

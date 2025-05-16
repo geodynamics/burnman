@@ -3,8 +3,7 @@
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
-from __future__ import print_function
+
 import numpy as np
 from sympy import Matrix, nsimplify
 import warnings

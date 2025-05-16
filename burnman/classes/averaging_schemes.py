@@ -3,7 +3,7 @@
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
+
 import numpy as np
 import warnings
 
