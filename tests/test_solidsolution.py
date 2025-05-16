@@ -1261,6 +1261,28 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(G1, G2)
 
+    def test_evaluate_with_volumes(self):
+        ol = olivine_ideal_ss()
+        molar_fractions = np.array([[0.1, 0.9], [0.2, 0.8]])
+        pressures = [1.0e9, 2.0e9]
+        temperatures = [300.0, 600.0]
+
+        volumes = ol.evaluate(["V"], pressures, temperatures, molar_fractions)[0]
+        P1, G1 = ol.evaluate_with_volumes(
+            ["pressure", "gibbs"], volumes, temperatures, molar_fractions
+        )
+        P2 = []
+        G2 = []
+        for i in range(2):
+            ol.set_composition(molar_fractions[i])
+            ol.set_state_with_volume(volumes[i], temperatures[i])
+            P2.append(ol.pressure)
+            G2.append(ol.gibbs)
+
+        self.assertArraysAlmostEqual(pressures, P1)
+        self.assertArraysAlmostEqual(P1, P2)
+        self.assertArraysAlmostEqual(G1, G2)
+
     def test_relaxed_solution(self):
         opx = burnman.minerals.JH_2015.orthopyroxene()
         ropx = burnman.RelaxedSolution(opx, opx.reaction_basis, opx.compositional_basis)

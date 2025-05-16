@@ -85,6 +85,34 @@ class test_layer(BurnManTest):
         self.assertArraysAlmostEqual(d[0], d0)
         self.assertArraysAlmostEqual(d[1], d1)
 
+    def test_properties(self):
+        m = self.layer1()
+
+        self.assertTrue(isinstance(m.mass, np.floating))
+        self.assertTrue(isinstance(m.moment_of_inertia, np.floating))
+        self.assertTrue(isinstance(m.gravity, np.ndarray))
+        self.assertTrue(isinstance(m.bullen, np.ndarray))
+        self.assertTrue(isinstance(m.brunt_vasala, np.ndarray))
+        self.assertTrue(isinstance(m.P, np.ndarray))
+        self.assertTrue(isinstance(m.T, np.ndarray))
+        self.assertTrue(isinstance(m.energy, np.ndarray))
+        self.assertTrue(isinstance(m.gibbs, np.ndarray))
+        self.assertTrue(isinstance(m.helmholtz, np.ndarray))
+        self.assertTrue(isinstance(m.H, np.ndarray))
+        self.assertTrue(isinstance(m.V, np.ndarray))
+        self.assertTrue(isinstance(m.molar_mass, np.ndarray))
+        self.assertTrue(isinstance(m.rho, np.ndarray))
+        self.assertTrue(isinstance(m.K_T, np.ndarray))
+        self.assertTrue(isinstance(m.K_S, np.ndarray))
+        self.assertTrue(isinstance(m.beta_T, np.ndarray))
+        self.assertTrue(isinstance(m.beta_S, np.ndarray))
+        self.assertTrue(isinstance(m.G, np.ndarray))
+        self.assertTrue(isinstance(m.v_phi, np.ndarray))
+        self.assertTrue(isinstance(m.gr, np.ndarray))
+        self.assertTrue(isinstance(m.alpha, np.ndarray))
+        self.assertTrue(isinstance(m.C_p, np.ndarray))
+        self.assertTrue(isinstance(m.C_v, np.ndarray))
+
     def test_tbl(self):
         p = BoundaryLayerPerturbation(
             radius_bottom=3480.0e3,
