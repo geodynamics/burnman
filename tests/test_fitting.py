@@ -214,6 +214,46 @@ class test_fitting(BurnManTest):
         self.assertEqual(len(s[1]), 3)
         self.assertEqual(len(s[2]), 3)
 
+    def test_PTV_data_eos_numerical_failure(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        fo.set_state(1.0e9, fo.params["T_0"])
+        V0 = fo.V
+        fo.set_state(2.0e9, fo.params["T_0"])
+        V1 = fo.V
+        volumes = V0 + (V1 - V0) * (pressures - 1.0e9) / 1.0e9
+        PTV = np.array([pressures, temperatures, volumes]).T
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        try:
+            _ = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
+            self.assertTrue(False)
+        except Exception:
+            self.assertTrue(True)
+
+    def test_PTV_data_eos_exception(self):
+        fo = burnman.minerals.SLB_2011.forsterite()
+
+        pressures = np.linspace(1.0e9, 100.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        fo.set_state(1.0e9, fo.params["T_0"])
+        V0 = fo.V
+        fo.set_state(2.0e9, fo.params["T_0"])
+        V1 = fo.V
+        volumes = V0 + (V1 - V0) * (pressures - 1.0e9) / 1.0e9
+        PTV = np.array([pressures, temperatures, volumes]).T
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        try:
+            _ = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
+            self.assertTrue(False)
+        except Exception:
+            self.assertTrue(True)
+
     def test_bounded_solution_fitting(self):
         solution = burnman.minerals.SLB_2011.mg_fe_olivine()
         solution.set_state(1.0e5, 300.0)
