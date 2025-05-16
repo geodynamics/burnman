@@ -4,8 +4,6 @@
 # GPL v2 or later.
 
 
-from __future__ import absolute_import
-
 import numpy as np
 
 from .mineral import Mineral, material_property

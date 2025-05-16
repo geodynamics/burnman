@@ -16,7 +16,6 @@ using the equation of state of :cite:`Brosh2007`.
 T^2, T^3, T^4, T^7, T^(1/2), ln(T)]]
 """
 
-from __future__ import absolute_import
 
 from ..classes.mineral import Mineral
 from ..utils.chemistry import formula_mass

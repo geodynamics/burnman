@@ -10,7 +10,7 @@
 # process_solution_chemistry returns information required to calculate
 # solution properties from a set of endmember formulae
 
-from __future__ import absolute_import
+
 import re
 import numpy as np
 from fractions import Fraction

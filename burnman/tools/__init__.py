@@ -14,7 +14,6 @@ It does not contain any functions that are required by the core
 BurnMan modules.
 """
 
-from __future__ import absolute_import
 
 from . import chemistry
 from . import eos

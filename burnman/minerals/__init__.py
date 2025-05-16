@@ -25,7 +25,7 @@ Mineral database
   - :mod:`~burnman.minerals.SE_2015`
   - :mod:`~burnman.minerals.other`
 """
-from __future__ import absolute_import
+
 
 # Stixrude and Lithgow-Bertelloni
 from . import SLB_2024

@@ -8,8 +8,7 @@
 This module provides several helper minerals/materials.
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
+
 
 from .material import Material, material_property
 from .composite import Composite

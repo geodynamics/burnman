@@ -2,7 +2,6 @@
 # Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
 
 from os import path
 import numpy as np

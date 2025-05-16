@@ -10,7 +10,7 @@ Equation of State
 
 
 """
-from __future__ import absolute_import
+
 
 from .equation_of_state import EquationOfState
 from .murnaghan import Murnaghan

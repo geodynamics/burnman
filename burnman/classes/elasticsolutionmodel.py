@@ -3,7 +3,6 @@
 # Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
 
 import importlib
 import warnings

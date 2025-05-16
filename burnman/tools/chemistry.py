@@ -5,7 +5,7 @@
 
 # This module provides higher level chemistry-related functions.
 
-from __future__ import absolute_import
+
 import numpy as np
 from scipy.optimize import fsolve
 import itertools
