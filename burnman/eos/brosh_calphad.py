@@ -1,10 +1,9 @@
-from __future__ import absolute_import
-
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
+from __future__ import absolute_import
 import numpy as np
 import warnings
 import pkgutil
@@ -44,11 +43,7 @@ class BroshCalphad(eos.EquationOfState):
         )
 
         nu = self._theta(pressure, params) / temperature
-        dP = 1000.0
-        dthetadP = (
-            self._theta(pressure + dP / 2.0, params)
-            - self._theta(pressure - dP / 2.0, params)
-        ) / dP
+        dthetadP = self._dtheta_dP(pressure, params)
         V_qh = (
             3.0
             * params["n"]
@@ -76,6 +71,50 @@ class BroshCalphad(eos.EquationOfState):
         # V = dG_c/dP + dG_qh/dP - C_T*(dI_P/dP)
         return V_c + V_qh + V_th
 
+    def dvolume_dP(self, pressure, temperature, params):
+        K_0 = params["K_0"]
+        n = params["n"]
+        b = params["b"][1]
+        delta = params["delta"][1]
+
+        dVc_dP = 0.0
+
+        for i in range(2, 6):
+            a_i = params["a"][i - 2]
+            c_i = params["c"][i - 2]
+            power_term = 1.0 + i * pressure / (3.0 * a_i * K_0)
+            z_i = power_term ** (1.0 / i)
+            x_i = 1.0 / (1.0 - a_i + a_i * z_i)
+            dx_i_dP = -(x_i**2) / (3.0 * K_0) * power_term ** ((1.0 / i) - 1.0)
+            dVc_dP_i = c_i * 3.0 * x_i**2 * dx_i_dP
+            dVc_dP += dVc_dP_i
+
+        dVc_dP *= params["V_0"]
+
+        theta = self._theta(pressure, params)
+        dthetadP = self._dtheta_dP(pressure, params)
+        d2thetadP2 = self._d2theta_dP2(pressure, params)
+
+        nu = theta / temperature
+        exp_neg_nu = np.exp(-nu)
+        denom = 1.0 - exp_neg_nu
+
+        factor1 = -(exp_neg_nu) / (denom**2) * (dthetadP**2) / temperature
+        factor2 = (exp_neg_nu) / denom * d2thetadP2
+
+        dV_qh_dP = 3.0 * n * gas_constant * (factor1 + factor2)
+
+        alpha = 2.0 * b * (1.0 + delta) / K_0
+        f = np.sqrt(1.0 + alpha * pressure)
+        exp_term = np.exp((1.0 - f) / b)
+
+        numerator = self._C_T(temperature, params) * (1.0 + delta) ** 2 * exp_term
+        denominator = K_0**2 * (1.0 + b) * f
+
+        dV_th_dP = -numerator / denominator
+
+        return dVc_dP + dV_qh_dP + dV_th_dP
+
     def pressure(self, temperature, volume, params):
         def _delta_volume(pressure):
             return self.volume(pressure, temperature, params) - volume
@@ -96,12 +135,7 @@ class BroshCalphad(eos.EquationOfState):
         as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        dP = 1000.0
-        dV = self.volume(pressure + dP / 2.0, temperature, params) - self.volume(
-            pressure - dP / 2.0, temperature, params
-        )
-
-        return -volume * dP / dV
+        return -volume / self.dvolume_dP(pressure, temperature, params)
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
@@ -217,6 +251,28 @@ class BroshCalphad(eos.EquationOfState):
             )
         )  # eq. A9, CHECKED
 
+    def _dGamma_dXT2(self, n, an, Xn):
+        total = 0.0
+        for k in range(0, n + 1):
+            coeff = binom(n, k) * (an - 1.0) ** (n - k)
+            if k != 3:
+                term = (3.0 - k) * Xn ** (2.0 - k) * k / (k - 3.0)
+            else:
+                term = -3.0 / Xn
+            total += coeff * term
+        return 3.0 * an ** (1.0 - n) / float(n) * total
+
+    def _d2Gamma_dXT2_2(self, n, an, Xn):
+        total = 0.0
+        for k in range(0, n + 1):
+            coeff = binom(n, k) * (an - 1.0) ** (n - k)
+            if k != 3:
+                term = (2.0 - k) * (3.0 - k) * Xn ** (1.0 - k) * k / (k - 3.0)
+            else:
+                term = 3.0 / (Xn**2)
+            total += coeff * term
+        return 3.0 * an ** (1.0 - n) / float(n) * total
+
     def _theta(self, pressure, params):
         # Theta (for quasiharmonic term)
         ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
@@ -230,6 +286,60 @@ class BroshCalphad(eos.EquationOfState):
             params["grueneisen_0"]
             / (1.0 + params["delta"][0])
             * (self._Gamma(2, ab2, XT2) - self._Gamma(2, ab2, 1.0))
+        )
+
+    def _dtheta_dP(self, pressure, params):
+        ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
+        K0b = params["K_0"] / (1.0 + params["delta"][0])
+        A = 2.0 / (3.0 * ab2 * K0b)
+        y = np.sqrt(1.0 + A * pressure)
+        XT2 = 1.0 / (1.0 - ab2 + ab2 * y)
+
+        dG_dXT2 = self._dGamma_dXT2(2, ab2, XT2)
+
+        # dXT2/dy
+        dXT2_dy = -ab2 / (1.0 - ab2 + ab2 * y) ** 2
+
+        # dy/dP
+        dy_dP = 0.5 * A / np.sqrt(1.0 + A * pressure)
+
+        # Prefactor
+        B = params["grueneisen_0"] / (1.0 + params["delta"][0])
+
+        # Theta
+        theta_val = self._theta(pressure, params)
+
+        return theta_val * B * dG_dXT2 * dXT2_dy * dy_dP
+
+    def _d2theta_dP2(self, pressure, params):
+        ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
+        K0b = params["K_0"] / (1.0 + params["delta"][0])
+        A = 2.0 / (3.0 * ab2 * K0b)
+        y = np.sqrt(1.0 + A * pressure)
+        dy_dP = 0.5 * A / np.sqrt(1.0 + A * pressure)
+        d2y_dP2 = -0.25 * A * A / (1.0 + A * pressure) ** (3.0 / 2.0)
+
+        XT2 = 1.0 / (1.0 - ab2 + ab2 * y)
+        D = 1.0 - ab2 + ab2 * y
+        dXT2_dy = -ab2 / (D**2)
+        d2XT2_dy2 = 2.0 * ab2 * ab2 / (D**3)
+
+        XT2_prime = dXT2_dy * dy_dP
+        XT2_double_prime = d2XT2_dy2 * (dy_dP**2) + dXT2_dy * d2y_dP2
+
+        # Gamma derivatives
+        dGamma_dXT2 = self._dGamma_dXT2(2, ab2, XT2)
+        d2Gamma_dXT2_2 = self._d2Gamma_dXT2_2(2, ab2, XT2)
+
+        B = params["grueneisen_0"] / (1.0 + params["delta"][0])
+        theta_val = self._theta(pressure, params)
+        dtheta_dP = self._dtheta_dP(pressure, params)
+
+        return (
+            theta_val
+            * B
+            * (d2Gamma_dXT2_2 * XT2_prime**2 + dGamma_dXT2 * XT2_double_prime)
+            + dtheta_dP * B * dGamma_dXT2 * XT2_prime
         )
 
     def _interpolating_function(self, pressure, params):
