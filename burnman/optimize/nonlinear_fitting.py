@@ -339,13 +339,29 @@ def nonlinear_least_squares_fit(
         return (current_params - new_params) / mod_params
 
     for n_it in range(max_lm_iterations):
-        # update the parameters with a LM iteration
-        f_delta_beta = _update_beta(lm_damping)
-        max_f = np.max(np.abs(f_delta_beta))
-        if verbose:
-            print(f"Iteration {n_it}: max param change = {max_f:.2e}")
-        if max_f < param_tolerance:
-            break
+        try:
+            # update the parameters with a LM iteration
+            f_delta_beta = _update_beta(lm_damping)
+            max_f = np.max(np.abs(f_delta_beta))
+
+            if np.isnan(max_f):
+                raise ValueError(
+                    "The Levenberg-Marquardt update for "
+                    f"Iteration {n_it} was non-numerical."
+                )
+
+            if verbose:
+                print(f"Iteration {n_it}: max param change = {max_f:.2e}")
+            if max_f < param_tolerance:
+                break
+        except Exception:
+            raise Exception(
+                f"During non-linear fitting, Iteration {n_it} produced an "
+                "exception. This is probably due to numerical failure of "
+                "the input model. "
+                "Consider imposing bounds on fitting or priors on your "
+                "parameter values to prevent this behaviour."
+            )
 
     J = model.jacobian
     r = model.weighted_residuals
