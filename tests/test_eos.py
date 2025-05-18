@@ -3,7 +3,6 @@ from __future__ import print_function
 import unittest
 from util import BurnManTest
 import warnings
-import numpy as np
 
 import burnman
 from burnman import minerals
@@ -147,7 +146,7 @@ class eos(BurnManTest):
         eoses = [
             burnman.eos.SLB2(),
             burnman.eos.SLB3(),
-            burnman.eos.BM2(),
+            burnman.eos.BM3Shear2(),
             burnman.eos.BM3(),
         ]
 

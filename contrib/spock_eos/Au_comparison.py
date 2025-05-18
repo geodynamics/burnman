@@ -2,8 +2,7 @@ from scipy.special import gamma, gammainc, exp1
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman.eos.reciprocal_kprime import RKprime
-from burnman.eos.birch_murnaghan import BM3
-from burnman.eos.birch_murnaghan_4th import BM4
+from burnman.eos.birch_murnaghan import BM3, BM4
 from burnman.eos.vinet import Vinet
 from burnman.eos.modified_tait import MT
 from burnman.eos.spock import SPOCK

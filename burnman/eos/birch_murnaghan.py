@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
@@ -10,12 +10,17 @@ from ..utils.math import bracket
 import warnings
 
 
-def bulk_modulus(volume, params):
+def bulk_modulus_third_order(volume, params):
     """
-    compute the bulk modulus as per the third order
-    birch-murnaghan equation of state.  Returns bulk
-    modulus in the same units as the reference bulk
-    modulus.  Pressure must be in :math:`[Pa]`.
+    Bulk modulus for the third order Birch-Murnaghan equation of state.
+
+    :param volume: Volume of the material in the same units as
+    the reference volume.
+    :type volume: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Bulk modulus in the same units as the reference bulk modulus.
+    :rtype: float
     """
 
     x = params["V_0"] / volume
@@ -33,44 +38,163 @@ def bulk_modulus(volume, params):
     return K
 
 
-def birch_murnaghan(x, params):
+def pressure_third_order(invVrel, params):
     """
-    equation for the third order birch-murnaghan equation of state, returns
-    pressure in the same units that are supplied for the reference bulk
-    modulus (params['K_0'])
+    Pressure for the third order Birch-Murnaghan equation of state.
+
+    :param invVrel: Reference volume divided by the volume
+    :type invVrel: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Pressure in the same units that are supplied
+    for the reference bulk modulus (params['K_0']).
+    :rtype: float
     """
 
     return (
         3.0
         * params["K_0"]
         / 2.0
-        * (pow(x, 7.0 / 3.0) - pow(x, 5.0 / 3.0))
-        * (1.0 - 0.75 * (4.0 - params["Kprime_0"]) * (pow(x, 2.0 / 3.0) - 1.0))
+        * (pow(invVrel, 7.0 / 3.0) - pow(invVrel, 5.0 / 3.0))
+        * (1.0 - 0.75 * (4.0 - params["Kprime_0"]) * (pow(invVrel, 2.0 / 3.0) - 1.0))
         + params["P_0"]
     )
 
 
-def volume(pressure, params):
+def volume_third_order(pressure, params):
     """
-    Get the birch-murnaghan volume at a reference temperature for a given
-    pressure :math:`[Pa]`. Returns molar volume in :math:`[m^3]`
+    Volume for the third order Birch-Murnaghan equation of state.
+
+    :param pressure: Pressure in the same units that are supplied
+    for the reference bulk modulus (params['K_0']).
+    :type pressure: float
+    :param params: Parameter dictionary
+    :type params: dict
+
+    :return: Molar volume in the same units as the reference volume.
+    :rtype: float
     """
 
-    func = lambda x: birch_murnaghan(params["V_0"] / x, params) - pressure
+    def delta_pressure(volume):
+        return pressure_third_order(params["V_0"] / volume, params) - pressure
+
     try:
-        sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
-    except:
+        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
+    except ValueError:
         raise ValueError(
-            "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
+            "Cannot find a volume, perhaps you are outside of the "
+            "range of validity for the equation of state?"
         )
-    return opt.brentq(func, sol[0], sol[1])
+    return opt.brentq(delta_pressure, sol[0], sol[1])
+
+
+def bulk_modulus_fourth_order(volume, params):
+    """
+    Bulk modulus for the fourth order Birch-Murnaghan equation of state.
+
+    :param volume: Volume of the material in the same units as
+    the reference volume.
+    :type volume: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Bulk modulus in the same units as the reference bulk modulus.
+    :rtype: float
+    """
+
+    invVrel = params["V_0"] / volume
+    f = 0.5 * (pow(invVrel, 2.0 / 3.0) - 1.0)
+
+    Xi = (3.0 / 4.0) * (4.0 - params["Kprime_0"])
+    Zeta = (3.0 / 8.0) * (
+        (params["K_0"] * params["Kprime_prime_0"])
+        + params["Kprime_0"] * (params["Kprime_0"] - 7.0)
+        + 143.0 / 9.0
+    )
+
+    K = (
+        5.0
+        * f
+        * pow((1.0 + 2.0 * f), 5.0 / 2.0)
+        * params["K_0"]
+        * (1.0 - (2.0 * Xi * f) + (4.0 * Zeta * pow(f, 2.0)))
+    ) + (
+        pow(1.0 + (2.0 * f), 7.0 / 2.0)
+        * params["K_0"]
+        * (1.0 - (4.0 * Xi * f) + (12.0 * Zeta * pow(f, 2.0)))
+    )
+
+    return K
+
+
+def pressure_fourth_order(invVrel, params):
+    """
+    Pressure for the fourth order Birch-Murnaghan equation of state.
+
+    :param invVrel: Reference volume divided by the volume
+    :type invVrel: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Pressure in the same units that are supplied
+    for the reference bulk modulus (params['K_0']).
+    :rtype: float
+    """
+
+    f = 0.5 * (pow(invVrel, 2.0 / 3.0) - 1.0)
+    Xi = (3.0 / 4.0) * (4.0 - params["Kprime_0"])
+    Zeta = (3.0 / 8.0) * (
+        (params["K_0"] * params["Kprime_prime_0"])
+        + params["Kprime_0"] * (params["Kprime_0"] - 7.0)
+        + 143.0 / 9.0
+    )
+
+    return (
+        3.0
+        * f
+        * pow(1.0 + 2.0 * f, 5.0 / 2.0)
+        * params["K_0"]
+        * (1.0 - (2.0 * Xi * f) + (4.0 * Zeta * pow(f, 2.0)))
+        + params["P_0"]
+    )
+
+
+def volume_fourth_order(pressure, params):
+    """
+    Volume for the fourth order Birch-Murnaghan equation of state.
+
+    :param pressure: Pressure in the same units that are supplied
+    for the reference bulk modulus (params['K_0']).
+    :type pressure: float
+    :param params: Parameter dictionary
+    :type params: dict
+
+    :return: Molar volume in the same units as the reference volume.
+    :rtype: float
+    """
+
+    def delta_pressure(x):
+        return pressure_fourth_order(params["V_0"] / x, params) - pressure
+
+    try:
+        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
+    except ValueError:
+        raise ValueError(
+            "Cannot find a volume, perhaps you are outside of "
+            "the range of validity for the equation of state?"
+        )
+    return opt.brentq(delta_pressure, sol[0], sol[1])
 
 
 def shear_modulus_second_order(volume, params):
     """
-    Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
-    params['G_0']).  This uses a second order finite strain expansion
+    Shear modulus for the second order Birch Murnaghan equation of state
+    (i.e. expanded to 2nd order in strain).
+
+    :param volume: Molar volume in the same units as the reference volume.
+    :type volume: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Shear modulus in the same units as the reference shear modulus.
+    :rtype: float
     """
 
     x = params["V_0"] / volume
@@ -89,9 +213,14 @@ def shear_modulus_second_order(volume, params):
 
 def shear_modulus_third_order(volume, params):
     """
-    Get the birch murnaghan shear modulus at a reference temperature, for a
-    given volume.  Returns shear modulus in :math:`[Pa]` (the same units as in
-    params['G_0']).  This uses a third order finite strain expansion
+    Shear modulus for the third order Birch Murnaghan equation of state.
+
+    :param volume: Molar volume in the same units as the reference volume.
+    :type volume: float
+    :param params: Parameter dictionary
+    :type params: dict
+    :return: Shear modulus in the same units as the reference shear modulus.
+    :rtype: float
     """
 
     x = params["V_0"] / volume
@@ -113,26 +242,30 @@ def shear_modulus_third_order(volume, params):
 
 class BirchMurnaghanBase(eos.EquationOfState):
     """
-    Base class for the isothermal Birch Murnaghan equation of state.  This is third order in strain, and
-    has no temperature dependence.  However, the shear modulus is sometimes fit to a second order
-    function, so if this is the case, you should use that.  For more see :class:`burnman.birch_murnaghan.BM2` and :class:`burnman.birch_murnaghan.BM3`.
+    Base class for the isothermal Birch Murnaghan equation of state.
+    This is third order in strain, and has no temperature dependence.
+    However, the shear modulus is sometimes fit to a second order
+    function, so if this is the case, you should use that.
+    For more see :class:`burnman.birch_murnaghan.BM3Shear2`
+    and :class:`burnman.birch_murnaghan.BM3`.
     """
 
     def volume(self, pressure, temperature, params):
         """
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
-        return volume(pressure, params)
+        return volume_third_order(pressure, params)
 
     def pressure(self, temperature, volume, params):
-        return birch_murnaghan(params["V_0"] / volume, params)
+        return pressure_third_order(params["V_0"] / volume, params)
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
-        Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
+        Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]`
+        as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        return bulk_modulus(volume, params)
+        return bulk_modulus_third_order(volume, params)
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
@@ -145,19 +278,20 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def entropy(self, pressure, temperature, volume, params):
         """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
+        Returns the molar entropy :math:`\\mathcal{S}`
+        of the mineral. :math:`[J/K/mol]`
         """
         return 0.0
 
     def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the internal energy :math:`\\mathcal{E}`
+        of the mineral. :math:`[J/mol]`
         """
         x = np.power(volume / params["V_0"], -1.0 / 3.0)
         x2 = x * x
         x4 = x2 * x2
         x6 = x4 * x2
-        x8 = x4 * x4
 
         xi1 = 3.0 * (4.0 - params["Kprime_0"]) / 4.0
 
@@ -176,7 +310,8 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
-        Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
+        Returns the Gibbs free energy :math:`\\mathcal{G}`
+        of the mineral. :math:`[J/mol]`
         """
         # G = int VdP = [PV] - int PdV = E + PV
 
@@ -187,19 +322,22 @@ class BirchMurnaghanBase(eos.EquationOfState):
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
+        Since this equation of state does not contain temperature effects,
+        simply return a very large number. :math:`[J/K/mol]`
         """
         return 1.0e99
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
+        Since this equation of state does not contain temperature effects,
+        simply return zero. :math:`[1/K]`
         """
         return 0.0
 
     def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
+        Since this equation of state does not contain temperature effects,
+        simply return zero. :math:`[unitless]`
         """
         return 0.0
 
@@ -252,7 +390,7 @@ class BM3(BirchMurnaghanBase):
         self.order = 3
 
 
-class BM2(BirchMurnaghanBase):
+class BM3Shear2(BirchMurnaghanBase):
     """
     Third order Birch Murnaghan isothermal equation of state.
     This uses the second order expansion for shear modulus.
@@ -260,3 +398,80 @@ class BM2(BirchMurnaghanBase):
 
     def __init__(self):
         self.order = 2
+
+
+class BM4(BirchMurnaghanBase):
+    """
+    Base class for the isothermal Birch Murnaghan equation of state.
+    This is fourth order in strain, and has no temperature dependence.
+    """
+
+    def volume(self, pressure, temperature, params):
+        """
+        Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
+        """
+        return volume_fourth_order(pressure, params)
+
+    def pressure(self, temperature, volume, params):
+        return pressure_fourth_order(params["V_0"] / volume, params)
+
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
+        """
+        Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
+        temperature :math:`[K]` and volume :math:`[m^3]`.
+        """
+        return bulk_modulus_fourth_order(volume, params)
+
+    def shear_modulus(self, pressure, temperature, volume, params):
+        """
+        Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
+        """
+        return 0.0
+
+    def _molar_internal_energy(self, pressure, temperature, volume, params):
+        """
+        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        """
+        x = np.power(volume / params["V_0"], -1.0 / 3.0)
+        x2 = x * x
+        x4 = x2 * x2
+        x6 = x4 * x2
+        x8 = x4 * x4
+
+        xi1 = 3.0 * (4.0 - params["Kprime_0"]) / 4.0
+        xi2 = (
+            3.0
+            / 8.0
+            * (
+                params["K_0"] * params["Kprime_prime_0"]
+                + params["Kprime_0"] * (params["Kprime_0"] - 7.0)
+            )
+            + 143.0 / 24.0
+        )
+
+        intPdV = (
+            -9.0
+            / 2.0
+            * params["V_0"]
+            * params["K_0"]
+            * (
+                (xi1 + 1.0) * (x4 / 4.0 - x2 / 2.0 + 1.0 / 4.0)
+                - xi1 * (x6 / 6.0 - x4 / 4.0 + 1.0 / 12.0)
+                + xi2 * (x8 / 8 - x6 / 2 + 3.0 * x4 / 4.0 - x2 / 2.0 + 1.0 / 8.0)
+            )
+        )
+
+        return -intPdV + params["E_0"]
+
+    def validate_parameters(self, params):
+        """
+        Check for existence and validity of the parameters
+        """
+
+        super().validate_parameters(params)
+
+        if "Kprime_prime_0" not in params:
+            raise KeyError("params object missing parameter : Kprime_prime_0")
+
+        if params["Kprime_prime_0"] > 0.0 or params["Kprime_prime_0"] < -10.0:
+            warnings.warn("Unusual value for Kprime_prime_0", stacklevel=2)

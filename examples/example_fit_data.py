@@ -62,7 +62,7 @@ if __name__ == "__main__":
     temperatures = pressures * 0.0 + 300.0
 
     # Fit to the second order Birch-Murnaghan EoS
-    mg_perovskite_test.set_method("bm2")
+    mg_perovskite_test.set_method("bm3shear2")
     fitted_eos = best_fit()
     print("2nd order fit:")
     burnman.utils.misc.pretty_print_values(
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     )[0]
 
     with warnings.catch_warnings(record=True) as w:
-        mg_perovskite_test.set_method("bm2")
+        mg_perovskite_test.set_method("bm3shear2")
         print(w[-1].message)
     model_vs_3rd_order_incorrect = mg_perovskite_test.evaluate(
         ["shear_wave_velocity"], pressures, temperatures
