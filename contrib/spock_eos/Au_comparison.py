@@ -1,4 +1,3 @@
-from scipy.special import gamma, gammainc, exp1
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman.eos.reciprocal_kprime import RKprime

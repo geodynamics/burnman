@@ -20,12 +20,9 @@ The script ends by making three plots; one with elastic moduli
 at high pressure, one with the corresponding shear moduli,
 and one with the elastic moduli at 1 bar.
 """
-
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize, differential_evolution
+from scipy.optimize import minimize
 from tools import print_table_for_mineral_constants
 
 import burnman

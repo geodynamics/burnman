@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 import burnman
 from burnman.minerals import DKS_2013_liquids
 from burnman import constants

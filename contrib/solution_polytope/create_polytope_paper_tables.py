@@ -31,9 +31,6 @@ This script reproduces the tables in Myhill and Connolly (2021).
 """
 
 # Initial imports
-from __future__ import absolute_import
-from __future__ import print_function
-
 import os
 import sys
 import numpy as np

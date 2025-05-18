@@ -15,11 +15,6 @@ Nissen-Meyer et al. (2014), AxiSEM: broadband 3-D seismic wavefields in axisymme
 www.axisem.info
 
 """
-# Import supporting libraries
-# Imports to be compatible with Python2 and Python3
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np  # Library used for general array
 
 # Import BurnMan

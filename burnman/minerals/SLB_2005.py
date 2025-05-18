@@ -11,7 +11,6 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 
 """
 
-from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
 
 

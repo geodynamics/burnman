@@ -4,7 +4,6 @@
 # GPL v2 or later.
 
 from burnman.eos.vinet import Vinet
-from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
 from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
 from burnman.utils.unitcell import molar_volume_from_unit_cell_volume

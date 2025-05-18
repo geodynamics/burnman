@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 # Benchmarks for the solid solution class
 from burnman import minerals
 import numpy as np

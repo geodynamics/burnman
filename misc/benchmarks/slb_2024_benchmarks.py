@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from burnman import Composite, equilibrate
 from burnman.constants import gas_constant
 from burnman.tools.polytope import simplify_composite_with_composition
@@ -7,7 +5,6 @@ from burnman.tools.eos import check_eos_consistency
 from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 from burnman.minerals import SLB_2024
 from burnman.minerals.HP_2011_fluids import O2
-from burnman.eos.property_modifiers import calculate_property_modifications
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg

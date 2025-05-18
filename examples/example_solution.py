@@ -40,9 +40,6 @@ These solutions can potentially deal with:
 * How to output thermodynamic and thermoelastic properties
 
 """
-from __future__ import absolute_import
-from ast import Sub
-
 import numpy as np
 import matplotlib.pyplot as plt
 

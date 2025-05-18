@@ -1,7 +1,4 @@
-from __future__ import absolute_import
-
 # Benchmarks for the chemical potential functions
-
 import numpy as np
 import matplotlib.pyplot as plt
 

@@ -23,8 +23,6 @@ This example script demonstrates the use of BurnMan's Composition class.
 * Modifying the independent set of components
 * Modifying compositions by adding and removing components
 """
-from __future__ import absolute_import
-from __future__ import print_function
 
 from burnman.utils.chemistry import dictionarize_formula
 

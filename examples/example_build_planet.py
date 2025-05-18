@@ -42,10 +42,6 @@ on each of the parameters which can be called.
 * computing various parameters for the planet
 * seismic comparison
 """
-
-from __future__ import absolute_import
-from __future__ import print_function
-
 import matplotlib.pyplot as plt
 import numpy as np
 

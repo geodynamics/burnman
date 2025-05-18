@@ -22,9 +22,6 @@ This script may be run by typing
     python step_2.py
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 # The imports here are identical to those from step 1
 import numpy as np
 import matplotlib.pyplot as plt

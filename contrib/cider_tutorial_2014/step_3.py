@@ -28,9 +28,6 @@ This script may be run by typing
     python step_3.py
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 # We import a couple extra modules for this step than in the previous
 # ones.  In particular, we will use a function for a normal distribution
 # from numpy.random, as well as a class for doing linear 1D interpolation

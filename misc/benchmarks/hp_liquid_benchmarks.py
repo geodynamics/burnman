@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 # Benchmarks for the solid solution class
 
 import numpy as np

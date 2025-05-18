@@ -3,12 +3,7 @@
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from __future__ import absolute_import
-from __future__ import print_function
-
-# Benchmarks for the solid solution class
-
-
+# Benchmarks for the Brosh-Calphad Equation of State
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg

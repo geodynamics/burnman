@@ -12,7 +12,6 @@ Minerals from Murakami 2013 and references therein.
 """
 
 
-from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
 
 

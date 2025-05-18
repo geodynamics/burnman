@@ -7,8 +7,6 @@
 Generates a text table with mineral properties.
 Run 'python table.py latex' to write a tex version of the table to mytable.tex
 """
-from __future__ import absolute_import
-from __future__ import print_function
 
 import sys
 

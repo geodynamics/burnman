@@ -3,9 +3,6 @@
 # Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-
-from __future__ import absolute_import
-
 import os
 import sys
 import numpy as np

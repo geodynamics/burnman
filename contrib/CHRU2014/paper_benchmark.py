@@ -10,9 +10,6 @@ paper_benchmark
 
 This script reproduces the benchmark in :cite:`Cottaar2014`, Figure 3.
 """
-from __future__ import absolute_import
-
-
 import os
 import sys
 import numpy as np

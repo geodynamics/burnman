@@ -5,7 +5,6 @@
 
 
 import numpy as np
-from sympy import Matrix
 from ..classes.combinedmineral import CombinedMineral
 from ..classes.solution import Solution
 from ..classes.solutionmodel import (

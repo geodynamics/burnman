@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from util import BurnManTest
 import numpy as np
 import unittest

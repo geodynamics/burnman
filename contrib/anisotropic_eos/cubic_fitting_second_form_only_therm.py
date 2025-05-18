@@ -21,12 +21,9 @@ at high pressure, one with the corresponding shear moduli,
 and one with the elastic moduli at 1 bar.
 """
 
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize, differential_evolution
-from tools import print_table_for_mineral_constants
+from scipy.optimize import minimize
 
 import burnman
 

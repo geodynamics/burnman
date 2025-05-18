@@ -21,8 +21,6 @@ Holland and Powell dataset.
 * calculating thermoelastic properties with self-consistent pressures
 * seismic comparison
 """
-from __future__ import absolute_import
-
 # Here we import standard python modules that are required for
 # usage of BurnMan.
 import numpy as np

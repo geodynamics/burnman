@@ -8,9 +8,6 @@
 # format (printed to stdout)
 
 
-import sys
-
-
 def read_dataset(datafile):
     f = open(datafile, "r")
     ds = []
