@@ -321,7 +321,7 @@ class SLBBase(eos.EquationOfState):
         q = self._volume_dependent_q(params["V_0"] / volume, params)
 
         K = (
-            bm.bulk_modulus(volume, params)
+            bm.bulk_modulus_third_order(volume, params)
             + (gr + 1.0 - q) * (gr / volume) * (E_th - E_th_ref)
             - (pow(gr, 2.0) / volume) * (C_v * temperature - C_v_ref * T_0)
         )

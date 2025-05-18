@@ -63,12 +63,13 @@ if __name__ == "__main__":
         stixrude and lithgow-bertelloni, 2005)
     or 'slb3 (finite-strain 3rd order shear modulus,
         stixrude and lithgow-bertelloni, 2005)
-    or 'mgd3' (mie-gruneisen-debeye 3rd order shear modulus,
+    or 'mgd3' (mie-gruneisen-debye 3rd order shear modulus,
         matas et al. 2007)
-    or 'mgd2' (mie-gruneisen-debeye 2nd order shear modulus,
+    or 'mgd2' (mie-gruneisen-debye 2nd order shear modulus,
         matas et al. 2007)
-    or 'bm2' (birch-murnaghan 2nd order, if you choose to ignore temperature
-       (your choice in geotherm will not matter in this case))
+    or 'bm3shear2' (birch-murnaghan 3rd order, 2nd order in shear,
+        if you choose to ignore temperature
+        (your choice in geotherm will not matter in this case))
     or 'bm3' (birch-murnaghan 3rd order, if you choose to ignore temperature
         (your choice in geotherm will not matter in this case))"""
     method = "slb3"

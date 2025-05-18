@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
         return func
 
-    mg_perovskite_test.set_method("bm2")
+    mg_perovskite_test.set_method("bm3shear2")
     sol = opt.fmin(
         error_func(mg_perovskite_test, obs_pressures, obs_vs), guess, disp=False
     )
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     )
 
     with warnings.catch_warnings(record=True) as w:
-        mg_perovskite_test.set_method("bm2")
+        mg_perovskite_test.set_method("bm3shear2")
         print(w[-1].message)
 
     model_vs_3rd_order_incorrect = calc_shear_velocities(

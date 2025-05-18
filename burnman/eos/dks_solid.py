@@ -191,7 +191,7 @@ class DKS_S(eos.EquationOfState):
         gr = self._grueneisen_parameter(pressure, temperature, volume, params)
         q = self._volume_dependent_q(params["V_0"] / volume, params)
         K = (
-            bm.bulk_modulus(volume, params)
+            bm.bulk_modulus_third_order(volume, params)
             + (gr + 1.0 - q) * (gr / volume) * E_th_diff
             - (pow(gr, 2.0) / volume) * E_th_diff
         )

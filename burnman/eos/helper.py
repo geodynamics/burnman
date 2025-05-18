@@ -8,7 +8,6 @@ from . import slb
 from . import mie_grueneisen_debye as mgd
 from . import murnaghan
 from . import birch_murnaghan as bm
-from . import birch_murnaghan_4th as bm4
 from . import modified_tait as mt
 from . import macaw
 from . import spock
@@ -63,12 +62,12 @@ def create(method):
             return slb.SLB3Conductive()
         elif method == "murnaghan":
             return murnaghan.Murnaghan()
-        elif method == "bm2":
-            return bm.BM2()
+        elif method == "bm3shear2":
+            return bm.BM3Shear2()
         elif method == "bm3":
             return bm.BM3()
         elif method == "bm4":
-            return bm4.BM4()
+            return bm.BM4()
         elif method == "mt":
             return mt.MT()
         elif method == "macaw":

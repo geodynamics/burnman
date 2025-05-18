@@ -9,8 +9,8 @@ Decker_1971
 """
 
 from burnman.eos.mie_grueneisen_debye import MGDBase
+from burnman.eos.birch_murnaghan import pressure_fourth_order
 from burnman.classes.calibrant import Calibrant
-from burnman.eos.birch_murnaghan_4th import pressure_birch_murnaghan_fourth
 
 
 class NaCl_B1(Calibrant):
@@ -18,16 +18,16 @@ class NaCl_B1(Calibrant):
     The NaCl (B1 structured) pressure standard reported by
     Decker (1971; https://doi.org/10.1063/1.1660714).
 
-    .. note:: This calibrant is not exactly the same as that proposed by Decker.
-        The cold compression curve has here been approximated by a 4th order
-        Birch-Murnaghan EoS, as described in
+    .. note:: This calibrant is not exactly the same as that
+        proposed by Decker. The cold compression curve has here been
+        approximated by a 4th order Birch-Murnaghan EoS, as described in
         Matsui et al. (2012; https://doi.org/10.2138/am.2012.4136).
     """
 
     def __init__(self):
         def _pressure_Decker_NaCl(volume, temperature, params):
             # Isothermal pressure (GPa)
-            P0 = pressure_birch_murnaghan_fourth(params["V_0"] / volume, params)
+            P0 = pressure_fourth_order(params["V_0"] / volume, params)
 
             # Thermal pressure
             thermal_model = MGDBase()

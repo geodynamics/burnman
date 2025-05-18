@@ -38,7 +38,7 @@ class MGDBase(eos.EquationOfState):
         """
         T_0 = params["T_0"]
         func = (
-            lambda x: bm.birch_murnaghan(params["V_0"] / x, params)
+            lambda x: bm.pressure_third_order(params["V_0"] / x, params)
             + self._thermal_pressure(temperature, x, params)
             - self._thermal_pressure(T_0, x, params)
             - pressure
@@ -58,7 +58,7 @@ class MGDBase(eos.EquationOfState):
         """
         T_0 = params["T_0"]
         K_T = (
-            bm.bulk_modulus(volume, params)
+            bm.bulk_modulus_third_order(volume, params)
             + self._thermal_bulk_modulus(temperature, volume, params)
             - self._thermal_bulk_modulus(T_0, volume, params)
         )  # EQB13
@@ -122,7 +122,7 @@ class MGDBase(eos.EquationOfState):
         """
         T_0 = params["T_0"]
         return (
-            bm.birch_murnaghan(params["V_0"] / volume, params)
+            bm.pressure_third_order(params["V_0"] / volume, params)
             + self._thermal_pressure(temperature, volume, params)
             - self._thermal_pressure(T_0, volume, params)
         )

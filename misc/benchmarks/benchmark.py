@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -10,10 +10,8 @@ import matplotlib.pyplot as plt
 
 import burnman
 import burnman.eos.birch_murnaghan as bm
-import burnman.eos.birch_murnaghan_4th as bm4
 import burnman.eos.mie_grueneisen_debye as mgd
 import burnman.eos.slb as slb
-import burnman.eos.vinet as vinet
 
 from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 
@@ -47,8 +45,8 @@ def check_birch_murnaghan():
 
     # calculate its static properties
     for i in range(len(pressure)):
-        volume[i] = bm.volume(pressure[i], test_mineral.params)
-        bulk_modulus[i] = bm.bulk_modulus(volume[i], test_mineral.params)
+        volume[i] = bm.volume_third_order(pressure[i], test_mineral.params)
+        bulk_modulus[i] = bm.bulk_modulus_third_order(volume[i], test_mineral.params)
         shear_modulus[i] = bm.shear_modulus_third_order(
             volume[i], test_mineral.params
         )  # third order is used for the plot we are comparing against
@@ -100,7 +98,7 @@ def check_birch_murnaghan_4th():
 
     # calculate its static properties
     for i in range(len(pressure)):
-        volume[i] = bm4.volume_fourth_order(
+        volume[i] = bm.volume_fourth_order(
             pressure[i], test_mineral.params
         ) / test_mineral.params.get("V_0")
 
