@@ -3,7 +3,6 @@
 # GPL v2 or later.
 
 
-from os import path
 import numpy as np
 import scipy.optimize as opt
 
@@ -12,8 +11,6 @@ try:
     from scipy.special import factorial
 except ImportError:
     from scipy.misc import factorial
-
-import warnings
 
 from . import equation_of_state as eos
 from .. import constants as constants
