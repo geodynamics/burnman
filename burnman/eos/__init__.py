@@ -12,7 +12,7 @@ Equation of State
 """
 
 
-from .equation_of_state import EquationOfState
+from .equation_of_state import EquationOfState, IsothermalEquationOfState
 from .murnaghan import Murnaghan
 from .birch_murnaghan import BM3Shear2, BM3, BM4
 from .mie_grueneisen_debye import MGD2, MGD3

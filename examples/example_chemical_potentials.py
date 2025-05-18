@@ -17,9 +17,6 @@ properties from an assemblage.
 * How to compute fugacities and relative fugacities.
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 import matplotlib.pyplot as plt
 

@@ -62,17 +62,21 @@ def volume(pressure, params):
     reference temperature for a given pressure :math:`[Pa]`.
     Returns molar volume in :math:`[m^3]`
     """
-    func = lambda V: morse_potential(V / params["V_0"], params) - pressure
+
+    def delta_pressure(volume):
+        return morse_potential(volume / params["V_0"], params) - pressure
+
     try:
-        sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
+        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
     except:
         raise ValueError(
-            "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
+            "Cannot find a volume, perhaps you are outside "
+            "of the range of validity for the equation of state?"
         )
-    return opt.brentq(func, sol[0], sol[1])
+    return opt.brentq(delta_pressure, sol[0], sol[1])
 
 
-class Morse(eos.EquationOfState):
+class Morse(eos.IsothermalEquationOfState):
     """
     Class for the isothermal Morse Potential equation of state
     detailed in :cite:`Stacey1981`.
@@ -101,12 +105,6 @@ class Morse(eos.EquationOfState):
         """
         return shear_modulus(volume, params)
 
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        """
-        return 0.0
-
     def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
@@ -132,24 +130,6 @@ class Morse(eos.EquationOfState):
             self._molar_internal_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

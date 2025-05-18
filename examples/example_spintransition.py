@@ -26,12 +26,8 @@ defined minerals by comparing the current pressure to the transition pressure.
 
 * implementation of spin transition in (Mg,Fe)O at user defined pressure
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 import matplotlib.pyplot as plt
-
 
 import burnman
 from burnman import minerals

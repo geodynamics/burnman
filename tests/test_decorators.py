@@ -2,7 +2,6 @@ import unittest
 from util import BurnManTest
 
 import burnman
-
 from burnman import material_property
 from burnman.utils.misc import copy_documentation
 

@@ -8,7 +8,6 @@
 # format (printed to stdout)
 
 
-import sys
 import os.path
 
 if os.path.isfile("stx11ver.dat") == False:

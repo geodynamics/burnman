@@ -38,7 +38,7 @@ def intVdP(pressure, V_0, K_0, Kprime_0):
     )
 
 
-class Murnaghan(eos.EquationOfState):
+class Murnaghan(eos.IsothermalEquationOfState):
     """
     Base class for the isothermal Murnaghan equation of state,
     as described in :cite:`Murnaghan1944`.
@@ -68,13 +68,6 @@ class Murnaghan(eos.EquationOfState):
         """
         return 0.0
 
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral.
-        :math:`[J/K/mol]`
-        """
-        return 0.0
-
     def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
         Returns the internal energy :math:`\\mathcal{E}` of the mineral.
@@ -94,27 +87,6 @@ class Murnaghan(eos.EquationOfState):
             self._molar_internal_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

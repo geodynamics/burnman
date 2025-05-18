@@ -24,8 +24,6 @@ different methods.
 * Each method for calculating velocity profiles currently included within BurnMan
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
 
 import warnings
 import numpy as np

@@ -47,7 +47,7 @@ def make_params(K0, K0_prime, K_infinity_prime):
     return A, B, C
 
 
-class MACAW(eos.EquationOfState):
+class MACAW(eos.IsothermalEquationOfState):
     """
     Class for the MACAW equation of state
     detailed in Lozano and Aslam (2022; https://doi.org/10.1063/5.0076897).
@@ -119,30 +119,6 @@ class MACAW(eos.EquationOfState):
         Returns shear modulus :math:`G` of the mineral. :math:`[Pa]`
         """
         return 1.0e99
-
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        """
-        return 0.0
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, return a very small number. :math:`[J/K/mol]`
-        """
-        return 1.0e-99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

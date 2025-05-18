@@ -42,8 +42,6 @@ example_spintransition.py for explanation of how to implement this
 * Compare computations to seismic models
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
 
 import numpy as np
 import matplotlib.pyplot as plt

@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 from burnman.minerals import DKS_2013_liquids
 import numpy as np
 

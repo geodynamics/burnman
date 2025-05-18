@@ -11,9 +11,6 @@ paper_onefit
 This script reproduces :cite:`Cottaar2014`, Figure 7.
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import os.path
 import sys
 
@@ -21,17 +18,9 @@ if not os.path.exists("burnman") and os.path.exists("../../burnman"):
     sys.path.insert(1, os.path.abspath("../.."))
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy.ma as ma
-import numpy.random
 import burnman
-import pickle
 from burnman import minerals
 from contrib.CHRU2014.helper_solid_solution import HelperSolidSolution
-import matplotlib.cm
-import matplotlib.colors
-from scipy import interpolate
-from scipy.stats import norm
-import matplotlib.mlab as mlab
 import contrib.CHRU2014.colors as colors
 
 

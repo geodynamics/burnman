@@ -2,7 +2,6 @@
 # Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-
 import scipy.constants
 
 """

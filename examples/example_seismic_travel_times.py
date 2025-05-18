@@ -12,11 +12,6 @@ L. Krischer, T. Megies, R. Barsch, M. Beyreuther, T. Lecocq, C. Caudron, J. Wass
 To find out more about the specific routines in this example see
     https://docs.obspy.org/packages/obspy.taup.html
 """
-# Import supporting libraries
-# Imports to be compatible with Python2 and Python3
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
 
@@ -27,7 +22,6 @@ from burnman import minerals  # import mineral library seperately
 # This example relies heavily  on the ObsPy, a python seismology toolkit
 import obspy
 from obspy.taup import taup_create
-from obspy.taup import TauPyModel
 
 
 def plot_rays_and_times(modelname):

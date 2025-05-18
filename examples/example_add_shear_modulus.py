@@ -27,7 +27,6 @@ modulus as proposed by Hacker and Abers (2004).
 * How to output thermoelastic properties from the new mineral object.
 
 """
-from __future__ import absolute_import
 
 import numpy as np
 import matplotlib.pyplot as plt

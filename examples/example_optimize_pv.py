@@ -26,9 +26,6 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * loops over models
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 import matplotlib.pyplot as plt
 

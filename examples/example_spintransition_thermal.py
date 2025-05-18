@@ -4,7 +4,6 @@
 
 
 """
-
 example_spintransition_thermal
 ------------------------------
 
@@ -36,18 +35,13 @@ explicitly precludes long range order.
   pressure and temperature
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-
 from scipy.optimize import brentq
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 import burnman
-from burnman import Mineral, minerals
 from burnman.classes.solutionmodel import SymmetricRegularSolution
-from burnman.utils.chemistry import formula_mass
 
 
 if __name__ == "__main__":

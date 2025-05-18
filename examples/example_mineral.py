@@ -37,8 +37,6 @@ implementations of may equations of state (:doc:`eos`).
 * How to output thermodynamic and thermoelastic properties
 
 """
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 

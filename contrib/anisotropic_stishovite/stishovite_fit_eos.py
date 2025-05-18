@@ -1,8 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
-from scipy.optimize import minimize, differential_evolution, leastsq, least_squares
+from scipy.optimize import minimize, differential_evolution, leastsq
 
 from stishovite_data import (
     common_data,

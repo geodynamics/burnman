@@ -1,9 +1,7 @@
-from __future__ import absolute_import
 import unittest
 from util import BurnManTest
 
 import burnman
-
 from burnman.tools.eos import check_eos_consistency
 
 

@@ -123,7 +123,7 @@ def shear_modulus(pressure, params):
     return G  # eq. 78
 
 
-class RKprime(eos.EquationOfState):
+class RKprime(eos.IsothermalEquationOfState):
     """
     Class for the isothermal reciprocal K-prime equation of state
     detailed in :cite:`StaceyDavis2004`.  This equation of state is
@@ -188,12 +188,6 @@ class RKprime(eos.EquationOfState):
         """
         return shear_modulus(pressure, params)
 
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        """
-        return 0.0
-
     def _intVdP(self, xi, params):
         a = params["Kprime_inf"]
         b = (
@@ -232,24 +226,6 @@ class RKprime(eos.EquationOfState):
             + self._intVdP((pressure - params["P_0"]) / K, params)
             - self._intVdP(0.0, params)
         )
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

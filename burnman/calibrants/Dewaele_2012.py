@@ -4,7 +4,6 @@
 # GPL v2 or later.
 
 from burnman.eos.vinet import Vinet
-from burnman.eos.mie_grueneisen_debye import MGDBase
 from burnman.classes.calibrant import Calibrant
 import numpy as np
 

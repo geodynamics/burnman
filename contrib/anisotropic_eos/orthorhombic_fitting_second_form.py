@@ -20,9 +20,6 @@ thermal expansivities at 1 bar, one with components of the
 isentropic elastic stiffness tensor at high pressure, and one with
 selected seismic properties at a fixed pressure and temperature.
 """
-
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize

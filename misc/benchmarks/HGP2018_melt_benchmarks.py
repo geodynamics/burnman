@@ -13,7 +13,6 @@ This script tests the Holland et al. (2018) melt model in
 the CMS and MS systems.
 
 """
-from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman import Composite

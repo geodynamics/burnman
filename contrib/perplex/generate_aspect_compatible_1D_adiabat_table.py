@@ -38,10 +38,6 @@ save these properties to an ASPECT-compatible file.
 * smoothing of thermodynamic properties
 * self consistent 1D geophysical profile generation
 """
-
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 from scipy.optimize import fsolve, brentq
 from scipy.integrate import odeint

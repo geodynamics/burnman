@@ -17,7 +17,6 @@ import sys
 from sympy import Symbol, prod, sympify
 from sympy.parsing.sympy_parser import parse_expr
 from burnman.constants import gas_constant
-from burnman.minerals import HGP_2018_ds633, HP_2011_ds62
 from datetime import date
 
 ds = [

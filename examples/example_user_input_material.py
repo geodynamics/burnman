@@ -21,9 +21,6 @@ need to be input for BurnMan to calculate :math:`V_P, V_\\Phi, V_S` and density 
 * how to create your own minerals
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 import burnman
 

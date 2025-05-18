@@ -31,13 +31,10 @@ Layers can also be used to build an entire planet (see example_build_planet.py)
 * calculating thermoelastic properties with self-consistent pressures
 * seismic comparison
 """
-from __future__ import absolute_import
-
 # Here we import standard python modules that are required for
 # usage of BurnMan.
 import numpy as np
 import matplotlib.pyplot as plt
-
 
 # Here we import the relevant modules from BurnMan.
 import burnman

@@ -3,7 +3,7 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 import numpy as np
-from scipy.linalg import expm, logm
+from scipy.linalg import expm
 from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property

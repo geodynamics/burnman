@@ -1,9 +1,4 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 # Benchmarks for the solid solution class
-
-
 from burnman.minerals import SLB_2011
 from burnman.minerals import HP_2011_ds62
 import numpy as np

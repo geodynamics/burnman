@@ -27,14 +27,11 @@ and how to assess goodness of fit.
 * Assessing goodness of fit.
 
 """
-from __future__ import absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
 from burnman import minerals
-from burnman.utils.chemistry import formula_to_string
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 from burnman.optimize.composition_fitting import DummyCompositionSolution
 from burnman.optimize.composition_fitting import (

@@ -33,7 +33,6 @@ composite polytope.
 * Completion of an independent endmember set from a partial set
 * Simplifying composites at a given bulk composition
 """
-from __future__ import absolute_import
 import numpy as np
 from sympy import Rational
 

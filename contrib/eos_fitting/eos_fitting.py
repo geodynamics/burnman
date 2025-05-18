@@ -13,9 +13,6 @@ equation of state to experimental periclase data.
 
 It has been designed so that it can easily be modified to fit other data.
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import os
 import sys
 import numpy as np

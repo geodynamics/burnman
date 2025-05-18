@@ -29,8 +29,6 @@ class.
   simple thermodynamic equilibrium problems.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 import numpy as np
 from scipy.optimize import brentq, fsolve
 import matplotlib.pyplot as plt

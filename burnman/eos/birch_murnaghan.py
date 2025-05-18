@@ -240,7 +240,7 @@ def shear_modulus_third_order(volume, params):
     return G
 
 
-class BirchMurnaghanBase(eos.EquationOfState):
+class BirchMurnaghanBase(eos.IsothermalEquationOfState):
     """
     Base class for the isothermal Birch Murnaghan equation of state.
     This is third order in strain, and has no temperature dependence.
@@ -275,13 +275,6 @@ class BirchMurnaghanBase(eos.EquationOfState):
             return shear_modulus_second_order(volume, params)
         elif self.order == 3:
             return shear_modulus_third_order(volume, params)
-
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}`
-        of the mineral. :math:`[J/K/mol]`
-        """
-        return 0.0
 
     def _molar_internal_energy(self, pressure, temperature, volume, params):
         """
@@ -319,27 +312,6 @@ class BirchMurnaghanBase(eos.EquationOfState):
             self._molar_internal_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        simply return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects,
-        simply return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

@@ -96,7 +96,7 @@ def intVdP(pressure, params):
     return intVdP
 
 
-class MT(eos.EquationOfState):
+class MT(eos.IsothermalEquationOfState):
     """
     Base class for the generic modified Tait equation of state.
     References for this can be found in :cite:`HC1974`
@@ -134,12 +134,6 @@ class MT(eos.EquationOfState):
         """
         return 0.0
 
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        """
-        return 0.0
-
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
@@ -155,24 +149,6 @@ class MT(eos.EquationOfState):
         )
 
         return intVdP + params["E_0"] + params["V_0"] * params["P_0"]
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[1/K]`
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Since this equation of state does not contain temperature effects, simply return zero. :math:`[unitless]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

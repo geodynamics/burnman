@@ -37,9 +37,6 @@ volume in order to create smoothly varying relaxed properties.
 * self consistent 1D geophysical profile generation
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve, brentq

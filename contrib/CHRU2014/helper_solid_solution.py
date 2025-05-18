@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 import sys
 
@@ -19,7 +17,8 @@ class HelperSolidSolution(burnman.Mineral):
     solution between two or more end member minerals.  It is not
     completely clear how to do this, or how valid this approximation
     is, but here we just do a weighted arithmetic average of the
-    thermoelastic properties of the end members according to their molar fractions
+    thermoelastic properties of the end members according to their molar
+    fractions.
     """
 
     def __init__(self, endmembers, molar_fractions):
@@ -129,7 +128,7 @@ class Murakami_2013_mg_fe_perovskite(HelperSolidSolution):
 
 class other_ferropericlase(HelperSolidSolution):
     def __init__(self, fe_num):
-        endmembers = [minerals.other.periclase(), minerals.other.wuestite()]
+        endmembers = [minerals.SLB_2011.periclase(), minerals.SLB_2011.wuestite()]
         molar_fractions = [1.0 - fe_num, 0.0 + fe_num]
         # keep the 0.0 +, otherwise it is an array sometimes
         HelperSolidSolution.__init__(self, endmembers, molar_fractions)
@@ -141,7 +140,10 @@ class other_ferropericlase(HelperSolidSolution):
 
 class other_mg_fe_perovskite(HelperSolidSolution):
     def __init__(self, fe_num):
-        endmembers = [minerals.other.mg_perovskite(), minerals.other.fe_perovskite()]
+        endmembers = [
+            minerals.SLB_2011.mg_perovskite(),
+            minerals.SLB_2011.fe_perovskite(),
+        ]
         molar_fractions = [
             1.0 - fe_num,
             0.0 + fe_num,

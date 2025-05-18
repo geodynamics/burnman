@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -376,3 +376,37 @@ class EquationOfState(object):
         :type params: dict
         """
         pass
+
+
+class IsothermalEquationOfState(EquationOfState):
+    def entropy(self, pressure, temperature, volume, params):
+        """
+        Entropy of the equation of state (:math:`[J/K/mol]`).
+        This equation of state is isothermal,
+        so the entropy arbitrarily returns a value of zero.
+        """
+        return 0.0
+
+    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
+        """
+        Isobaric molar heat capacity of the equation of state
+        (:math:`[J/K/mol]`). This equation of state is isothermal,
+        so this function arbitrarily returns a very small number.
+        """
+        return 1.0e-99
+
+    def thermal_expansivity(self, pressure, temperature, volume, params):
+        """
+        Thermal expansivity of the equation of state
+        (:math:`[1/K]`). This equation of state is isothermal,
+        so this function arbitrarily returns a value of zero.
+        """
+        return 0.0
+
+    def _grueneisen_parameter(self, pressure, temperature, volume, params):
+        """
+        Grueneisen parameter of the equation of state
+        (unitless). This equation of state is isothermal,
+        so this function arbitrarily returns a value of zero.
+        """
+        return 0.0
