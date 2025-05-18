@@ -65,7 +65,7 @@ def make_params(K_0, Kp_0, Kp_inf, Kdp_0):
     return a, b, c
 
 
-class SPOCK(eos.EquationOfState):
+class SPOCK(eos.IsothermalEquationOfState):
     """
     Class for the Scaled Power Of Compression K-prime equation of state.
     This equation is derived from the assumption that K' = b*(V/V_0)^a.
@@ -154,34 +154,6 @@ class SPOCK(eos.EquationOfState):
         This equation of state is athermal, so the function returns a very large number.
         """
         return 1.0e99
-
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        This equation of state is athermal, so the function returns zero.
-        """
-        return 0.0
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Returns the molar heat capacity at constant pressure. :math:`[J/K/mol]`
-        This equation of state is athermal, so the function returns zero.
-        """
-        return 1.0e-99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Returns the thermal expansivity at constant pressure. :math:`[1/K]`
-        This equation of state is athermal, so the function returns zero.
-        """
-        return 0.0
-
-    def _grueneisen_parameter(self, pressure, temperature, volume, params):
-        """
-        Returns the grueneisen parameter. Unitless
-        This equation of state is athermal, so the function returns zero.
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """

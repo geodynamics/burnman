@@ -57,7 +57,7 @@ def volume_vinet(pressure, params):
     return V
 
 
-class Vinet(eos.EquationOfState):
+class Vinet(eos.IsothermalEquationOfState):
     """
     Base class for the isothermal Vinet equation of state.
     References for this equation of state are :cite:`vinet1986`
@@ -89,13 +89,6 @@ class Vinet(eos.EquationOfState):
         """
         return 0.0
 
-    def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy :math:`\\mathcal{S}` of the mineral. :math:`[J/K/mol]`
-        The Vinet EOS is athermal, so this function returns 0.
-        """
-        return 0.0
-
     def gibbs_free_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
@@ -114,18 +107,6 @@ class Vinet(eos.EquationOfState):
         )
 
         return params["E_0"] - intPdV + volume * pressure
-
-    def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        The Vinet EOS is athermal, so this function returns a very large number. :math:`[J/K/mol]`
-        """
-        return 1.0e99
-
-    def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        The Vinet EOS is athermal, so this function returns zero. :math:`[1/K]`
-        """
-        return 0.0
 
     def validate_parameters(self, params):
         """
