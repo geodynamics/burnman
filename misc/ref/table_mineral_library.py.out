@@ -1135,10 +1135,6 @@ other.liquid_iron            1811.0 100.0 7.956261575723038e-06 109700000000.0  
 Name (mgd3 equation of state)         V_0            K_0 Kprime_0 G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0 q_0 eta_s_0
 other.Speziale_fe_periclase_HS   2.29e-05 157500000000.0     3.92 nan      nan    0.04567 2     587         1.46 1.2        
 other.Speziale_fe_periclase_LS  2.149e-05 186000000000.0      4.6 nan      nan    0.04567 2   587.0         1.46 1.2        
-Name (slb3 equation of state)                        V_0            K_0 Kprime_0            G_0 Gprime_0           molar_mass   n  Debye_0 grueneisen_0     q_0  eta_s_0
-other.ZSB_2013_fe_perovskite                   2.549e-05 272000000000.0      4.1 133000000000.0      1.4               0.1319   5    871.0         1.57     1.1      2.3
-other.ZSB_2013_mg_perovskite                   2.445e-05 250500000000.0     4.01 172900000000.0     1.74                  0.1   5    905.9         1.44    1.09     2.13
-other.fe_perovskite (SLB_2011.fe_perovskite)  2.5485e-05 272115200000.0     4.14 132684900000.0  1.37485            0.1319287 5.0 870.8122      1.56508 1.10945  2.29211
-other.mg_perovskite (SLB_2011.mg_perovskite)  2.4445e-05 250526400000.0     4.14 172900000000.0  1.69037            0.1003887 5.0 905.9412      1.56508 1.10945  2.56536
-other.periclase (SLB_2011.periclase)          1.1244e-05 161383600000.0  3.84045 130900000000.0   2.1438 0.040304400000000004 2.0 767.0977      1.36127  1.7217  2.81765
-other.wuestite (SLB_2011.wuestite)            1.2264e-05 179444200000.0   4.9376  59000000000.0  1.44673            0.0718444 2.0 454.1592      1.53047  1.7217 -0.05731
+Name (slb3 equation of state)        V_0            K_0 Kprime_0            G_0 Gprime_0 molar_mass n Debye_0 grueneisen_0  q_0 eta_s_0
+other.ZSB_2013_fe_perovskite   2.549e-05 272000000000.0      4.1 133000000000.0      1.4     0.1319 5   871.0         1.57  1.1     2.3
+other.ZSB_2013_mg_perovskite   2.445e-05 250500000000.0     4.01 172900000000.0     1.74        0.1 5   905.9         1.44 1.09    2.13
