@@ -324,14 +324,16 @@ if __name__ == "__main__":
         ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressure, temperature
     )
 
-    err_vs, err_vphi, err_rho = burnman.utils.math.compare_l2(
-        depths / np.mean(depths),
-        [vs / np.mean(seis_vs), vphi / np.mean(seis_vphi), rho / np.mean(seis_rho)],
-        [
-            seis_vs / np.mean(seis_vs),
-            seis_vphi / np.mean(seis_vphi),
-            seis_rho / np.mean(seis_rho),
-        ],
+    err_vs, err_vphi, err_rho = np.square(
+        burnman.utils.math.compare_l2_norm(
+            depths / np.mean(depths),
+            [vs / np.mean(seis_vs), vphi / np.mean(seis_vphi), rho / np.mean(seis_rho)],
+            [
+                seis_vs / np.mean(seis_vs),
+                seis_vphi / np.mean(seis_vphi),
+                seis_rho / np.mean(seis_rho),
+            ],
+        )
     )
     error = np.sum([err_rho, err_vphi, err_vs])
 

@@ -43,9 +43,9 @@ if __name__ == "__main__":
     def error(amount_pv, iron_pv, iron_fp):
         mat_vp, mat_vs, mat_rho = calc_velocities(amount_pv, iron_pv, iron_fp)
 
-        vs_err = burnman.utils.math.l2(depths, mat_vs, seis_vs) / 1e9
-        vp_err = burnman.utils.math.l2(depths, mat_vp, seis_vp) / 1e9
-        den_err = burnman.utils.math.l2(depths, mat_rho, seis_rho) / 1e9
+        vs_err = np.square(burnman.utils.math.l2_norm(depths, mat_vs, seis_vs)) / 1e9
+        vp_err = np.square(burnman.utils.math.l2_norm(depths, mat_vp, seis_vp)) / 1e9
+        den_err = np.square(burnman.utils.math.l2_norm(depths, mat_rho, seis_rho)) / 1e9
 
         # print vs_err, vp_err, den_err
 

@@ -97,14 +97,14 @@ if __name__ == "__main__":
         mat_rho, mat_vs, mat_vphi = rock.evaluate(
             ["rho", "v_s", "v_phi"], seis_p, temperature
         )
-        # [rho_err,vphi_err,vs_err]=burnman.utils.compare_chifactor(mat_vs,mat_vphi,mat_rho,seis_vs,seis_vphi,seis_rho)
-
         return seis_p, mat_vs, mat_vphi, mat_rho
 
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
-        [vs_err, vphi_err, rho_err] = burnman.utils.math.compare_l2(
-            depths, [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho]
+        [vs_err, vphi_err, rho_err] = np.square(
+            burnman.utils.math.compare_l2_norm(
+                depths, [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho]
+            )
         )
         scale = 2700e3 - 850e3
         return vs_err / scale, vphi_err / scale

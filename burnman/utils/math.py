@@ -30,13 +30,6 @@ def unit_normalize(a, order=2, axis=-1):
     return a / np.expand_dims(l2, axis)[0][0]
 
 
-def float_eq(a, b):
-    """
-    Test if two floats are almost equal to each other
-    """
-    return abs(a - b) < 1e-10 * max(1e-5, abs(a), abs(b))
-
-
 def linear_interpol(x, x1, x2, y1, y2):
     """
     Linearly interpolate to point x, between
@@ -353,7 +346,7 @@ def interp_smoothed_array_and_derivatives(
     return interps
 
 
-def compare_l2(depth, calc, obs):
+def compare_l2_norm(depth, calc, obs):
     """
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
 
@@ -369,82 +362,79 @@ def compare_l2(depth, calc, obs):
     """
     err = []
     for i in range(len(calc)):
-        err.append(l2(depth, calc[i], obs[i]))
+        err.append(l2_norm(depth, calc[i], obs[i]))
 
     return err
 
 
-def compare_chifactor(calc, obs):
+def compare_chisqr_factor(calc, obs):
     """
-    Computes the chi factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
-
+    Computes the chisqr factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
 
     :type calc: list of arrays of float
     :param calc: N arrays calculated values, e.g. [mat_vs,mat_vphi]
     :type obs: list of arrays of float
-    :param obs: N arrays of values (observed or calculated) to compare to , e.g. [seis_vs, seis_vphi]
+    :param obs: N arrays of values (observed or calculated) to compare to, e.g. [seis_vs, seis_vphi]
 
     :returns: error array of length N
     :rtype: array of floats
     """
     err = []
     for i in range(len(calc)):
-        err.append(chi_factor(calc[i], obs[i]))
+        err.append(chisqr_factor(calc[i], obs[i]))
 
     return err
 
 
-def l2(x, funca, funcb):
+def l2_norm(x, funca, funcb):
     """
-    Computes the L2 norm for one profile(assumed to be linear between points).
+    Computes the L2 norm of the difference between two 1D profiles,
+    assuming linear interpolation between points.
 
-    :type x: array of float
-    :param x: depths :math:`[m]`.
-    :type funca: list of arrays of float
-    :param funca: array calculated values
-    :type funcb: list of arrays of float
-    :param funcb: array of values (observed or calculated) to compare to
+    This is equivalent to the square root of the integrated squared
+    difference between the two functions over the given depth range.
+    The integration is performed using the trapezoidal rule.
 
-    :returns: L2 norm
-    :rtype: array of floats
-    """
-    diff = np.array(funca - funcb)
-    diff = diff * diff
+    :param x: Array of depth values [m], must be 1D and monotonically increasing.
+    :type x: array-like of float
 
-    return integrate.trapezoid(diff, x)
+    :param funca: First profile (e.g., model or predicted values), must be same length as x.
+    :type funca: array-like of float
 
+    :param funcb: Second profile (e.g., observed or reference values), same shape as funca.
+    :type funcb: array-like of float
 
-def nrmse(x, funca, funcb):
-    """
-    Normalized root mean square error for one profile
-    :type x: array of float
-    :param x: depths in m.
-    :type funca: list of arrays of float
-    :param funca: array calculated values
-    :type funcb: list of arrays of float
-    :param funcb: array of values (observed or calculated) to compare to
-
-    :returns: RMS error
-    :rtype: array of floats
+    :return: L2 norm (scalar)
+    :rtype: float
     """
     diff = np.array(funca - funcb)
     diff = diff * diff
-    rmse = np.sqrt(np.sum(diff) / x)
-    nrmse = rmse / (np.max(funca) - np.min(funca))
-
-    return nrmse
+    return np.sqrt(integrate.trapezoid(diff, x))
 
 
-def chi_factor(calc, obs):
+def chisqr_factor(calc, obs):
     """
-    :math:`\\chi` factor for one profile assuming 1% uncertainty on the reference model (obs)
-    :type calc: list of arrays of float
-    :param calc: array calculated values
-    :type obs: list of arrays of float
-    :param obs: array of reference values to compare to
+    Computes the :math:`\\chi^2` factor for a single profile, assuming a 1 %
+    uncertainty on the reference (observed) values. This provides a normalized
+    measure of the deviation between calculated and reference values.
 
-    :returns: :math:`\\chi` factor
-    :rtype: array of floats
+    The :math:`\\chi^2` factor is calculated as:
+
+    .. math::
+
+        \\chi^2 = \\frac{1}{N} \\sum_{i=1}^{N}
+                  \\left( \\frac{\\text{calc}_i - \\text{obs}_i}{0.01 \\cdot \\text{mean}(\\text{obs})} \\right)^2
+
+    where :math:`N` is the number of elements in the profile.
+
+    :param calc: Array of calculated values (e.g., from a model).
+    :type calc: array-like of float
+
+    :param obs: Array of reference or observed values.
+    :type obs: array-like of float
+
+    :return: The :math:`\\chi^2` factor for the profile.
+    :rtype: float
     """
 
     err = np.empty_like(calc)
@@ -495,27 +485,33 @@ def array_to_rational_matrix(array):
 
 def complete_basis(basis, flip_columns=True):
     """
-    Creates a full basis by filling remaining rows with
-    selected rows of the identity matrix that have indices
-    not in the column pivot list of the basis RREF
+    Extends a partial basis (with fewer rows than columns) to a full basis
+    by adding rows from the identity matrix that are linearly independent
+    of the existing rows.
 
-    :param basis: A partial basis
-    :type basis: numpy array
-    :param flip_columns: whether to calculate the RREF
-        from a flipped basis. This can be useful, for example,
-        when dependent columns are known to be further to the
-        right in the basis. defaults to True
+    This is done by computing the reduced row echelon form (RREF) of the basis
+    to identify pivot columns. Identity rows corresponding to non-pivot columns
+    are added to complete the basis.
+
+    :param basis: A 2D NumPy array representing a partial basis, with shape (n, m)
+                  where n < m.
+    :type basis: numpy.ndarray
+
+    :param flip_columns: If True, the basis columns are flipped (reversed) before
+                         computing the RREF. This is helpful if the dependent columns
+                         are expected to appear later in the matrix. Default is True.
     :type flip_columns: bool, optional
-    :return: basis
-    :rtype: numpy array
-    """
 
+    :return: A completed basis as a NumPy array with shape (m, m), containing the
+             original rows plus additional rows from the identity matrix.
+    :rtype: numpy.ndarray
+    """
     n, m = basis.shape
     if n < m:
         if flip_columns:
             pivots = list(m - 1 - np.array(Matrix(np.flip(basis, axis=1)).rref()[1]))
         else:
-            pivots = list(Matrix(basis)).rref()[1]
+            pivots = list(Matrix(basis).rref())[1]
 
         return np.concatenate(
             (basis, np.identity(m)[[i for i in range(m) if i not in pivots], :]), axis=0
