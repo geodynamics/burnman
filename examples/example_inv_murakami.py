@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import minerals
+from burnman.utils.math import l2_norm_profile
 
 import pymc
 import cProfile
@@ -43,12 +44,9 @@ if __name__ == "__main__":
     def error(amount_pv, iron_pv, iron_fp):
         mat_vp, mat_vs, mat_rho = calc_velocities(amount_pv, iron_pv, iron_fp)
 
-        vs_err = np.square(burnman.utils.math.l2_norm(depths, mat_vs, seis_vs)) / 1e9
-        vp_err = np.square(burnman.utils.math.l2_norm(depths, mat_vp, seis_vp)) / 1e9
-        den_err = np.square(burnman.utils.math.l2_norm(depths, mat_rho, seis_rho)) / 1e9
-
-        # print vs_err, vp_err, den_err
-
+        vs_err = l2_norm_profile(depths, mat_vs, seis_vs) / 1.0e3
+        vp_err = l2_norm_profile(depths, mat_vp, seis_vp) / 1.0e3
+        den_err = l2_norm_profile(depths, mat_rho, seis_rho) / 1.0e3
         return vs_err + vp_err + den_err
 
     # Priors on unknown parameters:
@@ -282,7 +280,7 @@ if __name__ == "__main__":
             markersize=4,
             label="ref",
         )
-        plt.title("density ($\cdot 10^3$ kg/m^$3$)")
+        plt.title("density ($\\cdot 10^3$ kg/m^$3$)")
         plt.legend(loc="upper left")
         plt.ylim([4, 8])
         plt.savefig("output_figures/example_inv_murakami_2.png")
@@ -525,7 +523,7 @@ if __name__ == "__main__":
             markersize=4,
             label="ref",
         )
-        plt.title("density ($\cdot 10^3$ kg/m$^3$)")
+        plt.title("density ($\\cdot 10^3$ kg/m$^3$)")
         plt.legend(loc="upper left")
         plt.ylim([4, 8])
         plt.savefig("output_figures/example_inv_murakami_2.png")

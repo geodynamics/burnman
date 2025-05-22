@@ -325,7 +325,7 @@ if __name__ == "__main__":
     )
 
     err_vs, err_vphi, err_rho = np.square(
-        burnman.utils.math.compare_l2_norm(
+        burnman.utils.math.l2_norm_profiles(
             depths / np.mean(depths),
             [vs / np.mean(seis_vs), vphi / np.mean(seis_vphi), rho / np.mean(seis_rho)],
             [

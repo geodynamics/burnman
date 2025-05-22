@@ -10,8 +10,8 @@ import scipy.integrate as integrate
 from burnman.utils.misc import extract_lines_between_markers
 from burnman.utils.misc import run_cli_program_with_input
 from burnman.utils.math import smooth_array
-from burnman.utils.math import compare_l2_norm, l2_norm
-from burnman.utils.math import compare_chisqr_factor
+from burnman.utils.math import l2_norm_profile, l2_norm_profiles
+from burnman.utils.math import chisqr_profiles
 from burnman.utils.math import independent_row_indices
 from burnman.utils.math import array_to_rational_matrix
 from burnman.utils.math import complete_basis, generate_complete_basis
@@ -85,7 +85,7 @@ class test_utils(BurnManTest):
     def test_l2_norm_exact_match(self):
         x = np.linspace(0, 10, 100)
         f = np.sin(x)
-        result = l2_norm(x, f, f)
+        result = l2_norm_profile(x, f, f)
         self.assertAlmostEqual(result, 0.0, places=10)
 
     def test_l2_norm_linear_difference(self):
@@ -94,7 +94,7 @@ class test_utils(BurnManTest):
         f2 = np.array([1, 1, 1])
         # diff = [0, 1, 2], squared = [0, 1, 4]
         # integrate: ∫0^2 of squared difference = trapezoid([0,1,4], x=[0,1,2]) = 3
-        result = l2_norm(x, f1, f2)
+        result = l2_norm_profile(x, f1, f2)
         self.assertAlmostEqual(result, np.sqrt(3), places=4)
 
     def test_l2_norm_constant_vs_zero(self):
@@ -102,14 +102,14 @@ class test_utils(BurnManTest):
         f1 = np.ones_like(x)
         f2 = np.zeros_like(x)
         expected = np.sqrt(integrate.trapezoid(f1**2, x))
-        result = l2_norm(x, f1, f2)
+        result = l2_norm_profile(x, f1, f2)
         self.assertAlmostEqual(result, expected, places=6)
 
     def test_l2_norm_nonuniform_grid(self):
         x = np.array([0.0, 0.1, 0.4, 1.0])
         f1 = np.array([1.0, 2.0, 3.0, 4.0])
         f2 = np.array([1.0, 2.0, 1.0, 0.0])
-        result = l2_norm(x, f1, f2)
+        result = l2_norm_profile(x, f1, f2)
         self.assertTrue(result > 0)
 
     def test_l2_norm_input_shape_mismatch(self):
@@ -117,13 +117,13 @@ class test_utils(BurnManTest):
         f1 = np.array([1, 2, 3])
         f2 = np.array([1, 2])
         with self.assertRaises(ValueError):
-            l2_norm(x, f1, f2)
+            l2_norm_profile(x, f1, f2)
 
     def test_compare_l2_norm_constant_vs_zero_profiles(self):
         depth = np.linspace(0, 1, 10)
         calc = [np.ones_like(depth), 2 * np.ones_like(depth)]
         obs = [np.zeros_like(depth), np.zeros_like(depth)]
-        result = compare_l2_norm(depth, calc, obs)
+        result = l2_norm_profiles(depth, calc, obs)
         expected_1 = np.sqrt(integrate.trapezoid(np.ones_like(depth) ** 2, depth))
         expected_2 = np.sqrt(integrate.trapezoid((2 * np.ones_like(depth)) ** 2, depth))
         self.assertAlmostEqual(result[0], expected_1, places=6)
@@ -134,18 +134,18 @@ class test_utils(BurnManTest):
         calc = [np.array([1, 2, 3])]
         obs = [np.array([1, 2])]
         with self.assertRaises(ValueError):
-            compare_l2_norm(depth, calc, obs)
+            l2_norm_profiles(depth, calc, obs)
 
-    def test_chisqr_factor_perfect_match(self):
+    def test_chisqr_perfect_match(self):
         profile1 = np.array([1.0, 2.0, 3.0])
         profile2 = np.array([4.0, 5.0, 6.0])
         calc = [profile1, profile2]
         obs = [profile1.copy(), profile2.copy()]
-        result = compare_chisqr_factor(calc, obs)
+        result = chisqr_profiles(calc, obs)
         for val in result:
             self.assertAlmostEqual(val, 0.0, places=12)
 
-    def test_chisqr_factor_known_difference(self):
+    def test_chisqr_known_difference(self):
         # Calculate chi-sqr manually for a simple case
         obs = np.array([10, 10, 10])
         calc = np.array([10, 11, 12])
@@ -154,15 +154,15 @@ class test_utils(BurnManTest):
         # terms = [0, (1/0.1)^2=100, (2/0.1)^2=400] -> sum=500, avg=500/3=166.6667
         expected = 166.6667
 
-        result = compare_chisqr_factor([calc], [obs])
+        result = chisqr_profiles([calc], [obs])
         self.assertAlmostEqual(result[0], expected, places=3)
 
-    def test_chisqr_factor_multiple_profiles(self):
+    def test_chisqr_multiple_profiles(self):
         obs1 = np.array([1, 2, 3])
         obs2 = np.array([4, 5, 6])
         calc1 = np.array([1.1, 2.1, 3.1])
         calc2 = np.array([3.9, 4.9, 6.1])
-        result = compare_chisqr_factor([calc1, calc2], [obs1, obs2])
+        result = chisqr_profiles([calc1, calc2], [obs1, obs2])
 
         # Compute expected manually
         def manual_chi(calc, obs):
@@ -173,17 +173,17 @@ class test_utils(BurnManTest):
         for r, e in zip(result, expected):
             self.assertAlmostEqual(r, e, places=6)
 
-    def test_chisqr_factor_empty_input(self):
+    def test_chisqr_empty_input(self):
         # Empty input returns empty list
-        result = compare_chisqr_factor([], [])
-        self.assertEqual(result, [])
+        result = chisqr_profiles([], [])
+        self.assertEqual(len(result), 0)
 
-    def test_chisqr_factor_mismatched_lengths(self):
+    def test_chisqr_mismatched_lengths(self):
         # If calc and obs length mismatch, should raise IndexError or handle gracefully
         calc = [np.array([1, 2])]
         obs = []
         with self.assertRaises(IndexError):
-            compare_chisqr_factor(calc, obs)
+            chisqr_profiles(calc, obs)
 
     def test_independent_row_indices(self):
         arr = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])

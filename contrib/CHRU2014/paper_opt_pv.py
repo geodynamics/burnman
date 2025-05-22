@@ -102,7 +102,7 @@ if __name__ == "__main__":
     def material_error(x):
         _, mat_vs, mat_vphi, mat_rho = eval_material(x)
         [vs_err, vphi_err, rho_err] = np.square(
-            burnman.utils.math.compare_l2_norm(
+            burnman.utils.math.l2_norm_profiles(
                 depths, [mat_vs, mat_vphi, mat_rho], [seis_vs, seis_vphi, seis_rho]
             )
         )

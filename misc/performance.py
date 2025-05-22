@@ -7,7 +7,7 @@ import numpy as np
 
 import burnman
 from burnman import minerals
-
+from burnman.utils.math import l2_norm_profile
 
 if True:
 
@@ -78,9 +78,9 @@ if True:
     def error(a, b, c):
         mat_vp, mat_vs, mat_rho = calc_velocities(a, b, c)
 
-        vs_err = np.square(burnman.utils.math.l2_norm(depths, mat_vs, seis_vs)) / 1e9
-        vp_err = np.square(burnman.utils.math.l2_norm(depths, mat_vp, seis_vp)) / 1e9
-        den_err = np.square(burnman.utils.math.l2_norm(depths, mat_rho, seis_rho)) / 1e9
+        vs_err = l2_norm_profile(depths, mat_vs, seis_vs) / 1.0e3
+        vp_err = l2_norm_profile(depths, mat_vp, seis_vp) / 1.0e3
+        den_err = l2_norm_profile(depths, mat_rho, seis_rho) / 1.0e3
 
         return vs_err + vp_err + den_err
 

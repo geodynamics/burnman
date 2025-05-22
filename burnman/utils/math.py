@@ -346,7 +346,7 @@ def interp_smoothed_array_and_derivatives(
     return interps
 
 
-def compare_l2_norm(depth, calc, obs):
+def l2_norm_profiles(depth, calc, obs):
     """
     Computes the L2 norm for N profiles at a time (assumed to be linear between points).
 
@@ -362,12 +362,12 @@ def compare_l2_norm(depth, calc, obs):
     """
     err = []
     for i in range(len(calc)):
-        err.append(l2_norm(depth, calc[i], obs[i]))
+        err.append(l2_norm_profile(depth, calc[i], obs[i]))
 
     return err
 
 
-def compare_chisqr_factor(calc, obs):
+def chisqr_profiles(calc, obs):
     """
     Computes the chisqr factor for N profiles at a time. Assumes a 1% a priori uncertainty on the seismic model.
 
@@ -381,12 +381,12 @@ def compare_chisqr_factor(calc, obs):
     """
     err = []
     for i in range(len(calc)):
-        err.append(chisqr_factor(calc[i], obs[i]))
+        err.append(chisqr_profile(calc[i], obs[i]))
 
-    return err
+    return np.array(err)
 
 
-def l2_norm(x, funca, funcb):
+def l2_norm_profile(x, funca, funcb):
     """
     Computes the L2 norm of the difference between two 1D profiles,
     assuming linear interpolation between points.
@@ -407,12 +407,11 @@ def l2_norm(x, funca, funcb):
     :return: L2 norm (scalar)
     :rtype: float
     """
-    diff = np.array(funca - funcb)
-    diff = diff * diff
+    diff = np.square(funca - funcb)
     return np.sqrt(integrate.trapezoid(diff, x))
 
 
-def chisqr_factor(calc, obs):
+def chisqr_profile(calc, obs, uncertainties=0.01):
     """
     Computes the :math:`\\chi^2` factor for a single profile, assuming a 1 %
     uncertainty on the reference (observed) values. This provides a normalized
@@ -428,22 +427,20 @@ def chisqr_factor(calc, obs):
     where :math:`N` is the number of elements in the profile.
 
     :param calc: Array of calculated values (e.g., from a model).
-    :type calc: array-like of float
+    :type calc: array
 
     :param obs: Array of reference or observed values.
-    :type obs: array-like of float
+    :type obs: array
+
+    :param uncertainties: Array of uncertainties values.
+    :type uncertainties: array or float
 
     :return: The :math:`\\chi^2` factor for the profile.
     :rtype: float
     """
 
-    err = np.empty_like(calc)
-    for i in range(len(calc)):
-        err[i] = pow((calc[i] - obs[i]) / (0.01 * np.mean(obs)), 2.0)
-
-    err_tot = np.sum(err) / len(err)
-
-    return err_tot
+    err = np.square((calc - obs) / (uncertainties * np.mean(obs)))
+    return np.sum(err) / len(err)
 
 
 def independent_row_indices(array):
