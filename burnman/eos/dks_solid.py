@@ -228,12 +228,12 @@ class DKS_S(eos.EquationOfState):
         alpha = gr * C_v / K / volume
         return alpha
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self._helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
@@ -252,7 +252,7 @@ class DKS_S(eos.EquationOfState):
 
         return S_0 + S_th
 
-    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """

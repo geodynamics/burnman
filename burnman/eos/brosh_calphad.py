@@ -397,7 +397,7 @@ class BroshCalphad(eos.EquationOfState):
 
         return C_T
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy of the mineral. :math:`[J/mol]`
         """

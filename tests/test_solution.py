@@ -19,6 +19,7 @@ from burnman.minerals.SLB_2011 import mg_post_perovskite
 from burnman.minerals.SLB_2011 import fe_post_perovskite
 from burnman.minerals.SLB_2011 import al_post_perovskite
 from burnman.tools.eos import check_eos_consistency
+from burnman.tools.solution import transform_solution_to_new_basis
 
 
 class forsterite(Mineral):
@@ -229,6 +230,7 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
             ],
             entropy_interaction=[[[1.0, -2.0], [0.0, 1.0]], [[0.0, 0.0]]],
             energy_ternary_terms=[[0, 1, 2, 3.0e3]],
+            volume_ternary_terms=[[0, 1, 2, 3.0e-5]],
         )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -262,7 +264,7 @@ class two_site_ss_polynomial_ternary(burnman.SolidSolution):
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 3.0e-5, 0, 1, 1, 1, 2, 1],
             ],
         )
 
@@ -303,7 +305,7 @@ class two_site_ss_polynomial_ternary_transformed(burnman.SolidSolution):
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 3.0e-5, 0, 1, 1, 1, 2, 1],
             ],
             transformation_matrix=np.array(
                 [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
@@ -1053,12 +1055,23 @@ class test_solidsolution(BurnManTest):
         ol.set_composition(np.array([0.5, 0.5]))
         ol.set_state(1.0e5, 1000.0)
         self.assertArraysAlmostEqual(ol.activities, [0.25, 0.25])
+        self.assertArraysAlmostEqual(ol.activity_coefficients, [1.0, 1.0])
 
-    def test_activity_coefficients_ideal(self):
+    def test_entropy_ideal(self):
         ol = olivine_ideal_ss()
         ol.set_composition(np.array([0.5, 0.5]))
         ol.set_state(1.0e5, 1000.0)
-        self.assertArraysAlmostEqual(ol.activity_coefficients, [1.0, 1.0])
+
+        R = burnman.constants.gas_constant
+        self.assertAlmostEqual(
+            ol.solution_model.configurational_entropy(ol.molar_fractions),
+            2.0 * np.log(2) * R,
+        )
+
+        S_hess = 2 * np.array([[-R, R], [R, -R]])
+
+        np.testing.assert_allclose(ol.entropy_hessian, S_hess)
+        np.testing.assert_allclose(ol.volume_hessian, np.zeros((2, 2)))
 
     def test_activity_coefficients_non_ideal(self):
         opx = orthopyroxene()
@@ -1327,6 +1340,155 @@ class test_solidsolution(BurnManTest):
             ropx.isothermal_compressibility_reuss
             > ropx.unrelaxed.isothermal_compressibility_reuss
         )
+
+    def test_transform_ideal(self):
+        ol = olivine_ideal_ss()
+        new_ol = transform_solution_to_new_basis(
+            ol, [[0.25, 0.75], [0.75, 0.25]], endmember_names=["fafo", "fofa"]
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ol.set_composition([0.5, 0.5])
+        new_ol.set_composition([0.5, 0.5])
+        ol.set_state(P, T)
+        new_ol.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ol.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ol.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ol.gibbs, new_ol.gibbs)
+
+    def test_transform_asymmetric(self):
+        cpx = burnman.minerals.JH_2015.clinopyroxene()
+        new_cpx = transform_solution_to_new_basis(
+            cpx,
+            [[1, 1, 0, 0, 0, 0, 0, -1], [0, 0, 1, 0, 0, 0, 0, 0]],
+            solution_name="fdi-cats",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        cpx.set_composition([0.5, 0.5, 0.5, 0, 0, 0, 0, -0.5])
+        new_cpx.set_composition([0.5, 0.5])
+        cpx.set_state(P, T)
+        new_cpx.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(cpx.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_cpx.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(cpx.gibbs, new_cpx.gibbs)
+
+    def test_transform_asymmetric_new_disordered_endmember(self):
+        cpx = burnman.minerals.JH_2015.clinopyroxene()
+        new_cpx = transform_solution_to_new_basis(
+            cpx,
+            [[0.5, 0.5, 0, 0, 0, 0, 0, 0.0], [0, 0, 1, 0, 0, 0, 0, 0]],
+            solution_name="fdi-cats",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        cpx.set_composition([0.25, 0.25, 0.5, 0, 0, 0, 0, 0])
+        new_cpx.set_composition([0.5, 0.5])
+        cpx.set_state(P, T)
+        new_cpx.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(cpx.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_cpx.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(cpx.gibbs, new_cpx.gibbs)
+
+    def test_transform_subregular_new_disordered_endmember(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.25, 0.75, 0], [0, 0, 1], [0.75, 0.25, 0.0]],
+            solution_name="new",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.5, 0.5, 0.0])
+        new_ss.set_composition([0.5, 0.0, 0.5])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
+
+    def test_transform_subregular_new_disordered_endmember_cut(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.25, 0.75, 0], [0, 0, 1], [0.75, 0.25, 0.0]],
+            solution_name="new",
+            n_mbrs=2,
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.125, 0.375, 0.5])
+        new_ss.set_composition([0.5, 0.5])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
+
+    def test_transform_subregular_one_disordered_endmember(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.5, 0.5, 0]],
+            solution_name="new",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.5, 0.5, 0.0])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
+
+    def test_solution_model_functions(self):
+        sm = burnman.classes.solutionmodel.SolutionModel()
+        P = 1.0e9
+        T = 1000.0
+        f = np.array([1.0, 0.0])
+        pGs = sm.excess_partial_gibbs_energies(P, T, f)
+        pSs = sm.excess_partial_entropies(P, T, f)
+        pVs = sm.excess_partial_volumes(P, T, f)
+        zeros = np.zeros(2)
+        np.testing.assert_allclose(pGs, zeros)
+        np.testing.assert_allclose(pSs, zeros)
+        np.testing.assert_allclose(pVs, zeros)
+
+    def test_mechanical_solution_model_functions(self):
+        sm = burnman.classes.solutionmodel.MechanicalSolution(
+            [[forsterite(), ""], [fayalite(), ""]]
+        )
+        P = 1.0e9
+        T = 1000.0
+        f = np.array([1.0, 0.0])
+        pGs = sm.excess_partial_gibbs_energies(P, T, f)
+        pSs = sm.excess_partial_entropies(P, T, f)
+        pVs = sm.excess_partial_volumes(P, T, f)
+
+        H_xs = sm.excess_enthalpy(P, T, f)
+        gammas = sm.activity_coefficients(P, T, f)
+        alphas = sm.activities(P, T, f)
+
+        zeros = np.zeros(2)
+        ones = np.ones(2)
+        np.testing.assert_allclose(pGs, zeros)
+        np.testing.assert_allclose(pSs, zeros)
+        np.testing.assert_allclose(pVs, zeros)
+        np.testing.assert_allclose(gammas, ones)
+        np.testing.assert_allclose(alphas, ones)
+        np.testing.assert_almost_equal(H_xs, 0.0)
 
 
 if __name__ == "__main__":

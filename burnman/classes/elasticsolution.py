@@ -150,7 +150,7 @@ class ElasticSolution(Mineral):
         ]
 
         gibbs_pure = [
-            self.solution_model.endmembers[i][0].method.gibbs_free_energy(
+            self.solution_model.endmembers[i][0].method.gibbs_energy(
                 self.pressure,
                 self.temperature,
                 volumes[i],

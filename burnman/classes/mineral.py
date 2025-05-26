@@ -224,7 +224,7 @@ class Mineral(Material):
     @copy_documentation(Material.molar_gibbs)
     def molar_gibbs(self):
         return (
-            self.method.gibbs_free_energy(
+            self.method.gibbs_energy(
                 self.pressure,
                 self.temperature,
                 self._molar_volume_unmodified,

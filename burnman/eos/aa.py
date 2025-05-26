@@ -344,7 +344,7 @@ class AA(eos.EquationOfState):
 
         return C_p
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         F + PV

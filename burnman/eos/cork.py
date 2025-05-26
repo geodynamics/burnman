@@ -192,7 +192,7 @@ class CORK(eos.EquationOfState):
 
         return Cp0 - temperature * d2RTlnfdTdT
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].

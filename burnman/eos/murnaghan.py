@@ -77,7 +77,7 @@ class Murnaghan(eos.IsothermalEquationOfState):
             volume, params["E_0"], params["V_0"], params["K_0"], params["Kprime_0"]
         )
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral.
         :math:`[J/mol]`

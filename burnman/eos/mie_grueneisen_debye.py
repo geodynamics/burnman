@@ -127,12 +127,12 @@ class MGDBase(eos.EquationOfState):
             - self._thermal_pressure(T_0, volume, params)
         )
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self._helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
@@ -145,7 +145,7 @@ class MGDBase(eos.EquationOfState):
         S = debye.entropy(temperature, Debye_T, params["n"])
         return S
 
-    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
@@ -160,9 +160,9 @@ class MGDBase(eos.EquationOfState):
         )
 
         Debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        F_thermal = debye.helmholtz_free_energy(
+        F_thermal = debye.helmholtz_energy(
             temperature, Debye_T, params["n"]
-        ) - debye.helmholtz_free_energy(params["T_0"], Debye_T, params["n"])
+        ) - debye.helmholtz_energy(params["T_0"], Debye_T, params["n"])
 
         return params["F_0"] + F_pressure + F_thermal
 

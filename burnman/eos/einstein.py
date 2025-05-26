@@ -63,7 +63,7 @@ def molar_heat_capacity_v(T, einstein_T, n):
 
 
 @jit(nopython=True)
-def helmholtz_free_energy(T, einstein_T, n):
+def helmholtz_energy(T, einstein_T, n):
     """
     Helmholtz free energy of lattice vibrations in the Einstein model [J].
     It is important to note that this does NOT include the zero

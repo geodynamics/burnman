@@ -34,7 +34,7 @@ class CombinedMineral(Mineral):
         self,
         mineral_list,
         molar_amounts,
-        free_energy_adjustment=[],
+        energy_adjustment=[],
         name="User-created endmember",
     ):
         model = MechanicalSolution(endmembers=[[m, ""] for m in mineral_list])
@@ -54,9 +54,9 @@ class CombinedMineral(Mineral):
             "n": sum(self.mixture.formula.values()),
         }
 
-        if free_energy_adjustment != []:
-            assert len(free_energy_adjustment) == 3
-            dE, dS, dV = free_energy_adjustment
+        if energy_adjustment != []:
+            assert len(energy_adjustment) == 3
+            dE, dS, dV = energy_adjustment
             self.property_modifiers = [
                 ["linear", {"delta_E": dE, "delta_S": dS, "delta_V": dV}]
             ]

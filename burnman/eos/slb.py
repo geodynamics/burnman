@@ -407,7 +407,7 @@ class SLBBase(eos.EquationOfState):
             )
         return S
 
-    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature
         of the mineral [J/mol]
@@ -416,9 +416,9 @@ class SLBBase(eos.EquationOfState):
         f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
         Debye_T = self._debye_temperature(params["V_0"] / volume, params)
 
-        F_quasiharmonic = debye.helmholtz_free_energy(
+        F_quasiharmonic = debye.helmholtz_energy(
             temperature, Debye_T, params["n"]
-        ) - debye.helmholtz_free_energy(params["T_0"], Debye_T, params["n"])
+        ) - debye.helmholtz_energy(params["T_0"], Debye_T, params["n"])
 
         b_iikk = 9.0 * params["K_0"]  # EQ 28
         b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29
@@ -476,13 +476,13 @@ class SLBBase(eos.EquationOfState):
         C_p = C_v + alpha * alpha * K_T * volume * temperature
         return C_p
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature
         of the mineral [J/mol]
         """
         G = (
-            self._helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
