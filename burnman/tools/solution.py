@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -12,9 +12,11 @@ from ..classes.solutionmodel import (
     SymmetricRegularSolution,
     AsymmetricRegularSolution,
     SubregularSolution,
+    logish,
 )
 from ..utils.chemistry import site_occupancies_to_strings
 from ..utils.math import complete_basis
+from ..constants import gas_constant as R
 
 
 def _decompose_3D_matrix(W):
@@ -101,9 +103,7 @@ def _decompose_3D_matrix(W):
     return (new_endmember_excesses, new_binary_matrix, new_ternary_terms)
 
 
-def _subregular_matrix_conversion(
-    new_basis, binary_matrix, ternary_terms=None, endmember_excesses=None
-):
+def _subregular_matrix_conversion(new_basis, Wijk, n_mbrs):
     """
     Converts the arrays reguired to describe a subregular solution
     from one endmember basis to another.
@@ -130,37 +130,10 @@ def _subregular_matrix_conversion(
         the ternary terms in a list where each item is in the form [i, j, k, WT_ijk]
     :rtype: tuple
     """
-    n_mbrs = len(binary_matrix)
-    # Compact 3D representation of original interactions
-    W = (
-        np.einsum("i, jk -> ijk", np.ones(n_mbrs), binary_matrix)
-        + np.einsum("ij, jk -> ijk", binary_matrix, np.identity(n_mbrs))
-        - np.einsum("ij, ik -> ijk", binary_matrix, np.identity(n_mbrs))
-    ) / 2.0
-
-    # Add endmember components to 3D representation
-    if endmember_excesses is not None:
-        W += (
-            np.einsum(
-                "i, j, k->ijk", endmember_excesses, np.ones(n_mbrs), np.ones(n_mbrs)
-            )
-            + np.einsum(
-                "j, i, k->ijk", endmember_excesses, np.ones(n_mbrs), np.ones(n_mbrs)
-            )
-            + np.einsum(
-                "k, i, j->ijk", endmember_excesses, np.ones(n_mbrs), np.ones(n_mbrs)
-            )
-        ) / 3.0
-
-    # Add ternary values to 3D representation
-    if ternary_terms is not None:
-        for i, j, k, val in ternary_terms:
-            W[i, j, k] += val
-
     # Transformation to new 3D representation
     A = new_basis.T
-    Wn = np.einsum("il, jm, kn, ijk -> lmn", A, A, A, W)
-
+    Wn = np.einsum("il, jm, kn, ijk -> lmn", A, A, A, Wijk)
+    Wn = Wn[:n_mbrs, :n_mbrs, :n_mbrs]
     new_endmember_excesses, new_binary_terms, new_ternary_terms = _decompose_3D_matrix(
         Wn
     )
@@ -218,9 +191,9 @@ def transform_solution_to_new_basis(
     # Use type here to avoid inheritance problems
     solution_type = type(solution_model)
     if solution_type == IdealSolution:
-        ESV_modifiers = [[0.0, 0.0, 0.0] for v in new_basis]
+        ESV_modifiers = [[0.0, 0.0, 0.0] for _ in new_basis]
 
-    if (
+    elif (
         solution_type == AsymmetricRegularSolution
         or solution_type == SymmetricRegularSolution
     ):
@@ -268,21 +241,14 @@ def transform_solution_to_new_basis(
 
         # N.B. initial endmember_excesses are zero
         Emod, We, ternary_e = _subregular_matrix_conversion(
-            full_basis,
-            solution.solution_model.We,
-            solution.solution_model.ternary_terms_e,
+            full_basis, solution.solution_model.Wijke, n_mbrs
         )
         Smod, Ws, ternary_s = _subregular_matrix_conversion(
-            full_basis,
-            solution.solution_model.Ws,
-            solution.solution_model.ternary_terms_s,
+            full_basis, solution.solution_model.Wijks, n_mbrs
         )
         Vmod, Wv, ternary_v = _subregular_matrix_conversion(
-            full_basis,
-            solution.solution_model.Wv,
-            solution.solution_model.ternary_terms_v,
+            full_basis, solution.solution_model.Wijkv, n_mbrs
         )
-
         energy_interaction = new_interactions(We, n_mbrs)
         entropy_interaction = new_interactions(Ws, n_mbrs)
         volume_interaction = new_interactions(Wv, n_mbrs)
@@ -300,6 +266,7 @@ def transform_solution_to_new_basis(
     new_occupancies = np.array(new_basis).dot(
         solution.solution_model.endmember_occupancies
     )
+    new_noccs = np.array(new_basis).dot(solution.solution_model.endmember_noccupancies)
     new_multiplicities = np.array(new_basis).dot(
         solution.solution_model.site_multiplicities
     )
@@ -307,9 +274,15 @@ def transform_solution_to_new_basis(
         solution.solution_model.sites, new_multiplicities, new_occupancies
     )
 
+    S_conf = -R * (new_noccs * (logish(new_noccs) - logish(new_multiplicities))).sum(-1)
+
     # Create endmembers
     endmembers = []
-    for i, vector in enumerate(new_basis):
+    for i, vector in enumerate(new_basis[:n_mbrs]):
+
+        # Add ideal configurational entropy to endmembers
+        ESV_modifiers[i][1] += S_conf[i]
+
         nonzero_indices = np.nonzero(vector)[0]
         if len(nonzero_indices) == 1:
             endmembers.append(
@@ -341,15 +314,22 @@ def transform_solution_to_new_basis(
     else:
         if solution_type == IdealSolution:
             new_solution_model = IdealSolution(endmembers=endmembers)
-        elif (
-            solution_type == SymmetricRegularSolution
-            or solution_type == SubregularSolution
-        ):
+        elif solution_type == SymmetricRegularSolution:
             new_solution_model = type(solution_model)(
                 endmembers=endmembers,
                 energy_interaction=energy_interaction,
                 volume_interaction=volume_interaction,
                 entropy_interaction=entropy_interaction,
+            )
+        elif solution_type == SubregularSolution:
+            new_solution_model = type(solution_model)(
+                endmembers=endmembers,
+                energy_interaction=energy_interaction,
+                volume_interaction=volume_interaction,
+                entropy_interaction=entropy_interaction,
+                energy_ternary_terms=ternary_e,
+                volume_ternary_terms=ternary_v,
+                entropy_ternary_terms=ternary_s,
             )
         else:
             new_solution_model = type(solution_model)(

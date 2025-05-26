@@ -19,6 +19,7 @@ from burnman.minerals.SLB_2011 import mg_post_perovskite
 from burnman.minerals.SLB_2011 import fe_post_perovskite
 from burnman.minerals.SLB_2011 import al_post_perovskite
 from burnman.tools.eos import check_eos_consistency
+from burnman.tools.solution import transform_solution_to_new_basis
 
 
 class forsterite(Mineral):
@@ -1327,6 +1328,118 @@ class test_solidsolution(BurnManTest):
             ropx.isothermal_compressibility_reuss
             > ropx.unrelaxed.isothermal_compressibility_reuss
         )
+
+    def test_transform_ideal(self):
+        ol = olivine_ideal_ss()
+        new_ol = transform_solution_to_new_basis(
+            ol, [[0.25, 0.75], [0.75, 0.25]], endmember_names=["fafo", "fofa"]
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ol.set_composition([0.5, 0.5])
+        new_ol.set_composition([0.5, 0.5])
+        ol.set_state(P, T)
+        new_ol.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ol.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ol.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ol.gibbs, new_ol.gibbs)
+
+    def test_transform_asymmetric(self):
+        cpx = burnman.minerals.JH_2015.clinopyroxene()
+        new_cpx = transform_solution_to_new_basis(
+            cpx,
+            [[1, 1, 0, 0, 0, 0, 0, -1], [0, 0, 1, 0, 0, 0, 0, 0]],
+            solution_name="fdi-cats",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        cpx.set_composition([0.5, 0.5, 0.5, 0, 0, 0, 0, -0.5])
+        new_cpx.set_composition([0.5, 0.5])
+        cpx.set_state(P, T)
+        new_cpx.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(cpx.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_cpx.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(cpx.gibbs, new_cpx.gibbs)
+
+    def test_transform_asymmetric_new_disordered_endmember(self):
+        cpx = burnman.minerals.JH_2015.clinopyroxene()
+        new_cpx = transform_solution_to_new_basis(
+            cpx,
+            [[0.5, 0.5, 0, 0, 0, 0, 0, 0.0], [0, 0, 1, 0, 0, 0, 0, 0]],
+            solution_name="fdi-cats",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        cpx.set_composition([0.25, 0.25, 0.5, 0, 0, 0, 0, 0])
+        new_cpx.set_composition([0.5, 0.5])
+        cpx.set_state(P, T)
+        new_cpx.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(cpx.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_cpx.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(cpx.gibbs, new_cpx.gibbs)
+
+    def test_transform_subregular_new_disordered_endmember(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.25, 0.75, 0], [0, 0, 1], [0.75, 0.25, 0.0]],
+            solution_name="new",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.5, 0.5, 0.0])
+        new_ss.set_composition([0.5, 0.0, 0.5])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
+
+    def test_transform_subregular_new_disordered_endmember_cut(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.25, 0.75, 0], [0, 0, 1], [0.75, 0.25, 0.0]],
+            solution_name="new",
+            n_mbrs=2,
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.125, 0.375, 0.5])
+        new_ss.set_composition([0.5, 0.5])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
+
+    def test_transform_subregular_one_disordered_endmember(self):
+        ss = two_site_ss_subregular_ternary()
+        new_ss = transform_solution_to_new_basis(
+            ss,
+            [[0.5, 0.5, 0]],
+            solution_name="new",
+        )
+
+        P = 1.0e9
+        T = 1000.0
+        ss.set_composition([0.5, 0.5, 0.0])
+        ss.set_state(P, T)
+        new_ss.set_state(P, T)
+        old_formula = burnman.utils.chemistry.formula_to_string(ss.formula)
+        new_formula = burnman.utils.chemistry.formula_to_string(new_ss.formula)
+        self.assertEqual(old_formula, new_formula)
+        self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
 
 
 if __name__ == "__main__":

@@ -1251,8 +1251,11 @@ class PolynomialSolution(IdealSolution):
 
     def _make_interaction_arrays(self, Ws, n):
         """
-        A hidden convenience function that splits each
-        excess term into _summary_
+        A hidden convenience function that splits the user-defined
+        excess interaction terms into an array of interaction values
+        and a list of Interaction dataclass objects that facilitate
+        fast computation of first and second compositional derivatives
+        of thermodynamic properties.
 
         :param Ws: List of interactions in form input by the user.
         :type Ws: list of lists

@@ -612,7 +612,7 @@ class Solution(Mineral):
     @cached_property
     def stoichiometric_array(self):
         """
-        An array where each element arr[i,j] corresponds
+        A numpy array where each element arr[i,j] corresponds
         to the number of atoms of element[j] in endmember[i].
         """
         return np.array(self.stoichiometric_matrix)
@@ -620,8 +620,17 @@ class Solution(Mineral):
     @cached_property
     def reaction_basis(self):
         """
-        An array where each element arr[i,j] corresponds
-        to the number of moles of endmember[j] involved in reaction[i].
+        Returns a basis for the reaction space, represented as the left
+        nullspace of the stoichiometric matrix.
+
+        Each row of the returned array corresponds to a linearly independent
+        chemical reaction that conserves mass and charge.
+        The value at arr[i, j] gives the number of moles of endmember[j]
+        involved in reaction[i].
+
+        :returns: An array where each row defines a balanced chemical reaction
+        in terms of molar amounts of endmembers.
+        :rtype: numpy.ndarray
         """
         reaction_basis = np.array(
             [v[:] for v in self.stoichiometric_matrix.T.nullspace()], dtype=float
@@ -641,11 +650,25 @@ class Solution(Mineral):
 
     @cached_property
     def compositional_basis(self):
-        """_summary_
-
-        :return: _description_
-        :rtype: _type_
         """
+        :returns: A basis for the compositional degrees of freedom,
+        orthogonal to the reaction space.
+
+        Each row of the returned array defines an independent
+        compositional constraint in terms of moles of endmembers.
+        These constraints span the row space of the stoichiometric
+        matrix and are complementary to the reaction basis
+        (which spans the left null space).
+
+        For example, endmembers with site-species occupancies
+        [Fe][Mg] and [Mg][Fe] have reaction basis vector [1, -1].
+        A compositional basis vector orthogonal to this is: [1, 1],
+        which satisfies the requirement that the Fe-Mg ratio of the
+        system remains fixed and the total amount of the two sites
+        remains equal.
+        :rtype: numpy.ndarray
+        """
+
         return complete_basis(self.reaction_basis)[self.n_reactions :]
 
     @cached_property
@@ -672,8 +695,29 @@ class Solution(Mineral):
     @cached_property
     def compositional_null_basis(self):
         """
-        An array N such that N.b = 0 for all bulk compositions that can
-        be produced with a linear sum of the endmembers in the solution.
+        Returns a basis for the compositional nullspace (kernel)
+        of the stoichiometric matrix.
+
+        This basis consists of vectors that represent linear constraints
+        any valid bulk composition must satisfy to be formed from the
+        endmembers. In other words, for any bulk composition vector `b`
+        that can be expressed as a combination of the endmembers,
+        multiplying it by these vectors results in zero (`N @ b = 0`).
+
+        These constraints typically reflect conserved properties
+        such as elemental mass balance or charge neutrality.
+
+        Example: Suppose the stoichiometric matrix corresponds to
+        elements C and O in species, and the nullspace basis vector
+        is `[1, -2]`. Then for any bulk composition vector
+        `b = [b_C, b_O]`, the constraint `1 * b_C - 2 * b_O = 0`
+        must hold. This means the ratio of carbon to oxygen must
+        satisfy that relationship to be achievable from the given
+        endmembers.
+
+        :return: A 2D array where each row is a basis vector of the
+        nullspace.
+        :rtype: numpy.ndarray
         """
         null = self.stoichiometric_matrix.nullspace()
         null_basis = np.array([v[:] for v in null])
@@ -687,7 +731,7 @@ class Solution(Mineral):
     @cached_property
     def endmember_formulae(self):
         """
-        A list of formulae for all the endmember in the solution.
+        A list of formulae for all the endmembers in the solution.
         """
         mbrs = self.solution_model.endmembers
         return [mbr[0].params["formula"] for mbr in mbrs]
@@ -695,7 +739,7 @@ class Solution(Mineral):
     @cached_property
     def endmember_names(self):
         """
-        A list of names for all the endmember in the solution.
+        A list of names for all the endmembers in the solution.
         """
         return [mbr[0].name for mbr in self.solution_model.endmembers]
 
