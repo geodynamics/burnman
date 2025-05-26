@@ -56,7 +56,7 @@ for i, c in enumerate(comp):
     molar_fractions = [1.0 - c, c]
     sp.set_composition(np.array(molar_fractions))
     sp.set_state(1e5, 298.15)
-    sp_entropies[i] = sp.solution_model._configurational_entropy(molar_fractions)
+    sp_entropies[i] = sp.solution_model.configurational_entropy(molar_fractions)
     sp_entropies_NK1967[i] = -8.3145 * (
         c * np.log(c)
         + (1.0 - c) * np.log(1.0 - c)
@@ -147,7 +147,7 @@ for idx, model in enumerate(opx_models):
         molar_fractions = [1.0 - c, c]
         model.set_composition(np.array(molar_fractions))
         model.set_state(0.0, 0.0)
-        opx_entropies[idx][i] = model.solution_model._configurational_entropy(
+        opx_entropies[idx][i] = model.solution_model.configurational_entropy(
             molar_fractions
         )
 

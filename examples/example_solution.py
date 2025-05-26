@@ -295,7 +295,7 @@ if __name__ == "__main__":
         molar_fractions = [1.0 - c, 0.0, c]
         g3.set_composition(molar_fractions)
         g3.set_state(P, T)
-        Sconf = g3.solution_model._configurational_entropy(molar_fractions)
+        Sconf = g3.solution_model.configurational_entropy(molar_fractions)
         Gex = g3.solution_model._ideal_excess_partial_gibbs(T, molar_fractions)
         g3_configurational_entropy[i] = Sconf
         g3_excess_entropy[i] = -np.dot(molar_fractions, Gex) / T

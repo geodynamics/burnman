@@ -296,7 +296,7 @@ class ElasticIdealSolution(ElasticSolutionModel):
     def pressure_hessian(self, volume, temperature, molar_fractions):
         return np.zeros((len(molar_fractions), len(molar_fractions)))
 
-    def _configurational_entropy(self, molar_fractions):
+    def configurational_entropy(self, molar_fractions):
         site_noccupancies = np.einsum(
             "i, ij", molar_fractions, self.endmember_noccupancies
         )
