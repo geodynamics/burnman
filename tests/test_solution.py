@@ -1441,6 +1441,43 @@ class test_solidsolution(BurnManTest):
         self.assertEqual(old_formula, new_formula)
         self.assertAlmostEqual(ss.gibbs, new_ss.gibbs)
 
+    def test_solution_model_functions(self):
+        sm = burnman.classes.solutionmodel.SolutionModel()
+        P = 1.0e9
+        T = 1000.0
+        f = np.array([1.0, 0.0])
+        pGs = sm.excess_partial_gibbs_energies(P, T, f)
+        pSs = sm.excess_partial_entropies(P, T, f)
+        pVs = sm.excess_partial_volumes(P, T, f)
+        zeros = np.zeros(2)
+        np.testing.assert_allclose(pGs, zeros)
+        np.testing.assert_allclose(pSs, zeros)
+        np.testing.assert_allclose(pVs, zeros)
+
+    def test_mechanical_solution_model_functions(self):
+        sm = burnman.classes.solutionmodel.MechanicalSolution(
+            [[forsterite(), ""], [fayalite(), ""]]
+        )
+        P = 1.0e9
+        T = 1000.0
+        f = np.array([1.0, 0.0])
+        pGs = sm.excess_partial_gibbs_energies(P, T, f)
+        pSs = sm.excess_partial_entropies(P, T, f)
+        pVs = sm.excess_partial_volumes(P, T, f)
+
+        H_xs = sm.excess_enthalpy(P, T, f)
+        gammas = sm.activity_coefficients(P, T, f)
+        alphas = sm.activities(P, T, f)
+
+        zeros = np.zeros(2)
+        ones = np.ones(2)
+        np.testing.assert_allclose(pGs, zeros)
+        np.testing.assert_allclose(pSs, zeros)
+        np.testing.assert_allclose(pVs, zeros)
+        np.testing.assert_allclose(gammas, ones)
+        np.testing.assert_allclose(alphas, ones)
+        np.testing.assert_almost_equal(H_xs, 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()
