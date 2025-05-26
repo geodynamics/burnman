@@ -230,6 +230,7 @@ class two_site_ss_subregular_ternary(burnman.SolidSolution):
             ],
             entropy_interaction=[[[1.0, -2.0], [0.0, 1.0]], [[0.0, 0.0]]],
             energy_ternary_terms=[[0, 1, 2, 3.0e3]],
+            volume_ternary_terms=[[0, 1, 2, 3.0e-5]],
         )
 
         burnman.SolidSolution.__init__(self, molar_fractions)
@@ -263,7 +264,7 @@ class two_site_ss_polynomial_ternary(burnman.SolidSolution):
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 3.0e-5, 0, 1, 1, 1, 2, 1],
             ],
         )
 
@@ -304,7 +305,7 @@ class two_site_ss_polynomial_ternary_transformed(burnman.SolidSolution):
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 [-5.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
                 # Ternary term
-                [3.0e3, 0.0, 0.0, 0, 1, 1, 1, 2, 1],
+                [3.0e3, 0.0, 3.0e-5, 0, 1, 1, 1, 2, 1],
             ],
             transformation_matrix=np.array(
                 [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
@@ -1054,12 +1055,23 @@ class test_solidsolution(BurnManTest):
         ol.set_composition(np.array([0.5, 0.5]))
         ol.set_state(1.0e5, 1000.0)
         self.assertArraysAlmostEqual(ol.activities, [0.25, 0.25])
+        self.assertArraysAlmostEqual(ol.activity_coefficients, [1.0, 1.0])
 
-    def test_activity_coefficients_ideal(self):
+    def test_entropy_ideal(self):
         ol = olivine_ideal_ss()
         ol.set_composition(np.array([0.5, 0.5]))
         ol.set_state(1.0e5, 1000.0)
-        self.assertArraysAlmostEqual(ol.activity_coefficients, [1.0, 1.0])
+
+        R = burnman.constants.gas_constant
+        self.assertAlmostEqual(
+            ol.solution_model.configurational_entropy(ol.molar_fractions),
+            2.0 * np.log(2) * R,
+        )
+
+        S_hess = 2 * np.array([[-R, R], [R, -R]])
+
+        np.testing.assert_allclose(ol.entropy_hessian, S_hess)
+        np.testing.assert_allclose(ol.volume_hessian, np.zeros((2, 2)))
 
     def test_activity_coefficients_non_ideal(self):
         opx = orthopyroxene()
