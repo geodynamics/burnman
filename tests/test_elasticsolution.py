@@ -152,23 +152,6 @@ class two_site_ss_function(burnman.ElasticSolution):
         burnman.ElasticSolution.__init__(self, molar_fractions)
 
 
-class two_site_ss_asymmetric(burnman.ElasticSolution):
-    # Three-endmember, two site asymmetric solid solution
-    def __init__(self, molar_fractions=None):
-        self.name = "two_site_ss (asymmetric)"
-        self.solution_model = ElasticAsymmetricRegularSolution(
-            endmembers=[
-                [pyrope(), "[Mg]3[Al]2Si3O12"],
-                [pyrope(), "[Fe]3[Al]2Si3O12"],
-                [pyrope(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-            ],
-            alphas=[1.0, 2.0, 2.0],
-            energy_interaction=[[10.0e3, 5.0e3], [-10.0e3]],
-        )
-
-        burnman.ElasticSolution.__init__(self, molar_fractions)
-
-
 class two_site_ss_subregular(burnman.ElasticSolution):
     # Three-endmember, two site solid solution
     def __init__(self, molar_fractions=None):
@@ -181,25 +164,6 @@ class two_site_ss_subregular(burnman.ElasticSolution):
             ],
             energy_interaction=[
                 [[10.0e3, 10.0e3], [5.0e3, 5.0e3]],
-                [[-10.0e3, -10.0e3]],
-            ],
-        )
-
-        burnman.ElasticSolution.__init__(self, molar_fractions)
-
-
-class two_site_ss_subregular_asymmetric(burnman.ElasticSolution):
-    # Three-endmember, two site solid solution
-    def __init__(self, molar_fractions=None):
-        self.name = "two_site_ss (subregular symmetric)"
-        self.solution_model = ElasticSubregularSolution(
-            endmembers=[
-                [pyrope(), "[Mg]3[Al]2Si3O12"],
-                [pyrope(), "[Fe]3[Al]2Si3O12"],
-                [pyrope(), "[Mg]3[Mg1/2Si1/2]2Si3O12"],
-            ],
-            energy_interaction=[
-                [[10.0e3, -10.0e3], [5.0e3, 3.0e3]],
                 [[-10.0e3, -10.0e3]],
             ],
         )

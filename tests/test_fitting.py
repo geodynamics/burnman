@@ -228,11 +228,8 @@ class test_fitting(BurnManTest):
         PTV = np.array([pressures, temperatures, volumes]).T
         params = ["V_0", "K_0", "Kprime_0"]
 
-        try:
+        with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
-            self.assertTrue(False)
-        except Exception:
-            self.assertTrue(True)
 
     def test_PTV_data_eos_exception(self):
         fo = burnman.minerals.SLB_2011.forsterite()
@@ -248,11 +245,8 @@ class test_fitting(BurnManTest):
         PTV = np.array([pressures, temperatures, volumes]).T
         params = ["V_0", "K_0", "Kprime_0"]
 
-        try:
+        with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
-            self.assertTrue(False)
-        except Exception:
-            self.assertTrue(True)
 
     def test_bounded_solution_fitting(self):
         solution = burnman.minerals.SLB_2011.mg_fe_olivine()
