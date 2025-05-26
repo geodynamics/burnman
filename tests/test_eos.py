@@ -443,8 +443,8 @@ class test_eos_validation(BurnManTest):
         ) / dT
         S2 = (
             -(
-                debye.helmholtz_free_energy(T + dT / 2.0, debye_T, n)
-                - debye.helmholtz_free_energy(T - dT / 2.0, debye_T, n)
+                debye.helmholtz_energy(T + dT / 2.0, debye_T, n)
+                - debye.helmholtz_energy(T - dT / 2.0, debye_T, n)
             )
             / dT
         )

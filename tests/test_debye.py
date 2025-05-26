@@ -36,7 +36,7 @@ class Debye(BurnManTest):
     def test_return_zero(self):
         rock = mypericlase()
         x = 0.0
-        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
+        test_helmholtz = burnman.eos.debye.helmholtz_energy(
             x, rock.params["Debye_0"], rock.params["n"]
         )
         self.assertFloatEqual(test_helmholtz, 0.0)
@@ -52,7 +52,7 @@ class Debye(BurnManTest):
     def test_small(self):
         rock = mypericlase()
         x = 1e-16
-        test_helmholtz = burnman.eos.debye.helmholtz_free_energy(
+        test_helmholtz = burnman.eos.debye.helmholtz_energy(
             x, rock.params["Debye_0"], rock.params["n"]
         )
         self.assertFloatEqual(test_helmholtz, 0.0)

@@ -241,7 +241,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         :param pressure: Pressure at which to evaluate the equation of state
             :math:`[Pa]`.
@@ -264,7 +264,7 @@ class EquationOfState(object):
         """
         raise NotImplementedError("")
 
-    def helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def helmholtz_energy(self, pressure, temperature, volume, params):
         """
         :param pressure: Pressure at which to evaluate the equation of state
             :math:`[Pa]`.

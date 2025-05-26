@@ -201,7 +201,7 @@ class Solution(Mineral):
         Returns excess partial molar gibbs free energy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_partial_gibbs_free_energies(
+        return self.solution_model.excess_partial_gibbs_energies(
             self.pressure, self.temperature, self.molar_fractions
         )
 
@@ -264,7 +264,7 @@ class Solution(Mineral):
         Returns molar excess gibbs free energy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_gibbs_free_energy(
+        return self.solution_model.excess_gibbs_energy(
             self.pressure, self.temperature, self.molar_fractions
         )
 

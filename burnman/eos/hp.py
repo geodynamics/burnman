@@ -97,7 +97,7 @@ class HP_TMT(eos.EquationOfState):
         )
         return Cp
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
@@ -411,7 +411,7 @@ class HP_TMTL(eos.EquationOfState):
         )
         return Cp
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].
@@ -434,8 +434,8 @@ class HP_TMTL(eos.EquationOfState):
         # so here we take a numerical derivative.
         # TODO Derive and use the analytical derivative.
         dT = 0.1
-        G1 = self.gibbs_free_energy(pressure, temperature + dT / 2.0, volume, params)
-        G0 = self.gibbs_free_energy(pressure, temperature - dT / 2.0, volume, params)
+        G1 = self.gibbs_energy(pressure, temperature + dT / 2.0, volume, params)
+        G0 = self.gibbs_energy(pressure, temperature - dT / 2.0, volume, params)
 
         return (G0 - G1) / dT
 
@@ -633,7 +633,7 @@ class HP98(eos.EquationOfState):
         )
         return Cp
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the gibbs free energy [J/mol] as a function of pressure [Pa]
         and temperature [K].

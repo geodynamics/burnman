@@ -129,7 +129,7 @@ class cfs(CombinedMineral):
             name="clinoferrosilite",
             mineral_list=[HP_2011_ds62.fs()],
             molar_amounts=[1.0],
-            free_energy_adjustment=[3.8e3, 3.0, 0.03e-5],
+            energy_adjustment=[3.8e3, 3.0, 0.03e-5],
         )
 
 
@@ -140,7 +140,7 @@ class crdi(CombinedMineral):
             name="chromium diopside",
             mineral_list=[HP_2011_ds62.cats(), HP_2011_ds62.kos(), HP_2011_ds62.jd()],
             molar_amounts=[1.0, 1.0, -1.0],
-            free_energy_adjustment=[-3.0e3, 0.0, 0.0],
+            energy_adjustment=[-3.0e3, 0.0, 0.0],
         )
 
 
@@ -151,7 +151,7 @@ class cess(CombinedMineral):
             name="ferric diopside",
             mineral_list=[HP_2011_ds62.cats(), HP_2011_ds62.acm(), HP_2011_ds62.jd()],
             molar_amounts=[1.0, 1.0, -1.0],
-            free_energy_adjustment=[-6.0e3, 0.0, 0.0],
+            energy_adjustment=[-6.0e3, 0.0, 0.0],
         )
 
 
@@ -162,7 +162,7 @@ class cen(CombinedMineral):
             name="clinoenstatite",
             mineral_list=[HP_2011_ds62.en()],
             molar_amounts=[1.0],
-            free_energy_adjustment=[3.5e3, 2.0, 0.048e-5],
+            energy_adjustment=[3.5e3, 2.0, 0.048e-5],
         )
 
 
@@ -173,7 +173,7 @@ class cfm(CombinedMineral):
             name="ordered clinoferroenstatite",
             mineral_list=[HP_2011_ds62.en(), HP_2011_ds62.fs()],
             molar_amounts=[0.5, 0.5],
-            free_energy_adjustment=[-3.0e3, 0.0, 0.0],
+            energy_adjustment=[-3.0e3, 0.0, 0.0],
         )
 
 
@@ -281,7 +281,7 @@ class fm(CombinedMineral):
             name="ordered ferroenstatite",
             mineral_list=[HP_2011_ds62.en(), HP_2011_ds62.fs()],
             molar_amounts=[0.5, 0.5],
-            free_energy_adjustment=[-6.0e3, 0.0, 0.0],
+            energy_adjustment=[-6.0e3, 0.0, 0.0],
         )
 
 
@@ -292,7 +292,7 @@ class odi(CombinedMineral):
             name="orthodiopside",
             mineral_list=[HP_2011_ds62.di()],
             molar_amounts=[1.0],
-            free_energy_adjustment=[-0.1e3, -0.211, 0.005e-5],
+            energy_adjustment=[-0.1e3, -0.211, 0.005e-5],
         )  # note sign of *entropy* change.
 
 
@@ -303,7 +303,7 @@ class cren(CombinedMineral):
             name="chromium enstatite",
             mineral_list=[HP_2011_ds62.mgts(), HP_2011_ds62.kos(), HP_2011_ds62.jd()],
             molar_amounts=[1.0, 1.0, -1.0],
-            free_energy_adjustment=[3.0e3, 0.0, 0.0],
+            energy_adjustment=[3.0e3, 0.0, 0.0],
         )
 
 
@@ -314,7 +314,7 @@ class mess(CombinedMineral):
             name="ferrienstatite",
             mineral_list=[HP_2011_ds62.mgts(), HP_2011_ds62.acm(), HP_2011_ds62.jd()],
             molar_amounts=[1.0, 1.0, -1.0],
-            free_energy_adjustment=[-15.0e3, 0.0, 0.15e-5],
+            energy_adjustment=[-15.0e3, 0.0, 0.15e-5],
         )
 
 

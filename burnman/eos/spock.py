@@ -139,7 +139,7 @@ class SPOCK(eos.IsothermalEquationOfState):
 
         return params["E_0"] + params["P_0"] * (volume - params["V_0"]) + f * (I1 - I2)
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """

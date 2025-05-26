@@ -663,12 +663,12 @@ class DKS_L(eos.EquationOfState):
         ) / self.isothermal_bulk_modulus_reuss(0.0, temperature, volume, params)
         return alpha
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy at the pressure and temperature of the mineral [J/mol]
         """
         G = (
-            self._helmholtz_free_energy(pressure, temperature, volume, params)
+            self._helmholtz_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
         return G
@@ -685,7 +685,7 @@ class DKS_L(eos.EquationOfState):
         )
         return S
 
-    def _helmholtz_free_energy(self, pressure, temperature, volume, params):
+    def _helmholtz_energy(self, pressure, temperature, volume, params):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
@@ -701,7 +701,7 @@ class DKS_L(eos.EquationOfState):
         """
         Returns the Helmholtz free energy at the pressure and temperature of the mineral [J/mol]
         """
-        F = self._helmholtz_free_energy(pressure, temperature, volume, params)
+        F = self._helmholtz_energy(pressure, temperature, volume, params)
         S = self.entropy(pressure, temperature, volume, params)
         return F + temperature * S
 

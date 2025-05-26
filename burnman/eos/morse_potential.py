@@ -122,7 +122,7 @@ class Morse(eos.IsothermalEquationOfState):
 
         return -intPdV + params["E_0"]
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """

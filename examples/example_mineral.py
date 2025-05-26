@@ -104,7 +104,7 @@ if __name__ == "__main__":
         name="ordered ferroenstatite",
         mineral_list=[HGP_2018_ds633.en(), HGP_2018_ds633.fs()],
         molar_amounts=[0.5, 0.5],
-        free_energy_adjustment=[-6.0e3, 0.0, 0.0],
+        energy_adjustment=[-6.0e3, 0.0, 0.0],
     )
     print(
         f"Formula of CombinedMineral {fe_mg_orthopyroxene.name}: "

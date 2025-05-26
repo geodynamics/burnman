@@ -541,7 +541,7 @@ def _debye_excesses(pressure, temperature, params):
     f = params["Cv_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
 
-    G = debye.helmholtz_free_energy(temperature, theta, f)
+    G = debye.helmholtz_energy(temperature, theta, f)
     dGdT = -debye.entropy(temperature, theta, f)
     dGdP = 0.0
     if temperature > 1.0e-20:
@@ -603,7 +603,7 @@ def _einstein_excesses(pressure, temperature, params):
     f = params["Cv_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
 
-    G = einstein.helmholtz_free_energy(temperature, theta, f)
+    G = einstein.helmholtz_energy(temperature, theta, f)
     dGdT = -einstein.entropy(temperature, theta, f)
     dGdP = 0.0
     if temperature > 1.0e-20:

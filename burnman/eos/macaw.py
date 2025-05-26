@@ -105,7 +105,7 @@ class MACAW(eos.IsothermalEquationOfState):
         I0 = (-A * (B + C) + params["P_0"]) * params["V_0"] * (Vrel - 1.0)
         return -A * I1 - I0
 
-    def gibbs_free_energy(self, pressure, temperature, volume, params):
+    def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
