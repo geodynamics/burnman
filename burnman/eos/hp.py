@@ -30,24 +30,25 @@ class HP_TMT(eos.EquationOfState):
     def volume(self, pressure, temperature, params):
         """
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
-        EQ 12
         """
+        # Equation 12 of HP2011
         Pth = self.__relative_thermal_pressure(temperature, params)
         return mt.volume(pressure - Pth, params)
 
     def pressure(self, temperature, volume, params):
         """
         Returns pressure [Pa] as a function of temperature [K] and volume[m^3]
-        EQ B7
         """
+        # Between Equations 11 and 12 of HP2011
         Pth = self.__relative_thermal_pressure(temperature, params)
-        return mt.modified_tait(params["V_0"] / volume, params) + Pth
+        return mt.pressure_modified_tait(volume / params["V_0"], params) + Pth
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
-        temperature [K], and volume [m^3].  EQ 13+2
+        temperature [K], and volume [m^3].
         """
+        # Two equations after Equations 13 of HP2011
         Pth = self.__relative_thermal_pressure(temperature, params)
         return mt.bulk_modulus(pressure - Pth, params)
 
@@ -63,8 +64,8 @@ class HP_TMT(eos.EquationOfState):
     def thermal_expansivity(self, pressure, temperature, volume, params):
         """
         Returns thermal expansivity at the pressure, temperature,
-        and volume [1/K]. This function replaces -Pth in EQ 13+1
-        with P-Pth for non-ambient temperature
+        and volume [1/K]. This function replaces -Pth in Equation 13+1
+        in :cite:`HP2011` with P-Pth for non-ambient temperature
         """
         a, b, c = mt.tait_constants(params)
         Pth = self.__relative_thermal_pressure(temperature, params)
@@ -108,7 +109,7 @@ class HP_TMT(eos.EquationOfState):
 
         psubpth = pressure - params["P_0"] - Pth
 
-        # EQ 13
+        # Equation 13 in HP2011
         if pressure != params["P_0"]:
             intVdP = (
                 (pressure - params["P_0"])
