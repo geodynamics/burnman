@@ -108,7 +108,7 @@ class test_fitting(BurnManTest):
         nonlinear_least_squares_fit(model=fitted_curve, param_tolerance=1.0e-5)
         self.assertArraysAlmostEqual([fitted_curve.WSS], [10.486904577])
 
-    def test_fit_PVT_data(self):
+    def test_fit_PTV_data(self):
         fo = burnman.minerals.HP_2011_ds62.fo()
 
         pressures = np.linspace(1.0e9, 2.0e9, 8)
@@ -123,10 +123,37 @@ class test_fitting(BurnManTest):
         params = ["V_0", "K_0", "Kprime_0"]
         fitted_eos = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
         zeros = np.zeros_like(fitted_eos.pcov[0])
-
         self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
 
-    def test_fit_PVT_data_w_priors(self):
+    def test_fit_PTp_data(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        PTG = np.empty((len(pressures), 3))
+        PTS = np.empty((len(pressures), 3))
+        PTH = np.empty((len(pressures), 3))
+        PTa = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            PTG[i] = [pressures[i], temperatures[i], fo.gibbs]
+            PTS[i] = [pressures[i], temperatures[i], fo.S]
+            PTH[i] = [pressures[i], temperatures[i], fo.H]
+            PTa[i] = [pressures[i], temperatures[i], fo.alpha]
+
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        for flag, data in [("gibbs", PTG), ("S", PTS), ("H", PTH), ("alpha", PTa)]:
+            flags = [flag] * len(pressures)
+            fitted_eos = burnman.eos_fitting.fit_PTp_data(
+                fo, params, flags, data, verbose=False
+            )
+            zeros = np.zeros_like(fitted_eos.pcov[0])
+            self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
+
+    def test_fit_PTV_data_w_priors(self):
         fo = burnman.minerals.HP_2011_ds62.fo()
 
         pressures = np.linspace(1.0e9, 2.0e9, 8)
@@ -155,7 +182,7 @@ class test_fitting(BurnManTest):
 
         self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
 
-    def test_fit_bounded_PVT_data(self):
+    def test_fit_bounded_PTV_data(self):
         fo = burnman.minerals.HP_2011_ds62.fo()
 
         pressures = np.linspace(0.0e9, 10.0e9, 8)
@@ -247,6 +274,191 @@ class test_fitting(BurnManTest):
 
         with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_PTV_data(fo, params, PTV, verbose=False)
+
+    def test_fit_VTF_data(self):
+        fo = burnman.minerals.SLB_2011.forsterite()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        VTF = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            VTF[i] = [fo.V, temperatures[i], fo.helmholtz]
+
+        flags = ["helmholtz"] * len(temperatures)
+        params = ["F_0", "V_0", "K_0", "Kprime_0"]
+        fitted_eos = burnman.eos_fitting.fit_VTp_data(
+            fo, params, flags, VTF, verbose=False
+        )
+        zeros = np.zeros_like(fitted_eos.pcov[0])
+
+        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
+
+    def test_fit_VTP_data(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        VTP = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            VTP[i] = [fo.V, temperatures[i], pressures[i]]
+
+        params = ["V_0", "K_0", "Kprime_0"]
+        fitted_eos = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
+        zeros = np.zeros_like(fitted_eos.pcov[0])
+
+        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
+
+    def test_fit_VTp_data(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        VTS = np.empty((len(pressures), 3))
+        VTH = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            VTS[i] = [fo.V, temperatures[i], fo.S]
+            VTH[i] = [fo.V, temperatures[i], fo.H]
+
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        for flag, data in [("S", VTS), ("H", VTH)]:
+            flags = [flag] * len(pressures)
+            fitted_eos = burnman.eos_fitting.fit_VTp_data(
+                fo, params, flags, data, verbose=False
+            )
+            zeros = np.zeros_like(fitted_eos.pcov[0])
+            self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros, tol_zero=1.0e-5)
+
+    def test_fit_VTP_data_w_priors(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        VTP = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            VTP[i] = [fo.V, temperatures[i], pressures[i]]
+
+        params = ["V_0", "K_0", "Kprime_0"]
+        priors = [fo.params["V_0"], fo.params["K_0"], fo.params["Kprime_0"]]
+        invcov = np.linalg.inv(
+            np.diag(np.power(np.array([fo.params["V_0"] / 10.0, 1.0e9, 1.0]), 2.0))
+        )
+        fitted_eos = burnman.eos_fitting.fit_VTP_data(
+            fo,
+            params,
+            VTP,
+            param_priors=priors,
+            param_prior_inv_cov_matrix=invcov,
+            verbose=False,
+        )
+        zeros = np.zeros_like(fitted_eos.pcov[0])
+
+        self.assertArraysAlmostEqual(fitted_eos.pcov[0], zeros)
+
+    def test_fit_bounded_VTP_data(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(0.0e9, 10.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        VTP = np.empty((len(pressures), 3))
+
+        for i in range(len(pressures)):
+            fo.set_state(pressures[i], temperatures[i])
+            VTP[i] = [fo.V, temperatures[i], pressures[i]]
+
+        # Modify the lowest and highest pressure points
+        # to artificially reduce the value of K'0
+        VTP[0, 0] *= 1.01
+        VTP[-1, 0] *= 0.99
+
+        params = ["V_0", "K_0", "Kprime_0"]
+        bounds = np.array([[0.0, np.inf], [0.0, np.inf], [3.0, 4.0]])
+        fitted_eos = burnman.eos_fitting.fit_VTP_data(
+            fo, params, VTP, bounds=bounds, verbose=False
+        )
+
+        cp_bands = burnman.nonlinear_fitting.confidence_prediction_bands(
+            model=fitted_eos,
+            x_array=VTP,
+            confidence_interval=0.95,
+            f=attribute_function(fo, "V"),
+            flag="V",
+        )
+        self.assertEqual(len(cp_bands[0]), len(VTP))
+        self.assertEqual(len(cp_bands), 4)
+
+        self.assertFloatEqual(3.0, fitted_eos.popt[2])
+
+        s = pretty_string_values(
+            fitted_eos.popt,
+            fitted_eos.pcov,
+            extra_decimal_places=1,
+            combine_value_and_sigma=False,
+        )
+
+        self.assertEqual(len(s), 3)
+        self.assertEqual(len(s[0]), 3)
+        self.assertEqual(len(s[1]), 3)
+        self.assertEqual(len(s[2]), 3)
+
+        s = pretty_string_values(
+            fitted_eos.popt,
+            fitted_eos.pcov,
+            extra_decimal_places=1,
+            combine_value_and_sigma=True,
+        )
+
+        self.assertEqual(len(s), 3)
+        self.assertEqual(len(s[0]), 3)
+        self.assertEqual(len(s[1]), 3)
+        self.assertEqual(len(s[2]), 3)
+
+    def test_VTP_data_eos_numerical_failure(self):
+        fo = burnman.minerals.HP_2011_ds62.fo()
+
+        pressures = np.linspace(1.0e9, 2.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        fo.set_state(1.0e9, fo.params["T_0"])
+        V0 = fo.V
+        fo.set_state(2.0e9, fo.params["T_0"])
+        V1 = fo.V
+        volumes = V0 + (V1 - V0) * (pressures - 1.0e9) / 1.0e9
+        VTP = np.array([volumes, temperatures, pressures]).T
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        with self.assertRaises(Exception):
+            _ = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
+
+    def test_VTP_data_eos_exception(self):
+        fo = burnman.minerals.SLB_2011.forsterite()
+
+        pressures = np.linspace(1.0e9, 100.0e9, 8)
+        temperatures = np.ones_like(pressures) * fo.params["T_0"]
+
+        fo.set_state(1.0e9, fo.params["T_0"])
+        V0 = fo.V
+        fo.set_state(2.0e9, fo.params["T_0"])
+        V1 = fo.V
+        volumes = V0 + (V1 - V0) * (pressures - 1.0e9) / 1.0e9
+        VTP = np.array([volumes, temperatures, pressures]).T
+        params = ["V_0", "K_0", "Kprime_0"]
+
+        with self.assertRaises(Exception):
+            _ = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
 
     def test_bounded_solution_fitting(self):
         solution = burnman.minerals.SLB_2011.mg_fe_olivine()
