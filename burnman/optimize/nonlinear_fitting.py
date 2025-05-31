@@ -378,7 +378,7 @@ def nonlinear_least_squares_fit(
 
     if verbose:
         print(
-            "Converged in {0:d} iterations"
+            f"Converged in {n_it} iterations"
             if n_it < max_lm_iterations - 1
             else f"Max iterations reached (param tolerance = {param_tolerance:1e})"
         )

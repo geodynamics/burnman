@@ -12,6 +12,63 @@ from ..utils.math import unit_normalize
 from .nonlinear_fitting import NonLinearModel, nonlinear_least_squares_fit
 
 
+def default_mle_tolerances(material, flags):
+    """
+    Computes default tolerances for maximum likelihood estimation (MLE).
+
+    The tolerances are computed per property flag, using either:
+    - A fixed absolute tolerance (e.g., 1.0 J) for energy-related properties
+    - A fixed absolute tolerance (e.g., 100 Pa) for pressure
+    - A relative tolerance (1e-5 x standard state value) for all other properties
+
+    All computed tolerances must be > 0.
+
+    :param material: The material instance to evaluate properties on.
+    :type material: :class:`burnman.Material`
+
+    :param flags: List of property names (strings) for which MLE tolerances
+        should be generated.
+    :type flags: list of str
+
+    :returns: A NumPy array of tolerances, one per property flag.
+    :rtype: np.ndarray
+
+    :raises Exception: If any computed tolerance is not strictly positive.
+    """
+    material.set_state(1.0e5, 300.0)
+    mle_tolerance_factor = 1.0e-5
+    mle_tolerances = np.empty(len(flags))
+
+    energy_flags = {
+        "H",
+        "energy",
+        "molar_internal_energy",
+        "helmholtz",
+        "molar_helmholtz",
+        "gibbs",
+        "molar_gibbs",
+        "enthalpy",
+        "molar_enthalpy",
+    }
+    pressure_flags = {"P", "pressure"}
+
+    for i, flag in enumerate(flags):
+        if flag in energy_flags:
+            mle_tolerances[i] = 1.0  # Absolute tolerance in joules
+        elif flag in pressure_flags:
+            mle_tolerances[i] = 100.0  # Absolute tolerance in pascals
+        else:
+            value = getattr(material, flag)
+            mle_tolerances[i] = mle_tolerance_factor * value
+
+    if not np.all(mle_tolerances > 0.0):
+        raise Exception(
+            f"All MLE tolerances should be > 0. They are currently: {mle_tolerances}"
+        )
+
+    return mle_tolerances
+
+
 class MineralFit(NonLinearModel):
     """
     Class for fitting mineral parameters to experimental data.
@@ -188,14 +245,7 @@ def fit_PTp_data(
 
     # Apply mle tolerances if they dont exist
     if len(mle_tolerances) == 0:
-        mineral.set_state(1.0e5, 300.0)
-        mle_tolerance_factor = 1.0e-5
-        mle_tolerances = np.empty(len(flags))
-        for i, flag in enumerate(flags):
-            if flag in ["gibbs", "enthalpy", "H", "helmholtz"]:
-                mle_tolerances[i] = 1.0  # 1 J
-            else:
-                mle_tolerances[i] = mle_tolerance_factor * getattr(mineral, flag)
+        mle_tolerances = default_mle_tolerances(mineral, flags)
 
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and p)
@@ -278,6 +328,276 @@ def fit_PTV_data(
     return fit_PTp_data(
         mineral=mineral,
         flags="V",
+        data=data,
+        data_covariances=data_covariances,
+        fit_params=fit_params,
+        param_tolerance=param_tolerance,
+        delta_params=delta_params,
+        bounds=bounds,
+        max_lm_iterations=max_lm_iterations,
+        param_priors=param_priors,
+        param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
+        verbose=verbose,
+    )
+
+
+class MineralFitV(NonLinearModel):
+    """
+    Class for fitting mineral parameters to experimental data
+    using volume as an independent variable.
+    Instances of this class are passed to
+    :func:`burnman.nonlinear_least_squares_fit`.
+
+    For attributes added to this model when fitting is done,
+    please see the documentation for that function.
+    """
+
+    def __init__(
+        self,
+        mineral,
+        data,
+        data_covariances,
+        flags,
+        fit_params,
+        mle_tolerances,
+        delta_params=None,
+        bounds=None,
+    ):
+        self.m = mineral
+        self.data = data
+        self.data_covariances = data_covariances
+        self.flags = flags
+        self.fit_params = fit_params
+        self.mle_tolerances = mle_tolerances
+        if delta_params is None:
+            self.delta_params = self.get_params() * 1.0e-5 + 1.0e-10
+        else:
+            self.delta_params = delta_params
+        self.bounds = bounds
+
+    def set_params(self, param_values):
+        i = 0
+
+        if self.bounds is not None:
+            param_values = np.clip(param_values, self.bounds[:, 0], self.bounds[:, 1])
+
+        for param in self.fit_params:
+            if isinstance(self.m.params[param], float):
+                self.m.params[param] = param_values[i]
+                i += 1
+            else:
+                for j in range(len(self.m.params[param])):
+                    self.m.params[param][j] = param_values[i]
+                    i += 1
+
+    def get_params(self):
+        params = []
+        for i, param in enumerate(self.fit_params):
+            params.append(self.m.params[param])
+        return np.array(flatten([self.m.params[prm] for prm in self.fit_params]))
+
+    def function(self, x, flag):
+        V, T, p = x
+        self.m.set_state_with_volume(V, T)
+        return np.array([V, T, getattr(self.m, flag)])
+
+    def normal(self, x, flag):
+        V, T, p = x
+
+        # See Stacey and Hodgkinson (2019), Table A2.
+        if flag == "P" or flag == "pressure":
+            self.m.set_state_with_volume(V, T)
+            dVdp = -self.m.V / self.m.isothermal_bulk_modulus_reuss  # dVdP|T
+            dpdT = self.m.alpha * self.m.isothermal_bulk_modulus_reuss  # dPdT|V
+        elif flag == "S" or flag == "molar_entropy":
+            self.m.set_state_with_volume(V, T)
+            dVdp = 1.0 / (self.m.alpha * self.m.isothermal_bulk_modulus_reuss)  # dVdS|T
+            dpdT = self.m.molar_heat_capacity_v / T  # dSdT|V
+        elif flag == "helmholtz" or flag == "molar_helmholtz":
+            self.m.set_state_with_volume(V, T)
+            dVdp = -1.0 / self.m.pressure  # dVdF|T
+            dpdT = -self.m.S  # dFdT|V
+        else:
+            dV = V * 1.0e-5
+            dT = 1.0
+            dVdp = (2.0 * dV) / (
+                self.function([V + dV, T, 0.0], flag)[2]
+                - self.function([V - dV, T, 0.0], flag)[2]
+            )
+            dpdT = (
+                self.function([V, T + dT, 0.0], flag)[2]
+                - self.function([V, T - dT, 0.0], flag)[2]
+            ) / (2.0 * dT)
+        dVdT = -dVdp * dpdT
+        n = np.array([-1.0, dVdT, dVdp])
+        return unit_normalize(n)
+
+
+def fit_VTp_data(
+    mineral,
+    fit_params,
+    flags,
+    data,
+    data_covariances=[],
+    mle_tolerances=[],
+    param_tolerance=1.0e-5,
+    delta_params=None,
+    bounds=None,
+    max_lm_iterations=50,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
+    verbose=True,
+):
+    """
+    Given a mineral of any type, a list of fit parameters
+    and a set of V-T-property points and (optional) uncertainties,
+    this function returns a list of optimized parameters
+    and their associated covariances, fitted using the
+    scipy.optimize.curve_fit routine.
+
+    :param mineral: Mineral for which the parameters should be optimized.
+    :type mineral: :class:`burnman.Mineral`
+
+    :param fit_params: List of dictionary keys contained in mineral.params
+        corresponding to the variables to be optimized
+        during fitting. Initial guesses are taken from the existing
+        values for the parameters
+    :type fit_params: list of str
+
+    :param flags: Attribute names for the property to be fit for the whole
+        dataset or each datum individually (e.g. 'P')
+    :type flags: string or list of strings
+
+    :param data: Observed V-T-property values
+    :type data: 2D numpy.array
+
+    :param data_covariances: V-T-property covariances (optional)
+        If not given, all covariance matrices are chosen
+        such that all data points have equal weight,
+        with all error in the properties.
+    :type data_covariances: 3D numpy.array
+
+    :param mle_tolerances: Tolerances for termination of the
+        maximum likelihood iterations (optional).
+    :type mle_tolerances: numpy.array
+
+    :param param_tolerance: Fractional tolerance for termination
+        of the nonlinear optimization (optional).
+    :type param_tolerance: float
+
+    :param delta_params: Initial values for the change in parameters (optional).
+    :type delta_params: numpy.array
+
+    :param bounds: Minimum and maximum bounds for the parameters (optional).
+        The shape must be (n_parameters, 2).
+    :type bounds: 2D numpy.array
+
+    :param max_lm_iterations: Maximum number of Levenberg-Marquardt iterations.
+    :type max_lm_iterations: int
+
+    :param verbose: Whether to print detailed information about the
+        optimization to screen.
+    :type verbose: bool
+
+    :returns: Model with optimized parameters.
+    :rtype: :class:`burnman.optimize.eos_fitting.MineralFitV`
+    """
+
+    # If only one property flag is given, assume it applies to all data
+    if type(flags) is str:
+        flags = np.array([flags] * len(data[:, 0]))
+
+    if len(flags) != len(data):
+        raise Exception(
+            f"The number of flags (n = {len(flags)}) must be equal "
+            f"to the number of data (n = {len(data)})."
+        )
+
+    # Apply mle tolerances if they dont exist
+    if len(mle_tolerances) == 0:
+        mle_tolerances = default_mle_tolerances(mineral, flags)
+
+    # If covariance matrix is not given, apply unit weighting to all properties
+    # (with zero errors on V and T)
+    covariances_defined = True
+    if len(data_covariances) == 0:
+        covariances_defined = False
+        data_covariances = np.zeros((len(data[:, 0]), len(data[0]), len(data[0])))
+        for i in range(len(data_covariances)):
+            data_covariances[i][2][2] = 1.0
+
+    model = MineralFitV(
+        mineral=mineral,
+        data=data,
+        data_covariances=data_covariances,
+        flags=flags,
+        fit_params=fit_params,
+        delta_params=delta_params,
+        mle_tolerances=mle_tolerances,
+        bounds=bounds,
+    )
+
+    nonlinear_least_squares_fit(
+        model,
+        max_lm_iterations=max_lm_iterations,
+        param_tolerance=param_tolerance,
+        param_priors=param_priors,
+        param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
+        verbose=verbose,
+    )
+
+    if verbose is True and covariances_defined is True:
+        confidence_interval = 0.9
+        d = nonlinear_fitting.extreme_values(
+            model.weighted_residuals, confidence_interval
+        )
+        confidence_bound, indices, probabilities = d
+        if indices != []:
+            print(
+                "The function nonlinear_fitting.extreme_values"
+                "(model.weighted_residuals, confidence_interval) "
+                f"has determined that there are {len(indices):d} data points"
+                " which have residuals which are not expected at the "
+                f"{confidence_interval*100.:.1f}% confidence level "
+                f"(> {confidence_bound:.1f} s.d. away from the model fit).\n"
+                "Their indices and the probabilities of finding "
+                "such extreme values are:"
+            )
+            for i, idx in enumerate(indices):
+                print(
+                    f"[{idx:d}]: {probabilities[i]:.4f} "
+                    f"({np.abs(model.weighted_residuals[idx]):.1f} s.d. "
+                    "from the model)"
+                )
+            print(
+                "You might consider removing them from your fit, "
+                "or increasing the uncertainties in their "
+                "measured values.\n"
+            )
+
+    return model
+
+
+def fit_VTP_data(
+    mineral,
+    fit_params,
+    data,
+    data_covariances=[],
+    delta_params=None,
+    bounds=None,
+    param_tolerance=1.0e-5,
+    max_lm_iterations=50,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
+    verbose=True,
+):
+    """
+    A simple alias for the fit_VTp_data for when all the data is pressure data
+    """
+
+    return fit_VTp_data(
+        mineral=mineral,
+        flags="P",
         data=data,
         data_covariances=data_covariances,
         fit_params=fit_params,
@@ -544,14 +864,7 @@ def fit_XPTp_data(
 
     # Apply mle tolerances if they dont exist
     if len(mle_tolerances) == 0:
-        solution.set_state(1.0e5, 300.0)
-        mle_tolerance_factor = 1.0e-5
-        mle_tolerances = np.empty(len(flags))
-        for i, flag in enumerate(flags):
-            if flag in ["gibbs", "enthalpy", "H", "helmholtz"]:
-                mle_tolerances[i] = 1.0  # 1 J
-            else:
-                mle_tolerances[i] = mle_tolerance_factor * getattr(solution, flag)
+        mle_tolerances = default_mle_tolerances(solution, flags)
 
     # If covariance matrix is not given, apply unit weighting to all pressures
     # (with zero errors on T and property)
