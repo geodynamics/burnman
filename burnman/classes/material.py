@@ -193,9 +193,9 @@ class Material(object):
         evaluated with a P(V, T) equation of state, there might be a
         property modifier G_mod(P, T) added on top - which might then
         introduce a pressure dependent V_mod(P, T).
-        Thus, we must solve for the volume iteratively:
-        V = V_i(P(V_i, T), T) + V_mod(P, T), where P(V_i, T) is
-        solved for iteratively.
+        We must therefore find the pressure P(V, T) iteratively:
+        V = V_base(P, T) + V_mod(P, T), even if there is a function
+        for P_base(V_base, T).
 
         This function is overloaded by the Mineral class.
 
