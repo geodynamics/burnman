@@ -32,9 +32,9 @@ def tait_constants(params):
 def pressure_modified_tait(Vrel, params):
     """
     Pressure according to the modified Tait equation of state.
-    EQ 2 from Holland and Powell, 2011
+    Equation 2 in :cite:`HP2011`.
 
-    :param Vrel: V/V_0
+    :param Vrel: Volume divided by the reference volume.
     :type Vrel: float or numpy array
     :param params: Parameter dictionary
     :type params: dictionary
@@ -49,7 +49,7 @@ def pressure_modified_tait(Vrel, params):
 def volume(pressure, params):
     """
     Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
-    EQ 12
+    Equation 12 in :cite:`HP2011`.
     """
     a, b, c = tait_constants(params)
     Vrel = 1.0 - a * (1.0 - np.power((1.0 + b * (pressure - params["P_0"])), -1.0 * c))

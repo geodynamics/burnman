@@ -1,0 +1,37 @@
+Least squares equation of state fitting with volume as an independent variable.
+
+1) Fitting to stishovite room temperature P(V) data
+
+Optimized equation of state for stishovite (HP):
+V_0: (1.4005 +/- 0.0001) x 1e-05
+K_0: (3.12 +/- 0.03) x 1e+11
+Kprime_0: (4.4 +/- 0.2) x 1e+00
+
+Optimized equation of state for stishovite (SLB):
+V_0: (1.4005 +/- 0.0001) x 1e-05
+K_0: (3.12 +/- 0.03) x 1e+11
+Kprime_0: (4.4 +/- 0.2) x 1e+00
+
+2) Fitting to synthetic F(V, T) data
+
+Actual equation of state:
+V_0: 1.1244e-05
+K_0: 1.6138e+11
+Kprime_0: 3.8405e+00
+grueneisen_0: 1.3613e+00
+q_0: 1.7217e+00
+Debye_0: 7.6710e+02
+F_0: -5.6944e+05
+
+Optimized equation of state:
+V_0: (1.1245 +/- 0.0001) x 1e-05
+K_0: (1.613 +/- 0.002) x 1e+11
+Kprime_0: (3.841 +/- 0.004) x 1e+00
+grueneisen_0: (1.360 +/- 0.003) x 1e+00
+q_0: (1.71 +/- 0.01) x 1e+00
+Debye_0: (7.671 +/- 0.001) x 1e+02
+F_0: (-5.69450 +/- 0.00008) x 1e+05
+
+Goodness of fit:
+0.673607559420123
+
