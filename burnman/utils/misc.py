@@ -193,31 +193,50 @@ def lookup_and_interpolate(table_x, table_y, x_value):
         return table_y[idx]
 
 
-def attribute_function(m, attributes, powers=[]):
+def attribute_function(m, attributes, powers=[], using_volume=False):
     """
-    Function which returns a function which can be used to
-    evaluate material properties at a point. This function
-    allows the user to define the property returned
-    as a string. The function can itself be passed to another
-    function
-    (such as nonlinear_fitting.confidence_prediction_bands()).
+    Returns a callable function that evaluates a derived material property
+    defined as a product of material attributes (optionally raised to given
+    powers) at specified thermodynamic conditions.
 
-    Properties can either be simple attributes (e.g. K_T) or
-    a product of attributes, each raised to some power.
+    The returned function is designed to be compatible with
+    :func:`burnman.optimize.nonlinear_fitting.confidence_prediction_bands`,
+    which expects functions of the form ``f(x)`` where `x` contains
+    composition and thermodynamic state variables.
 
-    :param m: The material instance evaluated by the output function.
+    The expected order of arguments in `x` depends on the value of
+    `using_volume`:
+    - If ``using_volume=False``, the function expects ``x = [X1, X2, ..., P, T, _]`` and the state of the material is set using `set_state`
+    - If ``using_volume=True``, the function expects ``x = [X1, X2, ..., V, T, _]`` and the state of the material is set using `set_state_with_volume`
+
+    The function sets the state of the material using the appropriate method,
+    evaluates the specified attributes, raises them to the corresponding
+    powers, and returns the product.
+
+    :param m: The material instance whose attributes are evaluated.
     :type m: :class:`burnman.Material`
 
-    :param attributes: The list of material attributes / properties to
-        be evaluated in the product.
+    :param attributes: List of material attributes to include in the product
+        expression (e.g., ['K_T', 'rho']).
     :type attributes: list of str
 
-    :param powers: The powers to which each attribute should be raised
-        during evaluation.
-    :type powers: list of floats
+    :param powers: List of exponents to raise each corresponding attribute to.
+        If empty, defaults to 1.0 for each attribute.
+    :type powers: list of float
 
-    :returns: Function which returns the value of product(a_i**p_i)
-        as a function of condition (x = [X1, X2, ..., P, T, V]).
+    :param using_volume: If True, the input function defines the
+        thermodynamic state using volume and temperature (V, T).
+        If False, pressure and temperature (P, T) are used.
+        This argument also determines the expected order of the
+        final three elements in the input vector `x`.
+    :type using_volume: bool
+
+    :returns: A function ``f(x)`` that evaluates the product of the
+        specified attributes, each raised to the corresponding power,
+        at the composition and thermodynamic conditions specified
+        by `x`. The format of `x` is determined by `using_volume`,
+        and is compatible with the `x_array` argument of
+        :func:`burnman.optimize.nonlinear_fitting.confidence_prediction_bands`.
     :rtype: function
     """
     if type(attributes) is str:
@@ -228,8 +247,10 @@ def attribute_function(m, attributes, powers=[]):
     def f(x):
         if len(x) > 3:
             m.set_composition(x[:-3])
-        P, T = x[-3:-1]
-        m.set_state(P, T)
+        if using_volume:
+            m.set_state_with_volume(x[-3], x[-2])
+        else:
+            m.set_state(x[-3], x[-2])
         value = 1.0
         for a, p in zip(*[attributes, powers]):
             value *= np.power(getattr(m, a), p)
