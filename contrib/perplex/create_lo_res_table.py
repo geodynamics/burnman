@@ -138,8 +138,10 @@ if __name__ == "__main__":
                 temperature_range_total[0] + (i_T + 1) * delta_T,
             ]
             if n_splits_pressure > 1 or n_splits_temperature > 1:
+                split_project_name = f"{project_name}_P{i_P + 1:02d}_T{i_T + 1:02d}"
                 outfile = f"{outfile_base}_P{i_P + 1:02d}_T{i_T + 1:02d}.dat"
             else:
+                split_project_name = project_name
                 outfile = f"{outfile_base}.dat"
 
             print(
@@ -148,7 +150,7 @@ if __name__ == "__main__":
             # Create the table for the current split
             create_table(
                 perplex_bindir,
-                project_name,
+                split_project_name,
                 database,
                 perplex_option_file,
                 composition,
