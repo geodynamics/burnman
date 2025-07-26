@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import numpy as np
 import burnman
 from perplex_utils import databases, make_build_file
 from perplex_utils import run_vertex, run_pssect
@@ -8,6 +8,7 @@ from perplex_utils import create_mode_table
 from perplex_utils import pretty_plot_phase_diagram
 
 import matplotlib.pyplot as plt
+import pickle
 
 
 def run_perplex(
@@ -71,25 +72,11 @@ compositions = {
         "molar",
     ),
     "harzburgite": burnman.Composition(
-        {
-            "SiO2": 36.07,
-            "MgO": 56.51,
-            "FeO": 6.07,
-            "CaO": 0.81,
-            "Al2O3": 0.53,
-            "Na2O": 0.001,
-        },
+        {"SiO2": 36.07, "MgO": 56.51, "FeO": 6.07, "CaO": 0.81, "Al2O3": 0.53},
         "molar",
     ),
     "modified_harzburgite": burnman.Composition(
-        {
-            "SiO2": 36.04,
-            "MgO": 56.54,
-            "FeO": 5.97,
-            "CaO": 0.79,
-            "Al2O3": 0.65,
-            "Na2O": 0.001,
-        },
+        {"SiO2": 36.04, "MgO": 56.54, "FeO": 5.97, "CaO": 0.79, "Al2O3": 0.65},
         "molar",
     ),
 }
@@ -100,15 +87,15 @@ if __name__ == "__main__":
     project_name = "basalt"
     database = databases["stx21"]
     composition = compositions[project_name]
-    pressure_range_total = [1.0e5, 140.0e9]
-    temperature_range_total = [200.0, 3000.0]
+    pressure_range_total = [1.0, 140.0e9]
+    temperature_range_total = [200.0, 4000.0]
 
     # Split pressure and temperature so that PerpleX
     # no temperature splits seems to make diagram with
     # less prominent discontinuities
-    n_pressures_per_split = 121
-    n_temperatures_per_split = 601
-    n_splits_pressure = 14
+    n_pressures_per_split = 101
+    n_temperatures_per_split = 761
+    n_splits_pressure = 28
     n_splits_temperature = 1
 
     # If this script has already been run, and you just want to
@@ -258,6 +245,10 @@ if __name__ == "__main__":
 
             modes_filenames.append(split_project_name + "_modes.dat")
 
+    mask_polygon = np.array(
+        [[0.0, 2150.0], [12.0e9, 4000.0001], [0.0, 4000.001], [0.0, 2150.0]]
+    )
+
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(1, 1, 1)
 
@@ -273,15 +264,23 @@ if __name__ == "__main__":
         label_scaling=3.0,
         label_clearance=0.01,
         number_small_fields=True,
+        mask_polygon=mask_polygon,
     )
 
-    with open(f"{project_name}_field_ids.txt", "w") as f:
+    # Save the assemblage data for all the small fields
+    with open(f"{project_name}_phase_diagram_field_ids.txt", "w") as f:
         for i, small_field in enumerate(small_fields):
             line = f"{i+1}: {small_field}"
             print(line)
             f.write(f"{line}\n")
 
-    fig.savefig(f"{project_name}.pdf")
+    # Save figure as a pdf
+    fig.savefig(f"{project_name}_phase_diagram.pdf")
+
+    # Save figure as a pickle file to reload later
+    with open(f"{project_name}_phase_diagram.pkl", "wb") as f:
+        pickle.dump(fig, f)
+
     plt.show()
 
     print("Processing complete.")
