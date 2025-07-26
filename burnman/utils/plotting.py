@@ -99,6 +99,47 @@ class Cell:
         return self.max > other.max
 
 
+def closest_point_on_segment(p, a, b):
+    """
+    Return the closest point on segment ab to point p.
+    p, a, b: numpy arrays of shape (2,)
+    """
+    ab = b - a
+    ap = p - a
+
+    ab_len_sq = np.dot(ab, ab)
+    if ab_len_sq < np.finfo(float).eps:
+        return a.copy()
+    else:
+        t = np.dot(ap, ab) / ab_len_sq
+        t = np.clip(t, 0, 1)  # constrain t to [0, 1]
+        return a + t * ab
+
+
+def closest_point_on_polygon(p, polygon):
+    """
+    Find the closest point on a polygon to point p.
+
+    :param p: np.array of shape (2,) - the target point
+    :param polygon: np.array of shape (N, 2) - the polygon vertices
+    (assumed closed or will be treated as closed)
+    :return: np.array of shape (2,) - closest point on polygon
+    """
+    min_dist = np.inf
+    closest_point = None
+    num_points = polygon.shape[0]
+    for i in range(num_points):
+        a = polygon[i]
+        b = polygon[(i + 1) % num_points]  # wrap around
+        proj = closest_point_on_segment(p, a, b)
+        dist = np.linalg.norm(p - proj)
+        if dist < min_dist:
+            min_dist = dist
+            closest_point = proj
+
+    return closest_point
+
+
 def _get_centroid_cell(polygon):
     """
     Estimate the polygon's centroid as an initial guess.
@@ -121,7 +162,9 @@ def _get_centroid_cell(polygon):
         b = a
 
     if area == 0:
-        return Cell(points[0][0], points[0][1], 0.0, polygon)
+        midpoint = (np.min(points, axis=0) + np.max(points, axis=0)) / 2
+        closest = closest_point_on_polygon(midpoint, points)
+        return Cell(closest[0], closest[1], 0.0, polygon)
 
     return Cell(cx / area, cy / area, 0.0, polygon)
 
