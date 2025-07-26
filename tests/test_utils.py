@@ -15,6 +15,7 @@ from burnman.utils.math import chisqr_profiles
 from burnman.utils.math import independent_row_indices
 from burnman.utils.math import array_to_rational_matrix
 from burnman.utils.math import complete_basis, generate_complete_basis
+from burnman.utils.plotting import visual_center_of_polygon
 
 
 class test_utils(BurnManTest):
@@ -257,6 +258,47 @@ class test_utils(BurnManTest):
         c = np.array([[1, 0, 0], [1, 1, 0], [0, 0, 1]])
         c2 = generate_complete_basis(incomplete_basis, array)
         np.testing.assert_allclose(c, c2, rtol=1e-5)
+
+    def test_visual_center_square(self):
+        square = [np.array([[0, 0], [10, 0], [10, 10], [0, 10]])]
+        center = visual_center_of_polygon(square, precision=0.01)
+        self.assertTrue(np.allclose(center, [5, 5], atol=0.1))
+
+    def test_visual_center_with_distance(self):
+        square = [np.array([[0, 0], [10, 0], [10, 10], [0, 10]])]
+        center, dist = visual_center_of_polygon(
+            square, precision=0.01, with_distance=True
+        )
+        self.assertTrue(np.allclose(center, [5, 5], atol=0.1))
+        self.assertTrue(abs(dist - 5.0) < 0.2)
+
+    def test_visual_center_narrow_rectangle(self):
+        rect = [np.array([[0, 0], [100, 0], [100, 1], [0, 1]])]
+        center, dist = visual_center_of_polygon(
+            rect, precision=0.01, with_distance=True
+        )
+        self.assertTrue(np.allclose(center[1], 0.5, atol=0.05))
+        self.assertTrue(dist < 1.0)
+
+    def test_visual_center_invalid_input_shape(self):
+        invalid = [np.array([[1, 2, 3]])]
+        with self.assertRaises(ValueError):
+            visual_center_of_polygon(invalid)
+
+    def test_visual_center_tiny_square(self):
+        tiny = [np.array([[0, 0], [0.001, 0], [0.001, 0.001], [0, 0.001]])]
+        center = visual_center_of_polygon(tiny)
+        self.assertTrue(np.allclose(center, [0.0005, 0.0005], atol=1e-4))
+
+    def test_visual_center_long_square(self):
+        tiny = [np.array([[0, 0], [1, 0], [1, 0.001], [0, 0.001]])]
+        center = visual_center_of_polygon(tiny)
+        self.assertTrue(np.allclose(center, [0.5, 0.0005], atol=1e-4))
+
+    def test_visual_center_area_zero(self):
+        tiny = [np.array([[0, 0], [0.01, 0.1], [0, 0]])]
+        center = visual_center_of_polygon(tiny)
+        self.assertTrue(np.allclose(center, [0.005, 0.05], atol=1e-4))
 
 
 if __name__ == "__main__":
