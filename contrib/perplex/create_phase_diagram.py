@@ -45,67 +45,79 @@ def run_perplex(
     run_pssect(perplex_bindir, project_name, convert_to_pdf=False, verbose=False)
 
 
+# The following compositions are from Xu et al. (2008)
+# (https://doi.org/10.1016/j.epsl.2008.08.012)
+compositions = {
+    "pyrolite": burnman.Composition(
+        {
+            "SiO2": 38.71,
+            "MgO": 49.85,
+            "FeO": 6.17,
+            "CaO": 2.94,
+            "Al2O3": 2.22,
+            "Na2O": 0.11,
+        },
+        "molar",
+    ),
+    "basalt": burnman.Composition(
+        {
+            "SiO2": 51.75,
+            "MgO": 14.94,
+            "FeO": 7.06,
+            "CaO": 13.88,
+            "Al2O3": 10.19,
+            "Na2O": 2.18,
+        },
+        "molar",
+    ),
+    "harzburgite": burnman.Composition(
+        {
+            "SiO2": 36.07,
+            "MgO": 56.51,
+            "FeO": 6.07,
+            "CaO": 0.81,
+            "Al2O3": 0.53,
+            "Na2O": 0.001,
+        },
+        "molar",
+    ),
+    "modified_harzburgite": burnman.Composition(
+        {
+            "SiO2": 36.04,
+            "MgO": 56.54,
+            "FeO": 5.97,
+            "CaO": 0.79,
+            "Al2O3": 0.65,
+            "Na2O": 0.001,
+        },
+        "molar",
+    ),
+}
+
+
 if __name__ == "__main__":
     # Define the project parameters
-    compositions = {
-        "pyrolite": burnman.Composition(
-            {
-                "SiO2": 38.71,
-                "MgO": 49.85,
-                "FeO": 6.17,
-                "CaO": 2.94,
-                "Al2O3": 2.22,
-                "Na2O": 0.11,
-            },
-            "molar",
-        ),
-        "basalt": burnman.Composition(
-            {
-                "SiO2": 51.75,
-                "MgO": 14.94,
-                "FeO": 7.06,
-                "CaO": 13.88,
-                "Al2O3": 10.19,
-                "Na2O": 2.18,
-            },
-            "molar",
-        ),
-        "harzburgite": burnman.Composition(
-            {
-                "SiO2": 36.07,
-                "MgO": 56.51,
-                "FeO": 6.07,
-                "CaO": 0.81,
-                "Al2O3": 0.53,
-                "Na2O": 0.001,
-            },
-            "molar",
-        ),
-        "modified_harzburgite": burnman.Composition(
-            {
-                "SiO2": 36.04,
-                "MgO": 56.54,
-                "FeO": 5.97,
-                "CaO": 0.79,
-                "Al2O3": 0.65,
-                "Na2O": 0.001,
-            },
-            "molar",
-        ),
-    }
     project_name = "basalt"
     database = databases["stx21"]
     composition = compositions[project_name]
     pressure_range_total = [1.0e5, 140.0e9]
     temperature_range_total = [200.0, 3000.0]
-    n_pressures_per_split = 241
-    n_temperatures_per_split = 201
-    n_splits_pressure = 7
-    n_splits_temperature = 3
 
-    create_plots = True
+    # Split pressure and temperature so that PerpleX
+    # no temperature splits seems to make diagram with
+    # less prominent discontinuities
+    n_pressures_per_split = 121
+    n_temperatures_per_split = 601
+    n_splits_pressure = 14
+    n_splits_temperature = 1
+
+    # If this script has already been run, and you just want to
+    # tweak the figure, perplex should not be run again.
+    perplex_should_be_run = True
+
+    # End of project definitions
+
     outfile_base = f"{project_name}_table"
-
     perplex_dir = os.path.join(os.getcwd(), "perplex-installer/Perple_X")
     perplex_bindir = os.path.join(os.getcwd(), "perplex-installer/Perple_X/bin")
 
@@ -114,7 +126,7 @@ if __name__ == "__main__":
         temperature_range_total[1] - temperature_range_total[0]
     ) / n_splits_temperature
 
-    if create_plots:
+    if perplex_should_be_run:
         # Check if the project directory already exists
         # If it does, delete it to start fresh.
         try:
@@ -249,18 +261,25 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(1, 1, 1)
 
-    pretty_plot_phase_diagram(
+    small_fields = pretty_plot_phase_diagram(
         ax,
         modes_filenames,
         phase_name_replacements,
         bounding_colors,
+        n_phases_bounds=[2.0, 7.0],
         smoothing_window=8,
         smoothing_order=1,
         linewidth=0.5,
         label_scaling=3.0,
         label_clearance=0.01,
-        n_phases_bounds=[2.0, 7.0],
+        number_small_fields=True,
     )
+
+    with open(f"{project_name}_field_ids.txt", "w") as f:
+        for i, small_field in enumerate(small_fields):
+            line = f"{i+1}: {small_field}"
+            print(line)
+            f.write(f"{line}\n")
 
     fig.savefig(f"{project_name}.pdf")
     plt.show()

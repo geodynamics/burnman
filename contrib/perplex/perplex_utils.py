@@ -1060,12 +1060,13 @@ def pretty_plot_phase_diagram(
     werami_mode_tab_filenames,
     phase_name_replacements,
     bounding_colors=["#44015a", "#ffffff"],
+    n_phases_bounds=[2, 10],
     smoothing_window=4,
     smoothing_order=1,
     linewidth=0.5,
     label_scaling=3.0,
     label_clearance=0.01,
-    n_phases_bounds=[2, 10],
+    number_small_fields=True,
 ):
     """
     Plot the Perple_X calculated phase diagram on a matplotlib axis.
@@ -1078,17 +1079,26 @@ def pretty_plot_phase_diagram(
     :type phase_name_replacements: dict[str, str]
     :param bounding_colors: List of two colors for bounding colormap.
     :type bounding_colors: [str, str]
+    :param n_phases_bounds: Minimum and maximum number of phases for the colormap.
+    :type n_phases_bounds: [int, int]
     :param smoothing_window: Savitzky-Golay smoothing window length.
     :type smoothing_window: int
     :param smoothing_order: Savitzky-Golay smoothing polynomial order.
     :type smoothing_order: int
+    :param linewidth: Linewidth for the edges of fields.
+    :type linewidth: float
     :param label_scaling: Scaling factor corresponding to an
     approximate value of the width:height ratio of the label.
     :type label_scaling: float
     :param label_clearance: Only plot the label if there is a certain
-    clearance to the edge of the field. Scaled to the height of the domain.
+    clearance between the center and the edge of the field.
+    Scaled to the height of the domain.
     :type label_clearance: float
-    :return: None
+    :param number_small_fields: Replace assemblage labels with numbers if
+    there is not enough clearance around the label.
+    :type number_small_fields: bool
+    :return: List of assemblages corresponding to numbered small fields.
+    :rtype: [str]
     """
 
     polygon_data = []
@@ -1131,6 +1141,8 @@ def pretty_plot_phase_diagram(
     # ScalarMappable for colorbar
     sm = ScalarMappable(cmap=cmap, norm=norm)
 
+    small_fields = []
+    large_fields = set()
     for polygon in polygon_data:
 
         color = cmap(norm(polygon["n_phases"]))
@@ -1151,8 +1163,34 @@ def pretty_plot_phase_diagram(
         label_pos, label_dist = get_label_position_from_polygon_contour(
             contour, P_range, T_range, label_scaling
         )
+
         if label_dist > label_clearance:
+            large_fields.add(polygon["label"])
             ax.text(*label_pos, polygon["label"], fontsize=6, ha="center", va="center")
+        elif number_small_fields:
+            if len(polygon["edges"]) > 0:
+                small_fields.append([label_pos, polygon["label"]])
+
+    unique_ids = {}
+    unique_small_fields = []
+    i = 1
+    for _, label in small_fields:
+        if label not in unique_ids.keys() and label not in large_fields:
+            unique_ids[label] = i
+            unique_small_fields.append(label)
+            i = i + 1
+
+    for label_pos, label in small_fields:
+        try:
+            ax.text(
+                *label_pos,
+                f"{unique_ids[label]:02d}",
+                fontsize=6,
+                ha="center",
+                va="center",
+            )
+        except KeyError:
+            pass
 
     cbar = plt.colorbar(sm, ax=ax, boundaries=boundaries, ticks=n_phases_range)
     cbar.set_label("n phases")
@@ -1164,3 +1202,5 @@ def pretty_plot_phase_diagram(
     ax.set_ylim(bounds[1])
     ax.grid(True, linestyle="--", color="gray", alpha=0.7)
     ax.set_axisbelow(False)
+
+    return unique_small_fields
