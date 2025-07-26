@@ -457,10 +457,8 @@ def create_werami_table(
             print(f"Output file renamed to '{outfile}'")
             print("Processing complete.")
 
-    except FileNotFoundError:
-        raise RuntimeError(f"'werami' not found at path: {werami_path}")
     except Exception as e:
-        raise RuntimeError(f"Failed to run werami: {e}")
+        raise RuntimeError(f"Failed to create werami table: {e}")
 
 
 def create_mode_table(
@@ -553,10 +551,8 @@ def create_mode_table(
             print(f"Output file renamed to '{outfile}'")
             print("Processing complete.")
 
-    except FileNotFoundError:
-        raise RuntimeError(f"'werami' not found at path: {werami_path}")
     except Exception as e:
-        raise RuntimeError(f"Failed to run werami: {e}")
+        raise RuntimeError(f"Failed to create mode table: {e}")
 
 
 def create_perplex_class_table(
