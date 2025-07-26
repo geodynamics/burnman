@@ -809,7 +809,11 @@ def _smooth_polygon_edges_between_intersections(
 
 
 def get_fields_assemblages_and_bounds(
-    filename, phase_name_replacements, smoothing_window, smoothing_order
+    filename,
+    phase_name_replacements,
+    smoothing_window,
+    smoothing_order,
+    mask_polygon=None,
 ):
     """
     Extract phase assemblage fields and plot bounds from a mode tab file.
@@ -823,6 +827,9 @@ def get_fields_assemblages_and_bounds(
     :type smoothing_window: int
     :param smoothing_order: Polynomial order for smoothing polygon edges.
     :type smoothing_order: int
+    :param mask_polygon: 2D array of points (P in Pa, T in K),
+    defining a polygon to mask out.
+    :type mask_polygon: 2D numpy array
     :return: Tuple containing list of polygon data dicts and bounds
     [[P_min, P_max], [T_min, T_max]].
     :rtype: (list[dict], list[list[float]])
@@ -832,8 +839,21 @@ def get_fields_assemblages_and_bounds(
     P, T = data[:2]
     pressures = P[:, 0]
     temperatures = T[0]
-
     phase_modes = data[2:]
+
+    if mask_polygon is not None:
+
+        mask_polygon_bar = mask_polygon.copy()
+        mask_polygon_bar[:, 0] = mask_polygon_bar[:, 0] / 1.0e5
+
+        poly = Polygon(mask_polygon_bar)
+        points = np.vstack((P.ravel(), T.ravel())).T
+        mask = np.array(
+            [poly.contains(Point(pt)) or poly.touches(Point(pt)) for pt in points]
+        )
+        mask = mask.reshape(P.shape)
+        phase_modes[:, mask] = 0.0
+
     num_phases = phase_modes.shape[0]
     phase_names = [phase_name_replacements.get(name, name) for name in column_names[2:]]
 
@@ -1067,6 +1087,7 @@ def pretty_plot_phase_diagram(
     label_scaling=3.0,
     label_clearance=0.01,
     number_small_fields=True,
+    mask_polygon=None,
 ):
     """
     Plot the Perple_X calculated phase diagram on a matplotlib axis.
@@ -1097,6 +1118,9 @@ def pretty_plot_phase_diagram(
     :param number_small_fields: Replace assemblage labels with numbers if
     there is not enough clearance around the label.
     :type number_small_fields: bool
+    :param mask_polygon: 2D array of points (P in Pa, T in K),
+    defining a polygon to mask out.
+    :type mask_polygon: 2D numpy array
     :return: List of assemblages corresponding to numbered small fields.
     :rtype: [str]
     """
@@ -1110,6 +1134,7 @@ def pretty_plot_phase_diagram(
             phase_name_replacements,
             smoothing_window,
             smoothing_order,
+            mask_polygon,
         )
         polygon_data.extend(polygon_data_i)
         bounds.append(bounds_i)
