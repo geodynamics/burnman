@@ -8,6 +8,7 @@ from perplex_utils import create_mode_table
 from perplex_utils import pretty_plot_phase_diagram
 
 import matplotlib.pyplot as plt
+import pickle
 
 
 def run_perplex(
@@ -266,13 +267,20 @@ if __name__ == "__main__":
         mask_polygon=mask_polygon,
     )
 
-    with open(f"{project_name}_field_ids.txt", "w") as f:
+    # Save the assemblage data for all the small fields
+    with open(f"{project_name}_phase_diagram_field_ids.txt", "w") as f:
         for i, small_field in enumerate(small_fields):
             line = f"{i+1}: {small_field}"
             print(line)
             f.write(f"{line}\n")
 
-    fig.savefig(f"{project_name}.pdf")
+    # Save figure as a pdf
+    fig.savefig(f"{project_name}_phase_diagram.pdf")
+
+    # Save figure as a pickle file to reload later
+    with open(f"{project_name}_phase_diagram.pkl", "wb") as f:
+        pickle.dump(fig, f)
+
     plt.show()
 
     print("Processing complete.")
