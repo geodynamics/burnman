@@ -23,3 +23,4 @@ from . import reductions
 from . import unitcell
 from . import geotherm
 from . import anisotropy
+from . import plotting

@@ -38,7 +38,7 @@ echo ""
 
 # Quietly install optional modules after burnman
 echo "Installing optional autograd and jupyter modules ..."
-$PYTHON -m pip install -q autograd jupyter
+$PYTHON -m pip install -q autograd jupyter shapely
 echo ""
 
 function testit {

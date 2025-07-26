@@ -4,10 +4,10 @@ import shutil
 import burnman
 from perplex_utils import databases, make_build_file
 from perplex_utils import run_vertex, run_pssect
-from perplex_utils import create_perplex_table
+from perplex_utils import create_perplex_class_table
 
 
-def create_table(
+def run_perplex(
     perplex_bindir,
     project_name,
     database,
@@ -46,7 +46,7 @@ def create_table(
 
     # Create the BurnMan-readable table from the vertex output
     print("* Creating BurnMan-readable table...")
-    create_perplex_table(
+    create_perplex_class_table(
         perplex_bindir,
         project_name,
         outfile,
@@ -148,7 +148,7 @@ if __name__ == "__main__":
                 f"Creating table [{i_P + 1}/{n_splits_pressure}, {i_T + 1}/{n_splits_temperature}]"
             )
             # Create the table for the current split
-            create_table(
+            run_perplex(
                 perplex_bindir,
                 split_project_name,
                 database,
