@@ -90,16 +90,17 @@ if __name__ == "__main__":
     pressure_range_total = [1.0, 140.0e9]
     temperature_range_total = [200.0, 4000.0]
 
-    # Split pressure and temperature so that PerpleX
-    # no temperature splits seems to make diagram with
-    # less prominent discontinuities
+    # Split pressure and temperature so that PerpleX does not create
+    # too many assemblages.
+    # Splitting only pressures seems to make diagrams with
+    # less prominent spurious discontinuities
     n_pressures_per_split = 101
     n_temperatures_per_split = 761
     n_splits_pressure = 28
     n_splits_temperature = 1
 
     # If this script has already been run, and you just want to
-    # tweak the figure, perplex should not be run again.
+    # tweak the figure, PerpleX should not be run again.
     perplex_should_be_run = True
 
     # End of project definitions
@@ -142,7 +143,7 @@ if __name__ == "__main__":
         # Define the number of exploratory nodes.
         # These are the nodes over which the full Gibbs minimization is performed.
         # In the refinement stage, the number of nodes is increased.
-        # Any solutions not present on any of the bounding nodes will be excluded
+        # Any phases not present on any of the bounding nodes will be excluded
         # from the calculations.
         n_P_exploratory = int((n_pressures_per_split + 1) / 2)
         n_T_exploratory = int((n_temperatures_per_split + 1) / 2)
