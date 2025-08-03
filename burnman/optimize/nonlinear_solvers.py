@@ -1,4 +1,7 @@
+from __future__ import annotations
 import numpy as np
+import numpy.typing as npt
+from typing import Any
 from scipy.linalg import lu_factor, lu_solve
 from types import SimpleNamespace
 from collections import namedtuple
@@ -120,17 +123,29 @@ class DampedNewtonSolver:
                 self.guess
             ), "tol must either be a float or an array like guess."
 
-    def _constraints(self, x):
+    def _constraints(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         return np.dot(self.linear_constraints[0], x) + self.linear_constraints[1]
 
-    def _update_lmda(self, x, dx, h, lmda_bounds):
+    def _update_lmda(
+        self,
+        x: npt.NDArray[np.float64],
+        dx: npt.NDArray[np.float64],
+        h: npt.NDArray[np.float64],
+        lmda_bounds: tuple[float, float],
+    ) -> float:
         assert lmda_bounds[1] < 1.0 + self.eps
         assert lmda_bounds[0] > 1.0e-8 - self.eps
 
         lmda_j = min(1.0 / (h + self.eps), lmda_bounds[1])
         return max(lmda_j, lmda_bounds[0])
 
-    def _solve_subject_to_constraints(self, x, jac_x, c_x, c_prime):
+    def _solve_subject_to_constraints(
+        self,
+        x: npt.NDArray[np.float64],
+        jac_x: npt.NDArray[np.float64],
+        c_x: npt.NDArray[np.float64],
+        c_prime: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
         """
         Solve a constrained Newton correction step using the method of
         Lagrange multipliers (KKT system).
@@ -209,7 +224,14 @@ class DampedNewtonSolver:
         dx = dx_lambda[:n_x]
         return x + dx, dx_lambda[n_x:], condition_number
 
-    def _constrain_step_to_feasible_region(self, x, dx, n_constraints, lmda, x_j):
+    def _constrain_step_to_feasible_region(
+        self,
+        x: npt.NDArray[np.float64],
+        dx: npt.NDArray[np.float64],
+        n_constraints: int,
+        lmda: float,
+        x_j: npt.NDArray[np.float64],
+    ) -> tuple[npt.NDArray[np.float64], float]:
         """
         Project a trial Newton step back into the feasible region defined
         by linear inequality constraints A.x + b <= 0.
@@ -267,8 +289,13 @@ class DampedNewtonSolver:
         return lmda, x_j, violated_constraints
 
     def _lagrangian_walk_along_constraints(
-        self, sol, dx, luJ, dx_norm, violated_constraints
-    ):
+        self,
+        sol: Any,
+        dx: npt.NDArray[np.float64],
+        luJ: Any,
+        dx_norm: float,
+        violated_constraints: list[int],
+    ) -> tuple[npt.NDArray[np.float64], float]:
         """
         Attempt to find a constrained Newton step when a step along the
         standard Newton direction would immediately violate active linear
@@ -354,7 +381,13 @@ class DampedNewtonSolver:
 
         return lmda, x_j, dx, persistent_bound_violation
 
-    def _check_convergence(self, dxbar_j, dx, lmda, lmda_bounds):
+    def _check_convergence(
+        self,
+        dxbar_j: npt.NDArray[np.float64],
+        dx: npt.NDArray[np.float64],
+        lmda: float,
+        lmda_bounds: tuple[float, float],
+    ) -> bool:
         if (
             all(np.abs(dxbar_j) < self.tol)
             and all(np.abs(dx) < np.sqrt(10.0 * self.tol))
@@ -365,21 +398,21 @@ class DampedNewtonSolver:
 
     def _posteriori_loop(
         self,
-        x,
-        F,
-        dx,
-        dx_norm,
-        dxbar_j,
-        dxbar_j_norm,
-        x_j,
-        luJ,
-        lmda,
-        lmda_bounds,
-        converged,
-        minimum_lmda,
-        persistent_bound_violation,
-        require_posteriori_loop,
-    ):
+        x: npt.NDArray[np.float64],
+        F: npt.NDArray[np.float64],
+        dx: npt.NDArray[np.float64],
+        dx_norm: float,
+        dxbar_j: npt.NDArray[np.float64],
+        dxbar_j_norm: float,
+        x_j: npt.NDArray[np.float64],
+        luJ: Any,
+        lmda: float,
+        lmda_bounds: tuple[float, float],
+        converged: bool,
+        minimum_lmda: bool,
+        persistent_bound_violation: bool,
+        require_posteriori_loop: bool,
+    ) -> tuple[npt.NDArray[np.float64], float, bool, bool, bool]:
         """
         Perform the a posteriori step-size control loop of Deuflhard's
         damped Newton method.
@@ -465,14 +498,14 @@ class DampedNewtonSolver:
 
     def _termination_info(
         self,
-        converged,
-        minimum_lmda,
-        persistent_bound_violation,
-        lmda_bounds,
-        n_it,
-        max_iterations,
-        violated_constraints,
-    ):
+        converged: bool,
+        minimum_lmda: bool,
+        persistent_bound_violation: bool,
+        lmda_bounds: tuple[float, float],
+        n_it: int,
+        max_iterations: int,
+        violated_constraints: list[int],
+    ) -> tuple[int, str, bool]:
         if converged:
             return (
                 True,
@@ -693,10 +726,10 @@ def damped_newton_solve(
         F,
         J,
         guess,
-        tol=tol,
-        max_iterations=max_iterations,
-        lambda_bounds=lambda_bounds,
-        linear_constraints=linear_constraints,
-        store_iterates=store_iterates,
+        tol,
+        max_iterations,
+        lambda_bounds,
+        linear_constraints,
+        store_iterates,
     )
     return solver.solve()
