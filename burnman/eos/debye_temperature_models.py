@@ -157,8 +157,8 @@ class PowerLawGamma(DebyeTemperatureModelBase):
 
     This class is based on a power-law model for the Grueneisen parameter,
     which is defined as:
-    :math:`\\gamma(V) = c_0 + c_1 (V/V_0)^{q_1} + c_2 (V/V_0)^{q_2}`
-    where :math:`c_0`, :math:`c_1`, :math:`c_2`, :math:`q_1`, and :math:`q_2`
+    :math:`\\gamma(V) = grueneisen_0 + c_1 ((V/V_0)^{q_1} - 1) + c_2 ((V/V_0)^{q_2} - 1)`
+    where :math:`grueneisen_0`, :math:`c_1`, :math:`c_2`, :math:`q_1`, and :math:`q_2`
     are parameters that define the Grueneisen parameter's dependence on volume.
 
     The Debye temperature is computed as:
@@ -174,7 +174,7 @@ class PowerLawGamma(DebyeTemperatureModelBase):
         # This method computes the Debye temperature.
         return (
             params["Debye_0"]
-            * np.power(Vrel, -params["c_0"])
+            * np.power(Vrel, params["c_2"] + params["c_1"] - params["grueneisen_0"])
             * np.exp(
                 -params["c_1"] / params["q_1"] * (np.power(Vrel, params["q_1"]) - 1.0)
                 - params["c_2"] / params["q_2"] * (np.power(Vrel, params["q_2"]) - 1.0)
@@ -183,9 +183,9 @@ class PowerLawGamma(DebyeTemperatureModelBase):
 
     def _gamma(self, Vrel, params):
         return (
-            params["c_0"]
-            + params["c_1"] * np.power(Vrel, params["q_1"])
-            + params["c_2"] * np.power(Vrel, params["q_2"])
+            params["grueneisen_0"]
+            + params["c_1"] * (np.power(Vrel, params["q_1"]) - 1.0)
+            + params["c_2"] * (np.power(Vrel, params["q_2"]) - 1.0)
         )
 
     def _gamma_prime(self, Vrel, params):
