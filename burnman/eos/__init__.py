@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -17,6 +17,13 @@ from .murnaghan import Murnaghan
 from .birch_murnaghan import BM3Shear2, BM3, BM4
 from .mie_grueneisen_debye import MGD2, MGD3
 from .slb import SLB2, SLB3, SLB3Conductive
+from .modular_mie_grueneisen_debye import ModularMGD
+from .debye_temperature_models import (
+    DebyeTemperatureModelBase,
+    SLB,
+    PowerLawGammaSimple,
+    PowerLawGamma,
+)
 from .modified_tait import MT
 from .hp import HP_TMT
 from .hp import HP_TMTL

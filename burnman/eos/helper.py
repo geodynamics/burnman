@@ -1,11 +1,12 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 import inspect
 from . import slb
 from . import mie_grueneisen_debye as mgd
+from . import modular_mie_grueneisen_debye as mmgd
 from . import murnaghan
 from . import birch_murnaghan as bm
 from . import modified_tait as mt
@@ -60,6 +61,8 @@ def create(method):
             return slb.SLB3()
         elif method == "slb3-conductive":
             return slb.SLB3Conductive()
+        elif method == "modular_mgd":
+            return mmgd.ModularMGD()
         elif method == "murnaghan":
             return murnaghan.Murnaghan()
         elif method == "bm3shear2":
