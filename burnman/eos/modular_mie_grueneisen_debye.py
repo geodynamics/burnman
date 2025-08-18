@@ -23,6 +23,7 @@ except ImportError:
 from . import debye
 from . import equation_of_state as eos
 from ..utils.math import bracket
+from . import bukowinski_electronic as el
 
 
 class ModularMGD(eos.EquationOfState):
@@ -65,17 +66,32 @@ class ModularMGD(eos.EquationOfState):
         Returns the pressure of the mineral at a given temperature and volume
         [Pa]
         """
-        P_ref = params["reference_eos"].pressure(params["T_0"], volume, params)
-        Debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
-        dThetadV = (
-            params["debye_temperature_model"].dVrel(volume / params["V_0"], params)
-            / params["V_0"]
-        )
+        Vrel = volume / params["V_0"]
+        T_0 = params["T_0"]
+
+        P_ref = params["reference_eos"].pressure(T_0, volume, params)
+        Debye_T = params["debye_temperature_model"](Vrel, params)
+        dThetadV = params["debye_temperature_model"].dVrel(Vrel, params) / params["V_0"]
         P_th = -dThetadV * (
             debye.dhelmholtz_dTheta(temperature, Debye_T, params["n"])
-            - debye.dhelmholtz_dTheta(params["T_0"], Debye_T, params["n"])
+            - debye.dhelmholtz_dTheta(T_0, Debye_T, params["n"])
         )
-        return P_ref + P_th
+
+        P = P_ref + P_th
+
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            bel_0 = params["bel_0"]
+            gel = params["gel"]
+            P += (
+                0.5
+                * gel
+                * bel_0
+                * pow(Vrel, gel)
+                * (temperature * temperature - T_0 * T_0)
+                / volume
+            )
+        return P
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
@@ -101,7 +117,19 @@ class ModularMGD(eos.EquationOfState):
         d2FthdV2 = d2ThetadV2 * (dFthdTheta - dFthdTheta_T0) + dThetadV**2 * (
             d2FthdTheta2 - d2FthdTheta2_T0
         )
-        return KT_ref + V * d2FthdV2
+
+        KT = KT_ref + V * d2FthdV2
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            KT += volume * el.KToverV(
+                temperature,
+                volume,
+                params["T_0"],
+                params["V_0"],
+                params["bel_0"],
+                params["gel"],
+            )
+        return KT
 
     def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
         """
@@ -109,6 +137,12 @@ class ModularMGD(eos.EquationOfState):
         """
         debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
         C_v = debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
+
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            bel_0 = params["bel_0"]
+            gel = params["gel"]
+            C_v += temperature * el.CVoverT(volume, params["V_0"], bel_0, gel)
         return C_v
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
@@ -123,6 +157,12 @@ class ModularMGD(eos.EquationOfState):
         dSdTheta = debye.dentropy_dTheta(temperature, debye_T, params["n"])
         aKT = dSdTheta * dThetadV
 
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            bel_0 = params["bel_0"]
+            gel = params["gel"]
+            aKT += el.aKT(temperature, volume, params["V_0"], bel_0, gel)
+
         KT = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
 
         return aKT / KT
@@ -134,6 +174,12 @@ class ModularMGD(eos.EquationOfState):
         """
         Debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
         S = debye.entropy(temperature, Debye_T, params["n"])
+
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            S += el.entropy(
+                temperature, volume, params["V_0"], params["bel_0"], params["gel"]
+            )
         return S
 
     def _helmholtz_energy(self, pressure, temperature, volume, params):
@@ -154,7 +200,20 @@ class ModularMGD(eos.EquationOfState):
             temperature, Debye_T, params["n"]
         ) - debye.helmholtz_energy(params["T_0"], Debye_T, params["n"])
 
-        return F_ref + F_th
+        F = F_ref + F_th
+
+        # If the material is conductive, add the electronic contribution
+        if params["bel_0"] is not None:
+            F += el.helmholtz(
+                temperature,
+                volume,
+                params["T_0"],
+                params["V_0"],
+                params["bel_0"],
+                params["gel"],
+            )
+
+        return F
 
     # Derived properties from here
     # These functions can use pressure as an argument,
@@ -235,3 +294,8 @@ class ModularMGD(eos.EquationOfState):
         for k in expected_keys:
             if k not in params:
                 raise KeyError("params object missing parameter : " + k)
+
+        # Check if material is conductive
+        if not hasattr(params, "bel_0"):
+            params["bel_0"] = None
+            params["gel"] = None
