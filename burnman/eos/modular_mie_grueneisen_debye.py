@@ -30,18 +30,29 @@ from .anharmonic_debye_pade import AnharmonicDebyePade as Anharmonic
 class ModularMGD(eos.EquationOfState):
     """
     Base class for a modular Mie-Grueneisen-Debye equation of state.
-    The user must provide the following parameters in the params dictionary:
-    - V_0: reference volume [m^3]
-    - T_0: reference temperature [K]
-    - n: number of formula units in the mineral
-    - molar_mass: molar mass of the mineral [kg/mol]
-    The params dictionary must also contain the following
-    - reference_eos: an instance of an equation of state that gas methods
-      for pressure, isothermal bulk modulus, and Gibbs energy.
-    - debye_temperature_model: an instance of a class that provides
-      the Debye temperature as a function of relative volume from method "__call__",
-      and its first and second derivatives with respect to relative volume
-      from methods "dVrel" and "d2dVrel2", respectively.
+
+    Parameters
+    ----------
+    params : dict
+        Dictionary of parameters. Must contain all the parameters needed by
+        the reference EoS and Debye temperature model, parameters for
+        the electronic and anharmonic contributions (if necessary), plus:
+
+        V_0 : float
+            Reference volume [m^3].
+        T_0 : float
+            Reference temperature [K].
+        n : int
+            Number of formula units in the mineral.
+        molar_mass : float
+            Molar mass of the mineral [kg/mol].
+        reference_eos : EquationOfState
+            Instance of an equation of state that has methods for pressure,
+            isothermal bulk modulus, and Gibbs energy.
+        debye_temperature_model : callable
+            An instance providing the Debye temperature as a function of relative
+            volume via ``__call__``, and its first and second derivatives with
+            respect to relative volume via ``dVrel`` and ``d2dVrel2``.
     """
 
     def volume(self, pressure, temperature, params):
