@@ -1,7 +1,8 @@
 import unittest
 from util import BurnManTest
 
-from burnman import Mineral
+from burnman import Mineral, Composite
+from burnman.minerals.SLB_2011 import forsterite as forsterite_slb
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.eos.helper import create
 from burnman.tools.eos import check_eos_consistency
@@ -261,6 +262,21 @@ class ModularMGD(BurnManTest):
             m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
         )
         self.assertTrue(consistent)
+
+    def test_SLB_is_same_as_MGD(self):
+        fo_slb = forsterite_slb()
+        params = fo_slb.params.copy()
+        params["equation_of_state"] = "modular_mgd"
+        params["reference_eos"] = create("bm3")
+        params["debye_temperature_model"] = theta_SLB()
+        fo_mgd = Mineral(params)
+
+        minerals = Composite([fo_slb, fo_mgd])
+        minerals.set_state(1.0e5, 298.15)
+        self.assertAlmostEqual(fo_slb.helmholtz, fo_mgd.helmholtz, places=3)
+
+        minerals.set_state(1.0e9, 2000.0)
+        self.assertAlmostEqual(fo_slb.helmholtz, fo_mgd.helmholtz, places=3)
 
 
 if __name__ == "__main__":
