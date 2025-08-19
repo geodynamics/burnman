@@ -24,6 +24,7 @@ from . import debye
 from . import equation_of_state as eos
 from ..utils.math import bracket
 from . import bukowinski_electronic as el
+from .anharmonic_debye_pade import AnharmonicDebyePade as Anharmonic
 
 
 class ModularMGD(eos.EquationOfState):
@@ -91,6 +92,11 @@ class ModularMGD(eos.EquationOfState):
                 * (temperature * temperature - T_0 * T_0)
                 / volume
             )
+
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            P += Anharmonic.pressure(temperature, volume, params)
+
         return P
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
@@ -119,6 +125,7 @@ class ModularMGD(eos.EquationOfState):
         )
 
         KT = KT_ref + V * d2FthdV2
+
         # If the material is conductive, add the electronic contribution
         if params["bel_0"] is not None:
             KT += volume * el.KToverV(
@@ -129,6 +136,11 @@ class ModularMGD(eos.EquationOfState):
                 params["bel_0"],
                 params["gel"],
             )
+
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            KT += Anharmonic.isothermal_bulk_modulus(temperature, volume, params)
+
         return KT
 
     def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
@@ -143,6 +155,11 @@ class ModularMGD(eos.EquationOfState):
             bel_0 = params["bel_0"]
             gel = params["gel"]
             C_v += temperature * el.CVoverT(volume, params["V_0"], bel_0, gel)
+
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            C_v += Anharmonic.heat_capacity_v(temperature, volume, params)
+
         return C_v
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
@@ -163,6 +180,10 @@ class ModularMGD(eos.EquationOfState):
             gel = params["gel"]
             aKT += el.aKT(temperature, volume, params["V_0"], bel_0, gel)
 
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            aKT += Anharmonic.dSdV(temperature, volume, params)
+
         KT = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
 
         return aKT / KT
@@ -180,6 +201,11 @@ class ModularMGD(eos.EquationOfState):
             S += el.entropy(
                 temperature, volume, params["V_0"], params["bel_0"], params["gel"]
             )
+
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            S += Anharmonic.entropy(temperature, volume, params)
+
         return S
 
     def _helmholtz_energy(self, pressure, temperature, volume, params):
@@ -212,6 +238,10 @@ class ModularMGD(eos.EquationOfState):
                 params["bel_0"],
                 params["gel"],
             )
+
+        # If the material has an anharmonic component, add it
+        if params["a_anh"] is not None:
+            F += Anharmonic.helmholtz_energy(temperature, volume, params)
 
         return F
 
@@ -296,6 +326,11 @@ class ModularMGD(eos.EquationOfState):
                 raise KeyError("params object missing parameter : " + k)
 
         # Check if material is conductive
-        if not hasattr(params, "bel_0"):
+        if "bel_0" not in params:
             params["bel_0"] = None
             params["gel"] = None
+
+        # Check if material has an anharmonic component
+        if "a_anh" not in params:
+            params["a_anh"] = None
+            params["m_anh"] = None
