@@ -1,13 +1,13 @@
 Formula in dictionary form: {'Mg': 2.0, 'Si': 1.0, 'O': 4.0}
 Molar mass: 0.14069 kg
-{'name': 'Forsterite', 'formula': {'Mg': 2.0, 'Si': 1.0, 'O': 4.0}, 'equation_of_state': 'slb3', 'F_0': -2055403.0, 'V_0': 4.3603e-05, 'K_0': 127955500000.0, 'Kprime_0': 4.21796, 'Debye_0': 809.1703, 'grueneisen_0': 0.99282, 'q_0': 2.10672, 'G_0': 81600000000.0, 'Gprime_0': 1.46257, 'eta_s_0': 2.29972, 'n': 7.0, 'molar_mass': 0.14069310000000002, 'T_0': 300.0, 'E_0': 0.0, 'P_0': 0.0}
+{'name': 'Forsterite', 'formula': {'Mg': 2.0, 'Si': 1.0, 'O': 4.0}, 'equation_of_state': 'slb3', 'F_0': -2055403.0, 'V_0': 4.3603e-05, 'K_0': 127955500000.0, 'Kprime_0': 4.21796, 'Debye_0': 809.1703, 'grueneisen_0': 0.99282, 'q_0': 2.10672, 'G_0': 81600000000.0, 'Gprime_0': 1.46257, 'eta_s_0': 2.29972, 'n': 7.0, 'molar_mass': 0.14069310000000002, 'T_0': 300.0, 'P_0': 0.0}
 Counter({'O': 6.0, 'Si': 2.0, 'Mg': 1.0, 'Fe': 1.0})
 Forsterite (SLB2011)
 Formula: Mg2SiO4
 Gibbs: -2.148e+06 J/mol
 S: 2.747e+02 J/K/mol
 V_p: 8.308e+03 m/s
-{'name': 'Quartz', 'formula': {'Si': 1.0, 'O': 2.0}, 'equation_of_state': 'slb3', 'F_0': -858853.4, 'V_0': 2.367003e-05, 'K_0': 49547430000.0, 'Kprime_0': 4.33155, 'Debye_0': 816.3307, 'grueneisen_0': -0.00296, 'q_0': 1.0, 'G_0': 44856170000.0, 'Gprime_0': 0.95315, 'eta_s_0': 2.36469, 'n': 3.0, 'molar_mass': 0.0600843, 'T_0': 300.0, 'E_0': 0.0, 'P_0': 0.0}
+{'name': 'Quartz', 'formula': {'Si': 1.0, 'O': 2.0}, 'equation_of_state': 'slb3', 'F_0': -858853.4, 'V_0': 2.367003e-05, 'K_0': 49547430000.0, 'Kprime_0': 4.33155, 'Debye_0': 816.3307, 'grueneisen_0': -0.00296, 'q_0': 1.0, 'G_0': 44856170000.0, 'Gprime_0': 0.95315, 'eta_s_0': 2.36469, 'n': 3.0, 'molar_mass': 0.0600843, 'T_0': 300.0, 'P_0': 0.0}
 [['landau', {'Tc_0': 847.0, 'S_D': 5.164, 'V_D': 1.222e-06}]]
 Bridgmanite composition: {'Mg': 0.8, 'Si': 0.9, 'O': 3.0, 'Fe': 0.1, 'Al': 0.2}
 Bridgmanite volume: 2.315e-05 m
