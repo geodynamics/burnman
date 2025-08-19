@@ -1,5 +1,5 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -138,6 +138,24 @@ def debye_fn_cheb(x):
         return ((val_infinity / x) / x) / x
 
 
+"""
+# The following functions are the derivatives of the Debye function
+# with respect to x, which is the inverse of the
+# dimensionless temperature.
+# Currently not used but kept here for reference.
+
+def ddebye_fn_dx(x):
+    D = debye_fn_cheb(x)
+    return 3.0 / (np.exp(x) - 1.0) - 3.0 * D / x
+
+
+def d2debye_fn_dx2(x):
+    D = debye_fn_cheb(x)
+    D1 = 3.0 / (np.exp(x) - 1.0) - 3.0 * D / x
+    return -3.0 * np.exp(x) / (np.exp(x) - 1.0) ** 2 - 3.0 * (x * D1 - D) / x**2
+"""
+
+
 @jit(nopython=True)
 def thermal_energy(T, debye_T, n):
     """
@@ -220,3 +238,44 @@ def dmolar_heat_capacity_v_dT(T, debye_T, n):
     dCvdT = 3.0 * C_v_over_T + (C_v_over_T - 4.0 * E_over_Tsqr) * x / (1.0 - np.exp(-x))
 
     return dCvdT
+
+
+def dhelmholtz_dTheta(T, debye_T, n):
+    """
+    First derivative of the Helmholtz free energy with respect to the Debye temperature
+    [J/K].
+    """
+    if T <= eps:
+        return 0.0
+    x = debye_T / T
+    return 3.0 * n * constants.gas_constant * debye_fn(x) / x
+
+
+def d2helmholtz_dTheta2(T, debye_T, n):
+    """
+    Second derivative of the Helmholtz free energy with respect to the Debye temperature
+    [J/K^2].
+    """
+    if T <= eps:
+        return 0.0
+    x = debye_T / T
+    D = debye_fn(x)
+    return (
+        3.0
+        * n
+        * constants.gas_constant
+        / T
+        * (3.0 / (x * (np.exp(x) - 1.0)) - 4.0 * D / x**2)
+    )
+
+
+def dentropy_dTheta(T, debye_T, n):
+    """
+    First derivative of the entropy with respect to the Debye temperature
+    [J/K].
+    """
+    if T <= eps:
+        return 0.0
+    x = debye_T / T
+    D = debye_fn(x)
+    return n * constants.gas_constant / T * (9.0 / (np.exp(x) - 1.0) - 12.0 * D / x)

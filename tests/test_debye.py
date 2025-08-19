@@ -65,6 +65,35 @@ class Debye(BurnManTest):
         )
         self.assertFloatEqual(test_thermal_energy, 0.0)
 
+    def test_theta_derivatives(self):
+        rock = mypericlase()
+        T = 300.0
+        debye_T = rock.params["Debye_0"]
+        n = rock.params["n"]
+
+        # Numerical derivatives
+        delta = 1e-6
+        dF_dTheta_num = (
+            burnman.eos.debye.helmholtz_energy(T, debye_T + delta, n)
+            - burnman.eos.debye.helmholtz_energy(T, debye_T - delta, n)
+        ) / (2 * delta)
+        d2F_dTheta2_num = (
+            burnman.eos.debye.dhelmholtz_dTheta(T, debye_T + delta, n)
+            - burnman.eos.debye.dhelmholtz_dTheta(T, debye_T - delta, n)
+        ) / (2 * delta)
+        dS_dTheta_num = (
+            burnman.eos.debye.entropy(T, debye_T + delta, n)
+            - burnman.eos.debye.entropy(T, debye_T - delta, n)
+        ) / (2 * delta)
+
+        # Analytical derivatives
+        dF_dTheta_analytical = burnman.eos.debye.dhelmholtz_dTheta(T, debye_T, n)
+        d2F_dTheta2_analytical = burnman.eos.debye.d2helmholtz_dTheta2(T, debye_T, n)
+        dS_dTheta_analytical = burnman.eos.debye.dentropy_dTheta(T, debye_T, n)
+        self.assertFloatEqual(dF_dTheta_num, dF_dTheta_analytical)
+        self.assertFloatEqual(d2F_dTheta2_num, d2F_dTheta2_analytical)
+        self.assertFloatEqual(dS_dTheta_num, dS_dTheta_analytical)
+
 
 if __name__ == "__main__":
     unittest.main()
