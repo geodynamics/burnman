@@ -221,7 +221,7 @@ class RKprime(eos.IsothermalEquationOfState):
         # G = E0 + int VdP (when S = 0)
         K = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
         return (
-            params["E_0"]
+            params["F_0"]
             + params["P_0"] * params["V_0"]
             + self._intVdP((pressure - params["P_0"]) / K, params)
             - self._intVdP(0.0, params)
@@ -234,10 +234,17 @@ class RKprime(eos.IsothermalEquationOfState):
         between 5/3 and :math:`K'_0` :cite:`StaceyDavis2004`.
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 0.0
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # If G and Gprime_inf are not included this is presumably deliberate,
         # as we can model density and bulk modulus just fine without them,

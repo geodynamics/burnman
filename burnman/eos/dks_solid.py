@@ -294,12 +294,17 @@ class DKS_S(eos.EquationOfState):
         if "E_0" not in params:
             params["E_0"] = float("nan")
 
-        # First, let's check the EoS parameters for Tref
-        bm.BirchMurnaghanBase.validate_parameters(bm.BirchMurnaghanBase(), params)
-
         # Now check all the required keys for the
         # thermal part of the EoS are in the dictionary
-        expected_keys = ["Cv", "grueneisen_0", "q_0", "eta_s_0"]
+        expected_keys = [
+            "V_0",
+            "K_0",
+            "Kprime_0",
+            "Cv",
+            "grueneisen_0",
+            "q_0",
+            "eta_s_0",
+        ]
         for k in expected_keys:
             if k not in params:
                 raise KeyError("params object missing parameter : " + k)

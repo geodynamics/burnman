@@ -1,7 +1,9 @@
 import unittest
 from util import BurnManTest
 
-from burnman import Mineral
+from burnman import Mineral, Composite
+from burnman.minerals.SLB_2011 import forsterite as forsterite_slb
+from burnman.minerals.SLB_2024 import fea as alpha_iron_slb
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.eos.helper import create
 from burnman.tools.eos import check_eos_consistency
@@ -16,7 +18,7 @@ mineral_params = {
     "name": "Forsterite",
     "formula": formula,
     "equation_of_state": "modular_mgd",
-    "E_0": -2055403.0,
+    "F_0": -2055403.0,
     "V_0": 4.3603e-05,
     "K_0": 1.279555e11,
     "Kprime_0": 4.21796,
@@ -261,6 +263,43 @@ class ModularMGD(BurnManTest):
             m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
         )
         self.assertTrue(consistent)
+
+    def test_SLB_is_same_as_MGD_non_conductive(self):
+        fo_slb = forsterite_slb()
+        params = fo_slb.params.copy()
+        params["equation_of_state"] = "modular_mgd"
+        params["reference_eos"] = create("bm3")
+        params["debye_temperature_model"] = theta_SLB()
+        fo_mgd = Mineral(params)
+
+        minerals = Composite([fo_slb, fo_mgd])
+        minerals.set_state(1.0e5, 298.15)
+        self.assertAlmostEqual(fo_slb.helmholtz, fo_mgd.helmholtz, places=3)
+
+        minerals.set_state(1.0e9, 2000.0)
+        self.assertAlmostEqual(fo_slb.helmholtz, fo_mgd.helmholtz, places=3)
+
+    def test_SLB_is_same_as_MGD_conductive(self):
+        fea_slb = alpha_iron_slb()
+        fea_slb.property_modifiers = []
+        params = fea_slb.params.copy()
+        params["equation_of_state"] = "modular_mgd"
+        params["reference_eos"] = create("bm3")
+        params["debye_temperature_model"] = theta_SLB()
+        fea_mgd = Mineral(params)
+
+        self.assertTrue(params["bel_0"] != 0)
+
+        minerals = Composite([fea_slb, fea_mgd])
+        minerals.set_state(params["P_0"], params["T_0"])
+        self.assertAlmostEqual(fea_mgd.helmholtz, params["F_0"])
+        self.assertAlmostEqual(fea_mgd.V, params["V_0"], places=16)
+        minerals.set_state(params["P_0"], params["T_0"])
+        self.assertAlmostEqual(fea_slb.helmholtz, params["F_0"])
+        self.assertAlmostEqual(fea_slb.V, params["V_0"], places=16)
+
+        minerals.set_state(1.0e9, 2000.0)
+        self.assertAlmostEqual(fea_slb.helmholtz, fea_mgd.helmholtz, places=3)
 
 
 if __name__ == "__main__":

@@ -68,13 +68,13 @@ class Murnaghan(eos.IsothermalEquationOfState):
         """
         return 0.0
 
-    def _molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_helmholtz_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral.
+        Returns the Helmholtz energy :math:`\\mathcal{F}` of the mineral.
         :math:`[J/mol]`
         """
         return energy(
-            volume, params["E_0"], params["V_0"], params["K_0"], params["Kprime_0"]
+            volume, params["F_0"], params["V_0"], params["K_0"], params["Kprime_0"]
         )
 
     def gibbs_energy(self, pressure, temperature, volume, params):
@@ -84,7 +84,7 @@ class Murnaghan(eos.IsothermalEquationOfState):
         """
         # G = E + PV
         return (
-            self._molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_helmholtz_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
 
@@ -93,10 +93,17 @@ class Murnaghan(eos.IsothermalEquationOfState):
         Check for existence and validity of the parameters
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 0.0
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # G is not included in the Murnaghan EOS so we shall set them to NaN's
         if "G_0" not in params:

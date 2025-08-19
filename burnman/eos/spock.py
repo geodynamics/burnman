@@ -112,10 +112,10 @@ class SPOCK(eos.IsothermalEquationOfState):
             * (generalised_gammainc(-ci / ai, bi * np.exp(ai * lnVrel), bi))
         )
 
-    def _molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_helmholtz_energy(self, pressure, temperature, volume, params):
         """
-        Internal function returning the internal energy
-        :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Internal function returning the Helmholtz energy
+        :math:`\\mathcal{F}` of the mineral. :math:`[J/mol]`
         """
         ai, bi, ci = make_params(
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
@@ -137,14 +137,14 @@ class SPOCK(eos.IsothermalEquationOfState):
         )
         I2 = generalised_gammainc((1.0 - ci) / ai, bi * np.exp(ai * lnVrel), bi)
 
-        return params["E_0"] + params["P_0"] * (volume - params["V_0"]) + f * (I1 - I2)
+        return params["F_0"] + params["P_0"] * (volume - params["V_0"]) + f * (I1 - I2)
 
     def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return (
-            self._molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_helmholtz_energy(pressure, temperature, volume, params)
             + pressure * volume
         )
 
@@ -162,10 +162,17 @@ class SPOCK(eos.IsothermalEquationOfState):
         between 5/3 and :math:`K'_0` :cite:`StaceyDavis2004`.
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 1.0e5
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # Check that all the required keys are in the dictionary
         expected_keys = ["V_0", "K_0", "Kprime_0", "Kdprime_0", "Kprime_inf"]

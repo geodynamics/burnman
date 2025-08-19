@@ -230,7 +230,7 @@ class test_tools(BurnManTest):
                 "Z": 2.0,
                 "molar_mass": 0.060085,
                 "T_0": 300.0,
-                "E_0": 0.0,
+                "F_0": 0.0,
                 "P_0": 0.0,
             }
         )

@@ -148,17 +148,24 @@ class MT(eos.IsothermalEquationOfState):
             + (1.0 - a) * (pressure - params["P_0"])
         )
 
-        return intVdP + params["E_0"] + params["V_0"] * params["P_0"]
+        return intVdP + params["F_0"] + params["V_0"] * params["P_0"]
 
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 1.0e5
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # G and Gprime are not defined in this equation of state,
         # We can model density and bulk modulus just fine without them,

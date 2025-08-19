@@ -276,9 +276,9 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
         elif self.order == 3:
             return shear_modulus_third_order(volume, params)
 
-    def _molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_helmholtz_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}`
+        Returns the Helmholtz energy :math:`\\mathcal{F}`
         of the mineral. :math:`[J/mol]`
         """
         x = np.power(volume / params["V_0"], -1.0 / 3.0)
@@ -299,7 +299,7 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
             )
         )
 
-        return -intPdV + params["E_0"]
+        return -intPdV + params["F_0"]
 
     def gibbs_energy(self, pressure, temperature, volume, params):
         """
@@ -309,7 +309,7 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
         # G = int VdP = [PV] - int PdV = E + PV
 
         return (
-            self._molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_helmholtz_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
 
@@ -318,10 +318,17 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
         Check for existence and validity of the parameters
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 0.0
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # If G and Gprime are not included this is presumably deliberate,
         # as we can model density and bulk modulus just fine without them,
@@ -400,9 +407,9 @@ class BM4(BirchMurnaghanBase):
         """
         return 0.0
 
-    def _molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_helmholtz_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the Helmholtz free energy :math:`\\mathcal{F}` of the mineral. :math:`[J/mol]`
         """
         x = np.power(volume / params["V_0"], -1.0 / 3.0)
         x2 = x * x
@@ -433,7 +440,7 @@ class BM4(BirchMurnaghanBase):
             )
         )
 
-        return -intPdV + params["E_0"]
+        return -intPdV + params["F_0"]
 
     def validate_parameters(self, params):
         """
