@@ -346,13 +346,13 @@ class test_eos_validation(BurnManTest):
             # Trigger warning
             low_K = mymineralwithkingigapascals()
             if len(w) == 0:
-                self.fail("Did not catch expected warning K in Gpa")
+                self.fail("Did not catch expected warning K in GPa")
 
     def test_reference_energies(self):
         m = burnman.Mineral(
             params={
                 "equation_of_state": "bm3",
-                "E_0": 1000.0,
+                "F_0": 1000.0,
                 "T_0": 100.0,
                 "P_0": 1.0e10,
                 "V_0": 7.95626e-6,
@@ -372,9 +372,9 @@ class test_eos_validation(BurnManTest):
             m.params["equation_of_state"] = eos
             burnman.Mineral.__init__(m)
             m.set_state(m.params["P_0"], m.params["T_0"])
-            energies.append(m.molar_internal_energy)
+            energies.append(m.molar_helmholtz)
 
-        self.assertArraysAlmostEqual(energies, [m.params["E_0"]] * len(energies))
+        self.assertArraysAlmostEqual(energies, [m.params["F_0"]] * len(energies))
 
     def test_energy_derivatives(self):
         m = burnman.Mineral(

@@ -106,17 +106,24 @@ class Vinet(eos.IsothermalEquationOfState):
             * ((1.0 - eta * (1.0 - x)) * exp(eta * (1.0 - x)) - 1.0)
         )
 
-        return params["E_0"] - intPdV + volume * pressure
+        return params["F_0"] - intPdV + volume * pressure
 
     def validate_parameters(self, params):
         """
         Check for existence and validity of the parameters
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 0.0
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # G is not included in the Vinet EOS so we shall set them to NaN's
         if "G_0" not in params:

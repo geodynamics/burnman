@@ -105,9 +105,9 @@ class Morse(eos.IsothermalEquationOfState):
         """
         return shear_modulus(volume, params)
 
-    def _molar_internal_energy(self, pressure, temperature, volume, params):
+    def _molar_helmholtz_energy(self, pressure, temperature, volume, params):
         """
-        Returns the internal energy :math:`\\mathcal{E}` of the mineral. :math:`[J/mol]`
+        Returns the Helmholtz energy :math:`\\mathcal{F}` of the mineral. :math:`[J/mol]`
         """
 
         x = (params["Kprime_0"] - 1) * (1 - np.power(volume / params["V_0"], 1.0 / 3.0))
@@ -120,14 +120,14 @@ class Morse(eos.IsothermalEquationOfState):
             * (2.0 * np.exp(x) - np.exp(2.0 * x) - 1.0)
         )
 
-        return -intPdV + params["E_0"]
+        return -intPdV + params["F_0"]
 
     def gibbs_energy(self, pressure, temperature, volume, params):
         """
         Returns the Gibbs free energy :math:`\\mathcal{G}` of the mineral. :math:`[J/mol]`
         """
         return (
-            self._molar_internal_energy(pressure, temperature, volume, params)
+            self._molar_helmholtz_energy(pressure, temperature, volume, params)
             + volume * pressure
         )
 
@@ -136,10 +136,17 @@ class Morse(eos.IsothermalEquationOfState):
         Check for existence and validity of the parameters
         """
 
-        if "E_0" not in params:
-            params["E_0"] = 0.0
+        if "F_0" not in params:
+            params["F_0"] = 0.0
         if "P_0" not in params:
             params["P_0"] = 0.0
+
+        if "E_0" in params:
+            raise KeyError(
+                "Isothermal equations of state should be "
+                "defined in terms of Helmholtz free energy "
+                "F_0, not internal energy E_0."
+            )
 
         # If G and Gprime are not included this is presumably deliberate,
         # as we can model density and bulk modulus just fine without them,

@@ -16,7 +16,7 @@ mineral_params = {
     "name": "Forsterite",
     "formula": formula,
     "equation_of_state": "modular_mgd",
-    "E_0": -2055403.0,
+    "F_0": -2055403.0,
     "V_0": 4.3603e-05,
     "K_0": 1.279555e11,
     "Kprime_0": 4.21796,

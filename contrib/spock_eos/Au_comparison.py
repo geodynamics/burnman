@@ -43,7 +43,7 @@ eoses = {
 # Create the parameter dictionary with the required values for
 # all the equations of state.
 params = {
-    "E_0": 0.0,
+    "F_0": 0.0,
     "P_0": 1.0e5,
     "T_0": 0.0,
     "V_0": 10.1959e-6,
@@ -194,7 +194,7 @@ ax[3].set_ylim(1.0e3, 1.0e9)
 ax[1].set_yscale("log")
 ax[3].set_yscale("log")
 
-for i, param in enumerate(["Kprime_0", "K_0", "P_0", "E_0"]):
+for i, param in enumerate(["Kprime_0", "K_0", "P_0", "F_0"]):
     p = params[param]
     if i == 1 or i == 2:
         p = p / 1.0e9
