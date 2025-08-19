@@ -18,12 +18,6 @@ from .birch_murnaghan import BM3Shear2, BM3, BM4
 from .mie_grueneisen_debye import MGD2, MGD3
 from .slb import SLB2, SLB3, SLB3Conductive
 from .modular_mie_grueneisen_debye import ModularMGD
-from .debye_temperature_models import (
-    DebyeTemperatureModelBase,
-    SLB,
-    PowerLawGammaSimple,
-    PowerLawGamma,
-)
 from .modified_tait import MT
 from .hp import HP_TMT
 from .hp import HP_TMTL
