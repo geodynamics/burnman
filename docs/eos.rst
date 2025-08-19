@@ -1,9 +1,10 @@
-Equations of state
-==================
+Isothermal Equations of state
+=============================
 
 Base class
 ----------
-.. autoclass:: burnman.eos.EquationOfState
+
+.. autoclass:: burnman.eos.IsothermalEquationOfState
 
 Murnaghan
 ---------
@@ -49,6 +50,19 @@ Reciprocal K-prime
 
 .. autoclass:: burnman.eos.RKprime
 
+SPOCK
+-----
+
+.. autoclass:: burnman.eos.SPOCK
+
+Thermal Equations of state
+==========================
+
+Base class
+^^^^^^^^^^
+
+.. autoclass:: burnman.eos.EquationOfState
+
 Stixrude and Lithgow-Bertelloni Formulation
 -------------------------------------------
 
@@ -68,7 +82,7 @@ SLB3
 .. autoclass:: burnman.eos.SLB3
 
 Mie-Grüneisen-Debye
--------------------------------------------
+-------------------
 
 Base class
 ^^^^^^^^^^
@@ -84,6 +98,23 @@ MGD3
 ^^^^
 
 .. autoclass:: burnman.eos.MGD3
+
+Modular Mie-Grüneisen-Debye
+---------------------------
+
+.. autoclass:: burnman.eos.ModularMGD
+
+Debye Temperature Models
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: burnman.eos.debye_temperature_models.DebyeTemperatureModelBase
+
+.. autoclass:: burnman.eos.debye_temperature_models.SLB
+
+.. autoclass:: burnman.eos.debye_temperature_models.PowerLawGammaSimple
+
+.. autoclass:: burnman.eos.debye_temperature_models.PowerLawGamma
+
 
 Modified Tait
 -------------

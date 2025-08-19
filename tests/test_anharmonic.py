@@ -1,12 +1,14 @@
 import unittest
 from util import BurnManTest
 
+import burnman
 from burnman.eos.anharmonic_debye_pade import AnharmonicDebyePade
 from burnman.eos.debye_temperature_models import SLB as theta_SLB
-
+from burnman.eos import debye
+from burnman.constants import gas_constant
 
 params = {
-    "a_anh": 1500.0,
+    "a_anh": 1.5,
     "V_0": 2.0e-6,
     "m_anh": 3.0,
     "Debye_0": 1000.0,
@@ -66,6 +68,16 @@ class Anharmonic(BurnManTest):
         self.assertAlmostEqual(K_T / 1.0e8, -V * dPdV / 1.0e8, places=6)
         self.assertAlmostEqual(alphaK_T / 1.0e3, dSdV / 1.0e3, places=6)
         self.assertAlmostEqual(alphaK_T / 1.0e3, dPdT / 1.0e3, places=6)
+
+    def test_standard_entropy(self):
+        V = params["V_0"]
+        T = params["debye_temperature_model"](Vrel=1.0, params=params)
+        self.assertAlmostEqual(T, params["Debye_0"], places=6)
+
+        S = AnharmonicDebyePade.entropy(T, V, params) / params["a_anh"]
+        S1 = -debye.thermal_energy(1.0, 1.0, 1.0) / gas_constant / 3.0
+        self.assertAlmostEqual(S, S1, places=4)
+        self.assertAlmostEqual(S, -0.6744, places=4)
 
 
 if __name__ == "__main__":

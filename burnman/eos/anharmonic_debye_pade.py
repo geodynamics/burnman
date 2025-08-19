@@ -153,7 +153,7 @@ def _nondimensional_helmholtz_energy(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return _helmholtz_pade(t)
+    return _helmholtz_pade(t) * debye_T
 
 
 @jit(nopython=True)
@@ -170,7 +170,7 @@ def _nondimensional_entropy(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return -_dhelmholtzdt_pade(t) / debye_T
+    return -_dhelmholtzdt_pade(t)
 
 
 @jit(nopython=True)
@@ -187,7 +187,7 @@ def _nondimensional_heat_capacity(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return -t * _d2helmholtzdt2_pade(t) / debye_T
+    return -t * _d2helmholtzdt2_pade(t)
 
 
 @jit(nopython=True)
@@ -205,7 +205,7 @@ def _nondimensional_dhelmholtz_dTheta(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return -_dhelmholtzdt_pade(t) * t / debye_T
+    return _helmholtz_pade(t) - _dhelmholtzdt_pade(t) * t
 
 
 @jit(nopython=True)
@@ -223,7 +223,7 @@ def _nondimensional_d2helmholtz_dTheta2(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return t * (t * _d2helmholtzdt2_pade(t) + 2.0 * _dhelmholtzdt_pade(t)) / debye_T**2
+    return t * t * _d2helmholtzdt2_pade(t) / debye_T
 
 
 @jit(nopython=True)
@@ -241,7 +241,7 @@ def _nondimensional_dentropy_dTheta(T, debye_T):
     :rtype: float
     """
     t = T / debye_T
-    return (_d2helmholtzdt2_pade(t) * t + _dhelmholtzdt_pade(t)) / debye_T**2
+    return _d2helmholtzdt2_pade(t) * t / debye_T
 
 
 class AnharmonicDebyePade:
@@ -256,16 +256,21 @@ class AnharmonicDebyePade:
     :math:`A = a_{anh} * (V/V_0)^{m_{anh}}`, with both :math:`a_{anh}`
     and :math:`m_{anh}` being parameters of the model.
     The term :math:`F_a` is calculated using the 3-5 Pade approximant to
-    the function: :math:`\\int_0^x (E_{D}/3nR) dt / x^{4}`, then
+    the function: :math:`\\int_0^x E_{D}(T)/3nR dT / x^{4}`, then
     post-multiplied by :math:`x^{4}`.
 
     The :math:`E_{D}` term inside the integral is the thermal energy of a
-    Debye solid per mole of atoms. This expression is chosen because it
-    matches the behaviour of the anharmonic contribution to the entropy
-    at low and high temperatures - i.e., it is equal to zero at low temperature
-    (with all derivatives also equal to zero) and linear at high temperature.
+    Debye solid per mole of atoms where the Debye temperature is 1 K.
+    This expression is chosen because it matches the behaviour of the
+    anharmonic contribution to the entropy at low and high temperatures;
+    i.e., it is equal to zero at low temperature (with all derivatives
+    also equal to zero) and linear at high temperature.
     See Figure 3 in Oganov and Dorogokupets
     (2004; dx.doi.org/10.1088/0953-8984/16/8/018).
+
+    The model is such that the entropy at the Debye temperature is equal to
+    -A * debye.thermal_energy(T=1., debye_T=1., n=1.) / (3R), which is
+    roughly -0.6744 J/K/mol when A = 1. Note the negative sign.
 
     :return: _description_
     :rtype: _type_
