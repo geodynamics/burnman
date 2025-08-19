@@ -49,11 +49,13 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (2.0 * dVrel)
-        dtdVrel_analytical = t.dVrel(Vrel, params)
-        d2tdVrel2_numerical = (t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)) / (
+        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
             2.0 * dVrel
         )
+        dtdVrel_analytical = t.dVrel(Vrel, params)
+        d2tdVrel2_numerical = (
+            t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
@@ -63,7 +65,7 @@ class ModularMGD(BurnManTest):
         params["reference_eos"] = create("bm3")
         params["debye_temperature_model"] = PLG()
         params["Debye_0"] = 1000.0
-        params["grueneisen_0"] = 1.
+        params["grueneisen_0"] = 1.0
         params["c_1"] = 0.2
         params["c_2"] = 0.1
         params["q_1"] = 1.0
@@ -73,11 +75,13 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (2.0 * dVrel)
-        dtdVrel_analytical = t.dVrel(Vrel, params)
-        d2tdVrel2_numerical = (t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)) / (
+        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
             2.0 * dVrel
         )
+        dtdVrel_analytical = t.dVrel(Vrel, params)
+        d2tdVrel2_numerical = (
+            t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
@@ -94,11 +98,13 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (2.0 * dVrel)
-        dtdVrel_analytical = t.dVrel(Vrel, params)
-        d2tdVrel2_numerical = (t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)) / (
+        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
             2.0 * dVrel
         )
+        dtdVrel_analytical = t.dVrel(Vrel, params)
+        d2tdVrel2_numerical = (
+            t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
@@ -112,7 +118,9 @@ class ModularMGD(BurnManTest):
         params["q_0"] = 1.1
 
         m = Mineral(params)
-        consistent = check_eos_consistency(m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
         self.assertTrue(consistent)
 
     def test_check_PLG_consistency(self):
@@ -127,7 +135,9 @@ class ModularMGD(BurnManTest):
         params["q_2"] = 2.0
 
         m = Mineral(params)
-        consistent = check_eos_consistency(m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
         self.assertTrue(consistent)
 
     def test_check_PLGS_consistency(self):
@@ -139,7 +149,9 @@ class ModularMGD(BurnManTest):
         params["q_0"] = 1.0
 
         m = Mineral(params)
-        consistent = check_eos_consistency(m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
         self.assertTrue(consistent)
 
     def test_SLB_grueneisen(self):
@@ -149,10 +161,10 @@ class ModularMGD(BurnManTest):
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
-        params["P_0"] = 1.e5
+        params["P_0"] = 1.0e5
 
         m = Mineral(params)
-        m.set_state(1.e5, 298.15)
+        m.set_state(1.0e5, 298.15)
         self.assertAlmostEqual(m.gr, params["grueneisen_0"], places=6)
 
     def test_PLG_grueneisen(self):
@@ -165,10 +177,10 @@ class ModularMGD(BurnManTest):
         params["c_2"] = 0.1
         params["q_1"] = 1.0
         params["q_2"] = 2.0
-        params["P_0"] = 1.e5
+        params["P_0"] = 1.0e5
 
         m = Mineral(params)
-        m.set_state(1.e5, 298.15)
+        m.set_state(1.0e5, 298.15)
         self.assertAlmostEqual(m.gr, params["grueneisen_0"], places=6)
 
     def test_PLGS_grueneisen(self):
@@ -178,10 +190,10 @@ class ModularMGD(BurnManTest):
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
-        params["P_0"] = 1.e5
+        params["P_0"] = 1.0e5
 
         m = Mineral(params)
-        m.set_state(1.e5, 298.15)
+        m.set_state(1.0e5, 298.15)
         self.assertAlmostEqual(m.gr, params["grueneisen_0"], places=6)
 
     def test_SLB_electronic_contribution(self):
@@ -191,12 +203,14 @@ class ModularMGD(BurnManTest):
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
-        params["P_0"] = 1.e5
+        params["P_0"] = 1.0e5
         params["bel_0"] = 0.005
         params["gel"] = 1.5
 
         m = Mineral(params)
-        consistent = check_eos_consistency(m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
         self.assertTrue(consistent)
 
     def test_SPOCK_isothermal_contribution(self):
@@ -206,13 +220,15 @@ class ModularMGD(BurnManTest):
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
-        params["P_0"] = 1.e5
+        params["P_0"] = 1.0e5
         params["Kprime_inf"] = 2.0
         params["Kprime_0"] = 4.21796
         params["Kdprime_0"] = -4 / 1.0e11
 
         m = Mineral(params)
-        consistent = check_eos_consistency(m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
         self.assertTrue(consistent)
 
 
