@@ -7,10 +7,9 @@ from burnman.minerals.SLB_2024 import fea as alpha_iron_slb
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.eos.helper import create
 from burnman.tools.eos import check_eos_consistency
-from burnman.eos.debye_temperature_models import SLB as theta_SLB
-from burnman.eos.debye_temperature_models import PowerLawGamma as PLG
-from burnman.eos.debye_temperature_models import PowerLawGammaSimple as PLGS
-
+from burnman.eos import debye_temperature_models
+from burnman.eos import anharmonic_thermal_models
+from burnman.eos import anharmonic_prefactor_models
 
 formula = "Mg2SiO4"
 formula = dictionarize_formula(formula)
@@ -32,7 +31,7 @@ class ModularMGD(BurnManTest):
     def test_setup(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -42,30 +41,30 @@ class ModularMGD(BurnManTest):
     def test_SLB_derivatives(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
 
-        t = theta_SLB()
+        t = debye_temperature_models.SLB()
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 
     def test_PLG_derivatives(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLG()
+        params["debye_temperature_model"] = debye_temperature_models.PowerLawGamma()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.0
         params["c_1"] = 0.2
@@ -73,48 +72,50 @@ class ModularMGD(BurnManTest):
         params["q_1"] = 1.0
         params["q_2"] = 2.0
 
-        t = PLG()
+        t = debye_temperature_models.PowerLawGamma()
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 
     def test_PLGS_derivatives(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLGS()
+        params["debye_temperature_model"] = (
+            debye_temperature_models.PowerLawGammaSimple()
+        )
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
 
-        t = PLGS()
+        t = debye_temperature_models.PowerLawGammaSimple()
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 
     def test_check_SLB_consistency(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -128,7 +129,7 @@ class ModularMGD(BurnManTest):
     def test_check_PLG_consistency(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLG()
+        params["debye_temperature_model"] = debye_temperature_models.PowerLawGamma()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.0
         params["c_1"] = 0.2
@@ -145,7 +146,9 @@ class ModularMGD(BurnManTest):
     def test_check_PLGS_consistency(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLGS()
+        params["debye_temperature_model"] = (
+            debye_temperature_models.PowerLawGammaSimple()
+        )
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.0
         params["q_0"] = 1.0
@@ -159,7 +162,7 @@ class ModularMGD(BurnManTest):
     def test_SLB_grueneisen(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -172,7 +175,7 @@ class ModularMGD(BurnManTest):
     def test_PLG_grueneisen(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLG()
+        params["debye_temperature_model"] = debye_temperature_models.PowerLawGamma()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.0
         params["c_1"] = 0.2
@@ -188,7 +191,9 @@ class ModularMGD(BurnManTest):
     def test_PLGS_grueneisen(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = PLGS()
+        params["debye_temperature_model"] = (
+            debye_temperature_models.PowerLawGammaSimple()
+        )
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -201,7 +206,7 @@ class ModularMGD(BurnManTest):
     def test_SLB_electronic_contribution(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -222,10 +227,10 @@ class ModularMGD(BurnManTest):
         m_without_component.set_state(2.0e9, 2000.0)
         self.assertFalse(m_without_component.S == m.S)
 
-    def test_SLB_anharmonic_contribution(self):
+    def test_SLB_pade_anharmonic_contribution(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -235,6 +240,36 @@ class ModularMGD(BurnManTest):
         params2 = params.copy()
         params2["a_anh"] = 1000.0
         params2["m_anh"] = 3.0
+        params2["anharmonic_prefactor_model"] = anharmonic_prefactor_models.PowerLaw()
+        params2["anharmonic_thermal_model"] = anharmonic_thermal_models.Pade()
+
+        m = Mineral(params2)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
+        self.assertTrue(consistent)
+
+        m.set_state(2.0e9, 2000.0)
+        m_without_component.set_state(2.0e9, 2000.0)
+        self.assertFalse(m_without_component.S == m.S)
+
+    def test_SLB_lognormal_anharmonic_contribution(self):
+        params = mineral_params.copy()
+        params["reference_eos"] = create("bm3")
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
+        params["Debye_0"] = 1000.0
+        params["grueneisen_0"] = 1.2
+        params["q_0"] = 1.1
+        params["P_0"] = 1.0e5
+        m_without_component = Mineral(params)
+
+        params2 = params.copy()
+        params2["a_anh"] = 1.0
+        params2["m_anh"] = 3.0
+        params2["sigma_anh"] = 1.2
+        params2["mu_anh"] = 0.2
+        params2["anharmonic_prefactor_model"] = anharmonic_prefactor_models.PowerLaw()
+        params2["anharmonic_thermal_model"] = anharmonic_thermal_models.LogNormal()
 
         m = Mineral(params2)
         consistent = check_eos_consistency(
@@ -249,7 +284,7 @@ class ModularMGD(BurnManTest):
     def test_SPOCK_isothermal_contribution(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("spock")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         params["Debye_0"] = 1000.0
         params["grueneisen_0"] = 1.2
         params["q_0"] = 1.1
@@ -269,7 +304,7 @@ class ModularMGD(BurnManTest):
         params = fo_slb.params.copy()
         params["equation_of_state"] = "modular_mgd"
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         fo_mgd = Mineral(params)
 
         minerals = Composite([fo_slb, fo_mgd])
@@ -285,7 +320,7 @@ class ModularMGD(BurnManTest):
         params = fea_slb.params.copy()
         params["equation_of_state"] = "modular_mgd"
         params["reference_eos"] = create("bm3")
-        params["debye_temperature_model"] = theta_SLB()
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
         fea_mgd = Mineral(params)
 
         self.assertTrue(params["bel_0"] != 0)

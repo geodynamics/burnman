@@ -24,7 +24,7 @@ from . import debye
 from . import equation_of_state as eos
 from ..utils.math import bracket
 from . import bukowinski_electronic as el
-from .anharmonic_debye_pade import AnharmonicDebyePade as Anharmonic
+from .anharmonic_debye import AnharmonicDebye as Anharmonic
 
 
 class ModularMGD(eos.EquationOfState):
@@ -51,8 +51,8 @@ class ModularMGD(eos.EquationOfState):
             isothermal bulk modulus, and Gibbs energy.
         debye_temperature_model : callable
             An instance providing the Debye temperature as a function of relative
-            volume via ``__call__``, and its first and second derivatives with
-            respect to relative volume via ``dVrel`` and ``d2dVrel2``.
+            volume via ``value``, and its first and second derivatives with
+            respect to relative volume via ``dVrel`` and ``dVrel2``.
     """
 
     def volume(self, pressure, temperature, params):
@@ -82,7 +82,7 @@ class ModularMGD(eos.EquationOfState):
         T_0 = params["T_0"]
 
         P_ref = params["reference_eos"].pressure(T_0, volume, params)
-        Debye_T = params["debye_temperature_model"](Vrel, params)
+        Debye_T = params["debye_temperature_model"].value(Vrel, params)
         dThetadV = params["debye_temperature_model"].dVrel(Vrel, params) / params["V_0"]
         P_th = -dThetadV * (
             debye.dhelmholtz_dTheta(temperature, Debye_T, params["n"])
@@ -105,7 +105,7 @@ class ModularMGD(eos.EquationOfState):
             )
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             P += Anharmonic.pressure(temperature, volume, params)
 
         return P
@@ -117,10 +117,12 @@ class ModularMGD(eos.EquationOfState):
         KT_ref = params["reference_eos"].isothermal_bulk_modulus_reuss(
             0.0, params["T_0"], volume, params
         )
-        Debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
+        Debye_T = params["debye_temperature_model"].value(
+            volume / params["V_0"], params
+        )
         V = volume
         d2ThetadV2 = (
-            params["debye_temperature_model"].d2dVrel2(V / params["V_0"], params)
+            params["debye_temperature_model"].dVrel2(V / params["V_0"], params)
             / params["V_0"] ** 2
         )
         dThetadV = (
@@ -149,7 +151,7 @@ class ModularMGD(eos.EquationOfState):
             )
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             KT += Anharmonic.isothermal_bulk_modulus(temperature, volume, params)
 
         return KT
@@ -158,7 +160,9 @@ class ModularMGD(eos.EquationOfState):
         """
         Returns heat capacity at constant volume. :math:`[J/K/mol]`
         """
-        debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
+        debye_T = params["debye_temperature_model"].value(
+            volume / params["V_0"], params
+        )
         C_v = debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
 
         # If the material is conductive, add the electronic contribution
@@ -168,7 +172,7 @@ class ModularMGD(eos.EquationOfState):
             C_v += temperature * el.CVoverT(volume, params["V_0"], bel_0, gel)
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             C_v += Anharmonic.heat_capacity_v(temperature, volume, params)
 
         return C_v
@@ -177,7 +181,9 @@ class ModularMGD(eos.EquationOfState):
         """
         Returns thermal expansivity. :math:`[1/K]`
         """
-        debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
+        debye_T = params["debye_temperature_model"].value(
+            volume / params["V_0"], params
+        )
         dThetadV = (
             params["debye_temperature_model"].dVrel(volume / params["V_0"], params)
             / params["V_0"]
@@ -192,7 +198,7 @@ class ModularMGD(eos.EquationOfState):
             aKT += el.aKT(temperature, volume, params["V_0"], bel_0, gel)
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             aKT += Anharmonic.dSdV(temperature, volume, params)
 
         KT = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
@@ -204,7 +210,9 @@ class ModularMGD(eos.EquationOfState):
         Returns the entropy at the pressure and temperature
         of the mineral [J/K/mol]
         """
-        Debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
+        Debye_T = params["debye_temperature_model"].value(
+            volume / params["V_0"], params
+        )
         S = debye.entropy(temperature, Debye_T, params["n"])
 
         # If the material is conductive, add the electronic contribution
@@ -214,7 +222,7 @@ class ModularMGD(eos.EquationOfState):
             )
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             S += Anharmonic.entropy(temperature, volume, params)
 
         return S
@@ -231,7 +239,9 @@ class ModularMGD(eos.EquationOfState):
         F_ref = G_ref - volume * params["reference_eos"].pressure(
             params["T_0"], volume, params
         )
-        Debye_T = params["debye_temperature_model"](volume / params["V_0"], params)
+        Debye_T = params["debye_temperature_model"].value(
+            volume / params["V_0"], params
+        )
 
         F_th = debye.helmholtz_energy(
             temperature, Debye_T, params["n"]
@@ -251,7 +261,7 @@ class ModularMGD(eos.EquationOfState):
             )
 
         # If the material has an anharmonic component, add it
-        if params["a_anh"] is not None:
+        if "anharmonic_thermal_model" in params:
             F += Anharmonic.helmholtz_energy(temperature, volume, params)
 
         return F
@@ -317,18 +327,19 @@ class ModularMGD(eos.EquationOfState):
                 "params object missing 'debye_temperature_model' key, which must be a class instance."
             )
 
-        if not hasattr(params["debye_temperature_model"], "__call__"):
-            raise AttributeError(
-                "params['debye_temperature_model'] must have a __call__ method to compute the Debye temperature as a function of Vrel and params."
-            )
-        if not hasattr(params["debye_temperature_model"], "dVrel"):
-            raise AttributeError(
-                "params['debye_temperature_model'] must have a dVrel method to compute the first derivative of the Debye temperature with respect to Vrel. Arguments should be Vrel and the params dictionary."
-            )
-        if not hasattr(params["debye_temperature_model"], "d2dVrel2"):
-            raise AttributeError(
-                "params['debye_temperature_model'] must have a d2dVrel2 method to compute the second derivative of the Debye temperature with respect to Vrel. Arguments should be Vrel and the params dictionary."
-            )
+        # Check that the Debye temperature model has the required methods
+        expected_methods = ["value", "dVrel", "dVrel2"]
+        for method in expected_methods:
+            if not hasattr(params["debye_temperature_model"], method):
+                raise AttributeError(
+                    f"params['debye_temperature_model'] must have a {method} method."
+                )
+
+        params["debye_temperature_model"].validate_parameters(params)
+
+        # Make some checks if anharmonicity is included
+        if "anharmonic_thermal_model" in params:
+            Anharmonic.validate_parameters(params)
 
         # Now check all the other required keys are in the dictionary
         expected_keys = ["molar_mass", "n", "T_0", "V_0"]
@@ -340,8 +351,3 @@ class ModularMGD(eos.EquationOfState):
         if "bel_0" not in params:
             params["bel_0"] = None
             params["gel"] = None
-
-        # Check if material has an anharmonic component
-        if "a_anh" not in params:
-            params["a_anh"] = None
-            params["m_anh"] = None

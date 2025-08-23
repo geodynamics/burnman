@@ -22,7 +22,7 @@ class DebyeTemperatureModelBase(ABC):
     """Abstract base class for Debye temperature models."""
 
     @abstractmethod
-    def __call__(self, Vrel: float, params: dict) -> float:
+    def value(self, Vrel: float, params: dict) -> float:
         """Return the Debye temperature for the given relative volume."""
 
     @abstractmethod
@@ -35,13 +35,13 @@ class DebyeTemperatureModelBase(ABC):
 
     def dVrel(self, Vrel: float, params: dict) -> float:
         """First derivative of Debye temperature wrt relative volume."""
-        theta = self.__call__(Vrel, params)
+        theta = self.value(Vrel, params)
         gamma = self._gamma(Vrel, params)
         return -theta * gamma / Vrel
 
-    def d2dVrel2(self, Vrel: float, params: dict) -> float:
+    def dVrel2(self, Vrel: float, params: dict) -> float:
         """Second derivative of Debye temperature wrt relative volume."""
-        theta = self.__call__(Vrel, params)
+        theta = self.value(Vrel, params)
         gamma = self._gamma(Vrel, params)
         gamma_prime = self._gamma_prime(Vrel, params)
         return theta / Vrel**2 * (gamma * (gamma + 1.0) - Vrel * gamma_prime)
@@ -68,7 +68,7 @@ class SLB(DebyeTemperatureModelBase):
     :type params: dict
     """
 
-    def __call__(self, Vrel, params):
+    def value(self, Vrel, params):
         # This method computes the Debye temperature.
         a1_ii, a2_iikk, f = self.a1_a2_and_f(Vrel, params)
         nu_o_nu0_sq = 1.0 + a1_ii * f + (1.0 / 2.0) * a2_iikk * f * f
@@ -108,6 +108,13 @@ class SLB(DebyeTemperatureModelBase):
         f = 0.5 * (pow(Vrel, -2.0 / 3.0) - 1.0)
         return a1_ii, a2_iikk, f
 
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["grueneisen_0", "q_0", "Debye_0"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
+
 
 @singleton
 class PowerLawGammaSimple(DebyeTemperatureModelBase):
@@ -131,7 +138,7 @@ class PowerLawGammaSimple(DebyeTemperatureModelBase):
     :type params: dict
     """
 
-    def __call__(self, Vrel, params):
+    def value(self, Vrel, params):
         # This method computes the Debye temperature.
         return params["Debye_0"] * np.exp(
             -params["grueneisen_0"]
@@ -146,6 +153,13 @@ class PowerLawGammaSimple(DebyeTemperatureModelBase):
         return (
             params["grueneisen_0"] * params["q_0"] * np.power(Vrel, params["q_0"] - 1.0)
         )
+
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["grueneisen_0", "q_0", "Debye_0"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
 
 
 @singleton
@@ -170,7 +184,7 @@ class PowerLawGamma(DebyeTemperatureModelBase):
     :type params: dict
     """
 
-    def __call__(self, Vrel, params):
+    def value(self, Vrel, params):
         # This method computes the Debye temperature.
         return (
             params["Debye_0"]
@@ -192,3 +206,10 @@ class PowerLawGamma(DebyeTemperatureModelBase):
         return params["c_1"] * params["q_1"] * np.power(
             Vrel, params["q_1"] - 1.0
         ) + params["c_2"] * params["q_2"] * np.power(Vrel, params["q_2"] - 1.0)
+
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["Debye_0", "grueneisen_0", "c_1", "c_2", "q_1", "q_2"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
