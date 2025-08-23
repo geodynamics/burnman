@@ -1,7 +1,6 @@
 import unittest
 from util import BurnManTest
 
-import burnman
 from burnman.eos.anharmonic_debye import AnharmonicDebye
 from burnman.eos import anharmonic_thermal_models
 from burnman.eos import debye_temperature_models
