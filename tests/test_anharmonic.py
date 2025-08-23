@@ -249,6 +249,52 @@ class Anharmonic(BurnManTest):
         self.assertAlmostEqual(S, S1, places=4)
         self.assertAlmostEqual(S, -0.6744, places=4)
 
+    def test_prefactor_power_law(self):
+        prefactor_model = anharmonic_prefactor_models.PowerLaw()
+        model_params = {"a_anh": 1.1, "m_anh": 5.0}
+
+        # Check first and second derivatives
+        # functions are called value, dVrel and d2dVrel2
+        Vrel = 0.8
+        dVrel = 1.0e-6
+
+        dAdVrel_num = (
+            prefactor_model.value(Vrel + dVrel, model_params)
+            - prefactor_model.value(Vrel - dVrel, model_params)
+        ) / (2.0 * dVrel)
+        dAdVrel_analytical = prefactor_model.dVrel(Vrel, model_params)
+        self.assertAlmostEqual(dAdVrel_num, dAdVrel_analytical, places=6)
+
+        d2AdVrel2_num = (
+            prefactor_model.dVrel(Vrel + dVrel, model_params)
+            - prefactor_model.dVrel(Vrel - dVrel, model_params)
+        ) / (2.0 * dVrel)
+        d2AdVrel2_analytical = prefactor_model.d2dVrel2(Vrel, model_params)
+        self.assertAlmostEqual(d2AdVrel2_num, d2AdVrel2_analytical, places=6)
+
+    def test_prefactor_sigmoid(self):
+        prefactor_model = anharmonic_prefactor_models.Sigmoid()
+        model_params = {"a_anh": 1.1, "b_anh": 1.2, "c_anh": 1.3}
+
+        # Check first and second derivatives
+        # functions are called value, dVrel and d2dVrel2
+        Vrel = 0.8
+        dVrel = 1.0e-6
+
+        dAdVrel_num = (
+            prefactor_model.value(Vrel + dVrel, model_params)
+            - prefactor_model.value(Vrel - dVrel, model_params)
+        ) / (2.0 * dVrel)
+        dAdVrel_analytical = prefactor_model.dVrel(Vrel, model_params)
+        self.assertAlmostEqual(dAdVrel_num, dAdVrel_analytical, places=6)
+
+        d2AdVrel2_num = (
+            prefactor_model.dVrel(Vrel + dVrel, model_params)
+            - prefactor_model.dVrel(Vrel - dVrel, model_params)
+        ) / (2.0 * dVrel)
+        d2AdVrel2_analytical = prefactor_model.d2dVrel2(Vrel, model_params)
+        self.assertAlmostEqual(d2AdVrel2_num, d2AdVrel2_analytical, places=6)
+
 
 if __name__ == "__main__":
     unittest.main()
