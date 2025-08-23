@@ -50,14 +50,14 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 
@@ -76,14 +76,14 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 
@@ -101,14 +101,14 @@ class ModularMGD(BurnManTest):
 
         dVrel = 1.0e-6
         Vrel = 0.7
-        dtdVrel_numerical = (t(Vrel + dVrel, params) - t(Vrel - dVrel, params)) / (
-            2.0 * dVrel
-        )
+        dtdVrel_numerical = (
+            t.value(Vrel + dVrel, params) - t.value(Vrel - dVrel, params)
+        ) / (2.0 * dVrel)
         dtdVrel_analytical = t.dVrel(Vrel, params)
         d2tdVrel2_numerical = (
             t.dVrel(Vrel + dVrel, params) - t.dVrel(Vrel - dVrel, params)
         ) / (2.0 * dVrel)
-        d2tdVrel2_analytical = t.d2dVrel2(Vrel, params)
+        d2tdVrel2_analytical = t.dVrel2(Vrel, params)
         self.assertAlmostEqual(dtdVrel_numerical, dtdVrel_analytical, places=6)
         self.assertAlmostEqual(d2tdVrel2_numerical, d2tdVrel2_analytical, places=6)
 

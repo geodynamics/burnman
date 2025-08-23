@@ -1,4 +1,5 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
 # Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
@@ -31,7 +32,7 @@ class AnharmonicDebye:
         A = params["anharmonic_prefactor_model"].value(x, params)
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
         F_a = anharmonic_model.nondimensional_helmholtz_energy(
             temperature, debye_T, params
         )
@@ -46,7 +47,7 @@ class AnharmonicDebye:
         A = params["anharmonic_prefactor_model"].value(x, params)
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
         S_a = anharmonic_model.nondimensional_entropy(temperature, debye_T, params)
         return A * S_a
 
@@ -56,7 +57,7 @@ class AnharmonicDebye:
         A = params["anharmonic_prefactor_model"].value(x, params)
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
         Cv_a = anharmonic_model.nondimensional_heat_capacity(
             temperature, debye_T, params
         )
@@ -69,7 +70,7 @@ class AnharmonicDebye:
         dAdV = params["anharmonic_prefactor_model"].dVrel(x, params) / params["V_0"]
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
         F_a = anharmonic_model.nondimensional_helmholtz_energy(
             temperature, debye_T, params
         )
@@ -93,12 +94,11 @@ class AnharmonicDebye:
         A = params["anharmonic_prefactor_model"].value(x, params)
         dAdV = params["anharmonic_prefactor_model"].dVrel(x, params) / params["V_0"]
         d2AdV2 = (
-            params["anharmonic_prefactor_model"].d2dVrel2(x, params)
-            / params["V_0"] ** 2
+            params["anharmonic_prefactor_model"].dVrel2(x, params) / params["V_0"] ** 2
         )
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
 
         F_a = anharmonic_model.nondimensional_helmholtz_energy(
             temperature, debye_T, params
@@ -123,7 +123,7 @@ class AnharmonicDebye:
             d2AdV2 * (F_a - F_a0)
             + 2 * dAdV * (F_ad - F_ad0) * theta_model.dVrel(x, params) / params["V_0"]
             + A * (F_add - F_add0) * (theta_model.dVrel(x, params) / params["V_0"]) ** 2
-            + A * (F_ad - F_ad0) * theta_model.d2dVrel2(x, params) / params["V_0"] ** 2
+            + A * (F_ad - F_ad0) * theta_model.dVrel2(x, params) / params["V_0"] ** 2
         )
 
     @staticmethod
@@ -133,7 +133,7 @@ class AnharmonicDebye:
         dAdV = params["anharmonic_prefactor_model"].dVrel(x, params) / params["V_0"]
         theta_model = params["debye_temperature_model"]
         anharmonic_model = params["anharmonic_thermal_model"]
-        debye_T = theta_model(x, params)
+        debye_T = theta_model.value(x, params)
 
         S_a = anharmonic_model.nondimensional_entropy(temperature, debye_T, params)
         S_ad = anharmonic_model.nondimensional_dentropy_dTheta(
@@ -143,3 +143,66 @@ class AnharmonicDebye:
         aK_T = dAdV * S_a + A * (theta_model.dVrel(x, params) / params["V_0"]) * S_ad
 
         return aK_T
+
+    @staticmethod
+    def validate_parameters(params):
+        # Check for all required keys
+        expected_keys = [
+            "debye_temperature_model",
+            "anharmonic_prefactor_model",
+            "anharmonic_thermal_model",
+            "V_0",
+            "T_0",
+        ]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain an '{key}' key")
+
+        # Validate the three models:
+        models = [
+            params["debye_temperature_model"],
+            params["anharmonic_prefactor_model"],
+            params["anharmonic_thermal_model"],
+        ]
+        for model in models:
+            model.validate_parameters(params)
+
+        # Check that the required methods are present in the
+        # debye_temperature_model
+        expected_methods = ["value", "dVrel", "dVrel2"]
+        for method in expected_methods:
+            if not hasattr(params["debye_temperature_model"], method) or not callable(
+                getattr(params["debye_temperature_model"], method)
+            ):
+                raise AttributeError(
+                    f"params['debye_temperature_model'] must have a {method} method that takes arguments Vrel and params"
+                )
+
+        # Check that the required methods are present in the
+        # anharmonic_prefactor_model
+        expected_methods = ["value", "dVrel", "dVrel2"]
+        for method in expected_methods:
+            if not hasattr(
+                params["anharmonic_prefactor_model"], method
+            ) or not callable(getattr(params["anharmonic_prefactor_model"], method)):
+                raise AttributeError(
+                    f"params['anharmonic_prefactor_model'] must have a {method} method that takes arguments Vrel and params"
+                )
+
+        # Check that the required methods are present in the
+        # anharmonic_thermal_model
+        expected_methods = [
+            "nondimensional_helmholtz_energy",
+            "nondimensional_dhelmholtz_dTheta",
+            "nondimensional_d2helmholtz_dTheta2",
+            "nondimensional_entropy",
+            "nondimensional_dentropy_dTheta",
+            "nondimensional_heat_capacity",
+        ]
+        for method in expected_methods:
+            if not hasattr(params["anharmonic_thermal_model"], method) or not callable(
+                getattr(params["anharmonic_thermal_model"], method)
+            ):
+                raise AttributeError(
+                    f"params['anharmonic_thermal_model'] must have a {method} method that takes arguments temperature, debye_T, and params"
+                )

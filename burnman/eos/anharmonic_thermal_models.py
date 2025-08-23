@@ -305,6 +305,9 @@ class Pade(object):
         t = T / debye_T
         return _d2helmholtzdt2_pade(t) * t / debye_T
 
+    def validate_parameters(self, params):
+        pass
+
 
 @singleton
 class LogNormal(object):
@@ -481,3 +484,15 @@ class LogNormal(object):
         return (
             self._d2helmholtzdt2(t, params["mu_anh"], params["sigma_anh"]) * t / debye_T
         )
+
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["mu_anh", "sigma_anh"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
+
+        # Check that the required parameters are valid numbers
+        for key in expected_keys:
+            if not isinstance(params[key], (int, float)):
+                raise TypeError(f"params['{key}'] must be a number")

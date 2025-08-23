@@ -241,7 +241,7 @@ class Anharmonic(BurnManTest):
         params["anharmonic_thermal_model"] = thermal_model
         params["anharmonic_prefactor_model"] = prefactor_model
         V = params["V_0"]
-        T = params["debye_temperature_model"](Vrel=1.0, params=params)
+        T = params["debye_temperature_model"].value(Vrel=1.0, params=params)
         self.assertAlmostEqual(T, params["Debye_0"], places=6)
 
         S = AnharmonicDebye.entropy(T, V, params) / params["a_anh"]
@@ -254,7 +254,7 @@ class Anharmonic(BurnManTest):
         model_params = {"a_anh": 1.1, "m_anh": 5.0}
 
         # Check first and second derivatives
-        # functions are called value, dVrel and d2dVrel2
+        # functions are called value, dVrel and dVrel2
         Vrel = 0.8
         dVrel = 1.0e-6
 
@@ -269,7 +269,7 @@ class Anharmonic(BurnManTest):
             prefactor_model.dVrel(Vrel + dVrel, model_params)
             - prefactor_model.dVrel(Vrel - dVrel, model_params)
         ) / (2.0 * dVrel)
-        d2AdVrel2_analytical = prefactor_model.d2dVrel2(Vrel, model_params)
+        d2AdVrel2_analytical = prefactor_model.dVrel2(Vrel, model_params)
         self.assertAlmostEqual(d2AdVrel2_num, d2AdVrel2_analytical, places=6)
 
     def test_prefactor_sigmoid(self):
@@ -277,7 +277,7 @@ class Anharmonic(BurnManTest):
         model_params = {"a_anh": 1.1, "b_anh": 1.2, "c_anh": 1.3}
 
         # Check first and second derivatives
-        # functions are called value, dVrel and d2dVrel2
+        # functions are called value, dVrel and dVrel2
         Vrel = 0.8
         dVrel = 1.0e-6
 
@@ -292,7 +292,7 @@ class Anharmonic(BurnManTest):
             prefactor_model.dVrel(Vrel + dVrel, model_params)
             - prefactor_model.dVrel(Vrel - dVrel, model_params)
         ) / (2.0 * dVrel)
-        d2AdVrel2_analytical = prefactor_model.d2dVrel2(Vrel, model_params)
+        d2AdVrel2_analytical = prefactor_model.dVrel2(Vrel, model_params)
         self.assertAlmostEqual(d2AdVrel2_num, d2AdVrel2_analytical, places=6)
 
 

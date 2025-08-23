@@ -16,8 +16,13 @@ class AnharmonicPrefactorModel(object):
     def dVrel(self, Vrel, params):
         raise NotImplementedError("need to implement dVrel() in derived class!")
 
-    def d2dVrel2(self, Vrel, params):
-        raise NotImplementedError("need to implement d2dVrel2() in derived class!")
+    def dVrel2(self, Vrel, params):
+        raise NotImplementedError("need to implement dVrel2() in derived class!")
+
+    def validate_parameters(self, params):
+        raise NotImplementedError(
+            "need to implement validate_parameters() in derived class!"
+        )
 
 
 class PowerLaw(AnharmonicPrefactorModel):
@@ -38,13 +43,25 @@ class PowerLaw(AnharmonicPrefactorModel):
     def dVrel(self, Vrel, params):
         return params["a_anh"] * params["m_anh"] * np.power(Vrel, params["m_anh"] - 1)
 
-    def d2dVrel2(self, Vrel, params):
+    def dVrel2(self, Vrel, params):
         return (
             params["a_anh"]
             * params["m_anh"]
             * (params["m_anh"] - 1)
             * np.power(Vrel, params["m_anh"] - 2)
         )
+
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["a_anh", "m_anh"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
+
+        # Check that the required parameters are valid numbers
+        for key in expected_keys:
+            if not isinstance(params[key], (int, float)):
+                raise TypeError(f"params['{key}'] must be a number")
 
 
 class Sigmoid(AnharmonicPrefactorModel):
@@ -74,10 +91,22 @@ class Sigmoid(AnharmonicPrefactorModel):
         denom = (1 + (Vrel + b) ** c) ** 2
         return a * c * (Vrel + b) ** (c - 1) / denom
 
-    def d2dVrel2(self, Vrel, params):
+    def dVrel2(self, Vrel, params):
         a = params["a_anh"]
         b = params["b_anh"]
         c = params["c_anh"]
         num = (c - 1) - (c + 1) * (Vrel + b) ** c
         denom = (1 + (Vrel + b) ** c) ** 3
         return a * c * (Vrel + b) ** (c - 2) * num / denom
+
+    def validate_parameters(self, params):
+        # Check for all required keys
+        expected_keys = ["a_anh", "b_anh", "c_anh"]
+        for key in expected_keys:
+            if key not in params:
+                raise AttributeError(f"params dictionary must contain a '{key}' key")
+
+        # Check that the required parameters are valid numbers
+        for key in expected_keys:
+            if not isinstance(params[key], (int, float)):
+                raise TypeError(f"params['{key}'] must be a number")
