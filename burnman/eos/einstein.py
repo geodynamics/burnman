@@ -114,3 +114,39 @@ def dmolar_heat_capacity_v_dT(T, einstein_T, n):
     )
 
     return dCvdT
+
+
+@jit(nopython=True)
+def dentropy_dTheta(T, einstein_T, n):
+    """
+    Derivative of Einstein entropy with respect to Einstein temperature [J/K^2]
+    """
+    if T <= eps:
+        return 0.0
+    x = einstein_T / T
+    f = np.exp(x) - 1.0
+    return -3.0 * n * constants.gas_constant * (x * np.exp(x) / (f * f * T))
+
+
+@jit(nopython=True)
+def dhelmholtz_dTheta(T, einstein_T, n):
+    """
+    First derivative of Helmholtz free energy with respect to Einstein temperature [J/K]
+    """
+    if T <= eps:
+        return 0.0
+    x = einstein_T / T
+    f = np.exp(x) - 1.0
+    return 3.0 * n * constants.gas_constant / f
+
+
+@jit(nopython=True)
+def d2helmholtz_dTheta2(T, einstein_T, n):
+    """
+    Second derivative of Helmholtz free energy with respect to Einstein temperature [J/K^2]
+    """
+    if T <= eps:
+        return 0.0
+    x = einstein_T / T
+    f = np.exp(x) - 1.0
+    return -3.0 * n * constants.gas_constant * np.exp(x) / (f * f * T)

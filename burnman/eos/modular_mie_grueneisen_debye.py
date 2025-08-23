@@ -24,7 +24,7 @@ from . import debye
 from . import equation_of_state as eos
 from ..utils.math import bracket
 from . import bukowinski_electronic as el
-from .anharmonic_debye_pade import AnharmonicDebyePade as Anharmonic
+from .anharmonic_debye import AnharmonicDebye as Anharmonic
 
 
 class ModularMGD(eos.EquationOfState):
