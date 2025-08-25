@@ -63,6 +63,8 @@ def create(method):
             return slb.SLB3Conductive()
         elif method == "modular_mgd":
             return mmgd.ModularMGD()
+        elif method == "modular_mgd_with_anharmonicity":
+            return mmgd.ModularMGDWithAnharmonicity()
         elif method == "murnaghan":
             return murnaghan.Murnaghan()
         elif method == "bm3shear2":

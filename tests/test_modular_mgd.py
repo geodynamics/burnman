@@ -281,6 +281,30 @@ class ModularMGD(BurnManTest):
         m_without_component.set_state(2.0e9, 2000.0)
         self.assertFalse(m_without_component.S == m.S)
 
+    def test_SLB_inbuilt_anharmonic_contribution(self):
+        params = mineral_params.copy()
+        params["reference_eos"] = create("bm3")
+        params["debye_temperature_model"] = debye_temperature_models.SLB()
+        params["Debye_0"] = 1000.0
+        params["grueneisen_0"] = 1.2
+        params["q_0"] = 1.1
+        params["P_0"] = 1.0e5
+        m_without_component = Mineral(params)
+
+        params2 = params.copy()
+        params2["equation_of_state"] = "modular_mgd_with_anharmonicity"
+        params2["c_anh"] = 0.05
+
+        m = Mineral(params2)
+        consistent = check_eos_consistency(
+            m, 2.0e9, 2000.0, including_shear_properties=False, tol=1.0e-4
+        )
+        self.assertTrue(consistent)
+
+        m.set_state(2.0e9, 2000.0)
+        m_without_component.set_state(2.0e9, 2000.0)
+        self.assertFalse(m_without_component.S == m.S)
+
     def test_SPOCK_isothermal_contribution(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("spock")

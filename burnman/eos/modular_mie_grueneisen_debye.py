@@ -20,9 +20,11 @@ except ImportError:
         return decorator
 
 
+import numpy as np
 from . import debye
 from . import equation_of_state as eos
 from ..utils.math import bracket
+from ..utils.misc import copy_documentation
 from . import bukowinski_electronic as el
 from .anharmonic_debye import AnharmonicDebye as Anharmonic
 
@@ -351,3 +353,296 @@ class ModularMGD(eos.EquationOfState):
         if "bel_0" not in params:
             params["bel_0"] = None
             params["gel"] = None
+
+
+class ModularMGDWithAnharmonicity(ModularMGD):
+    """
+    This class extends the ModularMGD class to include anharmonicity effects
+    according to a simplification of the model proposed by
+    Wu and Wentzcovitch, 2009.
+
+    The basis of the anharmonic model is the definition of a scaled volume, :math:`V'`:
+    :math:`\\ln (V'/V) =  = - c \\ln (V/V_0)`.
+    In this expression, :math:`V` is the target volume,
+    :math:`V_0` is a first order approximation to the volume at the same pressure
+    and reference temperature :math:`T_0`, and :math:`c` is an anharmonicity parameter
+    provided in the params dictionary as `c_anh`.
+
+    The anharmonic Helmholtz energy :math:`F` is related to the scaled volume by the equation:
+
+    .. math::
+
+        F(V,T) = F_h(V',T) + F_h(V,T_0) - F_h(V',T_0)
+
+    where :math:`F_h` is the harmonic Helmholtz energy,
+    potentially with electronic contributions.
+
+    Note: This model is not the same as that published in
+    Wu and Wentzcovitch (2009). The results are expected to be similar,
+    but the :math:`c` parameter will in general need to be tweaked.
+    This is because only a local approximation to the volume change
+    between 0 K and the target temperature is used. This does not mean that
+    the model is less able to capture the essential physics of the problem;
+    indeed, the model of Wu and Wentzcovitch (2009) is only intended to be
+    an effective ansatz.
+    """
+
+    def lnVoverV0_approx(self, temperature, volume, params):
+        a_h = ModularMGD.thermal_expansivity(
+            super(), np.nan, temperature, volume, params
+        )
+        KT_h = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, temperature, volume, params
+        )
+        KT0_h = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, params["T_0"], volume, params
+        )
+        P_th = a_h * KT_h * (temperature - params["T_0"])
+        return P_th / KT0_h  # assume a constant bulk modulus
+
+    @copy_documentation(ModularMGD.pressure)
+    def pressure(self, temperature, volume, params):
+        dV = 1e-5 * params["V_0"]
+
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        dlnVoverV0_dV = (
+            self.lnVoverV0_approx(temperature, volume + dV, params)
+            - self.lnVoverV0_approx(temperature, volume - dV, params)
+        ) / (2 * dV)
+
+        lnVprimeoverV = -params["c_anh"] * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+
+        dlnVprimeoverV_dV = -params["c_anh"] * dlnVoverV0_dV
+        dVprime_dV = Vprime * (1.0 / volume + dlnVprimeoverV_dV)
+
+        T0 = params["T_0"]
+        P_V_T0 = ModularMGD.pressure(super(), T0, volume, params)
+        P_Vp_T = ModularMGD.pressure(super(), temperature, Vprime, params)
+        P_Vp_T0 = ModularMGD.pressure(super(), T0, Vprime, params)
+
+        P = P_V_T0 + dVprime_dV * (P_Vp_T - P_Vp_T0)
+
+        return P
+
+    @copy_documentation(ModularMGD.isothermal_bulk_modulus_reuss)
+    def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
+        dV = 1e-5 * params["V_0"]
+
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        lnVoverV0_plus_dV = self.lnVoverV0_approx(temperature, volume + dV, params)
+        lnVoverV0_minus_dV = self.lnVoverV0_approx(temperature, volume - dV, params)
+
+        dlnVoverV0_dV = (lnVoverV0_plus_dV - lnVoverV0_minus_dV) / (2 * dV)
+        d2lnVoverV0_dV2 = (lnVoverV0_plus_dV - 2 * lnVoverV0 + lnVoverV0_minus_dV) / (
+            dV**2
+        )
+
+        lnVprimeoverV = -params["c_anh"] * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+
+        dlnVprimeoverV_dV = -params["c_anh"] * dlnVoverV0_dV
+        dVprime_dV = Vprime * (1.0 / volume + dlnVprimeoverV_dV)
+        d2Vprime_dV2 = Vprime * (
+            (1.0 / volume + dlnVprimeoverV_dV) ** 2
+            - 1.0 / volume**2
+            - params["c_anh"] * d2lnVoverV0_dV2
+        )
+
+        T0 = params["T_0"]
+        P_Vp_T = ModularMGD.pressure(super(), temperature, Vprime, params)
+        P_Vp_T0 = ModularMGD.pressure(super(), T0, Vprime, params)
+
+        KT_V_T0 = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, T0, volume, params
+        )
+        KT_Vp_T = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, temperature, Vprime, params
+        )
+        KT_Vp_T0 = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, T0, Vprime, params
+        )
+
+        KT = (
+            KT_V_T0
+            - volume * d2Vprime_dV2 * (P_Vp_T - P_Vp_T0)
+            + volume / Vprime * (dVprime_dV) ** 2 * (KT_Vp_T - KT_Vp_T0)
+        )
+        return KT
+
+    @copy_documentation(ModularMGD._molar_heat_capacity_v)
+    def _molar_heat_capacity_v(self, pressure, temperature, volume, params):
+        dT = 1e-2
+
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        lnVoverV0_plus_dT = self.lnVoverV0_approx(temperature + dT, volume, params)
+        lnVoverV0_minus_dT = self.lnVoverV0_approx(temperature - dT, volume, params)
+
+        dlnVoverV0_dT = (lnVoverV0_plus_dT - lnVoverV0_minus_dT) / (2 * dT)
+        d2lnVoverV0_dT2 = (lnVoverV0_plus_dT - 2 * lnVoverV0 + lnVoverV0_minus_dT) / (
+            dT**2
+        )
+
+        c = params["c_anh"]
+        lnVprimeoverV = -c * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+
+        dlnVprimeoverV_dT = -c * dlnVoverV0_dT
+        d2lnVprimeoverV_dT2 = -c * d2lnVoverV0_dT2
+
+        dVprime_dT = Vprime * dlnVprimeoverV_dT
+        d2Vprime_dT2 = Vprime * (dlnVprimeoverV_dT**2 + d2lnVprimeoverV_dT2)
+
+        T0 = params["T_0"]
+
+        Cvh_Vprime_T = ModularMGD._molar_heat_capacity_v(
+            super(), np.nan, temperature, Vprime, params
+        )
+        P_Vprime_T = ModularMGD.pressure(super(), temperature, Vprime, params)
+        P_Vprime_T0 = ModularMGD.pressure(super(), T0, Vprime, params)
+        KT_Vprime_T = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, temperature, Vprime, params
+        )
+        KT_Vprime_T0 = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, T0, Vprime, params
+        )
+        dPdT_Vprime_T = (
+            ModularMGD.thermal_expansivity(super(), np.nan, temperature, Vprime, params)
+            * KT_Vprime_T
+        )
+
+        C_v = Cvh_Vprime_T + temperature * (
+            2.0 * dPdT_Vprime_T * dVprime_dT
+            - (P_Vprime_T0 - P_Vprime_T) * d2Vprime_dT2
+            - (KT_Vprime_T - KT_Vprime_T0) / Vprime * dVprime_dT**2
+        )
+        return C_v
+
+    def thermal_expansivity(self, pressure, temperature, volume, params):
+        dV = 1e-5 * params["V_0"]
+        dT = 1e-2
+
+        # lnVoverV0 derivatives
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        lnVoverV0_plusV = self.lnVoverV0_approx(temperature, volume + dV, params)
+        lnVoverV0_minusV = self.lnVoverV0_approx(temperature, volume - dV, params)
+        lnVoverV0_plusT = self.lnVoverV0_approx(temperature + dT, volume, params)
+        lnVoverV0_minusT = self.lnVoverV0_approx(temperature - dT, volume, params)
+        lnVoverV0_plusV_plusT = self.lnVoverV0_approx(
+            temperature + dT, volume + dV, params
+        )
+        lnVoverV0_plusV_minusT = self.lnVoverV0_approx(
+            temperature - dT, volume + dV, params
+        )
+        lnVoverV0_minusV_plusT = self.lnVoverV0_approx(
+            temperature + dT, volume - dV, params
+        )
+        lnVoverV0_minusV_minusT = self.lnVoverV0_approx(
+            temperature - dT, volume - dV, params
+        )
+
+        dlnVoverV0_dV = (lnVoverV0_plusV - lnVoverV0_minusV) / (2 * dV)
+        dlnVoverV0_dT = (lnVoverV0_plusT - lnVoverV0_minusT) / (2 * dT)
+        d2lnVoverV0_dTdV = (
+            lnVoverV0_plusV_plusT
+            - lnVoverV0_plusV_minusT
+            - lnVoverV0_minusV_plusT
+            + lnVoverV0_minusV_minusT
+        ) / (4 * dV * dT)
+
+        c = params["c_anh"]
+        lnVprimeoverV = -c * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+        dlnVprime_dV = -c * dlnVoverV0_dV
+        dlnVprime_dT = -c * dlnVoverV0_dT
+        d2lnVprime_dTdV = -c * d2lnVoverV0_dTdV
+
+        dVprime_dV = Vprime * (1.0 / volume + dlnVprime_dV)
+        dVprime_dT = Vprime * dlnVprime_dT
+        d2Vprime_dTdV = Vprime * (
+            dlnVprime_dT * (1.0 / volume + dlnVprime_dV) + d2lnVprime_dTdV
+        )
+
+        T0 = params["T_0"]
+        P_Vprime_T = ModularMGD.pressure(super(), temperature, Vprime, params)
+        P_Vprime_T0 = ModularMGD.pressure(super(), T0, Vprime, params)
+        KT_Vprime_T = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, temperature, Vprime, params
+        )
+        KT_Vprime_T0 = ModularMGD.isothermal_bulk_modulus_reuss(
+            super(), np.nan, T0, Vprime, params
+        )
+        alphaKT_Vprime_T = (
+            ModularMGD.thermal_expansivity(super(), np.nan, temperature, Vprime, params)
+            * KT_Vprime_T
+        )
+
+        aKT = (
+            alphaKT_Vprime_T * dVprime_dV
+            - (KT_Vprime_T - KT_Vprime_T0) * dVprime_dV * dVprime_dT / Vprime
+            + (P_Vprime_T - P_Vprime_T0) * d2Vprime_dTdV
+        )
+        KT = self.isothermal_bulk_modulus_reuss(pressure, temperature, volume, params)
+
+        return aKT / KT
+
+    def entropy(self, pressure, temperature, volume, params):
+        dT = 1e-2
+
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        dlnVoverV0_dT = (
+            self.lnVoverV0_approx(temperature + dT, volume, params)
+            - self.lnVoverV0_approx(temperature - dT, volume, params)
+        ) / (2 * dT)
+
+        c = params["c_anh"]
+        lnVprimeoverV = -c * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+
+        dlnVprimeoverV_dT = -c * dlnVoverV0_dT
+        dVprime_dT = Vprime * dlnVprimeoverV_dT
+
+        Sh_Vprime_T = ModularMGD.entropy(super(), np.nan, temperature, Vprime, params)
+        P_Vprime_T = ModularMGD.pressure(super(), temperature, Vprime, params)
+        P_Vprime_T0 = ModularMGD.pressure(super(), params["T_0"], Vprime, params)
+
+        S = Sh_Vprime_T + (P_Vprime_T - P_Vprime_T0) * dVprime_dT
+        return S
+
+    def _helmholtz_energy(self, pressure, temperature, volume, params):
+        lnVoverV0 = self.lnVoverV0_approx(temperature, volume, params)
+        lnVprimeoverV = -params["c_anh"] * lnVoverV0
+        Vprime = volume * np.exp(lnVprimeoverV)
+        Fh_Vprime_T = ModularMGD._helmholtz_energy(
+            super(), np.nan, temperature, Vprime, params
+        )
+        F_V_T0 = ModularMGD._helmholtz_energy(
+            super(), np.nan, params["T_0"], volume, params
+        )
+        F_Vprime_T0 = ModularMGD._helmholtz_energy(
+            super(), np.nan, params["T_0"], Vprime, params
+        )
+
+        F = Fh_Vprime_T + F_V_T0 - F_Vprime_T0
+        return F
+
+    def validate_parameters(self, params):
+        """
+        Check for existence and validity of the parameters
+        """
+
+        ModularMGD.validate_parameters(self, params)
+
+        if "anharmonic_thermal_model" in params:
+            raise ValueError(
+                "The ModularMGDWithAnharmonicity class "
+                "does not allow for a separate anharmonic "
+                "contribution. Anharmonicity is incorporated "
+                "through a single 'c_anh' parameter."
+            )
+
+        if "c_anh" not in params:
+            raise ValueError(
+                "The ModularMGDWithAnharmonicity class "
+                "requires a 'c_anh' parameter to be set."
+            )
