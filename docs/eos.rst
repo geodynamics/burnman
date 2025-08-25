@@ -104,6 +104,8 @@ Modular Mie-Grüneisen-Debye
 
 .. autoclass:: burnman.eos.ModularMGD
 
+.. autoclass:: burnman.eos.ModularMGDWithAnharmonicity
+
 Debye Temperature Models
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
