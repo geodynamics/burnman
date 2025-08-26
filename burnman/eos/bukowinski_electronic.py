@@ -8,7 +8,7 @@ import numpy as np
 
 """
 Functions for the Bukowinski (1977) model for the electronic component
-of the Helmholtz energy as used by Stixrude an Lithgow-Bertelloni (2024).
+of the Helmholtz energy as used by Stixrude and Lithgow-Bertelloni (2024).
 """
 
 
