@@ -407,7 +407,7 @@ class hb(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a hb solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.tr(), "[Va][Mgmonethree]3[Mgmtwo]2[Camfour]2[Sitone][Ohv]2"]
         * [tsm, "[Va][Mgmonethree]3[Almtwo]2[Camfour]2[Sitone1/2Altone1/2][Ohv]2"]
         * [prgm, "[Naa][Mgmonethree]3[Mgmtwo1/2Almtwo1/2]2[Camfour]2[Sitone1/2Altone1/2][Ohv]2"]
@@ -503,7 +503,7 @@ class aug(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a aug solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.di(), "[Mgmone][Camtwo][Sitone]1/4[Sittwo]1/4"]
         * [cenh, "[Mgmone][Mgmtwo][Sitone]1/4[Sittwo]1/4"]
         * [cfs, "[Femone][Femtwo][Sitone]1/4[Sittwo]1/4"]
@@ -565,7 +565,7 @@ class dio(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a dio solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.jd(), "[Almonem]1/2[Almonea]1/2[Namtwoc]1/2[Namtwon]1/2"]
         * [HP_2011_ds62.di(), "[Mgmonem]1/2[Mgmonea]1/2[Camtwoc]1/2[Camtwon]1/2"]
         * [HP_2011_ds62.hed(), "[Femonem]1/2[Femonea]1/2[Camtwoc]1/2[Camtwon]1/2"]
@@ -606,7 +606,7 @@ class opx(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a opx solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.en(), "[Mgmone][Mgmtwo][Sit]1/2"]
         * [HP_2011_ds62.fs(), "[Femone][Femtwo][Sit]1/2"]
         * [fm, "[Mgmone][Femtwo][Sit]1/2"]
@@ -649,7 +649,7 @@ class g(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a g solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.py(), "[Mgx]3[Aly]2"]
         * [HP_2011_ds62.alm(), "[Fex]3[Aly]2"]
         * [HP_2011_ds62.gr(), "[Cax]3[Aly]2"]
@@ -679,7 +679,7 @@ class ol(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a ol solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.fo(), "[Mgm]2"]
         * [HP_2011_ds62.fa(), "[Fem]2"]
 
@@ -700,7 +700,7 @@ class pl4tr(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a pl4tr solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.ab(), "[Naa][Altb1/4Sitb3/4]"]
         * [HP_2011_ds62.an(), "[Caa][Altb1/2Sitb1/2]"]
         * [HP_2011_ds62.san(), "[Ka][Altb1/4Sitb3/4]"]
@@ -729,7 +729,7 @@ class abc(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a abc solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [abm, "[Naa]"]
         * [anm, "[Caa]"]
 
@@ -751,7 +751,7 @@ class k4tr(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a k4tr solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.ab(), "[Naa][Altb1/4Sitb3/4]"]
         * [HP_2011_ds62.an(), "[Caa][Altb1/2Sitb1/2]"]
         * [HP_2011_ds62.san(), "[Ka][Altb1/4Sitb3/4]"]
@@ -780,7 +780,7 @@ class ksp(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a ksp solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.san(), "[K]"]
         * [HP_2011_ds62.abh(), "[Na]"]
         * [anC, "[Ca]"]
@@ -806,7 +806,7 @@ class plc(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a plc solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.abh(), "[Na]"]
         * [anC, "[Ca]"]
         * [HP_2011_ds62.san(), "[K]"]
@@ -832,7 +832,7 @@ class pli(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a pli solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [abhI, "[Na]"]
         * [HP_2011_ds62.an(), "[Ca]"]
         * [HP_2011_ds62.san(), "[K]"]
@@ -858,7 +858,7 @@ class sp(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a sp solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.herc(), "[Al][Fetwo]"]
         * [HP_2011_ds62.sp(), "[Al][Mg]"]
         * [HP_2011_ds62.mt(), "[Fethree][Fetwo]"]
@@ -883,7 +883,7 @@ class ilm(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a ilm solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [oilm, "[Fetwoa][Tib]"]
         * [dilm, "[Fetwoa1/2Tia1/2][Fetwob1/2Tib1/2]"]
         * [dhem, "[Fethreea][Fethreeb]"]
@@ -906,7 +906,7 @@ class ilmm(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a ilmm solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [oilm, "[Fea][Tib]"]
         * [dilm, "[Fea1/2Tia1/2][Feb1/2Tib1/2]"]
         * [dhem, "[Fethreea][Fethreeb]"]
@@ -935,7 +935,7 @@ class ep(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a ep solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.cz(), "[Almone][Almthree]"]
         * [HP_2011_ds62.ep(), "[Almone][Femthree]"]
         * [HP_2011_ds62.fep(), "[Femone][Femthree]"]
@@ -958,7 +958,7 @@ class bi(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a bi solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.phl(), "[Mgmthree][Mgmonetwo]2[Sit1/2Alt1/2]2[Ohv]2"]
         * [annm, "[Femthree][Femonetwo]2[Sit1/2Alt1/2]2[Ohv]2"]
         * [obi, "[Femthree][Mgmonetwo]2[Sit1/2Alt1/2]2[Ohv]2"]
@@ -993,7 +993,7 @@ class mu(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a mu solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.mu(), "[Ka][Almtwoa][Almtwob][Sitone1/2Altone1/2]2"]
         * [HP_2011_ds62.cel(), "[Ka][Mgmtwoa][Almtwob][Sitone]2"]
         * [HP_2011_ds62.fcel(), "[Ka][Femtwoa][Almtwob][Sitone]2"]
@@ -1043,7 +1043,7 @@ class chl(Solution):
     def __init__(self, molar_fractions=None):
         """
         Initialisation for a chl solution object.
-        Contains the following endmembers with associated site occupancies :
+        Contains the following endmembers with associated site occupancies:
         * [HP_2011_ds62.clin(), "[Mgmone][Mgmtwothree]4[Almfour][Sittwo1/2Alttwo1/2]2"]
         * [HP_2011_ds62.afchl(), "[Mgmone][Mgmtwothree]4[Mgmfour][Sittwo]2"]
         * [HP_2011_ds62.ames(), "[Almone][Mgmtwothree]4[Almfour][Alttwo]2"]

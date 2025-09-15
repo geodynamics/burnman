@@ -386,15 +386,15 @@ for solution_file, mbr_dataset in ds:
         doc = '        """\n'
         doc += f"        Initialisation for a {name} solution object.\n"
 
-        doc += "        Contains the following endmembers with associated site occupancies :\n"
+        doc += "        Contains the following endmembers with associated site occupancies:\n"
 
         for mbr_initialization in mbr_initializations:
             doc += f"        * {mbr_initialization}\n"
 
         if formulation == "asf":
-            doc += f"\n        This is implemented as an asymmetric solution.\n"
+            doc += "\n        This is implemented as an asymmetric solution.\n"
         else:
-            doc += f"\n        This is implemented as a symmetric solution.\n"
+            doc += "\n        This is implemented as a symmetric solution.\n"
         doc += '        """\n'
 
         out_ss += f"class {name}(Solution):\n"
