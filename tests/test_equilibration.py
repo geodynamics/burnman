@@ -112,6 +112,44 @@ class equilibration(BurnManTest):
             [1620.532183457096, 0.45, 0.6791743],
         )
 
+    def test_binary_solution_convergence(self):
+        mg_bdg = SLB_2011.mg_bridgmanite()
+        fe_bdg = SLB_2011.fe_bridgmanite()
+        mg_ppv = SLB_2011.mg_post_perovskite()
+        fe_ppv = SLB_2011.fe_post_perovskite()
+        bdg_endmembers = [[mg_bdg, "[Mg]"], [fe_bdg, "[Fe]"]]
+        ppv_endmembers = [[mg_ppv, "[Mg]"], [fe_ppv, "[Fe]"]]
+
+        bdg = burnman.Solution(
+            "bdg",
+            solution_model=burnman.classes.solutionmodel.IdealSolution(bdg_endmembers)
+        )
+        ppv = burnman.Solution(
+            "ppv",
+            solution_model=burnman.classes.solutionmodel.IdealSolution(ppv_endmembers)
+        )
+
+        composition = {"Mg": 0.9, "Fe": 0.1, "Si": 1.0, "O": 3.0}
+        assemblage = burnman.Composite(
+            phases=[bdg, ppv],
+            fractions=[0.9, 0.1],
+            name="MgSiO3-pv-ppv-assemblage"
+        )
+        bdg.set_composition([0.9, 0.1])
+        ppv.set_composition([0.9, 0.1])
+
+        temperatures = np.linspace(1000, 4000, 4)
+        assemblage.set_state(120.e9, temperatures[0])
+
+        equality_constraints = [
+            ("T", temperatures),
+            ("phase_fraction", (ppv, 0.0))
+        ]
+
+        sol, prm = equilibrate(composition, assemblage, equality_constraints)
+        self.assertFalse(any(not s.success for s in sol))
+
+
 
 if __name__ == "__main__":
     unittest.main()
