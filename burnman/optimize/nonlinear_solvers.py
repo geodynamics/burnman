@@ -618,7 +618,15 @@ class DampedNewtonSolver:
 
             # Evaluate simplified Newton step
             F_j = self.F(x_j)
-            dxbar_j = lu_solve(luJ, -F_j)
+
+            # Regularise ill-conditioned Jacobian
+            condition_number = np.linalg.cond(sol.J)
+            if condition_number < self.cond_lu_thresh:
+                dxbar_j = lu_solve(luJ, -F_j)
+            else:
+                J_reg = sol.J + np.eye(sol.J.shape[0]) * self.eps
+                dxbar_j = lu_solve(lu_factor(J_reg), -F_j)
+
             dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
             converged = self._check_convergence(dxbar_j, dx, lmda, lmda_bounds)
