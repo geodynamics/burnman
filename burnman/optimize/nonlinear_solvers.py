@@ -119,9 +119,11 @@ class DampedNewtonSolver:
         ), "The starting guess is outside the supplied constraints."
 
         if not isinstance(self.tol, float):
+            self.tol = np.asarray(self.tol, dtype=np.float64)
+            assert self.tol.ndim == 1, "tol must be a float or a 1D array."
             assert len(self.tol) == len(
                 self.guess
-            ), "tol must either be a float or an array like guess."
+            ), f"tol must either be a float or an array like guess. Got len(tol)={len(self.tol)} and len(guess)={len(self.guess)}."
 
     def _constraints(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         return np.dot(self.linear_constraints[0], x) + self.linear_constraints[1]
