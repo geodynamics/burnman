@@ -119,7 +119,7 @@ class DampedNewtonSolver:
         ), "The starting guess is outside the supplied constraints."
 
         if not isinstance(self.tol, float):
-            assert len(self.tol) < len(
+            assert len(self.tol) == len(
                 self.guess
             ), "tol must either be a float or an array like guess."
 
