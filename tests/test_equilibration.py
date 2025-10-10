@@ -122,33 +122,27 @@ class equilibration(BurnManTest):
 
         bdg = burnman.Solution(
             "bdg",
-            solution_model=burnman.classes.solutionmodel.IdealSolution(bdg_endmembers)
+            solution_model=burnman.classes.solutionmodel.IdealSolution(bdg_endmembers),
         )
         ppv = burnman.Solution(
             "ppv",
-            solution_model=burnman.classes.solutionmodel.IdealSolution(ppv_endmembers)
+            solution_model=burnman.classes.solutionmodel.IdealSolution(ppv_endmembers),
         )
 
         composition = {"Mg": 0.9, "Fe": 0.1, "Si": 1.0, "O": 3.0}
         assemblage = burnman.Composite(
-            phases=[bdg, ppv],
-            fractions=[0.9, 0.1],
-            name="MgSiO3-pv-ppv-assemblage"
+            phases=[bdg, ppv], fractions=[0.9, 0.1], name="MgSiO3-pv-ppv-assemblage"
         )
         bdg.set_composition([0.9, 0.1])
         ppv.set_composition([0.9, 0.1])
 
         temperatures = np.linspace(1000, 4000, 4)
-        assemblage.set_state(120.e9, temperatures[0])
+        assemblage.set_state(120.0e9, temperatures[0])
 
-        equality_constraints = [
-            ("T", temperatures),
-            ("phase_fraction", (ppv, 0.0))
-        ]
+        equality_constraints = [("T", temperatures), ("phase_fraction", (ppv, 0.0))]
 
         sol, prm = equilibrate(composition, assemblage, equality_constraints)
         self.assertFalse(any(not s.success for s in sol))
-
 
 
 if __name__ == "__main__":
