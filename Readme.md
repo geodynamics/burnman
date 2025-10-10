@@ -31,6 +31,7 @@ Authors (as of 2024):
 * Juliane Dannberg
 * Rene Gassmoeller
 * Robert Farla
+* Benedict Heinen
 
 ## Citing BurnMan
 
