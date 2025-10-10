@@ -607,10 +607,23 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
         degrees of freedom for the equilibrium problem.
     :type free_compositional_vectors: list of dictionaries
 
-    :returns: A tuple with attributes n_parameters
-        (the number of parameters for the current equilibrium problem)
-        and phase_amount_indices (the indices of the parameters that
-        correspond to phase amounts).
+    :returns: A tuple with attributes:
+        - parameter_names: list of strings, the names of the parameters
+          for the current equilibrium problem
+        - default_tolerances: numpy.array, the default tolerances for each parameter
+        - n_parameters: int, the number of parameters for the current equilibrium problem
+        - phase_amount_indices: list of int, the indices of the parameters that
+          correspond to phase amounts
+        - bulk_composition_vector: numpy.array, the bulk composition vector
+        - free_compositional_vectors: 2D numpy.array, the free compositional vectors
+        - reduced_composition_vector: numpy.array, the bulk composition vector
+          reduced to the independent elements
+        - reduced_free_composition_vectors: 2D numpy.array, the free compositional vectors
+          reduced to the independent elements
+        - constraint_vector: numpy.array, vector for the linear constraints bounding the
+          valid parameter space (b in Ax + b < eps)
+        - constraint_matrix: 2D numpy.array, matrix for the linear constraints bounding the
+          valid parameter space (A in Ax + b < eps)
     :rtype: namedtuple
     """
     # Initialize a named tuple for the equilibration parameters
@@ -618,18 +631,24 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
 
     # Process parameter names
     prm.parameter_names = ["Pressure (Pa)", "Temperature (K)"]
+    prm.default_tolerances = [1.0, 1.0e-3]
     for i, n in enumerate(assemblage.endmembers_per_phase):
         prm.parameter_names.append("x({0})".format(assemblage.phases[i].name))
+        prm.default_tolerances.append(1.0e-6)
         if n > 1:
             p_names = [
                 "p({0} in {1})".format(n, assemblage.phases[i].name)
                 for n in assemblage.phases[i].endmember_names[1:]
             ]
             prm.parameter_names.extend(p_names)
+            prm.default_tolerances.extend([1.0e-6] * len(p_names))
 
     n_free_compositional_vectors = len(free_compositional_vectors)
     for i in range(n_free_compositional_vectors):
         prm.parameter_names.append(f"v_{i}")
+        prm.default_tolerances.append(1.0e-6)
+
+    prm.default_tolerances = np.array(prm.default_tolerances)
 
     prm.n_parameters = len(prm.parameter_names)
     prm.phase_amount_indices = [
@@ -797,7 +816,7 @@ def equilibrate(
     assemblage,
     equality_constraints,
     free_compositional_vectors=[],
-    tol=1.0e-3,
+    tol=None,
     store_iterates=False,
     store_assemblage=True,
     max_iterations=100.0,
@@ -866,8 +885,16 @@ def equilibrate(
         Vector given in atomic (molar) units of elements.
     :type free_compositional_vectors: list of dict
 
-    :param tol: The tolerance for the nonlinear solver.
-    :type tol: float
+    :param tol: The tolerance for the nonlinear solver. This can be a single float,
+        which is then applied to all parameters, or a numpy array with the
+        same length as the number of parameters in the solve (2 + number of
+        phases + number of free compositional vectors). The default is None,
+        which sets the tolerances to 1 Pa for pressure, 1e-3 K for temperature,
+        1e-6 for phase amounts and 1e-6 for free compositional vectors.
+        One of the termination criteria for the nonlinear solver is that
+        the absolute change in each parameter is less than the corresponding
+        tolerance.
+    :type tol: float or numpy.array
 
     :param store_iterates: Whether to store the parameter values for
         each iteration in each solution object.
@@ -931,6 +958,10 @@ def equilibrate(
     prm = get_equilibration_parameters(
         assemblage, composition, free_compositional_vectors
     )
+
+    # Set default tolerances if not provided
+    if tol is None:
+        tol = prm.default_tolerances
 
     # Check equality constraints have the correct structure
     # Convert into the format readable by the function and jacobian functions

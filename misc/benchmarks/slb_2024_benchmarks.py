@@ -196,13 +196,13 @@ def check_fig_3_fcc_ferric_fper():
 
     assemblage = Composite([bcc, fcc], [0.5, 0.5])
     equality_constraints = [["P", 1.0e5], ["phase_fraction", (bcc, 0.0)]]
-    sol = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-5)
+    sol = equilibrate(composition, assemblage, equality_constraints)
     T_a_g = sol[0].assemblage.temperature
 
     assemblage = Composite([bcc, fper], [0.5, 0.5])
     temperatures = np.linspace(T_a_wu_mag, T_a_g, 31)
     equality_constraints = [["P", 1.0e5], ["T", temperatures]]
-    sol = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-5)
+    sol = equilibrate(composition, assemblage, equality_constraints)
     xs = np.empty_like(temperatures)
     for i, s in enumerate(sol[0]):
         xs[i] = -s.assemblage.phases[1].formula["Fe"] / 4.0
@@ -211,16 +211,17 @@ def check_fig_3_fcc_ferric_fper():
     assemblage = Composite([fcc, fper], [0.5, 0.5])
     temperatures = np.linspace(T_a_g, 1800.0, 31)
     equality_constraints = [["P", 1.0e5], ["T", temperatures]]
-    sol = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-5)
+    sol = equilibrate(composition, assemblage, equality_constraints)
     xs = np.empty_like(temperatures)
     for i, s in enumerate(sol[0]):
         xs[i] = -s.assemblage.phases[1].formula["Fe"] / 4.0
     ax[0].plot(xs, temperatures, linestyle=":", linewidth=3.0)
 
+    composition = {"Fe": 1.0, "O": 1.3}
     assemblage = Composite([mag, fper], [0.5, 0.5])
     temperatures = np.linspace(T_a_wu_mag, 1800.0, 31)
     equality_constraints = [["P", 1.0e5], ["T", temperatures]]
-    sol = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-5)
+    sol = equilibrate(composition, assemblage, equality_constraints)
     xs = np.empty_like(temperatures)
     for i, s in enumerate(sol[0]):
         xs[i] = -s.assemblage.phases[1].formula["Fe"] / 4.0
@@ -246,9 +247,7 @@ def check_fig_3_fcc_ferric_fper():
         for i, x_MgO in enumerate(x_MgOs):
             composition = {"Mg": x_MgO, "Fe": 2.0, "O": 1.0}
             try:
-                sol = equilibrate(
-                    composition, assemblage, equality_constraints, tol=1.0e-5
-                )
+                sol = equilibrate(composition, assemblage, equality_constraints)
                 if sol[0].success:
                     f = assemblage.phases[0].formula
                     x_Mgs[i] = f["Mg"] / 4.0
@@ -408,7 +407,7 @@ def check_fig_7_fO2():
                 ["phase_fraction", [a.phases[0], 0.0]],
                 ["T", 1500.0],
             ]
-            equilibrate(a.phases[0].formula, a, equality_constraints, tol=1.0e-5)
+            equilibrate(a.phases[0].formula, a, equality_constraints)
             P_bounds[i][1] = a.pressure
             P_bounds[i + 1][0] = a.pressure
 
@@ -437,9 +436,9 @@ def check_fig_7_fO2():
         for i, P in enumerate(pressures):
             assemblage.set_state(P, T)
             try:
-                sol = equilibrate(
-                    assemblage.formula, assemblage, [["P", P], ["T", T]], tol=1.0e-7
-                )[0]
+                sol = equilibrate(assemblage.formula, assemblage, [["P", P], ["T", T]])[
+                    0
+                ]
                 if sol.success:
                     mu_O2 = assemblage.chemical_potential([{"O": 2.0}])[0]
                     O2_gas.set_state(1.0e5, T)

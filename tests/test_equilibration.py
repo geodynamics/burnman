@@ -144,6 +144,44 @@ class equilibration(BurnManTest):
         sol, prm = equilibrate(composition, assemblage, equality_constraints)
         self.assertFalse(any(not s.success for s in sol))
 
+    def test_incorrect_tol(self):
+        ol = SLB_2011.mg_fe_olivine()
+        wad = SLB_2011.mg_fe_wadsleyite()
+
+        assemblage = burnman.Composite([ol, wad], [0.7, 0.3])
+        ol.set_composition([0.5, 0.5])
+        wad.set_composition([0.6, 0.4])
+
+        assemblage.set_state(10.0e9, 1200.0)
+        equality_constraints = [
+            ("P", 10.0e9),
+            (
+                "phase_composition",
+                (ol, (["Mg_A", "Fe_A"], [0.0, 1.0], [1.0, 1.0], 0.45)),
+            ),
+        ]
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+
+        # These should raise errors
+        with self.assertRaises(AssertionError):
+            _ = equilibrate(
+                composition, assemblage, equality_constraints, tol=[1.0e-3, 1.0e-3]
+            )
+        with self.assertRaises(AssertionError):
+            _ = equilibrate(
+                composition, assemblage, equality_constraints, tol=[[1.0e-3] * 6] * 2
+            )
+
+        # These should work
+        _ = equilibrate(composition, assemblage, equality_constraints, tol=1.0e-3)
+        _ = equilibrate(
+            composition,
+            assemblage,
+            equality_constraints,
+            tol=[1.0e-3] * 6,
+        )
+        _ = equilibrate(composition, assemblage, equality_constraints)
+
 
 if __name__ == "__main__":
     unittest.main()
