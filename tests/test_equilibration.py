@@ -8,6 +8,16 @@ from burnman.minerals import HP_2011_ds62, SLB_2011
 import numpy as np
 
 
+def make_ol_wad_assemblage():
+    ol = SLB_2011.mg_fe_olivine()
+    wad = SLB_2011.mg_fe_wadsleyite()
+
+    assemblage = burnman.Composite([ol, wad], [0.7, 0.3])
+    ol.set_composition([0.5, 0.5])
+    wad.set_composition([0.6, 0.4])
+    return assemblage
+
+
 class equilibration(BurnManTest):
     def test_univariant_line(self):
         andalusite = HP_2011_ds62.andalusite()
@@ -89,13 +99,9 @@ class equilibration(BurnManTest):
         self.assertArraysAlmostEqual(Ps, Ps_ref)
 
     def test_ol_wad_eqm(self):
-        ol = SLB_2011.mg_fe_olivine()
-        wad = SLB_2011.mg_fe_wadsleyite()
-
-        assemblage = burnman.Composite([ol, wad], [0.7, 0.3])
-        ol.set_composition([0.5, 0.5])
-        wad.set_composition([0.6, 0.4])
-
+        assemblage = make_ol_wad_assemblage()
+        ol = assemblage.phases[0]
+        wad = assemblage.phases[1]
         assemblage.set_state(10.0e9, 1200.0)
         equality_constraints = [
             ("P", 10.0e9),
@@ -145,13 +151,8 @@ class equilibration(BurnManTest):
         self.assertFalse(any(not s.success for s in sol))
 
     def test_incorrect_tol(self):
-        ol = SLB_2011.mg_fe_olivine()
-        wad = SLB_2011.mg_fe_wadsleyite()
-
-        assemblage = burnman.Composite([ol, wad], [0.7, 0.3])
-        ol.set_composition([0.5, 0.5])
-        wad.set_composition([0.6, 0.4])
-
+        assemblage = make_ol_wad_assemblage()
+        ol = assemblage.phases[0]
         assemblage.set_state(10.0e9, 1200.0)
         equality_constraints = [
             ("P", 10.0e9),
@@ -181,6 +182,67 @@ class equilibration(BurnManTest):
             tol=[1.0e-3] * 6,
         )
         _ = equilibrate(composition, assemblage, equality_constraints)
+
+    def test_ol_wad_eqm_entropy(self):
+        assemblage = make_ol_wad_assemblage()
+        wad = assemblage.phases[1]
+        equality_constraints = [
+            ("P", 10.0e9),
+            ("phase_fraction", (wad, 0.5)),
+        ]
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+
+        sol, _ = equilibrate(composition, assemblage, equality_constraints)
+        self.assertTrue(sol.success)
+
+        P = assemblage.pressure
+        T = assemblage.temperature
+        S = assemblage.molar_entropy * assemblage.n_moles
+
+        assemblage = make_ol_wad_assemblage()
+        equality_constraints = [("P", P), ("S", S)]
+        sol, _ = equilibrate(composition, assemblage, equality_constraints)
+        self.assertTrue(sol.success)
+        self.assertAlmostEqual(assemblage.temperature, T, places=5)
+
+    def test_ol_wad_eqm_volume(self):
+        assemblage = make_ol_wad_assemblage()
+        wad = assemblage.phases[1]
+        equality_constraints = [
+            ("P", 10.0e9),
+            ("phase_fraction", (wad, 0.5)),
+        ]
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+
+        sol, _ = equilibrate(composition, assemblage, equality_constraints)
+        self.assertTrue(sol.success)
+
+        P = assemblage.pressure
+        T = assemblage.temperature
+        V = assemblage.molar_volume * assemblage.n_moles
+
+        assemblage = make_ol_wad_assemblage()
+        equality_constraints = [("P", P), ("V", V)]
+        sol, _ = equilibrate(composition, assemblage, equality_constraints)
+        self.assertTrue(sol.success)
+        self.assertAlmostEqual(assemblage.temperature, T, places=5)
+
+    def test_ol_wad_eqm_compositional_constraint(self):
+        assemblage = make_ol_wad_assemblage()
+        ol = assemblage.phases[0]
+        wad = assemblage.phases[1]
+        assemblage.set_state(10.0e9, 1200.0)
+        equality_constraints = [
+            ("P", 10.0e9),
+            ("X", [[0.0, 0.0, 0.0, 2.0, 0.0, 0.0], 0.9]),
+        ]
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+
+        _, _ = equilibrate(composition, assemblage, equality_constraints)
+        self.assertArraysAlmostEqual(
+            [assemblage.temperature, ol.molar_fractions[1], wad.molar_fractions[1]],
+            [1620.532183457096, 0.45, 0.6791743],
+        )
 
 
 if __name__ == "__main__":
