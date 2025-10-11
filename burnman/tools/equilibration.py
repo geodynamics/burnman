@@ -631,22 +631,22 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
 
     # Process parameter names
     prm.parameter_names = ["Pressure (Pa)", "Temperature (K)"]
-    prm.default_tolerances = [1.0, 1.0e-3]
+    prm.default_tolerances = [1.0, 1.0e-6]
     for i, n in enumerate(assemblage.endmembers_per_phase):
         prm.parameter_names.append("x({0})".format(assemblage.phases[i].name))
-        prm.default_tolerances.append(1.0e-6)
+        prm.default_tolerances.append(1.0e-9)
         if n > 1:
             p_names = [
                 "p({0} in {1})".format(n, assemblage.phases[i].name)
                 for n in assemblage.phases[i].endmember_names[1:]
             ]
             prm.parameter_names.extend(p_names)
-            prm.default_tolerances.extend([1.0e-6] * len(p_names))
+            prm.default_tolerances.extend([1.0e-9] * len(p_names))
 
     n_free_compositional_vectors = len(free_compositional_vectors)
     for i in range(n_free_compositional_vectors):
         prm.parameter_names.append(f"v_{i}")
-        prm.default_tolerances.append(1.0e-6)
+        prm.default_tolerances.append(1.0e-9)
 
     prm.default_tolerances = np.array(prm.default_tolerances)
 
@@ -1036,6 +1036,10 @@ def equilibrate(
         if sol.success and len(assemblage.reaction_affinities) > 0.0:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.0e-5
             assemblage.equilibrium_tolerance = maxres
+            assert maxres < 10.0, (
+                "Equilibrium not satisfied to high enough precision. "
+                f"Max reaction affinity is {maxres} J/mol. Try reducing tol."
+            )
 
         if store_assemblage:
             sol.assemblage = assemblage.copy()

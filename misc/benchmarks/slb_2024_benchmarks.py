@@ -60,6 +60,7 @@ def check_fper_entropy():
 def check_fig_1_fper_relaxed():
     print("\nChecking Figure 1...")
     fper = SLB_2024.ferropericlase_relaxed()
+    fper_unrelaxed = SLB_2024.ferropericlase()
     c = molar_volume_from_unit_cell_volume(1.0, SLB_2024.periclase().params["Z"])
 
     pressures = np.linspace(1.0e5, 140.0e9, 141)
@@ -80,7 +81,26 @@ def check_fig_1_fper_relaxed():
     ax[3].imshow(fig4, extent=[0.0, 200.0, 0.0, 4000.0], aspect="auto")
 
     for x_fe in [0.1, 0.3, 0.5, 1.0]:
-        fper.set_composition([1.0 - x_fe, x_fe, 0.0, 0.0])
+        # First, we need to equilibrate the system at 1 bar and 1473 K
+        # according to the caption of SLB2024 Figure 1
+        assemblage = Composite([fper_unrelaxed, SLB_2024.gamma_fcc_iron()], [0.5, 0.5])
+        composition = {
+            "Mg": (1.0 - x_fe),
+            "Fe": 1.0,
+            "O": 1.0,
+            "Na": 1.0e-9,
+            "Al": 1.0e-9,
+        }
+        fper_unrelaxed.set_composition(
+            [1.0 - x_fe, x_fe * 0.98, x_fe * 0.01, 0.0, x_fe * 0.01]
+        )
+        equality_constraints = [["P", 1.0e5], ["T", 1473.0]]
+        _, _ = equilibrate(composition, assemblage, equality_constraints)
+        f = fper_unrelaxed.molar_fractions
+        molar_fractions = [f[0], f[1] + f[2], f[3], f[4]]  # combine HS and LS Fe
+
+        # Now use that composition of ferropericlase in the relaxed solution
+        fper.set_composition(molar_fractions)
         Vs, K_Ss = fper.evaluate(["V", "K_S"], pressures, temperatures)
 
         ax[0].plot(pressures / 1.0e9, Vs / c, linestyle=":", linewidth=3.0)
@@ -353,6 +373,7 @@ def check_fig_7_fO2():
     wu = simplify_composite_with_composition(
         Composite([wu]), {"Fe": 1, "O": 1.01}
     ).phases[0]
+    assert len(wu.endmembers) == 3  # check that the simplification worked
 
     hepv = SLB_2024.hepv()
     hppv = SLB_2024.hppv()
@@ -435,17 +456,15 @@ def check_fig_7_fO2():
         T = 1500.0
         for i, P in enumerate(pressures):
             assemblage.set_state(P, T)
-            try:
-                sol = equilibrate(assemblage.formula, assemblage, [["P", P], ["T", T]])[
-                    0
-                ]
-                if sol.success:
-                    mu_O2 = assemblage.chemical_potential([{"O": 2.0}])[0]
-                    O2_gas.set_state(1.0e5, T)
-                    O2_gibbs = O2_gas.gibbs + f
-                    logfO2[i] = (mu_O2 - O2_gibbs) / (gas_constant * T) / np.log(10.0)
-            except AssertionError:
-                pass
+            sol, _ = equilibrate(
+                assemblage.formula, assemblage, [["P", P], ["T", T]], tol=1.0e-10
+            )
+            if sol.success:
+                mu_O2 = sol.assemblage.chemical_potential([{"O": 2.0}])[0]
+                O2_gas.set_state(1.0e5, T)
+                O2_gibbs = O2_gas.gibbs + f
+                logfO2[i] = (mu_O2 - O2_gibbs) / (gas_constant * T) / np.log(10.0)
+
         ax[0].plot(pressures / 1.0e9, logfO2, linestyle=":", linewidth=3.0)
 
     ax[0].set_ylim(-14, 22)
