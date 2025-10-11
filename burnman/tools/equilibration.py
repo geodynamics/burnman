@@ -169,6 +169,38 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     return None
 
 
+def default_F_tolerances(assemblage, equality_constraints, n_atoms):
+    """
+    Returns the default tolerances for each component of F(x).
+    """
+    F_tolerances = np.zeros(assemblage.n_endmembers + len(equality_constraints))
+    i = 0
+    for i, (type_c, _) in enumerate(equality_constraints):
+        if type_c == "P":
+            F_tolerances[i] = 1.0  # Pa
+        elif type_c == "T":
+            F_tolerances[i] = 1.0e-6  # K
+        elif type_c == "S":
+            F_tolerances[i] = 1.0e-8  # J/K
+        elif type_c == "V":
+            # Typical volume of 1 mole of atoms is ~1e-5 m^3
+            # We want a much smaller tolerance than this
+            F_tolerances[i] = 1.0e-11 * n_atoms  # m^3
+        elif type_c == "PT_ellipse":
+            F_tolerances[i] = 1.0e-3  # [no units]
+        elif type_c == "X":
+            F_tolerances[i] = 1.0e-8  # [no units]
+        else:
+            raise Exception("constraint type not recognised")
+    i += 1
+
+    # Next set of tolerances are for reaction affinities (1 J/mol)
+    # and bulk composition (1e-8)
+    F_tolerances[i : i + assemblage.n_reactions] = 1.0
+    F_tolerances[i + assemblage.n_reactions :] = 1.0e-8
+    return F_tolerances
+
+
 def F(
     x,
     assemblage,
@@ -934,7 +966,8 @@ def equilibrate(
         f = 1.0 / float(n_phases)
         assemblage.set_fractions([f for i in range(n_phases)])
 
-    assemblage.n_moles = sum(composition.values()) / sum(assemblage.formula.values())
+    n_atoms = sum(composition.values())
+    assemblage.n_moles = n_atoms / sum(assemblage.formula.values())
 
     n_equality_constraints = len(equality_constraints)
     n_free_compositional_vectors = len(free_compositional_vectors)
@@ -1007,6 +1040,8 @@ def equilibrate(
 
         equality_constraints = [eq_constraint_lists[i][i_c[i]] for i in range(len(nc))]
 
+        F_tol = default_F_tolerances(assemblage, equality_constraints, n_atoms)
+
         # Set the initial fractions and compositions
         # of the phases in the assemblage:
         sol = damped_newton_solve(
@@ -1029,6 +1064,7 @@ def equilibrate(
             guess=parameters,
             linear_constraints=(prm.constraint_matrix, prm.constraint_vector),
             tol=tol,
+            F_tol=F_tol,
             store_iterates=store_iterates,
             max_iterations=max_iterations,
         )
@@ -1036,10 +1072,6 @@ def equilibrate(
         if sol.success and len(assemblage.reaction_affinities) > 0.0:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.0e-5
             assemblage.equilibrium_tolerance = maxres
-            assert maxres < 10.0, (
-                "Equilibrium not satisfied to high enough precision. "
-                f"Max reaction affinity is {maxres} J/mol. Try reducing tol."
-            )
 
         if store_assemblage:
             sol.assemblage = assemblage.copy()
