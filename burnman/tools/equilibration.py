@@ -352,7 +352,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
                 -assemblage.n_moles
                 * assemblage.molar_volume
                 / assemblage.isothermal_bulk_modulus_reuss,
-                assemblage.n_moles * assemblage.molar_volume,
+                assemblage.n_moles * assemblage.molar_volume * assemblage.alpha,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
