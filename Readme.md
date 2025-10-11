@@ -53,7 +53,7 @@ If you use BurnMan in your work, we ask that you cite the following publications
     
 ## Installation requirements
 
-* Python 3.8+
+* Python 3.10+
 * Python modules:
   NumPy, SciPy, SymPy, Matplotlib
 
