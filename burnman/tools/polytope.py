@@ -174,6 +174,19 @@ def composite_polytope_at_constrained_composition(
     return MaterialPolytope(equalities, inequalities, return_fractions=return_fractions)
 
 
+def reorder_to_echelon(A):
+    """
+    Reorders the rows of a matrix A so that it is in echelon form.
+    :param A: The input matrix.
+    :type A: 2D numpy array
+    :returns: The reordered matrix.
+    :rtype: 2D numpy array
+    """
+    A = np.array(A, dtype=float)
+    pivot_cols = [np.argmax(r != 0) if np.any(r != 0) else np.inf for r in A]
+    return A[np.argsort(pivot_cols)]
+
+
 def simplify_composite_with_composition(composite, composition):
     """
     Takes a composite and a composition, and returns the simplest composite
@@ -248,6 +261,11 @@ def simplify_composite_with_composition(composite, composition):
                     )
 
                     composite_changed = True
+
+                    # Try to preserve the order of endmembers
+                    # in the original solution model
+                    # by reordering rows of the new_basis matrix
+                    new_basis = reorder_to_echelon(new_basis)
 
                     # If the composition is set and
                     # consistent with the new basis,
