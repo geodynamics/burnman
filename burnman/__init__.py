@@ -81,7 +81,7 @@ Structure
 Requirements
 ------------
 
-  - Python 3.8+
+  - Python 3.10+
   - Python modules: NumPy, SciPy, SymPy, Sparse, Matplotlib
 
 Optional modules
