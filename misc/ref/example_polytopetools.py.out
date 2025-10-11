@@ -31,7 +31,7 @@ The complete set of endmembers expressed as proportions of the independent endme
 [[ 1. -0. -0. -0.]
  [ 0.  1. -0.  0.]
  [-0.  0.  1. -0.]
- [-0.  0.  0.  1.]
+ [-0. -0. -0.  1.]
  [-1.  2.  2. -2.]]
 
 We can also create a polytope using the site-species occupancies of a set of independent endmembers of a solution. Here we do this for the garnet solid solution provided in the Stixrude and Lithgow-Bertelloni database.
@@ -42,13 +42,13 @@ Ca3Al2Si3O12
 Mg4Si4O12
 Na2Al2Si4O12
 Endmembers as independent endmember amounts:
-[[-0. -0. -0.  1.  0.]
+[[ 0. -0.  0.  1. -0.]
  [ 1.  0.  0.  0.  0.]
- [ 0.  1.  0. -0. -0.]
+ [-0.  1. -0.  0. -0.]
  [-1.  1.  0.  1. -0.]
- [ 0.  0.  1. -0.  0.]
- [-1. -0.  1.  1.  0.]
- [ 0. -0. -0.  0.  1.]]
+ [ 0. -0.  1.  0.  0.]
+ [-1. -0.  1.  1. -0.]
+ [ 0. -0.  0. -0.  1.]]
 Site occupancies for all endmembers:
 [Mg]3[Mg][Si]
 [Mg]3[Al][Al]
@@ -72,7 +72,7 @@ Which led to the following extreme vertices satifying the bulk compositional con
  [0 0 0 5/2 0 4 1]]
 
 The new assemblage has fewer endmembers, with compositions:
-['Mg4Si4O12', 'MgFe3Si4O12', 'Mg2SiO4', 'Fe2SiO4']
+['MgFe3Si4O12', 'Mg4Si4O12', 'Mg2SiO4', 'Fe2SiO4']
 The same vertices now look like this:
-[[11/6 2/3 5 0]
- [5/2 0 4 1]]
+[[2/3 11/6 5 0]
+ [0 5/2 4 1]]

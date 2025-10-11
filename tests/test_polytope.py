@@ -6,7 +6,7 @@ from fractions import Fraction
 import importlib
 
 from burnman import Composite
-from burnman.minerals import SLB_2011, JH_2015
+from burnman.minerals import SLB_2011, SLB_2024, JH_2015
 from burnman.tools.polytope import solution_polytope_from_charge_balance
 from burnman.tools.polytope import solution_polytope_from_endmember_occupancies
 from burnman.tools.polytope import simplify_composite_with_composition
@@ -134,6 +134,15 @@ class polytope(BurnManTest):
             self.assertTrue(type(poly.raw_vertices[0][0]) is Fraction)
         except ImportError:
             self.assertTrue(type(poly.raw_vertices[0][0]) is float)
+
+    def test_simplified_composite_endmember_order(self):
+        wu = SLB_2024.ferropericlase()
+        wu.set_composition([0.0, 0.97, 0.005, 0.0, 0.025])
+        wu = simplify_composite_with_composition(
+            Composite([wu]), {"Fe": 1, "O": 1.01}
+        ).phases[0]
+        self.assertTrue(len(wu.endmembers) == 3)
+        self.assertArraysAlmostEqual(wu.molar_fractions, [0.97, 0.005, 0.025])
 
 
 if __name__ == "__main__":

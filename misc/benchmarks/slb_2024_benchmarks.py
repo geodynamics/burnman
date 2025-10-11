@@ -451,19 +451,21 @@ def check_fig_7_fO2():
     ax[0].imshow(fig1, extent=[0, 100.0, -14.0, 22.0], aspect="auto")
 
     for i, assemblage in enumerate([a1, a2, a3, a4, a5, a6, a7, a8, a9]):
+        wu.set_composition([0.8, 0.005, 0.195])
         pressures = np.linspace(P_bounds[i][0], P_bounds[i][1], 11)
         logfO2 = np.empty_like(pressures) * np.nan
         T = 1500.0
         for i, P in enumerate(pressures):
             assemblage.set_state(P, T)
-            sol, _ = equilibrate(
-                assemblage.formula, assemblage, [["P", P], ["T", T]], tol=1.0e-10
-            )
+            sol, _ = equilibrate(assemblage.formula, assemblage, [["P", P], ["T", T]])
             if sol.success:
                 mu_O2 = sol.assemblage.chemical_potential([{"O": 2.0}])[0]
                 O2_gas.set_state(1.0e5, T)
                 O2_gibbs = O2_gas.gibbs + f
                 logfO2[i] = (mu_O2 - O2_gibbs) / (gas_constant * T) / np.log(10.0)
+            else:
+                print(assemblage)
+                print(sol)
 
         ax[0].plot(pressures / 1.0e9, logfO2, linestyle=":", linewidth=3.0)
 

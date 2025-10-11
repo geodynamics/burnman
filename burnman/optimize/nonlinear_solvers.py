@@ -3,8 +3,82 @@ import numpy as np
 import numpy.typing as npt
 from typing import Any
 from scipy.linalg import lu_factor, lu_solve
-from types import SimpleNamespace
 from collections import namedtuple
+from types import SimpleNamespace
+
+
+class Solution:
+    """
+    Container for the results of a nonlinear solver.
+    Attributes:
+        - x: Final solution vector.
+        - n_it: Number of iterations performed.
+        - F: Function evaluation at the solution, F(x).
+        - F_norm: Euclidean (L2) norm of F(x).
+        - J: Jacobian matrix at the solution, J(x).
+        - code: Exit status code (0=success, >0=failure).
+        - text: Description of the exit status.
+        - success: Boolean indicating whether the solver converged.
+        - iterates: Object storing all intermediate iterates, function evaluations,
+            and lambda values (if enabled).
+    """
+
+    def __init__(
+        self,
+        x=None,
+        n_it=None,
+        F=None,
+        F_norm=None,
+        J=None,
+        code=None,
+        text=None,
+        success=False,
+        iterates=None,
+    ):
+        self.x = x
+        self.n_it = n_it
+        self.F = F
+        self.F_norm = F_norm
+        self.J = J
+        self.code = code
+        self.text = text
+        self.success = success
+
+        if iterates is None:
+            self.iterates = Iterates()
+        else:
+            self.iterates = iterates
+
+    def __repr__(self):
+        s = f"{self.text}\n"
+        s += f"x = {self.x}\n"
+        s += f"F = {self.F}\n"
+        s += f"F_norm = {self.F_norm}\n"
+        s += f"J = {self.J}\n"
+        if len(self.iterates.x) > 0:
+            s += f"{self.iterates}"
+        return s
+
+    def __str__(self):
+        return self.__repr__()
+
+
+class Iterates:
+    def __init__(self):
+        self.x = []
+        self.F = []
+        self.lmda = []
+
+    def append(self, x, F, lmda):
+        self.x.append(x)
+        self.F.append(F)
+        self.lmda.append(lmda)
+
+    def __repr__(self):
+        s = "Iterates:\n"
+        for i in range(len(self.x)):
+            s += f"Iter {i}: x={self.x[i]}, F={self.F[i]}, lmda={self.lmda[i]}\n"
+        return s
 
 
 class DampedNewtonSolver:
@@ -46,7 +120,8 @@ class DampedNewtonSolver:
         F,
         J,
         guess,
-        tol: float = 1.0e-6,
+        tol: float | npt.NDArray = 1.0e-6,
+        F_tol: float | npt.NDArray = 1.0e-8,
         max_iterations: int = 100,
         lambda_bounds=lambda dx, x: (1.0e-8, 1.0),
         linear_constraints=(0.0, np.array([-1.0])),
@@ -69,8 +144,13 @@ class DampedNewtonSolver:
         :param guess: Initial guess for the solution vector x.
         :type guess: np.ndarray
 
-        :param tol: Convergence tolerance for Newton iterations, defaults to 1.0e-6.
-        :type tol: float, optional
+        :param tol: Convergence tolerance for each component of the
+            Newton step dx, defaults to 1.0e-6.
+        :type tol: float, or numpy.ndarray, optional
+
+        :param F_tol: Convergence tolerance for each component of F(x),
+            defaults to 1.0e-8.
+        :type F_tol: float, or numpy.ndarray, optional
 
         :param max_iterations: Maximum number of Newton iterations to perform,
             defaults to 100.
@@ -105,6 +185,7 @@ class DampedNewtonSolver:
         self.J = J
         self.guess = guess
         self.tol = tol
+        self.F_tol = F_tol
         self.max_iterations = max_iterations
         self.lambda_bounds = lambda_bounds
         self.linear_constraints = linear_constraints
@@ -533,7 +614,7 @@ class DampedNewtonSolver:
             return False, 3, f"The solver reached max_iterations ({max_iterations})"
         raise Exception("Unknown termination of solver")
 
-    def solve(self) -> SimpleNamespace:
+    def solve(self) -> Solution:
         """
         Execute the damped Newton solver to find a root of F(x) = 0,
         optionally subject to linear inequality constraints A·x + b <= 0.
@@ -564,17 +645,14 @@ class DampedNewtonSolver:
                 * **F** (list[np.ndarray]) -- Function evaluation for each iteration.
                 * **lmda** (list[float]) -- Step length scaling factor for each iteration.
 
-        :rtype: SimpleNamespace
+        :rtype: Solution instance
         """
-        sol = namedtuple(
-            "Solution", ["x", "n_it", "F", "F_norm", "J", "code", "text", "success"]
-        )
+        sol = Solution()
         sol.x = self.guess
         sol.F = self.F(sol.x)
 
         if self.store_iterates:
-            sol.iterates = namedtuple("iterates", ["x", "F", "lmda"])
-            sol.iterates.x, sol.iterates.F, sol.iterates.lmda = [sol.x], [sol.F], [0.0]
+            sol.iterates.append(sol.x, sol.F, 0.0)
 
         lmda, dxprev, dxbar = 0.0, [1.0], [1.0]
         sol.n_it = 0
@@ -632,6 +710,11 @@ class DampedNewtonSolver:
             dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
             converged = self._check_convergence(dxbar_j, dx, lmda, lmda_bounds)
+
+            # Additional convergence check on F(x)
+            if converged and not all(np.abs(F_j) < self.F_tol):
+                converged = False
+
             require_posteriori_loop = not converged
 
             loop_vars = self._posteriori_loop(
@@ -655,9 +738,7 @@ class DampedNewtonSolver:
 
             sol.n_it += 1
             if self.store_iterates:
-                sol.iterates.x.append(sol.x)
-                sol.iterates.F.append(sol.F)
-                sol.iterates.lmda.append(lmda)
+                sol.iterates.append(sol.x, sol.F, lmda)
 
         # Final adjustment for constraints
         if converged and not persistent_bound_violation:
@@ -668,10 +749,6 @@ class DampedNewtonSolver:
         sol.F = self.F(sol.x)
         sol.F_norm = np.linalg.norm(sol.F, ord=2)
         sol.J = self.J(sol.x)
-
-        if self.store_iterates:
-            sol.iterates.x = np.array(sol.iterates.x)
-            sol.iterates.F = np.array(sol.iterates.F)
 
         sol.success, sol.code, sol.text = self._termination_info(
             converged,
@@ -689,7 +766,8 @@ def damped_newton_solve(
     F,
     J,
     guess,
-    tol: float = 1.0e-6,
+    tol: float | npt.NDArray = 1.0e-6,
+    F_tol: float | npt.NDArray = 1.0e-8,
     max_iterations: int = 100,
     lambda_bounds=lambda dx, x: (1.0e-8, 1.0),
     linear_constraints=(0.0, np.array([-1.0])),
@@ -737,6 +815,7 @@ def damped_newton_solve(
         J,
         guess,
         tol,
+        F_tol,
         max_iterations,
         lambda_bounds,
         linear_constraints,
