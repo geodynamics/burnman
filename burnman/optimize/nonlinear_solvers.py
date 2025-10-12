@@ -129,6 +129,7 @@ class DampedNewtonSolver:
         regularization: float = 0.0,
         cond_lu_thresh: float = 1e12,
         cond_lstsq_thresh: float = 1e15,
+        constraint_thresh: float = 1.0e-8,
     ):
         """
         Initialize the solver instance.
@@ -180,12 +181,17 @@ class DampedNewtonSolver:
         :param cond_lstsq_thresh: Condition number threshold below which
             least-squares fallback is considered stable, defaults to 1e15.
         :type cond_lstsq_thresh: float, optional
+
+        :param constraint_thresh: Threshold for considering a constraint
+            "active" when determining step feasibility, defaults to 1.0e-8.
+        :type constraint_thresh: float, optional
         """
         self.F = F
         self.J = J
         self.guess = guess
         self.tol = tol
         self.F_tol = F_tol
+        self.constraint_thresh = constraint_thresh
         self.max_iterations = max_iterations
         self.lambda_bounds = lambda_bounds
         self.linear_constraints = linear_constraints
@@ -408,10 +414,10 @@ class DampedNewtonSolver:
         :rtype: tuple[float, np.ndarray, np.ndarray, bool]
         """
         active_constraint_indices = [
-            i for i, vc in violated_constraints if vc < self.eps
+            i for i, vc in violated_constraints if vc < self.constraint_thresh
         ]
         inactive_constraint_indices = [
-            i for i, vc in violated_constraints if vc >= self.eps
+            i for i, vc in violated_constraints if vc >= self.constraint_thresh
         ]
         c_newton = self._constraints(sol.x + dx)[active_constraint_indices]
         c_A = self.linear_constraints[0][active_constraint_indices]
