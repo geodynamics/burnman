@@ -127,6 +127,7 @@ jupyter kernelspec list
 echo ""
 
 cd tutorial
+$PYTHON --version
 for tutorial_notebook in `ls tutorial*.ipynb`
 do
   tutorial_script="${tutorial_notebook%%.*}.py"
@@ -140,6 +141,7 @@ echo ""
 
 echo "*** checking examples/ ..."
 cd examples
+$PYTHON --version
 for test in `ls example*.py`
 do
     [ $test == "example_inv_murakami.py" ] && echo "  *** skipping $test !" && continue
@@ -153,7 +155,7 @@ echo ""
 
 echo "*** checking misc/ ..."
 cd misc
-
+$PYTHON --version
 for test in `ls *.py`
 do
     [ $test == "burnman_path.py" ] && continue
@@ -167,6 +169,7 @@ echo ""
 
 echo "*** checking misc/benchmarks/ ..."
 cd benchmarks
+$PYTHON --version
 for test in `ls *.py`
 do
     [ $test == "burnman_path.py" ] && continue
@@ -178,6 +181,7 @@ echo ""
 
 echo "*** checking contrib/cider_tutorial_2014/ ..."
 cd contrib/cider_tutorial_2014/
+$PYTHON --version
 for test in `ls step*.py`
 do
     testit $test $fulldir || exit 1
@@ -187,6 +191,7 @@ echo ""
 
 echo "*** checking contrib/CHRU2014/ ..."
 cd contrib/CHRU2014
+$PYTHON --version
 for test in `ls *.py`
 do
     [ $test == "helper_solid_solution.py" ] && echo "  *** skipping $test !" && continue
@@ -197,6 +202,7 @@ echo ""
 
 echo "*** checking contrib/solution_polytope/ ..."
 cd contrib/solution_polytope/
+$PYTHON --version
 testit create_polytope_paper_tables.py $fulldir || exit 1
 testit example_solution_creation_and_manipulation.py $fulldir || exit 1
 cd ../..
@@ -204,6 +210,7 @@ echo ""
 
 echo "*** checking contrib/perplex/ ..."
 cd contrib/perplex/
+$PYTHON --version
 ./download_and_install_perplex.sh
 rm -fr iron_olivine_lo_res
 testit create_lo_res_table.py $fulldir || exit 1
