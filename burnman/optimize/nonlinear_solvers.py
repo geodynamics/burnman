@@ -129,7 +129,7 @@ class DampedNewtonSolver:
         regularization: float = 0.0,
         cond_lu_thresh: float = 1e12,
         cond_lstsq_thresh: float = 1e15,
-        constraint_thresh: float = 1.0e-8,
+        constraint_thresh: float = 2 * np.finfo(float).eps,
     ):
         """
         Initialize the solver instance.
@@ -183,7 +183,7 @@ class DampedNewtonSolver:
         :type cond_lstsq_thresh: float, optional
 
         :param constraint_thresh: Threshold for considering a constraint
-            "active" when determining step feasibility, defaults to 1.0e-8.
+            "active" when determining step feasibility, defaults to 2*eps.
         :type constraint_thresh: float, optional
         """
         self.F = F

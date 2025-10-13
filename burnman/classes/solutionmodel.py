@@ -12,6 +12,8 @@ import warnings
 from .material import material_property, cached_property
 from dataclasses import make_dataclass
 
+np_eps = np.finfo(float).eps
+
 Interaction = make_dataclass(
     "Interaction", ["inds", "expts", "f_r", "m_jr", "f_rs", "m_jrs"]
 )
@@ -104,7 +106,7 @@ def _non_ideal_interactions_subreg(p, n_endmembers, Wijk):
     return Wint
 
 
-def logish(x, eps=1.0e-7):
+def logish(x, eps=np_eps):
     """
     2nd order series expansion of log(x) about eps:
     log(eps) - sum_k=1^infty (f_eps)^k / k
@@ -117,7 +119,7 @@ def logish(x, eps=1.0e-7):
     return ln
 
 
-def inverseish(x, eps=1.0e-5):
+def inverseish(x, eps=np_eps):
     """
     1st order series expansion of 1/x about eps: 2/eps - x/eps/eps
     Prevents infinities at x=0
