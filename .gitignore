@@ -1,3 +1,9 @@
+.DS_Store
+.coverage
+coverage.*
+.python-version
+.vscode
+/burnman/data/*
 /contrib/tutorial/uncertainty.dat
 /misc/*.pdf
 /sphinx/*.pdf
@@ -6,6 +12,10 @@
 /build/*
 *.tmp
 *.pyc
-/contrib/perplex/perplex-installer
-/contrib/perplex/iron_olivine_lo_res
-/contrib/perplex/ASPECT_1D_isentrope_properties.txt
+/contrib/*
+examples/axisem_lowermantle_chondritic.txt
+examples/axisem_lowermantle_pyrolite.txt
+examples/fo90_SLB2011_phase_diagram.pdf
+examples/fo90_SLB2022_phase_diagram.pdf
+examples/mineos_lowermantle_chondritic.txt
+examples/mineos_lowermantle_pyrolite.txt
