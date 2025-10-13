@@ -27,6 +27,9 @@ class.
   compositional, thermodynamic and thermoelastic properties.
 * How to use the stoichiometric and reaction affinity methods to solve
   simple thermodynamic equilibrium problems.
+
+Please see example_equilibrate.py for more advanced (and user-friendly)
+examples of equilibration of a composite material.
 """
 
 import numpy as np
@@ -35,6 +38,7 @@ import matplotlib.pyplot as plt
 
 
 import burnman
+from burnman import equilibrate
 from burnman import minerals
 
 
@@ -213,19 +217,20 @@ if __name__ == "__main__":
 
     # Now solve for the equilibrium state at a range of pressures
     # less than the univariant pressure
-    def delta_affinity_two_binaries_x_Fe_ol_wad(x, P, T):
-        x_fe_ol, x_fe_wad = x
-        rock.set_state(P, T)
-        ol.set_composition([1.0 - x_fe_ol, x_fe_ol])
-        wad.set_composition([1.0 - x_fe_wad, x_fe_wad])
-        return rock.reaction_affinities
-
     pressures = np.linspace(10.0e9, fo_mwd.pressure, 21)
-    x_fe_ols = np.zeros_like(pressures)
-    x_fe_wads = np.zeros_like(pressures)
-    for i, P in enumerate(pressures[:-1]):
-        sol = fsolve(delta_affinity_two_binaries_x_Fe_ol_wad, [0.1, 0.1], args=(P, T))
-        x_fe_ols[i], x_fe_wads[i] = sol
+    free_compositional_vectors = [{"Mg": 1.0, "Fe": -1.0}]
+    composition = {"Mg": 1.8, "Fe": 0.2, "Si": 1.0, "O": 4.0}
+    equality_constraints = [["P", pressures], ["T", T], ["phase_fraction", [ol, 0.5]]]
+    sol, prm = equilibrate(
+        composition, rock, equality_constraints, free_compositional_vectors
+    )
+
+    x_fe_ols = np.array(
+        [s.assemblage.phases[0].molar_fractions[1] if s.success else 0 for s in sol]
+    )
+    x_fe_wads = np.array(
+        [s.assemblage.phases[1].molar_fractions[1] if s.success else 0 for s in sol]
+    )
 
     # Pretty-print the results
     print(f"Olivine-wadsleyite equilibria at {T} K:")
