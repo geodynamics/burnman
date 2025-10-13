@@ -240,19 +240,19 @@ if __name__ == "__main__" and run_gt_solvus:
 
     # Run the equilibration
     pressure = 1.0e5
-    temperatures = np.linspace(300.0, 601.4, 41)
+    temperatures = np.linspace(300.0, 601.0, 41)
     equality_constraints = [("P", pressure), ("T", temperatures)]
 
     sols, prm = equilibrate(composition, assemblage, equality_constraints)
 
     # Interrogate the stable assemblages for phase compositions.
     x1s = np.array(
-        [sol.assemblage.phases[0].molar_fractions[1] for sol in sols if sol.code == 0]
+        [sol.assemblage.phases[0].molar_fractions[1] for sol in sols if sol.success]
     )
     x2s = np.array(
-        [sol.assemblage.phases[1].molar_fractions[1] for sol in sols if sol.code == 0]
+        [sol.assemblage.phases[1].molar_fractions[1] for sol in sols if sol.success]
     )
-    Ts = np.array([sol.assemblage.temperature for sol in sols if sol.code == 0])
+    Ts = np.array([sol.assemblage.temperature for sol in sols if sol.success])
 
     plt.plot(x1s, Ts)
     plt.plot(x2s, Ts)
