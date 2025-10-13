@@ -444,12 +444,16 @@ class DampedNewtonSolver:
         x_j = sol.x + lmda * dx
 
         # Check feasibility
-        x_j_min = sol.x + lmda_bounds_new[0] * dx
-        F_j_min = self.F(x_j_min)
-        dxbar_j_min = lu_solve(luJ, -F_j_min)
-        dxbar_j_min_norm = np.linalg.norm(dxbar_j_min, ord=2)
+        try:
+            x_j_min = sol.x + lmda_bounds_new[0] * dx
+            F_j_min = self.F(x_j_min)
+            dxbar_j_min = lu_solve(luJ, -F_j_min)
+            dxbar_j_min_norm = np.linalg.norm(dxbar_j_min, ord=2)
 
-        if dxbar_j_min_norm > dx_norm or np.linalg.norm(dx, ord=2) < self.eps:
+            if dxbar_j_min_norm > dx_norm or np.linalg.norm(dx, ord=2) < self.eps:
+                persistent_bound_violation = True
+        except Exception:
+            # For example, if self.F(x_j_min) fails
             persistent_bound_violation = True
 
         # Check newly violated inactive constraints

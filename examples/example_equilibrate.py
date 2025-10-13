@@ -240,7 +240,7 @@ if __name__ == "__main__" and run_gt_solvus:
 
     # Run the equilibration
     pressure = 1.0e5
-    temperatures = np.linspace(300.0, 601.0, 41)
+    temperatures = np.linspace(300.0, 601.4, 301)
     equality_constraints = [("P", pressure), ("T", temperatures)]
 
     sols, prm = equilibrate(composition, assemblage, equality_constraints)
