@@ -244,6 +244,46 @@ class equilibration(BurnManTest):
             [1620.532183457096, 0.45, 0.6791743],
         )
 
+    def test_convergence_with_singular_system(self):
+
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+        a = burnman.Composite(
+            [SLB_2011.mg_fe_olivine(), SLB_2011.mg_fe_olivine()], [0.5, 0.5]
+        )
+
+        a.phases[0].set_composition([0.1, 0.9])
+        a.phases[1].set_composition([0.9, 0.1])
+        equality_constraints = [("P", 1.0e5), ("T", 1000.0)]
+        sol, _ = equilibrate(composition, a, equality_constraints)
+        self.assertTrue(sol.success)  # Expect successful convergence
+        self.assertTrue(sol.code == 5)  # Expect singular system at solution
+
+    def test_ill_posed_problem(self):
+
+        composition = {"Mg": 1.8, "Fe": 0.2, "Si": 1.0, "O": 4.0}
+        a = burnman.Composite(
+            [SLB_2011.mg_fe_olivine(), SLB_2011.mg_fe_olivine()], [0.5, 0.5]
+        )
+
+        a.phases[0].set_composition([0.4, 0.6])
+        a.phases[1].set_composition([0.5, 0.5])
+        equality_constraints = [("P", 1.0e5), ("T", 300.0)]
+        sol, _ = equilibrate(composition, a, equality_constraints)
+        self.assertTrue(sol.code == 2)  # Expect problem to leave the feasible region
+
+    def test_ill_conditioned_jacobian(self):
+
+        composition = {"Mg": 1.8, "Fe": 0.2, "Si": 1.0, "O": 4.0}
+        a = burnman.Composite(
+            [SLB_2011.mg_fe_olivine(), SLB_2011.mg_fe_olivine()], [0.5, 0.5]
+        )
+
+        a.phases[0].set_composition([0.4, 0.6])
+        a.phases[1].set_composition([0.4, 0.6])
+        equality_constraints = [("P", 1.0e5), ("T", 300.0)]
+        sol, _ = equilibrate(composition, a, equality_constraints)
+        self.assertTrue(sol.code == 4)  # Expect singular system
+
 
 if __name__ == "__main__":
     unittest.main()

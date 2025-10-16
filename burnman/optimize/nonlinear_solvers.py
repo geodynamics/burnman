@@ -3,7 +3,6 @@ import numpy as np
 import numpy.typing as npt
 from typing import Any
 from scipy.linalg import lu_factor, lu_solve
-from collections import namedtuple
 from types import SimpleNamespace
 
 
@@ -200,6 +199,7 @@ class DampedNewtonSolver:
         self.cond_lu_thresh = cond_lu_thresh
         self.cond_lstsq_thresh = cond_lstsq_thresh
         self.eps = 2.0 * np.finfo(float).eps
+        self.max_condition_number = 1.0 / np.finfo(float).eps
 
         assert np.all(
             self._constraints(self.guess) < self.eps
@@ -222,8 +222,12 @@ class DampedNewtonSolver:
         h: npt.NDArray[np.float64],
         lmda_bounds: tuple[float, float],
     ) -> float:
-        assert lmda_bounds[1] < 1.0 + self.eps
-        assert lmda_bounds[0] > 1.0e-8 - self.eps
+        assert (
+            lmda_bounds[1] < 1.0 + self.eps
+        ), f"max_lambda must be <= 1.0, got {lmda_bounds[1]}"
+        assert (
+            lmda_bounds[0] > 1.0e-8 - self.eps
+        ), f"min_lambda must be > 1.0e-8, got {lmda_bounds[0]}"
 
         lmda_j = min(1.0 / (h + self.eps), lmda_bounds[1])
         return max(lmda_j, lmda_bounds[0])
@@ -598,8 +602,10 @@ class DampedNewtonSolver:
         n_it: int,
         max_iterations: int,
         violated_constraints: list[int],
+        condition_number: float,
     ) -> tuple[int, str, bool]:
-        if converged:
+        singular_jacobian = condition_number > self.max_condition_number
+        if converged and not singular_jacobian:
             return (
                 True,
                 0,
@@ -611,7 +617,7 @@ class DampedNewtonSolver:
                 1,
                 f"The function is too non-linear for lower lambda bound ({lmda_bounds[0]})",
             )
-        if persistent_bound_violation:
+        if persistent_bound_violation and not singular_jacobian:
             return (
                 False,
                 2,
@@ -622,6 +628,30 @@ class DampedNewtonSolver:
             )
         if n_it == max_iterations:
             return False, 3, f"The solver reached max_iterations ({max_iterations})"
+        if singular_jacobian and not converged:
+            return (
+                False,
+                4,
+                (
+                    f"The system was effectively singular (cond={condition_number:.2e}) "
+                    f"and tried to leave the feasible region at iteration {n_it} by "
+                    "crossing the constraints with the following indices: "
+                    f"{[i for i, lmda in violated_constraints]}.\n"
+                    "You may want to try a different initial guess "
+                    "or check the Jacobian implementation. "
+                    "It may be that the problem is ill-posed."
+                ),
+            )
+        if singular_jacobian and converged:
+            return (
+                True,
+                5,
+                (
+                    f"The solver successfully found a root after {n_it} iterations,"
+                    f"but the system is effectively singular (cond={condition_number:.2e}). "
+                    "You should check the problem formulation before trusting this result."
+                ),
+            )
         raise Exception("Unknown termination of solver")
 
     def solve(self) -> Solution:
@@ -645,10 +675,12 @@ class DampedNewtonSolver:
                 * 1 -- Failure: lambda reached its minimum bound
                 * 2 -- Failure: descent direction violates constraints
                 * 3 -- Failure: maximum iterations reached
+                * 4 -- Failure: singular system and violated constraints
+                * 5 -- Successful convergence but singular system
 
             * **text** (str) -- Human-readable termination description.
             * **n_it** (int) -- Number of Newton iterations performed.
-            * **iterates** (namedtuple, optional) -- Present if
+            * **iterates** (Iterates instance, optional) -- Present if
               ``store_iterates=True``. Contains iteration history:
 
                 * **x** (list[np.ndarray]) -- Solution for each iteration.
@@ -676,9 +708,15 @@ class DampedNewtonSolver:
             and not converged
         ):
             sol.J = self.J(sol.x)
+            condition_number = np.linalg.cond(sol.J)
             luJ = lu_factor(sol.J)
             dx = lu_solve(luJ, -sol.F)
             dx_norm = np.linalg.norm(dx, ord=2)
+
+            is_singular = condition_number > self.max_condition_number
+            if is_singular and any(np.isnan(dx)):
+                lmda_bounds = [0.0, 0.0]
+                break
 
             lmda_bounds = self.lambda_bounds(dx, sol.x)
             h = (
@@ -710,7 +748,6 @@ class DampedNewtonSolver:
             F_j = self.F(x_j)
 
             # Regularise ill-conditioned Jacobian
-            condition_number = np.linalg.cond(sol.J)
             if condition_number < self.cond_lu_thresh:
                 dxbar_j = lu_solve(luJ, -F_j)
             else:
@@ -751,14 +788,16 @@ class DampedNewtonSolver:
                 sol.iterates.append(sol.x, sol.F, lmda)
 
         # Final adjustment for constraints
-        if converged and not persistent_bound_violation:
-            sol.x = x_j + dxbar_j
-            if not np.all(self._constraints(sol.x) <= 0.0):
-                sol.x -= dxbar_j
+        if condition_number < self.max_condition_number:
+            if converged and not persistent_bound_violation:
+                sol.x = x_j + dxbar_j
+                if not np.all(self._constraints(sol.x) <= 0.0):
+                    sol.x -= dxbar_j
 
-        sol.F = self.F(sol.x)
-        sol.F_norm = np.linalg.norm(sol.F, ord=2)
-        sol.J = self.J(sol.x)
+            sol.F = self.F(sol.x)
+            sol.F_norm = np.linalg.norm(sol.F, ord=2)
+            sol.J = self.J(sol.x)
+            condition_number = np.linalg.cond(sol.J)
 
         sol.success, sol.code, sol.text = self._termination_info(
             converged,
@@ -768,6 +807,7 @@ class DampedNewtonSolver:
             sol.n_it,
             self.max_iterations,
             locals().get("violated_constraints", []),
+            condition_number,
         )
         return sol
 
