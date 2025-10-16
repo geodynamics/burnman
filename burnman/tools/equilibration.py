@@ -498,10 +498,12 @@ def lambda_bounds(dx, x, endmembers_per_phase):
         ]
     )
     if np.isnan(max_lmda):
-        raise ValueError("NaN in lambda bounds calculation.\n"
-                         f"dx: {dx}\n"
-                         f"x: {x}\n"
-                         f"endmembers_per_phase: {endmembers_per_phase}.")
+        raise ValueError(
+            "NaN in lambda bounds calculation.\n"
+            f"dx: {dx}\n"
+            f"x: {x}\n"
+            f"endmembers_per_phase: {endmembers_per_phase}."
+        )
     return (1.0e-8, max_lmda)
 
 

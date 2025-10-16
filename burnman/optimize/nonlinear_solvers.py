@@ -708,9 +708,15 @@ class DampedNewtonSolver:
             and not converged
         ):
             sol.J = self.J(sol.x)
+            condition_number = np.linalg.cond(sol.J)
             luJ = lu_factor(sol.J)
             dx = lu_solve(luJ, -sol.F)
             dx_norm = np.linalg.norm(dx, ord=2)
+
+            is_singular = condition_number > self.max_condition_number
+            if is_singular and any(np.isnan(dx)):
+                lmda_bounds = [0.0, 0.0]
+                break
 
             lmda_bounds = self.lambda_bounds(dx, sol.x)
             h = (
@@ -742,7 +748,6 @@ class DampedNewtonSolver:
             F_j = self.F(x_j)
 
             # Regularise ill-conditioned Jacobian
-            condition_number = np.linalg.cond(sol.J)
             if condition_number < self.cond_lu_thresh:
                 dxbar_j = lu_solve(luJ, -F_j)
             else:
