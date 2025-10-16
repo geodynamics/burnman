@@ -125,7 +125,7 @@ class DampedNewtonSolver:
         lambda_bounds=lambda dx, x: (1.0e-8, 1.0),
         linear_constraints=(0.0, np.array([-1.0])),
         store_iterates: bool = False,
-        regularization: float = 0.0,
+        regularization: float = np.finfo(float).eps,
         cond_lu_thresh: float = 1e12,
         cond_lstsq_thresh: float = 1e15,
         constraint_thresh: float = 2 * np.finfo(float).eps,
@@ -169,8 +169,12 @@ class DampedNewtonSolver:
             evaluations, and lambda values in the solution object, defaults to False.
         :type store_iterates: bool, optional
 
-        :param regularization: Regularization parameter for the KKT system
-            in Lagrangian solves, defaults to 0.0.
+        :param regularization: Regularization parameter for the Jacobian.
+            This parameter scales a diagonal matrix, which is added to the Jacobian
+            when its condition number exceeds cond_lu_thresh,
+            or by default for solves subject to one or more linear constraints.
+            This helps stabilize the solution of the linear system in ill-conditioned cases.
+            Must be a small positive value; defaults to numpy float epsilon.
         :type regularization: float, optional
 
         :param cond_lu_thresh: Condition number threshold below which LU decomposition
@@ -709,6 +713,11 @@ class DampedNewtonSolver:
         ):
             sol.J = self.J(sol.x)
             condition_number = np.linalg.cond(sol.J)
+
+            # Regularize ill-conditioned Jacobian
+            if condition_number > self.cond_lu_thresh:
+                sol.J = sol.J + np.eye(sol.J.shape[0]) * self.regularization
+
             luJ = lu_factor(sol.J)
             dx = lu_solve(luJ, -sol.F)
             dx_norm = np.linalg.norm(dx, ord=2)
@@ -746,19 +755,11 @@ class DampedNewtonSolver:
 
             # Evaluate simplified Newton step
             F_j = self.F(x_j)
-
-            # Regularise ill-conditioned Jacobian
-            if condition_number < self.cond_lu_thresh:
-                dxbar_j = lu_solve(luJ, -F_j)
-            else:
-                J_reg = sol.J + np.eye(sol.J.shape[0]) * self.eps
-                dxbar_j = lu_solve(lu_factor(J_reg), -F_j)
-
+            dxbar_j = lu_solve(luJ, -F_j)
             dxbar_j_norm = np.linalg.norm(dxbar_j, ord=2)
 
-            converged = self._check_convergence(dxbar_j, dx, lmda, lmda_bounds)
-
             # Additional convergence check on F(x)
+            converged = self._check_convergence(dxbar_j, dx, lmda, lmda_bounds)
             if converged and not all(np.abs(F_j) < self.F_tol):
                 converged = False
 
@@ -788,6 +789,7 @@ class DampedNewtonSolver:
                 sol.iterates.append(sol.x, sol.F, lmda)
 
         # Final adjustment for constraints
+        # and recompute F, J, condition number without regularization
         if condition_number < self.max_condition_number:
             if converged and not persistent_bound_violation:
                 sol.x = x_j + dxbar_j
