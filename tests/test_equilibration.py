@@ -256,7 +256,7 @@ class equilibration(BurnManTest):
         equality_constraints = [("P", 1.0e5), ("T", 1000.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
         self.assertTrue(sol.success)  # Expect successful convergence
-        self.assertTrue(sol.code == 5)  # Expect singular system at solution
+        self.assertEqual(sol.code, 5)  # Expect singular system at solution
 
     def test_ill_posed_problem(self):
 
@@ -269,7 +269,7 @@ class equilibration(BurnManTest):
         a.phases[1].set_composition([0.5, 0.5])
         equality_constraints = [("P", 1.0e5), ("T", 300.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
-        self.assertTrue(sol.code == 2)  # Expect problem to leave the feasible region
+        self.assertEqual(sol.code, 2)  # Expect problem to leave the feasible region
 
     def test_ill_conditioned_jacobian(self):
 
@@ -282,7 +282,7 @@ class equilibration(BurnManTest):
         a.phases[1].set_composition([0.4, 0.6])
         equality_constraints = [("P", 1.0e5), ("T", 300.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
-        self.assertTrue(sol.code == 4)  # Expect singular system
+        self.assertEqual(sol.code, 4)  # Expect singular system
 
 
 if __name__ == "__main__":
