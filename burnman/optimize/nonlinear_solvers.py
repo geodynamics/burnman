@@ -722,11 +722,6 @@ class DampedNewtonSolver:
             dx = lu_solve(luJ, -sol.F)
             dx_norm = np.linalg.norm(dx, ord=2)
 
-            is_singular = condition_number > self.max_condition_number
-            if is_singular and any(np.isnan(dx)):
-                lmda_bounds = [0.0, 0.0]
-                break
-
             lmda_bounds = self.lambda_bounds(dx, sol.x)
             h = (
                 lmda
