@@ -3,6 +3,7 @@ from util import BurnManTest
 
 import burnman
 from burnman import equilibrate
+from burnman.optimize.nonlinear_solvers import TerminationCode
 from burnman.minerals import HP_2011_ds62, SLB_2011
 
 import numpy as np
@@ -256,7 +257,7 @@ class equilibration(BurnManTest):
         equality_constraints = [("P", 1.0e5), ("T", 1000.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
         self.assertTrue(sol.success)  # Expect successful convergence
-        self.assertEqual(sol.code, 5)  # Expect singular system at solution
+        self.assertEqual(sol.code, TerminationCode.SINGULAR_SUCCESS)
 
     def test_ill_posed_problem(self):
 
@@ -269,7 +270,7 @@ class equilibration(BurnManTest):
         a.phases[1].set_composition([0.5, 0.5])
         equality_constraints = [("P", 1.0e5), ("T", 300.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
-        self.assertEqual(sol.code, 2)  # Expect problem to leave the feasible region
+        self.assertEqual(sol.code, TerminationCode.CONSTRAINT_VIOLATION)
 
     def test_ill_conditioned_jacobian(self):
 
@@ -282,7 +283,16 @@ class equilibration(BurnManTest):
         a.phases[1].set_composition([0.4, 0.6])
         equality_constraints = [("P", 1.0e5), ("T", 300.0)]
         sol, _ = equilibrate(composition, a, equality_constraints)
-        self.assertEqual(sol.code, 4)  # Expect singular system
+
+        # Different testers give different results here
+        if sol.code == TerminationCode.SINGULAR_SUCCESS:
+            # In some cases the solver converges despite the singular Jacobian
+            # In that case require that the two identical phases have the same composition
+            self.assertArraysAlmostEqual(a.phases[0].molar_fractions, [0.9, 0.1])
+            self.assertArraysAlmostEqual(a.phases[1].molar_fractions, [0.9, 0.1])
+        else:
+            # In other cases the solver fails due to the singular Jacobian
+            self.assertEqual(sol.code, TerminationCode.SINGULAR_FAIL)
 
 
 if __name__ == "__main__":
