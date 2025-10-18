@@ -245,6 +245,45 @@ class equilibration(BurnManTest):
             [1620.532183457096, 0.45, 0.6791743],
         )
 
+    def test_mg_rich_ol_wad_eqm_with_free_compositional_vector(self):
+        # Without the scaling of parameters in equilibrate,
+        # this problem is very ill-conditioned.
+        assemblage = make_ol_wad_assemblage()
+        ol = assemblage.phases[0]
+        wad = assemblage.phases[1]
+
+        assemblage = burnman.Composite([ol, wad], [1.0, 0.0])
+
+        # Set the pressure and temperature
+        P = 12.0e9  # Pa
+        T = 1673.0  # K
+        assemblage.set_state(P, T)
+
+        # Define the starting compositions of the phases
+        x_fe_ol = 1.0e-4
+        ol.set_composition([1.0 - x_fe_ol, x_fe_ol])
+        wad.set_composition([1.0 - x_fe_ol, x_fe_ol])
+
+        # Set up the constraints and compositional degree of freedom
+        composition = {"Fe": 0.2, "Mg": 1.8, "Si": 1.0, "O": 4.0}
+        free_compositional_vectors = [{"Mg": 1.0, "Fe": -1.0}]
+
+        equality_constraints = [
+            ("T", T),
+            (
+                "phase_composition",
+                (ol, [["Mg_A", "Fe_A"], [0.0, 1.0], [1.0, 1.0], x_fe_ol]),
+            ),
+            ("phase_fraction", (wad, 0.0)),
+        ]
+        sol, _ = equilibrate(
+            composition,
+            assemblage,
+            equality_constraints,
+            free_compositional_vectors,
+        )
+        self.assertEqual(sol.code, TerminationCode.SUCCESS)
+
     def test_convergence_with_singular_system(self):
 
         composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
