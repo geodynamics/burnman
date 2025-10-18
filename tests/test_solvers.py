@@ -2,7 +2,7 @@ import unittest
 from util import BurnManTest
 import numpy as np
 
-from burnman.optimize.nonlinear_solvers import damped_newton_solve
+from burnman.optimize.nonlinear_solvers import damped_newton_solve, TerminationCode
 
 
 class test_solvers(BurnManTest):
@@ -25,7 +25,7 @@ class test_solvers(BurnManTest):
             F, J, guess=np.array([-1.2, 1.0]), linear_constraints=C
         )
         self.assertFloatEqual(sol.x[0], 0.0)
-        assert sol.code == 2
+        assert sol.code == TerminationCode.CONSTRAINT_VIOLATION
 
     def test_dns_rosenbrock_1_w_temporary_constraint_violation(self):
         F = lambda x: np.array([10.0 * (x[1] - x[0] * x[0]), 1.0 - x[0]])
@@ -259,7 +259,7 @@ class test_solvers(BurnManTest):
         )
 
         self.assertFloatEqual(sol.x[1], y_max)
-        assert sol.code == 2
+        assert sol.code == TerminationCode.CONSTRAINT_VIOLATION
 
 
 if __name__ == "__main__":

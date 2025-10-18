@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -8,9 +8,17 @@ import numpy as np
 from itertools import product
 from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
+import logging
 
 from ..optimize.nonlinear_solvers import damped_newton_solve
 from ..classes.solution import Solution
+
+P_scaling = 1.0e9  # Pa
+T_scaling = 1.0e3  # K
+S_scaling = 1.0e3  # J/K
+V_scaling = 1.0e-6  # m^3
+G_scaling = 1.0e3  # J/mol
+X_scaling = 1.0  # mole amount
 
 
 def calculate_constraints(assemblage, n_free_compositional_vectors):
@@ -95,7 +103,10 @@ def get_parameters(assemblage, n_free_compositional_vectors=0):
     n_moles_phase = assemblage.n_moles * np.array(assemblage.molar_fractions)
 
     try:
-        params[:2] = [assemblage.pressure, assemblage.temperature]
+        params[:2] = [
+            assemblage.pressure / P_scaling,
+            assemblage.temperature / T_scaling,
+        ]
     except AttributeError:
         raise Exception("You need to set_state before getting parameters")
 
@@ -147,7 +158,8 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     :param parameters: The current parameter values.
     :type parameters: numpy.array
     """
-    assemblage.set_state(parameters[0], parameters[1])
+
+    assemblage.set_state(parameters[0] * P_scaling, parameters[1] * T_scaling)
     i = 2
     phase_amounts = np.zeros(len(assemblage.phases))
     for phase_idx, ph in enumerate(assemblage.phases):
@@ -177,27 +189,25 @@ def default_F_tolerances(assemblage, equality_constraints, n_atoms):
     i = 0
     for i, (type_c, _) in enumerate(equality_constraints):
         if type_c == "P":
-            F_tolerances[i] = 1.0  # Pa
+            F_tolerances[i] = 1.0 / P_scaling  # Pa
         elif type_c == "T":
-            F_tolerances[i] = 1.0e-6  # K
+            F_tolerances[i] = 1.0e-6 / T_scaling  # K
         elif type_c == "S":
-            F_tolerances[i] = 1.0e-8  # J/K
+            F_tolerances[i] = 1.0e-8 / S_scaling  # J/K
         elif type_c == "V":
             # Typical volume of 1 mole of atoms is ~1e-5 m^3
             # We want a much smaller tolerance than this
-            F_tolerances[i] = 1.0e-11 * n_atoms  # m^3
-        elif type_c == "PT_ellipse":
-            F_tolerances[i] = 1.0e-3  # [no units]
+            F_tolerances[i] = 1.0e-11 * n_atoms / V_scaling  # m^3
         elif type_c == "X":
-            F_tolerances[i] = 1.0e-8  # [no units]
+            F_tolerances[i] = 1.0e-8 / X_scaling  # [no units]
         else:
             raise Exception("constraint type not recognised")
     i += 1
 
     # Next set of tolerances are for reaction affinities (1 J/mol)
     # and bulk composition (1e-8)
-    F_tolerances[i : i + assemblage.n_reactions] = 1.0
-    F_tolerances[i + assemblage.n_reactions :] = 1.0e-8
+    F_tolerances[i : i + assemblage.n_reactions] = 1.0 / G_scaling
+    F_tolerances[i + assemblage.n_reactions :] = 1.0e-8 / X_scaling
     return F_tolerances
 
 
@@ -216,7 +226,6 @@ def F(
       - eq[i][0] = 'T', F[i] = T - eq[i][1]
       - eq[i][0] = 'S', F[i] = entropy - eq[i][1]
       - eq[i][0] = 'V', F[i] = volume - eq[i][1]
-      - eq[i][0] = 'PT_ellipse', F[i] = norm(([P, T] - eq[i][1][0])/eq[i][1][1]) - 1
       - eq[i][0] = 'X', np.dot(eq[i][1][0], x) - eq[i][1][1]
 
     The next set of vector values correspond to the reaction affinities.
@@ -254,32 +263,32 @@ def F(
     i = 0
     for i, (type_c, eq_c) in enumerate(equality_constraints):
         if type_c == "P":
-            eqns[i] = x[0] - eq_c
+            eqns[i] = (assemblage.pressure - eq_c) / P_scaling
         elif type_c == "T":
-            eqns[i] = x[1] - eq_c
+            eqns[i] = (assemblage.temperature - eq_c) / T_scaling
         elif type_c == "S":
-            eqns[i] = assemblage.molar_entropy * assemblage.n_moles - eq_c
+            eqns[i] = (assemblage.molar_entropy * assemblage.n_moles - eq_c) / S_scaling
         elif type_c == "V":
-            eqns[i] = assemblage.molar_volume * assemblage.n_moles - eq_c
-        elif type_c == "PT_ellipse":
-            v_scaled = (x[0:2] - eq_c[0]) / eq_c[1]
-            eqns[i] = np.linalg.norm(v_scaled) - 1.0
+            eqns[i] = (assemblage.molar_volume * assemblage.n_moles - eq_c) / V_scaling
         elif type_c == "X":
-            eqns[i] = np.dot(eq_c[0], x) - eq_c[1]  # i.e. Ax = b
+            eqns[i] = (np.dot(eq_c[0], x) - eq_c[1]) / X_scaling  # i.e. Ax = b
         else:
             raise Exception("constraint type not recognised")
     i += 1
     if n_equality_constraints > 2:
-        new_reduced_composition_vector = reduced_composition_vector + x[
-            2 - n_equality_constraints :
-        ].dot(reduced_free_composition_vectors)
+        new_reduced_composition_vector = (
+            reduced_composition_vector
+            + x[2 - n_equality_constraints :].dot(reduced_free_composition_vectors)
+            / X_scaling
+        )
     else:
-        new_reduced_composition_vector = reduced_composition_vector
-    eqns[i : i + assemblage.n_reactions] = assemblage.reaction_affinities
+        new_reduced_composition_vector = reduced_composition_vector / X_scaling
+    eqns[i : i + assemblage.n_reactions] = assemblage.reaction_affinities / G_scaling
     eqns[i + assemblage.n_reactions :] = (
         np.dot(assemblage.reduced_stoichiometric_array.T, new_endmember_amounts)
         - new_reduced_composition_vector
-    )
+    ) / X_scaling
+
     return eqns
 
 
@@ -324,18 +333,24 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
     ic = 0
     for ic, (type_c, eq_c) in enumerate(equality_constraints):
         if type_c == "P":  # dP/dx
-            jacobian[ic, 0] = 1.0  # jacobian[i, j!=0] = 0
+            jacobian[ic, 0] = 1.0 / P_scaling  # jacobian[i, j!=0] = 0
         elif type_c == "T":  # dT/dx
-            jacobian[ic, 1] = 1.0  # jacobian[i, j!=1] = 0
+            jacobian[ic, 1] = 1.0 / T_scaling  # jacobian[i, j!=1] = 0
         elif type_c == "S":  # dS/dx
             # dS/dP = -aV, dS/dT = Cp/T
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles * assemblage.alpha * assemblage.molar_volume,
-                assemblage.n_moles * assemblage.molar_heat_capacity_p / x[1],
+                -assemblage.n_moles
+                * assemblage.alpha
+                * assemblage.molar_volume
+                / S_scaling,
+                assemblage.n_moles
+                * assemblage.molar_heat_capacity_p
+                / assemblage.temperature
+                / S_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
-                jacobian[ic, j] = assemblage.phases[k].molar_entropy
+                jacobian[ic, j] = assemblage.phases[k].molar_entropy / S_scaling
                 if n > 1:  # for solutions with >1 endmember
                     jacobian[ic, j + 1 : j + n] = (
                         assemblage.n_moles
@@ -344,6 +359,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
                             assemblage.phases[k].partial_entropies[1:]
                             - assemblage.phases[k].partial_entropies[0]
                         )
+                        / S_scaling
                     )
                 j += n
         elif type_c == "V":  # dV/dx
@@ -351,12 +367,16 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
             jacobian[ic, 0:2] = [
                 -assemblage.n_moles
                 * assemblage.molar_volume
-                / assemblage.isothermal_bulk_modulus_reuss,
-                assemblage.n_moles * assemblage.molar_volume * assemblage.alpha,
+                / assemblage.isothermal_bulk_modulus_reuss
+                / V_scaling,
+                assemblage.n_moles
+                * assemblage.molar_volume
+                * assemblage.alpha
+                / V_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
-                jacobian[ic, j] = assemblage.phases[k].molar_volume
+                jacobian[ic, j] = assemblage.phases[k].molar_volume / V_scaling
                 if n > 1:  # for solutions with >1 stable endmember
                     jacobian[ic, j + 1 : j + n] = (
                         assemblage.n_moles
@@ -365,13 +385,11 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
                             assemblage.phases[k].partial_volumes[1:]
                             - assemblage.phases[k].partial_volumes[0]
                         )
+                        / V_scaling
                     )
                 j += n
-        elif type_c == "PT_ellipse":
-            v_scaled = (x[0:2] - eq_c[0]) / eq_c[1]
-            jacobian[ic, 0:2] = v_scaled / (np.linalg.norm(v_scaled) * eq_c[1])
         elif type_c == "X":
-            jacobian[ic, :] = eq_c[0]
+            jacobian[ic, :] = eq_c[0] / X_scaling
         else:
             raise Exception("constraint type not recognised")
     ic += 1
@@ -394,8 +412,8 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
     reaction_entropies = np.dot(assemblage.reaction_basis, partial_entropies_vector)
 
     # dGi/dP = deltaVi; dGi/dT = -deltaSi
-    jacobian[ic : ic + len(reaction_volumes), 0] = reaction_volumes
-    jacobian[ic : ic + len(reaction_volumes), 1] = -reaction_entropies
+    jacobian[ic : ic + len(reaction_volumes), 0] = reaction_volumes / G_scaling
+    jacobian[ic : ic + len(reaction_volumes), 1] = -reaction_entropies / G_scaling
 
     # Pressure and temperature have no effect on the bulk
     # compositional constraints
@@ -444,17 +462,20 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
 
     if reaction_hessian.shape[0] > 0:
         jacobian[ic:, 2 : 2 + len(reaction_hessian[0])] = np.concatenate(
-            (reaction_hessian, bulk_hessian)
+            (reaction_hessian / G_scaling, bulk_hessian / X_scaling)
         )
     else:
-        jacobian[ic:, 2 : 2 + len(bulk_hessian[0])] = bulk_hessian
+        jacobian[ic:, 2 : 2 + len(bulk_hessian[0])] = bulk_hessian / X_scaling
 
     if len(reduced_free_composition_vectors) > 0:
         jacobian[
             -reduced_free_composition_vectors.shape[1] :, 2 + len(reaction_hessian[0]) :
-        ] = -reduced_free_composition_vectors.T
+        ] = (-reduced_free_composition_vectors.T / X_scaling)
 
-    return jacobian
+    x_scaling_array = np.ones_like(x)
+    x_scaling_array[0] = P_scaling  # Pa
+    x_scaling_array[1] = T_scaling  # K
+    return jacobian * x_scaling_array[np.newaxis, :]
 
 
 def lambda_bounds(dx, x, endmembers_per_phase):
@@ -477,8 +498,10 @@ def lambda_bounds(dx, x, endmembers_per_phase):
 
     max_steps = np.ones((len(x))) * 100000.0
 
-    # first two constraints are P and T
-    max_steps[0:2] = [20.0e9, 500.0]  # biggest reasonable P and T steps
+    # first two constraints are P and T, scaled appropriately
+    max_steps[0:2] = np.array(
+        [20.0e9 / P_scaling, 500.0 / T_scaling]
+    )  # biggest reasonable P and T steps
 
     j = 2
     for i, n in enumerate(endmembers_per_phase):
@@ -669,7 +692,10 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
 
     # Process parameter names
     prm.parameter_names = ["Pressure (Pa)", "Temperature (K)"]
-    prm.default_tolerances = [1.0, 1.0e-6]
+    prm.default_tolerances = [
+        1.0 / P_scaling,
+        1.0e-6 / T_scaling,
+    ]  # Tolerances scaled to match F scaling
     for i, n in enumerate(assemblage.endmembers_per_phase):
         prm.parameter_names.append("x({0})".format(assemblage.phases[i].name))
         prm.default_tolerances.append(1.0e-9)
@@ -814,13 +840,12 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
                 )
 
             eq_constraint_lists.append(
-                [["X", [constraint[0], p]] for p in constraint[1]]
+                [["X", [np.array(constraint[0]), p]] for p in constraint[1]]
             )
 
         elif (
             equality_constraints[i][0] == "P"
             or equality_constraints[i][0] == "T"
-            or equality_constraints[i][0] == "PT_ellipse"
             or equality_constraints[i][0] == "S"
             or equality_constraints[i][0] == "V"
         ):
@@ -843,8 +868,7 @@ def process_eq_constraints(equality_constraints, assemblage, prm):
                 "The type of equality_constraint is "
                 "not recognised for constraint {0}.\n"
                 "Should be one of P, T, S, V, X,\n"
-                "PT_ellipse, phase_fraction, "
-                "or phase_composition.".format(i + 1)
+                "phase_fraction, or phase_composition.".format(i + 1)
             )
     return eq_constraint_lists
 
@@ -874,7 +898,7 @@ def equilibrate(
     There are a number of equality constraints implemented in burnman. These are
     given as a list of lists. Each constraint should have the form:
     [<constraint type>, <constraint>], where
-    <constraint type> is one of 'P', 'T', 'S', 'V', 'X', 'PT_ellipse',
+    <constraint type> is one of 'P', 'T', 'S', 'V', 'X',
     'phase_fraction', or 'phase_composition'. The format of the
     <constraint> object depends on the constraint type:
         - P: float or numpy.array of
@@ -885,8 +909,6 @@ def equilibrate(
             entropies [J/K]
         - V: float or numpy.array of
             volumes [m:math:`^3`]
-        - PT_ellipse: list of two floats or numpy.arrays, where the equality
-            satifies the equation norm(([P, T] - arr[0])/arr[1]) = 1
         - phase_fraction: tuple with the form (<phase> <fraction(s)>),
             where <phase> is one of the phase objects in the assemblage
             and <fraction(s)> is a float or numpy.array corresponding
@@ -961,6 +983,10 @@ def equilibrate(
         sols[0][1].x[0] or sols[0][1].assemblage.pressure to get the pressure.
     :rtype: tuple
     """
+    logger = logging.getLogger(__name__)
+    outer_logger_level = logger.level
+    logger.setLevel(logging.INFO if verbose else outer_logger_level)
+
     for ph in assemblage.phases:
         if isinstance(ph, Solution) and not hasattr(ph, "molar_fractions"):
             raise Exception(
@@ -1019,8 +1045,6 @@ def equilibrate(
             initial_state[0] = eq_constraint_lists[i][0][1]
         elif eq_constraint_lists[i][0][0] == "T":
             initial_state[1] = eq_constraint_lists[i][0][1]
-        elif eq_constraint_lists[i][0][0] == "PT_ellipse":
-            initial_state = eq_constraint_lists[i][0][1][1]
 
     if initial_state[0] is None:
         initial_state[0] = 5.0e9
@@ -1029,6 +1053,7 @@ def equilibrate(
 
     assemblage.set_state(*initial_state)
     parameters = get_parameters(assemblage, n_free_compositional_vectors)
+    parameters = np.array(parameters)
 
     # Solve the system of equations, loop over input parameters
     sol_array = np.empty(shape=tuple(nc), dtype="object")
@@ -1037,12 +1062,12 @@ def equilibrate(
     problems = list(product(*[list(range(nc[i])) for i in range(len(nc))]))
     n_problems = len(problems)
     for i_problem, i_c in enumerate(problems):
-        if verbose:
+        if logger.isEnabledFor(logging.DEBUG):
             string = "Processing solution"
             for i in range(len(i_c)):
                 string += " {0}/{1}".format(i_c[i] + 1, nc[i])
 
-            print(string + ":")
+            logging.info(string + ":")
 
         equality_constraints = [eq_constraint_lists[i][i_c[i]] for i in range(len(nc))]
 
@@ -1084,8 +1109,15 @@ def equilibrate(
             if sol.success and len(assemblage.reaction_affinities) > 0.0:
                 sol.assemblage.equilibrium_tolerance = maxres
 
-        if verbose:
-            print(sol.text)
+        logging.info(sol.text)
+
+        # Scale solution back to physical units
+        sol.x[0] = sol.x[0] * P_scaling
+        sol.x[1] = sol.x[1] * T_scaling
+
+        if store_iterates:
+            sol.iterates.x[:, 0] = sol.iterates.x[:, 0] * P_scaling
+            sol.iterates.x[:, 1] = sol.iterates.x[:, 1] * T_scaling
 
         sol_array[i_c] = sol
 
@@ -1114,15 +1146,18 @@ def equilibrate(
                     # next guess based on a Newton step
                     # using the old solution vector and Jacobian
                     # with the new constraints.
+                    x = s.x.copy()
+                    x[0] = x[0] / P_scaling
+                    x[1] = x[1] / T_scaling
                     dF = F(
-                        s.x,
+                        x,
                         assemblage,
                         next_equality_constraints,
                         prm.reduced_composition_vector,
                         prm.reduced_free_composition_vectors,
                     )
                     luJ = lu_factor(s.J)
-                    new_parameters = s.x + lu_solve(luJ, -dF)
+                    new_parameters = x + lu_solve(luJ, -dF)
                     c = (
                         prm.constraint_matrix.dot(new_parameters)
                         + prm.constraint_vector
@@ -1130,7 +1165,7 @@ def equilibrate(
                     if all(c <= 0.0):  # accept new guess
                         parameters = new_parameters
                     else:  # use the parameters from this step
-                        parameters = s.x
+                        parameters = x
                         exhausted_phases = [
                             assemblage.phases[phase_idx].name
                             for phase_idx, v in enumerate(
@@ -1138,8 +1173,8 @@ def equilibrate(
                             )
                             if v < 0.0
                         ]
-                        if len(exhausted_phases) > 0 and verbose:
-                            print(
+                        if len(exhausted_phases) > 0:
+                            logging.info(
                                 "A phase might be exhausted before the "
                                 f"next step: {exhausted_phases}"
                             )
@@ -1152,4 +1187,5 @@ def equilibrate(
     else:
         sol_array = sol_array.flatten()[0]
 
+    logger.setLevel(outer_logger_level)
     return sol_array, prm
