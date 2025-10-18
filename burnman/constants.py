@@ -3,6 +3,7 @@
 # GPL v2 or later.
 
 import scipy.constants
+import numpy as np
 
 """
 molar gas constant (R) in J mol^-1 K^-1
@@ -42,3 +43,10 @@ Dirac = 1.054571726e-34
 1 cm^-1 in J/mol
 """
 invcm = 11.9627
+
+
+"""
+Small number for numerical stability
+Kept in list form for mutability
+"""
+logish_eps = [np.finfo(float).eps]

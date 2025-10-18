@@ -6,13 +6,12 @@
 
 import importlib
 import numpy as np
+from ..constants import logish_eps
 from ..utils.chemistry import process_solution_chemistry
 from .. import constants
 import warnings
 from .material import material_property, cached_property
 from dataclasses import make_dataclass
-
-np_eps = np.finfo(float).eps
 
 Interaction = make_dataclass(
     "Interaction", ["inds", "expts", "f_r", "m_jr", "f_rs", "m_jrs"]
@@ -106,26 +105,26 @@ def _non_ideal_interactions_subreg(p, n_endmembers, Wijk):
     return Wint
 
 
-def logish(x, eps=np_eps):
+def logish(x, eps=logish_eps):
     """
     2nd order series expansion of log(x) about eps:
     log(eps) - sum_k=1^infty (f_eps)^k / k
     Prevents infinities at x=0
     """
-    f_eps = 1.0 - x / eps
-    mask = x > eps
-    ln = np.where(x <= eps, np.log(eps) - f_eps - f_eps * f_eps / 2.0, 0.0)
+    f_eps = 1.0 - x / eps[0]
+    mask = x > eps[0]
+    ln = np.where(x <= eps[0], np.log(eps[0]) - f_eps - f_eps * f_eps / 2.0, 0.0)
     ln[mask] = np.log(x[mask])
     return ln
 
 
-def inverseish(x, eps=np_eps):
+def inverseish(x, eps=logish_eps):
     """
     1st order series expansion of 1/x about eps: 2/eps - x/eps/eps
     Prevents infinities at x=0
     """
-    mask = x > eps
-    oneoverx = np.where(x <= eps, 2.0 / eps - x / eps / eps, 0.0)
+    mask = x > eps[0]
+    oneoverx = np.where(x <= eps[0], 2.0 / eps[0] - x / eps[0] / eps[0], 0.0)
     oneoverx[mask] = 1.0 / x[mask]
     return oneoverx
 

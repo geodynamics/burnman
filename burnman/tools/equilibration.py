@@ -10,7 +10,8 @@ from scipy.linalg import lu_factor, lu_solve
 from collections import namedtuple
 import logging
 
-from ..optimize.nonlinear_solvers import damped_newton_solve
+from ..constants import logish_eps
+from ..optimize.nonlinear_solvers import damped_newton_solve, TerminationCode
 from ..classes.solution import Solution
 
 P_scaling = 1.0e9  # Pa
@@ -1073,32 +1074,94 @@ def equilibrate(
 
         F_tol = default_F_tolerances(assemblage, equality_constraints, n_atoms)
 
-        # Set the initial fractions and compositions
-        # of the phases in the assemblage:
-        sol = damped_newton_solve(
-            F=lambda x: F(
+        def F_fn(x):
+            return F(
                 x,
                 assemblage,
                 equality_constraints,
                 prm.reduced_composition_vector,
                 prm.reduced_free_composition_vectors,
-            ),
-            J=lambda x: jacobian(
+            )
+
+        def J_fn(x):
+            return jacobian(
                 x,
                 assemblage,
                 equality_constraints,
                 prm.reduced_free_composition_vectors,
-            ),
-            lambda_bounds=lambda dx, x: lambda_bounds(
-                dx, x, assemblage.endmembers_per_phase
-            ),
+            )
+
+        def lambda_bounds_fn(dx, x):
+            return lambda_bounds(dx, x, assemblage.endmembers_per_phase)
+
+        linear_constraints = (prm.constraint_matrix, prm.constraint_vector)
+
+        sol = damped_newton_solve(
+            F=F_fn,
+            J=J_fn,
+            lambda_bounds=lambda_bounds_fn,
             guess=parameters,
-            linear_constraints=(prm.constraint_matrix, prm.constraint_vector),
+            linear_constraints=linear_constraints,
             tol=tol,
             F_tol=F_tol,
             store_iterates=store_iterates,
             max_iterations=max_iterations,
         )
+        # If we hit max iterations, we try relaxing the logish_eps
+        # and solving again. This helps convergence in hard problems because
+        # it allows larger steps when phase compositions are close to the
+        # boundaries of the solution (where the gradient in excess entropy is large).
+        if sol.code == TerminationCode.MAX_ITERATIONS:
+            old_logish_eps = logish_eps[0]
+            logish_eps[0] = 1.0e-5
+            c_shifts = sol.x[-n_free_compositional_vectors:]
+            new_parameters = get_parameters(assemblage, n_free_compositional_vectors)
+            new_parameters[-n_free_compositional_vectors:] = c_shifts
+            set_compositions_and_state_from_parameters(assemblage, parameters)  # reset
+
+            sol2 = damped_newton_solve(
+                F=F_fn,
+                J=J_fn,
+                lambda_bounds=lambda_bounds_fn,
+                guess=new_parameters,
+                linear_constraints=linear_constraints,
+                tol=tol,
+                F_tol=F_tol,
+                store_iterates=store_iterates,
+                max_iterations=max_iterations,
+            )
+
+            logish_eps[0] = old_logish_eps
+            c_shifts = sol2.x[-n_free_compositional_vectors:]
+            new_parameters = get_parameters(assemblage, n_free_compositional_vectors)
+            new_parameters[-n_free_compositional_vectors:] = c_shifts
+            set_compositions_and_state_from_parameters(assemblage, parameters)  # reset
+            sol3 = damped_newton_solve(
+                F=F_fn,
+                J=J_fn,
+                lambda_bounds=lambda_bounds_fn,
+                guess=new_parameters,
+                linear_constraints=linear_constraints,
+                tol=tol,
+                F_tol=F_tol,
+                store_iterates=store_iterates,
+                max_iterations=max_iterations,
+            )
+
+            # combine iterates from all three solves
+            sol3.n_it = sol.n_it + sol2.n_it + sol3.n_it
+            if store_iterates:
+                sol3.iterates.x = np.concatenate(
+                    (sol.iterates.x, sol2.iterates.x, sol3.iterates.x), axis=0
+                )
+                sol3.iterates.F = np.concatenate(
+                    (sol.iterates.F, sol2.iterates.F, sol3.iterates.F), axis=0
+                )
+                sol3.iterates.lmda = np.concatenate(
+                    (sol.iterates.lmda, sol2.iterates.lmda, sol3.iterates.lmda),
+                    axis=0,
+                )
+            sol = sol3
 
         if sol.success and len(assemblage.reaction_affinities) > 0.0:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.0e-5
