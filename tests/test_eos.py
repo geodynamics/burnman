@@ -6,6 +6,9 @@ import burnman
 from burnman import minerals
 from burnman.eos import debye
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
+import logging
+
+logging.basicConfig(level=logging.CRITICAL)
 
 
 class mypericlase(burnman.Mineral):

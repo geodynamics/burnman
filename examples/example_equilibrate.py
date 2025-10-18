@@ -65,7 +65,7 @@ import burnman
 from burnman import equilibrate
 from burnman.minerals import HP_2011_ds62, SLB_2011, JH_2015
 from burnman.tools.polytope import simplify_composite_with_composition
-
+from burnman.optimize.nonlinear_solvers import TerminationCode
 
 run_aluminosilicates = True
 run_ordering = True
@@ -500,7 +500,7 @@ if __name__ == "__main__" and run_olivine_polymorphs:
     sol, prm = equilibrate(composition, assemblage, equality_constraints)
     Pinv1, Tinv1 = sol.x[0:2]
 
-    if sol.code != 0:
+    if sol.code != TerminationCode.SUCCESS:
         raise Exception("Couldn't find ol-wad-rw invariant")
 
     assemblage = burnman.Composite([ol, wad, rw])
