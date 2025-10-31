@@ -474,6 +474,40 @@ class Composite(Material):
         return partial_gibbs
 
     @material_property
+    def endmember_partial_entropies(self):
+        """
+        Returns the partial entropies for all
+        the endmember minerals in the Composite
+        """
+        partial_entropies = np.empty(self.n_endmembers)
+        j = 0
+        for i, n_endmembers in enumerate(self.endmembers_per_phase):
+            if n_endmembers == 1:
+                partial_entropies[j] = self.phases[i].molar_entropy
+            else:
+                partial_entropies[j : j + n_endmembers] = self.phases[
+                    i
+                ].partial_entropies
+            j += n_endmembers
+        return partial_entropies
+
+    @material_property
+    def endmember_partial_volumes(self):
+        """
+        Returns the partial volumes for all
+        the endmember minerals in the Composite
+        """
+        partial_volumes = np.empty(self.n_endmembers)
+        j = 0
+        for i, n_endmembers in enumerate(self.endmembers_per_phase):
+            if n_endmembers == 1:
+                partial_volumes[j] = self.phases[i].molar_volume
+            else:
+                partial_volumes[j : j + n_endmembers] = self.phases[i].partial_volumes
+            j += n_endmembers
+        return partial_volumes
+
+    @material_property
     def reaction_affinities(self):
         """
         Returns the affinities corresponding to each reaction in reaction_basis

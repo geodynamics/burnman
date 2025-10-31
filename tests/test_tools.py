@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
+from burnman import Composite
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import hugoniot
@@ -16,6 +17,70 @@ from burnman.utils.math import smooth_array
 from burnman.utils.math import interp_smoothed_array_and_derivatives
 from burnman.utils.math import _pad_ndarray_inverse_mirror
 from burnman.utils.math import is_positive_definite
+
+from burnman.minerals import HP_2011_ds62, mp50MnNCKFMASHTO
+from burnman.tools.thermobarometry import estimate_conditions
+
+
+def setup_assemblage(scale=1.0):
+    """
+    Set up a mineral assemblage for testing thermobarometry.
+    :param scale: Scale factor for compositional noise.
+    """
+    np.random.seed(42)
+
+    # Define observed mineral assemblage
+    mu = mp50MnNCKFMASHTO.mu()
+    bi = mp50MnNCKFMASHTO.bi()
+    g = mp50MnNCKFMASHTO.g()
+    ilmm = mp50MnNCKFMASHTO.ilmm()
+    st = mp50MnNCKFMASHTO.st()
+    q = HP_2011_ds62.q()
+
+    # These compositions correspond to an equilibrated assemblage at P = 0.4 GPa and T = 873 K
+    # In practice, these would be the measured compositions of the minerals
+    compositions = [
+        np.array(
+            [0.55510672, 0.00393874, 0.00365819, 0.43232719, 0.00339884, 0.00157032]
+        ),
+        np.array(
+            [
+                0.12024528,
+                0.55795845,
+                -0.23022757,
+                0.2928378,
+                0.19457943,
+                0.06260454,
+                0.00200206,
+            ]
+        ),
+        np.array([0.11996805, 0.75282947, 0.10051702, 0.02013999, 0.00654547]),
+        np.array([-0.05461279, 0.84687573, 0.1062428, 0.05404236, 0.04745189]),
+        np.array([0.06925327, 0.80706976, 0.01346876, 0.03074615, 0.07946205]),
+    ]
+
+    # Assumed compositional uncertainties (1 sigma)
+    mu.compositional_covariances = [0.01, 0.001, 0.001, 0.01, 0.001, 0.0005]
+    bi.compositional_covariances = [0.01, 0.01, 0.05, 0.01, 0.01, 0.01, 0.0005]
+    g.compositional_covariances = [0.01, 0.01, 0.01, 0.01, 0.001]
+    ilmm.compositional_covariances = [0.01, 0.01, 0.01, 0.01, 0.01]
+    st.compositional_covariances = [0.01, 0.01, 0.01, 0.01, 0.01]
+
+    assemblage = Composite([mu, bi, g, ilmm, st, q], [1.0 / 6.0] * 6)
+    for phase, comp in zip(assemblage.phases[:-1], compositions):
+        noise = np.random.normal(0, 1.0, len(comp)) * phase.compositional_covariances
+        comp_with_noise = comp + noise * scale
+        # Normalize to ensure valid molar fractions
+        comp_with_noise /= np.sum(comp_with_noise)
+        phase.set_composition(comp_with_noise)
+
+    # Convert uncertainties to covariances
+    for phase in assemblage.phases[:-1]:
+        phase.compositional_covariances = np.diag(
+            np.array(phase.compositional_covariances) ** 2
+        )
+
+    return assemblage
 
 
 class test_tools(BurnManTest):
@@ -324,6 +389,82 @@ class test_tools(BurnManTest):
         self.assertTrue(len(contour_sets) == 11)
         self.assertTrue(len(ticks) == 11)
         self.assertTrue(len(lines) == 11)
+
+    def test_estimate_conditions(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+        res = estimate_conditions(
+            assemblage, dataset_covariances, guessed_conditions=theta
+        )
+        self.assertTrue(res.success)
+        self.assertEqual(res.n_reactions, 18)
+
+    def test_estimate_conditions_at_equilibrium(self):
+        assemblage = setup_assemblage(scale=0.0)
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+        res = estimate_conditions(
+            assemblage, dataset_covariances, guessed_conditions=theta
+        )
+        self.assertTrue(res.success)
+        self.assertArraysAlmostEqual(
+            [res.x[0] / 1.0e6, res.x[1]], [400.0, 873.0], tol=0.1
+        )
+
+    def test_estimate_conditions_exclude_small_fractions(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+        res = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=theta,
+            small_fraction_tol=0.01,
+        )
+        self.assertTrue(res.success)
+        self.assertEqual(res.n_reactions, 11)
+
+    def test_estimate_conditions_fixed_P(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+        res = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=theta,
+            pressure_bounds=[1.0e9, 1.0e9],
+        )
+        self.assertTrue(res.success)
+        self.assertEqual(res.x[0], 1.0e9)
+
+    def test_estimate_conditions_fixed_T(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+        res = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=theta,
+            temperature_bounds=[500.0, 500.0],
+        )
+        self.assertTrue(res.success)
+        self.assertEqual(res.x[1], 500.0)
+
+    def test_estimate_conditions_fail_fixed_P_and_T(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+
+        # assert that an exception is raised when both P and T are fixed
+        with self.assertRaises(Exception):
+            _ = estimate_conditions(
+                assemblage,
+                dataset_covariances,
+                guessed_conditions=theta,
+                pressure_bounds=[1.0e9, 1.0e9],
+                temperature_bounds=[500.0, 500.0],
+            )
 
 
 if __name__ == "__main__":
