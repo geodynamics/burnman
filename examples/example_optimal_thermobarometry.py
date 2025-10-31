@@ -133,15 +133,17 @@ if __name__ == "__main__":
         f"+/- {np.sqrt(res.xcov[0, 0])/1.e9:.2f} GPa"
     )
     print(
-        f"Estimated Temperature: {assemblage.temperature:.2f} "
-        f"+/- {np.sqrt(res.xcov[1, 1]):.2f} K"
+        f"Estimated Temperature: {assemblage.temperature:.0f} "
+        f"+/- {np.sqrt(res.xcov[1, 1]):.0f} K"
     )
-    print(f"Correlation between P and T: {res.xcorr:.4f}")
+    print(f"Correlation between P and T: {res.xcorr:.2f}")
     print(f"Number of Reactions: {res.n_reactions}")
     print(f"Number of Parameters: {res.n_params}")
     print(f"Degrees of Freedom: {res.degrees_of_freedom}")
-    print(f"Reduced Chi-squared: {res.reduced_chisqr:.4f}")
-    print(f"Fit (sqrt reduced chi-squared): {res.fit:.4f}")
-    print("Weighted reaction affinities:")
-    np.set_printoptions(precision=2)
-    print(res.weighted_affinities)
+    print(f"Reduced Chi-squared: {res.reduced_chisqr:.2f}")
+    print(f"Fit (sqrt reduced chi-squared): {res.fit:.2f}")
+
+    # Uncomment to see the weighted reaction affinities
+    # print("Weighted reaction affinities:")
+    # np.set_printoptions(precision=2)
+    # print(res.weighted_affinities)
