@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman.optimize.eos_fitting import fit_XPTp_data
+from burnman.optimize.linear_fitting import weighted_constrained_least_squares
 from burnman.optimize.nonlinear_fitting import (
     NonLinearModel,
     nonlinear_least_squares_fit,
@@ -107,6 +108,91 @@ class test_fitting(BurnManTest):
         fitted_curve = m(data, cov, guessed_params, delta_params)
         nonlinear_least_squares_fit(model=fitted_curve, param_tolerance=1.0e-5)
         self.assertArraysAlmostEqual([fitted_curve.WSS], [10.486904577])
+
+    def test_basic_unweighted_least_squares_exact_answer(self):
+        """Test simple unweighted least squares with exact answer."""
+        A = np.array([[1, 0], [1, 1]])
+        b = np.array([1, 3])
+        popt, pcov, res = weighted_constrained_least_squares(A, b)
+        self.assertArraysAlmostEqual(popt, [1.0, 2.0])
+        self.assertArraysAlmostEqual(pcov[0], [1.0, -1.0])
+        self.assertArraysAlmostEqual(pcov[1], [-1.0, 2.0])
+        self.assertAlmostEqual(res, 0.0)
+
+    def test_basic_unweighted_least_squares(self):
+        """Test simple unweighted least squares."""
+        A = np.array([[1, 1], [1, 2], [1, 3]])
+        b = np.array([1, 2, 2])
+        popt, pcov, res = weighted_constrained_least_squares(A, b)
+        self.assertArraysAlmostEqual(popt, [2.0 / 3.0, 1.0 / 2.0])
+        self.assertArraysAlmostEqual(pcov[0], [7.0 / 3.0, -1.0])
+        self.assertArraysAlmostEqual(pcov[1], [-1.0, 1.0 / 2.0])
+        self.assertAlmostEqual(res, 1.0 / 6.0)
+
+    def test_basic_unit_weighted_least_squares(self):
+        """Test simple unit weighted least squares."""
+        A = np.array([[1, 1], [1, 2], [1, 3]])
+        b = np.array([1, 2, 2])
+        Cov_b = np.diag([1, 1, 1])
+        popt, pcov, res = weighted_constrained_least_squares(A, b, Cov_b)
+        self.assertArraysAlmostEqual(popt, [2.0 / 3.0, 1.0 / 2.0])
+        self.assertArraysAlmostEqual(pcov[0], [7.0 / 3.0, -1.0])
+        self.assertArraysAlmostEqual(pcov[1], [-1.0, 1.0 / 2.0])
+        self.assertAlmostEqual(res, 1.0 / 6.0)
+
+    def test_unevenly_weighted_least_squares(self):
+        """Test weighted least squares with non-identity covariance."""
+        A = np.array([[1, 1], [1, 2], [1, 3]])
+        b = np.array([1, 2, 2])
+        Cov_b = np.diag([1, 1, 2])  # higher weight on 3rd observation
+        popt, pcov, res = weighted_constrained_least_squares(A, b, Cov_b=Cov_b)
+        self.assertArraysAlmostEqual(popt, [4.0 / 7.0, 4.0 / 7.0], tol_zero=1.0e-12)
+        self.assertArraysAlmostEqual(pcov[0], [19.0 / 7.0, -9.0 / 7.0])
+        self.assertArraysAlmostEqual(pcov[1], [-9.0 / 7.0, 5.0 / 7.0])
+        self.assertAlmostEqual(res, 1.0 / 7.0)
+
+    def test_equality_constraints_least_squares(self):
+        """Test equality constraint (force x1 + x2 = 1)."""
+        A = np.array([[1, 2], [3, 4], [5, 6]])
+        b = np.array([7, 8, 9])
+        C = np.array([[1, 1]])  # x1 + x2 = 1
+        c = np.array([0.5])
+        popt, _, res = weighted_constrained_least_squares(
+            A, b, equality_constraints=[C, c]
+        )
+        self.assertArraysAlmostEqual(popt, [-6.0, 6.5], tol_zero=1.0e-12)
+        self.assertAlmostEqual(res, 0.0)
+
+    def test_inequality_constraints_least_squares(self):
+        """Test inequality constraint (x1 >= 2, x2 >= 0)."""
+        A = np.array([[1, 1], [1, 2], [1, 3]])
+        b = np.array([1, 2, 2])
+        D = np.array([[-1, 0], [0, -1]])
+        d = np.array([-2, 0])
+        popt, pcov, res = weighted_constrained_least_squares(
+            A, b, inequality_constraints=[D, d]
+        )
+        self.assertArraysAlmostEqual(popt, [2.0, 0.0], tol_zero=1.0e-12)
+        self.assertArraysAlmostEqual(pcov[0], [7.0 / 3.0, -1.0])
+        self.assertArraysAlmostEqual(pcov[1], [-1.0, 1.0 / 2.0])
+        self.assertAlmostEqual(res, 1.0)
+
+    def test_rank_deficient_least_squares(self):
+        """Test rank-deficient A with allow_rank_deficient=False → expect error."""
+        A = np.array([[1, 2], [2, 4], [3, 6]])
+        b = np.array([1, 2, 3])
+        with self.assertRaises(Exception):
+            _, _, _ = weighted_constrained_least_squares(A, b)
+
+    def test_rank_deficient_allowed_least_squares(self):
+        """Test rank-deficient A with allow_rank_deficient=True."""
+        A = np.array([[1, 2], [2, 4], [3, 6]])  # rank 1
+        b = np.array([1, 2, 3])
+        popt, pcov, res = weighted_constrained_least_squares(
+            A, b, allow_rank_deficient=True
+        )
+        self.assertAlmostEqual(res, 0.0)
+        self.assertArraysAlmostEqual(A @ popt, b)
 
     def test_fit_PTV_data(self):
         fo = burnman.minerals.HP_2011_ds62.fo()

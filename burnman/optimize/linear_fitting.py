@@ -6,7 +6,7 @@
 
 import importlib
 import numpy as np
-from scipy.linalg import inv, sqrtm
+from scipy.linalg import sqrtm
 import warnings
 
 try:
@@ -18,7 +18,12 @@ except ImportError as err:
 
 
 def weighted_constrained_least_squares(
-    A, b, Cov_b=None, equality_constraints=None, inequality_constraints=None
+    A,
+    b,
+    Cov_b=None,
+    equality_constraints=None,
+    inequality_constraints=None,
+    allow_rank_deficient=False,
 ):
     """
     Solves a weighted, constrained least squares problem using cvxpy.
@@ -45,6 +50,10 @@ def weighted_constrained_least_squares(
         in the objective function above.
     :type inequality_constraints: list containing a 2D array and 1D array
 
+    :param allow_rank_deficient: If True, allows the problem to be solved
+        even if the design matrix is rank-deficient.
+    :type allow_rank_deficient: bool
+
     :returns: Tuple containing the optimized phase amounts (1D numpy.array),
         a covariance matrix corresponding to the optimized phase amounts
         (2D numpy.array), and the weighted residual of the fitting procedure
@@ -58,11 +67,23 @@ def weighted_constrained_least_squares(
     # Create the standard weighted least squares objective function
     # (https://stats.stackexchange.com/a/333551)
     n_vars = A.shape[1]
-    m = inv(sqrtm(Cov_b))
-    mA = m @ A
-    mb = m @ b
+    M = np.linalg.pinv(sqrtm(Cov_b))
+    MA = M @ A
+    Mb = M @ b
     x = cp.Variable(n_vars)
-    objective = cp.Minimize(cp.sum_squares(mA @ x - mb))
+    objective = cp.Minimize(cp.sum_squares(MA @ x - Mb))
+
+    # Add a check for rank deficiency
+    rank_MA = np.linalg.matrix_rank(MA)
+    if not allow_rank_deficient and rank_MA < n_vars:
+        raise Exception(
+            f"The weighted design matrix is rank-deficient "
+            f"(Cov_b^(-1/2).A={rank_MA} < n_vars={n_vars}). "
+            "This probably means that you haven't supplied sufficient "
+            "independent constraints to yield a unique solution to the "
+            "problem. If you wish to proceed anyway, set "
+            "allow_rank_deficient=True in the function call."
+        )
 
     constraints = []
     if equality_constraints is not None:
@@ -83,7 +104,7 @@ def weighted_constrained_least_squares(
 
     # Set up the problem and solve it
     warns = []
-    if len(constraints) > 1:
+    if len(constraints) > 0:
         prob = cp.Problem(objective, constraints)
     else:
         prob = cp.Problem(objective)
@@ -104,7 +125,7 @@ def weighted_constrained_least_squares(
 
     # Calculate the covariance matrix
     # (also from https://stats.stackexchange.com/a/333551)
-    inv_Cov_b = np.linalg.inv(Cov_b)
-    pcov = np.linalg.inv(A.T.dot(inv_Cov_b.dot(A)))
+    inv_Cov_b = np.linalg.pinv(Cov_b)
+    pcov = np.linalg.pinv(A.T.dot(inv_Cov_b.dot(A)))
 
     return (popt, pcov, res)
