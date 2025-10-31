@@ -312,3 +312,75 @@ def simplify_composite_with_composition(composite, composition):
         return Composite(new_phases)
     else:
         return composite
+
+
+def greedy_independent_endmember_selection(
+    endmember_site_occupancies, site_occupancies, small_fraction_tol=0.0, norm_tol=1e-12
+):
+    """
+    Greedy algorithm to select independent endmembers from a solution to approximate given
+    site occupancies through a non-negative linear combination of endmember site occupancies.
+
+    This function starts with the full site occupancies and then iteratively selects endmembers
+    to approximate those site occupancies. It loops through all possible endmembers in a number of steps.
+    At each step the algorithm selects the endmember that can be subtracted in the largest amount from the
+    current residual site occupancies without making any site occupancy negative.
+    The process continues until either no endmember can be subtracted in an amount greater than fraction_tol,
+    or the norm of the residual site occupancies is less than tol.
+
+    :param endmember_site_occupancies: A 2D array of shape (m, n), where m is the number of endmembers
+    and n is the number of sites. Each row corresponds to the site occupancies of an endmember.
+    :type endmember_site_occupancies: np.ndarray
+
+    :param site_occupancies: A 1D array of length n, representing the target site occupancies to approximate.
+    :type site_occupancies: np.ndarray
+
+    :param small_fraction_tol: Algorithm stops if no endmember can be added with a molar fraction larger than this value.
+    :type small_fraction_tol: float, optional, default 0.0
+
+    :param norm_tol: Algorithm stops if the norm of the residual site occupancies is less than this value.
+    :type norm_tol: float, optional, default 1e-12
+
+    :return: indices of selected endmembers, their fractions, and the final residual site occupancies.
+    :rtype: tuple(list[int], list[float], np.ndarray)
+    """
+
+    site_occupancy_residuals = site_occupancies.copy()
+    indices = []
+    fractions = []
+
+    for _ in range(endmember_site_occupancies.shape[0]):
+        # compute fraction for each candidate endmember
+        # fraction_i = min_j r_j / s_ij over s_ij > 0; if no s_ij>0 -> fraction_i = 0
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratios = np.where(
+                endmember_site_occupancies > 0,
+                site_occupancy_residuals[np.newaxis, :] / endmember_site_occupancies,
+                np.inf,
+            )  # shape (m,n)
+
+        # For each row, take minimum ratio over columns where S>0; if all entries inf -> set 0
+        fractions_all = np.min(ratios, axis=1)
+        fractions_all[np.isinf(fractions_all)] = 0.0
+
+        # pick largest alpha
+        i_max = int(np.argmax(fractions_all))
+        fraction_max = float(fractions_all[i_max])
+        if fraction_max <= small_fraction_tol:
+            break  # no further progress possible or desirable
+
+        # update residual
+        site_occupancy_residuals = (
+            site_occupancy_residuals - fraction_max * endmember_site_occupancies[i_max]
+        )
+
+        # ensure non-negativity in elements of the residual
+        site_occupancy_residuals[site_occupancy_residuals < 0] = 0.0
+        indices.append(i_max)
+        fractions.append(fraction_max)
+
+        # check if done
+        if np.linalg.norm(site_occupancy_residuals) <= norm_tol:
+            break
+
+    return indices, fractions, site_occupancy_residuals

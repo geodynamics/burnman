@@ -31,6 +31,12 @@ Burnman has a number of high-level tools to help achieve common goals.
 Several of these have already been described in previous sections.
 
 
+Optimal thermobarometry
+-----------------------
+
+.. automodule:: burnman.tools.thermobarometry
+
+
 Plotting
 --------
 
