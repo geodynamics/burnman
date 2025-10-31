@@ -167,6 +167,7 @@ Advanced examples:
   - :mod:`~examples.example_fit_data`,
   - :mod:`~examples.example_fit_eos`,
   - :mod:`~examples.example_fit_solution`,
+  - :mod:`~examples.example_optimal_thermobarometry`,
   - :mod:`~examples.example_equilibrate`, and
   - :mod:`~examples.example_olivine_binary`.
 
