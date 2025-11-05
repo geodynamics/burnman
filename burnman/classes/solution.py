@@ -143,7 +143,6 @@ class Solution(Mineral):
         self,
         precision=2,
         print_absent_species=True,
-        latex_format=False,
         site_occupancies=None,
     ):
         """
@@ -155,9 +154,6 @@ class Solution(Mineral):
 
         :param print_absent_species: If True, prints site occupancies that are absent (i.e., zero).
         :type print_absent_species: bool
-
-        :param latex_format: If True, returns a LaTeX formatted string
-        :type latex_format: bool
 
         :param site_occupancies: Optional site occupancies to use instead of
             the current ones.
@@ -187,12 +183,7 @@ class Solution(Mineral):
                 if np.abs(occ) < 1.0e-12 and not print_absent_species:
                     i += 1
                     continue
-
-                # append species and occupancy to formula string
-                if latex_format:
-                    formula += f"{species}_{{{occ:0.{precision}f}}}"
-                else:
-                    formula += f"{species}{occ:0.{precision}f}"
+                formula += f"{species}{occ:0.{precision}f}"
                 i += 1
             formula += split_formula[j + 1]
 

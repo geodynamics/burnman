@@ -521,6 +521,36 @@ class test_solidsolution(BurnManTest):
 
         self.assertEqual(ol_ss.site_formula(), "[Mg0.40Fe0.60]2SiO4")
 
+    def test_ol_ss_formulae_high_precision(self):
+        P = 1.0e5
+        T = 1000.0
+        ol_ss = olivine_ss()
+        f = 0.43673678
+        ol_ss.set_composition([f, 1 - f])
+        ol_ss.set_state(P, T)
+        self.assertEqual(ol_ss.site_formula(precision=4), "[Mg0.4367Fe0.5633]2SiO4")
+
+    def test_ol_ss_formulae_absent_species(self):
+        P = 1.0e5
+        T = 1000.0
+        ol_ss = olivine_ss()
+        ol_ss.set_composition([0.0, 1.0])
+        ol_ss.set_state(P, T)
+        self.assertEqual(ol_ss.site_formula(), "[Mg0.00Fe1.00]2SiO4")
+        self.assertEqual(
+            ol_ss.site_formula(print_absent_species=False), "[Fe1.00]2SiO4"
+        )
+
+    def test_ol_ss_formulae_custom_site_occupancies(self):
+        P = 1.0e5
+        T = 1000.0
+        ol_ss = olivine_ss()
+        ol_ss.set_composition([0.4, 0.6])
+        ol_ss.set_state(P, T)
+        self.assertEqual(
+            ol_ss.site_formula(site_occupancies=[1.0, 2.0]), "[Mg1.00Fe2.00]2SiO4"
+        )
+
     def test_1_gibbs(self):
         fo, fo_ss = self.setup_1min_ss()
         with warnings.catch_warnings(record=True) as w:
