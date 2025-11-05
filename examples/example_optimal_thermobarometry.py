@@ -37,6 +37,7 @@ from burnman import Composite
 from burnman.minerals import mp50MnNCKFMASHTO, HP_2011_ds62
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 from burnman.tools.thermobarometry import estimate_conditions
+from burnman.utils.chemistry import formula_to_string
 
 if __name__ == "__main__":
 
@@ -70,7 +71,9 @@ if __name__ == "__main__":
     mu.compositional_covariances = pcov
 
     # b) Biotite (requires parameter constraining order state of
-    # Mg and Fe on the first two sites)
+    # Mg and Fe on the first two sites).
+    # Here, we will allow the Mg-Fe ordering to vary to improve the fit
+    # by adding a free compositional vector.
     fitted_species = ["Mn", "Fe", "Mg", "Al", "Si", "Ti", "Mg_M3"]
     species_amounts = np.array([0.01, 1.50, 1.00, 1.65, 2.65, 0.20, 0.10])
     species_covariances = np.diag(
@@ -82,6 +85,7 @@ if __name__ == "__main__":
     )
     bi.set_composition(popt)
     bi.compositional_covariances = pcov
+    bi.free_compositional_vectors = Composite([bi]).reaction_basis
 
     # c) Garnet
     fitted_species = ["Mn", "Fe", "Mg", "Ca", "Al", "Si"]
@@ -94,6 +98,8 @@ if __name__ == "__main__":
     g.compositional_covariances = pcov
 
     # d) Ilmenite (requires parameter constraining order state of Fe and Ti)
+    # Here, we will allow the Fe-Ti ordering to vary to improve the fit
+    # by adding a free compositional vector.
     fitted_species = ["Mn", "Fe", "Ti", "Mg", "Fe2+_A"]
     species_amounts = np.array([0.05, 1.0, 0.90, 0.05, 0.4])
     species_covariances = np.diag(np.array([0.01, 0.01, 0.01, 0.01, 0.2]) ** 2)
@@ -103,6 +109,7 @@ if __name__ == "__main__":
     )
     ilmm.set_composition(popt)
     ilmm.compositional_covariances = pcov
+    ilmm.free_compositional_vectors = Composite([ilmm]).reaction_basis
 
     # e) Staurolite
     fitted_species = ["Mn", "Fe", "Mg", "Al", "Si", "Ti"]
@@ -128,20 +135,74 @@ if __name__ == "__main__":
 
     # 4) Print the estimated conditions along with their uncertainties
     #    and correlations.
+    print("Results of thermobarometric inversion:")
     print(
-        f"Estimated Pressure: {assemblage.pressure/1.e9:.2f} "
+        f"    Estimated Pressure: {assemblage.pressure/1.e9:.2f} "
         f"+/- {np.sqrt(res.xcov[0, 0])/1.e9:.2f} GPa"
     )
     print(
-        f"Estimated Temperature: {assemblage.temperature:.0f} "
+        f"    Estimated Temperature: {assemblage.temperature:.0f} "
         f"+/- {np.sqrt(res.xcov[1, 1]):.0f} K"
     )
-    print(f"Correlation between P and T: {res.xcorr:.2f}")
-    print(f"Number of Reactions: {res.n_reactions}")
-    print(f"Number of Parameters: {res.n_params}")
-    print(f"Degrees of Freedom: {res.degrees_of_freedom}")
-    print(f"Reduced Chi-squared: {res.reduced_chisqr:.2f}")
-    print(f"Fit (sqrt reduced chi-squared): {res.fit:.2f}")
+    print(f"    Correlation between P and T: {res.xcorr:.2f}")
+    print(f"    Number of Reactions: {res.n_reactions}")
+    print(f"    Number of Parameters: {res.n_params}")
+    print(f"    Degrees of Freedom: {res.degrees_of_freedom}")
+    print(f"    Reduced Chi-squared: {res.reduced_chisqr:.2f}")
+    print(f"    Fit (sqrt reduced chi-squared): {res.fit:.2f}")
+
+    # The names of the sites in these models are a bit cumbersome,
+    # so we will do some string replacements to make them more
+    # readable in the output.
+    replace_strings = [
+        ["Fethree", "Fe3+"],
+        ["monetwo", ""],
+        ["mtwoa", ""],
+        ["mtwob", ""],
+        ["mthree", ""],
+        ["x", ""],
+        ["y", ""],
+        ["tone", ""],
+        ["t", ""],
+        ["Ka", "K"],
+        ["Naa", "Na"],
+        ["Caa", "Ca"],
+        ["Fea", "Fe"],
+        ["Mga", "Mg"],
+        ["Mna", "Mn"],
+        ["Tia", "Ti"],
+        ["Fe3+a", "Fe3+"],
+        ["Oh", "(OH)"],
+        ["b", ""],
+        ["v", ""],
+    ]
+
+    print("\nMineral compositions and site occupancies:")
+    for phase in assemblage.phases:
+        np.set_printoptions(precision=2, formatter={"all": lambda x: f"{x:0.2f}"})
+        print(f"{phase.name}:")
+
+        if hasattr(phase, "free_compositional_vectors"):
+            free_site_occupancy_vectors = phase.free_compositional_vectors.dot(
+                phase.solution_model.endmember_occupancies
+            )
+            for v in free_site_occupancy_vectors:
+                site_formula = phase.site_formula(
+                    precision=2, site_occupancies=v, print_absent_species=False
+                )
+                for old, new in replace_strings:
+                    site_formula = site_formula.replace(old, new)
+                print(f"    free site occupancy vector: {site_formula}")
+
+        print(
+            f"    composition: {formula_to_string(phase.formula, use_fractions=False)}"
+        )
+        if hasattr(phase, "molar_fractions"):
+            site_formula = phase.site_formula(2)
+            for old, new in replace_strings:
+                site_formula = site_formula.replace(old, new)
+            print(f"    site occupancies: {site_formula}")
+    print("")
 
     # Uncomment to see the weighted reaction affinities
     # print("Weighted reaction affinities:")

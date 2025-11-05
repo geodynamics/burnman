@@ -561,10 +561,19 @@ def ordered_compositional_array(formulae, elements):
     return formula_array
 
 
-def formula_to_string(formula):
+def formula_to_string(formula, use_fractions=True, significant_figures=2):
     """
     :param formula: Chemical formula
     :type formula: dict or Counter
+
+    :param use_fractions: Whether or not to use fractions in the output string.
+        If False, numbers are rounded to the number of significant figures
+        given by the significant_figures parameter.
+    :type use_fractions: bool
+
+    :param significant_figures: Number of significant figures to use if
+        use_fractions=False.
+    :type significant_figures: int
 
     :returns: A formula string, with element order as given in the list
         IUPAC_element_order.
@@ -574,20 +583,39 @@ def formula_to_string(formula):
     """
 
     formula_string = ""
-    for e in IUPAC_element_order:
-        if e in formula and np.abs(formula[e]) > 1.0e-12:
-            if np.abs(formula[e] - 1.0) < 1.0e-12:
-                formula_string += e
-            else:
-                formula_string += e + str(nsimplify(formula[e]))
-
-    for e in formula:
-        if e not in IUPAC_element_order:
+    if use_fractions:
+        for e in IUPAC_element_order:
             if e in formula and np.abs(formula[e]) > 1.0e-12:
                 if np.abs(formula[e] - 1.0) < 1.0e-12:
                     formula_string += e
                 else:
                     formula_string += e + str(nsimplify(formula[e]))
+
+        for e in formula:
+            if e not in IUPAC_element_order:
+                if e in formula and np.abs(formula[e]) > 1.0e-12:
+                    if np.abs(formula[e] - 1.0) < 1.0e-12:
+                        formula_string += e
+                    else:
+                        formula_string += e + str(nsimplify(formula[e]))
+
+    else:
+        for e in IUPAC_element_order:
+            if e in formula and np.abs(formula[e]) > 1.0e-12:
+                if np.abs(formula[e] - 1.0) < 1.0e-12:
+                    formula_string += e
+                else:
+                    formula_string += e + str(round(formula[e], significant_figures))
+
+        for e in formula:
+            if e not in IUPAC_element_order:
+                if e in formula and np.abs(formula[e]) > 1.0e-12:
+                    if np.abs(formula[e] - 1.0) < 1.0e-12:
+                        formula_string += e
+                    else:
+                        formula_string += e + str(
+                            round(formula[e], significant_figures)
+                        )
 
     return formula_string
 

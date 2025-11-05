@@ -7,6 +7,7 @@ from scipy.ndimage import gaussian_filter
 from sympy import Matrix, Rational
 import scipy.integrate as integrate
 
+from burnman.utils.chemistry import formula_to_string
 from burnman.utils.misc import extract_lines_between_markers
 from burnman.utils.misc import run_cli_program_with_input
 from burnman.utils.math import smooth_array
@@ -299,6 +300,26 @@ class test_utils(BurnManTest):
         tiny = [np.array([[0, 0], [0.01, 0.1], [0, 0]])]
         center = visual_center_of_polygon(tiny)
         self.assertTrue(np.allclose(center, [0.005, 0.05], atol=1e-4))
+
+    def test_formula_to_string(self):
+        formula = {"Si": 1, "O": 4, "Mg": 1.5, "Fe": 0.5}
+        result = formula_to_string(formula, use_fractions=False)
+        self.assertEqual(result, "Mg1.5Fe0.5SiO4")
+
+        result_frac = formula_to_string(formula)
+        self.assertEqual(result_frac, "Mg3/2Fe1/2SiO4")
+
+        formula_zero = {"Si": 1.0, "O": 4.0, "Mg": 0.0, "Fe": 2.0}
+        result_zero = formula_to_string(
+            formula_zero, use_fractions=False, significant_figures=1
+        )
+        self.assertEqual(result_zero, "Fe2.0SiO4.0")
+
+        formula_sf = {"Si": 2, "O": 4, "Mg": 1.123456, "Fe": 0.5}
+        result_sf = formula_to_string(
+            formula_sf, use_fractions=False, significant_figures=2
+        )
+        self.assertEqual(result_sf, "Mg1.12Fe0.5Si2O4")
 
 
 if __name__ == "__main__":

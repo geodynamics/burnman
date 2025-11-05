@@ -466,6 +466,25 @@ class test_tools(BurnManTest):
                 temperature_bounds=[500.0, 500.0],
             )
 
+    def test_estimate_conditions_free_compositional_vector(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.5e9, 500.0])
+        dataset_covariances = HP_2011_ds62.cov()
+
+        # set free compositional vectors for each phase
+        # corresponding to isochemical reactions
+        for phase in assemblage.phases:
+            r = Composite([phase]).reaction_basis
+            if r.shape[0] > 0:
+                phase.free_compositional_vectors = Composite([phase]).reaction_basis
+
+        res = estimate_conditions(
+            assemblage, dataset_covariances, guessed_conditions=theta
+        )
+        self.assertTrue(res.success)
+        self.assertEqual(res.n_reactions, 18)
+        self.assertEqual(res.n_params, 4)
+
 
 if __name__ == "__main__":
     unittest.main()
