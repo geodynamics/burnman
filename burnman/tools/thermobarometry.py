@@ -107,6 +107,12 @@ def estimate_conditions(
     for a given mineral assemblage. Algorithm based on Powell and Holland (1994).
 
     :param assemblage: The mineral assemblage for which to perform the inversion.
+        Each solution phase in the assemblage must have its composition set along with
+        its compositional covariance matrix (called `compositional_covariances`).
+        If there are compositional degrees of freedom, they can be added by setting
+        the attribute `free_compositional_vectors` on the relevant solution phases, where each
+        row of the array corresponds to a free compositional vector, and the columns correspond
+        to the amounts of endmembers of that phase in each vector.
     :type assemblage: Assemblage
 
     :param dataset_covariances: The covariance data from the thermodynamic dataset.
@@ -146,13 +152,21 @@ def estimate_conditions(
         and the fit quality (fit, given by the square root of the reduced chi-squared value).
     :rtype: OptimizeResult
     """
-    # TODO: Implement compositional unknown parameters like redox state
-    # to join P and T in the optimization
 
+    # Count the number of free compositional vectors across all phases
+    n_free_vectors = 0
+    for phase in assemblage.phases:
+        if hasattr(phase, "free_compositional_vectors"):
+            n_free_vectors += phase.free_compositional_vectors.shape[0]
+            phase.baseline_composition = phase.molar_fractions.copy()
+
+    # Check if P and/or T are fixed
     P_fixed = np.isclose(pressure_bounds[0], pressure_bounds[1])
     T_fixed = np.isclose(temperature_bounds[0], temperature_bounds[1])
-    if P_fixed and T_fixed:
-        raise Exception("Both pressure and temperature cannot be fixed!")
+    if P_fixed and T_fixed and n_free_vectors == 0:
+        raise Exception(
+            "Both pressure and temperature cannot be fixed if there are no free compositional vectors!"
+        )
 
     # Build the reaction matrix R, possibly reducing the number of endmembers
     # by excluding components with small molar fractions
@@ -189,7 +203,18 @@ def estimate_conditions(
         raise Exception("No independent reactions found for the given assemblage!")
 
     def calculate_cov_a(assemblage, theta, dataset_covariances):
-        assemblage.set_state(*theta)
+        if n_free_vectors > 0:
+            vi = 2
+            for phase in assemblage.phases:
+                if hasattr(phase, "free_compositional_vectors"):
+                    n_free_vectors_in_phase = phase.free_compositional_vectors.shape[0]
+                    v = np.array(theta[vi : vi + n_free_vectors_in_phase])
+                    dc = phase.free_compositional_vectors.T.dot(v)
+                    new_composition = phase.baseline_composition + dc
+                    phase.set_composition(new_composition)
+                    vi += n_free_vectors_in_phase
+
+        assemblage.set_state(*theta[:2])
         cov1 = _build_endmember_covariance_matrix(assemblage, dataset_covariances)
         cov2 = _build_solution_covariance_matrix(assemblage)
         cov_mu = cov1 + cov2
@@ -207,18 +232,36 @@ def estimate_conditions(
         """
         # These are the chemical potential covariances for all endmembers
         cov_a = calculate_cov_a(
-            assemblage, [args[0] * P_scaling, args[1]], dataset_covariances
+            assemblage, [args[0] * P_scaling, *args[1:]], dataset_covariances
         )
         a = R.dot(assemblage.endmember_partial_gibbs)
-        chisqr = a.T.dot(np.linalg.inv(cov_a)).dot(a)
+        chisqr = a.T.dot(np.linalg.pinv(cov_a)).dot(a)
         return chisqr
 
     # Minimize the chi-squared function
-    x0 = [guessed_conditions[0] / P_scaling, guessed_conditions[1]]
+    x0 = [
+        guessed_conditions[0] / P_scaling,
+        guessed_conditions[1],
+        *[0.0] * n_free_vectors,
+    ]
     bounds = [
         (pressure_bounds[0] / P_scaling, pressure_bounds[1] / P_scaling),
         (temperature_bounds[0], temperature_bounds[1]),
+        *[(None, None)] * n_free_vectors,
     ]
+
+    if n_free_vectors > 0:
+        # Nelder-Mead is more robust for problems where the feasible region
+        # may be complex due to compositional degrees of freedom
+        res = minimize(
+            chisqr,
+            x0,
+            method="Nelder-Mead",
+            bounds=bounds,
+            options={"maxiter": max_it},
+        )
+        x0 = res.x
+
     res = minimize(
         chisqr,
         x0,
