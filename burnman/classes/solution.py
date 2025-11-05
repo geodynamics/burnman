@@ -131,22 +131,21 @@ class Solution(Mineral):
     @material_property
     def site_occupancies(self):
         """
-        :returns: The fractional occupancies of species on each site.
-        :rtype: list of OrderedDicts
+        :returns: The fractional occupancies of species on each site
+            as a flat vector.
+        :rtype: numpy.ndarray
         """
         f = self.molar_fractions
-        occs = np.einsum("ij, i", self.solution_model.endmember_occupancies, f)
-        site_occs = []
-        k = 0
-        for site in self.solution_model.sites:
-            site_occs.append(OrderedDict())
-            for species in site:
-                site_occs[-1][species] = occs[k]
-                k += 1
+        occs = f.dot(self.solution_model.endmember_occupancies)
+        return occs
 
-        return site_occs
-
-    def site_formula(self, precision=2):
+    def site_formula(
+        self,
+        precision=2,
+        print_absent_species=True,
+        latex_format=False,
+        site_occupancies=None,
+    ):
         """
         Returns the molar chemical formula of the solution with
             site occupancies. For example, [Mg0.4Fe0.6]2SiO4.
@@ -154,18 +153,49 @@ class Solution(Mineral):
         :param precision: Precision with which to print the site occupancies
         :type precision: int
 
+        :param print_absent_species: If True, prints site occupancies that are absent (i.e., zero).
+        :type print_absent_species: bool
+
+        :param latex_format: If True, returns a LaTeX formatted string
+        :type latex_format: bool
+
+        :param site_occupancies: Optional site occupancies to use instead of
+            the current ones.
+        :type site_occupancies: numpy.ndarray
+
         :returns: Molar chemical formula of the solution with site occupancies
         :rtype: str
         """
-        split_empty = self.solution_model.empty_formula.split("[")
-        formula = split_empty[0]
-        for i, site_occs in enumerate(self.site_occupancies):
+        if site_occupancies is not None:
+            occs = site_occupancies
+        else:
+            occs = self.site_occupancies
+
+        i = 0
+        # Split the empty formula into site sections.
+        # This allows us to reconstruct the formula including
+        # occupancies and anything outside the sites.
+        split_formula = self.solution_model.empty_formula.split("[")
+        formula = split_formula[0]
+        for j, site in enumerate(self.solution_model.sites):
             formula += "["
-            for species, occ in site_occs.items():
-                if np.abs(occ) < 1.0e-12:
-                    occ = np.abs(occ)
-                formula += f"{species}{occ:0.{precision}f}"
-            formula += split_empty[i + 1]
+            for species in site:
+                # avoid printing -0.00
+                occ = occs[i] if np.abs(occs[i]) >= 1.0e-12 else 0.0
+
+                # skip absent species if requested
+                if np.abs(occ) < 1.0e-12 and not print_absent_species:
+                    i += 1
+                    continue
+
+                # append species and occupancy to formula string
+                if latex_format:
+                    formula += f"{species}_{{{occ:0.{precision}f}}}"
+                else:
+                    formula += f"{species}{occ:0.{precision}f}"
+                i += 1
+            formula += split_formula[j + 1]
+
         return formula
 
     @material_property
