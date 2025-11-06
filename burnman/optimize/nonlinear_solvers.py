@@ -124,8 +124,10 @@ class Solution:
         s += f"F = {self.F}\n"
         s += f"F_norm = {self.F_norm}\n"
         s += f"J = {self.J}\n"
-        if len(self.iterates.x) > 0:
+        try:
             s += f"{self.iterates}"
+        except AttributeError:
+            pass
         return s
 
     def __str__(self):

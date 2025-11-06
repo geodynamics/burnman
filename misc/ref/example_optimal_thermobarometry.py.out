@@ -1,6 +1,14 @@
-Results of thermobarometric inversion:
-    Estimated Pressure: 0.43 +/- 0.04 GPa
-    Estimated Temperature: 888 +/- 11 K
+Estimated conditions for sillimanite-kyanite equilibrium:
+    Temperature: 650 +/- 6 K
+    (fixed pressure at 0.1 GPa)
+
+Estimated conditions for olivine-wadsleyite equilibrium:
+    Pressure: 12.4 +/- 0.0 GPa
+    Temperature: 1380 +/- 12 K
+
+Estimated conditions for mu-bi-g-ilmm-st-q assemblage:
+    Pressure: 0.43 +/- 0.04 GPa
+    Temperature: 888 +/- 11 K
     Correlation between P and T: 0.11
     Number of Reactions: 11
     Number of Parameters: 4
@@ -8,24 +16,35 @@ Results of thermobarometric inversion:
     Reduced Chi-squared: 0.25
     Fit (sqrt reduced chi-squared): 0.50
 
-Mineral compositions and site occupancies:
-mu:
-    composition: K0.56Na0.41Ca0.02Mg0.01Fe0.01Al2.99Si2.99O12.0H2.0
-    site occupancies: [K0.56Na0.41Ca0.02][Al0.98Mg0.01Fe0.01][Al1.00Fe3+0.00][Si0.50Al0.50]2
-bi:
-    free site occupancy vector: [Mg-0.67Fe0.67][Mg0.33Fe-0.33]2[]2[]2
-    composition: KMg1.0Ti0.2Mn0.01Fe1.5Al1.65Si2.65O12.0H1.6
-    site occupancies: [Mg0.12Fe0.32Al0.29Ti0.20Fe3+0.06Mn0.00][Mg0.44Fe0.56Mn0.00]2[Si0.32Al0.68]2[(OH)0.80O0.20]2
-g:
-    composition: Ca0.05Mg0.4Mn0.25Fe2.3Al2.0Si3.0O12.0
-    site occupancies: [Mg0.13Fe0.77Mn0.08Ca0.02]3[Al1.00Fe3+0.00]2
-ilmm:
-    free site occupancy vector: [Fe-0.50Ti0.50][Ti-0.50Fe0.50]
-    composition: Mg0.05Ti0.9Mn0.05FeO3.0
-    site occupancies: [Fe0.37Ti0.43Fe3+0.10Mg0.05Mn0.05][Ti0.47Fe0.43Fe3+0.10]
-st:
-    composition: Mg0.72Ti0.12Mn0.05Fe3.3Al17.77Si7.5O48.0H4.0
-    site occupancies: [Mg0.18Fe0.81Mn0.01]4[Al0.89Fe3+0.03Ti0.06V0.02]2
-q:
-    composition: SiO2.0
+    Mineral compositions and site occupancies:
+    mu:
+        composition: K0.56Na0.41Ca0.02Mg0.01Fe0.01Al2.99Si2.99O12.0H2.0
+        site occupancies: [K0.56Na0.41Ca0.02][Al0.98Mg0.01Fe0.01][Al1.00Fe3+0.00][Si0.50Al0.50]2
+    bi:
+        free site occupancy vector: [Mg-0.67Fe0.67][Mg0.33Fe-0.33]2[]2[]2
+        composition: KMg1.0Ti0.2Mn0.01Fe1.5Al1.65Si2.65O12.0H1.6
+        site occupancies: [Mg0.12Fe0.32Al0.29Ti0.20Fe3+0.06Mn0.00][Mg0.44Fe0.56Mn0.00]2[Si0.32Al0.68]2[(OH)0.80O0.20]2
+    g:
+        composition: Ca0.05Mg0.4Mn0.25Fe2.3Al2.0Si3.0O12.0
+        site occupancies: [Mg0.13Fe0.77Mn0.08Ca0.02]3[Al1.00Fe3+0.00]2
+    ilmm:
+        free site occupancy vector: [Fe-0.50Ti0.50][Ti-0.50Fe0.50]
+        composition: Mg0.05Ti0.9Mn0.05FeO3.0
+        site occupancies: [Fe0.37Ti0.43Fe3+0.10Mg0.05Mn0.05][Ti0.47Fe0.43Fe3+0.10]
+    st:
+        composition: Mg0.72Ti0.12Mn0.05Fe3.3Al17.77Si7.5O48.0H4.0
+        site occupancies: [Mg0.18Fe0.81Mn0.01]4[Al0.89Fe3+0.03Ti0.06V0.02]2
+    q:
+        composition: SiO2.0
+
+    Reduced chi-squared misfit variation with compositional degrees of freedom:
+    bi Fe-Mg order:
+        chisq(x=-0.1)=0.41,
+        chisq(x=0.0)=0.25,
+        chisq(x=0.1)=0.52
+
+    ilmm Fe-Ti order:
+        chisq(x=-0.1)=0.26,
+        chisq(x=0.0)=0.25,
+        chisq(x=0.1)=0.26
 
