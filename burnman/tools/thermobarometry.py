@@ -1,7 +1,9 @@
+import warnings
 import numpy as np
+import sympy as sp
+
 from scipy.linalg import sqrtm, block_diag
 from scipy.optimize import minimize
-import sympy as sp
 
 from ..classes.solution import Solution
 from ..classes.combinedmineral import CombinedMineral
@@ -10,6 +12,60 @@ from .polytope import (
     greedy_independent_endmember_selection,
     solution_polytope_from_endmember_occupancies,
 )
+
+
+def get_reaction_matrix(assemblage, small_fraction_tol=0.0):
+    """
+    Set up a matrix of independent reactions for an assemblage,
+    possibly reducing the number of endmembers by excluding components
+    with small molar fractions.
+
+    :param assemblage: The mineral assemblage for which to build the
+        reaction matrix.
+    :type assemblage: Assemblage
+
+    :param small_fraction_tol: If > 0.0, reduces the number of endmembers
+        in solution phases by transforming to a smaller set of independent
+        endmembers using a greedy algorithm and excluding those with molar
+        fractions smaller than this value during the inversion.
+    :type small_fraction_tol: float, optional, default 0.0
+
+    :return: The reaction matrix for the assemblage,
+        returned in the original endmember basis.
+    :rtype: 2D np.array
+    """
+    transformation_matrix = []
+    if small_fraction_tol > 0.0:
+        transformation_matrices = []
+        for phase in assemblage.phases:
+            if isinstance(phase, Solution):
+                occs = phase.solution_model.endmember_occupancies
+                poly = solution_polytope_from_endmember_occupancies(occs)
+                S = poly.endmember_occupancies
+                T = poly.endmembers_as_independent_endmember_amounts
+                f = phase.molar_fractions
+                v = f.dot(occs)
+                mbrs = greedy_independent_endmember_selection(
+                    S, v, small_fraction_tol=small_fraction_tol, norm_tol=1e-12
+                )
+                idx, _, _ = mbrs
+                transformation_matrices.append(T[idx, :])
+            else:
+                transformation_matrices.append(np.array([[1.0]]))
+
+        transformation_matrix = block_diag(*transformation_matrices)
+    else:
+        transformation_matrix = np.identity(len(assemblage.endmember_names))
+
+    # Here we build the reaction matrix R in the reduced endmember basis
+    # i.e. after applying the transformation to the stoichiometric matrix
+    S = sp.Matrix(transformation_matrix.dot(assemblage.stoichiometric_array))
+    S = S.applyfunc(lambda x: sp.nsimplify(x))
+    R = np.array([v[:] for v in S.T.nullspace()], dtype=float)
+    R = R.dot(transformation_matrix)  # transform back to original basis
+    if len(R) == 0:
+        raise Exception("No independent reactions found for the given assemblage!")
+    return R
 
 
 def _build_endmember_covariance_matrix(assemblage, dataset_covariances):
@@ -63,6 +119,18 @@ def _build_endmember_covariance_matrix(assemblage, dataset_covariances):
 
 
 def _build_solution_covariance_matrix(assemblage):
+    """
+    Build the Gibbs free energy covariance matrix contribution from
+    the compositional uncertainties of solution phases in the assemblage.
+
+    :param assemblage: The mineral assemblage for which to build the
+        covariance matrix.
+    :type assemblage: Assemblage
+
+    :return: The Gibbs free energy covariance matrix contribution from
+        the compositional uncertainties of solution phases in the assemblage.
+    :rtype: 2D np.array
+    """
     n_mbrs_all = len(assemblage.endmember_names)
     cov_RTlna = np.zeros((n_mbrs_all, n_mbrs_all))
 
@@ -73,15 +141,20 @@ def _build_solution_covariance_matrix(assemblage):
             n_mbrs_phase = H_G.shape[0]
             cov_X_phase = np.array(phase.compositional_covariances)
 
-            assert (
-                cov_X_phase.ndim == 2
-            ), "Compositional uncertainties must be provided as a covariance matrix."
-            assert (
-                cov_X_phase.shape[0] == n_mbrs_phase
-            ), "Compositional uncertainties covariance matrix must have the same number of rows as phases."
-            assert (
-                cov_X_phase.shape[1] == n_mbrs_phase
-            ), "Compositional uncertainties covariance matrix must be square."
+            if cov_X_phase.ndim != 2:
+                raise Exception(
+                    "Compositional uncertainties for each phase must be "
+                    "provided as a 2D covariance matrix."
+                )
+            if cov_X_phase.shape[0] != cov_X_phase.shape[1]:
+                raise Exception(
+                    "Compositional uncertainties covariance matrix must be square."
+                )
+            if cov_X_phase.shape[0] != n_mbrs_phase:
+                raise Exception(
+                    "Compositional uncertainties covariance matrix "
+                    "must have the same number of rows as phases."
+                )
 
             cov_RTlna_phase = H_G.dot(cov_X_phase).dot(H_G.T)
             cov_RTlna[j : j + n_mbrs_phase, j : j + n_mbrs_phase] = cov_RTlna_phase
@@ -92,10 +165,100 @@ def _build_solution_covariance_matrix(assemblage):
     return cov_RTlna
 
 
+def assemblage_set_state_from_params(assemblage, params):
+    """
+    Set the state of the assemblage (P, T, compositions) from the given
+    list of parameters.
+
+    :param assemblage: The mineral assemblage to set the state for.
+    :type assemblage: Assemblage
+
+    :param params: List of parameters, where the first two are pressure (Pa)
+        and temperature (K), and any additional parameters correspond to
+        compositional degrees of freedom. Each compositional degree of freedom
+        corresponds to a free compositional vector defined on one of the
+        solution phases in the assemblage.
+    :type params: list or np.array
+
+    :return: None
+    :rtype: None
+    """
+    # If there are compositional degrees of freedom, set the compositions
+    # according to the values in params
+    if len(params) > 2:
+        vi = 2
+        for phase in assemblage.phases:
+            if hasattr(phase, "free_compositional_vectors"):
+                nv_in_phase = phase.free_compositional_vectors.shape[0]
+                v = np.array(params[vi : vi + nv_in_phase])
+                dc = phase.free_compositional_vectors.T.dot(v)
+                new_composition = phase.baseline_composition + dc
+                phase.set_composition(new_composition)
+                vi += nv_in_phase
+
+    # Set pressure and temperature
+    assemblage.set_state(params[0], params[1])
+    return None
+
+
+def assemblage_affinity_covariance_matrix(
+    assemblage, reaction_matrix, dataset_covariances
+):
+    """
+    Compute the covariance matrix of the affinities of the independent
+    reactions for the given assemblage.
+
+    :param assemblage: The mineral assemblage for which to compute
+        the covariance matrix. Should have its state (P, T, compositions)
+        set prior to calling this function.
+    :type assemblage: Assemblage
+
+    :param reaction_matrix: The reaction matrix for the assemblage.
+    :type reaction_matrix: 2D np.array
+
+    :param dataset_covariances: The covariance data from the thermodynamic dataset.
+    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'
+
+    :return: Covariance matrix of the affinities of the independent reactions.
+    :rtype: 2D np.array
+    """
+    R = reaction_matrix
+    cov1 = _build_endmember_covariance_matrix(assemblage, dataset_covariances)
+    cov2 = _build_solution_covariance_matrix(assemblage)
+    cov_mu = cov1 + cov2
+    acov = R.dot(cov_mu).dot(R.T)
+    return acov
+
+
+def assemblage_affinity_misfit(assemblage, reaction_matrix, dataset_covariances):
+    """
+    Compute the objective misfit function (chi-squared) for given P and T.
+
+    :param assemblage: The mineral assemblage for which to compute the misfit.
+        Should have its state (P, T, compositions) set prior to calling this function.
+    :type assemblage: Assemblage
+
+    :param reaction_matrix: The reaction matrix for the assemblage.
+    :type reaction_matrix: 2D np.array
+
+    :param dataset_covariances: The covariance data from the thermodynamic dataset.
+    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'
+
+    :return: Chi-squared misfit value.
+    :rtype: float
+    """
+    R = reaction_matrix
+    cov_a = assemblage_affinity_covariance_matrix(assemblage, R, dataset_covariances)
+    a = R.dot(assemblage.endmember_partial_gibbs)
+    return a.T.dot(np.linalg.pinv(cov_a)).dot(a)
+
+
 def estimate_conditions(
     assemblage,
     dataset_covariances,
-    guessed_conditions=np.array([1.0e9, 873.0]),
+    guessed_conditions=[1.0e9, 1000.0],
+    condition_priors=None,
+    condition_covariances=None,
     pressure_bounds=[1.0e5, 400.0e9],
     temperature_bounds=[300.0, 4000.0],
     P_scaling=1.0e6,
@@ -104,7 +267,7 @@ def estimate_conditions(
 ):
     """
     Perform the avPT thermobarometric inversion to find the optimal pressure and temperature
-    for a given mineral assemblage. Algorithm based on Powell and Holland (1994).
+    for a given mineral assemblage. Algorithm modified from Powell and Holland (1994).
 
     :param assemblage: The mineral assemblage for which to perform the inversion.
         Each solution phase in the assemblage must have its composition set along with
@@ -116,10 +279,20 @@ def estimate_conditions(
     :type assemblage: Assemblage
 
     :param dataset_covariances: The covariance data from the thermodynamic dataset.
-    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'
+    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
 
     :param guessed_conditions: Initial guess for pressure (Pa) and temperature (K).
-    :type guessed_conditions: np.array of shape (2,)
+        If not provided, the initial guess will be taken from the current
+        state of the assemblage.
+    :type guessed_conditions: np.array of shape (2,), optional, default None
+
+    :param condition_priors: The prior expectation for pressure and temperature.
+    :type condition_priors: np.array of shape (2,), optional, default None
+
+    :param condition_covariances: The covariance matrix for pressure and temperature.
+        If provided, this will be incorporated into the inversion as a prior, with
+        the condition_prior parameter as the prior expectation.
+    :type condition_covariances: np.array of shape (2, 2), optional, default None
 
     :param pressure_bounds: Bounds for pressure (Pa) during optimization.
     :type pressure_bounds: list of two floats
@@ -153,6 +326,41 @@ def estimate_conditions(
     :rtype: OptimizeResult
     """
 
+    # Set up the condition prior covariance inverse if provided
+    cov_cond_inv = None
+    if condition_covariances is not None:
+        # Calculate the inverse covariance matrix. Scaling here
+        # preserves small eigenvalues that would otherwise be lost.
+        cov = condition_covariances.copy()
+        cov[0, :] /= P_scaling
+        cov[:, 0] /= P_scaling
+        cov_cond_inv = np.linalg.pinv(cov)
+
+        if condition_priors is None:
+            raise ValueError(
+                "If condition_covariances is provided, condition_prior "
+                "must also be provided as the prior expectation values."
+            )
+
+    if condition_priors is not None:
+        if condition_covariances is None:
+            raise ValueError(
+                "If condition_prior is provided, condition_covariances "
+                "must also be provided as the prior covariance matrix."
+            )
+
+    # Set initial guess for P and T if guessed_conditions is not provided
+    if guessed_conditions is None:
+        try:
+            guessed_conditions = np.array([assemblage.pressure, assemblage.temperature])
+        except Exception as e:
+            raise ValueError(
+                "guessed_conditions was not passed as an "
+                "argument to the function, and could not "
+                "be inferred from the current state of "
+                "the assemblage."
+            ) from e
+
     # Count the number of free compositional vectors across all phases
     n_free_vectors = 0
     for phase in assemblage.phases:
@@ -165,140 +373,96 @@ def estimate_conditions(
     T_fixed = np.isclose(temperature_bounds[0], temperature_bounds[1])
     if P_fixed and T_fixed and n_free_vectors == 0:
         raise Exception(
-            "Both pressure and temperature cannot be fixed if there are no free compositional vectors!"
+            "Both pressure and temperature cannot be fixed if there "
+            "are no free compositional vectors!"
         )
 
-    # Build the reaction matrix R, possibly reducing the number of endmembers
-    # by excluding components with small molar fractions
-    transformation_matrix = []
-    if small_fraction_tol > 0.0:
-        transformation_matrices = []
-        for phase in assemblage.phases:
-            if isinstance(phase, Solution):
-                occs = phase.solution_model.endmember_occupancies
-                poly = solution_polytope_from_endmember_occupancies(occs)
-                S = poly.endmember_occupancies
-                T = poly.endmembers_as_independent_endmember_amounts
-                f = phase.molar_fractions
-                v = f.dot(occs)
-                mbrs = greedy_independent_endmember_selection(
-                    S, v, small_fraction_tol=small_fraction_tol, norm_tol=1e-12
-                )
-                idx, _, _ = mbrs
-                transformation_matrices.append(T[idx, :])
-            else:
-                transformation_matrices.append(np.array([[1.0]]))
+    # Set up the reaction matrix for the assemblage and assign it to an
+    # assemblage attribute called reaction_matrix_for_optimization
+    R = get_reaction_matrix(assemblage, small_fraction_tol)
 
-        transformation_matrix = block_diag(*transformation_matrices)
-    else:
-        transformation_matrix = np.identity(len(assemblage.endmember_names))
+    # Check that there are enough constraints on the problem
+    n_params = 2 + n_free_vectors - int(P_fixed) - int(T_fixed)
+    n_constraints = 2 if cov_cond_inv is not None else 0
+    n_reactions = R.shape[0]
+    if n_reactions + n_constraints < n_params:
+        raise Exception(
+            f"Not enough independent reactions ({n_reactions}) to constrain "
+            "the inversion! You may need to relax small_fraction_tol, "
+            "fix P or T through the pressure_bounds or temperature_bounds, "
+            "or add priors on P and T via condition_covariances "
+            "and condition_priors."
+        )
 
-    # Here we build the reaction matrix R in the reduced endmember basis
-    # i.e. after applying the transformation matrix to the stoichiometric matrix
-    S = sp.Matrix(transformation_matrix.dot(assemblage.stoichiometric_array))
-    S = S.applyfunc(lambda x: sp.nsimplify(x))
-    R = np.array([v[:] for v in S.T.nullspace()], dtype=float)
-    R = R.dot(transformation_matrix)  # transform back to original endmember basis
-    if len(R) == 0:
-        raise Exception("No independent reactions found for the given assemblage!")
-
-    def calculate_cov_a(assemblage, theta, dataset_covariances):
-        if n_free_vectors > 0:
-            vi = 2
-            for phase in assemblage.phases:
-                if hasattr(phase, "free_compositional_vectors"):
-                    n_free_vectors_in_phase = phase.free_compositional_vectors.shape[0]
-                    v = np.array(theta[vi : vi + n_free_vectors_in_phase])
-                    dc = phase.free_compositional_vectors.T.dot(v)
-                    new_composition = phase.baseline_composition + dc
-                    phase.set_composition(new_composition)
-                    vi += n_free_vectors_in_phase
-
-        assemblage.set_state(*theta[:2])
-        cov1 = _build_endmember_covariance_matrix(assemblage, dataset_covariances)
-        cov2 = _build_solution_covariance_matrix(assemblage)
-        cov_mu = cov1 + cov2
-        acov = R.dot(cov_mu).dot(R.T)
-        return acov
-
+    # Define the chi-squared function to minimize
     def chisqr(args):
-        """
-        Compute the objective misfit function (chi-squared) for given P and T.
-        :param theta: Array of pressure (Pa) and temperature (K).
-        :type theta: np.array of shape (2,)
-
-        :return: Chi-squared misfit value.
-        :rtype: float
-        """
-        # These are the chemical potential covariances for all endmembers
-        cov_a = calculate_cov_a(
-            assemblage, [args[0] * P_scaling, *args[1:]], dataset_covariances
-        )
-        a = R.dot(assemblage.endmember_partial_gibbs)
-        chisqr = a.T.dot(np.linalg.pinv(cov_a)).dot(a)
+        assemblage_set_state_from_params(assemblage, [args[0] * P_scaling, *args[1:]])
+        chisqr = assemblage_affinity_misfit(assemblage, R, dataset_covariances)
+        if cov_cond_inv is not None:
+            delta = np.array(
+                [
+                    args[0] - condition_priors[0] / P_scaling,
+                    args[1] - condition_priors[1],
+                ]
+            )
+            chisqr += delta.T.dot(cov_cond_inv).dot(delta)
         return chisqr
 
-    # Minimize the chi-squared function
-    x0 = [
-        guessed_conditions[0] / P_scaling,
-        guessed_conditions[1],
-        *[0.0] * n_free_vectors,
-    ]
+    # Set up initial guess, bounds, and options for the optimizer
+    x0 = list(guessed_conditions)
+    x0[0] /= P_scaling
+    x0.extend([0.0] * n_free_vectors)
     bounds = [
         (pressure_bounds[0] / P_scaling, pressure_bounds[1] / P_scaling),
         (temperature_bounds[0], temperature_bounds[1]),
         *[(None, None)] * n_free_vectors,
     ]
+    options = {"maxiter": max_it}
 
+    # Solve first with Nelder-Mead if there are free compositional vectors
+    # Nelder-Mead is more robust for problems where the feasible region
+    # may be complex due to compositional degrees of freedom
     if n_free_vectors > 0:
-        # Nelder-Mead is more robust for problems where the feasible region
-        # may be complex due to compositional degrees of freedom
-        res = minimize(
-            chisqr,
-            x0,
-            method="Nelder-Mead",
-            bounds=bounds,
-            options={"maxiter": max_it},
-        )
+        res = minimize(chisqr, x0, method="Nelder-Mead", bounds=bounds, options=options)
         x0 = res.x
 
-    res = minimize(
-        chisqr,
-        x0,
-        method="SLSQP",
-        bounds=bounds,
-        options={"maxiter": max_it},
-    )
+    # Solve with SLSQP, which returns the Jacobian needed for uncertainty estimation
+    res = minimize(chisqr, x0, method="SLSQP", bounds=bounds, options=options)
 
-    # Rescale pressure back to Pa
+    # Rescale solution and Jacobian back to SI units (Pa for pressure)
     res.x[0] *= P_scaling
     res.jac[0] /= P_scaling
 
     # Post-process results
     # First we reset the assemblage to the optimal P and T
-    # and recalculate the affinity covariance matrix
-    res.acov = calculate_cov_a(assemblage, res.x, dataset_covariances)
+    assemblage_set_state_from_params(assemblage, res.x)
 
-    # Compute additional diagnostics
-    res.dadx = R.dot(
-        np.array(
-            [
-                assemblage.endmember_partial_volumes,
-                -assemblage.endmember_partial_entropies,
-            ]
-        ).T
+    # Compute the covariance matrix of the estimated parameters
+    # and other statistics
+    res.acov = assemblage_affinity_covariance_matrix(assemblage, R, dataset_covariances)
+    dmudP = assemblage.endmember_partial_volumes
+    dmudT = -assemblage.endmember_partial_entropies
+    res.dadx = R.dot(np.array([dmudP, dmudT]).T)
+    res.xcov = np.linalg.pinv(
+        res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx)
+        + (cov_cond_inv if cov_cond_inv is not None else 0)
     )
-
-    res.xcov = np.linalg.pinv(res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx))
     res.xcorr = res.xcov[0, 1] / np.sqrt(res.xcov[0, 0] * res.xcov[1, 1])
 
     res.affinities = R.dot(assemblage.endmember_partial_gibbs)
     res.weighted_affinities = np.linalg.pinv(sqrtm(res.acov)).dot(res.affinities)
 
-    res.n_reactions = len(res.affinities)
-    res.n_params = len(res.x)
-    res.degrees_of_freedom = res.n_reactions - res.n_params
-    res.reduced_chisqr = res.fun / res.degrees_of_freedom
-    res.fit = np.sqrt(res.reduced_chisqr)
+    res.n_reactions = n_reactions
+    res.n_constraints = n_constraints
+    res.n_params = n_params
+    res.degrees_of_freedom = res.n_reactions + res.n_constraints - res.n_params
+    if res.degrees_of_freedom > 0:
+        res.reduced_chisqr = res.fun / res.degrees_of_freedom
+        res.fit = np.sqrt(res.reduced_chisqr)
+    else:
+        warnings.warn(
+            "Degrees of freedom <= 0, cannot compute reduced chi-squared and fit quality.",
+            RuntimeWarning,
+        )
 
     return res

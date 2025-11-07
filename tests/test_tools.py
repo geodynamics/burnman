@@ -485,6 +485,30 @@ class test_tools(BurnManTest):
         self.assertEqual(res.n_reactions, 18)
         self.assertEqual(res.n_params, 4)
 
+    def test_estimate_conditions_with_condition_priors(self):
+        assemblage = setup_assemblage()
+        theta = np.array([0.4e9, 873.0])
+        dataset_covariances = HP_2011_ds62.cov()
+
+        condition_priors = np.array([1.0e9, 873.0])  # P too high, T correct
+        condition_covariances = np.diag(np.array([0.1e9, 50.0]) ** 2)
+
+        res_with_priors = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=theta,
+            condition_priors=condition_priors,
+            condition_covariances=condition_covariances,
+        )
+        res_without_priors = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=res_with_priors.x[:2],
+        )
+        self.assertTrue(res_without_priors.success)
+        self.assertEqual(res_without_priors.n_reactions, 18)
+        self.assertTrue(res_without_priors.x[0] < res_with_priors.x[0])
+
 
 if __name__ == "__main__":
     unittest.main()

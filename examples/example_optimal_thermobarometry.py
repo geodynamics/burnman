@@ -33,15 +33,179 @@ the estimated conditions along with their uncertainties and correlations.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
+import warnings
+
 from burnman import Composite
-from burnman.minerals import mp50MnNCKFMASHTO, HP_2011_ds62
+from burnman.minerals import mp50MnNCKFMASHTO, HP_2011_ds62, SLB_2024
 from burnman.optimize.composition_fitting import fit_composition_to_solution
 from burnman.tools.thermobarometry import estimate_conditions
+from burnman.tools.thermobarometry import (
+    get_reaction_matrix,
+    assemblage_set_state_from_params,
+    assemblage_affinity_misfit,
+)
 from burnman.utils.chemistry import formula_to_string
+from burnman import equilibrate
+from burnman.optimize.nonlinear_fitting import plot_cov_ellipse
 
 if __name__ == "__main__":
 
-    # 1) Define observed mineral assemblage
+    # Example 1: Sillimanite-Kyanite equilibrium
+    # In this example, we will estimate the temperature of
+    # the sillimanite-kyanite equilibrium at known pressure,
+    # taking into account uncertainties in the
+    # thermodynamic dataset.
+    sill = HP_2011_ds62.sill()
+    ky = HP_2011_ds62.ky()
+    assemblage = Composite([sill, ky])
+
+    temperatures = np.linspace(600, 800, 5)
+    equality_constraints = [["T", temperatures], ["phase_fraction", (sill, 0.0)]]
+    sols, prm = equilibrate(
+        assemblage.formula, assemblage, equality_constraints=equality_constraints
+    )
+    Ps = np.array([sol.assemblage.pressure for sol in sols])
+    Ts = np.array([sol.assemblage.temperature for sol in sols])
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        res = estimate_conditions(
+            assemblage,
+            dataset_covariances=HP_2011_ds62.cov(),
+            guessed_conditions=np.array([0.5e9, 500.0]),
+            pressure_bounds=[0.1e9, 0.1e9],
+        )
+
+    print("Estimated conditions for sillimanite-kyanite equilibrium:")
+    print(f"    Temperature: {res.x[1]:.0f} +/- {np.sqrt(res.xcov[1, 1]):.0f} K")
+    print(f"    (fixed pressure at {res.x[0]/1.e9} GPa)")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(Ps / 1.0e9, Ts, label="Equilibrium sill+ky")
+    ax.scatter(res.x[0] / 1.0e9, res.x[1], color="red", label="Estimated conditions")
+    ax.set_xlabel("Pressure (GPa)")
+    ax.set_ylabel("Temperature (K)")
+    ax.legend()
+    plt.show()
+
+    # Example 2: Olivine-Wadsleyite equilibrium with compositional fitting
+    # In this example, we will estimate the pressure and temperature of
+    # the olivine-wadsleyite equilibrium based on fitted compositions
+    # of the two minerals, taking into account uncertainties in the
+    # thermodynamic dataset as well as uncertainties in the fitted
+    # compositions, and also a prior on the conditions themselves.
+    ol = SLB_2024.olivine()
+    wad = SLB_2024.wadsleyite()
+    assemblage = Composite([ol, wad])
+
+    f_fwd = 0.18
+    ol.set_composition([0.9, 0.1])
+    wad.set_composition([1.0 - f_fwd, f_fwd])
+
+    ol.compositional_covariances = np.diag(np.array([0.00001, 0.00001]) ** 2)
+    wad.compositional_covariances = np.diag(np.array([0.01, 0.01]) ** 2)
+
+    # The covariance matrix here is not very realistic - the correlations
+    # between the endmembers of olivine and wadsleyite are not negligible.
+    # Here, we apply 70 J/mol uncorrelated uncertainty to each endmember
+    # to illustrate the method.
+    condition_priors = np.array([13.0e9, 1400.0])
+    condition_covariances = np.array([[1.0e9**2, 0.0], [0.0, 100.0**2]])
+    dataset_covariances = {
+        "endmember_names": [*ol.endmember_names, *wad.endmember_names],
+        "covariance_matrix": np.eye(4) * 70.0 * 70.0,
+    }
+    res = estimate_conditions(
+        assemblage,
+        dataset_covariances=dataset_covariances,
+        guessed_conditions=np.array([14.0e9, 1400.0]),
+        condition_covariances=condition_covariances,
+        condition_priors=condition_priors,
+    )
+    print("\nEstimated conditions for olivine-wadsleyite equilibrium:")
+    print(
+        f"    Pressure: {res.x[0]/1.e9:.1f} +/- {np.sqrt(res.xcov[0, 0])/1.e9:.1f} GPa"
+    )
+    print(
+        f"    Temperature: {int(round(res.x[1], -1))} +/- {np.sqrt(res.xcov[1, 1]):.0f} K"
+    )
+
+    f_fwds = np.linspace(f_fwd - 0.02, f_fwd + 0.02, 5)
+    assemblage.set_state(10.0e9, 1400.0)
+    equality_constraints = [
+        ["phase_fraction", (ol, 1.0)],
+        [
+            "phase_composition",
+            (wad, (["Mg_A", "Fe_A"], [0.0, 1.0], [1.0, 1.0], f_fwds)),
+        ],
+    ]
+    sols, prm = equilibrate(ol.formula, assemblage, equality_constraints)
+
+    Ps = np.array([sol.assemblage.pressure for sol in sols])
+    Ts = np.array([sol.assemblage.temperature for sol in sols])
+
+    # Plot the uncertainty ellipse
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    # Plot the prior uncertainty
+    prior_cov = condition_covariances.copy()
+    prior_cov[0, :] /= 1.0e9
+    prior_cov[:, 0] /= 1.0e9
+    plot_cov_ellipse(
+        prior_cov,
+        condition_priors / np.array([1.0e9, 1.0]),
+        nstd=2,
+        ax=ax,
+        facecolor="none",
+        edgecolor="black",
+        linestyle="--",
+        label="2-sigma prior uncertainty",
+    )
+
+    # Plot the equilibrium curve and estimated conditions
+    ax.scatter(Ps[2] / 1.0e9, Ts[2], s=40, color="purple")
+    ax.plot(Ps / 1.0e9, Ts, color="purple")
+    ax.scatter(
+        Ps / 1.0e9,
+        Ts,
+        s=10,
+        color="purple",
+        label="equilibrium (wd $x_{{{Fe}}}$=0.16-0.20)",
+    )
+
+    # Plot the estimated conditions and uncertainty
+    ax.scatter(res.x[0] / 1.0e9, res.x[1], color="red", label="estimated conditions")
+    cov = res.xcov.copy()
+    cov[0, :] /= 1.0e9
+    cov[:, 0] /= 1.0e9
+    plot_cov_ellipse(
+        cov,
+        res.x / np.array([1.0e9, 1.0]),
+        nstd=2,
+        ax=ax,
+        facecolor="none",
+        edgecolor="red",
+        label="2-sigma uncertainty",
+    )
+
+    ax.set_xlim(10, 16)
+    ax.set_ylim(800, 2000)
+    ax.set_xlabel("Pressure (GPa)")
+    ax.set_ylabel("Temperature (K)")
+    ax.legend()
+    plt.show()
+
+    # Example 3: Complex assemblage with multiple solid solutions
+    # In this example, we will estimate the pressure and temperature of
+    # equilibration of a complex mineral assemblage based on fitted
+    # compositions of the constituent minerals, taking into account
+    # uncertainties in the thermodynamic dataset as well as uncertainties
+    # in the fitted compositions.
+
+    # 1) Define the observed mineral assemblage
     mu = mp50MnNCKFMASHTO.mu()
     bi = mp50MnNCKFMASHTO.bi()
     g = mp50MnNCKFMASHTO.g()
@@ -135,13 +299,14 @@ if __name__ == "__main__":
 
     # 4) Print the estimated conditions along with their uncertainties
     #    and correlations.
-    print("Results of thermobarometric inversion:")
+    assemblage_name = "-".join([phase.name for phase in assemblage.phases])
+    print(f"\nEstimated conditions for {assemblage_name} assemblage:")
     print(
-        f"    Estimated Pressure: {assemblage.pressure/1.e9:.2f} "
+        f"    Pressure: {assemblage.pressure/1.e9:.2f} "
         f"+/- {np.sqrt(res.xcov[0, 0])/1.e9:.2f} GPa"
     )
     print(
-        f"    Estimated Temperature: {assemblage.temperature:.0f} "
+        f"    Temperature: {assemblage.temperature:.0f} "
         f"+/- {np.sqrt(res.xcov[1, 1]):.0f} K"
     )
     print(f"    Correlation between P and T: {res.xcorr:.2f}")
@@ -177,10 +342,10 @@ if __name__ == "__main__":
         ["v", ""],
     ]
 
-    print("\nMineral compositions and site occupancies:")
+    print("\n    Mineral compositions and site occupancies:")
     for phase in assemblage.phases:
         np.set_printoptions(precision=2, formatter={"all": lambda x: f"{x:0.2f}"})
-        print(f"{phase.name}:")
+        print(f"    {phase.name}:")
 
         if hasattr(phase, "free_compositional_vectors"):
             free_site_occupancy_vectors = phase.free_compositional_vectors.dot(
@@ -192,17 +357,51 @@ if __name__ == "__main__":
                 )
                 for old, new in replace_strings:
                     site_formula = site_formula.replace(old, new)
-                print(f"    free site occupancy vector: {site_formula}")
+                print(f"        free site occupancy vector: {site_formula}")
 
         print(
-            f"    composition: {formula_to_string(phase.formula, use_fractions=False)}"
+            f"        composition: {formula_to_string(phase.formula, use_fractions=False)}"
         )
         if hasattr(phase, "molar_fractions"):
             site_formula = phase.site_formula(2)
             for old, new in replace_strings:
                 site_formula = site_formula.replace(old, new)
-            print(f"    site occupancies: {site_formula}")
+            print(f"        site occupancies: {site_formula}")
     print("")
+
+    # Let's also have a look at how the misfit changes when varying the
+    # compositional degrees of freedom.
+    R = get_reaction_matrix(assemblage, small_fraction_tol=0.01)
+
+    x = np.linspace(-0.1, 0.1, 51)
+    fig, ax = plt.subplots()
+    labels = ["bi Fe-Mg order", "ilmm Fe-Ti order"]
+    print(
+        "    Reduced chi-squared misfit variation with compositional degrees of freedom:"
+    )
+    for i in range(res.n_params - 2):
+        chisqr_vals = []
+        for xi in x:
+            params = res.x.copy()
+            params[i + 2] += xi
+            assemblage_set_state_from_params(assemblage, params)
+            chisqr = assemblage_affinity_misfit(
+                assemblage, R, dataset_covariances=HP_2011_ds62.cov()
+            )
+            chisqr_vals.append(chisqr)
+        red_chisqr = np.array(chisqr_vals) / (res.n_reactions - res.n_params)
+        ax.plot(x, red_chisqr, label=f"{labels[i]}")
+        print(
+            f"    {labels[i]}:\n"
+            f"        chisq(x={x[0]})={red_chisqr[0]:.2f},\n"
+            f"        chisq(x={x[25]})={red_chisqr[25]:.2f},\n"
+            f"        chisq(x={x[-1]})={red_chisqr[-1]:.2f}\n"
+        )
+
+    ax.set_xlabel("Change in order relative to optimal value")
+    ax.set_ylabel("Reduced chi-squared misfit")
+    ax.legend()
+    plt.show()
 
     # Uncomment to see the weighted reaction affinities
     # print("Weighted reaction affinities:")
