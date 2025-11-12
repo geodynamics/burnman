@@ -170,13 +170,19 @@ def assemblage_set_state_from_params(assemblage, params):
     Set the state of the assemblage (P, T, compositions) from the given
     list of parameters.
 
-    :param assemblage: The mineral assemblage to set the state for.
+    :param assemblage: The mineral assemblage for which to set the state.
+        If there are free compositional vectors for any solution phases
+        (e.g., to account for an unknown state of order at fixed composition),
+        the corresponding phases must have the attributes
+        `baseline_composition` and `free_compositional_vectors` set,
+        and the length of params must match the number of
+        free compositional vectors plus two (for P and T).
     :type assemblage: Assemblage
 
     :param params: List of parameters, where the first two are pressure (Pa)
         and temperature (K), and any additional parameters correspond to
         compositional degrees of freedom. Each compositional degree of freedom
-        corresponds to a free compositional vector defined on one of the
+        corresponds to a free compositional vector in one of the
         solution phases in the assemblage.
     :type params: list or np.array
 
@@ -227,7 +233,7 @@ def assemblage_affinity_covariance_matrix(
 
     :param include_state_uncertainties: If True, includes the contribution
         from uncertainties in pressure and temperature to the covariance matrix.
-        If True, the assemblage must have its attribute `state_covariances` set.
+        If True, the assemblage must have the attribute `state_covariances`.
     :type include_state_uncertainties: bool
 
     :return: Covariance matrix of the affinities of the independent reactions.
@@ -269,6 +275,11 @@ def assemblage_affinity_misfit(
     :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
         Default is None, in which case only compositional uncertainties are considered.
 
+    :param include_state_uncertainties: If True, includes the contribution
+        from uncertainties in pressure and temperature to the covariance matrix.
+        If True, the assemblage must have the attribute `state_covariances`.
+    :type include_state_uncertainties: bool
+
     :return: Chi-squared misfit value.
     :rtype: float
     """
@@ -284,7 +295,8 @@ def assemblage_state_misfit(assemblage):
     """
     Compute the objective misfit function (chi-squared) for given P and T
     based on prior expectations for P and T and their covariance.
-    The assemblage must have attributes `state_priors` and `state_inverse_covariances`.
+    The assemblage must have attributes `state_priors` and
+    `state_inverse_covariances`.
 
     :param assemblage: The mineral assemblage for which to compute the misfit.
     :type assemblage: Assemblage
@@ -314,29 +326,35 @@ def estimate_conditions(
     max_it=100,
 ):
     """
-    Perform a least-squares inversion to find the optimal pressure and temperature
-    for a given mineral assemblage. Algorithm modified from Powell and Holland (1994).
+    Perform a least-squares inversion to find the optimal pressure and
+    temperature for a given mineral assemblage.
+    Algorithm modified from Powell and Holland (1994).
 
-    :param assemblage: The mineral assemblage for which to perform the inversion.
-        Each solution phase in the assemblage must have its composition set along with
-        its compositional covariance matrix (called `compositional_covariances`).
-        If there are compositional degrees of freedom, they can be added by setting
-        the attribute `free_compositional_vectors` on the relevant solution phases, where each
-        row of the array corresponds to a free compositional vector, and the columns correspond
-        to the amounts of endmembers of that phase in each vector.
+    :param assemblage: The mineral assemblage for which to perform the
+        inversion. Each solution phase in the assemblage must have its
+        composition set along with its compositional covariance matrix
+        (called `compositional_covariances`).
+        If there are compositional degrees of freedom, they can be added by
+        setting the attribute `free_compositional_vectors` on the relevant
+        solution phases, where each row of the array corresponds to a
+        free compositional vector, and the columns correspond to the
+        amounts of endmembers of that phase in each vector.
     :type assemblage: Assemblage
 
-    :param dataset_covariances: The covariance data from the thermodynamic dataset.
-    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
-        Default is None, in which case only compositional uncertainties are considered.
+    :param dataset_covariances: The covariance data from the thermodynamic
+        dataset.
+    :type dataset_covariances: dict, with keys 'endmember_names' and
+        'covariance_matrix'. Default is None, in which case only
+        compositional uncertainties are considered.
 
-    :param include_state_misfit: If True, includes the misfit from prior expectations on P and T.
-        The assemblage must also have attributes `state_priors` and `state_inverse_covariances`.
+    :param include_state_misfit: If True, includes the misfit from
+        prior expectations on P and T. The assemblage must also have
+        attributes `state_priors` and `state_inverse_covariances`.
     :type include_state_misfit: bool
 
-    :param guessed_conditions: Initial guess for pressure (Pa) and temperature (K).
-        If not provided, the initial guess will be taken from the current
-        state of the assemblage.
+    :param guessed_conditions: Initial guess for pressure (Pa) and
+        temperature (K). If not provided, the initial guess will be taken
+        from the current state of the assemblage.
     :type guessed_conditions: np.array of shape (2,), optional, default None
 
     :param pressure_bounds: Bounds for pressure (Pa) during optimization.
@@ -348,17 +366,21 @@ def estimate_conditions(
     :param P_scaling: Scaling factor for pressure to improve numerical stability.
     :type P_scaling: float
 
-    :param small_fraction_tol: If > 0.0, reduces the number of endmembers in solution phases by
-        transforming to a smaller set of independent endmembers using a greedy algorithm
-        and excluding those with molar fractions smaller than this value during the inversion.
+    :param small_fraction_tol: If > 0.0, reduces the number of endmembers in
+        solution phases by transforming to a smaller set of independent
+        endmembers using a greedy algorithm and excluding those with
+        molar fractions smaller than this value during the inversion.
     :type small_fraction_tol: float, optional, default 0.0
 
     :param max_it: Maximum number of iterations for the optimization algorithm.
     :type max_it: int, optional, default 100
 
-    :return: Result object from the optimization containing optimal P and T (x) and other properties
-        of the solution. These include the covariance matrix of the estimated parameters (xcov),
-        the correlation coefficient between P and T (xcorr),
+    :return: Result object from the optimization containing the optimal
+        conditions (x, which includes P, T, and any free compositional vectors)
+        and other properties of the solution. These include
+        the covariance matrix of the estimated parameters (xcov),
+        the standard deviations of the estimated parameters (var),
+        the correlation matrix (xcorr),
         the affinities of the independent reactions at the optimal conditions (affinities),
         the covariance matrix of the affinities (acov),
         the affinities weighted by the inverse square root of their covariance matrix (weighted_affinities),
@@ -479,7 +501,8 @@ def estimate_conditions(
         res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx)
         + (assemblage.state_inverse_covariances if include_state_misfit else 0)
     )
-    res.xcorr = res.xcov[0, 1] / np.sqrt(res.xcov[0, 0] * res.xcov[1, 1])
+    res.var = np.sqrt(np.diag(res.xcov))
+    res.xcorr = res.xcov / np.outer(res.var, res.var)
 
     res.affinities = R.dot(assemblage.endmember_partial_gibbs)
     res.weighted_affinities = np.linalg.pinv(sqrtm(res.acov)).dot(res.affinities)

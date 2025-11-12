@@ -310,7 +310,7 @@ if __name__ == "__main__":
         f"    Temperature: {assemblage.temperature:.0f} "
         f"+/- {np.sqrt(res.xcov[1, 1]):.0f} K"
     )
-    print(f"    Correlation between P and T: {res.xcorr:.2f}")
+    print(f"    Correlation between P and T: {res.xcorr[0][1]:.2f}")
     print(f"    Number of Reactions: {res.n_reactions}")
     print(f"    Number of Parameters: {res.n_params}")
     print(f"    Degrees of Freedom: {res.degrees_of_freedom}")
