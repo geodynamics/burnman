@@ -79,10 +79,13 @@ def weighted_constrained_least_squares(
         raise Exception(
             f"The weighted design matrix is rank-deficient "
             f"(Cov_b^(-1/2).A={rank_MA} < n_vars={n_vars}). "
-            "This probably means that you haven't supplied sufficient "
-            "independent constraints to yield a unique solution to the "
-            "problem. If you wish to proceed anyway, set "
-            "allow_rank_deficient=True in the function call."
+            "This might mean: "
+            "\n(a) that there are insufficient independent "
+            "constraints to yield a unique solution to the problem or "
+            "\n(b) that the covariance matrix is poorly conditioned "
+            "(e.g. a zero element along the diagonal). "
+            "\nEither modify the problem (recommended), or "
+            "set allow_rank_deficient=True in the function call."
         )
 
     constraints = []

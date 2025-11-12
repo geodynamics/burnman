@@ -62,9 +62,9 @@ def get_reaction_matrix(assemblage, small_fraction_tol=0.0):
     S = sp.Matrix(transformation_matrix.dot(assemblage.stoichiometric_array))
     S = S.applyfunc(lambda x: sp.nsimplify(x))
     R = np.array([v[:] for v in S.T.nullspace()], dtype=float)
-    R = R.dot(transformation_matrix)  # transform back to original basis
     if len(R) == 0:
         raise Exception("No independent reactions found for the given assemblage!")
+    R = R.dot(transformation_matrix)  # transform back to original basis
     return R
 
 
@@ -202,11 +202,16 @@ def assemblage_set_state_from_params(assemblage, params):
 
 
 def assemblage_affinity_covariance_matrix(
-    assemblage, reaction_matrix, dataset_covariances
+    assemblage,
+    reaction_matrix,
+    dataset_covariances=None,
+    include_state_uncertainties=False,
 ):
     """
     Compute the covariance matrix of the affinities of the independent
-    reactions for the given assemblage.
+    reactions for the given assemblage. This can include contributions from
+    compositional uncertainties, dataset uncertainties, and from uncertainties
+    in pressure and temperature.
 
     :param assemblage: The mineral assemblage for which to compute
         the covariance matrix. Should have its state (P, T, compositions)
@@ -217,20 +222,39 @@ def assemblage_affinity_covariance_matrix(
     :type reaction_matrix: 2D np.array
 
     :param dataset_covariances: The covariance data from the thermodynamic dataset.
-    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'
+    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
+        Default is None, in which case only compositional uncertainties are considered.
+
+    :param include_state_uncertainties: If True, includes the contribution
+        from uncertainties in pressure and temperature to the covariance matrix.
+        If True, the assemblage must have its attribute `state_covariances` set.
+    :type include_state_uncertainties: bool
 
     :return: Covariance matrix of the affinities of the independent reactions.
     :rtype: 2D np.array
     """
     R = reaction_matrix
-    cov1 = _build_endmember_covariance_matrix(assemblage, dataset_covariances)
-    cov2 = _build_solution_covariance_matrix(assemblage)
-    cov_mu = cov1 + cov2
+    cov_mu = _build_solution_covariance_matrix(assemblage)
+    if dataset_covariances is not None:
+        cov_mu += _build_endmember_covariance_matrix(assemblage, dataset_covariances)
+    if include_state_uncertainties:
+        jacobian = np.array(
+            [
+                assemblage.endmember_partial_volumes,
+                -assemblage.endmember_partial_entropies,
+            ]
+        ).T
+        cov_mu += jacobian.dot(assemblage.state_covariances).dot(jacobian.T)
     acov = R.dot(cov_mu).dot(R.T)
     return acov
 
 
-def assemblage_affinity_misfit(assemblage, reaction_matrix, dataset_covariances):
+def assemblage_affinity_misfit(
+    assemblage,
+    reaction_matrix,
+    dataset_covariances=None,
+    include_state_uncertainties=False,
+):
     """
     Compute the objective misfit function (chi-squared) for given P and T.
 
@@ -242,23 +266,47 @@ def assemblage_affinity_misfit(assemblage, reaction_matrix, dataset_covariances)
     :type reaction_matrix: 2D np.array
 
     :param dataset_covariances: The covariance data from the thermodynamic dataset.
-    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'
+    :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
+        Default is None, in which case only compositional uncertainties are considered.
 
     :return: Chi-squared misfit value.
     :rtype: float
     """
     R = reaction_matrix
-    cov_a = assemblage_affinity_covariance_matrix(assemblage, R, dataset_covariances)
+    cov_a = assemblage_affinity_covariance_matrix(
+        assemblage, R, dataset_covariances, include_state_uncertainties
+    )
     a = R.dot(assemblage.endmember_partial_gibbs)
     return a.T.dot(np.linalg.pinv(cov_a)).dot(a)
 
 
+def assemblage_state_misfit(assemblage):
+    """
+    Compute the objective misfit function (chi-squared) for given P and T
+    based on prior expectations for P and T and their covariance.
+    The assemblage must have attributes `state_priors` and `state_inverse_covariances`.
+
+    :param assemblage: The mineral assemblage for which to compute the misfit.
+    :type assemblage: Assemblage
+
+    :return: Chi-squared misfit value.
+    :rtype: float
+    """
+    delta_conditions = np.array(
+        [
+            assemblage.pressure - assemblage.state_priors[0],
+            assemblage.temperature - assemblage.state_priors[1],
+        ]
+    )
+    invcov = assemblage.state_inverse_covariances
+    return delta_conditions.T.dot(invcov).dot(delta_conditions)
+
+
 def estimate_conditions(
     assemblage,
-    dataset_covariances,
+    dataset_covariances=None,
+    include_state_misfit=False,
     guessed_conditions=[1.0e9, 1000.0],
-    condition_priors=None,
-    condition_covariances=None,
     pressure_bounds=[1.0e5, 400.0e9],
     temperature_bounds=[300.0, 4000.0],
     P_scaling=1.0e6,
@@ -266,7 +314,7 @@ def estimate_conditions(
     max_it=100,
 ):
     """
-    Perform the avPT thermobarometric inversion to find the optimal pressure and temperature
+    Perform a least-squares inversion to find the optimal pressure and temperature
     for a given mineral assemblage. Algorithm modified from Powell and Holland (1994).
 
     :param assemblage: The mineral assemblage for which to perform the inversion.
@@ -280,19 +328,16 @@ def estimate_conditions(
 
     :param dataset_covariances: The covariance data from the thermodynamic dataset.
     :type dataset_covariances: dict, with keys 'endmember_names' and 'covariance_matrix'.
+        Default is None, in which case only compositional uncertainties are considered.
+
+    :param include_state_misfit: If True, includes the misfit from prior expectations on P and T.
+        The assemblage must also have attributes `state_priors` and `state_inverse_covariances`.
+    :type include_state_misfit: bool
 
     :param guessed_conditions: Initial guess for pressure (Pa) and temperature (K).
         If not provided, the initial guess will be taken from the current
         state of the assemblage.
     :type guessed_conditions: np.array of shape (2,), optional, default None
-
-    :param condition_priors: The prior expectation for pressure and temperature.
-    :type condition_priors: np.array of shape (2,), optional, default None
-
-    :param condition_covariances: The covariance matrix for pressure and temperature.
-        If provided, this will be incorporated into the inversion as a prior, with
-        the condition_prior parameter as the prior expectation.
-    :type condition_covariances: np.array of shape (2, 2), optional, default None
 
     :param pressure_bounds: Bounds for pressure (Pa) during optimization.
     :type pressure_bounds: list of two floats
@@ -326,28 +371,13 @@ def estimate_conditions(
     :rtype: OptimizeResult
     """
 
-    # Set up the condition prior covariance inverse if provided
-    cov_cond_inv = None
-    if condition_covariances is not None:
-        # Calculate the inverse covariance matrix. Scaling here
-        # preserves small eigenvalues that would otherwise be lost.
-        cov = condition_covariances.copy()
-        cov[0, :] /= P_scaling
-        cov[:, 0] /= P_scaling
-        cov_cond_inv = np.linalg.pinv(cov)
-
-        if condition_priors is None:
-            raise ValueError(
-                "If condition_covariances is provided, condition_prior "
-                "must also be provided as the prior expectation values."
-            )
-
-    if condition_priors is not None:
-        if condition_covariances is None:
-            raise ValueError(
-                "If condition_prior is provided, condition_covariances "
-                "must also be provided as the prior covariance matrix."
-            )
+    if include_state_misfit:
+        assert hasattr(assemblage, "state_priors") and hasattr(
+            assemblage, "state_inverse_covariances"
+        ), (
+            "To include state misfit, the assemblage must have "
+            "attributes 'state_priors' and 'state_inverse_covariances'."
+        )
 
     # Set initial guess for P and T if guessed_conditions is not provided
     if guessed_conditions is None:
@@ -383,7 +413,7 @@ def estimate_conditions(
 
     # Check that there are enough constraints on the problem
     n_params = 2 + n_free_vectors - int(P_fixed) - int(T_fixed)
-    n_constraints = 2 if cov_cond_inv is not None else 0
+    n_constraints = 2 if include_state_misfit else 0
     n_reactions = R.shape[0]
     if n_reactions + n_constraints < n_params:
         raise Exception(
@@ -397,15 +427,17 @@ def estimate_conditions(
     # Define the chi-squared function to minimize
     def chisqr(args):
         assemblage_set_state_from_params(assemblage, [args[0] * P_scaling, *args[1:]])
-        chisqr = assemblage_affinity_misfit(assemblage, R, dataset_covariances)
-        if cov_cond_inv is not None:
-            delta = np.array(
-                [
-                    args[0] - condition_priors[0] / P_scaling,
-                    args[1] - condition_priors[1],
-                ]
-            )
-            chisqr += delta.T.dot(cov_cond_inv).dot(delta)
+        # Compute the misfit. We do not include the state uncertainties
+        # in the affinity misfit because we are optimizing over P and T directly
+        # i.e., we are finding the misfit assuming that P and T are known exactly
+        chisqr = assemblage_affinity_misfit(
+            assemblage, R, dataset_covariances, include_state_uncertainties=False
+        )
+
+        # We do, however, include the state misfit if priors are provided
+        # because this adds additional constraints to the problem
+        if include_state_misfit:
+            chisqr += assemblage_state_misfit(assemblage)
         return chisqr
 
     # Set up initial guess, bounds, and options for the optimizer
@@ -445,7 +477,7 @@ def estimate_conditions(
     res.dadx = R.dot(np.array([dmudP, dmudT]).T)
     res.xcov = np.linalg.pinv(
         res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx)
-        + (cov_cond_inv if cov_cond_inv is not None else 0)
+        + (assemblage.state_inverse_covariances if include_state_misfit else 0)
     )
     res.xcorr = res.xcov[0, 1] / np.sqrt(res.xcov[0, 0] * res.xcov[1, 1])
 

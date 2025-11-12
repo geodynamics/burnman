@@ -111,8 +111,10 @@ if __name__ == "__main__":
     # between the endmembers of olivine and wadsleyite are not negligible.
     # Here, we apply 70 J/mol uncorrelated uncertainty to each endmember
     # to illustrate the method.
-    condition_priors = np.array([13.0e9, 1400.0])
-    condition_covariances = np.array([[1.0e9**2, 0.0], [0.0, 100.0**2]])
+    assemblage.state_priors = np.array([13.0e9, 1400.0])
+    assemblage.state_inverse_covariances = np.array(
+        [[1.0e-9**2, 0.0], [0.0, 1.0e-2**2]]
+    )
     dataset_covariances = {
         "endmember_names": [*ol.endmember_names, *wad.endmember_names],
         "covariance_matrix": np.eye(4) * 70.0 * 70.0,
@@ -120,9 +122,8 @@ if __name__ == "__main__":
     res = estimate_conditions(
         assemblage,
         dataset_covariances=dataset_covariances,
+        include_state_misfit=True,
         guessed_conditions=np.array([14.0e9, 1400.0]),
-        condition_covariances=condition_covariances,
-        condition_priors=condition_priors,
     )
     print("\nEstimated conditions for olivine-wadsleyite equilibrium:")
     print(
@@ -151,12 +152,12 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
 
     # Plot the prior uncertainty
-    prior_cov = condition_covariances.copy()
+    prior_cov = np.linalg.inv(assemblage.state_inverse_covariances)
     prior_cov[0, :] /= 1.0e9
     prior_cov[:, 0] /= 1.0e9
     plot_cov_ellipse(
         prior_cov,
-        condition_priors / np.array([1.0e9, 1.0]),
+        assemblage.state_priors / np.array([1.0e9, 1.0]),
         nstd=2,
         ax=ax,
         facecolor="none",
