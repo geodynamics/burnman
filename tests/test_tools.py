@@ -20,6 +20,10 @@ from burnman.utils.math import is_positive_definite
 
 from burnman.minerals import HP_2011_ds62, mp50MnNCKFMASHTO
 from burnman.tools.thermobarometry import estimate_conditions
+from burnman.tools.thermobarometry import get_reaction_matrix
+from burnman.tools.thermobarometry import assemblage_affinity_misfit
+from burnman.tools.thermobarometry import assemblage_state_misfit
+from burnman import equilibrate
 
 
 def setup_assemblage(scale=1.0):
@@ -490,24 +494,120 @@ class test_tools(BurnManTest):
         theta = np.array([0.4e9, 873.0])
         dataset_covariances = HP_2011_ds62.cov()
 
-        condition_priors = np.array([1.0e9, 873.0])  # P too high, T correct
-        condition_covariances = np.diag(np.array([0.1e9, 50.0]) ** 2)
+        res_without_priors = estimate_conditions(
+            assemblage,
+            dataset_covariances,
+            guessed_conditions=theta,
+        )
+
+        # P too high, T correct
+        assemblage.state_priors = np.array([1.0e9, 873.0])
+        assemblage.state_inverse_covariances = np.diag(
+            np.array([1.0 / 0.1e9, 1.0 / 50.0]) ** 2
+        )
 
         res_with_priors = estimate_conditions(
             assemblage,
             dataset_covariances,
-            guessed_conditions=theta,
-            condition_priors=condition_priors,
-            condition_covariances=condition_covariances,
-        )
-        res_without_priors = estimate_conditions(
-            assemblage,
-            dataset_covariances,
-            guessed_conditions=res_with_priors.x[:2],
+            include_state_misfit=True,
+            guessed_conditions=res_without_priors.x[:2],
         )
         self.assertTrue(res_without_priors.success)
         self.assertEqual(res_without_priors.n_reactions, 18)
         self.assertTrue(res_without_priors.x[0] < res_with_priors.x[0])
+
+    def test_assemblage_affinity_misfit(self):
+        sill = HP_2011_ds62.sill()
+        ky = HP_2011_ds62.ky()
+        assemblage = Composite([sill, ky], [0.5, 0.5])
+
+        equality_constraints = [["P", 1.0e9], ["phase_fraction", (sill, 0.5)]]
+        equilibrate(assemblage.formula, assemblage, equality_constraints)
+        P_true = assemblage.pressure
+        T_true = assemblage.temperature
+
+        P_unc = 1.0e8  # 0.1 GPa
+        T_unc = 10.0  # 10 K
+
+        R = get_reaction_matrix(assemblage)
+
+        # expect failure if state uncertainties are included without state covariances
+        with self.assertRaises(AttributeError):
+            assemblage_affinity_misfit(assemblage, R, include_state_uncertainties=True)
+
+        assemblage.state_covariances = np.diag(np.array([P_unc, T_unc]) ** 2)
+        chisqr = assemblage_affinity_misfit(
+            assemblage, R, include_state_uncertainties=True
+        )
+        self.assertAlmostEqual(chisqr, 0.0, places=5)
+
+        # Without state uncertainties, the misfit grows very large even for small deviations
+        # from true P and T
+        assemblage.set_state(P_true + P_unc, T_true)
+        chisqr = assemblage_affinity_misfit(
+            assemblage, R, include_state_uncertainties=False
+        )
+        self.assertTrue(chisqr > 1.0e12)
+
+        # We therefore want to include state uncertainties in the
+        # misfit calculation. The misfit will still increase as we
+        # move away from the true P and T, but the increase will be
+        # moderated by the state uncertainties.
+        # Note that the resultant misfits do not represent misfits
+        # arising from the difference between the equilibrium and actual
+        # state, because we cannot know where the equilibrium state is.
+        # Therefore, we do not expect chi-squared values corresponding
+        # to 1-sigma for 1-sigma deviations in P and T.
+        # Rather, these are affinity misfits that include state
+        # uncertainties in the covariance matrix.
+        assemblage.set_state(P_true + P_unc, T_true)
+        chisqr = assemblage_affinity_misfit(
+            assemblage, R, include_state_uncertainties=True
+        )
+        self.assertAlmostEqual(chisqr, 0.956585, places=4)
+
+        # The misfit should be much smaller for a 1-sigma deviation in T
+        # because the affinity of the reaction is less sensitive to 10 K
+        # changes in T than to 0.1 GPa changes in P. Essentially, this is
+        # saying that the measured affinity is well within the values
+        # expected given the uncertainties in state.
+        assemblage.set_state(P_true, T_true + T_unc)
+        chisqr = assemblage_affinity_misfit(
+            assemblage, R, include_state_uncertainties=True
+        )
+        self.assertAlmostEqual(chisqr, 0.043427, places=4)
+
+    def test_assemblage_state_misfit(self):
+        sill = HP_2011_ds62.sill()
+        ky = HP_2011_ds62.ky()
+        assemblage = Composite([sill, ky], [0.5, 0.5])
+
+        equality_constraints = [["P", 1.0e9], ["phase_fraction", (sill, 0.5)]]
+        equilibrate(assemblage.formula, assemblage, equality_constraints)
+        P_true = assemblage.pressure
+        T_true = assemblage.temperature
+
+        P_unc = 1.0e8  # 0.1 GPa
+        T_unc = 10.0  # 10 K
+
+        # expect failure if state uncertainties are included without state covariances
+        with self.assertRaises(AttributeError):
+            assemblage_state_misfit(assemblage)
+
+        assemblage.state_priors = np.array([P_true, T_true])
+        assemblage.state_inverse_covariances = np.diag(
+            1.0 / np.array([P_unc, T_unc]) ** 2
+        )
+        chisqr = assemblage_state_misfit(assemblage)
+        self.assertAlmostEqual(chisqr, 0.0, places=5)
+
+        assemblage.set_state(P_true + P_unc, T_true)
+        chisqr = assemblage_state_misfit(assemblage)
+        self.assertAlmostEqual(chisqr, 1.0, places=5)
+
+        assemblage.set_state(P_true, T_true + T_unc)
+        chisqr = assemblage_state_misfit(assemblage)
+        self.assertAlmostEqual(chisqr, 1.0, places=5)
 
 
 if __name__ == "__main__":
