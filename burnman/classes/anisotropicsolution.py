@@ -312,11 +312,6 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
 
         self.dndx = np.array(unrelaxed_vectors).T
         assert len(self.dndx.shape) == 2
-        assert len(self.dndx) == self.unrelaxed.n_endmembers
-        assert (
-            len(unrelaxed_vectors) + len(relaxation_vectors)
-            == self.unrelaxed.n_endmembers
-        )
 
         self.q_initial = np.zeros(len(relaxation_vectors)) + 0.001
 
@@ -389,8 +384,8 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         self.unrelaxed.set_composition(n)
 
         if self.unrelaxed.pressure is not None and relaxed:
-            self._relax_at_PTX()
             AnisotropicSolution.set_composition(self, n)
+            self._relax_at_PTX()
             self.unrelaxed._scalar_solution.set_composition(self.molar_fractions)
             self.unrelaxed.set_composition(self.molar_fractions)
 

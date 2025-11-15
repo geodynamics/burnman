@@ -45,9 +45,21 @@ Base classes
 .. autoclass:: burnman.ElasticSolution
   :noindex:
 
+.. autoclass:: burnman.AnisotropicSolution
+  :noindex:
+
 .. autoclass:: burnman.SolutionModel
 
 .. autoclass:: burnman.ElasticSolutionModel
+
+Relaxed solutions
+-----------------
+
+.. autoclass:: burnman.RelaxedSolution
+  :noindex:
+
+.. autoclass:: burnman.RelaxedAnisotropicSolution
+  :noindex:
 
 Mechanical solution
 -------------------
