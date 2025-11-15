@@ -1,14 +1,15 @@
 Solution models
 ===============
 
-Solution objects in BurnMan are instances of one of two classes:
-type :class:`~burnman.Solution` (alias :class:`~burnman.SolidSolution`)
-and
-type :class:`~burnman.ElasticSolution`
-(alias :class:`~burnman.ElasticSolidSolution`). The :class:`~burnman.Solution`
-class implements commonly used models (in petrology). Excess properties
-are defined relative to the endmember properties at fixed pressure
-and temperature. The formulations are defined with interaction parameters
+Solution objects in BurnMan are instances of one of three classes:
+type :class:`~burnman.Solution` (alias :class:`~burnman.SolidSolution`),
+type :class:`~burnman.ElasticSolution` and
+type :class:`~burnman.AnisotropicSolution`.
+
+The :class:`~burnman.Solution` class implements commonly used models
+(in petrology). Excess properties are defined relative to the endmember
+properties at fixed pressure and temperature.
+The formulations are defined with interaction parameters
 such as excess energies, volumes and entropies.
 
 The :class:`~burnman.ElasticSolution` class instead defines excess properties
@@ -19,10 +20,28 @@ instances of the same lattice type requires deformation
 a local chemical stress. Therefore, volume may be a more useful
 independent variable than pressure. For more details, see :cite:`Myhill2018`.
 
+The :class:`~burnman.AnisotropicSolution` class extends the
+:class:`~burnman.Solution` class to include anisotropic elastic properties.
 
-The :class:`~burnman.Solution` and :class:`~burnman.ElasticSolution`
-classes both accept several methods which define the properties of the solution.
+The standard and anisotropic solution classes can also be "relaxed" via
+two derived classes: :class:`~burnman.RelaxedSolution` and
+:class:`~burnman.RelaxedAnisotropicSolution`. In these classes, specific
+linear combinations of molar fractions can be designated as relaxation vectors.
+These are allowed to vary freely to minimize the Gibbs free energy of the solution.
 
+The :class:`~burnman.Solution`, :class:`~burnman.ElasticSolution` and
+:class:`~burnman.AnisotropicSolution` classes all accept several
+methods which define the properties of the solution.
+
+.. rubric:: Available solution classes
+.. inheritance-diagram::
+  burnman.Solution
+  burnman.RelaxedSolution
+  burnman.ElasticSolution
+  burnman.AnisotropicSolution
+  burnman.RelaxedAnisotropicSolution
+
+.. rubric:: Available solution model classes
 .. inheritance-diagram::
   burnman.classes.solutionmodel.MechanicalSolution
   burnman.classes.solutionmodel.IdealSolution
