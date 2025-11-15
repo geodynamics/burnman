@@ -1,25 +1,30 @@
+.. _ref-methods-relaxation:
+
 Calculating Relaxed Thermodynamic Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Burnman can calculate relaxed thermodynamic properties for materials that have
-isochemical degrees of freedom. This is done by minimizing the Gibbs free energy
-of the system with respect to the isochemical variables at each pressure and
-temperature point. If these isochemical variables can vary on timescales
-shorter than the timescales of changes in pressure and temperature,
-then the second derivatives of the Gibbs free energy with respect to these variables
-are affected by the relaxation. 
+isochemical degrees of freedom. This is done by minimizing the Gibbs energy
+of the system by varying the isochemical variables at fixed pressure and
+temperature. The Gibbs energy and first derivatives of the Gibbs energy are
+dictated by the equilibrium values of the isochemical variables. Meanwhile,
+if the isochemical variables can vary on timescales shorter than the
+timescales of changes in pressure and temperature, then the second derivatives
+of the Gibbs energy are affected not only by the relaxed values, but also their
+susceptibility to change due to changes in pressure and temperature. To calculate
+the thermodynamic properties that are a function of the second derivatives of the
+Gibbs energy, we use variational calculus.
 
-To calculate these properties, we use
-variational calculus. Let the extent of the isochemical reactions be given by the
-vector :math:`\xi`. Let us also define the partial derivative function
-:math:`F(P,T,X,\xi) = \partial G / \partial \xi`, where :math:`G` is the Gibbs free energy
-of the system. The relaxed state is given by the condition :math:`F(P,T,X,\xi) = 0`.
-For simplicity, let us group the pressure, temperature, and composition variables
-into a single vector :math:`Z = (P,T,X)` (we aren't actually interested in the composition,
-but keep it here for completeness). Finally, we define a function
-:math:`\phi(Z) = \xi`, which gives the extent of the isochemical reactions
-at equilibrium for given pressure, temperature, and composition.
-Assuming that the reaction variables are always at equilibrium, we have:
+Let the extent of the isochemical reactions be given by the vector :math:`\xi`.
+Let us also define the partial derivative function
+:math:`F(P,T,X,\xi) = \partial G(P,T,X,\xi) / \partial \xi`,
+where :math:`G` is the Gibbs free energy of the system.
+For simplicity, let us group the pressure, temperature, and
+composition variables into a single vector :math:`Z = (P,T,X)`
+(we aren't actually interested in the composition, but keep it here for completeness). 
+The relaxed state is given by the condition :math:`F(Z,\xi) = 0`.
+Finally, we define a function :math:`\phi(Z) = \xi`,
+which gives the extent of the isochemical reactions at equilibrium. We now have:
 .. math::
     F = F(Z, \phi(Z)) = \frac{\partial G}{\partial \xi} (Z, \phi(Z))
 
@@ -35,36 +40,35 @@ and therefore:
     \frac{\partial \phi}{\partial Z} = - \frac{\partial F}{\partial Z}
     
 Note that the matrix :math:`\partial F / \partial \xi` is the Hessian matrix of second derivatives
-of the Gibbs free energy with respect to the isochemical variables:
+of the Gibbs energy with respect to the isochemical variables:
 .. math::
-
     \frac{\partial F}{\partial \xi} = \frac{\partial^2 G}{\partial \xi^2}
 
 It is therefore symmetric. Let us define the pseudo-inverse of this matrix as
 :math:`R`, so that :math:`R \partial F / \partial \xi = I`, where :math:`I` is the identity matrix.
-Then we have:
+Then:
 .. math::
     \frac{\partial \phi}{\partial Z} = - R \frac{\partial F}{\partial Z}
 
 
-Finally, define a function :math:`g(Z) = G(Z, \phi(Z))`, which gives the Gibbs free energy
+Finally, define a function :math:`g(Z) = G(Z, \phi(Z))`, which gives the Gibbs energy
 of the system at equilibrium. Using the chain rule, we can write the total derivative of this function with respect to :math:`Z` as:
 .. math::
     \frac{d g}{d Z} = \frac{\partial G}{\partial Z} + \frac{\partial G}{\partial \xi}
     \frac{\partial \phi}{\partial Z}
 
-However, since :math:`F = \partial G / \partial \xi = 0`, the second term on the right-hand side
+Since :math:`F = \partial G / \partial \xi = 0`, the second term on the right-hand side
 vanishes, and we have:
 .. math::
     \frac{d g}{d Z} = \frac{\partial G(Z, \phi(Z))}{\partial Z}
 
-Taking the second derivative of :math:`g` with respect to :math:`Z`, we have:
+Taking the second derivative of :math:`g` with respect to :math:`Z`:
 .. math::
     \frac{d^2 g}{d Z^2} = \frac{\partial^2 G}{\partial Z^2} +
     \frac{\partial^2 G}{\partial Z \partial \xi} \frac{\partial \phi}{\partial Z}
 
 
-Now, substituting in our expression for :math:`\partial \phi / \partial Z`, we have:
+Now, substituting in our expression for :math:`\partial \phi / \partial Z`:
 .. math::
     \frac{d^2 g}{d Z^2} = \frac{\partial^2 G}{\partial Z^2} -
     \frac{\partial^2 G}{\partial Z \partial \xi} R
@@ -77,7 +81,7 @@ or, equivalently:
     R
     \frac{\partial^2 G}{\partial \xi \partial Z}
 
-This expression gives the relaxed second derivatives of the Gibbs free energy
+This expression gives the relaxed second derivatives of the Gibbs energy
 with respect to pressure, temperature, and composition. These second derivatives
 can then be used to calculate the relaxed thermodynamic properties of the system,
 such as the bulk modulus, thermal expansivity, and heat capacity:
