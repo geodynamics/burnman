@@ -70,7 +70,6 @@ Base classes
   :noindex:
 
 .. autoclass:: burnman.AnisotropicSolution
-  :noindex:
 
 .. autoclass:: burnman.SolutionModel
 
@@ -80,10 +79,8 @@ Relaxed solutions
 -----------------
 
 .. autoclass:: burnman.RelaxedSolution
-  :noindex:
 
 .. autoclass:: burnman.RelaxedAnisotropicSolution
-  :noindex:
 
 Mechanical solution
 -------------------
