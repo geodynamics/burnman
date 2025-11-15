@@ -12,14 +12,6 @@ properties at fixed pressure and temperature.
 The formulations are defined with interaction parameters
 such as excess energies, volumes and entropies.
 
-The :class:`~burnman.ElasticSolution` class instead defines excess properties
-are relative to the endmember properties at fixed volume and temperature.
-Such models have their roots in atom-scale considerations; mixing of two
-instances of the same lattice type requires deformation
-(local lattice distortions), that can be considered to induce
-a local chemical stress. Therefore, volume may be a more useful
-independent variable than pressure. For more details, see :cite:`Myhill2018`.
-
 The :class:`~burnman.AnisotropicSolution` class extends the
 :class:`~burnman.Solution` class to include anisotropic elastic properties.
 
@@ -29,9 +21,14 @@ two derived classes: :class:`~burnman.RelaxedSolution` and
 linear combinations of molar fractions can be designated as relaxation vectors.
 These are allowed to vary freely to minimize the Gibbs free energy of the solution.
 
-The :class:`~burnman.Solution`, :class:`~burnman.ElasticSolution` and
-:class:`~burnman.AnisotropicSolution` classes all accept several
-methods which define the properties of the solution.
+An independent class of solution models is provided by the
+:class:`~burnman.ElasticSolution` class. This class instead defines excess
+properties are relative to the endmember properties at fixed volume and
+temperature. Such models have their roots in atom-scale considerations;
+mixing of two instances of the same lattice type requires deformation
+(local lattice distortions), that can be considered to induce
+a local chemical stress. Therefore, volume may be a more useful
+independent variable than pressure. For more details, see :cite:`Myhill2018`.
 
 .. rubric:: Available solution classes
 .. inheritance-diagram::
@@ -41,6 +38,11 @@ methods which define the properties of the solution.
   burnman.AnisotropicSolution
   burnman.RelaxedAnisotropicSolution
 
+All of the above classes accept several models which define the properties
+of the solution. The standard and anisotropic solution classes share the same
+solution models, while the elastic solution class has its own set of
+closely related solution models.
+
 .. rubric:: Available solution model classes
 .. inheritance-diagram::
   burnman.classes.solutionmodel.MechanicalSolution
@@ -49,6 +51,9 @@ methods which define the properties of the solution.
   burnman.classes.solutionmodel.SymmetricRegularSolution
   burnman.classes.solutionmodel.SubregularSolution
   burnman.classes.solutionmodel.FunctionSolution
+
+.. rubric:: Available elastic solution model classes
+.. inheritance-diagram::
   burnman.classes.elasticsolutionmodel.ElasticMechanicalSolution
   burnman.classes.elasticsolutionmodel.ElasticIdealSolution
   burnman.classes.elasticsolutionmodel.ElasticAsymmetricRegularSolution
