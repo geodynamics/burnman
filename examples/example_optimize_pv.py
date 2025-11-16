@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
         # Compute velocities
         mat_rho, mat_vp, mat_vs, mat_vphi, mat_K, mat_G = rock.evaluate(
-            ["density", "v_p", "v_s", "v_phi", "K_S", "G"], seis_p, temperature
+            ["density", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], seis_p, temperature
         )
 
         print("Calculations are done for:")

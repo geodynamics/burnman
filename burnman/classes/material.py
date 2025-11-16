@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
@@ -590,7 +590,39 @@ class Material(object):
         :returns: Shear modulus in [Pa].
         :rtype: float
         """
-        raise NotImplementedError("need to implement shear_modulus() in derived class!")
+        raise NotImplementedError(
+            "need to implement shear_modulus() in derived class! Perhaps you meant to call effective_shear_modulus, or G_eff?"
+        )
+
+    @material_property
+    def effective_isentropic_bulk_modulus(self):
+        """
+        Returns the effective isentropic bulk modulus of the mineral.
+
+        .. note:: Needs to be implemented in derived classes.
+            Aliased with :func:`~burnman.Material.K_eff`.
+
+        :returns: Effective isentropic bulk modulus in [Pa].
+        :rtype: float
+        """
+        raise NotImplementedError(
+            "need to implement effective_isentropic_bulk_modulus() in derived class!"
+        )
+
+    @material_property
+    def effective_shear_modulus(self):
+        """
+        Returns the effective shear modulus of the mineral.
+
+        .. note:: Needs to be implemented in derived classes.
+            Aliased with :func:`~burnman.Material.G_eff`.
+
+        :returns: Effective shear modulus in [Pa].
+        :rtype: float
+        """
+        raise NotImplementedError(
+            "need to implement effective_shear_modulus() in derived class!"
+        )
 
     @material_property
     def p_wave_velocity(self):
@@ -778,6 +810,16 @@ class Material(object):
     def G(self):
         """Alias for :func:`~burnman.Material.shear_modulus`"""
         return self.shear_modulus
+
+    @property
+    def K_eff(self):
+        """Alias for :func:`~burnman.Material.effective_isentropic_bulk_modulus`"""
+        return self.effective_isentropic_bulk_modulus
+
+    @property
+    def G_eff(self):
+        """Alias for :func:`~burnman.Material.effective_shear_modulus`"""
+        return self.effective_shear_modulus
 
     @property
     def v_p(self):

@@ -73,7 +73,9 @@ class VRH(BurnManTest):
         rock.set_method("slb3")
         rock.set_averaging_scheme(avg.VoigtReussHill())
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -88,7 +90,9 @@ class VRH(BurnManTest):
         rock.set_method("slb3")
         rock.set_averaging_scheme(avg.VoigtReussHill())
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -110,7 +114,9 @@ class VRH(BurnManTest):
         rock.set_method("slb3")
         rock.set_averaging_scheme(avg.VoigtReussHill())
         rho, v_p, v_s, v_phi, K_vrh, G_vrh = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(9957.665, v_p[0])
@@ -125,7 +131,9 @@ class Reuss(BurnManTest):
         rock = burnman.Composite([mypericlase()], [1.0])
         rock.set_averaging_scheme(avg.Reuss())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -138,7 +146,9 @@ class Reuss(BurnManTest):
         rock = burnman.Composite([mypericlase()] * number, [1.0 / number] * number)
         rock.set_averaging_scheme(avg.Reuss())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -159,7 +169,9 @@ class Reuss(BurnManTest):
         )
         rock.set_averaging_scheme(avg.Reuss())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(9887.625, v_p[0])
@@ -174,7 +186,16 @@ class Reuss(BurnManTest):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], 10.0e9, 300.0
+                [
+                    "rho",
+                    "v_p",
+                    "v_s",
+                    "v_phi",
+                    "K_eff",
+                    "G_eff",
+                ],
+                10.0e9,
+                300.0,
             )
             assert len(w) == 2  # we expect two errors to be thrown when p_nonrigid = 0
         self.assertFloatEqual(150.901, G / 1.0e9)
@@ -185,7 +206,16 @@ class Reuss(BurnManTest):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-                ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], 10.0e9, 300.0
+                [
+                    "rho",
+                    "v_p",
+                    "v_s",
+                    "v_phi",
+                    "K_eff",
+                    "G_eff",
+                ],
+                10.0e9,
+                300.0,
             )
             assert (
                 len(w) == 4
@@ -198,7 +228,9 @@ class Voigt(BurnManTest):
         rock = burnman.Composite([mypericlase()], [1.0])
         rock.set_averaging_scheme(avg.Voigt())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -211,7 +243,9 @@ class Voigt(BurnManTest):
         rock = burnman.Composite([mypericlase()] * number, [1.0 / number] * number)
         rock.set_averaging_scheme(avg.Voigt())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -232,7 +266,9 @@ class Voigt(BurnManTest):
         )
         rock.set_averaging_scheme(avg.Voigt())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(10027.216, v_p[0])
@@ -247,7 +283,9 @@ class HSLower(BurnManTest):
         rock = burnman.Composite([mypericlase()], [1.0])
         rock.set_averaging_scheme(avg.HashinShtrikmanLower())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -260,7 +298,9 @@ class HSLower(BurnManTest):
         rock = burnman.Composite([mypericlase()] * number, [1.0 / number] * number)
         rock.set_averaging_scheme(avg.HashinShtrikmanLower())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -281,7 +321,9 @@ class HSLower(BurnManTest):
         )
         rock.set_averaging_scheme(avg.HashinShtrikmanLower())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(9951.957, v_p[0])
@@ -296,7 +338,9 @@ class HSUpper(BurnManTest):
         rock = burnman.Composite([mypericlase()], [1.0])
         rock.set_averaging_scheme(avg.HashinShtrikmanUpper())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -309,7 +353,9 @@ class HSUpper(BurnManTest):
         rock = burnman.Composite([mypericlase()] * number, [1.0 / number] * number)
         rock.set_averaging_scheme(avg.HashinShtrikmanUpper())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -330,7 +376,9 @@ class HSUpper(BurnManTest):
         )
         rock.set_averaging_scheme(avg.HashinShtrikmanUpper())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(9952.798, v_p[0])
@@ -345,7 +393,9 @@ class HSAverage(BurnManTest):
         rock = burnman.Composite([mypericlase()], [1.0])
         rock.set_averaging_scheme(avg.HashinShtrikmanAverage())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(10285.368, v_p[0])
         self.assertFloatEqual(6308.811, v_s[0])
@@ -357,7 +407,9 @@ class HSAverage(BurnManTest):
         rock = burnman.Composite([mypericlase()] * number, [1.0 / number] * number)
         rock.set_averaging_scheme(avg.HashinShtrikmanAverage())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(3791.392, rho[0])
         self.assertFloatEqual(10285.368, v_p[0])
@@ -378,7 +430,9 @@ class HSAverage(BurnManTest):
         )
         rock.set_averaging_scheme(avg.HashinShtrikmanAverage())
         rho, v_p, v_s, v_phi, K, G = rock.evaluate(
-            ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], [10.0e9], [300.0]
+            ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"],
+            [10.0e9],
+            [300.0],
         )
         self.assertFloatEqual(4881.469, rho[0])
         self.assertFloatEqual(9952.378, v_p[0])

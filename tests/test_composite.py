@@ -248,17 +248,17 @@ class composite(BurnManTest):
         )
 
         rock.set_state(5.0e9, 1000.0)
-        G1 = rock.shear_modulus
+        G1 = rock.effective_shear_modulus
         self.assertFloatEqual(108.686, G1 / 1.0e9)
 
         rock.set_averaging_scheme("HashinShtrikmanLower")
         rock.set_state(5.0e9, 1000.0)
-        G2 = rock.shear_modulus
+        G2 = rock.effective_shear_modulus
         self.assertFloatEqual(104.451, G2 / 1.0e9)
 
         rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanUpper())
         rock.set_state(5.0e9, 1000.0)
-        G3 = rock.shear_modulus
+        G3 = rock.effective_shear_modulus
         self.assertFloatEqual(115.155, G3 / 1.0e9)
 
     def test_mass_to_molar_fractions(self):
@@ -288,10 +288,10 @@ class composite(BurnManTest):
             [0.5, 0.5],
         )
 
-        K, G = rock.evaluate(["K_S", "G"], 40.0e9, 2000.0)
+        K, G = rock.evaluate(["K_eff", "G_eff"], 40.0e9, 2000.0)
         rock.set_state(40.0e9, 2000.0)
-        K2 = rock.K_S
-        G2 = rock.G
+        K2 = rock.K_eff
+        G2 = rock.G_eff
         self.assertFloatEqual(K, K2)
         self.assertFloatEqual(G, G2)
 
@@ -428,6 +428,61 @@ class composite(BurnManTest):
         self.assertArraysAlmostEqual(rock.independent_element_indices, [0, 1])
         self.assertArraysAlmostEqual(rock.dependent_element_indices, [2, 3])
         self.assertTrue(rock.n_reactions == 4)
+
+    def test_single_phase_composite(self):
+        min1 = minerals.SLB_2011.mg_fe_olivine()
+        min2 = minerals.SLB_2011.mg_fe_olivine()
+        min1.set_composition([0.8, 0.2])
+        min2.set_composition([0.8, 0.2])
+        rock1 = burnman.Composite([min1, min2], [0.6, 0.4])
+
+        properties = [
+            "gibbs",
+            "molar_entropy",
+            "molar_volume",
+            "molar_heat_capacity_p",
+            "molar_heat_capacity_v",
+            "thermal_expansivity",
+            "density",
+            "grueneisen_parameter",
+            "isothermal_bulk_modulus_reuss",
+            "isentropic_bulk_modulus_reuss",
+        ]
+        rock_prps = rock1.evaluate(properties, 1.0e9, 1400.0)
+        min_prps = min1.evaluate(properties, 1.0e9, 1400.0)
+        for i in range(len(properties)):
+            self.assertFloatEqual(rock_prps[i], min_prps[i])
+
+    def test_single_phase_composite_aliases(self):
+        min1 = minerals.SLB_2011.mg_fe_olivine()
+        min2 = minerals.SLB_2011.mg_fe_olivine()
+        min1.set_composition([0.8, 0.2])
+        min2.set_composition([0.8, 0.2])
+        rock1 = burnman.Composite([min1, min2], [0.6, 0.4])
+
+        properties = [
+            "P",
+            "T",
+            "energy",
+            "helmholtz",
+            "gibbs",
+            "V",
+            "rho",
+            "S",
+            "H",
+            "K_T",
+            "K_S",
+            "beta_T",
+            "beta_S",
+            "gr",
+            "alpha",
+            "C_v",
+            "C_p",
+        ]
+        rock_prps = rock1.evaluate(properties, 1.0e9, 1400.0)
+        alias_prps = rock1.evaluate(properties, 1.0e9, 1400.0)
+        for i in range(len(properties)):
+            self.assertFloatEqual(rock_prps[i], alias_prps[i])
 
 
 if __name__ == "__main__":

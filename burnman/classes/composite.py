@@ -1,6 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
-# the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
+# for the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -208,6 +208,32 @@ class Composite(Material):
         return "{0}: {1}".format(self.__class__.__name__, self.name)
 
     @material_property
+    def phase_volumes(self):
+        """
+        Returns total volumes of each phase in the composite
+        """
+        volumes = np.array(
+            [
+                phase.molar_volume * molar_fraction
+                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
+            ]
+        )
+        return volumes
+
+    @material_property
+    def phase_masses(self):
+        """
+        Returns total masses of each phase in the composite
+        """
+        masses = np.array(
+            [
+                phase.molar_mass * molar_fraction
+                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
+            ]
+        )
+        return masses
+
+    @material_property
     def formula(self):
         """
         Returns molar chemical formula of the composite
@@ -256,25 +282,14 @@ class Composite(Material):
         Returns molar volume of the composite [m^3/mol]
         Aliased with self.V
         """
-        volumes = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
-        return np.sum(volumes)
+        return np.sum(self.phase_volumes)
 
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the composite [kg/mol]
         """
-        return sum(
-            [
-                phase.molar_mass * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
+        return sum(self.phase_masses)
 
     @material_property
     def density(self):
@@ -282,14 +297,7 @@ class Composite(Material):
         Compute the density of the composite based on the molar volumes and masses
         Aliased with self.rho
         """
-        densities = np.array([phase.density for phase in self.phases])
-        volumes = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
-        return self.averaging_scheme.average_density(volumes, densities)
+        return self.molar_mass / self.molar_volume
 
     @material_property
     def molar_entropy(self):
@@ -321,33 +329,53 @@ class Composite(Material):
         Returns isothermal bulk modulus of the composite [Pa]
         Aliased with self.K_T
         """
-        V_frac = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
-        K_ph = np.array([phase.isothermal_bulk_modulus_reuss for phase in self.phases])
-        G_ph = np.array([phase.shear_modulus for phase in self.phases])
+        # Note: d2G/dP2 = -V/K_T, and we sum d2G/dP2 arithmetically:
+        Vs = self.phase_volumes
+        KTs = np.array([phase.isothermal_bulk_modulus_reuss for phase in self.phases])
+        VoverKTs = Vs / KTs
+        return np.sum(Vs) / np.sum(VoverKTs)
 
-        return self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+    @material_property
+    def thermal_expansivity(self):
+        """
+        Returns thermal expansion coefficient of the composite [1/K]
+        Aliased with self.alpha
+        """
+        # Note: d2G/dTdP = V * alpha, and we sum d2G/dTdP arithmetically:
+        Vs = self.phase_volumes
+        alphas = np.array([phase.thermal_expansivity for phase in self.phases])
+        return np.sum(Vs * alphas) / np.sum(Vs)
+
+    @material_property
+    def molar_heat_capacity_p(self):
+        """
+        Returns molar heat capacity at constant pressure of the composite [J/K/mol]
+        Aliased with self.C_p
+        """
+        # Note: d2G/dT2 = -C_p/T, and we sum d2G/dT2 arithmetically:
+        c_p = np.array([phase.molar_heat_capacity_p for phase in self.phases])
+        return np.sum(self.molar_fractions * c_p)
 
     @material_property
     def isentropic_bulk_modulus_reuss(self):
         """
         Returns adiabatic bulk modulus of the mineral [Pa]
+
+        Note: This function implicitly assumes that all of the
+        individual phases are, and remain, in thermal and
+        mechanical equilibrium. A corollary is that the
+        individual phases may not be isentropically compressed,
+        since heat exchange between phases may be required
+        to maintain the same temperature in all phases.
+
         Aliased with self.K_S
         """
-        V_frac = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
-        K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
-        G_ph = np.array([phase.shear_modulus for phase in self.phases])
-
-        return self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+        K_T = self.isothermal_bulk_modulus_reuss
+        alpha = self.thermal_expansivity
+        C_p = self.molar_heat_capacity_p
+        V = self.molar_volume
+        T = self.temperature
+        return K_T / (1.0 - (alpha**2) * K_T * T * V / C_p)
 
     @material_property
     def isothermal_compressibility_reuss(self):
@@ -368,17 +396,61 @@ class Composite(Material):
         return 1.0 / self.isentropic_bulk_modulus_reuss
 
     @material_property
-    def shear_modulus(self):
+    def molar_heat_capacity_v(self):
         """
-        Returns shear modulus of the mineral [Pa]
-        Aliased with self.G
+        Returns molar_heat capacity at constant volume of the composite [J/K/mol]
+
+        Note: This function implicitly assumes that all of the
+        individual phases are, and remain, in thermal and
+        mechanical equilibrium. A corollary is that the
+        individual phases may not be isochorically heated,
+        since differential expansion between phases may be required
+        to maintain the same pressure in all phases.
+
+        Aliased with self.C_v
         """
-        V_frac = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
+        C_p = self.molar_heat_capacity_p
+        K_T = self.isothermal_bulk_modulus_reuss
+        K_S = self.isentropic_bulk_modulus_reuss
+        return C_p * K_T / K_S
+
+    @material_property
+    def grueneisen_parameter(self):
+        """
+        Returns grueneisen parameter of the composite [unitless]
+
+        Note: This function implicitly assumes that all of the
+        individual phases are, and remain, in thermal and
+        mechanical equilibrium.
+
+        Aliased with self.gr
+        """
+        return (
+            self.thermal_expansivity
+            * self.isothermal_bulk_modulus_reuss
+            * self.molar_volume
+            / self.molar_heat_capacity_v
         )
+
+    @material_property
+    def effective_isentropic_bulk_modulus(self):
+        """
+        Returns the effective isotropic, isentropic bulk modulus of the composite [Pa]
+        Aliased with self.K_eff
+        """
+        V_frac = self.phase_volumes
+        K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
+        G_ph = np.array([phase.shear_modulus for phase in self.phases])
+
+        return self.averaging_scheme.average_bulk_moduli(V_frac, K_ph, G_ph)
+
+    @material_property
+    def effective_shear_modulus(self):
+        """
+        Returns the effective isotropic shear modulus of the mineral [Pa]
+        Aliased with self.G_eff
+        """
+        V_frac = self.phase_volumes
         K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
 
@@ -391,7 +463,10 @@ class Composite(Material):
         Aliased with self.v_p
         """
         return np.sqrt(
-            (self.isentropic_bulk_modulus_reuss + 4.0 / 3.0 * self.shear_modulus)
+            (
+                self.effective_isentropic_bulk_modulus
+                + 4.0 / 3.0 * self.effective_shear_modulus
+            )
             / self.density
         )
 
@@ -401,7 +476,7 @@ class Composite(Material):
         Returns bulk sound speed of the composite [m/s]
         Aliased with self.v_phi
         """
-        return np.sqrt(self.isentropic_bulk_modulus_reuss / self.density)
+        return np.sqrt(self.effective_isentropic_bulk_modulus / self.density)
 
     @material_property
     def shear_wave_velocity(self):
@@ -409,53 +484,7 @@ class Composite(Material):
         Returns shear wave speed of the composite [m/s]
         Aliased with self.v_s
         """
-        return np.sqrt(self.shear_modulus / self.density)
-
-    @material_property
-    def grueneisen_parameter(self):
-        """
-        Returns grueneisen parameter of the composite [unitless]
-        Aliased with self.gr
-        """
-        return (
-            self.thermal_expansivity
-            * self.isothermal_bulk_modulus_reuss
-            * self.molar_volume
-            / self.molar_heat_capacity_v
-        )
-
-    @material_property
-    def thermal_expansivity(self):
-        """
-        Returns thermal expansion coefficient of the composite [1/K]
-        Aliased with self.alpha
-        """
-        volumes = np.array(
-            [
-                phase.molar_volume * molar_fraction
-                for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
-            ]
-        )
-        alphas = np.array([phase.thermal_expansivity for phase in self.phases])
-        return self.averaging_scheme.average_thermal_expansivity(volumes, alphas)
-
-    @material_property
-    def molar_heat_capacity_v(self):
-        """
-        Returns molar_heat capacity at constant volume of the composite [J/K/mol]
-        Aliased with self.C_v
-        """
-        c_v = np.array([phase.molar_heat_capacity_v for phase in self.phases])
-        return self.averaging_scheme.average_heat_capacity_v(self.molar_fractions, c_v)
-
-    @material_property
-    def molar_heat_capacity_p(self):
-        """
-        Returns molar heat capacity at constant pressure of the composite [J/K/mol]
-        Aliased with self.C_p
-        """
-        c_p = np.array([phase.molar_heat_capacity_p for phase in self.phases])
-        return self.averaging_scheme.average_heat_capacity_p(self.molar_fractions, c_p)
+        return np.sqrt(self.effective_shear_modulus / self.density)
 
     @material_property
     def endmember_partial_gibbs(self):

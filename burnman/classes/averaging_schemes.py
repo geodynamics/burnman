@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -59,87 +59,6 @@ class AveragingScheme(object):
         :rtype: float
         """
         raise NotImplementedError("")
-
-    def average_density(self, volumes, densities):
-        """
-        Average the densities of a composite, given a list of volume
-        fractions and densitites. This is implemented in the base class,
-        as how to calculate it is not dependent on the geometry of the rock.
-        The formula for density is given by
-
-        .. math::
-            \\rho = \\frac{\\Sigma_i \\rho_i V_i }{\\Sigma_i V_i}
-
-        :param volumes: List of the volume of each phase in the composite
-            :math:`[m^3]`.
-        :type volumes: list of floats
-        :param densities: List of densities of each phase in the composite
-            :math:`[kg/m^3]`.
-        :type densities: list of floats
-
-        :returns: Density :math:`\\rho` :math:`[kg/m^3]`.
-        :rtype: float
-        """
-        total_mass = np.sum(np.array(densities) * np.array(volumes))
-        total_vol = np.sum(np.array(volumes))  # should sum to one
-        density = total_mass / total_vol
-        return density
-
-    def average_thermal_expansivity(self, volumes, alphas):
-        """
-        Averages the thermal expansion coefficient of the mineral :math:`\\alpha`
-        :math:`[1/K]`.
-
-        :param volumes: List of volume fractions of each phase
-            in the composite (should sum to 1.0).
-        :type volumes: list of floats
-        :param alphas: List of thermal expansivities :math:`\\alpha`
-            of each phase in the composite. :math:`[1/K]`
-        :type alphas: list of floats
-
-        :returns: Thermal expansivity of the composite :math:`\\alpha`. :math:`[1/K]`
-        :rtype: float
-        """
-        total_vol = np.sum(np.array(volumes))
-        return np.sum(np.array(alphas) * np.array(volumes)) / total_vol
-
-    def average_heat_capacity_v(self, fractions, c_v):
-        # TODO: double-check that the formula we use is appropriate here.
-        """
-        Averages the heat capacities at constant volume :math:`C_V` by molar fractions
-        as in eqn. (16) in :cite:`Ita1992`.
-
-        :param fractions: List of molar fractions of each phase
-            in the composite (should sum to 1.0).
-        :type fractions: list of floats
-        :param c_v: List of heat capacities at constant volume :math:`C_V`
-            of each phase in the composite. :math:`[J/K/mol]`
-        :type c_v: list of floats
-
-        :returns: Heat capacity at constant volume of the composite :math:`C_V`
-            :math:`[J/K/mol]`.
-        :rtype: float
-        """
-        return np.sum(np.array(fractions) * np.array(c_v))
-
-    def average_heat_capacity_p(self, fractions, c_p):
-        # TODO: double-check that the formula we use is correct.
-        """
-        Averages the heat capacities at constant pressure :math:`C_P`
-        by molar fractions.
-
-        :param fractions: List of molar fractions of each phase in the composite
-            (should sum to 1.0).
-        :type fractions: list of floats
-        :param c_p: List of heat capacities at constant pressure :math:`C_P` of each
-            phase in the composite :math:`[J/K/mol]`.
-        :type c_p: list of floats
-
-        :returns: Heat capacity at constant pressure :math:`C_P` of the composite
-            :math:`[J/K/mol]`.
-        :rtype: float
-        """
-        return np.sum(np.array(fractions) * np.array(c_p))
 
 
 class VoigtReussHill(AveragingScheme):

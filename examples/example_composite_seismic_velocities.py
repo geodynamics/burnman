@@ -130,7 +130,7 @@ if __name__ == "__main__":
     rock.debug_print()
 
     mat_rho, mat_vp, mat_vphi, mat_vs, mat_K, mat_G = rock.evaluate(
-        ["density", "v_p", "v_phi", "v_s", "K_S", "G"], seis_p, temperature
+        ["density", "v_p", "v_phi", "v_s", "K_eff", "G_eff"], seis_p, temperature
     )
 
     [vs_err, vphi_err, rho_err] = burnman.utils.math.chisqr_profiles(
