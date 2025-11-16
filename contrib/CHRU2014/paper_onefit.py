@@ -321,7 +321,7 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressure, temperature
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressure, temperature
     )
 
     err_vs, err_vphi, err_rho = np.square(
@@ -401,7 +401,7 @@ if __name__ == "__main__":
     temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressure, temperature
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressure, temperature
     )
     plt.plot(
         pressure / 1.0e9,

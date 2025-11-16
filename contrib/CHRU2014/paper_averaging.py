@@ -12,8 +12,8 @@ This script reproduces :cite:`Cottaar2014`, Figure 2.
 
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
-1. Voight-Reuss-Hill
-2. Voight averaging
+1. Voigt-Reuss-Hill
+2. Voigt averaging
 3. Reuss averaging
 4. Hashin-Shtrikman averaging
 
@@ -96,41 +96,41 @@ if __name__ == "__main__":
 
     # evaluate the end members
     rho_pv, vp_pv, vs_pv, vphi_pv, K_pv, G_pv = perovskitite.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     rho_fp, vp_fp, vs_fp, vphi_fp, K_fp, G_fp = periclasite.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # Voigt Reuss Hill averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.VoigtReussHill())
     rho_vrh, vp_vrh, vs_vrh, vphi_vrh, K_vrh, G_vrh = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # Voigt averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.Voigt())
     rho_v, vp_v, vs_v, vphi_v, K_v, G_v = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # Reuss averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.Reuss())
     rho_r, vp_r, vs_r, vphi_r, K_r, G_r = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # Upper bound for Hashin-Shtrikman averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanUpper())
     rho_hsu, vp_hsu, vs_hsu, vphi_hsu, K_hsu, G_hsu = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # Lower bound for Hashin-Shtrikman averaging
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanLower())
     rho_hsl, vp_hsl, vs_hsl, vphi_hsl, K_hsl, G_hsl = rock.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], pressures, temperatures
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressures, temperatures
     )
 
     # linear fit

@@ -158,13 +158,13 @@ if __name__ == "__main__":
     preferred_mixture.set_method(method)
 
     mat_rho_1, mat_vp_1, mat_vs_1, mat_vphi_1, mat_K_1, mat_G_1 = perovskitite.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], seis_p, temperature_bs
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], seis_p, temperature_bs
     )
     mat_rho_2, mat_vp_2, mat_vs_2, mat_vphi_2, mat_K_2, mat_G_2 = periclasite.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], seis_p, temperature_bs
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], seis_p, temperature_bs
     )
     mat_rho_3, mat_vp_3, mat_vs_3, mat_vphi_3, mat_K_3, mat_G_3 = pyrolite.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], seis_p, temperature_bs
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], seis_p, temperature_bs
     )
     (
         mat_rho_4,
@@ -174,7 +174,7 @@ if __name__ == "__main__":
         mat_K_4,
         mat_G_4,
     ) = preferred_mixture.evaluate(
-        ["rho", "v_p", "v_s", "v_phi", "K_S", "G"], seis_p, temperature_bs
+        ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], seis_p, temperature_bs
     )
 
     # HERE IS THE STEP WITH THE INCORRECT MIXING ###
