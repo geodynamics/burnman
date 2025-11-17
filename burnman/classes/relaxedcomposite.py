@@ -52,9 +52,17 @@ class RelaxedComposite(Composite):
         # The relaxation vectors
         self.n_relaxation_vectors = len(relaxation_vectors)
 
+        # Check the shape of the relaxation vectors:
+        # should be a 2D array with n_endmembers rows and
+        # n_relaxation_vectors columns
         self.dndq = np.array(relaxation_vectors).T
         assert len(self.dndq.shape) == 2
         assert len(self.dndq) == self.unrelaxed.n_endmembers
+
+        # Check that the relaxation vectors are isochemical
+        delta_c = self.unrelaxed.stoichiometric_array.T @ self.dndq
+        if not np.allclose(delta_c, 0.0):
+            raise ValueError("Relaxation vectors must be isochemical.")
 
         try:
             molar_fractions = composite.molar_fractions
