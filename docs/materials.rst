@@ -59,6 +59,8 @@ Composites
 
 .. autoclass:: burnman.Composite
 
+.. autoclass:: burnman.RelaxedComposite
+
 
 Calibrants
 ----------
