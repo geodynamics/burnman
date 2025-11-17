@@ -3,7 +3,46 @@ import warnings
 import unittest
 
 import burnman
-from burnman import minerals
+from burnman import minerals, Composite, RelaxedComposite
+from burnman.minerals import HP_2011_ds62, mp50MnNCKFMASHTO
+from burnman.tools.eos import check_eos_consistency
+
+
+def setup_assemblage():
+    """
+    Set up a mineral assemblage for testing RelaxedComposite.
+    """
+
+    # Define observed mineral assemblage
+    mu = mp50MnNCKFMASHTO.mu()
+    bi = mp50MnNCKFMASHTO.bi()
+    g = mp50MnNCKFMASHTO.g()
+    ilmm = mp50MnNCKFMASHTO.ilmm()
+    st = mp50MnNCKFMASHTO.st()
+    q = HP_2011_ds62.q()
+
+    # These compositions correspond to an equilibrated assemblage
+    # at P = 0.4 GPa and T = 873 K
+    compositions = [
+        [0.55510672, 0.00393874, 0.00365819, 0.43232719, 0.00339884, 0.00157032],
+        [
+            0.12024528,
+            0.55795845,
+            -0.23022757,
+            0.2928378,
+            0.19457943,
+            0.06260454,
+            0.00200206,
+        ],
+        [0.11996805, 0.75282947, 0.10051702, 0.02013999, 0.00654547],
+        [-0.05461279, 0.84687573, 0.1062428, 0.05404236, 0.04745189],
+        [0.06925327, 0.80706976, 0.01346876, 0.03074615, 0.07946205],
+    ]
+
+    assemblage = Composite([mu, bi, g, ilmm, st, q], [1.0 / 6.0] * 6)
+    for phase, composition in zip(assemblage.phases[:-1], compositions):
+        phase.set_composition(composition)
+    return assemblage
 
 
 # TODO: test composite that changes number of entries
@@ -483,6 +522,40 @@ class composite(BurnManTest):
         alias_prps = rock1.evaluate(properties, 1.0e9, 1400.0)
         for i in range(len(properties)):
             self.assertFloatEqual(rock_prps[i], alias_prps[i])
+
+    def test_relaxed_composite(self):
+        assemblage = setup_assemblage()
+        relaxed_assemblage = RelaxedComposite(assemblage, assemblage.reaction_basis)
+        relaxed_assemblage2 = RelaxedComposite(
+            assemblage, assemblage.reaction_basis[:2, :]
+        )
+
+        P = 0.4e9
+        T = 873.0
+        assemblage.set_state(P, T)
+        relaxed_assemblage.set_state(P, T)
+        relaxed_assemblage2.set_state(P, T)
+
+        self.assertTrue(
+            check_eos_consistency(
+                assemblage, P=P, T=T, including_shear_properties=False
+            )
+        )
+
+        # The properties calculated for this relaxed assemblage should be EOS consistent
+        self.assertTrue(
+            check_eos_consistency(
+                relaxed_assemblage, P=P, T=T, including_shear_properties=False
+            )
+        )
+
+        # The properties for this assemblage are calculated by relaxing only a subset of reactions,
+        # so its properties should not be EOS consistent
+        self.assertFalse(
+            check_eos_consistency(
+                relaxed_assemblage2, P=P, T=T, including_shear_properties=False
+            )
+        )
 
 
 if __name__ == "__main__":

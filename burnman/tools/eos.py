@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
@@ -19,12 +19,12 @@ def check_eos_consistency(
 ):
     """
     Checks that numerical derivatives of the Gibbs energy of a mineral
-    under given conditions are equal to those provided
+    or composite under given conditions are equal to those provided
     analytically by the equation of state.
 
-    :param m: The mineral for which the equation of state
+    :param m: The material for which the equation of state
         is to be checked for consistency.
-    :type m: :class:`burnman.Mineral`
+    :type m: :class:`burnman.Mineral` or :class:`burnman.Composite`
 
     :param P: The pressure at which to check consistency.
     :type P: float
@@ -59,11 +59,17 @@ def check_eos_consistency(
     dT = 1.0
     dP = 1000.0
 
+    def n_moles(m):
+        try:
+            return m.n_moles
+        except AttributeError:
+            return 1.0
+
     m.set_state(P, T)
     equilibration_function(m)
-    G0 = m.gibbs
-    S0 = m.S
-    V0 = m.V
+    G0 = m.gibbs * n_moles(m)
+    S0 = m.S * n_moles(m)
+    V0 = m.V * n_moles(m)
 
     expr = ["G = F + PV", "G = H - TS", "G = E - TS + PV"]
     eq = [
@@ -74,14 +80,14 @@ def check_eos_consistency(
 
     m.set_state(P, T + dT)
     equilibration_function(m)
-    G1 = m.gibbs
-    S1 = m.S
-    V1 = m.V
+    G1 = m.gibbs * n_moles(m)
+    S1 = m.S * n_moles(m)
+    V1 = m.V * n_moles(m)
 
     m.set_state(P + dP, T)
     equilibration_function(m)
-    G2 = m.gibbs
-    V2 = m.V
+    G2 = m.gibbs * n_moles(m)
+    V2 = m.V * n_moles(m)
 
     # T derivatives
     m.set_state(P, T + 0.5 * dT)
@@ -89,9 +95,9 @@ def check_eos_consistency(
     expr.extend(["S = -dG/dT", "alpha = 1/V dV/dT", "C_p = T dS/dT"])
     eq.extend(
         [
-            [m.S, -(G1 - G0) / dT],
-            [m.alpha, (V1 - V0) / dT / m.V],
-            [m.molar_heat_capacity_p, (T + 0.5 * dT) * (S1 - S0) / dT],
+            [m.S * n_moles(m), -(G1 - G0) / dT],
+            [m.alpha, (V1 - V0) / dT / (V1 + V0) * 2.0],
+            [m.molar_heat_capacity_p * n_moles(m), (T + 0.5 * dT) * (S1 - S0) / dT],
         ]
     )
 
@@ -101,7 +107,7 @@ def check_eos_consistency(
     expr.extend(["V = dG/dP", "K_T = -V dP/dV"])
     eq.extend(
         [
-            [m.V, (G2 - G0) / dP],
+            [m.V * n_moles(m), (G2 - G0) / dP],
             [m.isothermal_bulk_modulus_reuss, -0.5 * (V2 + V0) * dP / (V2 - V0)],
         ]
     )
@@ -132,10 +138,12 @@ def check_eos_consistency(
         ]
     )
 
-    expr.append("Vphi = np.sqrt(K_S/rho)")
-    eq.append([m.bulk_sound_velocity, np.sqrt(m.isentropic_bulk_modulus_reuss / m.rho)])
-
     if including_shear_properties:
+        expr.append("Vphi = np.sqrt(K_S/rho)")
+        eq.append(
+            [m.bulk_sound_velocity, np.sqrt(m.isentropic_bulk_modulus_reuss / m.rho)]
+        )
+
         expr.extend(["Vp = np.sqrt((K_S + 4G/3)/rho)", "Vs = np.sqrt(G_S/rho)"])
 
         with warnings.catch_warnings(record=True) as w:

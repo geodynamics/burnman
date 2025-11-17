@@ -17,6 +17,7 @@ from . import solution
 from . import elasticsolutionmodel
 from . import elasticsolution
 from . import composite
+from . import relaxedcomposite
 from . import anisotropy
 from . import anisotropicmineral
 from . import mineral_helpers
