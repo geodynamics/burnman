@@ -109,7 +109,7 @@ Using thermodynamic relations we can derive equations for the thermal pressure a
 The thermal shear correction used in BurnMan was developed by :cite:`HS1998`
 
 .. math::
-    G_{th}(V,T) &= \frac{3}{5} \left[ K_{th} (V, T) - 2\frac{3nRT}{V}\gamma D(x) \right]
+    G_{th}(V,T) = \frac{3}{5} \left[ K_{th} (V, T) - 2\frac{3nRT}{V}\gamma D(x) \right]
 
 
 The total pressure, bulk and shear moduli can be calculated from the following sums
