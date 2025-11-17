@@ -990,8 +990,8 @@ class RelaxedSolution(Solution):
     @material_property
     def _d2Gdqdz(self):
         """
-        Second derivatives of the Helmholtz energy with
-        respect to composition and z (pressure or temperature).
+        Second derivatives of the Gibbs energy with
+        respect to composition and z (pressure and temperature).
         """
         dVdq = np.einsum("i, ij->j", self.unrelaxed.partial_volumes, self.dndq)
         dSdq = np.einsum("i, ij->j", self.unrelaxed.partial_entropies, self.dndq)
@@ -1001,9 +1001,9 @@ class RelaxedSolution(Solution):
     @material_property
     def _d2Gdqdq_fixed_PT_pinv(self):
         """
-        The second derivative of the Helmholtz energy
+        The second derivative of the Gibbs energy
         with respect to the structure parameters at constant
-        strain and temperature. Often referred to as the
+        pressure and temperature. Often referred to as the
         susceptibility matrix.
         """
         return np.linalg.pinv(self._d2Gdqdq_fixed_PT)
@@ -1012,7 +1012,7 @@ class RelaxedSolution(Solution):
     def dqdz_relaxed(self):
         """
         The change of the structure parameters with respect to
-        strain and temperature that minimizes the Helmholtz
+        strain and temperature that minimizes the Gibbs
         energy.
         """
         return -np.einsum("kl, lj->kj", self._d2Gdqdq_fixed_PT_pinv, self._d2Gdqdz)
@@ -1041,13 +1041,12 @@ class RelaxedSolution(Solution):
         )
 
     # The following scalar properties are all
-    # second derivatives that are calculated in AnisotropicMineral
-    # or Solution (rather than being derived from other properties),
+    # second derivatives that are calculated in Solution
+    # (rather than being derived from other properties),
     # and must therefore be redefined in relaxed materials
 
-    # The volumetric molar heat capacity and grueneisen parameter are
-    # derived properties in AnisotropicMineral
-    # and so do not need to be redefined.
+    # The volumetric molar heat capacity and Grueneisen parameter are
+    # derived properties in Solution and so do not need to be redefined.
 
     @material_property
     @copy_documentation(Solution.isothermal_compressibility_reuss)

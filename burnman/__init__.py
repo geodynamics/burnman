@@ -233,6 +233,7 @@ from .classes.solution import Solution, SolidSolution, RelaxedSolution
 from .classes.elasticsolutionmodel import ElasticSolutionModel
 from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution
 from .classes.composite import Composite
+from .classes.relaxedcomposite import RelaxedComposite
 from .classes.calibrant import Calibrant
 from .classes.anisotropy import AnisotropicMaterial
 from .classes.anisotropicmineral import AnisotropicMineral
