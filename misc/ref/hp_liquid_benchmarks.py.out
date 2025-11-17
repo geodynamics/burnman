@@ -19,5 +19,4 @@ K_T = -V dP/dV : True
 C_v = Cp - alpha^2*K_T*V*T : True 
 K_S = K_T*Cp/Cv : True 
 gr = alpha*K_T*V/Cv : True 
-Vphi = np.sqrt(K_S/rho) : True 
 All EoS consistency constraints satisfied for 'burnman.minerals.HGP_2018_ds633.abL'

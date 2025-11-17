@@ -11,7 +11,6 @@ K_T = -V dP/dV : True
 C_v = Cp - alpha^2*K_T*V*T : True 
 K_S = K_T*Cp/Cv : True 
 gr = alpha*K_T*V/Cv : True 
-Vphi = np.sqrt(K_S/rho) : True 
 All EoS consistency constraints satisfied for 'burnman.minerals.other.liquid_iron'
 Pressure (GPa), Temperature (K), Density (kg/m^3), Grueneisen parameter
 0.0 7019 1811.0 1.7350
