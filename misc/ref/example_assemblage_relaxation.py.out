@@ -1,17 +1,23 @@
-Following results are for an olivine-wadsleyite assemblage at 1600 K.
-Order of results: Unrelaxed, Partial relaxation (Fe-Mg exchange), Full relaxation
+The following results are for an olivine-wadsleyite assemblage at 1600 K.
+Order of results:
+  - Unrelaxed
+  - Partial relaxation (Fe-Mg exchange only), allowing reaction
+    1.0 Fayalite + 1.0 Mg_Wadsleyite = 1.0 Forsterite + 1.0 Fe_Wadsleyite
+  - Partial relaxation (phase change only), allowing reaction
+    1.0 Mg_Wadsleyite + 1.0 Fe_Wadsleyite = 1.0 Forsterite + 1.0 Fayalite
+  - Full relaxation
 
-Start of ol-wad transition zone at 13.32 GPa
-Isentropic bulk modulus: 163.15 GPa, 163.15 GPa, 13.09 GPa
-Thermal expansivity: 23.17e-6 /K, 23.17e-6 /K, 319.41e-6 /K
-Specific heat capacity: 1209.9 J/K/kg, 1209.9 J/K/kg, 1610.9 J/K/kg
+Start of ol-wad transition zone at 13.01 GPa
+Isentropic bulk modulus (GPa): 163.15, 163.15, 163.15, 13.09
+Thermal expansivity (/K): 23.17e-6, 23.17e-6, 23.17e-6, 319.41e-6
+Specific heat capacity (J/K/kg): 1209.9, 1209.9, 1209.9, 1610.9
 
 Middle of ol-wad transition zone at 13.17 GPa
-Isentropic bulk modulus: 175.45 GPa, 175.38 GPa, 8.93 GPa
-Thermal expansivity: 23.91e-6 /K, 24.06e-6 /K, 469.46e-6 /K
-Specific heat capacity: 1214.9 J/K/kg, 1217.0 J/K/kg, 1759.6 J/K/kg
+Isentropic bulk modulus (GPa): 175.45, 175.38, 155.73, 8.93
+Thermal expansivity (/K): 23.91e-6, 24.06e-6, 27.93e-6, 469.46e-6
+Specific heat capacity (J/K/kg): 1214.9, 1217.0, 1223.8, 1759.6
 
-End of ol-wad transition zone at 13.01 GPa
-Isentropic bulk modulus: 202.37 GPa, 202.37 GPa, 5.73 GPa
-Thermal expansivity: 25.36e-6 /K, 25.36e-6 /K, 818.79e-6 /K
-Specific heat capacity: 1223.6 J/K/kg, 1223.6 J/K/kg, 2103.0 J/K/kg
+End of ol-wad transition zone at 13.32 GPa
+Isentropic bulk modulus (GPa): 202.37, 202.37, 202.37, 5.73
+Thermal expansivity (/K): 25.36e-6, 25.36e-6, 25.36e-6, 818.79e-6
+Specific heat capacity (J/K/kg): 1223.6, 1223.6, 1223.6, 2103.0
