@@ -1000,6 +1000,11 @@ class FunctionSolution(IdealSolution):
         self.n_endmembers = len(endmembers)
         self._excess_gibbs_function = excess_gibbs_function
 
+        # Calculate derivatives using autograd
+        # Each function is wrapped in a warnings catcher to suppress
+        # autograd warnings.
+        # The functions are defined here, rather than as
+        # class methods to avoid passing self as an argument.
         self._non_ideal_excess_partial_gibbs = ag.jacobian(
             excess_gibbs_function, argnum=2
         )
@@ -1021,6 +1026,48 @@ class FunctionSolution(IdealSolution):
                 )
 
         self.excess_partial_volumes = partial_volumes
+
+        def Cp_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dT2 = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=1
+                    )(pressure, temperature, molar_amounts),
+                    argnum=1,
+                )
+
+                return -temperature * d2G_dT2(pressure, temperature, molar_amounts)
+
+        self.Cp_excess = Cp_xs
+
+        def alphaV_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dP_dT = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=1
+                    )(pressure, temperature, molar_amounts),
+                    argnum=0,
+                )
+
+                return d2G_dP_dT(pressure, temperature, molar_amounts)
+
+        self.alphaV_excess = alphaV_xs
+
+        def VoverKT_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dP2 = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=0
+                    )(pressure, temperature, molar_amounts),
+                    argnum=0,
+                )
+
+                return -d2G_dP2(pressure, temperature, molar_amounts)
+
+        self.VoverKT_excess = VoverKT_xs
 
         self._non_ideal_gibbs_hessian = ag.jacobian(
             self._non_ideal_excess_partial_gibbs, argnum=2

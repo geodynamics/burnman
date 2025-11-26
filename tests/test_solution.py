@@ -453,8 +453,21 @@ def excess_gibbs_function_ppv(pressure, temperature, molar_amounts):
     return n_moles * 60.0e3 * molar_fractions[0] * molar_fractions[2]
 
 
+def excess_gibbs_function_ppv_PT_dependent(pressure, temperature, molar_amounts):
+    n_moles = sum(molar_amounts)
+    molar_fractions = molar_amounts / n_moles
+    P_GPa = pressure / 1.0e9
+    T_k = temperature
+    W0 = 60.0e3
+    WP = 100.0 * P_GPa + 10.0 * P_GPa * P_GPa
+    WT = -0.1 * T_k - 0.0002 * T_k * T_k
+    WPT = 0.1 * P_GPa * T_k
+    W = W0 + WP + WT + WPT
+    return n_moles * W * molar_fractions[0] * molar_fractions[2]
+
+
 class ppv_function(burnman.Solution):
-    def __init__(self, molar_fractions=None):
+    def __init__(self, excess_gibbs_function, molar_fractions=None):
         self.name = "post-perovskite/bridgmanite"
         self.solution_model = FunctionSolution(
             endmembers=[
@@ -462,7 +475,7 @@ class ppv_function(burnman.Solution):
                 [fe_post_perovskite(), "[Fe][Si]O3"],
                 [al_post_perovskite(), "[Al][Al]O3"],
             ],
-            excess_gibbs_function=excess_gibbs_function_ppv,
+            excess_gibbs_function=excess_gibbs_function,
         )
 
         burnman.Solution.__init__(self, molar_fractions=molar_fractions)
@@ -1231,8 +1244,14 @@ class test_solidsolution(BurnManTest):
 
         self.assertArraysAlmostEqual(H0.dot(df), dGdx2 - dGdx1)
 
+    def test_function_solution_consistency(self):
+        ss = ppv_function(excess_gibbs_function_ppv, [0.2, 0.3, 0.5])
+        self.assertTrue(check_eos_consistency(ss))
+        ss = ppv_function(excess_gibbs_function_ppv_PT_dependent, [0.2, 0.3, 0.5])
+        self.assertTrue(check_eos_consistency(ss))
+
     def test_function_solution(self):
-        ss = [ppv_symmetric(), ppv_function()]
+        ss = [ppv_symmetric(), ppv_function(excess_gibbs_function_ppv)]
         for s in ss:
             s.set_state(1.0e5, 300.0)
             s.set_composition([0.2, 0.3, 0.5])
@@ -1260,7 +1279,7 @@ class test_solidsolution(BurnManTest):
         )
 
     def test_function_solution_low_proportions(self):
-        ss = [ppv_symmetric(), ppv_function()]
+        ss = [ppv_symmetric(), ppv_function(excess_gibbs_function_ppv)]
         for s in ss:
             s.set_state(1.0e5, 300.0)
             s.set_composition([0.0, 0.5, 0.5])
