@@ -468,7 +468,9 @@ class Solution(Mineral):
                         for i in range(self.n_endmembers)
                     ]
                 )
-                + self.solution_model.VoverKT_excess()
+                + self.solution_model.VoverKT_excess(
+                    self.pressure, self.temperature, self.molar_fractions
+                )
             )
         )
 
@@ -577,7 +579,9 @@ class Solution(Mineral):
                     for i in range(self.n_endmembers)
                 ]
             )
-            + self.solution_model.alphaV_excess()
+            + self.solution_model.alphaV_excess(
+                self.pressure, self.temperature, self.molar_fractions
+            )
         )
 
     @material_property
@@ -603,15 +607,14 @@ class Solution(Mineral):
         of the solution [J/K/mol].
         Aliased with self.C_p.
         """
-        return (
-            sum(
-                [
-                    self.solution_model.endmembers[i][0].molar_heat_capacity_p
-                    * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)
-                ]
-            )
-            + self.solution_model.Cp_excess()
+        return sum(
+            [
+                self.solution_model.endmembers[i][0].molar_heat_capacity_p
+                * self.molar_fractions[i]
+                for i in range(self.n_endmembers)
+            ]
+        ) + self.solution_model.Cp_excess(
+            self.pressure, self.temperature, self.molar_fractions
         )
 
     @cached_property

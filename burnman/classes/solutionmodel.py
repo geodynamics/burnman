@@ -335,24 +335,48 @@ class SolutionModel(object):
         """
         return np.zeros_like(np.array(molar_fractions))
 
-    def Cp_excess(self):
+    def Cp_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess heat capacity of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess isobaric heat capacity of the solution.
+        :rtype: float
         """
         return 0.0
 
-    def alphaV_excess(self):
+    def alphaV_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess alpha*V of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess alpha*V of the solution model
+        :rtype: float
         """
         return 0.0
 
-    def VoverKT_excess(self):
+    def VoverKT_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess V/K_T of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess V/K_T of the solution model
+        :rtype: float
         """
         return 0.0
 
@@ -976,6 +1000,11 @@ class FunctionSolution(IdealSolution):
         self.n_endmembers = len(endmembers)
         self._excess_gibbs_function = excess_gibbs_function
 
+        # Calculate derivatives using autograd
+        # Each function is wrapped in a warnings catcher to suppress
+        # autograd warnings.
+        # The functions are defined here, rather than as
+        # class methods to avoid passing self as an argument.
         self._non_ideal_excess_partial_gibbs = ag.jacobian(
             excess_gibbs_function, argnum=2
         )
@@ -997,6 +1026,48 @@ class FunctionSolution(IdealSolution):
                 )
 
         self.excess_partial_volumes = partial_volumes
+
+        def Cp_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dT2 = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=1
+                    )(pressure, temperature, molar_amounts),
+                    argnum=1,
+                )
+
+                return -temperature * d2G_dT2(pressure, temperature, molar_amounts)
+
+        self.Cp_excess = Cp_xs
+
+        def alphaV_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dP_dT = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=1
+                    )(pressure, temperature, molar_amounts),
+                    argnum=0,
+                )
+
+                return d2G_dP_dT(pressure, temperature, molar_amounts)
+
+        self.alphaV_excess = alphaV_xs
+
+        def VoverKT_xs(pressure, temperature, molar_amounts):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                d2G_dP2 = ag.grad(
+                    lambda pressure, temperature, molar_amounts: ag.grad(
+                        self._excess_gibbs_function, argnum=0
+                    )(pressure, temperature, molar_amounts),
+                    argnum=0,
+                )
+
+                return -d2G_dP2(pressure, temperature, molar_amounts)
+
+        self.VoverKT_excess = VoverKT_xs
 
         self._non_ideal_gibbs_hessian = ag.jacobian(
             self._non_ideal_excess_partial_gibbs, argnum=2
@@ -1542,21 +1613,21 @@ class PolynomialSolution(IdealSolution):
 
         return d2Vdndn
 
-    def Cp_excess(self):
+    def Cp_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_Cp = np.array(
             [mbr.molar_heat_capacity_p for mbr in self.interaction_endmembers]
         )
         return np.einsum("i, i", mbr_scalar, mbr_Cp)
 
-    def alphaV_excess(self):
+    def alphaV_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdt = np.array(
             [mbr.alpha * mbr.V for mbr in self.interaction_endmembers]
         )
         return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdt)
 
-    def VoverKT_excess(self):
+    def VoverKT_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdp = np.array(
             [
