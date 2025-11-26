@@ -335,24 +335,48 @@ class SolutionModel(object):
         """
         return np.zeros_like(np.array(molar_fractions))
 
-    def Cp_excess(self):
+    def Cp_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess heat capacity of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess isobaric heat capacity of the solution.
+        :rtype: float
         """
         return 0.0
 
-    def alphaV_excess(self):
+    def alphaV_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess alpha*V of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess alpha*V of the solution model
+        :rtype: float
         """
         return 0.0
 
-    def VoverKT_excess(self):
+    def VoverKT_excess(self, pressure, temperature, molar_fractions):
         """
-        Returns the excess V/K_T of the solution model
-        at its current state
+        :param pressure: Pressure at which to evaluate the solution model [Pa].
+        :type pressure: float
+        :param temperature: Temperature at which to evaluate the solution model [K].
+        :type temperature: float
+        :param molar_fractions: List of molar fractions of the
+            different independent endmembers in the solution model.
+        :type molar_fractions: list of floats
+
+        :returns: The excess V/K_T of the solution model
+        :rtype: float
         """
         return 0.0
 
@@ -1542,21 +1566,21 @@ class PolynomialSolution(IdealSolution):
 
         return d2Vdndn
 
-    def Cp_excess(self):
+    def Cp_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_Cp = np.array(
             [mbr.molar_heat_capacity_p for mbr in self.interaction_endmembers]
         )
         return np.einsum("i, i", mbr_scalar, mbr_Cp)
 
-    def alphaV_excess(self):
+    def alphaV_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdt = np.array(
             [mbr.alpha * mbr.V for mbr in self.interaction_endmembers]
         )
         return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdt)
 
-    def VoverKT_excess(self):
+    def VoverKT_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdp = np.array(
             [
