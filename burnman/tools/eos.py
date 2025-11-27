@@ -59,17 +59,11 @@ def check_eos_consistency(
     dT = 1.0
     dP = 1000.0
 
-    def n_moles(m):
-        try:
-            return m.n_moles
-        except AttributeError:
-            return 1.0
-
     m.set_state(P, T)
     equilibration_function(m)
-    G0 = m.gibbs * n_moles(m)
-    S0 = m.S * n_moles(m)
-    V0 = m.V * n_moles(m)
+    G0 = m.gibbs * m.number_of_moles
+    S0 = m.S * m.number_of_moles
+    V0 = m.V * m.number_of_moles
 
     expr = ["G = F + PV", "G = H - TS", "G = E - TS + PV"]
     eq = [
@@ -80,14 +74,14 @@ def check_eos_consistency(
 
     m.set_state(P, T + dT)
     equilibration_function(m)
-    G1 = m.gibbs * n_moles(m)
-    S1 = m.S * n_moles(m)
-    V1 = m.V * n_moles(m)
+    G1 = m.gibbs * m.number_of_moles
+    S1 = m.S * m.number_of_moles
+    V1 = m.V * m.number_of_moles
 
     m.set_state(P + dP, T)
     equilibration_function(m)
-    G2 = m.gibbs * n_moles(m)
-    V2 = m.V * n_moles(m)
+    G2 = m.gibbs * m.number_of_moles
+    V2 = m.V * m.number_of_moles
 
     # T derivatives
     m.set_state(P, T + 0.5 * dT)
@@ -95,9 +89,12 @@ def check_eos_consistency(
     expr.extend(["S = -dG/dT", "alpha = 1/V dV/dT", "C_p = T dS/dT"])
     eq.extend(
         [
-            [m.S * n_moles(m), -(G1 - G0) / dT],
+            [m.S * m.number_of_moles, -(G1 - G0) / dT],
             [m.alpha, (V1 - V0) / dT / (V1 + V0) * 2.0],
-            [m.molar_heat_capacity_p * n_moles(m), (T + 0.5 * dT) * (S1 - S0) / dT],
+            [
+                m.molar_heat_capacity_p * m.number_of_moles,
+                (T + 0.5 * dT) * (S1 - S0) / dT,
+            ],
         ]
     )
 
@@ -107,7 +104,7 @@ def check_eos_consistency(
     expr.extend(["V = dG/dP", "K_T = -V dP/dV"])
     eq.extend(
         [
-            [m.V * n_moles(m), (G2 - G0) / dP],
+            [m.V * m.number_of_moles, (G2 - G0) / dP],
             [m.isothermal_bulk_modulus_reuss, -0.5 * (V2 + V0) * dP / (V2 - V0)],
         ]
     )

@@ -100,7 +100,7 @@ class RelaxedComposite(Composite):
             try:
                 bulk_composition = Counter(
                     {
-                        el: count * self.unrelaxed.n_moles
+                        el: count * self.unrelaxed.number_of_moles
                         for el, count in self.unrelaxed.formula.items()
                     }
                 )
@@ -117,7 +117,7 @@ class RelaxedComposite(Composite):
         # Set the relaxed composite to the equilibrated state
         Composite.set_state(self, pressure, temperature)
         Composite.set_fractions(self, self.unrelaxed.molar_fractions)
-        self.n_moles = self.unrelaxed.n_moles
+        self.number_of_moles = self.unrelaxed.number_of_moles
 
     @material_property
     def _d2Gdqdq_fixed_PT(self):
@@ -126,7 +126,7 @@ class RelaxedComposite(Composite):
         calculated at constant pressure and temperature.
         """
         phases = self.unrelaxed.phases
-        molar_amounts = self.unrelaxed.molar_fractions * self.unrelaxed.n_moles
+        molar_amounts = self.unrelaxed.molar_fractions * self.unrelaxed.number_of_moles
         hessians = [
             (
                 phase.gibbs_hessian / molar_amounts[i]
@@ -176,8 +176,8 @@ class RelaxedComposite(Composite):
         """
         beta_TR = self.unrelaxed.isothermal_compressibility_reuss
         alpha = self.unrelaxed.thermal_expansivity
-        c_p = self.unrelaxed.molar_heat_capacity_p * self.n_moles
-        V = self.molar_volume * self.n_moles
+        c_p = self.unrelaxed.molar_heat_capacity_p * self.number_of_moles
+        V = self.molar_volume * self.number_of_moles
         T = self.temperature
         return np.array([[-V * beta_TR, V * alpha], [V * alpha, -c_p / T]])
 
@@ -199,17 +199,17 @@ class RelaxedComposite(Composite):
     @material_property
     @copy_documentation(Composite.isothermal_compressibility_reuss)
     def isothermal_compressibility_reuss(self):
-        return -self._d2Gdzdz[0, 0] / self.V / self.n_moles
+        return -self._d2Gdzdz[0, 0] / self.V / self.number_of_moles
 
     @material_property
     @copy_documentation(Composite.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._d2Gdzdz[0, 1] / self.V / self.n_moles
+        return self._d2Gdzdz[0, 1] / self.V / self.number_of_moles
 
     @material_property
     @copy_documentation(Composite.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
-        return -self._d2Gdzdz[1, 1] * self.T / self.n_moles
+        return -self._d2Gdzdz[1, 1] * self.T / self.number_of_moles
 
     @material_property
     @copy_documentation(Composite.isothermal_bulk_modulus_reuss)

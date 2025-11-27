@@ -57,6 +57,7 @@ class Material(object):
     def __init__(self):
         self._pressure = None
         self._temperature = None
+        self._number_of_moles = 1.0
         if not hasattr(self, "name"):
             # if a derived class decides to set .name before calling this
             # constructor (I am looking at you, SLB_2011.py!), do not
@@ -200,6 +201,34 @@ class Material(object):
                 )
         pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
         self.set_state(pressure, temperature)
+
+    @property
+    def number_of_moles(self):
+        """
+        Returns the number of moles in this material.
+
+        :returns: Number of moles.
+        :rtype: float
+        """
+        return self._number_of_moles
+
+    @number_of_moles.setter
+    def number_of_moles(self, value):
+        """
+        Sets the number of moles in this material.
+
+        :param value: Number of moles.
+        :type value: float
+        """
+        if value < 0:
+            raise ValueError("Moles cannot be negative")
+        self._number_of_moles = value
+
+    def n_moles(self):
+        """
+        Alias for number_of_moles property.
+        """
+        return self.number_of_moles
 
     def reset(self):
         """
@@ -406,6 +435,16 @@ class Material(object):
         :rtype: float
         """
         return self._temperature
+
+    @property
+    def n_moles(self):
+        """
+        Returns the number of moles in this material.
+
+        :returns: Number of moles.
+        :rtype: float
+        """
+        return self._number_of_moles
 
     @material_property
     def molar_internal_energy(self):

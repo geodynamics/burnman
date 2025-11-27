@@ -101,7 +101,7 @@ def get_parameters(assemblage, n_free_compositional_vectors=0):
     :rtype: numpy.array
     """
     params = np.zeros(assemblage.n_endmembers + 2 + n_free_compositional_vectors)
-    n_moles_phase = assemblage.n_moles * np.array(assemblage.molar_fractions)
+    n_moles_phase = assemblage.number_of_moles * np.array(assemblage.molar_fractions)
 
     try:
         params[:2] = [
@@ -133,7 +133,7 @@ def get_endmember_amounts(assemblage):
     :returns: The current amounts of all the endmembers.
     :rtype: numpy.array
     """
-    phase_amounts = assemblage.n_moles * assemblage.molar_fractions
+    phase_amounts = assemblage.number_of_moles * assemblage.molar_fractions
     amounts = np.empty(assemblage.n_endmembers)
     j = 0
     for i, ph in enumerate(assemblage.phases):
@@ -177,8 +177,8 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
 
     assert np.all(phase_amounts > -1.0e-8)
     phase_amounts = np.abs(phase_amounts)
-    assemblage.n_moles = sum(phase_amounts)
-    assemblage.set_fractions(phase_amounts / assemblage.n_moles)
+    assemblage.number_of_moles = sum(phase_amounts)
+    assemblage.set_fractions(phase_amounts / assemblage.number_of_moles)
     return None
 
 
@@ -268,9 +268,13 @@ def F(
         elif type_c == "T":
             eqns[i] = (assemblage.temperature - eq_c) / T_scaling
         elif type_c == "S":
-            eqns[i] = (assemblage.molar_entropy * assemblage.n_moles - eq_c) / S_scaling
+            eqns[i] = (
+                assemblage.molar_entropy * assemblage.number_of_moles - eq_c
+            ) / S_scaling
         elif type_c == "V":
-            eqns[i] = (assemblage.molar_volume * assemblage.n_moles - eq_c) / V_scaling
+            eqns[i] = (
+                assemblage.molar_volume * assemblage.number_of_moles - eq_c
+            ) / V_scaling
         elif type_c == "X":
             eqns[i] = (np.dot(eq_c[0], x) - eq_c[1]) / X_scaling  # i.e. Ax = b
         else:
@@ -340,11 +344,11 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "S":  # dS/dx
             # dS/dP = -aV, dS/dT = Cp/T
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles
+                -assemblage.number_of_moles
                 * assemblage.alpha
                 * assemblage.molar_volume
                 / S_scaling,
-                assemblage.n_moles
+                assemblage.number_of_moles
                 * assemblage.molar_heat_capacity_p
                 / assemblage.temperature
                 / S_scaling,
@@ -354,7 +358,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
                 jacobian[ic, j] = assemblage.phases[k].molar_entropy / S_scaling
                 if n > 1:  # for solutions with >1 endmember
                     jacobian[ic, j + 1 : j + n] = (
-                        assemblage.n_moles
+                        assemblage.number_of_moles
                         * assemblage.molar_fractions[k]
                         * (
                             assemblage.phases[k].partial_entropies[1:]
@@ -366,11 +370,11 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "V":  # dV/dx
             # dV/dP = -V/K_T, dV/dT = aV
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles
+                -assemblage.number_of_moles
                 * assemblage.molar_volume
                 / assemblage.isothermal_bulk_modulus_reuss
                 / V_scaling,
-                assemblage.n_moles
+                assemblage.number_of_moles
                 * assemblage.molar_volume
                 * assemblage.alpha
                 / V_scaling,
@@ -380,7 +384,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
                 jacobian[ic, j] = assemblage.phases[k].molar_volume / V_scaling
                 if n > 1:  # for solutions with >1 stable endmember
                     jacobian[ic, j + 1 : j + n] = (
-                        assemblage.n_moles
+                        assemblage.number_of_moles
                         * assemblage.molar_fractions[k]
                         * (
                             assemblage.phases[k].partial_volumes[1:]
@@ -422,7 +426,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
 
     # Finally, let's build the compositional Hessian d2G/dfidfj = dmui/dfj
     # where fj is the fraction of endmember j in a phase
-    phase_amounts = np.array(assemblage.molar_fractions) * assemblage.n_moles
+    phase_amounts = np.array(assemblage.molar_fractions) * assemblage.number_of_moles
     comp_hessian = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
     dfi_dxj = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
     dpi_dxj = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
@@ -1000,7 +1004,7 @@ def equilibrate(
         assemblage.set_fractions([f for i in range(n_phases)])
 
     n_atoms = sum(composition.values())
-    assemblage.n_moles = n_atoms / sum(assemblage.formula.values())
+    assemblage.number_of_moles = n_atoms / sum(assemblage.formula.values())
 
     n_equality_constraints = len(equality_constraints)
     n_free_compositional_vectors = len(free_compositional_vectors)
