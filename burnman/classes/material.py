@@ -175,7 +175,7 @@ class Material(object):
             # and brentq will try a larger pressure.
             try:
                 self.set_state(pressure, temperature)
-                return volume - self.molar_volume
+                return volume - self.volume
             except Exception:
                 return -np.inf
 
