@@ -59,35 +59,29 @@ def check_eos_consistency(
     dT = 1.0
     dP = 1000.0
 
-    def n_moles(m):
-        try:
-            return m.n_moles
-        except AttributeError:
-            return 1.0
-
     m.set_state(P, T)
     equilibration_function(m)
-    G0 = m.gibbs * n_moles(m)
-    S0 = m.S * n_moles(m)
-    V0 = m.V * n_moles(m)
+    G0 = m.gibbs
+    S0 = m.S
+    V0 = m.V
 
     expr = ["G = F + PV", "G = H - TS", "G = E - TS + PV"]
     eq = [
         [m.gibbs, (m.helmholtz + P * m.V)],
         [m.gibbs, (m.H - T * m.S)],
-        [m.gibbs, (m.molar_internal_energy - T * m.S + P * m.V)],
+        [m.gibbs, (m.internal_energy - T * m.S + P * m.V)],
     ]
 
     m.set_state(P, T + dT)
     equilibration_function(m)
-    G1 = m.gibbs * n_moles(m)
-    S1 = m.S * n_moles(m)
-    V1 = m.V * n_moles(m)
+    G1 = m.gibbs
+    S1 = m.S
+    V1 = m.V
 
     m.set_state(P + dP, T)
     equilibration_function(m)
-    G2 = m.gibbs * n_moles(m)
-    V2 = m.V * n_moles(m)
+    G2 = m.gibbs
+    V2 = m.V
 
     # T derivatives
     m.set_state(P, T + 0.5 * dT)
@@ -95,9 +89,12 @@ def check_eos_consistency(
     expr.extend(["S = -dG/dT", "alpha = 1/V dV/dT", "C_p = T dS/dT"])
     eq.extend(
         [
-            [m.S * n_moles(m), -(G1 - G0) / dT],
+            [m.S, -(G1 - G0) / dT],
             [m.alpha, (V1 - V0) / dT / (V1 + V0) * 2.0],
-            [m.molar_heat_capacity_p * n_moles(m), (T + 0.5 * dT) * (S1 - S0) / dT],
+            [
+                m.heat_capacity_p,
+                (T + 0.5 * dT) * (S1 - S0) / dT,
+            ],
         ]
     )
 
@@ -107,7 +104,7 @@ def check_eos_consistency(
     expr.extend(["V = dG/dP", "K_T = -V dP/dV"])
     eq.extend(
         [
-            [m.V * n_moles(m), (G2 - G0) / dP],
+            [m.V, (G2 - G0) / dP],
             [m.isothermal_bulk_modulus_reuss, -0.5 * (V2 + V0) * dP / (V2 - V0)],
         ]
     )
@@ -118,22 +115,17 @@ def check_eos_consistency(
     eq.extend(
         [
             [
-                m.molar_heat_capacity_v,
-                m.molar_heat_capacity_p
+                m.heat_capacity_v,
+                m.heat_capacity_p
                 - m.alpha * m.alpha * m.isothermal_bulk_modulus_reuss * m.V * T,
             ],
             [
                 m.isentropic_bulk_modulus_reuss,
-                m.isothermal_bulk_modulus_reuss
-                * m.molar_heat_capacity_p
-                / m.molar_heat_capacity_v,
+                m.isothermal_bulk_modulus_reuss * m.heat_capacity_p / m.heat_capacity_v,
             ],
             [
                 m.gr,
-                m.alpha
-                * m.isothermal_bulk_modulus_reuss
-                * m.V
-                / m.molar_heat_capacity_v,
+                m.alpha * m.isothermal_bulk_modulus_reuss * m.V / m.heat_capacity_v,
             ],
         ]
     )
@@ -248,7 +240,7 @@ def check_anisotropic_eos_consistency(
     eq = [
         [m.gibbs, (m.helmholtz + P * m.V)],
         [m.gibbs, (m.H - T * m.S)],
-        [m.gibbs, (m.molar_internal_energy - T * m.S + P * m.V)],
+        [m.gibbs, (m.internal_energy - T * m.S + P * m.V)],
     ]
 
     m.set_state(P, T + dT)
@@ -270,7 +262,7 @@ def check_anisotropic_eos_consistency(
         [
             [m.S, -(G1 - G0) / dT],
             [m.alpha, (V1 - V0) / dT / m.V],
-            [m.molar_heat_capacity_p, (T + 0.5 * dT) * (S1 - S0) / dT],
+            [m.heat_capacity_p, (T + 0.5 * dT) * (S1 - S0) / dT],
         ]
     )
 
@@ -289,15 +281,13 @@ def check_anisotropic_eos_consistency(
     eq.extend(
         [
             [
-                m.molar_heat_capacity_v,
-                m.molar_heat_capacity_p
+                m.heat_capacity_v,
+                m.heat_capacity_p
                 - m.alpha * m.alpha * m.isothermal_bulk_modulus_reuss * m.V * T,
             ],
             [
                 m.isentropic_bulk_modulus_reuss,
-                m.isothermal_bulk_modulus_reuss
-                * m.molar_heat_capacity_p
-                / m.molar_heat_capacity_v,
+                m.isothermal_bulk_modulus_reuss * m.heat_capacity_p / m.heat_capacity_v,
             ],
         ]
     )

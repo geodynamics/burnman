@@ -55,8 +55,7 @@ class Material(object):
     """
 
     def __init__(self):
-        self._pressure = None
-        self._temperature = None
+        self._number_of_moles = 1.0
         if not hasattr(self, "name"):
             # if a derived class decides to set .name before calling this
             # constructor (I am looking at you, SLB_2011.py!), do not
@@ -130,13 +129,7 @@ class Material(object):
         :param temperature: The desired temperature in [K].
         :type temperature: float
         """
-        if not hasattr(self, "_pressure"):
-            raise Exception(
-                "Material.set_state() could not find class member _pressure. "
-                "Did you forget to call Material.__init__(self) in __init___?"
-            )
         self.reset()
-
         self._pressure = pressure
         self._temperature = temperature
 
@@ -182,7 +175,7 @@ class Material(object):
             # and brentq will try a larger pressure.
             try:
                 self.set_state(pressure, temperature)
-                return volume - self.molar_volume
+                return volume - self.volume
             except Exception:
                 return -np.inf
 
@@ -200,6 +193,28 @@ class Material(object):
                 )
         pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
         self.set_state(pressure, temperature)
+
+    @property
+    def number_of_moles(self):
+        """
+        Returns the number of moles in this material.
+
+        :returns: Number of moles.
+        :rtype: float
+        """
+        return self._number_of_moles
+
+    @number_of_moles.setter
+    def number_of_moles(self, value):
+        """
+        Sets the number of moles in this material.
+
+        :param value: Number of moles.
+        :type value: float
+        """
+        if value < 0:
+            raise ValueError("The number of moles cannot be negative")
+        self._number_of_moles = value
 
     def reset(self):
         """
@@ -250,8 +265,13 @@ class Material(object):
             have different shapes.
         :rtype: list or :class:`numpy.array`, n-dimensional
         """
-        old_pressure = self.pressure
-        old_temperature = self.temperature
+        try:
+            old_pressure = self.pressure
+            old_temperature = self.temperature
+        except AttributeError:
+            old_pressure = None
+            old_temperature = None
+
         try:
             old_molar_fractions = self.molar_fractions
         except AttributeError:
@@ -286,9 +306,11 @@ class Material(object):
             for j in range(len(vars_list)):
                 output[j][i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
-            # do not set_state if old values were None. Just reset to None
-            # manually
-            self._pressure = self._temperature = None
+            # delete the pressure and temperature attributes
+            # if they were not set before
+            del self._pressure
+            del self._temperature
+
             self.reset()
         else:
             self.set_state(old_pressure, old_temperature)
@@ -328,8 +350,13 @@ class Material(object):
             have different shapes.
         :rtype: list or :class:`numpy.array`, n-dimensional
         """
-        old_pressure = self.pressure
-        old_temperature = self.temperature
+        try:
+            old_pressure = self.pressure
+            old_temperature = self.temperature
+        except AttributeError:
+            old_pressure = None
+            old_temperature = None
+
         try:
             old_molar_fractions = self.molar_fractions
         except AttributeError:
@@ -363,10 +390,10 @@ class Material(object):
             for j in range(len(vars_list)):
                 output[j][i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
-            # do not set_state if old values were None. Just reset to None
-            # manually
-            self._pressure = self._temperature = None
-            self.reset()
+            # delete the pressure and temperature attributes
+            # if they were not set before
+            del self._pressure
+            del self._temperature
         else:
             self.set_state(old_pressure, old_temperature)
 
@@ -392,7 +419,12 @@ class Material(object):
         :returns: Pressure in [Pa].
         :rtype: float
         """
-        return self._pressure
+        try:
+            return self._pressure
+        except AttributeError:
+            raise AttributeError(
+                "Material.pressure: pressure is not set. Did you forget to call set_state()?"
+            )
 
     @property
     def temperature(self):
@@ -405,7 +437,12 @@ class Material(object):
         :returns: Temperature in [K].
         :rtype: float
         """
-        return self._temperature
+        try:
+            return self._temperature
+        except AttributeError:
+            raise AttributeError(
+                "Material.temperature: temperature is not set. Did you forget to call set_state()?"
+            )
 
     @material_property
     def molar_internal_energy(self):
@@ -461,6 +498,16 @@ class Material(object):
         :rtype: float
         """
         raise NotImplementedError("need to implement molar_mass() in derived class!")
+
+    @material_property
+    def mass(self):
+        """
+        Returns the mass of this material.
+
+        :returns: Mass in [kg].
+        :rtype: float
+        """
+        return self.molar_mass * self.number_of_moles
 
     @material_property
     def molar_volume(self):
@@ -739,7 +786,47 @@ class Material(object):
             "need to implement isentropic_thermal_gradient() in derived class!"
         )
 
-    #
+    # Extensive properties
+    @property
+    def internal_energy(self):
+        """Extensive internal energy of the material (J)."""
+        return self.molar_internal_energy * self.number_of_moles
+
+    @property
+    def helmholtz(self):
+        """Extensive Helmholtz free energy of the material (J)."""
+        return self.molar_helmholtz * self.number_of_moles
+
+    @property
+    def gibbs(self):
+        """Extensive Gibbs free energy of the material (J)."""
+        return self.molar_gibbs * self.number_of_moles
+
+    @property
+    def enthalpy(self):
+        """Extensive enthalpy of the material (J)."""
+        return self.molar_enthalpy * self.number_of_moles
+
+    @property
+    def volume(self):
+        """Extensive volume of the material (m^3)."""
+        return self.molar_volume * self.number_of_moles
+
+    @property
+    def entropy(self):
+        """Extensive entropy of the material (J/K)."""
+        return self.molar_entropy * self.number_of_moles
+
+    @property
+    def heat_capacity_v(self):
+        """Extensive heat capacity at constant volume of the material (J/K)."""
+        return self.molar_heat_capacity_v * self.number_of_moles
+
+    @property
+    def heat_capacity_p(self):
+        """Extensive heat capacity at constant pressure of the material (J/K)."""
+        return self.molar_heat_capacity_p * self.number_of_moles
+
     # Aliased properties
     @property
     def P(self):
@@ -752,24 +839,9 @@ class Material(object):
         return self.temperature
 
     @property
-    def energy(self):
-        """Alias for :func:`~burnman.Material.molar_internal_energy`"""
-        return self.molar_internal_energy
-
-    @property
-    def helmholtz(self):
-        """Alias for :func:`~burnman.Material.molar_helmholtz`"""
-        return self.molar_helmholtz
-
-    @property
-    def gibbs(self):
-        """Alias for :func:`~burnman.Material.molar_gibbs`"""
-        return self.molar_gibbs
-
-    @property
     def V(self):
-        """Alias for :func:`~burnman.Material.molar_volume`"""
-        return self.molar_volume
+        """Alias for :func:`~burnman.Material.volume`"""
+        return self.volume
 
     @property
     def rho(self):
@@ -778,13 +850,13 @@ class Material(object):
 
     @property
     def S(self):
-        """Alias for :func:`~burnman.Material.molar_entropy`"""
-        return self.molar_entropy
+        """Alias for :func:`~burnman.Material.entropy`"""
+        return self.entropy
 
     @property
     def H(self):
-        """Alias for :func:`~burnman.Material.molar_enthalpy`"""
-        return self.molar_enthalpy
+        """Alias for :func:`~burnman.Material.enthalpy`"""
+        return self.enthalpy
 
     @property
     def K_T(self):
@@ -848,10 +920,10 @@ class Material(object):
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_v`"""
-        return self.molar_heat_capacity_v
+        """Alias for :func:`~burnman.Material.heat_capacity_v`"""
+        return self.heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
-        return self.molar_heat_capacity_p
+        """Alias for :func:`~burnman.Material.heat_capacity_p`"""
+        return self.heat_capacity_p

@@ -133,6 +133,15 @@ class test_material_name(BurnManTest):
         m.set_state(P1, T1)  # return to new state
         self.assertFloatEqual(V, m.V)
 
+    def test_unset_state_raises(self):
+        m = self.min_with_name()
+        with self.assertRaises(AttributeError):
+            _ = m.pressure
+        with self.assertRaises(AttributeError):
+            _ = m.temperature
+        with self.assertRaises(AttributeError):
+            _ = m.V
+
 
 if __name__ == "__main__":
     unittest.main()

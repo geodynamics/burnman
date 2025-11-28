@@ -111,8 +111,10 @@ class ElasticSolution(Mineral):
         self.reset()
         self.molar_fractions = np.array(molar_fractions)
 
-        if self.temperature is not None:
+        try:  # set the volume if pressure and temperature are already set
             _ = self.molar_volume
+        except AttributeError:
+            pass
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
