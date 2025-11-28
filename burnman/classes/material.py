@@ -350,8 +350,13 @@ class Material(object):
             have different shapes.
         :rtype: list or :class:`numpy.array`, n-dimensional
         """
-        old_pressure = self.pressure
-        old_temperature = self.temperature
+        try:
+            old_pressure = self.pressure
+            old_temperature = self.temperature
+        except AttributeError:
+            old_pressure = None
+            old_temperature = None
+
         try:
             old_molar_fractions = self.molar_fractions
         except AttributeError:
@@ -385,10 +390,10 @@ class Material(object):
             for j in range(len(vars_list)):
                 output[j][i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
-            # do not set_state if old values were None. Just reset to None
-            # manually
-            self._pressure = self._temperature = None
-            self.reset()
+            # delete the pressure and temperature attributes
+            # if they were not set before
+            del self._pressure
+            del self._temperature
         else:
             self.set_state(old_pressure, old_temperature)
 

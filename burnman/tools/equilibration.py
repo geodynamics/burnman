@@ -1026,8 +1026,10 @@ def equilibrate(
     # Set up solves
     nc = [len(eq_constraint_list) for eq_constraint_list in eq_constraint_lists]
 
-    # Find the initial state (could be none here)
-    initial_state = [assemblage.pressure, assemblage.temperature]
+    try:
+        initial_state = [assemblage.pressure, assemblage.temperature]
+    except AttributeError:
+        initial_state = [None, None]
 
     # Reset initial state if equality constraints
     # are related to pressure or temperature

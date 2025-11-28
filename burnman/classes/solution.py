@@ -865,10 +865,13 @@ class RelaxedSolution(Solution):
         :type relaxed: bool, optional
         """
         self.unrelaxed.set_state(pressure, temperature)
+        Solution.set_state(self, pressure, temperature)
 
-        if hasattr(self.unrelaxed, "molar_fractions") and relaxed:
-            self._relax_at_PTX()
-            Solution.set_state(self, pressure, temperature)
+        if relaxed:
+            try:  # relax if composition has already been set
+                self._relax_at_PTX()
+            except AttributeError:
+                pass
 
     def set_composition(self, molar_fractions, q_initial=None, relaxed=True):
         """
@@ -900,10 +903,12 @@ class RelaxedSolution(Solution):
 
         self.unrelaxed.set_composition(n)
 
-        if self.unrelaxed.pressure is not None and relaxed:
-            Solution.set_composition(self, n)
-            self._relax_at_PTX()
-            self.unrelaxed.set_composition(self.molar_fractions)
+        if relaxed:
+            try:  # relax if state has already been set
+                Solution.set_composition(self, n)
+                self._relax_at_PTX()
+            except AttributeError:
+                pass
 
     def _relax_at_PTX(self):
         """
@@ -926,6 +931,7 @@ class RelaxedSolution(Solution):
         n = n0 + np.einsum("ij, j", self.dndq, sol.x)
         self.unrelaxed.set_composition(n)
         Solution.set_composition(self, n)
+        self.unrelaxed.set_composition(self.molar_fractions)
 
     def set_state_with_volume(
         self, volume, temperature, pressure_guesses=[0.0e9, 10.0e9]

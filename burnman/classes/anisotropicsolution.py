@@ -178,8 +178,10 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         )
         # Calculate all other required properties
         Solution.set_composition(self, molar_fractions)
-        if self._scalar_solution.pressure is not None:
+        try:  # if pressure and temperature are already set, compute base properties
             self.compute_base_properties()
+        except AttributeError:
+            pass
 
     @cached_property
     def ones(self):
@@ -349,9 +351,12 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         """
         self.unrelaxed.set_state(pressure, temperature)
 
-        if hasattr(self.unrelaxed, "molar_fractions") and relaxed:
-            self._relax_at_PTX()
-            AnisotropicSolution.set_state(self, pressure, temperature)
+        if relaxed:
+            try:  # relax the structure if composition has been set
+                self._relax_at_PTX()
+                AnisotropicSolution.set_state(self, pressure, temperature)
+            except AttributeError:
+                pass
 
     def set_composition(self, molar_fractions, q_initial=None, relaxed=True):
         """
@@ -383,11 +388,14 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
 
         self.unrelaxed.set_composition(n)
 
-        if self.unrelaxed.pressure is not None and relaxed:
-            AnisotropicSolution.set_composition(self, n)
-            self._relax_at_PTX()
-            self.unrelaxed._scalar_solution.set_composition(self.molar_fractions)
-            self.unrelaxed.set_composition(self.molar_fractions)
+        if relaxed:
+            try:  # relax the structure if state has been set
+                AnisotropicSolution.set_composition(self, n)
+                self._relax_at_PTX()
+                self.unrelaxed._scalar_solution.set_composition(self.molar_fractions)
+                self.unrelaxed.set_composition(self.molar_fractions)
+            except AttributeError:
+                pass
 
     def _relax_at_PTX(self):
         """
