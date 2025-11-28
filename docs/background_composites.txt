@@ -34,7 +34,7 @@ where :math:`\rho_i` is the density and :math:`\mu_i` is the molar mass of the :
 
 
 Unlike density and volume, there is no straightforward way to average the effective bulk and shear moduli of a multiphase rock, as it depends on the specific distribution and orientation of the constituent minerals.
-BurnMan allows several schemes for averaging the effective elastic moduli :math:`K_eff` and :math:`G_eff`: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
+BurnMan allows several schemes for averaging the effective elastic moduli :math:`K_{eff}` and :math:`G_{eff}`: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
 
 
 The Voigt average, assuming constant strain across all phases, is defined as
