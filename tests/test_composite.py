@@ -525,6 +525,8 @@ class composite(BurnManTest):
 
     def test_relaxed_composite(self):
         assemblage = setup_assemblage()
+        old_formula = assemblage.formula.copy()
+        old_number_of_moles = assemblage.number_of_moles
         relaxed_assemblage = RelaxedComposite(assemblage, assemblage.reaction_basis)
         relaxed_assemblage2 = RelaxedComposite(
             assemblage, assemblage.reaction_basis[:2, :]
@@ -535,6 +537,15 @@ class composite(BurnManTest):
         assemblage.set_state(P, T)
         relaxed_assemblage.set_state(P, T)
         relaxed_assemblage2.set_state(P, T)
+
+        # Check that the formula is unchanged by isochemical reaction
+        for key in old_formula:
+            self.assertAlmostEqual(old_formula[key], relaxed_assemblage.formula[key])
+            self.assertAlmostEqual(old_formula[key], relaxed_assemblage2.formula[key])
+
+        # Check that the number of moles has changed by isochemical reaction
+        self.assertFalse(old_number_of_moles == relaxed_assemblage.number_of_moles)
+        self.assertFalse(old_number_of_moles == relaxed_assemblage2.number_of_moles)
 
         self.assertTrue(
             check_eos_consistency(
