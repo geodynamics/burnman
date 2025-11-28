@@ -55,8 +55,6 @@ class Material(object):
     """
 
     def __init__(self):
-        self._pressure = None
-        self._temperature = None
         self._number_of_moles = 1.0
         if not hasattr(self, "name"):
             # if a derived class decides to set .name before calling this
@@ -131,13 +129,7 @@ class Material(object):
         :param temperature: The desired temperature in [K].
         :type temperature: float
         """
-        if not hasattr(self, "_pressure"):
-            raise Exception(
-                "Material.set_state() could not find class member _pressure. "
-                "Did you forget to call Material.__init__(self) in __init___?"
-            )
         self.reset()
-
         self._pressure = pressure
         self._temperature = temperature
 
@@ -273,8 +265,13 @@ class Material(object):
             have different shapes.
         :rtype: list or :class:`numpy.array`, n-dimensional
         """
-        old_pressure = self.pressure
-        old_temperature = self.temperature
+        try:
+            old_pressure = self.pressure
+            old_temperature = self.temperature
+        except AttributeError:
+            old_pressure = None
+            old_temperature = None
+
         try:
             old_molar_fractions = self.molar_fractions
         except AttributeError:
@@ -309,9 +306,11 @@ class Material(object):
             for j in range(len(vars_list)):
                 output[j][i] = getattr(self, vars_list[j])
         if old_pressure is None or old_temperature is None:
-            # do not set_state if old values were None. Just reset to None
-            # manually
-            self._pressure = self._temperature = None
+            # delete the pressure and temperature attributes
+            # if they were not set before
+            del self._pressure
+            del self._temperature
+
             self.reset()
         else:
             self.set_state(old_pressure, old_temperature)
@@ -415,7 +414,12 @@ class Material(object):
         :returns: Pressure in [Pa].
         :rtype: float
         """
-        return self._pressure
+        try:
+            return self._pressure
+        except AttributeError:
+            raise AttributeError(
+                "Material.pressure: pressure is not set. Did you forget to call set_state()?"
+            )
 
     @property
     def temperature(self):
@@ -428,7 +432,12 @@ class Material(object):
         :returns: Temperature in [K].
         :rtype: float
         """
-        return self._temperature
+        try:
+            return self._temperature
+        except AttributeError:
+            raise AttributeError(
+                "Material.temperature: temperature is not set. Did you forget to call set_state()?"
+            )
 
     @material_property
     def molar_internal_energy(self):
@@ -493,7 +502,7 @@ class Material(object):
         :returns: Mass in [kg].
         :rtype: float
         """
-        raise self.molar_mass * self.number_of_moles
+        return self.molar_mass * self.number_of_moles
 
     @material_property
     def molar_volume(self):
