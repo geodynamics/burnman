@@ -502,7 +502,7 @@ class composite(BurnManTest):
         properties = [
             "P",
             "T",
-            "energy",
+            "internal_energy",
             "helmholtz",
             "gibbs",
             "V",
@@ -549,7 +549,8 @@ class composite(BurnManTest):
             )
         )
 
-        # The properties for this assemblage are calculated by relaxing only a subset of reactions,
+        # The properties for this assemblage are calculated by relaxing
+        # only a subset of reactions,
         # so its properties should not be EOS consistent
         self.assertFalse(
             check_eos_consistency(

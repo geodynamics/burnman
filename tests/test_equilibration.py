@@ -198,7 +198,7 @@ class equilibration(BurnManTest):
 
         P = assemblage.pressure
         T = assemblage.temperature
-        S = assemblage.molar_entropy * assemblage.n_moles
+        S = assemblage.entropy
 
         assemblage = make_ol_wad_assemblage()
         equality_constraints = [("P", P), ("S", S)]
@@ -220,7 +220,7 @@ class equilibration(BurnManTest):
 
         P = assemblage.pressure
         T = assemblage.temperature
-        V = assemblage.molar_volume * assemblage.n_moles
+        V = assemblage.molar_volume * assemblage.number_of_moles
 
         assemblage = make_ol_wad_assemblage()
         equality_constraints = [("P", P), ("V", V)]

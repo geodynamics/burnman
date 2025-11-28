@@ -236,9 +236,10 @@ class Composite(Material):
     @material_property
     def formula(self):
         """
-        Returns molar chemical formula of the composite
+        Returns extensive chemical formula of the composite
         """
-        return sum_formulae([ph.formula for ph in self.phases], self.molar_fractions)
+        molar_amounts = self.molar_fractions * self.number_of_moles
+        return sum_formulae([ph.formula for ph in self.phases], molar_amounts)
 
     @material_property
     def molar_internal_energy(self):

@@ -63,7 +63,7 @@ if __name__ == "__main__":
     temperatures = np.linspace(600, 800, 5)
     equality_constraints = [["T", temperatures], ["phase_fraction", (sill, 0.0)]]
     sols, prm = equilibrate(
-        assemblage.formula, assemblage, equality_constraints=equality_constraints
+        ky.formula, assemblage, equality_constraints=equality_constraints
     )
     Ps = np.array([sol.assemblage.pressure for sol in sols])
     Ts = np.array([sol.assemblage.temperature for sol in sols])

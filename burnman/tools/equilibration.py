@@ -268,13 +268,9 @@ def F(
         elif type_c == "T":
             eqns[i] = (assemblage.temperature - eq_c) / T_scaling
         elif type_c == "S":
-            eqns[i] = (
-                assemblage.molar_entropy * assemblage.number_of_moles - eq_c
-            ) / S_scaling
+            eqns[i] = (assemblage.entropy - eq_c) / S_scaling
         elif type_c == "V":
-            eqns[i] = (
-                assemblage.molar_volume * assemblage.number_of_moles - eq_c
-            ) / V_scaling
+            eqns[i] = (assemblage.volume - eq_c) / V_scaling
         elif type_c == "X":
             eqns[i] = (np.dot(eq_c[0], x) - eq_c[1]) / X_scaling  # i.e. Ax = b
         else:
@@ -344,14 +340,8 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "S":  # dS/dx
             # dS/dP = -aV, dS/dT = Cp/T
             jacobian[ic, 0:2] = [
-                -assemblage.number_of_moles
-                * assemblage.alpha
-                * assemblage.molar_volume
-                / S_scaling,
-                assemblage.number_of_moles
-                * assemblage.molar_heat_capacity_p
-                / assemblage.temperature
-                / S_scaling,
+                -assemblage.alpha * assemblage.volume / S_scaling,
+                assemblage.heat_capacity_p / assemblage.temperature / S_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
@@ -370,14 +360,10 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "V":  # dV/dx
             # dV/dP = -V/K_T, dV/dT = aV
             jacobian[ic, 0:2] = [
-                -assemblage.number_of_moles
-                * assemblage.molar_volume
+                -assemblage.volume
                 / assemblage.isothermal_bulk_modulus_reuss
                 / V_scaling,
-                assemblage.number_of_moles
-                * assemblage.molar_volume
-                * assemblage.alpha
-                / V_scaling,
+                assemblage.volume * assemblage.alpha / V_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):

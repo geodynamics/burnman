@@ -79,6 +79,8 @@ class RelaxedComposite(Composite):
             name=composite.name,
         )
 
+        self.number_of_moles = composite.number_of_moles
+
     def set_state(self, pressure, temperature, bulk_composition=None):
         """
         Sets the state of the composite. Also relaxes the
@@ -97,15 +99,7 @@ class RelaxedComposite(Composite):
         :type bulk_composition: dict
         """
         if bulk_composition is None:
-            try:
-                bulk_composition = Counter(
-                    {
-                        el: count * self.unrelaxed.number_of_moles
-                        for el, count in self.unrelaxed.formula.items()
-                    }
-                )
-            except AttributeError:
-                bulk_composition = self.unrelaxed.formula
+            bulk_composition = self.unrelaxed.formula
 
         self.unrelaxed.set_state(pressure, temperature)
 
@@ -176,9 +170,9 @@ class RelaxedComposite(Composite):
         """
         beta_TR = self.unrelaxed.isothermal_compressibility_reuss
         alpha = self.unrelaxed.thermal_expansivity
-        c_p = self.unrelaxed.molar_heat_capacity_p * self.number_of_moles
-        V = self.molar_volume * self.number_of_moles
-        T = self.temperature
+        c_p = self.unrelaxed.heat_capacity_p
+        V = self.unrelaxed.volume
+        T = self.unrelaxed.temperature
         return np.array([[-V * beta_TR, V * alpha], [V * alpha, -c_p / T]])
 
     @material_property
