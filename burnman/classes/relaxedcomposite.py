@@ -106,7 +106,7 @@ class RelaxedComposite(Composite):
         sol, _ = equilibrate(
             bulk_composition, self.unrelaxed, [["P", pressure], ["T", temperature]]
         )
-        assert sol.success
+        assert sol.success, "Equilibration failed in RelaxedComposite.set_state()"
 
         # Set the relaxed composite to the equilibrated state
         Composite.set_state(self, pressure, temperature)
@@ -193,12 +193,12 @@ class RelaxedComposite(Composite):
     @material_property
     @copy_documentation(Composite.isothermal_compressibility_reuss)
     def isothermal_compressibility_reuss(self):
-        return -self._d2Gdzdz[0, 0] / self.V / self.number_of_moles
+        return -self._d2Gdzdz[0, 0] / self.volume
 
     @material_property
     @copy_documentation(Composite.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._d2Gdzdz[0, 1] / self.V / self.number_of_moles
+        return self._d2Gdzdz[0, 1] / self.volume
 
     @material_property
     @copy_documentation(Composite.molar_heat_capacity_p)
