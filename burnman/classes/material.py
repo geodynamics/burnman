@@ -221,7 +221,7 @@ class Material(object):
         :type value: float
         """
         if value < 0:
-            raise ValueError("Moles cannot be negative")
+            raise ValueError("The number of moles cannot be negative")
         self._number_of_moles = value
 
     def reset(self):
