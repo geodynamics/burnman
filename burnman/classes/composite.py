@@ -214,7 +214,7 @@ class Composite(Material):
         """
         volumes = np.array(
             [
-                phase.molar_volume * molar_fraction
+                phase.volume * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -227,7 +227,7 @@ class Composite(Material):
         """
         masses = np.array(
             [
-                phase.molar_mass * molar_fraction
+                phase.mass * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -283,14 +283,14 @@ class Composite(Material):
         Returns molar volume of the composite [m^3/mol]
         Aliased with self.V
         """
-        return np.sum(self.phase_volumes)
+        return np.sum(self.phase_volumes) / self.number_of_moles
 
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the composite [kg/mol]
         """
-        return sum(self.phase_masses)
+        return sum(self.phase_masses) / self.number_of_moles
 
     @material_property
     def density(self):
@@ -439,7 +439,7 @@ class Composite(Material):
         Returns the effective isotropic, isentropic bulk modulus of the composite [Pa]
         Aliased with self.K_eff
         """
-        V_frac = self.phase_volumes
+        V_frac = self.phase_volumes / sum(self.phase_volumes)
         K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
 
@@ -451,7 +451,7 @@ class Composite(Material):
         Returns the effective isotropic shear modulus of the mineral [Pa]
         Aliased with self.G_eff
         """
-        V_frac = self.phase_volumes
+        V_frac = self.phase_volumes / sum(self.phase_volumes)
         K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
 
