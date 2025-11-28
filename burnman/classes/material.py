@@ -775,42 +775,42 @@ class Material(object):
     # Extensive properties
     @property
     def internal_energy(self):
-        """Extensive internal energy of the material."""
+        """Extensive internal energy of the material (J)."""
         return self.molar_internal_energy * self.number_of_moles
 
     @property
     def helmholtz(self):
-        """Extensive Helmholtz free energy of the material."""
+        """Extensive Helmholtz free energy of the material (J)."""
         return self.molar_helmholtz * self.number_of_moles
 
     @property
     def gibbs(self):
-        """Extensive Gibbs free energy of the material."""
+        """Extensive Gibbs free energy of the material (J)."""
         return self.molar_gibbs * self.number_of_moles
 
     @property
+    def enthalpy(self):
+        """Extensive enthalpy of the material (J)."""
+        return self.molar_enthalpy * self.number_of_moles
+
+    @property
     def volume(self):
-        """Extensive volume of the material."""
+        """Extensive volume of the material (m^3)."""
         return self.molar_volume * self.number_of_moles
 
     @property
     def entropy(self):
-        """Extensive entropy of the material."""
+        """Extensive entropy of the material (J/K)."""
         return self.molar_entropy * self.number_of_moles
 
     @property
-    def enthalpy(self):
-        """Extensive enthalpy of the material."""
-        return self.molar_enthalpy * self.number_of_moles
-
-    @property
     def heat_capacity_v(self):
-        """Extensive heat capacity at constant volume of the material."""
+        """Extensive heat capacity at constant volume of the material (J/K)."""
         return self.molar_heat_capacity_v * self.number_of_moles
 
     @property
     def heat_capacity_p(self):
-        """Extensive heat capacity at constant pressure of the material."""
+        """Extensive heat capacity at constant pressure of the material (J/K)."""
         return self.molar_heat_capacity_p * self.number_of_moles
 
     # Aliased properties
