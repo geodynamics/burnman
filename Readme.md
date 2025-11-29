@@ -8,19 +8,29 @@
 
 ## About
 
-BurnMan is a Python library for generating thermodynamic and thermoelastic models of planetary interiors.
+BurnMan is a free, open-source toolkit written in Python. It is designed to compute thermodynamic and thermoelastic properties of geological and planetary materials — from pure mineral ``endmembers'', through solid solutions, to composites of multiple phases, through to planetary layers and whole planets.
 
-It began as a working-group at the 2012 CIDER workshop in Santa Barbara.
+BurnMan is a modular, class-based toolkit, and as such it has a wide range of use cases. It is well-suited to both discipline-specific and interdisciplinary problems, including:
+- Fitting experimental data on mineral/melt endmembers (the `Mineral` class) and solutions (the `Solution` class) to a range of equations of state and solution models
+- Designing experimental starting mix compositions (via the `Composition` class) and performing mass balance calculations on post-run products (via the `burnman.optimize.composition_fitting` submodule)
+- Predicting thermodynamic properties from user-generated or existing thermodynamic datasets (e.g. Stixrude + Lithgow-Bertelloni, Holland, Powell et al.; see the `minerals` submodule)
+- Creation and property interrogation of fully anisotropic models of endmembers (the `AnisotropicMineral` class) and solutions (the `AnistropicSolution` class)
+- Pressure-temperature estimation of experiments from XRD data (via the `Calibrant` class)
+- Pressure-temperature estimation of natural samples (via the `optimize.thermobarometry.estimate_conditions` function)
+- Calculating equilibrium compositions of known mineralogical assemblages given constraints (via the `equilibrate` function)
+- Calculating assemblage boundaries or isopleths, including uncertainties (also via the `equilibrate` function)
+- Calculating seismic velocities of multiphase assemblages according to different averaging schemes (e.g. Reuss, Voigt, VRH, Hashin-Strikman) and with or without isochemical reaction during passage of the wave (``seismic softening'', see the `RelaxedSolution` and `RelaxedAnisotropicSolution` class).
+- Generating 1D profiles of planetary interiors (via the `Layer` and `Planet` classes).
 
-BurnMan is released under the GNU GPL v2 or newer
+A variety of tutorials, examples and tests accompany the BurnMan module, and can be used as a basis for your own work.
 
-Homepage: https://geodynamics.github.io/burnman/
 
-Documentation: http://burnman.readthedocs.io
+BurnMan began as a working-group at the 2012 CIDER workshop in Santa Barbara. It is released under the GNU GPL v2 or newer
 
-Source code: https://github.com/geodynamics/burnman
-
-Forums: https://community.geodynamics.org/c/burnman
+* Homepage: https://geodynamics.github.io/burnman/
+* Documentation: http://burnman.readthedocs.io
+* Source code: https://github.com/geodynamics/burnman
+* Forums: https://community.geodynamics.org/c/burnman
 
 Authors (as of 2024):
 * Bob (Robert) Myhill (main contributor)
