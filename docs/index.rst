@@ -76,9 +76,9 @@ Acknowledgement and Support
   :maxdepth: 4
 
   introduction
-  background
   tutorial
-  cider_tutorial
+  materials
+  background
   examples
   api
   zreferences
