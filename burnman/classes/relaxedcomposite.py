@@ -108,8 +108,17 @@ class RelaxedComposite(Composite):
         )
         assert sol.success, "Equilibration failed in RelaxedComposite.set_state()"
 
+        self.copy_state_from_unrelaxed()
+
+    def copy_state_from_unrelaxed(self):
+        """
+        Copies the state (P, T, molar_fractions) from the unrelaxed
+        composite to the relaxed composite. This can be useful
+        if the unrelaxed composite has been modified externally
+        and the relaxed composite needs to be updated to match.
+        """
         # Set the relaxed composite to the equilibrated state
-        Composite.set_state(self, pressure, temperature)
+        Composite.set_state(self, self.unrelaxed.pressure, self.unrelaxed.temperature)
         Composite.set_fractions(self, self.unrelaxed.molar_fractions)
         self.number_of_moles = self.unrelaxed.number_of_moles
 

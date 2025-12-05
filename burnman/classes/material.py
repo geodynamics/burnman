@@ -55,7 +55,8 @@ class Material(object):
     """
 
     def __init__(self):
-        self._number_of_moles = 1.0
+        if not hasattr(self, "number_of_moles"):
+            self.number_of_moles = 1.0
         if not hasattr(self, "name"):
             # if a derived class decides to set .name before calling this
             # constructor (I am looking at you, SLB_2011.py!), do not
@@ -212,6 +213,7 @@ class Material(object):
         :param value: Number of moles.
         :type value: float
         """
+        self.reset()
         if value < 0:
             raise ValueError("The number of moles cannot be negative")
         self._number_of_moles = value
