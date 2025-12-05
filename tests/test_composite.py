@@ -8,6 +8,42 @@ from burnman.minerals import HP_2011_ds62, mp50MnNCKFMASHTO
 from burnman.tools.eos import check_eos_consistency
 from burnman.tools.equilibration import equilibrate
 
+properties_extensive = [
+    "internal_energy",
+    "helmholtz",
+    "gibbs",
+    "enthalpy",
+    "entropy",
+    "volume",
+    "heat_capacity_p",
+    "heat_capacity_v",
+    "mass",
+    "H",
+    "S",
+    "V",
+    "C_p",
+    "C_v",
+]
+
+properties_intensive = [
+    "molar_internal_energy",
+    "molar_helmholtz",
+    "molar_gibbs",
+    "molar_enthalpy",
+    "molar_entropy",
+    "molar_volume",
+    "molar_heat_capacity_p",
+    "molar_heat_capacity_v",
+    "isothermal_bulk_modulus_reuss",
+    "isentropic_bulk_modulus_reuss",
+    "isothermal_compressibility_reuss",
+    "isentropic_compressibility_reuss",
+    "grueneisen_parameter",
+    "thermal_expansivity",
+    "molar_mass",
+    "density",
+]
+
 
 def setup_assemblage():
     """
@@ -524,6 +560,37 @@ class composite(BurnManTest):
         for i in range(len(properties)):
             self.assertFloatEqual(rock_prps[i], alias_prps[i])
 
+    def test_number_of_moles_composite(self):
+        min1 = minerals.SLB_2011.mg_perovskite()
+        min2 = minerals.SLB_2011.periclase()
+        molar_fractions = [0.5, 0.5]
+        c1 = burnman.Composite([min1, min2], molar_fractions, fraction_type="molar")
+        c2 = burnman.Composite([min1, min2], molar_fractions, fraction_type="molar")
+        c1.set_state(40.0e9, 2000.0)
+        c2.set_state(40.0e9, 2000.0)
+
+        for prop in properties_extensive:
+            val1 = getattr(c1, prop)
+            val2 = getattr(c2, prop)
+            self.assertFloatEqual(val1, val2)
+
+        for prop in properties_intensive:
+            val1 = getattr(c1, prop)
+            val2 = getattr(c2, prop)
+            self.assertFloatEqual(val1, val2)
+
+        c2.number_of_moles = 2.0
+
+        for prop in properties_extensive:
+            val1 = getattr(c1, prop)
+            val2 = getattr(c2, prop)
+            self.assertFloatEqual(val1, val2 / 2.0)
+
+        for prop in properties_intensive:
+            val1 = getattr(c1, prop)
+            val2 = getattr(c2, prop)
+            self.assertFloatEqual(val1, val2)
+
     def test_relaxed_composite(self):
         assemblage = setup_assemblage()
         old_formula = assemblage.formula.copy()
@@ -596,46 +663,10 @@ class composite(BurnManTest):
         c1.set_state(40.0e9, 2000.0)
         c2.set_state(40.0e9, 2000.0)
 
-        properties_extensive = [
-            "internal_energy",
-            "helmholtz",
-            "gibbs",
-            "enthalpy",
-            "entropy",
-            "volume",
-            "heat_capacity_p",
-            "heat_capacity_v",
-            "mass",
-            "V",
-            "S",
-            "H",
-            "C_v",
-            "C_p",
-        ]
-
         for prop in properties_extensive:
             val1 = getattr(c1, prop)
             val2 = getattr(c2, prop)
             self.assertFloatEqual(val1, val2 / 2.0)
-
-        properties_intensive = [
-            "molar_internal_energy",
-            "molar_helmholtz",
-            "molar_gibbs",
-            "molar_enthalpy",
-            "molar_entropy",
-            "molar_volume",
-            "molar_heat_capacity_p",
-            "molar_heat_capacity_v",
-            "isothermal_bulk_modulus_reuss",
-            "isentropic_bulk_modulus_reuss",
-            "isothermal_compressibility_reuss",
-            "isentropic_compressibility_reuss",
-            "grueneisen_parameter",
-            "thermal_expansivity",
-            "molar_mass",
-            "density",
-        ]
 
         for prop in properties_intensive:
             val1 = getattr(c1, prop)
@@ -710,46 +741,10 @@ class composite(BurnManTest):
         c1.set_state(40.0e9, 2000.0)
         c2.set_state(40.0e9, 2000.0)
 
-        properties_extensive = [
-            "internal_energy",
-            "helmholtz",
-            "gibbs",
-            "enthalpy",
-            "entropy",
-            "volume",
-            "heat_capacity_p",
-            "heat_capacity_v",
-            "mass",
-            "H",
-            "S",
-            "V",
-            "C_p",
-            "C_v",
-        ]
-
         for prop in properties_extensive:
             val1 = getattr(c1, prop)
             val2 = getattr(c2, prop)
             self.assertFloatEqual(val1, val2 / 2.0)
-
-        properties_intensive = [
-            "molar_internal_energy",
-            "molar_helmholtz",
-            "molar_gibbs",
-            "molar_enthalpy",
-            "molar_entropy",
-            "molar_volume",
-            "molar_heat_capacity_p",
-            "molar_heat_capacity_v",
-            "isothermal_bulk_modulus_reuss",
-            "isentropic_bulk_modulus_reuss",
-            "isothermal_compressibility_reuss",
-            "isentropic_compressibility_reuss",
-            "grueneisen_parameter",
-            "thermal_expansivity",
-            "molar_mass",
-            "density",
-        ]
 
         for prop in properties_intensive:
             val1 = getattr(c1, prop)
