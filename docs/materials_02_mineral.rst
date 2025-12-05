@@ -1,6 +1,12 @@
 .. _ref-materials-mineral:
 
-Mineral Class
-=============
+Mineral Classes
+===============
 
 Documentation under construction.
+
+.. toctree::
+  :maxdepth: 2
+
+  materials_02_mineral_01_base_class
+  materials_02_mineral_02_combined_mineral
