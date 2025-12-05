@@ -79,6 +79,7 @@ Acknowledgement and Support
   tutorial
   materials
   anisotropic_materials
+  calibrants
   background
   examples
   api
