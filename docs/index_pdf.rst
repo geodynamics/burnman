@@ -13,6 +13,14 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
    introduction
    tutorial
    materials
+   anisotropic_materials
+   relaxed_materials
+   averaging_schemes
+   layers_and_planets
+   calibrants
+   compositions
+   seismic_models
+   material_polytopes
    background
    examples
    api
