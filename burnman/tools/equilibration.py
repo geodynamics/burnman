@@ -929,7 +929,7 @@ def equilibrate(
     :type composition: dict
 
     :param assemblage: The assemblage to be equilibrated.
-    :type assemblage: :class:`burnman.Composite`
+    :type assemblage: :class:`burnman.Composite` or :class:`burnman.RelaxedComposite`
 
     :param equality_constraints: The list of equality constraints. See above
         for valid formats.
