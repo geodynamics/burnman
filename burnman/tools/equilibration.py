@@ -159,8 +159,6 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     :param parameters: The current parameter values.
     :type parameters: numpy.array
     """
-
-    assemblage.set_state(parameters[0] * P_scaling, parameters[1] * T_scaling)
     i = 2
     phase_amounts = np.zeros(len(assemblage.phases))
     for phase_idx, ph in enumerate(assemblage.phases):
@@ -179,6 +177,15 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     phase_amounts = np.abs(phase_amounts)
     assemblage.number_of_moles = sum(phase_amounts)
     assemblage.set_fractions(phase_amounts / assemblage.number_of_moles)
+
+    # We set_state last because setting the state may depend on the
+    # current composition of the assemblage. This would occur, for example,
+    # in the case of relaxed composites, where the relaxed state depends
+    # on the current bulk composition.
+    # Note that in the case of relaxed composites, the equilibrate function
+    # actually equilibrates the unrelaxed assemblage, and then copies the
+    # state to the relaxed assemblage afterwards.
+    assemblage.set_state(parameters[0] * P_scaling, parameters[1] * T_scaling)
     return None
 
 
@@ -978,6 +985,11 @@ def equilibrate(
     outer_logger_level = logger.level
     logger.setLevel(logging.INFO if verbose else outer_logger_level)
 
+    relaxed_assemblage = None
+    if hasattr(assemblage, "unrelaxed"):
+        relaxed_assemblage = assemblage
+        assemblage = assemblage.unrelaxed
+
     for ph in assemblage.phases:
         if isinstance(ph, Solution) and not hasattr(ph, "molar_fractions"):
             raise Exception(
@@ -1155,7 +1167,11 @@ def equilibrate(
                 )
             sol = sol3
 
-        if sol.success and len(assemblage.reaction_affinities) > 0.0:
+        if relaxed_assemblage is not None:
+            relaxed_assemblage.copy_state_from_unrelaxed()
+            assemblage = relaxed_assemblage
+
+        if sol.success and len(assemblage.reaction_affinities) > 0:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.0e-5
             assemblage.equilibrium_tolerance = maxres
 
