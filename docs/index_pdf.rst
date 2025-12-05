@@ -13,6 +13,7 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
    introduction
    tutorial
    materials
+   anisotropic_materials
    background
    examples
    api

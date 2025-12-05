@@ -78,6 +78,7 @@ Acknowledgement and Support
   introduction
   tutorial
   materials
+  anisotropic_materials
   background
   examples
   api
