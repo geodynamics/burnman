@@ -5,7 +5,7 @@
 
 """
 Irving et al. 2018
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 Seismically derived EoS parameters for the outer core using normal mode center frequencies.
 These parameters are derived parameterizing the outer core velocity and density with an equation-of-state, and inverting for K, Kprime, and molar_volume (molar_mass is fixed to 0.05, as sensitivy of the normal modes is only to molar density). The equations-of-state are assumed to capture the isentropic behaviour across the outer core. Potentially, these parameters can be used to represent cores of other planets.

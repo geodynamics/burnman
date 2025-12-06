@@ -24,7 +24,7 @@ here shown by importing AK135 :cite:`kennett1995`.
 
 *Uses:*
 
-* :doc:`seismic`
+* :ref:`ref-seismic-models`
 
 
 

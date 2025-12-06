@@ -15,10 +15,12 @@ def bulk_modulus_third_order(volume, params):
     Bulk modulus for the third order Birch-Murnaghan equation of state.
 
     :param volume: Volume of the material in the same units as
-    the reference volume.
+        the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Bulk modulus in the same units as the reference bulk modulus.
     :rtype: float
     """
@@ -44,10 +46,12 @@ def pressure_third_order(invVrel, params):
 
     :param invVrel: Reference volume divided by the volume
     :type invVrel: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :rtype: float
     """
 
@@ -66,8 +70,9 @@ def volume_third_order(pressure, params):
     Volume for the third order Birch-Murnaghan equation of state.
 
     :param pressure: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :type pressure: float
+
     :param params: Parameter dictionary
     :type params: dict
 
@@ -93,10 +98,12 @@ def bulk_modulus_fourth_order(volume, params):
     Bulk modulus for the fourth order Birch-Murnaghan equation of state.
 
     :param volume: Volume of the material in the same units as
-    the reference volume.
+        the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Bulk modulus in the same units as the reference bulk modulus.
     :rtype: float
     """
@@ -132,10 +139,12 @@ def pressure_fourth_order(invVrel, params):
 
     :param invVrel: Reference volume divided by the volume
     :type invVrel: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :rtype: float
     """
 
@@ -162,8 +171,9 @@ def volume_fourth_order(pressure, params):
     Volume for the fourth order Birch-Murnaghan equation of state.
 
     :param pressure: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :type pressure: float
+
     :param params: Parameter dictionary
     :type params: dict
 
@@ -191,8 +201,10 @@ def shear_modulus_second_order(volume, params):
 
     :param volume: Molar volume in the same units as the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Shear modulus in the same units as the reference shear modulus.
     :rtype: float
     """
@@ -217,8 +229,10 @@ def shear_modulus_third_order(volume, params):
 
     :param volume: Molar volume in the same units as the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Shear modulus in the same units as the reference shear modulus.
     :rtype: float
     """

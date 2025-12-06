@@ -6,7 +6,6 @@
 
 import numpy as np
 from sympy import Matrix, nsimplify
-from collections import OrderedDict
 
 from .material import material_property, cached_property
 from .mineral import Mineral
@@ -653,7 +652,7 @@ class Solution(Mineral):
         involved in reaction[i].
 
         :returns: An array where each row defines a balanced chemical reaction
-        in terms of molar amounts of endmembers.
+            in terms of molar amounts of endmembers.
         :rtype: numpy.ndarray
         """
         reaction_basis = np.array(
@@ -676,20 +675,20 @@ class Solution(Mineral):
     def compositional_basis(self):
         """
         :returns: A basis for the compositional degrees of freedom,
-        orthogonal to the reaction space.
+            orthogonal to the reaction space.
 
-        Each row of the returned array defines an independent
-        compositional constraint in terms of moles of endmembers.
-        These constraints span the row space of the stoichiometric
-        matrix and are complementary to the reaction basis
-        (which spans the left null space).
+            Each row of the returned array defines an independent
+            compositional constraint in terms of moles of endmembers.
+            These constraints span the row space of the stoichiometric
+            matrix and are complementary to the reaction basis
+            (which spans the left null space).
 
-        For example, endmembers with site-species occupancies
-        [Fe][Mg] and [Mg][Fe] have reaction basis vector [1, -1].
-        A compositional basis vector orthogonal to this is: [1, 1],
-        which satisfies the requirement that the Fe-Mg ratio of the
-        system remains fixed and the total amount of the two sites
-        remains equal.
+            For example, endmembers with site-species occupancies
+            [Fe][Mg] and [Mg][Fe] have reaction basis vector [1, -1].
+            A compositional basis vector orthogonal to this is: [1, 1],
+            which satisfies the requirement that the Fe-Mg ratio of the
+            system remains fixed and the total amount of the two sites
+            remains equal.
         :rtype: numpy.ndarray
         """
 
@@ -740,7 +739,7 @@ class Solution(Mineral):
         endmembers.
 
         :return: A 2D array where each row is a basis vector of the
-        nullspace.
+            nullspace.
         :rtype: numpy.ndarray
         """
         null = self.stoichiometric_matrix.nullspace()

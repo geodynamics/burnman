@@ -1,3 +1,6 @@
+2022-10-22
+^^^^^^^^^^
+
 * BurnMan now has a generalised PolynomialSolution class. The
   non-ideal excesses in this model are polynomial functions
   of composition. The coefficients of these polynomials are either

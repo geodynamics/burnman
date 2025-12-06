@@ -1,3 +1,6 @@
+2022-02-05
+^^^^^^^^^^
+
 * New: BurnMan now has a new fitting function,
   :func:`burnman.optimize.eos_fitting.fit_XPTp_data`.
   It has the same arguments as

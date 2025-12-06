@@ -1,4 +1,4 @@
-.. _ref-materials-mineral-equations-of-state:
+.. _ref-eos:
 
 Equations of State for Minerals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,8 +19,7 @@ seismic velocities (:math:`V_S, V_P, V_\Phi`), one uses an Equation of State
 
 To calculate these thermoelastic parameters, the EoS
 requires the user to input the pressure, temperature, and the phases
-and their molar fractions.  These inputs and outputs are further discussed in
-:ref:`ref-methods-user-input`.
+and their molar fractions.
 
 
 

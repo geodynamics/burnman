@@ -31,7 +31,7 @@ on each of the parameters which can be called.
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Planet`
 * :class:`burnman.Layer`
 

@@ -1,3 +1,6 @@
+2021-08-04
+^^^^^^^^^^
+
 * The BurnMan homepage is updated and moved to
   https://geodynamics.github.io/burnman/
 

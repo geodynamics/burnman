@@ -196,7 +196,7 @@ class AnisotropicMaterial(Material):
     def isentropic_linear_compressibility(self, direction):
         """
         :returns: The linear isentropic compressibility in a given direction
-        relative to the stiffness tensor [1/Pa].
+            relative to the stiffness tensor [1/Pa].
         :rtype: float
         """
         direction = unit_normalize(direction)
@@ -211,7 +211,7 @@ class AnisotropicMaterial(Material):
     def isentropic_youngs_modulus(self, direction):
         """
         :returns: The isentropic Youngs modulus in a given direction
-        relative to the stiffness tensor [Pa].
+            relative to the stiffness tensor [Pa].
         :rtype: float
         """
         direction = unit_normalize(direction)
@@ -228,7 +228,7 @@ class AnisotropicMaterial(Material):
     def isentropic_shear_modulus(self, plane_normal, shear_direction):
         """
         :returns: The isentropic shear modulus on a plane in a given
-        shear direction relative to the stiffness tensor [Pa].
+            shear direction relative to the stiffness tensor [Pa].
         :rtype: float
         """
         plane_normal = unit_normalize(plane_normal)
@@ -252,7 +252,7 @@ class AnisotropicMaterial(Material):
     def isentropic_poissons_ratio(self, axial_direction, lateral_direction):
         """
         :returns: The isentropic poisson ratio given loading and response
-        directions relative to the stiffness tensor [unitless].
+            directions relative to the stiffness tensor [unitless].
         :rtype: float
         """
 
@@ -285,7 +285,7 @@ class AnisotropicMaterial(Material):
     def wave_velocities(self, propagation_direction):
         """
         :returns: The compressional wave velocity, and two
-        shear wave velocities in a given propagation direction [m/s].
+            shear wave velocities in a given propagation direction [m/s].
         :rtype: list, containing the wave speeds and directions
             of particle motion relative to the stiffness tensor
         """

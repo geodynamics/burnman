@@ -3,15 +3,15 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-import numpy as np
-from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
-from burnman.classes.calibrant import Calibrant
-from burnman.utils.unitcell import molar_volume_from_unit_cell_volume
-
 """
 Anderson_1989
 ^^^^^^^^^^^^^
 """
+
+import numpy as np
+from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
+from burnman.classes.calibrant import Calibrant
+from burnman.utils.unitcell import molar_volume_from_unit_cell_volume
 
 
 class Au(Calibrant):

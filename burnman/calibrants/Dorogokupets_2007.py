@@ -3,15 +3,16 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
+"""
+Dorogokupets_2007
+^^^^^^^^^^^^^^^^^
+"""
+
 import numpy as np
 from burnman.classes.calibrant import Calibrant
 from burnman.constants import gas_constant
 from burnman.eos.vinet import Vinet
 
-"""
-Dorogokupets_2007
-^^^^^^^^^^^^^^^^^
-"""
 
 _materials_data = {
     "Ag": {

@@ -36,10 +36,12 @@ def pressure_modified_tait(Vrel, params):
 
     :param Vrel: Volume divided by the reference volume.
     :type Vrel: float or numpy array
+
     :param params: Parameter dictionary
     :type params: dictionary
+
     :return: pressure in the same units that are supplied for the reference bulk
-    modulus (params['K_0'])
+        modulus (params['K_0'])
     :rtype: float or numpy array
     """
     a, b, c = tait_constants(params)

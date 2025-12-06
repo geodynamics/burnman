@@ -18,7 +18,7 @@ along the vector [n_Mg - n_Fe].
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """

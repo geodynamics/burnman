@@ -7,7 +7,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 
-def singleton(cls):
+def _singleton(cls):
     instances = {}
 
     def get_instance(*args, **kwargs):
@@ -47,7 +47,7 @@ class DebyeTemperatureModelBase(ABC):
         return theta / Vrel**2 * (gamma * (gamma + 1.0) - Vrel * gamma_prime)
 
 
-@singleton
+@_singleton
 class SLB(DebyeTemperatureModelBase):
     """
     A class that provides the Debye temperature as a function of relative volume,
@@ -116,7 +116,7 @@ class SLB(DebyeTemperatureModelBase):
                 raise AttributeError(f"params dictionary must contain a '{key}' key")
 
 
-@singleton
+@_singleton
 class PowerLawGammaSimple(DebyeTemperatureModelBase):
     """
     A class that provides the Debye temperature as a function of relative volume,
@@ -162,7 +162,7 @@ class PowerLawGammaSimple(DebyeTemperatureModelBase):
                 raise AttributeError(f"params dictionary must contain a '{key}' key")
 
 
-@singleton
+@_singleton
 class PowerLawGamma(DebyeTemperatureModelBase):
     """
     A class that provides the Debye temperature as a function of relative volume,

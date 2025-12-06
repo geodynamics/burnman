@@ -4973,13 +4973,10 @@ def cov():
     A function which loads and returns the variance-covariance matrix of the
     zero-point energies of all the endmembers in the dataset.
 
-    Returns
-    -------
-    cov : dictionary
-        Dictionary keys are:
-        - endmember_names: a list of endmember names, and
-        - covariance_matrix: a 2D variance-covariance array for the
-          endmember zero-point energies of formation
+    :returns: covariance matrix dictionary, with keys 'endmember_names' and
+              'covariance_matrix'. Endmember names are in the same order as the rows
+              and columns of the covariance matrix.
+    :rtype: dict
     """
 
     from .HP_2011_ds62_cov import cov

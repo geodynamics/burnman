@@ -79,7 +79,7 @@ class Material(object):
 
     def set_method(self, method):
         """
-        Set the averaging method. See :doc:`averaging` for details.
+        Set the averaging method. See :ref:`ref-averaging-schemes` for details.
 
         .. note:: Needs to be implemented in derived classes.
         """
