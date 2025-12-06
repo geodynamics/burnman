@@ -87,6 +87,7 @@ Acknowledgement and Support
   compositions
   layers_and_planets
   material_polytopes
+  fitting
   background
   examples
   api

@@ -22,6 +22,7 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
    compositions
    layers_and_planets
    material_polytopes
+   fitting
    background
    examples
    api
