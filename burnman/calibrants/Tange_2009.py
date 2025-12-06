@@ -3,16 +3,16 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
+"""
+Tange_2009
+^^^^^^^^^^
+"""
+
 from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
 from burnman.eos.vinet import Vinet
 from burnman.eos import debye
 from burnman.classes.calibrant import Calibrant
 import numpy as np
-
-"""
-Tange_2009
-^^^^^^^^^^
-"""
 
 
 class MgO_BM3(Calibrant):

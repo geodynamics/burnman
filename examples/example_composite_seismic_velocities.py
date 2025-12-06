@@ -30,7 +30,7 @@ example_spintransition.py for explanation of how to implement this
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.Mineral`
 * :class:`burnman.Solution`

@@ -21,19 +21,24 @@ def file_to_composition_list(fname, unit_type, normalize):
         The first read-line of the datafile contains a list of tab or
         space-separated components (e.g. FeO or SiO2), followed by the
         word Comment.
+
         Following lines are lists of floats with the amounts of each component.
         After the component amounts, the user can write anything they like
         in the Comment section.
     :type fname: str
+
     :param unit_type: 'mass', 'weight' or 'molar'
         Specify whether the compositions in the file are given as
         mass (weight) or molar amounts.
     :type unit_type: str
+
     :param normalize: If False, absolute numbers of moles/grams of component are stored,
         otherwise the component amounts of returned compositions will
         sum to one (until Composition.renormalize() is used).
-    :type normalize : bool
+    :type normalize: bool
 
+    :returns: A list of Composition objects and a list of comments.
+    :rtype: list of Composition, list of list of str
     """
     lines = list(
         filter(

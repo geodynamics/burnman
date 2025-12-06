@@ -53,7 +53,7 @@ with a series of boolean variables. In order of complexity:
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """

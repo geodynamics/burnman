@@ -28,7 +28,7 @@ These solutions can potentially deal with:
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Solution`
 * :class:`burnman.SolutionModel`
 

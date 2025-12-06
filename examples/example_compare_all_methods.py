@@ -16,7 +16,7 @@ different methods.
 
 *Specifically uses:*
 
-* :doc:`eos`
+* :ref:`ref-eos`
 
 
 *Demonstrates:*

@@ -55,9 +55,6 @@ of BurnMan objects:
   .. image:: figures/example_composite_figure_2.png
 
 
-  .. automodule:: examples.example_mineral
-
-
   .. automodule:: examples.example_calibrants
 
 

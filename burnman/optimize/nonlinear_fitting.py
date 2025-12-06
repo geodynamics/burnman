@@ -249,33 +249,35 @@ def nonlinear_least_squares_fit(
     :modifies: model — Sets optimized parameters, covariance matrix, weighted residuals, Jacobian, and noise estimates.
 
     .. note:: The object passed as model must have the following attributes:
-        * data [2D numpy.array] - Elements of x[i][j] contain the
+
+        - data [2D numpy.array] - Elements of x[i][j] contain the
             observed position of data point i.
-        * data_covariances [3D numpy.array] Elements of cov[i][j][k] contain
+        - data_covariances [3D numpy.array] Elements of cov[i][j][k] contain
             the covariance matrix of data point i.
-        * mle_tolerances [numpy.array] - The iterations to find the maximum likelihood
+        - mle_tolerances [numpy.array] - The iterations to find the maximum likelihood
             estimator for each observed data point will stop when mle_tolerances[i] <
             np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
-        * delta_params [numpy.array] - parameter perturbations used to compute the jacobian
+        - delta_params [numpy.array] - parameter perturbations used to compute the jacobian
 
         Must also have the following methods:
-        * set_params(self, param_values) -  Function to set parameters.
-        * get_params(self) - Function to get current model parameters.
-        * function(self, x) - Returns value of model function evaluated at x.
-        * normal(self, x) - Returns value of normal to the model function evaluated at x.
+
+        - set_params(self, param_values) -  Function to set parameters.
+        - get_params(self) - Function to get current model parameters.
+        - function(self, x) - Returns value of model function evaluated at x.
+        - normal(self, x) - Returns value of normal to the model function evaluated at x.
 
         After this function has been performed, the following attributes are added to model:
 
-        * n_dof [int] - Degrees of freedom of the system.
-        * data_mle [2D numpy array] - Maximum likelihood estimates of the observed data points
+        - n_dof [int] - Degrees of freedom of the system.
+        - data_mle [2D numpy array] - Maximum likelihood estimates of the observed data points
             on the best-fit curve.
-        * jacobian [2D numpy array] - d(weighted_residuals)/d(parameter).
-        * weighted_residuals [numpy array] - Weighted residuals.
-        * weights [numpy array] - 1/(data variances normal to the best fit curve).
-        * WSS [float] - Weighted sum of squares residuals.
-        * popt [numpy array] - Optimized parameters.
-        * pcov [2D numpy array] - Covariance matrix of optimized parameters.
-        * noise_variance [float] - Estimate of the variance of the data normal to the curve.
+        - jacobian [2D numpy array] - d(weighted_residuals)/d(parameter).
+        - weighted_residuals [numpy array] - Weighted residuals.
+        - weights [numpy array] - 1/(data variances normal to the best fit curve).
+        - WSS [float] - Weighted sum of squares residuals.
+        - popt [numpy array] - Optimized parameters.
+        - pcov [2D numpy array] - Covariance matrix of optimized parameters.
+        - noise_variance [float] - Estimate of the variance of the data normal to the curve.
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """

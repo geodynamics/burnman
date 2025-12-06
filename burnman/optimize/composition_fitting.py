@@ -80,16 +80,20 @@ def fit_composition_to_solution(
         would impose a constraint that the amount of Mg would be equal on
         the first and second site in the solution.
     :type variable_conversions: dict of dict, or None
+
     :param normalize: Whether to normalize the molar fractions to sum to one.
     :type normalize: bool, default=True
 
-    :returns: (molar_fractions, covariance_matrix, weighted_residual)
-             - molar_fractions: Optimized molar fractions of endmembers.
-             - covariance_matrix: Covariance matrix of the optimized fractions,
-                                  computed from the pseudo-inverse of the weighted design matrix.
-             - weighted_residual: The weighted residual of the fit, calculated as the
-                                  square root of the weighted sum of squared differences
-                                  between observed and modeled variables.
+    :returns: (molar_fractions, covariance_matrix, weighted_residual):
+
+        - molar_fractions: Optimized molar fractions of each endmember.
+        - covariance_matrix: Covariance matrix of the optimized molar
+            fractions, computed from the pseudo-inverse of the weighted
+            design matrix.
+        - weighted_residual: The weighted residual of the fit, representing
+            the square root of the weighted sum of squared differences between
+            observed and modeled variables.
+
     :rtype: tuple of 1D numpy.array, 2D numpy.array and float
 
     .. seealso::
@@ -190,12 +194,14 @@ def fit_phase_proportions_to_bulk_composition(phase_compositions, bulk_compositi
     :type bulk_composition: numpy.array
 
     :returns: (phase_proportions, covariance_matrix, weighted_residual)
-             - phase_proportions: Optimized proportions of each phase.
-             - covariance_matrix: Covariance matrix of the optimized phase proportions,
-                                  computed from the pseudo-inverse of the weighted design matrix.
-             - weighted_residual: The weighted residual of the fit, representing the square root
-                                  of the weighted sum of squared differences between observed
-                                  and modeled bulk compositions.
+
+        - phase_proportions: Optimized proportions of each phase.
+        - covariance_matrix: Covariance matrix of the optimized phase proportions,
+            computed from the pseudo-inverse of the weighted design matrix.
+        - weighted_residual: The weighted residual of the fit, representing the square root
+            of the weighted sum of squared differences between observed
+            and modeled bulk compositions.
+
     :rtype: tuple of 1D numpy.array, 2D numpy.array and float
 
     .. seealso::

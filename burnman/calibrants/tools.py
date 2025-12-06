@@ -1,5 +1,10 @@
 import numpy as np
 
+"""
+Tools for the calibrant class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""
+
 
 def pressure_to_pressure(
     old_calibrant, new_calibrant, pressure, temperature, PT_covariance=None

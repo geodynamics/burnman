@@ -3,14 +3,13 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.mie_grueneisen_debye import MGDBase
-from burnman.classes.calibrant import Calibrant
-
-
 """
 Matsui_2012
 ^^^^^^^^^^^
 """
+
+from burnman.eos.mie_grueneisen_debye import MGDBase
+from burnman.classes.calibrant import Calibrant
 
 
 class NaCl_B1(Calibrant):

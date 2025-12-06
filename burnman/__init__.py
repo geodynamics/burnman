@@ -107,7 +107,9 @@ Dependencies
 First, make sure you have a sufficiently recent version of python installed
 on your machine (see above for the latest requirements).
 To check your version of python, type the following in a terminal:
+
     python --version
+
 If your version is not recent enough, visit https://www.python.org/ to
 find out how to install a newer version.
 
@@ -230,6 +232,7 @@ from .classes.perplex import PerplexMaterial
 from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
 from .classes.solution import Solution, SolidSolution, RelaxedSolution
+from .classes.solutionmodel import SolutionModel
 from .classes.elasticsolutionmodel import ElasticSolutionModel
 from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution
 from .classes.composite import Composite

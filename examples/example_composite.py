@@ -14,7 +14,7 @@ class.
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Mineral`
 * :class:`burnman.Solution`
 * :class:`burnman.Composite`

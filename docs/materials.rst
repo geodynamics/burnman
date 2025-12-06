@@ -9,7 +9,7 @@ and seismic properties.
 
 
 .. toctree::
-  :maxdepth: 3
+  :maxdepth: 1
 
   materials_01_base_class
   materials_02_mineral

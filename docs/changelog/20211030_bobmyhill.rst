@@ -1,3 +1,6 @@
+2021-10-30
+^^^^^^^^^^
+
 * The :class:`burnman.Composite` class now has a `chemical_potential` method.
   This replaces the more limited function
   :func:`burnman.tools.chemistry.chemical_potentials`. The related functions

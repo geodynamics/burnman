@@ -3,13 +3,13 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.classes.calibrant import Calibrant
-import numpy as np
-
 """
 Zhao_1997
 ^^^^^^^^^
 """
+
+from burnman.classes.calibrant import Calibrant
+import numpy as np
 
 
 class hBN(Calibrant):

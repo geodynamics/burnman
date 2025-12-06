@@ -10,11 +10,13 @@ Debye model
 ^^^^^^^^^^^
 
 .. automodule:: burnman.eos.debye
+    :noindex:
 
 Einstein model
 ^^^^^^^^^^^^^^
 
 .. automodule:: burnman.eos.einstein
+    :noindex:
 
 Chemistry parsing and thermodynamics
 ------------------------------------

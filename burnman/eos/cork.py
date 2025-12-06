@@ -15,7 +15,7 @@ from .. import constants
 import warnings
 
 
-def cork_variables(cork, cork_P, cork_T, temperature):
+def _cork_variables(cork, cork_P, cork_T, temperature):
     a = (
         cork[0][0] * cork_T ** (2.5) / cork_P
         + cork[0][1] * cork_T ** (1.5) / cork_P * temperature
@@ -47,7 +47,7 @@ class CORK(eos.EquationOfState):
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         Eq. 7 in Holland and Powell, 1991
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         V = constants.gas_constant * temperature / pressure + (
@@ -69,7 +69,7 @@ class CORK(eos.EquationOfState):
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ 13+2
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         dVdP = -constants.gas_constant * temperature / (pressure * pressure) + (
@@ -105,7 +105,7 @@ class CORK(eos.EquationOfState):
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
         Replace -Pth in EQ 13+1 with P-Pth for non-ambient temperature
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         dcorkdT = params["dcorkdT"]
@@ -152,7 +152,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             d2RTlnfdTdT = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
             dcorkdT = params["dcorkdT"]
@@ -228,7 +228,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             RTlnf = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
 
@@ -278,7 +278,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             dRTlnfdT = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
             dcorkdT = params["dcorkdT"]

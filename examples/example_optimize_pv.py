@@ -13,7 +13,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`

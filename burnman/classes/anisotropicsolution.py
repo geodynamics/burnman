@@ -24,7 +24,7 @@ from ..utils.misc import copy_documentation
 class AnisotropicSolution(Solution, AnisotropicMineral):
     """
     A class implementing the anisotropic solution model described
-    in :cite:`Myhill2024a`.
+    in :cite:`Myhill2024`.
     This class is derived from Solution and AnisotropicMineral,
     and inherits most of the methods from those classes.
 
@@ -277,7 +277,7 @@ depsdeps = np.einsum("pm, qn->pqmn", np.eye(3), np.eye(3))
 class RelaxedAnisotropicSolution(AnisotropicSolution):
     """
     A class implementing the relaxed anisotropic solution
-    model described in :cite:`Myhill2024b`.
+    model described in :cite:`Myhill2025`.
     This class is derived from AnisotropicSolution,
     and inherits most of the methods from that class.
 

@@ -1,3 +1,6 @@
+2021-10-22
+^^^^^^^^^^
+
 * The ideal solution model has been updated to allow site multiplicities to
   vary linearly with endmember proportions. It therefore implements a
   Temkin-type model :cite:`Temkin1945`.

@@ -667,22 +667,24 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
     :type free_compositional_vectors: list of dictionaries
 
     :returns: A tuple with attributes:
+
         - parameter_names: list of strings, the names of the parameters
-          for the current equilibrium problem
+            for the current equilibrium problem
         - default_tolerances: numpy.array, the default tolerances for each parameter
         - n_parameters: int, the number of parameters for the current equilibrium problem
         - phase_amount_indices: list of int, the indices of the parameters that
-          correspond to phase amounts
+            correspond to phase amounts
         - bulk_composition_vector: numpy.array, the bulk composition vector
         - free_compositional_vectors: 2D numpy.array, the free compositional vectors
         - reduced_composition_vector: numpy.array, the bulk composition vector
-          reduced to the independent elements
+            reduced to the independent elements
         - reduced_free_composition_vectors: 2D numpy.array, the free compositional vectors
-          reduced to the independent elements
+            reduced to the independent elements
         - constraint_vector: numpy.array, vector for the linear constraints bounding the
-          valid parameter space (b in Ax + b < eps)
+            valid parameter space (b in Ax + b < eps)
         - constraint_matrix: 2D numpy.array, matrix for the linear constraints bounding the
-          valid parameter space (A in Ax + b < eps)
+            valid parameter space (A in Ax + b < eps)
+
     :rtype: namedtuple
     """
     # Initialize a named tuple for the equilibration parameters
@@ -899,6 +901,7 @@ def equilibrate(
     <constraint type> is one of 'P', 'T', 'S', 'V', 'X',
     'phase_fraction', or 'phase_composition'. The format of the
     <constraint> object depends on the constraint type:
+
         - P: float or numpy.array of
             pressures [Pa]
         - T: float or numpy.array of

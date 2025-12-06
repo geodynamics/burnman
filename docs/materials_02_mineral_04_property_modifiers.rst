@@ -1,4 +1,4 @@
-.. _ref-materials-mineral-property-modifiers:
+.. _ref-property-modifiers:
 
 Mineral Property Modifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

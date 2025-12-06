@@ -15,7 +15,7 @@ for visual comparison.
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
 * :func:`burnman.geotherm.brown_shankland`

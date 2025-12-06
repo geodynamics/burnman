@@ -13,20 +13,19 @@ Material Base Class
 .. autoclass:: burnman.Material
 
 Perple_X Class
---------------
+==============
 
 .. autoclass:: burnman.PerplexMaterial
 
 Minerals
---------
-
-Endmembers
-^^^^^^^^^^
+========
 
 .. autoclass:: burnman.Mineral
 
+.. autoclass:: burnman.CombinedMineral
+
 Solutions
-^^^^^^^^^
+=========
 
 .. autoclass:: burnman.Solution
 
@@ -39,12 +38,12 @@ Solutions
   :no-inherited-members:
 
 Mineral helpers
-^^^^^^^^^^^^^^^
+===============
 
 .. autoclass:: burnman.classes.mineral_helpers.HelperSpinTransition
 
 Anisotropic materials
-^^^^^^^^^^^^^^^^^^^^^
+=====================
 
 .. autoclass:: burnman.AnisotropicMaterial
 
@@ -55,7 +54,7 @@ Anisotropic materials
 .. autofunction:: burnman.cell_vectors_to_parameters
 
 Composites
-----------
+==========
 
 .. autoclass:: burnman.Composite
 
@@ -63,6 +62,6 @@ Composites
 
 
 Calibrants
-----------
+==========
 
 .. autoclass:: burnman.Calibrant

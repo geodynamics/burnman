@@ -329,7 +329,7 @@ def greedy_independent_endmember_selection(
     or the norm of the residual site occupancies is less than tol.
 
     :param endmember_site_occupancies: A 2D array of shape (m, n), where m is the number of endmembers
-    and n is the number of sites. Each row corresponds to the site occupancies of an endmember.
+        and n is the number of sites. Each row corresponds to the site occupancies of an endmember.
     :type endmember_site_occupancies: np.ndarray
 
     :param site_occupancies: A 1D array of length n, representing the target site occupancies to approximate.

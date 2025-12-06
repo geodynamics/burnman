@@ -24,7 +24,7 @@ These modifications currently take the forms:
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 
 
 *Demonstrates:*
