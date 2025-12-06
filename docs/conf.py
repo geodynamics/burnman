@@ -66,6 +66,11 @@ extensions = [
     "sphinxcontrib.bibtex",
     "nbsphinx",
 ]
+
+autosummary_generate = True
+
+templates_path = ['_templates']
+
 bibtex_bibfiles = ["ref.bib"]
 
 numpydoc_show_class_members = False

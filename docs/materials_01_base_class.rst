@@ -1,7 +1,7 @@
 .. _ref-materials-base-class:
 
 Material Base Class
-===================
+-------------------
 
 .. currentmodule:: burnman
 
@@ -19,8 +19,6 @@ Material Base Class
     solution models, mechanical mixing laws), while :class:`Material` ensures
     that all materials (simple or composite) expose a consistent and unified interface.
 
-Contents
---------
 
 .. contents::
    :local:
@@ -28,7 +26,7 @@ Contents
 
 
 Overview
---------
+~~~~~~~~
 
 Regardless of type, materials support the same set of state variables and
 property queries.
@@ -49,7 +47,7 @@ performance. Changing any state variable automatically resets cached values
 to ensure consistency.
 
 Property Evaluation
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 A large number of physical properties can be evaluated. Examples include:
 
@@ -84,7 +82,7 @@ been set before computation.
 
 
 State Management
-----------------
+~~~~~~~~~~~~~~~~
 
 .. method:: Material.set_state(pressure, temperature)
 
@@ -101,7 +99,7 @@ State Management
 
 
 Introspection and Debugging
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: Material.to_string()
 
@@ -132,7 +130,7 @@ Introspection and Debugging
 
 
 Evaluation Routines
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. method:: Material.evaluate(property_list, pressures, temperatures, molar_fractions=None)
 
