@@ -3,7 +3,7 @@
 .. _ref-example-tutorial:
 
 The BurnMan Tutorials
-*********************
+=====================
 
 These tutorials introduce users to the main classes and some of the important
 functions implemented in BurnMan. The tutorials are split according to topic,

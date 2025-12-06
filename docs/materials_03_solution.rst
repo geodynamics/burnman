@@ -1,7 +1,7 @@
 .. _ref-materials-solution:
 
 Solution Classes
-================
+----------------
 
 Many phases (whether minerals, melts, fluids or gases) can exist over a finite region of composition space.
 These spaces are bounded by endmembers (which may themselves not be stable), and each phase can then be described

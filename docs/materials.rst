@@ -1,7 +1,7 @@
 .. _ref-materials:
 
 Materials
-*********
+=========
 
 A key feature of BurnMan is its modular treatment of materials.
 Materials are represented by classes that define their thermodynamic
