@@ -18,6 +18,7 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
   averaging_schemes
   calibrants
   seismic_models
+  geotherms
   datasets
   compositions
   layers_and_planets
@@ -25,7 +26,6 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
   fitting
   tools
   utils
-  background
   examples
   api
   changes

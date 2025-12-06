@@ -1,7 +1,7 @@
-.. _ref-methods-equilibration:
+.. _ref-tools-equilibration:
 
-Thermodynamic Equilibration
----------------------------
+Equilibration
+=============
 
 For a composite with fixed phases at a given pressure, temperature
 and composition, equilibrium is reached when the following relationships are
