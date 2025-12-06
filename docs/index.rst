@@ -88,6 +88,8 @@ Acknowledgement and Support
   layers_and_planets
   material_polytopes
   fitting
+  tools
+  utils
   background
   examples
   api
