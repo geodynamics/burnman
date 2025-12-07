@@ -4,7 +4,10 @@
 # Required
 version: 2
 
-formats: all
+# Specify the formats to build
+# Turn off pdf build until we can fix the LaTeX issues
+# formats: pdf, epub, htmlzip
+formats: epub, htmlzip
 
 # Set the version of Python and other tools you might need
 build:
