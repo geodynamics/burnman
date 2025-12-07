@@ -45,8 +45,21 @@ a dictionary of parameters as argument. The parameters required
 depend on the selected equation of state. Instantiation looks
 like this:
 
->>> from burnman import Mineral
->>> mineral = Mineral(params, property_modifiers)
+.. code-block:: python
+
+    from burnman import Mineral
+
+    params = {
+        'equation_of_state': 'slb3',  # using the Stixrude and Lithgow-Bertelloni EoS
+        # EOS-specific parameters...
+    }
+
+    property_modifiers = [
+        ['linear', {'delta_E': 1.e3, 'delta_S': 0., 'delta_V': 0.}],
+        # Additional modifiers...
+    ]
+
+    mineral = Mineral(params, property_modifiers)
 
 An important parameter in the `params` dictionary is the
 `equation_of_state` key, which specifies the EOS to use.

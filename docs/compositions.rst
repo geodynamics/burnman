@@ -3,4 +3,8 @@
 Composition Class
 =================
 
-Documentation under construction.
+.. autoclass:: burnman.classes.composition.Composition
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

@@ -45,18 +45,18 @@ thermal_delta_params = {"Theta_0": 1200.0, "S_inf": 1.0}
 
 
 fn_params = [
-    [pm._linear_excesses, "linear", linear_params],
-    [pm._landau_excesses, "landau", landau_params],
-    [pm._landau_excesses, "landau", landau_params_2],
-    [pm._landau_hp_excesses, "landau_hp", landau_hp_params],
-    [pm._landau_hp_excesses, "landau_hp", landau_hp_params_2],
-    [pm._bragg_williams_excesses, "bragg_williams", bragg_williams_params],
-    [pm._magnetic_excesses_chs, "magnetic_chs", magnetic_params],
-    [pm._magnetic_excesses_chs, "magnetic_chs", magnetic_params_2],
-    [pm._debye_excesses, "debye", thermal_params],
-    [pm._debye_delta_excesses, "debye_delta", thermal_delta_params],
-    [pm._einstein_excesses, "einstein", thermal_params],
-    [pm._einstein_delta_excesses, "einstein_delta", thermal_delta_params],
+    [pm.linear_excesses, "linear", linear_params],
+    [pm.landau_excesses, "landau", landau_params],
+    [pm.landau_excesses, "landau", landau_params_2],
+    [pm.landau_hp_excesses, "landau_hp", landau_hp_params],
+    [pm.landau_hp_excesses, "landau_hp", landau_hp_params_2],
+    [pm.bragg_williams_excesses, "bragg_williams", bragg_williams_params],
+    [pm.magnetic_excesses_chs, "magnetic_chs", magnetic_params],
+    [pm.magnetic_excesses_chs, "magnetic_chs", magnetic_params_2],
+    [pm.debye_excesses, "debye", thermal_params],
+    [pm.debye_delta_excesses, "debye_delta", thermal_delta_params],
+    [pm.einstein_excesses, "einstein", thermal_params],
+    [pm.einstein_delta_excesses, "einstein_delta", thermal_delta_params],
 ]
 
 

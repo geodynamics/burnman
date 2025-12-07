@@ -31,30 +31,55 @@ from .anharmonic_debye import AnharmonicDebye as Anharmonic
 
 class ModularMGD(eos.EquationOfState):
     """
-    Base class for a modular Mie-Grueneisen-Debye equation of state.
+    This class implements a modular Mie-Grueneisen-Debye (MGD) equation of state (EoS)
+    where the reference (isothermal) EoS and Debye temperature model
+    can be chosen by the user.
 
-    Parameters
-    ----------
-    params : dict
-        Dictionary of parameters. Must contain all the parameters needed by
-        the reference EoS and Debye temperature model, parameters for
-        the electronic and anharmonic contributions (if necessary), plus:
+    The equation of state also supports electronic contributions to the Helmholtz
+    energy and thermodynamic properties according to the model of :cite:`Bukowinski1977`.
 
-        V_0 : float
-            Reference volume [m^3].
-        T_0 : float
-            Reference temperature [K].
-        n : int
-            Number of formula units in the mineral.
-        molar_mass : float
-            Molar mass of the mineral [kg/mol].
-        reference_eos : EquationOfState
-            Instance of an equation of state that has methods for pressure,
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``V_0``
+          - Reference volume
+          - :math:`\\textrm{m}^3`
+        * - ``T_0``
+          - Reference temperature
+          - K
+        * - ``bel_0``
+          - Electronic contribution parameter
+          - unitless
+        * - ``gel``
+          - Electronic contribution exponent
+          - unitless
+        * - ``n``
+          - Number of atoms per formula unit
+          - atoms per formula unit
+        * - ``molar_mass``
+          - Molar mass
+          - kg/mol
+        * - ``reference_eos``
+          - Reference isothermal equation of state. Must have methods for pressure,
             isothermal bulk modulus, and Gibbs energy.
-        debye_temperature_model : callable
-            An instance providing the Debye temperature as a function of relative
-            volume via ``value``, and its first and second derivatives with
+          - :class:`burnman.eos.EquationOfState`
+        * - ``debye_temperature_model``
+          - Debye temperature model. An object providing the Debye temperature
+            as a function of relative volume via ``value``,
+            and its first and second derivatives with
             respect to relative volume via ``dVrel`` and ``dVrel2``.
+          - callable. Examples include :class:`burnman.eos.debye_temperature_models.SLB`,
+            :class:`burnman.eos.debye_temperature_models.PowerLawGammaSimple`, and
+            :class:`burnman.eos.debye_temperature_models.PowerLawGamma`.
+        * - ``anharmonic_thermal_model``
+          - Anharmonic thermal model. An object providing the anharmonic contribution
+            to the energy.
+          - callable. Examples include :class:`burnman.eos.anharmonic_thermal_models.Pade`
+            and :class:`burnman.eos.anharmonic_thermal_models.LogNormal`.
     """
 
     def volume(self, pressure, temperature, params):
@@ -68,7 +93,7 @@ class ModularMGD(eos.EquationOfState):
 
         try:
             sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
-        except:
+        except Exception:
             raise ValueError(
                 "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
             )
@@ -379,12 +404,58 @@ class ModularMGDWithAnharmonicity(ModularMGD):
 
     Note: This model is not the same as that published in
     Wu and Wentzcovitch (2009). The results are expected to be similar,
-    but the :math:`c` parameter will in general need to be tweaked.
+    but the :math:`c` parameter will in general need to be changed.
     This is because only a local approximation to the volume change
     between 0 K and the target temperature is used. This does not mean that
     the model is less able to capture the essential physics of the problem;
     indeed, the model of Wu and Wentzcovitch (2009) is only intended to be
     an effective ansatz.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``V_0``
+          - Reference volume
+          - :math:`\\textrm{m}^3`
+        * - ``T_0``
+          - Reference temperature
+          - K
+        * - ``bel_0``
+          - Electronic contribution parameter
+          - unitless
+        * - ``gel``
+          - Electronic contribution exponent
+          - unitless
+        * - ``n``
+          - Number of atoms per formula unit
+          - atoms per formula unit
+        * - ``molar_mass``
+          - Molar mass
+          - kg/mol
+        * - ``reference_eos``
+          - Reference isothermal equation of state. Must have methods for pressure,
+            isothermal bulk modulus, and Gibbs energy.
+          - :class:`burnman.eos.EquationOfState`
+        * - ``debye_temperature_model``
+          - Debye temperature model. An object providing the Debye temperature
+            as a function of relative volume via ``value``,
+            and its first and second derivatives with
+            respect to relative volume via ``dVrel`` and ``dVrel2``.
+          - callable. Examples include :class:`burnman.eos.debye_temperature_models.SLB`,
+            :class:`burnman.eos.debye_temperature_models.PowerLawGammaSimple`, and
+            :class:`burnman.eos.debye_temperature_models.PowerLawGamma`.
+        * - ``anharmonic_thermal_model``
+          - Anharmonic thermal model. An object providing the anharmonic contribution
+            to the energy.
+          - callable. Examples include :class:`burnman.eos.anharmonic_thermal_models.Pade`
+            and :class:`burnman.eos.anharmonic_thermal_models.LogNormal`.
+        * - ``c_anh``
+          - Anharmonicity parameter
+          - unitless
     """
 
     def lnVoverV0_approx(self, temperature, volume, params):

@@ -1,6 +1,12 @@
+.. _ref-api-seismic:
 
-Seismic
-=======
+Seismic Models
+==============
+
+.. contents::
+   :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
+   :depth: 2
 
 Base class for all seismic models
 ---------------------------------
@@ -32,4 +38,4 @@ Models currently implemented
 Attenuation Correction
 -----------------------
 
-.. autofunction:: burnman.classes.seismic.attenuation_correction
+.. autofunction:: burnman.tools.seismic.attenuation_correction

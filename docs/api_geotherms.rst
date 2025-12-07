@@ -1,5 +1,6 @@
+.. _ref-api-geotherms:
 
 Geotherms
 =========
 
-.. automodule:: burnman.geotherm
+.. automodule:: burnman.utils.geotherm

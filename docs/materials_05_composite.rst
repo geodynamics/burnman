@@ -3,4 +3,8 @@
 Composite Class
 ---------------
 
-Documentation under construction.
+.. autoclass:: burnman.Composite
+   :no-members:
+   :no-undoc-members:
+   :no-inherited-members:
+   :no-index:

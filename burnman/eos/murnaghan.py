@@ -40,8 +40,29 @@ def intVdP(pressure, V_0, K_0, Kprime_0):
 
 class Murnaghan(eos.IsothermalEquationOfState):
     """
-    Base class for the isothermal Murnaghan equation of state,
+    The isothermal Murnaghan equation of state,
     as described in :cite:`Murnaghan1944`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):
@@ -95,8 +116,6 @@ class Murnaghan(eos.IsothermalEquationOfState):
 
         if "F_0" not in params:
             params["F_0"] = 0.0
-        if "P_0" not in params:
-            params["P_0"] = 0.0
 
         if "E_0" in params:
             raise KeyError(

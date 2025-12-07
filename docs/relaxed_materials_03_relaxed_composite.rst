@@ -1,6 +1,10 @@
-.. _ref-relaxed-materials-relaxed-composite:
+.. _ref-relaxed-composite:
 
 Relaxed Composite Class
 -----------------------
 
-Documentation under construction.
+.. autoclass:: burnman.RelaxedComposite
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

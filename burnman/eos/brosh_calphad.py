@@ -19,6 +19,55 @@ class BroshCalphad(eos.EquationOfState):
     """
     Class for the high pressure CALPHAD equation of state by
     :cite:`Brosh2007`.
+
+    This equation of state includes contributions from
+    cold compression, quasiharmonic lattice vibrations,
+    and thermal excitation of electrons.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``gibbs_coefficients``
+          - Coefficients for the piecewise polynomial fit to the Gibbs free energy at 1 bar.
+            Format is a list of lists, where each sublist contains the maximum temperature for
+            that segment and the coefficients in the following order:
+            [const, T, T*ln(T), T^(-1), T^(-2), T^(-3), T^(-9), T^2, T^3, T^4, T^7, T^(1/2), ln(T)]
+          - varies
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``n``
+          - Number of atoms per formula unit.
+          - Dimensionless
+        * - ``a``
+          - Parameter array for cold compression (length 4 array).
+          - Dimensionless
+        * - ``b``
+          - Parameter array for thermal excitation (length 2 array).
+          - Dimensionless
+        * - ``c``
+          - [OPTIONAL] Parameter array for cold compression (length 4 array).
+            If you do not know how to calculate it, do not add it to the
+            parameters dictionary.
+            It will be calculated from the other input parameters.
+          - Dimensionless
+        * - ``delta``
+          - Parameter array for thermal excitation (length 2 array).
+          - Dimensionless
+        * - ``theta_0``
+          - Reference Debye temperature.
+          - :math:`\\text{K}`
+        * - ``grueneisen_0``
+          - Reference Grüneisen parameter.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):

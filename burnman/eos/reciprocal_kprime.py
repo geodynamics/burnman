@@ -143,6 +143,30 @@ class RKprime(eos.IsothermalEquationOfState):
     :math:`V = V_0 ( K'_0 / (K'_0 - K'_{\\infty}) )^{K'_0/{K'}^2_{\\infty}} \\exp{(-1/K'_{\\infty})}`.
 
     This equation of state has no temperature dependence.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at reference conditions.
+          - Dimensionless
+        * - ``Kprime_inf``
+          - Pressure derivative of bulk modulus at infinite pressure.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):

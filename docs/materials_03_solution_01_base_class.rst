@@ -3,4 +3,8 @@
 The Solution Class
 ~~~~~~~~~~~~~~~~~~
 
-Documentation under construction.
+.. autoclass:: burnman.Solution
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

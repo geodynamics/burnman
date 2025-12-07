@@ -14,22 +14,25 @@ from ..utils.misc import copy_documentation
 
 class PerplexMaterial(Material):
     """
-    This is the base class for a PerpleX material. States of the material
-    can only be queried after setting the pressure and temperature
-    using set_state().
-
-    Instances of this class are initialised with
-    a 2D PerpleX tab file. This file should be in the standard format
-    (as output by werami), and should have columns with the following names:
+    PerpleX material class. This class creates a material
+    based on thermodynamic and thermoelastic data read
+    from a 2D PerpleX tab file. This file should be in the standard format
+    output by the werami program, and should have columns with the following
+    names:
     'rho,kg/m3', 'alpha,1/K', 'beta,1/bar', 'Ks,bar', 'Gs,bar', 'v0,km/s',
     'vp,km/s', 'vs,km/s', 's,J/K/kg', 'h,J/kg', 'cp,J/K/kg', 'V,J/bar/mol'.
     The order of these names is not important.
 
-    Properties of the material are determined by linear interpolation from
-    the PerpleX grid. They are all returned in SI units on a molar basis,
+    Properties of the material can only be queried after setting the
+    pressure and temperature using set_state(). These properties
+    are determined by linear interpolation from the PerpleX grid.
+    They are all returned in SI units on a molar basis,
     even though the PerpleX tab file is not in these units.
 
-    This class is available as ``burnman.PerplexMaterial``.
+    :param tab_file: Path to the 2D PerpleX tab file.
+    :type tab_file: str
+    :param name: Name of the material.
+    :type name: str
     """
 
     def __init__(self, tab_file, name="Perple_X material"):

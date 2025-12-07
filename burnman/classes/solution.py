@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -24,31 +24,52 @@ from scipy.optimize import minimize
 
 class Solution(Mineral):
     """
-    This is the base class for all solutions.
-    Site occupancies, endmember activities and the constant
-    and pressure and temperature dependencies of the excess
-    properties can be queried after using set_composition().
-    States of the solution can only be queried after setting
-    the pressure, temperature and composition using set_state().
+    The Solution class has overall responsibility for calculating
+    thermodynamically self-consistent properties of a solution phase.
 
-    This class is available as :class:`burnman.Solution`.
-    It uses an instance of :class:`burnman.SolutionModel` to
-    calculate interaction terms between endmembers.
+    In this class, solutions are treated as a collection of independent
+    endmember phases (components), plus a model that describes the
+    excess properties of the solution. It stores the current state
+    (pressure, temperature and molar fractions of all the endmembers)
+    of the solution, and interrogates a SolutionModel object to calculate
+    the excess properties of the solution. It then combines these with the
+    properties of the individual endmember phases (also stored in the
+    SolutionModel) to calculate the overall properties of the solution.
+    This is done using standard thermodynamic relations:
 
-    All the solution parameters are expected to be in SI units.  This
-    means that the interaction parameters should be in J/mol, with the T
-    and P derivatives in J/K/mol and m^3/mol.
+    .. math::
+        G = \\sum_i X_i G_i + G^{\\text{excess}} \\\\
+        V = \\sum_i X_i V_i + V^{\\text{excess}} \\\\
+        S = \\sum_i X_i S_i + S^{\\text{excess}} \\\\
+        C_p = \\sum_i X_i C_{p,i} + C_p^{\\text{excess}} \\\\
+        \\alpha V = \\sum_i X_i \\alpha_i V_i + (\\alpha V)^{\\text{excess}} \\\\
+        \\frac{V}{K_T} = \\sum_i X_i \\frac{V_i}{K_{T,i}} + \\left(\\frac{V}{K_T}\\right)^{\\text{excess}}
 
-    The parameters are relevant to all solution models. Please
-    see the documentation for individual models for details about
-    other parameters.
+
+    After instantiation, the user can set the composition of the solution
+    using the set_composition() method, and the pressure and temperature
+    using the set_state() method.
+
+    Instantiation of a Solution object can be achieved in just a few lines:
+
+    .. code-block:: python
+
+        from burnman import Solution, SolutionModel
+
+        # Create a SolutionModel object (explained in the documentation for that class)
+        solution_model = SolutionModel(...)
+
+        # Create a Solution object
+        solution = Solution(name="MySolution", solution_model=solution_model, molar_fractions=...)
+
+    where the arguments are as follows:
 
     :param name: Name of the solution.
     :type name: string
     :param solution_model: The SolutionModel object defining the properties
         of the solution.
     :type solution_model: :class:`burnman.SolutionModel`
-    :param molar_fractions: The molar fractions of each endmember
+    :param molar_fractions: The initial molar fractions of each endmember
         in the solution. Can be reset using the set_composition() method.
     :type molar_fractions: numpy.array
     """

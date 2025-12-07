@@ -22,6 +22,7 @@ from . import output_seismo
 from . import partitioning
 from . import plot
 from . import polytope
+from . import seismic
 from . import solution
 from . import thermobarometry
 from . import unitcell
