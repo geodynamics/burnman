@@ -545,7 +545,7 @@ with open(output_rst, "w") as f:
         name = modifier_names[string]
         header = f"{name} (available as \"{string}\")"
         f.write(f"{header}\n")
-        f.write(f"{'"' * len(header)}\n\n")
+        f.write(f"{'\"' * len(header)}\n\n")
         f.write(f".. autofunction:: burnman.eos.property_modifiers.{func.__name__}\n")
         f.write("   :no-index:\n\n")
 
@@ -571,7 +571,7 @@ with open(output_rst, "w") as f:
             if name.endswith("Base") or name.endswith("Model") or name == "Interaction":
                 continue
 
-            f.write(f"{name}\n{'"' * len(name)}\n\n")
+            f.write(f"{name}\n{'\"' * len(name)}\n\n")
             f.write(f".. autoclass:: {module_name}.{name}\n")
             f.write("   :no-members:\n")
             f.write("   :no-undoc-members:\n")
@@ -598,7 +598,7 @@ with open(output_rst, "w") as f:
             if name.endswith("Base") or name.endswith("Model") or name == "Interaction":
                 continue
 
-            f.write(f"{name}\n{'"' * len(name)}\n\n")
+            f.write(f"{name}\n{'\"' * len(name)}\n\n")
             f.write(f".. autoclass:: {module_name}.{name}\n")
             f.write("   :no-members:\n")
             f.write("   :no-undoc-members:\n")
@@ -625,7 +625,7 @@ with open(output_rst, "w") as f:
             if name == "AveragingScheme":
                 continue
 
-            f.write(f"{name}\n{'"' * len(name)}\n\n")
+            f.write(f"{name}\n{'\"' * len(name)}\n\n")
             f.write(f".. autoclass:: {module_name}.{name}\n")
             f.write("   :no-members:\n")
             f.write("   :no-undoc-members:\n")
