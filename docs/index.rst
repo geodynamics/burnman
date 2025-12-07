@@ -81,10 +81,10 @@ Acknowledgement and Support
   anisotropic_materials
   relaxed_materials
   averaging_schemes
+  mineral_datasets
   calibrants
   seismic_models
   geotherms
-  datasets
   compositions
   layers_and_planets
   material_polytopes

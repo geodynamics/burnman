@@ -3,4 +3,8 @@
 PerpleX Class
 -------------
 
-Documentation under construction.
+.. autoclass:: burnman.PerplexMaterial
+   :no-members:
+   :no-undoc-members:
+   :no-inherited-members:
+   :no-index:

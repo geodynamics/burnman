@@ -1,6 +1,11 @@
-.. _ref-relaxed-materials-relaxed-anisotropic-solution:
+.. _ref-relaxed-anisotropic-solution:
 
 Relaxed Anisotropic Solution Class
 ----------------------------------
 
-Documentation under construction.
+.. autoclass:: burnman.RelaxedAnisotropicSolution
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:
+

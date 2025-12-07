@@ -3,11 +3,19 @@
 Seismic Models
 ==============
 
+Overview
+--------
+
 BurnMan allows for direct visual and quantitative comparison with seismic velocity models.
 Various ways of plotting can be found in the examples.
 Quantitative misfits between two profiles include an L2-norm and a chi-squared misfit, but user defined norms can be implemented.
 A seismic model in BurnMan is
 an object that provides pressure, density, and seismic velocities (:math:`V_P, V_\Phi, V_S`) as a function of depth.
+
+See :ref:`ref-api-seismic` for a list of built-in seismic models available in BurnMan.
+
+Comparison to Seismic profiles
+------------------------------
 
 To compare to seismically constrained profiles, BurnMan provides the 1D seismic velocity model PREM :cite:`dziewonski1981`.
 One can choose to evaluate :math:`V_P, V_\Phi, V_S, \rho, K_S` and/or :math:`G`.

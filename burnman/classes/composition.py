@@ -59,33 +59,61 @@ def file_to_composition_list(fname, unit_type, normalize):
 
 class Composition(object):
     """
-    Class for a composition object, which can be used
+    The Composition class can be used
     to store, modify and renormalize compositions,
     and also convert between mass, molar
     and atomic amounts. Weight is provided as an alias
     for mass, as we assume that only Earthlings
     will use this software.
 
-    This class is available as ``burnman.Composition``.
+    Composition can parse dictionaries of components, rather than
+    only elements. Components are given as strings (e.g. 'MgSiO3', 'Fe2O3', etc).
+    The Composition class breaks these components down into their
+    elemental constituents internally.
+
+    Example:
+
+    .. code-block:: python
+
+        from burnman.composition import Composition
+
+        comp_dict = {'MgSiO3': 0.5, 'FeSiO3': 0.5}
+        comp = Composition(comp_dict, unit_type='molar', normalize=True)
+        print(comp.atomic_composition)
+
+        # Renormalize to 1 kg of material
+        comp.renormalize(unit_type='mass', normalization_component='total', normalization_amount=1.0)
+        print(comp.mass_composition)
+
+        # Add 0.1 moles of Al2O3 to the composition
+        comp.add_components({'Al2O3': 0.1}, unit_type='molar')
+        print(comp.molar_composition)
+
+        # Change the component set to only oxides
+        comp.change_component_set(['MgO', 'SiO2', 'FeO', 'Al2O3'])
+        print(comp.molar_composition)
+
+        # Remove components with less than 1.e-10 moles
+        comp.remove_null_components(tol=1.e-10)
+        print(comp.molar_composition)
+
+        # Pretty-print the molar composition, normalized to 100 moles total
+        comp.print(unit_type='molar', significant_figures=3, normalization_component='total', normalization_amount=100.0)
+
+    :param composition_dictionary: Dictionary of components
+        (given as a string) and their amounts.
+    :type composition_dictionary: dictionary
+    :param unit_type: 'mass', 'weight' or 'molar' (optional, 'mass' as default)
+        Specify whether the input composition is given as mass or
+        molar amounts.
+    :type unit_type: str
+    :param normalize: If False, absolute numbers of kilograms/moles of component are
+        stored, otherwise the component amounts of returned compositions
+        will sum to one (until Composition.renormalize() is used).
+    :type normalize: bool
     """
 
     def __init__(self, composition_dictionary, unit_type="mass", normalize=False):
-        """
-        Create a composition using a dictionary and unit type.
-
-        :param composition_dictionary: Dictionary of components
-            (given as a string) and their amounts.
-        :type composition_dictionary: dictionary
-        :param unit_type: 'mass', 'weight' or 'molar' (optional, 'mass' as default)
-            Specify whether the input composition is given as mass or
-            molar amounts.
-        :type unit_type: str
-        :param normalize: If False, absolute numbers of kilograms/moles of component are
-            stored, otherwise the component amounts of returned compositions
-            will sum to one (until Composition.renormalize() is used).
-        :type normalize: bool
-        """
-
         self._cached = {}
 
         n_total = float(sum(composition_dictionary.values()))

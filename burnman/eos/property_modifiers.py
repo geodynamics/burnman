@@ -1,5 +1,6 @@
-# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
+# the Earth and Planetary Sciences
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -7,33 +8,66 @@ import numpy as np
 import scipy.optimize as opt
 from ..constants import gas_constant
 from . import debye, einstein
+from collections import OrderedDict
 
 """
 Functions for modifying the thermodynamic properties of minerals
-Currently includes modifications for:
-- second order transitions (landau, landau_slb_2022, landau_hp),
-- order-disorder (bragg_williams),
-- magnetism (magnetic_chs),
-- and a linear modification (linear).
+via excess Gibbs energies that are added to the base energy calculated
+via the equation of state. These excess Gibbs energies are a function of
+pressure and temperature.
 """
 
 
-def _landau_excesses(pressure, temperature, params):
+def landau_excesses(pressure, temperature, params):
     """
     Applies a tricritical Landau correction to the properties
-    of an endmember which undergoes a displacive phase transition.
-    This correction follows Putnis (1992), and is done relative to
+    of an endmember which undergoes a displacive phase transition. These
+    transitions are not associated with an activation energy, and therefore
+    they occur rapidly compared with seismic wave propagation.
+
+    This correction follows :cite:`Putnis1992`, and is done relative to
     the completely *ordered* state (at 0 K).
-    It therefore differs in implementation from both
-    Stixrude and Lithgow-Bertelloni (2011) and
-    Holland and Powell (2011), who compute properties relative to
+    It therefore differs in implementation from both :cite:`Stixrude2011` and
+    :cite:`HP2011`, who compute properties relative to
     the completely disordered state and standard states respectively.
+    The current implementation is preferred, as the excess
+    entropy (and heat capacity) terms are equal to zero at 0 K.
 
-    The excess entropy (and heat capacity) terms are equal to zero at 0 K.
+    .. math::
+        Tc = Tc_0 + \\frac{V_D P}{S_D}
 
-    N.B. The excesses are for a *completely relaxed* mineral;
-    for example, seismic wave propagation is *slow* compared to the
-    rate of change in order parameter.
+    If the temperature is above the critical temperature,
+    Q (the order parameter) is equal to zero, and the Gibbs free energy is simply that of the disordered phase:
+
+    .. math::
+        \\mathcal{G}_{\\textrm{dis}} = -S_D \\left( \\left( T - Tc \\right) + \\frac{Tc_0}{3} \\right), \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P}_{\\textrm{dis}} = V_D, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T}_{\\textrm{dis}} = -S_D
+
+    If temperature is below the critical temperature, Q is between 0 and 1.
+    The Gibbs energy can be described thus:
+
+    .. math::
+        Q^2 = \\sqrt{\\left( 1 - \\frac{T}{Tc} \\right)}, \\\\
+        \\mathcal{G} = S_D \\left((T - Tc) Q^2 + \\frac{Tc_0 Q^6}{3} \\right) + \\mathcal{G}_{\\textrm{dis}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = - V_D Q^2 \\left(1 + \\frac{T}{2 Tc} \\left(1. - \\frac{Tc_0}{Tc} \\right) \\right) + \\frac{\\partial \\mathcal{G}}{\\partial P}_{\\textrm{dis}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = S_D Q^2 \\left(\\frac{3}{2} - \\frac{Tc_0}{2 Tc} \\right) + \\frac{\\partial \\mathcal{G}}{\\partial T}_{\\textrm{dis}}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = V_D^2 \\frac{T}{S_D Tc^2 Q^2} \\left( \\frac{T}{4 Tc} \\left(1. + \\frac{Tc_0}{Tc} \\right) + Q^4 \\left(1. - \\frac{Tc_0}{Tc} \\right) - 1 \\right), \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = - \\frac{S_D}{Tc Q^2} \\left(\\frac{3}{4} - \\frac{Tc_0}{4 Tc} \\right), \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P \\partial T} = \\frac{V_D}{2 Tc Q^2} \\left(1 + \\left(\\frac{T}{2 Tc} - Q^4 \\right) \\left(1 - \\frac{Tc_0}{Tc} \\right) \\right)
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``Tc_0``
+          - Critical temperature at reference pressure (K)
+        * - ``S_D``
+          - Entropy parameter (J/mol/K)
+        * - ``V_D``
+          - Volume parameter (m³/mol)
     """
 
     Tc = params["Tc_0"] + params["V_D"] * pressure / params["S_D"]
@@ -99,24 +133,34 @@ def _landau_excesses(pressure, temperature, params):
     return (excesses, {"Q": np.sqrt(Q2)})
 
 
-def _landau_slb_2022_excesses(pressure, temperature, params):
+def landau_slb_2022_excesses(pressure, temperature, params):
     """
     Applies a tricritical Landau correction to the properties
     of an endmember which undergoes a displacive phase transition.
-    This correction follows Stixrude and Lithgow-Bertelloni (2022),
-    and is done relative to the state with order parameter Q=1.
+    This correction follows :cite:`Stixrude2022`,
+    and is done relative to the state with order parameter :math:`Q=1`.
 
     The order parameter of this formulation can exceed one,
-    at odds with Putnis (above), but in better agreement with
-    atomic intuition (Stixrude and Lithgow-Bertelloni, 2022).
+    at odds with :cite:`Putnis1992`, but in better agreement with
+    atomic intuition :cite:`Stixrude2022`.
     Nevertheless, this implementation is still not perfect,
     as the excess entropy (and heat capacity) terms are not equal
-    to zero at 0 K. Q is limited to values less than or equal to 2
+    to zero at 0 K. :math:`Q` is limited to values less than or equal to 2
     to avoid unrealistic stabilisation at ultrahigh pressure.
 
-    N.B. These excesses are for a *completely relaxed* mineral;
-    for example, seismic wave propagation is *slow* compared to the
-    rate of change in order parameter.
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``Tc_0``
+          - Critical temperature at reference pressure (K)
+        * - ``S_D``
+          - Entropy parameter (J/mol/K)
+        * - ``V_D``
+          - Volume parameter (m³/mol)
+
     """
 
     Tc = params["Tc_0"] + params["V_D"] * pressure / params["S_D"]
@@ -184,23 +228,64 @@ def _landau_slb_2022_excesses(pressure, temperature, params):
     return (excesses, {"Q": np.sqrt(Q2)})
 
 
-def _landau_hp_excesses(pressure, temperature, params):
+def landau_hp_excesses(pressure, temperature, params):
     """
-    Applies a tricritical Landau correction to the properties
-    of an endmember which undergoes a displacive phase transition.
-    This correction is done relative to the standard state, as per
-    Holland and Powell (1998).
+    Applies a tricritical Landau correction similar to that described
+    above. However, this implementation follows :cite:`HP2011`,
+    who compute properties relative to the standard state.
 
     Includes the correction published within landaunote.pdf
     (Holland, pers. comm), which 'corrects' the terms involving
-    the critical temperature Tc / Tc*
+    the critical temperature Tc / Tc*.
 
-    This formalism predicts that the order parameter can be greater
-    than one, unlike _landau_excesses.
+    Note that this implementation allows the order parameter Q to be
+    greater than one.
 
-    N.B. The excesses are for a *completely relaxed* mineral;
-    i.e. the seismic wave propagation is *slow* compared to the
-    rate of change in order parameter.
+    .. math::
+        Tc = Tc0 + \\frac{V_D P}{S_D}
+
+    If the temperature is above the critical temperature,
+    Q (the order parameter) is equal to zero. Otherwise
+
+    .. math::
+        Q^2 = \\sqrt{\\left( \\frac{Tc - T}{Tc0} \\right)}
+
+    .. math::
+        \\mathcal{G} = Tc_0 S_D \\left( Q_0^2 - \\frac{Q_0 ^ 6}{3} \\right) \\\\
+            - S_D \\left( Tc Q^2 - Tc_0 \\frac{Q ^ 6}{3} \\right) \\\\
+            - T S_D \\left( Q_0^2 - Q^2 \\right) + P V_D Q_0^2, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = -V_D \\left( Q^2 - Q_0^2
+        \\right), \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = S_D \\left( Q^2 - Q_0^2
+        \\right), \\\\
+
+    The second derivatives of the Gibbs free energy are only non-zero if
+    the order parameter exceeds zero. Then
+
+    .. math::
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2}  = -\\frac{V_D^2}{2
+        S_D Tc_0 Q^2}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2}  =
+        -\\frac{S_D}{2 Tc_0 Q^2}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P \\partial T} =
+        \\frac{V_D}{2 Tc_0 Q^2}
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``P_0``
+          - Reference pressure (Pa)
+        * - ``T_0``
+          - Reference temperature (K)
+        * - ``Tc_0``
+          - Critical temperature at reference pressure (K)
+        * - ``S_D``
+          - Entropy parameter (J/mol/K)
+        * - ``V_D``
+          - Volume parameter (m³/mol)
     """
 
     P = pressure
@@ -253,19 +338,37 @@ def _landau_hp_excesses(pressure, temperature, params):
     return (excesses, {"Q": Q})
 
 
-def _linear_excesses(pressure, temperature, params):
+def linear_excesses(pressure, temperature, params):
     """
-    Applies a 'Darken's quadratic formalism' correction (Powell, 1987)
-    to the thermodynamic properties of a mineral endmember.
-    This correction is relative to P = 0 and T = 0 and linear in P and T
-    and therefore corresponds to a constant volume and entropy correction.
+    A simple linear correction in pressure and temperature.
 
-    Applying either a volume or entropy term will generally break
-    equations of state (i.e. the properties of the mineral will
-    no longer obey the equation of state defined in the
-    params dictionary. However, this form of excess is extremely
-    useful as a first order tweak to free energies
-    (especially in solid solution calculations)
+    The excess Gibbs energy and its derivatives are given by:
+
+    .. math::
+        \\mathcal{G} = \\Delta \\mathcal{E} - T \\Delta S + P \\Delta V, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = - \\Delta S, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = \\Delta V, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T \\partial P} = 0
+
+    This form of excess is extremely useful as a first order tweak
+    to free energies (especially in solid solutions where data on
+    all endmembers may not be available).
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``delta_E``
+          - Energy correction (J/mol)
+        * - ``delta_S``
+          - Entropy correction (J/mol/K)
+        * - ``delta_V``
+          - Volume correction (m³/mol)
+
     """
     G = (
         params["delta_E"]
@@ -290,21 +393,42 @@ def _linear_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
-def _bragg_williams_excesses(pressure, temperature, params):
+def bragg_williams_excesses(pressure, temperature, params):
     """
-    Applies a Bragg-Williams type correction to the thermodynamic
-    properties of a mineral endmember. Used for modelling
-    order-disorder processes.
-    Expressions are from Holland and Powell (1996).
+    The Bragg-Williams model is a symmetric solution
+    model with an excess configurational entropy term
+    determined by the specifics of order-disorder in the
+    mineral, multiplied by some empirical factor. Expressions for the
+    excess Gibbs free energy can be found in :cite:`HP1996`.
 
-    N.B. The excesses are for a *completely relaxed* mineral;
-    i.e. the seismic wave propagation is *slow* compared to the
-    rate of reaction.
+    Excess properties assume that order-disorder processes are
+    rapid compared with the timescales of pressure and temperature
+    changes (i.e., equilibrium is maintained).
 
     This may not be reasonable for order-disorder, especially
     for slow or coupled diffusers (Si-Al, for example).
-    The completely *unrelaxed* mineral (in terms of order-disorder)
-    can be calculated with a solid solution model.
+    Properties for minerals that order-disorder slowly
+    should be calculated using an explicit solid solution model.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``deltaH``
+          - Enthalpy change (J/mol)
+        * - ``deltaV``
+          - Volume change (m³/mol)
+        * - ``Wh``
+          - Enthalpy interaction parameter (J/mol)
+        * - ``Wv``
+          - Volume interaction parameter (m³/mol)
+        * - ``n``
+          - Related to the number of available sites for ordering
+        * - ``factor``
+          - An empirical factor
+
     """
 
     R = gas_constant
@@ -403,13 +527,26 @@ def _bragg_williams_excesses(pressure, temperature, params):
     return (excesses, {"Q": Q})
 
 
-def _magnetic_excesses_chs(pressure, temperature, params):
+def magnetic_excesses_chs(pressure, temperature, params):
     """
-    Applies a magnetic contribution to the thermodynamic
-    properties of a mineral endmember.
-    The expression for the gibbs energy contribution is that
-    used by Chin, Hertzman and Sundman (1987) as reported
-    in the Journal of Phase Equilibria (Sundman, 1991).
+    This model approximates the excess energy due to magnetic ordering. It
+    was originally described in :cite:`CHS1987`. The expressions used
+    in this implementation can be found in :cite:`Sundman1991`.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``structural_parameter``
+          - A dimensionless parameter related to the crystal structure
+        * - ``curie_temperature``
+          - A list of length 2: zero pressure Curie temperature (K)
+            and pressure dependence (K/Pa)
+        * - ``magnetic_moment``
+          - A list of length 2: zero pressure magnetic moment (Bohr magnetons)
+            and pressure dependence (Bohr magnetons/Pa)
     """
 
     structural_parameter = params["structural_parameter"]
@@ -532,11 +669,33 @@ def _magnetic_excesses_chs(pressure, temperature, params):
     return (excesses, None)
 
 
-def _debye_excesses(pressure, temperature, params):
+def debye_excesses(pressure, temperature, params):
     """
-    Applies an excess contribution based
-    on a Debye model. The excess heat capacity
-    tends toward a constant value at high temperature.
+    Applies an excess contribution based on a Debye model.
+    The excess Gibbs energy and its derivatives are given by:
+
+    .. math::
+
+        \\mathcal{G} = F_{\\textrm{Debye}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = - S_{\\textrm{Debye}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = - \\frac{C_{V,\\textrm{Debye}}}{T}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T \\partial P} = 0
+
+    The excess heat capacity tends toward a constant value at high temperature.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``Cv_inf``
+          - Heat capacity at infinite temperature (J/mol/K).
+        * - ``Theta_0``
+          - Debye temperature (K).
+
     """
     f = params["Cv_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
@@ -563,14 +722,34 @@ def _debye_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
-def _debye_delta_excesses(pressure, temperature, params):
+def debye_delta_excesses(pressure, temperature, params):
     """
-    Applies an excess contribution based
-    on the thermal derivatives of a Debye model.
-    The excess entropy tends toward a
-    constant value at high temperature
-    and behaves like the heat capacity of a Debye model
-    at finite temperature.
+    Applies an excess contribution based on a Debye model.
+    The excess Gibbs energy and its derivatives are given by:
+
+    .. math::
+
+        \\mathcal{G} = - U_{\\textrm{Debye}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = - C_{V,\\textrm{Debye}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = - \\frac{dC_{V,\\textrm{Debye}}}{dT}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T \\partial P} = 0
+
+    The excess entropy tends toward a constant value at high temperature
+    and behaves like the heat capacity of a Debye model at finite temperature.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``S_inf``
+          - Entropy at infinite temperature (J/mol/K).
+        * - ``Theta_0``
+          - Einstein temperature (K).
+
     """
     f = params["S_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
@@ -594,11 +773,33 @@ def _debye_delta_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
-def _einstein_excesses(pressure, temperature, params):
+def einstein_excesses(pressure, temperature, params):
     """
-    Applies an excess contribution based
-    on an Einstein model. The excess heat capacity
-    tends toward a constant value at high temperature.
+    Applies an excess contribution based an Einstein model.
+    The excess Gibbs energy and its derivatives are given by:
+
+    .. math::
+
+        \\mathcal{G} = F_{\\textrm{Einstein}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = - S_{\\textrm{Einstein}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = - \\frac{C_{V,\\textrm{Einstein}}}{T}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T \\partial P} = 0
+
+    The excess heat capacity tends toward a constant value at high temperature.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``Cv_inf``
+          - Heat capacity at infinite temperature (J/mol/K).
+        * - ``Theta_0``
+          - Einstein temperature (K).
+
     """
     f = params["Cv_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
@@ -625,14 +826,36 @@ def _einstein_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
-def _einstein_delta_excesses(pressure, temperature, params):
+def einstein_delta_excesses(pressure, temperature, params):
     """
-    Applies an excess contribution based
-    on the thermal derivatives of an Einstein model.
+    Applies an excess contribution based an Einstein model.
+    The excess Gibbs energy and its derivatives are given by:
+
+    .. math::
+
+        \\mathcal{G} = - U_{\\textrm{Einstein}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial T} = - C_{V,\\textrm{Einstein}}, \\\\
+        \\frac{\\partial \\mathcal{G}}{\\partial P} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T^2} = - \\frac{dC_{V,\\textrm{Einstein}}}{dT}, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial P^2} = 0, \\\\
+        \\frac{\\partial^2 \\mathcal{G}}{\\partial T \\partial P} = 0
+
     The excess entropy tends toward a
     constant value at high temperature
     and behaves like the heat capacity of an Einstein model
     at finite temperature.
+
+    .. list-table:: Parameters
+        :widths: 25 75
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - ``S_inf``
+          - Entropy at infinite temperature (J/mol/K).
+        * - ``Theta_0``
+          - Einstein temperature (K).
+
     """
     f = params["S_inf"] / 3.0 / gas_constant
     theta = params["Theta_0"]
@@ -654,6 +877,31 @@ def _einstein_delta_excesses(pressure, temperature, params):
     }
 
     return (excesses, None)
+
+
+modifier_names = OrderedDict()
+modifier_names["landau"] = "Landau tricritical model :cite:`Putnis1992`"
+modifier_names["landau_slb_2022"] = "Landau tricritical model :cite:`Stixrude2022`"
+modifier_names["landau_hp"] = "Landau tricritical model :cite:`Holland1998`"
+modifier_names["linear"] = "Linear in P and T"
+modifier_names["bragg_williams"] = "Bragg-Williams model"
+modifier_names["magnetic_chs"] = "Magnetic ordering :cite:`CHS1987`"
+modifier_names["debye"] = "Debye model excess (Helmholtz)"
+modifier_names["debye_delta"] = "Debye model excess (internal energy)"
+modifier_names["einstein"] = "Einstein model excess (Helmholtz)"
+modifier_names["einstein_delta"] = "Einstein model excess (internal energy)"
+
+modifier_functions = OrderedDict()
+modifier_functions["landau"] = landau_excesses
+modifier_functions["landau_slb_2022"] = landau_slb_2022_excesses
+modifier_functions["landau_hp"] = landau_hp_excesses
+modifier_functions["linear"] = linear_excesses
+modifier_functions["bragg_williams"] = bragg_williams_excesses
+modifier_functions["magnetic_chs"] = magnetic_excesses_chs
+modifier_functions["debye"] = debye_excesses
+modifier_functions["debye_delta"] = debye_delta_excesses
+modifier_functions["einstein"] = einstein_excesses
+modifier_functions["einstein_delta"] = einstein_delta_excesses
 
 
 def calculate_property_modifications(mineral):
@@ -687,26 +935,8 @@ def calculate_property_modifications(mineral):
     }
     mineral.property_modifier_properties = []
     for modifier in mineral.property_modifiers:
-        if modifier[0] == "landau":
-            xs_function = _landau_excesses
-        elif modifier[0] == "landau_slb_2022":
-            xs_function = _landau_slb_2022_excesses
-        elif modifier[0] == "landau_hp":
-            xs_function = _landau_hp_excesses
-        elif modifier[0] == "linear":
-            xs_function = _linear_excesses
-        elif modifier[0] == "bragg_williams":
-            xs_function = _bragg_williams_excesses
-        elif modifier[0] == "magnetic_chs":
-            xs_function = _magnetic_excesses_chs
-        elif modifier[0] == "debye":
-            xs_function = _debye_excesses
-        elif modifier[0] == "debye_delta":
-            xs_function = _debye_delta_excesses
-        elif modifier[0] == "einstein":
-            xs_function = _einstein_excesses
-        elif modifier[0] == "einstein_delta":
-            xs_function = _einstein_delta_excesses
+        if modifier[0] in modifier_functions:
+            xs_function = modifier_functions[modifier[0]]
         else:
             raise Exception(
                 f"Property modifier label for {mineral.name} ({modifier[0]}) not recognised."

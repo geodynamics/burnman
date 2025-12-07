@@ -4,6 +4,7 @@
 
 
 import inspect
+from collections import OrderedDict
 from . import slb
 from . import mie_grueneisen_debye as mgd
 from . import modular_mie_grueneisen_debye as mmgd
@@ -37,64 +38,78 @@ class CombinedMineralMethod(object):
     pass
 
 
+eos_names = OrderedDict()
+eos_names["murnaghan"] = "Murnaghan EoS :cite:`Murnaghan1944`"
+eos_names["bm3shear2"] = (
+    "3rd-order Birch-Murnaghan with 2nd order Shear Modulus expansion :cite:`Birch1947`"
+)
+eos_names["bm3"] = "3rd-order Birch-Murnaghan EoS :cite:`Birch1947`"
+eos_names["bm4"] = "4th-order Birch-Murnaghan EoS :cite:`Birch1947`"
+eos_names["vinet"] = "Vinet EoS :cite:`vinet1987`"
+eos_names["morse"] = "Morse Potential EoS :cite:`Morse1929`"
+eos_names["rkprime"] = "Reciprocal K' EoS :cite:`StaceyDavis2004`"
+eos_names["mgd2"] = "Mie-Gruneisen-Debye 2nd-order EoS :cite:`Matas2007`"
+eos_names["mgd3"] = "Mie-Gruneisen-Debye 3rd-order EoS :cite:`Matas2007`"
+eos_names["slb2"] = "Stixrude and Lithgow-Bertelloni 2nd-order EoS :cite:`Stixrude2005`"
+eos_names["slb3"] = "Stixrude and Lithgow-Bertelloni 3rd-order EoS :cite:`Stixrude2005`"
+eos_names["slb3-conductive"] = (
+    "Stixrude and Lithgow-Bertelloni 3rd-order EoS with Conductive Heat Transport :cite:`Stixrude2024`"
+)
+eos_names["dks_l"] = "De Koker and Stixrude Liquid EoS :cite:`deKoker2013`"
+eos_names["dks_s"] = "De Koker and Stixrude Solid EoS :cite:`deKoker2013`"
+eos_names["modular_mgd"] = "Modular Mie-Gruneisen-Debye EoS"
+eos_names["modular_mgd_with_anharmonicity"] = (
+    "Modular Mie-Gruneisen-Debye EoS with Anharmonicity"
+)
+eos_names["mt"] = "Modified Tait EoS :cite:`HC1974`"
+eos_names["macaw"] = "MACAW EoS :cite:`Lozano2022`"
+eos_names["spock"] = "SPOCK EoS :cite:`Myhill2025spock`"
+eos_names["hp98"] = "Holland and Powell 1998 EoS :cite:`Holland1998`"
+eos_names["hp_tmt"] = "Holland and Powell Modified Tait Thermal EoS :cite:`HP2011`"
+eos_names["hp_tmtL"] = (
+    "Holland and Powell Modified Tait Thermal Liquid EoS :cite:`HP2011`"
+)
+eos_names["cork"] = "CORK EoS :cite:`HP1991`"
+eos_names["brosh_calphad"] = "Brosh CALPHAD EoS :cite:`Brosh2007`"
+eos_names["aa"] = "Anderson and Ahrens Liquid Metal EoS :cite:`AA1994`"
+
+eos_methods = OrderedDict()
+eos_methods["murnaghan"] = murnaghan.Murnaghan
+eos_methods["bm3shear2"] = bm.BM3Shear2
+eos_methods["bm3"] = bm.BM3
+eos_methods["bm4"] = bm.BM4
+eos_methods["vinet"] = vinet.Vinet
+eos_methods["morse"] = morse_potential.Morse
+eos_methods["rkprime"] = reciprocal_kprime.RKprime
+eos_methods["mgd2"] = mgd.MGD2
+eos_methods["mgd3"] = mgd.MGD3
+eos_methods["slb2"] = slb.SLB2
+eos_methods["slb3"] = slb.SLB3
+eos_methods["slb3-conductive"] = slb.SLB3Conductive
+eos_methods["dks_l"] = dks_liquid.DKS_L
+eos_methods["dks_s"] = dks_solid.DKS_S
+eos_methods["modular_mgd"] = mmgd.ModularMGD
+eos_methods["modular_mgd_with_anharmonicity"] = mmgd.ModularMGDWithAnharmonicity
+eos_methods["mt"] = mt.MT
+eos_methods["macaw"] = macaw.MACAW
+eos_methods["spock"] = spock.SPOCK
+eos_methods["hp98"] = hp.HP98
+eos_methods["hp_tmt"] = hp.HP_TMT
+eos_methods["hp_tmtL"] = hp.HP_TMTL
+eos_methods["cork"] = cork.CORK
+eos_methods["brosh_calphad"] = brosh_calphad.BroshCalphad
+eos_methods["aa"] = aa.AA
+eos_methods["combined"] = CombinedMineralMethod
+
+
 def create(method):
     """
     Creates an instance of an EquationOfState from a string,
     a class EquationOfState, or an instance of EquationOfState.
     """
     if isinstance(method, str):
-        if method == "slb2":
-            return slb.SLB2()
-        elif method == "vinet":
-            return vinet.Vinet()
-        elif method == "morse":
-            return morse_potential.Morse()
-        elif method == "rkprime":
-            return reciprocal_kprime.RKprime()
-        elif method == "aa":
-            return aa.AA()
-        elif method == "mgd2":
-            return mgd.MGD2()
-        elif method == "mgd3":
-            return mgd.MGD3()
-        elif method == "slb3":
-            return slb.SLB3()
-        elif method == "slb3-conductive":
-            return slb.SLB3Conductive()
-        elif method == "modular_mgd":
-            return mmgd.ModularMGD()
-        elif method == "modular_mgd_with_anharmonicity":
-            return mmgd.ModularMGDWithAnharmonicity()
-        elif method == "murnaghan":
-            return murnaghan.Murnaghan()
-        elif method == "bm3shear2":
-            return bm.BM3Shear2()
-        elif method == "bm3":
-            return bm.BM3()
-        elif method == "bm4":
-            return bm.BM4()
-        elif method == "mt":
-            return mt.MT()
-        elif method == "macaw":
-            return macaw.MACAW()
-        elif method == "spock":
-            return spock.SPOCK()
-        elif method == "hp98":
-            return hp.HP98()
-        elif method == "hp_tmt":
-            return hp.HP_TMT()
-        elif method == "hp_tmtL":
-            return hp.HP_TMTL()
-        elif method == "cork":
-            return cork.CORK()
-        elif method == "dks_l":
-            return dks_liquid.DKS_L()
-        elif method == "dks_s":
-            return dks_solid.DKS_S()
-        elif method == "brosh_calphad":
-            return brosh_calphad.BroshCalphad()
-        elif method == "combined":
-            return CombinedMineralMethod()
+        if method in eos_methods:
+            return eos_methods[method]()
         else:
             raise Exception("unsupported material method " + method)
     elif isinstance(method, EquationOfState):

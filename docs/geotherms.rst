@@ -8,7 +8,8 @@ As elsewhere, BurnMan provides a number of built-in geotherms, as well as the ab
 A geotherm in BurnMan is an object that returns temperature as a function of pressure.
 Alternatively, the user could ignore the geothermal and compute elastic velocities for a range of temperatures at any give pressure.
 
-Currently, we include geotherms published by :cite:`Brown1981` and :cite:`anderson1982earth`.
+See :ref:`ref-api-geotherms` for a list of built-in geotherms currently available in BurnMan.
+
 Alternatively one can use an adiabatic gradient defined by the thermoelastic properties of a given mineralogical model.
 For a homogeneous material, the adiabatic temperature profile is given by integrating the ordinary differential equation (ODE)
 

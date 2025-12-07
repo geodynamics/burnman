@@ -3,4 +3,8 @@
 Anisotropic Solution Class
 --------------------------
 
-Documentation under construction.
+.. autoclass:: burnman.classes.anisotropicsolution.AnisotropicSolution
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

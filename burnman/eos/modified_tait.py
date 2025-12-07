@@ -100,14 +100,44 @@ def intVdP(pressure, params):
 
 class MT(eos.IsothermalEquationOfState):
     """
-    Base class for the generic modified Tait equation of state.
-    References for this can be found in :cite:`HC1974`
-    and :cite:`HP2011` (followed here).
+    The Modified Tait equation of state was developed by :cite:`HC1974`.
+    It has the considerable benefit of allowing volume to be expressed as
+    a function of pressure.
+    It performs very well to pressures and temperatures
+    relevant to the deep Earth :cite:`HP2011`.
 
-    An instance "m" of a Mineral can be assigned this
-    equation of state with the command m.set_method('mt')
-    (or by initialising the class with the param
-    equation_of_state = 'mt').
+    .. math::
+        \\frac{V_{P, T}}{V_{1 bar, 298 K}} &= 1 - a(1-(1 + bP)^{-c}), \\\\
+        a &= \\frac{1 + K_0'}{1 + K_0' + K_0 K_0''}, \\\\
+        b &= \\frac{K_0'}{K_0} - \\frac{K_0''}{1 + K_0'}, \\\\
+        c &= \\frac{1 + K_0' + K_0 K_0''}{K_0'^2 + K_0' - K_0 K_0''}
+
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus.
+          - Dimensionless
+        * - ``Kdprime_0``
+          - Second pressure derivative of bulk modulus.
+          - :math:`\\text{Pa}^{-1}`
     """
 
     def volume(self, pressure, temperature, params):
@@ -178,7 +208,7 @@ class MT(eos.IsothermalEquationOfState):
             params["Gprime_0"] = float("nan")
 
         # Check that all the required keys are in the dictionary
-        expected_keys = ["V_0", "K_0", "Kprime_0", "Kdprime_0", "G_0", "Gprime_0"]
+        expected_keys = ["V_0", "K_0", "Kprime_0", "Kdprime_0", "P_0", "F_0"]
         for k in expected_keys:
             if k not in params:
                 raise KeyError("params object missing parameter : " + k)

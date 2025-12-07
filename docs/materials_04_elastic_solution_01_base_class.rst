@@ -3,4 +3,8 @@
 The Elastic Solution Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Documentation under construction.
+.. autoclass:: burnman.ElasticSolution
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

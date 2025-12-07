@@ -10,3 +10,6 @@ pressure and/or temperature conditions based on measured unit cell volumes.
 BurnMan includes a Calibrant class for this purpose. A Calibrant is
 defined by a volumetric equation of state (EOS) and accompanying parameters.
 It may or may not be temperature dependent.
+
+See :ref:`ref-api-calibrant-database` for a list of built-in calibrants
+available in BurnMan.

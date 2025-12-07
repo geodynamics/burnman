@@ -50,9 +50,36 @@ def make_params(K0, K0_prime, K_infinity_prime):
 class MACAW(eos.IsothermalEquationOfState):
     """
     Class for the MACAW equation of state
-    detailed in Lozano and Aslam (2022; https://doi.org/10.1063/5.0076897).
+    detailed in :cite:`Lozano2022`.
 
     This equation of state has no temperature dependence.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of the bulk modulus at reference pressure.
+          - Dimensionless
+        * - ``Kprime_inf``
+          - Infinite pressure derivative of the bulk modulus.
+          - Dimensionless
+
     """
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):

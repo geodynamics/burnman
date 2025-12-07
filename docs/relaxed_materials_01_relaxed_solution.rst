@@ -1,6 +1,10 @@
-.. _ref-relaxed-materials-relaxed-solution:
+.. _ref-relaxed-solution:
 
 Relaxed Solution Class
 ----------------------
 
-Documentation under construction.
+.. autoclass:: burnman.RelaxedSolution
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:

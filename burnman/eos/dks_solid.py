@@ -65,6 +65,51 @@ class DKS_S(eos.EquationOfState):
     """
     Base class for the finite strain solid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
+
+    This equation of state is a somewhat modified version of that described
+    in :cite:`Stixrude2005`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``T_0``
+          - Reference temperature.
+          - :math:`\\text{K}`
+        * - ``E_0``
+          - Reference internal energy.
+          - :math:`\\text{J/mol}`
+        * - ``S_0``
+          - Reference entropy.
+          - :math:`\\text{J/K/mol}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of the reference bulk modulus.
+          - :math:`\\text{unitless}`
+        * - ``grueneisen_0``
+          - Reference Grüneisen parameter.
+          - :math:`\\text{unitless}`
+        * - ``q_0``
+          - Volume derivative of the Grüneisen parameter.
+          - :math:`\\text{unitless}`
+        * - ``eta_s_0``
+          - Isotropic shear strain derivative of the Grüneisen parameter.
+          - :math:`\\text{unitless}`
+        * - ``Cv``
+          - Constant volume heat capacity.
+          - :math:`\\text{J/K/mol}`
+
     """
 
     def _volume_dependent_q(self, x, params):

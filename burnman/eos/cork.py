@@ -40,6 +40,50 @@ class CORK(eos.EquationOfState):
     the MRK equation of state to overestimate volumes at high pressures and
     accommodate the volume behaviour of coexisting gas and liquid phases along
     the saturation curve.
+
+    .. math::
+        V &= \\frac{RT}{P} + c_1 - \\frac{c_0 R T^{0.5}}{(RT + c_1 P)(RT + 2 c_1 P)} + c_2 P^{0.5} + c_3 P, \\\\
+        c_0 &= c_{0,0} T_c^{2.5}/P_c + c_{0,1} T_c^{1.5}/P_c T, \\\\
+        c_1 &= c_{1,0} T_c/P_c, \\\\
+        c_2 &= c_{2,0} T_c/P_c^{1.5} + c_{2,1}/P_c^{1.5} T, \\\\
+        c_3 &= c_{3,0} T_c/P_c^2 + c_{3,1}/P_c^2 T
+
+    where :math:`c_{i,j}` are the CoRK parameters,
+    :math:`T_c` is the critical temperature,
+    and :math:`P_c` is the critical pressure.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``H_0``
+          - Reference enthalpy.
+          - :math:`\\text{J/mol}`
+        * - ``S_0``
+          - Reference entropy.
+          - :math:`\\text{J/(mol K)}`
+        * - ``Cp``
+          - Heat capacity parameters (length 4 array).
+          - :math:`\\text{J/(mol K)}`
+        * - ``T_0``
+          - Reference temperature.
+          - :math:`\\text{K}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``cork_params``
+          - CoRK parameters (length 4x2 array).
+          - varies
+        * - ``cork_T``
+          - Critical temperature.
+          - :math:`\\text{K}`
+        * - ``cork_P``
+          - Critical pressure.
+          - :math:`\\text{Pa}`
+
     """
 
     def volume(self, pressure, temperature, params):

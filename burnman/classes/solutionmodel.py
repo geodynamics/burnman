@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2022 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -426,20 +426,30 @@ class MechanicalSolution(SolutionModel):
 
 class IdealSolution(SolutionModel):
     """
-    A class representing an ideal solution model.
-    Calculates the excess gibbs free energy and entropy due to configurational
-    entropy. Excess internal energy and volume are equal to zero.
+    A solution model representing ideal mixing between endmembers.
+    In ideal solutions, the enthalpy of mixing is equal to zero; i.e.
+    chemical mixing of endmembers at fixed pressure and temperature
+    does not involve the absorption or release of heat.
+    The only contribution to the Gibbs energy of mixing
+    is the configurational entropy :math:`S_{\\textrm{conf}}`:
 
-    The multiplicity of each type of site in the structure is allowed to
-    change linearly as a function of endmember proportions. This class
-    is therefore equivalent to the entropic part of
-    a Temkin-type model :cite:`Temkin1945`.
+    .. math::
+        \\mathcal{G}_{\\textrm{mixing}} = - T \\Delta S_{\\textrm{conf}}, \\\\
+        S_{\\textrm{conf}} = R x_c^s \\ln \\frac{x_c^s}{\\sum_{c^s} x_c^s}
+
+    where :math:`s` is a site in the lattice, :math:`c` are the species
+    mixing on site :math:`s`. :math:`x_c^s` is the absolute number of species
+    :math:`c` on site :math:`s` in the lattice; it is calculated by
+    multiplying the proportion of the species on the site by the
+    multiplicity of the site per formula unit and the
+    number of moles of formula units. This class allows the site
+    multiplicities to vary linearly between endmembers.
+    This is known as a Temkin model :cite:`Temkin1945`.
     """
 
     def __init__(self, endmembers):
-        self.endmembers = endmembers
-        self.n_endmembers = len(endmembers)
-        self.site_formulae = [e[1] for e in endmembers]
+        # Initialize attributes from MechanicalSolution
+        MechanicalSolution.__init__(self, endmembers)
 
         # Process solution chemistry
         process_solution_chemistry(self)
@@ -603,7 +613,7 @@ class AsymmetricRegularSolution(IdealSolution):
     formulation as described in :cite:`HP2003`.
 
     The excess nonconfigurational Gibbs energy is given by the
-    expression:
+    expression :cite:`DPWH2007`:
 
     .. math::
         \\mathcal{G}_{\\textrm{excess}} = \\alpha^T p (\\phi^T W \\phi)
@@ -614,6 +624,35 @@ class AsymmetricRegularSolution(IdealSolution):
     .. math::
         \\phi_i = \\frac{\\alpha_i p_i}{\\sum_{k=1}^{n} \\alpha_k p_k},
         W_{ij} = \\frac{2 w_{ij}}{\\alpha_i + \\alpha_j} \\textrm{for i<j}
+
+    The :math:`w_{ij}` terms are a set of interaction terms between
+    endmembers :math:`i` and :math:`j`.
+    If all the :math:`\\alpha` terms are equal to unity,
+    a non-zero :math:`w` yields an excess with a quadratic form and
+    a maximum of :math:`w/4` half-way between the two endmembers.
+
+    :param endmembers: A list of tuples defining the endmembers
+        of the solution. Each tuple contains a :class:`burnman.Mineral` object
+        and a string defining the site formula of that endmember.
+    :type endmembers: list of tuples
+    :param alphas: A list of van Laar parameters governing asymmetry
+        in the excess properties.
+    :type alphas: list of floats
+    :param energy_interaction: A 2D list of interaction parameters
+        defining the energetic interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type energy_interaction: list of lists of floats
+    :param volume_interaction: (optional) A 2D list of interaction parameters
+        defining the volumetric interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type volume_interaction: list of lists of floats
+    :param entropy_interaction: (optional) A 2D list of interaction parameters
+        defining the entropic interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type entropy_interaction: list of lists of floats
     """
 
     def __init__(
@@ -624,7 +663,8 @@ class AsymmetricRegularSolution(IdealSolution):
         volume_interaction=None,
         entropy_interaction=None,
     ):
-        self.n_endmembers = len(endmembers)
+        # Initialize attributes from IdealSolution
+        IdealSolution.__init__(self, endmembers)
 
         # Create array of van Laar parameters
         self.alphas = np.array(alphas)
@@ -650,9 +690,6 @@ class AsymmetricRegularSolution(IdealSolution):
             )
         else:
             self.Wv = np.zeros((self.n_endmembers, self.n_endmembers))
-
-        # initialize ideal solution model
-        IdealSolution.__init__(self, endmembers)
 
     def _phi(self, molar_fractions):
         phi = self.alphas * molar_fractions
@@ -742,9 +779,43 @@ class AsymmetricRegularSolution(IdealSolution):
 
 class SymmetricRegularSolution(AsymmetricRegularSolution):
     """
-    Solution model implementing the symmetric regular solution model.
+    Solution model implementing the Symmetric Regular Solution Model.
     This is a special case of the
-    :class:`burnman.solutionmodel.AsymmetricRegularSolution` class.
+    :class:`burnman.solutionmodel.AsymmetricRegularSolution` class where
+    all van Laar parameters are equal to unity.
+
+    The excess terms in the Symmetric Regular Solution Model
+    have the matrix form :cite:`DPWH2007`
+
+    .. math::
+        \\mathcal{G}_{\\textrm{excess}} = RT \\ln \\gamma = p^T W p
+
+    where :math:`p` is a vector of molar fractions of each of the
+    :math:`n` endmembers and :math:`W` is a strictly upper-triangular
+    matrix of interaction terms between endmembers.
+    Excesses within binary systems (:math:`i`-:math:`j`) have a
+    quadratic form and a maximum of :math:`W_{ij}/4` half-way
+    between the two endmembers.
+
+    :param endmembers: A list of tuples defining the endmembers
+        of the solution. Each tuple contains a :class:`burnman.Mineral` object
+        and a string defining the site formula of that endmember.
+    :type endmembers: list of tuples
+    :param energy_interaction: A 2D list of interaction parameters
+        defining the energetic interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type energy_interaction: list of lists of floats
+    :param volume_interaction: (optional) A 2D list of interaction parameters
+        defining the volumetric interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type volume_interaction: list of lists of floats
+    :param entropy_interaction: (optional) A 2D list of interaction parameters
+        defining the entropic interactions between endmembers.
+        The list should be upper-triangular, such that the first row
+        has n-1 elements (for n endmembers), the second row has n-2 elements, etc.
+    :type entropy_interaction: list of lists of floats
     """
 
     def __init__(
@@ -821,8 +892,8 @@ class SubregularSolution(IdealSolution):
         """
         Initialization function for the SubregularSolution class.
         """
-
-        self.n_endmembers = len(endmembers)
+        # Initialize attributes from IdealSolution
+        IdealSolution.__init__(self, endmembers)
 
         # Create 3D arrays of interaction parameters
         self.Wijke = np.zeros(
@@ -884,9 +955,6 @@ class SubregularSolution(IdealSolution):
         if volume_ternary_terms is not None:
             for i, j, k, v in volume_ternary_terms:
                 self.Wijkv[i, j, k] += v
-
-        # initialize ideal solution model
-        IdealSolution.__init__(self, endmembers)
 
     def _non_ideal_function(self, Wijk, molar_fractions):
         n = len(molar_fractions)
@@ -993,11 +1061,9 @@ class FunctionSolution(IdealSolution):
         """
         Initialization function for the GeneralSolution class.
         """
-
-        # initialize ideal solution model
+        # Initialize attributes from IdealSolution
         IdealSolution.__init__(self, endmembers)
 
-        self.n_endmembers = len(endmembers)
         self._excess_gibbs_function = excess_gibbs_function
 
         # Calculate derivatives using autograd
@@ -1186,11 +1252,8 @@ class PolynomialSolution(IdealSolution):
         endmember_coefficients_and_interactions=None,
         transformation_matrix=None,
     ):
-        # initialize ideal solution model
+        # Initialize attributes from IdealSolution
         IdealSolution.__init__(self, endmembers)
-
-        self.n_endmembers = len(endmembers)
-        self.endmembers = endmembers
 
         self.W_ESV = None
         self.c_ESV = None

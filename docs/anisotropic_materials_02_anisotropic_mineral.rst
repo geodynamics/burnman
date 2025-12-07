@@ -3,5 +3,9 @@
 Anisotropic Mineral Class
 -------------------------
 
-Documentation under construction.
+.. autoclass:: burnman.classes.anisotropicmineral.AnisotropicMineral
+    :no-members:
+    :no-undoc-members:
+    :no-inherited-members:
+    :no-index:
  

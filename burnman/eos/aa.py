@@ -53,6 +53,69 @@ class AA(eos.EquationOfState):
     reproduce Figure 5. We assume that the figure is correct, and
     that the correct expression has the form:
     :math:`F(-325.23 + 302.07 (\\rho/\\rho_0) + 30.45 (\\rho/\\rho_0)^{0.4})`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``E_0``
+          - Reference internal energy.
+          - :math:`\\text{J/mol}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_S``
+          - Reference isentropic bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_S``
+          - First pressure derivative of the isentropic bulk modulus.
+          - :math:`\\text{unitless}`
+        * - ``Kprime_prime_S``
+          - Second pressure derivative of the isentropic bulk modulus.
+          - :math:`\\text{Pa}^{-1}`
+        * - ``T_0``
+          - Reference temperature on the principal isentrope.
+          - :math:`\\text{K}`
+        * - ``S_0``
+          - Reference entropy on the principal isentrope.
+          - :math:`\\text{J/K/mol}`
+        * - ``n``
+          - Number of atoms per formula unit.
+          - :math:`\\text{unitless}`
+        * - ``grueneisen_0``
+          - Reference Gruneisen parameter on the principal isentrope.
+          - :math:`\\text{unitless}`
+        * - ``grueneisen_n``
+          - Volume dependence of the Gruneisen parameter on the principal isentrope.
+          - :math:`\\text{unitless}`
+        * - ``grueneisen_prime``
+          - First pressure derivative of the Gruneisen parameter on the principal isentrope.
+          - :math:`\\text{Pa}^{-1}`
+        * - ``theta``
+          - Debye temperature on the principal isentrope.
+          - :math:`\\text{K}`
+        * - ``a``
+          - Electronic heat capacity parameter A (length 2 array).
+          - :math:`\\text{unitless}`
+        * - ``b``
+          - Electronic heat capacity parameter B (length 2 array).
+          - :math:`\\text{unitless}`
+        * - ``Theta``
+          - Volume dependence parameters for electronic heat capacity (length 2 array).
+          - :math:`\\text{unitless}`
+        * - ``lmda``
+          - Potential heat capacity parameter lambda (length 3 array).
+          - :math:`\\text{unitless}`
+        * - ``xi_0``
+          - Reference xi parameter.
+          - :math:`\\text{unitless}`
+        * - ``F``
+          - Reference F parameter (length 2 array).
+          - :math:`\\text{unitless}`
+
     """
 
     def _ABTheta(self, volume, params):

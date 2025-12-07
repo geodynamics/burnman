@@ -37,9 +37,43 @@ def _make_params(K_0, Kp_0, Kp_inf, Kdp_0):
 class SPOCK(eos.IsothermalEquationOfState):
     """
     Class for the Scaled Power Of Compression K-prime equation of state.
-    This equation is derived from the assumption that K' = b*(V/V_0)^a.
+    This equation is derived from the assumption that
 
-    This equation of state has no temperature dependence.
+    .. math::
+        K' = b \\left( \\frac{V}{V_0} \\right)^a
+
+    This equation of state is described in :cite:`Myhill2025spock`,
+    but was originally derived by :cite:`Weppner2015`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at zero pressure.
+          - Dimensionless
+        * - ``Kdprime_0``
+          - Second pressure derivative of bulk modulus at zero pressure.
+          - :math:`\\text{Pa}^{-1}`
+        * - ``Kprime_inf``
+          - Infinite pressure limit of the pressure derivative of bulk modulus.
+          - Dimensionless
+
     """
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):

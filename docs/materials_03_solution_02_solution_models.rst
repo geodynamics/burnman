@@ -3,110 +3,48 @@
 Solution Model Classes
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
-Implemented models
-^^^^^^^^^^^^^^^^^^
-
-Ideal solutions
-"""""""""""""""
-A solution is not simply a mechanical mixture of its constituent endmembers.
-The mixing of different species results in an excess configurational entropy :math:`S`.
-In Bragg-Williams-type solutions, the entropy only depends on the amounts of
-species on sites, and the site multiplicities.
-
-
-.. math::
-    \mathcal{S}_{\textrm{conf}} = R x_c^s \ln \frac{x_c^s}{\sum_{c^s} x_c^s}
-
-
-where :math:`s` is a site in the lattice, :math:`c` are the species mixing on site :math:`s`.
-:math:`x_c^s` is the absolute number of species :math:`c` on site :math:`s` in the lattice; it is calculated by
-multiplying the proportion of the species on the site by the multiplicity of the site per formula unit and the
-number of moles of formula units.
-
-Solutions where this configurational entropy is the only deviation from a mechanical mixture are termed *ideal*, because
-the enthalpy of mixing is zero. In BurnMan, the multiplicities of each site are allowed to vary linearly between endmembers. This is known as a Temkin
-model :cite:`Temkin1945`.
-
-
-
-Symmetric solutions
-"""""""""""""""""""
-Many real phases are not well approximated as ideal solutions. Deviations are the result of elastic and chemical interactions between ions with different physical and chemical characteristics. Regular (symmetric) solution models account for the simplest form of deviations from ideality by incorporating terms describing excess enthalpies, non-configurational entropies and volumes relative to the ideal solution model. These excess terms have the matrix form :cite:`DPWH2007`
-
-.. math::
-    \mathcal{G}_{\textrm{excess}} = RT \ln \gamma = p^T W p
-
-where :math:`p` is a vector of molar fractions of each of the :math:`n` endmembers and :math:`W` is a strictly upper-triangular matrix of interaction terms between endmembers. Excesses within binary systems (:math:`i`-:math:`j`) have a quadratic form and a maximum of :math:`W_{ij}/4` half-way between the two endmembers.
-
-Asymmetric solutions
-""""""""""""""""""""
-
-Some solutions exhibit asymmetric excess terms. These can be accounted for with an asymmetric solution :cite:`DPWH2007`
-
-.. math::
-    \mathcal{G}_{\textrm{excess}} = \alpha^T p (\phi^T W \phi)
-
-:math:`\alpha` is a vector of "van  Laar parameters" governing asymmetry in the excess properties.
-
-
-.. math::
-    \phi_i &= \frac{\alpha_i p_i}{\sum_{k=1}^{n} \alpha_k p_k}, \\
-    W_{ij} &= \frac{2 w_{ij}}{\alpha_i + \alpha_j} \textrm{for i<j}
-
-The :math:`w_{ij}` terms are a set of interaction terms between endmembers :math:`i` and :math:`j`. If all the :math:`\alpha` terms are equal to unity, a non-zero :math:`w` yields an excess with a quadratic form and a maximum of :math:`w/4` half-way between the two endmembers.
-
-
-Subregular solutions
-""""""""""""""""""""
-An alternative way to create asymmetric solution models is to expand each binary term as a cubic expression :cite:`HW1989`. In this case,
-
-.. math::
-    \mathcal{G}_{\textrm{excess}} = \sum_i \sum_{j > i} (p_i p_j^2 W_{ij} + p_j p_i^2 W_{ji} + \sum_{k > j > i} p_i p_j p_k W_{ijk})
-
-Note the similarity with the symmetric solution model, the primary difference being that there are two interaction terms for each binary and also additional ternary terms.
-
-
-
-Arbitrary solutions
-"""""""""""""""""""
-
-BurnMan also allows the user to define their own excess Gibbs energy function for a solution model.
-
-
-
-Thermodynamic and thermoelastic properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-From the preceeding equations, we can define the thermodynamic potentials of solutions:
-
-.. math::
-    \mathcal{G}_{\textrm{SS}} &= \sum_i n_i \left( \mathcal{G}_i + RT \ln \alpha_i \right)\\
-    \mathcal{S}_{\textrm{SS}} &= \sum_in_i\mathcal{S}_i + \mathcal{S}_{\textrm{conf}} - \frac{\partial \mathcal{G}_{\textrm{excess}}}{\partial T} \\
-    \mathcal{H}_{\textrm{SS}} &= \mathcal{G}_{\textrm{SS}} + T\mathcal{S}_{\textrm{SS}}\\
-    V_{\textrm{SS}} &= \sum_in_iV_i + \frac{\partial \mathcal{G}_{\textrm{excess}}}{\partial P}
-
-We can also define the derivatives of volume with respect to pressure and temperature
-
-.. math::
-    \alpha_{P,\textrm{SS}} &= \frac{1}{V}\left(\frac{\partial V}{\partial T}\right)_P = \left( \frac{1}{V_{\textrm{SS}}}\right)\left( \sum_i\left(n_i\,\alpha_i\,V_i \right) \right) \\
-    K_{T,\textrm{SS}} &= V\left( \frac{\partial P}{\partial V} \right)_T = V_{\textrm{SS}} \left( \frac{1}{\sum_i\left(n_i \frac{V_{i}}{K_{Ti}} \right)} + \frac{\partial P}{\partial V_{\textrm{excess}}} \right)
-
-Making the approximation that the excess entropy has no temperature dependence
-
-.. math::
-    C_{P,\textrm{SS}} &= \sum_in_iC_{Pi}\\
-    C_{V, \textrm{SS}} &= C_{P,\textrm{SS}} - V_{\textrm{SS}}\,T\,\alpha_{\textrm{SS}}^{2}\,K_{T,\textrm{SS}} \\
-    K_{S,\textrm{SS}} &= K_{T,\textrm{SS}} \,\frac{C_{P,\textrm{SS}}}{C_{V,\textrm{SS}}}\\
-    \gamma_{\textrm{SS}} &= \frac{\alpha_{\textrm{SS}}\,K_{T,\textrm{SS}}\,V_{\textrm{SS}}}{C_{V, \textrm{SS}}}
-
-
-Including order-disorder
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Order-disorder can be treated trivially with solutions. The only difference between mixing between ordered and disordered endmembers is that disordered endmembers have a non-zero configurational entropy, which must be accounted for when calculating the excess entropy within a solution.
-
-Including spin transitions
+Mean-field solution models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The regular solution formalism should provide an elegant way to model spin transitions in phases such as periclase and bridgmanite. High and low spin iron can be treated as different elements, providing distinct endmembers and an excess configurational entropy. Further excess terms can be added as necessary.
+In BurnMan, all solution models are based on mean-field theories of solutions.
+These theories, introduced by Bragg and Williams in 1934, assume that each component
+in the solution experiences an average environment created by all other components,
+rather than accounting for specific local interactions between different species.
+This simplification allows for tractable mathematical descriptions of solution behaviour.
 
+Each of the solution models below takes an ``endmembers`` argument, which is a list of
+lists. Each sub-list contains two items. The first is an instance of :class:`burnman.Mineral` 
+representing an independent endmember (or component) of the solution. The second is a
+string, which represents the occupancies of different species on distinct sites in the
+solution. For example, low pressure silicate garnets have two distinct sites on
+which mixing takes place; a dodecahedral site
+(of which there are three per unit cell on an eight-cation basis)
+and octahedral site (of which there are two per unit cell).
+A third tetrahedral cation site (three per unit cell)
+is usually assumed to be occupied solely by silicon,
+and therefore can be ignored in solution calculations.
+The chemical formula of many low pressure garnets exist within the solution:
+
+.. math::
+    \textrm{[Mg,Fe,Mn,Ca]}_3\textrm{[Al,Fe}^{\textrm{3+}}\textrm{,Cr]}_2\textrm{Si}_3\textrm{O}_{12}
+
+where the dodecahedral site is occupied by Mg, Fe, Mn and Ca,
+and the octahedral site is occupied by Al, Fe and Cr.
+The pyrope endmember, composition :math:`\textrm{Mg}_3\textrm{Al}_2\textrm{Si}_3\textrm{O}_{12}`,
+would have the corrsponding site occupancy string ``[Mg]3[Al]2Si3O12``, while andradite would have
+``[Ca]3[Fef]2Si3O12``. BurnMan also allows for partial occupancies on sites; for example,
+disordered grandite with composition :math:`\textrm{Ca}_3\textrm{AlFeSi}_3\textrm{O}_{12}` would have
+the site occupancy string ``[Ca]3[Al0.5Fef0.5]2Si3O12``. Note that distinct species do not need to
+be named as elements; the only requirement is that the names start with a capital letter and
+are followed by lower-case letters. Atom proportions and site multiplicities can be expressed
+as decimal numbers or fractions.
+
+In BurnMan, the multiplicities of each site are allowed to vary linearly between endmembers.
+This is known as a Temkin model :cite:`Temkin1945`, and is useful for modelling phases
+where the site multiplicities are not fixed by crystal structure, such as glasses or
+melts.
+
+Implemented solution models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: autogenerated/solution_models.rst
