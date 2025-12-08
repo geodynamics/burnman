@@ -129,3 +129,4 @@ Solution tools
 ==============
 
 .. autofunction:: burnman.tools.solution.transform_solution_to_new_basis
+    :noindex:

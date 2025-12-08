@@ -24,6 +24,8 @@ BurnMan: a thermodynamic and geophysics toolkit for the Earth and planetary scie
   layers_and_planets
   material_polytopes
   fitting
+  equilibration
+  thermobarometry
   tools
   utils
   examples

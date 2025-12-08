@@ -230,11 +230,12 @@ def F(
     The vector-valued function for which the root is sought.
     The first two vector values depend on the
     equality_constraints chosen. For example, if
-      - eq[i][0] = 'P', F[i] = P - eq[i][1]
-      - eq[i][0] = 'T', F[i] = T - eq[i][1]
-      - eq[i][0] = 'S', F[i] = entropy - eq[i][1]
-      - eq[i][0] = 'V', F[i] = volume - eq[i][1]
-      - eq[i][0] = 'X', np.dot(eq[i][1][0], x) - eq[i][1][1]
+
+    - eq[i][0] = 'P', F[i] = P - eq[i][1]
+    - eq[i][0] = 'T', F[i] = T - eq[i][1]
+    - eq[i][0] = 'S', F[i] = entropy - eq[i][1]
+    - eq[i][0] = 'V', F[i] = volume - eq[i][1]
+    - eq[i][0] = 'X', np.dot(eq[i][1][0], x) - eq[i][1][1]
 
     The next set of vector values correspond to the reaction affinities.
     The final set of vector values correspond to the bulk

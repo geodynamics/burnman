@@ -5655,8 +5655,8 @@ def cov():
     zero-point energies of all the endmembers in the dataset.
 
     :returns: covariance matrix dictionary, with keys 'endmember_names' and
-              'covariance_matrix'. Endmember names are in the same order as the rows
-              and columns of the covariance matrix.
+        'covariance_matrix'. Endmember names are in the same order as the rows
+        and columns of the covariance matrix.
     :rtype: dict
     """
 

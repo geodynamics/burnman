@@ -3,6 +3,9 @@
 Equilibration
 -------------
 
+Overview
+^^^^^^^^
+
 For a composite with fixed phases at a given pressure, temperature
 and composition, equilibrium is reached when the following relationships are
 satisfied:
@@ -17,5 +20,11 @@ reactions between endmembers.
 It is generally true that at a fixed composition, one can choose two
 equilibrium constraints (such as fixed temperature, pressure, entropy, volume,
 phase proportion or some composition constraint) and solve for the remaining
-unknowns. In BurnMan, this can be achieved using the equilibrate function
-(see :ref:`ref-equilibrate`).
+unknowns. In BurnMan, this can be achieved using the :func:`burnman.equilibrate`
+function.
+
+Implemented function
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: burnman.equilibrate
+    :no-index:

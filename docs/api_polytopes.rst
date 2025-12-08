@@ -28,3 +28,4 @@ Polytope tools
 --------------
 
 .. automodule:: burnman.tools.polytope
+    :noindex:
