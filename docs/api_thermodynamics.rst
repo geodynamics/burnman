@@ -22,8 +22,10 @@ Chemistry parsing and thermodynamics
 ------------------------------------
 
 .. automodule:: burnman.utils.chemistry
+    :no-index:
 
 .. automodule:: burnman.tools.chemistry
+    :noindex:
 
 
 .. _ref-equilibrate:
@@ -32,5 +34,7 @@ Equilibrium Thermodynamics
 ==========================
 
 .. autofunction:: burnman.tools.equilibration.equilibrate
+    :noindex:
 
 .. autofunction:: burnman.tools.equilibration.get_equilibration_parameters
+    :noindex:

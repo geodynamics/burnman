@@ -39,3 +39,4 @@ Attenuation Correction
 -----------------------
 
 .. autofunction:: burnman.tools.seismic.attenuation_correction
+    :noindex:

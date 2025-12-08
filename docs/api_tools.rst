@@ -1,28 +1,4 @@
-Utilities
-=========
-
-BurnMan has a number of low-level utilities to help achieve common goals.
-Several of these have already been described in previous sections.
-
-
-Unit cell
----------
-
-.. automodule:: burnman.utils.unitcell
-
-
-
-Mathematical
-------------
-
-.. automodule:: burnman.utils.math
-
-
-Miscellaneous
--------------
-
-.. automodule:: burnman.utils.misc
-
+.. _ref-api-tools:
 
 Tools
 =====
@@ -30,26 +6,63 @@ Tools
 Burnman has a number of high-level tools to help achieve common goals.
 Several of these have already been described in previous sections.
 
+Unit cell
+---------
+
+.. automodule:: burnman.tools.unitcell
+    :inherited-members:
+    :show-inheritance:
+
+Equilibration
+-------------
+
+.. automodule:: burnman.tools.equilibration
+
+.. _ref-api-tools-thermobarometry:
 
 Optimal thermobarometry
 -----------------------
 
 .. automodule:: burnman.tools.thermobarometry
 
+Equations of state
+------------------
+
+.. automodule:: burnman.tools.eos
+
+Solution 
+--------
+
+.. automodule:: burnman.tools.solution
+
+Chemistry
+---------
+
+.. automodule:: burnman.tools.chemistry
+
+
+Partitioning
+------------
+
+.. automodule:: burnman.tools.partitioning
 
 Plotting
 --------
 
 .. automodule:: burnman.tools.plot
 
+Seismic
+-------
+
+.. automodule:: burnman.tools.seismic
 
 Output for seismology
 ---------------------
 
 .. automodule:: burnman.tools.output_seismo
 
+Polytopes
+---------
 
-Equations of state
-------------------
+.. automodule:: burnman.tools.polytope
 
-.. automodule:: burnman.tools.eos

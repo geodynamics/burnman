@@ -328,7 +328,7 @@ def estimate_conditions(
     """
     Perform a least-squares inversion to find the optimal pressure and
     temperature for a given mineral assemblage.
-    Algorithm modified from Powell and Holland (1994).
+    Algorithm modified from :cite:`Powell1994`.
 
     :param assemblage: The mineral assemblage for which to perform the
         inversion. Each solution phase in the assemblage must have its
@@ -341,8 +341,11 @@ def estimate_conditions(
         amounts of endmembers of that phase in each vector.
     :type assemblage: Assemblage
 
-    :param dataset_covariances: The covariance data from the thermodynamic
-        dataset.
+    :param dataset_covariances: The covariance data describing the
+        uncertainties in endmember energies, taken from the thermodynamic
+        dataset. For example, the covariance for the Holland et al. (2018)
+        dataset can be obtained using
+        :func:`burnman.minerals.HGP_2018_ds633.cov`.
     :type dataset_covariances: dict, with keys 'endmember_names' and
         'covariance_matrix'. Default is None, in which case only
         compositional uncertainties are considered.
