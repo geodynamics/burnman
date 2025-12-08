@@ -49,7 +49,7 @@ if __name__ == "__main__":
     pressure, seis_rho, seis_vphi, seis_vs = seismic_model.evaluate(
         ["pressure", "density", "v_phi", "v_s"], depths
     )
-    temperature = burnman.geotherm.brown_shankland(depths)
+    temperature = burnman.geotherm.BrownShankland().temperatures(depths)
 
     """
     This is the main workhorse of this script.  We define the function ``misfit''

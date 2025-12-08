@@ -79,7 +79,7 @@ if __name__ == "__main__":
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             rock.set_method(methods[m])
-        temperature = burnman.geotherm.adiabatic(seis_p, T0, rock)
+        temperature = burnman.geotherm.adiabatic_profile(seis_p, rock, T0)
 
         print("Calculations are done for:")
         rock.debug_print()

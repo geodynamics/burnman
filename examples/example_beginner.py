@@ -18,7 +18,7 @@ for visual comparison.
 * :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
-* :func:`burnman.geotherm.brown_shankland`
+* :class:`burnman.geotherm.BrownShankland`
 * :func:`burnman.Material.evaluate`
 
 
@@ -78,7 +78,8 @@ if __name__ == "__main__":
     # Now we get an array of temperatures at which we compute
     # the seismic properties of the rock.  Here we use the Brown+Shankland (1981)
     # geotherm for mapping depths to temperature.
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
 
     # This is the step that does the heavy lifting.  burnman.evaluate
     # sets the state of the rock at each of the pressures and temperatures defined,

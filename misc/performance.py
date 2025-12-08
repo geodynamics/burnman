@@ -62,7 +62,7 @@ if True:
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperature = burnman.geotherm.brown_shankland(depths)
+    temperature = burnman.geotherm.BrownShankland().temperatures(depths)
 
     def calc_velocities(a, b, c):
         amount_perovskite = a

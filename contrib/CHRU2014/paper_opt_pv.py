@@ -90,7 +90,7 @@ if __name__ == "__main__":
             [amount_perovskite, 1.0 - amount_perovskite],
         )
         rock.set_method(method)
-        temperature = burnman.geotherm.adiabatic(seis_p, 1900, rock)
+        temperature = burnman.geotherm.adiabatic_profile(seis_p, rock, 1900.0)
         print("Calculations are done for:")
         rock.debug_print()
 

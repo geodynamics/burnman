@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -11,8 +11,8 @@ example_averaging
 This example shows the effect of different averaging schemes. Currently four
 averaging schemes are available:
 
-1. Voight-Reuss-Hill
-2. Voight averaging
+1. Voigt-Reuss-Hill
+2. Voigt averaging
 3. Reuss averaging
 4. Hashin-Shtrikman averaging
 
@@ -67,7 +67,8 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperatures = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperatures = geotherm.temperatures(depths)
 
     print("Calculations are done for:")
     rock.debug_print()

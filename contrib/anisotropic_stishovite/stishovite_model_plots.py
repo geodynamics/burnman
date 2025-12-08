@@ -442,7 +442,8 @@ if plot_isotropic_velocities:
     pressures = np.linspace(9.0e9, 128e9, 501)
     seismic_model = burnman.seismic.PREM()
     depths = seismic_model.depth(pressures)
-    temperatures = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperatures = geotherm.temperatures(depths)
 
     fig = plt.figure()
     ax = [fig.add_subplot(1, 1, 1)]

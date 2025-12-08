@@ -29,19 +29,19 @@ class mypericlase(burnman.Mineral):
 
 class geotherm(BurnManTest):
     def test_brown_shankland(self):
-        T = burnman.geotherm.brown_shankland([600.0e3])
+        T = burnman.geotherm.BrownShankland().temperatures([600.0e3])
         self.assertArraysAlmostEqual(T, [1825.0])
 
     def test_anderson(self):
-        T = burnman.geotherm.anderson([621.0e3])
+        T = burnman.geotherm.Anderson().temperatures([621.0e3])
         self.assertArraysAlmostEqual(T, [1805.0])
 
     def test_stacey_continental(self):
-        T = burnman.geotherm.stacey_continental([11.0e3, 620.0e3])
+        T = burnman.geotherm.StaceyContinental().temperatures([11.0e3, 620.0e3])
         self.assertArraysAlmostEqual(T, [540.0, 2225])
 
     def test_stacey_oceanic(self):
-        T = burnman.geotherm.stacey_oceanic([11.0e3, 620.0e3])
+        T = burnman.geotherm.StaceyOceanic().temperatures([11.0e3, 620.0e3])
         self.assertArraysAlmostEqual(T, [550.0, 2225])
 
     def test_adiabat(self):
@@ -49,7 +49,47 @@ class geotherm(BurnManTest):
         pressure = [100.0e9, 150.0e9]
         rock.set_method("slb3")
         T0 = 1500.0
-        test_K_adiabat = burnman.geotherm.adiabatic(pressure, T0, rock)
+        test_K_adiabat = burnman.geotherm.adiabatic_profile(pressure, rock, T0)
+        self.assertArraysAlmostEqual(test_K_adiabat, [1500, 1650.22034002])
+
+    def test_adiabat_with_different_anchor_pressure(self):
+        rock = mypericlase()
+
+        # First get the value at 50 GPa
+        pressure = [100.0e9, 50.0e9]
+        rock.set_method("slb3")
+        T0 = 1500.0
+        T_at_50GPa = burnman.geotherm.adiabatic_profile(pressure, rock, T0)[-1]
+
+        # Now use that as the anchor temperature at 50 GPa
+        pressure = [100.0e9, 150.0e9]
+        test_K_adiabat = burnman.geotherm.adiabatic_profile(
+            pressure, rock, T_at_50GPa, P_0=50.0e9
+        )
+        self.assertArraysAlmostEqual(test_K_adiabat, [1500, 1650.22034002])
+
+    def test_adiabatic_geotherm(self):
+        rock = mypericlase()
+        rock.set_method("slb3")
+        T0 = 1500.0
+        P0 = 100.0e9
+        adiabat = burnman.geotherm.AdiabaticGeotherm(rock, T0, P0)
+        pressure = [100.0e9, 150.0e9]
+        test_K_adiabat = adiabat.temperatures_from_pressures(pressure)
+        self.assertArraysAlmostEqual(test_K_adiabat, [1500, 1650.22034002])
+
+    def test_adiabatic_geotherm_with_prem(self):
+        rock = mypericlase()
+        rock.set_method("slb3")
+
+        prem = burnman.seismic.prem_model
+
+        T0 = 1500.0
+        P0 = 100.0e9
+        adiabat = burnman.geotherm.AdiabaticGeotherm(rock, T0, P0, prem)
+        pressure = [100.0e9, 150.0e9]
+        depths = prem.depth(pressure)
+        test_K_adiabat = adiabat.temperatures(depths)
         self.assertArraysAlmostEqual(test_K_adiabat, [1500, 1650.22034002])
 
 

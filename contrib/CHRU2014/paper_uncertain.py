@@ -73,7 +73,9 @@ if __name__ == "__main__":
         rock = burnman.Composite([my_perovskite(uncertain)], [1.0])
         rock.set_method("slb3")
 
-        temperature = burnman.geotherm.adiabatic(seis_p, 1900 * uncertain[8], rock)
+        temperature = burnman.geotherm.adiabatic_profile(
+            seis_p, rock, 1900 * uncertain[8]
+        )
 
         mat_rho, mat_vs, mat_vphi = rock.evaluate(
             ["rho", "v_s", "v_phi"], seis_p, temperature

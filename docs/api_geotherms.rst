@@ -3,4 +3,4 @@
 Geotherms
 =========
 
-.. automodule:: burnman.utils.geotherm
+.. automodule:: burnman.classes.geotherm
