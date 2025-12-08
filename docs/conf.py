@@ -486,7 +486,7 @@ with open(output_rst, "w") as f:
 
             if string_key is not None:
                 cls_name = eos_names[string_key]
-                heading = f"{cls_name} (\"{string_key}\")"
+                heading = f"{cls_name} ({string_key})"
                 f.write(f"{heading}\n{'^' * len(heading)}\n\n")
             else:
                 f.write(f"{cls}\n{'^' * len(cls)}\n\n")
@@ -524,7 +524,7 @@ with open(output_rst, "w") as f:
 
             if string_key is not None:
                 cls_name = eos_names[string_key]
-                heading = f"{cls_name} (\"{string_key}\")"
+                heading = f"{cls_name} ({string_key})"
                 f.write(f"{heading}\n{'^' * len(heading)}\n\n")
             else:
                 f.write(f"{cls}\n{'^' * len(cls)}\n\n")
@@ -543,7 +543,7 @@ output_rst = os.path.join(
 with open(output_rst, "w") as f:
     for string, func in modifier_functions.items():
         name = modifier_names[string]
-        header = f"{name} (available as \"{string}\")"
+        header = f"{name} (available as {string})"
         f.write(f"{header}\n")
         f.write('"' * len(header) + "\n\n")
         f.write(f".. autofunction:: burnman.eos.property_modifiers.{func.__name__}\n")

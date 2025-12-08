@@ -880,12 +880,14 @@ def einstein_delta_excesses(pressure, temperature, params):
 
 
 modifier_names = OrderedDict()
-modifier_names["landau"] = "Landau tricritical model :cite:`Putnis1992`"
-modifier_names["landau_slb_2022"] = "Landau tricritical model :cite:`Stixrude2022`"
-modifier_names["landau_hp"] = "Landau tricritical model :cite:`Holland1998`"
+modifier_names["landau"] = "Landau tricritical model (Putnis, 1992)"
+modifier_names["landau_slb_2022"] = (
+    "Landau tricritical model (Stixrude and Lithgow-Bertelloni, 2022)"
+)
+modifier_names["landau_hp"] = "Landau tricritical model (Holland and Powell, 1998)"
 modifier_names["linear"] = "Linear in P and T"
 modifier_names["bragg_williams"] = "Bragg-Williams model"
-modifier_names["magnetic_chs"] = "Magnetic ordering :cite:`CHS1987`"
+modifier_names["magnetic_chs"] = "Magnetic ordering (Chin et al., 1987)"
 modifier_names["debye"] = "Debye model excess (Helmholtz)"
 modifier_names["debye_delta"] = "Debye model excess (internal energy)"
 modifier_names["einstein"] = "Einstein model excess (Helmholtz)"
