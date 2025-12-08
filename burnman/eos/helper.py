@@ -39,40 +39,45 @@ class CombinedMineralMethod(object):
 
 
 eos_names = OrderedDict()
-eos_names["murnaghan"] = "Murnaghan EoS :cite:`Murnaghan1944`"
+eos_names["murnaghan"] = "Murnaghan EoS (Murnaghan, 1944)"
 eos_names["bm3shear2"] = (
-    "3rd-order Birch-Murnaghan with 2nd order Shear Modulus expansion :cite:`Birch1947`"
+    "3rd-order Birch-Murnaghan with 2nd order Shear Modulus expansion (Birch, 1947)"
 )
-eos_names["bm3"] = "3rd-order Birch-Murnaghan EoS :cite:`Birch1947`"
-eos_names["bm4"] = "4th-order Birch-Murnaghan EoS :cite:`Birch1947`"
-eos_names["vinet"] = "Vinet EoS :cite:`vinet1987`"
-eos_names["morse"] = "Morse Potential EoS :cite:`Morse1929`"
-eos_names["rkprime"] = "Reciprocal K' EoS :cite:`StaceyDavis2004`"
-eos_names["mgd2"] = "Mie-Gruneisen-Debye 2nd-order EoS :cite:`Matas2007`"
-eos_names["mgd3"] = "Mie-Gruneisen-Debye 3rd-order EoS :cite:`Matas2007`"
-eos_names["slb2"] = "Stixrude and Lithgow-Bertelloni 2nd-order EoS :cite:`Stixrude2005`"
-eos_names["slb3"] = "Stixrude and Lithgow-Bertelloni 3rd-order EoS :cite:`Stixrude2005`"
+eos_names["bm3"] = "3rd-order Birch-Murnaghan EoS (Birch, 1947)"
+eos_names["bm4"] = "4th-order Birch-Murnaghan EoS (Birch, 1947)"
+eos_names["vinet"] = "Vinet EoS (Vinet et al., 1987)"
+eos_names["morse"] = "Morse Potential EoS (Morse, 1929)"
+eos_names["rkprime"] = "Reciprocal K' EoS (Stacey and Davis, 2004)"
+eos_names["mgd2"] = "Mie-Gruneisen-Debye 2nd-order EoS (Matas et al., 2007)"
+eos_names["mgd3"] = "Mie-Gruneisen-Debye 3rd-order EoS (Matas et al., 2007)"
+eos_names["slb2"] = (
+    "Stixrude and Lithgow-Bertelloni 2nd-order EoS (Stixrude and Lithgow-Bertelloni, 2005)"
+)
+eos_names["slb3"] = (
+    "Stixrude and Lithgow-Bertelloni 3rd-order EoS (Stixrude and Lithgow-Bertelloni, 2005)"
+)
 eos_names["slb3-conductive"] = (
-    "Stixrude and Lithgow-Bertelloni 3rd-order EoS with Conductive Heat Transport :cite:`Stixrude2024`"
+    "Stixrude and Lithgow-Bertelloni 3rd-order Conductive EoS (Stixrude and Lithgow-Bertelloni, 2024)"
 )
-eos_names["dks_l"] = "De Koker and Stixrude Liquid EoS :cite:`deKoker2013`"
-eos_names["dks_s"] = "De Koker and Stixrude Solid EoS :cite:`deKoker2013`"
+eos_names["dks_l"] = "De Koker and Stixrude Liquid EoS (de Koker and Stixrude, 2013)"
+eos_names["dks_s"] = "De Koker and Stixrude Solid EoS (de Koker and Stixrude, 2013)"
 eos_names["modular_mgd"] = "Modular Mie-Gruneisen-Debye EoS"
 eos_names["modular_mgd_with_anharmonicity"] = (
     "Modular Mie-Gruneisen-Debye EoS with Anharmonicity"
 )
-eos_names["mt"] = "Modified Tait EoS :cite:`HC1974`"
-eos_names["macaw"] = "MACAW EoS :cite:`Lozano2022`"
-eos_names["spock"] = "SPOCK EoS :cite:`Myhill2025spock`"
-eos_names["hp98"] = "Holland and Powell 1998 EoS :cite:`Holland1998`"
-eos_names["hp_tmt"] = "Holland and Powell Modified Tait Thermal EoS :cite:`HP2011`"
-eos_names["hp_tmtL"] = (
-    "Holland and Powell Modified Tait Thermal Liquid EoS :cite:`HP2011`"
+eos_names["mt"] = "Modified Tait EoS (Huang and Chow, 1974)"
+eos_names["macaw"] = "MACAW EoS (Lozano and Aslam, 2022)"
+eos_names["spock"] = "SPOCK EoS (Myhill, 2025)"
+eos_names["hp98"] = "Holland and Powell 1998 EoS (Holland and Powell, 1998)"
+eos_names["hp_tmt"] = (
+    "Holland and Powell Modified Tait Thermal EoS (Holland and Powell, 2011)"
 )
-eos_names["cork"] = "CORK EoS :cite:`HP1991`"
-eos_names["brosh_calphad"] = "Brosh CALPHAD EoS :cite:`Brosh2007`"
-eos_names["aa"] = "Anderson and Ahrens Liquid Metal EoS :cite:`AA1994`"
-
+eos_names["hp_tmtL"] = (
+    "Holland and Powell Modified Tait Thermal Liquid EoS (Holland and Powell, 2011)"
+)
+eos_names["cork"] = "CORK EoS (Holland and Powell, 1991)"
+eos_names["brosh_calphad"] = "Brosh CALPHAD EoS (Brosh, 2007)"
+eos_names["aa"] = "Liquid Metal EoS (Anderson and Ahrens, 1994)"
 eos_methods = OrderedDict()
 eos_methods["murnaghan"] = murnaghan.Murnaghan
 eos_methods["bm3shear2"] = bm.BM3Shear2

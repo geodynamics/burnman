@@ -5,9 +5,8 @@
 version: 2
 
 # Specify the formats to build
-# Turn off pdf build until we can fix the LaTeX issues
-# formats: pdf, epub, htmlzip
 formats:
+  - pdf
   - epub
   - htmlzip
 
