@@ -16,7 +16,7 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
-* :func:`burnman.geotherm.brown_shankland`
+* :class:`burnman.geotherm.BrownShankland`
 * :func:`burnman.Material.evaluate`
 * :func:`burnman.utils.math.l2_norm_profiles`
 
@@ -52,7 +52,8 @@ if __name__ == "__main__":
     )
 
     # Define geotherm
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
 
     # Define solid solutions
     perovskite = minerals.SLB_2011.mg_fe_perovskite()

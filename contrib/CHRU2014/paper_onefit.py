@@ -318,7 +318,7 @@ if __name__ == "__main__":
         lit.append(mymaplit[n])
 
     rock, anchor_t = array_to_rock(fit, names)
-    temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+    temperature = burnman.geotherm.adiabatic_profile(pressure, rock, anchor_t)
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = rock.evaluate(
         ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressure, temperature
@@ -398,7 +398,7 @@ if __name__ == "__main__":
     )
 
     rock, anchor_t = array_to_rock(lit, names)
-    temperature = burnman.geotherm.adiabatic(pressure, anchor_t, rock)
+    temperature = burnman.geotherm.adiabatic_profile(pressure, rock, anchor_t)
     rock.set_averaging_scheme(burnman.averaging_schemes.HashinShtrikmanAverage())
     rho, vp, vs, vphi, K, G = rock.evaluate(
         ["rho", "v_p", "v_s", "v_phi", "K_eff", "G_eff"], pressure, temperature

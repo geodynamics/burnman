@@ -224,7 +224,6 @@ import importlib.metadata
 
 # Low level utility functions
 from . import utils
-from .utils import geotherm
 
 # Classes and associated functions for representing rocks and minerals:
 from .classes.material import Material, material_property
@@ -253,6 +252,7 @@ from .classes.layer import Layer, BoundaryLayerPerturbation
 from .classes.planet import Planet
 from .classes.polytope import MaterialPolytope
 from .classes import seismic
+from .classes import geotherm
 from .classes import averaging_schemes
 
 # Mineral library

@@ -124,7 +124,8 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
 
     print("Calculations are done for:")
     rock.debug_print()

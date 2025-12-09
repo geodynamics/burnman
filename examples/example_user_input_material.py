@@ -98,7 +98,8 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
     # The next line is not required here, because the method is set
     # automatically by defining 'equation_of_state' in mineral.params. This
     # shows an alternative way to set the method later, or reset the method to

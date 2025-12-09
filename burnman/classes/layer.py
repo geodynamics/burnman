@@ -9,7 +9,7 @@ from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
 from scipy.optimize import fsolve
 from burnman import constants
-from burnman.utils import geotherm
+from .geotherm import adiabatic_profile
 import warnings
 
 from .material import Material, material_property
@@ -328,10 +328,10 @@ class Layer(object):
             self.temperature_mode == "adiabatic"
             or self.temperature_mode == "perturbed-adiabatic"
         ):
-            adiabat = geotherm.adiabatic(
+            adiabat = adiabatic_profile(
                 pressures[::-1],
-                temperature_top - self.usertemperatures[-1],
                 self.material,
+                temperature_top - self.usertemperatures[-1],
             )[::-1]
         else:
             adiabat = np.zeros_like(self.radii)

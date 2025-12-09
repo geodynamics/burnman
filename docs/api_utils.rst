@@ -20,11 +20,6 @@ Anisotropy
 
 .. automodule:: burnman.utils.anisotropy
 
-Geotherm
---------
-
-.. automodule:: burnman.utils.geotherm
-    :no-index:
 
 Plotting
 --------

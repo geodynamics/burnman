@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2015 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -13,16 +13,19 @@ These are:
 
 1. Brown and Shankland, 1981 :cite:`Brown1981`
 2. Anderson, 1982 :cite:`anderson1982earth`
-3. Watson and Baxter, 2007 :cite:`Watson2007`
-4. linear extrapolation
-5. Read in from file from user
-6. Adiabatic from potential temperature and choice of mineral
+3. Stacey, 1977 continental :cite:`stacey1977`
+4. Stacey, 1977 oceanic :cite:`stacey1977`
+5. Custom tabulated geotherm
+6. Adiabatic geotherm for a given mineral assemblage
 
 *Uses:*
 
-* :func:`burnman.geotherm.brown_shankland`
-* :func:`burnman.geotherm.anderson`
-* input geotherm file *input_geotherm/example_geotherm.txt* (optional)
+* :class:`burnman.geotherm.BrownShankland`
+* :class:`burnman.geotherm.Anderson`
+* :class:`burnman.geotherm.StaceyContinental`
+* :class:`burnman.geotherm.StaceyOceanic`
+* :class:`burnman.geotherm.Geotherm`
+* :class:`burnman.geotherm.AdiabaticGeotherm`
 * :class:`burnman.Composite` for adiabat
 
 *Demonstrates:*
@@ -40,39 +43,35 @@ from burnman import minerals
 
 
 if __name__ == "__main__":
-    # we want to evaluate several geotherms at these values
+    # We want to evaluate several geotherms at particular pressures
+    # The geotherms are defined as a function of depth, so we convert pressure
+    # to depth using a seismic model, in this case PREM
     pressures = np.arange(9.0e9, 128e9, 3e9)
     seismic_model = burnman.seismic.PREM()
     depths = seismic_model.depth(pressures)
-    # load two builtin geotherms and evaluate the temperatures at all pressures
-    temperature1 = burnman.geotherm.brown_shankland(depths)
-    temperature2 = burnman.geotherm.anderson(depths)
 
-    # a geotherm is actually just a function that returns a list of temperatures given pressures in Pa
-    # so we can just write our own function
-    my_geotherm_function = lambda p: [1500 + (2500 - 1500) * x / 128e9 for x in p]
-    temperature3 = my_geotherm_function(pressures)
+    # Load the geotherms packaged with BurnMan
+    geotherm_BrownShankland = burnman.geotherm.BrownShankland()
+    geotherm_Anderson = burnman.geotherm.Anderson()
+    geotherm_StaceyContinental = burnman.geotherm.StaceyContinental()
+    geotherm_StaceyOceanic = burnman.geotherm.StaceyOceanic()
 
-    # what about a geotherm defined from datapoints given in a file (our
-    # inline)?
-    table = [[1e9, 1600], [30e9, 1700], [130e9, 2700]]
-    # this could also be loaded from a file, just uncomment this
-    # table = burnman.utils.misc.read_table("input_geotherm/example_geotherm.txt")
+    # Evaluate the temperatures at the desired depths
+    temperature_BrownShankland = geotherm_BrownShankland.temperatures(depths)
+    temperature_Anderson = geotherm_Anderson.temperatures(depths)
+    temperature_StaceyContinental = geotherm_StaceyContinental.temperatures(depths)
+    temperature_StaceyOceanic = geotherm_StaceyOceanic.temperatures(depths)
 
-    table_pressure = np.array(table)[:, 0]
-    table_temperature = np.array(table)[:, 1]
+    # We can also define our own geotherm using the Geotherm class.
+    depths_array = [0.0, 100.0e3, 660.0e3, 3000.0e3]
+    temperatures_array = [300.0, 1500.0, 1900.0, 2500.0]
+    geotherm_custom = burnman.geotherm.Geotherm(depths_array, temperatures_array)
+    temperature_custom = geotherm_custom.temperatures(depths)
 
-    my_geotherm_interpolate = lambda p: [
-        np.interp(x, table_pressure, table_temperature) for x in p
-    ]
-
-    temperature4 = my_geotherm_interpolate(pressures)
-
-    # finally, we can also calculate a self consistent
-    # geotherm for an assemblage of minerals
-    # based on self compression of the composite rock.
-    # First we need to define an assemblage
-    amount_perovskite = 0.8
+    # We can also calculate an adiabatic geotherm for a given material.
+    # For this we need to define a material, for example a perovskite
+    # and ferropericlase assemblage.
+    molar_fraction_perovskite = 0.8
     fe_pv = 0.05
     fe_pc = 0.2
     pv = minerals.SLB_2011.mg_fe_perovskite()
@@ -80,30 +79,42 @@ if __name__ == "__main__":
     pv.set_composition([1.0 - fe_pv, fe_pv, 0.0])
     pc.set_composition([1.0 - fe_pc, fe_pc])
     example_rock = burnman.Composite(
-        [pv, pc], [amount_perovskite, 1.0 - amount_perovskite]
+        [pv, pc], [molar_fraction_perovskite, 1.0 - molar_fraction_perovskite]
     )
 
-    # next, define an anchor temperature at which we are starting.
-    # Perhaps 1500 K for the upper mantle
-    T0 = 1500.0
-    # then generate temperature values using the self consistent function.
-    # This takes more time than the above methods
-    temperature5 = burnman.geotherm.adiabatic(pressures, T0, example_rock)
+    # Next, define an anchor temperature at the first depth
+    # and calculate the adiabatic geotherm.
+    # Let's choose 1600 K for the upper mantle at 9 GPa
+    # (the first pressure in the list).
+    T_0 = 1600.0
+    geotherm_adiabatic = burnman.geotherm.AdiabaticGeotherm(
+        example_rock, T_0=T_0, P_0=9.0e9, depth_to_pressure_model=seismic_model
+    )
+    temperature_adiabatic = geotherm_adiabatic.temperatures(depths)
 
-    # you can also look at burnman/geotherm.py to see how the geotherms are
-    # implemented
+    # Finally, we plot the results
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(1, 1, 1)
 
-    plt.plot(pressures / 1e9, temperature1, "-r", label="Brown, Shankland")
-    plt.plot(pressures / 1e9, temperature2, "-c", label="Anderson")
-    plt.plot(pressures / 1e9, temperature3, "-b", label="handwritten linear")
-    plt.plot(pressures / 1e9, temperature4, "-k", label="handwritten from table")
-    plt.plot(
-        pressures / 1e9, temperature5, "-m", label="Adiabat with pv (70%) and fp(30%)"
+    ax.plot(
+        pressures / 1e9, temperature_BrownShankland, "-r", label="Brown & Shankland"
+    )
+    ax.plot(pressures / 1e9, temperature_Anderson, "-c", label="Anderson")
+    ax.plot(
+        pressures / 1e9, temperature_StaceyContinental, "-g", label="Stacey Continental"
+    )
+    ax.plot(pressures / 1e9, temperature_StaceyOceanic, "-b", label="Stacey Oceanic")
+    ax.plot(pressures / 1e9, temperature_custom, "-k", label="Custom Geotherm")
+    ax.plot(
+        pressures / 1e9,
+        temperature_adiabatic,
+        "-m",
+        label="Adiabat with pv (80%) and fp(20%)",
     )
 
-    plt.legend(loc="lower right")
-    plt.xlim([8.5, 130])
-    plt.xlabel("Pressure/GPa")
-    plt.ylabel("Temperature")
-    plt.savefig("output_figures/example_geotherm.png")
+    ax.legend(loc="lower right")
+    ax.set_xlim([8.5, 130])
+    ax.set_xlabel("Pressure/GPa")
+    ax.set_ylabel("Temperature")
+    fig.savefig("output_figures/example_geotherm.png")
     plt.show()
