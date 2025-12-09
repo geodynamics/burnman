@@ -32,7 +32,7 @@ BurnMan began as a working-group at the 2012 CIDER workshop in Santa Barbara. It
 * Source code: https://github.com/geodynamics/burnman
 * Forums: https://community.geodynamics.org/c/burnman
 
-Authors (as of 2024):
+Authors (as of 2025):
 * Bob (Robert) Myhill (main contributor)
 * Sanne Cottaar
 * Timo Heister
