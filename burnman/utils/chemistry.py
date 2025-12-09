@@ -37,17 +37,9 @@ def read_masses():
     return lookup
 
 
-"""
-atomic_masses is a dictionary of atomic masses
-"""
-atomic_masses = read_masses()
+atomic_masses = read_masses()  #: atomic_masses is a dictionary of atomic masses
 
-"""
-IUPAC_element_order provides a list of all the elements.
-Element order is based loosely on electronegativity,
-following the scheme suggested by IUPAC, except that H
-comes after the Group 16 elements, not before them.
-"""
+
 IUPAC_element_order = [
     "v",
     "Og",
@@ -167,8 +159,8 @@ IUPAC_element_order = [
     "I",
     "Br",
     "Cl",
-    "F",
-]  # Group 17
+    "F",  # Group 17
+]  #: IUPAC_element_order is a list of all the elements. Element order is based loosely on electronegativity, following the scheme suggested by IUPAC, except that H comes after the Group 16 elements, not before them.
 
 
 def dictionarize_formula(formula):
