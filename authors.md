@@ -13,6 +13,10 @@ BurnMan is developed by a collaborative and inclusive community.
 * Timo Heister (Clemson University, USA)
 * Ian Rose (Independent Researcher, USA)
 * Cayman Unterborn (Southwest Research Institute, USA)
+* Benedict Heinen (University of Bristol, UK)
+* Robert Farla (Deutsches Elektronen-Synchrotron DESY, Germany)
+* Juliane Dannberg (GEOMAR Helmholtz Centre for Ocean Research Kiel, Germany)
+* Rene Gassmoeller (GEOMAR Helmholtz Centre for Ocean Research Kiel, Germany)
 
 ### Contributors
 

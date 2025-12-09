@@ -34,14 +34,14 @@ BurnMan began as a working-group at the 2012 CIDER workshop in Santa Barbara. It
 
 Authors (as of 2024):
 * Bob (Robert) Myhill (main contributor)
-* Cayman Unterborn
-* Ian Rose
 * Sanne Cottaar
 * Timo Heister
+* Ian Rose
+* Cayman Unterborn
+* Benedict Heinen
+* Robert Farla
 * Juliane Dannberg
 * Rene Gassmoeller
-* Robert Farla
-* Benedict Heinen
 
 ## Citing BurnMan
 
