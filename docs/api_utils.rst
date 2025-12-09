@@ -13,7 +13,12 @@ Unit cell
 Chemistry
 ---------
 
+.. autodata:: burnman.utils.chemistry.IUPAC_element_order
+
+.. autodata:: burnman.utils.chemistry.atomic_masses
+
 .. automodule:: burnman.utils.chemistry
+    :exclude-members: read_masses, atomic_masses, IUPAC_element_order
 
 Anisotropy
 ----------
