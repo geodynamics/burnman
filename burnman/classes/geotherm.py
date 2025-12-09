@@ -35,6 +35,9 @@ class Geotherm:
         self.depths_array = np.asarray(depths_array)
         self.temperatures_array = np.asarray(temperatures_array)
 
+        self.minimum_depth = self.depths_array.min()
+        self.maximum_depth = self.depths_array.max()
+
     def temperatures(self, depths):
         """
         Evaluate the geotherm at given depths.
@@ -48,67 +51,225 @@ class Geotherm:
         """
         depths = np.asarray(depths)
 
-        if depths.min() < self.depths_array.min():
+        z_min = depths.min()
+        z_max = depths.max()
+        if z_min < self.minimum_depth:
             raise ValueError(
-                f"Requested depth ({depths.min()}) m is shallower than "
-                f"minimum geotherm depth ({self.depths_array.min()}) m."
+                f"Requested depth ({z_min}) m is shallower than "
+                f"minimum geotherm depth ({self.minimum_depth}) m."
             )
-        if depths.max() > self.depths_array.max():
+        if z_max > self.maximum_depth:
             raise ValueError(
-                f"Requested depth ({depths.max()}) m is deeper than "
-                f"maximum geotherm depth ({self.depths_array.max()}) m."
+                f"Requested depth ({z_max}) m is deeper than "
+                f"maximum geotherm depth ({self.maximum_depth}) m."
             )
-        temperature = np.empty_like(depths)
+        temperatures = np.empty_like(depths)
 
         for i, d in enumerate(depths):
-            temperature[i] = lookup_and_interpolate(
+            temperatures[i] = lookup_and_interpolate(
                 self.depths_array, self.temperatures_array, d
             )
 
-        return temperature
+        return temperatures
 
 
 class BrownShankland(Geotherm):
     """
-    Geotherm from Brown & Shankland (1981)
+    Geotherm from Brown and Shankland, 1981 (:cite:`Brown1981`)
     """
 
     def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
         table = read_table("input_geotherm/brown_81.txt")
         Geotherm.__init__(self, table[:, 0], table[:, 1])
 
 
 class Anderson(Geotherm):
     """
-    Geotherm from Anderson (1982)
+    Geotherm from Anderson, 1982 (:cite:`anderson1982earth`)
     """
 
     def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
         table = read_table("input_geotherm/anderson_82.txt")
         Geotherm.__init__(self, table[:, 0], table[:, 1])
 
 
 class StaceyContinental(Geotherm):
     """
-    Stacey (1977) continental geotherm
+    Continental geotherm from Stacey, 1977 (:cite:`stacey1977`)
     """
 
     def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
         table = read_table("input_geotherm/Stacey_1977_continents.txt")
         Geotherm.__init__(self, table[:, 0], table[:, 1])
 
 
 class StaceyOceanic(Geotherm):
     """
-    Stacey (1977) oceanic geotherm
+    Oceanic geotherm from Stacey, 1977 (:cite:`stacey1977`)
     """
 
     def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
         table = read_table("input_geotherm/Stacey_1977_oceans.txt")
         Geotherm.__init__(self, table[:, 0], table[:, 1])
 
 
-class AdiabaticGeotherm(Geotherm):
+class Katsura2022(Geotherm):
+    """
+    Geotherm from Katsura, 2022 (:cite:`Katsura2022`)
+    """
+
+    def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
+        table = read_table("input_geotherm/Katsura_2022.txt")
+        Geotherm.__init__(self, table[:, 0], table[:, 1])
+
+
+class Plesa2022Mars6cm3(Geotherm):
+    """
+    Martian areotherm from Plesa, 2022 (:cite:`Plesa2022`)
+    assuming 6 cm³/mol activation volume for mantle viscosity.
+    """
+
+    def __init__(self):
+        """
+        No arguments need to be passed to the constructor.
+        """
+        table = read_table("input_geotherm/Plesa_2022_Mars_V_6cm3.txt")
+        Geotherm.__init__(self, table[:, 0], table[:, 1])
+
+
+class GeothermFromPressures(Geotherm):
+    """
+    Geotherm defined by pressures and temperatures.
+
+    :param pressures_array: Array of pressures (in Pa).
+    :type pressures_array: np.array
+    :param temperatures_array: Array of temperatures (in Kelvin).
+    :type temperatures_array: np.array
+    :param depth_to_pressure_model: Object with an object.pressure(depth)
+        method, such as :class:`burnman.seismic.SeismicModel`.
+        If not given, the PREM model will be used.
+    :type depth_to_pressure_model: :class:`burnman.seismic.SeismicModel` or
+        other object with a pressure(depth) method.
+    """
+
+    def __init__(
+        self, pressures_array, temperatures_array, depth_to_pressure_model=prem_model
+    ):
+        """
+        Initialize the GeothermFromPressures with pressure and temperature arrays, and
+        a depth-to-pressure model.
+
+        :param pressures_array: Array of pressures (in Pa).
+        :type pressures_array: np.array
+        :param temperatures_array: Array of temperatures (in Kelvin).
+        :type temperatures_array: np.array
+        :param depth_to_pressure_model: Object with an object.pressure(depth)
+            method, such as :class:`burnman.seismic.SeismicModel`.
+            If not given, the PREM model will be used.
+        :type depth_to_pressure_model: :class:`burnman.seismic.SeismicModel` or
+            other object with a pressure(depth) method.
+        """
+        self.pressures_array = np.asarray(pressures_array)
+        self.temperatures_array = np.asarray(temperatures_array)
+        self.depth_to_pressure_model = depth_to_pressure_model
+
+        self.minimum_pressure = self.pressures_array.min()
+        self.maximum_pressure = self.pressures_array.max()
+
+    def temperatures_from_pressures(self, pressures):
+        """
+        Evaluate the geotherm at given pressures.
+
+        :param pressures: Pressures at which to evaluate the geotherm (in Pa).
+        :type pressures: array-like of float
+        :return: Temperatures at the given pressures (in Kelvin).
+        :rtype: np.ndarray of float
+        """
+
+        pressures = np.asarray(pressures)
+
+        P_min = pressures.min()
+        P_max = pressures.max()
+        if P_min < self.minimum_pressure:
+            raise ValueError(
+                f"Requested pressure ({P_min}) Pa is lower than "
+                f"minimum geotherm pressure ({self.minimum_pressure}) Pa."
+            )
+        if P_max > self.maximum_pressure:
+            raise ValueError(
+                f"Requested pressure ({P_max}) Pa is higher than "
+                f"maximum geotherm pressure ({self.maximum_pressure}) Pa."
+            )
+
+        temperatures = np.empty_like(pressures)
+        for i, P in enumerate(pressures):
+            temperatures[i] = lookup_and_interpolate(
+                self.pressures_array, self.temperatures_array, P
+            )
+
+        return temperatures
+
+    def temperatures(self, depths):
+        """
+        Evaluate the geotherm at given depths.
+
+        :param depths: Depths at which to evaluate the geotherm (in meters).
+        :type depths: array-like of float
+        :return: Temperatures at the given depths (in Kelvin).
+        :rtype: np.ndarray of float
+        """
+        depths = np.asarray(depths)
+        pressures = self.depth_to_pressure_model.pressure(depths)
+        return self.temperatures_from_pressures(pressures)
+
+
+class Anzellini2013(GeothermFromPressures):
+    """
+    Geotherm from Anzellini et al., 2013 (:cite:`Anzellini2013`) (their Figure S4).
+    Mantle part is from Steinberger and Holme, 2008 (:cite:`Steinberger2008`).
+
+    :param depth_to_pressure_model: Object with an object.pressure(depth)
+        method, such as :class:`burnman.seismic.SeismicModel`.
+        If not given, the PREM model will be used.
+    :type depth_to_pressure_model: :class:`burnman.seismic.SeismicModel` or
+        other object with a pressure(depth) method.
+    """
+
+    def __init__(self, depth_to_pressure_model=prem_model):
+        """
+        Initialize the Anzellini et al., 2013 (:cite:`Anzellini2013`) geotherm.
+
+        :param depth_to_pressure_model: Object with an object.pressure(depth)
+            method, such as :class:`burnman.seismic.SeismicModel`.
+            If not given, the PREM model will be used.
+        :type depth_to_pressure_model: :class:`burnman.seismic.SeismicModel` or
+            other object with a pressure(depth) method, optional
+        """
+        table = read_table("input_geotherm/Anzellini_2013_PT.txt")
+        GeothermFromPressures.__init__(
+            self,
+            table[:, 0],
+            table[:, 1],
+            depth_to_pressure_model=depth_to_pressure_model,
+        )
+
+
+class AdiabaticGeotherm(GeothermFromPressures):
     """
     Geotherm calculated as an adiabat for a given material, anchored
     on a specified temperature and pressure.
@@ -132,6 +293,20 @@ class AdiabaticGeotherm(Geotherm):
     """
 
     def __init__(self, material, T_0, P_0, depth_to_pressure_model=prem_model):
+        """
+        Initialize the AdiabaticGeotherm.
+        :param material: :class:`burnman.Material` object.
+        :type material: burnman.Material
+        :param T_0: Temperature at the anchor pressure [K].
+        :type T_0: float
+        :param P_0: The anchor pressure [Pa].
+        :type P_0: float
+        :param depth_to_pressure_model: Object with an object.pressure(depth)
+            method, such as :class:`burnman.seismic.SeismicModel`.
+            If not given, the PREM model will be used.
+        :type depth_to_pressure_model: :class:`burnman.seismic.SeismicModel` or
+            other object with a pressure(depth) method.
+        """
         self.material = material
         self.T_0 = T_0
         self.P_0 = P_0
@@ -147,19 +322,6 @@ class AdiabaticGeotherm(Geotherm):
         :rtype: np.ndarray of float
         """
         return adiabatic_profile(pressures, self.material, self.T_0, self.P_0)
-
-    def temperatures(self, depths):
-        """
-        Evaluate the adiabat geotherm at given depths.
-
-        :param depths: Depths at which to evaluate the geotherm (in meters).
-        :type depths: array-like of float
-        :return: Temperatures at the given depths (in Kelvin).
-        :rtype: np.ndarray of float
-        """
-        depths = np.asarray(depths)
-        pressures = self.depth_to_pressure_model.pressure(depths)
-        return self.temperatures_from_pressures(pressures)
 
 
 def adiabatic_profile(pressures, rock, T_0, P_0=None):

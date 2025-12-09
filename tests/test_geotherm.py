@@ -44,6 +44,18 @@ class geotherm(BurnManTest):
         T = burnman.geotherm.StaceyOceanic().temperatures([11.0e3, 620.0e3])
         self.assertArraysAlmostEqual(T, [550.0, 2225])
 
+    def test_katsura_geotherm(self):
+        T = burnman.geotherm.Katsura2022().temperatures([100.0e3, 400.0e3])
+        self.assertArraysAlmostEqual(T, [1672, 1796])
+
+    def test_plesa_geotherm(self):
+        T = burnman.geotherm.Plesa2022Mars6cm3().temperatures([173e3, 320e3])
+        self.assertArraysAlmostEqual(T, [1028, 1489])
+
+    def test_anzellini_prem(self):
+        T = burnman.geotherm.Anzellini2013().temperatures([100.0e3, 700.0e3])
+        self.assertArraysAlmostEqual(T, [1603.017, 1952.184])
+
     def test_adiabat(self):
         rock = mypericlase()
         pressure = [100.0e9, 150.0e9]

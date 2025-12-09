@@ -46,21 +46,25 @@ if __name__ == "__main__":
     # We want to evaluate several geotherms at particular pressures
     # The geotherms are defined as a function of depth, so we convert pressure
     # to depth using a seismic model, in this case PREM
-    pressures = np.arange(9.0e9, 128e9, 3e9)
+    pressures = np.linspace(9.0e9, 128e9, 300)
     seismic_model = burnman.seismic.PREM()
     depths = seismic_model.depth(pressures)
 
-    # Load the geotherms packaged with BurnMan
+    # Load the Earth-based geotherms packaged with BurnMan
     geotherm_BrownShankland = burnman.geotherm.BrownShankland()
     geotherm_Anderson = burnman.geotherm.Anderson()
     geotherm_StaceyContinental = burnman.geotherm.StaceyContinental()
     geotherm_StaceyOceanic = burnman.geotherm.StaceyOceanic()
+    geotherm_Katsura = burnman.geotherm.Katsura2022()
+    geotherm_Anzellini = burnman.geotherm.Anzellini2013(seismic_model)
 
     # Evaluate the temperatures at the desired depths
     temperature_BrownShankland = geotherm_BrownShankland.temperatures(depths)
     temperature_Anderson = geotherm_Anderson.temperatures(depths)
     temperature_StaceyContinental = geotherm_StaceyContinental.temperatures(depths)
     temperature_StaceyOceanic = geotherm_StaceyOceanic.temperatures(depths)
+    temperature_Katsura = geotherm_Katsura.temperatures(depths)
+    temperature_Anzellini = geotherm_Anzellini.temperatures(depths)
 
     # We can also define our own geotherm using the Geotherm class.
     depths_array = [0.0, 100.0e3, 660.0e3, 3000.0e3]
@@ -96,15 +100,13 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(10, 6))
     ax = fig.add_subplot(1, 1, 1)
 
-    ax.plot(
-        pressures / 1e9, temperature_BrownShankland, "-r", label="Brown & Shankland"
-    )
-    ax.plot(pressures / 1e9, temperature_Anderson, "-c", label="Anderson")
-    ax.plot(
-        pressures / 1e9, temperature_StaceyContinental, "-g", label="Stacey Continental"
-    )
-    ax.plot(pressures / 1e9, temperature_StaceyOceanic, "-b", label="Stacey Oceanic")
-    ax.plot(pressures / 1e9, temperature_custom, "-k", label="Custom Geotherm")
+    ax.plot(pressures / 1e9, temperature_BrownShankland, label="Brown & Shankland")
+    ax.plot(pressures / 1e9, temperature_Anderson, label="Anderson")
+    ax.plot(pressures / 1e9, temperature_StaceyContinental, label="Stacey Continental")
+    ax.plot(pressures / 1e9, temperature_StaceyOceanic, label="Stacey Oceanic")
+    ax.plot(pressures / 1e9, temperature_Katsura, label="Katsura 2022")
+    ax.plot(pressures / 1e9, temperature_Anzellini, label="Anzellini 2013")
+    ax.plot(pressures / 1e9, temperature_custom, label="Custom Geotherm")
     ax.plot(
         pressures / 1e9,
         temperature_adiabatic,
