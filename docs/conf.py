@@ -45,9 +45,9 @@ year = str(year)
 
 project = "BurnMan"
 copyright = (
-    f"{year}, Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn"
+    f"{year}, Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn, Benedict Heinen, Robert Farla, Juliane Dannberg, Rene Gassmoeller"
 )
-author = "Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn"
+author = "Robert Myhill, Sanne Cottaar, Timo Heister, Ian Rose, Cayman Unterborn, Benedict Heinen, Robert Farla, Juliane Dannberg, Rene Gassmoeller"
 
 # The short X.Y version.
 v = burnman.__version__.split(".")
@@ -231,7 +231,7 @@ COMPUTATIONAL INFRASTRUCTURE FOR GEODYNAMICS (CIG)
 % FILL: author list
 % e.g. Author One\\Author Two\\Author Three\\
 % be sure to have a newline (\\) after the final author
-Robert Myhill\\Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\
+Robert Myhill\\Sanne Cottaar\\Timo Heister\\Ian Rose\\Cayman Unterborn\\Benedict Heinen\\Robert Farla\\Juliane Dannberg\\Rene Gassmoeller\\
 }
 
 {\fontfamily{\sfdefault}\selectfont \href{http://geodynamics.org}{http://geodynamics.org}}
