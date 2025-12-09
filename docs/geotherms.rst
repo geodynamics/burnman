@@ -4,8 +4,15 @@ Geotherms
 =========
 
 Unlike the pressure, the temperature of the lower mantle is relatively unconstrained.
-BurnMan provides a lightweight :class:`burnman.classes.geotherm.Geotherm` class to represent
-temperature profiles as a function of depth. A number of geotherms from the literature are provided.
+BurnMan provides lightweight :class:`burnman.classes.geotherm.Geotherm` and
+:class:`burnman.classes.geotherm.GeothermFromPressures` classes
+that store a geotherm defined by arrays of depths and temperatures or
+pressures and temperatures respectively. Both classes have a `temperatures()` method
+that takes an array or list of depths as input and outputs the corresponding
+temperatures along the geotherm. In addition, the
+:class:`burnman.classes.geotherm.GeothermFromPressures` class has a
+`temperatures_from_pressures()` method that takes an array or list of pressures as
+input. A number of geotherms from the literature are provided.
 See :ref:`ref-api-geotherms` for a list.
 
 Also implemented in BurnMan is an :class:`burnman.classes.geotherm.AdiabaticGeotherm`
