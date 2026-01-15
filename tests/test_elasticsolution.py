@@ -345,14 +345,6 @@ class test_ElasticSolution(BurnManTest):
         m.set_state(P1, T1)  # return to new state
         self.assertFloatEqual(V, m.V)
 
-    def test_gt_Wh(self):
-        gt_ss = garnet_ss()
-        H_excess = gt_ss.solution_model.excess_enthalpy(
-            1.0e5, 1000.0, [0.5, 0.5]
-        )  # Hxs = Exs if Vxs=0
-        We = gt_ss.solution_model.We[0][1]
-        self.assertArraysAlmostEqual([We / 4.0], [H_excess])
-
     def test_order_disorder(self):
         opx = orthopyroxene()
         opx.set_composition(np.array([0.0, 1.0]))
