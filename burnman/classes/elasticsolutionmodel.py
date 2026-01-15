@@ -121,31 +121,6 @@ class ElasticSolutionModel(object):
             self.excess_partial_entropies(volume, temperature, molar_fractions),
         )
 
-    def excess_enthalpy(self, volume, temperature, molar_fractions):
-        """
-        Given a list of molar fractions of different phases,
-        compute the excess enthalpy of the solution.
-        The base class implementation assumes that the excess enthalpy is zero.
-
-        :param volume: Volume at which to evaluate the solution model. [m^3/mol]
-        :type volume: float
-
-        :param temperature: Temperature at which to evaluate the solution. [K]
-        :type temperature: float
-
-        :param molar_fractions: List of molar fractions of the different
-            endmembers in solution.
-        :type molar_fractions: list of floats
-
-        :returns: The excess enthalpy of the solution.
-        :rtype: float
-        """
-        return (
-            self.excess_helmholtz_energy(volume, temperature, molar_fractions)
-            + temperature * self.excess_entropy(volume, temperature, molar_fractions)
-            - volume * self.excess_pressure(volume, temperature, molar_fractions)
-        )
-
     def excess_partial_helmholtz_energies(self, volume, temperature, molar_fractions):
         """
         Given a list of molar fractions of different phases,
@@ -595,7 +570,7 @@ class ElasticSubregularSolution(ElasticIdealSolution):
         self.Wijks = np.zeros_like(self.Wijke)
         self.Wijkp = np.zeros_like(self.Wijke)
 
-        # setup excess enthalpy interaction matrix
+        # setup excess interaction matrices
         for i in range(self.n_endmembers):
             for j in range(i + 1, self.n_endmembers):
                 w0 = energy_interaction[i][j - i - 1][0] / 2.0
@@ -647,7 +622,7 @@ class ElasticSubregularSolution(ElasticIdealSolution):
 
         if pressure_ternary_terms is not None:
             for i, j, k, v in pressure_ternary_terms:
-                self.Wijkv[i, j, k] += v
+                self.Wijkp[i, j, k] += v
 
         # initialize ideal solution model
         ElasticIdealSolution.__init__(self, endmembers)
