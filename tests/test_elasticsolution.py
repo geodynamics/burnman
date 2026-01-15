@@ -469,6 +469,14 @@ class test_ElasticSolution(BurnManTest):
 
         self.assertArraysAlmostEqual(dVdx, dVdx2)
 
+    def test_subregular_model_ternary_eos_consistency(self):
+        ss = two_site_ss_subregular_ternary()
+        f0 = np.array([0.25, 0.35, 0.4])
+        ss.set_composition(f0)
+        ss.set_state(1.0e9, 1000.0)
+
+        self.assertTrue(burnman.tools.eos.check_eos_consistency(ss))
+
     def test_subregular(self):
         ss0 = two_site_ss()
         ss1 = two_site_ss_subregular()
