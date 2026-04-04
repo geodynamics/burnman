@@ -28,6 +28,7 @@ This script may be run by typing
     python step_3.py
 
 """
+
 # We import a couple extra modules for this step than in the previous
 # ones.  In particular, we will use a function for a normal distribution
 # from numpy.random, as well as a class for doing linear 1D interpolation
@@ -52,7 +53,6 @@ if not os.path.exists("burnman") and os.path.exists("../../burnman"):
 # The BurnMan imports, however, are the same.
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     """

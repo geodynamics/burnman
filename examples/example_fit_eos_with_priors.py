@@ -18,6 +18,7 @@ teaches:
 - least squares fitting with Gaussian priors on the parameter values.
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

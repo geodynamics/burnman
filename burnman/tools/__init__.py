@@ -14,7 +14,6 @@ It does not contain any functions that are required by the core
 BurnMan modules.
 """
 
-
 from . import chemistry
 from . import eos
 from . import equilibration

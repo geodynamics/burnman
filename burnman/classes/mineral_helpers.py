@@ -9,7 +9,6 @@ This module provides several helper minerals/materials.
 
 """
 
-
 from .material import Material, material_property
 from .composite import Composite
 

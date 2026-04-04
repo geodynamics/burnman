@@ -11,6 +11,7 @@ paper_uncertain
 This script reproduces :cite:`Cottaar2014`, Figure 8.
 It shows the sensitivity of the velocities to various mineralogical parameters.
 """
+
 import os
 import sys
 import numpy as np

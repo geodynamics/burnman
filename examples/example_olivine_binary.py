@@ -22,13 +22,13 @@ along the vector [n_Mg - n_Fe].
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 from burnman import equilibrate
 from burnman.minerals import SLB_2011
-
 
 if __name__ == "__main__":
     # Initialize the minerals we will use in this example.

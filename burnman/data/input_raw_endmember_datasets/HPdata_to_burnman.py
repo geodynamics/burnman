@@ -21,7 +21,6 @@ if not os.path.exists("burnman") and os.path.exists("../../../burnman"):
 
 from burnman.tools.chemistry import dictionarize_formula, formula_mass
 
-
 if not os.path.isfile("tc-ds62.txt"):
     print("This code requires the data file tc-ds62.txt.")
     print(

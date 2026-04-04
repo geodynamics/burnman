@@ -41,7 +41,6 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
 
-
 if __name__ == "__main__":
     # We want to evaluate several geotherms at particular pressures
     # The geotherms are defined as a function of depth, so we convert pressure

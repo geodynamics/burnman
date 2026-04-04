@@ -112,7 +112,7 @@ class Material(object):
         P, T as a list of minerals.
         This requires set_state() has been called before.
         """
-        (minerals, fractions) = self.unroll()
+        minerals, fractions = self.unroll()
         if len(minerals) == 1:
             print(minerals[0].to_string())
         else:

@@ -20,6 +20,7 @@ teaches:
 - least squares fitting for solution data
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import random
@@ -30,7 +31,6 @@ from burnman.optimize.eos_fitting import fit_XPTp_data
 from burnman.optimize.nonlinear_fitting import plot_residuals, extreme_values
 from burnman.optimize.nonlinear_fitting import corner_plot
 from burnman.optimize.nonlinear_fitting import weighted_residual_plot
-
 
 if __name__ == "__main__":
     # Set np.array printing precision to be low

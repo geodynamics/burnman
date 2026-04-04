@@ -21,9 +21,9 @@ need to be input for BurnMan to calculate :math:`V_P, V_\\Phi, V_S` and density 
 * how to create your own minerals
 
 """
+
 import numpy as np
 import burnman
-
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,

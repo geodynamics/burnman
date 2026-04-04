@@ -26,13 +26,13 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * loops over models
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # Define reference model and depth to evaluate

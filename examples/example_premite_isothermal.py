@@ -12,12 +12,12 @@ teaches:
 
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 import pymc
-
 
 seismic_model = (
     burnman.seismic.PREM()

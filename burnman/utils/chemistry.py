@@ -553,7 +553,7 @@ def ordered_compositional_array(formulae, elements):
     return formula_array
 
 
-def formula_to_string(formula, use_fractions=True, significant_figures=2):
+def formula_to_string(formula, use_fractions=True, significant_figures=2, latex=False):
     """
     :param formula: Chemical formula
     :type formula: dict or Counter
@@ -566,6 +566,9 @@ def formula_to_string(formula, use_fractions=True, significant_figures=2):
     :param significant_figures: Number of significant figures to use if
         use_fractions=False.
     :type significant_figures: int
+
+    :param latex: Whether or not to format the output string for use in LaTeX.
+    :type latex: bool
 
     :returns: A formula string, with element order as given in the list
         IUPAC_element_order.
@@ -581,7 +584,10 @@ def formula_to_string(formula, use_fractions=True, significant_figures=2):
                 if np.abs(formula[e] - 1.0) < 1.0e-12:
                     formula_string += e
                 else:
-                    formula_string += e + str(nsimplify(formula[e]))
+                    val = str(nsimplify(formula[e]))
+                    if latex:
+                        val = "$_{{{" + val + "}}}$"
+                    formula_string += e + val
 
         for e in formula:
             if e not in IUPAC_element_order:
@@ -589,7 +595,10 @@ def formula_to_string(formula, use_fractions=True, significant_figures=2):
                     if np.abs(formula[e] - 1.0) < 1.0e-12:
                         formula_string += e
                     else:
-                        formula_string += e + str(nsimplify(formula[e]))
+                        val = str(nsimplify(formula[e]))
+                        if latex:
+                            val = "$_{{{" + val + "}}}$"
+                        formula_string += e + val
 
     else:
         for e in IUPAC_element_order:
@@ -597,7 +606,10 @@ def formula_to_string(formula, use_fractions=True, significant_figures=2):
                 if np.abs(formula[e] - 1.0) < 1.0e-12:
                     formula_string += e
                 else:
-                    formula_string += e + str(round(formula[e], significant_figures))
+                    val = str(round(formula[e], significant_figures))
+                    if latex:
+                        val = "$_{{{" + val + "}}}$"
+                    formula_string += e + val
 
         for e in formula:
             if e not in IUPAC_element_order:
@@ -605,9 +617,10 @@ def formula_to_string(formula, use_fractions=True, significant_figures=2):
                     if np.abs(formula[e] - 1.0) < 1.0e-12:
                         formula_string += e
                     else:
-                        formula_string += e + str(
-                            round(formula[e], significant_figures)
-                        )
+                        val = str(round(formula[e], significant_figures))
+                        if latex:
+                            val = "$_{{{" + val + "}}}$"
+                        formula_string += e + val
 
     return formula_string
 

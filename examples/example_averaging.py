@@ -32,11 +32,11 @@ of each averaging scheme.
 * implemented averaging schemes
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # Create a rock out of MgSiO3 perovskite and MgO periclase

@@ -11,7 +11,6 @@ Minerals from Murakami 2013 and references therein.
 
 """
 
-
 from ..classes.mineral import Mineral
 
 

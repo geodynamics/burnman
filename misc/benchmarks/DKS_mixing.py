@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
 phases = [
     DKS_2013_liquids.SiO2_liquid(),
     DKS_2013_liquids.MgSiO3_liquid(),

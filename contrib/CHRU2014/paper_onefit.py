@@ -11,6 +11,7 @@ paper_onefit
 This script reproduces :cite:`Cottaar2014`, Figure 7.
 It shows an example for a  best fit for a pyrolitic model within mineralogical error bars.
 """
+
 import os.path
 import sys
 

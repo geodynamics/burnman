@@ -20,6 +20,7 @@ thermal expansivities at 1 bar, one with components of the
 isentropic elastic stiffness tensor at high pressure, and one with
 selected seismic properties at a fixed pressure and temperature.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
@@ -30,7 +31,6 @@ from burnman import AnisotropicMineral
 
 from tools import print_table_for_mineral_constants
 from burnman.tools.plot import plot_projected_elastic_properties
-
 
 run_fitting = False
 
@@ -398,8 +398,8 @@ if do_plotting:
         f'the isotropic model: $V_0$: {m.params["V_0"]*1.e6:.5f} cm$^3$/mol, '
         f'$K_0$: {m.params["K_0"]/1.e9:.5f} GPa, '
         f'$K\'_0$: {m.params["Kprime_0"]:.5f}, '
-        f'$\Theta_0$: {m.params["Debye_0"]:.5f} K, '
-        f'$\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
+        f'$\\Theta_0$: {m.params["Debye_0"]:.5f} K, '
+        f'$\\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
         f'and $q_0$: {m.params["q_0"]:.5f}.'
     )
 

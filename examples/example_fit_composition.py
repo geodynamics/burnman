@@ -27,6 +27,7 @@ and how to assess goodness of fit.
 * Assessing goodness of fit.
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
@@ -37,7 +38,6 @@ from burnman.optimize.composition_fitting import DummyCompositionSolution
 from burnman.optimize.composition_fitting import (
     fit_phase_proportions_to_bulk_composition,
 )
-
 
 if __name__ == "__main__":
     """

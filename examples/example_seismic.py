@@ -35,12 +35,12 @@ here shown by importing AK135 :cite:`kennett1995`.
 
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 import warnings
-
 
 if __name__ == "__main__":
     # List of seismic 1D models

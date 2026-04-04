@@ -24,11 +24,11 @@ teaches:
 - output computed seismic data to file
 
 """
+
 import numpy as np
 
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # input variables ###

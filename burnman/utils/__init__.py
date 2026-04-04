@@ -15,7 +15,6 @@ They do not depend on any other BurnMan objects apart from
 those in constants.py.
 """
 
-
 from . import chemistry
 from . import math
 from . import misc

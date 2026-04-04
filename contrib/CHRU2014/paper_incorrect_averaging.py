@@ -12,6 +12,7 @@ paper_incorrect_averaging
 This script reproduces :cite:`Cottaar2014`, Figure 5.
 Attempt to reproduce Figure 6.12 from :cite:`Murakami2013`
 """
+
 import os
 import sys
 import numpy as np

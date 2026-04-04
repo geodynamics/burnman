@@ -90,24 +90,24 @@ class composite(BurnManTest):
 
         c = burnman.Composite([min1], [1.0])
         c.set_state(5e9, 300)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertEqual(f, [0.0, 1.0])
         c = burnman.Composite([min1, min2], [0.4, 0.6])
         c.set_state(5e9, 300)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertEqual(f, [0.0, 0.4, 0.6])
 
         c1 = burnman.Composite([min1], [1.0])
         c2 = burnman.Composite([min2], [1.0])
         c = burnman.Composite([min1, c1, c2], [0.1, 0.4, 0.5])
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertEqual(f, [0.0, 0.1, 0.0, 0.4, 0.5])
 
         min1 = burnman.minerals.Murakami_etal_2012.fe_periclase_HS()
         c1 = burnman.Composite([min1, min2], [0.1, 0.9])
         c2 = burnman.Composite([min2], [1.0])
         c = burnman.Composite([min1, c1, c2], [0.3, 0.1, 0.6])
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertArraysAlmostEqual(f, [0.3, 0.01, 0.09, 0.6])
 
     def test_changevalues(self):
@@ -127,7 +127,7 @@ class composite(BurnManTest):
 
         c = mycomposite()
         c.set_state(5e9, 300)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         mins = ",".join([a.to_string() for a in m])
         self.assertArraysAlmostEqual(f, [0.3, 0.7])
         self.assertEqual(
@@ -140,7 +140,7 @@ class composite(BurnManTest):
             ),
         )
         c.set_state(5e9, 3000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertArraysAlmostEqual(f, [0.1, 0.9])
         self.assertEqual(
             mins,
@@ -169,12 +169,12 @@ class composite(BurnManTest):
 
         c = mycomposite()
         c.set_state(5e9, 1000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         mins = ",".join([a.to_string() for a in m])
         self.assertArraysAlmostEqual(f, [1.0])
         self.assertEqual(mins, minerals.Murakami_etal_2012.fe_periclase().to_string())
         c.set_state(5e9, 300)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         mins = ",".join([a.to_string() for a in m])
         self.assertArraysAlmostEqual(f, [0.3, 0.7])
         self.assertEqual(
@@ -193,7 +193,7 @@ class composite(BurnManTest):
         ca = burnman.Composite([min1], [1.0])
         c = burnman.Composite([ca, min2], [0.4, 0.6])
         c.set_state(5e9, 1000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         mins = ",".join([a.to_string() for a in m])
         self.assertArraysAlmostEqual(f, [0.4, 0.6])
         self.assertEqual(mins, ",".join([min1.to_string(), min2.to_string()]))
@@ -294,7 +294,7 @@ class composite(BurnManTest):
             assert len(w) == 1
         c.set_method("slb3")
         c.set_state(5e9, 1000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertArraysAlmostEqual(f, [2.0 / 3.0, 1.0 / 3.0])
 
     def test_summing_smaller(self):
@@ -305,7 +305,7 @@ class composite(BurnManTest):
             assert len(w) == 1
         c.set_method("slb3")
         c.set_state(5e9, 1000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertArraysAlmostEqual(f, [2.0 / 3.0, 1.0 / 3.0])
 
     def test_summing_slightly_negative(self):
@@ -313,7 +313,7 @@ class composite(BurnManTest):
         c = burnman.Composite([min1, min1, min1], [0.8, 0.2, 1.0 - 0.8 - 0.2])
         c.set_method("slb3")
         c.set_state(5e9, 1000)
-        (m, f) = c.unroll()
+        m, f = c.unroll()
         self.assertArraysAlmostEqual(f, [0.8, 0.2, 0.0])
         self.assertTrue(f[2] >= 0.0)
 

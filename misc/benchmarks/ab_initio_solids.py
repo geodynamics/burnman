@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from burnman.tools.eos import check_eos_consistency
 
-
 """
 SOLIDS
 """

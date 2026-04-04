@@ -13,7 +13,6 @@ from burnman import minerals
 from burnman import equilibrate
 from burnman.tools.eos import check_eos_consistency
 
-
 fcc = minerals.SE_2015.fcc_iron()
 bcc = minerals.SE_2015.bcc_iron()
 hcp = minerals.SE_2015.hcp_iron()

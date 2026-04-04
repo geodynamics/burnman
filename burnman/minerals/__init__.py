@@ -8,7 +8,6 @@
 This package contains thermodynamic models from a variety of published sources:
 """
 
-
 # Stixrude and Lithgow-Bertelloni
 from . import SLB_2024
 from . import SLB_2022
