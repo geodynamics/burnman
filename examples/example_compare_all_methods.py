@@ -32,7 +32,6 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
 
-
 if __name__ == "__main__":
     # Input composition.
 

@@ -34,7 +34,6 @@ from burnman.utils.chemistry import dictionarize_formula
 from burnman import Composition
 from burnman.classes.composition import file_to_composition_list
 
-
 if __name__ == "__main__":
     print(
         "1) Creating a Composite instance, printing "

@@ -52,7 +52,6 @@ from burnman import minerals
 from burnman.classes.solution import Solution
 from burnman.classes.solutionmodel import IdealSolution
 
-
 if __name__ == "__main__":
     # To compute seismic velocities and other properties, we need to supply
     # burnman with a list of minerals (phases) and their molar abundances.

@@ -8,7 +8,6 @@ import matplotlib.image as mpimg
 from burnman.tools.eos import check_eos_consistency
 from burnman.tools.chemistry import hugoniot
 
-
 SiO2_liq = DKS_2013_liquids.SiO2_liquid()
 MgO_liq = DKS_2013_liquids.MgO_liquid()
 

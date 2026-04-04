@@ -57,6 +57,7 @@ with a series of boolean variables. In order of complexity:
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """
+
 from copy import copy
 import numpy as np
 import matplotlib.pyplot as plt

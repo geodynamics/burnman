@@ -13,7 +13,6 @@ EoS terms for fcc are from an unpublished calibration
 (R. Myhill, 02/2017)
 """
 
-
 from ..classes.mineral import Mineral
 from ..utils.chemistry import formula_mass
 

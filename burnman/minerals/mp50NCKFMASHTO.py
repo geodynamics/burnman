@@ -46,7 +46,6 @@ from ..classes.solutionmodel import SymmetricRegularSolution
 from ..classes.solutionmodel import AsymmetricRegularSolution
 from ..classes.combinedmineral import CombinedMineral
 
-
 hem_nood = Mineral(
     {
         "name": "hem",

@@ -20,6 +20,7 @@ thermal expansivities at 1 bar, one with components of the
 isentropic elastic stiffness tensor at high pressure, and one with
 selected seismic properties at a fixed pressure and temperature.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
@@ -30,7 +31,6 @@ from burnman import AnisotropicMineral
 
 from tools import print_table_for_mineral_constants_2
 from burnman.tools.plot import plot_projected_elastic_properties
-
 
 run_fitting = False
 plot_SLB = False

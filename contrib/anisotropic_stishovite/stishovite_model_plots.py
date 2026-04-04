@@ -923,11 +923,11 @@ if plot_Q_V_abc:
         Pmin = np.max([1.0e5, (T - 300.0) * 1.0e7 - 10.0e9])
         pressures = np.linspace(Pmin, 150.0e9, 151)
         Ts = pressures * 0.0 + T
-        (volumes, cell_params, molar_fractions) = stishovite_relaxed.evaluate(
+        volumes, cell_params, molar_fractions = stishovite_relaxed.evaluate(
             ["V", "cell_parameters", "molar_fractions"], pressures, Ts
         )
         stishovite_unrelaxed.set_composition([0.5, 0.5])
-        (volumes_Q0, cell_params_Q0) = stishovite_unrelaxed.evaluate(
+        volumes_Q0, cell_params_Q0 = stishovite_unrelaxed.evaluate(
             ["V", "cell_parameters"], pressures, Ts
         )
         ax_Q[0].plot(
@@ -1088,7 +1088,7 @@ if plot_relaxed:
     pressures = np.linspace(1.0e5, 70.0e9, 101)
     Ts = pressures * 0.0 + T
 
-    (molar_fractions, C_N, K_NR) = stishovite_relaxed.evaluate(
+    molar_fractions, C_N, K_NR = stishovite_relaxed.evaluate(
         [
             "molar_fractions",
             "isentropic_stiffness_tensor",
@@ -1097,7 +1097,7 @@ if plot_relaxed:
         pressures,
         Ts,
     )
-    (C_N_u, K_NR_u) = stishovite_relaxed.unrelaxed.evaluate(
+    C_N_u, K_NR_u = stishovite_relaxed.unrelaxed.evaluate(
         ["isentropic_stiffness_tensor", "isentropic_bulk_modulus_reuss"],
         pressures,
         Ts,
@@ -1105,11 +1105,11 @@ if plot_relaxed:
     )
 
     stishovite_unrelaxed.set_composition([0.5, 0.5])
-    (C_N_Q0, K_NR_Q0) = stishovite_unrelaxed.evaluate(
+    C_N_Q0, K_NR_Q0 = stishovite_unrelaxed.evaluate(
         ["isentropic_stiffness_tensor", "isentropic_bulk_modulus_reuss"], pressures, Ts
     )
     stishovite_unrelaxed.set_composition([1.0, 0.0])
-    (C_N_Q1, K_NR_Q1) = stishovite_unrelaxed.evaluate(
+    C_N_Q1, K_NR_Q1 = stishovite_unrelaxed.evaluate(
         ["isentropic_stiffness_tensor", "isentropic_bulk_modulus_reuss"], pressures, Ts
     )
 
@@ -1205,7 +1205,7 @@ if plot_relaxed_SN:
     pressures = np.linspace(1.0e5, 70.0e9, 101)
     Ts = pressures * 0.0 + T
 
-    (molar_fractions, S_N, K_NR) = stishovite_relaxed.evaluate(
+    molar_fractions, S_N, K_NR = stishovite_relaxed.evaluate(
         [
             "molar_fractions",
             "isentropic_compliance_tensor",
@@ -1214,7 +1214,7 @@ if plot_relaxed_SN:
         pressures,
         Ts,
     )
-    (S_N_u, K_NR_u) = stishovite_relaxed.unrelaxed.evaluate(
+    S_N_u, K_NR_u = stishovite_relaxed.unrelaxed.evaluate(
         ["isentropic_compliance_tensor", "isentropic_bulk_modulus_reuss"],
         pressures,
         Ts,
@@ -1222,11 +1222,11 @@ if plot_relaxed_SN:
     )
 
     stishovite_unrelaxed.set_composition([0.5, 0.5])
-    (S_N_Q0, K_NR_Q0) = stishovite_unrelaxed.evaluate(
+    S_N_Q0, K_NR_Q0 = stishovite_unrelaxed.evaluate(
         ["isentropic_compliance_tensor", "isentropic_bulk_modulus_reuss"], pressures, Ts
     )
     stishovite_unrelaxed.set_composition([1.0, 0.0])
-    (S_N_Q1, K_NR_Q1) = stishovite_unrelaxed.evaluate(
+    S_N_Q1, K_NR_Q1 = stishovite_unrelaxed.evaluate(
         ["isentropic_compliance_tensor", "isentropic_bulk_modulus_reuss"], pressures, Ts
     )
 

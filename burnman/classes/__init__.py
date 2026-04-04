@@ -7,7 +7,6 @@
 BurnMan object classes
 """
 
-
 from . import material
 from . import perplex
 from . import mineral

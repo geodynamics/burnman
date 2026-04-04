@@ -31,6 +31,7 @@ very realistic, and you will want to change it to one that is more
 in accordance with what we think the bulk composition of Earth's lower mantle is.
 
 """
+
 # Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
 # numerical arrays and mathematical operations on them, and
@@ -53,7 +54,6 @@ if not os.path.exists("burnman") and os.path.exists("../../burnman"):
 # BurnMan
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     """

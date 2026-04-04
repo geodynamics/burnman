@@ -41,7 +41,6 @@ These modifications currently take the forms:
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Here we import the relevant modules from BurnMan.  The burnman
 # module imports several of the most important functionalities of
 # the library, including the ability to make composites, and compute
@@ -50,7 +49,6 @@ import matplotlib.pyplot as plt
 # BurnMan
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # Here we show the interesting features of Landau transitions

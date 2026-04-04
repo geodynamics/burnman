@@ -42,13 +42,13 @@ on each of the parameters which can be called.
 * computing various parameters for the planet
 * seismic comparison
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 import burnman
 
 import warnings
-
 
 if __name__ == "__main__":
     # FIRST: we must define the composition of the planet as individual layers.

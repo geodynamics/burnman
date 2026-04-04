@@ -37,7 +37,6 @@ from ..classes.solutionmodel import SymmetricRegularSolution
 from ..classes.solutionmodel import AsymmetricRegularSolution
 from ..classes.combinedmineral import CombinedMineral
 
-
 annm = CombinedMineral(
     [HP_2011_ds62.ann()],
     [1.0],

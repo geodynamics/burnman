@@ -5,7 +5,6 @@ from burnman.minerals.HP_2011_ds62 import stv
 from burnman.minerals.SLB_2011 import periclase
 from string import ascii_lowercase
 
-
 stishovite = periclase()
 stishovite.params["V_0"] = 46.57e-6  # only relative matters
 stishovite.params["K_0"] = 317.2e9

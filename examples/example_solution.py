@@ -40,6 +40,7 @@ These solutions can potentially deal with:
 * How to output thermodynamic and thermoelastic properties
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -53,7 +54,6 @@ from burnman.classes.solutionmodel import (
     AsymmetricRegularSolution,
     SubregularSolution,
 )
-
 
 if __name__ == "__main__":
     """

@@ -27,12 +27,12 @@ format, see burnman/contrib/perplex/.
 
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 from burnman.utils.math import smooth_array
-
 
 if __name__ == "__main__":
     rock = burnman.PerplexMaterial("../burnman/data/input_perplex/in23_1.tab")

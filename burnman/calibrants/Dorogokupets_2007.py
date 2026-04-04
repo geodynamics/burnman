@@ -13,7 +13,6 @@ from burnman.classes.calibrant import Calibrant
 from burnman.constants import gas_constant
 from burnman.eos.vinet import Vinet
 
-
 _materials_data = {
     "Ag": {
         "F_0": 0.0,

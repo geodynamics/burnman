@@ -14,7 +14,6 @@ Irving, Cottaar, Lekic (2018) Seismically determined elastic parameters for the 
 
 """
 
-
 from ..classes.mineral import Mineral
 
 

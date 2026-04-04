@@ -16,7 +16,6 @@ import inspect
 from burnman import minerals
 from burnman import utils
 
-
 if __name__ == "__main__":
 
     def create_list(name, mineral):

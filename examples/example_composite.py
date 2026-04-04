@@ -41,7 +41,6 @@ import burnman
 from burnman import equilibrate
 from burnman import minerals
 
-
 if __name__ == "__main__":
     print("Part I: Making and interrogating composite materials")
 

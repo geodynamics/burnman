@@ -24,6 +24,7 @@ teaches:
 - loops over models
 
 """
+
 import os
 import sys
 import numpy as np

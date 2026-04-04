@@ -9,7 +9,6 @@ from . import equation_of_state as eos
 import warnings
 import numpy as np
 
-
 # Try to import the jit from numba.  If it is
 # not available, just go with the standard
 # python interpreter

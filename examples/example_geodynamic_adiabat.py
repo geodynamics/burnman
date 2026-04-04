@@ -46,7 +46,6 @@ from scipy.interpolate import UnivariateSpline
 import burnman
 from burnman.utils.math import interp_smoothed_array_and_derivatives
 
-
 if __name__ == "__main__":
     #  Define fitting function to find the temperature along the isentrope
     def isentrope(rock, pressures, entropy, T_guess):

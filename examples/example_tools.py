@@ -15,6 +15,7 @@ This example demonstrates BurnMan's tools, which are currently
 - Hugoniot calculation
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

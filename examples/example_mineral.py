@@ -37,6 +37,7 @@ implementations of may equations of state (:ref:`ref-eos`).
 * How to output thermodynamic and thermoelastic properties
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -47,7 +48,6 @@ from burnman import CombinedMineral
 
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.utils.chemistry import formula_to_string
-
 
 if __name__ == "__main__":
     """
