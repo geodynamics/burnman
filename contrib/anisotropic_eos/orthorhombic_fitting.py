@@ -398,8 +398,8 @@ if do_plotting:
         f'the isotropic model: $V_0$: {m.params["V_0"]*1.e6:.5f} cm$^3$/mol, '
         f'$K_0$: {m.params["K_0"]/1.e9:.5f} GPa, '
         f'$K\'_0$: {m.params["Kprime_0"]:.5f}, '
-        f'$\Theta_0$: {m.params["Debye_0"]:.5f} K, '
-        f'$\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
+        f'$\\Theta_0$: {m.params["Debye_0"]:.5f} K, '
+        f'$\\gamma_0$: {m.params["grueneisen_0"]:.5f}, '
         f'and $q_0$: {m.params["q_0"]:.5f}.'
     )
 
