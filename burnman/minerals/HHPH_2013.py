@@ -650,7 +650,7 @@ class hed(Mineral):
 
 class jd(Mineral):
     def __init__(self):
-        formula = "NaAlSiO6"
+        formula = "NaAlSi2O6"
         formula = dictionarize_formula(formula)
         self.params = {
             "name": "jd",
@@ -794,7 +794,7 @@ class fscf(Mineral):
 
 class nacf(Mineral):
     def __init__(self):
-        formula = "NaAlSiO6"
+        formula = "NaAlSiO4"
         formula = dictionarize_formula(formula)
         self.params = {
             "name": "nacf",
