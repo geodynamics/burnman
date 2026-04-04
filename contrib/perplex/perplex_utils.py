@@ -1075,7 +1075,7 @@ def merge_bounds(bounds_list):
     ]
 
 
-def pretty_plot_phase_diagram(
+def pretty_plot_phase_diagram_old(
     ax,
     werami_mode_tab_filenames,
     phase_name_replacements,
@@ -1225,6 +1225,162 @@ def pretty_plot_phase_diagram(
 
     ax.set_xlim(bounds[0])
     ax.set_ylim(bounds[1])
+    ax.grid(True, linestyle="--", color="gray", alpha=0.7)
+    ax.set_axisbelow(False)
+
+    return unique_small_fields
+
+
+def pretty_plot_phase_diagram(
+    ax,
+    werami_mode_tab_filenames,
+    phase_name_replacements,
+    bounding_colors=["#44015a", "#ffffff"],
+    n_phases_bounds=[2, 10],
+    smoothing_window=4,
+    smoothing_order=1,
+    linewidth=0.5,
+    label_scaling=3.0,
+    label_clearance=0.01,
+    number_small_fields=True,
+    mask_polygon=None,
+):
+    """
+    Plot the Perple_X calculated phase diagram on a matplotlib axis.
+
+    :param ax: Matplotlib Axes object to plot on.
+    :type ax: matplotlib.axes.Axes
+    :param werami_mode_tab_filenames: Paths to mode tab files.
+    :type werami_mode_tab_filenames: List[str]
+    :param phase_name_replacements: Dict mapping phase names to replacement names.
+    :type phase_name_replacements: dict[str, str]
+    :param bounding_colors: List of two colors for bounding colormap.
+    :type bounding_colors: [str, str]
+    :param n_phases_bounds: Minimum and maximum number of phases for the colormap.
+    :type n_phases_bounds: [int, int]
+    :param smoothing_window: Savitzky-Golay smoothing window length.
+    :type smoothing_window: int
+    :param smoothing_order: Savitzky-Golay smoothing polynomial order.
+    :type smoothing_order: int
+    :param linewidth: Linewidth for the edges of fields.
+    :type linewidth: float
+    :param label_scaling: Scaling factor corresponding to an
+    approximate value of the width:height ratio of the label.
+    :type label_scaling: float
+    :param label_clearance: Only plot the label if there is a certain
+    clearance between the center and the edge of the field.
+    Scaled to the height of the domain.
+    :type label_clearance: float
+    :param number_small_fields: Replace assemblage labels with numbers if
+    there is not enough clearance around the label.
+    :type number_small_fields: bool
+    :param mask_polygon: 2D array of points (P in Pa, T in K),
+    defining a polygon to mask out.
+    :type mask_polygon: 2D numpy array
+    :return: List of assemblages corresponding to numbered small fields.
+    :rtype: [str]
+    """
+
+    polygon_data = []
+    bounds = []
+
+    for werami_mode_tab_filename in werami_mode_tab_filenames:
+        polygon_data_i, bounds_i = get_fields_assemblages_and_bounds(
+            werami_mode_tab_filename,
+            phase_name_replacements,
+            smoothing_window,
+            smoothing_order,
+            mask_polygon,
+        )
+        polygon_data.extend(polygon_data_i)
+        bounds.append(bounds_i)
+
+    polygon_data = merge_polygons_by_label(polygon_data)
+    bounds = merge_bounds(bounds)
+
+    P_range = bounds[0][1] - bounds[0][0]
+    T_range = bounds[1][1] - bounds[1][0]
+
+    ax.set_facecolor("white")
+
+    n_phases_min, n_phases_max = n_phases_bounds
+    n_phases_range = np.arange(n_phases_min, n_phases_max + 1)
+
+    # Generate N colors from the original colormap
+    base_cmap = LinearSegmentedColormap.from_list("base", bounding_colors)
+    discrete_colors = [
+        base_cmap(i / (len(n_phases_range) - 1)) for i in range(len(n_phases_range))
+    ]
+
+    # Create a discrete ListedColormap
+    cmap = ListedColormap(discrete_colors)
+    boundaries = np.arange(
+        n_phases_min - 0.5, n_phases_max + 1.5, 1
+    )  # one bin per phase count
+    norm = BoundaryNorm(boundaries, cmap.N)
+
+    # ScalarMappable for colorbar
+    sm = ScalarMappable(cmap=cmap, norm=norm)
+
+    small_fields = []
+    large_fields = set()
+    for polygon in polygon_data:
+
+        color = cmap(norm(polygon["n_phases"]))
+
+        contour = polygon["contour"]
+        ax.fill(
+            contour[:, 1],
+            contour[:, 0],
+            color=color,
+            linewidth=0,
+            edgecolor="none",
+            zorder=2,
+        )
+
+        for edge in polygon["edges"]:
+            ax.plot(edge[:, 1], edge[:, 0], c="black", linewidth=linewidth)
+
+        label_pos, label_dist = get_label_position_from_polygon_contour(
+            contour, T_range, P_range, label_scaling
+        )
+
+        if label_dist > label_clearance:
+            large_fields.add(polygon["label"])
+            ax.text(*label_pos, polygon["label"], fontsize=6, ha="center", va="center")
+        elif number_small_fields:
+            if len(polygon["edges"]) > 0:
+                small_fields.append([label_pos, polygon["label"]])
+
+    unique_ids = {}
+    unique_small_fields = []
+    i = 1
+    for _, label in small_fields:
+        if label not in unique_ids.keys() and label not in large_fields:
+            unique_ids[label] = i
+            unique_small_fields.append(label)
+            i = i + 1
+
+    for label_pos, label in small_fields:
+        try:
+            ax.text(
+                *label_pos,
+                f"{unique_ids[label]:02d}",
+                fontsize=6,
+                ha="center",
+                va="center",
+            )
+        except KeyError:
+            pass
+
+    cbar = plt.colorbar(sm, ax=ax, boundaries=boundaries, ticks=n_phases_range)
+    cbar.set_label("n phases")
+
+    ax.set_ylabel("Pressure (GPa)")
+    ax.set_xlabel("Temperature (K)")
+
+    ax.set_xlim(bounds[1])
+    ax.set_ylim(bounds[0])
     ax.grid(True, linestyle="--", color="gray", alpha=0.7)
     ax.set_axisbelow(False)
 
