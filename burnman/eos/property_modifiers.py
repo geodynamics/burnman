@@ -659,6 +659,13 @@ def _einstein_delta_excesses(pressure, temperature, params):
 def _volume_ww_excesses(pressure, temperature, params):
     """
     Exponential (WW) volume-based correction expressed in Gibbs space.
+    The pressure-dependent volume correction follows Wu et al. (2008)
+    [JGR Solid Earth, doi:10.1029/2007JB005275], where
+    delta V = delta V0 * exp(-P / Pc) was introduced for the MgO
+    pressure scale. Marcondes and Wentzcovitch (2015)
+    [J. Appl. Phys., doi:10.1063/1.4921904] refer to this as the
+    Wu-Wentzcovitch (WW) correction and compare it with related
+    hybrid ab-initio/experimental EoS correction schemes.
 
     Parameters in ``params``:
     dV0
